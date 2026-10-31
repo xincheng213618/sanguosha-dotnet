@@ -70,14 +70,14 @@ internal sealed partial class CoreNativeActionDispatchRuntime
             return;
         if (_characterGuanYuWumiaoOperations.TryExecuteWuyouIdentityUse(actor, card, action))
             return;
-        if (_coreSingleCardTrickConversionsOperations.TryExecuteSingleCardTrickConversion(actor, card, action))
+        if (_coreSingleCardTrickConversionsOperations.Value.TryExecuteSingleCardTrickConversion(actor, card, action))
             return;
         card = _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, card, action.ConversionSource);
         switch (action.Kind)
         {
             case LegalActionKind.Recast:
                 if (action.ConversionSource is { } recastSource)
-                    _coreActualTurnViewAsOperations.ConsumeActualTurnLimitedViewAs(recastSource);
+                    _coreActualTurnViewAsOperations.Value.ConsumeActualTurnLimitedViewAs(recastSource);
                 _coreCardActionsOperations.ResolveRecast(actor, card, action.PlayedCardKind);
                 break;
             case LegalActionKind.Slash:
@@ -117,7 +117,7 @@ internal sealed partial class CoreNativeActionDispatchRuntime
                 _coreNativeTrickUseOperations.ResolveDrawTwo(actor, card);
                 break;
             case LegalActionKind.AllianceFeast:
-                _coreHulaoCardsOperations.ResolveAllianceFeast(actor, card);
+                _coreHulaoCardsOperations.Value.ResolveAllianceFeast(actor, card);
                 break;
             case LegalActionKind.SowBeans:
                 _coreShenwuCardsOperations.ResolveShenwuSowBeans(actor, card);

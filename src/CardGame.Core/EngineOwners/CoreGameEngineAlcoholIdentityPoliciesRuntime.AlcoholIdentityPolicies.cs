@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEngineAlcoholIdentityPoliciesRuntime
     {
         if (!HasDyingAlcoholProducer(trigger))
             return true;
-        if (context.Window is not (SkillProgramTriggerWindow.DyingResponse or SkillProgramTriggerWindow.SelfDyingResponse) || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.FrameId != context.ParentFrameId || dying.ResponderSeat != responder || context.TargetSeat != dying.VictimSeat)
+        if (context.Window is not (SkillProgramTriggerWindow.DyingResponse or SkillProgramTriggerWindow.SelfDyingResponse) || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.FrameId != context.ParentFrameId || dying.ResponderSeat != responder || context.TargetSeat != dying.VictimSeat)
             return false;
         // A pile provider does not use Wine: its exact dying victim is the actor.
         return !_characterZhouYuOlMouOperations.MouGuquPhysicalUseForbidden(dying.VictimSeat, []) && !IsForeignTurnAlcoholUseForbidden(dying.VictimSeat, CardKind.Alcohol, CardActionType.Use);
@@ -49,18 +49,18 @@ internal sealed partial class CoreGameEngineAlcoholIdentityPoliciesRuntime
         var trigger = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
         if (!HasDyingAlcoholProducer(trigger))
             return null;
-        if (!CanRunProgramDyingAlcoholPolicy(trigger, context, candidate.OwnerSeat) || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying)
+        if (!CanRunProgramDyingAlcoholPolicy(trigger, context, candidate.OwnerSeat) || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying)
             throw new InvalidOperationException("A prohibited Wine producer cannot issue a dying-use permission.");
         return new(dying.FrameId, dying.VictimSeat, candidate.OwnerSeat, candidate.SkillId, candidate.BindingId, candidate.SkillInstanceId, candidate.GameplayHash, context.Window);
     }
 
     internal bool HasFrozenProgramDyingAlcoholPermission(ProgramSkillFrame frame, SkillProgramEffectOp op)
     {
-        if (frame.DyingAlcoholPermission is not { } permission || frame.WindowContext is not { } context || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || permission.DyingFrameId != dying.FrameId || context.ParentFrameId != dying.FrameId || permission.ActorSeat != dying.VictimSeat || permission.ResponderSeat != dying.ResponderSeat || permission.ResponderSeat != frame.OwnerSeat || permission.SkillId != frame.SkillId || permission.BindingId != frame.TriggerId || permission.SkillInstanceId != frame.SkillInstanceId || permission.GameplayHash != frame.GameplayHash || permission.Window != context.Window || context.TargetSeat != dying.VictimSeat || context.Window != (op == SkillProgramEffectOp.UseVirtualDyingAlcohol ? SkillProgramTriggerWindow.SelfDyingResponse : SkillProgramTriggerWindow.DyingResponse))
+        if (frame.DyingAlcoholPermission is not { } permission || frame.WindowContext is not { } context || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || permission.DyingFrameId != dying.FrameId || context.ParentFrameId != dying.FrameId || permission.ActorSeat != dying.VictimSeat || permission.ResponderSeat != dying.ResponderSeat || permission.ResponderSeat != frame.OwnerSeat || permission.SkillId != frame.SkillId || permission.BindingId != frame.TriggerId || permission.SkillInstanceId != frame.SkillInstanceId || permission.GameplayHash != frame.GameplayHash || permission.Window != context.Window || context.TargetSeat != dying.VictimSeat || context.Window != (op == SkillProgramEffectOp.UseVirtualDyingAlcohol ? SkillProgramTriggerWindow.SelfDyingResponse : SkillProgramTriggerWindow.DyingResponse))
             return false;
         var trigger = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!.Triggers.Single(t => t.Id == frame.TriggerId);
         return ProgramInstructionResolver.Default.Features(trigger).HasOperation(op);
     }
 
-    internal bool CanUseProgramDyingAlcohol(ProgramSkillFrame frame, SkillProgramEffectOp op) => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && !_characterZhouYuOlMouOperations.MouGuquPhysicalUseForbidden(dying.VictimSeat, []) && (HasFrozenProgramDyingAlcoholPermission(frame, op) || !IsForeignTurnAlcoholUseForbidden(dying.VictimSeat, CardKind.Alcohol, CardActionType.Use));
+    internal bool CanUseProgramDyingAlcohol(ProgramSkillFrame frame, SkillProgramEffectOp op) => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && !_characterZhouYuOlMouOperations.MouGuquPhysicalUseForbidden(dying.VictimSeat, []) && (HasFrozenProgramDyingAlcoholPermission(frame, op) || !IsForeignTurnAlcoholUseForbidden(dying.VictimSeat, CardKind.Alcohol, CardActionType.Use));
 }

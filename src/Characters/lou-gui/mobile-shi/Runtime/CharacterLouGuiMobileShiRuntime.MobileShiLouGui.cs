@@ -50,13 +50,13 @@ internal sealed partial class CharacterLouGuiMobileShiRuntime
         FinishShiLgOperation(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }
 
-    internal int ShiLgJiYuUsesThisPhase(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLgJiYuCostPaidEvent>().Count(entry => entry.OwnerSeat == seat && entry.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber);
+    internal int ShiLgJiYuUsesThisPhase(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLgJiYuCostPaidEvent>().Count(entry => entry.OwnerSeat == seat && entry.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber);
     internal bool ShiLgJiYuGainsAllUsed(int seat)
     {
-        var lastActivation = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLgJiYuCostPaidEvent>().Where(entry => entry.OwnerSeat == seat && entry.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber).Select(entry => entry.FrameId).LastOrDefault();
+        var lastActivation = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLgJiYuCostPaidEvent>().Where(entry => entry.OwnerSeat == seat && entry.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber).Select(entry => entry.FrameId).LastOrDefault();
         if (lastActivation == 0)
             return false;
-        var gained = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLgJiYuGainedEvent>().Where(entry => entry.FrameId == lastActivation).Select(entry => entry.CardId).Distinct();
+        var gained = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLgJiYuGainedEvent>().Where(entry => entry.FrameId == lastActivation).Select(entry => entry.CardId).Distinct();
         return gained.All(cardId => _cardZonesOperations._cardZones.GetLocation(cardId)is not { Zone: CardZoneKind.Hand, OwnerSeat: var owner } || owner != seat);
     }
 

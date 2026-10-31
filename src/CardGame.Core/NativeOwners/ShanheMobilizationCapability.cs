@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class ShanheMobilizationCapability(Func<RuntimeEntries.CoreGameEngineShanheMobilizationEntries> getCoreGameEngineShanheMobilizationRuntime) : IShanheMobilizationHost
+internal sealed class ShanheMobilizationCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheMobilizationRuntime>> getCoreGameEngineShanheMobilizationRuntime) : IShanheMobilizationHost
 {
-    public SkillProgramStepOutcome ReviveRoundAllies(ProgramSkillFrame frame) => getCoreGameEngineShanheMobilizationRuntime().BeginShanheMobilization(frame);
+    public SkillProgramStepOutcome ReviveRoundAllies(ProgramSkillFrame frame) => getCoreGameEngineShanheMobilizationRuntime().Value.BeginShanheMobilization(frame);
 }

@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
         if (op == SkillProgramEffectOp.ResolveAnniversaryMaTieQuxian)
             return _characterMaTieAnniversaryOperations.AnniversaryMaTieRequestActor(f, actor);
         if (op == SkillProgramEffectOp.RequestAnniversaryLeiBoSileiSlash)
-            return actor == f.OwnerSeat && _characterLeiBoAnniversaryOperations.IsAnniversaryLeiBoFixedSlash(f);
+            return actor == f.OwnerSeat && _characterLeiBoAnniversaryOperations.Value.IsAnniversaryLeiBoFixedSlash(f);
         if (op == SkillProgramEffectOp.ResolveSayingPlayStartObtainAndReply)
             return _characterSunYuanOlOperations.TryGetSayingSlashRequest(f, out var sayingActor, out _) && actor == sayingActor;
         if (op is SkillProgramEffectOp.ResolveChanshuangSimultaneousChoices or SkillProgramEffectOp.ResolveChanshuangEnding)
@@ -129,7 +129,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash), programSkillCardUseFrameId: f.Id);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, target, IgnoresArmor: attack.IgnoresArmor));

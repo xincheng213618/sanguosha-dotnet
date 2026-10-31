@@ -9,7 +9,7 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
     internal bool HasWuHuangFuSongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveWuHuangFuSongChaozhen) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveWuHuangFuSongLianjie) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ArmWuHuangFuSongJiangxian);
 
     internal WuHuangFuSongTurn WuHfTurn() => new(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat);
-    internal bool WuHfTurnOpen(WuHuangFuSongTurn t) => t == WuHfTurn() && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == t.Number && e.OwnerSeat == t.OwnerSeat);
+    internal bool WuHfTurnOpen(WuHuangFuSongTurn t) => t == WuHfTurn() && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == t.Number && e.OwnerSeat == t.OwnerSeat);
     internal static CardConversionSource WuHfSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_huangfu_song_wumiao_WuHuangFuSong.WuHfSource(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 30000, SkillProgramEffectOp.ResolveWuHuangFuSongChaozhen, SkillProgramEffectOp.ResolveWuHuangFuSongLianjie, SkillProgramEffectOp.SettleWuHuangFuSongJiangxian)]
     internal bool CanOfferWuHuangFuSong(ProgramTriggerCandidate candidate, SkillProgramTrigger t, ProgramSkillWindowContext c)
@@ -248,7 +248,7 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
     internal void FinishWuHf(ProgramSkillFrame f)
     {
         var r = f.WuHuangFuSong!;
-        if (r.Operation == SkillProgramEffectOp.SettleWuHuangFuSongJiangxian && !_coreProgramEventHistoryOperations.ProgramEventHistory<WuHuangFuSongJiangxianSettledEvent>().Any(e => e.OwnerSeat == f.OwnerSeat && e.Turn == r.Turn))
+        if (r.Operation == SkillProgramEffectOp.SettleWuHuangFuSongJiangxian && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHuangFuSongJiangxianSettledEvent>().Any(e => e.OwnerSeat == f.OwnerSeat && e.Turn == r.Turn))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuHuangFuSongJiangxianSettledEvent(f.Id, f.OwnerSeat, null, r.Turn));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuHuangFuSongCompletedEvent(f.Id, r.Operation, r.Paid));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuHuangFuSong = null, PendingMovementContinuation = null });

@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEnginePublicPilePreparationReceiptsRuntime
         return awaiting ? f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } pending && pending.SubjectSeat == f.OwnerSeat : f.PendingMovementContinuation is null;
     }
 
-    internal bool PublicPilePreparationPaymentDestination(ProgramSkillFrame f, CardMovementRecord movement, CardLocation destination) => movement.To == destination || f.PublicPilePreparation is { Operation: SkillProgramEffectOp.StoreNonBasicOwnedPublicPile, Pile: { } pile } receipt && destination == pile.Location && movement.From == CardLocation.Equipment(f.OwnerSeat) && movement.Sequence > receipt.Before && movement.Sequence <= receipt.After && movement.Reason.Value == CoreGameEnginePublicPilePreparationRuntime.PreparationReason(f, "payment") && _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == movement.CardId && fact.MovementSequence == movement.Sequence && fact.ParentFrameId == f.Id) == 1;
+    internal bool PublicPilePreparationPaymentDestination(ProgramSkillFrame f, CardMovementRecord movement, CardLocation destination) => movement.To == destination || f.PublicPilePreparation is { Operation: SkillProgramEffectOp.StoreNonBasicOwnedPublicPile, Pile: { } pile } receipt && destination == pile.Location && movement.From == CardLocation.Equipment(f.OwnerSeat) && movement.Sequence > receipt.Before && movement.Sequence <= receipt.After && movement.Reason.Value == CoreGameEnginePublicPilePreparationRuntime.PreparationReason(f, "payment") && _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Count(fact => fact.CardId == movement.CardId && fact.MovementSequence == movement.Sequence && fact.ParentFrameId == f.Id) == 1;
     internal bool PublicPilePreparationFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.PublicPilePreparation is not { } r || !ValidPublicPilePreparation(f))
@@ -95,7 +95,7 @@ internal sealed partial class CoreGameEnginePublicPilePreparationReceiptsRuntime
                     break;
                 }
 
-                if (_resolutionStackOperations._resolutionStack[n] is DyingFrame dying && n + 1 < _resolutionStackOperations._resolutionStack.Count && ((_coreDyingSuitsAndHistoricalUseObserversOperations.IsOriginalDyingSuspendedByDyingSuits(dying) || _coreRecipientCategoryMarkContinuationsOperations.IsOriginalDyingSuspendedByRecipientCategoryMark(dying)) || _coreOwnedDeathBenefitReturnsOperations.IsOriginalDyingSuspendedByOwnedDeathBenefit(dying) || _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(n, dying) || _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(n, dying) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(n, dying) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(n, dying)))
+                if (_resolutionStackOperations._resolutionStack[n] is DyingFrame dying && n + 1 < _resolutionStackOperations._resolutionStack.Count && ((_coreDyingSuitsAndHistoricalUseObserversOperations.IsOriginalDyingSuspendedByDyingSuits(dying) || _coreRecipientCategoryMarkContinuationsOperations.Value.IsOriginalDyingSuspendedByRecipientCategoryMark(dying)) || _coreOwnedDeathBenefitReturnsOperations.Value.IsOriginalDyingSuspendedByOwnedDeathBenefit(dying) || _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(n, dying) || _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(n, dying) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(n, dying) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(n, dying)))
                     break;
             }
 
@@ -106,5 +106,5 @@ internal sealed partial class CoreGameEnginePublicPilePreparationReceiptsRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 250)]
-    internal bool IsPublicPilePreparationProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && PublicPilePreparationObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsPublicPilePreparationProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && PublicPilePreparationObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

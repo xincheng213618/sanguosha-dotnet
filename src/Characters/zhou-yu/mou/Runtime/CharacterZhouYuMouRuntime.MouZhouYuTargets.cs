@@ -49,7 +49,7 @@ internal sealed partial class CharacterZhouYuMouRuntime
     internal bool MouZySuffix(int i) => _resolutionStackOperations._resolutionStack[i + 1] is DyingFrame d && i + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _characterZhouYuMouOperations.MouZyEdge(n), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? MouZyObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterZhouYuMouOperations.MouZyFirstChild(f, c), (n) => _characterZhouYuMouOperations.MouZySuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36000)]
-    internal bool MouZyDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouZyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
+    internal bool MouZyDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && MouZyObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36000)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 36000)]
     internal bool MouZyRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

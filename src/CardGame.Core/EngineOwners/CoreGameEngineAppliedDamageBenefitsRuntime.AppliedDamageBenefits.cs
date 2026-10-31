@@ -29,7 +29,7 @@ internal sealed partial class CoreGameEngineAppliedDamageBenefitsRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == active.Id);
         if (active.AppliedDamageBenefit is not null || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame damage || active.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || context.ParentFrameId != damage.Id || context.DamageFrameId != damage.ParentFrameId || context.TargetSeat != damage.TargetSeat || damage.TriggerWindow != context.Window || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("An applied-damage Draw requires its exact actual producer and frozen current candidate.");
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage);
         if (!attack.DamageWasApplied || attack.DamageAmount <= 0 || context.Amount != attack.DamageAmount)
             throw new InvalidOperationException("An applied-damage benefit requires positive actual applied damage.");
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId))

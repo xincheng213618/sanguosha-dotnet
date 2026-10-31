@@ -9,14 +9,14 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
     internal const string ShiKaijiDraw = "skill-program.mobile:shi-kaiji.recipient-draw";
     internal static CardConversionSource ShiWangChangSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static CardKind ShiWangChangName(CardKind kind) => kind is CardKind.FireSlash or CardKind.ThunderSlash ? CardKind.Slash : kind;
-    internal int ShiKaijiMaximum() => Math.Max(1, _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Select(e => e.VictimSeat).Distinct().Count(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive));
+    internal int ShiKaijiMaximum() => Math.Max(1, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDyingEvent>().Select(e => e.VictimSeat).Distinct().Count(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive));
     internal CardUseFrame? ShiShepanUse(ProgramSkillWindowContext c, int owner) => c is { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects, CardUse: { } identity } && _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } window && window.ParentFrameId == identity.ParentCardUseFrameId && window.Action.ActionId == identity.CardActionId && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { Action: { Type: CardActionType.Use } a } use && a.ActorSeat != owner && a.ActorSeat == c.SourceSeat && a.ActionId == identity.CardActionId && use.TargetSeats.Contains(owner) && c.TargetSeat == owner && CoreGameEngineMouLuMengRuntime.IsDamageCardKind(a.EffectiveKind) ? use : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 47400)]
     internal bool CanOfferShiWangChang(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (candidate.SkillId != ShiShepan)
             return true;
-        return ShiShepanUse(context, candidate.OwnerSeat)is { } use && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiShepanChosenEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillInstanceId == candidate.SkillInstanceId && e.GameplayHash == candidate.GameplayHash && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.Name == ShiWangChangName(use.CardKind));
+        return ShiShepanUse(context, candidate.OwnerSeat)is { } use && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiShepanChosenEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillInstanceId == candidate.SkillInstanceId && e.GameplayHash == candidate.GameplayHash && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.Name == ShiWangChangName(use.CardKind));
     }
 
     SkillProgramStepOutcome IMobileShiWangChangHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => ResolveShiWangChang(frame, op);
@@ -216,7 +216,7 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
             else
             {
                 states.Add(new(instance.SkillInstanceId, "shepan-adjust", ProgramPublicRuleStateKind.ActivationLimit, 1, _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, skillId, "shepan-adjust@" + instance.SkillInstanceId, SkillUsageScope.Turn), SkillUsageScope.Turn));
-                states.AddRange(_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiShepanChosenEvent>().Where(e => e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.Source.OwnerSeat == owner.Seat && e.Source.SkillInstanceId == instance.SkillInstanceId).Select(e => e.Name).Distinct().Select(kind => new ProgramPublicRuleStateSnapshot(instance.SkillInstanceId, "shepan-name-" + kind, ProgramPublicRuleStateKind.ActivationLimit, 1, 1, SkillUsageScope.Round)));
+                states.AddRange(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiShepanChosenEvent>().Where(e => e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.Source.OwnerSeat == owner.Seat && e.Source.SkillInstanceId == instance.SkillInstanceId).Select(e => e.Name).Distinct().Select(kind => new ProgramPublicRuleStateSnapshot(instance.SkillInstanceId, "shepan-name-" + kind, ProgramPublicRuleStateKind.ActivationLimit, 1, 1, SkillUsageScope.Round)));
             }
         }
 

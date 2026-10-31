@@ -20,7 +20,7 @@ internal sealed partial class CharacterTaiShiCiMobileShiRuntime
 
     bool IShiTaiShiCiFacts.HasActivationOperation(SkillProgramEffectOp operation) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(operation);
     ContentSkillDefinition IShiTaiShiCiFacts.Skill(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId);
-    IEnumerable<T> IShiTaiShiCiFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IShiTaiShiCiFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     IReadOnlyList<CardMovementRecord> IShiTaiShiCiFacts.Movements => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.AsReadOnly();
 
     int IShiTaiShiCiFacts.LieScanSequence => _characterTaiShiCiMobileShiShiTzLieScanSequenceAccess._shiTzLieScanSequence;

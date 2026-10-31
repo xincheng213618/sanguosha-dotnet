@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEnginePhaseStartCardControlObserversRuntim
 {
     internal bool PhaseStartCardControlFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
-        if (root.PhaseStartCardControl is not { Payment: { } payment } receipt || !_corePhaseStartCardControlOperations.HasExactPhaseStartCardControl(root))
+        if (root.PhaseStartCardControl is not { Payment: { } payment } receipt || !_corePhaseStartCardControlOperations.Value.HasExactPhaseStartCardControl(root))
             return false;
         if (child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged)
             return skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex <= skills.Candidates.Count && (receipt.Stage == PhaseStartCardControlStage.MovementChildren && root.PendingMovementContinuation is not null || receipt.Stage == PhaseStartCardControlStage.GrantChildren && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<OtherPlayRestrictionGrantedEvent>().Any(e => e.ProgramFrameId == root.Id && e.Source == receipt.Source));
@@ -24,7 +24,7 @@ internal sealed partial class CoreGameEnginePhaseStartCardControlObserversRuntim
 
     internal ProgramSkillFrame? PhaseStartCardControlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.PhaseStartCardControlFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 220)]
-    internal bool IsPhaseStartCardControlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PhaseStartCardControlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsPhaseStartCardControlDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && PhaseStartCardControlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 50)]
     internal bool TryAdvancePhaseStartCardControlSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && PhaseStartCardControlObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

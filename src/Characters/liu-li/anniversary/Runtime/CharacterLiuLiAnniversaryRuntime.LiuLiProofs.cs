@@ -6,14 +6,14 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     internal bool LiuLiOriginal(ProgramSkillFrame f)
     {
         if (f.SkillId == AnniversaryLiuLiComposition.Fuli)
-            return f.TriggerId is null && f.ActivationId == "reveal-discard-draw" && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.ActivationId == f.ActivationId) == 1;
-        return f.SkillId == AnniversaryLiuLiComposition.Dehua && f.ActivationId == f.TriggerId && f.TriggerId == "round-damage-name" && f.WindowContext is { Window: SkillProgramTriggerWindow.RoundStarting } c && c.OwnerSeat == f.OwnerSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == c.ParentFrameId)is ProgramLifecycleTriggerWindowFrame w && w.Window == c.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.SkillInstanceId == f.SkillInstanceId && e.BindingId == f.TriggerId && e.Window == c.Window) == 1;
+            return f.TriggerId is null && f.ActivationId == "reveal-discard-draw" && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.ActivationId == f.ActivationId) == 1;
+        return f.SkillId == AnniversaryLiuLiComposition.Dehua && f.ActivationId == f.TriggerId && f.TriggerId == "round-damage-name" && f.WindowContext is { Window: SkillProgramTriggerWindow.RoundStarting } c && c.OwnerSeat == f.OwnerSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == c.ParentFrameId)is ProgramLifecycleTriggerWindowFrame w && w.Window == c.Window && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex]) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.SkillInstanceId == f.SkillInstanceId && e.BindingId == f.TriggerId && e.Window == c.Window) == 1;
     }
 
     internal bool LiuLiDiscardProof(ProgramSkillFrame f)
     {
         var r = f.AnniversaryLiuLi!;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiDiscardPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid.Category != r.Category || paid.Count != r.Cards.Count || paid.NameSum != r.NameSum || paid.DamageDiscarded != r.DamageDiscarded || paid.Before != paid.After || paid.Before < 0 || paid.Before > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Cards.Count == 0)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiDiscardPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid.Category != r.Category || paid.Count != r.Cards.Count || paid.NameSum != r.NameSum || paid.DamageDiscarded != r.DamageDiscarded || paid.Before != paid.After || paid.Before < 0 || paid.Before > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Cards.Count == 0)
             return false;
         var materials = r.Cards.Select(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > paid.Before && m.CardId == id && m.From == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == LiuLiDiscardReason && (m.To == CardLocation.DiscardPile || _coreProgramAtomicCardMovesOperations.IsRedirectedPaidDiscardMovement(m, CardLocation.Hand(f.OwnerSeat), new CardMoveReason(LiuLiDiscardReason)))).ToArray()).ToArray();
         // The payment is frozen before its first move fact. No child may use
@@ -25,7 +25,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
 
     internal bool ValidLiuLi(ProgramSkillFrame f)
     {
-        if (f.AnniversaryLiuLi is not { } r || r.Source != LiuLiSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || r.ParentId != (f.WindowContext?.ParentFrameId ?? 0) || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Round != _coreActualRoundProgressRoundNumberAccess._roundNumber || !LiuLiOriginal(f) || !Enum.IsDefined(r.Stage) || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Cards.Distinct().Count() != r.Cards.Count || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var start] || start != new AnniversaryLiuLiStartedEvent(f.Id, r.Source, r.Hash, r.ParentId, r.Turn, r.Round))
+        if (f.AnniversaryLiuLi is not { } r || r.Source != LiuLiSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || r.ParentId != (f.WindowContext?.ParentFrameId ?? 0) || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.Round != _coreActualRoundProgressRoundNumberAccess._roundNumber || !LiuLiOriginal(f) || !Enum.IsDefined(r.Stage) || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Cards.Distinct().Count() != r.Cards.Count || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var start] || start != new AnniversaryLiuLiStartedEvent(f.Id, r.Source, r.Hash, r.ParentId, r.Turn, r.Round))
             return false;
         if (f.SkillId == AnniversaryLiuLiComposition.Dehua)
         {
@@ -39,9 +39,9 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
                 return false;
             if (r.Stage == AnniversaryLiuLiStage.IssuingUse)
                 return r.UseId == 0 && r.ActionId == 0;
-            if (r.UseId <= f.Id || r.ActionId <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiNativeIssuedEvent>().Count(e => e == new AnniversaryLiuLiNativeIssuedEvent(f.Id, r.UseId, r.ActionId, p.Kind)) != 1)
+            if (r.UseId <= f.Id || r.ActionId <= 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiNativeIssuedEvent>().Count(e => e == new AnniversaryLiuLiNativeIssuedEvent(f.Id, r.UseId, r.ActionId, p.Kind)) != 1)
                 return false;
-            return r.Stage == AnniversaryLiuLiStage.NativeUse || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == p.Kind) == 1;
+            return r.Stage == AnniversaryLiuLiStage.NativeUse || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == p.Kind) == 1;
         }
 
         if (r.Stage is AnniversaryLiuLiStage.Revealing or AnniversaryLiuLiStage.Category)
@@ -50,13 +50,13 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
             return false;
         if (r.Stage == AnniversaryLiuLiStage.CostChildren)
             return r.Draw is null;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiDrawIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var issued] || issued.NameSum != r.NameSum || issued.Count != r.DrawCount || issued.Count != Math.Min(issued.NameSum, issued.MaximumHandCount) || issued.MaximumHandCount < 0)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiDrawIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var issued] || issued.NameSum != r.NameSum || issued.Count != r.DrawCount || issued.Count != Math.Min(issued.NameSum, issued.MaximumHandCount) || issued.MaximumHandCount < 0)
             return false;
         if (r.Stage == AnniversaryLiuLiStage.Drawing)
             return r.DrawCount > 0 && r.Draw is null;
         if (r.Stage is not (AnniversaryLiuLiStage.DrawChildren or AnniversaryLiuLiStage.RangeTarget or AnniversaryLiuLiStage.Completed))
             return false;
-        return r.DrawCount == 0 ? r.Draw is null : r.Draw is { } draw && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.DrawCount && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiDrawReturnedEvent>().Count(e => e == new AnniversaryLiuLiDrawReturnedEvent(f.Id, r.DrawCount, draw.ActualDrawIds.Count, r.Before, r.After)) == 1;
+        return r.DrawCount == 0 ? r.Draw is null : r.Draw is { } draw && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == r.DrawCount && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiDrawReturnedEvent>().Count(e => e == new AnniversaryLiuLiDrawReturnedEvent(f.Id, r.DrawCount, draw.ActualDrawIds.Count, r.Before, r.After)) == 1;
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 43300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 43300)]

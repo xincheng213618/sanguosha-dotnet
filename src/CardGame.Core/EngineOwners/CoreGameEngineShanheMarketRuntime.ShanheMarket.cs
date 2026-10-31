@@ -38,7 +38,7 @@ internal sealed partial class CoreGameEngineShanheMarketRuntime
             var status = _coreMatchOutcomeStatusWinnerAccess._status;
             var depth = _resolutionStackOperations._resolutionStack.Count;
             var parent = _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id;
-            var discardQuote = _coreProgramHandLimitKindExemptionsOperations.CaptureShanheMarketDiscardQuote();
+            var discardQuote = _coreProgramHandLimitKindExemptionsOperations.Value.CaptureShanheMarketDiscardQuote();
             var bought = _shanheMarketOperations._shanheMarket.Submit(new Campaigns.BuyShanheMarketItemCommand(command.ChoiceId, command.ReplaceSkillId, _shanheMarketOperations._shanheMarket.Revision));
             if (!bought.Accepted)
                 throw new InvalidOperationException(bought.Error ?? "The validated market purchase changed before payment.");
@@ -105,7 +105,7 @@ internal sealed partial class CoreGameEngineShanheMarketRuntime
         }
     }
 
-    internal bool ValidShanheMarketPurchase(ShanheMarketPurchaseFrame f) => _shanheMarketOperations._shanheMarket is not null && _coreMatchDefinitionOptionsAccess._options.ShanheBattle?.MarketSetup is not null && f.MarketRevision == _shanheMarketOperations._shanheMarket.Revision && f.GoldAfter == _shanheMarketOperations._shanheMarket.Snapshot.Gold && f.Price >= 0 && _shanheMarketOperations._shanheMarket.AcceptedCommands.LastOrDefault()is Campaigns.BuyShanheMarketItemCommand command && command.ChoiceId == f.ChoiceId && command.ReplaceSkillId == f.ReplaceSkillId && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheMarketPurchaseCommittedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var paid] && paid.MarketRevision == f.MarketRevision && paid.ChoiceId == f.ChoiceId && paid.RewardId == f.RewardId && paid.Price == f.Price && paid.GoldAfter == f.GoldAfter;
+    internal bool ValidShanheMarketPurchase(ShanheMarketPurchaseFrame f) => _shanheMarketOperations._shanheMarket is not null && _coreMatchDefinitionOptionsAccess._options.ShanheBattle?.MarketSetup is not null && f.MarketRevision == _shanheMarketOperations._shanheMarket.Revision && f.GoldAfter == _shanheMarketOperations._shanheMarket.Snapshot.Gold && f.Price >= 0 && _shanheMarketOperations._shanheMarket.AcceptedCommands.LastOrDefault()is Campaigns.BuyShanheMarketItemCommand command && command.ChoiceId == f.ChoiceId && command.ReplaceSkillId == f.ReplaceSkillId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheMarketPurchaseCommittedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var paid] && paid.MarketRevision == f.MarketRevision && paid.ChoiceId == f.ChoiceId && paid.RewardId == f.RewardId && paid.Price == f.Price && paid.GoldAfter == f.GoldAfter;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 62030)]
     internal bool AllowsShanheMarketAcquisition(ProgramTriggerLegalityContext gate)
     {
@@ -132,7 +132,7 @@ internal sealed partial class CoreGameEngineShanheMarketRuntime
     {
         if (program.SkillId != ShanheMarketPrograms.ExecutionSkillId)
             return false;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ShanheMarketPurchaseFrame market || program.WindowContext?.ParentFrameId != market.Id || market.ProgramFrameId != program.Id || !ValidShanheMarketPurchase(market) || !completed || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheMarketPurchaseAppliedEvent>().Count(e => e.PurchaseFrameId == market.Id && e.RewardId == market.RewardId) != 1)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ShanheMarketPurchaseFrame market || program.WindowContext?.ParentFrameId != market.Id || market.ProgramFrameId != program.Id || !ValidShanheMarketPurchase(market) || !completed || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheMarketPurchaseAppliedEvent>().Count(e => e.PurchaseFrameId == market.Id && e.RewardId == market.RewardId) != 1)
             throw new InvalidOperationException("A market acquisition did not return its exact applied purchase.");
         _coreRuntimeOperations.ReplaceRuntimeTop(market with { Applied = true });
         ContinueShanheMarketPurchase(market.Id);
@@ -146,11 +146,11 @@ internal sealed partial class CoreGameEngineShanheMarketRuntime
     };
     internal void RefreshShanheMarketSuspendedPrompt(ShanheMarketDiscardQuote? discardQuote)
     {
-        if (_coreTargetHandVisibilityOperations.RefreshVisibleTargetHandSelectionPrompt())
+        if (_coreTargetHandVisibilityOperations.Value.RefreshVisibleTargetHandSelectionPrompt())
             return;
         if (_coreShanheAlliedTricksOperations.RefreshShanheAlliedHarvestSelection())
             return;
-        if (_coreProgramHandLimitKindExemptionsOperations.RefreshShanheMarketDiscardPrompt(discardQuote))
+        if (_coreProgramHandLimitKindExemptionsOperations.Value.RefreshShanheMarketDiscardPrompt(discardQuote))
             return;
         if (_coreRevealedFireAttackPaymentOperations.RefreshRevealedFireAttackPaymentPrompt())
             return;
@@ -187,7 +187,7 @@ internal sealed partial class CoreGameEngineShanheMarketRuntime
                 Choices = _coreNativeNullificationOperations.CreateNullificationChoices(counter, actor, cards)
             };
         }
-        else if (pending.Kind == DecisionKind.RescueDying && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying)
+        else if (pending.Kind == DecisionKind.RescueDying && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying)
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             if (_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp > 0)

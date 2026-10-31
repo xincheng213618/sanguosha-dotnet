@@ -11,14 +11,14 @@ internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
     internal bool BoundaryDanshouFinalizedTargetWindows(ProgramTargetCardWindowQuery query) => HasBoundaryDanshou;
     internal void CaptureBoundaryDanshouUse(CardUseFrame use)
     {
-        if (!HasBoundaryDanshou || use.Action is { Type: not CardActionType.Use } || _coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().SingleOrDefault(e => e.OriginFrameId == use.Id && e.RoundActionType == CardActionType.Use && e.ProgramInstructionIndex is null)is not { } declared)
+        if (!HasBoundaryDanshou || use.Action is { Type: not CardActionType.Use } || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().SingleOrDefault(e => e.OriginFrameId == use.Id && e.RoundActionType == CardActionType.Use && e.ProgramInstructionIndex is null)is not { } declared)
             return;
         if (use.Action is { } a)
         {
-            if (a.ActorSeat != use.SourceSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == a.ActionId && e.Action.Type == CardActionType.Use))
+            if (a.ActorSeat != use.SourceSeat || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == a.ActionId && e.Action.Type == CardActionType.Use))
                 return;
             var actor = declared.ActorSeat;
-            foreach (var change in _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == use.Id))
+            foreach (var change in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == use.Id))
             {
                 if (change.PreviousActorSeat != actor || change.ProviderSeat != a.ProviderSeat)
                     return;
@@ -33,13 +33,13 @@ internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
         }
         else if (!_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use))
             return;
-        var old = _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryDanshouUseActorEvent>().LastOrDefault(e => e.UseId == use.Id);
+        var old = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryDanshouUseActorEvent>().LastOrDefault(e => e.UseId == use.Id);
         var next = new BoundaryDanshouUseActorEvent(use.Id, use.Action?.ActionId, declared.TurnNumber, declared.TurnOwnerSeat, use.SourceSeat, use.Action?.ProviderSeat ?? use.SourceSeat);
         if (old != next)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(next);
         var targets = use.Action?.EffectiveDesignatedTargetSeats ?? (use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Where((_, i) => i % 2 == 0).ToArray() : use.TargetSeats);
         foreach (var target in targets.Distinct().Where(_coreTableSeatQueriesOperations.IsValidPlayerSeat))
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryDanshouUseTargetEvent>().Any(e => e.UseId == use.Id && e.Target == target))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryDanshouUseTargetEvent>().Any(e => e.UseId == use.Id && e.Target == target))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryDanshouUseTargetEvent(use.Id, declared.TurnNumber, declared.TurnOwnerSeat, target));
     }
 
@@ -50,7 +50,7 @@ internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
             return;
         // The original native legacy Duel owns its attack on the producing
         // program instruction instead of manufacturing a CardUse/Action.
-        if (payload is CurrentTurnCardUseKindsRecordedEvent { RoundActionType: CardActionType.Use, ProgramInstructionIndex: { } instruction } direct && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == direct.OriginFrameId)is { } producer && producer.InstructionIndex == instruction && _coreProgramVirtualDuelOperations.FrozenProgramDuelInstructionIndex(producer.Id) == instruction && producer.CardAttack is { Active: true, EffectiveCardKind: CardKind.Duel, CardId: null, PhysicalCardIds.Count: 0 } attack && producer.Continuations.Duel is { Active: true } && attack.CardUserSeat == direct.ActorSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryDanshouDirectDuelTargetEvent>().Any(e => e.ProducerFrameId == producer.Id && e.InstructionIndex == instruction))
+        if (payload is CurrentTurnCardUseKindsRecordedEvent { RoundActionType: CardActionType.Use, ProgramInstructionIndex: { } instruction } direct && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == direct.OriginFrameId)is { } producer && producer.InstructionIndex == instruction && _coreProgramVirtualDuelOperations.FrozenProgramDuelInstructionIndex(producer.Id) == instruction && producer.CardAttack is { Active: true, EffectiveCardKind: CardKind.Duel, CardId: null, PhysicalCardIds.Count: 0 } attack && producer.Continuations.Duel is { Active: true } && attack.CardUserSeat == direct.ActorSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryDanshouDirectDuelTargetEvent>().Any(e => e.ProducerFrameId == producer.Id && e.InstructionIndex == instruction))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryDanshouDirectDuelTargetEvent(producer.Id, instruction, direct.TurnNumber, direct.TurnOwnerSeat, direct.ActorSeat, attack.TargetSeat));
         foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().ToArray())
             CaptureBoundaryDanshouUse(use);
@@ -83,7 +83,7 @@ internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
     {
         if (BoundaryDanshouMother(c, context)is not { } p || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive)
             return false;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryDanshouStartedEvent>().Any(e => e.EndingId == p.Id && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryDanshouStartedEvent>().Any(e => e.EndingId == p.Id && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId))
             return false;
         var x = BoundaryDanshouCount(c.OwnerSeat, p.OwnerSeat, p.TurnNumber, _coreActualTurnProgressTurnProgressionAccess._turnProgression.OwnerSeat, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Count());
         return c.BindingId == BoundaryZhuRanComposition.Draw ? x == 0 : x > 0 && BoundaryDanshouMaterials(c.OwnerSeat).Length >= x;
@@ -186,7 +186,7 @@ internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
             _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryDanshou = r = r with { Stage = BoundaryDanshouStage.PaidChildren, Paid = true, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, r.Selected, new(BoundaryDanshouDiscard));
-        var invoice = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().SingleOrDefault(e => e.ParentFrameId == f.Id && e.Reason.Value == BoundaryDanshouDiscard && e.SequenceBefore == r.Before);
+        var invoice = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().SingleOrDefault(e => e.ParentFrameId == f.Id && e.Reason.Value == BoundaryDanshouDiscard && e.SequenceBefore == r.Before);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryDanshou = r with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, DiscardInvocationId = invoice?.InvocationId, Actual = invoice?.ActualCount ?? 0 } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryDanshouPaidEvent(f.Id, r.X, invoice?.InvocationId, invoice?.ActualCount ?? 0, r.Before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));

@@ -15,11 +15,11 @@ internal sealed partial class CharacterQiaoZhouOlRuntime
     {
         if (!HasQiaoZhouCapability)
             return[];
-        var expired = _coreProgramEventHistoryOperations.ProgramEventHistory<QiaoZhouForecastExpiredEvent>().Select(e => e.GrantId).ToHashSet();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<QiaoZhouForecastGrantedEvent>().Where(e => !expired.Contains(e.GrantId)).ToArray();
+        var expired = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QiaoZhouForecastExpiredEvent>().Select(e => e.GrantId).ToHashSet();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QiaoZhouForecastGrantedEvent>().Where(e => !expired.Contains(e.GrantId)).ToArray();
     }
 
-    internal QiaoZhouForecastActivatedEvent? QiaoZhouActivation(long grantId) => _coreProgramEventHistoryOperations.ProgramEventHistory<QiaoZhouForecastActivatedEvent>().SingleOrDefault(e => e.GrantId == grantId);
+    internal QiaoZhouForecastActivatedEvent? QiaoZhouActivation(long grantId) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QiaoZhouForecastActivatedEvent>().SingleOrDefault(e => e.GrantId == grantId);
     internal bool QiaoZhouRecipientAvailable(int owner, int recipient) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) && recipient != owner && _coreMatchParticipantsPlayersAccess._players[recipient].IsAlive && !QiaoZhouMarks().Any(e => e.RecipientSeat == recipient);
     internal SkillProgramStepOutcome BeginQiaoZhouForecast(ProgramSkillFrame supplied)
     {

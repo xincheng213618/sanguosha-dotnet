@@ -38,7 +38,7 @@ internal sealed partial class CharacterChengYuMouRuntime
         return new(s.Id, s.Name, s.Name, s.Description);
     }
 
-    IEnumerable<T> IMouChengYuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouChengYuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     IReadOnlyList<int> IMouChengYuAnniversaryFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
     IReadOnlyList<ProgramTriggerCandidate> IMouChengYuAnniversaryFacts.Candidates(int owner, SkillProgramTriggerWindow window) => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[owner], window);
     bool IMouChengYuAnniversaryFacts.Parent(ProgramSkillFrame f)

@@ -1,8 +1,8 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class LiuBianProgramCapability(Func<RuntimeEntries.CharacterLiuBianOlEntries> getCharacterLiuBianOlRuntime) : ILiuBianProgramHost
+internal sealed class LiuBianProgramCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiuBianOlRuntime>> getCharacterLiuBianOlRuntime) : ILiuBianProgramHost
 {
-    public SkillProgramStepOutcome ShiYuanTargetDraw(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterLiuBianOlRuntime().ShiYuanProgramTargetDraw(frame, effect);
-    public SkillProgramStepOutcome DuShiGrantSkill(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterLiuBianOlRuntime().DuShiProgramGrantSkill(frame, effect);
-    public SkillProgramStepOutcome YuWeiMarkActiveTurn(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterLiuBianOlRuntime().YuWeiProgramMarkActiveTurn(frame, effect);
+    public SkillProgramStepOutcome ShiYuanTargetDraw(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterLiuBianOlRuntime().Value.ShiYuanProgramTargetDraw(frame, effect);
+    public SkillProgramStepOutcome DuShiGrantSkill(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterLiuBianOlRuntime().Value.DuShiProgramGrantSkill(frame, effect);
+    public SkillProgramStepOutcome YuWeiMarkActiveTurn(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterLiuBianOlRuntime().Value.YuWeiProgramMarkActiveTurn(frame, effect);
 }

@@ -9,7 +9,7 @@ internal sealed partial class CharacterXiZhiCaiOlRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
         if (f.Chouce is not null || index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.ParentFrameId != window.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("Chouce needs its exact actual after-damage point candidate.");
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window);
         if (!attack.DamageWasApplied || attack.TargetSeat != f.OwnerSeat || c.OccurrenceIndex < 0 || c.OccurrenceIndex >= attack.DamageAmount)
             throw new InvalidOperationException("Chouce lost its actual positive damage point.");
         var receipt = new ChoucePointReceipt(XiZhiCaiSource(f), f.GameplayHash, window.Id, window.ParentFrameId, attack.ResolutionId, c.OccurrenceIndex, attack.DamageAmount, attack.IsSourceLess || attack.IsDelayedJudgmentDamage ? null : attack.SourceSeat, attack.TargetSeat, f.InstructionIndex, _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1, effect.JudgmentReason!, effect.ResultBind!);

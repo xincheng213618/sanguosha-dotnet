@@ -23,7 +23,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(id, 0, CardKind.FireSlash, f.OwnerSeat));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TargetsConfirmedEvent(id, [targetSeat]));
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, f.OwnerSeat, targetSeat, card: null, damageAmount: 1 + source.AlcoholDamageBonus, playedCardKind: CardKind.FireSlash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(source, target, CardKind.FireSlash), programSkillCardUseFrameId: f.Id);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, source);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, source);
         source.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(source.Seat, CardKind.FireSlash);
@@ -35,7 +35,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
 
     internal bool IsShenJwNativeSlash(CardUseFrame use)
     {
-        if (use.ShenJiangWeiPingxiang is not { } o || use.CardId != 0 || use.CardKind != CardKind.FireSlash || use.UnlimitedUse != true || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.FireSlash, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0 } a || use.Id != o.UseId || a.ActionId != o.ActionId || a.ActorSeat != o.Source.OwnerSeat || a.ProviderSeat != o.Source.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { ShenJiangWei: { Operation: SkillProgramEffectOp.ResolveShenJiangWeiPingxiang, Stage: ShenJiangWeiStage.NativeUse } r } f || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.SlashCount != o.Ordinal || r.TargetSeat != o.TargetSeat || r.UseId != use.Id || r.ActionId != a.ActionId || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || !HasShenJwPaidPingxiang(f))
+        if (use.ShenJiangWeiPingxiang is not { } o || use.CardId != 0 || use.CardKind != CardKind.FireSlash || use.UnlimitedUse != true || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.FireSlash, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0 } a || use.Id != o.UseId || a.ActionId != o.ActionId || a.ActorSeat != o.Source.OwnerSeat || a.ProviderSeat != o.Source.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { ShenJiangWei: { Operation: SkillProgramEffectOp.ResolveShenJiangWeiPingxiang, Stage: ShenJiangWeiStage.NativeUse } r } f || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.SlashCount != o.Ordinal || r.TargetSeat != o.TargetSeat || r.UseId != use.Id || r.ActionId != a.ActionId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || !HasShenJwPaidPingxiang(f))
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat);
     }
@@ -73,7 +73,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.ShenJiangWei!;
-        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Pingxiang cannot repeat or skip a native use return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenJiangWei = r with { NativeReturned = true } });
         if (use.CardAttack is not { Active: true })
@@ -95,7 +95,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var r = f.ShenJiangWei!;
-        if (!r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiSlashReturnedEvent>().Any(e => e.FrameId == id && e.Ordinal == r.SlashCount))
+        if (!r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiSlashReturnedEvent>().Any(e => e.FrameId == id && e.Ordinal == r.SlashCount))
             throw new InvalidOperationException("Pingxiang cannot continue before its once-only native return.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenJiangWeiSlashReturnedEvent(id, r.SlashCount, r.UseId, r.ActionId));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenJiangWei = r with { Stage = ShenJiangWeiStage.SlashChildren } });

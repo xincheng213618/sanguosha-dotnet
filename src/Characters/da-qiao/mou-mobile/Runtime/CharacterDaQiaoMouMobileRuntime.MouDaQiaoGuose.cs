@@ -7,11 +7,11 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
     internal int MouDaQiaoGuoseLimit => _coreMatchDefinitionModeDefinitionAccess._modeDefinition.ModeKind == ContentModeKind.Identity ? 4 : 2;
 
     internal static CardConversionSource MouDaQiaoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_da_qiao_mou_mobile_MouDaQiaoGuose.MouDaQiaoSource(f);
-    internal int MouDaQiaoGuoseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoGuoseReservedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Phase == phase);
+    internal int MouDaQiaoGuoseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDaQiaoGuoseReservedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Phase == phase);
     [ProgramPhaseUsedProjection(80)]
     internal int MouDaQiaoProjectedPhaseUses(int owner, string skill, int fallback) => skill == MouDaQiaoComposition.Guose && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p ? MouDaQiaoGuoseUses(owner, p) : fallback;
     internal IEnumerable<Card> MouDaQiaoRemovable(int target) => _corePhysicalOwnedCardQueriesOperations.GetJudgment(_coreMatchParticipantsPlayersAccess._players[target]).Where(c => !_characterDaQiaoLeOperations.IsZixiQinJudgmentCard(c.Id) && _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(c) == CardKind.Indulgence);
-    internal bool MouDaQiaoGuoseTarget(int owner, int? card, int target, string branch) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && (branch == "remove-delayed" ? MouDaQiaoRemovable(target).Any() : card is { } id && _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(_coreMatchParticipantsPlayersAccess._players[owner], id)is { } physical && _coreDiamondDelayedProgramsOperations.DiamondUseTargetLegal(owner, physical, target, MouDaQiaoComposition.Guose));
+    internal bool MouDaQiaoGuoseTarget(int owner, int? card, int target, string branch) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && (branch == "remove-delayed" ? MouDaQiaoRemovable(target).Any() : card is { } id && _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(_coreMatchParticipantsPlayersAccess._players[owner], id)is { } physical && _coreDiamondDelayedProgramsOperations.Value.DiamondUseTargetLegal(owner, physical, target, MouDaQiaoComposition.Guose));
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 31300, SkillProgramEffectOp.ResolveMouDaQiaoGuose, SkillProgramEffectOp.ResolveMouDaQiaoGuoseRemove)]
     internal bool CanMouDaQiaoGuose(ProgramActivationLegalityContext c) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == c.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == c.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && MouDaQiaoGuoseUses(c.OwnerSeat, p) < MouDaQiaoGuoseLimit;
     internal SkillProgramStepOutcome BeginMouDaQiaoGuose(ProgramSkillFrame supplied)
@@ -72,7 +72,7 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouDaQiaoGuose: { Stage: MouDaQiaoGuoseStage.Using } r } f || r.UseId != useId)
             return;
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Any(e => e.ResolutionId == useId && e.CardId == r.CardId && e.CardKind == CardKind.Indulgence))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Any(e => e.ResolutionId == useId && e.CardId == r.CardId && e.CardKind == CardKind.Indulgence))
             throw new InvalidOperationException("Guose returned from a different native Use.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouDaQiaoGuose = r with { Stage = MouDaQiaoGuoseStage.MovementChildren, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         ContinueMouDaQiaoGuose(f.Id);

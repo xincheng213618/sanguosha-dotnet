@@ -11,13 +11,13 @@ internal sealed partial class CoreNativeDodgeRuntime
         _coreRoundOnceCardlessNativeResponsesOperations.ClearRoundOnceCardlessDodgeResponse(attack);
         _coreTieredRoundZeroResponsesOperations.ClearTieredRoundDodgeResponse(attack);
         _coreChainedStateBasicReturnsOperations.ClearChainedStateBasicDodgeResponse(attack);
-        _coreDrawFundedDistinctBasicResponsesOperations.ClearDrawFundedDistinctBasicDodgeResponse(attack);
+        _coreDrawFundedDistinctBasicResponsesOperations.Value.ClearDrawFundedDistinctBasicDodgeResponse(attack);
         FinishSuccessfulDodgeResponse(attack);
     }
 
     internal void FinishSuccessfulDodgeResponse(NativeOwners.CardAttackHandle attack)
     {
-        if (_coreRequiredGroupDodgesOperations.TryFinishRequiredGroupDodge(attack))
+        if (_coreRequiredGroupDodgesOperations.Value.TryFinishRequiredGroupDodge(attack))
             return;
         var completed = attack.RegisterDodgeResponse();
         if (attack.RequiredDodgeResponses > 1)
@@ -43,7 +43,7 @@ internal sealed partial class CoreNativeDodgeRuntime
 
     internal void ContinueSlashAfterDodgePrograms(NativeOwners.CardAttackHandle attack)
     {
-        if (_coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(attack))
+        if (_coreSlashSuitDiscardOperations.Value.IsSlashDodgeCancellationPrevented(attack))
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);
             if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
@@ -63,7 +63,7 @@ internal sealed partial class CoreNativeDodgeRuntime
             return;
         }
 
-        if (_coreNativeStoneAxeOperations.TryBeginStoneAxeChoice(attack))
+        if (_coreNativeStoneAxeOperations.Value.TryBeginStoneAxeChoice(attack))
         {
             return;
         }
@@ -128,7 +128,7 @@ internal sealed partial class CoreNativeDodgeRuntime
         var responseName = CardCatalog.Get(responseCardKind).DisplayName;
         var responseDescription = _coreCardDeclarationsOperations.PublicDeclarationDescription(responseCard, CoreNativeCardClassificationsRuntime.IsNativeResponseCard(responseCard, CardKind.Dodge) ? $"打出【{(responseName)}】" : $"将【{(responseCard.DisplayName)}】当作【{(responseName)}】");
         var completesResponse = attack.SuccessfulDodgeResponses + 1 >= attack.RequiredDodgeResponses;
-        _coreMatchLogOperations.AddLog("CardResponded", completesResponse ? _coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(attack) ? $"{(defender.Name)} {(responseDescription)}，响应了【{(incomingName)}】，但此杀不能被抵消。" : $"{(defender.Name)} {(responseDescription)}，抵消了【{(incomingName)}】。" : $"{(defender.Name)} {(responseDescription)}响应【{(incomingName)}】；【无双】仍要求下一张【闪】。", defender.Seat, attack.SourceSeat);
+        _coreMatchLogOperations.AddLog("CardResponded", completesResponse ? _coreSlashSuitDiscardOperations.Value.IsSlashDodgeCancellationPrevented(attack) ? $"{(defender.Name)} {(responseDescription)}，响应了【{(incomingName)}】，但此杀不能被抵消。" : $"{(defender.Name)} {(responseDescription)}，抵消了【{(incomingName)}】。" : $"{(defender.Name)} {(responseDescription)}响应【{(incomingName)}】；【无双】仍要求下一张【闪】。", defender.Seat, attack.SourceSeat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(responseCard.Id, defender.Seat, attack.SourceSeat, responseCardKind));
         var responseCost = new CardActionCost(responseCard.Id, responseCard.Kind, responseFrom, responseCostIsRed);
         if (_coreCardActionsOperations.TryBeginCardResponsePrograms(attack, defender, defender, requesterSeat: null, attack.SourceSeat, responseCardKind, [responseCost], ProgramCardContinuation.Dodge, responseConversion, completedResponseUseSuit))

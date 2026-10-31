@@ -15,7 +15,7 @@ internal sealed partial class CoreGameEngineNamedHandChoiceObserversRuntime
 
         if (effect?.Op == SkillProgramEffectOp.ResolveDamageSourceHandChoice && f.DamageSourceHandChoice is { Stage: DamageSourceHandChoiceStage.MovementChildren })
         {
-            _coreDamageSourceHandChoiceOperations.RequireDamageSourceHandChoice(f);
+            _coreDamageSourceHandChoiceOperations.Value.RequireDamageSourceHandChoice(f);
             return true;
         }
 
@@ -44,7 +44,7 @@ internal sealed partial class CoreGameEngineNamedHandChoiceObserversRuntime
 
         if (root.DamageSourceHandChoice is not { Stage: DamageSourceHandChoiceStage.DamageIssued } || root.AttackAttempt is not { } attack || root.AttackReturn is null)
             return false;
-        _coreDamageSourceHandChoiceOperations.RequireDamageSourceHandChoice(root);
+        _coreDamageSourceHandChoiceOperations.Value.RequireDamageSourceHandChoice(root);
         if (child is BeforeDamageProgramWindowFrame before)
             return before.ParentFrameId == root.Id && before.Continuation == BeforeDamageProgramContinuation.Attack && before.SourceSeat == attack.SourceSeat && (before.RedirectedTargetSeat ?? before.TargetSeat) == attack.TargetSeat && before.Amount > 0 && before.Nature == attack.Nature;
         if (child is DyingFrame { Continuation: DyingContinuationKind.AttackHpLoss } replaced)

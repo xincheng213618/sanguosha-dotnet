@@ -232,11 +232,11 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
             if (draft.OriginalParentId is { } pingduanParent)
                 _characterKeBiNengOlOperations.TryCancelKeBiNengPingduanBasicPayment(pingduanParent);
             if (draft.OriginalParentId is { } liwenParent)
-                _characterKongRongMouOlOperations.TryCancelMouKrLiwenPayment(liwenParent);
+                _characterKongRongMouOlOperations.Value.TryCancelMouKrLiwenPayment(liwenParent);
             return true;
         }
 
-        if (draft.Intent is EquipmentSlotNamedUseIntent.DyingPeach or EquipmentSlotNamedUseIntent.DyingAlcohol && _coreDyingCursorRuntimeOperations.ActiveDying is { } rescued && _coreMatchParticipantsPlayersAccess._players[rescued.VictimSeat].Hp > 0)
+        if (draft.Intent is EquipmentSlotNamedUseIntent.DyingPeach or EquipmentSlotNamedUseIntent.DyingAlcohol && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } rescued && _coreMatchParticipantsPlayersAccess._players[rescued.VictimSeat].Hp > 0)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new EquipmentSlotNamedUseCancelledEvent(paid.FrameId));
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -251,7 +251,7 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
             _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
             if (draft.OriginalParentId is { } pingduanParent && _characterKeBiNengOlOperations.TryCancelKeBiNengPingduanBasicPayment(pingduanParent))
                 return true;
-            if (draft.OriginalParentId is { } liwenParent && _characterKongRongMouOlOperations.TryCancelMouKrLiwenPayment(liwenParent))
+            if (draft.OriginalParentId is { } liwenParent && _characterKongRongMouOlOperations.Value.TryCancelMouKrLiwenPayment(liwenParent))
                 return true;
             if (actor.IsHuman && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == actor.Seat)
                 _coreNativePromptBoundaryOperations.RequestHumanPlay();

@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouLuZhiCapability(Func<RuntimeEntries.CharacterLuZhiMouMobileEntries> getCharacterLuZhiMouMobileRuntime) : IMouLuZhiHost
+internal sealed class MouLuZhiCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuZhiMouMobileRuntime>> getCharacterLuZhiMouMobileRuntime) : IMouLuZhiHost
 {
-    public SkillProgramStepOutcome Start(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterLuZhiMouMobileRuntime().StartMouLuZhi(f, op);
+    public SkillProgramStepOutcome Start(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterLuZhiMouMobileRuntime().Value.StartMouLuZhi(f, op);
 }

@@ -10,7 +10,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
 
     internal Card[] MouDongZhaoHE(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner])).ToArray();
     internal MouDongZhaoNameCount[] MouDongZhaoNames(int owner) => MouDongZhaoHE(owner).GroupBy(c => _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[owner], c)).Select(g => new MouDongZhaoNameCount(g.Key, g.Count())).ToArray();
-    internal bool MouShunjiSpent(int owner, int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoShunjiAcceptedEvent>().Any(e => e.Source.OwnerSeat == owner && e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.TargetSeat == target);
+    internal bool MouShunjiSpent(int owner, int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoShunjiAcceptedEvent>().Any(e => e.Source.OwnerSeat == owner && e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.TargetSeat == target);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 33500, SkillProgramEffectOp.ResolveMouDongZhaoShunji)]
     internal bool CanOfferMouShunji(ProgramTriggerLegalityContext c) => c.SkillId == MouDongZhaoComposition.Shunji && c.Owner.IsAlive && _coreActualRoundProgressRoundNumberAccess._roundNumber > 0 && c.Context is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, TargetSeat: { } target } && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !MouShunjiSpent(c.OwnerSeat, target);
     internal bool ExactMouShunjiWindow(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0 } c && _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == c.ParentFrameId)is DamageTriggerWindowFrame window && window.TriggerWindow == c.Window && window.ParentFrameId == c.DamageFrameId && window.TargetSeat == c.TargetSeat && window.Candidates.Any(candidate => candidate.ToProgramCandidate()is { } native && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, native)) && _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == window.ParentFrameId)is DamageFrame damage && damage.TargetSeat == c.TargetSeat && damage.Amount == c.Amount;
@@ -128,7 +128,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
         if (r.TargetSeat == f.OwnerSeat)
             return;
         var after = MouDongZhaoNames(f.OwnerSeat);
-        foreach (var name in r.Names.Where(n => n.Count > 0 && !after.Any(a => a.Kind == n.Kind && a.Count > 0) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoNameSpentEvent>().Any(e => e.OwnerSeat == f.OwnerSeat && e.Kind == n.Kind)))
+        foreach (var name in r.Names.Where(n => n.Count > 0 && !after.Any(a => a.Kind == n.Kind && a.Count > 0) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoNameSpentEvent>().Any(e => e.OwnerSeat == f.OwnerSeat && e.Kind == n.Kind)))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhaoNameSpentEvent(f.Id, f.OwnerSeat, name.Kind));
     }
 

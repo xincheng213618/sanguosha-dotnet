@@ -55,7 +55,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicPlayRuntime
         return[];
     }
 
-    internal bool CanUseRoundDistinctBasicAlcohol(CharacterState owner, IReadOnlyList<Card> cards) => (!owner.HasAlcoholEffect || _characterDaQiaoXiaoQiaoHappyGodOperations.IsHappyQiaoShutuCardQuery(owner, null)) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && (_characterDaQiaoXiaoQiaoHappyGodOperations.IsHappyQiaoShutuCardQuery(owner, null) || _characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(owner, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(owner.Seat, owner.Seat) || (_coreAdvancedPoliciesOperations.HasNextUnlimitedCard(owner) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(owner) || _coreAdvancedPoliciesOperations.HasFriendQihuiAllowance(owner)) || _coreProgramCardPoliciesOperations.HasCardPolicy(owner, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, CardKind.Alcohol) || _coreRoundGainedSourceUsesOperations.HasRoundGainedBasicBonus(owner, CardKind.Alcohol, cards.Select(c => c.Id).ToArray())) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, CardKind.Alcohol, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards));
+    internal bool CanUseRoundDistinctBasicAlcohol(CharacterState owner, IReadOnlyList<Card> cards) => (!owner.HasAlcoholEffect || _characterDaQiaoXiaoQiaoHappyGodOperations.IsHappyQiaoShutuCardQuery(owner, null)) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && (_characterDaQiaoXiaoQiaoHappyGodOperations.IsHappyQiaoShutuCardQuery(owner, null) || _characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(owner, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(owner.Seat, owner.Seat) || (_coreAdvancedPoliciesOperations.Value.HasNextUnlimitedCard(owner) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(owner) || _coreAdvancedPoliciesOperations.Value.HasFriendQihuiAllowance(owner)) || _coreProgramCardPoliciesOperations.HasCardPolicy(owner, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, CardKind.Alcohol) || _coreRoundGainedSourceUsesOperations.HasRoundGainedBasicBonus(owner, CardKind.Alcohol, cards.Select(c => c.Id).ToArray())) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, CardKind.Alcohol, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards));
     internal CommandError? ValidateRoundDistinctBasicPlaySelection(CharacterState owner, LegalAction action, IReadOnlyList<int> cards, IReadOnlyList<int> targets)
     {
         if (_coreSkillProgramsOperations.ValidateProgramSelection(action, cards, targets)is { } error)
@@ -142,7 +142,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicPlayRuntime
     {
         if (selection.OutputKind != CardKind.Alcohol || _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.RoundDistinctBasicUse is null)
             return false;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.ResponderSeat != owner.Seat || dying.VictimSeat != owner.Seat || !owner.IsAlive || owner.Hp > 0 || _coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) || _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, CardKind.Alcohol, CardActionType.Use))
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.ResponderSeat != owner.Seat || dying.VictimSeat != owner.Seat || !owner.IsAlive || owner.Hp > 0 || _coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) || _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, CardKind.Alcohol, CardActionType.Use))
             throw new InvalidOperationException("A pair Alcohol use requires its own actual dying response.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(owner, owner, selection.Cards[0], "酒", CardKind.Alcohol, conversionSource: selection.Source, dyingResponse: new(dying.FrameId, owner.Seat, false, null, true, selection.Cards[0].Id), physicalCards: selection.Cards);
@@ -153,7 +153,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicPlayRuntime
     {
         if (use.CardKind != CardKind.Alcohol || use.RoundDistinctBasicUses?.Any(r => !r.IsResponseUse && r.CardActionId == use.Action?.ActionId) != true)
             return false;
-        _coreRoundDistinctBasicUseOperations.AssertRoundDistinctBasicUses(use);
+        _coreRoundDistinctBasicUseOperations.Value.AssertRoundDistinctBasicUses(use);
         if (use.CardId != card.Id || use.PhysicalCardIds is not { Count: 2 } ids)
             throw new InvalidOperationException("A pair Alcohol lost its exact native representative and two materials.");
         foreach (var id in ids)

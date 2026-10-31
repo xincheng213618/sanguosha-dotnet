@@ -2,6 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineLifetimeSlashUsesRuntime(RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations, RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations)
+internal sealed partial class CoreGameEngineLifetimeSlashUsesRuntime(RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime> _coreProgramEventHistoryOperations, RuntimeEntries.CoreTableSeatQueriesEntries _coreTableSeatQueriesOperations)
 {
 }

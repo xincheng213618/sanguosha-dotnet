@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime
 {
     internal const string ShanheS5TieqiDiscardReason = "skill-program.shanhe-tieqi.discard";
-    SkillProgramStepOutcome IShanheS5TieqiProgramHost.SuppressAndJudgeAllColor(ProgramSkillFrame frame, SkillProgramEffect effect) => _coreSlashSuitDiscardOperations.BeginProgramSlashSuitDiscard(frame, effect);
+    SkillProgramStepOutcome IShanheS5TieqiProgramHost.SuppressAndJudgeAllColor(ProgramSkillFrame frame, SkillProgramEffect effect) => _coreSlashSuitDiscardOperations.Value.BeginProgramSlashSuitDiscard(frame, effect);
     internal bool IsShanheS5Tieqi(ProgramSkillFrame frame) => frame.TriggerId is not null && ProgramInstructionResolver.Default.Features(_coreProgramLifecycleOperations.GetProgramTrigger(frame)).HasOperation(SkillProgramEffectOp.SuppressCurrentSlashTargetAndJudgeColorAllDiscard);
     internal Card[] ShanheS5TieqiColorCards(ProgramSkillFrame frame)
     {
@@ -46,7 +46,7 @@ internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime
         var draft = frame.SlashSuitDiscard!;
         if (frame.PendingMovementContinuation is not null)
             return true;
-        _ = _coreSlashSuitDiscardOperations.SlashSuitDiscardAttack(frame);
+        _ = _coreSlashSuitDiscardOperations.Value.SlashSuitDiscardAttack(frame);
         if (draft.Stage is ProgramSlashSuitDiscardStage.Judging or ProgramSlashSuitDiscardStage.Choosing)
             return true;
         if (draft.Stage == ProgramSlashSuitDiscardStage.PaymentMovement)
@@ -74,7 +74,7 @@ internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack[^1].Id);
         if (!IsShanheS5Tieqi(frame) || frame.SlashSuitDiscard is not { Stage: ProgramSlashSuitDiscardStage.Choosing } draft || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != draft.TargetSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], ShanheS5TieqiChoices(frame).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Whole-color Tieqi requires its exact published target-private cohort.");
-        _ = _coreSlashSuitDiscardOperations.SlashSuitDiscardAttack(frame);
+        _ = _coreSlashSuitDiscardOperations.Value.SlashSuitDiscardAttack(frame);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Parameters.GetValueOrDefault("program-action") == "shanhe-tieqi-skip" || !_coreMatchParticipantsPlayersAccess._players[draft.TargetSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
         {
@@ -104,16 +104,16 @@ internal sealed partial class CoreGameEngineShanheS5MaSiblingsRuntime
     {
         if (frame.ShanheS5Tieqi is not { } paid || frame.SlashSuitDiscard is not { Stage: ProgramSlashSuitDiscardStage.PaymentMovement } draft || paid.CardIds.Count == 0 || paid.CardIds.Count != paid.From.Count || paid.CardIds.Distinct().Count() != paid.CardIds.Count || paid.BatchId <= 0 || paid.Before >= paid.After || paid.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || paid.From.Any(from => from.OwnerSeat != draft.TargetSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)))
             return false;
-        var logical = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ParentFrameId == frame.Id && e.InitiatorSeat == frame.OwnerSeat && e.ExecutorSeat == draft.TargetSeat && e.SubjectSeat == draft.TargetSeat && e.ActualCount == paid.CardIds.Count && e.SequenceBefore == paid.Before && e.SequenceAfter == paid.After && e.Reason.Value == ShanheS5TieqiDiscardReason).ToArray();
-        if (logical.Length != 1 || paid.CardIds.Select((id, index) => _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(e => e.InvocationId == logical[0].InvocationId && e.CardId == id && e.From == paid.From[index] && e.CompletionSequence > paid.Before && e.CompletionSequence <= paid.After) == 1).Any(valid => !valid))
+        var logical = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ParentFrameId == frame.Id && e.InitiatorSeat == frame.OwnerSeat && e.ExecutorSeat == draft.TargetSeat && e.SubjectSeat == draft.TargetSeat && e.ActualCount == paid.CardIds.Count && e.SequenceBefore == paid.Before && e.SequenceAfter == paid.After && e.Reason.Value == ShanheS5TieqiDiscardReason).ToArray();
+        if (logical.Length != 1 || paid.CardIds.Select((id, index) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(e => e.InvocationId == logical[0].InvocationId && e.CardId == id && e.From == paid.From[index] && e.CompletionSequence > paid.Before && e.CompletionSequence <= paid.After) == 1).Any(valid => !valid))
             return false;
-        return paid.CardIds.Select((id, index) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == id && move.Sequence > paid.Before && move.Sequence <= paid.After && move.Reason.Value == ShanheS5TieqiDiscardReason && (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move) == paid.From[index] || move.From == paid.From[index] && move.From.Zone == CardZoneKind.Equipment && move.To == CardLocation.OutsideGame && (_coreCardAttackStateOperations.GetAttackCard(id).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(move)))) == 1).All(value => value) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5TieqiPaidEvent>().Count(e => e.FrameId == frame.Id && e.CardUseFrameId == draft.CardUseFrameId && e.TargetSeat == draft.TargetSeat && e.Count == paid.CardIds.Count && e.Before == paid.Before && e.After == paid.After) == 1;
+        return paid.CardIds.Select((id, index) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == id && move.Sequence > paid.Before && move.Sequence <= paid.After && move.Reason.Value == ShanheS5TieqiDiscardReason && (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move) == paid.From[index] || move.From == paid.From[index] && move.From.Zone == CardZoneKind.Equipment && move.To == CardLocation.OutsideGame && (_coreCardAttackStateOperations.GetAttackCard(id).IsGeneralWeapon || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(move)))) == 1).All(value => value) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5TieqiPaidEvent>().Count(e => e.FrameId == frame.Id && e.CardUseFrameId == draft.CardUseFrameId && e.TargetSeat == draft.TargetSeat && e.Count == paid.CardIds.Count && e.Before == paid.Before && e.After == paid.After) == 1;
     }
 
     internal void FinishShanheS5Tieqi(ProgramSkillFrame frame, bool paid)
     {
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheS5Tieqi = null });
-        _coreSlashSuitDiscardOperations.FinishProgramSlashSuitDiscard(frame, paid);
+        _coreSlashSuitDiscardOperations.Value.FinishProgramSlashSuitDiscard(frame, paid);
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5760)]

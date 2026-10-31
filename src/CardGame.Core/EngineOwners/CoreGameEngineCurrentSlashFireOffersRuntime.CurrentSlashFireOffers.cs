@@ -34,8 +34,8 @@ internal sealed partial class CoreGameEngineCurrentSlashFireOffersRuntime
     internal int CurrentFireSlashMaximum(CardUseFrame use)
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat];
-        var baseMaximum = _coreNativeDamageHandlesOperations.UsesFormalFangtianHalberd && use.Action!.PhysicalCards.Count == 1 && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count == 0 && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.FangtianHalberd) ? 3 : 1;
-        return baseMaximum + ((FiniteRuleQueryValue)_coreRuleQueriesOperations.EvaluateCardTargetCount(actor, CardKind.FireSlash).Value).Value - 1 + _coreShanheSourceLihuo3160Operations.ShanheSourceLihuoProspectiveTargetBonus(use);
+        var baseMaximum = _coreNativeDamageHandlesOperations.Value.UsesFormalFangtianHalberd && use.Action!.PhysicalCards.Count == 1 && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count == 0 && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.FangtianHalberd) ? 3 : 1;
+        return baseMaximum + ((FiniteRuleQueryValue)_coreRuleQueriesOperations.EvaluateCardTargetCount(actor, CardKind.FireSlash).Value).Value - 1 + _coreShanheSourceLihuo3160Operations.Value.ShanheSourceLihuoProspectiveTargetBonus(use);
     }
 
     internal bool CanAddCurrentFireSlashTarget(CardUseFrame use) => use.TargetSeats.Count < CurrentFireSlashMaximum(use) && CurrentFireSlashExtraTargets(use).Length != 0;
@@ -249,7 +249,7 @@ internal sealed partial class CoreGameEngineCurrentSlashFireOffersRuntime
 
             if (e is ProgramCurrentSlashFireRedirectedEvent redirected && redirected.CardUseFrameId == use.Id)
             {
-                if (_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(f => f.ProgramFrameId == redirected.ProgramFrameId && f.CardUseFrameId == use.Id && f.ActionId == redirected.ActionId && f.Source == redirected.Source && f.TargetIndex == redirected.TargetIndex && f.PreviousTargetSeat == redirected.OriginalTargetSeat && f.NewTargetSeat == redirected.NewTargetSeat))
+                if (_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability && history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(f => f.ProgramFrameId == redirected.ProgramFrameId && f.CardUseFrameId == use.Id && f.ActionId == redirected.ActionId && f.Source == redirected.Source && f.TargetIndex == redirected.TargetIndex && f.PreviousTargetSeat == redirected.OriginalTargetSeat && f.NewTargetSeat == redirected.NewTargetSeat))
                     continue;
                 actual[redirected.TargetIndex] = redirected.NewTargetSeat;
             }

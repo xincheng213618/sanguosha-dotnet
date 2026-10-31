@@ -64,7 +64,7 @@ internal sealed partial class CharacterCaoShuangOlRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
             _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
-        var previous = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoShuangTuoguInheritedEvent>().LastOrDefault(e => e.OwnerSeat == f.OwnerSeat);
+        var previous = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoShuangTuoguInheritedEvent>().LastOrDefault(e => e.OwnerSeat == f.OwnerSeat);
         if (previous is not null)
             owner.SkillGrants.RemoveGrant(previous.GrantId);
         var existing = _coreNationalSkillsOperations.GetSkillBindingShard(owner).ActiveGrants.Where(g => g.SkillId == skillId).OrderBy(g => g.SourceId.StartsWith("turn:", StringComparison.Ordinal) ? 1 : 0).ThenBy(g => g.SkillInstanceId, StringComparer.Ordinal).FirstOrDefault();

@@ -15,7 +15,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
 
     internal void AfterGongjieGifts(ProgramSkillFrame f)
     {
-        var count = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuCardPaidEvent>().Where(e => e.FrameId == f.Id && e.Stage == CaoYuStage.GongjieGiftChildren && e.Suit != Suit.None).Select(e => e.Suit).Distinct().Count();
+        var count = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuCardPaidEvent>().Where(e => e.FrameId == f.Id && e.Stage == CaoYuStage.GongjieGiftChildren && e.Suit != Suit.None).Select(e => e.Suit).Distinct().Count();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
         {
             FinishCaoYu(f);

@@ -17,7 +17,7 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
     internal bool HappyGuardRemovalIsPaid(HappyGuardRemovalReturn r)
     {
         if (r.DeathParent)
-            return _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().SingleOrDefault(d => d.Id == r.ParentId)is { HappyGuardMarkerCleanupCompleted: true, HappyGuardRemovals: { } removals } death && death.HappyGuardRemovalIndex >= 0 && death.HappyGuardRemovalIndex < removals.Count && removals[death.HappyGuardRemovalIndex] is { } entry && entry.RemovedSeat == r.RemovedSeat && entry.GuardOwner == r.GuardOwnerSeat && entry.ResolutionId == r.RemovalId && _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerMarkerChangedEvent>().Count(e => e.ResolutionId == r.RemovalId && e.PlayerSeat == r.RemovedSeat && e.SkillOwnerSeat == r.GuardOwnerSeat && e.Marker == PlayerMarkerKind.HappyGuard && e.Delta == -1 && e.Count == 0 && e.Reason == "program.attributed-marker.death-clear") == 1;
+            return _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().SingleOrDefault(d => d.Id == r.ParentId)is { HappyGuardMarkerCleanupCompleted: true, HappyGuardRemovals: { } removals } death && death.HappyGuardRemovalIndex >= 0 && death.HappyGuardRemovalIndex < removals.Count && removals[death.HappyGuardRemovalIndex] is { } entry && entry.RemovedSeat == r.RemovedSeat && entry.GuardOwner == r.GuardOwnerSeat && entry.ResolutionId == r.RemovalId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerMarkerChangedEvent>().Count(e => e.ResolutionId == r.RemovalId && e.PlayerSeat == r.RemovedSeat && e.SkillOwnerSeat == r.GuardOwnerSeat && e.Marker == PlayerMarkerKind.HappyGuard && e.Delta == -1 && e.Count == 0 && e.Reason == "program.attributed-marker.death-clear") == 1;
         return _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == r.ParentId)is { HappyGuard: { Stage: HappyGuardStage.RemovedChildren } guard } parent && parent.Id == r.RemovalId && parent.OwnerSeat == r.GuardOwnerSeat && guard.GuardedSeat == r.RemovedSeat && ValidHappyGuardFrame(parent);
     }
 
@@ -63,7 +63,7 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
             if (attack.DamageRedirected)
                 throw new InvalidOperationException("The guard cannot replace a recipient after a different frozen redirection.");
             attack.RedirectFinalizedDamageTarget(f.OwnerSeat, new GameEngine.ProgramDamageTransferFollowup(f.SkillId, f.OwnerSeat, f.OwnerSeat, false));
-            _coreRecipientScopedDamageOperations.UpdateRecipientScopedDamageRedirect(attack);
+            _coreRecipientScopedDamageOperations.Value.UpdateRecipientScopedDamageRedirect(attack);
             _coreRuntimeOperations.ReplaceRuntimeFrame(window.Id, window with { RedirectedTargetSeat = f.OwnerSeat });
         }
 

@@ -1,8 +1,8 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouLuBuMobileCapability(Func<RuntimeEntries.CharacterLuBuMouMobileEntries> getCharacterLuBuMouMobileRuntime) : IMouLuBuMobileHost
+internal sealed class MouLuBuMobileCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuBuMouMobileRuntime>> getCharacterLuBuMouMobileRuntime) : IMouLuBuMobileHost
 {
-    public SkillProgramStepOutcome Bonus(ProgramSkillFrame f) => getCharacterLuBuMouMobileRuntime().ResolveMouLbBonus(f);
-    public SkillProgramStepOutcome Liyu(ProgramSkillFrame f) => getCharacterLuBuMouMobileRuntime().BeginMouLbLiyu(f);
+    public SkillProgramStepOutcome Bonus(ProgramSkillFrame f) => getCharacterLuBuMouMobileRuntime().Value.ResolveMouLbBonus(f);
+    public SkillProgramStepOutcome Liyu(ProgramSkillFrame f) => getCharacterLuBuMouMobileRuntime().Value.BeginMouLbLiyu(f);
 }

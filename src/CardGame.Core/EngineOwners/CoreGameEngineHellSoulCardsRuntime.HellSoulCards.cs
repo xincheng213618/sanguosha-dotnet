@@ -8,8 +8,8 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
     internal string HellSoulGrantSource(long id) => $"turn:{(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber)}:{(_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)}:card-use:hell-return-soul:{(id)}";
     internal HellWanghunGrantLostEvent[] HellSoulOutstandingLosses(int seat)
     {
-        var restored = _coreProgramEventHistoryOperations.ProgramEventHistory<HellSoulGrantRestoredEvent>().Select(e => (e.LossFrameId, e.TargetSeat, e.GrantId)).ToHashSet();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<HellWanghunGrantLostEvent>().Where(e => e.TargetSeat == seat && !restored.Contains((e.FrameId, e.TargetSeat, e.Grant.GrantId))).OrderBy(e => e.FrameId).ThenBy(e => e.Grant.GrantId, StringComparer.Ordinal).ToArray();
+        var restored = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellSoulGrantRestoredEvent>().Select(e => (e.LossFrameId, e.TargetSeat, e.GrantId)).ToHashSet();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellWanghunGrantLostEvent>().Where(e => e.TargetSeat == seat && !restored.Contains((e.FrameId, e.TargetSeat, e.Grant.GrantId))).OrderBy(e => e.FrameId).ThenBy(e => e.Grant.GrantId, StringComparer.Ordinal).ToArray();
     }
 
     internal IReadOnlyList<int> HellReturnSoulTargets(int actorSeat) => Array.AsReadOnly(Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(offset => _coreTableOrderOperations.TableStepSeat(actorSeat, offset)).Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && HellSoulOutstandingLosses(seat).Length != 0).ToArray());
@@ -77,7 +77,7 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
     internal SkillProgramStepOutcome BeginHellSoulRestoration(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!IsExactHellSoulProgram(frame) || frame.InstructionIndex != 1 || frame.HellSoulRestore is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<HellSoulRestoreIssuedEvent>().Any(e => e.ProgramFrameId == frame.Id))
+        if (!IsExactHellSoulProgram(frame) || frame.InstructionIndex != 1 || frame.HellSoulRestore is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellSoulRestoreIssuedEvent>().Any(e => e.ProgramFrameId == frame.Id))
             throw new InvalidOperationException("Return soul restoration requires its exact once-issued native effect child.");
         var returned = frame.HellSoulReturn!;
         var target = _coreMatchParticipantsPlayersAccess._players[returned.TargetSeat];
@@ -85,7 +85,7 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
         var decisions = losses.Select(loss =>
         {
             var existing = target.SkillGrants.Grants.SingleOrDefault(g => g.GrantId == loss.Grant.GrantId);
-            var outcome = _coreAlcoholSlashSkillReplacementsOperations.WasGrantPermanentlyRevokedAfterLoss(target.Seat, loss.Grant, loss) ? "permanently-lost" : !target.IsAlive ? "owner-dead" : target.General.Id != loss.GeneralId || target.SecondaryGeneral?.Id != loss.SecondaryGeneralId ? "template-changed" : loss.Grant.TurnExpiry is { } turn && _coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == turn.TurnNumber && e.ActorSeat == turn.TurnOwnerSeat) ? "grant-expired" : loss.Grant.PhaseExpiry is not null || _coreNextActualTurnStartSkillGrantsOperations.HasNextActualTurnStartSkillGrantExpired(loss.Grant) ? "grant-expired" : existing is null ? "restored" : existing == loss.Grant ? "already-present" : "source-changed";
+            var outcome = _coreAlcoholSlashSkillReplacementsOperations.WasGrantPermanentlyRevokedAfterLoss(target.Seat, loss.Grant, loss) ? "permanently-lost" : !target.IsAlive ? "owner-dead" : target.General.Id != loss.GeneralId || target.SecondaryGeneral?.Id != loss.SecondaryGeneralId ? "template-changed" : loss.Grant.TurnExpiry is { } turn && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == turn.TurnNumber && e.ActorSeat == turn.TurnOwnerSeat) ? "grant-expired" : loss.Grant.PhaseExpiry is not null || _coreNextActualTurnStartSkillGrantsOperations.HasNextActualTurnStartSkillGrantExpired(loss.Grant) ? "grant-expired" : existing is null ? "restored" : existing == loss.Grant ? "already-present" : "source-changed";
             return (Loss: loss, Outcome: outcome);
         }).ToArray();
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
@@ -115,7 +115,7 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
 
     internal void ContinueHellSoulRestoration(ProgramSkillFrame frame)
     {
-        if (!IsExactHellSoulProgram(frame) || frame.HellSoulRestore is not { } receipt || receipt.InstructionIndex != frame.InstructionIndex || receipt.TargetSeat != frame.HellSoulReturn!.TargetSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<HellSoulRestoreIssuedEvent>().Count(e => e.ProgramFrameId == frame.Id && e.CardUseFrameId == frame.HellSoulReturn.CardUseFrameId && e.TargetSeat == receipt.TargetSeat && e.RestoredGrants == receipt.RestoredGrants) != 1)
+        if (!IsExactHellSoulProgram(frame) || frame.HellSoulRestore is not { } receipt || receipt.InstructionIndex != frame.InstructionIndex || receipt.TargetSeat != frame.HellSoulReturn!.TargetSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellSoulRestoreIssuedEvent>().Count(e => e.ProgramFrameId == frame.Id && e.CardUseFrameId == frame.HellSoulReturn.CardUseFrameId && e.TargetSeat == receipt.TargetSeat && e.RestoredGrants == receipt.RestoredGrants) != 1)
             throw new InvalidOperationException("Return soul lost its exact already restored skill receipt.");
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(frame.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(frame.Id))
             return;
@@ -154,5 +154,5 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HellReturnSoulDestroyedEvent(card.Id, entered.Sequence, _coreCardMovementJournalCardMovementsAccess._cardMovements.Last(m => m.CardId == card.Id).Sequence));
     }
 
-    internal bool IsHellDestroyedSoulMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action is { } action && action.PhysicalCards.Any(material => material.CardId == cardId && material.CardKind == CardKind.ReturnSoul) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && _coreProgramEventHistoryOperations.ProgramEventHistory<HellReturnSoulDestroyedEvent>().Any(e => e.CardId == cardId && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence == e.DiscardSequence && m.To == CardLocation.DiscardPile) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence == e.DestroySequence && m.From == CardLocation.DiscardPile && m.To == CardLocation.OutsideGame && m.Reason.Value == "activity.hell.return-soul-destroyed"));
+    internal bool IsHellDestroyedSoulMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action is { } action && action.PhysicalCards.Any(material => material.CardId == cardId && material.CardKind == CardKind.ReturnSoul) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellReturnSoulDestroyedEvent>().Any(e => e.CardId == cardId && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence == e.DiscardSequence && m.To == CardLocation.DiscardPile) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence == e.DestroySequence && m.From == CardLocation.DiscardPile && m.To == CardLocation.OutsideGame && m.Reason.Value == "activity.hell.return-soul-destroyed"));
 }

@@ -44,7 +44,7 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
             return;
         }
 
-        if (card.Kind == CardKind.Lightning && !_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && _coreCardActionsOperations.TryBeginDelayedCardUsePrograms(id))
+        if (card.Kind == CardKind.Lightning && !_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability && _coreCardActionsOperations.TryBeginDelayedCardUsePrograms(id))
             return;
         var required = CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(card.Kind) ? _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, card.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), enforceUsePermission: true, actualEffectiveColor: _coreActionDiscardColorsOperations.CapturePhysicalCardColor(actor.Seat, card), hasActualColor: true, physicalCardIds: [card.Id]).FirstOrDefault(o => o.ActionKind == a.Kind && o.TargetCardId == a.TargetCardId && o.TargetSeats.SequenceEqual(a.TargetSeats))?.RequiredCardKind : null;
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(id, card, actor.Seat, _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats, a.Kind, a.TargetCardId, required, card.Kind);
@@ -68,7 +68,7 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MaterialPayment, 43600)]
     internal bool PayAnniversaryBlyProcessing(IReadOnlyList<Card> cards, int provider, CardLocation? from, CardMoveReason reason) => from == CardLocation.Processing && reason == CardMoveReasons.Use && cards is [var card] && _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { AnniversaryBlyUse: { } o } u && provider == o.Source.OwnerSeat && card.Id == o.CardId && _cardZonesOperations._cardZones.Contains(CardLocation.Processing, card.Id) && IsAnniversaryBlyNative(u);
-    internal bool IsAnniversaryBlyNative(CardUseFrame use) => use.AnniversaryBlyUse is { } o && use.Id == o.UseId && use.CardId == o.CardId && use.Action is { Type: CardActionType.Use } a && a.ActionId == o.ActionId && a.ProviderSeat == o.Source.OwnerSeat && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == o.CardId && from == CardLocation.Processing && a.EffectiveKind == use.CardKind && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == o.FrameId)is { AnniversaryBly: { } r } parent && ValidAnniversaryBly(parent) && r.Source == o.Source && r.Hash == o.Hash && r.UseId == use.Id && r.ActionId == a.ActionId && r.Plan?.CardId == id && AnniversaryBlyUsePaid(parent) && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryBlyNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
+    internal bool IsAnniversaryBlyNative(CardUseFrame use) => use.AnniversaryBlyUse is { } o && use.Id == o.UseId && use.CardId == o.CardId && use.Action is { Type: CardActionType.Use } a && a.ActionId == o.ActionId && a.ProviderSeat == o.Source.OwnerSeat && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == o.CardId && from == CardLocation.Processing && a.EffectiveKind == use.CardKind && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == o.FrameId)is { AnniversaryBly: { } r } parent && ValidAnniversaryBly(parent) && r.Source == o.Source && r.Hash == o.Hash && r.UseId == use.Id && r.ActionId == a.ActionId && r.Plan?.CardId == id && AnniversaryBlyUsePaid(parent) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryBlyNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
     [NativeUseValidation(43600)]
     internal void ValidateAnniversaryBlyNativeReturn(CardUseFrame use)
     {
@@ -83,7 +83,7 @@ internal sealed partial class CharacterBaiLingYunAnniversaryRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.AnniversaryBly!;
-        if (!IsAnniversaryBlyNative(use) || r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == o.CardId) != 1)
+        if (!IsAnniversaryBlyNative(use) || r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == o.CardId) != 1)
             throw new InvalidOperationException("Linghui cannot return a different or unfinished use or pay its reward twice.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { AnniversaryBly = r with { Returned = true } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryBlyNativeReturnedEvent(f.Id, use.Id, o.ActionId));

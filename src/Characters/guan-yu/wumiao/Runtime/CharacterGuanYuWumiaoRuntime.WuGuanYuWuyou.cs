@@ -12,7 +12,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     internal ActualDiscardRecoveryPhaseKey? WuyouPlay(int donor) => HasWuyouCapability && _coreMatchSetupSetupCompleteAccess._setupComplete && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreTableSeatQueriesOperations.IsValidPlayerSeat(donor) && _coreMatchParticipantsPlayersAccess._players[donor].IsAlive && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == donor && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == donor && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) ? phase : null;
     internal IEnumerable<(CardConversionSource Source, string Hash)> WuyouSources(CharacterState owner) => _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(i => i.SkillId == "wumiao:wuyou" && i.Program.Activations.Any(a => a.Id == WuyouBinding && a.Effects is [{ Op: SkillProgramEffectOp.ResolveWuyouContributionAndNamedReturn }])).OrderBy(i => i.SkillInstanceId, StringComparer.Ordinal).Take(1).Select(i => (new CardConversionSource(i.SkillId, WuyouBinding, owner.Seat, i.SkillInstanceId), i.Program.GameplayHash));
-    internal bool WuyouPhaseSpent(int issuer, int donor, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<WuyouStartedEvent>().Any(e => e.Source.OwnerSeat == issuer && e.DonorSeat == donor && e.Phase == phase);
+    internal bool WuyouPhaseSpent(int issuer, int donor, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuyouStartedEvent>().Any(e => e.Source.OwnerSeat == issuer && e.DonorSeat == donor && e.Phase == phase);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 28520, SkillProgramEffectOp.ResolveWuyouContributionAndNamedReturn)]
     internal bool WuyouHasNativeContributionOnly(ProgramActivationLegalityContext context) => false;
     [ProgramActionSource(ProgramActionSourcePhase.ProgramTail, 28520)]
@@ -100,7 +100,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             SkillInstanceId = source.Source.SkillInstanceId,
             Wuyou = receipt
         };
-        f = _coreHpConditionalSkillGrantsOperations.CaptureHpConditionalProgramSource(f);
+        f = _coreHpConditionalSkillGrantsOperations.Value.CaptureHpConditionalProgramSource(f);
         f = _characterHeQiOlOperations.CaptureEquipmentSuitProgramSource(f);
         _coreRuntimeOperations.PushRuntimeFrame(f);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillStartedEvent(f.Id, f.OwnerSeat, f.SkillId, f.ActivationId));

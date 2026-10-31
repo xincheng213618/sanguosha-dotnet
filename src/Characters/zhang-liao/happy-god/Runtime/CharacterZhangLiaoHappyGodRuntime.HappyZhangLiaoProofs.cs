@@ -7,21 +7,21 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
     internal bool HappyZlCannotRespond(long useId, int responderSeat) => HasHappyZl && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { } action } use && action.Type == CardActionType.Use && action.ActorSeat == use.SourceSeat && action.EffectiveKind == use.CardKind && HappyZlCannotRespond(action, responderSeat);
     internal bool HappyZlNullificationForbidden(NullificationWindowFrame window, int responderSeat)
     {
-        if (!HasHappyZl || !_coreDelayedNullificationOperations.HasNullificationEffectOwner(window))
+        if (!HasHappyZl || !_coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(window))
             return false;
         if (window.ChainDepth == 0)
             return window.DelayedReturn is null && HappyZlCannotRespond(window.ParentFrameId, responderSeat);
         if (window.HappyZhangLiao is not { } r || r.Window != window.Id || r.Parent != window.ParentFrameId || r.Depth != window.ChainDepth || HappyZlColor(r.Actor, r.Target, r.Color)is not { } grant || grant.FrameId != r.GrantFrame)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<HappyZlCounterspellEvent>().Count(e => e.Receipt == r) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == r.ActionId && e.Action.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(window) && e.Action.ActorSeat == r.Actor && e.Action.Type == CardActionType.Response && e.Action.EffectiveKind == CardKind.Nullification && HappyZlCannotRespond(e.Action, responderSeat));
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZlCounterspellEvent>().Count(e => e.Receipt == r) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == r.ActionId && e.Action.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(window) && e.Action.ActorSeat == r.Actor && e.Action.Type == CardActionType.Response && e.Action.EffectiveKind == CardKind.Nullification && HappyZlCannotRespond(e.Action, responderSeat));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 40980)]
     internal void ObserveHappyZlCounterspell(IGameEvent payload)
     {
-        if (!HasHappyZl || payload is not CardActionAcceptedEvent { Action: { Type: CardActionType.Response, EffectiveKind: CardKind.Nullification } a } || _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } w || w.ChainDepth < 1 || !_coreDelayedNullificationOperations.HasNullificationEffectOwner(w) || a.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(w) || a.ResponderSeat != a.ActorSeat || a.RequesterSeat is not null || a.OpponentSeat != w.SourceSeat)
+        if (!HasHappyZl || payload is not CardActionAcceptedEvent { Action: { Type: CardActionType.Response, EffectiveKind: CardKind.Nullification } a } || _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } w || w.ChainDepth < 1 || !_coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(w) || a.ParentActionId != _coreDelayedNullificationOperations.Value.NullificationParentActionId(w) || a.ResponderSeat != a.ActorSeat || a.RequesterSeat is not null || a.OpponentSeat != w.SourceSeat)
             return;
-        var grant = _coreProgramEventHistoryOperations.ProgramEventHistory<HappyZlColorEvent>().LastOrDefault(e => e.Source.OwnerSeat == a.ActorSeat && HappyZlCannotRespond(a, e.Target));
+        var grant = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZlColorEvent>().LastOrDefault(e => e.Source.OwnerSeat == a.ActorSeat && HappyZlCannotRespond(a, e.Target));
         if (grant?.Color is not { } color)
             return;
         var receipt = new HappyZlCounterspell(w.Id, w.ParentFrameId, w.ChainDepth, a.ActionId, a.ActorSeat, grant.Target, color, grant.FrameId);
@@ -51,7 +51,7 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
 
     internal ProgramSkillFrame? HappyZlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.HappyZlFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40980)]
-    internal bool HappyZlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HappyZlObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
+    internal bool HappyZlDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && HappyZlObserverRoot()is { } r && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == r.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40980)]
     internal bool AdvanceHappyZlChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HappyZlObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40980)]

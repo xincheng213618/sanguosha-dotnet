@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineDyingProgramsRuntime
     internal void RevealProgramUniqueRankForDying(ProgramSkillFrame frame, CardZoneKind zone, int rescueHp)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("The unique-rank rescue has no dying occurrence.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("The unique-rank rescue has no dying occurrence.");
         if (active.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.ParentFrameId != dying.FrameId || dying.VictimSeat != active.OwnerSeat || dying.ResponderSeat != active.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Hp > 0)
             throw new InvalidOperationException("The unique-rank rescue lost its dying owner.");
         if (!_corePhysicalDrawFacadesOperations.EnsureDrawPile())
@@ -25,7 +25,7 @@ internal sealed partial class CoreGameEngineDyingProgramsRuntime
     internal void UseProgramBoundCardAsDyingAlcohol(ProgramSkillFrame frame, string sourceBind, CardMoveReason reason)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("The configured rescue has no dying occurrence.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("The configured rescue has no dying occurrence.");
         if (active.WindowContext is not { Window: SkillProgramTriggerWindow.DyingResponse } context || context.ParentFrameId != dying.FrameId || context.TargetSeat != dying.VictimSeat || dying.ResponderSeat != active.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp > 0)
             throw new InvalidOperationException("The configured rescue lost its responder or dying victim.");
         if (!_coreAlcoholIdentityPoliciesOperations.CanUseProgramDyingAlcohol(active, SkillProgramEffectOp.UseBoundCardAsDyingAlcohol))
@@ -73,7 +73,7 @@ internal sealed partial class CoreGameEngineDyingProgramsRuntime
     internal void UseProgramVirtualDyingAlcohol(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("The configured rescue has no dying occurrence.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("The configured rescue has no dying occurrence.");
         if (active.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.ParentFrameId != dying.FrameId || context.TargetSeat != dying.VictimSeat || dying.VictimSeat != active.OwnerSeat || dying.ResponderSeat != active.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp > 0)
             throw new InvalidOperationException("The configured rescue lost its dying owner.");
         if (!_coreAlcoholIdentityPoliciesOperations.CanUseProgramDyingAlcohol(active, SkillProgramEffectOp.UseVirtualDyingAlcohol))
@@ -102,7 +102,7 @@ internal sealed partial class CoreGameEngineDyingProgramsRuntime
     internal void ResumeProgramVirtualDyingAlcoholRecovery(long resolutionId, long programParentId, long dyingId)
     {
         var useIndex = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == resolutionId);
-        if (useIndex < 1 || useIndex != _resolutionStackOperations._resolutionStack.Count - 1 || _resolutionStackOperations._resolutionStack[useIndex] is not CardUseFrame { CardId: 0, CardKind: CardKind.Alcohol, PhysicalCardIds.Count: 0 } use || _resolutionStackOperations._resolutionStack[useIndex - 1] is not ProgramSkillFrame active || active.Id != programParentId || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.FrameId != dyingId || dying.VictimSeat != use.SourceSeat || active.OwnerSeat != use.SourceSeat || active.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.ParentFrameId != dyingId || context.TargetSeat != use.SourceSeat)
+        if (useIndex < 1 || useIndex != _resolutionStackOperations._resolutionStack.Count - 1 || _resolutionStackOperations._resolutionStack[useIndex] is not CardUseFrame { CardId: 0, CardKind: CardKind.Alcohol, PhysicalCardIds.Count: 0 } use || _resolutionStackOperations._resolutionStack[useIndex - 1] is not ProgramSkillFrame active || active.Id != programParentId || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.FrameId != dyingId || dying.VictimSeat != use.SourceSeat || active.OwnerSeat != use.SourceSeat || active.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.ParentFrameId != dyingId || context.TargetSeat != use.SourceSeat)
             throw new InvalidOperationException("Legacy virtual Alcohol recovery lost its exact accepted use and dying producer.");
         var victim = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat];
         if (!victim.IsAlive)

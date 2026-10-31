@@ -41,7 +41,7 @@ internal sealed partial class CharacterLuMengMobileRuntime
             return;
         }
 
-        if (frame.Stage is not (NativeDiscardEntryStage.Skipping or NativeDiscardEntryStage.Entering) || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDiscardEntryPolicyChosenEvent>().Count(e => e == new NativeDiscardEntryPolicyChosenEvent(frame.Id, frame.Source, frame.GameplayHash, frame.TurnNumber, frame.TurnOwnerSeat, frame.BeforePhase, frame.PlayPhaseInstanceId, frame.Stage == NativeDiscardEntryStage.Skipping)) != 1)
+        if (frame.Stage is not (NativeDiscardEntryStage.Skipping or NativeDiscardEntryStage.Entering) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDiscardEntryPolicyChosenEvent>().Count(e => e == new NativeDiscardEntryPolicyChosenEvent(frame.Id, frame.Source, frame.GameplayHash, frame.TurnNumber, frame.TurnOwnerSeat, frame.BeforePhase, frame.PlayPhaseInstanceId, frame.Stage == NativeDiscardEntryStage.Skipping)) != 1)
             throw new InvalidOperationException("A discard entry lost its singular accepted native choice.");
     }
 

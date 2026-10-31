@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime
     {
         if (!HasShanheChanrangCapability || batch.TurnNumber <= 0 || batch.MovementTiming is not { } timing)
             return;
-        var seen = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheChanrangFirstGainEvent>().Where(fact => fact.ActualTurn == batch.TurnNumber).Select(fact => fact.RecipientSeat).ToHashSet();
+        var seen = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheChanrangFirstGainEvent>().Where(fact => fact.ActualTurn == batch.TurnNumber).Select(fact => fact.RecipientSeat).ToHashSet();
         foreach (var seat in batch.Movements.Where(move => move.To.Zone == CardZoneKind.Hand && move.To.OwnerSeat is not null).Select(move => move.To.OwnerSeat!.Value).Distinct())
         {
             if (seat == timing.ActualTurnOwnerSeat || seen.Contains(seat))
@@ -23,14 +23,14 @@ internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime
 
     internal bool IsShanheChanrangCandidate(ProgramTriggerCandidate candidate) => candidate.SkillId == ShanheChanrangSkill && candidate.BindingId == "first-foreign-turn-gain";
     internal Card? ShanheChanrangEquipment(int owner, string instance) => _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner]).FirstOrDefault(card => card.Kind == CardKind.ShanRangZhaoShu && _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, ShanheChanrangSkill, instance, card));
-    internal int[] ShanheChanrangRecipients(CardMovementBatchContext batch, int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheChanrangFirstGainEvent>().Where(fact => fact.BatchId == batch.Id && fact.ActualTurn == batch.TurnNumber && fact.RecipientSeat != owner && _coreMatchParticipantsPlayersAccess._players[fact.RecipientSeat].IsAlive).OrderBy(fact => fact.FirstMovementSequence).ThenBy(fact => fact.RecipientSeat).Select(fact => fact.RecipientSeat).ToArray();
+    internal int[] ShanheChanrangRecipients(CardMovementBatchContext batch, int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheChanrangFirstGainEvent>().Where(fact => fact.BatchId == batch.Id && fact.ActualTurn == batch.TurnNumber && fact.RecipientSeat != owner && _coreMatchParticipantsPlayersAccess._players[fact.RecipientSeat].IsAlive).OrderBy(fact => fact.FirstMovementSequence).ThenBy(fact => fact.RecipientSeat).Select(fact => fact.RecipientSeat).ToArray();
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 5434)]
     internal void CollectShanheChanrangCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> candidates)
     {
         if (!HasShanheChanrangCapability)
             return;
         candidates.RemoveAll(IsShanheChanrangCandidate);
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheChanrangFirstGainEvent>().Any(fact => fact.BatchId == batch.Id))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheChanrangFirstGainEvent>().Any(fact => fact.BatchId == batch.Id))
             return;
         foreach (var player in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && _corePhysicalOwnedCardQueriesOperations.GetEquipment(player).Any(card => card.Kind == CardKind.ShanRangZhaoShu) && ShanheChanrangRecipients(batch, player.Seat).Length != 0))
             candidates.AddRange(_coreProgramLifecycleOperations.CollectProgramTriggerCandidates(player, SkillProgramTriggerWindow.CardsMoved).Where(candidate => IsShanheChanrangCandidate(candidate) && ShanheChanrangEquipment(player.Seat, candidate.SkillInstanceId)is not null));

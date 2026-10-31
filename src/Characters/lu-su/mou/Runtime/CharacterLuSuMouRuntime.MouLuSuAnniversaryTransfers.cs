@@ -29,7 +29,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         if (m.From != CardLocation.Processing)
             return null;
         var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(e => e.CardId == m.CardId && e.Sequence < m.Sequence);
-        return entry is { From.OwnerSeat: { } owner } && entry.To == CardLocation.Processing && owner != recipient && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuSuAnniversaryTransferInvoiceEvent>().Any(e => e.EntrySequence == entry.Sequence && e.Owner == owner && e.Recipient == recipient) ? owner : null;
+        return entry is { From.OwnerSeat: { } owner } && entry.To == CardLocation.Processing && owner != recipient && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuSuAnniversaryTransferInvoiceEvent>().Any(e => e.EntrySequence == entry.Sequence && e.Owner == owner && e.Recipient == recipient) ? owner : null;
     }
 
     internal static bool IsMouLuSuGainTrigger(SkillProgramTrigger t) => t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouLuSuMengmou);

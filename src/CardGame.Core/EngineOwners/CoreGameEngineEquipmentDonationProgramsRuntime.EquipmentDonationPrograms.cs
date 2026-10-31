@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineEquipmentDonationProgramsRuntime
             return AwaitEquipmentDonationMovements(frame.Id);
         }
 
-        if (!_coreEquipmentDonationObserversOperations.IsValidAllEquipmentDonation(frame))
+        if (!_coreEquipmentDonationObserversOperations.Value.IsValidAllEquipmentDonation(frame))
             throw new InvalidOperationException("Donation lost its frozen actual payment or limited usage.");
         var receipt = frame.EquipmentDonation;
         if (receipt.Stage is EquipmentDonationStage.Complete or EquipmentDonationStage.RecoveryIssued)
@@ -139,7 +139,7 @@ internal sealed partial class CoreGameEngineEquipmentDonationProgramsRuntime
 
     internal void ResolveEquipmentDonationChoice(ProgramSkillFrame f, PromptChoice choice)
     {
-        if (!_coreEquipmentDonationObserversOperations.IsValidAllEquipmentDonation(f) || f.EquipmentDonation is not { } receipt || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != receipt.RecipientSeat)
+        if (!_coreEquipmentDonationObserversOperations.Value.IsValidAllEquipmentDonation(f) || f.EquipmentDonation is not { } receipt || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != receipt.RecipientSeat)
             throw new InvalidOperationException("The recipient choice lost its exact paid donation.");
         choice = EquipmentDonationChoices(f).Single(c => c.Id == choice.Id);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

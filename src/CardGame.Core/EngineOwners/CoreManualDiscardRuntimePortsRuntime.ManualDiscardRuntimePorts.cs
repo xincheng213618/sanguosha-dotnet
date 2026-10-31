@@ -8,7 +8,7 @@ internal sealed partial class CoreManualDiscardRuntimePortsRuntime
     EngineStatus IManualDiscardFacts.Status => _coreMatchOutcomeStatusWinnerAccess._status;
 
     int IManualDiscardFacts.RequiredDiscard(CharacterState owner) => _coreTurnHandCategoryRestrictionsOperations.RequiredSelfHandLimitDiscard(owner);
-    int IManualDiscardFacts.QuotaMultiplier(CharacterState owner) => _corePlannedPhaseQuantitiesOperations.GetDiscardQuotaMultiplier(owner);
+    int IManualDiscardFacts.QuotaMultiplier(CharacterState owner) => _corePlannedPhaseQuantitiesOperations.Value.GetDiscardQuotaMultiplier(owner);
     IReadOnlyList<Card> IManualDiscardFacts.DiscardableHand(CharacterState owner) => _coreTurnHandCategoryRestrictionsOperations.GetSelfDiscardableHand(owner);
     int IManualDiscardFacts.HandLimit(CharacterState owner) => _coreNativeRuleQueriesOperations.GetHandLimit(owner);
     void IManualDiscardTransitions.SetPrompt(PendingDecision prompt)

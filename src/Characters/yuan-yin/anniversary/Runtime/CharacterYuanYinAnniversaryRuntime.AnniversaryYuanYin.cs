@@ -25,7 +25,7 @@ internal sealed partial class CharacterYuanYinAnniversaryRuntime
         if (f.AnniversaryYuanYin is not null || f.InstructionIndex != 1 || f.SkillId != AnniversaryYuanYinComposition.Moshou || f.TriggerId != "black-target-cycle" || f.WindowContext is not { CardUse: { } card } w || !CanOfferYuanYin(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0), _coreProgramLifecycleOperations.GetProgramTrigger(f), w))
             throw new InvalidOperationException("Moshou requires its original real black-card target after the optional activation.");
         var source = YuanYinSource(f);
-        var previous = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYuanYinMoshouAdvancedEvent>().LastOrDefault(e => e.Source == source && e.Hash == f.GameplayHash);
+        var previous = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYuanYinMoshouAdvancedEvent>().LastOrDefault(e => e.Source == source && e.Hash == f.GameplayHash);
         var requested = previous is { Next: > 0 } ? previous.Next : Math.Max(1, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp);
         var next = requested <= 1 ? 0 : requested - 1;
         var r = new AnniversaryYuanYinReceipt(source, f.GameplayHash, w.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, "moshou", "drawing")

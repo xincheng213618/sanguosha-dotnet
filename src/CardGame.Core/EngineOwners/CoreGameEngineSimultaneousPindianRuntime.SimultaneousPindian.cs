@@ -84,7 +84,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
         if (r.Stage == SimultaneousPindianStage.Claiming)
         {
             var claim = r.Claims!.Claims[r.Claims.Index];
-            var ids = _coreSimultaneousPindianClaimsOperations.AvailableSimultaneousClaimCards(claim);
+            var ids = _coreSimultaneousPindianClaimsOperations.Value.AvailableSimultaneousClaimCards(claim);
             return Array.AsReadOnly(new[] { new PromptChoice(new($"simultaneous.{(f.Id)}.{(r.ComparisonIndex)}.claim.{(r.Claims.Index)}"), $"获得拼点牌（{(ids.Length)}张）", ids, [], P("claim")), new PromptChoice(new($"simultaneous.{(f.Id)}.{(r.ComparisonIndex)}.claim-decline.{(r.Claims.Index)}"), "不获得拼点牌", [], [], P("claim-decline")) });
         }
 
@@ -136,7 +136,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
 
         if (r.Stage == SimultaneousPindianStage.Claiming)
         {
-            _coreSimultaneousPindianClaimsOperations.ResolveSimultaneousClaim(f, choice);
+            _coreSimultaneousPindianClaimsOperations.Value.ResolveSimultaneousClaim(f, choice);
             return;
         }
 
@@ -290,14 +290,14 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
             r = f.SimultaneousPindian!;
             if (r.Claims is null)
             {
-                var claims = _coreSimultaneousPindianClaimsOperations.FreezeSimultaneousClaims(f, pair);
+                var claims = _coreSimultaneousPindianClaimsOperations.Value.FreezeSimultaneousClaims(f, pair);
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimultaneousPindian = r = r with { Claims = claims } });
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SimultaneousPindianClaimsIssuedEvent(f.Id, r.ComparisonIndex, claims));
             }
 
             if (_characterJianYongBoundaryMobileOperations.TryBeginBoundaryJianYongSimultaneousZongshi(f))
                 return true;
-            if (_coreSimultaneousPindianClaimsOperations.OfferSimultaneousClaim(f))
+            if (_coreSimultaneousPindianClaimsOperations.Value.OfferSimultaneousClaim(f))
                 return true;
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             r = f.SimultaneousPindian!;

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouMengHuoCapability(Func<RuntimeEntries.CharacterMengHuoMouMobileEntries> getCharacterMengHuoMouMobileRuntime) : IMouMengHuoHost
+internal sealed class MouMengHuoCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterMengHuoMouMobileRuntime>> getCharacterMengHuoMouMobileRuntime) : IMouMengHuoHost
 {
-    public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterMengHuoMouMobileRuntime().ResolveMouMh(f, op);
+    public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterMengHuoMouMobileRuntime().Value.ResolveMouMh(f, op);
 }

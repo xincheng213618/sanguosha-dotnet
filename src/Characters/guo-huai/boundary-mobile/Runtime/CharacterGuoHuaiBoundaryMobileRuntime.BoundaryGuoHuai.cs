@@ -9,22 +9,22 @@ internal sealed partial class CharacterGuoHuaiBoundaryMobileRuntime
     {
         if (!HasBoundaryGuoHuaiJingce || batch.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || batch.ParentFrameId is not { } parent || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber <= 0)
             return;
-        foreach (var move in batch.Movements.Where(m => _coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(batch, m)))
+        foreach (var move in batch.Movements.Where(m => _coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, m)))
         {
             var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == move.CardId && m.Sequence < move.Sequence);
-            var actionId = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeTrueUseProcessingEntryEvent>().SingleOrDefault(e => e.ParentFrameId == parent && e.CardId == move.CardId && e.EntrySequence == entry.Sequence)?.ParentActionId ?? 0;
+            var actionId = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeTrueUseProcessingEntryEvent>().SingleOrDefault(e => e.ParentFrameId == parent && e.CardId == move.CardId && e.EntrySequence == entry.Sequence)?.ParentActionId ?? 0;
             RecordBoundaryGuoHuaiDiscard(move, parent, actionId, batch.TurnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
         }
     }
 
     internal void RecordBoundaryGuoHuaiDiscard(CardMovementRecord move, long nativeParent, long action, int turn, int actualOwner)
     {
-        if (move.From != CardLocation.Processing || move.To != CardLocation.DiscardPile || move.TurnNumber != turn || move.Sequence <= 0 || move.Sequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements[move.Sequence - 1] != move || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryGuoHuaiDiscardedEntityEvent>().Any(e => e.MovementSequence == move.Sequence))
+        if (move.From != CardLocation.Processing || move.To != CardLocation.DiscardPile || move.TurnNumber != turn || move.Sequence <= 0 || move.Sequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements[move.Sequence - 1] != move || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryGuoHuaiDiscardedEntityEvent>().Any(e => e.MovementSequence == move.Sequence))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryGuoHuaiDiscardedEntityEvent(turn, actualOwner, nativeParent, action, move.CardId, move.Sequence));
     }
 
-    internal int BoundaryGuoHuaiCount(int turn, int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryGuoHuaiDiscardedEntityEvent>().Count(e => e.TurnNumber == turn && e.ActualTurnOwnerSeat == owner);
+    internal int BoundaryGuoHuaiCount(int turn, int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryGuoHuaiDiscardedEntityEvent>().Count(e => e.TurnNumber == turn && e.ActualTurnOwnerSeat == owner);
     internal TurnEndingBoundaryFrame? BoundaryGuoHuaiEnding(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
         if (candidate.SkillId != BoundaryGuoHuaiComposition.Skill || candidate.BindingId != BoundaryGuoHuaiComposition.Ending || context is not { Window: SkillProgramTriggerWindow.TurnEnding, SourceSeat: { } actor, TargetSeat: { } target } || actor != candidate.OwnerSeat || target != actor || context.OwnerSeat != actor || actor != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(f => f.Id == context.ParentFrameId)is not { } ending || ending.OwnerSeat != actor || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || ending.ItemIndex < 0 || ending.ItemIndex >= ending.Items.Count || ending.Items[ending.ItemIndex].Candidate != candidate)

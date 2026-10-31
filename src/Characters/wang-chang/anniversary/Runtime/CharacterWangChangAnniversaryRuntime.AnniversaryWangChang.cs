@@ -264,7 +264,7 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
                 if (_coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None, effectiveRank: 0, physicalCardIds: [], conversionSource: r.Source, countsTowardLimit: false) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(f.OwnerSeat, target, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None, null))
                 {
                     _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryWangChang = r with { Stage = AnniversaryWangChangStage.IssuingSlash, UseId = 0, ActionId = 0, NativeReturned = false } });
-                    _coreTriggeredCardProgramsOperations.UseTriggeredProgramVirtualSlash(f, target);
+                    _coreTriggeredCardProgramsOperations.Value.UseTriggeredProgramVirtualSlash(f, target);
                     return;
                 }
 

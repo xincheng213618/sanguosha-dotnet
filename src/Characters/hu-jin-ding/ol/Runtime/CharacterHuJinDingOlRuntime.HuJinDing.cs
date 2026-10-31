@@ -19,7 +19,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
         var second = e.Op == SkillProgramEffectOp.SelectQingyuanFirstDamagePartner;
         if (QingyuanPartners(c.OwnerSeat, c.SkillId, c.SkillInstanceId).Any(p => p.FirstDamage == second))
             return false;
-        return second ? context.Window == SkillProgramTriggerWindow.AfterDamageApplied && context.TargetSeat == c.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<QingyuanFirstDamageEvent>().Any(d => d.OwnerSeat == c.OwnerSeat && d.DamageFrameId == context.DamageFrameId && d.Amount == context.Amount) : context.Window == SkillProgramTriggerWindow.GameStarting;
+        return second ? context.Window == SkillProgramTriggerWindow.AfterDamageApplied && context.TargetSeat == c.OwnerSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyuanFirstDamageEvent>().Any(d => d.OwnerSeat == c.OwnerSeat && d.DamageFrameId == context.DamageFrameId && d.Amount == context.Amount) : context.Window == SkillProgramTriggerWindow.GameStarting;
     }
 
     internal SkillProgramStepOutcome BeginQingyuan(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -27,7 +27,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.Qingyuan is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !CanOfferHuJinDing(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
             throw new InvalidOperationException("Qingyuan requires its exact unissued lifecycle or qualified hand-gain candidate.");
-        var receipt = new QingyuanReceipt(HuJinDingSource(f), f.GameplayHash, op, f.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, QingyuanStage.ChoosingPartner, Damage: op == SkillProgramEffectOp.SelectQingyuanFirstDamagePartner ? _coreProgramEventHistoryOperations.ProgramEventHistory<QingyuanFirstDamageEvent>().Single(d => d.OwnerSeat == f.OwnerSeat) : null);
+        var receipt = new QingyuanReceipt(HuJinDingSource(f), f.GameplayHash, op, f.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, QingyuanStage.ChoosingPartner, Damage: op == SkillProgramEffectOp.SelectQingyuanFirstDamagePartner ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyuanFirstDamageEvent>().Single(d => d.OwnerSeat == f.OwnerSeat) : null);
         if (op == SkillProgramEffectOp.TakeRandomQingyuanHandAfterGain)
             receipt = receipt with
             {

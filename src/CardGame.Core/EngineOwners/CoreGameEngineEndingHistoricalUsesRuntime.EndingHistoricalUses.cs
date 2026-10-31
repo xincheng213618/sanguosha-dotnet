@@ -127,7 +127,7 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
         var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, physical);
         var option = CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) ? _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: CoreGameEnginePublicPileColorsRuntime.SuitColor(suit), hasActualColor: true, physicalCardIds: [physical.Id], includeNextActualUseAdjustment: true).Single(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && o.TargetSeats.SequenceEqual(action.TargetSeats!)) : null;
         var adjustedBasic = action.ProgramActivationId == "next-actual-use-target-adjustment";
-        var fangtian = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action.TargetSeats.Count > 1 && _coreNativeDamageHandlesOperations.UsesFormalFangtianHalberd && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count == 1 && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.FangtianHalberd);
+        var fangtian = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action.TargetSeats.Count > 1 && _coreNativeDamageHandlesOperations.Value.UsesFormalFangtianHalberd && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count == 1 && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.FangtianHalberd);
         var programTargetCount = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && action.TargetSeats.Count > 1 && _coreProgramCardUseRulesOperations.UsesProgramCardTargetCount(actor, physical, kind, action.TargetSeats.Count);
         if (option?.NextActualUseAdjusted == true)
             _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats = option.TargetSeats;
@@ -137,9 +137,9 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var ret = new EndingHistoricalUseReturn(f.Id, f.InstructionIndex, r.Source, f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, r.EndingFrameId, r.SlotIndex, r.Slots[r.SlotIndex].CardActionId, id, use.Action!.ActionId, physical.Id, kind);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { EndingHistoricalUses = r with { UseReturn = ret } });
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { EndingHistoricalUseReturn = ret, EndingHistoricalCostBefore = _coreUniqueHpPeerProgramsOperations.RecipientContestSequence, EndingHistoricalActionKind = action.Kind, EndingHistoricalTargetCardId = action.TargetCardId, EndingHistoricalRequiredCardKind = option?.RequiredCardKind, EndingHistoricalUsesFangtian = fangtian, EndingHistoricalUsesProgramTargetCount = programTargetCount });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { EndingHistoricalUseReturn = ret, EndingHistoricalCostBefore = _coreUniqueHpPeerProgramsOperations.Value.RecipientContestSequence, EndingHistoricalActionKind = action.Kind, EndingHistoricalTargetCardId = action.TargetCardId, EndingHistoricalRequiredCardKind = option?.RequiredCardKind, EndingHistoricalUsesFangtian = fangtian, EndingHistoricalUsesProgramTargetCount = programTargetCount });
         _corePhysicalMovementFacadesOperations.MoveCard(physical, CardLocation.Hand(actor.Seat), CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { EndingHistoricalCostAfter = _coreUniqueHpPeerProgramsOperations.RecipientContestSequence });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { EndingHistoricalCostAfter = _coreUniqueHpPeerProgramsOperations.Value.RecipientContestSequence });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new EndingHistoricalUseIssuedEvent(ret));
         ContinueHistoricalEndingPayment(id);
     }
@@ -196,7 +196,7 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
             var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
             var nuzhan = _coreCardConversionsOperations.GetNuzhanModifiers(id, actor);
             var damage = (1 + actor.AlcoholDamageBonus) + nuzhan.DamageBonus;
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
             actor.HasAlcoholEffect = false;
             // Ending is outside Play: issue a genuine Use without consuming a
             // finite Play quota. The mature ordered owner drains every target.

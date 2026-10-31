@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineTurnHandCategoryRestrictionsRuntime
 {
     internal void GrantDamageSourceHandCategory(ProgramSkillFrame f, SkillProgramCardCategory category)
     {
-        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } source, TargetSeat: { } victim } c || victim != f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source) || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || damage.Id != c.ParentFrameId || damage.ParentFrameId != c.DamageFrameId || _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage).IsSourceLess || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2].Id != damage.Id || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()))
+        if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } source, TargetSeat: { } victim } c || victim != f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source) || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } damage || damage.Id != c.ParentFrameId || damage.ParentFrameId != c.DamageFrameId || _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage).IsSourceLess || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2].Id != damage.Id || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "伤害来源已不存在，未发行手牌类别限制。");
             return;
@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEngineTurnHandCategoryRestrictionsRuntime
             return 0;
         // Counted cards and self-discardable cards remain different sets. Only
         // the amount owed changes, then the actual legal payment caps it.
-        return (int)Math.Min((long)excess * _corePlannedPhaseQuantitiesOperations.GetDiscardQuotaMultiplier(owner), GetSelfDiscardableHand(owner).Count);
+        return (int)Math.Min((long)excess * _corePlannedPhaseQuantitiesOperations.Value.GetDiscardQuotaMultiplier(owner), GetSelfDiscardableHand(owner).Count);
     }
 
     internal IReadOnlyList<TurnHandCategoryRestriction>? GetTurnHandCategoryRestrictionSnapshot(int seat)

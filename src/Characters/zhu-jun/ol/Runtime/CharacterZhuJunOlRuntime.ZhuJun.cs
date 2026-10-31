@@ -44,7 +44,7 @@ internal sealed partial class CharacterZhuJunOlRuntime
         foreach (var binding in bindings.Where(b => b.Trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveCuipoActualTurnUse)))
         {
             var source = new CardConversionSource(binding.SkillId, binding.Trigger.Id, actor, binding.SkillInstanceId);
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<ZhuJunCuipoQualifiedEvent>().Any(e => e.OriginFrameId == ordinal.OriginFrameId && e.ActionId == action?.ActionId && e.Source == source))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhuJunCuipoQualifiedEvent>().Any(e => e.OriginFrameId == ordinal.OriginFrameId && e.ActionId == action?.ActionId && e.Source == source))
                 continue;
             var qualified = new ZhuJunCuipoQualifiedEvent(ordinal.OriginFrameId, action?.ActionId, source, binding.Program.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, kind, length, length, IsZhuJunDamageCard(kind));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(qualified);
@@ -64,7 +64,7 @@ internal sealed partial class CharacterZhuJunOlRuntime
             return null;
         var source = new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId);
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ZhuJunCuipoQualifiedEvent>().SingleOrDefault(e => !e.Damage && e.Source == source && e.GameplayHash == candidate.GameplayHash && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && e.EffectiveKind == card.EffectiveKind && (e.ActionId == card.CardActionId || e.ActionId is null && use is not null && e.OriginFrameId == use.Id && _coreActualTurnLegacyCompletionOperations.IsExactLegacyActualUseCompletion(use)));
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhuJunCuipoQualifiedEvent>().SingleOrDefault(e => !e.Damage && e.Source == source && e.GameplayHash == candidate.GameplayHash && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && e.EffectiveKind == card.EffectiveKind && (e.ActionId == card.CardActionId || e.ActionId is null && use is not null && e.OriginFrameId == use.Id && _coreActualTurnLegacyCompletionOperations.IsExactLegacyActualUseCompletion(use)));
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27030)]
@@ -77,7 +77,7 @@ internal sealed partial class CharacterZhuJunOlRuntime
             throw new InvalidOperationException("Cuipo requires its exact mandatory committed instruction.");
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority);
         var q = ZhuJunQualification(candidate, context) ?? throw new InvalidOperationException("Cuipo lost its declaration-qualified actual use.");
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ZhuJunCuipoDrawIssuedEvent>().Any(e => e.Source == q.Source && e.OriginFrameId == q.OriginFrameId && e.ActionId == q.ActionId))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhuJunCuipoDrawIssuedEvent>().Any(e => e.Source == q.Source && e.OriginFrameId == q.OriginFrameId && e.ActionId == q.ActionId))
             throw new InvalidOperationException("Cuipo cannot draw twice for one accepted use.");
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZhuJunCuipoDraw = new(q, context.ParentFrameId, f.InstructionIndex, before, before, 0), PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -137,7 +137,7 @@ internal sealed partial class CharacterZhuJunOlRuntime
         var actualAction = use.Action;
         foreach (var r in state.Grants)
         {
-            if (r.UseId != use.Id || r.EffectiveKind != use.CardKind || attack.EffectiveCardKind != r.EffectiveKind || !IsZhuJunDamageCard(r.EffectiveKind) || r.Ordinal != r.NameLength || r.NameLength != ZhuJunCardNameLength(r.EffectiveKind) || (actualAction is null ? use.SourceSeat != r.Source.OwnerSeat || r.ActionId is not null || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) : !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.Source.OwnerSeat, r.ProviderSeat) || r.ActionId is { } actionId && actualAction.ActionId != actionId) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhuJunCuipoQualifiedEvent>().Count(e => e.Damage && e.OriginFrameId == use.Id && e.ActionId == r.ActionId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Turn == r.Turn && e.TurnOwner == r.TurnOwner && e.EffectiveKind == r.EffectiveKind && e.Ordinal == r.Ordinal && e.NameLength == r.NameLength) != 1)
+            if (r.UseId != use.Id || r.EffectiveKind != use.CardKind || attack.EffectiveCardKind != r.EffectiveKind || !IsZhuJunDamageCard(r.EffectiveKind) || r.Ordinal != r.NameLength || r.NameLength != ZhuJunCardNameLength(r.EffectiveKind) || (actualAction is null ? use.SourceSeat != r.Source.OwnerSeat || r.ActionId is not null || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) : !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.Source.OwnerSeat, r.ProviderSeat) || r.ActionId is { } actionId && actualAction.ActionId != actionId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhuJunCuipoQualifiedEvent>().Count(e => e.Damage && e.OriginFrameId == use.Id && e.ActionId == r.ActionId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Turn == r.Turn && e.TurnOwner == r.TurnOwner && e.EffectiveKind == r.EffectiveKind && e.Ordinal == r.Ordinal && e.NameLength == r.NameLength) != 1)
                 throw new InvalidOperationException("Cuipo damage lost its exact issued native card and original accepted actor.");
         }
 

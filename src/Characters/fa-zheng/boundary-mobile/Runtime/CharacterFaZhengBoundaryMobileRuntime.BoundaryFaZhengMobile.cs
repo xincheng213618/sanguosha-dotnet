@@ -5,7 +5,7 @@ internal sealed partial class CharacterFaZhengBoundaryMobileRuntime
 {
     internal int[] FaZhengMobileAssistedTargets(ProgramSkillFrame frame, int actor)
     {
-        if (_characterJiangWeiBoundaryMobileOperations.MobileJiangWeiAssistedTargets(frame, actor)is { } mobileTargets)
+        if (_characterJiangWeiBoundaryMobileOperations.Value.MobileJiangWeiAssistedTargets(frame, actor)is { } mobileTargets)
             return mobileTargets;
         if (frame.SkillId != "boundary:xuanhuo-mobile")
             return _coreAssistedPhysicalCardsOperations.AssistedPhysicalSlashTargets(actor);

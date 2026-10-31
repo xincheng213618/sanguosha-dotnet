@@ -80,7 +80,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
             if (candidate.OwnerSeat != owner || candidate.ProgramId != skill || instance is not null && candidate.SkillInstanceId != instance)
                 continue;
             var receipt = borrows.SingleOrDefault(r => r.Candidate == candidate);
-            if (receipt is null || receipt.BorrowerSeat != owner || receipt.Selected.SkillId != skill || receipt.Selected.GameplayHash != candidate.GameplayHash || receipt.DamageFrameId != window.ParentFrameId || window.TargetSeat != owner || receipt.Source.OwnerSeat != owner || candidate.SkillInstanceId != $"keming:{(owner)}:{(receipt.Source.SkillInstanceId)}:{(skill)}" || _contentRegistryOperations._contentRegistry.GetSkill(skill).Program?.GameplayHash != candidate.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<KemingBorrowIssuedEvent>().Count(e => e.WindowId == window.Id && e.Receipt == receipt) != 1)
+            if (receipt is null || receipt.BorrowerSeat != owner || receipt.Selected.SkillId != skill || receipt.Selected.GameplayHash != candidate.GameplayHash || receipt.DamageFrameId != window.ParentFrameId || window.TargetSeat != owner || receipt.Source.OwnerSeat != owner || candidate.SkillInstanceId != $"keming:{(owner)}:{(receipt.Source.SkillInstanceId)}:{(skill)}" || _contentRegistryOperations._contentRegistry.GetSkill(skill).Program?.GameplayHash != candidate.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KemingBorrowIssuedEvent>().Count(e => e.WindowId == window.Id && e.Receipt == receipt) != 1)
                 continue;
             return receipt;
         }

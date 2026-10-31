@@ -31,7 +31,7 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
         var start = Array.FindLastIndex(facts, e => e is TurnStartedEvent);
         var since = facts.Skip(start + 1).ToArray();
         var first = since.OfType<TargetsConfirmedEvent>().FirstOrDefault(e => e.TargetSeats.Contains(owner) && since.OfType<CardUseDeclaredEvent>().Any(d => d.ResolutionId == e.ResolutionId && CoreNativeCardClassificationsRuntime.IsSlashCard(d.CardKind)));
-        return first?.ResolutionId == use.ParentCardUseFrameId && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappyDiaoChanStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.ResolveHappyDiaoChanMeihun && e.Source.OwnerSeat == owner && e.Source.BindingId == "first-slash-target" && e.ParentId == context.ParentFrameId);
+        return first?.ResolutionId == use.ParentCardUseFrameId && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyDiaoChanStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.ResolveHappyDiaoChanMeihun && e.Source.OwnerSeat == owner && e.Source.BindingId == "first-slash-target" && e.ParentId == context.ParentFrameId);
     }
 
     internal SkillProgramStepOutcome BeginHappyDc(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
@@ -250,7 +250,7 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
         {
             if (r.Stage == HappyDiaoChanStage.Pindian)
             {
-                var result = _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Single(e => e.FrameId == r.PindianId && e.SkillId == f.SkillId).Result;
+                var result = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().Single(e => e.FrameId == r.PindianId && e.SkillId == f.SkillId).Result;
                 var losers = new[]
                 {
                     result.SourceSeat,

@@ -88,7 +88,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
     internal void ResolveFirstSlashDuelChoice(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The first-use choice lost its owning frame.");
-        _coreFirstSlashDuelBenefitObserversOperations.RequireFirstSlashDuelBenefit(f);
+        _coreFirstSlashDuelBenefitObserversOperations.Value.RequireFirstSlashDuelBenefit(f);
         var r = f.FirstSlashDuelBenefit!;
         if (r.SelectedBranch is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], FirstSlashDuelChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The first-use choice is stale or already settled.");
@@ -129,7 +129,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FirstSlashDuelBenefit: { SelectedBranch: "draw" } } f || f.Id != id)
             return false;
-        _coreFirstSlashDuelBenefitObserversOperations.RequireFirstSlashDuelBenefit(f);
+        _coreFirstSlashDuelBenefitObserversOperations.Value.RequireFirstSlashDuelBenefit(f);
         if (!DrainFirstSlashDuelChildren(f))
             FinishFirstSlashDuelBenefit(f);
         return true;
@@ -140,14 +140,14 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
     {
         if (f.FirstSlashDuelBenefit?.SelectedBranch != "draw")
             return false;
-        _coreFirstSlashDuelBenefitObserversOperations.RequireFirstSlashDuelBenefit(f);
+        _coreFirstSlashDuelBenefitObserversOperations.Value.RequireFirstSlashDuelBenefit(f);
         if (!DrainFirstSlashDuelChildren(f))
             FinishFirstSlashDuelBenefit(f);
         return true;
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 390)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 390)]
-    internal bool CanContinueFirstSlashDuelBenefit(ProgramSkillFrame f) => f.FirstSlashDuelBenefit?.SelectedBranch == "draw" && _coreFirstSlashDuelBenefitObserversOperations.ValidFirstSlashDuelBenefit(f);
+    internal bool CanContinueFirstSlashDuelBenefit(ProgramSkillFrame f) => f.FirstSlashDuelBenefit?.SelectedBranch == "draw" && _coreFirstSlashDuelBenefitObserversOperations.Value.ValidFirstSlashDuelBenefit(f);
     [ProgramAiChoice(SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit)]
     internal PromptChoice SelectAiFirstSlashDuelBenefit(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.Single(c => c.Parameters["branch"] == (_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count < 3 ? "draw" : "damage"));
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 20)]

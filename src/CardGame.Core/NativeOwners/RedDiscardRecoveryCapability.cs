@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class RedDiscardRecoveryCapability(Func<RuntimeEntries.CoreGameEngineRedDiscardRecoveryEntries> getCoreGameEngineRedDiscardRecoveryRuntime) : IRedDiscardRecoveryHost
+internal sealed class RedDiscardRecoveryCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRedDiscardRecoveryRuntime>> getCoreGameEngineRedDiscardRecoveryRuntime) : IRedDiscardRecoveryHost
 {
-    public SkillProgramStepOutcome OfferRedDiscardRecoveryChoice(ProgramSkillFrame f) => getCoreGameEngineRedDiscardRecoveryRuntime().BeginRedDiscardRecovery(f);
+    public SkillProgramStepOutcome OfferRedDiscardRecoveryChoice(ProgramSkillFrame f) => getCoreGameEngineRedDiscardRecoveryRuntime().Value.BeginRedDiscardRecovery(f);
 }

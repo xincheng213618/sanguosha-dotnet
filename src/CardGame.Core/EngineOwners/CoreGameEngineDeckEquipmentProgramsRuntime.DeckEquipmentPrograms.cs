@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineDeckEquipmentProgramsRuntime
 {
     SkillProgramStepOutcome IDeckEquipmentProgramHost.UseRandomDeckEquipment(ProgramSkillFrame f, int seat, string bind) => UseProgramRandomDeckEquipment(f, seat, bind);
     void IDeckEquipmentProgramHost.GrantRandomSkillAndSuitShield(ProgramSkillFrame f, int seat, IReadOnlyList<string> skills, Suit suit) => GrantProgramRandomSkillAndSuitShield(f, seat, skills, suit);
-    internal bool IsShieldedRescueSelection(CharacterState owner, ProgramMultiCardViewAsSelection selection) => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HasBeneficiarySuitShield(owner.Seat, dying.VictimSeat, _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(selection) ? Suit.None : selection.Cards.Select(card => _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)).Distinct().ToArray()is [var suit] ? suit : null);
+    internal bool IsShieldedRescueSelection(CharacterState owner, ProgramMultiCardViewAsSelection selection) => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && HasBeneficiarySuitShield(owner.Seat, dying.VictimSeat, _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(selection) ? Suit.None : selection.Cards.Select(card => _coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)).Distinct().ToArray()is [var suit] ? suit : null);
     internal bool HasBeneficiarySuitShield(int actor, int target, Suit? suit) => actor != target && suit is { } actual && (_coreGameEngineDeckEquipmentProgramsBeneficiarySuitShieldSequenceBeneficiarySuitShieldsAccess._beneficiarySuitShields.Any(s => s.BeneficiarySeat == target && s.Suit == actual) || _characterDuXiOlOperations.IsDuXiSuitTargetProhibited(actor, target, actual));
     internal IReadOnlyList<LegalAction> FilterBeneficiarySuitShieldActions(CharacterState actor, IReadOnlyList<LegalAction> actions)
     {
@@ -76,9 +76,9 @@ internal sealed partial class CoreGameEngineDeckEquipmentProgramsRuntime
             return true;
         if (_characterXiangChongOlOperations.IsXiangChongGuyingEquipmentRide(ride, beneath) || _characterYangFuOlOperations.IsSuyiEquipmentRide(ride, beneath))
             return true;
-        if (_characterHuoJunOlOperations.IsHuoJunFenruiNativeEquipment(ride, beneath))
+        if (_characterHuoJunOlOperations.Value.IsHuoJunFenruiNativeEquipment(ride, beneath))
             return true;
-        if (_characterGuoZhaoAnniversaryOperations.IsAnniversaryGuoZhaoNativeEquipment(ride, beneath))
+        if (_characterGuoZhaoAnniversaryOperations.Value.IsAnniversaryGuoZhaoNativeEquipment(ride, beneath))
             return true;
         if (_coreFriendTrioOperations.FriendXuanjianFrameRidesOn(ride, beneath))
             return true;

@@ -22,7 +22,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     }
 
     internal int DuFuRenDamageCursor(GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetIndex : -1;
-    internal IReadOnlyList<DuFuRenBlackIssuedEvent> AvailableDuFuRenBlack(int target) => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenBlackIssuedEvent>().Where(g => g.RecipientSeat == target && !_coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenBlackConsumedEvent>().Any(c => c.GrantId == g.FrameId) && !_resolutionStackOperations._resolutionStack.Any(f => (f switch
+    internal IReadOnlyList<DuFuRenBlackIssuedEvent> AvailableDuFuRenBlack(int target) => Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuFuRenBlackIssuedEvent>().Where(g => g.RecipientSeat == target && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuFuRenBlackConsumedEvent>().Any(c => c.GrantId == g.FrameId) && !_resolutionStackOperations._resolutionStack.Any(f => (f switch
     {
         CardUseFrame u => u.DuFuRenDamage,
         ProgramSkillFrame p => p.DuFuRenDamage,
@@ -37,7 +37,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
         var cursor = DuFuRenDamageCursor(attack);
         if (DuFuRenDamageState(attack.ResolutionId)is { } previous && previous.TargetSeat == attack.TargetSeat && previous.ChainCursor == cursor)
         {
-            if (!previous.GrantIds.Any(id => _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenBlackConsumedEvent>().Any(e => e.GrantId == id)))
+            if (!previous.GrantIds.Any(id => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuFuRenBlackConsumedEvent>().Any(e => e.GrantId == id)))
                 return previous.GrantIds.Count;
             SetDuFuRenDamageState(attack.ResolutionId, null);
         }
@@ -64,11 +64,11 @@ internal sealed partial class CharacterDuFuRenOlRuntime
 
         if (!HasDuFuRenYise || payload is not DamageAppliedEvent { Amount: > 0 } e || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || damage.ParentFrameId != attack.ResolutionId || damage.TargetSeat != e.TargetSeat || damage.Amount != e.Amount || attack.TargetSeat != e.TargetSeat || DuFuRenDamageState(attack.ResolutionId)is not { } r || r.AttackId != attack.ResolutionId || (r.TransferredTargetSeat ?? r.TargetSeat) != e.TargetSeat || r.ChainCursor != DuFuRenDamageCursor(attack))
             return;
-        if (r.TransferredTargetSeat is { } recipient && (r.TransferWindowId is not { } windowId || !attack.DamageRedirected || _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenDamageTransferredEvent>().Count(x => x.AttackId == attack.ResolutionId && x.OriginalTargetSeat == r.TargetSeat && x.TargetSeat == recipient && x.ChainCursor == r.ChainCursor && x.WindowId == windowId && x.Amount == e.Amount) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageTransferredEvent>().Any(x => x.ResolutionId == attack.ResolutionId && x.TargetSeat == recipient && x.SourceSeat == attack.SourceSeat && x.DamageAmount == e.Amount)))
+        if (r.TransferredTargetSeat is { } recipient && (r.TransferWindowId is not { } windowId || !attack.DamageRedirected || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuFuRenDamageTransferredEvent>().Count(x => x.AttackId == attack.ResolutionId && x.OriginalTargetSeat == r.TargetSeat && x.TargetSeat == recipient && x.ChainCursor == r.ChainCursor && x.WindowId == windowId && x.Amount == e.Amount) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramDamageTransferredEvent>().Any(x => x.ResolutionId == attack.ResolutionId && x.TargetSeat == recipient && x.SourceSeat == attack.SourceSeat && x.DamageAmount == e.Amount)))
             throw new InvalidOperationException("Yise's transferred finalized amount lost its exact native original recipient invoice.");
         foreach (var grant in r.GrantIds)
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenBlackConsumedEvent>().Any(c => c.GrantId == grant))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuFuRenBlackConsumedEvent>().Any(c => c.GrantId == grant))
                 throw new InvalidOperationException("One Yise mark cannot fund two actual damage instances.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuFuRenBlackConsumedEvent(grant, attack.ResolutionId, damage.Id, e.TargetSeat, r.ChainCursor));
         }

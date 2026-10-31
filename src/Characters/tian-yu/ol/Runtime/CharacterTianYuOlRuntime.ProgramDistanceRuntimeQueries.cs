@@ -11,7 +11,7 @@ internal sealed partial class CharacterTianYuOlRuntime
 
     bool IDistanceRuleRuntimeQueries.HasTriggerOperation(SkillProgramEffectOp op) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(op);
     bool IDistanceRuleRuntimeQueries.HasSkill(int seat, string skillId) => _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[seat], skillId);
-    IReadOnlyList<T> IDistanceRuleRuntimeQueries.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IReadOnlyList<T> IDistanceRuleRuntimeQueries.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     IEnumerable<int> IDistanceRuleRuntimeQueries.OwnedCardIds(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat])).Select(card => card.Id);
     CardLocation IDistanceRuleRuntimeQueries.Location(int cardId) => _cardZonesOperations._cardZones.GetLocation(cardId);
     IEnumerable<ProgramDirectedDistanceLedgerEntry> IDistanceRuleRuntimeQueries.DirectedDistanceLedger()

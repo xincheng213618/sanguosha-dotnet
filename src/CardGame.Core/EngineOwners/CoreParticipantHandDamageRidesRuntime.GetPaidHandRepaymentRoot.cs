@@ -37,7 +37,7 @@ internal sealed partial class CoreParticipantHandDamageRidesRuntime
         }
         else
         {
-            if (action.ConversionChain is not [var conversion] || conversion.OwnerSeat != rescue.SourceSeat || string.IsNullOrWhiteSpace(conversion.SkillId) || string.IsNullOrWhiteSpace(conversion.BindingId) || string.IsNullOrWhiteSpace(conversion.SkillInstanceId) || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(conversion.SkillId)?.Program?.ViewAs.SingleOrDefault(r => r.Id == conversion.BindingId)is not { } rule || rule.OutputKind != rescue.CardKind || !rule.ForResponse && !(rule.UseOnly && rule.ForPlay) || (rule.InputCountExpression is null ? rule.InputCount != action.PhysicalCards.Count : !_characterZhaoYunOlGod2016Operations.HasPaidHpScaledViewAsAction(action)) || action.PhysicalCards.Any(cost => !rule.SourceZones.Contains(cost.From.Zone)))
+            if (action.ConversionChain is not [var conversion] || conversion.OwnerSeat != rescue.SourceSeat || string.IsNullOrWhiteSpace(conversion.SkillId) || string.IsNullOrWhiteSpace(conversion.BindingId) || string.IsNullOrWhiteSpace(conversion.SkillInstanceId) || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(conversion.SkillId)?.Program?.ViewAs.SingleOrDefault(r => r.Id == conversion.BindingId)is not { } rule || rule.OutputKind != rescue.CardKind || !rule.ForResponse && !(rule.UseOnly && rule.ForPlay) || (rule.InputCountExpression is null ? rule.InputCount != action.PhysicalCards.Count : !_characterZhaoYunOlGod2016Operations.Value.HasPaidHpScaledViewAsAction(action)) || action.PhysicalCards.Any(cost => !rule.SourceZones.Contains(cost.From.Zone)))
                 return false;
             // Validate frozen provenance, never the giver's post-payment skill availability, condition or rewritten suits.
             if (response.UsedPeach && response.UsedPeachPhysicalCardKind != (action.PhysicalCards.Count > 1 || action.PhysicalCards[0].CardKind == CardKind.Peach ? (CardKind? )null : action.PhysicalCards[0].CardKind))
@@ -84,7 +84,7 @@ internal sealed partial class CoreParticipantHandDamageRidesRuntime
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 380)]
     internal bool IsPaidHandRepaymentProgramDying()
     {
-        if (_coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } trigger || _coreDyingCursorRuntimeOperations.ActiveDying is not { ResumesProgramSkill: true } dying || GetPaidHandRepaymentRoot(trigger.Id)is not { } root || _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(f => f.Id == dying.FrameId)is not { } child || child.ParentFrameId != dying.ParentFrameId)
+        if (_coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } trigger || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { ResumesProgramSkill: true } dying || GetPaidHandRepaymentRoot(trigger.Id)is not { } root || _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(f => f.Id == dying.FrameId)is not { } child || child.ParentFrameId != dying.ParentFrameId)
             return false;
         var top = _coreDamageObserverCursorQueriesOperations.DamageCursorEffectiveTop(includeNestedObservers: true);
         if (top is null)

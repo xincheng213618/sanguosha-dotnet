@@ -44,7 +44,7 @@ internal sealed partial class CharacterZhangXiuMouRuntime
         var c = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
         return new MouZhangXiuAnniversaryCard(c.Id, c.Kind, _cardZonesOperations._cardZones.GetLocation(id), c.DisplayName);
     }).ToArray());
-    IEnumerable<T> IMouZhangXiuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouZhangXiuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     void IMouZhangXiuAnniversaryNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     void IMouZhangXiuAnniversaryNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     bool IMouZhangXiuAnniversaryNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);

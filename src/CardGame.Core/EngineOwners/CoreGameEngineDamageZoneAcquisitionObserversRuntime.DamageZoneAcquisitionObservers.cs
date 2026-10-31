@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionObserversRuntim
     {
         if (root.DamageZoneAcquisition is not { Stage: DamageZoneAcquisitionStage.MovementChildren } r)
             return false;
-        _coreDamageZoneAcquisitionOperations.RequireDamageAcquisitionReceipt(root);
+        _coreDamageZoneAcquisitionOperations.Value.RequireDamageAcquisitionReceipt(root);
         if (child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged)
             return skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex <= skills.Candidates.Count;
         if (root.PendingMovementContinuation is not null && child is CardsMovedTriggerWindowFrame moved)
@@ -25,5 +25,5 @@ internal sealed partial class CoreGameEngineDamageZoneAcquisitionObserversRuntim
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 480)]
     internal bool TryAdvanceDamageAcquisitionSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && DamageAcquisitionObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 10)]
-    internal bool IsDamageAcquisitionDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DamageAcquisitionObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsDamageAcquisitionDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && DamageAcquisitionObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

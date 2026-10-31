@@ -16,8 +16,8 @@ internal sealed partial class CharacterLingTongBoundaryMobileRuntime
         var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
         if (gate.Trigger.Id != "discard-phase" || phase is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } || phase.ActorSeat != gate.OwnerSeat || phase.ActualTurnOwnerSeat != gate.OwnerSeat)
             return false;
-        var invocations = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.Phase == phase && e.ExecutorSeat == gate.OwnerSeat).Select(e => e.InvocationId).ToHashSet();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(e => invocations.Contains(e.InvocationId) && e.From.OwnerSeat == gate.OwnerSeat && e.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment) >= 2;
+        var invocations = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.Phase == phase && e.ExecutorSeat == gate.OwnerSeat).Select(e => e.InvocationId).ToHashSet();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(e => invocations.Contains(e.InvocationId) && e.From.OwnerSeat == gate.OwnerSeat && e.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment) >= 2;
     }
 
     internal SkillProgramStepOutcome SelectBoundaryLingTongEquipmentPair(ProgramSkillFrame frame)

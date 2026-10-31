@@ -24,7 +24,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         if (owner is null)
             return;
         var p = ZonghuResponseOrigin(owner)!;
-        if (!ValidZonghuPayment(p) || p.OutputKind != a.EffectiveKind || p.Need.ActorSeat != a.ActorSeat || p.Need.ProviderSeat != a.ProviderSeat || p.Need.RequesterSeat != a.RequesterSeat || a.ResponderSeat != a.ActorSeat || a.TargetSeats.Count != 0 || a.OpponentSeat != p.Need.OpponentSeat || a.EffectiveIsRed is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuResponseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuUseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId))
+        if (!ValidZonghuPayment(p) || p.OutputKind != a.EffectiveKind || p.Need.ActorSeat != a.ActorSeat || p.Need.ProviderSeat != a.ProviderSeat || p.Need.RequesterSeat != a.RequesterSeat || a.ResponderSeat != a.ActorSeat || a.TargetSeats.Count != 0 || a.OpponentSeat != p.Need.OpponentSeat || a.EffectiveIsRed is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZonghuResponseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZonghuUseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId))
             throw new InvalidOperationException("Zonghu zero response changed its original native participants or already-issued cost.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZonghuResponseIssuedEvent(p.AttemptId, owner.Id, a.ActionId, a.ActorSeat, a.ProviderSeat, a.RequesterSeat, p.OutputKind, ZonghuResponseContinuation(p)));
     }
@@ -88,7 +88,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         if (a.Type != CardActionType.Response || a.PhysicalCards.Count != 0 || a.ConversionChain is not [var source] || source.SkillId != "ol:zonghu")
             return false;
-        return _resolutionStackOperations._resolutionStack.Any(f => ZonghuResponseOrigin(f)is { } p && ValidZonghuPayment(p) && p.Source == source && p.Need.ActorSeat == a.ActorSeat && p.Need.ProviderSeat == a.ProviderSeat && p.Need.RequesterSeat == a.RequesterSeat && p.Need.ParentActionId == a.ParentActionId && p.OutputKind == a.EffectiveKind && _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuResponseIssuedEvent>().Count(e => e.AttemptId == p.AttemptId && e.OwnerFrameId == f.Id && e.ActionId == a.ActionId && e.Continuation == c) == 1);
+        return _resolutionStackOperations._resolutionStack.Any(f => ZonghuResponseOrigin(f)is { } p && ValidZonghuPayment(p) && p.Source == source && p.Need.ActorSeat == a.ActorSeat && p.Need.ProviderSeat == a.ProviderSeat && p.Need.RequesterSeat == a.RequesterSeat && p.Need.ParentActionId == a.ParentActionId && p.OutputKind == a.EffectiveKind && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZonghuResponseIssuedEvent>().Count(e => e.AttemptId == p.AttemptId && e.OwnerFrameId == f.Id && e.ActionId == a.ActionId && e.Continuation == c) == 1);
     }
 
     internal void DispatchZonghuFactionUse(ZonghuPaidOrigin p)
@@ -160,7 +160,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
 
         if (n.Intent == ZonghuIntent.Dying)
         {
-            _coreNativeDyingOperations.RequestHumanDyingResponse(actor, _coreNativeDyingOperations.GetDyingPeaches(actor), _coreNativeDyingOperations.GetDyingAlcohols(actor, _coreDyingCursorRuntimeOperations.ActiveDying!.VictimSeat));
+            _coreNativeDyingOperations.RequestHumanDyingResponse(actor, _coreNativeDyingOperations.GetDyingPeaches(actor), _coreNativeDyingOperations.GetDyingAlcohols(actor, _coreDyingCursorRuntimeOperations.Value.ActiveDying!.VictimSeat));
             return;
         }
 

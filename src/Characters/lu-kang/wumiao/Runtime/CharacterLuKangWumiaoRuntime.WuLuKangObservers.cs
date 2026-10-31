@@ -11,12 +11,12 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         foreach (var m in _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > before && m.Sequence <= after && m.Reason.Value != WuLuKangReserveReason))
         {
             var fact = new WuLuKangMovementSignedEvent(id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence);
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangMovementSignedEvent>().Contains(fact))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuLuKangMovementSignedEvent>().Contains(fact))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(fact);
         }
     }
 
-    internal bool WuLuKangSignedMovement(ProgramSkillFrame f, CardMovementRecord m) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangMovementSignedEvent>().Count(e => e == new WuLuKangMovementSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1;
+    internal bool WuLuKangSignedMovement(ProgramSkillFrame f, CardMovementRecord m) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuLuKangMovementSignedEvent>().Count(e => e == new WuLuKangMovementSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1;
     internal bool IsWuLuKangMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => p == f.PendingMovementContinuation && p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && (e?.Op == SkillProgramEffectOp.ResolveWuLuKangShenduan && f.WuLuKangShenduan is { Stage: not WuLuKangShenduanStage.DiscardChoice and not WuLuKangShenduanStage.Drawing } && ValidWuLuKangShenduan(f) || e?.Op == SkillProgramEffectOp.ResolveWuLuKangKegou && f.WuLuKangKegou is { Stage: WuLuKangKegouStage.GainChildren or WuLuKangKegouStage.NativeSlashChildren } && ValidWuLuKangKegou(f));
     internal bool DrainWuLuKangChildren(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     internal bool WuLuKangFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -46,7 +46,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
             return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => m.Sequence > before && m.Sequence <= after && WuLuKangSignedMovement(f, m));
         }
 
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
+        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
     internal bool WuLuKangObserverEdge(int n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[n - 1], _resolutionStackOperations._resolutionStack[n]) || _resolutionStackOperations._resolutionStack[n - 1] is ProgramSkillFrame f && WuLuKangFirstChild(f, _resolutionStackOperations._resolutionStack[n]) || WuLuKangPindianEdge(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[n], _resolutionStackOperations._resolutionStack[n - 1]);
@@ -54,7 +54,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     internal ProgramSkillFrame? WuLuKangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.WuLuKangFirstChild(f, c), (n) => this.WuLuKangObserverSuffix(n));
     internal bool HasWuLuKangBeforeDamageObserver(long id) => WuLuKangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id && f is BeforeDamageProgramWindowFrame) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 750)]
-    internal bool IsWuLuKangDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WuLuKangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsWuLuKangDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && WuLuKangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 530)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 520)]
     internal bool IsWuLuKangRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

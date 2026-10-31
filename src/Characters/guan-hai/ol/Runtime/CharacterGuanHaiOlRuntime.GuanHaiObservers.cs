@@ -22,7 +22,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
             return false;
         if (r.Stage == GuanHaiStage.XieweiChildren)
             return _coreCardUseLifecycleOperations.LifecycleCardUse(r.NativeUseId)?.XieweiPayments?.Any(p => p.Id == r.PaymentId && ValidXieweiPayment(p) && p.Movements.Contains(m)) == true;
-        if (r.Stage == GuanHaiStage.Pindian && _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().SingleOrDefault(e => e.FrameId == r.PindianId && e.SkillId == f.SkillId)is { Result: { } result })
+        if (r.Stage == GuanHaiStage.Pindian && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().SingleOrDefault(e => e.FrameId == r.PindianId && e.SkillId == f.SkillId)is { Result: { } result })
             return new[]
             {
                 result.SourceCardId,
@@ -42,7 +42,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         if (f.GuanHai is not { Paid: true } r)
             return false;
         if (child is PindianFrame p)
-            return r.Stage == GuanHaiStage.Pindian && p.ParentFrameId == f.Id && p.Id == r.PindianId && IsGuanHaiPindianSource(p, _corePindianOwnedPileSourcesOperations.HasPaidOwnedPilePindianSource(p));
+            return r.Stage == GuanHaiStage.Pindian && p.ParentFrameId == f.Id && p.Id == r.PindianId && IsGuanHaiPindianSource(p, _corePindianOwnedPileSourcesOperations.Value.HasPaidOwnedPilePindianSource(p));
         if (child is CardUseFrame use)
             return r.Stage == GuanHaiStage.NativeSlash && use.YouqueSlash?.ProgramFrameId == f.Id && IsIssuedYouqueUse(use);
         if (r.Stage == GuanHaiStage.RewardDraw && f.NativeDraw is not null)

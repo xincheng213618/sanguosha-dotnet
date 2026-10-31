@@ -25,7 +25,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         use = null !;
         window = null !;
         target = -1;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } id } || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != id.ParentCardUseFrameId || w.CompletedResponseReturn is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { Type: CardActionType.Use } a, MoQuanyuSoleUse: { } original } u || original != new MoQuanyuSoleUse(u.Id, a.ActionId, w.Id, actor, original.TargetSeat, u.CardKind) || a.ActorSeat != actor || u.SourceSeat != actor || a.EffectiveKind != u.CardKind || a.ActionId != id.CardActionId || w.Action.ActionId != a.ActionId || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuSoleUseCapturedEvent>().Count(e => e.Original == original) != 1)
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } id } || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.ParentFrameId != id.ParentCardUseFrameId || w.CompletedResponseReturn is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { Type: CardActionType.Use } a, MoQuanyuSoleUse: { } original } u || original != new MoQuanyuSoleUse(u.Id, a.ActionId, w.Id, actor, original.TargetSeat, u.CardKind) || a.ActorSeat != actor || u.SourceSeat != actor || a.EffectiveKind != u.CardKind || a.ActionId != id.CardActionId || w.Action.ActionId != a.ActionId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQuanyuSoleUseCapturedEvent>().Count(e => e.Original == original) != 1)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == w.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != u.Id)
@@ -42,7 +42,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     {
         if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMoSunQuanQuanyuSlashEffects))
             return true;
-        return candidate.SkillId == "ol:mo-quanyu" && candidate.BindingId == "singleton-slash-effects" && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && TryGetMoQuanyuSingletonUse(candidate.OwnerSeat, context, out var use, out var window, out var target) && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window) && MoQuanyuSlashMask(candidate.OwnerSeat, target) != 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuSlashStartedEvent>().Any(e => e.Original.UseId == use.Id && e.Source.OwnerSeat == candidate.OwnerSeat);
+        return candidate.SkillId == "ol:mo-quanyu" && candidate.BindingId == "singleton-slash-effects" && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && TryGetMoQuanyuSingletonUse(candidate.OwnerSeat, context, out var use, out var window, out var target) && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window) && MoQuanyuSlashMask(candidate.OwnerSeat, target) != 0 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQuanyuSlashStartedEvent>().Any(e => e.Original.UseId == use.Id && e.Source.OwnerSeat == candidate.OwnerSeat);
     }
 
     internal SkillProgramStepOutcome BeginMoQuanyuSlash(ProgramSkillFrame supplied)
@@ -121,7 +121,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     {
         var r = f.MoQuanyuSlash ?? throw new InvalidOperationException("Quanyu lost its issued sword effects.");
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(r.Original.UseId) ?? throw new InvalidOperationException("Quanyu lost its one accepted Use.");
-        if (r.Stage != MoQuanyuSlashStage.AdditionalTarget || use.MoQuanyuSlashPolicy is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuSlashStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == f.GameplayHash && e.Original == r.Original && e.Mask == r.Mask) != 1)
+        if (r.Stage != MoQuanyuSlashStage.AdditionalTarget || use.MoQuanyuSlashPolicy is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQuanyuSlashStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == f.GameplayHash && e.Original == r.Original && e.Mask == r.Mask) != 1)
             throw new InvalidOperationException("Quanyu's accepted effects cannot be repeated or retargeted.");
         r = r with
         {

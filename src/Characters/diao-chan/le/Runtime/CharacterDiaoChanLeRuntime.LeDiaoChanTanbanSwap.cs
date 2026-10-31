@@ -18,16 +18,16 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             return false;
         var candidate = new ProgramTriggerCandidate(frame.OwnerSeat, frame.SkillId, frame.TriggerId, frame.SkillInstanceId, frame.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(frame).Priority, context.OccurrenceIndex);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == context.ParentFrameId && IsExactTanbanDrawEndCandidate(candidate, context) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == frame.Id && e.OwnerSeat == frame.OwnerSeat && e.SkillId == frame.SkillId && e.BindingId == frame.TriggerId && e.SkillInstanceId == frame.SkillInstanceId && e.Window == context.Window) == 1;
+        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == context.ParentFrameId && IsExactTanbanDrawEndCandidate(candidate, context) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == frame.Id && e.OwnerSeat == frame.OwnerSeat && e.SkillId == frame.SkillId && e.BindingId == frame.TriggerId && e.SkillInstanceId == frame.SkillInstanceId && e.Window == context.Window) == 1;
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29041)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 29041)]
-    internal bool PermitCompletedTanbanSwap(ProgramSkillFrame frame) => ExactTanbanDrawEndFrame(frame) && _coreProgramEventHistoryOperations.ProgramEventHistory<TanbanHandMarksSwappedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var paid] && paid.Source == TanbanSource(frame) && paid.GameplayHash == frame.GameplayHash && paid.WindowId == frame.WindowContext!.ParentFrameId && paid.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && paid.HolderSeat == frame.OwnerSeat;
+    internal bool PermitCompletedTanbanSwap(ProgramSkillFrame frame) => ExactTanbanDrawEndFrame(frame) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanHandMarksSwappedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var paid] && paid.Source == TanbanSource(frame) && paid.GameplayHash == frame.GameplayHash && paid.WindowId == frame.WindowContext!.ParentFrameId && paid.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && paid.HolderSeat == frame.OwnerSeat;
     internal SkillProgramStepOutcome SwapTanbanHandMarks(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!ExactTanbanDrawEndFrame(frame) || _coreProgramEventHistoryOperations.ProgramEventHistory<TanbanHandMarksSwappedEvent>().Any(e => e.FrameId == frame.Id) || _coreProgramEventHistoryOperations.ProgramEventHistory<TanbanEntityMarkChangedEvent>().Any(e => e.FrameId == frame.Id))
+        if (!ExactTanbanDrawEndFrame(frame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanHandMarksSwappedEvent>().Any(e => e.FrameId == frame.Id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanEntityMarkChangedEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("Tanban inversion requires its once-accepted exact actual draw-end mother.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         if (!owner.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, frame.SkillId, frame.SkillInstanceId))

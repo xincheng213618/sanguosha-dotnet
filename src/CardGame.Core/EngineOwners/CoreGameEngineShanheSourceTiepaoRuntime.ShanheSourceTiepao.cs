@@ -12,11 +12,11 @@ internal sealed partial class CoreGameEngineShanheSourceTiepaoRuntime
             return null;
         // Resolve the suspended owner by the original DamageFrame's parent.
         // CurrentDamageAttempt may now belong to the counter-Slash child.
-        var attack = _coreDamageArmorPaymentsOperations.DamageArmorPaymentOwner(damage);
+        var attack = _coreDamageArmorPaymentsOperations.Value.DamageArmorPaymentOwner(damage);
         return attack is { DamageWasApplied: true, IsSourceLess: false } && attack.ResolutionId == damage.ParentFrameId && attack.SourceSeat == damage.SourceSeat && attack.TargetSeat == damage.TargetSeat && attack.DamageAmount == damage.Amount && window.SourceCardId == attack.Card?.Id && window.SourceCard == attack.EffectiveCardKind ? attack : null;
     }
 
-    internal bool SourceTiepaoDamage(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => c.SkillId == ShanheSourceTiepaoComposition.SkillId && w.Window == SkillProgramTriggerWindow.AfterDamageApplied && w.TargetSeat == c.OwnerSeat && w.Amount > 0 && w.SourceSeat is { } source && source != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[source].IsAlive && w.DamageFrameId is { } damageId && _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } parent && parent.Id == w.ParentFrameId && parent.ParentFrameId == damageId && SourceTiepaoOriginalAttack(parent, damageId, w.Amount)is { } attack && attack.SourceSeat == source && attack.TargetSeat == c.OwnerSeat;
+    internal bool SourceTiepaoDamage(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => c.SkillId == ShanheSourceTiepaoComposition.SkillId && w.Window == SkillProgramTriggerWindow.AfterDamageApplied && w.TargetSeat == c.OwnerSeat && w.Amount > 0 && w.SourceSeat is { } source && source != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[source].IsAlive && w.DamageFrameId is { } damageId && _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is { } parent && parent.Id == w.ParentFrameId && parent.ParentFrameId == damageId && SourceTiepaoOriginalAttack(parent, damageId, w.Amount)is { } attack && attack.SourceSeat == source && attack.TargetSeat == c.OwnerSeat;
     internal CardConversionSource SourceTiepaoConversion(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool SourceTiepaoMaterialLegal(int owner, int target, Card card, CardConversionSource source)
     {
@@ -100,7 +100,7 @@ internal sealed partial class CoreGameEngineShanheSourceTiepaoRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheSourceTiepao: { } r } f || r.UseId != use.Id)
             return;
-        if (r.Returned || use.Action?.ActionId != r.ActionId || use.CardId != r.MaterialCardId || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceTiepaoIssuedEvent>().Any(e => e.ProgramFrameId == f.Id && e.UseId == use.Id && e.ActionId == r.ActionId))
+        if (r.Returned || use.Action?.ActionId != r.ActionId || use.CardId != r.MaterialCardId || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceTiepaoIssuedEvent>().Any(e => e.ProgramFrameId == f.Id && e.UseId == use.Id && e.ActionId == r.ActionId))
             throw new InvalidOperationException("Source14075 requires its exact once-completed native Slash return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheSourceTiepao = r with { Returned = true } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceTiepaoReturnedEvent(f.Id, use.Id, f.OwnerSeat, use.CausedDamage));
@@ -128,7 +128,7 @@ internal sealed partial class CoreGameEngineShanheSourceTiepaoRuntime
     {
         if (q.Source.Seat == q.Target.Seat)
             return;
-        foreach (var g in _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceTiepaoDistanceGrantedEvent>().Where(g => g.AffectedSeat == q.Source.Seat && g.OwnerSeat == q.Target.Seat && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Any(t => t.ActorSeat == g.OwnerSeat && t.TurnNumber > g.ActualTurn)))
+        foreach (var g in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceTiepaoDistanceGrantedEvent>().Where(g => g.AffectedSeat == q.Source.Seat && g.OwnerSeat == q.Target.Seat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Any(t => t.ActorSeat == g.OwnerSeat && t.TurnNumber > g.ActualTurn)))
             terms.Add(new($"source-tiepao:{(g.ProgramFrameId)}:{(g.UseId)}", 1));
     }
 

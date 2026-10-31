@@ -12,7 +12,7 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
     {
         1,
         2
-    }.Where(option => !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYanXiangOptionChosenEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillInstanceId == instance && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Phase == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && e.Option == option)).ToArray();
+    }.Where(option => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYanXiangOptionChosenEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillInstanceId == instance && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Phase == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && e.Option == option)).ToArray();
     internal Card[] YanXiangDiscardableHand(int actor) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[actor]).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(actor, c, CardLocation.Hand(actor), OwnedCardMoveIntent.Discard)).OrderBy(c => c.Id).ToArray();
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 46800, SkillProgramEffectOp.ResolveAnniversaryYanXiangYuzheng)]
     internal bool CanActivateYanXiang(ProgramActivationLegalityContext c) => c.Owner.IsAlive && c.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreNationalSkillsOperations.GetSkillBindingShard(c.Owner).ProgramInstances.Where(i => i.SkillId == AnniversaryYanXiangComposition.Yuzheng).Any(i => YanXiangAvailableOptions(c.OwnerSeat, i.SkillInstanceId).Length > 0);
@@ -217,9 +217,9 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
     internal void IssueYanXiangLease(ProgramSkillFrame f, int amount)
     {
         var r = f.AnniversaryYanXiang!;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYanXiangLeaseEvent>().Any(e => e.Id == f.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYanXiangLeaseEvent>().Any(e => e.Id == f.Id))
             throw new InvalidOperationException("Yuzheng cannot issue the same paid round effect twice.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryYanXiangLeaseEvent(f.Id, r.Source, r.Hash, r.Round, r.Actor, r.Option, amount, _coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Count(), _coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryYanXiangLeaseEvent(f.Id, r.Source, r.Hash, r.Round, r.Actor, r.Option, amount, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Count(), _coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence));
     }
 
     internal void ContinueYanXiang(long id)
@@ -244,7 +244,7 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
         if (r.Operation == SkillProgramEffectOp.ResolveAnniversaryYanXiangYuzheng)
         {
-            var actual = r.Option == 2 ? r.Requested : _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(m => m.From == CardLocation.Hand(r.Actor) && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(i => i.InvocationId == m.InvocationId && i.ParentFrameId == f.Id && i.Reason.Value == YanXiangDiscardReason && i.SequenceBefore >= r.Before && i.SequenceAfter <= r.After));
+            var actual = r.Option == 2 ? r.Requested : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(m => m.From == CardLocation.Hand(r.Actor) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(i => i.InvocationId == m.InvocationId && i.ParentFrameId == f.Id && i.Reason.Value == YanXiangDiscardReason && i.SequenceBefore >= r.Before && i.SequenceAfter <= r.After));
             IssueYanXiangLease(f, actual);
             FinishYanXiang(f);
             return;

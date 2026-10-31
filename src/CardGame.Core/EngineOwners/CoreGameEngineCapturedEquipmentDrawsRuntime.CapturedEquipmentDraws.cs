@@ -64,7 +64,7 @@ internal sealed partial class CoreGameEngineCapturedEquipmentDrawsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.CapturedEquipmentDraw is not { } r)
             return false;
-        if (_coreActualDiscardRecoveriesOperations.DrainCapturedEquipmentOrDiscardChildren(f))
+        if (_coreActualDiscardRecoveriesOperations.Value.DrainCapturedEquipmentOrDiscardChildren(f))
             return true;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         r = f.CapturedEquipmentDraw!;

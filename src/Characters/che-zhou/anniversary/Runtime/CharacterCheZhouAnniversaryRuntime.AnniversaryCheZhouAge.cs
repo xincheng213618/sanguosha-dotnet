@@ -13,14 +13,14 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
             return;
         if (fact is RoundStartedEvent round)
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCheZhouRoundBoundaryEvent>().Any(e => e.Round == round.RoundNumber))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCheZhouRoundBoundaryEvent>().Any(e => e.Round == round.RoundNumber))
                 throw new InvalidOperationException("Che Zhou cannot issue the same actual round boundary twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryCheZhouRoundBoundaryEvent(round.RoundNumber, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         }
 
         if (fact is not CardUseDeclaredEvent declared || _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use)
             return;
-        if (use.AnniversaryCheZhouAge is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCheZhouUseAgeCapturedEvent>().Any(e => e.UseId == use.Id))
+        if (use.AnniversaryCheZhouAge is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCheZhouUseAgeCapturedEvent>().Any(e => e.UseId == use.Id))
             throw new InvalidOperationException("Che Zhou cannot replace an accepted Use's original age receipt.");
         var r = new AnniversaryCheZhouUseAge(action.ActionId, action.ActorSeat, Math.Max(1, _coreActualRoundProgressRoundNumberAccess._roundNumber), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, action.PhysicalCards.Count, AnniversaryCheZhouAgeAt(use, Math.Max(1, _coreActualRoundProgressRoundNumberAccess._roundNumber), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, f => f with { AnniversaryCheZhouAge = r });
@@ -48,7 +48,7 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
                 CardMovementRecord? departure = null;
                 if (use.PaymentMovementReceipt is { } native && native.OwnerFrameId == use.Id && native.ActionId == action.ActionId)
                     departure = native.Batch.Movements.SingleOrDefault(m => m.CardId == material.CardId && m.From == material.From && m.Sequence <= cutoff && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
-                if (departure is null && use.AcceptedDeclarationPayment is { } paid && paid.OwnerFrameId == use.Id && paid.ProviderSeat == action.ActorSeat && paid.Cost == material && locationAtDeclaration.From == material.From && locationAtDeclaration.To == CardLocation.Processing && locationAtDeclaration.Reason.Value == "conversion.declaration.pay" && _coreProgramEventHistoryOperations.ProgramEventHistory<CardDeclarationCommittedEvent>().Any(e => e.DeclarationId == paid.DeclarationId && e.OwnerSeat == paid.ProviderSeat))
+                if (departure is null && use.AcceptedDeclarationPayment is { } paid && paid.OwnerFrameId == use.Id && paid.ProviderSeat == action.ActorSeat && paid.Cost == material && locationAtDeclaration.From == material.From && locationAtDeclaration.To == CardLocation.Processing && locationAtDeclaration.Reason.Value == "conversion.declaration.pay" && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardDeclarationCommittedEvent>().Any(e => e.DeclarationId == paid.DeclarationId && e.OwnerSeat == paid.ProviderSeat))
                     departure = locationAtDeclaration;
                 if (departure is null || departure.Sequence != locationAtDeclaration.Sequence)
                     return 0;
@@ -58,7 +58,7 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
             var gain = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == material.CardId && m.Sequence <= heldThrough && m.To == material.From && m.From != m.To);
             if (gain is null || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == material.CardId && m.Sequence > gain.Sequence && m.Sequence <= heldThrough && m.From == material.From && m.To != m.From))
                 return 0;
-            var acquiredRound = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCheZhouRoundBoundaryEvent>().Where(e => e.MovementSequence < gain.Sequence).Select(e => e.Round).DefaultIfEmpty(1).Max();
+            var acquiredRound = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCheZhouRoundBoundaryEvent>().Where(e => e.MovementSequence < gain.Sequence).Select(e => e.Round).DefaultIfEmpty(1).Max();
             minimum = Math.Min(minimum, Math.Max(1, checked(round - acquiredRound + 1)));
         }
 
@@ -69,7 +69,7 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
     {
         if (use.AnniversaryCheZhouAge is not { } r || use.Action is not { Type: CardActionType.Use } a || r.ActionId != a.ActionId || r.Actor != a.ActorSeat || r.Round <= 0 || r.Round > Math.Max(1, _coreActualRoundProgressRoundNumberAccess._roundNumber) || r.Cutoff < 0 || r.Cutoff > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Materials != a.PhysicalCards.Count || r.Age != AnniversaryCheZhouAgeAt(use, r.Round, r.Cutoff))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCheZhouUseAgeCapturedEvent>().Where(e => e.UseId == use.Id).ToArray()is [var issued] && issued == new AnniversaryCheZhouUseAgeCapturedEvent(use.Id, r.ActionId, r.Actor, r.Round, r.Cutoff, r.Materials, r.Age);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCheZhouUseAgeCapturedEvent>().Where(e => e.UseId == use.Id).ToArray()is [var issued] && issued == new AnniversaryCheZhouUseAgeCapturedEvent(use.Id, r.ActionId, r.Actor, r.Round, r.Cutoff, r.Materials, r.Age);
     }
 
     internal bool TryGetAnniversaryCheZhouDamageReplacement(GameEngine.IDamageAttempt attack, out int amount)

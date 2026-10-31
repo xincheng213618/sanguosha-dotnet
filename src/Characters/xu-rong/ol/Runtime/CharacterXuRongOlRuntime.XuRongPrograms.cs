@@ -142,7 +142,7 @@ internal sealed partial class CharacterXuRongOlRuntime
 
     internal SkillProgramStepOutcome ClaimXuRong(ProgramSkillFrame f)
     {
-        if (f.XuRong is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering, XuRongDying: { } proof } w || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.Id != proof.DyingFrameId || dying.XuRongProof != proof || proof.VictimSeat == f.OwnerSeat || f.InstructionIndex != 1)
+        if (f.XuRong is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering, XuRongDying: { } proof } w || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.Id != proof.DyingFrameId || dying.XuRongProof != proof || proof.VictimSeat == f.OwnerSeat || f.InstructionIndex != 1)
             throw new InvalidOperationException("ShaJue2023 requires the actual other native dying entry and its original frozen rescue requirement.");
         var before = XuRongPool(f.OwnerSeat);
         var gained = Math.Max(0, Math.Min(1, 3 - _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.Baoli)));

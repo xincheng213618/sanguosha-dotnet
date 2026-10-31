@@ -28,16 +28,16 @@ internal sealed partial class CharacterDengAiMouOlRuntime
             return;
         foreach (var move in batch.Movements.Where(m => m.To == CardLocation.DiscardPile && m.From == CardLocation.Processing))
         {
-            if (!_coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(batch, move))
+            if (!_coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, move))
                 continue;
             var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == move.CardId && m.Sequence < move.Sequence);
-            var proof = _coreProgramEventHistoryOperations.ProgramEventHistory<MouDengAiUseEntryEvent>().SingleOrDefault(e => e.ParentId == batch.ParentFrameId && e.CardId == move.CardId && e.EntrySequence == entry?.Sequence);
+            var proof = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDengAiUseEntryEvent>().SingleOrDefault(e => e.ParentId == batch.ParentFrameId && e.CardId == move.CardId && e.EntrySequence == entry?.Sequence);
             if (proof is { OutsideOwnPlay: true })
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDengAiUseDiscardEvent(batch.Id, move.CardId, move.Sequence, proof.ParentId, proof.ActorSeat));
         }
     }
 
-    internal int[] MouDengAiDiscardIndexes(CardMovementBatchContext batch) => batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From == CardLocation.Processing && _coreAdvancedLifecycleOperations.GetAdvancedCard(x.m.CardId).Suit != Suit.Heart && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDengAiUseDiscardEvent>().Any(e => e.BatchId == batch.Id && e.CardId == x.m.CardId && e.Sequence == x.m.Sequence && e.ParentId == batch.ParentFrameId)).Select(x => x.i).ToArray();
+    internal int[] MouDengAiDiscardIndexes(CardMovementBatchContext batch) => batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From == CardLocation.Processing && _coreAdvancedLifecycleOperations.GetAdvancedCard(x.m.CardId).Suit != Suit.Heart && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDengAiUseDiscardEvent>().Any(e => e.BatchId == batch.Id && e.CardId == x.m.CardId && e.Sequence == x.m.Sequence && e.ParentId == batch.ParentFrameId)).Select(x => x.i).ToArray();
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 33400)]
     internal int[]? SelectMouDengAiDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, ProgramInstructionFeatures features) => features.HasOperation(SkillProgramEffectOp.CollectMouDengAiJigu) ? MouDengAiDiscardIndexes(batch) : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 33400, SkillProgramEffectOp.CollectMouDengAiJigu, SkillProgramEffectOp.ExchangeMouDengAiJigu, SkillProgramEffectOp.UseMouDengAiJiewan, SkillProgramEffectOp.GrowMouDengAiJiewan)]
@@ -54,7 +54,7 @@ internal sealed partial class CharacterDengAiMouOlRuntime
     }
 
     internal bool MouDengAiCanGrow(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && MouDengAiGu(owner).Length == _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Count && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != owner && p.MaxHp >= _coreMatchParticipantsPlayersAccess._players[owner].MaxHp);
-    internal bool ValidMouDengAiOl(ProgramSkillFrame f) => f.MouDengAiOl is { } r && r.Source == MouDengAiSource(f) && r.GameplayHash == f.GameplayHash && f.InstructionIndex == 1 && f.ActivationId == f.TriggerId && f.WindowContext is { OwnerSeat: var owner, ParentFrameId: var window } && owner == f.OwnerSeat && window == r.WindowId && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f).Op == r.Operation && Enum.IsDefined(r.Stage) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDengAiStartedEvent>().Count(e => e == new MouDengAiStartedEvent(f.Id, r.Source, r.GameplayHash, r.Operation, r.WindowId)) == 1;
+    internal bool ValidMouDengAiOl(ProgramSkillFrame f) => f.MouDengAiOl is { } r && r.Source == MouDengAiSource(f) && r.GameplayHash == f.GameplayHash && f.InstructionIndex == 1 && f.ActivationId == f.TriggerId && f.WindowContext is { OwnerSeat: var owner, ParentFrameId: var window } && owner == f.OwnerSeat && window == r.WindowId && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f).Op == r.Operation && Enum.IsDefined(r.Stage) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDengAiStartedEvent>().Count(e => e == new MouDengAiStartedEvent(f.Id, r.Source, r.GameplayHash, r.Operation, r.WindowId)) == 1;
     internal SkillProgramStepOutcome StartMouDengAiOl(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

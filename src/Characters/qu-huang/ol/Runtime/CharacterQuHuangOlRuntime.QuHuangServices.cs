@@ -46,7 +46,7 @@ internal sealed partial class CharacterQuHuangOlRuntime
     bool IQuHuangNativeQueries.MovementReturnMatches(ProgramSkillFrame parent, CardsMovedTriggerWindowFrame child) => CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(parent, child);
     bool IQuHuangNativeQueries.IsMovementObserverEdge(long childId) => _coreObserverSubtreesOperations.IsMovementObserverEdge(_resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == childId));
     bool IQuHuangNativeQueries.IsSuspendedOrPaidRescueSuffix(long childId, DyingFrame dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(_resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == childId), dying);
-    DyingFrame? IQuHuangNativeQueries.ActiveDying => _coreDyingCursorRuntimeOperations.ActiveDying;
+    DyingFrame? IQuHuangNativeQueries.ActiveDying => _coreDyingCursorRuntimeOperations.Value.ActiveDying;
 
     void IQuHuangNativeOperations.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     long IQuHuangNativeOperations.BeginCardUse(Card card, int actor, IReadOnlyList<int> targets, CardKind kind, CardConversionSource source, QuHuangNishouUseOrigin origin) => _coreNativeCardUseOperations.BeginCardUse(card, actor, targets, kind, conversionSource: source, quHuangNishou: origin);

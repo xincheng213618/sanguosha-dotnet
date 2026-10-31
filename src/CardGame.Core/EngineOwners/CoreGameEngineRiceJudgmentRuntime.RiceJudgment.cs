@@ -12,11 +12,11 @@ internal sealed partial class CoreGameEngineRiceJudgmentRuntime
     internal SkillProgramStepOutcome BeginRiceJudgmentReplacement(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!_coreRicePileOperations.ExactRiceParent(f, effect.Op) || f.RicePile is not null || f.WindowContext?.JudgmentReplacement is not { } context || _coreJudgmentCursorRuntimeOperations.ActiveJudgment is not { } judgment || judgment.Id != context.JudgmentFrameId || _coreNativeDamageHandlesOperations.GetJudgmentCard(judgment)?.Id != context.OldCardId)
+        if (!_coreRicePileOperations.ExactRiceParent(f, effect.Op) || f.RicePile is not null || f.WindowContext?.JudgmentReplacement is not { } context || _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is not { } judgment || judgment.Id != context.JudgmentFrameId || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(judgment)?.Id != context.OldCardId)
             throw new InvalidOperationException("Rice judgment must retain its real selected replacement and owning judgment candidate.");
         var pile = _coreRicePileOperations.RiceSources(f.OwnerSeat, effect, f.SkillInstanceId).Single(p => _corePublicPileSourcesOperations.PublicPileCards(p).Any(c => c.Id == context.ReplacementCardId));
         var replacement = _corePublicPileSourcesOperations.PublicPileCards(pile).Single(c => c.Id == context.ReplacementCardId);
-        var old = _coreNativeDamageHandlesOperations.GetJudgmentCard(judgment)!;
+        var old = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(judgment)!;
         var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[judgment.TargetSeat], replacement);
         var before = _coreCardMovementJournalMovementSequenceAccess._movementSequence;
         var r = new RicePileReceipt

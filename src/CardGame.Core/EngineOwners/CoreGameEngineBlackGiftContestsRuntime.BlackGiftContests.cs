@@ -238,5 +238,5 @@ internal sealed partial class CoreGameEngineBlackGiftContestsRuntime
     }
 
     SkillProgramStepOutcome IRecipientContestConsequencesHost.BlackGiftContest(ProgramSkillFrame f, int recipient) => BeginBlackGiftContest(f, recipient);
-    SkillProgramStepOutcome IRecipientContestConsequencesHost.PrintedLordBenefit(ProgramSkillFrame f) => _corePrintedLordBenefitsOperations.BeginPrintedLordBenefit(f);
+    SkillProgramStepOutcome IRecipientContestConsequencesHost.PrintedLordBenefit(ProgramSkillFrame f) => _corePrintedLordBenefitsOperations.Value.BeginPrintedLordBenefit(f);
 }

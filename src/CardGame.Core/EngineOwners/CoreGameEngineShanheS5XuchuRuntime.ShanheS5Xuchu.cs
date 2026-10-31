@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEngineShanheS5XuchuRuntime
         }
 
         var frozen = ShanheS5LuoyiFrozen(f, effect.SourceBind!);
-        if (frozen.DrawPlanFrameId != parent.Id || frozen.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || frozen.InstructionIndex >= f.InstructionIndex || _coreProgramEventHistoryOperations.ProgramEventHistory<CardDamageModifierGrantedEvent>().Any(e => e.Modifier.ParentFrameId == f.Id))
+        if (frozen.DrawPlanFrameId != parent.Id || frozen.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || frozen.InstructionIndex >= f.InstructionIndex || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardDamageModifierGrantedEvent>().Any(e => e.Modifier.ParentFrameId == f.Id))
             throw new InvalidOperationException("S5 Luoyi lost its unique frozen reveal before draw substitution.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { ActualPhaseSubstitution = new(parent.Id, f.Id, f.OwnerSeat, f.SkillId, f.SkillInstanceId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, SkillProgramTurnPhase.Draw) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, SkillProgramTriggerWindow.DrawPhaseStarting, SkillProgramTurnPhase.Draw));
@@ -45,8 +45,8 @@ internal sealed partial class CoreGameEngineShanheS5XuchuRuntime
     internal ShanheS5LuoyiFrozenEvent ShanheS5LuoyiFrozen(ProgramSkillFrame f, string bind)
     {
         var values = f.NumberBindings.Where(b => b.Name == ShanheS5LuoyiNumberPrefix + bind).ToArray();
-        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5LuoyiFrozenEvent>().Where(e => e.FrameId == f.Id && e.Bind == bind).ToArray();
-        var revealed = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardsRevealedEvent>().Where(e => e.FrameId == f.Id && e.Bind == bind).ToArray();
+        var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5LuoyiFrozenEvent>().Where(e => e.FrameId == f.Id && e.Bind == bind).ToArray();
+        var revealed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardsRevealedEvent>().Where(e => e.FrameId == f.Id && e.Bind == bind).ToArray();
         var set = _coreProgramLifecycleOperations.GetProgramCardSet(f, bind);
         if (values is not [var value] || value.Value <= 0 || facts is not [var fact] || fact.X != value.Value || fact.SkillId != f.SkillId || fact.SkillInstanceId != f.SkillInstanceId || fact.GameplayHash != f.GameplayHash || fact.OwnerSeat != f.OwnerSeat || fact.InstructionIndex < 1 || revealed is not [var shown] || shown.SkillId != f.SkillId || shown.OwnerSeat != f.OwnerSeat || shown.BindingId != CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) || shown.Cards.Count > fact.X || !shown.Cards.Select(c => c.Id).SequenceEqual(set.CardIds) || set.Visibility != SkillProgramCardSetVisibility.Public)
             throw new InvalidOperationException("S5 Luoyi's current-HP value lost its owning public reveal.");

@@ -208,7 +208,7 @@ internal sealed partial class CharacterTianChouOlRuntime
     internal void FinishTianChou(ProgramSkillFrame f, string reason)
     {
         var r = f.TianChouShandao!;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TianChouShandaoCompletedEvent(f.Id, r.Tops.Count, _coreProgramEventHistoryOperations.ProgramEventHistory<TianChouShandaoNativeIssuedEvent>().Count(e => e.FrameId == f.Id), reason));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TianChouShandaoCompletedEvent(f.Id, r.Tops.Count, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TianChouShandaoNativeIssuedEvent>().Count(e => e.FrameId == f.Id), reason));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { TianChouShandao = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }

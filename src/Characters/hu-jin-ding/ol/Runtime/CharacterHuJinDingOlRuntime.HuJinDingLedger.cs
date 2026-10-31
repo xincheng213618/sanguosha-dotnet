@@ -6,19 +6,19 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     internal bool HasQingyuanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.SelectQingyuanOpeningPartner);
 
     internal static CardConversionSource HuJinDingSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_hu_jin_ding_ol_HuJinDingLedger.HuJinDingSource(f);
-    internal IEnumerable<QingyuanPartnerSelectedEvent> QingyuanPartners(int owner, string skill, string instance) => _coreProgramEventHistoryOperations.ProgramEventHistory<QingyuanPartnerSelectedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.Source.SkillInstanceId == instance);
+    internal IEnumerable<QingyuanPartnerSelectedEvent> QingyuanPartners(int owner, string skill, string instance) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyuanPartnerSelectedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.Source.SkillInstanceId == instance);
     internal bool IsLiveQingyuanPartner(QingyuanPartnerSelectedEvent p) => _coreMatchParticipantsPlayersAccess._players[p.PartnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat], p.Source.SkillId, p.Source.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash == p.GameplayHash;
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 26820)]
     internal void ObserveHuJinDingFacts(IGameEvent fact)
     {
         if (fact is RoundStartedEvent round && HasZhongshenCapability)
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<ZhongshenRoundBoundaryEvent>().Any(e => e.RoundNumber == round.RoundNumber))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhongshenRoundBoundaryEvent>().Any(e => e.RoundNumber == round.RoundNumber))
                 throw new InvalidOperationException("Zhongshen cannot enter the same actual round twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhongshenRoundBoundaryEvent(round.RoundNumber, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         }
 
-        if (!HasQingyuanCapability || fact is not DamageAppliedEvent { Amount: > 0 } applied || _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Count(e => e.TargetSeat == applied.TargetSeat) != 1 || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { DamageWasApplied: true } attempt)
+        if (!HasQingyuanCapability || fact is not DamageAppliedEvent { Amount: > 0 } applied || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Count(e => e.TargetSeat == applied.TargetSeat) != 1 || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { DamageWasApplied: true } attempt)
             return;
         var damage = _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.ParentFrameId == attempt.ResolutionId && d.TargetSeat == applied.TargetSeat && d.Amount == applied.Amount) ?? throw new InvalidOperationException("Qingyuan lost its exact first actual damage frame.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QingyuanFirstDamageEvent(applied.TargetSeat, damage.Id, damage.ParentFrameId, applied.Amount));
@@ -29,7 +29,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     {
         if (!HasQingyuanCapability)
             return;
-        var valid = _coreProgramEventHistoryOperations.ProgramEventHistory<QingyuanPartnerSelectedEvent>().Where(IsLiveQingyuanPartner).ToArray();
+        var valid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyuanPartnerSelectedEvent>().Where(IsLiveQingyuanPartner).ToArray();
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
         {
             var marker = PlayerMarkerKind.QingyuanPartner;
@@ -69,12 +69,12 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     {
         if (!HasQingyuanCapability)
             return[];
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<QingyuanGainQualifiedEvent>().Where(q => q.BatchId == batch.Id && q.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _coreMatchParticipantsPlayersAccess._players[q.Source.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[q.Source.OwnerSeat], q.Source.SkillId, q.Source.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash == q.GameplayHash).Select(q => new ProgramTriggerCandidate(q.Source.OwnerSeat, q.Source.SkillId, q.Source.BindingId, q.Source.SkillInstanceId, q.GameplayHash, _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program!.Triggers.Single(t => t.Id == q.Source.BindingId).Priority, q.MovementIndex)).ToArray();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyuanGainQualifiedEvent>().Where(q => q.BatchId == batch.Id && q.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _coreMatchParticipantsPlayersAccess._players[q.Source.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[q.Source.OwnerSeat], q.Source.SkillId, q.Source.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash == q.GameplayHash).Select(q => new ProgramTriggerCandidate(q.Source.OwnerSeat, q.Source.SkillId, q.Source.BindingId, q.Source.SkillInstanceId, q.GameplayHash, _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program!.Triggers.Single(t => t.Id == q.Source.BindingId).Priority, q.MovementIndex)).ToArray();
     }
 
     internal ProgramSkillWindowContext CreateQingyuanGainContext(CardsMovedTriggerWindowFrame parent, ProgramTriggerCandidate c)
     {
-        var q = _coreProgramEventHistoryOperations.ProgramEventHistory<QingyuanGainQualifiedEvent>().Single(q => q.BatchId == parent.Id && q.Source.OwnerSeat == c.OwnerSeat && q.Source.SkillId == c.SkillId && q.Source.SkillInstanceId == c.SkillInstanceId && q.MovementIndex == c.OccurrenceIndex);
+        var q = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyuanGainQualifiedEvent>().Single(q => q.BatchId == parent.Id && q.Source.OwnerSeat == c.OwnerSeat && q.Source.SkillId == c.SkillId && q.Source.SkillInstanceId == c.SkillInstanceId && q.MovementIndex == c.OccurrenceIndex);
         return new(SkillProgramTriggerWindow.CardsGained, parent.Id, c.OwnerSeat, SourceSeat: q.GainingSeat, TargetSeat: c.OwnerSeat, OccurrenceIndex: c.OccurrenceIndex, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat]), MovementBatch: parent.Batch, MovementIndex: q.MovementIndex);
     }
 
@@ -82,7 +82,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     {
         if (context.Window != SkillProgramTriggerWindow.CardsGained || context.OwnerSeat != c.OwnerSeat || context.TargetSeat != c.OwnerSeat || context.MovementBatch is not { } batch || context.ParentFrameId != batch.Id || context.MovementIndex != c.OccurrenceIndex || context.OccurrenceIndex != c.OccurrenceIndex || c.OccurrenceIndex < 0 || c.OccurrenceIndex >= batch.Movements.Count || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == batch.Id)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != c || !parent.Batch.Movements.SequenceEqual(batch.Movements))
             return null;
-        var q = _coreProgramEventHistoryOperations.ProgramEventHistory<QingyuanGainQualifiedEvent>().SingleOrDefault(q => q.BatchId == batch.Id && q.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && q.Source.OwnerSeat == c.OwnerSeat && q.Source.SkillId == c.SkillId && q.Source.SkillInstanceId == c.SkillInstanceId && q.Source.BindingId == c.BindingId && q.GameplayHash == c.GameplayHash && q.MovementIndex == c.OccurrenceIndex);
+        var q = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyuanGainQualifiedEvent>().SingleOrDefault(q => q.BatchId == batch.Id && q.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && q.Source.OwnerSeat == c.OwnerSeat && q.Source.SkillId == c.SkillId && q.Source.SkillInstanceId == c.SkillInstanceId && q.Source.BindingId == c.BindingId && q.GameplayHash == c.GameplayHash && q.MovementIndex == c.OccurrenceIndex);
         return q is not null && context.SourceSeat == q.GainingSeat && batch.Movements[c.OccurrenceIndex] is { } move && move.Sequence == q.GainSequence && move.To == CardLocation.Hand(q.GainingSeat) && _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(move, batch) != CardLocation.Hand(q.GainingSeat) && QingyuanPartners(c.OwnerSeat, c.SkillId, c.SkillInstanceId).Any(p => p.PartnerSeat == q.GainingSeat && p.MovementSequence < q.GainSequence) ? q : null;
     }
 

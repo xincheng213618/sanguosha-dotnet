@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineKuangfuReceiptsRuntime
 {
     internal bool ValidKuangfu(ProgramSkillFrame f)
     {
-        if (f.Kuangfu is not { } r || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != CoreGameEngineKuangfuRuntime.KuangfuSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || r.ActualTurnOwnerSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play && !_coreKuangfuOperations.KuangfuGameEnded() || !Enum.IsDefined(r.Stage) || f.SelectedCardIds.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } definition || definition.GameplayHash != f.GameplayHash)
+        if (f.Kuangfu is not { } r || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != CoreGameEngineKuangfuRuntime.KuangfuSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || r.ActualTurnOwnerSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play && !_coreKuangfuOperations.Value.KuangfuGameEnded() || !Enum.IsDefined(r.Stage) || f.SelectedCardIds.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } definition || definition.GameplayHash != f.GameplayHash)
             return false;
         var plan = ProgramInstructionResolver.Default.Resolve(f, definition);
         if (plan.Activation is not { UsesPerPhase: 1, UsesPerTurn: null, MinCards: 0, MaxCards: 0, MinTargets: 0, MaxTargets: 0 } || plan.Instructions is not [{ Op: SkillProgramEffectOp.DiscardEquipmentThenSlashAndOwnershipOutcome }])
@@ -86,7 +86,7 @@ internal sealed partial class CoreGameEngineKuangfuReceiptsRuntime
             {
                 if (_resolutionStackOperations._resolutionStack[j] is ProgramLifecycleTriggerWindowFrame changed && _resolutionStackOperations._resolutionStack[j - 1] is ProgramSkillFrame owner && changed.Window == SkillProgramTriggerWindow.SkillsChanged && changed.ResumeProgramFrameId == owner.Id && changed.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && changed.CandidateIndex >= 0 && changed.CandidateIndex <= changed.Candidates.Count)
                     continue;
-                if (!_corePaidColorDamageClaimObserversOperations.PaidColorDamageClaimObserverEdge(j) && !_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[j - 1], _resolutionStackOperations._resolutionStack[j]))
+                if (!_corePaidColorDamageClaimObserversOperations.Value.PaidColorDamageClaimObserverEdge(j) && !_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[j - 1], _resolutionStackOperations._resolutionStack[j]))
                 {
                     valid = false;
                     break;
@@ -103,7 +103,7 @@ internal sealed partial class CoreGameEngineKuangfuReceiptsRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 180)]
-    internal bool IsKuangfuProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && KuangfuPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsKuangfuProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && KuangfuPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 490)]
     internal bool TryAdvanceKuangfuSubtree()
     {

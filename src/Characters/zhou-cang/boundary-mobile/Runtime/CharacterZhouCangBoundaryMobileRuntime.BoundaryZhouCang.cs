@@ -36,7 +36,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
 
     internal bool BoundaryZhongyongEntityAvailable(long action, int id)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhongyongEntityOriginEvent>().SingleOrDefault(e => e.ActionId == action && e.CardId == id)is not { } origin || _cardZonesOperations._cardZones.GetLocation(id).Zone is not (CardZoneKind.Processing or CardZoneKind.DiscardPile))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhongyongEntityOriginEvent>().SingleOrDefault(e => e.ActionId == action && e.CardId == id)is not { } origin || _cardZonesOperations._cardZones.GetLocation(id).Zone is not (CardZoneKind.Processing or CardZoneKind.DiscardPile))
             return false;
         // Slash declaration precedes its native hand->Processing payment. A
         // response is recorded after payment. Both retain the same original
@@ -47,18 +47,18 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
 
     internal CardUseFrame? BoundaryZhongyongUse(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (c.SkillId != BoundaryZhouCangComposition.Skill || c.BindingId != BoundaryZhouCangComposition.Binding || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } a } use || a.ActionId != identity.CardActionId || a.ActorSeat != c.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhongyongUseOriginEvent>().SingleOrDefault(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.Actor == c.OwnerSeat)is null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Continuation: ProgramCardContinuation.CompletedSlash or ProgramCardContinuation.CompletedCard } window || window.ParentFrameId != use.Id || window.Action.ActionId != a.ActionId || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(c, context, window))
+        if (c.SkillId != BoundaryZhouCangComposition.Skill || c.BindingId != BoundaryZhouCangComposition.Binding || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } a } use || a.ActionId != identity.CardActionId || a.ActorSeat != c.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhongyongUseOriginEvent>().SingleOrDefault(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.Actor == c.OwnerSeat)is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Continuation: ProgramCardContinuation.CompletedSlash or ProgramCardContinuation.CompletedCard } window || window.ParentFrameId != use.Id || window.Action.ActionId != a.ActionId || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(c, context, window))
             return null;
         return use;
     }
 
     internal CardActionContext[] BoundaryZhongyongResponses(CardUseFrame use)
     {
-        var accepted = _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Select(e => e.Action).ToArray();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardResponseCompletedEvent>().Where(e => e.AttackOwnerFrameId == use.Id && e.ParentFrameId == use.Id && e.EffectiveKind == CardKind.Dodge && e.OriginalContinuation is ProgramCardContinuation.Dodge or ProgramCardContinuation.FactionDefenseDodge && use.TargetSeats.Contains(e.NativeActorSeat)).Select(e => accepted.SingleOrDefault(a => a.ActionId == e.ActionId && a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Dodge && a.ParentActionId == use.Action!.ActionId && a.ActorSeat == e.NativeActorSeat && a.ProviderSeat == e.ProviderSeat)).Where(a => a is not null).Cast<CardActionContext>().DistinctBy(a => a.ActionId).ToArray();
+        var accepted = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Select(e => e.Action).ToArray();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardResponseCompletedEvent>().Where(e => e.AttackOwnerFrameId == use.Id && e.ParentFrameId == use.Id && e.EffectiveKind == CardKind.Dodge && e.OriginalContinuation is ProgramCardContinuation.Dodge or ProgramCardContinuation.FactionDefenseDodge && use.TargetSeats.Contains(e.NativeActorSeat)).Select(e => accepted.SingleOrDefault(a => a.ActionId == e.ActionId && a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Dodge && a.ParentActionId == use.Action!.ActionId && a.ActorSeat == e.NativeActorSeat && a.ProviderSeat == e.ProviderSeat)).Where(a => a is not null).Cast<CardActionContext>().DistinctBy(a => a.ActionId).ToArray();
     }
 
-    internal bool HasBoundaryZhouCangResponseObserver(CardActionContext a, ProgramCardContinuation continuation) => HasBoundaryZhouCang && a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Dodge && continuation is ProgramCardContinuation.Dodge or ProgramCardContinuation.FactionDefenseDodge && a.ParentActionId is { } parent && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => u.Action?.ActionId == parent && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhongyongUseOriginEvent>().Any(e => e.UseId == u.Id && e.ActionId == parent));
+    internal bool HasBoundaryZhouCangResponseObserver(CardActionContext a, ProgramCardContinuation continuation) => HasBoundaryZhouCang && a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Dodge && continuation is ProgramCardContinuation.Dodge or ProgramCardContinuation.FactionDefenseDodge && a.ParentActionId is { } parent && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => u.Action?.ActionId == parent && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhongyongUseOriginEvent>().Any(e => e.UseId == u.Id && e.ActionId == parent));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 53300, SkillProgramEffectOp.ResolveBoundaryZhouCangZhongyong)]
     internal bool CanOfferBoundaryZhongyong(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
@@ -82,7 +82,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
         if (f.BoundaryZhongyong is not null)
             throw new InvalidOperationException("Zhongyong cannot reopen its original completed use.");
         var responses = BoundaryZhongyongResponses(use);
-        var phase = _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhongyongUseOriginEvent>().Single(e => e.UseId == use.Id).Phase;
+        var phase = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhongyongUseOriginEvent>().Single(e => e.UseId == use.Id).Phase;
         var r = new BoundaryZhongyongReceipt(BoundaryZhongyongSource(f), f.GameplayHash, use.Id, use.Action!.ActionId, f.WindowContext!.ParentFrameId, phase, responses.Length > 0, BoundaryZhongyongStage.Choose)
         {
             Slash = use.Action.PhysicalCards.Where(p => BoundaryZhongyongEntityAvailable(use.Action.ActionId, p.CardId)).Select(p => p.CardId).ToArray(),
@@ -254,7 +254,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
 
         if (r.Stage == BoundaryZhongyongStage.GiveDodgeChildren && BoundaryZhongyongOriginalTurn(r) && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && r.Settlement!.Movements.Any(m => m.To == CardLocation.Hand(r.Recipient)))
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhongyongBonusEvent>().Any(e => e.FrameId == f.Id))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhongyongBonusEvent>().Any(e => e.FrameId == f.Id))
                 throw new InvalidOperationException("Zhongyong cannot grant the same paid bonus twice.");
             _coreCardUseModulesOperations.GrantProgramTurnRuleModifier(f, SkillRuleQuery.SlashLimit, SkillRuleOperation.Add, 1, []);
             var index = _coreGameEngineNextSlashProgramsNamedNextSlashReservesAccess._namedNextSlashReserves.FindIndex(n => n.OwnerSeat == f.OwnerSeat && n.SkillId == f.SkillId && n.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && n.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);

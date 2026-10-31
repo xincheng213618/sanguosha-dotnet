@@ -7,8 +7,8 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
 {
     internal const string MobileHtWuling = "mobile-god:wuling", MobileHtYouyi = "mobile-god:youyi", MobileHtEffects = "mobile-god:wuling-effects", MobileHtDeer = "mobile-god:wuling-deer";
     internal static CardConversionSource MobileHtSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal MobileWulingTaughtEvent? MobileHtCourse(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingTaughtEvent>().LastOrDefault(c => c.TargetSeat == seat && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingAdvancedEvent>().LastOrDefault(e => e.CourseId == c.CourseId)?.Active == true);
-    internal int MobileHtCourseIndex(long id) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingAdvancedEvent>().Last(e => e.CourseId == id).Index;
+    internal MobileWulingTaughtEvent? MobileHtCourse(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileWulingTaughtEvent>().LastOrDefault(c => c.TargetSeat == seat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileWulingAdvancedEvent>().LastOrDefault(e => e.CourseId == c.CourseId)?.Active == true);
+    internal int MobileHtCourseIndex(long id) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileWulingAdvancedEvent>().Last(e => e.CourseId == id).Index;
     internal MobileWulingAnimal[] MobileHtCourseOrder(long id) => _characterHuaTuoMobileGodMobileWulingCoursesAccess._mobileWulingCourses.TryGetValue(id, out var c) ? c.Order.ToArray() : throw new InvalidOperationException("Wuling lost its private accepted persistent course.");
     internal bool MobileHtSpirit(int seat, MobileWulingAnimal animal) => _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[seat], MobileHtEffects) && MobileHtCourse(seat)is { } c && MobileHtCourseOrder(c.CourseId)[MobileHtCourseIndex(c.CourseId)] == animal;
     internal int[] MobileHtTeachingTargets() => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && MobileHtCourse(p.Seat)is null && p.Markers.GetValueOrDefault(PlayerMarkerKind.MobileWuling) == 0).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(_coreActualTurnProgressCurrentSeatAccess._currentSeat, p.Seat)).Select(p => p.Seat).ToArray();
@@ -16,8 +16,8 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
     {
         if (_coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase || phase.ActorSeat != owner)
             return[];
-        var invocations = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.Phase == phase).Select(e => e.InvocationId).ToHashSet();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => invocations.Contains(e.InvocationId)).OrderBy(e => e.CompletionSequence).Select(e => new DiscardRecoveryEntity(e.CardId, e.CompletionSequence, e.From)).Where(_coreActualDiscardRecoveryPhasesOperations.ActualDiscardEntityStillAvailable).DistinctBy(e => e.CardId).ToArray();
+        var invocations = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.Phase == phase).Select(e => e.InvocationId).ToHashSet();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => invocations.Contains(e.InvocationId)).OrderBy(e => e.CompletionSequence).Select(e => new DiscardRecoveryEntity(e.CardId, e.CompletionSequence, e.From)).Where(_coreActualDiscardRecoveryPhasesOperations.ActualDiscardEntityStillAvailable).DistinctBy(e => e.CardId).ToArray();
     }
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 39100)]

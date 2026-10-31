@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarkObserversRuntim
         if (e.Op == SkillProgramEffectOp.SpendCategoryMarkForDyingRecovery)
             return _coreDyingOwnedCardSelectionsOperations.ExactDyingOwnedCardEntry(f, out var dying, out _) && dying.VictimSeat == f.OwnerSeat;
         if (e.Op == SkillProgramEffectOp.SpendCategoryMarkForAreaDiscard)
-            return _coreTurnDefaultStatsValidationOperations.ExactTurnDefaultStatPhaseParent(f) && c.Window == SkillProgramTriggerWindow.PlayPhaseStarting;
+            return _coreTurnDefaultStatsValidationOperations.Value.ExactTurnDefaultStatPhaseParent(f) && c.Window == SkillProgramTriggerWindow.PlayPhaseStarting;
         return e.Op == SkillProgramEffectOp.SpendCategoryMarkForSlashTargets && _coreRecipientCategorySlashTargetsOperations.TryGetRecipientCategorySlashUse(f.OwnerSeat, c, out _, out var window) && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0), c, window);
     }
 
@@ -60,7 +60,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarkObserversRuntim
             return false;
         if (r.Operation == SkillProgramEffectOp.SpendCategoryMarkForDyingRecovery)
         {
-            if (!_coreDyingOwnedCardSelectionsOperations.ExactDyingOwnedCardEntry(f, out var dying, out var entry) || r.DyingFrameId != dying.Id || !_coreRecipientCategoryMarkContinuationsOperations.ExactRecipientCategoryDyingCursor(f, dying, entry) || r.CardUseFrameId is not null || r.ActionId is not null || r.Materials.Count != 0 || r.SelectedCardIds.Count != 0 || r.TargetSeat is not null || r.CandidateSeats.Count != 0 || r.BaseTargetSeats.Count != 0 || r.AddedTargetSeats.Count != 0 || r.SequenceBefore != 0 || r.SequenceAfter != 0 || r.BatchId is not null || payments.Length != 0 || targets.Length != 0 || !r.RecoveryIssued || r.RecoveryAmount <= 0 || recovery is not [var heal] || heal != new RecipientCategoryMarkRecoveryIssuedEvent(f.Id, r.HolderSeat, r.RecoveryAmount))
+            if (!_coreDyingOwnedCardSelectionsOperations.ExactDyingOwnedCardEntry(f, out var dying, out var entry) || r.DyingFrameId != dying.Id || !_coreRecipientCategoryMarkContinuationsOperations.Value.ExactRecipientCategoryDyingCursor(f, dying, entry) || r.CardUseFrameId is not null || r.ActionId is not null || r.Materials.Count != 0 || r.SelectedCardIds.Count != 0 || r.TargetSeat is not null || r.CandidateSeats.Count != 0 || r.BaseTargetSeats.Count != 0 || r.AddedTargetSeats.Count != 0 || r.SequenceBefore != 0 || r.SequenceAfter != 0 || r.BatchId is not null || payments.Length != 0 || targets.Length != 0 || !r.RecoveryIssued || r.RecoveryAmount <= 0 || recovery is not [var heal] || heal != new RecipientCategoryMarkRecoveryIssuedEvent(f.Id, r.HolderSeat, r.RecoveryAmount))
                 return false;
             if (r.Stage == RecipientCategoryMarkStage.RecoveryChildren)
                 return !r.DrawIssued && draws.Length == 0 && f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } recovering && recovering.SubjectSeat == r.HolderSeat;

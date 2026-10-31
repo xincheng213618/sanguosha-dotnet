@@ -7,10 +7,10 @@ internal sealed partial class CharacterCaoSongOlRuntime
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GrantYizhengSupport))
             return[];
-        var grants = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongYizhengGrantedEvent>();
+        var grants = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengGrantedEvent>();
         if (grants.Count == 0)
             return[];
-        var expired = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongYizhengExpiredEvent>().Select(e => e.GrantId).ToHashSet();
+        var expired = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengExpiredEvent>().Select(e => e.GrantId).ToHashSet();
         return grants.Where(e => e.RecipientSeat == beneficiary && !expired.Contains(e.GrantId)).OrderBy(e => e.Source.OwnerSeat).ThenBy(e => e.GrantId).ToArray();
     }
 
@@ -20,7 +20,7 @@ internal sealed partial class CharacterCaoSongOlRuntime
     internal void IssueCaoSongYizheng(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, OwnerSeat: var owner } context || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } ending || ending.OwnerSeat != frame.OwnerSeat || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || owner != frame.OwnerSeat || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || frame.SelectedTargetSeats is not [var recipient] || recipient == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongYizhengGrantedEvent>().Any(e => e.GrantId == frame.Id))
+        if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, OwnerSeat: var owner } context || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } ending || ending.OwnerSeat != frame.OwnerSeat || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || owner != frame.OwnerSeat || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || frame.SelectedTargetSeats is not [var recipient] || recipient == frame.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengGrantedEvent>().Any(e => e.GrantId == frame.Id))
             throw new InvalidOperationException("Yizheng requires one exact other living recipient at the owner's native ending.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoSongYizhengGrantedEvent(frame.Id, CaoSongSource(frame), recipient, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber));
     }
@@ -30,10 +30,10 @@ internal sealed partial class CharacterCaoSongOlRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 26031)]
     internal void ExpireCaoSongYizhengAtNextOwnTurn(TurnStartedEvent started)
     {
-        var grants = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongYizhengGrantedEvent>();
+        var grants = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengGrantedEvent>();
         if (grants.Count == 0)
             return;
-        var expired = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongYizhengExpiredEvent>().Select(e => e.GrantId).ToHashSet();
+        var expired = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengExpiredEvent>().Select(e => e.GrantId).ToHashSet();
         foreach (var grant in grants.Where(e => e.Source.OwnerSeat == started.ActorSeat && !expired.Contains(e.GrantId)))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoSongYizhengExpiredEvent(grant.GrantId, started.ActorSeat, started.TurnNumber));
     }
@@ -150,7 +150,7 @@ internal sealed partial class CharacterCaoSongOlRuntime
     internal void ValidateCaoSongSupportPaid(long parentId, CaoSongAmountSupportReceipt receipt, bool recovery)
     {
         var grant = receipt.Grants[receipt.NextGrantIndex];
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongYizhengAmountPaidEvent>().Where(e => e.ParentFrameId == parentId && e.GrantId == grant.GrantId && e.Recovery == recovery).ToArray()is not [var paid] || paid.OwnerSeat != grant.Source.OwnerSeat || paid.BeneficiarySeat != receipt.BeneficiarySeat || paid.MaximumHpBefore != paid.MaximumHpAfter + 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongYizhengAmountIncreasedEvent>().Any(e => e.ParentFrameId == parentId && e.GrantId == grant.GrantId && e.Recovery == recovery))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengAmountPaidEvent>().Where(e => e.ParentFrameId == parentId && e.GrantId == grant.GrantId && e.Recovery == recovery).ToArray()is not [var paid] || paid.OwnerSeat != grant.Source.OwnerSeat || paid.BeneficiarySeat != receipt.BeneficiarySeat || paid.MaximumHpBefore != paid.MaximumHpAfter + 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengAmountIncreasedEvent>().Any(e => e.ParentFrameId == parentId && e.GrantId == grant.GrantId && e.Recovery == recovery))
             throw new InvalidOperationException("Yizheng amount increment requires one exact cost and cannot repeat a fulfilled payment.");
     }
 
@@ -174,11 +174,11 @@ internal sealed partial class CharacterCaoSongOlRuntime
             return baseAmount;
         if (receipt.OriginalAmount <= 0 || receipt.NextGrantIndex < 0 || receipt.NextGrantIndex > receipt.Grants.Count || receipt.Grants.Select(g => g.GrantId).Distinct().Count() != receipt.Grants.Count)
             throw new InvalidOperationException("Recovery support lost its frozen recipient, positive original amount or grant cursor.");
-        var increases = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongYizhengAmountIncreasedEvent>().Where(e => e.ParentFrameId == recovery.Id && e.Recovery).ToArray();
+        var increases = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengAmountIncreasedEvent>().Where(e => e.ParentFrameId == recovery.Id && e.Recovery).ToArray();
         var amount = receipt.OriginalAmount;
         foreach (var increase in increases)
         {
-            if (increase.BeneficiarySeat != receipt.BeneficiarySeat || increase.Before != amount || increase.After != amount + 1 || receipt.Grants.SingleOrDefault(g => g.GrantId == increase.GrantId)is not { } grant || increases.Count(e => e.GrantId == grant.GrantId) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongYizhengAmountPaidEvent>().Where(e => e.ParentFrameId == recovery.Id && e.GrantId == grant.GrantId && e.Recovery && e.OwnerSeat == grant.Source.OwnerSeat && e.BeneficiarySeat == receipt.BeneficiarySeat && e.MaximumHpBefore == e.MaximumHpAfter + 1).Count() != 1)
+            if (increase.BeneficiarySeat != receipt.BeneficiarySeat || increase.Before != amount || increase.After != amount + 1 || receipt.Grants.SingleOrDefault(g => g.GrantId == increase.GrantId)is not { } grant || increases.Count(e => e.GrantId == grant.GrantId) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongYizhengAmountPaidEvent>().Where(e => e.ParentFrameId == recovery.Id && e.GrantId == grant.GrantId && e.Recovery && e.OwnerSeat == grant.Source.OwnerSeat && e.BeneficiarySeat == receipt.BeneficiarySeat && e.MaximumHpBefore == e.MaximumHpAfter + 1).Count() != 1)
                 throw new InvalidOperationException("Recovery support has an increment without its exact once-paid issued grant.");
             amount++;
         }

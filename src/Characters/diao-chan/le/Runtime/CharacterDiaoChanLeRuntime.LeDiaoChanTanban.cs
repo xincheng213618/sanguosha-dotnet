@@ -19,7 +19,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     {
         if (!HasLeDiaoChanTanbanCapability || cardId <= 0)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<TanbanEntityMarkChangedEvent>().LastOrDefault(e => e.CardId == cardId && (_coreProgramEventHistoryOperations.ProgramEventHistory<TanbanInitializedEvent>().Any(done => done.FrameId == e.FrameId) || _coreProgramEventHistoryOperations.ProgramEventHistory<TanbanHandMarksSwappedEvent>().Any(done => done.FrameId == e.FrameId)))?.Marked == true;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanEntityMarkChangedEvent>().LastOrDefault(e => e.CardId == cardId && (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanInitializedEvent>().Any(done => done.FrameId == e.FrameId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanHandMarksSwappedEvent>().Any(done => done.FrameId == e.FrameId)))?.Marked == true;
     }
 
     internal bool IsTanbanHandLimitExempt(CharacterState owner, int cardId) => HasLeDiaoChanTanbanCapability && owner.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(owner, "le:tanban") && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(owner.Seat) && HasTanbanEntityMark(cardId);
@@ -44,7 +44,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     }
 
     [ProgramIssuedTrigger(200)]
-    internal bool IsIssuedTanbanInitialCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => HasLeDiaoChanTanbanCapability && candidate.SkillId == "le:tanban" && candidate.BindingId == "mark-initial-entities" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program?.GameplayHash == candidate.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.InitializeTanbanInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == candidate.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.NotStarted && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, TanbanInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == candidate && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<TanbanInitializedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat);
+    internal bool IsIssuedTanbanInitialCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => HasLeDiaoChanTanbanCapability && candidate.SkillId == "le:tanban" && candidate.BindingId == "mark-initial-entities" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program?.GameplayHash == candidate.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.InitializeTanbanInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == candidate.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.NotStarted && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, TanbanInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == candidate && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanInitializedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29040, SkillProgramEffectOp.InitializeTanbanInitialEntities)]
     internal bool CanOfferTanbanInitial(ProgramTriggerLegalityContext gate) => IsIssuedTanbanInitialCandidate(gate.Candidate, gate.Context);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29040)]
@@ -56,7 +56,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         var candidate = new ProgramTriggerCandidate(frame.OwnerSeat, frame.SkillId, frame.TriggerId, frame.SkillInstanceId, frame.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(frame).Priority, context.OccurrenceIndex);
         if (IsIssuedTanbanInitialCandidate(candidate, context))
             return true;
-        return frame.InstructionIndex == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<TanbanInitializedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var initialized] && initialized.Source == TanbanSource(frame) && initialized.GameplayHash == frame.GameplayHash;
+        return frame.InstructionIndex == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanInitializedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var initialized] && initialized.Source == TanbanSource(frame) && initialized.GameplayHash == frame.GameplayHash;
     }
 
     SkillProgramStepOutcome ILeDiaoChanTanbanHost.InitializeTanban(ProgramSkillFrame frame) => InitializeTanban(frame);
@@ -64,7 +64,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     internal SkillProgramStepOutcome InitializeTanban(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.InstructionIndex != 1 || !PermitIssuedTanbanInitial(frame) || _coreProgramEventHistoryOperations.ProgramEventHistory<TanbanInitializedEvent>().Any(e => e.Source.OwnerSeat == frame.OwnerSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<TanbanEntityMarkChangedEvent>().Any(e => e.FrameId == frame.Id))
+        if (frame.InstructionIndex != 1 || !PermitIssuedTanbanInitial(frame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanInitializedEvent>().Any(e => e.Source.OwnerSeat == frame.OwnerSeat) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanEntityMarkChangedEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("Tanban requires its exact frozen opening mother and initializes once per owner.");
         var parent = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == frame.WindowContext!.ParentFrameId);
         var entities = parent.TanbanInitialEntities!.Where(e => e.OwnerSeat == frame.OwnerSeat).ToArray();

@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEngineShanheMarketOpeningRuntime
     {
         if (window.ShanheMarketOpening is not { } origin || window.Window != SkillProgramTriggerWindow.GameStarting || window.OwnerSeat != 0 || window.Continuation != ProgramLifecycleContinuation.ResumeParentProgram || window.ResumeProgramFrameId != origin.ExecutionFrameId || window.Candidates.Count == 0 || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == origin.ExecutionFrameId)is not ProgramSkillFrame { ShanheMarketApplication: { Stage: ShanheMarketApplicationStage.Materials } receipt } execution || receipt.PurchaseFrameId != origin.PurchaseFrameId || receipt.RewardId != origin.RewardId || !window.Candidates.All(c => c.OwnerSeat == 0 && receipt.NewSkillInstanceIds.Contains(c.SkillInstanceId, StringComparer.Ordinal)))
             return false;
-        var market = _coreShanheMarketApplicationOperations.RequireShanheMarketProgram(execution);
+        var market = _coreShanheMarketApplicationOperations.Value.RequireShanheMarketProgram(execution);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == execution.Id);
         return market.Id == origin.PurchaseFrameId && market.RewardId == origin.RewardId && index >= 0 && index + 1 < _resolutionStackOperations._resolutionStack.Count && _resolutionStackOperations._resolutionStack[index + 1].Id == window.Id;
     }

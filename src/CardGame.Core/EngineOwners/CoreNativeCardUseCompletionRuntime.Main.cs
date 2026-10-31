@@ -7,7 +7,7 @@ internal sealed partial class CoreNativeCardUseCompletionRuntime
     {
         if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsProgramSkillUse: true, AwaitingProviders: false } jijiang && CoreNativeDamageHandlesRuntime.SameAttackOwner(jijiang.ActiveAttack, attack))
         {
-            _coreNativeFactionSlashCompletionOperations.CompleteProgramFactionCardRequest(jijiang);
+            _coreNativeFactionSlashCompletionOperations.Value.CompleteProgramFactionCardRequest(jijiang);
         }
         else if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsQinglongCrescentBladeUse: true, AwaitingProviders: false } qinglongFactionSlash && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglongFactionSlash.ActiveAttack, attack))
         {
@@ -83,7 +83,7 @@ internal sealed partial class CoreNativeCardUseCompletionRuntime
             throw new InvalidOperationException($"Resolution frame {(frameId)} has unfinished child frames.");
         }
 
-        _coreNoDamageSkillDisableOperations.SettleNoDamageSkillDisable(cardUse);
+        _coreNoDamageSkillDisableOperations.Value.SettleNoDamageSkillDisable(cardUse);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(frameId, card.Id, playedCardKind ?? card.Kind));
     }
 

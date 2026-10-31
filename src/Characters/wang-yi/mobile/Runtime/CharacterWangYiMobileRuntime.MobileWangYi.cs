@@ -16,7 +16,7 @@ internal sealed partial class CharacterWangYiMobileRuntime
     internal void BeginDeckTopJudgmentReplacementChoice(JudgmentFrame pending, JudgmentTriggerCandidate candidate, SkillProgram program, SkillProgramTrigger trigger)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat];
-        var old = _coreNativeDamageHandlesOperations.GetJudgmentCard(pending) ?? throw new InvalidOperationException("The deck-top retrial lost its current judgment.");
+        var old = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending) ?? throw new InvalidOperationException("The deck-top retrial lost its current judgment.");
         _coreNativeJudgmentOperations.SetJudgmentFrameStep(pending.Id, ResolutionFrameStep.AwaitingResponse);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JudgmentReplacementRequestedEvent(pending.Id, pending.Id, pending.TargetSeat, owner.Seat, pending.Reason, old.Id, old.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[pending.TargetSeat], old)));
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramJudgmentReplacement, owner.Seat, $"【{(_contentRegistryOperations._contentRegistry.GetSkill(program.Id).Name)}】：是否亮出未知的牌堆顶牌代替当前判定牌？", [], [], pending.TargetSeat, old.Kind)
@@ -53,7 +53,7 @@ internal sealed partial class CharacterWangYiMobileRuntime
             return true;
         }
 
-        var old = _coreNativeDamageHandlesOperations.GetJudgmentCard(pending) ?? throw new InvalidOperationException("The accepted retrial lost its old judgment card.");
+        var old = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending) ?? throw new InvalidOperationException("The accepted retrial lost its old judgment card.");
         var replacement = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile)[^1];
         var shared = new ProgramTriggerCandidate(candidate.OwnerSeat, program.Id, trigger.Id, candidate.SkillInstanceId!, program.GameplayHash, trigger.Priority);
         _coreProgramLifecycleOperations.BeginProgramBinding(shared, new(SkillProgramTriggerWindow.JudgmentReplacing, pending.Id, candidate.OwnerSeat, SourceSeat: pending.SourceSeat, TargetSeat: pending.TargetSeat, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]), JudgmentReplacement: new(pending.Id, pending.TargetSeat, pending.Reason, old.Id, replacement.Id)));
@@ -68,9 +68,9 @@ internal sealed partial class CharacterWangYiMobileRuntime
 
     internal bool TryResolveAiDeckTopJudgmentReplacement()
     {
-        if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment is not { } judgment || _coreNativeJudgmentOperations.CurrentJudgmentCandidate(judgment)is not { } candidate || !IsDeckTopJudgmentReplacement(_coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacement(candidate).Trigger))
+        if (_coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is not { } judgment || _coreNativeJudgmentOperations.CurrentJudgmentCandidate(judgment)is not { } candidate || !IsDeckTopJudgmentReplacement(_coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacement(candidate).Trigger))
             return false;
-        var current = _coreNativeDamageHandlesOperations.GetJudgmentCard(judgment)!;
+        var current = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(judgment)!;
         // The choice only uses the current public judgment, never the hidden
         // replacement material. Miji wants black; an already-black result stays.
         var activate = judgment.Reason == "skill.mobile-wang-yi.miji" && _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[judgment.TargetSeat], current)is Suit.Heart or Suit.Diamond;

@@ -6,7 +6,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
     internal const string MobileLbWuqian = "mobile-god:wuqian", MobileLbWushuang = "classic:wushuang", MobileLbGainReason = "skill.mobile-god.wuqian.damage-card";
     internal bool HasMobileWuqianCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMobileShenLuBuWuqian);
 
-    internal IEnumerable<MobileLuBuWuqianIssuedEvent> ActiveMobileWuqian(int actor) => !HasMobileWuqianCapability ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<MobileLuBuWuqianIssuedEvent>().Where(e => e.Source.OwnerSeat == actor && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileLuBuWuqianEndedEvent>().Any(end => end.FrameId == e.FrameId));
+    internal IEnumerable<MobileLuBuWuqianIssuedEvent> ActiveMobileWuqian(int actor) => !HasMobileWuqianCapability ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileLuBuWuqianIssuedEvent>().Where(e => e.Source.OwnerSeat == actor && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileLuBuWuqianEndedEvent>().Any(end => end.FrameId == e.FrameId));
     internal bool HasMobileWuqianArmorDisabled(int targetSeat) => HasMobileWuqianCapability && _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Any(p => ActiveMobileWuqian(p.Seat).Any(e => e.TargetSeat == targetSeat));
     internal IEnumerable<RuleQueryContribution> MobileWuqianRuleContributions(CharacterState player, SkillRuleQuery query)
     {
@@ -115,7 +115,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
         else if (payload is CardUseFinishedEvent finished && _coreCardUseLifecycleOperations.LifecycleCardUse(finished.ResolutionId)is { MobileLuBuUse: { } r, CausedDamage: false } completed)
         {
             ValidateMobileLbUse(completed, r);
-            foreach (var issue in _coreProgramEventHistoryOperations.ProgramEventHistory<MobileLuBuWuqianIssuedEvent>().Where(e => r.IssuedFrames.Contains(e.FrameId) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileLuBuWuqianEndedEvent>().Any(end => end.FrameId == e.FrameId)).ToArray())
+            foreach (var issue in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileLuBuWuqianIssuedEvent>().Where(e => r.IssuedFrames.Contains(e.FrameId) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileLuBuWuqianEndedEvent>().Any(end => end.FrameId == e.FrameId)).ToArray())
             {
                 var owner = _coreMatchParticipantsPlayersAccess._players[issue.Source.OwnerSeat];
                 foreach (var player in _coreMatchParticipantsPlayersAccess._players)
@@ -129,7 +129,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
 
     internal void ValidateMobileLbUse(CardUseFrame use, MobileLuBuUseReceipt r)
     {
-        if (r.UseFrameId != use.Id || r.ActionId != use.Action?.ActionId || !CoreGameEngineMouLuMengRuntime.IsDamageCardKind(r.Kind) || r.IssuedFrames.Count == 0 || r.IssuedFrames.Distinct().Count() != r.IssuedFrames.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.SourceSeat == r.ActorSeat && e.CardKind == r.Kind) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileLuBuUseCapturedEvent>().Count(e => e.UseFrameId == use.Id && e.ActorSeat == r.ActorSeat && e.ActionId == r.ActionId && e.Kind == r.Kind) != 1 || r.IssuedFrames.Any(id => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileLuBuWuqianIssuedEvent>().Count(e => e.FrameId == id && e.Source.OwnerSeat == r.ActorSeat) != 1))
+        if (r.UseFrameId != use.Id || r.ActionId != use.Action?.ActionId || !CoreGameEngineMouLuMengRuntime.IsDamageCardKind(r.Kind) || r.IssuedFrames.Count == 0 || r.IssuedFrames.Distinct().Count() != r.IssuedFrames.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.SourceSeat == r.ActorSeat && e.CardKind == r.Kind) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileLuBuUseCapturedEvent>().Count(e => e.UseFrameId == use.Id && e.ActorSeat == r.ActorSeat && e.ActionId == r.ActionId && e.Kind == r.Kind) != 1 || r.IssuedFrames.Any(id => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileLuBuWuqianIssuedEvent>().Count(e => e.FrameId == id && e.Source.OwnerSeat == r.ActorSeat) != 1))
             throw new InvalidOperationException("Mobile Wuqian retirement lost the actual declared damage-card Use and its frozen original issues.");
     }
 

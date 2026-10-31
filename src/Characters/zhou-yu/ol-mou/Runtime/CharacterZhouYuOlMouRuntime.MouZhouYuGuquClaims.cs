@@ -52,7 +52,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         var actual = _resolutionStackOperations._resolutionStack.Single(f => f.Id == parent.Id);
         if (actual.GuquResponseAdmissions?.SingleOrDefault(a => a.ActionId == action.ActionId)is { } accepted)
         {
-            if (accepted.UseId != actual.Id || accepted.ActorSeat != action.ActorSeat || accepted.ProviderSeat != action.ProviderSeat || accepted.EffectiveKind != action.EffectiveKind || accepted.MaterialCount != action.PhysicalCards.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<GuquUseAcceptedEvent>().Count(e => e.Admission == accepted) != 1)
+            if (accepted.UseId != actual.Id || accepted.ActorSeat != action.ActorSeat || accepted.ProviderSeat != action.ProviderSeat || accepted.EffectiveKind != action.EffectiveKind || accepted.MaterialCount != action.PhysicalCards.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquUseAcceptedEvent>().Count(e => e.Admission == accepted) != 1)
                 throw new InvalidOperationException("Guqu response admission changed its original native parent or paid action.");
             return;
         }
@@ -77,7 +77,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         foreach (var q in claims)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuquUseClaimedEvent(q));
-            var originals = _coreProgramEventHistoryOperations.ProgramEventHistory<GuquUseMaterialClaimedEvent>().Where(e => e.ParentFrameId == paid.DeclarationId && e.ActionId == 0 && e.Source == q.Source).OrderBy(e => e.Index).ToArray();
+            var originals = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquUseMaterialClaimedEvent>().Where(e => e.ParentFrameId == paid.DeclarationId && e.ActionId == 0 && e.Source == q.Source).OrderBy(e => e.Index).ToArray();
             foreach (var original in originals)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(original with { ParentFrameId = parentId, ActionId = actionId });
         }
@@ -109,9 +109,9 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
 
     internal bool ValidMouGuquClaim(GuquUseClaim q, CardActionContext action)
     {
-        if (q.ActionId != action.ActionId || q.QueMaterialCount < 1 || q.ProviderSeat != action.ProviderSeat || !MouGuquActorLineageMatches(q.ParentFrameId, q.ActionId, q.ActorSeat, action.ActorSeat, q.ProviderSeat, action.Type) || q.EffectiveKind != action.EffectiveKind && !(CoreNativeCardClassificationsRuntime.IsSlashCard(q.EffectiveKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind)) || q.Source.SkillId != MouGuquSkill || q.Source.BindingId != MouGuquBinding || q.Source.OwnerSeat != q.TurnOwner || q.ActualTurn < 1 || q.MovementSequence < 0 || q.MovementSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash != q.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<GuquUseClaimedEvent>().Count(e => e.Claim == q) != 1)
+        if (q.ActionId != action.ActionId || q.QueMaterialCount < 1 || q.ProviderSeat != action.ProviderSeat || !MouGuquActorLineageMatches(q.ParentFrameId, q.ActionId, q.ActorSeat, action.ActorSeat, q.ProviderSeat, action.Type) || q.EffectiveKind != action.EffectiveKind && !(CoreNativeCardClassificationsRuntime.IsSlashCard(q.EffectiveKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind)) || q.Source.SkillId != MouGuquSkill || q.Source.BindingId != MouGuquBinding || q.Source.OwnerSeat != q.TurnOwner || q.ActualTurn < 1 || q.MovementSequence < 0 || q.MovementSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash != q.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquUseClaimedEvent>().Count(e => e.Claim == q) != 1)
             return false;
-        var materials = _coreProgramEventHistoryOperations.ProgramEventHistory<GuquUseMaterialClaimedEvent>().Where(e => e.ParentFrameId == q.ParentFrameId && e.ActionId == q.ActionId && e.Source == q.Source).OrderBy(e => e.Index).ToArray();
-        return materials.Length == q.QueMaterialCount && materials.Select(m => m.CardId).Distinct().Count() == materials.Length && materials.Select((m, i) => m.Index == i && action.PhysicalCards.Any(c => c.CardId == m.CardId && c.CardKind == m.PrintedKind && c.From == m.From) && _coreProgramEventHistoryOperations.ProgramEventHistory<GuquQueMarkedEvent>().Any(e => e.ActualTurn == q.ActualTurn && e.TurnOwner == q.TurnOwner && e.Source == q.Source && e.GameplayHash == q.GameplayHash && e.CardId == m.CardId && e.MovementSequence <= q.MovementSequence)).All(b => b);
+        var materials = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquUseMaterialClaimedEvent>().Where(e => e.ParentFrameId == q.ParentFrameId && e.ActionId == q.ActionId && e.Source == q.Source).OrderBy(e => e.Index).ToArray();
+        return materials.Length == q.QueMaterialCount && materials.Select(m => m.CardId).Distinct().Count() == materials.Length && materials.Select((m, i) => m.Index == i && action.PhysicalCards.Any(c => c.CardId == m.CardId && c.CardKind == m.PrintedKind && c.From == m.From) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquQueMarkedEvent>().Any(e => e.ActualTurn == q.ActualTurn && e.TurnOwner == q.TurnOwner && e.Source == q.Source && e.GameplayHash == q.GameplayHash && e.CardId == m.CardId && e.MovementSequence <= q.MovementSequence)).All(b => b);
     }
 }

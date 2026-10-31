@@ -18,6 +18,6 @@ internal sealed partial class CoreMatchPresentationRuntime
         Role.TeamA => GetTeamName(_coreMatchSetupDefinitionsOperations.GetModeTeamIds().FirstOrDefault() ?? "team:blue", _coreMatchDefinitionModeDefinitionAccess._modeDefinition),
         Role.TeamB => GetTeamName(_coreMatchSetupDefinitionsOperations.GetModeTeamIds().Skip(1).FirstOrDefault() ?? "team:red", _coreMatchDefinitionModeDefinitionAccess._modeDefinition),
         _ => role.ToString()};
-    internal string GetPublicGeneralName(CharacterState player) => player.IdentityConcealed ? "隐匿" : _coreNativeDamageHandlesOperations.IsNationalWarMode && !player.GeneralRevealed ? "暗将" : player.General.Name;
+    internal string GetPublicGeneralName(CharacterState player) => player.IdentityConcealed ? "隐匿" : _coreNativeDamageHandlesOperations.Value.IsNationalWarMode && !player.GeneralRevealed ? "暗将" : player.General.Name;
     internal static string GetWinnerName(Winner winner) => RuntimeSkills.RuntimeRules_Core_CommonRules.GetWinnerName(winner);
 }

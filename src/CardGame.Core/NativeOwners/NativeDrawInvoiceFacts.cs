@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class NativeDrawInvoiceFacts(Func<ModeRuleSet> getModeRuleSet, EngineStates.CoreMatchSetupState matchSetupState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, Func<RuntimeEntries.CharacterPangJiOlEntries> getCharacterPangJiOlRuntime, Func<RuntimeEntries.CharacterMiHengLeEntries> getCharacterMiHengLeRuntime, Func<RuntimeEntries.CharacterZhouFeiLeEntries> getCharacterZhouFeiLeRuntime, Func<RuntimeEntries.CharacterTaoQianOlEntries> getCharacterTaoQianOlRuntime, Func<RuntimeEntries.CharacterZhaoZhongOlEntries> getCharacterZhaoZhongOlRuntime, Func<RuntimeEntries.CoreHellKingProgramsEntries> getCoreHellKingProgramsRuntime, Func<RuntimeEntries.CharacterLiuZhangOlEntries> getCharacterLiuZhangOlRuntime, Func<RuntimeEntries.CharacterFeiYiOlEntries> getCharacterFeiYiOlRuntime, Func<RuntimeEntries.CharacterTangTangOlEntries> getCharacterTangTangOlRuntime, Func<RuntimeEntries.CharacterYuanJiOlEntries> getCharacterYuanJiOlRuntime, Func<RuntimeEntries.CharacterWangCanOlEntries> getCharacterWangCanOlRuntime) : INativeDrawInvoiceFacts
+internal sealed class NativeDrawInvoiceFacts(Func<ModeRuleSet> getModeRuleSet, EngineStates.CoreMatchSetupState matchSetupState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, Func<RuntimeEntries.CharacterPangJiOlEntries> getCharacterPangJiOlRuntime, Func<RuntimeEntries.CharacterMiHengLeEntries> getCharacterMiHengLeRuntime, Func<RuntimeEntries.CharacterZhouFeiLeEntries> getCharacterZhouFeiLeRuntime, Func<RuntimeEntries.CharacterTaoQianOlEntries> getCharacterTaoQianOlRuntime, Func<RuntimeEntries.CharacterZhaoZhongOlEntries> getCharacterZhaoZhongOlRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreHellKingProgramsRuntime>> getCoreHellKingProgramsRuntime, Func<RuntimeEntries.CharacterLiuZhangOlEntries> getCharacterLiuZhangOlRuntime, Func<RuntimeEntries.CharacterFeiYiOlEntries> getCharacterFeiYiOlRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterTangTangOlRuntime>> getCharacterTangTangOlRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYuanJiOlRuntime>> getCharacterYuanJiOlRuntime, Func<RuntimeEntries.CharacterWangCanOlEntries> getCharacterWangCanOlRuntime) : INativeDrawInvoiceFacts
 {
     public bool ModeTracksInvocations => getModeRuleSet().RuntimeRequirements.TracksNativeDrawInvocations;
     public bool SetupComplete => matchSetupState.ReferenceToSetupComplete;
@@ -13,10 +13,10 @@ internal sealed class NativeDrawInvoiceFacts(Func<ModeRuleSet> getModeRuleSet, E
     public bool HasLeZhouFeiLingkongCapability => getCharacterZhouFeiLeRuntime().HasLeZhouFeiLingkongCapability;
     public bool HasTaoQianCapability => getCharacterTaoQianOlRuntime().HasTaoQianCapability;
     public bool HasZhaoZhongCapability => getCharacterZhaoZhongOlRuntime().HasZhaoZhongCapability;
-    public bool HasHellZhiwangHolder => getCoreHellKingProgramsRuntime().HasHellZhiwangHolder;
+    public bool HasHellZhiwangHolder => getCoreHellKingProgramsRuntime().Value.HasHellZhiwangHolder;
     public bool HasFengweiCapability => getCharacterLiuZhangOlRuntime().HasFengweiCapability;
     public bool HasFeiYiHezhong => getCharacterFeiYiOlRuntime().HasFeiYiHezhong;
-    public bool HasTangTangZhiyi => getCharacterTangTangOlRuntime().HasTangTangZhiyi;
-    public bool HasYuanJiCapability => getCharacterYuanJiOlRuntime().HasYuanJiCapability;
+    public bool HasTangTangZhiyi => getCharacterTangTangOlRuntime().Value.HasTangTangZhiyi;
+    public bool HasYuanJiCapability => getCharacterYuanJiOlRuntime().Value.HasYuanJiCapability;
     public bool HasSanwenCapability => getCharacterWangCanOlRuntime().HasSanwenCapability;
 }

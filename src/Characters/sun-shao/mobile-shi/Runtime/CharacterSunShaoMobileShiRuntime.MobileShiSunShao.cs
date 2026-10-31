@@ -26,7 +26,7 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
         var r = f.SunShao!;
         var equipment = _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).SingleOrDefault(card => card.Id == equipmentCardId) ?? throw new InvalidOperationException("GanJue lost its equipped strike material.");
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        var damageBefore = _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Count(entry => entry.SourceSeat == f.OwnerSeat && entry.TargetSeat == targetSeat);
+        var damageBefore = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Count(entry => entry.SourceSeat == f.OwnerSeat && entry.TargetSeat == targetSeat);
         var useId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actor.Seat, actor.Seat, null, null, null, CardKind.Slash, [targetSeat], [], Array.AsReadOnly(new[] { ShiSsSource(f) }), effectiveSuit: equipment.Suit, effectiveRank: 0));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SunShao = r with { Stage = ShiSsStage.GanjueIssued, EquipmentCardId = equipmentCardId, StrikeSuit = equipment.Suit, UseId = useId, DamageCountBefore = damageBefore } });
@@ -39,7 +39,7 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
         _coreAlternativeViewAsCostsOperations.RecordProgramUsedBasicCard(actor.Seat, CardKind.Slash);
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, actor.Seat, targetSeat, card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targetSeat], CardKind.Slash), programSkillCardUseFrameId: f.Id);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(useId, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(useId, actor);
         actor.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, targetSeat));
@@ -54,7 +54,7 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
     {
         var r = f.SunShao!;
         var target = f.SelectedTargetSeats is [var seat] ? seat : -1;
-        var damaged = _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Count(entry => entry.SourceSeat == f.OwnerSeat && entry.TargetSeat == target) > r.DamageCountBefore;
+        var damaged = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Count(entry => entry.SourceSeat == f.OwnerSeat && entry.TargetSeat == target) > r.DamageCountBefore;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiSsGanjueSettledEvent(f.Id, f.OwnerSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, r.UseId, target, damaged));
         FinishShiSsOperation(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }

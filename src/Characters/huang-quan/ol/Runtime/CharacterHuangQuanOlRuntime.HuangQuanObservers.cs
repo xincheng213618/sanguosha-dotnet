@@ -32,14 +32,14 @@ internal sealed partial class CharacterHuangQuanOlRuntime
     {
         if (!ValidHuangQuanDraw(root) || root.HuangQuan is not { } p)
             return false;
-        if (_coreJianjiDeclarationsOperations.IsJianjiDeclarationChild(root, child))
+        if (_coreJianjiDeclarationsOperations.Value.IsJianjiDeclarationChild(root, child))
             return true;
         if (child is CardUseFrame use)
             return JianjiNativeUseRidesOn(use, root);
         return p.Stage == "draw-paid" && child is CardsMovedTriggerWindowFrame moved && moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => m.Sequence > p.Before && m.Sequence <= p.After && p.CardIds.Contains(m.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
     }
 
-    internal ProgramSkillFrame? HuangQuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.HuangQuanFirstChild(r, c), (i) => _coreJianjiDeclarationsOperations.HuangQuanDeclarationObserverSuffix(i));
+    internal ProgramSkillFrame? HuangQuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.HuangQuanFirstChild(r, c), (i) => _coreJianjiDeclarationsOperations.Value.HuangQuanDeclarationObserverSuffix(i));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 300)]
     internal bool TryAdvanceHuangQuanSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HuangQuanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

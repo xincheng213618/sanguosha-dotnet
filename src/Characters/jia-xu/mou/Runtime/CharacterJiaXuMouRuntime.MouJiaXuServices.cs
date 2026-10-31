@@ -21,7 +21,7 @@ internal sealed partial class CharacterJiaXuMouRuntime
     int IMouJiaXuFacts.MaximumHp(int s) => _coreMatchParticipantsPlayersAccess._players[s].MaxHp;
     string IMouJiaXuFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
     SkillProgram? IMouJiaXuFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
-    IEnumerable<T> IMouJiaXuFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouJiaXuFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     IReadOnlyList<int> IMouJiaXuFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
     IReadOnlyList<MouJiaXuCard> IMouJiaXuFacts.Hand(int seat, bool discard) => !((IMouJiaXuFacts)this).Alive(seat) ? [] : Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Where(c => !discard || !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, CardLocation.Hand(seat), OwnedCardMoveIntent.Discard)).Select(c => new MouJiaXuCard(c.Id, seat, c.DisplayName, _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[seat], c))).ToArray());
     string IMouJiaXuFacts.FumouInstance(int owner) => _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[owner], MouJiaXuRuntime.Fumou);
@@ -48,7 +48,7 @@ internal sealed partial class CharacterJiaXuMouRuntime
 
     void IMouJiaXuNative.Grant(ProgramSkillFrame f)
     {
-        if (!MouJiaXu.Valid(f) || f.MouJiaXu is not { Stage: MouJiaXuStage.GrantChildren, Record: { } record } || record.FrameId != f.Id || _coreProgramEventHistoryOperations.ProgramEventHistory<MouJiaXuDerivedGrantedEvent>().Any(g => g.FrameId == f.Id))
+        if (!MouJiaXu.Valid(f) || f.MouJiaXu is not { Stage: MouJiaXuStage.GrantChildren, Record: { } record } || record.FrameId != f.Id || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiaXuDerivedGrantedEvent>().Any(g => g.FrameId == f.Id))
             throw new InvalidOperationException("Sushen must record real current values before actually granting derived Rushi once.");
         _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], $"sushen:{(f.OwnerSeat)}:{(f.SkillInstanceId)}:{(f.Id)}", [MouJiaXuRuntime.Rushi]);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiaXuDerivedGrantedEvent(f.Id, f.OwnerSeat));

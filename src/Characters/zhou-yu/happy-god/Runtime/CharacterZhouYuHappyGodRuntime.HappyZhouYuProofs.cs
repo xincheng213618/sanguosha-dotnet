@@ -25,13 +25,13 @@ internal sealed partial class CharacterZhouYuHappyGodRuntime
         if (child is HpChangedTriggerWindowFrame hp)
             return r.Mode is "heal" or "lose" && hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Change.TargetSeat == r.Target && hp.Continuation is PostEventContinuation.Program or PostEventContinuation.AwaitedProgramMovement && hp.Change.Kind == (r.Mode == "lose" ? HpChangeKind.Loss : HpChangeKind.Recovery);
         if (child is DyingFrame dying)
-            return r.Mode == "lose" && dying.ParentFrameId == f.Id && dying.VictimSeat == r.Target && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == r.Target && e.Amount == 1 && e.RemainingHp <= 0);
+            return r.Mode == "lose" && dying.ParentFrameId == f.Id && dying.VictimSeat == r.Target && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == r.Target && e.Amount == 1 && e.RemainingHp <= 0);
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
     internal ProgramSkillFrame? HappyZyObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.HappyZyFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 41440)]
-    internal bool HappyZyDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HappyZyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool HappyZyDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && HappyZyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 41440)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 41440)]
     internal bool HappyZyRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

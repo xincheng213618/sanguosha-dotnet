@@ -13,7 +13,7 @@ internal sealed partial class CharacterSunHaoOlRuntime
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber <= 0)
             return[];
-        var grants = _coreProgramEventHistoryOperations.ProgramEventHistory<SunHaoCanshiGrantedEvent>().Where(g => g.Source.OwnerSeat == owner && g.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && g.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat).OrderBy(g => g.FrameId).ToArray();
+        var grants = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunHaoCanshiGrantedEvent>().Where(g => g.Source.OwnerSeat == owner && g.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && g.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat).OrderBy(g => g.FrameId).ToArray();
         return grants.Length == 0 || !SunHaoActualTurnOpen ? [] : Array.AsReadOnly(grants);
     }
 
@@ -43,12 +43,12 @@ internal sealed partial class CharacterSunHaoOlRuntime
             return false;
         if (w.Action.Type == CardActionType.Use)
         {
-            if (_coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { } use || use.Action?.ActionId != w.Action.ActionId || use.SourceSeat != candidate.OwnerSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id))
+            if (_coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { } use || use.Action?.ActionId != w.Action.ActionId || use.SourceSeat != candidate.OwnerSeat || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id))
                 return false;
         }
         else if (w.CompletedResponseReturn is not { IsCommitted: true } typed || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(w.Action, typed.Kind))
             return false;
-        return CurrentSunHaoGrants(candidate.OwnerSeat).Any(g => g.Source.SkillId == candidate.SkillId && g.Source.SkillInstanceId == candidate.SkillInstanceId && g.GameplayHash == candidate.GameplayHash) && !_coreProgramEventHistoryOperations.ProgramEventHistory<SunHaoCanshiStartedEvent>().Any(e => e.WindowId == w.Id && e.Source.SkillInstanceId == candidate.SkillInstanceId);
+        return CurrentSunHaoGrants(candidate.OwnerSeat).Any(g => g.Source.SkillId == candidate.SkillId && g.Source.SkillInstanceId == candidate.SkillInstanceId && g.GameplayHash == candidate.GameplayHash) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunHaoCanshiStartedEvent>().Any(e => e.WindowId == w.Id && e.Source.SkillInstanceId == candidate.SkillInstanceId);
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27330)]
@@ -73,7 +73,7 @@ internal sealed partial class CharacterSunHaoOlRuntime
         if (op == SkillProgramEffectOp.GrantSunHaoCanshiDrawObligation)
         {
             if (f.SkillId == SunHaoComposition.MobileCanshi)
-                return _characterSunHaoMobileOperations.BeginMobileSunHaoDraw(f);
+                return _characterSunHaoMobileOperations.Value.BeginMobileSunHaoDraw(f);
             var x = _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive && _coreTreatedWoundedOperations.IsRuleWounded(p));
             if (x <= 0)
                 throw new InvalidOperationException("Zero wounded characters cannot issue Canshi.");
@@ -173,7 +173,7 @@ internal sealed partial class CharacterSunHaoOlRuntime
 
     internal void FinishSunHao(ProgramSkillFrame f)
     {
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SunHaoCanshiCompletedEvent(f.Id, _coreProgramEventHistoryOperations.ProgramEventHistory<SunHaoCanshiDiscardedEvent>().Any(e => e.FrameId == f.Id)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SunHaoCanshiCompletedEvent(f.Id, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunHaoCanshiDiscardedEvent>().Any(e => e.FrameId == f.Id)));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SunHaoCanshi = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
@@ -231,7 +231,7 @@ internal sealed partial class CharacterSunHaoOlRuntime
     {
         if (!HasSunHaoCanshiCapability || useId is not { } id || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { } action } use || action.ActorSeat != actorSeat || use.SourceSeat != actorSeat)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<SunHaoCanshiStartedEvent>().Any(s => s.UseId == id && s.ActionId == action.ActionId && s.Source.OwnerSeat == actorSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<SunHaoCanshiOriginalTargetEvent>().Any(t => t.FrameId == s.FrameId && t.TargetSeat == targetSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<SunHaoCanshiDiscardedEvent>().Any(p => p.FrameId == s.FrameId && p.From.OwnerSeat == actorSeat && p.Before < p.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > p.Before && m.Sequence <= p.After && m.CardId == p.CardId && m.From == p.From && m.To == p.To && m.Reason.Value == SunHaoCanshiDiscardReason)));
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunHaoCanshiStartedEvent>().Any(s => s.UseId == id && s.ActionId == action.ActionId && s.Source.OwnerSeat == actorSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunHaoCanshiOriginalTargetEvent>().Any(t => t.FrameId == s.FrameId && t.TargetSeat == targetSeat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunHaoCanshiDiscardedEvent>().Any(p => p.FrameId == s.FrameId && p.From.OwnerSeat == actorSeat && p.Before < p.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > p.Before && m.Sequence <= p.After && m.CardId == p.CardId && m.From == p.From && m.To == p.To && m.Reason.Value == SunHaoCanshiDiscardReason)));
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 70)]

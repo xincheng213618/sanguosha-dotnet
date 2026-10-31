@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaoYuOlRuntime
 {
-    internal bool XiangzuSpent(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuXiangzuSpentEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == "ol:xiangzu");
+    internal bool XiangzuSpent(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuXiangzuSpentEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == "ol:xiangzu");
     internal bool CaoYuDyingEntry(ProgramSkillFrame f, out DyingFrame dying)
     {
         dying = null !;

@@ -20,16 +20,16 @@ internal sealed partial class CharacterYuanJiOlRuntime
             foreach (var loss in losses)
             {
                 var cards = loss.DistinctBy(m => m.CardId).OrderBy(m => m.Sequence).ToArray();
-                var index = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiLossOpportunityEvent>().Count();
+                var index = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiLossOpportunityEvent>().Count();
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YuanJiLossOpportunityEvent(index, batch.Id, new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash, loss.Key, batch.TurnNumber, _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber, cards[0].CardId, cards[1].CardId, cards[0].Sequence, cards[1].Sequence));
             }
     }
 
     internal IEnumerable<YuanJiMarkClaim> YuanJiActiveClaims(int owner, string skill)
     {
-        var started = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && IsYuanJiMarkDraw(e.Op)).ToDictionary(e => e.FrameId);
-        var closed = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiMarkClosedEvent>().Select(e => (e.DrawFrameId, e.Index, e.CardId)).ToHashSet();
-        foreach (var a in _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiAcquiredEvent>().Where(a => started.ContainsKey(a.FrameId) && !closed.Contains((a.FrameId, a.Index, a.CardId))).OrderBy(a => a.MovementSequence))
+        var started = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiStartedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && IsYuanJiMarkDraw(e.Op)).ToDictionary(e => e.FrameId);
+        var closed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiMarkClosedEvent>().Select(e => (e.DrawFrameId, e.Index, e.CardId)).ToHashSet();
+        foreach (var a in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiAcquiredEvent>().Where(a => started.ContainsKey(a.FrameId) && !closed.Contains((a.FrameId, a.Index, a.CardId))).OrderBy(a => a.MovementSequence))
         {
             var s = started[a.FrameId];
             yield return new(a.FrameId, a.Index, a.CardId, s.Source, s.GameplayHash, a.MovementSequence);
@@ -62,7 +62,7 @@ internal sealed partial class CharacterYuanJiOlRuntime
         if (claims.Length == 0)
             return ordinary;
         var first = claims[0];
-        var index = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().Select((e, i) => (e, i)).Single(x => x.e.FrameId == first.DrawFrameId).i;
+        var index = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiStartedEvent>().Select((e, i) => (e, i)).Single(x => x.e.FrameId == first.DrawFrameId).i;
         var candidate = new ProgramTriggerCandidate(owner.Seat, skill, binding, first.Source.SkillInstanceId, first.GameplayHash, 0, index);
         if (ordinary.Contains(candidate))
             return ordinary;
@@ -91,7 +91,7 @@ internal sealed partial class CharacterYuanJiOlRuntime
         var claims = YuanJiActiveClaims(c.OwnerSeat, c.SkillId).ToArray();
         if (claims.Length == 0)
             return false;
-        var started = _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().ToArray();
+        var started = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiStartedEvent>().ToArray();
         return c.OccurrenceIndex >= 0 && c.OccurrenceIndex < started.Length && started[c.OccurrenceIndex].FrameId == claims[0].DrawFrameId && claims[0].Source.SkillInstanceId == c.SkillInstanceId && claims[0].GameplayHash == c.GameplayHash;
     }
 
@@ -108,7 +108,7 @@ internal sealed partial class CharacterYuanJiOlRuntime
             return IsIssuedYuanJiReturn(c, context);
         if (!YuanJiWindowCandidate(c, context, out _))
             return false;
-        return op == SkillProgramEffectOp.ResolveJinghuaRoundDraw ? context.Window == SkillProgramTriggerWindow.RoundStarting && _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Count == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<RoundStartedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber && e.ActorSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat) && !_coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().Any(e => e.Source.OwnerSeat == q.OwnerSeat && e.Op == op && e.Round == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber) : context.Window == SkillProgramTriggerWindow.AfterTurnEnded && q.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiStartedEvent>().Any(e => e.Source.OwnerSeat == q.OwnerSeat && e.Op == op && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber);
+        return op == SkillProgramEffectOp.ResolveJinghuaRoundDraw ? context.Window == SkillProgramTriggerWindow.RoundStarting && _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Count == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<RoundStartedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber && e.ActorSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiStartedEvent>().Any(e => e.Source.OwnerSeat == q.OwnerSeat && e.Op == op && e.Round == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber) : context.Window == SkillProgramTriggerWindow.AfterTurnEnded && q.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiStartedEvent>().Any(e => e.Source.OwnerSeat == q.OwnerSeat && e.Op == op && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber);
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 3000)]

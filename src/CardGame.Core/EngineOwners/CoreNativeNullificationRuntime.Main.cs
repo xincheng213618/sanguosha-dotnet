@@ -17,7 +17,7 @@ internal sealed partial class CoreNativeNullificationRuntime
 
         if (_coreCardUseLifecycleOperations.TryBeginCommittedCardUse(resolutionId, ProgramCardContinuation.CommittedTrick, trick: new(effectCard.Id, actionKind, targetCardId, requiredCardKind)))
             return;
-        if (CoreNativeCardClassificationsRuntime.IsDelayedCard(effectiveCardKind) && _coreDelayedPlacementTargetProgramsOperations.TryBeginFinalizedDelayedPlacementPrograms(resolutionId, effectCard, actionKind))
+        if (CoreNativeCardClassificationsRuntime.IsDelayedCard(effectiveCardKind) && _coreDelayedPlacementTargetProgramsOperations.Value.TryBeginFinalizedDelayedPlacementPrograms(resolutionId, effectCard, actionKind))
             return;
         var pending = new NativeOwners.JizhiResolution(sourceSeat, resolutionId, effectCard, effectiveCardKind, targetSeats, actionKind, targetCardId, requiredCardKind);
         if (_coreCardActionsOperations.TryBeginFinalizedTrickPrograms(pending))
@@ -118,7 +118,7 @@ internal sealed partial class CoreNativeNullificationRuntime
             }
 
             var effectName = CardCatalog.Get(pending.EffectCardKind).DisplayName;
-            var effectDescription = _coreGroupTargetNullificationOperations.NullificationEffectDescription(pending);
+            var effectDescription = _coreGroupTargetNullificationOperations.Value.NullificationEffectDescription(pending);
             _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.Nullification, responder.Seat, pending.EffectNullified ? $"上一张【无懈可击】使{(effectDescription)}暂时失效，是否继续使用【无懈可击】？" : pending.DelayedReturn is not null ? $"{(_coreMatchParticipantsPlayersAccess._players[pending.SourceSeat].Name)} 的【{(effectName)}】即将判定，是否使用【无懈可击】？" : pending.GroupTargetReturn is not null ? $"{(effectDescription)}即将结算，是否使用【无懈可击】？" : $"{(_coreMatchParticipantsPlayersAccess._players[pending.SourceSeat].Name)} 使用了【{(effectName)}】，是否使用【无懈可击】？", cards.Select(card => card.Id).ToArray(), [], pending.SourceSeat, pending.EffectCardKind)
             {
                 PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
@@ -138,7 +138,7 @@ internal sealed partial class CoreNativeNullificationRuntime
 
     internal IReadOnlyList<PromptChoice> CreateNullificationChoices(NullificationWindowFrame pending, CharacterState responder, IReadOnlyList<Card> cards)
     {
-        var effectDescription = _coreGroupTargetNullificationOperations.NullificationEffectDescription(pending);
+        var effectDescription = _coreGroupTargetNullificationOperations.Value.NullificationEffectDescription(pending);
         var choices = cards.Where(card => _characterGuanYuWumiaoOperations.IsWuyouIdentityKind(responder, card, CardKind.Nullification) || card.Kind == CardKind.Nullification || _coreActionQueriesOperations.GetProgramViewAsConversions(responder, card, CardKind.Nullification, true).Count > 0).SelectMany(card => _coreCardConversionsOperations.CreateConversionChoiceVariants(responder, card, CardKind.Nullification, forResponse: true, $"nullification.card-{(card.Id)}.depth-{(pending.ChainDepth)}", pending.EffectNullified ? $"使用【无懈可击】恢复{(effectDescription)}。" : $"使用【无懈可击】使{(effectDescription)}失效。", [card.Id], [], new Dictionary<string, string> { ["response"] = "nullification", ["effect-card-id"] = pending.EffectCardId.ToString(System.Globalization.CultureInfo.InvariantCulture), ["chain-depth"] = pending.ChainDepth.ToString(System.Globalization.CultureInfo.InvariantCulture) })).ToList();
         choices.AddRange(_coreExtendedViewAsOperations.ExtendedViewAsResponseChoices(responder, CardKind.Nullification));
         choices.AddRange(_coreTieredRoundZeroResponsesOperations.TieredRoundZeroResponseChoices(responder, CardKind.Nullification));
@@ -236,7 +236,7 @@ internal sealed partial class CoreNativeNullificationRuntime
         if (pending.NamedAmbushResponse is null)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, responder.Seat, card.Id, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
-            _coreMatchLogOperations.AddLog("NullificationResponded", pending.EffectNullified ? $"{(responder.Name)} 使用【无懈可击】，使{(_coreGroupTargetNullificationOperations.NullificationEffectDescription(pending))}失效。" : $"{(responder.Name)} 使用【无懈可击】，使{(_coreGroupTargetNullificationOperations.NullificationEffectDescription(pending))}恢复。", responder.Seat, pending.SourceSeat);
+            _coreMatchLogOperations.AddLog("NullificationResponded", pending.EffectNullified ? $"{(responder.Name)} 使用【无懈可击】，使{(_coreGroupTargetNullificationOperations.Value.NullificationEffectDescription(pending))}失效。" : $"{(responder.Name)} 使用【无懈可击】，使{(_coreGroupTargetNullificationOperations.Value.NullificationEffectDescription(pending))}恢复。", responder.Seat, pending.SourceSeat);
         }
 
         var parentActionId = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(frame => frame.Id == pending.ParentFrameId)?.Action?.ActionId;
@@ -256,7 +256,7 @@ internal sealed partial class CoreNativeNullificationRuntime
         _coreOffTurnUsedCardsOperations.CaptureOffTurnResponseUsedCards(responseAction);
         if (_coreUnrespondableCounterspellsOperations.TryBeginPolicyCounterspellPayment(pending, responseAction, unrespondableSource, [card.Id]))
             return;
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(null, responseAction, ProgramCardContinuation.NullificationResponse))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(null, responseAction, ProgramCardContinuation.NullificationResponse))
             return;
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(null, responseAction, SkillProgramTriggerWindow.CardResponseAccepted, [], ProgramCardContinuation.NullificationResponse))
             return;
@@ -284,14 +284,14 @@ internal sealed partial class CoreNativeNullificationRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (pending.DelayedReturn is { } delayed)
         {
-            _coreDelayedNullificationOperations.CompleteDelayedNullification(pending, delayed);
+            _coreDelayedNullificationOperations.Value.CompleteDelayedNullification(pending, delayed);
             return;
         }
 
         _coreNativeCardUseFramesOperations.SetCardUseStep(pending.ParentFrameId, ResolutionFrameStep.ResolvingEffect);
         if (pending.GroupTargetReturn is not null)
         {
-            _coreGroupTargetNullificationOperations.CompleteGroupTargetNullification(pending);
+            _coreGroupTargetNullificationOperations.Value.CompleteGroupTargetNullification(pending);
             return;
         }
 
@@ -318,7 +318,7 @@ internal sealed partial class CoreNativeNullificationRuntime
     internal void ResolveNullifiableEffect(NullificationWindowFrame pending)
     {
         var effectUse = _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ParentFrameId) ?? throw new InvalidOperationException("A trick effect lost its owning use.");
-        if (_coreProgramCardUseNullificationOperations.IsProgramUseIneffective(effectUse) || _coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(effectUse))
+        if (_coreProgramCardUseNullificationOperations.Value.IsProgramUseIneffective(effectUse) || _coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(effectUse))
         {
             _coreProgramCardTargetEffectsOperations.CompleteIneffectiveTrickTarget(pending, pending.TargetSeats.FirstOrDefault(pending.SourceSeat));
             return;
@@ -354,7 +354,7 @@ internal sealed partial class CoreNativeNullificationRuntime
                 _coreNativeTrickEffectsOperations.ResolveDrawTwoEffect(pending);
                 break;
             case LegalActionKind.AllianceFeast:
-                _coreHulaoCardsOperations.ResolveAllianceFeastEffect(pending);
+                _coreHulaoCardsOperations.Value.ResolveAllianceFeastEffect(pending);
                 break;
             case LegalActionKind.SowBeans:
                 _coreShenwuCardsOperations.ResolveShenwuSowBeansEffect(pending);

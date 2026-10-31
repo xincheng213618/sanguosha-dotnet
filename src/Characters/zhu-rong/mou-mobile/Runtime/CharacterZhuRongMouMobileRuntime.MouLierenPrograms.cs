@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuRongMouMobileRuntime
 {
-    internal MouZhuRongLierenWonEvent? MouZhuRongWin(int owner, ProgramSkillWindowContext c) => c.CardUse is { } a ? _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhuRongLierenWonEvent>().SingleOrDefault(e => e.Source.OwnerSeat == owner && e.UseId == a.ParentCardUseFrameId && e.ActionId == a.CardActionId) : null;
+    internal MouZhuRongLierenWonEvent? MouZhuRongWin(int owner, ProgramSkillWindowContext c) => c.CardUse is { } a ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhuRongLierenWonEvent>().SingleOrDefault(e => e.Source.OwnerSeat == owner && e.UseId == a.ParentCardUseFrameId && e.ActionId == a.CardActionId) : null;
     internal void RecordMouZhuRongLieren(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -23,7 +23,7 @@ internal sealed partial class CharacterZhuRongMouMobileRuntime
     internal SkillProgramStepOutcome SelectMouZhuRongLierenTarget(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != MouZhuRongComposition.Lieren || f.TriggerId != "won-slash-damage" || f.InstructionIndex != 2 || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCompleted } c || MouZhuRongWin(f.OwnerSeat, c)is not { } won || won.Source.SkillInstanceId != f.SkillInstanceId || won.GameplayHash != f.GameplayHash || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || target == won.OpponentSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhuRongLierenDamageChosenEvent>().Any(e => e.UseId == won.UseId && e.OwnerSeat == f.OwnerSeat))
+        if (f.SkillId != MouZhuRongComposition.Lieren || f.TriggerId != "won-slash-damage" || f.InstructionIndex != 2 || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCompleted } c || MouZhuRongWin(f.OwnerSeat, c)is not { } won || won.Source.SkillInstanceId != f.SkillInstanceId || won.GameplayHash != f.GameplayHash || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || target == won.OpponentSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhuRongLierenDamageChosenEvent>().Any(e => e.UseId == won.UseId && e.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Lieren requires one native-selected other target for its original won Slash.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhuRongLierenDamageChosenEvent(f.Id, won.UseId, won.ActionId, f.OwnerSeat, target));
         return SkillProgramStepOutcome.Continue;
@@ -37,7 +37,7 @@ internal sealed partial class CharacterZhuRongMouMobileRuntime
         var trigger = _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(MouZhuRongComposition.Lieren)?.Program?.Triggers.SingleOrDefault(t => t.Id == "won-slash-damage");
         if (trigger is null)
             return;
-        foreach (var won in _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhuRongLierenWonEvent>().Where(e => e.ActionId == action.ActionId && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ActionId)?.Id == e.UseId && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouZhuRongLierenDamageChosenEvent>().Any(d => d.UseId == e.UseId && d.OwnerSeat == e.Source.OwnerSeat)))
+        foreach (var won in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhuRongLierenWonEvent>().Where(e => e.ActionId == action.ActionId && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ActionId)?.Id == e.UseId && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhuRongLierenDamageChosenEvent>().Any(d => d.UseId == e.UseId && d.OwnerSeat == e.Source.OwnerSeat)))
         {
             if (!_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != won.Source.OwnerSeat && p.Seat != won.OpponentSeat))
                 continue;
@@ -51,7 +51,7 @@ internal sealed partial class CharacterZhuRongMouMobileRuntime
     {
         if (candidate.SkillId != MouZhuRongComposition.Lieren || candidate.BindingId != "won-slash-damage" || c.Window != SkillProgramTriggerWindow.CardUseCompleted || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program?.GameplayHash != candidate.GameplayHash || MouZhuRongWin(candidate.OwnerSeat, c)is not { } won || won.Source.SkillInstanceId != candidate.SkillInstanceId || won.GameplayHash != candidate.GameplayHash || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } parent || parent.ParentFrameId != won.UseId || parent.Action.ActionId != won.ActionId || CoreGameEngineCardActionsRuntime.GetCardActionWindow(parent) != c.Window || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] is not { } pending || pending.OwnerSeat != candidate.OwnerSeat || pending.SkillInstanceId != candidate.SkillInstanceId || pending.GameplayHash != candidate.GameplayHash || pending.TriggerId != candidate.BindingId)
             return false;
-        return !_coreProgramEventHistoryOperations.ProgramEventHistory<MouZhuRongLierenDamageChosenEvent>().Any(e => e.UseId == won.UseId && e.OwnerSeat == candidate.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != candidate.OwnerSeat && p.Seat != won.OpponentSeat);
+        return !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhuRongLierenDamageChosenEvent>().Any(e => e.UseId == won.UseId && e.OwnerSeat == candidate.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != candidate.OwnerSeat && p.Seat != won.OpponentSeat);
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30400)]

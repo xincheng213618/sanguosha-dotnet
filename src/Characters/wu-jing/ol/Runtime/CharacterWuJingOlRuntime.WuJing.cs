@@ -281,7 +281,7 @@ internal sealed partial class CharacterWuJingOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27130)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27130)]
-    internal bool ContinuePaidWuJing(ProgramSkillFrame f) => f.WuJing is { } r && (r.Stage != WuJingStage.UseChoice || WuJingHasPaidAdapter(f)) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
+    internal bool ContinuePaidWuJing(ProgramSkillFrame f) => f.WuJing is { } r && (r.Stage != WuJingStage.UseChoice || WuJingHasPaidAdapter(f)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.UseHejiAtCompletedSingleTarget, SkillProgramEffectOp.ClaimLiubingUndamagingSlash, SkillProgramEffectOp.RewardHejiUnconvertedUse)]
     internal PromptChoice AiWuJing(PendingDecision p, ProgramSkillFrame f) => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.WuJing!.TargetSeat]) ? p.Choices.Single(c => c.Parameters.GetValueOrDefault("kind") == "decline") : p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("kind") != "decline") ?? p.Choices.First();
 }

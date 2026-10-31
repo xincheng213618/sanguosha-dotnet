@@ -219,7 +219,7 @@ internal sealed partial class CoreGameEngineIncomingDistanceCourtesyRuntime
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.IncomingContributions, 10)]
-    internal IEnumerable<RuleQueryContribution> IncomingDistanceCourtesyContributions(int target) => !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AdjustIncomingDistanceByLivingFactions) && !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseEndingCourtesyBenefits) ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<IncomingDistanceChangedEvent>().Where(e => e.Source.OwnerSeat == target).Select(e => (RuleQueryContribution)new FiniteRuleQueryContribution($"incoming-distance:{(e.ProgramFrameId)}:{(e.StepIndex)}", SkillRuleOperation.Add, e.Amount));
+    internal IEnumerable<RuleQueryContribution> IncomingDistanceCourtesyContributions(int target) => !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AdjustIncomingDistanceByLivingFactions) && !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseEndingCourtesyBenefits) ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<IncomingDistanceChangedEvent>().Where(e => e.Source.OwnerSeat == target).Select(e => (RuleQueryContribution)new FiniteRuleQueryContribution($"incoming-distance:{(e.ProgramFrameId)}:{(e.StepIndex)}", SkillRuleOperation.Add, e.Amount));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 460)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 450)]
     internal bool CanContinueIncomingDistanceCourtesy(ProgramSkillFrame f)

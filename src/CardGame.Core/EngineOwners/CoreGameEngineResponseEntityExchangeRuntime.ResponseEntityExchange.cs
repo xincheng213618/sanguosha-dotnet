@@ -24,7 +24,7 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
     internal bool IsExchangedUseCardClaim(long frameId, int cardId) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == frameId)?.Action is { } action && IsExchangedCardClaim(action.ActionId, cardId);
     internal bool IsResponseEntityRestricted(int seat, int id)
     {
-        foreach (var claim in _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramResponseEntityClaimedEvent>())
+        foreach (var claim in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramResponseEntityClaimedEvent>())
             if (claim.Restricted && claim.RecipientSeat == seat && claim.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && claim.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && claim.CardIds.Contains(id))
                 return true;
         return false;

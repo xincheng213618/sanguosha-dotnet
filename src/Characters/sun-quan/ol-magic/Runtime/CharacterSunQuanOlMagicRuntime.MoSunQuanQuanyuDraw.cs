@@ -67,7 +67,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMoSunQuanQuanyuRoundChoices, SkillProgramEffectOp.ResolveMoSunQuanQuanyuTargetChoice)]
     internal void ReturnMoQuanyuDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.MoQuanyu is not { Stage: MoQuanyuStage.Drawing } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.DrawCount || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.MoQuanyu is not { Stage: MoQuanyuStage.Drawing } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.DrawCount || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQuanyuDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Quanyu lost its one native matching-choice draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MoQuanyu = r with { Stage = MoQuanyuStage.DrawChildren, DrawOutcome = outcome }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoQuanyuDrawReturnedEvent(f.Id, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));
@@ -77,7 +77,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     internal void CompleteMoQuanyu(ProgramSkillFrame f)
     {
         var r = f.MoQuanyu!;
-        if (r.Stage == MoQuanyuStage.Choosing || f.NativeDraw is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQuanyuChoicesCompletedEvent>().Any(e => e.FrameId == f.Id))
+        if (r.Stage == MoQuanyuStage.Choosing || f.NativeDraw is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQuanyuChoicesCompletedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Quanyu cannot complete before every private choice and native child returns.");
         var count = r.DrawOutcome?.RequestedCount ?? 0;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoQuanyuChoicesCompletedEvent(f.Id, r.Kind, count));

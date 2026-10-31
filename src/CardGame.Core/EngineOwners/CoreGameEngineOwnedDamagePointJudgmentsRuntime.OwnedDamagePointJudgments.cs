@@ -8,9 +8,9 @@ internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
     {
         if (!trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.StartOwnedDamagePointJudgment))
             return true;
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.OwnerSeat != ownerSeat || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { TriggerWindow: SkillProgramTriggerWindow.AfterDamageApplied } damage || context.ParentFrameId != damage.Id)
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.OwnerSeat != ownerSeat || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { TriggerWindow: SkillProgramTriggerWindow.AfterDamageApplied } damage || context.ParentFrameId != damage.Id)
             return false;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage);
         return !attack.IsSourceLess && context.SourceSeat == attack.SourceSeat && context.TargetSeat == attack.TargetSeat;
     }
 
@@ -21,7 +21,7 @@ internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == active.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame damage || context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } || context.ParentFrameId != damage.Id || damage.TriggerWindow != context.Window || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(active, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId) || active.OwnedDamagePointJudgment is not null || effect.Target != SkillProgramEffectTarget.Owner || effect.Visibility != SkillProgramCardSetVisibility.Public || effect.Op != SkillProgramEffectOp.StartOwnedDamagePointJudgment)
             throw new InvalidOperationException("An owned damage-point judgment requires its exact live source and current damage candidate.");
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage);
         if (attack.IsSourceLess || context.SourceSeat != attack.SourceSeat || context.TargetSeat != attack.TargetSeat)
             throw new InvalidOperationException("An owned damage-point judgment lost its real damage participants.");
         var receipt = new ProgramOwnedDamagePointJudgment(active.InstructionIndex, damage.Id, damage.ParentFrameId, context.OccurrenceIndex, _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1, attack.SourceSeat, attack.TargetSeat, effect.JudgmentReason!, effect.ResultBind!);
@@ -104,11 +104,11 @@ internal sealed partial class CoreGameEngineOwnedDamagePointJudgmentsRuntime
 
     internal bool IsOwnedDamagePointJudgmentResultClaimed(JudgmentFrame judgment)
     {
-        if (_coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || OwnedDamagePointJudgmentRoot(damage.Id)is not { } root || root.Id != judgment.ParentFrameId || root.OwnedDamagePointJudgment is not { } receipt || receipt.JudgmentFrameId != judgment.Id || receipt.ResultBind != judgment.ProgramResultBind || judgment.CardId is not { } cardId)
+        if (_coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } damage || OwnedDamagePointJudgmentRoot(damage.Id)is not { } root || root.Id != judgment.ParentFrameId || root.OwnedDamagePointJudgment is not { } receipt || receipt.JudgmentFrameId != judgment.Id || receipt.ResultBind != judgment.ProgramResultBind || judgment.CardId is not { } cardId)
             return false;
         bool Claim(IGameEvent value) => value is ProgramJudgmentCardClaimedEvent claimed && claimed.JudgmentFrameId == judgment.Id && claimed.OwnerSeat == judgment.TargetSeat && claimed.CardId == cardId;
         return _coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents.Any(Claim) || _coreCommandJournalStorageEventsPendingEventsAccess._events.Any(e => Claim(e.Payload));
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 390)]
-    internal bool IsOwnedDamagePointJudgmentProgramDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && OwnedDamagePointJudgmentRoot(damage.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(f => f.Id == dying.FrameId && f.ParentFrameId == dying.ParentFrameId);
+    internal bool IsOwnedDamagePointJudgmentProgramDying() => _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is { } damage && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { ResumesProgramSkill: true } dying && OwnedDamagePointJudgmentRoot(damage.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(f => f.Id == dying.FrameId && f.ParentFrameId == dying.ParentFrameId);
 }

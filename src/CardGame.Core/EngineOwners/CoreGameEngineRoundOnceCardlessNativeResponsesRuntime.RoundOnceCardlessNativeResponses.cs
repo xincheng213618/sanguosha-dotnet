@@ -76,7 +76,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeResponsesRunt
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(action));
         _coreFriendEventsOperations.CaptureFriendMinimumHandUse(action);
         _coreOffTurnUsedCardsOperations.CaptureOffTurnResponseUseOrigin(attack.ResolutionId, action);
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.Dodge))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.Dodge))
             return;
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardResponseAccepted, [attack.SourceSeat], ProgramCardContinuation.Dodge))
             return;

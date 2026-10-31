@@ -2,7 +2,7 @@
 using System.Globalization;
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class MoCaoCaoFacts(Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineTableOrderEntries> getCoreGameEngineTableOrderRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, Func<RuntimeEntries.CoreGameEngineActualDiscardRecoveryPhasesEntries> getCoreGameEngineActualDiscardRecoveryPhasesRuntime, Func<CardZoneStore> getCardZoneStore, Func<RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries> getCoreGameEngineAdvancedLifecycleRuntime, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CoreGameEngineNationalSkillsEntries> getCoreGameEngineNationalSkillsRuntime, EngineStates.CoreMatchOutcomeState matchOutcomeState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, Func<RuntimeEntries.CoreGameEnginePrivateOfferReturnsEntries> getCoreGameEnginePrivateOfferReturnsRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineProgramCardPaymentsEntries> getCoreGameEngineProgramCardPaymentsRuntime, Func<RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries> getCoreGameEngineProgramAttackAttemptRuntime, Func<RuntimeEntries.CoreGameEngineCardUseLifecycleEntries> getCoreGameEngineCardUseLifecycleRuntime, Func<RuntimeEntries.CoreGameEngineAdvancedWeaponsEntries> getCoreGameEngineAdvancedWeaponsRuntime, Func<RuntimeEntries.CharacterCaoCaoOlMagicEntries> getCharacterCaoCaoOlMagicRuntime, EngineStates.CoreGameEngineAdvancedLifecycleState gameEngineAdvancedLifecycleState, EngineStates.CoreAiBrainsState aiBrainsState, KernelCreateSnapshotCall createSnapshot) : IMoCaoCaoFacts
+internal sealed class MoCaoCaoFacts(Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineTableOrderEntries> getCoreGameEngineTableOrderRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, Func<RuntimeEntries.CoreGameEngineActualDiscardRecoveryPhasesEntries> getCoreGameEngineActualDiscardRecoveryPhasesRuntime, Func<CardZoneStore> getCardZoneStore, Func<RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries> getCoreGameEngineAdvancedLifecycleRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CoreGameEngineNationalSkillsEntries> getCoreGameEngineNationalSkillsRuntime, EngineStates.CoreMatchOutcomeState matchOutcomeState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, Func<RuntimeEntries.CoreGameEnginePrivateOfferReturnsEntries> getCoreGameEnginePrivateOfferReturnsRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineProgramCardPaymentsEntries> getCoreGameEngineProgramCardPaymentsRuntime, Func<RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries> getCoreGameEngineProgramAttackAttemptRuntime, Func<RuntimeEntries.CoreGameEngineCardUseLifecycleEntries> getCoreGameEngineCardUseLifecycleRuntime, Func<RuntimeEntries.CoreGameEngineAdvancedWeaponsEntries> getCoreGameEngineAdvancedWeaponsRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoCaoOlMagicRuntime>> getCharacterCaoCaoOlMagicRuntime, EngineStates.CoreGameEngineAdvancedLifecycleState gameEngineAdvancedLifecycleState, EngineStates.CoreAiBrainsState aiBrainsState, KernelCreateSnapshotCall createSnapshot) : IMoCaoCaoFacts
 {
     public bool Enabled => getContentRegistry().ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeMoCaoCaoFuzai);
     public IReadOnlyList<int> Seats => getCoreGameEngineTableOrderRuntime().CurrentTableOrder();
@@ -29,7 +29,7 @@ internal sealed class MoCaoCaoFacts(Func<ContentRegistry> getContentRegistry, Fu
     public CardLocation Location(int id) => getCardZoneStore().GetLocation(id);
     public CardKind Kind(int id) => getCoreGameEngineAdvancedLifecycleRuntime().GetAdvancedCard(id).Kind;
     public IEnumerable<T> History<T>()
-        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>();
+        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>();
     public bool Held(ProgramSkillFrame f) => getCoreGameEngineNationalSkillsRuntime().HasRuntimeSkillInstance(matchParticipantsState.ReferenceToPlayers[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
     public bool Finished => matchOutcomeState.ReferenceToWinner != Winner.None;
     public long MovementSequence => cardMovementJournalState.ReferenceToMovementSequence;
@@ -76,7 +76,7 @@ internal sealed class MoCaoCaoFacts(Func<ContentRegistry> getContentRegistry, Fu
         var physical = getCorePhysicalOwnedCardQueriesRuntime().GetEquipment(matchParticipantsState.ReferenceToPlayers[seat]).FirstOrDefault(c => !c.IsGeneralWeapon && getCoreGameEngineAdvancedWeaponsRuntime().GetWeaponAbilityKinds(c).Contains(kind));
         if (physical is not null)
             return new(physical.Id, 0, $"equipment:{physical.Id}:{kind}");
-        if (getCharacterCaoCaoOlMagicRuntime().MoCaoCaoEquipment.VirtualKind(seat, EquipmentSlot.Weapon) == kind && getCharacterCaoCaoOlMagicRuntime().MoCaoCaoEquipment.LastIssue(seat)is { } issue)
+        if (getCharacterCaoCaoOlMagicRuntime().Value.MoCaoCaoEquipment.VirtualKind(seat, EquipmentSlot.Weapon) == kind && getCharacterCaoCaoOlMagicRuntime().Value.MoCaoCaoEquipment.LastIssue(seat)is { } issue)
             return new(0, issue.IssueId, $"fuzai:{issue.IssueId}:{kind}");
         return (gameEngineAdvancedLifecycleState.ReferenceToInheritedWeaponAbilities.GetValueOrDefault(seat) ?? []).Contains(kind) ? new(0, 0, $"inherited:{seat}:{kind}") : null;
     }
@@ -98,7 +98,7 @@ internal sealed class MoCaoCaoFacts(Func<ContentRegistry> getContentRegistry, Fu
         );
     }
 
-    public bool NativeChild(ProgramSkillFrame f, ResolutionFrame child) => getCharacterCaoCaoOlMagicRuntime().MoCaoCaoFirstNativeChild(f, child);
+    public bool NativeChild(ProgramSkillFrame f, ResolutionFrame child) => getCharacterCaoCaoOlMagicRuntime().Value.MoCaoCaoFirstNativeChild(f, child);
     public bool Friendly(int chooser, int target) => aiBrainsState.ReferenceToAiBrains[chooser].ScoreProgramTarget(createSnapshot(chooser), target, new SkillProgramAiHint(0, 0, 0, 1, 0, 0, false, false)) > 0;
     public int KeepValue(int chooser, int card) => EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(getCoreGameEngineAdvancedLifecycleRuntime().GetAdvancedCard(card), matchParticipantsState.ReferenceToPlayers[chooser]);
 }

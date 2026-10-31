@@ -5,7 +5,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
 {
     internal void IssueMouHqOriginalEffect(ProgramSkillFrame f)
     {
-        if (!ValidMouHq(f) || f.MouHuangQuan is not { Paid: true, Stage: MouHqStage.GiveChildren } r || !TryMouHqOriginalUse(f.OwnerSeat, f.WindowContext, out var use, out var window) || use.Id != r.UseId || use.Action!.ActionId != r.ActionId || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHqEffectIssuedEvent>().Any(e => e.Grant.FrameId == f.Id))
+        if (!ValidMouHq(f) || f.MouHuangQuan is not { Paid: true, Stage: MouHqStage.GiveChildren } r || !TryMouHqOriginalUse(f.OwnerSeat, f.WindowContext, out var use, out var window) || use.Id != r.UseId || use.Action!.ActionId != r.ActionId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHqEffectIssuedEvent>().Any(e => e.Grant.FrameId == f.Id))
             throw new InvalidOperationException("Qiaodui requires the exact once-paid original Use after all Give children return.");
         var grant = new MouHqEffectGrant(f.Id, r.Source, r.GameplayHash, r.WindowId, r.UseId, r.ActionId, r.Recipient, r.Count);
         if (!r.Outgoing)
@@ -35,7 +35,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHqEffectIssuedEvent(grant, true));
     }
 
-    internal bool ValidMouHqEffectGrant(CardUseFrame use, MouHqEffectGrant g, bool repeats) => use.Action is { Type: CardActionType.Use } a && g.UseId == use.Id && g.ActionId == a.ActionId && g.Source.SkillId == MouHqQiaodui && g.Source.BindingId == "give-for-original-effect" && g.WindowId > use.Id && g.FrameId > g.WindowId && g.GivenCount is >= 0 and <= 2 && g.Recipient != g.Source.OwnerSeat && _contentRegistryOperations._contentRegistry.GetSkill(g.Source.SkillId).Program?.GameplayHash == g.GameplayHash && (repeats ? a.ActorSeat == g.Source.OwnerSeat && a.EffectiveDesignatedTargetSeats.Any(t => t != g.Source.OwnerSeat) : a.ActorSeat != g.Source.OwnerSeat && a.EffectiveDesignatedTargetSeats.Contains(g.Source.OwnerSeat)) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHqEffectIssuedEvent>().Count(e => e.Grant == g && e.Repeats == repeats) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHqCommittedEvent>().Count(e => e.FrameId == g.FrameId && e.OwnerSeat == g.Source.OwnerSeat && e.Recipient == g.Recipient && e.Count == g.GivenCount) == 1;
+    internal bool ValidMouHqEffectGrant(CardUseFrame use, MouHqEffectGrant g, bool repeats) => use.Action is { Type: CardActionType.Use } a && g.UseId == use.Id && g.ActionId == a.ActionId && g.Source.SkillId == MouHqQiaodui && g.Source.BindingId == "give-for-original-effect" && g.WindowId > use.Id && g.FrameId > g.WindowId && g.GivenCount is >= 0 and <= 2 && g.Recipient != g.Source.OwnerSeat && _contentRegistryOperations._contentRegistry.GetSkill(g.Source.SkillId).Program?.GameplayHash == g.GameplayHash && (repeats ? a.ActorSeat == g.Source.OwnerSeat && a.EffectiveDesignatedTargetSeats.Any(t => t != g.Source.OwnerSeat) : a.ActorSeat != g.Source.OwnerSeat && a.EffectiveDesignatedTargetSeats.Contains(g.Source.OwnerSeat)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHqEffectIssuedEvent>().Count(e => e.Grant == g && e.Repeats == repeats) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHqCommittedEvent>().Count(e => e.FrameId == g.FrameId && e.OwnerSeat == g.Source.OwnerSeat && e.Recipient == g.Recipient && e.Count == g.GivenCount) == 1;
     internal bool IsMouHqUseIneffective(CardUseFrame use)
     {
         if (use.MouHqIneffective is not { } g)
@@ -45,7 +45,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         return true;
     }
 
-    internal bool HasUnstartedMouHqRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouHqRounds: { } r, Action: { } a } u && a.ActionId == r.ActionId && r.Started < r.Grants.Count && _coreMatchOutcomeWinnerAccess._winner == Winner.None && !IsMouHqUseIneffective(u) && !_coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(u) && !_coreProgramCardUseNullificationOperations.IsProgramUseIneffective(u);
+    internal bool HasUnstartedMouHqRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouHqRounds: { } r, Action: { } a } u && a.ActionId == r.ActionId && r.Started < r.Grants.Count && _coreMatchOutcomeWinnerAccess._winner == Winner.None && !IsMouHqUseIneffective(u) && !_coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(u) && !_coreProgramCardUseNullificationOperations.Value.IsProgramUseIneffective(u);
     internal bool IsMouHqRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.MouHqRounds is { Active: true };
     internal void CaptureMouHqAttack(NativeOwners.CardAttackHandle attack)
     {
@@ -66,7 +66,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
 
     internal bool TryBeginMouHqRound(long id, bool afterAttack)
     {
-        if (!HasUnstartedMouHqRound(id) || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { MouHqRounds: { } r, Action: { } a } u || u.ExtraCardEffect is { WholeGroupRepeated: false } || _characterFeiYiOlOperations.HasUnstartedFeiYiExtraEffect(id) || _characterDaQiaoLeOperations.HasUnstartedZixiExtraEffect(id) || _characterSunQuanOlMagicOperations.HasUnstartedMoQuanyuExtraRound(id) || _characterHuangYueyingOlMouOperations.HasUnstartedMouBingcaiExtraEffect(id) || _coreSoleIncomingEffectRepeatOperations.HasUnstartedSoleIncomingEffect(id) || _coreSequentialTrickTargetsOperations.HasRemainingSequentialTrickTargets(id) || _coreNextCardTargetAdjustmentsOperations.HasRemainingAdjustedSimpleTargets(id))
+        if (!HasUnstartedMouHqRound(id) || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { MouHqRounds: { } r, Action: { } a } u || u.ExtraCardEffect is { WholeGroupRepeated: false } || _characterFeiYiOlOperations.HasUnstartedFeiYiExtraEffect(id) || _characterDaQiaoLeOperations.HasUnstartedZixiExtraEffect(id) || _characterSunQuanOlMagicOperations.HasUnstartedMoQuanyuExtraRound(id) || _characterHuangYueyingOlMouOperations.HasUnstartedMouBingcaiExtraEffect(id) || _coreSoleIncomingEffectRepeatOperations.Value.HasUnstartedSoleIncomingEffect(id) || _coreSequentialTrickTargetsOperations.HasRemainingSequentialTrickTargets(id) || _coreNextCardTargetAdjustmentsOperations.HasRemainingAdjustedSimpleTargets(id))
             return false;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != id || r.Active)
             throw new InvalidOperationException("Qiaodui must await the original native effect and its actual children.");

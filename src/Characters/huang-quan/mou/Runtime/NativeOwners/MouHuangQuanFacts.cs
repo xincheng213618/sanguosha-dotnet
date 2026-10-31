@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouHuangQuanFacts(EngineStates.CoreMatchOutcomeState matchOutcomeState, EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries> getCoreGameEngineAdvancedLifecycleRuntime, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CharacterHuangQuanMouEntries> getCharacterHuangQuanMouRuntime, Func<RuntimeEntries.CoreGameEngineProgramCardPaymentsEntries> getCoreGameEngineProgramCardPaymentsRuntime, Func<CardZoneStore> getCardZoneStore, EngineStates.CoreAiBrainsState aiBrainsState, KernelCreateSnapshotCall createSnapshot, Func<RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries> getCoreGameEngineRecoveryReplacementDamageRidesRuntime) : IMouHuangQuanFacts
+internal sealed class MouHuangQuanFacts(EngineStates.CoreMatchOutcomeState matchOutcomeState, EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries> getCoreGameEngineAdvancedLifecycleRuntime, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CharacterHuangQuanMouEntries> getCharacterHuangQuanMouRuntime, Func<RuntimeEntries.CoreGameEngineProgramCardPaymentsEntries> getCoreGameEngineProgramCardPaymentsRuntime, Func<CardZoneStore> getCardZoneStore, EngineStates.CoreAiBrainsState aiBrainsState, KernelCreateSnapshotCall createSnapshot, Func<RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries> getCoreGameEngineRecoveryReplacementDamageRidesRuntime) : IMouHuangQuanFacts
 {
     public bool GameOver => matchOutcomeState.ReferenceToWinner != Winner.None;
     public int Turn => actualTurnProgressState.ReferenceToTurnNumber;
@@ -15,7 +15,7 @@ internal sealed class MouHuangQuanFacts(EngineStates.CoreMatchOutcomeState match
 
     public ContentSkillDefinition Skill(string id) => getContentRegistry().GetSkill(id);
     public IEnumerable<T> History<T>()
-        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>();
+        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>();
     public bool ParentMatches(ProgramSkillFrame f) => getCharacterHuangQuanMouRuntime().MouHqParent(f);
     public MouHqOriginalUse? OriginalUse(int owner, ProgramSkillWindowContext? context) => getCharacterHuangQuanMouRuntime().TryMouHqOriginalUse(owner, context, out var u, out _) ? new(u.Id, u.Action!.ActionId, u.SourceSeat == owner) : null;
     public IReadOnlyList<MouHqGift> Gifts(int giver) => matchParticipantsState.ReferenceToPlayers[giver].MouHqActualGifts ?? [];
@@ -34,7 +34,7 @@ internal sealed class MouHuangQuanFacts(EngineStates.CoreMatchOutcomeState match
                 continue;
             if (child is RecoveryReplacementFrame recovery && getCoreGameEngineRecoveryReplacementDamageRidesRuntime().RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.Program && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == reason && recovery.Attempt.SourceSeat == seat && recovery.Attempt.TargetSeat == seat)
                 return true;
-            if (child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == seat && hp.Change.TargetSeat == seat && getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<SilverLionRemovedRecoveryEvent>().Any(x => x.PlayerSeat == seat && x.Reason.Value == reason && x.RecoveredAmount == hp.Change.Amount && x.RemainingHp == hp.Change.HpAfter))
+            if (child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == seat && hp.Change.TargetSeat == seat && getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<SilverLionRemovedRecoveryEvent>().Any(x => x.PlayerSeat == seat && x.Reason.Value == reason && x.RecoveredAmount == hp.Change.Amount && x.RemainingHp == hp.Change.HpAfter))
                 return true;
         }
 

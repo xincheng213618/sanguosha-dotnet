@@ -324,7 +324,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, actor.Seat, target.Seat, card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), programSkillCardUseFrameId: f.Id);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(useId, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(useId, actor);
         actor.HasAlcoholEffect = false;
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, target.Seat, IgnoresArmor: attack.IgnoresArmor));

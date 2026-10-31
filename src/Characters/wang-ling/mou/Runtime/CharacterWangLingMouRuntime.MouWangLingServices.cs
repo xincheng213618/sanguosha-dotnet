@@ -21,7 +21,7 @@ internal sealed partial class CharacterWangLingMouRuntime
     CardLocation IMouWangLingFacts.Location(int id) => _cardZonesOperations._cardZones.GetLocation(id);
     IReadOnlyList<Card> IMouWangLingFacts.Hand(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]);
     CardKind IMouWangLingFacts.HandKind(int seat, int id) => _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[seat], _coreAdvancedLifecycleOperations.GetAdvancedCard(id));
-    IEnumerable<T> IMouWangLingFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouWangLingFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     IReadOnlyList<CardMovementRecord> IMouWangLingFacts.Movements(long before, long after) => Array.AsReadOnly(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > before && m.Sequence <= after).ToArray());
     double IMouWangLingFacts.KeepValue(int owner, int id) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[owner]);
     double IMouWangLingFacts.TargetValue(int owner, int target) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), target, new(0, 0, 0, 0, 1, 0, true, false));

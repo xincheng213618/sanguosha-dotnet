@@ -21,7 +21,7 @@ internal sealed partial class CharacterMangYaChangAnniversaryRuntime
         }
         else
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || w.TargetSeat is not { } target || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || JiedaoCostWitness(JiedaoCandidate(f), w)is not { } paid || paid.Grant is not { } grant || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryJiedaoCostBoundEvent>().Any(e => e.GrantFrameId == grant.FrameId))
+            if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || w.TargetSeat is not { } target || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || JiedaoCostWitness(JiedaoCandidate(f), w)is not { } paid || paid.Grant is not { } grant || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryJiedaoCostBoundEvent>().Any(e => e.GrantFrameId == grant.FrameId))
                 throw new InvalidOperationException("Jiedao can only pay once after its original native damage recipient survived.");
             var required = Math.Min(grant.Bonus, JiedaoDiscardableCards(f).Count);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryJiedao = paid with { Required = required } });

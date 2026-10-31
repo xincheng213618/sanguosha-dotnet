@@ -38,7 +38,7 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 30900)]
     internal void CaptureMouMhUse(CardUseDeclaredEvent e)
     {
-        if (!HasMouMengHuoCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)is not { Action: { Type: CardActionType.Use, EffectiveKind: CardKind.BarbarianAssault } a } || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != a.ActorSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<MouMengHuoBarbarianUsedEvent>().Any(x => x.UseId == e.ResolutionId))
+        if (!HasMouMengHuoCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)is not { Action: { Type: CardActionType.Use, EffectiveKind: CardKind.BarbarianAssault } a } || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != a.ActorSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouMengHuoBarbarianUsedEvent>().Any(x => x.UseId == e.ResolutionId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouMengHuoBarbarianUsedEvent(a.ActorSeat, phase, e.ResolutionId, a.ActionId));
     }
@@ -47,14 +47,14 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
     {
         if (!HasMouMengHuoCapability || kind != CardKind.BarbarianAssault || type != CardActionType.Use || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[actor], MouMengHuoComposition.Huoshou) || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != actor)
             return false;
-        if (existingUseId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { Type: CardActionType.Use, EffectiveKind: CardKind.BarbarianAssault } a } && a.ActorSeat == actor && _coreProgramEventHistoryOperations.ProgramEventHistory<MouMengHuoBarbarianUsedEvent>().Any(e => e.UseId == id && e.ActionId == a.ActionId && e.ActorSeat == actor && e.Phase == phase))
+        if (existingUseId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { Type: CardActionType.Use, EffectiveKind: CardKind.BarbarianAssault } a } && a.ActorSeat == actor && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouMengHuoBarbarianUsedEvent>().Any(e => e.UseId == id && e.ActionId == a.ActionId && e.ActorSeat == actor && e.Phase == phase))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouMengHuoBarbarianUsedEvent>().Any(e => e.ActorSeat == actor && e.Phase == phase);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouMengHuoBarbarianUsedEvent>().Any(e => e.ActorSeat == actor && e.Phase == phase);
     }
 
     internal bool RestoreMouMengHuoDamageSource(NativeOwners.GroupCardHandle group)
     {
-        if (!HasMouMengHuoCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)is not { CardKind: CardKind.BarbarianAssault, Action: { } a, MouMengHuoDamageSource: { } r } use || r.UseId != use.Id || r.ActionId != a.ActionId || r.OriginalActorSeat != a.ActorSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouMengHuoAttributionIssuedEvent>().Any(e => e.Attribution == r))
+        if (!HasMouMengHuoCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)is not { CardKind: CardKind.BarbarianAssault, Action: { } a, MouMengHuoDamageSource: { } r } use || r.UseId != use.Id || r.ActionId != a.ActionId || r.OriginalActorSeat != a.ActorSeat || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouMengHuoAttributionIssuedEvent>().Any(e => e.Attribution == r))
             return false;
         group.DamageSourceSeat = r.Source.OwnerSeat;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuoshouAttributedEvent(use.Id, a.ActorSeat, r.Source.OwnerSeat));
@@ -69,7 +69,7 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
         if (g.Features.HasOperation(SkillProgramEffectOp.ObtainMouMengHuoBarbarian))
             return _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == g.OwnerSeat && _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Any(c => c.Kind == CardKind.BarbarianAssault);
         if (g.Features.HasOperation(SkillProgramEffectOp.GainMouMengHuoCharge))
-            return g.Context.SourceSeat == g.OwnerSeat && g.Context.Amount > 0 && MouMhCharge(g.OwnerSeat) < 7 && MouMhTurn()is { } turn && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouMengHuoChargeGainedEvent>().Any(e => e.Source.OwnerSeat == g.OwnerSeat && e.Turn == turn);
+            return g.Context.SourceSeat == g.OwnerSeat && g.Context.Amount > 0 && MouMhCharge(g.OwnerSeat) < 7 && MouMhTurn()is { } turn && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouMengHuoChargeGainedEvent>().Any(e => e.Source.OwnerSeat == g.OwnerSeat && e.Turn == turn);
         return MouMhCharge(g.OwnerSeat) > 0 && g.Context.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && g.Context.SourceSeat == g.OwnerSeat;
     }
 
@@ -92,7 +92,7 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
 
         if (op == SkillProgramEffectOp.GainMouMengHuoCharge)
         {
-            if (c.Window != SkillProgramTriggerWindow.AfterDamageApplied || c.SourceSeat != f.OwnerSeat || c.Amount <= 0 || MouMhTurn()is not { } turn || c.DamageFrameId is not { } damage || MouMhCharge(f.OwnerSeat) >= 7 || _coreProgramEventHistoryOperations.ProgramEventHistory<MouMengHuoChargeGainedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Turn == turn))
+            if (c.Window != SkillProgramTriggerWindow.AfterDamageApplied || c.SourceSeat != f.OwnerSeat || c.Amount <= 0 || MouMhTurn()is not { } turn || c.DamageFrameId is not { } damage || MouMhCharge(f.OwnerSeat) >= 7 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouMengHuoChargeGainedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Turn == turn))
                 return SkillProgramStepOutcome.Continue;
             var before = MouMhCharge(f.OwnerSeat);
             ChangeMouMhCharge(f, 1);

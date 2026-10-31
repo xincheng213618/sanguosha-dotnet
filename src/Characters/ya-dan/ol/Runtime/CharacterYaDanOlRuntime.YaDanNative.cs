@@ -62,15 +62,15 @@ internal sealed partial class CharacterYaDanOlRuntime
 
     internal bool IsIssuedQingyaUse(long id)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { QingyaOrigin: { } o, Action: { Type: CardActionType.Use } action, PhysicalCardIds: [var material] } use || o.UseId != id || o.CardId != use.CardId || o.CardId != material || o.ActionId != action.ActionId || o.ProviderSeat != action.ProviderSeat || action.PhysicalCards is not [var cost] || cost.CardId != material || cost.From != CardLocation.DiscardPile || use.CurrentSlashFirePolicy is null && use.CardKind != o.Kind || action.EffectiveKind != use.CardKind || _coreProgramEventHistoryOperations.ProgramEventHistory<QingyaNativeIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { QingyaOrigin: { } o, Action: { Type: CardActionType.Use } action, PhysicalCardIds: [var material] } use || o.UseId != id || o.CardId != use.CardId || o.CardId != material || o.ActionId != action.ActionId || o.ProviderSeat != action.ProviderSeat || action.PhysicalCards is not [var cost] || cost.CardId != material || cost.From != CardLocation.DiscardPile || use.CurrentSlashFirePolicy is null && use.CardKind != o.Kind || action.EffectiveKind != use.CardKind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyaNativeIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         var at = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id);
         if (at < 1 || _resolutionStackOperations._resolutionStack[at - 1] is not ProgramSkillFrame { YaDan: { Stage: QingyaStage.NativeUse, NativeCompleted: false } r } f || f.Id != o.ProgramFrameId || f.OwnerSeat != o.OriginalActor || r.NativeOrigin != o || r.GrantId != o.GrantId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.ActualTurn != o.ActualTurn || r.SelectedAction?.CardId != material || f.InstructionIndex != 1)
             return false;
         var actor = o.OriginalActor;
-        foreach (var change in _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == id))
+        foreach (var change in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == id))
         {
-            if (change.PreviousActorSeat != actor || change.OwnerSeat != actor || change.ProviderSeat != o.ProviderSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(change.ActorSeat) || change.FrameId <= id || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.FrameId == change.FrameId && e.OwnerSeat == change.OwnerSeat && e.SkillId == change.SkillId && e.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized))
+            if (change.PreviousActorSeat != actor || change.OwnerSeat != actor || change.ProviderSeat != o.ProviderSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(change.ActorSeat) || change.FrameId <= id || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.FrameId == change.FrameId && e.OwnerSeat == change.OwnerSeat && e.SkillId == change.SkillId && e.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized))
                 return false;
             actor = change.ActorSeat;
         }
@@ -92,7 +92,7 @@ internal sealed partial class CharacterYaDanOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(origin.ProgramFrameId);
         var r = f.YaDan;
-        if (r is not { Stage: QingyaStage.NativeUse, NativeCompleted: false } || r.NativeOrigin != origin || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.CardId == origin.CardId && m.From == CardLocation.DiscardPile && m.To == CardLocation.Processing && (m.Reason == CardMoveReasons.Use || m.Reason == CardMoveReasons.IronChainUse || m.Reason == CardMoveReasons.EquipmentUse)) != 1)
+        if (r is not { Stage: QingyaStage.NativeUse, NativeCompleted: false } || r.NativeOrigin != origin || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.CardId == origin.CardId && m.From == CardLocation.DiscardPile && m.To == CardLocation.Processing && (m.Reason == CardMoveReasons.Use || m.Reason == CardMoveReasons.IronChainUse || m.Reason == CardMoveReasons.EquipmentUse)) != 1)
             throw new InvalidOperationException("Qingya lost its exact once-paid whole native return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { YaDan = r with { NativeCompleted = true, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         if (use.CardAttack is { Active: true })
@@ -115,7 +115,7 @@ internal sealed partial class CharacterYaDanOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(origin.ProgramFrameId);
         var r = f.YaDan!;
-        if (!r.NativeCompleted || r.NativeOrigin != origin || _coreCardUseLifecycleOperations.LifecycleCardUse(origin.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<QingyaNativeReturnedEvent>().Any(e => e.Origin == origin))
+        if (!r.NativeCompleted || r.NativeOrigin != origin || _coreCardUseLifecycleOperations.LifecycleCardUse(origin.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyaNativeReturnedEvent>().Any(e => e.Origin == origin))
             throw new InvalidOperationException("Qingya cannot finish before or twice after its exact whole native use.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { YaDan = r with { Stage = QingyaStage.NativeChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QingyaNativeReturnedEvent(origin));

@@ -10,14 +10,14 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
         if (!HasOrdinaryCaiFuRenCapability || e is OrdinaryQietingActualUseEvent || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber <= 0)
             return;
         foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().ToArray())
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(d => d.ResolutionId == use.Id))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(d => d.ResolutionId == use.Id))
                 RecordOrdinaryQietingUse(use);
     }
 
     [NativeUsePreparation(27596)]
     internal bool CaptureOrdinaryQietingFinalUse(CardUseFrame use)
     {
-        if (HasOrdinaryCaiFuRenCapability && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(d => d.ResolutionId == use.Id))
+        if (HasOrdinaryCaiFuRenCapability && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(d => d.ResolutionId == use.Id))
             RecordOrdinaryQietingUse(use);
         return false;
     }
@@ -27,7 +27,7 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
         if (use.Action is { Type: not CardActionType.Use })
             return;
         var targets = use.Action?.EffectiveDesignatedTargetSeats ?? use.TargetSeats;
-        var old = _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryQietingActualUseEvent>().LastOrDefault(e => e.NativeUseId == use.Id);
+        var old = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<OrdinaryQietingActualUseEvent>().LastOrDefault(e => e.NativeUseId == use.Id);
         var next = new OrdinaryQietingActualUseEvent(old?.ActualTurn ?? _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, old?.TurnOwnerSeat ?? _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, use.Id, use.Action?.ActionId, use.SourceSeat, targets.Any(t => t != use.SourceSeat), targets.Distinct().Count());
         if (next != old)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(next);

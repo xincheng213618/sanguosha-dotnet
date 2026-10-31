@@ -10,7 +10,7 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
         return _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Select(c => (Card: c, From: CardLocation.Hand(owner))).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Select(c => (Card: c, From: CardLocation.DiscardPile))).Where(p => _coreEquipmentContentOperations.EquipmentRules.IsEquipment(p.Card.Kind) && !p.Card.IsGeneralWeapon && !_coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, MouHuangYueyingMobileComposition.Qicai, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[owner], MouHuangYueyingMobileComposition.Qicai), p.Card) && _coreMatchParticipantsPlayersAccess._players[target].EquipmentSlotCapacity(_coreEquipmentContentOperations.EquipmentRules.Get(p.Card.Kind).Slot) > 0).ToArray();
     }
 
-    internal int MouHyQicaiPhaseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQicaiReservedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Phase == phase);
+    internal int MouHyQicaiPhaseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingQicaiReservedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Phase == phase);
     [ProgramPhaseUsedProjection(90)]
     internal int MouHyQicaiProjectedUses(int owner, string skill, int fallback) => skill == MouHuangYueyingMobileComposition.Qicai && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p ? MouHyQicaiPhaseUses(owner, p) : fallback;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 31500, SkillProgramEffectOp.PlaceMouHuangYueyingQicaiEquipment)]
@@ -78,8 +78,8 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.PlaceMouHuangYueyingQicaiEquipment)]
     internal PromptChoice AiMouHyQicai(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
-    internal MouHuangYueyingQiGrantedEvent? CurrentMouHyQi(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGrantedEvent>().LastOrDefault(e => e.RecipientSeat == target);
-    internal int MouHyQiRemaining(MouHuangYueyingQiGrantedEvent grant) => Math.Max(0, 3 - _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().Count(e => e.GrantId == grant.GrantId));
+    internal MouHuangYueyingQiGrantedEvent? CurrentMouHyQi(int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingQiGrantedEvent>().LastOrDefault(e => e.RecipientSeat == target);
+    internal int MouHyQiRemaining(MouHuangYueyingQiGrantedEvent grant) => Math.Max(0, 3 - _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().Count(e => e.GrantId == grant.GrantId));
     internal void SyncMouHyQiMarker(long frame, int target)
     {
         var grant = CurrentMouHyQi(target);

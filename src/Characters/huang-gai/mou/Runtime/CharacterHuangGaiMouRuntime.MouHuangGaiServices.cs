@@ -34,7 +34,7 @@ internal sealed partial class CharacterHuangGaiMouRuntime
     IReadOnlyList<int> IMouHuangGaiFacts.ProcessingReveals(ProgramSkillFrame f) => Array.AsReadOnly(f.MouHuangGai!.Reveals.Where(c => _cardZonesOperations._cardZones.GetLocation(c.CardId) == CardLocation.Processing).Select(c => c.CardId).ToArray());
     IReadOnlyList<MouHgLiejiGrant> IMouHuangGaiFacts.Grants(int owner) => Array.AsReadOnly((_coreMatchParticipantsPlayersAccess._players[owner].MouHgLiejiGrants ?? []).ToArray());
     MouHgUseFacts? IMouHuangGaiFacts.Use(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { Type: CardActionType.Use } a } u ? new(u.Id, a.ActionId, Array.AsReadOnly(a.PhysicalCards.Select(c => c.CardId).ToArray()), u.MouHgBonuses is { } b ? Array.AsReadOnly(b.ToArray()) : null) : null;
-    IEnumerable<T> IMouHuangGaiFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouHuangGaiFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     void IMouHuangGaiNative.SetGrants(int owner, IReadOnlyList<MouHgLiejiGrant>? grants) => _coreMatchParticipantsPlayersAccess._players[owner].MouHgLiejiGrants = grants is null ? null : Array.AsReadOnly(grants.ToArray());
     void IMouHuangGaiNative.SetUseBonuses(long useId, IReadOnlyList<MouHgUseBonus> bonuses) => _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, u => u with { MouHgBonuses = bonuses });
     MouHgReveal? IMouHuangGaiNative.Reveal(ProgramSkillFrame f, string binding)

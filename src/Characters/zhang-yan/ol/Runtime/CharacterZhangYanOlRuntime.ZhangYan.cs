@@ -229,7 +229,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27000)]
-    internal bool ContinuePaidZhangYan(ProgramSkillFrame f) => f.ZhangYan is { } r && r.Stage is ZhangYanStage.NativeUse or ZhangYanStage.NativeChildren or ZhangYanStage.RewardChildren && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
+    internal bool ContinuePaidZhangYan(ProgramSkillFrame f) => f.ZhangYan is { } r && r.Stage is ZhangYanStage.NativeUse or ZhangYanStage.NativeChildren or ZhangYanStage.RewardChildren && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYanStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.UseBlackCardAtWoundedPlayStart, SkillProgramEffectOp.ResolveLangdaoSimultaneousSlash, SkillProgramEffectOp.ObtainSujiDamagedPhaseOwnerCard)]
     internal PromptChoice AiZhangYan(PendingDecision p, ProgramSkillFrame f)
     {

@@ -281,7 +281,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
 
     internal void ExecuteValidatedProgramSkill(CharacterState owner, LegalAction action, IReadOnlyList<int> cards, IReadOnlyList<int> targets)
     {
-        if (_coreSharedPhaseSkillsOperations.TryExecuteSharedProgramActivation(owner, action, cards, targets))
+        if (_coreSharedPhaseSkillsOperations.Value.TryExecuteSharedProgramActivation(owner, action, cards, targets))
             return;
         if (action.ProgramSkillOwnerSeat is { } skillOwnerSeat)
         {
@@ -313,13 +313,13 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
             HpLossSlashSelection = _coreHpLossSlashMaterialsOperations.FreezeHpLossSlashSelection(owner, plan, targets),
             SelectedAllOwnerHandCards = plan.Features.HasOperation(SkillProgramEffectOp.DrawAllHandSelectedBonus) ? _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > 0 && _corePhysicalOwnedCardQueriesOperations.GetHand(owner).All(card => cards.Contains(card.Id)) : null
         };
-        frame = _coreHpConditionalSkillGrantsOperations.CaptureHpConditionalProgramSource(frame);
+        frame = _coreHpConditionalSkillGrantsOperations.Value.CaptureHpConditionalProgramSource(frame);
         frame = _characterHeQiOlOperations.CaptureEquipmentSuitProgramSource(frame);
         frame = _characterLuKangWumiaoOperations.CaptureWuLuKangPindianSelection(frame, activation);
         _coreRuntimeOperations.PushRuntimeFrame(frame);
         _characterLuKangWumiaoOperations.IssueWuLuKangPindianSelection(frame);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillStartedEvent(frame.Id, owner.Seat, program.Id, activation.Id));
-        _characterZhaoYunOlGod2016Operations.IssueHpScaledProgramSelection(frame, activation);
+        _characterZhaoYunOlGod2016Operations.Value.IssueHpScaledProgramSelection(frame, activation);
         _coreMatchLogOperations.AddLog("ActiveSkill", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry!.Skills[program.Id].Name)}】。", owner.Seat);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
@@ -356,26 +356,26 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
     internal void FinishProgramSkill(ProgramSkillFrame frame, bool completed) => _programCompletionOperations.Get().Finish(frame, completed);
     internal void BeginProgramSkillDying(long parentFrameId, CharacterState victim)
     {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != parentFrameId)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != parentFrameId)
             throw new InvalidOperationException("A program dying continuation requires its program frame.");
         var responders = Array.AsReadOnly(_coreNativeDyingOperations.BuildDyingResponderSeats(victim.Seat).ToArray());
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         _coreRuntimeOperations.PushRuntimeFrame(new DyingFrame(id, parentFrameId, victim.Seat, null, responders, 0, DyingContinuationKind.ProgramSkill) { HappyQiaoPool = _characterDaQiaoXiaoQiaoHappyGodOperations.CurrentHappyQiaoPool(victim.Seat, parentFrameId) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerDyingEvent(id, victim.Seat, null));
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
-        if (!_coreProgramLifecycleOperations.TryBeginMandatorySelfDyingProgram(_coreDyingCursorRuntimeOperations.ActiveDying!) && !_coreDyingEntryProgramsOperations.TryBeginDyingEntryProgramWindow(_coreDyingCursorRuntimeOperations.ActiveDying!))
+        if (!_coreProgramLifecycleOperations.TryBeginMandatorySelfDyingProgram(_coreDyingCursorRuntimeOperations.Value.ActiveDying!) && !_coreDyingEntryProgramsOperations.TryBeginDyingEntryProgramWindow(_coreDyingCursorRuntimeOperations.Value.ActiveDying!))
             _coreNativeDyingOperations.ExposeHumanDyingPrompt();
     }
 
     internal SkillProgramStepOutcome BeginProgramSkillDamage(ProgramSkillFrame frame, int targetSeat, int amount, ProgramParticipantReference? sourceReference = null, DamageNature? nature = null, bool sourceLess = false, int? explicitSourceSeat = null)
     {
-        var insertion = _coreProgramDamageInsertionRuntimeOperations.DamageInsertions.Describe(frame);
-        var judgmentNested = frame.WindowContext?.Judgment is { } frozenJudgment && _coreJudgmentCursorRuntimeOperations.ActiveJudgment is { } pendingJudgment && pendingJudgment.Id == frozenJudgment.JudgmentFrameId && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, _coreNativeDamageHandlesOperations.GetJudgmentAttack(pendingJudgment));
-        var damageWindowNested = frame.WindowContext?.Window == SkillProgramTriggerWindow.AfterDamageApplied && _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } outerWindow && outerWindow.Id == frame.WindowContext.ParentFrameId;
-        _ = _coreRecoveryDamageEdgesOperations.TryDescribeRecoveryDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat, out var recoveryOrigin, out var recoveryDamageWindowId);
+        var insertion = _coreProgramDamageInsertionRuntimeOperations.Value.DamageInsertions.Describe(frame);
+        var judgmentNested = frame.WindowContext?.Judgment is { } frozenJudgment && _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is { } pendingJudgment && pendingJudgment.Id == frozenJudgment.JudgmentFrameId && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, _coreNativeDamageHandlesOperations.Value.GetJudgmentAttack(pendingJudgment));
+        var damageWindowNested = frame.WindowContext?.Window == SkillProgramTriggerWindow.AfterDamageApplied && _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is { } outerWindow && outerWindow.Id == frame.WindowContext.ParentFrameId;
+        _ = _coreRecoveryDamageEdgesOperations.Value.TryDescribeRecoveryDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat, out var recoveryOrigin, out var recoveryDamageWindowId);
         NativeDrawThresholdDyingOrigin? drawDyingOrigin = null;
-        _ = frame.AttackAttempt is null && _coreNativeDrawThresholdDyingOperations.TryDescribeNativeDrawThresholdDyingDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat, out drawDyingOrigin);
-        if (insertion is null && (_coreProgramAttackAttemptOperations.CurrentDamageAttempt is not null || _coreDyingCursorRuntimeOperations.ActiveDying is not null) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame current || current.Id != frame.Id || amount <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive)
+        _ = frame.AttackAttempt is null && _coreNativeDrawThresholdDyingOperations.Value.TryDescribeNativeDrawThresholdDyingDamage(frame, targetSeat, amount, sourceReference, nature, sourceLess, explicitSourceSeat, out drawDyingOrigin);
+        if (insertion is null && (_coreProgramAttackAttemptOperations.CurrentDamageAttempt is not null || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not null) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame current || current.Id != frame.Id || amount <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive)
             throw new InvalidOperationException("A program damage effect requires one active program and living target.");
         var state = new AttackAttemptState(explicitSourceSeat ?? (sourceReference is { } reference ? _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, reference) : frame.OwnerSeat), targetSeat, amount, nature ?? DamageNature.Normal, sourceLess, frame.WindowContext?.Window == SkillProgramTriggerWindow.JudgmentFinalized ? frame.WindowContext.ParentFrameId : null);
         var parentAttackId = _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId;
@@ -413,7 +413,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
         var source = new CardConversionSource(frame.SkillId, viewAsId, owner.Seat, frame.SkillInstanceId);
         var selection = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(owner, frame.SelectedCardIds, outputKind, forResponse: false, source) ?? throw new InvalidOperationException("The selected physical cards no longer satisfy the configured view-as rule.");
         if (outputKind == CardKind.ArrowBarrage)
-            return _coreProgramSelectedGlobalCardUsesOperations.UseProgramSelectedCardsAsGlobal(frame, selection);
+            return _coreProgramSelectedGlobalCardUsesOperations.Value.UseProgramSelectedCardsAsGlobal(frame, selection);
         if (outputKind == CardKind.Peach)
         {
             var rule = GetEnabledSkillProgram(owner, frame.SkillId).ViewAs.Single(item => item.Id == viewAsId);

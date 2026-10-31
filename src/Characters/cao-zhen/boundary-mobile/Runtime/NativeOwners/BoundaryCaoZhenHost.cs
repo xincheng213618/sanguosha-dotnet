@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class BoundaryCaoZhenHost(Func<RuntimeEntries.CharacterCaoZhenBoundaryMobileEntries> getCharacterCaoZhenBoundaryMobileRuntime) : IBoundaryCaoZhenHost
+internal sealed class BoundaryCaoZhenHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoZhenBoundaryMobileRuntime>> getCharacterCaoZhenBoundaryMobileRuntime) : IBoundaryCaoZhenHost
 {
-    public SkillProgramStepOutcome Execute(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterCaoZhenBoundaryMobileRuntime().BeginBoundarySidi(frame, effect);
+    public SkillProgramStepOutcome Execute(ProgramSkillFrame frame, SkillProgramEffect effect) => getCharacterCaoZhenBoundaryMobileRuntime().Value.BeginBoundarySidi(frame, effect);
 }

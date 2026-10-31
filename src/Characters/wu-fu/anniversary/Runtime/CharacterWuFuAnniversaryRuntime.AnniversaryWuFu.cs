@@ -15,7 +15,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
             throw new InvalidOperationException("Wu Fu requires his original current actual-Play activation.");
         if (op == SkillProgramEffectOp.ResolveAnniversaryWuFuJuekai)
         {
-            if (f.SkillId != AnniversaryWuFuComposition.Juekai || f.ActivationId != "reset-and-restrict" || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuJuekaiEvent>().Any(e => e.FrameId == f.Id))
+            if (f.SkillId != AnniversaryWuFuComposition.Juekai || f.ActivationId != "reset-and-restrict" || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuJuekaiEvent>().Any(e => e.FrameId == f.Id))
                 throw new InvalidOperationException("Juekai cannot repeat its accepted limited activation.");
             var program = _contentRegistryOperations._contentRegistry.GetSkill(AnniversaryWuFuComposition.Zhonge).Program ?? throw new InvalidOperationException("Juekai lost its paired Zhonge definition.");
             var activation = program.Activations.Single(a => a.Id == "adjust-and-commit");

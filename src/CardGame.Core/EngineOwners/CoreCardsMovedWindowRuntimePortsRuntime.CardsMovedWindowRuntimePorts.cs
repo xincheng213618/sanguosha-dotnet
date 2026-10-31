@@ -17,7 +17,7 @@ internal sealed partial class CoreCardsMovedWindowRuntimePortsRuntime
 
     bool ICardsMovedWindowFacts.IsValidPlayerSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool ICardsMovedWindowFacts.IsAlive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
-    bool ICardsMovedWindowFacts.HasActiveJudgment => _coreJudgmentCursorRuntimeOperations.ActiveJudgment is not null;
+    bool ICardsMovedWindowFacts.HasActiveJudgment => _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is not null;
 
     SkillProgramTrigger ICardsMovedWindowFacts.GetProgramTrigger(ProgramTriggerCandidate candidate) => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
     IEnumerable<(CardMovementSourceCount Count, bool DiscardOriginOnly)> ICardsMovedWindowFacts.ProgramMovementSourceCounts(CardMovementBatchContext batch, SkillProgramTriggerWindow window) => _coreProgramMovementSourceCountsOperations.ProgramMovementSourceCounts(batch, window);
@@ -34,9 +34,9 @@ internal sealed partial class CoreCardsMovedWindowRuntimePortsRuntime
     bool ICardsMovedWindowNativeProofs.IsShanheNullifiedClaimMovement(NullificationWindowFrame window, CardMovementBatchContext batch) => _coreShanheNullifiedTrickClaimsOperations.IsShanheNullifiedClaimMovement(window, batch);
     bool ICardsMovedWindowNativeProofs.IsKemingEchoMovement(KemingSkillEchoFrame f, CardMovementBatchContext b) => _characterCaoPiAnniversaryGodOperations.IsKemingEchoMovement(f, b);
     bool ICardsMovedWindowNativeProofs.IsSkillInvocationMovementBatch(SkillInvocationFrame f, CardMovementBatchContext batch) => _characterHuaTuoAnniversaryGodOperations.IsSkillInvocationMovementBatch(f, batch);
-    bool ICardsMovedWindowNativeProofs.IsRoundEndingMovement(RoundEndingBoundaryFrame parent, CardMovementBatchContext batch) => _coreRoundEndingOperations.IsRoundEndingMovement(parent, batch);
-    bool ICardsMovedWindowNativeProofs.IsNianRevivalMovementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _coreNianRevivalOperations.IsNianRevivalMovementBatch(f, batch);
-    bool ICardsMovedWindowCardUseProofs.HasPaidCardUseMovementTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => _coreProgramCardUsePaymentsOperations.HasPaidCardUseMovementTail(use, continuation);
+    bool ICardsMovedWindowNativeProofs.IsRoundEndingMovement(RoundEndingBoundaryFrame parent, CardMovementBatchContext batch) => _coreRoundEndingOperations.Value.IsRoundEndingMovement(parent, batch);
+    bool ICardsMovedWindowNativeProofs.IsNianRevivalMovementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _coreNianRevivalOperations.Value.IsNianRevivalMovementBatch(f, batch);
+    bool ICardsMovedWindowCardUseProofs.HasPaidCardUseMovementTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => _coreProgramCardUsePaymentsOperations.Value.HasPaidCardUseMovementTail(use, continuation);
     bool ICardsMovedWindowCardUseProofs.IsCardUsePaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => _coreCardUsePaymentsOperations.IsCardUsePaymentBatch(use, batch);
     bool ICardsMovedWindowCardUseProofs.IsSoleIncomingRangeDrawMovement(CardUseFrame use, CardMovementBatchContext batch) => _coreSoleIncomingRangeDrawOperations.IsSoleIncomingRangeDrawMovement(use, batch);
     bool ICardsMovedWindowCardUseProofs.IsWumiaoFloodMovement(CardUseFrame use, CardMovementBatchContext batch) => _characterGuanYuWumiaoOperations.IsWumiaoFloodMovement(use, batch);
@@ -62,7 +62,7 @@ internal sealed partial class CoreCardsMovedWindowRuntimePortsRuntime
     void ICardsMovedWindowNativeReturns.ReturnDeferredTurnEndPrelude(CardsMovedTriggerWindowFrame child) => _coreDeferredTurnEndPreludesOperations.ReturnDeferredTurnEndPrelude(child);
     void ICardsMovedWindowNativeReturns.ReturnSoleTargetQuarantineMovement(CardsMovedTriggerWindowFrame child) => _coreSoleTargetQuarantineOperations.ReturnSoleTargetQuarantineMovement(child);
     void ICardsMovedWindowNativeReturns.ResumeDrawFundedDistinctBasicMovement(CardsMovedTriggerWindowFrame completed) => _coreDrawFundedDistinctBasicPaymentOperations.ResumeDrawFundedDistinctBasicMovement(completed);
-    void ICardsMovedWindowNativeReturns.ReturnRoundEndingMovement(CardsMovedTriggerWindowFrame child) => _coreRoundEndingOperations.ReturnRoundEndingMovement(child);
+    void ICardsMovedWindowNativeReturns.ReturnRoundEndingMovement(CardsMovedTriggerWindowFrame child) => _coreRoundEndingOperations.Value.ReturnRoundEndingMovement(child);
     void ICardsMovedWindowNativeReturns.ReturnRuntimeProgramMovement(long frameId) => _coreRuntimeOperations.ReturnRuntimeProgramMovement(frameId);
     void ICardsMovedWindowCardUseContinuations.ContinueGuanduCardEffect(long id) => _coreGuanduCardsOperations.ContinueGuanduCardEffect(id);
     void ICardsMovedWindowCardUseContinuations.ContinueWumiaoFlood(long id) => _characterGuanYuWumiaoOperations.ContinueWumiaoFlood(id);
@@ -81,14 +81,14 @@ internal sealed partial class CoreCardsMovedWindowRuntimePortsRuntime
     void ICardsMovedWindowCardUseContinuations.ContinueMouZhitianFirePayment(long id) => _characterZhugeLiangMouOperations.ContinueMouZhitianFirePayment(id);
     void ICardsMovedWindowCardUseContinuations.ContinueColorFireAttackPayment(long useId) => _coreColorFireAttacksOperations.ContinueColorFireAttackPayment(useId);
     int ICardsMovedWindowSelections.RelativeTableOrder(int from, int target) => _coreTableOrderOperations.RelativeTableOrder(from, target);
-    IEnumerable<ProgramTriggerCandidate> ICardsMovedWindowSelections.CollectSourceOwnerGainCandidates(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, CardMovementSourceCount count) => _coreSourceOwnerGainsOperations.CollectSourceOwnerGainCandidates(batch, candidate, trigger, count);
+    IEnumerable<ProgramTriggerCandidate> ICardsMovedWindowSelections.CollectSourceOwnerGainCandidates(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, CardMovementSourceCount count) => _coreSourceOwnerGainsOperations.Value.CollectSourceOwnerGainCandidates(batch, candidate, trigger, count);
     int ICardsMovedWindowSelections.FriendManjuanMovedCount(CardMovementBatchContext batch, int seat, SkillProgramTrigger trigger, int fallback) => _characterPangTongFriendOperations.FriendManjuanMovedCount(batch, seat, trigger, fallback);
-    int[] ICardsMovedWindowSelections.MatchingNativeDrawOrdinalIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _coreNativeDrawOrdinalsOperations.MatchingNativeDrawOrdinalIndexes(batch, candidate);
-    int[] ICardsMovedWindowSelections.MatchingNativeDrawThresholdIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _coreNativeDrawThresholdOperations.MatchingNativeDrawThresholdIndexes(batch, candidate);
-    NativeDrawThresholdProgress? ICardsMovedWindowSelections.MatchingNativeDrawThresholdProgress(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _coreNativeDrawThresholdOperations.MatchingNativeDrawThresholdProgress(batch, candidate);
+    int[] ICardsMovedWindowSelections.MatchingNativeDrawOrdinalIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _coreNativeDrawOrdinalsOperations.Value.MatchingNativeDrawOrdinalIndexes(batch, candidate);
+    int[] ICardsMovedWindowSelections.MatchingNativeDrawThresholdIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _coreNativeDrawThresholdOperations.Value.MatchingNativeDrawThresholdIndexes(batch, candidate);
+    NativeDrawThresholdProgress? ICardsMovedWindowSelections.MatchingNativeDrawThresholdProgress(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _coreNativeDrawThresholdOperations.Value.MatchingNativeDrawThresholdProgress(batch, candidate);
     int[] ICardsMovedWindowSelections.MatchingLiJueUseDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _characterLiJueOlOperations.MatchingLiJueUseDiscardIndexes(batch, candidate);
-    int[] ICardsMovedWindowSelections.MatchingMouXiahouDunDiscardIndexes(CardMovementBatchContext batch) => _characterXiahouDunMouMobileOperations.MatchingMouXiahouDunDiscardIndexes(batch);
-    ProgramDiscardedEntityOriginEvent? ICardsMovedWindowSelections.DiscardedProvenanceOrigin(CardMovementRecord movement) => _coreDiscardedProvenanceOperations.DiscardedProvenanceOrigin(movement);
+    int[] ICardsMovedWindowSelections.MatchingMouXiahouDunDiscardIndexes(CardMovementBatchContext batch) => _characterXiahouDunMouMobileOperations.Value.MatchingMouXiahouDunDiscardIndexes(batch);
+    ProgramDiscardedEntityOriginEvent? ICardsMovedWindowSelections.DiscardedProvenanceOrigin(CardMovementRecord movement) => _coreDiscardedProvenanceOperations.Value.DiscardedProvenanceOrigin(movement);
     CardLocation? ICardsMovedWindowSelections.FaluDiscardOwnedSource(CardMovementRecord movement) => _characterZhangQiYingOlOperations.FaluDiscardOwnedSource(movement);
     void ICardsMovedWindowOperations.MoveCard(Card card, CardLocation from, CardLocation to, CardMoveReason reason) => _corePhysicalMovementFacadesOperations.MoveCard(card, from, to, reason);
     void ICardsMovedWindowOperations.AddLog(string type, string message, int actor, int target) => _coreMatchLogOperations.AddLog(type, message, actor, target);

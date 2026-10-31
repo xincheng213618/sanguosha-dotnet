@@ -14,7 +14,7 @@ internal sealed partial class CharacterHouChengAnniversaryRuntime
     {
         if (c is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch })
             return false;
-        return batch.Movements.Any(move => move.To == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move) && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Any(m => m.CardId == move.CardId && m.CompletionSequence == move.Sequence && m.From.OwnerSeat == owner && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(i => i.InvocationId == m.InvocationId && i.ExecutorSeat != owner && i.TurnNumber == batch.TurnNumber && m.CompletionSequence > i.SequenceBefore && m.CompletionSequence <= i.SequenceAfter)));
+        return batch.Movements.Any(move => move.To == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Any(m => m.CardId == move.CardId && m.CompletionSequence == move.Sequence && m.From.OwnerSeat == owner && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(i => i.InvocationId == m.InvocationId && i.ExecutorSeat != owner && i.TurnNumber == batch.TurnNumber && m.CompletionSequence > i.SequenceBefore && m.CompletionSequence <= i.SequenceAfter)));
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 48700)]
@@ -187,7 +187,7 @@ internal sealed partial class CharacterHouChengAnniversaryRuntime
         ContinueHouCheng(f.Id);
     }
 
-    internal int HouChengRoundGain(int owner, int round) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHouChengMovementEvent>().Where(e => !e.Giving && e.Source.OwnerSeat == owner && e.Round == round && ValidHouChengMovement(e)).Sum(e => e.ActualCount);
+    internal int HouChengRoundGain(int owner, int round) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHouChengMovementEvent>().Where(e => !e.Giving && e.Source.OwnerSeat == owner && e.Round == round && ValidHouChengMovement(e)).Sum(e => e.ActualCount);
     internal void ContinueHouCheng(long id)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);

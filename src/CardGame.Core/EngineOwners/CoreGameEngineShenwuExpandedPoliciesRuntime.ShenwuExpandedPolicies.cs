@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineShenwuExpandedPoliciesRuntime
 {
     [ProgramTargetRule(ProgramTargetRulePoint.TargetCountContributions, 20)]
     internal RuleQueryContribution? ShenwuJuyuanTargetCountContribution(ProgramTargetCountQuery query) => ShenwuJuyuanExtraTarget(query.Actor, query.Kind) ? new FiniteRuleQueryContribution($"turn:{(query.Actor.Seat)}:shenwu:juyuan", SkillRuleOperation.Add, 1) : null;
-    internal int ShenwuReplacementDrawBonus(int seat) => _coreShenwuActivitiesOperations.ShenwuBattleRules?.ReplacementDrawBonus(seat) ?? 0;
+    internal int ShenwuReplacementDrawBonus(int seat) => _coreShenwuActivitiesOperations.Value.ShenwuBattleRules?.ReplacementDrawBonus(seat) ?? 0;
     internal long CaptureShenwuFengdongStamp()
     {
         if (!_contentRegistryOperations._contentRegistry.Skills.ContainsKey("shenwu:fengdong") || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat) || _coreMatchParticipantsPlayersAccess._players.Count <= _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)

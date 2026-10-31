@@ -8,8 +8,8 @@ internal sealed partial class CoreProgramShanheLuanxinRuntime
     internal bool HasShanheLuanxinForeignHandDiscard(int owner, CardMovementBatchContext batch)
     {
         var sequences = batch.Movements.Select(movement => (long)movement.Sequence).ToHashSet();
-        var invoices = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(invoice => invoice.ExecutorSeat != owner).Select(invoice => invoice.InvocationId).ToHashSet();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Any(material => invoices.Contains(material.InvocationId) && material.From == CardLocation.Hand(owner) && material.To == CardLocation.DiscardPile && sequences.Contains(material.CompletionSequence));
+        var invoices = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(invoice => invoice.ExecutorSeat != owner).Select(invoice => invoice.InvocationId).ToHashSet();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Any(material => invoices.Contains(material.InvocationId) && material.From == CardLocation.Hand(owner) && material.To == CardLocation.DiscardPile && sequences.Contains(material.CompletionSequence));
     }
 
     internal bool HasShanheLuanxinOtherHandGain(int owner, CardMovementBatchContext batch) => batch.Movements.Any(movement => movement.To == CardLocation.Hand(owner) && _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(movement, batch)is { Zone: CardZoneKind.Hand, OwnerSeat: { } source } && source != owner);
@@ -28,7 +28,7 @@ internal sealed partial class CoreProgramShanheLuanxinRuntime
     internal void QueueShanheLuanxinNextDraw(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.SkillId != ShanheLuanxinSkillId || frame.TriggerId != "other-hand-gain" || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained, MovementBatch: { } batch } || !HasShanheLuanxinOtherHandGain(frame.OwnerSeat, batch) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLuanxinNextDrawIssuedEvent>().Any(issued => issued.ProgramFrameId == frame.Id && issued.InstructionIndex == frame.InstructionIndex))
+        if (frame.SkillId != ShanheLuanxinSkillId || frame.TriggerId != "other-hand-gain" || frame.WindowContext is not { Window: SkillProgramTriggerWindow.CardsGained, MovementBatch: { } batch } || !HasShanheLuanxinOtherHandGain(frame.OwnerSeat, batch) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheLuanxinNextDrawIssuedEvent>().Any(issued => issued.ProgramFrameId == frame.Id && issued.InstructionIndex == frame.InstructionIndex))
             throw new InvalidOperationException("Luanxin requires its original completed other-player hand gain batch.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheLuanxinNextDrawIssuedEvent(frame.Id, frame.InstructionIndex, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, batch.Id, frame.OwnerSeat));
     }
@@ -38,8 +38,8 @@ internal sealed partial class CoreProgramShanheLuanxinRuntime
     {
         if (started.Phase.Kind != ActualDiscardRecoveryPhaseKind.Draw || !_coreMatchParticipantsPlayersAccess._players[started.Phase.ActorSeat].IsAlive || !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.QueueShanheLuanxinNextDraw))
             return;
-        var assigned = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLuanxinNextDrawAssignedEvent>().Select(item => (item.ProgramFrameId, item.InstructionIndex)).ToHashSet();
-        foreach (var issued in _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLuanxinNextDrawIssuedEvent>().Where(item => item.TargetSeat == started.Phase.ActorSeat && !assigned.Contains((item.ProgramFrameId, item.InstructionIndex))).ToArray())
+        var assigned = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheLuanxinNextDrawAssignedEvent>().Select(item => (item.ProgramFrameId, item.InstructionIndex)).ToHashSet();
+        foreach (var issued in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheLuanxinNextDrawIssuedEvent>().Where(item => item.TargetSeat == started.Phase.ActorSeat && !assigned.Contains((item.ProgramFrameId, item.InstructionIndex))).ToArray())
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheLuanxinNextDrawAssignedEvent(issued.ProgramFrameId, issued.InstructionIndex, started.Phase));
     }
 
@@ -47,7 +47,7 @@ internal sealed partial class CoreProgramShanheLuanxinRuntime
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.QueueShanheLuanxinNextDraw) || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Draw } phase || phase.ActorSeat != player.Seat)
             return 0;
-        var assigned = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLuanxinNextDrawAssignedEvent>().Where(item => item.Phase == phase).Select(item => (item.ProgramFrameId, item.InstructionIndex)).ToHashSet();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLuanxinNextDrawIssuedEvent>().Count(item => item.TargetSeat == player.Seat && assigned.Contains((item.ProgramFrameId, item.InstructionIndex)));
+        var assigned = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheLuanxinNextDrawAssignedEvent>().Where(item => item.Phase == phase).Select(item => (item.ProgramFrameId, item.InstructionIndex)).ToHashSet();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheLuanxinNextDrawIssuedEvent>().Count(item => item.TargetSeat == player.Seat && assigned.Contains((item.ProgramFrameId, item.InstructionIndex)));
     }
 }

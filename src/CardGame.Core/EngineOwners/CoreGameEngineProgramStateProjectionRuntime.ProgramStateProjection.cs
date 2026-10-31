@@ -48,7 +48,7 @@ internal sealed partial class CoreGameEngineProgramStateProjectionRuntime
 
         return snapshot with
         {
-            PublicRuleStates = _coreGameActivationProgressOperations.GetSkillPublicRuleStates(owner, skillId),
+            PublicRuleStates = _coreGameActivationProgressOperations.Value.GetSkillPublicRuleStates(owner, skillId),
             BooleanStates = states is null ? CoreGameEngineProgramStateProjectionDefinitions.EmptyProgramBooleanStateSnapshots : Array.AsReadOnly(states.ToArray()),
             DirectedPolicies = _coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess._directedTurnCardPolicies.Count == 0 ? CoreGameEngineProgramStateProjectionDefinitions.EmptyDirectedPolicySnapshots : CreateNonemptyDirectedPolicySnapshots(owner, skillId),
             ActionProhibitions = _turnCardUseEffectsOperations._turnCardUseEffects.ActionProhibitions.Count == 0 ? CoreGameEngineProgramStateProjectionDefinitions.EmptyActionProhibitionSnapshots : CreateNonemptyActionProhibitionSnapshots(owner, skillId)

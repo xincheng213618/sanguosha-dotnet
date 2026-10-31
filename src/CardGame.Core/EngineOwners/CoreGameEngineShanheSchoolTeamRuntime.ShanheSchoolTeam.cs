@@ -19,7 +19,7 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamRuntime
         };
     }
 
-    internal bool ShanheAllyExpeditionRebirthAvailable(int seat) => _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is { PlayerRank: 5 } setup && !setup.AllyRankRebirthUsedSeats.Contains(seat) && !_coreProgramEventHistoryOperations.ProgramEventHistory<SkillUsageConsumedEvent>().Any(e => e.SkillOwnerSeat == seat && ShanheTeamRankPrograms.IsAllyExpeditionRebirthUsage(setup, e));
+    internal bool ShanheAllyExpeditionRebirthAvailable(int seat) => _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is { PlayerRank: 5 } setup && !setup.AllyRankRebirthUsedSeats.Contains(seat) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<SkillUsageConsumedEvent>().Any(e => e.SkillOwnerSeat == seat && ShanheTeamRankPrograms.IsAllyExpeditionRebirthUsage(setup, e));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 62025)]
     internal bool AllowsShanheSharedRebirth(ProgramTriggerLegalityContext gate)
     {
@@ -47,7 +47,7 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamRuntime
         var frame = RequireShanheTeamOpening(supplied, ShanheTeamRankPrograms.TeamHealthSkillId, "allied-health-privilege");
         if (!HasShanheTeamHealthTactic)
             throw new InvalidOperationException("An allied health privilege lost its actual carried tactic.");
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheAlliedHealthAppliedEvent>().Any(e => e.FrameId == frame.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheAlliedHealthAppliedEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("An allied health opening cannot apply twice.");
         foreach (var seat in Enumerable.Range(1, _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle!.AllyRoster.Count).Where(IsActualShanheAlly))
             ApplyShanheAllyHealth(frame, seat, 3);
@@ -77,7 +77,7 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamRuntime
         var frame = RequireShanheTeamOpening(supplied, ShanheSchoolEffects.TeamRankSkillId, "opening-team-rank");
         if (!_coreShanheSchoolsOperations.HasShanheSchoolEffect(0, 6) || frame.ShanheTeamRank is not null)
             throw new InvalidOperationException("A shared rank needs its actually completed school and original instruction.");
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheTeamRankActivatedEvent>().Count > 0)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheTeamRankActivatedEvent>().Count > 0)
             return SkillProgramStepOutcome.Continue;
         var setup = _coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle!;
         var rank = ShanheTeamRankPrograms.EffectiveRank(setup);
@@ -112,7 +112,7 @@ internal sealed partial class CoreGameEngineShanheSchoolTeamRuntime
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { ShanheTeamRank: { } state } f && f.Id == id)
         {
             f = RequireShanheTeamOpening(f, ShanheSchoolEffects.TeamRankSkillId, "opening-team-rank");
-            if (_coreShanheMarketApplicationOperations.DrainShanheMarketChildren(f))
+            if (_coreShanheMarketApplicationOperations.Value.DrainShanheMarketChildren(f))
                 return;
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
             if (f.PendingMovementContinuation is not null)

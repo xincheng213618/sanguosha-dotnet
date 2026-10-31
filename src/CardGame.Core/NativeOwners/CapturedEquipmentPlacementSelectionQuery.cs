@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class CapturedEquipmentPlacementSelectionQuery(Func<RuntimeEntries.CoreGameEngineCapturedEquipmentDrawsEntries> getCoreGameEngineCapturedEquipmentDrawsRuntime) : ICapturedEquipmentPlacementSelectionQuery
+internal sealed class CapturedEquipmentPlacementSelectionQuery(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineCapturedEquipmentDrawsRuntime>> getCoreGameEngineCapturedEquipmentDrawsRuntime) : ICapturedEquipmentPlacementSelectionQuery
 {
-    public bool CanPlace(int ownerSeat, int targetSeat, int cardId, string skillId) => getCoreGameEngineCapturedEquipmentDrawsRuntime().CanPlaceCapturedEquipmentActivation(ownerSeat, targetSeat, cardId, skillId);
+    public bool CanPlace(int ownerSeat, int targetSeat, int cardId, string skillId) => getCoreGameEngineCapturedEquipmentDrawsRuntime().Value.CanPlaceCapturedEquipmentActivation(ownerSeat, targetSeat, cardId, skillId);
 }

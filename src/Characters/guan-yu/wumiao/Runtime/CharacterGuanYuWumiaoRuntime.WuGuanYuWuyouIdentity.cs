@@ -7,7 +7,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     {
         if (!HasWuyouCapability || _cardZonesOperations._cardZones.GetLocation(cardId) != CardLocation.Hand(holder))
             return null;
-        var lease = _coreProgramEventHistoryOperations.ProgramEventHistory<WuyouLeaseIssuedEvent>().Where(e => e.Lease.HolderSeat == holder && e.Lease.CardId == cardId).Select(e => e.Lease).OrderByDescending(e => e.MovementCutoff).ThenByDescending(e => e.FrameId).FirstOrDefault();
+        var lease = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuyouLeaseIssuedEvent>().Where(e => e.Lease.HolderSeat == holder && e.Lease.CardId == cardId).Select(e => e.Lease).OrderByDescending(e => e.MovementCutoff).ThenByDescending(e => e.FrameId).FirstOrDefault();
         return lease is not null && ValidWuyouLease(lease) && !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence > lease.MovementCutoff && m.From == CardLocation.Hand(holder) && m.To != m.From) ? lease : null;
     }
 
@@ -35,7 +35,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     internal bool HasWuyouMaterialPrivilege(CharacterState actor, CardKind kind, IReadOnlyList<int>? materialIds, long? existingUseFrameId = null) => existingUseFrameId is { } use ? HasIssuedWuyouUse(use, actor.Seat) : WuyouPreUseLease(actor, kind, materialIds)is not null;
     internal bool HasWuyouPotentialSlash(CharacterState actor) => HasWuyouCapability && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Any(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && ActiveWuyouLease(actor.Seat, card.Id)is { } lease && (CoreNativeCardClassificationsRuntime.IsSlashCard(lease.EffectiveKind) || CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, false).Count != 0)));
-    internal bool HasPublicWuyouContributionPotential(CharacterState actor) => HasWuyouCapability && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<WuyouStartedEvent>().Any(started => started.DonorSeat == actor.Seat);
+    internal bool HasPublicWuyouContributionPotential(CharacterState actor) => HasWuyouCapability && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuyouStartedEvent>().Any(started => started.DonorSeat == actor.Seat);
     internal bool HasPotentialWuyouFactionSlash(CharacterState actor, CardKind kind) => HasWuyouCapability && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(actor, CardKind.Slash)is { } policy && _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actor.Seat, policy.FactionId).Any(seat => HasPublicWuyouContributionPotential(_coreMatchParticipantsPlayersAccess._players[seat]));
     internal bool IsWuyouFactionPaymentLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind, IReadOnlyList<Card> cards, bool isTrueZhangba = false)
     {
@@ -79,13 +79,13 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { WuyouUse: { } r, Action: { Type: CardActionType.Use } action } use || r.UseId != use.Id || r.ActionId != action.ActionId || action.ActorSeat != actor || use.SourceSeat != actor || !WuyouIssuedActorMatches(use, r) || r.ProviderSeat != action.ProviderSeat || action.PhysicalCards is not [var material] || material != r.Material || r.Lease.HolderSeat != r.ProviderSeat || r.Lease.CardId != material.CardId || material.From != CardLocation.Hand(r.ProviderSeat) || !ValidWuyouLease(r.Lease) || !(use.CardKind == r.EffectiveKind || CoreNativeCardClassificationsRuntime.IsSlashCard(r.EffectiveKind) && use.CardKind == CardKind.FireSlash && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use)))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<WuyouUseAcceptedEvent>().Where(e => e.Receipt.UseId == useId).ToArray()is [var accepted] && accepted.Receipt == r;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuyouUseAcceptedEvent>().Where(e => e.Receipt.UseId == useId).ToArray()is [var accepted] && accepted.Receipt == r;
     }
 
     internal bool WuyouIssuedActorMatches(CardUseFrame use, WuyouNativeUseReceipt receipt)
     {
         var actor = receipt.ActorSeat;
-        foreach (var change in _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == use.Id))
+        foreach (var change in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == use.Id))
         {
             if (change.PreviousActorSeat != actor || change.ProviderSeat != receipt.ProviderSeat)
                 return false;
@@ -106,7 +106,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
         };
     }
 
-    internal bool ValidWuyouDeclaration(DeclaredCardPayment payment, WuyouHandLease lease) => payment.Wuyou == lease && ValidWuyouLease(lease) && lease.HolderSeat == payment.ProviderSeat && lease.CardId == payment.Cost.CardId && payment.Cost.From == CardLocation.Hand(payment.ProviderSeat) && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == payment.OwnerFrameId)is { } owner && (owner.AcceptedDeclarationPayment == payment || owner is CardDeclarationFrame d && d.Payment == payment) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuyouDeclarationBoundEvent>().Where(e => e.DeclarationId == payment.DeclarationId).ToArray()is [var fact] && fact.OwnerFrameId == payment.DeclarationId && fact.ProviderSeat == payment.ProviderSeat && fact.ActorSeat == payment.ActorSeat && fact.CardId == payment.Cost.CardId && fact.Lease == lease;
+    internal bool ValidWuyouDeclaration(DeclaredCardPayment payment, WuyouHandLease lease) => payment.Wuyou == lease && ValidWuyouLease(lease) && lease.HolderSeat == payment.ProviderSeat && lease.CardId == payment.Cost.CardId && payment.Cost.From == CardLocation.Hand(payment.ProviderSeat) && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == payment.OwnerFrameId)is { } owner && (owner.AcceptedDeclarationPayment == payment || owner is CardDeclarationFrame d && d.Payment == payment) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuyouDeclarationBoundEvent>().Where(e => e.DeclarationId == payment.DeclarationId).ToArray()is [var fact] && fact.OwnerFrameId == payment.DeclarationId && fact.ProviderSeat == payment.ProviderSeat && fact.ActorSeat == payment.ActorSeat && fact.CardId == payment.Cost.CardId && fact.Lease == lease;
     [ProgramCardAction(ProgramCardActionPhase.BeforeProgram, 28520)]
     internal void AddWuyouIdentityActions(List<LegalAction> actions, CharacterState actor, IReadOnlyList<Card> playable, int? selectedPhysicalCardId = null)
     {

@@ -20,7 +20,7 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
         var program = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program;
         if (!owner.IsAlive || program is null || program.ViewAs.All(rule => rule.Id != source.BindingId))
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiDaozhuanUseRecordedEvent>().Any(item => item.ActionId == action.ActionId))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiDaozhuanUseRecordedEvent>().Any(item => item.ActionId == action.ActionId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiDaozhuanUseRecordedEvent(source.OwnerSeat, MobileShiYuJiComposition.Name(action.EffectiveKind), action.ActionId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualRoundProgressRoundNumberAccess._roundNumber, action.ActorSeat == source.OwnerSeat && source.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat));
     }

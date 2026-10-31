@@ -36,7 +36,7 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, owner.Seat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(owner.Seat, kind);
         var damage = (1 + owner.AlcoholDamageBonus) + nuzhan.DamageBonus;
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, owner);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, owner);
         owner.HasAlcoholEffect = false;
         NativeOwners.FangtianHalberdHandle pending = _kernelCoreMainOperations.CreateFangtianHalberdHandle(id, owner.Seat, cards[0], kind, armor, damage, seats, false, counted, conversion);
         _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd = pending;

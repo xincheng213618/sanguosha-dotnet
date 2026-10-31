@@ -192,7 +192,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveYixianAllEquipmentObtainAndCompensate)]
     internal void ReturnWuYixianDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.Yixian is not { Paid: true, Stage: YixianStage.Drawing, BenefitAccepted: true } r || r.Cursor >= r.Recipients.Count || outcome.RecipientSeat != r.Recipients[r.Cursor].Seat || outcome.RequestedCount != r.Recipients[r.Cursor].ObtainedCount || _coreProgramEventHistoryOperations.ProgramEventHistory<YixianDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Index == r.Cursor))
+        if (f.Yixian is not { Paid: true, Stage: YixianStage.Drawing, BenefitAccepted: true } r || r.Cursor >= r.Recipients.Count || outcome.RecipientSeat != r.Recipients[r.Cursor].Seat || outcome.RequestedCount != r.Recipients[r.Cursor].ObtainedCount || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YixianDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Index == r.Cursor))
             throw new InvalidOperationException("Yixian's native draw returned to a different or already-consumed original owner.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Yixian = r with { Stage = YixianStage.DrawChildren, DrawOutcome = outcome }, PendingMovementContinuation = new(outcome.RecipientSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YixianDrawReturnedEvent(f.Id, r.Cursor, outcome.RecipientSeat, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));
@@ -202,7 +202,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     internal void CompleteWuYixian(ProgramSkillFrame f)
     {
         var r = f.Yixian!;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YixianCompletedEvent(f.Id, r.Paid, r.Branch, r.Entities.Count, _coreProgramEventHistoryOperations.ProgramEventHistory<YixianRecipientDecisionEvent>().Count(e => e.FrameId == f.Id && e.Accepted)));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YixianCompletedEvent(f.Id, r.Paid, r.Branch, r.Entities.Count, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YixianRecipientDecisionEvent>().Count(e => e.FrameId == f.Id && e.Accepted)));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }

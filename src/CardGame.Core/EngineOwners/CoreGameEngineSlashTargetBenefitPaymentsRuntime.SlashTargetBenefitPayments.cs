@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
 
     internal bool SlashBenefitProgramParentMatches(ProgramSkillFrame f)
     {
-        if (f.WindowContext is not { SlashTargetBenefit: { } identity } context || !CoreGameEngineSlashTargetBenefitWindowsRuntime.IsSlashTargetBenefitWindow(context.Window) || _resolutionStackOperations._resolutionStack.OfType<SlashTargetBenefitWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.ParentFrameId != identity.Use.CardUseFrameId || !_coreSlashTargetBenefitObserversOperations.SlashBenefitWindowMatches(parent) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || parent.Contexts[parent.CandidateIndex] != context || identity.Source.OwnerSeat != f.OwnerSeat || identity.Source.SkillId != f.SkillId || identity.Source.SkillInstanceId != f.SkillInstanceId || identity.GameplayHash != f.GameplayHash || !_coreSlashTargetBenefitWindowsOperations.MatchesSlashTargetBenefitUse(identity.Use))
+        if (f.WindowContext is not { SlashTargetBenefit: { } identity } context || !CoreGameEngineSlashTargetBenefitWindowsRuntime.IsSlashTargetBenefitWindow(context.Window) || _resolutionStackOperations._resolutionStack.OfType<SlashTargetBenefitWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.ParentFrameId != identity.Use.CardUseFrameId || !_coreSlashTargetBenefitObserversOperations.Value.SlashBenefitWindowMatches(parent) || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || parent.Contexts[parent.CandidateIndex] != context || identity.Source.OwnerSeat != f.OwnerSeat || identity.Source.SkillId != f.SkillId || identity.Source.SkillInstanceId != f.SkillInstanceId || identity.GameplayHash != f.GameplayHash || !_coreSlashTargetBenefitWindowsOperations.MatchesSlashTargetBenefitUse(identity.Use))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == parent.Id && f.InstructionIndex == 1;
@@ -42,7 +42,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
                 InstructionIndex = 1,
                 ReexecuteParticipantInstruction = true
             };
-            if (!SlashBenefitProgramParentMatches(executing) || f.WindowContext!.SlashTargetBenefit is not { } identity || _coreSlashTargetBenefitWindowsOperations.SlashTargetBenefitCurrent(identity)is not { Stage: SlashTargetBenefitStage.CancellationQualified } qualified || !_coreSlashTargetBenefitObserversOperations.ValidSlashTargetBenefitReceipt(qualified))
+            if (!SlashBenefitProgramParentMatches(executing) || f.WindowContext!.SlashTargetBenefit is not { } identity || _coreSlashTargetBenefitWindowsOperations.SlashTargetBenefitCurrent(identity)is not { Stage: SlashTargetBenefitStage.CancellationQualified } qualified || !_coreSlashTargetBenefitObserversOperations.Value.ValidSlashTargetBenefitReceipt(qualified))
                 throw new InvalidOperationException("An unissued settlement cannot bypass skill-source ownership.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = executing);
         }
@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
 
     internal void FinishResumedSlashBenefit(ProgramSkillFrame f)
     {
-        if (!SlashBenefitProgramParentMatches(f) || f.SlashTargetBenefitDraft is not { Stage: SlashTargetBenefitDraftStage.Complete } d || _coreSlashTargetBenefitWindowsOperations.SlashTargetBenefitCurrent(d.Receipt)is not { } receipt || !_coreSlashTargetBenefitObserversOperations.ValidSlashTargetBenefitReceipt(receipt))
+        if (!SlashBenefitProgramParentMatches(f) || f.SlashTargetBenefitDraft is not { Stage: SlashTargetBenefitDraftStage.Complete } d || _coreSlashTargetBenefitWindowsOperations.SlashTargetBenefitCurrent(d.Receipt)is not { } receipt || !_coreSlashTargetBenefitObserversOperations.Value.ValidSlashTargetBenefitReceipt(receipt))
             throw new InvalidOperationException("An issued benefit cannot return before its original receipt and paid children finish.");
         var paid = d.Settlement || receipt.Stage == SlashTargetBenefitStage.Paid;
         _coreSkillProgramsOperations.FinishProgramSkill(f, _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (paid || _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId)));
@@ -88,7 +88,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ReexecuteParticipantInstruction = true });
         if (f.SlashTargetBenefitDraft!.Stage == SlashTargetBenefitDraftStage.PaidChildren)
         {
-            if (f.PendingMovementContinuation is not null || !_coreSlashTargetBenefitObserversOperations.ValidSlashBenefitDraftPayment(f))
+            if (f.PendingMovementContinuation is not null || !_coreSlashTargetBenefitObserversOperations.Value.ValidSlashBenefitDraftPayment(f))
                 throw new InvalidOperationException("A Slash benefit cannot finish before its paid children.");
             return CompleteSlashBenefitOperation(f, true);
         }
@@ -96,7 +96,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
         var receipt = _coreSlashTargetBenefitWindowsOperations.SlashTargetBenefitCurrent(identity) ?? throw new InvalidOperationException("The original use lost its benefit receipt.");
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[identity.Use.TargetSeat].IsAlive || !settlement && (!_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || !_coreCardUseLifecycleOperations.LifecycleCardUse(identity.Use.CardUseFrameId)!.TargetSeats.Contains(identity.Use.TargetSeat)))
             return CompleteSlashBenefitOperation(f, false);
-        if (settlement && (receipt.Stage != SlashTargetBenefitStage.CancellationQualified || !_coreSlashTargetBenefitObserversOperations.ValidSlashTargetBenefitReceipt(receipt)))
+        if (settlement && (receipt.Stage != SlashTargetBenefitStage.CancellationQualified || !_coreSlashTargetBenefitObserversOperations.Value.ValidSlashTargetBenefitReceipt(receipt)))
             throw new InvalidOperationException("The settlement requires the original paid and genuinely cancelled target.");
         var choices = SlashBenefitChoices(f);
         if (choices.Count == 0)
@@ -287,7 +287,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitPaymentsRuntime
     {
         if (f.SlashTargetBenefitDraft is not { Stage: SlashTargetBenefitDraftStage.PaidChildren })
             return false;
-        if (f.PendingMovementContinuation is null || !_coreSlashTargetBenefitObserversOperations.ValidSlashBenefitDraftPayment(f))
+        if (f.PendingMovementContinuation is null || !_coreSlashTargetBenefitObserversOperations.Value.ValidSlashBenefitDraftPayment(f))
             throw new InvalidOperationException("A benefit movement lost its original paid interval.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

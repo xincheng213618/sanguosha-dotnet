@@ -88,7 +88,7 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashReturnsRunti
     internal bool ForeignSelectedCardSlashStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => parent is ProgramSkillFrame frame && SelectedForeignCardSlashFirstChild(frame, child);
     internal ProgramSkillFrame? SelectedForeignCardSlashObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => root.ForeignSelectedCardSlash is { Stage: ForeignSelectedCardSlashStage.SettlementChildren or ForeignSelectedCardSlashStage.DrawChildren } && this.SelectedForeignCardSlashFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 140)]
-    internal bool IsSelectedForeignCardSlashProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SelectedForeignCardSlashObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsSelectedForeignCardSlashProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && SelectedForeignCardSlashObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 10)]
     internal bool TryAdvanceSelectedForeignCardSlashSubtree()

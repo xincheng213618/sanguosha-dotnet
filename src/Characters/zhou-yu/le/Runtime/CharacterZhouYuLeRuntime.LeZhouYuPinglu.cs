@@ -17,8 +17,8 @@ internal sealed partial class CharacterZhouYuLeRuntime
     internal int[] PingluTargets(int actor) => _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != actor && _coreNativeRuleQueriesOperations.GetCombatDistance(actor, player.Seat) <= _coreNativeRuleQueriesOperations.GetAttackRange(actor)).OrderBy(player => _coreTableOrderOperations.RelativeTableOrder(actor, player.Seat)).Select(player => player.Seat).ToArray();
     internal bool HasPingluCustody(int owner, ActualDiscardRecoveryPhaseKey phase)
     {
-        var starts = _coreProgramEventHistoryOperations.ProgramEventHistory<PingluStartedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Phase == phase).Select(e => e.FrameId).ToHashSet();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<PingluEntityObtainedEvent>().Any(e => starts.Contains(e.FrameId) && e.To == CardLocation.Hand(owner) && _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.Hand(owner) && !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == e.CardId && m.Sequence > e.Sequence && m.From == CardLocation.Hand(owner) && m.To != CardLocation.Hand(owner)));
+        var starts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PingluStartedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Phase == phase).Select(e => e.FrameId).ToHashSet();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PingluEntityObtainedEvent>().Any(e => starts.Contains(e.FrameId) && e.To == CardLocation.Hand(owner) && _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.Hand(owner) && !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == e.CardId && m.Sequence > e.Sequence && m.From == CardLocation.Hand(owner) && m.To != CardLocation.Hand(owner)));
     }
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 28820, SkillProgramEffectOp.ResolvePingluInRangeRandomHands)]

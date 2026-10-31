@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class AnniversaryFuRongFuQianCapability(Func<RuntimeEntries.CharacterFuRongFuQianAnniversaryEntries> getCharacterFuRongFuQianAnniversaryRuntime) : IAnniversaryFuRongFuQianHost
+internal sealed class AnniversaryFuRongFuQianCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterFuRongFuQianAnniversaryRuntime>> getCharacterFuRongFuQianAnniversaryRuntime) : IAnniversaryFuRongFuQianHost
 {
-    public SkillProgramStepOutcome Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterFuRongFuQianAnniversaryRuntime().BeginAnniversaryFuPair(f, op);
+    public SkillProgramStepOutcome Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterFuRongFuQianAnniversaryRuntime().Value.BeginAnniversaryFuPair(f, op);
 }

@@ -26,12 +26,12 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
         _characterFeiYiOlOperations.UpdateNativeExtraEffectState(group.ResolutionId, r => r with { FrozenGroupDamageSourceSeat = group.DamageSourceSeat });
     }
 
-    internal bool IsExtraCardEffectRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.ShanheSchoolTrick?.Started == true || _characterJiangJiMouOperations.IsMouJjEffectRound(id) || _characterHuangQuanMouOperations.IsMouHqRound(id) || _coreSoleIncomingEffectRepeatOperations.IsSoleIncomingExtraRound(id) || _characterHuangYueyingOlMouOperations.IsMouBingcaiExtraRound(id) || _characterSunQuanOlMagicOperations.IsMoQuanyuExtraRound(id) || _characterDaQiaoLeOperations.IsZixiExtraEffectRound(id) || _characterFeiYiOlOperations.IsFeiYiExtraEffectRound(id) || _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.ExtraCardEffect?.WholeGroupRepeated == true;
-    internal bool HasUnstartedExtraCardEffect(long id) => _coreShanheSchoolTrickOperations.HasUnstartedShanheSchoolTrick(id) || _characterJiangJiMouOperations.HasUnstartedMouJjEffect(id) || _characterHuangQuanMouOperations.HasUnstartedMouHqRound(id) || _coreSoleIncomingEffectRepeatOperations.HasUnstartedSoleIncomingEffect(id) || _characterHuangYueyingOlMouOperations.HasUnstartedMouBingcaiExtraEffect(id) || _characterSunQuanOlMagicOperations.HasUnstartedMoQuanyuExtraRound(id) || _characterDaQiaoLeOperations.HasUnstartedZixiExtraEffect(id) || _characterFeiYiOlOperations.HasUnstartedFeiYiExtraEffect(id) || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ExtraCardEffect: { WholeGroupRepeated: false } } use && use.Action is { } action && use.ExtraCardEffect.ActionId == action.ActionId && !_coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(use) && _coreMatchOutcomeWinnerAccess._winner == Winner.None;
+    internal bool IsExtraCardEffectRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.ShanheSchoolTrick?.Started == true || _characterJiangJiMouOperations.IsMouJjEffectRound(id) || _characterHuangQuanMouOperations.IsMouHqRound(id) || _coreSoleIncomingEffectRepeatOperations.Value.IsSoleIncomingExtraRound(id) || _characterHuangYueyingOlMouOperations.IsMouBingcaiExtraRound(id) || _characterSunQuanOlMagicOperations.IsMoQuanyuExtraRound(id) || _characterDaQiaoLeOperations.IsZixiExtraEffectRound(id) || _characterFeiYiOlOperations.IsFeiYiExtraEffectRound(id) || _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.ExtraCardEffect?.WholeGroupRepeated == true;
+    internal bool HasUnstartedExtraCardEffect(long id) => _coreShanheSchoolTrickOperations.Value.HasUnstartedShanheSchoolTrick(id) || _characterJiangJiMouOperations.HasUnstartedMouJjEffect(id) || _characterHuangQuanMouOperations.HasUnstartedMouHqRound(id) || _coreSoleIncomingEffectRepeatOperations.Value.HasUnstartedSoleIncomingEffect(id) || _characterHuangYueyingOlMouOperations.HasUnstartedMouBingcaiExtraEffect(id) || _characterSunQuanOlMagicOperations.HasUnstartedMoQuanyuExtraRound(id) || _characterDaQiaoLeOperations.HasUnstartedZixiExtraEffect(id) || _characterFeiYiOlOperations.HasUnstartedFeiYiExtraEffect(id) || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ExtraCardEffect: { WholeGroupRepeated: false } } use && use.Action is { } action && use.ExtraCardEffect.ActionId == action.ActionId && !_coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(use) && _coreMatchOutcomeWinnerAccess._winner == Winner.None;
     internal void CaptureExtraCardEffectAttack(NativeOwners.CardAttackHandle attack)
     {
         _characterHuangQuanMouOperations.CaptureMouHqAttack(attack);
-        _coreSoleIncomingEffectRepeatOperations.CaptureSoleIncomingAttack(attack);
+        _coreSoleIncomingEffectRepeatOperations.Value.CaptureSoleIncomingAttack(attack);
         _characterHuangYueyingOlMouOperations.CaptureMouBingcaiExtraEffectAttack(attack);
         _characterDaQiaoLeOperations.CaptureZixiExtraEffectAttack(attack);
         _characterSunQuanOlMagicOperations.CaptureMoQuanyuExtraAttack(attack);
@@ -42,10 +42,10 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
 
     internal bool TryBeginExtraCardEffectRound(long id, bool afterAttack = false)
     {
-        _coreShanheSchoolTrickOperations.CompleteShanheSchoolTrick(id);
+        _coreShanheSchoolTrickOperations.Value.CompleteShanheSchoolTrick(id);
         _characterJiangJiMouOperations.CompleteMouJjEffect(id);
         _characterHuangQuanMouOperations.CompleteMouHqRound(id);
-        _coreSoleIncomingEffectRepeatOperations.CompleteSoleIncomingExtraRound(id);
+        _coreSoleIncomingEffectRepeatOperations.Value.CompleteSoleIncomingExtraRound(id);
         _characterHuangYueyingOlMouOperations.CompleteMouBingcaiExtraEffectRound(id);
         _characterDaQiaoLeOperations.CompleteZixiExtraEffectRound(id);
         _characterSunQuanOlMagicOperations.CompleteMoQuanyuExtraRound(id);
@@ -57,13 +57,13 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
             return true;
         if (_characterHuangYueyingOlMouOperations.TryBeginMouBingcaiExtraEffectRound(id, afterAttack))
             return true;
-        if (_coreSoleIncomingEffectRepeatOperations.TryBeginSoleIncomingExtraRound(id, afterAttack))
+        if (_coreSoleIncomingEffectRepeatOperations.Value.TryBeginSoleIncomingExtraRound(id, afterAttack))
             return true;
         if (_characterHuangQuanMouOperations.TryBeginMouHqRound(id, afterAttack))
             return true;
         if (_characterJiangJiMouOperations.TryBeginMouJjEffect(id, afterAttack))
             return true;
-        if (_coreShanheSchoolTrickOperations.TryBeginShanheSchoolTrick(id, afterAttack))
+        if (_coreShanheSchoolTrickOperations.Value.TryBeginShanheSchoolTrick(id, afterAttack))
             return true;
         if (!HasUnstartedExtraCardEffect(id) || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { ExtraCardEffect: { } r, Action: { } action } use)
             return false;
@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
             throw new InvalidOperationException("An extra effect cannot pass an unfinished child.");
         if (r.Trick is not null && _coreSequentialTrickTargetsOperations.HasRemainingSequentialTrickTargets(id) || r.Simple is not null && _coreNextCardTargetAdjustmentsOperations.HasRemainingAdjustedSimpleTargets(id))
             return false;
-        if (r.Source.SkillId == "guandu:battle-event" && !_coreGuanduExtraEffectsOperations.GuanduRepeatTargetsRemainLegal(use))
+        if (r.Source.SkillId == "guandu:battle-event" && !_coreGuanduExtraEffectsOperations.Value.GuanduRepeatTargetsRemainLegal(use))
             return false;
         // The source/targets were already accepted, finalized and paid by this
         // use. Rechecking distance, target legality, skill ownership or quota
@@ -130,7 +130,7 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsRuntime
     {
         if (_characterHuangQuanMouOperations.ContinueMouHqFangtian(attack))
             return true;
-        if (_coreSoleIncomingEffectRepeatOperations.ContinueSoleIncomingFangtian(attack))
+        if (_coreSoleIncomingEffectRepeatOperations.Value.ContinueSoleIncomingFangtian(attack))
             return true;
         if (_characterHuangYueyingOlMouOperations.ContinueMouBingcaiExtraFangtian(attack))
             return true;

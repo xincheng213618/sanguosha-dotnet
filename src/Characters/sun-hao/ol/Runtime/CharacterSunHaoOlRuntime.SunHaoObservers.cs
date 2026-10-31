@@ -12,7 +12,7 @@ internal sealed partial class CharacterSunHaoOlRuntime
     internal bool SunHaoFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.MobileSunHaoDraw is not null)
-            return _characterSunHaoMobileOperations.MobileSunHaoDrawFirstChild(f, child);
+            return _characterSunHaoMobileOperations.Value.MobileSunHaoDrawFirstChild(f, child);
         if (f.SunHaoCanshi is not { Stage: SunHaoCanshiStage.DiscardChildren } r)
             return false;
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)

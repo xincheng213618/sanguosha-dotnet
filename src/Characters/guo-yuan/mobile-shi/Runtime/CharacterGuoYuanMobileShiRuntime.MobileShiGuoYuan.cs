@@ -10,9 +10,9 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
 
     internal static CardConversionSource ShiGySource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     SkillProgramStepOutcome IShiGuoYuanHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShiGy(f, op);
-    internal ShiGyRecordCommittedEvent? ShiGyRecord(int owner, string instance) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiGyRecordCommittedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner && e.Source.SkillInstanceId == instance);
-    internal ShiGyHandRecordedEvent? ShiGyRecordedHand(int owner, string instance, int target) => ShiGyRecord(owner, instance)is { } record ? _coreProgramEventHistoryOperations.ProgramEventHistory<ShiGyHandRecordedEvent>().SingleOrDefault(e => e.FrameId == record.FrameId && e.Target == target) : null;
-    internal int ShiGyHandLimitBonus(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiGyHandLimitRaisedEvent>().Count(e => e.Target == target);
+    internal ShiGyRecordCommittedEvent? ShiGyRecord(int owner, string instance) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiGyRecordCommittedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner && e.Source.SkillInstanceId == instance);
+    internal ShiGyHandRecordedEvent? ShiGyRecordedHand(int owner, string instance, int target) => ShiGyRecord(owner, instance)is { } record ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiGyHandRecordedEvent>().SingleOrDefault(e => e.FrameId == record.FrameId && e.Target == target) : null;
+    internal int ShiGyHandLimitBonus(int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiGyHandLimitRaisedEvent>().Count(e => e.Target == target);
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeShiGyDrawObservers(CharacterState subject, IReadOnlyList<ProgramTriggerCandidate> existing)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng))
@@ -48,7 +48,7 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
             r = r with
             {
                 OriginalUse = a.ParentCardUseFrameId,
-                Damaged = _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Any(e => e.SourceCardUseResolutionId == a.ParentCardUseFrameId && e.TargetSeat == f.OwnerSeat && e.Amount > 0)
+                Damaged = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Any(e => e.SourceCardUseResolutionId == a.ParentCardUseFrameId && e.TargetSeat == f.OwnerSeat && e.Amount > 0)
             };
         else if (f.SkillId == ShiGyXiugeng && op == SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng && w.Window is SkillProgramTriggerWindow.TurnBeforeStart or SkillProgramTriggerWindow.DrawPhaseStarting)
         {

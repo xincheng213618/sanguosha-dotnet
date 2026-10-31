@@ -5,7 +5,7 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
 {
     internal bool HasHappyDiaoChan => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveHappyDiaoChanHuoxin) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveHappyDiaoChanMeihun);
 
-    internal IEnumerable<HappyDiaoChanCharmIssuedEvent> HappyDcActiveCharms(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<HappyDiaoChanCharmIssuedEvent>().Where(e => e.TargetSeat == seat && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappyDiaoChanCharmExpiredEvent>().Any(x => x.FrameId == e.FrameId && x.TargetSeat == seat && x.Suit == e.Suit));
+    internal IEnumerable<HappyDiaoChanCharmIssuedEvent> HappyDcActiveCharms(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyDiaoChanCharmIssuedEvent>().Where(e => e.TargetSeat == seat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyDiaoChanCharmExpiredEvent>().Any(x => x.FrameId == e.FrameId && x.TargetSeat == seat && x.Suit == e.Suit));
     internal bool IsHappyDiaoChanSuitForbidden(int seat, Suit suit) => HasHappyDiaoChan && suit != Suit.None && HappyDcActiveCharms(seat).Any(e => e.Suit == suit);
     internal static PlayerMarkerKind HappyDcMarker(Suit suit) => suit switch
     {

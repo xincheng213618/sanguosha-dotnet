@@ -114,7 +114,7 @@ internal sealed partial class CoreGameEnginePindianRevealWindowsRuntime
             _coreGameEngineSkillProgramsProgramPhaseUsesAccess._programPhaseUses[key] = 0;
         var after = Math.Min(13, checked(card.Rank + bonus));
         _coreRuntimeOperations.ReplaceRuntimeFrame(w.Id, w with { Cards = w.Cards.Select(c => c.Seat == f.OwnerSeat ? c with { Rank = after } : c).ToArray() });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PindianRevealRankAdjustedEvent(w.Id, _coreSimultaneousPindianOperations.SimultaneousSource(f), card.CardId, card.Rank, bonus, after, skillId, activation.UsageGroup, before));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PindianRevealRankAdjustedEvent(w.Id, _coreSimultaneousPindianOperations.Value.SimultaneousSource(f), card.CardId, card.Rank, bonus, after, skillId, activation.UsageGroup, before));
     }
 
     internal void CompletePindianRevealWindow(PindianRevealWindowFrame w)

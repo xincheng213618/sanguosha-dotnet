@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTaoQianOlRuntime
 {
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 28122, SkillProgramEffectOp.ResolveWenrenSequentialDraw)]
-    internal bool CanActivateWenren(ProgramActivationLegalityContext c) => c.Owner.IsAlive && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == c.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == c.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<WenrenCommittedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Phase == p);
+    internal bool CanActivateWenren(ProgramActivationLegalityContext c) => c.Owner.IsAlive && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == c.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == c.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenrenCommittedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Phase == p);
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveWenrenSequentialDraw)]
     internal void ReturnWenrenDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome)
     {

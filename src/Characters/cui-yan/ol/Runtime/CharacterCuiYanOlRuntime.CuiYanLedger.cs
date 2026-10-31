@@ -6,14 +6,14 @@ internal sealed partial class CharacterCuiYanOlRuntime
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedAfterCategory, 10)]
     internal bool CuiYanFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => HasCuiYanCapability;
     internal bool HasCuiYanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShutongFinalizedUse) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZhijieActualTurnEnd);
-    internal bool CuiYanActualTurnOpen => _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
+    internal bool CuiYanActualTurnOpen => _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
 
     internal static Suit CuiYanTrueUseSuit(IReadOnlyList<int> ids, Suit? nativeSuit) => RuntimeSkills.RuntimeRules_cui_yan_ol_CuiYanLedger.CuiYanTrueUseSuit(ids, nativeSuit);
     internal void CaptureCuiYanUseTargets(CardUseFrame use)
     {
-        if (!HasCuiYanCapability || !CuiYanActualTurnOpen || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) || use.Action is { Type: not CardActionType.Use })
+        if (!HasCuiYanCapability || !CuiYanActualTurnOpen || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) || use.Action is { Type: not CardActionType.Use })
             return;
-        var old = _coreProgramEventHistoryOperations.ProgramEventHistory<CuiYanActualUseActorEvent>().LastOrDefault(e => e.UseId == use.Id);
+        var old = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CuiYanActualUseActorEvent>().LastOrDefault(e => e.UseId == use.Id);
         var next = new CuiYanActualUseActorEvent(use.Id, use.Action?.ActionId ?? 0, old?.ActualTurn ?? _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, old?.TurnOwner ?? _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, use.SourceSeat, use.CardKind);
         if (old != next)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(next);
@@ -21,7 +21,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
         if (targets.Length == 0 && !use.TargetsAdjusted && (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Equipment || use.CardKind is CardKind.DrawTwo or CardKind.Peach or CardKind.Alcohol))
             targets = [use.SourceSeat];
         foreach (var target in targets.Where(_coreTableSeatQueriesOperations.IsValidPlayerSeat))
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<CuiYanEverTargetedEvent>().Any(e => e.UseId == use.Id && e.TargetSeat == target))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CuiYanEverTargetedEvent>().Any(e => e.UseId == use.Id && e.TargetSeat == target))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CuiYanEverTargetedEvent(use.Id, next.ActualTurn, next.TurnOwner, target));
     }
 
@@ -30,7 +30,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
         parentId = 0;
         if (a.Type != CardActionType.Response || a.ActorSeat != a.ProviderSeat || a.RequesterSeat is not null || a.ResponderSeat != a.ActorSeat)
             return false;
-        if (a.EffectiveKind == CardKind.Nullification && _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault()is { } n && a.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(n) && a.OpponentSeat == n.SourceSeat)
+        if (a.EffectiveKind == CardKind.Nullification && _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault()is { } n && a.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(n) && a.OpponentSeat == n.SourceSeat)
         {
             parentId = n.Id;
             return true;
@@ -54,13 +54,13 @@ internal sealed partial class CharacterCuiYanOlRuntime
             ConsumeShutongForActualUse(use.Id, use.Action, use.SourceSeat, false);
         if (payload is CardActionAcceptedEvent { Action: { } a } && CuiYanTrueResponse(a, out var native))
             ConsumeShutongForActualUse(native, a, a.ActorSeat, true);
-        if (payload is CardRespondedEvent response && !_coreProgramEventHistoryOperations.ProgramEventHistory<CuiYanRespondedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.ResponderSeat == response.ResponderSeat))
+        if (payload is CardRespondedEvent response && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CuiYanRespondedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.ResponderSeat == response.ResponderSeat))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CuiYanRespondedEvent(_coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, response.ResponderSeat));
         if (payload is TurnEndedEvent)
         {
             foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive))
-                if (!_coreProgramEventHistoryOperations.ProgramEventHistory<CuiYanEndQualifiedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.OwnerSeat == owner.Seat))
-                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CuiYanEndQualifiedEvent(_coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, owner.Seat, CuiYanUsedOrPlayed(owner.Seat), _coreProgramEventHistoryOperations.ProgramEventHistory<CuiYanEverTargetedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.TargetSeat == owner.Seat)));
+                if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CuiYanEndQualifiedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.OwnerSeat == owner.Seat))
+                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CuiYanEndQualifiedEvent(_coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, owner.Seat, CuiYanUsedOrPlayed(owner.Seat), _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CuiYanEverTargetedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.TargetSeat == owner.Seat)));
         }
     }
 
@@ -80,5 +80,5 @@ internal sealed partial class CharacterCuiYanOlRuntime
         return false;
     }
 
-    internal bool CuiYanUsedOrPlayed(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<CuiYanRespondedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.ResponderSeat == seat) || _coreProgramEventHistoryOperations.ProgramEventHistory<CuiYanActualUseActorEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat).GroupBy(e => e.UseId).Any(g => g.Last().ActorSeat == seat);
+    internal bool CuiYanUsedOrPlayed(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CuiYanRespondedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.ResponderSeat == seat) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CuiYanActualUseActorEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat).GroupBy(e => e.UseId).Any(g => g.Last().ActorSeat == seat);
 }

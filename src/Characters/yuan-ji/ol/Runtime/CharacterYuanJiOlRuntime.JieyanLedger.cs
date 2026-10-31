@@ -3,8 +3,8 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterYuanJiOlRuntime
 {
-    internal bool JieyanDisabled(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiJieyanDisabledEvent>().Any(e => e.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber);
-    internal YuanJiLossOpportunityEvent? JieyanOpportunity(ProgramTriggerCandidate c) => _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiLossOpportunityEvent>().SingleOrDefault(e => e.Index == c.OccurrenceIndex && e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId) && e.GameplayHash == c.GameplayHash);
+    internal bool JieyanDisabled(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiJieyanDisabledEvent>().Any(e => e.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber);
+    internal YuanJiLossOpportunityEvent? JieyanOpportunity(ProgramTriggerCandidate c) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiLossOpportunityEvent>().SingleOrDefault(e => e.Index == c.OccurrenceIndex && e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId) && e.GameplayHash == c.GameplayHash);
     internal bool ValidJieyanOpportunity(YuanJiLossOpportunityEvent e, CardMovementBatchContext batch)
     {
         if (e.BatchId != batch.Id || e.ActualTurn != batch.TurnNumber || e.Source.SkillId != "ol:jieyan" || e.Source.BindingId != "hand-pair" || e.Round != _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber || e.FirstCardId == e.SecondCardId || e.FirstSequence >= e.SecondSequence || _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash != e.GameplayHash)
@@ -18,7 +18,7 @@ internal sealed partial class CharacterYuanJiOlRuntime
     {
         if (!HasYuanJiCapability)
             return;
-        foreach (var e in _coreProgramEventHistoryOperations.ProgramEventHistory<YuanJiLossOpportunityEvent>().Where(e => e.BatchId == batch.Id && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[e.LoserSeat].IsAlive && !JieyanDisabled(e.Source.OwnerSeat) && ValidJieyanOpportunity(e, batch)))
+        foreach (var e in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuanJiLossOpportunityEvent>().Where(e => e.BatchId == batch.Id && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[e.LoserSeat].IsAlive && !JieyanDisabled(e.Source.OwnerSeat) && ValidJieyanOpportunity(e, batch)))
             result.Add(new(e.Source.OwnerSeat, e.Source.SkillId, e.Source.BindingId, e.Source.SkillInstanceId, e.GameplayHash, 0, e.Index));
     }
 

@@ -13,7 +13,7 @@ internal sealed partial class CharacterMaMiDiOlRuntime
         if (f.MaMiDi is not { } r)
             return false;
         if (child is DeathFrame death)
-            return r.Op == SkillProgramEffectOp.PayBingjieTurnMaximumHp && r.Stage == MaMiDiStage.MaximumChildren && r.MaximumBefore == 1 && r.MaximumAfter == 0 && r.HpAfter <= 0 && death.ParentFrameId == f.Id && death.VictimSeat == f.OwnerSeat && death.KillerSeat is null && death.ReturnKind == DeathReturnKind.ProgramSkill && _coreProgramEventHistoryOperations.ProgramEventHistory<MaMiDiMaximumIssuedEvent>().Count(e => e.FrameId == f.Id && e.Op == r.Op && e.MaximumBefore == 1 && e.MaximumAfter == 0) == 1;
+            return r.Op == SkillProgramEffectOp.PayBingjieTurnMaximumHp && r.Stage == MaMiDiStage.MaximumChildren && r.MaximumBefore == 1 && r.MaximumAfter == 0 && r.HpAfter <= 0 && death.ParentFrameId == f.Id && death.VictimSeat == f.OwnerSeat && death.KillerSeat is null && death.ReturnKind == DeathReturnKind.ProgramSkill && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MaMiDiMaximumIssuedEvent>().Count(e => e.FrameId == f.Id && e.Op == r.Op && e.MaximumBefore == 1 && e.MaximumAfter == 0) == 1;
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is HpChangedTriggerWindowFrame hp)

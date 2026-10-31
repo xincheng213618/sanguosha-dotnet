@@ -1,10 +1,10 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MatchStepFacts(Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreDyingCursorRuntimeEntries> getCoreDyingCursorRuntimeRuntime, Func<RuntimeEntries.CoreDamageCursorRuntimeEntries> getCoreDamageCursorRuntimeRuntime, Func<RuntimeEntries.CoreNativeCardContinuationCursorsEntries> getCoreNativeCardContinuationCursorsRuntime, EngineStates.CoreMatchSetupState matchSetupState, EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreGameEngineStrategicProgramsState gameEngineStrategicProgramsState, EngineStates.CoreMatchDefinitionState matchDefinitionState, EngineStates.CoreMatchOutcomeState matchOutcomeState, EngineStates.CoreMatchParticipantsState matchParticipantsState) : IMatchStepFacts
+internal sealed class MatchStepFacts(Func<FrameStore> getFrameStore, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreDyingCursorRuntimeRuntime>> getCoreDyingCursorRuntimeRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreDamageCursorRuntimeRuntime>> getCoreDamageCursorRuntimeRuntime, Func<RuntimeEntries.CoreNativeCardContinuationCursorsEntries> getCoreNativeCardContinuationCursorsRuntime, EngineStates.CoreMatchSetupState matchSetupState, EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreGameEngineStrategicProgramsState gameEngineStrategicProgramsState, EngineStates.CoreMatchDefinitionState matchDefinitionState, EngineStates.CoreMatchOutcomeState matchOutcomeState, EngineStates.CoreMatchParticipantsState matchParticipantsState) : IMatchStepFacts
 {
     public int FrameCount => getFrameStore().Count;
-    public DyingFrame? ActiveDying => getCoreDyingCursorRuntimeRuntime().ActiveDying;
-    public bool HasDamageTrigger => getCoreDamageCursorRuntimeRuntime().ActiveDamageTrigger is not null;
+    public DyingFrame? ActiveDying => getCoreDyingCursorRuntimeRuntime().Value.ActiveDying;
+    public bool HasDamageTrigger => getCoreDamageCursorRuntimeRuntime().Value.ActiveDamageTrigger is not null;
     public bool HasGroupRecovery => getCoreNativeCardContinuationCursorsRuntime().ActiveGroupCard is { Effect: GroupCardEffect.Recovery };
     public bool SetupComplete => matchSetupState.ReferenceToSetupComplete;
     public bool GameStartingProgramsResolved => matchSetupState.ReferenceToGameStartingProgramsResolved;

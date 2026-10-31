@@ -137,7 +137,7 @@ internal sealed partial class CharacterCaoPiBoundaryMobileRuntime
             _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryFangzhu = r = r with { Stage = BoundaryFangzhuStage.DiscardChildren, Outcome = "discarded", Before = before, After = before }, PendingMovementContinuation = new(r.Target, 0, null) });
         _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, r.Target, r.Selected, new(BoundaryFangzhuDiscard));
-        var invoice = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().SingleOrDefault(e => e.ParentFrameId == f.Id && e.Reason.Value == BoundaryFangzhuDiscard && e.SequenceBefore == before);
+        var invoice = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().SingleOrDefault(e => e.ParentFrameId == f.Id && e.Reason.Value == BoundaryFangzhuDiscard && e.SequenceBefore == before);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryFangzhu = r with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, DiscardInvocation = invoice?.InvocationId, Actual = invoice?.ActualCount ?? 0 } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryFangzhuPaidEvent(f.Id, r.Target, r.X, invoice?.InvocationId, invoice?.ActualCount ?? 0, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));

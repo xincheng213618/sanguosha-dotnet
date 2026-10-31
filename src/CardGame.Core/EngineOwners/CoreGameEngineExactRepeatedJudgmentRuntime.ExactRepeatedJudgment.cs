@@ -31,7 +31,7 @@ internal sealed partial class CoreGameEngineExactRepeatedJudgmentRuntime
     internal bool ExactRepeatedJudgmentSourceLive(ProgramSkillFrame frame, ProgramRepeatedJudgment state) => state.ClaimTurn is { } turn && turn.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && turn.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId);
     internal void ResumeProgramExactRepeatedJudgment(JudgmentFrame judgment, ProgramSkillFrame frame, ProgramRepeatedJudgment state)
     {
-        if (_coreNativeDamageHandlesOperations.GetJudgmentCard(judgment)is not { } card)
+        if (_coreNativeDamageHandlesOperations.Value.GetJudgmentCard(judgment)is not { } card)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(frame with { RepeatedJudgment = null });
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);

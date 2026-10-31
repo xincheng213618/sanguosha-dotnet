@@ -22,7 +22,7 @@ internal sealed partial class CharacterChenLinMouRuntime
     }
 
     internal int MouChenLinDamageCursor(GameEngine.IDamageAttempt a) => !a.IsChainPropagation ? -1 : a is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(a.ResolutionId).ChainedTargetIndex : _coreCardAttackStateOperations.GetCardAttackState(a.ResolutionId).ChainedTargetIndex;
-    internal MouChenLinDamageTicketEvent[] AvailableMouChenLinTickets(GameEngine.IDamageAttempt a) => a.IsSourceLess ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinDamageTicketEvent>().Where(t => t.Source.OwnerSeat == a.SourceSeat && t.Target == a.TargetSeat && t.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _contentRegistryOperations._contentRegistry.GetSkill(t.Source.SkillId).Program?.GameplayHash == t.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinInvitationClosedEvent>().Count(e => e.FrameId == t.FrameId) == 1 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinDamageTicketConsumedEvent>().Any(e => e.FrameId == t.FrameId && e.Target == t.Target)).ToArray();
+    internal MouChenLinDamageTicketEvent[] AvailableMouChenLinTickets(GameEngine.IDamageAttempt a) => a.IsSourceLess ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenLinDamageTicketEvent>().Where(t => t.Source.OwnerSeat == a.SourceSeat && t.Target == a.TargetSeat && t.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _contentRegistryOperations._contentRegistry.GetSkill(t.Source.SkillId).Program?.GameplayHash == t.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenLinInvitationClosedEvent>().Count(e => e.FrameId == t.FrameId) == 1 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenLinDamageTicketConsumedEvent>().Any(e => e.FrameId == t.FrameId && e.Target == t.Target)).ToArray();
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 37000)]
     internal int ApplyMouChenLinNextDamage(GameEngine.IDamageAttempt a)
     {
@@ -55,7 +55,7 @@ internal sealed partial class CharacterChenLinMouRuntime
         if (payload is not DamageAppliedEvent { Amount: > 0 } applied || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || attack.IsSourceLess || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.ParentFrameId != attack.ResolutionId || damage.TargetSeat != applied.TargetSeat || damage.SourceSeat != applied.SourceSeat || damage.Amount != applied.Amount || MouChenLinDamageState(attack.ResolutionId)is not { } r || r.Source != applied.SourceSeat || (r.TransferredTarget ?? r.Target) != applied.TargetSeat || r.ChainCursor != MouChenLinDamageCursor(attack))
             return;
         foreach (var ticket in r.Tickets)
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinDamageTicketConsumedEvent>().Any(e => e.FrameId == ticket && e.Target == r.Target))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenLinDamageTicketConsumedEvent>().Any(e => e.FrameId == ticket && e.Target == r.Target))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenLinDamageTicketConsumedEvent(ticket, r.Target, attack.ResolutionId, r.ChainCursor));
     }
 

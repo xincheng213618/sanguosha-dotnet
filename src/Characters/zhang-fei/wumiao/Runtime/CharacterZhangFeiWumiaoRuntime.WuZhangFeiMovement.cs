@@ -22,12 +22,12 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
 
     internal void AdmitWuZishengDiscardMaterials(NativeLogicalDiscardInvocationDraft draft)
     {
-        if (!HasWuZishengMovementCapability || !_coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardAdmittedEvent>().Any(e => e.InvocationId == draft.InvocationId))
+        if (!HasWuZishengMovementCapability || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengDiscardAdmittedEvent>().Any(e => e.InvocationId == draft.InvocationId))
             return;
         for (var i = 0; i < draft.Materials.Count; i++)
         {
             var m = draft.Materials[i];
-            var existing = _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardMaterialAdmittedEvent>().Where(e => e.InvocationId == draft.InvocationId && e.Index == i).ToArray();
+            var existing = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengDiscardMaterialAdmittedEvent>().Where(e => e.InvocationId == draft.InvocationId && e.Index == i).ToArray();
             if (existing is [var prior])
             {
                 if (prior.CardId != m.CardId || prior.From != m.From)
@@ -44,9 +44,9 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
 
     internal void CloseWuZishengNativeDiscard(NativeLogicalDiscardInvocationDraft? draft)
     {
-        if (draft is null || !HasWuZishengMovementCapability || !_coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardAdmittedEvent>().Any(e => e.InvocationId == draft.InvocationId))
+        if (draft is null || !HasWuZishengMovementCapability || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengDiscardAdmittedEvent>().Any(e => e.InvocationId == draft.InvocationId))
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardClosedEvent>().Any(e => e.InvocationId == draft.InvocationId))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengDiscardClosedEvent>().Any(e => e.InvocationId == draft.InvocationId))
             throw new InvalidOperationException("A Zisheng native discard invoice cannot close twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuZishengDiscardClosedEvent(draft.InvocationId, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
     }
@@ -56,12 +56,12 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
         if (!HasWuZishengMovementCapability)
             return batch;
         var qualified = new List<(WuZishengMovementSource Source, int Victim, WuZishengMovementMaterial Material)>();
-        foreach (var admission in _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardAdmittedEvent>())
+        foreach (var admission in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengDiscardAdmittedEvent>())
         {
             if (admission.TurnNumber != batch.TurnNumber || !ValidWuZishengMovementSource(admission.Source))
                 continue;
-            var closed = _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardClosedEvent>().SingleOrDefault(e => e.InvocationId == admission.InvocationId);
-            foreach (var material in _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardMaterialAdmittedEvent>().Where(e => e.InvocationId == admission.InvocationId))
+            var closed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengDiscardClosedEvent>().SingleOrDefault(e => e.InvocationId == admission.InvocationId);
+            foreach (var material in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengDiscardMaterialAdmittedEvent>().Where(e => e.InvocationId == admission.InvocationId))
             {
                 if (material.From.OwnerSeat is not { } victim || victim == admission.ExecutorSeat || !CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(material.From))
                     continue;
@@ -70,7 +70,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
                     var directEntry = move.From == material.From && move.Reason == admission.Reason && batch.ParentFrameId == material.ProducerFrameId;
                     if (directEntry && (move.To == CardLocation.Processing || move.To == CardLocation.DiscardPile || move.To == CardLocation.OutsideGame && move.From.Zone == CardZoneKind.Equipment))
                     {
-                        var bound = _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardEntryBoundEvent>().Where(e => e.InvocationId == admission.InvocationId && e.MaterialIndex == material.Index).ToArray();
+                        var bound = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengDiscardEntryBoundEvent>().Where(e => e.InvocationId == admission.InvocationId && e.MaterialIndex == material.Index).ToArray();
                         if (bound.Length == 0)
                             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuZishengDiscardEntryBoundEvent(admission.InvocationId, material.Index, batch.Id, move.Sequence, material.ProducerFrameId));
                         else if (bound is not [var first] || first.MovementSequence != move.Sequence)
@@ -81,7 +81,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
                     if (!terminal && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && (move.Reason == admission.Reason || move.Reason.Value == admission.Reason.Value + "-finished" || move.Reason.Value == admission.Reason.Value + "-discard"))
                     {
                         var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == move.CardId && m.Sequence < move.Sequence);
-                        terminal = entry is not null && entry.From == material.From && entry.To == CardLocation.Processing && entry.Reason == admission.Reason && _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengDiscardEntryBoundEvent>().Any(e => e.InvocationId == admission.InvocationId && e.MaterialIndex == material.Index && e.MovementSequence == entry.Sequence && e.ProducerFrameId == material.ProducerFrameId) && batch.ParentFrameId == material.ProducerFrameId;
+                        terminal = entry is not null && entry.From == material.From && entry.To == CardLocation.Processing && entry.Reason == admission.Reason && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengDiscardEntryBoundEvent>().Any(e => e.InvocationId == admission.InvocationId && e.MaterialIndex == material.Index && e.MovementSequence == entry.Sequence && e.ProducerFrameId == material.ProducerFrameId) && batch.ParentFrameId == material.ProducerFrameId;
                     }
 
                     if (terminal)
@@ -120,7 +120,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
         var entryBatch = _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.SingleOrDefault(b => b.Id != batch.Id && b.Movements.Contains(entry) && b.ParentFrameId == parent && b.ParentBatchId == batch.ParentBatchId && b.TurnNumber == batch.TurnNumber);
         if (entryBatch is null)
             return null;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(parent)is { CardKind: CardKind.Snatch } use && exit.To == CardLocation.Hand(use.SourceSeat) && use.TargetSeats.Contains(originalOwner) && entry.Reason == CardMoveReasons.Snatch && exit.Reason == CardMoveReasons.SnatchFinished && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == parent && e.SourceSeat == use.SourceSeat && e.CardKind == CardKind.Snatch) && _coreProgramEventHistoryOperations.ProgramEventHistory<TargetCardTakenEvent>().Any(e => e.ResolutionId == parent && e.SourceSeat == use.SourceSeat && e.TargetSeat == originalOwner && e.FromZone == entry.From.Zone && (e.PublicCardId is null || e.PublicCardId == exit.CardId)))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(parent)is { CardKind: CardKind.Snatch } use && exit.To == CardLocation.Hand(use.SourceSeat) && use.TargetSeats.Contains(originalOwner) && entry.Reason == CardMoveReasons.Snatch && exit.Reason == CardMoveReasons.SnatchFinished && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == parent && e.SourceSeat == use.SourceSeat && e.CardKind == CardKind.Snatch) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TargetCardTakenEvent>().Any(e => e.ResolutionId == parent && e.SourceSeat == use.SourceSeat && e.TargetSeat == originalOwner && e.FromZone == entry.From.Zone && (e.PublicCardId is null || e.PublicCardId == exit.CardId)))
             return entry.From;
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == parent)is not ProgramSkillFrame program || program.InstructionIndex < 1 || batch.OriginOwnerSeat != program.OwnerSeat || batch.OriginSkillId != program.SkillId || batch.OriginSkillInstanceId != program.SkillInstanceId || entryBatch.OriginOwnerSeat != program.OwnerSeat || entryBatch.OriginSkillId != program.SkillId || entryBatch.OriginSkillInstanceId != program.SkillInstanceId || _contentRegistryOperations._contentRegistry.GetSkill(program.SkillId).Program?.GameplayHash != program.GameplayHash)
             return null;
@@ -140,7 +140,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
         }
     }
 
-    internal bool ValidWuZishengQualification(WuZishengMovementQualification q, CardMovementBatchContext batch) => q.BatchId == batch.Id && ValidWuZishengMovementSource(q.Source) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(q.VictimSeat) && q.VictimSeat != q.Source.Source.OwnerSeat && q.Materials.Count > 0 && q.Materials.Select(m => m.CardId).Distinct().Count() == q.Materials.Count && q.Materials.All(m => m.OriginalFrom.OwnerSeat == q.VictimSeat && batch.Movements.Any(e => e.CardId == m.CardId && e.CardKind == m.PrintedKind && e.Sequence == m.TerminalSequence)) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengMovementQualifiedEvent>().Count(e => e.BatchId == batch.Id && e.Qualification.Source == q.Source && e.Qualification.VictimSeat == q.VictimSeat && e.Qualification.Materials.SequenceEqual(q.Materials)) == 1;
+    internal bool ValidWuZishengQualification(WuZishengMovementQualification q, CardMovementBatchContext batch) => q.BatchId == batch.Id && ValidWuZishengMovementSource(q.Source) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(q.VictimSeat) && q.VictimSeat != q.Source.Source.OwnerSeat && q.Materials.Count > 0 && q.Materials.Select(m => m.CardId).Distinct().Count() == q.Materials.Count && q.Materials.All(m => m.OriginalFrom.OwnerSeat == q.VictimSeat && batch.Movements.Any(e => e.CardId == m.CardId && e.CardKind == m.PrintedKind && e.Sequence == m.TerminalSequence)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengMovementQualifiedEvent>().Count(e => e.BatchId == batch.Id && e.Qualification.Source == q.Source && e.Qualification.VictimSeat == q.VictimSeat && e.Qualification.Materials.SequenceEqual(q.Materials)) == 1;
     internal ProgramSkillWindowContext CreateWuZishengMovementContext(CardsMovedTriggerWindowFrame parent, ProgramTriggerCandidate candidate)
     {
         var q = parent.Batch.WuZisheng![candidate.OccurrenceIndex];
@@ -234,14 +234,14 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal bool WuZhangFeiMovementObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame parent && (this.WuZishengMovementFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child]) || this.WuHaoxianFirstChild(parent, _resolutionStackOperations2._resolutionStack()[child])) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? WuZhangFeiMovementObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.WuZishengMovementFirstChild(f, child) || this.WuHaoxianFirstChild(f, child), (index) => this.WuZhangFeiMovementObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 770)]
-    internal bool IsWuZhangFeiMovementDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WuZhangFeiMovementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsWuZhangFeiMovementDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && WuZhangFeiMovementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 29062)]
     internal bool AdvanceWuZhangFeiObserverChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuZhangFeiMovementObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 
     internal static string WuZishengCursorHash(ResolutionFrame frame) => RuntimeSkills.RuntimeRules_zhang_fei_wumiao_WuZhangFeiMovement.WuZishengCursorHash(frame);
     internal WuZishengSuspendedDying? CaptureWuZishengAncestorDying(ProgramSkillFrame f)
     {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying)
             return null;
         var parent = _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == dying.ParentFrameId);
         if (parent is null || !WuZishengDyingPrefix(f, dying) || !_coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(parent, dying))
@@ -256,7 +256,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
             return false;
         var di = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id);
         var fi = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (di < 1 || fi <= di + 1 || _resolutionStackOperations._resolutionStack[di - 1].Id != dying.ParentFrameId || _resolutionStackOperations._resolutionStack[fi - 1].Id != context.ParentFrameId || _resolutionStackOperations._resolutionStack.Skip(di + 1).Take(fi - di - 1).Any(x => x is DyingFrame) || _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == dying.Id && e.VictimSeat == dying.VictimSeat && e.KillerSeat == dying.KillerSeat) != 1)
+        if (di < 1 || fi <= di + 1 || _resolutionStackOperations._resolutionStack[di - 1].Id != dying.ParentFrameId || _resolutionStackOperations._resolutionStack[fi - 1].Id != context.ParentFrameId || _resolutionStackOperations._resolutionStack.Skip(di + 1).Take(fi - di - 1).Any(x => x is DyingFrame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == dying.Id && e.VictimSeat == dying.VictimSeat && e.KillerSeat == dying.KillerSeat) != 1)
             return false;
         for (var i = di + 1; i < fi; i++)
             if (!WuZishengSuspensionEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]))
@@ -267,7 +267,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal bool WuZishengSuspensionEdge(ResolutionFrame parent, ResolutionFrame child) => _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent);
     internal bool WuZishengSuspendsDying(ProgramSkillFrame f, WuZishengSuspendedDying s)
     {
-        if (f.WuZishengMovement is not { Issued: true, SuspendedDying: { } claimed } r || claimed != s || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == s.DyingFrameId)is not DyingFrame dying || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == s.ParentFrameId)is not { } parent || parent.Id != dying.ParentFrameId || !WuZishengDyingPrefix(f, dying) || WuZishengCursorHash(dying) != s.DyingHash || WuZishengCursorHash(parent) != s.ParentHash || s.AttackOwnerFrameId is { } owner && (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == owner)is not { } attackOwner || WuZishengCursorHash(attackOwner) != s.AttackOwnerHash) || _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengSuspendedDyingIssuedEvent>().Count(e => e.FrameId == f.Id && e.Suspension == s) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<WuZishengMovementDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.ParentWindowId == r.ParentWindowId && e.BatchId == r.Qualification.BatchId && e.Source == r.Qualification.Source.Source && e.RequestedDamage == r.RequestedDamage) != 1)
+        if (f.WuZishengMovement is not { Issued: true, SuspendedDying: { } claimed } r || claimed != s || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == s.DyingFrameId)is not DyingFrame dying || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == s.ParentFrameId)is not { } parent || parent.Id != dying.ParentFrameId || !WuZishengDyingPrefix(f, dying) || WuZishengCursorHash(dying) != s.DyingHash || WuZishengCursorHash(parent) != s.ParentHash || s.AttackOwnerFrameId is { } owner && (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == owner)is not { } attackOwner || WuZishengCursorHash(attackOwner) != s.AttackOwnerHash) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengSuspendedDyingIssuedEvent>().Count(e => e.FrameId == f.Id && e.Suspension == s) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuZishengMovementDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.ParentWindowId == r.ParentWindowId && e.BatchId == r.Qualification.BatchId && e.Source == r.Qualification.Source.Source && e.RequestedDamage == r.RequestedDamage) != 1)
             return false;
         var fi = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         for (var i = fi + 1; i < _resolutionStackOperations._resolutionStack.Count; i++)

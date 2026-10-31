@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingEndingRuntime
 {
     internal bool ValidSourceXiyingPaid(ShanheSourceXiyingPaidEvent paid)
     {
-        if (!_coreShanheSourceXiyingOperations.SourceXiyingMode || paid.Source.SkillId != ShanheSourceXiyingContract.Skill || paid.Source.BindingId != ShanheSourceXiyingContract.Start || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(paid.Source.OwnerSeat) || paid.ActualTurn < 1 || paid.PhaseInstance < 1 || paid.CardId <= 0 || paid.Before < 0 || paid.After <= paid.Before || paid.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || paid.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(paid.Source.SkillId).Program!.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingPaidEvent>().Count(e => e.FrameId == paid.FrameId) != 1)
+        if (!_coreShanheSourceXiyingOperations.SourceXiyingMode || paid.Source.SkillId != ShanheSourceXiyingContract.Skill || paid.Source.BindingId != ShanheSourceXiyingContract.Start || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(paid.Source.OwnerSeat) || paid.ActualTurn < 1 || paid.PhaseInstance < 1 || paid.CardId <= 0 || paid.Before < 0 || paid.After <= paid.Before || paid.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || paid.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(paid.Source.SkillId).Program!.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceXiyingPaidEvent>().Count(e => e.FrameId == paid.FrameId) != 1)
             return false;
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > paid.Before && m.Sequence <= paid.After && m.Reason.Value == "skill-program.source-xiying-1180.discard").ToArray();
         return moves is [var m] && m.CardId == paid.CardId && m.From == CardLocation.Hand(paid.Source.OwnerSeat) && (m.To == CardLocation.DiscardPile || m.To == CardLocation.OutsideGame) && CardCatalog.Get(m.CardKind).CategoryName != "基本牌";
@@ -29,7 +29,7 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingEndingRuntime
         return false;
     }
 
-    internal bool SourceXiyingEarned(ShanheSourceXiyingPaidEvent paid) => ValidSourceXiyingPaid(paid) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingResolvedEvent>().Any(e => e.FrameId == paid.FrameId && e.SkillId == paid.Source.SkillId && e.BindingId == ShanheSourceXiyingContract.Start && e.SkillInstanceId == paid.Source.SkillInstanceId && e.Window == SkillProgramTriggerWindow.PlayPhaseStarting && e.Completed) && SourceXiyingTurnHasOwnPlayDamage(paid);
+    internal bool SourceXiyingEarned(ShanheSourceXiyingPaidEvent paid) => ValidSourceXiyingPaid(paid) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingResolvedEvent>().Any(e => e.FrameId == paid.FrameId && e.SkillId == paid.Source.SkillId && e.BindingId == ShanheSourceXiyingContract.Start && e.SkillInstanceId == paid.Source.SkillInstanceId && e.Window == SkillProgramTriggerWindow.PlayPhaseStarting && e.Completed) && SourceXiyingTurnHasOwnPlayDamage(paid);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.Collection, 62063)]
     internal bool CollectSourceXiying(SkillProgramTrigger t) => t.Id != ShanheSourceXiyingContract.Ending || !t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveShanheSourceXiying);
     [ProgramPipelineHook(ProgramPipelinePhase.AppendTurnEndingItems, 62063)]
@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingEndingRuntime
     {
         if (!_coreShanheSourceXiyingOperations.SourceXiyingMode)
             return;
-        foreach (var paid in _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingPaidEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Source.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingRewardEvent>().Any(r => r.PaidFrameId == e.FrameId)).ToArray())
+        foreach (var paid in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceXiyingPaidEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Source.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceXiyingRewardEvent>().Any(r => r.PaidFrameId == e.FrameId)).ToArray())
         {
             if (!_coreMatchParticipantsPlayersAccess._players[paid.Source.OwnerSeat].IsAlive || !SourceXiyingEarned(paid))
                 continue;
@@ -51,12 +51,12 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingEndingRuntime
     {
         if (!_coreShanheSourceXiyingOperations.SourceXiyingMode || candidate.SkillId != ShanheSourceXiyingContract.Skill || candidate.BindingId != ShanheSourceXiyingContract.Ending || c.Window != SkillProgramTriggerWindow.TurnEnding || c.OwnerSeat != candidate.OwnerSeat || c.SourceSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || c.TargetSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || candidate.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is not { } parent || parent.OwnerSeat != candidate.OwnerSeat || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate != candidate)
             return null;
-        var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingPaidEvent>().SingleOrDefault(e => parent.Items[parent.ItemIndex].StableIdentity == "source-xiying-ending:" + e.FrameId);
+        var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceXiyingPaidEvent>().SingleOrDefault(e => parent.Items[parent.ItemIndex].StableIdentity == "source-xiying-ending:" + e.FrameId);
         return paid is not null && paid.Source.OwnerSeat == candidate.OwnerSeat && paid.Source.SkillInstanceId == candidate.SkillInstanceId && paid.GameplayHash == candidate.GameplayHash && paid.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && SourceXiyingEarned(paid) ? paid : null;
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 62063)]
-    internal bool IsIssuedSourceXiyingEnding(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c) => ExactSourceXiyingEnding(candidate, c)is { } paid && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingRewardEvent>().Any(e => e.PaidFrameId == paid.FrameId);
+    internal bool IsIssuedSourceXiyingEnding(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c) => ExactSourceXiyingEnding(candidate, c)is { } paid && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceXiyingRewardEvent>().Any(e => e.PaidFrameId == paid.FrameId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 62063, SkillProgramEffectOp.ResolveShanheSourceXiying)]
     internal bool CanOfferSourceXiying(ProgramTriggerLegalityContext gate)
     {
@@ -72,7 +72,7 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingEndingRuntime
         var c = f.WindowContext!;
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
         var paid = ExactSourceXiyingEnding(candidate, c) ?? throw new InvalidOperationException("Source1180 reward lost its exact paid Play and actual Ending obligation.");
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingRewardEvent>().Any(e => e.PaidFrameId == paid.FrameId))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceXiyingRewardEvent>().Any(e => e.PaidFrameId == paid.FrameId))
             throw new InvalidOperationException("Source1180 cannot pay the same earned reward twice.");
         var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) || CoreGameEngineShanheSchoolTrickRuntime.IsShanheSchoolDamageTrick(card.Kind)).ToArray();
         var selected = pool.Length == 0 ? null : pool[_randomOperations._random.Next(pool.Length)];
@@ -96,5 +96,5 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingEndingRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 62063)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 62063)]
-    internal bool KeepPaidSourceXiying(ProgramSkillFrame f) => f.SkillId == ShanheSourceXiyingContract.Skill && (f.ShanheSourceXiying is { CostCardId: > 0 } && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceXiyingPaidEvent>().Any(e => e.FrameId == f.Id && ValidSourceXiyingPaid(e)) || f.TriggerId == ShanheSourceXiyingContract.Ending && f.WindowContext is { } c && ExactSourceXiyingEnding(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex), c)is not null);
+    internal bool KeepPaidSourceXiying(ProgramSkillFrame f) => f.SkillId == ShanheSourceXiyingContract.Skill && (f.ShanheSourceXiying is { CostCardId: > 0 } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceXiyingPaidEvent>().Any(e => e.FrameId == f.Id && ValidSourceXiyingPaid(e)) || f.TriggerId == ShanheSourceXiyingContract.Ending && f.WindowContext is { } c && ExactSourceXiyingEnding(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex), c)is not null);
 }

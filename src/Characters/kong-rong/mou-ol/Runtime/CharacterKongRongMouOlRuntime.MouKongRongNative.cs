@@ -73,7 +73,7 @@ internal sealed partial class CharacterKongRongMouOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouKrLiwenNativeIssuedEvent(f.Id, r.Cursor, use.Id, a.ActionId, a.ActorSeat, a.ProviderSeat));
     }
 
-    internal bool MouKrNativeMatches(CardUseFrame use, ProgramSkillFrame f) => use.MouKrLiwenOrigin is { } o && f.MouKrLiwen is { Stage: MouKrLiwenStage.NativeUse } r && MouKongRong.Valid(f) && o.FrameId == f.Id && o.Index == r.Cursor && o.Source == r.Source && o.GameplayHash == r.GameplayHash && o.UseId == use.Id && o.UseId == r.UseId && o.ActionId == r.ActionId && use.Action is { } a && a.ActionId == o.ActionId && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ProviderSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouKrLiwenNativeIssuedEvent>().Count(e => e == new MouKrLiwenNativeIssuedEvent(f.Id, r.Cursor, use.Id, a.ActionId, o.ActorSeat, o.ProviderSeat)) == 1;
+    internal bool MouKrNativeMatches(CardUseFrame use, ProgramSkillFrame f) => use.MouKrLiwenOrigin is { } o && f.MouKrLiwen is { Stage: MouKrLiwenStage.NativeUse } r && MouKongRong.Valid(f) && o.FrameId == f.Id && o.Index == r.Cursor && o.Source == r.Source && o.GameplayHash == r.GameplayHash && o.UseId == use.Id && o.UseId == r.UseId && o.ActionId == r.ActionId && use.Action is { } a && a.ActionId == o.ActionId && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ProviderSeat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouKrLiwenNativeIssuedEvent>().Count(e => e == new MouKrLiwenNativeIssuedEvent(f.Id, r.Cursor, use.Id, a.ActionId, o.ActorSeat, o.ProviderSeat)) == 1;
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 34600)]
     internal bool MouKrNoSlashDebit(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouKrLiwenOrigin: { } o } use && o.ActorSeat == actor && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == o.FrameId)is { } parent && MouKrNativeMatches(use, parent);
     [NativeUseValidation(34600)]
@@ -90,7 +90,7 @@ internal sealed partial class CharacterKongRongMouOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MouKrLiwen!;
-        if (!MouKrNativeMatches(use, f) || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || r.NativeReturned || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (!MouKrNativeMatches(use, f) || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || r.NativeReturned || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Liwen cannot replace or repeat an issued native return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouKrLiwen = r with { NativeReturned = true } });
         if (use.CardAttack is not { Active: true })

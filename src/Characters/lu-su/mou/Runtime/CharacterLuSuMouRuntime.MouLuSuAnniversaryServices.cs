@@ -22,7 +22,7 @@ internal sealed partial class CharacterLuSuMouRuntime
     IReadOnlyList<CardSnapshot> IMouLuSuAnniversaryFacts.Hand(int seat) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray());
     bool IMouLuSuAnniversaryFacts.InHand(int seat, int id) => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(seat);
     SkillProgram IMouLuSuAnniversaryFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    IEnumerable<T> IMouLuSuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouLuSuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouLuSuAnniversaryFacts.Yin(int owner, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(owner, MouLuSuAnniversaryRuntime.Mengmou, instance, "yin");
     bool IMouLuSuAnniversaryFacts.Parent(ProgramSkillFrame f)
     {

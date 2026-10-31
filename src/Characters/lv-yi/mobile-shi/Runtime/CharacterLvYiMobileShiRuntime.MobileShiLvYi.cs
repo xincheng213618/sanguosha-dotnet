@@ -11,8 +11,8 @@ internal sealed partial class CharacterLvYiMobileShiRuntime
     SkillProgramStepOutcome IShiLvYiHost.ResolveSongyan(ProgramSkillFrame frame) => BeginShiLySongyan(frame);
     internal ShiLyHuilvGrantedEvent? ShiLyOpenGrant(int ownerSeat, int actorSeat)
     {
-        var settled = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLyHuilvSettledEvent>().Select(entry => entry.GrantFrameId).ToHashSet();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLyHuilvGrantedEvent>().FirstOrDefault(entry => entry.OwnerSeat == ownerSeat && entry.ActorSeat == actorSeat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && !settled.Contains(entry.FrameId));
+        var settled = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLyHuilvSettledEvent>().Select(entry => entry.GrantFrameId).ToHashSet();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLyHuilvGrantedEvent>().FirstOrDefault(entry => entry.OwnerSeat == ownerSeat && entry.ActorSeat == actorSeat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && !settled.Contains(entry.FrameId));
     }
 
     internal SkillProgramStepOutcome BeginShiLyHuilv(ProgramSkillFrame input)
@@ -22,8 +22,8 @@ internal sealed partial class CharacterLvYiMobileShiRuntime
             throw new InvalidOperationException("Shi Lü Yi restarted a running operation.");
         if (f.SkillId != ShiLyHuilv || f.TriggerId != ShiLvYiComposition.HuilvStartTrigger || f.WindowContext?.TargetSeat is not { } actor || actor == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[actor].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _cardZonesOperations._cardZones.Count(CardLocation.DrawPile) == 0)
             return SkillProgramStepOutcome.Continue;
-        var redFree = !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiLyHuilvGrantedEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && entry.Red);
-        var blackFree = !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiLyHuilvGrantedEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && !entry.Red);
+        var redFree = !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLyHuilvGrantedEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && entry.Red);
+        var blackFree = !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLyHuilvGrantedEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && !entry.Red);
         if (!redFree && !blackFree)
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LvYi = new("huilv", ShiLyStage.HuilvGrant) { ActorSeat = actor } });
@@ -146,9 +146,9 @@ internal sealed partial class CharacterLvYiMobileShiRuntime
             case ("huilv", ShiLyStage.HuilvGrant):
                 var deck = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile);
                 var choices = new List<PromptChoice>();
-                if (deck.Any(card => CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit)) && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiLyHuilvGrantedEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && entry.Red))
+                if (deck.Any(card => CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit)) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLyHuilvGrantedEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && entry.Red))
                     choices.Add(MakeShiLyChoice(f, "red", $"令 {(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat].Name)} 从牌堆中获得一张红色牌"));
-                if (deck.Any(card => !CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit)) && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiLyHuilvGrantedEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && !entry.Red))
+                if (deck.Any(card => !CoreNativeCardClassificationsRuntime.IsRedSuit(card.Suit)) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLyHuilvGrantedEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && !entry.Red))
                     choices.Add(MakeShiLyChoice(f, "black", $"令 {(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat].Name)} 从牌堆中获得一张黑色牌"));
                 choices.Add(MakeShiLyChoice(f, "pass", "不发动“隳律”"));
                 return choices;
@@ -263,13 +263,13 @@ internal sealed partial class CharacterLvYiMobileShiRuntime
             return false;
         if (!query.ForResponse)
             return true;
-        if (_resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault()is not { } window || window.EffectCardKind != CardKind.DrawTwo || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiLySongyanUsedEvent>().Any(entry => entry.UseId == window.ParentFrameId) || !query.Owner.IsAlive || query.CardIds is not [var cardId])
+        if (_resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault()is not { } window || window.EffectCardKind != CardKind.DrawTwo || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLySongyanUsedEvent>().Any(entry => entry.UseId == window.ParentFrameId) || !query.Owner.IsAlive || query.CardIds is not [var cardId])
             return true;
         var location = _cardZonesOperations._cardZones.GetLocation(cardId);
         if (location.OwnerSeat != query.Owner.Seat || location.Zone != CardZoneKind.Hand)
             return true;
         var red = CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(query.Owner, _coreAdvancedLifecycleOperations.GetAdvancedCard(cardId)));
-        return !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiLyRoundDiscardedEvent>().Any(entry => entry.Seat == query.Owner.Seat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && entry.Red == red);
+        return !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLyRoundDiscardedEvent>().Any(entry => entry.Seat == query.Owner.Seat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && entry.Red == red);
     }
 
     // ---- observers --------------------------------------------------------------

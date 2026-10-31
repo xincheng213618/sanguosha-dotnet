@@ -31,14 +31,14 @@ internal sealed partial class CharacterCaoZhiLeRuntime
 
     internal WenlanActionAcceptedEvent[] WenlanEntries(int owner)
     {
-        var retired = _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanActionReassignedEvent>().Where(e => e.RetiredEntryId is not null).Select(e => e.RetiredEntryId!.Value).ToHashSet();
-        var entries = _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanActionAcceptedEvent>().Where(e => e.OwnerSeat == owner && !retired.Contains(e.EntryId)).ToArray();
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<WenlanActionReassignedEvent>().Any(e => e.PreviousActorSeat == owner || e.ActorSeat == owner))
+        var retired = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanActionReassignedEvent>().Where(e => e.RetiredEntryId is not null).Select(e => e.RetiredEntryId!.Value).ToHashSet();
+        var entries = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanActionAcceptedEvent>().Where(e => e.OwnerSeat == owner && !retired.Contains(e.EntryId)).ToArray();
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanActionReassignedEvent>().Any(e => e.PreviousActorSeat == owner || e.ActorSeat == owner))
             return entries.OrderBy(e => e.Ordinal).ToArray();
         // Issued pairs never move or roll back. Only still-unclaimed entries
         // form the remaining tail when a real native actor replacement occurs.
         var frozen = new Dictionary<long, int>();
-        foreach (var q in _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanStartedEvent>().Where(e => e.Qualification.Source.Source.OwnerSeat == owner).Select(e => e.Qualification))
+        foreach (var q in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanStartedEvent>().Where(e => e.Qualification.Source.Source.OwnerSeat == owner).Select(e => e.Qualification))
         {
             frozen.Add(q.FirstEntryId, q.SecondOrdinal - 1);
             frozen.Add(q.SecondEntryId, q.SecondOrdinal);
@@ -49,8 +49,8 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     }
 
     internal int NextWenlanOrdinal(int owner) => WenlanEntries(owner).Select(e => e.Ordinal).DefaultIfEmpty(0).Max() + 1;
-    internal bool IsWenlanEntryClaimed(long id) => _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanStartedEvent>().Any(e => e.Qualification.FirstEntryId == id || e.Qualification.SecondEntryId == id);
-    internal long WenlanBoundActionId(WenlanActionAcceptedEvent entry) => entry.ActionId != 0 ? entry.ActionId : _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanLegacyActionBoundEvent>().SingleOrDefault(e => e.EntryId == entry.EntryId)?.ActionId ?? 0;
+    internal bool IsWenlanEntryClaimed(long id) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanStartedEvent>().Any(e => e.Qualification.FirstEntryId == id || e.Qualification.SecondEntryId == id);
+    internal long WenlanBoundActionId(WenlanActionAcceptedEvent entry) => entry.ActionId != 0 ? entry.ActionId : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanLegacyActionBoundEvent>().SingleOrDefault(e => e.EntryId == entry.EntryId)?.ActionId ?? 0;
     internal void RecordWenlanAccepted(CardActionContext action, long nativeId, WenlanActionCapture? capture)
     {
         var owner = action.Type == CardActionType.Response ? action.ProviderSeat : action.ActorSeat;
@@ -85,7 +85,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         var matches = _resolutionStackOperations._resolutionStack.Where(f => f.LeCaoZhiWenlanResponse is { } p && p.ProviderSeat == action.ProviderSeat && p.EffectiveKind == action.EffectiveKind && p.Materials.Select(c => c.CardId).SequenceEqual(action.PhysicalCards.Select(c => c.CardId))).ToArray();
         if (matches.Length == 0)
             return CaptureWenlanMaterials(action.ProviderSeat, action.PhysicalCards.Select(c => c.CardId).ToArray(), SkillProgramTriggerWindow.CardResponseCompleted);
-        if (matches is not [var parent] || parent.LeCaoZhiWenlanResponse is not { } payment || parent.Id != payment.NativeParentId || payment.Materials.Count != action.PhysicalCards.Count || !payment.Materials.Zip(action.PhysicalCards).All(pair => pair.First.CardId == pair.Second.CardId && pair.First.CardKind == pair.Second.CardKind && pair.First.From == pair.Second.From) || _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanResponsePreparedEvent>().Count(e => e == new WenlanResponsePreparedEvent(payment.CaptureId, parent.Id, payment.ProviderSeat, payment.EffectiveKind, payment.Before, payment.Capture)) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<WenlanResponseMaterialEvent>().Where(e => e.CaptureId == payment.CaptureId).OrderBy(e => e.Index).Select(e => e.Material).SequenceEqual(payment.Materials) || _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanResponseBoundEvent>().Any(e => e.CaptureId == payment.CaptureId) || payment.Materials.Any(c => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > payment.Before && m.CardId == c.CardId && m.CardKind == c.CardKind && m.From == c.From && m.Reason is var reason && (reason == CardMoveReasons.Respond || reason == CardMoveReasons.Nullification))))
+        if (matches is not [var parent] || parent.LeCaoZhiWenlanResponse is not { } payment || parent.Id != payment.NativeParentId || payment.Materials.Count != action.PhysicalCards.Count || !payment.Materials.Zip(action.PhysicalCards).All(pair => pair.First.CardId == pair.Second.CardId && pair.First.CardKind == pair.Second.CardKind && pair.First.From == pair.Second.From) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanResponsePreparedEvent>().Count(e => e == new WenlanResponsePreparedEvent(payment.CaptureId, parent.Id, payment.ProviderSeat, payment.EffectiveKind, payment.Before, payment.Capture)) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanResponseMaterialEvent>().Where(e => e.CaptureId == payment.CaptureId).OrderBy(e => e.Index).Select(e => e.Material).SequenceEqual(payment.Materials) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanResponseBoundEvent>().Any(e => e.CaptureId == payment.CaptureId) || payment.Materials.Any(c => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > payment.Before && m.CardId == c.CardId && m.CardKind == c.CardKind && m.From == c.From && m.Reason is var reason && (reason == CardMoveReasons.Respond || reason == CardMoveReasons.Nullification))))
             throw new InvalidOperationException("Wenlan requires its exact original, once-paid response materials.");
         parentId = parent.Id;
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { LeCaoZhiWenlanResponse = null });
@@ -138,7 +138,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         var legacy = WenlanEntries(action.ActorSeat).SingleOrDefault(e => e.NativeFrameId == native.Id && e.ActionId == 0);
         if (legacy is not null)
         {
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<WenlanLegacyActionBoundEvent>().Any(e => e.EntryId == legacy.EntryId))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanLegacyActionBoundEvent>().Any(e => e.EntryId == legacy.EntryId))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenlanLegacyActionBoundEvent(legacy.EntryId, action.ActionId));
             return;
         }
@@ -157,8 +157,8 @@ internal sealed partial class CharacterCaoZhiLeRuntime
             Source = CurrentWenlanSource(changed.ActorSeat, SkillProgramTriggerWindow.CardUseCompleted)
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { LeCaoZhiWenlanUse = capture });
-        var retired = _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanActionReassignedEvent>().Where(e => e.RetiredEntryId is not null).Select(e => e.RetiredEntryId!.Value).ToHashSet();
-        var all = _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanActionAcceptedEvent>().Where(e => WenlanBoundActionId(e) == action.ActionId).ToArray();
+        var retired = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanActionReassignedEvent>().Where(e => e.RetiredEntryId is not null).Select(e => e.RetiredEntryId!.Value).ToHashSet();
+        var all = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanActionAcceptedEvent>().Where(e => WenlanBoundActionId(e) == action.ActionId).ToArray();
         // A later mutation cannot undo a reward already issued while this Use
         // was an earlier member of another completed pair.
         if (all.Any(e => IsWenlanEntryClaimed(e.EntryId)))
@@ -183,23 +183,23 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         var owner = window == SkillProgramTriggerWindow.CardResponseCompleted ? action.ProviderSeat : action.ActorSeat;
         var entries = WenlanEntries(owner);
         var current = entries.SingleOrDefault(e => WenlanBoundActionId(e) == action.ActionId);
-        if (current is null || current.Ordinal % 2 != 0 || entries.SingleOrDefault(e => e.Ordinal == current.Ordinal - 1)is not { } first || CurrentWenlanSource(owner, window)is not { } source || _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanStartedEvent>().Any(e => e.Qualification.SecondEntryId == current.EntryId))
+        if (current is null || current.Ordinal % 2 != 0 || entries.SingleOrDefault(e => e.Ordinal == current.Ordinal - 1)is not { } first || CurrentWenlanSource(owner, window)is not { } source || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanStartedEvent>().Any(e => e.Qualification.SecondEntryId == current.EntryId))
             return;
         var q = new WenlanPairQualification(source, first.EntryId, current.EntryId, action.ActionId, window)
         {
             SecondOrdinal = current.Ordinal
         };
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<WenlanPairQualifiedEvent>().Any(e => e.Qualification == q))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanPairQualifiedEvent>().Any(e => e.Qualification == q))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenlanPairQualifiedEvent(q));
     }
 
-    internal WenlanPairQualification? WenlanQualificationFor(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId != WenlanSkill ? null : context.CardUse is not { } use ? WenlanDirectQualificationFor(c, context) : _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanPairQualifiedEvent>().Select(e => e.Qualification).SingleOrDefault(q => q.ActionId == use.CardActionId && q.Source == new WenlanSource(new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash) && q.Window == context.Window);
+    internal WenlanPairQualification? WenlanQualificationFor(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId != WenlanSkill ? null : context.CardUse is not { } use ? WenlanDirectQualificationFor(c, context) : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanPairQualifiedEvent>().Select(e => e.Qualification).SingleOrDefault(q => q.ActionId == use.CardActionId && q.Source == new WenlanSource(new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash) && q.Window == context.Window);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29081, SkillProgramEffectOp.ResolveLeCaoZhiWenlan)]
-    internal bool CanOfferLeCaoZhiWenlan(ProgramTriggerLegalityContext gate) => gate.Owner.IsAlive && WenlanQualificationFor(gate.Candidate, gate.Context)is { } q && !_coreProgramEventHistoryOperations.ProgramEventHistory<WenlanStartedEvent>().Any(e => e.Qualification.SecondEntryId == q.SecondEntryId);
+    internal bool CanOfferLeCaoZhiWenlan(ProgramTriggerLegalityContext gate) => gate.Owner.IsAlive && WenlanQualificationFor(gate.Candidate, gate.Context)is { } q && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanStartedEvent>().Any(e => e.Qualification.SecondEntryId == q.SecondEntryId);
     internal static CardKind[] WenlanNames(WenlanActionAcceptedEvent entry) => RuntimeSkills.RuntimeRules_cao_zhi_le_LeCaoZhiWenlan.WenlanNames(entry);
     internal WenlanActionAcceptedEvent WenlanEntry(long id)
     {
-        var raw = _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanActionAcceptedEvent>().Single(e => e.EntryId == id);
+        var raw = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanActionAcceptedEvent>().Single(e => e.EntryId == id);
         return WenlanEntries(raw.OwnerSeat).Single(e => e.EntryId == id);
     }
 
@@ -207,7 +207,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal SkillProgramStepOutcome BeginLeCaoZhiWenlan(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.LeCaoZhiWenlan is not null || f.SkillId != WenlanSkill || f.TriggerId is not (WenlanUseBinding or WenlanPlayedBinding) || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || WenlanQualificationFor(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context)is not { } q || _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanStartedEvent>().Any(e => e.Qualification.SecondEntryId == q.SecondEntryId))
+        if (f.LeCaoZhiWenlan is not null || f.SkillId != WenlanSkill || f.TriggerId is not (WenlanUseBinding or WenlanPlayedBinding) || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || WenlanQualificationFor(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context)is not { } q || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanStartedEvent>().Any(e => e.Qualification.SecondEntryId == q.SecondEntryId))
             throw new InvalidOperationException("Wenlan requires its exact accepted pair and the second action's completed native window.");
         long windowId;
         long nativeParentId;
@@ -313,7 +313,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
 
     internal void ObtainWenlanNamedCards(ProgramSkillFrame f, IReadOnlyList<CardKind> names)
     {
-        var plan = names.Select(kind => new WenlanNamedObtain(kind, _coreNamedCardAcquisitionsOperations.DeckNamedCard(kind)?.Id)).ToArray();
+        var plan = names.Select(kind => new WenlanNamedObtain(kind, _coreNamedCardAcquisitionsOperations.Value.DeckNamedCard(kind)?.Id)).ToArray();
         var ids = plan.Where(p => p.CardId is not null).Select(p => p.CardId!.Value).ToArray();
         var r = f.LeCaoZhiWenlan!;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LeCaoZhiWenlan = r with { ObtainPlan = plan, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -341,14 +341,14 @@ internal sealed partial class CharacterCaoZhiLeRuntime
             return false;
         var r = f.LeCaoZhiWenlan!;
         if (origin == FuMarkOrigin.WenlanHandRewrite)
-            return r.Stage == WenlanStage.MarkingHand && ids.SequenceEqual(r.SelectedIds) && ids.All(id => r.HandIds.Contains(id) && IsWenlanHandLike(f.OwnerSeat, id)) && _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanHandConfirmedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var confirmed] && confirmed.Count == ids.Count;
-        return origin == FuMarkOrigin.WenlanObtain && r.Stage == WenlanStage.ObtainChildren && ids.SequenceEqual(r.ObtainedIds) && ids.All(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(f.OwnerSeat)) && _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanObtainReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var returned] && returned.Count == ids.Count && returned.Before == r.Before && returned.After == r.After && _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanEntityObtainedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Sequence).Select(e => e.CardId).SequenceEqual(ids) && ids.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == WenlanObtainReason && r.ObtainPlan.Any(p => p.CardId == id && p.Kind == m.CardKind)) == 1);
+            return r.Stage == WenlanStage.MarkingHand && ids.SequenceEqual(r.SelectedIds) && ids.All(id => r.HandIds.Contains(id) && IsWenlanHandLike(f.OwnerSeat, id)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanHandConfirmedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var confirmed] && confirmed.Count == ids.Count;
+        return origin == FuMarkOrigin.WenlanObtain && r.Stage == WenlanStage.ObtainChildren && ids.SequenceEqual(r.ObtainedIds) && ids.All(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(f.OwnerSeat)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanObtainReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var returned] && returned.Count == ids.Count && returned.Before == r.Before && returned.After == r.After && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanEntityObtainedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Sequence).Select(e => e.CardId).SequenceEqual(ids) && ids.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == WenlanObtainReason && r.ObtainPlan.Any(p => p.CardId == id && p.Kind == m.CardKind)) == 1);
     }
 
     internal void FinishWenlan(ProgramSkillFrame f)
     {
         var r = f.LeCaoZhiWenlan!;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<WenlanCompletedEvent>().Any(e => e.FrameId == f.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanCompletedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Wenlan pair cannot complete twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenlanCompletedEvent(f.Id, f.OwnerSeat, r.Qualification.FirstEntryId, r.Qualification.SecondEntryId, r.CommonName, r.CommonName ? r.ObtainedIds.Count : r.SelectedIds.Count));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { LeCaoZhiWenlan = null, PendingMovementContinuation = null });
@@ -408,7 +408,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         var first = WenlanEntry(r.Qualification.FirstEntryId);
         var second = WenlanEntry(r.Qualification.SecondEntryId);
         var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == f.Id);
-        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == r.WindowId && first.OwnerSeat == f.OwnerSeat && second.OwnerSeat == f.OwnerSeat && second.Ordinal % 2 == 0 && first.Ordinal + 1 == second.Ordinal && (r.NativeParentKind == WenlanNativeParentKind.DirectDuel ? r.Qualification.DirectDuelEntryId == second.EntryId : WenlanBoundActionId(second) == r.Qualification.ActionId) && r.CommonName == WenlanNames(first).Intersect(WenlanNames(second)).Any() && _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanPairQualifiedEvent>().Count(e => e.Qualification == r.Qualification) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanStartedEvent>().Count(e => e == new WenlanStartedEvent(f.Id, r.Qualification, r.WindowId, r.NativeParentId, r.CommonName)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<WenlanStartedEvent>().Count(e => e.Qualification.SecondEntryId == second.EntryId) == 1;
+        return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == r.WindowId && first.OwnerSeat == f.OwnerSeat && second.OwnerSeat == f.OwnerSeat && second.Ordinal % 2 == 0 && first.Ordinal + 1 == second.Ordinal && (r.NativeParentKind == WenlanNativeParentKind.DirectDuel ? r.Qualification.DirectDuelEntryId == second.EntryId : WenlanBoundActionId(second) == r.Qualification.ActionId) && r.CommonName == WenlanNames(first).Intersect(WenlanNames(second)).Any() && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanPairQualifiedEvent>().Count(e => e.Qualification == r.Qualification) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanStartedEvent>().Count(e => e == new WenlanStartedEvent(f.Id, r.Qualification, r.WindowId, r.NativeParentId, r.CommonName)) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenlanStartedEvent>().Count(e => e.Qualification.SecondEntryId == second.EntryId) == 1;
     }
 
     internal bool WenlanOperationMovement(ProgramSkillFrame f, CardMovementRecord m) => f.LeCaoZhiWenlan is { Stage: WenlanStage.ObtainChildren } r && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && r.ObtainedIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == WenlanObtainReason && r.ObtainPlan.Any(p => p.CardId == m.CardId && p.Kind == m.CardKind);
@@ -419,7 +419,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
-            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
+            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement;
         return child is CardsMovedTriggerWindowFrame moved && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => WenlanOperationMovement(f, m));
@@ -428,7 +428,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal bool WenlanObserverSuffix(int index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(child) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[child - 1], _resolutionStackOperations2._resolutionStack()[child]) || _resolutionStackOperations2._resolutionStack()[child - 1] is ProgramSkillFrame f && (this.WenlanFirstChild(f, _resolutionStackOperations2._resolutionStack()[child]) || f.Zenrun is not null && _characterSunHongOlOperations.ZenrunFirstChild(f, _resolutionStackOperations2._resolutionStack()[child])) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[child], _resolutionStackOperations2._resolutionStack()[child - 1]), (child, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying));
     internal ProgramSkillFrame? WenlanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.WenlanFirstChild(f, child), (index) => this.WenlanObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 790)]
-    internal bool IsWenlanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && WenlanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsWenlanDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && WenlanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 560)]
     internal bool IsWenlanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
     {

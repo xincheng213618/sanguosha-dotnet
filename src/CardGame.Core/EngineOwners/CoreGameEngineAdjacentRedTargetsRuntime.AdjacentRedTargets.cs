@@ -75,7 +75,7 @@ internal sealed partial class CoreGameEngineAdjacentRedTargetsRuntime
         }
 
         var choices = AdjacentBorrowedSwordChoices(f, use);
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AdjacentRedTarget = new() { CardUseFrameId = use.Id, ActionId = use.Action!.ActionId, Source = _coreDamageZoneAcquisitionOperations.DamageAcquisitionSource(f), GameplayHash = f.GameplayHash, OriginalTargets = use.TargetSeats, Choices = choices } });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AdjacentRedTarget = new() { CardUseFrameId = use.Id, ActionId = use.Action!.ActionId, Source = _coreDamageZoneAcquisitionOperations.Value.DamageAcquisitionSource(f), GameplayHash = f.GameplayHash, OriginalTargets = use.TargetSeats, Choices = choices } });
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId);
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, f.OwnerSeat, "寄篱：成为借刀杀人的额外目标，请选择你使用杀的目标。", [], choices.SelectMany(c => c.Targets).Distinct().ToArray(), f.OwnerSeat)
         {
@@ -134,7 +134,7 @@ internal sealed partial class CoreGameEngineAdjacentRedTargetsRuntime
         };
         _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(updated, action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardUseTargetAddedEvent(f.Id, f.SkillId, f.OwnerSeat, use.Id, f.OwnerSeat));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AdjacentRedTargetAddedEvent(f.Id, use.Id, action.ActionId, action.ActorSeat, _coreDamageZoneAcquisitionOperations.DamageAcquisitionSource(f), f.GameplayHash, original, added, targets));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AdjacentRedTargetAddedEvent(f.Id, use.Id, action.ActionId, action.ActorSeat, _coreDamageZoneAcquisitionOperations.Value.DamageAcquisitionSource(f), f.GameplayHash, original, added, targets));
         _coreCurrentUseTargetCandidateRefreshOperations.RefreshCurrentUseAddedTargetCandidates(updated, [f.OwnerSeat]);
     }
 

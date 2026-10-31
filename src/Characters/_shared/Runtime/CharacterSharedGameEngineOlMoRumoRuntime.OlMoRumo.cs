@@ -42,7 +42,7 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoRuntime
     }
 
     [ProgramIssuedTrigger(140)]
-    internal bool IsIssuedOlMoRumoCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => HasOlMoRumoCapability && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && _characterSharedGameEngineOlMoRumoProofsOperations.OlMoRumoCandidateSource(candidate) && _coreRoundEndingOperations.IsExactRoundEndingCandidate(candidate, context) && !_coreProgramEventHistoryOperations.ProgramEventHistory<OlMoRumoRoundStartedEvent>().Any(fact => fact.OwnerSeat == candidate.OwnerSeat && fact.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
+    internal bool IsIssuedOlMoRumoCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => HasOlMoRumoCapability && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && _characterSharedGameEngineOlMoRumoProofsOperations.OlMoRumoCandidateSource(candidate) && _coreRoundEndingOperations.Value.IsExactRoundEndingCandidate(candidate, context) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<OlMoRumoRoundStartedEvent>().Any(fact => fact.OwnerSeat == candidate.OwnerSeat && fact.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
     SkillProgramStepOutcome IOlMoRumoHost.Resolve(ProgramSkillFrame frame) => ResolveOlMoRumoRoundPenalty(frame);
     internal SkillProgramStepOutcome ResolveOlMoRumoRoundPenalty(ProgramSkillFrame supplied)
     {

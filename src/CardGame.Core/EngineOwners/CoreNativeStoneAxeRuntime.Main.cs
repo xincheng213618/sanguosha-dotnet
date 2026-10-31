@@ -9,7 +9,7 @@ internal sealed partial class CoreNativeStoneAxeRuntime
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
         var effectiveKind = CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack);
         var discardableCards = GetStoneAxeDiscardCards(source);
-        if (!_coreNativeDamageHandlesOperations.UsesFormalStoneAxe || effectiveKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash) || !source.IsAlive || !target.IsAlive || !_coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.StoneAxe) || discardableCards.Count < 2)
+        if (!_coreNativeDamageHandlesOperations.Value.UsesFormalStoneAxe || effectiveKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash) || !source.IsAlive || !target.IsAlive || !_coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.StoneAxe) || discardableCards.Count < 2)
         {
             return false;
         }

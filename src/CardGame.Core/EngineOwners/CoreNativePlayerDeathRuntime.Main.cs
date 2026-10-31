@@ -7,7 +7,7 @@ internal sealed partial class CoreNativePlayerDeathRuntime
     {
         var victim = _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat];
         var killer = dying.KillerSeat is { } killerSeat ? _coreMatchParticipantsPlayersAccess._players[killerSeat] : null;
-        BeginPlayerDeath(dying.FrameId, victim, killer, _coreNativeDamageHandlesOperations.GetDyingAttack(dying), dying);
+        BeginPlayerDeath(dying.FrameId, victim, killer, _coreNativeDamageHandlesOperations.Value.GetDyingAttack(dying), dying);
     }
 
     internal void BeginPlayerDeath(long parentFrameId, CharacterState victim, CharacterState? killer, GameEngine.IDamageAttempt? attack, DyingFrame? dying, long? causingProgramSkillFrameId = null, long? causingCardDamageReplacementId = null)
@@ -40,7 +40,7 @@ internal sealed partial class CoreNativePlayerDeathRuntime
                 _coreCardDamageMaximumHpReplacementOperations.PublishMaximumHpDamageReplacement(replacementId);
             _characterCaoYuOlOperations.RecordCaoYuDeathMinimumTransitions(deathFrameId, victim.Seat, caoYuDeathMinimum);
             _coreCardUseModulesOperations.ExpireDeadOwnerDamageModifiers(victim.Seat);
-            _characterDongZhaoOlOperations.ApplyZaowangSuccession(deathFrameId, victim);
+            _characterDongZhaoOlOperations.Value.ApplyZaowangSuccession(deathFrameId, victim);
             if (victim.IsChained)
             {
                 victim.IsChained = false;
@@ -50,12 +50,12 @@ internal sealed partial class CoreNativePlayerDeathRuntime
             }
 
             victim.RoleRevealed = true;
-            if (_coreNativeDamageHandlesOperations.IsTeamMode)
+            if (_coreNativeDamageHandlesOperations.Value.IsTeamMode)
             {
                 victim.TeamRevealed = true;
             }
 
-            if (_coreNativeDamageHandlesOperations.IsNationalWarMode)
+            if (_coreNativeDamageHandlesOperations.Value.IsNationalWarMode)
             {
                 _coreNationalGeneralRevealOperations.RevealNationalInformation(victim);
             }
@@ -65,7 +65,7 @@ internal sealed partial class CoreNativePlayerDeathRuntime
             }
 
             _modeRuntimeOperations._modeRuntime.ApplyDeathReward(victim.Seat, killer?.Seat);
-            if (_characterYuanYinAnniversaryOperations.TryBeginAnniversaryYuanYinDeathBeforeCleanup(deathFrameId))
+            if (_characterYuanYinAnniversaryOperations.Value.TryBeginAnniversaryYuanYinDeathBeforeCleanup(deathFrameId))
                 return;
             _coreDeathProgramsOperations.ContinuePlayerDeathCleanup(deathFrameId);
         }

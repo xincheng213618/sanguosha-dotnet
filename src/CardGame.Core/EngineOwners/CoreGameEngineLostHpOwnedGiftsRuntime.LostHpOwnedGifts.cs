@@ -22,7 +22,7 @@ internal sealed partial class CoreGameEngineLostHpOwnedGiftsRuntime
     internal SkillProgramStepOutcome RunLostHpOwnedGift(ProgramSkillFrame frame)
     {
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (!_coreEarnedActualEndingBenefitsOperations.MatchesLostHpOwnedGiftEnding(frame))
+        if (!_coreEarnedActualEndingBenefitsOperations.Value.MatchesLostHpOwnedGiftEnding(frame))
             throw new InvalidOperationException("Lost-HP gifting requires its exact actual Ending item.");
         if (frame.LostHpOwnedGift is null)
         {
@@ -152,7 +152,7 @@ internal sealed partial class CoreGameEngineLostHpOwnedGiftsRuntime
 
     internal bool IsValidLostHpOwnedGift(ProgramSkillFrame root)
     {
-        if (root.LostHpOwnedGift is not { } gift || !_coreEarnedActualEndingBenefitsOperations.MatchesLostHpOwnedGiftEnding(root) || gift.InstructionIndex != 0 || root.InstructionIndex != 1 || gift.Source != new CardConversionSource(root.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId) || gift.GameplayHash != root.GameplayHash || gift.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || gift.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || gift.MaximumGiftCount < 0 || gift.ActualDrawCount < 0 || gift.ActualDrawCount > gift.MaximumGiftCount || gift.DrawSequenceBefore < 0 || gift.DrawSequenceAfter < gift.DrawSequenceBefore || gift.PaidCardIds.Count > gift.MaximumGiftCount || gift.PaidCardIds.Distinct().Count() != gift.PaidCardIds.Count || gift.DeliveredCount < 0 || gift.DeliveredCount > gift.PaidCardIds.Count)
+        if (root.LostHpOwnedGift is not { } gift || !_coreEarnedActualEndingBenefitsOperations.Value.MatchesLostHpOwnedGiftEnding(root) || gift.InstructionIndex != 0 || root.InstructionIndex != 1 || gift.Source != new CardConversionSource(root.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(root), root.OwnerSeat, root.SkillInstanceId) || gift.GameplayHash != root.GameplayHash || gift.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || gift.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || gift.MaximumGiftCount < 0 || gift.ActualDrawCount < 0 || gift.ActualDrawCount > gift.MaximumGiftCount || gift.DrawSequenceBefore < 0 || gift.DrawSequenceAfter < gift.DrawSequenceBefore || gift.PaidCardIds.Count > gift.MaximumGiftCount || gift.PaidCardIds.Distinct().Count() != gift.PaidCardIds.Count || gift.DeliveredCount < 0 || gift.DeliveredCount > gift.PaidCardIds.Count)
             return false;
         if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LostHpDrawGiftFrozenEvent>().Count(e => e.ProgramFrameId == root.Id && e.Source == gift.Source && e.GameplayHash == gift.GameplayHash && e.ActualTurnNumber == gift.ActualTurnNumber && e.ActualTurnOwnerSeat == gift.ActualTurnOwnerSeat && e.MaximumGiftCount == gift.MaximumGiftCount && e.ActualDrawCount == gift.ActualDrawCount) != 1)
             return false;
@@ -229,5 +229,5 @@ internal sealed partial class CoreGameEngineLostHpOwnedGiftsRuntime
     }
 
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 500)]
-    internal bool IsLostHpOwnedGiftProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } && LostHpOwnedGiftObserverRoot()is not null;
+    internal bool IsLostHpOwnedGiftProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { ResumesProgramSkill: true } && LostHpOwnedGiftObserverRoot()is not null;
 }

@@ -8,7 +8,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     internal bool HasShenJw => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShenJiangWeiTianren);
 
     SkillProgramStepOutcome IShenJiangWeiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenJw(f, op);
-    bool IShenJiangWeiSelection.CanPay(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && _coreMatchParticipantsPlayersAccess._players[owner].MaxHp > 9 && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiPingxiangPaidEvent>().Any(p => p.Source.OwnerSeat == owner);
+    bool IShenJiangWeiSelection.CanPay(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].HasHpValue && _coreMatchParticipantsPlayersAccess._players[owner].MaxHp > 9 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiPingxiangPaidEvent>().Any(p => p.Source.OwnerSeat == owner);
     // Capture while the native Use/response still owns its exact processing
     // invoice. Later discard windows can run after that native producer retires.
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.CaptureMovement, 38400)]
@@ -17,10 +17,10 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
         if (!HasShenJw)
             return;
         foreach (var m in b.Movements.Where(m => m.To == CardLocation.DiscardPile && m.From != m.To && CardUseCategoryCatalog.Get(m.CardKind)is CardUseCategories.Basic or CardUseCategories.InstantTrick))
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenJiangWeiDiscardOriginEvent(b.Id, m.CardId, m.Sequence, _coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(b, m)));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenJiangWeiDiscardOriginEvent(b.Id, m.CardId, m.Sequence, _coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(b, m)));
     }
 
-    internal int[] ShenJwDiscardIndexes(CardMovementBatchContext b) => b.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From != x.m.To && CardUseCategoryCatalog.Get(x.m.CardKind)is CardUseCategories.Basic or CardUseCategories.InstantTrick && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiDiscardOriginEvent>().Count(e => e == new ShenJiangWeiDiscardOriginEvent(b.Id, x.m.CardId, x.m.Sequence, false)) == 1).Select(x => x.i).ToArray();
+    internal int[] ShenJwDiscardIndexes(CardMovementBatchContext b) => b.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From != x.m.To && CardUseCategoryCatalog.Get(x.m.CardKind)is CardUseCategories.Basic or CardUseCategories.InstantTrick && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiDiscardOriginEvent>().Count(e => e == new ShenJiangWeiDiscardOriginEvent(b.Id, x.m.CardId, x.m.Sequence, false)) == 1).Select(x => x.i).ToArray();
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 38400)]
     internal int[]? SelectShenJwDiscards(CardMovementBatchContext b, ProgramTriggerCandidate c, ProgramInstructionFeatures features) => features.HasOperation(SkillProgramEffectOp.ResolveShenJiangWeiTianren) ? ShenJwDiscardIndexes(b) : null;
     internal ProgramCardTriggerWindowFrame? ShenJwActionParent(ProgramSkillWindowContext w) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)is ProgramCardTriggerWindowFrame p && w.CardUse?.CardActionId == p.Action.ActionId ? p : null;
@@ -32,7 +32,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
             return;
         foreach (var c in candidates.Where(c => c.SkillId == ShenJiangWeiComposition.Jiufa && c.OwnerSeat == action.ActorSeat).DistinctBy(c => c.SkillInstanceId))
         {
-            var history = _coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiNameRecordedEvent>().Where(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId).ToArray();
+            var history = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiNameRecordedEvent>().Where(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId).ToArray();
             if (history.Any(e => e.ActionId == action.ActionId))
                 continue;
             var cycle = history.LastOrDefault()is { } last ? last.Cycle + (last.DistinctCount == 9 ? 1 : 0) : 0;
@@ -50,10 +50,10 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     internal bool CanRunShenJw(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {
         if (t.Effects.Single().Op == SkillProgramEffectOp.ResolveShenJiangWeiJiufa)
-            return ShenJwActionParent(w)is { } p && ShenJwCompletedAction(p)is { } a && a.ActorSeat == c.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiNameRecordedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.ActionId == a.ActionId && e.DistinctCount == 9) && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.ResolveShenJiangWeiJiufa && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.ActionId == a.ActionId);
+            return ShenJwActionParent(w)is { } p && ShenJwCompletedAction(p)is { } a && a.ActorSeat == c.OwnerSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiNameRecordedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.ActionId == a.ActionId && e.DistinctCount == 9) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.ResolveShenJiangWeiJiufa && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.ActionId == a.ActionId);
         if (w.Window == SkillProgramTriggerWindow.AfterHealthChanged)
             return w.HpChange?.Kind == HpChangeKind.MaximumHp && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].MaxHp > 0 && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.Tianren) >= _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].MaxHp;
-        return w.MovementBatch is { } b && w.MovementIndex is { } i && ShenJwDiscardIndexes(b).Contains(i) && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiMarkReceivedEvent>().Any(e => e.OwnerSeat == c.OwnerSeat && e.MovementSequence == b.Movements[i].Sequence);
+        return w.MovementBatch is { } b && w.MovementIndex is { } i && ShenJwDiscardIndexes(b).Contains(i) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiMarkReceivedEvent>().Any(e => e.OwnerSeat == c.OwnerSeat && e.MovementSequence == b.Movements[i].Sequence);
     }
 
     internal SkillProgramStepOutcome BeginShenJw(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -80,7 +80,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
 
         if (op == SkillProgramEffectOp.ResolveShenJiangWeiJiufa)
         {
-            var recorded = _coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiNameRecordedEvent>().Single(e => e.Source == r.Source && e.ActionId == action!.ActionId && e.DistinctCount == 9);
+            var recorded = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiNameRecordedEvent>().Single(e => e.Source == r.Source && e.ActionId == action!.ActionId && e.DistinctCount == 9);
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenJiangWei = r with { Stage = ShenJiangWeiStage.JiufaOffer, Cycle = recorded.Cycle } });
         }
 
@@ -88,7 +88,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
         {
             var p = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
             var before = p.MaxHp;
-            if (!p.HasHpValue || before <= 9 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiPingxiangPaidEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
+            if (!p.HasHpValue || before <= 9 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiPingxiangPaidEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
                 throw new InvalidOperationException("Pingxiang requires nine genuinely payable maximum HP and its unused game limit.");
             _coreProgramLifecycleOperations.ChangeProgramMaximumHp(f, -9);
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenJiangWei = r with { MaximumBefore = before, MaximumAfter = p.MaxHp } });
@@ -212,7 +212,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.ShenJiangWei!;
-        if (r.Stage != ShenJiangWeiStage.DrawAttempt || f.NativeDraw is not null || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != 2 || o.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Cycle == r.Cycle))
+        if (r.Stage != ShenJiangWeiStage.DrawAttempt || f.NativeDraw is not null || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != 2 || o.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Cycle == r.Cycle))
             throw new InvalidOperationException("Tianren needs its exact once-only two-card native draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenJiangWei = r with { Stage = ShenJiangWeiStage.DrawChildren, Before = o.SequenceBefore, After = o.SequenceAfter } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenJiangWeiDrawReturnedEvent(f.Id, r.Cycle, o.ActualDrawIds.Count, o.AttemptFrameId, o.SequenceBefore, o.SequenceAfter));
@@ -325,7 +325,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
     {
         var r = f.ShenJiangWei!;
         var p = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        if (r.Operation != SkillProgramEffectOp.ResolveShenJiangWeiPingxiang || r.Stage != ShenJiangWeiStage.SlashChoice || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiPingxiangCompletedEvent>().Any(e => e.FrameId == f.Id))
+        if (r.Operation != SkillProgramEffectOp.ResolveShenJiangWeiPingxiang || r.Stage != ShenJiangWeiStage.SlashChoice || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiPingxiangCompletedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Pingxiang's then-clause requires its completed native Slash sequence.");
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
             _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(player.Seat, player.SkillGrants.Revision);
@@ -338,7 +338,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
 
     internal IEnumerable<RuleQueryContribution> ShenJiangWeiPingxiangHandLimitContributions(CharacterState p)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiPingxiangCompletedEvent>().Any(e => e.OwnerSeat == p.Seat && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenJiangWeiPingxiangPaidEvent>().Any(paid => paid.FrameId == e.FrameId && paid.Source.OwnerSeat == p.Seat && paid.Source.SkillId == ShenJiangWeiComposition.Pingxiang && paid.Source.BindingId == "nine-fire-slashes" && _contentRegistryOperations._contentRegistry.GetSkill(paid.Source.SkillId).Program?.GameplayHash == paid.GameplayHash && paid.MaximumBefore - paid.MaximumAfter == 9)))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiPingxiangCompletedEvent>().Any(e => e.OwnerSeat == p.Seat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenJiangWeiPingxiangPaidEvent>().Any(paid => paid.FrameId == e.FrameId && paid.Source.OwnerSeat == p.Seat && paid.Source.SkillId == ShenJiangWeiComposition.Pingxiang && paid.Source.BindingId == "nine-fire-slashes" && _contentRegistryOperations._contentRegistry.GetSkill(paid.Source.SkillId).Program?.GameplayHash == paid.GameplayHash && paid.MaximumBefore - paid.MaximumAfter == 9)))
             yield return new FiniteRuleQueryContribution($"issued:{(p.Seat)}:anniversary:pingxiang:hand-limit", SkillRuleOperation.Set, Math.Max(0, p.MaxHp), 384);
     }
 

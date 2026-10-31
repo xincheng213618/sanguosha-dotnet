@@ -11,10 +11,10 @@ internal sealed partial class CharacterYuanShaoMouMobileRuntime
     {
         if (!HasMouYuanShaoCapability)
             return;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouYuanShaoTurnStartedEvent(turn.TurnNumber, turn.ActorSeat, _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count(), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouYuanShaoTurnStartedEvent(turn.TurnNumber, turn.ActorSeat, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count(), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
     }
 
-    internal MouYuanShaoTurnStartedEvent MouYuanShaoTurn() => _coreProgramEventHistoryOperations.ProgramEventHistory<MouYuanShaoTurnStartedEvent>().LastOrDefault() ?? new(0, _coreActualTurnProgressCurrentSeatAccess._currentSeat, 0, 0);
+    internal MouYuanShaoTurnStartedEvent MouYuanShaoTurn() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuanShaoTurnStartedEvent>().LastOrDefault() ?? new(0, _coreActualTurnProgressCurrentSeatAccess._currentSeat, 0, 0);
     internal int MouYuanShaoActualRewards(int owner, string skill)
     {
         var start = MouYuanShaoTurn();
@@ -30,13 +30,13 @@ internal sealed partial class CharacterYuanShaoMouMobileRuntime
         {
             if (c.Window != SkillProgramTriggerWindow.CardResponseCompleted || w.ResponseCompletion is not { CostsDrained: true, OriginalContinuation: ProgramCardContinuation.GroupResponse or ProgramCardContinuation.FactionDefenseDodge } || w.Action.EffectiveKind != CardKind.Dodge || w.Action.ProviderSeat == candidate.OwnerSeat || w.Action.ParentActionId is not { } parentAction || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { Type: CardActionType.Use } parent } use || parent.ActionId != parentAction || parent.EffectiveKind != CardKind.ArrowBarrage || parent.ActorSeat != candidate.OwnerSeat || use.SourceSeat != candidate.OwnerSeat || MouYuanShaoActualRewards(candidate.OwnerSeat, candidate.SkillId) >= 3)
                 return false;
-            return !_coreProgramEventHistoryOperations.ProgramEventHistory<MouYuanShaoRewardReservedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillId == candidate.SkillId && e.ActionId == action.CardActionId);
+            return !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuanShaoRewardReservedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillId == candidate.SkillId && e.ActionId == action.CardActionId);
         }
 
         if (candidate.SkillId != MouYuanShaoComposition.Xueyi || c.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || c.TargetSeat is not { } target || w.Action.Type != CardActionType.Use || w.Action.ActorSeat != candidate.OwnerSeat || !_coreLordSkillProjectionsOperations.HasSkillRoleQualification(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], candidate.SkillId, candidate.SkillInstanceId, Role.Lord) || MouYuanShaoActualRewards(candidate.OwnerSeat, candidate.SkillId) >= 2)
             return false;
         var source = new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId);
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouYuanShaoDesignationEvent>().Any(e => e.UseId == w.ParentFrameId && e.ActionId == action.CardActionId && e.TargetSeat == target && e.Source == source && e.GameplayHash == candidate.GameplayHash && e.OtherQun) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouYuanShaoRewardReservedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillId == candidate.SkillId && e.ActionId == action.CardActionId && e.TargetSeat == target);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuanShaoDesignationEvent>().Any(e => e.UseId == w.ParentFrameId && e.ActionId == action.CardActionId && e.TargetSeat == target && e.Source == source && e.GameplayHash == candidate.GameplayHash && e.OtherQun) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuanShaoRewardReservedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillId == candidate.SkillId && e.ActionId == action.CardActionId && e.TargetSeat == target);
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 30100, SkillProgramEffectOp.ReserveMouYuanShaoReward)]
@@ -61,7 +61,7 @@ internal sealed partial class CharacterYuanShaoMouMobileRuntime
         var targets = action.EffectiveKind == CardKind.BorrowedSword ? action.TargetSeats.Where((_, i) => i % 2 == 0) : action.EffectiveDesignatedTargetSeats;
         foreach (var target in targets.Distinct().Where(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreMatchParticipantsPlayersAccess._players[t].IsAlive))
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouYuanShaoDesignationEvent>().Any(e => e.UseId == use.Id && e.TargetSeat == target))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuanShaoDesignationEvent>().Any(e => e.UseId == use.Id && e.TargetSeat == target))
                 continue;
             var bindings = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat]).GetInstanceTriggers(window).Where(b => IsMouYuanShaoTargetTrigger(b.SkillId, b.Trigger) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], b.SkillId, b.SkillInstanceId, Role.Lord)).ToArray();
             var otherQun = target != action.ActorSeat && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[target]) == "qun";
@@ -78,8 +78,8 @@ internal sealed partial class CharacterYuanShaoMouMobileRuntime
             return frame;
         var action = CoreGameEngineActorHandLimitTargetProgramsRuntime.ActorHandLimitTargetCollectionAction(use);
         CaptureMouYuanShaoDesignation(action, SkillProgramTriggerWindow.CardUseTargetsFinalized);
-        var claims = _coreProgramEventHistoryOperations.ProgramEventHistory<MouYuanShaoDesignationEvent>().Where(e => e.UseId == use.Id && e.Source is not null && e.OtherQun).ToArray();
-        var added = _coreCardActionsOperations.CollectSharedCardActionCandidates(action, SkillProgramTriggerWindow.CardUseTargetsFinalized, use.TargetSeats, null, frame.Continuation).Where(c => c.SkillId == MouYuanShaoComposition.Xueyi && claims.Any(e => e.TargetSeat == c.OpponentSeat && e.Source!.SkillInstanceId == c.SkillInstanceId) && !frame.Candidates.Any(old => old.SkillId == c.SkillId && old.OwnerSeat == c.OwnerSeat && old.OpponentSeat == c.OpponentSeat && old.SkillInstanceId == c.SkillInstanceId) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouYuanShaoRewardReservedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.ActionId == action.ActionId && e.TargetSeat == c.OpponentSeat)).Select(c => c with { FrozenContext = c.FrozenContext!with { ParentFrameId = frame.Id, CardUse = c.FrozenContext.CardUse!with { ParentCardUseFrameId = use.Id } } }).ToArray();
+        var claims = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuanShaoDesignationEvent>().Where(e => e.UseId == use.Id && e.Source is not null && e.OtherQun).ToArray();
+        var added = _coreCardActionsOperations.CollectSharedCardActionCandidates(action, SkillProgramTriggerWindow.CardUseTargetsFinalized, use.TargetSeats, null, frame.Continuation).Where(c => c.SkillId == MouYuanShaoComposition.Xueyi && claims.Any(e => e.TargetSeat == c.OpponentSeat && e.Source!.SkillInstanceId == c.SkillInstanceId) && !frame.Candidates.Any(old => old.SkillId == c.SkillId && old.OwnerSeat == c.OwnerSeat && old.OpponentSeat == c.OpponentSeat && old.SkillInstanceId == c.SkillInstanceId) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuanShaoRewardReservedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.ActionId == action.ActionId && e.TargetSeat == c.OpponentSeat)).Select(c => c with { FrozenContext = c.FrozenContext!with { ParentFrameId = frame.Id, CardUse = c.FrozenContext.CardUse!with { ParentCardUseFrameId = use.Id } } }).ToArray();
         if (added.Length != 0)
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Candidates = Array.AsReadOnly(frame.Candidates.Concat(added).ToArray()) });
         return frame;
@@ -91,9 +91,9 @@ internal sealed partial class CharacterYuanShaoMouMobileRuntime
             return false;
         var action = CoreGameEngineActorHandLimitTargetProgramsRuntime.ActorHandLimitTargetCollectionAction(use);
         CaptureMouYuanShaoDesignation(action, SkillProgramTriggerWindow.CardUseTargetsFinalized);
-        var claims = _coreProgramEventHistoryOperations.ProgramEventHistory<MouYuanShaoDesignationEvent>().Where(e => e.UseId == use.Id && e.Source is not null && e.OtherQun).ToArray();
+        var claims = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuanShaoDesignationEvent>().Where(e => e.UseId == use.Id && e.Source is not null && e.OtherQun).ToArray();
         var windowId = _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1;
-        var added = _coreCardActionsOperations.CollectSharedCardActionCandidates(action, SkillProgramTriggerWindow.CardUseTargetsFinalized, use.TargetSeats, null, ProgramCardContinuation.Slash).Where(c => c.SkillId == MouYuanShaoComposition.Xueyi && claims.Any(e => e.TargetSeat == c.OpponentSeat && e.Source!.SkillInstanceId == c.SkillInstanceId) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouYuanShaoRewardReservedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.ActionId == action.ActionId && e.TargetSeat == c.OpponentSeat)).OrderByDescending(c => c.Priority).ThenBy(c => c.OwnerSeat).ThenBy(c => c.SkillId, StringComparer.Ordinal).Select(c => c with { FrozenContext = c.FrozenContext!with { ParentFrameId = windowId, CardUse = c.FrozenContext.CardUse!with { ParentCardUseFrameId = use.Id } } }).ToArray();
+        var added = _coreCardActionsOperations.CollectSharedCardActionCandidates(action, SkillProgramTriggerWindow.CardUseTargetsFinalized, use.TargetSeats, null, ProgramCardContinuation.Slash).Where(c => c.SkillId == MouYuanShaoComposition.Xueyi && claims.Any(e => e.TargetSeat == c.OpponentSeat && e.Source!.SkillInstanceId == c.SkillInstanceId) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuanShaoRewardReservedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.ActionId == action.ActionId && e.TargetSeat == c.OpponentSeat)).OrderByDescending(c => c.Priority).ThenBy(c => c.OwnerSeat).ThenBy(c => c.SkillId, StringComparer.Ordinal).Select(c => c with { FrozenContext = c.FrozenContext!with { ParentFrameId = windowId, CardUse = c.FrozenContext.CardUse!with { ParentCardUseFrameId = use.Id } } }).ToArray();
         if (added.Length == 0)
             return false;
         _coreResolutionIdentityBoundaryOperations._resolutionSequence++;

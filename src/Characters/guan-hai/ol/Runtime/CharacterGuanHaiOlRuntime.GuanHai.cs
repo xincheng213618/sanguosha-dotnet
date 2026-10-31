@@ -107,11 +107,11 @@ internal sealed partial class CharacterGuanHaiOlRuntime
 
     internal bool IsGuanHaiPindianSource(PindianFrame p, bool revealed)
     {
-        if (p.OwnedPileSource is not { } s || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == s.OriginProgramFrameId)is not ProgramSkillFrame { GuanHai: { Paid: true, Stage: GuanHaiStage.Pindian } r } parent || r.Op != SkillProgramEffectOp.ResolveYouqueMinimumBaitPindian || p.Id != r.PindianId || p.ParentFrameId != parent.Id || p.SourceSeat != parent.OwnerSeat || p.OpponentSeat != r.OpponentSeat || p.SourceCardId != r.BaitCardId || s.Origin != r.Source || s.Pile != r.Pile || s.CardId != r.BaitCardId || s.PrintedRank != r.BaitRank || s.SequenceBefore != r.Before || p.ProgramResultBind != YouqueResultBind(parent) || _coreProgramEventHistoryOperations.ProgramEventHistory<YouquePindianIssuedEvent>().Count(e => e == new YouquePindianIssuedEvent(parent.Id, p.Id, r.Source, r.GameplayHash, s.Pile, s.CardId, s.PrintedRank, r.OpponentSeat, r.Phase!, r.Before)) != 1)
+        if (p.OwnedPileSource is not { } s || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == s.OriginProgramFrameId)is not ProgramSkillFrame { GuanHai: { Paid: true, Stage: GuanHaiStage.Pindian } r } parent || r.Op != SkillProgramEffectOp.ResolveYouqueMinimumBaitPindian || p.Id != r.PindianId || p.ParentFrameId != parent.Id || p.SourceSeat != parent.OwnerSeat || p.OpponentSeat != r.OpponentSeat || p.SourceCardId != r.BaitCardId || s.Origin != r.Source || s.Pile != r.Pile || s.CardId != r.BaitCardId || s.PrintedRank != r.BaitRank || s.SequenceBefore != r.Before || p.ProgramResultBind != YouqueResultBind(parent) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YouquePindianIssuedEvent>().Count(e => e == new YouquePindianIssuedEvent(parent.Id, p.Id, r.Source, r.GameplayHash, s.Pile, s.CardId, s.PrintedRank, r.OpponentSeat, r.Phase!, r.Before)) != 1)
             return false;
         if (!revealed)
             return _cardZonesOperations._cardZones.GetLocation(s.CardId) == s.Pile.Location && _coreAdvancedLifecycleOperations.GetAdvancedCard(s.CardId).Rank == s.PrintedRank && !YouqueBaits(parent.OwnerSeat).Any(b => b.Card.Rank < s.PrintedRank);
-        return _corePindianOwnedPileSourcesOperations.HasPaidOwnedPilePindianSource(p) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > s.SequenceBefore && m.CardId == s.CardId && m.From == s.Pile.Location && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.PindianReveal) == 1;
+        return _corePindianOwnedPileSourcesOperations.Value.HasPaidOwnedPilePindianSource(p) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > s.SequenceBefore && m.CardId == s.CardId && m.From == s.Pile.Location && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.PindianReveal) == 1;
     }
 
     internal bool DrainGuanHai(ProgramSkillFrame f) => _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
@@ -136,7 +136,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
         if (r.Stage == GuanHaiStage.Pindian)
         {
-            var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Where(e => e.FrameId == r.PindianId && e.SkillId == f.SkillId).ToArray();
+            var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().Where(e => e.FrameId == r.PindianId && e.SkillId == f.SkillId).ToArray();
             if (facts is not [var fact] || (fact.Result.SourceCardId != r.BaitCardId && !_characterPangJiOlOperations.IsDouyuHistoricalPairAssignment(r.PindianId, fact.Result, r.BaitCardId) && !_characterLuKangWumiaoOperations.IsWuLuKangHistoricalPairAssignment(r.PindianId, fact.Result, r.BaitCardId)) || fact.Result.SourceSeat != f.OwnerSeat || fact.Result.OpponentSeat != r.OpponentSeat || f.PindianResultBindings.SingleOrDefault(b => b.Name == YouqueResultBind(f))is not { } binding || binding.SourceRank != fact.Result.SourceRank || binding.OpponentRank != fact.Result.OpponentRank || binding.SourceWon != fact.Result.SourceWon)
                 throw new InvalidOperationException("Youque requires its exact completed native Pindian result.");
             var result = fact.Result;
@@ -204,7 +204,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
 
         if (r.Stage == GuanHaiStage.RewardChildren)
         {
-            if (r.Phase is { } phase && !YouqueBaits(f.OwnerSeat).Any(b => b.Card.Suit == Suit.Spade) && !_coreProgramEventHistoryOperations.ProgramEventHistory<YouquePhaseDisabledEvent>().Any(e => e.OwnerSeat == f.OwnerSeat && e.Phase == phase))
+            if (r.Phase is { } phase && !YouqueBaits(f.OwnerSeat).Any(b => b.Card.Suit == Suit.Spade) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YouquePhaseDisabledEvent>().Any(e => e.OwnerSeat == f.OwnerSeat && e.Phase == phase))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YouquePhaseDisabledEvent(f.Id, f.OwnerSeat, phase, r.Source));
             FinishGuanHai(f, true);
             return;

@@ -23,9 +23,9 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
 
     internal bool KenshangUseProof(CardUseFrame use)
     {
-        if (use.Kenshang is not { } r || use.Action is not { Type: CardActionType.Use } a || r.UseId != use.Id || r.ActionId != a.ActionId || r.Source.OwnerSeat != r.ActorSeat || r.ProviderSeat != r.ActorSeat || a.ProviderSeat != r.ProviderSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.EffectiveKind != use.CardKind || r.MaterialCount < 2 || a.PhysicalCards.Count != r.MaterialCount || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.ActorSeat, r.ProviderSeat) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program is not { } p || p.GameplayHash != r.GameplayHash || !p.ViewAs.Any(v => v.Id == r.Source.BindingId && v.KenshangUse == true) || !a.ConversionChain.Contains(r.Source) || _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangUseIssuedEvent>().Where(e => e.UseId == use.Id).ToArray()is not [var issued] || issued.ActionId != a.ActionId || issued.Source != r.Source || issued.GameplayHash != r.GameplayHash || issued.ActorSeat != r.ActorSeat || issued.ProviderSeat != r.ProviderSeat || issued.MaterialCount != r.MaterialCount)
+        if (use.Kenshang is not { } r || use.Action is not { Type: CardActionType.Use } a || r.UseId != use.Id || r.ActionId != a.ActionId || r.Source.OwnerSeat != r.ActorSeat || r.ProviderSeat != r.ActorSeat || a.ProviderSeat != r.ProviderSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.EffectiveKind != use.CardKind || r.MaterialCount < 2 || a.PhysicalCards.Count != r.MaterialCount || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.ActorSeat, r.ProviderSeat) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program is not { } p || p.GameplayHash != r.GameplayHash || !p.ViewAs.Any(v => v.Id == r.Source.BindingId && v.KenshangUse == true) || !a.ConversionChain.Contains(r.Source) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KenshangUseIssuedEvent>().Where(e => e.UseId == use.Id).ToArray()is not [var issued] || issued.ActionId != a.ActionId || issued.Source != r.Source || issued.GameplayHash != r.GameplayHash || issued.ActorSeat != r.ActorSeat || issued.ProviderSeat != r.ProviderSeat || issued.MaterialCount != r.MaterialCount)
             return false;
-        var costs = _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangMaterialEvent>().Where(e => e.UseId == use.Id).OrderBy(e => e.Index).ToArray();
+        var costs = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KenshangMaterialEvent>().Where(e => e.UseId == use.Id).OrderBy(e => e.Index).ToArray();
         return costs.Length == r.MaterialCount && costs.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, r.MaterialCount)) && costs.Select(e => e.Cost).SequenceEqual(a.PhysicalCards) && a.PhysicalCards.All(c => c.From.OwnerSeat == r.ProviderSeat && c.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment) && use.PhysicalCardIds!.SequenceEqual(a.PhysicalCards.Select(c => c.CardId));
     }
 
@@ -33,12 +33,12 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
     {
         if (amount <= 0 || !attack.DamageWasApplied || attack is not NativeOwners.CardAttackHandle card || attack.IsDelayedJudgmentDamage || attack.IsProgramJudgmentDamage || card.IsProgramSkillDamage || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Kenshang: { } r } use)
             return;
-        if (!KenshangUseProof(use) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame d || d.Id != damageId || d.ParentFrameId != use.Id || d.Amount != amount || d.SourceSeat != attack.SourceSeat || d.TargetSeat != attack.TargetSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangDamageEvent>().Any(e => e.DamageFrameId == damageId))
+        if (!KenshangUseProof(use) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame d || d.Id != damageId || d.ParentFrameId != use.Id || d.Amount != amount || d.SourceSeat != attack.SourceSeat || d.TargetSeat != attack.TargetSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KenshangDamageEvent>().Any(e => e.DamageFrameId == damageId))
             throw new InvalidOperationException("Kenshang damage requires the exact once-applied native use damage, including its real chain propagation.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KenshangDamageEvent(use.Id, r.ActionId, damageId, attack.SourceSeat, attack.TargetSeat, amount, attack.IsChainPropagation));
     }
 
-    internal int KenshangDamageTotal(CardUseFrame use) => _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangDamageEvent>().Where(e => e.UseId == use.Id && e.ActionId == use.Kenshang!.ActionId).Sum(e => e.Amount);
+    internal int KenshangDamageTotal(CardUseFrame use) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KenshangDamageEvent>().Where(e => e.UseId == use.Id && e.ActionId == use.Kenshang!.ActionId).Sum(e => e.Amount);
     internal int[] KenshangLegalTargets(CardUseFrame use)
     {
         var action = use.Action!;

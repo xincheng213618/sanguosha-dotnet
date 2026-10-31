@@ -211,7 +211,7 @@ internal sealed partial class CoreGameEngineStrategicProgramsRuntime
                 PublishStrategicPrompt(frame);
                 return SkillProgramStepOutcome.AwaitChoice;
             case SkillProgramEffectOp.SelectOneSelectedTarget:
-                if (_coreNamedAcquisitionObserversOperations.HasLostHpTargetSelection(frame))
+                if (_coreNamedAcquisitionObserversOperations.Value.HasLostHpTargetSelection(frame))
                 {
                     var live = frame.SelectedTargetSeats.Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive).ToArray();
                     if (live.Length == 0)
@@ -333,9 +333,9 @@ internal sealed partial class CoreGameEngineStrategicProgramsRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { StrategicDraft = null });
             var cardId = choice.Cards.Single();
             if (draft.Op == SkillProgramEffectOp.DiscardHandOrUseEquipment)
-                _characterCaoRenBoundaryOperations.ResolveDiscardHandOrUseEquipment(frame, cardId);
+                _characterCaoRenBoundaryOperations.Value.ResolveDiscardHandOrUseEquipment(frame, cardId);
             else
-                _characterCaoRenBoundaryOperations.ResolveMoveFieldEquipment(frame, cardId);
+                _characterCaoRenBoundaryOperations.Value.ResolveMoveFieldEquipment(frame, cardId);
             return;
         }
         else if (draft.Op == SkillProgramEffectOp.SuppressGeneralSkill)

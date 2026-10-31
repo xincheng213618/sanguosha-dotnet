@@ -8,7 +8,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         if (p is null)
             return;
-        if (!ValidWeijiePayment(p) || _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieAttemptResolvedEvent>().Count(e => e.FrameId == p.AttemptId && e.Matched && e.NativeLegal) != 1 || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.CardKind != p.OutputKind || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActorSeat != p.Need.ActorSeat || a.ProviderSeat != p.Need.ProviderSeat || a.RequesterSeat != p.Need.RequesterSeat || a.ConversionChain is not [var source] || source != p.Source || !use.TargetSeats.SequenceEqual([p.TargetSeat]) && !(p.OutputKind == CardKind.Alcohol && use.TargetSeats.Count == 0) || _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieUseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId) || _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieResponseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId))
+        if (!ValidWeijiePayment(p) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieAttemptResolvedEvent>().Count(e => e.FrameId == p.AttemptId && e.Matched && e.NativeLegal) != 1 || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.CardKind != p.OutputKind || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActorSeat != p.Need.ActorSeat || a.ProviderSeat != p.Need.ProviderSeat || a.RequesterSeat != p.Need.RequesterSeat || a.ConversionChain is not [var source] || source != p.Source || !use.TargetSeats.SequenceEqual([p.TargetSeat]) && !(p.OutputKind == CardKind.Alcohol && use.TargetSeats.Count == 0) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieUseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieResponseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId))
             throw new InvalidOperationException("Weijie cannot issue a second zero-entity basic or change its real payer, actor or original native target.");
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { WeijieOrigin = p });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WeijieUseIssuedEvent(p.AttemptId, use.Id, a.ActionId, a.ActorSeat, a.ProviderSeat, a.RequesterSeat, p.OutputKind));
@@ -31,10 +31,10 @@ internal sealed partial class CharacterGuoTuOlRuntime
             a = fire.OriginalAction;
         }
 
-        return (use.CardKind == p.OutputKind || use.CurrentSlashFirePolicy is not null && CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind)) && a.EffectiveKind == p.OutputKind && a.ConversionChain is [var source] && source == p.Source && a.ProviderSeat == p.Need.ProviderSeat && a.RequesterSeat == p.Need.RequesterSeat && a.ResponderSeat is null && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed is null && WeijieIssuedActorMatches(use, p) && _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieAttemptResolvedEvent>().Count(e => e.FrameId == p.AttemptId && e.Matched && e.NativeLegal) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieUseIssuedEvent>().Where(e => e.AttemptId == p.AttemptId).ToArray()is [var issued] && issued.UseId == use.Id && issued.ActionId == a.ActionId && issued.ActorSeat == p.Need.ActorSeat && issued.ProviderSeat == p.Need.ProviderSeat && issued.RequesterSeat == p.Need.RequesterSeat && issued.OutputKind == p.OutputKind;
+        return (use.CardKind == p.OutputKind || use.CurrentSlashFirePolicy is not null && CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind)) && a.EffectiveKind == p.OutputKind && a.ConversionChain is [var source] && source == p.Source && a.ProviderSeat == p.Need.ProviderSeat && a.RequesterSeat == p.Need.RequesterSeat && a.ResponderSeat is null && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed is null && WeijieIssuedActorMatches(use, p) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieAttemptResolvedEvent>().Count(e => e.FrameId == p.AttemptId && e.Matched && e.NativeLegal) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieUseIssuedEvent>().Where(e => e.AttemptId == p.AttemptId).ToArray()is [var issued] && issued.UseId == use.Id && issued.ActionId == a.ActionId && issued.ActorSeat == p.Need.ActorSeat && issued.ProviderSeat == p.Need.ProviderSeat && issued.RequesterSeat == p.Need.RequesterSeat && issued.OutputKind == p.OutputKind;
     }
 
-    internal bool WeijieIssuedActorMatches(CardUseFrame use, WeijiePaidOrigin p) => _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, p.Need.ActorSeat, p.Need.ProviderSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == p.Need.ActorSeat && use.Action?.ActorSeat == p.Need.ActorSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Any(e => e.CardUseFrameId == use.Id);
+    internal bool WeijieIssuedActorMatches(CardUseFrame use, WeijiePaidOrigin p) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, p.Need.ActorSeat, p.Need.ProviderSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == p.Need.ActorSeat && use.Action?.ActorSeat == p.Need.ActorSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Any(e => e.CardUseFrameId == use.Id);
     internal Card WeijieRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } u && IsIssuedWeijieUse(u) ? new(0, u.CardKind, Suit.None, 0) : throw new InvalidOperationException("Weijie representation requires its exact once-paid native zero use.");
     internal void DispatchWeijie(WeijiePaidOrigin p)
     {
@@ -181,7 +181,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
             faction.ActiveAttack = attack;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         if (counts && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && actor.Seat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat && actual.UnlimitedUse != true && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, p.Source))
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
@@ -263,7 +263,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         if (use.WeijieOrigin is not { } p)
             return;
-        if (!IsIssuedWeijieUse(use) || _resolutionStackOperations._resolutionStack.Any(f => f.Id == use.Id) || _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieUseReturnedEvent>().Any(e => e.AttemptId == p.AttemptId))
+        if (!IsIssuedWeijieUse(use) || _resolutionStackOperations._resolutionStack.Any(f => f.Id == use.Id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieUseReturnedEvent>().Any(e => e.AttemptId == p.AttemptId))
             throw new InvalidOperationException("Weijie native return is not its exact once completed use.");
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == p.Need.OwnerFrameId)is ProgramSkillFrame { WeijieReturn: { } r } parent && r.Origin == p && r.UseId == use.Id)
             _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { WeijieReturn = r with { Returned = true } });
@@ -275,7 +275,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WeijieReturn: { Returned: true } r } parent || parent.Id != id)
             return false;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<WeijieUseReturnedEvent>().Count(e => e.AttemptId == r.Origin.AttemptId && e.UseId == r.UseId && e.ActionId == r.ActionId) != 1)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieUseReturnedEvent>().Count(e => e.AttemptId == r.Origin.AttemptId && e.UseId == r.UseId && e.ActionId == r.ActionId) != 1)
             throw new InvalidOperationException("Weijie caller lost its once-completed typed return.");
         if (_characterSunYuanOlOperations.TryGetSayingSlashRequest(parent, out _, out _) || parent.Chanshuang is not null || parent.WuJing is not null || parent.LvKuangLvXiang is not null || parent.CaoChun is not null || parent.KeBiNengPingduan is not null)
             return false;

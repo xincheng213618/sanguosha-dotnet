@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
             return;
         // Cleanup movement windows may run after the whole native Use has popped.
         // Freeze its exact proof while that original frame still owns the batch.
-        foreach (var m in batch.Movements.Where(m => _coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(batch, m) && action.PhysicalCards.Any(c => c.CardId == m.CardId) && SourceDingxiDamageCard(m.CardKind)))
+        foreach (var m in batch.Movements.Where(m => _coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, m) && action.PhysicalCards.Any(c => c.CardId == m.CardId) && SourceDingxiDamageCard(m.CardKind)))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SourceDingxiDiscardQualifiedEvent(batch.Id, use.Id, action.ActionId, action.ActorSeat, m.CardId, m.Sequence));
     }
 
@@ -31,7 +31,7 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
     {
         if (context is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { ParentFrameId: { } parent } batch })
             return[];
-        return batch.Movements.Where(m => m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && SourceDingxiDamageCard(m.CardKind) && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile && _coreProgramEventHistoryOperations.ProgramEventHistory<SourceDingxiDiscardQualifiedEvent>().Count(e => e.BatchId == batch.Id && e.OriginalUseId == parent && e.OwnerSeat == owner && e.CardId == m.CardId && e.DiscardSequence == m.Sequence) == 1).Select(m => m.CardId).Distinct().ToArray();
+        return batch.Movements.Where(m => m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && SourceDingxiDamageCard(m.CardKind) && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SourceDingxiDiscardQualifiedEvent>().Count(e => e.BatchId == batch.Id && e.OriginalUseId == parent && e.OwnerSeat == owner && e.CardId == m.CardId && e.DiscardSequence == m.Sequence) == 1).Select(m => m.CardId).Distinct().ToArray();
     }
 
     internal GameEngine.SourceDingxiUsePlan? SourceDingxiPlan(int owner, int id, int target)
@@ -64,7 +64,7 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
         if (ids.Length == 0)
             return SkillProgramStepOutcome.Continue;
         var batch = f.WindowContext!.MovementBatch!;
-        var original = _coreProgramEventHistoryOperations.ProgramEventHistory<SourceDingxiDiscardQualifiedEvent>().First(e => e.BatchId == batch.Id && e.OwnerSeat == f.OwnerSeat && ids.Contains(e.CardId));
+        var original = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SourceDingxiDiscardQualifiedEvent>().First(e => e.BatchId == batch.Id && e.OwnerSeat == f.OwnerSeat && ids.Contains(e.CardId));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SourceDingxi = new(batch.Id, original.OriginalUseId, original.OriginalActionId, left, Array.AsReadOnly(ids), SourceDingxiStage.Choose) });
         var choices = ids.Select(id => new PromptChoice(new ChoiceId($"source-dingxi.{(f.Id)}.{(id)}"), $"对左侧角色使用【{(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).DisplayName)}】", [id], [left], new Dictionary<string, string> { ["program-action"] = "source-dingxi-card" })).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { Step = ResolutionFrameStep.AwaitingResponse });

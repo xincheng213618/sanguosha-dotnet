@@ -17,7 +17,7 @@ internal sealed partial class CharacterYanJunOlRuntime
             if (action is null)
                 continue;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SettledActionCardDiscardEvent(batchId, movement.Sequence, movement.CardId, action.ActorSeat, turnNumber));
-            _characterZhaoYanOlOperations.CaptureTongxieSettledSlashUse(batchId, movement);
+            _characterZhaoYanOlOperations.Value.CaptureTongxieSettledSlashUse(batchId, movement);
         }
     }
 

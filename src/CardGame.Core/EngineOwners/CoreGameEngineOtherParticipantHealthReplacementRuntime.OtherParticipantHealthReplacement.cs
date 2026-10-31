@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineOtherParticipantHealthReplacementRun
 {
     internal bool TryGetOtherParticipantHpReplacement(GameEngine.IDamageAttempt attack, out CardUseEffectSource source)
     {
-        if (_coreGuanduGeneralQualificationOperations.TryGetGuanduIncomingHpReplacement(attack, out source))
+        if (_coreGuanduGeneralQualificationOperations.Value.TryGetGuanduIncomingHpReplacement(attack, out source))
             return true;
         source = null !;
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss) || attack.IsSourceLess || attack.IsDelayedJudgmentDamage || attack.SourceSeat == attack.TargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat) || !_coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive || attack.DamageAmount <= 0)

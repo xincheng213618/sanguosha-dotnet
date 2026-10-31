@@ -15,7 +15,7 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
         projection.Append(HasMoLuBuQi(cardId) ? "炁" : null);
     }
 
-    internal bool HasMoLuBuQi(int id) => HasMoLuBu && id > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuQiMarkedEvent>().Any(e => e.CardId == id);
+    internal bool HasMoLuBuQi(int id) => HasMoLuBu && id > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuQiMarkedEvent>().Any(e => e.CardId == id);
     internal ProgramLifecycleTriggerWindowFrame CaptureMoLuBuInitialQi(ProgramLifecycleTriggerWindowFrame f)
     {
         if (!HasMoLuBu || f.Window != SkillProgramTriggerWindow.GameStarting || f.Continuation != ProgramLifecycleContinuation.CompleteGameStarting)
@@ -27,13 +27,13 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     }
 
     internal bool MoLuBuQiZone(CardLocation location) => location.Zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment or CardZoneKind.DrawPile or CardZoneKind.DiscardPile;
-    internal IReadOnlyList<MoLuBuQiCandidate> MoLuBuQiCandidates(int original) => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuQiMarkedEvent>().Where(e => e.OriginalOwnerSeat == original).DistinctBy(e => e.CardId).Select(e => new MoLuBuQiCandidate(e.CardId, _cardZonesOperations._cardZones.GetLocation(e.CardId))).Where(e => MoLuBuQiZone(e.From)).ToArray());
+    internal IReadOnlyList<MoLuBuQiCandidate> MoLuBuQiCandidates(int original) => Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuQiMarkedEvent>().Where(e => e.OriginalOwnerSeat == original).DistinctBy(e => e.CardId).Select(e => new MoLuBuQiCandidate(e.CardId, _cardZonesOperations._cardZones.GetLocation(e.CardId))).Where(e => MoLuBuQiZone(e.From)).ToArray());
     internal bool MoLuBuLastUseWasQi(int actor) => _coreCommandJournalStorageEventsPendingEventsAccess._events.Select(e => e.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents).LastOrDefault(e => e is MoLuBuActualUseQiEvent used && used.ActorSeat == actor || e is MoLuBuLegacyDuelUseEvent duel && duel.ActorSeat == actor)is MoLuBuActualUseQiEvent { IsQi: true };
     internal void CaptureMoLuBuLegacyDuel(ProgramSkillFrame frame, int actor)
     {
         if (!HasMoLuBu)
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuLegacyDuelUseEvent>().Any(e => e.ProducerFrameId == frame.Id && e.InstructionIndex == frame.InstructionIndex))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuLegacyDuelUseEvent>().Any(e => e.ProducerFrameId == frame.Id && e.InstructionIndex == frame.InstructionIndex))
             throw new InvalidOperationException("A native direct Duel cannot update the Gangquan use prefix twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoLuBuLegacyDuelUseEvent(frame.Id, frame.InstructionIndex, actor));
     }
@@ -44,7 +44,7 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
         if (!HasMoLuBu)
             return;
         var action = fact is CardUseDeclaredEvent declaration ? _coreCardUseLifecycleOperations.LifecycleCardUse(declaration.ResolutionId)?.Action : fact is CardActionAcceptedEvent accepted ? accepted.Action : null;
-        if (action is null || !IsMoLuBuTrueUse(action) || _coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuActualUseQiEvent>().Any(e => e.ActionId == action.ActionId))
+        if (action is null || !IsMoLuBuTrueUse(action) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuActualUseQiEvent>().Any(e => e.ActionId == action.ActionId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoLuBuActualUseQiEvent(action.ActionId, action.ActorSeat, action.PhysicalCards.Any(c => HasMoLuBuQi(c.CardId))));
     }
@@ -52,9 +52,9 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     internal bool IsMoLuBuTrueUse(CardActionContext action) => action.Type == CardActionType.Use || action.EffectiveKind == CardKind.Nullification && _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.NullificationResponse) || _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } incoming } attack } && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == action.ActorSeat;
     internal SkillProgramStepOutcome InitializeMoLuBu(ProgramSkillFrame f)
     {
-        if (f.SkillId != MoLuBuComposition.Duoqi || f.TriggerId != "initial-qi-opening-play" || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { MoLuBuInitialQi: { } initial } || _coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
+        if (f.SkillId != MoLuBuComposition.Duoqi || f.TriggerId != "initial-qi-opening-play" || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { MoLuBuInitialQi: { } initial } || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Duoqi needs its one actual opening-Hand snapshot.");
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuQiMarkedEvent>().Any())
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuQiMarkedEvent>().Any())
             foreach (var card in initial)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoLuBuQiMarkedEvent(f.Id, card.OriginalOwnerSeat, card.CardId, card.PrintedKind, card.EntrySequence));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoLuBuInitializedEvent(f.Id, MoLuBuSource(f), f.GameplayHash, c.ParentFrameId));
@@ -62,7 +62,7 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 30800, SkillProgramEffectOp.ResolveMoLuBuDuoqi)]
-    internal bool CanOfferMoDuoqi(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.SourceSeat == candidate.OwnerSeat && c.TargetSeat is { } victim && _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent).OfType<DamageAppliedEvent>().Count(e => !e.SourceLess && e.SourceSeat == candidate.OwnerSeat && e.TargetSeat == victim) == 1 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuStartedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Operation == SkillProgramEffectOp.ResolveMoLuBuDuoqi && e.OriginalOwnerSeat == victim && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber);
+    internal bool CanOfferMoDuoqi(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.SourceSeat == candidate.OwnerSeat && c.TargetSeat is { } victim && _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent).OfType<DamageAppliedEvent>().Count(e => !e.SourceLess && e.SourceSeat == candidate.OwnerSeat && e.TargetSeat == victim) == 1 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuStartedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.Operation == SkillProgramEffectOp.ResolveMoLuBuDuoqi && e.OriginalOwnerSeat == victim && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber);
     internal SkillProgramStepOutcome BeginMoDuoqi(ProgramSkillFrame f)
     {
         var c = f.WindowContext ?? throw new InvalidOperationException("Duoqi needs native damage.");

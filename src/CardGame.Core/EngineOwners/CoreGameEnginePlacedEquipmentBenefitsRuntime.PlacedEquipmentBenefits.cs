@@ -98,7 +98,7 @@ internal sealed partial class CoreGameEnginePlacedEquipmentBenefitsRuntime
     [ProgramAnswer("placed-equipment-benefit")]
     internal void ResolvePlacedEquipmentChoice(PromptChoice selected)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !_corePlacedEquipmentBenefitObserversOperations.ValidPlacedEquipmentBenefit(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != f.OwnerSeat || !PlacedEquipmentChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets)))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !_corePlacedEquipmentBenefitObserversOperations.Value.ValidPlacedEquipmentBenefit(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != f.OwnerSeat || !PlacedEquipmentChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets)))
             throw new InvalidOperationException("Equipment placement requires the exact published private choice.");
         var r = f.PlacedEquipmentBenefit!;
         var step = selected.Parameters["step"];
@@ -195,7 +195,7 @@ internal sealed partial class CoreGameEnginePlacedEquipmentBenefitsRuntime
     {
         if (f.PlacedEquipmentBenefit is null)
             return false;
-        if (f.PendingMovementContinuation is null || !_corePlacedEquipmentBenefitObserversOperations.ValidPlacedEquipmentBenefit(f))
+        if (f.PendingMovementContinuation is null || !_corePlacedEquipmentBenefitObserversOperations.Value.ValidPlacedEquipmentBenefit(f))
             throw new InvalidOperationException("Equipment benefit lost its paid movement.");
         ContinuePlacedEquipmentMovement(f);
         return true;
@@ -206,7 +206,7 @@ internal sealed partial class CoreGameEnginePlacedEquipmentBenefitsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.PlacedEquipmentBenefit is not { } r)
             return false;
-        if (!_corePlacedEquipmentBenefitObserversOperations.ValidPlacedEquipmentBenefit(f))
+        if (!_corePlacedEquipmentBenefitObserversOperations.Value.ValidPlacedEquipmentBenefit(f))
             throw new InvalidOperationException("Equipment benefit lost its exact original candidate and payment.");
         if (f.PendingMovementContinuation is not null)
         {

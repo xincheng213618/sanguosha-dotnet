@@ -24,7 +24,7 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
             return false;
         if (r.StartingSeat is null)
             return r.Stage == MouZhenJiLuoshenStage.StartingSeat && r.Seats.Count == 0 && r.Cursor == 0;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhenJiLuoshenStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.TurnNumber == r.TurnNumber && e.TurnOwnerSeat == r.TurnOwnerSeat && e.StartingSeat == r.StartingSeat && e.Count == r.Seats.Count) == 1 && r.Seats.Select((s, i) => new MouZhenJiLuoshenSeatQueuedEvent(f.Id, i, s)).All(e => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhenJiLuoshenSeatQueuedEvent>().Count(v => v == e) == 1);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhenJiLuoshenStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.TurnNumber == r.TurnNumber && e.TurnOwnerSeat == r.TurnOwnerSeat && e.StartingSeat == r.StartingSeat && e.Count == r.Seats.Count) == 1 && r.Seats.Select((s, i) => new MouZhenJiLuoshenSeatQueuedEvent(f.Id, i, s)).All(e => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhenJiLuoshenSeatQueuedEvent>().Count(v => v == e) == 1);
     }
 
     internal IReadOnlyList<PromptChoice> MouZhenJiLuoshenChoices(ProgramSkillFrame f)

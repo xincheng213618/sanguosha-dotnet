@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNextActualTurnStartSkillGrantsRuntime
 {
-    internal bool HasNextActualTurnStartSkillGrantExpired(SkillGrant grant) => grant.NextActualTurnStartExpiry is { } expiry && _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Any(started => started.ActorSeat == expiry.RecipientSeat && started.TurnNumber > expiry.GrantedTurnNumber);
+    internal bool HasNextActualTurnStartSkillGrantExpired(SkillGrant grant) => grant.NextActualTurnStartExpiry is { } expiry && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Any(started => started.ActorSeat == expiry.RecipientSeat && started.TurnNumber > expiry.GrantedTurnNumber);
     internal (CharacterState Recipient, SkillGrant Grant)[] NextActualTurnStartSkillGrantsDue(TurnStartedEvent started) => _coreMatchParticipantsPlayersAccess._players.OrderBy(player => player.Seat).SelectMany(recipient => recipient.SkillGrants.Grants.Where(grant => grant.NextActualTurnStartExpiry is { } expiry && expiry.RecipientSeat == recipient.Seat && recipient.Seat == started.ActorSeat && expiry.GrantedTurnNumber < started.TurnNumber).Select(grant => (Recipient: recipient, Grant: grant))).ToArray();
     internal static void RequireIssuedNextActualTurnStartSkillGrant(int recipientSeat, SkillGrant grant, IReadOnlyList<IGameEvent> history) => RuntimeSkills.RuntimeRules_Core_NextActualTurnStartSkillGrants.RequireIssuedNextActualTurnStartSkillGrant(recipientSeat, grant, history);
     // No binding-backed state may carry an expired skill into this new turn.

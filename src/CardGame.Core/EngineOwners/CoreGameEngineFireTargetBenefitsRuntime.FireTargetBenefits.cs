@@ -9,16 +9,16 @@ internal sealed partial class CoreGameEngineFireTargetBenefitsRuntime
     {
         if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.DrawFireTargetAndGrantTurnUseQuota))
             return true;
-        if (context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.SourceSeat != candidate.OwnerSeat || context.TargetSeat is not { } target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || damage.Id != context.ParentFrameId || damage.ParentFrameId != context.DamageFrameId)
+        if (context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.SourceSeat != candidate.OwnerSeat || context.TargetSeat is not { } target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } damage || damage.Id != context.ParentFrameId || damage.ParentFrameId != context.DamageFrameId)
             return false;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage);
         return attack.DamageWasApplied && attack.DamageAmount > 0 && !attack.IsSourceLess && attack.SourceSeat == candidate.OwnerSeat && attack.TargetSeat == target && _coreNativeCardClassificationsOperations.GetDamageNature(attack) == DamageNature.Fire;
     }
 
     internal SkillProgramStepOutcome BeginFireTargetBenefit(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.FireTargetBenefit is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.TargetSeat is not { } target || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || damage.Id != c.ParentFrameId || damage.ParentFrameId != c.DamageFrameId || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || !CanRunFireTargetBenefit(damage.Candidates[damage.CandidateIndex].ToProgramCandidate(), _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
+        if (f.FireTargetBenefit is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } c || c.TargetSeat is not { } target || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } damage || damage.Id != c.ParentFrameId || damage.ParentFrameId != c.DamageFrameId || damage.CandidateIndex < 0 || damage.CandidateIndex >= damage.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, damage.Candidates[damage.CandidateIndex].ToProgramCandidate()) || !CanRunFireTargetBenefit(damage.Candidates[damage.CandidateIndex].ToProgramCandidate(), _coreProgramLifecycleOperations.GetProgramTrigger(f), c))
             throw new InvalidOperationException("The fire-target benefit lost its exact actual applied-damage candidate.");
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             return SkillProgramStepOutcome.Continue;
@@ -41,7 +41,7 @@ internal sealed partial class CoreGameEngineFireTargetBenefitsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { FireTargetBenefit: { } r } f || f.Id != id)
             return false;
-        _coreFireTargetBenefitObserversOperations.AssertFireTargetBenefit(f);
+        _coreFireTargetBenefitObserversOperations.Value.AssertFireTargetBenefit(f);
         if (f.PendingMovementContinuation is not null)
         {
             if (!TryDrainFireTargetMovement(f))
@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineFireTargetBenefitsRuntime
     {
         if (f.FireTargetBenefit is null)
             return false;
-        _coreFireTargetBenefitObserversOperations.AssertFireTargetBenefit(f);
+        _coreFireTargetBenefitObserversOperations.Value.AssertFireTargetBenefit(f);
         if (TryDrainFireTargetMovement(f))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = null });
@@ -79,5 +79,5 @@ internal sealed partial class CoreGameEngineFireTargetBenefitsRuntime
         return true;
     }
     SkillProgramStepOutcome IFireTargetBenefitProgramHost.DrawFireTargetAndGrantTurnUseQuota(ProgramSkillFrame f) => BeginFireTargetBenefit(f);
-    SkillProgramStepOutcome IFireTargetBenefitProgramHost.LoseSkillsAndObtainNamedCard(ProgramSkillFrame f, SkillProgramEffect e) => _coreNamedCardAcquisitionsOperations.BeginNamedCardAcquisition(f, e);
+    SkillProgramStepOutcome IFireTargetBenefitProgramHost.LoseSkillsAndObtainNamedCard(ProgramSkillFrame f, SkillProgramEffect e) => _coreNamedCardAcquisitionsOperations.Value.BeginNamedCardAcquisition(f, e);
 }

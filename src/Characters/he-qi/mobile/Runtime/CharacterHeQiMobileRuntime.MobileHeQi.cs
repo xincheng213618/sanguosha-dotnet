@@ -6,7 +6,7 @@ internal sealed partial class CharacterHeQiMobileRuntime
     internal const string MobileHeQiAction = "mobile-he-qi-view";
     internal static CardConversionSource MobileHeQiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     SkillProgramStepOutcome IMobileHeQiHost.View(ProgramSkillFrame f) => BeginMobileHeQiView(f);
-    internal bool MobileHeQiOriginal(ProgramSkillFrame f) => f.SkillId == MobileHeQiComposition.Skill && f.TriggerId is null && f.ActivationId == MobileHeQiComposition.Activation && f.InstructionIndex == 3 && f.SelectedCardIds.Count == 1 && f.SelectedTargetSeats is [var target] && target != f.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == SkillProgramEffectOp.ResolveMobileHeQiShanxiView && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.ActivationId == f.ActivationId) == 1;
+    internal bool MobileHeQiOriginal(ProgramSkillFrame f) => f.SkillId == MobileHeQiComposition.Skill && f.TriggerId is null && f.ActivationId == MobileHeQiComposition.Activation && f.InstructionIndex == 3 && f.SelectedCardIds.Count == 1 && f.SelectedTargetSeats is [var target] && target != f.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == SkillProgramEffectOp.ResolveMobileHeQiShanxiView && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.ActivationId == f.ActivationId) == 1;
     internal NativeLogicalDiscardMaterialCompletedEvent? MobileHeQiDiscard(ProgramSkillFrame f, out NativeLogicalDiscardInvocationRecordedEvent? invoice)
     {
         invoice = null;
@@ -15,10 +15,10 @@ internal sealed partial class CharacterHeQiMobileRuntime
         var selected = f.CardSetBindings.SingleOrDefault(b => b.Name == MobileHeQiComposition.DiscardBind);
         if (selected?.CardIds is not [var id])
             return null;
-        var invocations = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(i => i.ParentFrameId == f.Id && i.InitiatorSeat == f.OwnerSeat && i.ExecutorSeat == f.OwnerSeat && i.ActualCount == 1 && i.Reason.Value == "skill-program." + f.SkillId + ".SelectAndMoveOwnedCard").ToArray();
+        var invocations = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(i => i.ParentFrameId == f.Id && i.InitiatorSeat == f.OwnerSeat && i.ExecutorSeat == f.OwnerSeat && i.ActualCount == 1 && i.Reason.Value == "skill-program." + f.SkillId + ".SelectAndMoveOwnedCard").ToArray();
         if (invocations is not [var exact])
             return null;
-        var material = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == exact.InvocationId && e.CardId == id && e.From.OwnerSeat == f.SelectedTargetSeats[0] && e.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment).ToArray();
+        var material = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == exact.InvocationId && e.CardId == id && e.From.OwnerSeat == f.SelectedTargetSeats[0] && e.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment).ToArray();
         if (material is not [var paid] || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == paid.CardId && m.Sequence == paid.CompletionSequence && m.Sequence > exact.SequenceBefore && m.Sequence <= exact.SequenceAfter))
             return null;
         invoice = exact;
@@ -70,7 +70,7 @@ internal sealed partial class CharacterHeQiMobileRuntime
     {
         if (f.MobileHeQiView is not { } r || !MobileHeQiOriginal(f) || r.Source != MobileHeQiSource(f) || r.Hash != f.GameplayHash || r.Target != f.SelectedTargetSeats[0] || MobileHeQiDiscard(f, out var invoice)is not { } paid || r.InvocationId != invoice!.InvocationId || r.CardId != paid.CardId || r.From != paid.From || r.DiscardedKind != _coreAdvancedLifecycleOperations.GetAdvancedCard(paid.CardId).Kind || r.Viewer != (r.DiscardedKind == CardKind.Dodge ? f.OwnerSeat : r.Target) || r.Holder != (r.DiscardedKind == CardKind.Dodge ? r.Target : f.OwnerSeat) || r.Hand.Distinct().Count() != r.Hand.Count || !r.Hand.SequenceEqual(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.Holder]).Select(c => c.Id)))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MobileHeQiHandViewedEvent>().Count(e => e == new MobileHeQiHandViewedEvent(f.Id, r.Source, r.InvocationId, r.CardId, r.DiscardedKind, r.Viewer, r.Holder, r.Hand.Count)) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileHeQiHandViewedEvent>().Count(e => e == new MobileHeQiHandViewedEvent(f.Id, r.Source, r.InvocationId, r.CardId, r.DiscardedKind, r.Viewer, r.Holder, r.Hand.Count)) == 1;
     }
 
     internal bool HasMobileHeQiPrompt() => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MobileHeQiView: { } r, Step: ResolutionFrameStep.AwaitingResponse } f && ValidMobileHeQiView(f) && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && p.PlayerSeat == r.Viewer && p.SourceSeat == f.OwnerSeat && p.TargetSeat == r.Holder && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, [MobileHeQiConfirm(f)]);

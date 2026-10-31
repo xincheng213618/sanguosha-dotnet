@@ -283,7 +283,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = null;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        var responseCosts = _coreResponseCompletionZhangbaOperations.CaptureZhangbaResponseCompletionCosts(provider, pair);
+        var responseCosts = _coreResponseCompletionZhangbaOperations.Value.CaptureZhangbaResponseCompletionCosts(provider, pair);
         _coreNativeGroupResponsesOperations.MoveZhangbaResponseCards(provider, pair, pending.ResolutionId, responseOpponentSeat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashResolvedEvent(pending.ResolutionId, owner.Seat, Succeeded: true, provider.Seat, pair[0].Id, CardKind.Slash, IsActiveUse: false));
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(owner.Seat, CardKind.Slash);

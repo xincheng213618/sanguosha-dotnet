@@ -24,7 +24,7 @@ internal sealed partial class CoreGameEngineBaguaResponsesRuntime
         var defense = _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense;
         var responder = _coreMatchParticipantsPlayersAccess._players[defense?.CurrentCandidateSeat ?? attack.TargetSeat];
         var cards = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(responder, CardKind.Dodge);
-        if (defense is null && _coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(attack)is { } requireRed)
+        if (defense is null && _coreConvertedSlashResponseOperations.Value.ConvertedSlashSameColorResponseColor(attack)is { } requireRed)
             cards = cards.Where(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(responder, card)) == requireRed).ToList();
         if (defense is null)
             _coreNativeResponseWindowsOperations.PushResponseWindow(attack.ResolutionId, attack.SourceSeat, responder.Seat, attack.EffectiveCardKind ?? CardKind.Slash, CardKind.Dodge);

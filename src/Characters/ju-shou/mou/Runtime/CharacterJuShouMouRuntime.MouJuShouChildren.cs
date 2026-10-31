@@ -19,7 +19,7 @@ internal sealed partial class CharacterJuShouMouRuntime
         if (r.Stage == MouJuShouStage.HealthChildren)
         {
             if (child is HpChangedTriggerWindowFrame hp)
-                return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Loss && hp.Change.SourceSeat is null && hp.Change.TargetSeat == r.Actor && hp.Change.Amount == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(e => e.FrameId == f.Id && e.TargetSeat == r.Actor && e.Amount == 1);
+                return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Loss && hp.Change.SourceSeat is null && hp.Change.TargetSeat == r.Actor && hp.Change.Amount == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(e => e.FrameId == f.Id && e.TargetSeat == r.Actor && e.Amount == 1);
             if (child is DyingFrame dying)
                 return dying.ParentFrameId == f.Id && dying.VictimSeat == r.Actor && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreGameEngineHpChangeProgramsPendingHpChangesAccess._pendingHpChanges.Any(p => p.ParentFrameId == f.Id && p.Kind == HpChangeKind.Loss && p.TargetSeat == r.Actor && p.Amount == 1);
         }
@@ -32,14 +32,14 @@ internal sealed partial class CharacterJuShouMouRuntime
                 return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.TargetSeat == r.Actor;
         }
 
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
+        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
     internal bool MouJsEdge(int i) => MouJsDeclarationEdge(i) || _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && MouJsFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal bool MouJsSuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterJuShouMouOperations.MouJsEdge(i), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? MouJsObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterJuShouMouOperations.MouJsFirstChild(f, c), (n) => _characterJuShouMouOperations.MouJsSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36900)]
-    internal bool MouJsDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouJsObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
+    internal bool MouJsDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && MouJsObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36900)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 36900)]
     internal bool MouJsRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame rr)

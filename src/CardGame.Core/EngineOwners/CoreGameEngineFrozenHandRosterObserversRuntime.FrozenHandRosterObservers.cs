@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineFrozenHandRosterObserversRuntime
 {
     internal bool FrozenHandRosterFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
-        if (f.FrozenHandRoster is not { } r || !_coreFrozenHandRosterOperations.ValidFrozenHandRoster(f))
+        if (f.FrozenHandRoster is not { } r || !_coreFrozenHandRosterOperations.Value.ValidFrozenHandRoster(f))
             return false;
         if (r.Stage == "movement" && f.PendingMovementContinuation is not null && child is CardsMovedTriggerWindowFrame moved)
             return moved.ResumeProgramFrameId is null && moved.Batch.ParentFrameId == f.Id && moved.Batch.AwaitingProgramFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
@@ -17,5 +17,5 @@ internal sealed partial class CoreGameEngineFrozenHandRosterObserversRuntime
     internal bool TryAdvanceFrozenHandRosterSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && FrozenHandRosterObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 530)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 550)]
-    internal bool CanContinueFrozenHandRoster(ProgramSkillFrame f) => f.FrozenHandRoster is { Stage: "movement" or "damage-issued" } && _coreFrozenHandRosterOperations.ValidFrozenHandRoster(f);
+    internal bool CanContinueFrozenHandRoster(ProgramSkillFrame f) => f.FrozenHandRoster is { Stage: "movement" or "damage-issued" } && _coreFrozenHandRosterOperations.Value.ValidFrozenHandRoster(f);
 }

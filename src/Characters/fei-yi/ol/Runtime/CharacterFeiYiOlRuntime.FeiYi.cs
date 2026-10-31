@@ -201,7 +201,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26600)]
-    internal bool ContinuePaidFeiYi(ProgramSkillFrame f) => f.FeiYi is { Paid: true } r && _coreProgramEventHistoryOperations.ProgramEventHistory<FeiYiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
+    internal bool ContinuePaidFeiYi(ProgramSkillFrame f) => f.FeiYi is { Paid: true } r && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeiYiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.YanruParityDrawDiscard, SkillProgramEffectOp.RevealSingletonAndArmRankEffects)]
     internal PromptChoice AiFeiYi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "finish") ?? p.Choices.Where(c => c.Parameters["branch"] != "unpick").OrderBy(c => c.Cards.Count == 0 ? 0 : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
 }

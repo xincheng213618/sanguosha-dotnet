@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiangChongOlRuntime
 {
-    internal bool MuzhenUsed(int owner, string branch, long token) => _coreProgramEventHistoryOperations.ProgramEventHistory<XiangChongBranchPaidEvent>().Any(e => e.OwnerSeat == owner && e.Branch == branch && e.PhaseToken == token);
+    internal bool MuzhenUsed(int owner, string branch, long token) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiangChongBranchPaidEvent>().Any(e => e.OwnerSeat == owner && e.Branch == branch && e.PhaseToken == token);
     internal bool MuzhenTarget(ProgramSkillFrame? f, int owner, int target, string branch) => target != owner && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && (branch == "gift" ? _corePhysicalOwnedCardQueriesOperations.GetEquipment2(target).Count > 0 && XiangOwned(owner, f).Count >= 2 : XiangOwned(owner, f).Any(c => _coreEquipmentContentOperations.EquipmentRules.IsEquipment(c.Kind) && _coreEquipmentPlacementAndHpPairOperations.CanPlaceOwnedEquipment(owner, target, _coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId), c.From)));
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 27140, SkillProgramEffectOp.ResolveMuzhenExchange)]
     internal bool AllowsMuzhen(ProgramActivationLegalityContext gate) => XiangPlayToken(gate.OwnerSeat)is> 0 and var token && gate.Activation.Effects is [{ StateId: { } branch }] && !MuzhenUsed(gate.OwnerSeat, branch, token) && _coreMatchParticipantsPlayersAccess._players.Any(t => MuzhenTarget(null, gate.OwnerSeat, t.Seat, branch));

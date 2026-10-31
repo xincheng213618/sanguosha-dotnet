@@ -18,7 +18,7 @@ internal sealed partial class CoreGameEngineProgramTurnPhaseRuntime
         _coreShanheS5ShensuOperations.RecordShanheS5PhaseSkipCost(active, phases, parent);
         if (actualDraw && parent.ResumeDrawPhaseObligationFrameId is not null)
         {
-            _coreAlternativePhaseCostProgramsOperations.RecordAlternativePhaseSkip(active, phases);
+            _coreAlternativePhaseCostProgramsOperations.Value.RecordAlternativePhaseSkip(active, phases);
             return SkillProgramStepOutcome.Continue;
         }
 
@@ -30,7 +30,7 @@ internal sealed partial class CoreGameEngineProgramTurnPhaseRuntime
                 SkillProgramTurnPhase.Play => GameEngine.DelayedTurnEffects.SkipPlayPhase,
                 SkillProgramTurnPhase.Discard => GameEngine.DelayedTurnEffects.SkipDiscardPhase,
                 _ => throw new InvalidOperationException("Unknown turn phase.")};
-        _coreAlternativePhaseCostProgramsOperations.RecordAlternativePhaseSkip(active, phases);
+        _coreAlternativePhaseCostProgramsOperations.Value.RecordAlternativePhaseSkip(active, phases);
         return SkillProgramStepOutcome.Continue;
     }
 
@@ -53,8 +53,8 @@ internal sealed partial class CoreGameEngineProgramTurnPhaseRuntime
         if (!source.IsAlive || !target.IsAlive || source.Seat == target.Seat || _coreShanheS5ShensuOperations.IsShanheS5ShensuFrame(active) && !_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(source, target, physicalSuit: Suit.None, physicalCardIds: [], ignoreDistance: ignoreDistance, countsTowardLimit: false) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(source.Seat, targetSeat, cardKind) || _coreNativeDamagePoliciesOperations.IsSlashProhibited(target) || !ignoreDistance && !(_characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(source) || _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(source)) && _coreNativeRuleQueriesOperations.GetSeatDistance(source.Seat, targetSeat) > _coreNativeRuleQueriesOperations.GetAttackRange(source.Seat))
             return SkillProgramStepOutcome.Continue;
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-        var nativeWindows = instruction.UseCardActionWindows || _coreCurrentSlashFireOffersOperations.HasCommittedSlashFireCapability(source) || _characterLuBuHappyGodOperations.HasHappyLuBuWuqianCapability(source) || _characterLeJiuAnniversaryOperations.HasAnniversaryLeJiuUseObserver(source);
-        var action = nativeWindows || _characterHuangYueyingOlMouOperations.HasMouHuangYueyingBingcaiCapability || _characterZhouQunOlOperations.HasZhouQunCapability || _characterKongShuOlOperations.HasKongShuCapability || _characterMaChengOlOperations.HasMaChengCapability || _characterCuiYanOlOperations.HasCuiYanCapability || _characterLiYiOlOperations.HasLiYiCapability || _characterCaiWenJiLeOperations.HasLeCaiWenJiBeifenCapability || _characterLiuYanOlOperations.HasLiuYanCapability || _coreNativeLogicalDiscardsOperations.TracksNativeLogicalDiscards || _characterLiuZanMobileOperations.TracksAlternateActualUseColor || _coreSoleTargetProtectionOperations.HasSoleTargetProtectionParticipant || phaseControlParticipant || _characterSunHaoOlOperations.HasSunHaoCanshiCapability ? _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, source.Seat, source.Seat, null, null, null, cardKind, [targetSeat], [], Array.AsReadOnly(new[] { new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId) }), effectiveSuit: Suit.None, effectiveRank: 0)) : null;
+        var nativeWindows = instruction.UseCardActionWindows || _coreCurrentSlashFireOffersOperations.HasCommittedSlashFireCapability(source) || _characterLuBuHappyGodOperations.HasHappyLuBuWuqianCapability(source) || _characterLeJiuAnniversaryOperations.Value.HasAnniversaryLeJiuUseObserver(source);
+        var action = nativeWindows || _characterHuangYueyingOlMouOperations.HasMouHuangYueyingBingcaiCapability || _characterZhouQunOlOperations.Value.HasZhouQunCapability || _characterKongShuOlOperations.HasKongShuCapability || _characterMaChengOlOperations.HasMaChengCapability || _characterCuiYanOlOperations.HasCuiYanCapability || _characterLiYiOlOperations.HasLiYiCapability || _characterCaiWenJiLeOperations.HasLeCaiWenJiBeifenCapability || _characterLiuYanOlOperations.HasLiuYanCapability || _coreNativeLogicalDiscardsOperations.TracksNativeLogicalDiscards || _characterLiuZanMobileOperations.TracksAlternateActualUseColor || _coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionParticipant || phaseControlParticipant || _characterSunHaoOlOperations.Value.HasSunHaoCanshiCapability ? _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, source.Seat, source.Seat, null, null, null, cardKind, [targetSeat], [], Array.AsReadOnly(new[] { new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId) }), effectiveSuit: Suit.None, effectiveRank: 0)) : null;
         _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, source.Seat, 0, cardKind, Array.AsReadOnly(new[] { targetSeat }), PhysicalCardIds: Array.AsReadOnly(Array.Empty<int>())) { Action = action });
         if (action is not null)
             _corePhaseNamePredictionOperations.ObservePhaseNamePredictionUse(action);
@@ -75,7 +75,7 @@ internal sealed partial class CoreGameEngineProgramTurnPhaseRuntime
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(resolutionId, source.Seat, targetSeat, card: null, damageAmount: nativeWindows ? 1 + source.AlcoholDamageBonus + _coreShanheS5ShensuOperations.ShanheS5ShensuBaseDamageBonus(active) : 1, playedCardKind: cardKind, ignoresArmor: nativeWindows && _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(source, target, cardKind), conversionSource: action?.ConversionChain.Single(), programSkillCardUseFrameId: frame.Id);
         if (nativeWindows && action is not null)
         {
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(resolutionId, source);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(resolutionId, source);
             source.HasAlcoholEffect = false;
         }
 

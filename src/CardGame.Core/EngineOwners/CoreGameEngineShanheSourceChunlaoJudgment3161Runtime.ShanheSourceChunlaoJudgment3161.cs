@@ -8,8 +8,8 @@ internal sealed partial class CoreGameEngineShanheSourceChunlaoJudgment3161Runti
     {
         if (_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipJudgmentPhase))
             return false;
-        var consumed = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceChunlaoJudgmentConsumedEvent>().Select(e => e.WineUseId).ToHashSet();
-        var due = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramRoundPileAlcoholIssuedEvent>().Where(e => e.Source.SkillId == ShanheSourceJiangdongTrioIds.Chunlao && e.VictimSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && !consumed.Contains(e.CardUseFrameId)).ToArray();
+        var consumed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceChunlaoJudgmentConsumedEvent>().Select(e => e.WineUseId).ToHashSet();
+        var due = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramRoundPileAlcoholIssuedEvent>().Where(e => e.Source.SkillId == ShanheSourceJiangdongTrioIds.Chunlao && e.VictimSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && !consumed.Contains(e.CardUseFrameId)).ToArray();
         if (due.Length == 0 || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat].IsAlive)
             return false;
         if (_resolutionStackOperations._resolutionStack.Count != 0 || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEngineShanheSourceChunlaoJudgment3161Runti
     {
         if (frame.ShanheSourceChunlaoJudgmentDraw is not { } r)
             return false;
-        if (r.OwnerSeat != frame.OwnerSeat || r.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.ActualTurn != frame.ActualTurnNumber || frame.ParentFrameId is not null || frame.IsExtra || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceChunlaoJudgmentConsumedEvent>().Any(e => e.WineUseId == r.AnchorWineUseId && e.DrawFrameId == frame.Id && e.OwnerSeat == r.OwnerSeat && e.ActualTurn == r.ActualTurn) || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramRoundPileAlcoholIssuedEvent>().Any(e => e.CardUseFrameId == r.AnchorWineUseId && e.VictimSeat == r.OwnerSeat && e.Source.SkillId == ShanheSourceJiangdongTrioIds.Chunlao))
+        if (r.OwnerSeat != frame.OwnerSeat || r.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || r.ActualTurn != frame.ActualTurnNumber || frame.ParentFrameId is not null || frame.IsExtra || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceChunlaoJudgmentConsumedEvent>().Any(e => e.WineUseId == r.AnchorWineUseId && e.DrawFrameId == frame.Id && e.OwnerSeat == r.OwnerSeat && e.ActualTurn == r.ActualTurn) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramRoundPileAlcoholIssuedEvent>().Any(e => e.CardUseFrameId == r.AnchorWineUseId && e.VictimSeat == r.OwnerSeat && e.Source.SkillId == ShanheSourceJiangdongTrioIds.Chunlao))
             throw new InvalidOperationException("Source3161 replacement Draw lost its exact paid Wine and normal-turn return.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceChunlaoJudgmentCompletedEvent(frame.Id, r.AnchorWineUseId, r.OwnerSeat, r.ActualTurn, frame.DrawCount));
         _coreActualTurnsOperations.CompleteTurnStart(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects, skippedActualJudgment: true);

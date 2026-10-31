@@ -23,7 +23,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     }
     internal bool MobileJwMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p)
     {
-        if (f.MobileJiangWei is not { } r || effect?.Op != r.Operation || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null || r.Stage is not (MobileJiangWeiStage.ExchangeChildren or MobileJiangWeiStage.ReserveChildren or MobileJiangWeiStage.ReturnChildren or MobileJiangWeiStage.DiscardChildren or MobileJiangWeiStage.RecoveryChildren or MobileJiangWeiStage.GrantChildren) || !r.Paid.SequenceEqual(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After)) || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileJiangWeiPaidEvent>().Count(e => e == new MobileJiangWeiPaidEvent(f.Id, r.PaymentIndex, r.Before, r.After, r.Paid.Count)) != 1)
+        if (f.MobileJiangWei is not { } r || effect?.Op != r.Operation || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null || r.Stage is not (MobileJiangWeiStage.ExchangeChildren or MobileJiangWeiStage.ReserveChildren or MobileJiangWeiStage.ReturnChildren or MobileJiangWeiStage.DiscardChildren or MobileJiangWeiStage.RecoveryChildren or MobileJiangWeiStage.GrantChildren) || !r.Paid.SequenceEqual(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileJiangWeiPaidEvent>().Count(e => e == new MobileJiangWeiPaidEvent(f.Id, r.PaymentIndex, r.Before, r.After, r.Paid.Count)) != 1)
             return false;
         return r.Paid.All(m => r.Stage switch
         {
@@ -48,14 +48,14 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
 
     internal bool IsMobileJwShenpeiDamage(ProgramSkillFrame f, int target, int amount, ProgramParticipantReference? source, DamageNature? nature, bool sourceLess, int? explicitSource)
     {
-        if (f.MobileJiangWei is not { Operation: SkillProgramEffectOp.ResolveMobileJiangWeiShenpei, Stage: MobileJiangWeiStage.ThunderIssued } r || f.AttackAttempt is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || target != r.Target || amount != r.Amount || source is not null || nature != DamageNature.Thunder || sourceLess || explicitSource is not null || _coreDyingCursorRuntimeOperations.ActiveDying?.Id != r.DyingId || f.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering } w || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { Continuation: ProgramLifecycleContinuation.ResumeDyingEntry } entry || entry.ResumeDyingFrameId != r.DyingId)
+        if (f.MobileJiangWei is not { Operation: SkillProgramEffectOp.ResolveMobileJiangWeiShenpei, Stage: MobileJiangWeiStage.ThunderIssued } r || f.AttackAttempt is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || target != r.Target || amount != r.Amount || source is not null || nature != DamageNature.Thunder || sourceLess || explicitSource is not null || _coreDyingCursorRuntimeOperations.Value.ActiveDying?.Id != r.DyingId || f.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering } w || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { Continuation: ProgramLifecycleContinuation.ResumeDyingEntry } entry || entry.ResumeDyingFrameId != r.DyingId)
             return false;
         return true;
     }
 
     internal bool IsMobileJwSuspendedDying(long attackId)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { Operation: SkillProgramEffectOp.ResolveMobileJiangWeiShenpei, Stage: MobileJiangWeiStage.ThunderIssued } r, AttackAttempt: { Nature: DamageNature.Thunder, SourceLess: false } a } f || f.Id != attackId || a.SourceSeat != f.OwnerSeat || _coreDyingCursorRuntimeOperations.ActiveDying?.Id != r.DyingId || f.AttackReturn is null)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileJiangWei: { Operation: SkillProgramEffectOp.ResolveMobileJiangWeiShenpei, Stage: MobileJiangWeiStage.ThunderIssued } r, AttackAttempt: { Nature: DamageNature.Thunder, SourceLess: false } a } f || f.Id != attackId || a.SourceSeat != f.OwnerSeat || _coreDyingCursorRuntimeOperations.Value.ActiveDying?.Id != r.DyingId || f.AttackReturn is null)
             return false;
         return true;
     }
@@ -81,7 +81,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40600)]
     internal bool MobileJwDyingProof()
     {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying)
             return false;
         var root = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.MobileJiangWei is { } r && r.DyingId == dying.Id);
         if (root is not null)

@@ -7,9 +7,9 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
 {
     internal const string ShiWyZhuangshi = "mobile:shi-zhuangshi", ShiWyYinzhan = "mobile:shi-yinzhan", ShiWyZhongao = "mobile:shi-zhongao", ShiWyKuanggu = "mobile:shi-kuanggu", ShiWyKuanggu2 = "mobile:shi-kuanggu-upgraded", ShiWyKunfen = "mobile:shi-kunfen";
     internal const string ShiWyDiscard = "skill.mobile-shi-wei-yan.discard", ShiWyObtain = "skill.mobile-shi-wei-yan.obtain";
-    internal bool ShiWyMissionOver(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanMissionEvent>().Any(e => e.OwnerSeat == seat);
-    internal int ShiWyPhaseUses(int seat, int turn, int phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanUseEvent>().Count(e => e.OwnerSeat == seat && e.TurnNumber == turn && e.PhaseInstanceId == phase);
-    internal MobileShiWeiYanPhaseGrantEvent? ShiWyPhaseGrant(int seat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat ? _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanPhaseGrantEvent>().LastOrDefault(e => e.OwnerSeat == seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) : null;
+    internal bool ShiWyMissionOver(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanMissionEvent>().Any(e => e.OwnerSeat == seat);
+    internal int ShiWyPhaseUses(int seat, int turn, int phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanUseEvent>().Count(e => e.OwnerSeat == seat && e.TurnNumber == turn && e.PhaseInstanceId == phase);
+    internal MobileShiWeiYanPhaseGrantEvent? ShiWyPhaseGrant(int seat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanPhaseGrantEvent>().LastOrDefault(e => e.OwnerSeat == seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) : null;
     SkillProgramStepOutcome IMobileShiWeiYanHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginMobileShiWeiYan(frame, operation);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 47100)]
     internal bool CanOfferMobileShiWeiYan(ProgramTriggerLegalityContext gate)
@@ -22,7 +22,7 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
             return gate.Context.SourceSeat == gate.OwnerSeat && gate.Owner.IsAlive;
         if (gate.SkillId != ShiWyYinzhan)
             return true;
-        return gate.Context.CardUse is { } use && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiYinzhanQualifiedEvent>().Any(e => e.UseId == use.ParentCardUseFrameId && e.OwnerSeat == gate.OwnerSeat && e.HandQualified && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiYinzhanAppliedEvent>().Any(a => a.QualificationId == e.Id) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiYinzhanClaimedEvent>().Any(a => a.QualificationId == e.Id));
+        return gate.Context.CardUse is { } use && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiYinzhanQualifiedEvent>().Any(e => e.UseId == use.ParentCardUseFrameId && e.OwnerSeat == gate.OwnerSeat && e.HandQualified && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiYinzhanAppliedEvent>().Any(a => a.QualificationId == e.Id) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiYinzhanClaimedEvent>().Any(a => a.QualificationId == e.Id));
     }
 
     internal SkillProgramStepOutcome BeginMobileShiWeiYan(ProgramSkillFrame input, SkillProgramEffectOp operation)
@@ -280,7 +280,7 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
             }
 
             var useId = f.WindowContext!.CardUse!.ParentCardUseFrameId;
-            var next = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiYinzhanQualifiedEvent>().FirstOrDefault(e => e.UseId == useId && e.OwnerSeat == f.OwnerSeat && e.HandQualified && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiYinzhanAppliedEvent>().Any(a => a.QualificationId == e.Id) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiYinzhanClaimedEvent>().Any(a => a.QualificationId == e.Id));
+            var next = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiYinzhanQualifiedEvent>().FirstOrDefault(e => e.UseId == useId && e.OwnerSeat == f.OwnerSeat && e.HandQualified && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiYinzhanAppliedEvent>().Any(a => a.QualificationId == e.Id) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiYinzhanClaimedEvent>().Any(a => a.QualificationId == e.Id));
             if (next is not null)
             {
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiYinzhanClaimedEvent(next.Id, f.Id));

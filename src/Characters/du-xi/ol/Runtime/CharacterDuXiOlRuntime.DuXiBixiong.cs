@@ -26,7 +26,7 @@ internal sealed partial class CharacterDuXiOlRuntime
             var source = new CardConversionSource(candidate.SkillId, candidate.BindingId, owner, candidate.SkillInstanceId);
             foreach (var move in moves)
             {
-                if (_coreProgramEventHistoryOperations.ProgramEventHistory<DuXiBixiongSuitRecordedEvent>().Any(e => e.Source == source && e.MovementSequence == move.Sequence))
+                if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuXiBixiongSuitRecordedEvent>().Any(e => e.Source == source && e.MovementSequence == move.Sequence))
                     continue;
                 var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], _coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId));
                 if (DuXiSuitBit(suit) == 0)
@@ -39,7 +39,7 @@ internal sealed partial class CharacterDuXiOlRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 26300)]
     internal void ExpireDuXiBixiong(IGameEvent payload)
     {
-        if (payload is TurnStartedEvent turn && _coreProgramEventHistoryOperations.ProgramEventHistory<DuXiBixiongSuitRecordedEvent>().Any(e => e.OwnerSeat == turn.ActorSeat))
+        if (payload is TurnStartedEvent turn && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuXiBixiongSuitRecordedEvent>().Any(e => e.OwnerSeat == turn.ActorSeat))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuXiBixiongExpiredEvent(turn.ActorSeat, turn.TurnNumber));
     }
 

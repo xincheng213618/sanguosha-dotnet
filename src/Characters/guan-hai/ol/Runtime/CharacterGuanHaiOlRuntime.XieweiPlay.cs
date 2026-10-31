@@ -105,7 +105,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         var damage = 1 + actor.AlcoholDamageBonus + nuzhan.DamageBonus;
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         var pending = _kernelCoreMainOperations.CreateFangtianHalberdHandle(id, actor.Seat, card, CardKind.Slash, armor, damage, targets, false, counted, s.Source);
         _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd = pending;
@@ -120,7 +120,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 6)]
     internal void CollectIssuedXieweiCandidates(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> candidates)
     {
-        if (window != SkillProgramTriggerWindow.CardUseCommitted || IssuedXieweiPayment(action)is not { } p || _coreProgramEventHistoryOperations.ProgramEventHistory<XieweiCommittedEvent>().Any(e => e.PaymentId == p.Id))
+        if (window != SkillProgramTriggerWindow.CardUseCommitted || IssuedXieweiPayment(action)is not { } p || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XieweiCommittedEvent>().Any(e => e.PaymentId == p.Id))
             return;
         var t = _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program!.Triggers.Single(t => t.Effects is [{ Op: SkillProgramEffectOp.ResolveXieweiTwoHandBaitBasicUse }]);
         var context = _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, p.OwnerSeat, -1, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[p.OwnerSeat], action));
@@ -133,6 +133,6 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     {
         if (c.SkillId != "ol:xiewei" || context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.OwnerSeat != c.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || CoreGameEngineCardActionsRuntime.ToSharedCandidate(w.Candidates[w.CandidateIndex]) != c || IssuedXieweiPayment(w.Action)is not { } p || p.Source.SkillInstanceId != c.SkillInstanceId || p.OwnerSeat != c.OwnerSeat || p.GameplayHash != c.GameplayHash || context.CardUse?.CardActionId != p.ActionId || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveXieweiTwoHandBaitBasicUse }])
             return false;
-        return !_coreProgramEventHistoryOperations.ProgramEventHistory<XieweiCommittedEvent>().Any(e => e.PaymentId == p.Id);
+        return !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<XieweiCommittedEvent>().Any(e => e.PaymentId == p.Id);
     }
 }

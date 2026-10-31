@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineDelegatedJudgmentChoicesRuntime
     internal bool ValidDelegatedJudgmentDraft(JudgmentFrame j, DelegatedJudgmentDraft d)
     {
         var candidate = _coreNativeJudgmentOperations.CurrentJudgmentCandidate(j);
-        var identity = d.JudgmentFrameId == j.Id && d.SubjectSeat == j.TargetSeat && candidate is not null && d.Source.OwnerSeat == candidate.OwnerSeat && d.Source.SkillId == candidate.ProgramId && d.Source.SkillInstanceId == candidate.SkillInstanceId && d.GameplayHash == candidate.GameplayHash && d.TriggerId == candidate.ProgramTriggerId && d.Source.BindingId == d.TriggerId && d.Material.Count > 0 && d.Material.Select(c => c.Id).Distinct().Count() == d.Material.Count && (d.Stage == DelegatedJudgmentStage.Paid || _coreNativeDamageHandlesOperations.GetJudgmentCard(j)?.Id == d.OldCardId);
+        var identity = d.JudgmentFrameId == j.Id && d.SubjectSeat == j.TargetSeat && candidate is not null && d.Source.OwnerSeat == candidate.OwnerSeat && d.Source.SkillId == candidate.ProgramId && d.Source.SkillInstanceId == candidate.SkillInstanceId && d.GameplayHash == candidate.GameplayHash && d.TriggerId == candidate.ProgramTriggerId && d.Source.BindingId == d.TriggerId && d.Material.Count > 0 && d.Material.Select(c => c.Id).Distinct().Count() == d.Material.Count && (d.Stage == DelegatedJudgmentStage.Paid || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(j)?.Id == d.OldCardId);
         if (!identity || !Enum.IsDefined(d.Stage))
             return false;
         if (d.Stage is DelegatedJudgmentStage.Chosen or DelegatedJudgmentStage.Paid)
@@ -28,10 +28,10 @@ internal sealed partial class CoreGameEngineDelegatedJudgmentChoicesRuntime
 
     internal void BeginDelegatedJudgmentChoice(JudgmentFrame j, JudgmentTriggerCandidate candidate, SkillProgram program, SkillProgramTrigger trigger, IReadOnlyList<Card> cards)
     {
-        var d = new DelegatedJudgmentDraft(j.Id, new(program.Id, trigger.Id, candidate.OwnerSeat, candidate.SkillInstanceId!), program.GameplayHash, trigger.Id, j.TargetSeat, _coreNativeDamageHandlesOperations.GetJudgmentCard(j)!.Id, DelegatedJudgmentStage.Offered, cards.Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray(), []);
+        var d = new DelegatedJudgmentDraft(j.Id, new(program.Id, trigger.Id, candidate.OwnerSeat, candidate.SkillInstanceId!), program.GameplayHash, trigger.Id, j.TargetSeat, _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(j)!.Id, DelegatedJudgmentStage.Offered, cards.Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray(), []);
         _coreNativeJudgmentOperations.SetJudgmentFrameStep(j.Id, ResolutionFrameStep.AwaitingResponse);
         _coreNativeJudgmentOperations.ReplaceJudgmentFrame(j = _coreNativeJudgmentOperations.GetJudgmentFrame(j.Id)with { DelegatedReplacement = d });
-        var current = _coreNativeDamageHandlesOperations.GetJudgmentCard(j)!;
+        var current = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(j)!;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JudgmentReplacementRequestedEvent(j.Id, j.Id, j.TargetSeat, candidate.OwnerSeat, j.Reason, current.Id, current.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[j.TargetSeat], current)));
         PublishDelegatedJudgmentChoice(j);
     }
@@ -44,7 +44,7 @@ internal sealed partial class CoreGameEngineDelegatedJudgmentChoicesRuntime
         var chooser = d.Stage == DelegatedJudgmentStage.Offered ? d.Source.OwnerSeat : d.SubjectSeat;
         var choices = DelegatedJudgmentChoices(j);
         var presentation = _contentRegistryOperations._contentRegistry.GetSkill(d.Source.SkillId);
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramJudgmentReplacement, chooser, d.Stage == DelegatedJudgmentStage.Offered ? "缓释：是否让被判定者观看并选择你的牌？" : "缓释：观看诸葛瑾的手牌，从其可选牌中选择一张替换自己的判定牌。", d.Stage == DelegatedJudgmentStage.Choosing ? d.Material.Select(c => c.Id).ToArray() : [], [], d.Source.OwnerSeat, IncomingCard: _coreNativeDamageHandlesOperations.GetJudgmentCard(j)!.Kind)
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramJudgmentReplacement, chooser, d.Stage == DelegatedJudgmentStage.Offered ? "缓释：是否让被判定者观看并选择你的牌？" : "缓释：观看诸葛瑾的手牌，从其可选牌中选择一张替换自己的判定牌。", d.Stage == DelegatedJudgmentStage.Choosing ? d.Material.Select(c => c.Id).ToArray() : [], [], d.Source.OwnerSeat, IncomingCard: _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(j)!.Kind)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             IsPrivate = true,
@@ -59,7 +59,7 @@ internal sealed partial class CoreGameEngineDelegatedJudgmentChoicesRuntime
     {
         if (selected.Parameters.GetValueOrDefault("action")is not ("delegated-judgment-accept" or "delegated-judgment-select"))
             return false;
-        var j = _coreJudgmentCursorRuntimeOperations.ActiveJudgment ?? throw new InvalidOperationException("Delegated judgment lost its actual judgment.");
+        var j = _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment ?? throw new InvalidOperationException("Delegated judgment lost its actual judgment.");
         var d = j.DelegatedReplacement ?? throw new InvalidOperationException("Delegated judgment has no owning draft.");
         if (!ValidDelegatedJudgmentDraft(j, d) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } p || p.PlayerSeat != (d.Stage == DelegatedJudgmentStage.Offered ? d.Source.OwnerSeat : d.SubjectSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DelegatedJudgmentChoices(j).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The delegated choice no longer matches its private chooser or material.");
@@ -93,10 +93,10 @@ internal sealed partial class CoreGameEngineDelegatedJudgmentChoicesRuntime
         return p.ValidCardIds.SequenceEqual(d.Stage == DelegatedJudgmentStage.Choosing ? d.Material.Select(c => c.Id) : []) && CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(p.Choices, DelegatedJudgmentChoices(j));
     }
 
-    internal IEnumerable<CardSnapshot> DelegatedJudgmentPrivateCards(int viewer) => _coreJudgmentCursorRuntimeOperations.ActiveJudgment is { DelegatedReplacement: { Stage: DelegatedJudgmentStage.Choosing } d } j && d.SubjectSeat == viewer && IsDelegatedJudgmentPromptValid(j, _corePendingDecisionPolicyPipelineOperations._pendingDecision) ? d.HandView : Array.Empty<CardSnapshot>();
+    internal IEnumerable<CardSnapshot> DelegatedJudgmentPrivateCards(int viewer) => _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is { DelegatedReplacement: { Stage: DelegatedJudgmentStage.Choosing } d } j && d.SubjectSeat == viewer && IsDelegatedJudgmentPromptValid(j, _corePendingDecisionPolicyPipelineOperations._pendingDecision) ? d.HandView : Array.Empty<CardSnapshot>();
     internal bool ResolveAiDelegatedJudgmentChoice()
     {
-        if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment is not { DelegatedReplacement: { Stage: DelegatedJudgmentStage.Offered or DelegatedJudgmentStage.Choosing } d } j)
+        if (_coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is not { DelegatedReplacement: { Stage: DelegatedJudgmentStage.Offered or DelegatedJudgmentStage.Choosing } d } j)
             return false;
         var p = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("AI delegate has no private prompt.");
         var view = _corePlayerViewProjectionOperations.CreateSnapshot(p.PlayerSeat);

@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineProgramAlcoholConversionsRuntime
     {
         if (_characterGuanYuWumiaoOperations.IsWuyouIdentityMaterial(owner, card, CardKind.Alcohol, source))
             return;
-        if (source is null ? card.Kind != CardKind.Alcohol || _coreCardConversionsOperations.HasProgramCardIdentity(owner, card) : !_coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, CardKind.Alcohol, forResponse, dyingUse: forResponse && _coreDyingCursorRuntimeOperations.ActiveDying?.VictimSeat == owner.Seat).Contains(source))
+        if (source is null ? card.Kind != CardKind.Alcohol || _coreCardConversionsOperations.HasProgramCardIdentity(owner, card) : !_coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, CardKind.Alcohol, forResponse, dyingUse: forResponse && _coreDyingCursorRuntimeOperations.Value.ActiveDying?.VictimSeat == owner.Seat).Contains(source))
             throw new InvalidOperationException("The Alcohol conversion has no matching enabled program source.");
     }
 }

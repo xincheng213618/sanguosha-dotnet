@@ -20,7 +20,7 @@ internal sealed partial class CharacterMaChengOlRuntime
         var r = f.Chenglie!;
         if (!_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || m.Sequence <= r.Before || m.Sequence > r.After)
             return false;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ChenglieCardMovedEvent>().Any(e => e.FrameId == f.Id && e.Stage == r.Stage && e.Index == r.Index && e.CardId == m.CardId && e.From == m.From && e.To == m.To && e.Reason == m.Reason && e.Sequence == m.Sequence))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChenglieCardMovedEvent>().Any(e => e.FrameId == f.Id && e.Stage == r.Stage && e.Index == r.Index && e.CardId == m.CardId && e.From == m.From && e.To == m.To && e.Reason == m.Reason && e.Sequence == m.Sequence))
             return true;
         if (r.Stage == ChenglieStage.RevealChildren)
             return m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle;

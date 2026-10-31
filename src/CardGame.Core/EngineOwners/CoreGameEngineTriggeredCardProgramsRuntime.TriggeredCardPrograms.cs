@@ -28,14 +28,14 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, source.Seat, source.Seat, null, null, null, CardKind.Slash, [targetSeat], [], [provenance], effectiveSuit: Suit.None, effectiveRank: 0));
         _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, source.Seat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: []) { Action = action });
         _characterMengDaOlOperations.IssueGoudeSlashUse(resolutionId, active, action);
-        _coreShanheS5ZhulingOperations.IssueShanheS5JixianSlashUse(resolutionId, active, action);
+        _coreShanheS5ZhulingOperations.Value.IssueShanheS5JixianSlashUse(resolutionId, active, action);
         _characterYangFuOlOperations.IssueSuyiSlashUse(resolutionId, active, action);
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(resolutionId, 0, CardKind.Slash, source.Seat));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TargetsConfirmedEvent(resolutionId, [targetSeat]));
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(resolutionId, source.Seat, targetSeat, card: null, damageAmount: 1 + source.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(source, target, CardKind.Slash), programSkillCardUseFrameId: active.Id);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(resolutionId, source);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(resolutionId, source);
         source.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _corePhaseNamePredictionOperations.ObservePhaseNamePredictionUse(action);

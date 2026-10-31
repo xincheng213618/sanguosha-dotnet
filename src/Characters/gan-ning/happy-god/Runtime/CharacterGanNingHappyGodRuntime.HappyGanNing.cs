@@ -114,7 +114,7 @@ internal sealed partial class CharacterGanNingHappyGodRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var receipt = frame.HappyPoxi ?? throw new InvalidOperationException("Happy Poxi lost its native reward draw parent.");
-        if (receipt.Stage != HappyPoxiStage.Drawing || outcome.RecipientSeat != frame.OwnerSeat || outcome.RequestedCount != (receipt.OwnCount == 2 ? 1 : 3) || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPoxiDrawReturnedEvent>().Any(e => e.FrameId == frame.Id))
+        if (receipt.Stage != HappyPoxiStage.Drawing || outcome.RecipientSeat != frame.OwnerSeat || outcome.RequestedCount != (receipt.OwnCount == 2 ? 1 : 3) || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPoxiDrawReturnedEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("Happy Poxi cannot change or repeat its already-issued native draw reward.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { HappyPoxi = receipt with { Stage = HappyPoxiStage.DrawChildren, DrawBefore = outcome.SequenceBefore, DrawAfter = outcome.SequenceAfter, DrawCount = outcome.ActualDrawIds.Count }, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyPoxiDrawReturnedEvent(frame.Id, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));

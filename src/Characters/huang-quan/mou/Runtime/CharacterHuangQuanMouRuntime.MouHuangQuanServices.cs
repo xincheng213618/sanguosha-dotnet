@@ -18,7 +18,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
     IReadOnlyList<int> IMouHuangQuanFacts.Living => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
 
     ContentSkillDefinition IMouHuangQuanFacts.Skill(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id);
-    IEnumerable<T> IMouHuangQuanFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouHuangQuanFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouHuangQuanFacts.ParentMatches(ProgramSkillFrame f) => MouHqParent(f);
     MouHqOriginalUse? IMouHuangQuanFacts.OriginalUse(int owner, ProgramSkillWindowContext? context) => TryMouHqOriginalUse(owner, context, out var u, out _) ? new(u.Id, u.Action!.ActionId, u.SourceSeat == owner) : null;
     IReadOnlyList<MouHqGift> IMouHuangQuanFacts.Gifts(int giver) => _coreMatchParticipantsPlayersAccess._players[giver].MouHqActualGifts ?? [];
@@ -37,7 +37,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
                 continue;
             if (child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.Program && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == reason && recovery.Attempt.SourceSeat == seat && recovery.Attempt.TargetSeat == seat)
                 return true;
-            if (child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == seat && hp.Change.TargetSeat == seat && _coreProgramEventHistoryOperations.ProgramEventHistory<SilverLionRemovedRecoveryEvent>().Any(x => x.PlayerSeat == seat && x.Reason.Value == reason && x.RecoveredAmount == hp.Change.Amount && x.RemainingHp == hp.Change.HpAfter))
+            if (child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == seat && hp.Change.TargetSeat == seat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SilverLionRemovedRecoveryEvent>().Any(x => x.PlayerSeat == seat && x.Reason.Value == reason && x.RecoveredAmount == hp.Change.Amount && x.RemainingHp == hp.Change.HpAfter))
                 return true;
         }
 

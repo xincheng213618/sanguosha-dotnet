@@ -31,9 +31,9 @@ internal sealed partial class CoreGameEngineShanheWoxinRuntime
 
     internal ShanheWoxinCreditEarnedEvent[] AvailableWoxinCredits(CardUseEffectSource source, string hash)
     {
-        var blocked = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinReservationConsumedEvent>().Select(fact => fact.ReservationId).Concat(LiveWoxinReservations().Select(receipt => receipt.Id)).ToHashSet();
-        var spent = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinCreditReservedEvent>().Where(fact => blocked.Contains(fact.ReservationId)).Select(fact => fact.CreditOrdinal).ToHashSet();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinCreditEarnedEvent>().Where(fact => fact.Source == source && fact.GameplayHash == hash && !spent.Contains(fact.Ordinal)).ToArray();
+        var blocked = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheWoxinReservationConsumedEvent>().Select(fact => fact.ReservationId).Concat(LiveWoxinReservations().Select(receipt => receipt.Id)).ToHashSet();
+        var spent = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheWoxinCreditReservedEvent>().Where(fact => blocked.Contains(fact.ReservationId)).Select(fact => fact.CreditOrdinal).ToHashSet();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheWoxinCreditEarnedEvent>().Where(fact => fact.Source == source && fact.GameplayHash == hash && !spent.Contains(fact.Ordinal)).ToArray();
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 63300)]
@@ -50,7 +50,7 @@ internal sealed partial class CoreGameEngineShanheWoxinRuntime
         var credits = AvailableWoxinCredits(binding, hash);
         if (credits.Length == 0)
             return 0;
-        var receipt = new ShanheWoxinReservation(_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinReservationIssuedEvent>().Count + 1L, attack.ResolutionId, binding, hash, attack.TargetSeat, credits.Length);
+        var receipt = new ShanheWoxinReservation(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheWoxinReservationIssuedEvent>().Count + 1L, attack.ResolutionId, binding, hash, attack.TargetSeat, credits.Length);
         if (attack is NativeOwners.ProgramAttackHandle)
             _coreProgramAttackAttemptOperations.UpdateProgramAttackState(attack.ResolutionId, state => state with { ShanheWoxin = receipt });
         else
@@ -69,12 +69,12 @@ internal sealed partial class CoreGameEngineShanheWoxinRuntime
         var earnedBinding = _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != applied.TargetSeat && _coreMatchParticipantsPlayersAccess._players[applied.TargetSeat].IsAlive ? WoxinSource(applied.TargetSeat) : null;
         if (earnedBinding is null && !LiveWoxinReservations().Any(receipt => receipt.Source.OwnerSeat == applied.SourceSeat))
             return;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.SourceSeat != applied.SourceSeat || damage.TargetSeat != applied.TargetSeat || damage.Amount != applied.Amount || _coreDamageArmorPaymentsOperations.DamageArmorPaymentOwner(damage)is not { } attack)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.SourceSeat != applied.SourceSeat || damage.TargetSeat != applied.TargetSeat || damage.Amount != applied.Amount || _coreDamageArmorPaymentsOperations.Value.DamageArmorPaymentOwner(damage)is not { } attack)
             throw new InvalidOperationException("Woxin requires the exact native applied-damage frame.");
         if (!attack.IsSourceLess && !attack.IsChainPropagation && WoxinReceipt(attack)is { } receipt)
         {
-            var reserved = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinCreditReservedEvent>().Where(fact => fact.ReservationId == receipt.Id).ToArray();
-            if (receipt.AttackFrameId != damage.ParentFrameId || receipt.Source.OwnerSeat != applied.SourceSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinReservationIssuedEvent>().Count(fact => fact.Receipt == receipt) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinReservationConsumedEvent>().Any(fact => fact.ReservationId == receipt.Id) || reserved.Length != receipt.Amount || reserved.Select(fact => fact.CreditOrdinal).Distinct().Count() != receipt.Amount || reserved.Any(fact => _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinCreditEarnedEvent>().Count(credit => credit.Ordinal == fact.CreditOrdinal && credit.Source == receipt.Source && credit.GameplayHash == receipt.GameplayHash) != 1) || _contentRegistryOperations._contentRegistry.GetSkill(receipt.Source.SkillId).Program?.GameplayHash != receipt.GameplayHash)
+            var reserved = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheWoxinCreditReservedEvent>().Where(fact => fact.ReservationId == receipt.Id).ToArray();
+            if (receipt.AttackFrameId != damage.ParentFrameId || receipt.Source.OwnerSeat != applied.SourceSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheWoxinReservationIssuedEvent>().Count(fact => fact.Receipt == receipt) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheWoxinReservationConsumedEvent>().Any(fact => fact.ReservationId == receipt.Id) || reserved.Length != receipt.Amount || reserved.Select(fact => fact.CreditOrdinal).Distinct().Count() != receipt.Amount || reserved.Any(fact => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheWoxinCreditEarnedEvent>().Count(credit => credit.Ordinal == fact.CreditOrdinal && credit.Source == receipt.Source && credit.GameplayHash == receipt.GameplayHash) != 1) || _contentRegistryOperations._contentRegistry.GetSkill(receipt.Source.SkillId).Program?.GameplayHash != receipt.GameplayHash)
                 throw new InvalidOperationException("Woxin lost its original frame-owned credit reservation.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheWoxinReservationConsumedEvent(receipt.Id, damage.Id, applied.SourceSeat, applied.TargetSeat, applied.Amount));
         }
@@ -83,7 +83,7 @@ internal sealed partial class CoreGameEngineShanheWoxinRuntime
         // may earn a new credit, which belongs to a later damage occurrence.
         if (earnedBinding is null)
             return;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheWoxinCreditEarnedEvent(_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheWoxinCreditEarnedEvent>().Count + 1, earnedBinding, _contentRegistryOperations._contentRegistry.GetSkill(earnedBinding.SkillId).Program!.GameplayHash, damage.Id, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, applied.Amount));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheWoxinCreditEarnedEvent(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheWoxinCreditEarnedEvent>().Count + 1, earnedBinding, _contentRegistryOperations._contentRegistry.GetSkill(earnedBinding.SkillId).Program!.GameplayHash, damage.Id, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, applied.Amount));
     }
 
     internal int WoxinPublicBonus(GameSnapshot view, int sourceSeat, bool sourceLess, bool chain, GameEngine.IDamageAttempt? attack)

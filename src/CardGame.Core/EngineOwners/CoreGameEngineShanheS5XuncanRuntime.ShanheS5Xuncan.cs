@@ -9,7 +9,7 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 5771)]
     internal void RecordShanheS5FirstElementalDamage(DamageAppliedEvent damage)
     {
-        if (damage.Amount <= 0 || damage.Nature == DamageNature.Normal || !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShanheS5Xuncan) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5FirstElementalDamageEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber))
+        if (damage.Amount <= 0 || damage.Nature == DamageNature.Normal || !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShanheS5Xuncan) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5FirstElementalDamageEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber))
             return;
         var native = _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().LastOrDefault();
         if (native is null || native.SourceSeat != damage.SourceSeat || native.TargetSeat != damage.TargetSeat || native.Nature != damage.Nature)
@@ -18,10 +18,10 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 5771, SkillProgramEffectOp.ResolveShanheS5Xuncan)]
-    internal bool CanOfferShanheS5Xuncan(ProgramTriggerLegalityContext c) => c.Trigger.Effects.Any(e => e.StateId == "leijie") || c.Context is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, DamageFrameId: { } damageId } && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5FirstElementalDamageEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.DamageFrameId == damageId);
+    internal bool CanOfferShanheS5Xuncan(ProgramTriggerLegalityContext c) => c.Trigger.Effects.Any(e => e.StateId == "leijie") || c.Context is { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, DamageFrameId: { } damageId } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5FirstElementalDamageEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.DamageFrameId == damageId);
     internal ShanheS5SkillTargetEvent RequireShanheS5SkillTarget(ProgramSkillFrame f)
     {
-        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5SkillTargetEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5SkillTargetEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (facts is not [var target] || target.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || target.GameplayHash != f.GameplayHash || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target.TargetSeat) || (f.SkillId == ShanheS5YunshenSkill ? f.SelectedTargetSeats is not [var selected] || selected != target.TargetSeat : f.SkillId != ShanheS5ShangshenSkill || f.WindowContext?.TargetSeat != target.TargetSeat))
             throw new InvalidOperationException("Xuncan lost his original accepted skill target and source instance.");
         return target;
@@ -29,14 +29,14 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
 
     internal void CaptureShanheS5SkillTarget(ProgramSkillFrame f, int targetSeat)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5SkillTargetEvent>().Any(e => e.FrameId == f.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5SkillTargetEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Xuncan cannot accept the same skill target twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5SkillTargetEvent(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, targetSeat));
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         // Only these printed skills declare a target. Acquiring an unrelated skill
         // never retroactively binds Fenchai to an unrelated character.
-        if (owner.Gender == target.Gender || !(owner.General.Skills.Any(s => s.ContentId == f.SkillId) || owner.SecondaryGeneral?.Skills.Any(s => s.ContentId == f.SkillId) == true) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5FenchaiBoundEvent>().Any(e => e.OwnerSeat == f.OwnerSeat && e.FenchaiSkillId == ShanheS5FenchaiSkill))
+        if (owner.Gender == target.Gender || !(owner.General.Skills.Any(s => s.ContentId == f.SkillId) || owner.SecondaryGeneral?.Skills.Any(s => s.ContentId == f.SkillId) == true) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5FenchaiBoundEvent>().Any(e => e.OwnerSeat == f.OwnerSeat && e.FenchaiSkillId == ShanheS5FenchaiSkill))
             return;
         var policy = _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.ShanheFenchaiJudgment).FirstOrDefault();
         if (policy.Source is null || policy.Source.SkillId != ShanheS5FenchaiSkill)
@@ -49,10 +49,10 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[judgment.TargetSeat];
         if (!_coreProgramCardPoliciesOperations.HasCardPolicy(owner, SkillProgramCardPolicyKind.ShanheFenchaiJudgment))
             return currentSuit;
-        var bound = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5FenchaiBoundEvent>().SingleOrDefault(e => e.OwnerSeat == owner.Seat && e.FenchaiSkillId == ShanheS5FenchaiSkill);
+        var bound = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5FenchaiBoundEvent>().SingleOrDefault(e => e.OwnerSeat == owner.Seat && e.FenchaiSkillId == ShanheS5FenchaiSkill);
         if (bound is null)
             return currentSuit;
-        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(bound.TargetSeat) || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5SkillTargetEvent>().Any(e => e.FrameId == bound.ProducerFrameId && e.Source.OwnerSeat == owner.Seat && e.TargetSeat == bound.TargetSeat))
+        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(bound.TargetSeat) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5SkillTargetEvent>().Any(e => e.FrameId == bound.ProducerFrameId && e.Source.OwnerSeat == owner.Seat && e.TargetSeat == bound.TargetSeat))
             throw new InvalidOperationException("Fenchai lost its first real opposite-gender skill target.");
         return _coreMatchParticipantsPlayersAccess._players[bound.TargetSeat].IsAlive ? Suit.Heart : Suit.Spade;
     }
@@ -78,7 +78,7 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
                 PublishShanheS5YunshenChoice(f, directions);
                 return SkillProgramStepOutcome.AwaitChoice;
             case "shangshen-bind":
-                if (f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, DamageFrameId: { } damage, TargetSeat: { } victim, Amount: > 0 } || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5FirstElementalDamageEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.DamageFrameId == damage && e.TargetSeat == victim))
+                if (f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, DamageFrameId: { } damage, TargetSeat: { } victim, Amount: > 0 } || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5FirstElementalDamageEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.DamageFrameId == damage && e.TargetSeat == victim))
                     throw new InvalidOperationException("Shangshen requires the first actual elemental segment this turn.");
                 CaptureShanheS5SkillTarget(f, victim);
                 return SkillProgramStepOutcome.Continue;
@@ -93,7 +93,7 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
                 if (!_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive)
                     return SkillProgramStepOutcome.Continue;
                 var count = Math.Max(0, 4 - _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[recipient]).Count);
-                if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5RefillRequestedEvent>().Any(e => e.FrameId == f.Id))
+                if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5RefillRequestedEvent>().Any(e => e.FrameId == f.Id))
                     throw new InvalidOperationException("Shangshen cannot pay its refill twice.");
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5RefillRequestedEvent(f.Id, recipient, count));
                 return _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, recipient, count, new("shanhe.s5.shangshen.refill"));
@@ -121,7 +121,7 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
 
     internal void RecordShanheS5JudgmentEffect(ProgramSkillFrame f, ProgramJudgmentOutcomeBinding outcome, string stage, int target, bool hit, int requested)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5JudgmentEffectEvent>().Any(e => e.FrameId == f.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5JudgmentEffectEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("An S5 judgment result cannot be applied twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5JudgmentEffectEvent(f.Id, outcome.JudgmentFrameId, stage, target, hit, requested));
     }
@@ -182,7 +182,7 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
             _coreCardUseDebitsOperations.RecordSlashUseDebit(useId, actorSeat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actorSeat, CardKind.ColdSlash);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, actorSeat, targetSeat, card: null, damageAmount: 1 + source.AlcoholDamageBonus, playedCardKind: CardKind.ColdSlash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(source, target, CardKind.ColdSlash), programSkillCardUseFrameId: f.Id);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(useId, source);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(useId, source);
         source.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _corePhaseNamePredictionOperations.ObservePhaseNamePredictionUse(action);
@@ -194,14 +194,14 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
             _coreNativeSlashUseOperations.BeginSlashTargetResolution(attack);
     }
 
-    internal bool IsShanheS5YunshenUse(long useId) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5YunshenIssuedEvent>().Any(e => e.UseId == useId);
+    internal bool IsShanheS5YunshenUse(long useId) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5YunshenIssuedEvent>().Any(e => e.UseId == useId);
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 5771)]
     internal bool ReturnShanheS5YunshenSlash(GameEngine.AttackCompletionReceipt completion)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShanheS5Yunshen: { } r } f || r.UseId != completion.ResolutionId)
             return false;
-        if (r.Returned || completion.ProgramFrameId != f.Id || !completion.RequestedSlashChild || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardKind == CardKind.ColdSlash) != 1)
+        if (r.Returned || completion.ProgramFrameId != f.Id || !completion.RequestedSlashChild || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardKind == CardKind.ColdSlash) != 1)
             throw new InvalidOperationException("Yunshen lost its exact completed native Cold Slash return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheS5Yunshen = r with { Returned = true } });
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
@@ -212,11 +212,11 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
     internal void ReturnShanheS5XuncanDraw(ProgramSkillFrame supplied, NativeDrawOutcome draw)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        var request = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5RefillRequestedEvent>().SingleOrDefault(e => e.FrameId == f.Id);
-        var judgment = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5JudgmentEffectEvent>().SingleOrDefault(e => e.FrameId == f.Id);
+        var request = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5RefillRequestedEvent>().SingleOrDefault(e => e.FrameId == f.Id);
+        var judgment = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5JudgmentEffectEvent>().SingleOrDefault(e => e.FrameId == f.Id);
         var target = request?.TargetSeat ?? judgment?.TargetSeat;
         var count = request?.Requested ?? judgment?.Requested;
-        if (target != draw.RecipientSeat || count != draw.RequestedCount || f.NativeDraw is not null || request is null && judgment is not { Stage: "leijie", LightningHit: false } || draw.SequenceAfter != _coreCardMovementJournalMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5XuncanDrawPaidEvent>().Any(e => e.FrameId == f.Id))
+        if (target != draw.RecipientSeat || count != draw.RequestedCount || f.NativeDraw is not null || request is null && judgment is not { Stage: "leijie", LightningHit: false } || draw.SequenceAfter != _coreCardMovementJournalMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5XuncanDrawPaidEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("The S5 refill lost its exact once-only native Draw return.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5XuncanDrawPaidEvent(f.Id, draw.RecipientSeat, draw.RequestedCount, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
@@ -224,6 +224,6 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 5771)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 5771)]
-    internal bool ContinueAcceptedShanheS5Xuncan(ProgramSkillFrame f) => f.SkillId is ShanheS5YunshenSkill or ShanheS5ShangshenSkill && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5SkillTargetEvent>().Any(e => e.FrameId == f.Id) || f.SkillId == "shanhe:s5-leijie-3231" && (_resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().Any(j => j.ParentFrameId == f.Id && j.Reason == "shanhe.s5.leijie") || f.JudgmentOutcomeBindings?.Any(o => o.Reason == "shanhe.s5.leijie" && _coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(f, o)) == true) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5JudgmentEffectEvent>().Any(e => e.FrameId == f.Id);
+    internal bool ContinueAcceptedShanheS5Xuncan(ProgramSkillFrame f) => f.SkillId is ShanheS5YunshenSkill or ShanheS5ShangshenSkill && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5SkillTargetEvent>().Any(e => e.FrameId == f.Id) || f.SkillId == "shanhe:s5-leijie-3231" && (_resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().Any(j => j.ParentFrameId == f.Id && j.Reason == "shanhe.s5.leijie") || f.JudgmentOutcomeBindings?.Any(o => o.Reason == "shanhe.s5.leijie" && _coreProgramJudgmentOutcomesOperations.IsValidProgramJudgmentOutcome(f, o)) == true) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5JudgmentEffectEvent>().Any(e => e.FrameId == f.Id);
     SkillProgramStepOutcome IShanheS5XuncanHost.ResolveShanheS5Xuncan(ProgramSkillFrame f, SkillProgramEffect e) => ResolveShanheS5Xuncan(f, e);
 }

@@ -27,12 +27,12 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
                 lastExits[movement.CardId] = movement.Sequence;
         }
 
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiMarkedEvent>().Where(mark => mark.Source.OwnerSeat == owner && mark.EntrySequence <= cutoff && entries.Contains((mark.EntrySequence, mark.CardId, mark.PrintedKind)) && (!lastExits.TryGetValue(mark.CardId, out var last) || last <= mark.EntrySequence)).Select(mark => mark.CardId).Distinct().Order().ToArray();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryQiaoRuiMarkedEvent>().Where(mark => mark.Source.OwnerSeat == owner && mark.EntrySequence <= cutoff && entries.Contains((mark.EntrySequence, mark.CardId, mark.PrintedKind)) && (!lastExits.TryGetValue(mark.CardId, out var last) || last <= mark.EntrySequence)).Select(mark => mark.CardId).Distinct().Order().ToArray();
     }
 
     internal bool QiaoRuiLastLoss(int owner, CardMovementBatchContext b)
     {
-        if (b.TurnNumber <= 0 || b.MovementTiming is not { } timing || timing.ActualTurnOwnerSeat == owner || b.Movements.Count == 0 || b.Movements.Any(m => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiMaximumHpEvent>().Any(e => e.LossBatchId == b.Id && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == owner)))
+        if (b.TurnNumber <= 0 || b.MovementTiming is not { } timing || timing.ActualTurnOwnerSeat == owner || b.Movements.Count == 0 || b.Movements.Any(m => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryQiaoRuiMaximumHpEvent>().Any(e => e.LossBatchId == b.Id && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryQiaoRuiStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == owner)))
             return false;
         var before = b.Movements.Min(m => m.Sequence) - 1;
         var after = b.Movements.Max(m => m.Sequence);
@@ -157,7 +157,7 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
         if (r.Stage == AnniversaryQiaoRuiStage.DiscardChildren)
         {
-            var actual = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(m => m.From == CardLocation.Hand(f.OwnerSeat) && r.Cards.Contains(m.CardId) && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(i => i.InvocationId == m.InvocationId && i.ParentFrameId == f.Id && i.Reason.Value == QiaoRuiDiscard && i.SequenceBefore >= r.Before && i.SequenceAfter <= r.After));
+            var actual = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(m => m.From == CardLocation.Hand(f.OwnerSeat) && r.Cards.Contains(m.CardId) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(i => i.InvocationId == m.InvocationId && i.ParentFrameId == f.Id && i.Reason.Value == QiaoRuiDiscard && i.SequenceBefore >= r.Before && i.SequenceAfter <= r.After));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryQiaoRuiDiscardedEvent(f.Id, actual, r.Before, r.After));
             if (actual > _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
             {

@@ -16,7 +16,7 @@ internal sealed partial class CharacterHuoJunOlRuntime
         CardZoneKind.Hand,
         CardZoneKind.Equipment
     }.Any(z => _cardZonesOperations._cardZones.CardsAt(new(z, seat)).Any(c => HuoJunDiscardable(seat, z, c)));
-    internal bool HuoJunDamageUsed(int owner, string skill) => _coreProgramEventHistoryOperations.ProgramEventHistory<HuoJunFenruiDamageCommittedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill);
+    internal bool HuoJunDamageUsed(int owner, string skill) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuoJunFenruiDamageCommittedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26210)]
     internal bool CanOfferHuoJunFenrui(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => !t.Effects.Any(e => e.Op == SkillProgramEffectOp.RestoreSlotAndUseMatchingEquipment) || context.Window == SkillProgramTriggerWindow.TurnEnding && HuoJunHasAbolishedSlot(c.OwnerSeat) && HuoJunHasDiscard(c.OwnerSeat);
     internal SkillProgramStepOutcome BeginHuoJunFenrui(ProgramSkillFrame supplied)
@@ -208,7 +208,7 @@ internal sealed partial class CharacterHuoJunOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26210)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26210)]
-    internal bool CanContinuePaidHuoJunFenrui(ProgramSkillFrame f) => f.HuoJunFenrui is { CostCardId: not null } r && _coreProgramEventHistoryOperations.ProgramEventHistory<HuoJunFenruiCostPaidEvent>().Any(e => e.FrameId == f.Id && e.Source == r.Source);
+    internal bool CanContinuePaidHuoJunFenrui(ProgramSkillFrame f) => f.HuoJunFenrui is { CostCardId: not null } r && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuoJunFenruiCostPaidEvent>().Any(e => e.FrameId == f.Id && e.Source == r.Source);
     [ProgramAiChoice(SkillProgramEffectOp.RestoreSlotAndUseMatchingEquipment)]
     internal PromptChoice AiHuoJunFenrui(PendingDecision p, ProgramSkillFrame f) => f.HuoJunFenrui!.Stage == HuoJunFenruiStage.Cost ? p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First() : p.Choices.OrderByDescending(c => c.Parameters["branch"] == "damage" ? _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count - _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count : 0).First();
 }

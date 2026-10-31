@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MobileBuLianShiAnxuHost(Func<RuntimeEntries.CharacterBuLianShiMobileEntries> getCharacterBuLianShiMobileRuntime) : IMobileBuLianShiAnxuHost
+internal sealed class MobileBuLianShiAnxuHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterBuLianShiMobileRuntime>> getCharacterBuLianShiMobileRuntime) : IMobileBuLianShiAnxuHost
 {
-    public void Prepare(ProgramSkillFrame frame) => getCharacterBuLianShiMobileRuntime().PrepareMobileBuLianShiAnxu(frame);
+    public void Prepare(ProgramSkillFrame frame) => getCharacterBuLianShiMobileRuntime().Value.PrepareMobileBuLianShiAnxu(frame);
 }

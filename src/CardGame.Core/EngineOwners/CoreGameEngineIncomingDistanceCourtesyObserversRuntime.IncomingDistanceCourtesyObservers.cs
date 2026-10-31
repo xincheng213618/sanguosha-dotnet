@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineIncomingDistanceCourtesyObserversRun
     {
         if (root.IncomingDistanceCourtesy is not { Stage: IncomingDistanceCourtesyStage.MovementChildren, Movements.Count: > 0 } r || root.PendingMovementContinuation is null)
             return false;
-        _coreIncomingDistanceCourtesyOperations.RequireIncomingDistanceCourtesyReceipt(root);
+        _coreIncomingDistanceCourtesyOperations.Value.RequireIncomingDistanceCourtesyReceipt(root);
         var m = r.Movements[^1];
         if (child is CardsMovedTriggerWindowFrame moved)
             return moved.Batch.ParentFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.AwaitingProgramFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(move => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) && move.Sequence > m.Before && move.Sequence <= m.After && move.Reason.Value == CoreGameEngineIncomingDistanceCourtesyRuntime.IncomingDistanceCourtesyReason(root, m.StepIndex));
@@ -28,7 +28,7 @@ internal sealed partial class CoreGameEngineIncomingDistanceCourtesyObserversRun
 
     internal ProgramSkillFrame? IncomingDistanceCourtesyObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.IncomingDistanceCourtesyFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 240)]
-    internal bool IsIncomingDistanceCourtesyDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && IncomingDistanceCourtesyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsIncomingDistanceCourtesyDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && IncomingDistanceCourtesyObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 70)]
     internal bool TryAdvanceIncomingDistanceCourtesySubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && IncomingDistanceCourtesyObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

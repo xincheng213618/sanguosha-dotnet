@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouWangLingFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreMatchDefinitionState matchDefinitionState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<ContentRegistry> getContentRegistry, Func<CardZoneStore> getCardZoneStore, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries> getCoreGameEngineAdvancedLifecycleRuntime, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, EngineStates.CoreAiBrainsState aiBrainsState, KernelCreateSnapshotCall createSnapshot, Func<RuntimeEntries.CharacterWangLingMouEntries> getCharacterWangLingMouRuntime) : IMouWangLingFacts
+internal sealed class MouWangLingFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreMatchDefinitionState matchDefinitionState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<ContentRegistry> getContentRegistry, Func<CardZoneStore> getCardZoneStore, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries> getCoreGameEngineAdvancedLifecycleRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime, EngineStates.CoreAiBrainsState aiBrainsState, KernelCreateSnapshotCall createSnapshot, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWangLingMouRuntime>> getCharacterWangLingMouRuntime) : IMouWangLingFacts
 {
     public int Turn => actualTurnProgressState.ReferenceToTurnNumber;
     public int CurrentSeat => actualTurnProgressState.ReferenceToCurrentSeat;
@@ -17,9 +17,9 @@ internal sealed class MouWangLingFacts(EngineStates.CoreActualTurnProgressState 
     public IReadOnlyList<Card> Hand(int seat) => getCorePhysicalOwnedCardQueriesRuntime().GetHand(matchParticipantsState.ReferenceToPlayers[seat]);
     public CardKind HandKind(int seat, int id) => getCoreGameEngineAdvancedLifecycleRuntime().AdvancedEffectiveHandKind(matchParticipantsState.ReferenceToPlayers[seat], getCoreGameEngineAdvancedLifecycleRuntime().GetAdvancedCard(id));
     public IEnumerable<T> History<T>()
-        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>();
+        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>();
     public IReadOnlyList<CardMovementRecord> Movements(long before, long after) => Array.AsReadOnly(cardMovementJournalState.ReferenceToCardMovements.Where(m => m.Sequence > before && m.Sequence <= after).ToArray());
     public double KeepValue(int owner, int id) => EngineOwners.CoreNativeAiDecisionsRuntime.GetKeepValue(getCoreGameEngineAdvancedLifecycleRuntime().GetAdvancedCard(id), matchParticipantsState.ReferenceToPlayers[owner]);
     public double TargetValue(int owner, int target) => aiBrainsState.ReferenceToAiBrains[owner].ScoreProgramTarget(createSnapshot(owner), target, new(0, 0, 0, 0, 1, 0, true, false));
-    public bool ParentMatches(ProgramSkillFrame f) => getCharacterWangLingMouRuntime().MouWangLingParentMatches(f);
+    public bool ParentMatches(ProgramSkillFrame f) => getCharacterWangLingMouRuntime().Value.MouWangLingParentMatches(f);
 }

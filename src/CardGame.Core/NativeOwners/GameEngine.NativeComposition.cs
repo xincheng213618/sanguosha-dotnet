@@ -660,15 +660,15 @@ public sealed partial class GameEngine
         return (ProgramSkillFrame arg2, NativeDrawOutcome arg3) => ((Action<ProgramSkillFrame, NativeDrawOutcome>)this.BindRuntimeHandler(nativeTarget, typeof(Action<ProgramSkillFrame, NativeDrawOutcome>)))(arg2, arg3);
     },() => this.RecoveryReplacementEntries,() => this.CharacterStateProgramsEntries,() => this.HpChangeProgramsEntries,() => this.CardMovementProgramsEntries,() => this.SkillOwnershipWindowsEntries);
     internal NativeOwners.NativeDrawThresholdNativeOperations ComposeNativeNativeDrawThresholdNativeOperations() => new NativeOwners.NativeDrawThresholdNativeOperations(() => this.SkillProgramsEntries, () => this.WeiYanMobileShiEntries);
-    internal NativeOwners.NativeFrameAutomaticFacts ComposeNativeNativeFrameAutomaticFacts() => new NativeOwners.NativeFrameAutomaticFacts(() => this.PendingDecisionPolicyPipelineEntries, (NativeFrameAutomaticPhase target_phase) => this.ModeNativeFrameRuntimeEntries.ModeNativeFrames.Automatic[target_phase].Count, (NativeFrameAutomaticPhase target_phase, int target_index) => this.ModeNativeFrameRuntimeEntries.ModeNativeFrames.Automatic[target_phase][target_index].Step, (NativeFrameAutomaticPhase target_phase, int target_index) =>
+    internal NativeOwners.NativeFrameAutomaticFacts ComposeNativeNativeFrameAutomaticFacts() => new NativeOwners.NativeFrameAutomaticFacts(() => this.PendingDecisionPolicyPipelineEntries, (NativeFrameAutomaticPhase target_phase) => this.ModeNativeFrameRuntimeEntries.Value.ModeNativeFrames.Automatic[target_phase].Count, (NativeFrameAutomaticPhase target_phase, int target_index) => this.ModeNativeFrameRuntimeEntries.Value.ModeNativeFrames.Automatic[target_phase][target_index].Step, (NativeFrameAutomaticPhase target_phase, int target_index) =>
     {
-        var nativeTarget = this.ModeNativeFrameRuntimeEntries.ModeNativeFrames.Automatic[target_phase][target_index].Matches;
+        var nativeTarget = this.ModeNativeFrameRuntimeEntries.Value.ModeNativeFrames.Automatic[target_phase][target_index].Matches;
         return (ResolutionFrame arg2) => nativeTarget(this, arg2);
     });
     internal NativeOwners.NativeFrameAutomaticRules ComposeNativeNativeFrameAutomaticRules() => new NativeOwners.NativeFrameAutomaticRules(this.AdvanceRulesAndPublishState);
     internal NativeOwners.NativeFrameRoutes ComposeNativeNativeFrameRoutes() => new NativeOwners.NativeFrameRoutes(() =>
     {
-        var nativeTarget = this.ModeNativeFrameRuntimeEntries.ModeNativeFrames;
+        var nativeTarget = this.ModeNativeFrameRuntimeEntries.Value.ModeNativeFrames;
         return (ResolutionFrame frame) => nativeTarget.TryAdvance(this, frame);
     });
     internal NativeOwners.NativeHealthRecoveryFacts ComposeNativeNativeHealthRecoveryFacts() => new NativeOwners.NativeHealthRecoveryFacts(() => this._resolutionStack, () => this.AlternatingBenefitsEntries, () => this.ProgramCardPaymentsEntries);

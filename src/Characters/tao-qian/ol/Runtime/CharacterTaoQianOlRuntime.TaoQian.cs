@@ -24,7 +24,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
         var r = new TaoQianReceipt(TaoQianSource(f), f.GameplayHash, op, f.WindowContext?.ParentFrameId ?? 0, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, op == SkillProgramEffectOp.ResolveZongluanPreparationSlashAndDiscard ? TaoQianStage.ActorChoice : TaoQianStage.RecipientChoice);
         if (op == SkillProgramEffectOp.ResolveWenrenSequentialDraw)
         {
-            if (f.TriggerId is not null || f.ActivationId != "distribute-draw" || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } p || p.ActorSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<WenrenCommittedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == p))
+            if (f.TriggerId is not null || f.ActivationId != "distribute-draw" || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } p || p.ActorSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenrenCommittedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == p))
                 throw new InvalidOperationException("Wenren requires an unspent real own Play-phase draft.");
             r = r with
             {
@@ -146,7 +146,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
                 IssueZongluanSlash(f);
                 return;
             case "recipient-confirm":
-                if (r.Paid || r.Targets.Count == 0 || r.Phase is not { } phase || _coreProgramEventHistoryOperations.ProgramEventHistory<WenrenCommittedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == phase))
+                if (r.Paid || r.Targets.Count == 0 || r.Phase is not { } phase || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenrenCommittedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == phase))
                     throw new InvalidOperationException("Wenren repeated its confirmed actual Play queue.");
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { TaoQian = r with { Paid = true, Stage = TaoQianStage.Drawing, Cursor = 0 } });
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenrenCommittedEvent(f.Id, r.Source, r.GameplayHash, phase, r.Targets.Count));

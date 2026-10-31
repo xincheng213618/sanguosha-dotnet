@@ -9,7 +9,7 @@ internal sealed partial class CharacterCaoPiOlGodRuntime
     Winner IOlShenCaoPiFacts.Winner => _coreMatchOutcomeWinnerAccess._winner;
 
     ContentSkillDefinition IOlShenCaoPiFacts.Skill(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId);
-    IEnumerable<T> IOlShenCaoPiFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IOlShenCaoPiFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     IReadOnlyList<CardMovementRecord> IOlShenCaoPiFacts.Movements => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.AsReadOnly();
 
     IReadOnlyList<SkillGrant> IOlShenCaoPiFacts.Grants(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants;

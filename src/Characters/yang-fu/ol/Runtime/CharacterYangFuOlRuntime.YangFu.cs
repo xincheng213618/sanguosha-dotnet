@@ -20,7 +20,7 @@ internal sealed partial class CharacterYangFuOlRuntime
 
     IReadOnlyList<CardMovementRecord> IYangFuFacts.Movements => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.AsReadOnly();
 
-    IEnumerable<T> IYangFuFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IYangFuFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     CardLocation IYangFuFacts.Location(int cardId) => _cardZonesOperations._cardZones.GetLocation(cardId);
     CardUseFrame? IYangFuFacts.CardUse(long useId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId);
     ContentSkillDefinition IYangFuFacts.Skill(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId);
@@ -34,7 +34,7 @@ internal sealed partial class CharacterYangFuOlRuntime
     bool IYangFuOperations.BeginHpChildren(long frameId) => _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frameId, PostEventContinuation.AwaitedProgramMovement);
     bool IYangFuOperations.BeginMovementChildren(long frameId) => _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frameId);
     bool IYangFuOperations.BeginSkillChildren(long frameId) => _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(frameId);
-    SkillProgramStepOutcome IYangFuOperations.UseVirtualSlash(ProgramSkillFrame frame, int target) => _coreTriggeredCardProgramsOperations.UseTriggeredProgramVirtualSlash(frame, target);
+    SkillProgramStepOutcome IYangFuOperations.UseVirtualSlash(ProgramSkillFrame frame, int target) => _coreTriggeredCardProgramsOperations.Value.UseTriggeredProgramVirtualSlash(frame, target);
     SkillProgramStepOutcome IYangFuOperations.UseDeckEquipment(ProgramSkillFrame frame, int target, string bind) => _coreDeckEquipmentProgramsOperations.UseProgramRandomDeckEquipment(frame, target, bind);
     void IYangFuOperations.Finish(ProgramSkillFrame frame, bool completed) => _coreSkillProgramsOperations.FinishProgramSkill(frame, completed);
     int IYangFuOperations.DrawCards(int recipient, int amount, CardMoveReason reason) => _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[recipient], amount, true, reason).Count;

@@ -227,7 +227,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     internal void FinishMouXuHuangShipo(ProgramSkillFrame f)
     {
         var r = f.MouXuHuangShipo!;
-        var transfers = _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangShipoTransferPaidEvent>().Where(e => e.FrameId == f.Id).Sum(e => e.Count);
+        var transfers = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangShipoTransferPaidEvent>().Where(e => e.FrameId == f.Id).Sum(e => e.Count);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouXuHuangShipoCompletedEvent(f.Id, r.Gifts.Count(g => g.To == CardLocation.Hand(f.OwnerSeat)), transfers));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouXuHuangShipo = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);

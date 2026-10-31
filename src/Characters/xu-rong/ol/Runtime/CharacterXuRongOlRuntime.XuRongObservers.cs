@@ -9,7 +9,7 @@ internal sealed partial class CharacterXuRongOlRuntime
             return;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame d || d.Id != damageFrameId || d.ParentFrameId != attack.ResolutionId || d.TargetSeat != attack.TargetSeat || d.Amount != actualAmount || actualAmount <= 0 || _coreMatchParticipantsPlayersAccess._players[d.TargetSeat].Hp != hpBefore || !_coreMatchParticipantsPlayersAccess._players[d.TargetSeat].HasHpValue || d.XuRongActualHp is not null)
             throw new InvalidOperationException("Xu Rong requires the exact native pre-clamp damage payment.");
-        if (d.ArmorPayment is { } armor && (armor.HpBefore != hpBefore || !_coreDamageArmorPaymentsOperations.IsValidDamageArmorPayment(d, requireApplied: false)))
+        if (d.ArmorPayment is { } armor && (armor.HpBefore != hpBefore || !_coreDamageArmorPaymentsOperations.Value.IsValidDamageArmorPayment(d, requireApplied: false)))
             throw new InvalidOperationException("Xu Rong lost the exact Armor-adjusted native damage payment.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(d.Id, d with { XuRongActualHp = new(d.Id, attack.ResolutionId, d.TargetSeat, hpBefore, actualAmount, checked(hpBefore - (d.ArmorPayment?.HpLossAmount ?? actualAmount))) });
     }
@@ -17,20 +17,20 @@ internal sealed partial class CharacterXuRongOlRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 460)]
     internal void ObserveXuRongDyingQualification(IGameEvent payload)
     {
-        if (payload is not PlayerDyingEvent fact || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.Id != fact.ResolutionId || dying.VictimSeat != fact.VictimSeat || dying.XuRongProof is not null)
+        if (payload is not PlayerDyingEvent fact || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.Id != fact.ResolutionId || dying.VictimSeat != fact.VictimSeat || dying.XuRongProof is not null)
             return;
         if (!_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(p).GetInstanceTriggers(SkillProgramTriggerWindow.DyingEntering).Any(b => b.Trigger.Effects is [{ Op: SkillProgramEffectOp.ReplenishShaJueAndClaimDyingCause }])))
             return;
         var victim = _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat];
         if (!victim.HasHpValue || victim.Hp > 0)
             return;
-        var attack = _coreNativeDamageHandlesOperations.GetDyingAttack(dying);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDyingAttack(dying);
         var originalHp = victim.Hp;
         long? actionId = null;
         var ids = Array.Empty<int>();
         if (dying.Continuation == DyingContinuationKind.Damage && attack is not null && attack.TargetSeat == victim.Seat && attack.DamageWasApplied && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == dying.ParentFrameId)is DamageFrame damage && damage.ParentFrameId == attack.ResolutionId && damage.TargetSeat == victim.Seat)
         {
-            if (damage.XuRongActualHp is not { } paid || paid.DamageFrameId != damage.Id || paid.DamageAttemptResolutionId != attack.ResolutionId || paid.TargetSeat != victim.Seat || paid.ActualAmount != damage.Amount || paid.ActualAmount != attack.DamageAmount || paid.UnclampedHpAfter != paid.HpBefore - (damage.ArmorPayment?.HpLossAmount ?? paid.ActualAmount) || damage.ArmorPayment is { } armor && (armor.HpBefore != paid.HpBefore || !_coreDamageArmorPaymentsOperations.IsIssuedDamageArmorPayment(damage)) || (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageAppliedEvent>().LastOrDefault()is not { } applied || applied.TargetSeat != victim.Seat || applied.Amount != paid.ActualAmount || applied.RemainingHp != paid.UnclampedHpAfter || applied.SourceLess != attack.IsSourceLess || applied.SourceSeat != attack.SourceSeat || applied.Nature != damage.Nature || applied.ArmorPayment != damage.ArmorPayment))
+            if (damage.XuRongActualHp is not { } paid || paid.DamageFrameId != damage.Id || paid.DamageAttemptResolutionId != attack.ResolutionId || paid.TargetSeat != victim.Seat || paid.ActualAmount != damage.Amount || paid.ActualAmount != attack.DamageAmount || paid.UnclampedHpAfter != paid.HpBefore - (damage.ArmorPayment?.HpLossAmount ?? paid.ActualAmount) || damage.ArmorPayment is { } armor && (armor.HpBefore != paid.HpBefore || !_coreDamageArmorPaymentsOperations.Value.IsIssuedDamageArmorPayment(damage)) || (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageAppliedEvent>().LastOrDefault()is not { } applied || applied.TargetSeat != victim.Seat || applied.Amount != paid.ActualAmount || applied.RemainingHp != paid.UnclampedHpAfter || applied.SourceLess != attack.IsSourceLess || applied.SourceSeat != attack.SourceSeat || applied.Nature != damage.Nature || applied.ArmorPayment != damage.ArmorPayment))
                 throw new InvalidOperationException("Xu Rong dying requirement lost its exact native applied damage proof.");
             originalHp = paid.UnclampedHpAfter;
             var native = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId);
@@ -53,7 +53,7 @@ internal sealed partial class CharacterXuRongOlRuntime
         _coreNativeDyingFramesOperations.UpdateDyingFrame(dying.Id, current => current with { XuRongProof = proof });
     }
 
-    internal ProgramSkillWindowContext CreateXuRongDyingContext(ProgramSkillWindowContext context) => context.Window == SkillProgramTriggerWindow.DyingEntering && _coreDyingCursorRuntimeOperations.ActiveDying?.XuRongProof is { } proof ? context with
+    internal ProgramSkillWindowContext CreateXuRongDyingContext(ProgramSkillWindowContext context) => context.Window == SkillProgramTriggerWindow.DyingEntering && _coreDyingCursorRuntimeOperations.Value.ActiveDying?.XuRongProof is { } proof ? context with
     {
         XuRongDying = proof
     }

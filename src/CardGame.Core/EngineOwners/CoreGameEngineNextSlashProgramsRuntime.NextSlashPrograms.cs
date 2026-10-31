@@ -45,7 +45,7 @@ internal sealed partial class CoreGameEngineNextSlashProgramsRuntime
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (active.WindowContext is not { Window: SkillProgramTriggerWindow.SlashFullyDodged, CardUse: { } context } || _coreCardUseLifecycleOperations.LifecycleCardUse(context.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } use || action.ActorSeat != active.OwnerSeat || use.CardAttack is not { } attack || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } actualAttack || actualAttack.ResolutionId != use.Id || attack.SuccessfulDodgeResponses < attack.RequiredDodgeResponses)
             throw new InvalidOperationException("Next Slash damage requires the actual user's fully dodged Slash owner.");
-        if (_coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(actualAttack))
+        if (_coreSlashSuitDiscardOperations.Value.IsSlashDodgeCancellationPrevented(actualAttack))
             return;
         var cancellation = new NamedSlashCancellation(active.SkillId, active.OwnerSeat, attack.TargetSeat);
         if (use.NamedSlashCancellations?.Contains(cancellation) == true)

@@ -40,7 +40,7 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillsRuntime
     internal bool DrainDeathGrowthChildren(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
     internal void AdvanceDeathGrowthChoice(ProgramSkillFrame f)
     {
-        _coreDeathGrowthSkillObserversOperations.RequireDeathGrowthSkill(f);
+        _coreDeathGrowthSkillObserversOperations.Value.RequireDeathGrowthSkill(f);
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
         {
             FinishDeathGrowthSkill(f);
@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillsRuntime
     internal void ResolveDeathGrowthChoice(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A death-growth choice lost its owning frame.");
-        _coreDeathGrowthSkillObserversOperations.RequireDeathGrowthSkill(f);
+        _coreDeathGrowthSkillObserversOperations.Value.RequireDeathGrowthSkill(f);
         var r = f.DeathGrowthSkill!;
         if (r.Stage != DeathGrowthSkillStage.ChooseSkill || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], DeathGrowthChoices(f).Where(c => c.Id == selected.Id).ToArray()))
             throw new InvalidOperationException("The selected death-growth skill is stale, already owned or belongs to another chooser.");
@@ -93,7 +93,7 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DeathGrowthSkill.Stage: DeathGrowthSkillStage.DrawChildren } f || f.Id != id)
             return false;
-        _coreDeathGrowthSkillObserversOperations.RequireDeathGrowthSkill(f);
+        _coreDeathGrowthSkillObserversOperations.Value.RequireDeathGrowthSkill(f);
         if (!DrainDeathGrowthChildren(f))
             AdvanceDeathGrowthChoice(f);
         return true;
@@ -104,7 +104,7 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillsRuntime
     {
         if (f.DeathGrowthSkill?.Stage != DeathGrowthSkillStage.DrawChildren)
             return false;
-        _coreDeathGrowthSkillObserversOperations.RequireDeathGrowthSkill(f);
+        _coreDeathGrowthSkillObserversOperations.Value.RequireDeathGrowthSkill(f);
         if (!DrainDeathGrowthChildren(f))
             AdvanceDeathGrowthChoice(f);
         return true;
@@ -112,6 +112,6 @@ internal sealed partial class CoreGameEngineDeathGrowthSkillsRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 30)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30)]
-    internal bool CanContinueDeathGrowthSkill(ProgramSkillFrame f) => f.DeathGrowthSkill is not null && _coreDeathGrowthSkillObserversOperations.ValidDeathGrowthSkill(f);
+    internal bool CanContinueDeathGrowthSkill(ProgramSkillFrame f) => f.DeathGrowthSkill is not null && _coreDeathGrowthSkillObserversOperations.Value.ValidDeathGrowthSkill(f);
     SkillProgramStepOutcome IDeathGrowthSkillHost.DrawAfterOtherDeathThenChooseMissingSkill(ProgramSkillFrame f, SkillProgramEffect e) => BeginDeathGrowthSkill(f, e);
 }

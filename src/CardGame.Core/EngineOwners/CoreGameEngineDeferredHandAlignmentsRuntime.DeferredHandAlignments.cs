@@ -48,11 +48,11 @@ internal sealed partial class CoreGameEngineDeferredHandAlignmentsRuntime
         CleanupDeferredHandAlignments();
         var dueIds = _coreGameEngineDeferredHandAlignmentsDeferredHandAlignmentSequenceDeferredHandAlignmentsAccess._deferredHandAlignments.Where(d => d.DueKind == DeferredHandAlignmentDueKind.SourceCurrentTurnEnd ? d.Source.OwnerSeat == previous.Seat && d.CreatedTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber : d.TargetSeat == previous.Seat && d.CreatedTurn < _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber).OrderBy(d => d.Id).Select(d => d.Id).ToArray();
         var quarantines = _coreSoleTargetQuarantineOperations.OutstandingSoleTargetQuarantines(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, previous.Seat);
-        if (dueIds.Length == 0 && !_corePrivateTurnHoldsOperations.HasActualTurnEndMovementPrelude && quarantines.Length == 0)
+        if (dueIds.Length == 0 && !_corePrivateTurnHoldsOperations.Value.HasActualTurnEndMovementPrelude && quarantines.Length == 0)
             return false;
         if (_resolutionStackOperations._resolutionStack.Count != 0 || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Finished)
             throw new InvalidOperationException("Actual end alignment requires a clean finalized turn boundary.");
-        _coreRuntimeOperations.PushRuntimeFrame(new DeferredTurnEndFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, previous.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, skipped, Array.AsReadOnly(dueIds)) { Prelude = _corePrivateTurnHoldsOperations.HasActualTurnEndMovementPrelude ? new() : null, SoleTargetQuarantineReturns = quarantines.Length == 0 ? null : new(Array.AsReadOnly(quarantines)) });
+        _coreRuntimeOperations.PushRuntimeFrame(new DeferredTurnEndFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, previous.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, skipped, Array.AsReadOnly(dueIds)) { Prelude = _corePrivateTurnHoldsOperations.Value.HasActualTurnEndMovementPrelude ? new() : null, SoleTargetQuarantineReturns = quarantines.Length == 0 ? null : new(Array.AsReadOnly(quarantines)) });
         ContinueDeferredTurnEnd();
         return true;
     }
@@ -88,7 +88,7 @@ internal sealed partial class CoreGameEngineDeferredHandAlignmentsRuntime
                 if (_coreAfterTurnEndedProgramsOperations.ContinueAfterTurnEndedPrograms(parent))
                     return;
                 _characterQinLangOlOperations.ExpireQinLangXianyingTurnEndWine();
-                _characterAHuiNanOlOperations.ExpireAHuiNanJuemanTurnEndWine();
+                _characterAHuiNanOlOperations.Value.ExpireAHuiNanJuemanTurnEndWine();
                 _coreRuntimeOperations.PopResolutionFrame(parent.Id, ResolutionFrameKind.DeferredTurnEnd);
                 _coreActualTurnsOperations.AdvanceAfterDeferredTurnEnd(_coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat], parent.Skipped);
                 return;

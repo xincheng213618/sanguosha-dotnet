@@ -60,5 +60,5 @@ internal sealed partial class CoreGameEngineTurnDrawDebtPaymentObserversRuntime
     }
 
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 450)]
-    internal bool IsTurnDrawDebtPaymentProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && TurnDrawDebtPaymentObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsTurnDrawDebtPaymentProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { ResumesProgramSkill: true } dying && TurnDrawDebtPaymentObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

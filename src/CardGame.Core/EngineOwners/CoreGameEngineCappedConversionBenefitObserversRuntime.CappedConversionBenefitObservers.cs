@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineCappedConversionBenefitObserversRunt
     {
         for (var index = 1; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
         {
-            if (_resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.CappedConversionBenefit is not { AwaitingMovement: true, ActualDrawAttempted: true } r || !_coreCappedConversionBenefitsOperations.ValidCappedConversionBenefit(root) || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame original || original.Id != r.DamageWindowFrameId || damageWindowId is { } requested && original.Id != requested && !_resolutionStackOperations._resolutionStack.Skip(index + 1).Any(w => w.Id == requested))
+            if (_resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.CappedConversionBenefit is not { AwaitingMovement: true, ActualDrawAttempted: true } r || !_coreCappedConversionBenefitsOperations.Value.ValidCappedConversionBenefit(root) || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame original || original.Id != r.DamageWindowFrameId || damageWindowId is { } requested && original.Id != requested && !_resolutionStackOperations._resolutionStack.Skip(index + 1).Any(w => w.Id == requested))
                 continue;
             if (_resolutionStackOperations._resolutionStack[index + 1] is not CardsMovedTriggerWindowFrame movement || movement.Batch.ParentFrameId != root.Id || movement.Batch.AwaitingProgramFrameId != root.Id || movement.ResumeProgramFrameId is { } resume && resume != root.Id || movement.Batch.OriginOwnerSeat != root.OwnerSeat || movement.Batch.OriginSkillId != root.SkillId || movement.Batch.OriginSkillInstanceId != root.SkillInstanceId || movement.Batch.Movements is not [var actual] || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(actual) || actual.Sequence <= r.SequenceBefore || actual.Sequence > r.SequenceAfter || actual.From != CardLocation.DrawPile || actual.To != CardLocation.Hand(root.OwnerSeat) || actual.Reason.Value != $"skill-program.{(root.SkillId)}.capped-conversion-draw")
                 continue;
@@ -33,5 +33,5 @@ internal sealed partial class CoreGameEngineCappedConversionBenefitObserversRunt
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 690)]
-    internal bool IsCappedConversionBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is not null && CappedConversionObserverRoot()is not null;
+    internal bool IsCappedConversionBenefitProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is not null && CappedConversionObserverRoot()is not null;
 }

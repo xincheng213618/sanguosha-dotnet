@@ -41,7 +41,7 @@ internal sealed partial class CharacterNiuFuOlRuntime
         }
 
         if (child is ProgramLifecycleTriggerWindowFrame lifecycle && lifecycle.ResumeProgramFrameId == f.Id)
-            return lifecycle.Window == SkillProgramTriggerWindow.SkillsChanged && lifecycle.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || r.Stage == NiuFuStage.SourceTurnChildren && lifecycle.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && lifecycle.CharacterStateContinuation == CharacterStateContinuation.Program && lifecycle.OwnerSeat == r.DamageSourceSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == lifecycle.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == r.DamageSourceSeat && e.Change.Window == lifecycle.Window);
+            return lifecycle.Window == SkillProgramTriggerWindow.SkillsChanged && lifecycle.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || r.Stage == NiuFuStage.SourceTurnChildren && lifecycle.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && lifecycle.CharacterStateContinuation == CharacterStateContinuation.Program && lifecycle.OwnerSeat == r.DamageSourceSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == lifecycle.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == r.DamageSourceSeat && e.Change.Window == lifecycle.Window);
         if (f.PendingMovementContinuation is null || r.Steps.Count == 0)
             return false;
         var step = r.Steps[^1];

@@ -8,7 +8,7 @@ internal sealed partial class CharacterYanRouOlRuntime
     internal const string YanRouDiscardReason = "skill-program.yan-rou.choutao.discard", YanRouDrawReason = "skill-program.yan-rou.xiangshu.draw";
     internal CardConversionSource YanRouSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     SkillProgramStepOutcome IYanRouHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginYanRou(f, op);
-    internal bool YanRouSpent(int owner, string skill, string hash) => _coreProgramEventHistoryOperations.ProgramEventHistory<YanRouXiangshuSpentEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.GameplayHash == hash);
+    internal bool YanRouSpent(int owner, string skill, string hash) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YanRouXiangshuSpentEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.GameplayHash == hash);
     internal int YanRouTurnDamage(int owner) => Math.Min(5, _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is TurnStartedEvent).OfType<DamageAppliedEvent>().Where(e => !e.SourceLess && e.SourceSeat == owner && e.Amount > 0).Sum(e => e.Amount));
     internal bool YanRouParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
     {

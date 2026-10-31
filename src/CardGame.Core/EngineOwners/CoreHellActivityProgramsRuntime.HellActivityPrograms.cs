@@ -9,7 +9,7 @@ internal sealed partial class CoreHellActivityProgramsRuntime
     {
         if (gate.SkillId is not ("hell:player-tier" or "hell:boss-tier"))
             return true;
-        return _coreHellEncounterHostOperations.HellFeature?.AllowsTierTrigger(gate.SkillId, gate.Candidate.BindingId, gate.Owner.TeamId) ?? false;
+        return _coreHellEncounterHostOperations.Value.HellFeature?.AllowsTierTrigger(gate.SkillId, gate.Candidate.BindingId, gate.Owner.TeamId) ?? false;
     }
 
     internal SkillProgramStepOutcome ExecuteHellActivity(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
@@ -19,7 +19,7 @@ internal sealed partial class CoreHellActivityProgramsRuntime
         switch (operation)
         {
             case SkillProgramEffectOp.GainHellTurnSlash:
-                if (_coreHellEncounterHostOperations.HellFeature?.AllowsTierTrigger("hell:boss-tier", "turn-slash", owner.TeamId) != true || frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || _coreActualTurnProgressTurnProgressionAccess._turnProgression.OwnerSeat != owner.Seat)
+                if (_coreHellEncounterHostOperations.Value.HellFeature?.AllowsTierTrigger("hell:boss-tier", "turn-slash", owner.TeamId) != true || frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || _coreActualTurnProgressTurnProgressionAccess._turnProgression.OwnerSeat != owner.Seat)
                     throw new InvalidOperationException("Hell tier Slash lost its actual turn owner.");
                 var slash = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(card => card.Kind == CardKind.Slash) ?? _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).FirstOrDefault(card => card.Kind == CardKind.Slash);
                 if (slash is not null)
@@ -40,7 +40,7 @@ internal sealed partial class CoreHellActivityProgramsRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.DrawHellChongshengRefill)]
     internal void ReturnHellChongshengDraw(ProgramSkillFrame frame, NativeDrawOutcome outcome)
     {
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<HellChongshengRefillIssuedEvent>().Single(e => e.ProgramFrameId == frame.Id);
+        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellChongshengRefillIssuedEvent>().Single(e => e.ProgramFrameId == frame.Id);
         if (issued.OwnerSeat != frame.OwnerSeat || outcome.RecipientSeat != frame.OwnerSeat || outcome.RequestedCount != issued.RequestedCount)
             throw new InvalidOperationException("Chongsheng refill changed its exact paid draw request.");
         _coreProgramLifecycleOperations.CompleteProgramDrawCards(frame.Id, frame.OwnerSeat, null, SkillProgramCardSetVisibility.Private, new("hell.chongsheng.refill"), 0, outcome.ActualDrawIds);

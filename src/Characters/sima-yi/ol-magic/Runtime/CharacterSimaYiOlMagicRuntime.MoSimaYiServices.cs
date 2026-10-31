@@ -14,10 +14,10 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     bool IMoSimaYiFacts.IsHuman(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
     bool IMoSimaYiFacts.IsGameOver => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
-    IReadOnlyList<T> IMoSimaYiFacts.History<T>() => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<T>().ToArray());
+    IReadOnlyList<T> IMoSimaYiFacts.History<T>() => Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>().ToArray());
     IReadOnlyList<CardConversionSource> IMoSimaYiFacts.GuiFuOwners() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(p, MoSimaYiComposition.Guifu)).Select(p => new CardConversionSource(MoSimaYiComposition.Guifu, "acquire-round", p.Seat, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(p, MoSimaYiComposition.Guifu))).ToArray());
     IReadOnlyList<string> IMoSimaYiFacts.EffectiveSkills(int owner) => Array.AsReadOnly(_coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[owner]).ActiveGrants.Select(g => g.SkillId).Distinct(StringComparer.Ordinal).ToArray());
-    IReadOnlyList<int> IMoSimaYiFacts.RetaliationActors(int owner, int round) => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiDamageCauseEvent>().Where(e => e.Cause.Round == round && e.Cause.SourceSeat == owner).Select(e => e.Cause.TargetSeat).Where(((IMoSimaYiFacts)this).IsAlive).Distinct().OrderBy(seat => (seat - owner + _coreMatchParticipantsPlayersAccess._players.Count) % _coreMatchParticipantsPlayersAccess._players.Count).ToArray());
+    IReadOnlyList<int> IMoSimaYiFacts.RetaliationActors(int owner, int round) => Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoSimaYiDamageCauseEvent>().Where(e => e.Cause.Round == round && e.Cause.SourceSeat == owner).Select(e => e.Cause.TargetSeat).Where(((IMoSimaYiFacts)this).IsAlive).Distinct().OrderBy(seat => (seat - owner + _coreMatchParticipantsPlayersAccess._players.Count) % _coreMatchParticipantsPlayersAccess._players.Count).ToArray());
     MoSimaYiDodge? IMoSimaYiFacts.FindDodge()
     {
         foreach (var location in new[]
@@ -49,7 +49,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
         _ = _contentRegistryOperations._contentRegistry.GetSkill(skill);
         var player = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var source = temporary ? $"turn:{(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber)}:mo-sima-yi:{(f.Id)}:{(skill)}" : $"mo-sima-yi:{(f.Id)}:{(skill)}";
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiSkillGrantedEvent>().Any(e => e.FrameId == f.Id && e.SkillId == skill))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoSimaYiSkillGrantedEvent>().Any(e => e.FrameId == f.Id && e.SkillId == skill))
             throw new InvalidOperationException("A frozen Sima Yi skill grant cannot be paid twice.");
         var old = _coreNationalSkillsOperations.GetSkillBindingShard(player).ActiveGrants.FirstOrDefault(g => g.SkillId == skill);
         var expiry = temporary ? new SkillGrantNextActualTurnStartExpiry(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, player.Seat) : null;
@@ -135,7 +135,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.RumoEntry, 33900)]
     internal bool IsMoSimaYiRumoEntry(ProgramSkillFrame f) => f.MoSimaYi is { Operation: SkillProgramEffectOp.ResolveMoSimaYiMoubian, Stage: MoSimaYiStage.Granting } && MoSimaYi.Valid(f);
     [ProgramPipelineHook(ProgramPipelinePhase.RumoOrigin, 33900)]
-    internal bool IsMoSimaYiRumoOrigin(long id, CardConversionSource source, string hash) => _coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiStartedEvent>().Count(e => e.FrameId == id && e.Source == source && e.GameplayHash == hash && e.Operation == SkillProgramEffectOp.ResolveMoSimaYiMoubian) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiSkillFrozenEvent>().Any(e => e.FrameId == id && e.SkillId == MoSimaYiComposition.Zhouxi);
+    internal bool IsMoSimaYiRumoOrigin(long id, CardConversionSource source, string hash) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoSimaYiStartedEvent>().Count(e => e.FrameId == id && e.Source == source && e.GameplayHash == hash && e.Operation == SkillProgramEffectOp.ResolveMoSimaYiMoubian) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoSimaYiSkillFrozenEvent>().Any(e => e.FrameId == id && e.SkillId == MoSimaYiComposition.Zhouxi);
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 33900)]
     internal bool RecordMoSimaYiDamage(GameEngine.IDamageAttempt attack, long damageFrameId)
     {

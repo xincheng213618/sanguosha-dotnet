@@ -23,7 +23,7 @@ internal sealed partial class CharacterZouShiLeRuntime
     {
         if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveHuoxinNonEquipmentUse))
             return true;
-        return candidate.SkillId == "le:huoxin" && candidate.BindingId == "non-equipment-use" && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && TryGetHuoxinUse(candidate.OwnerSeat, context, out var window) && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != candidate.OwnerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0) && !_coreProgramEventHistoryOperations.ProgramEventHistory<HuoxinStartedEvent>().Any(e => e.ActionId == window.Action.ActionId && e.Source.OwnerSeat == candidate.OwnerSeat);
+        return candidate.SkillId == "le:huoxin" && candidate.BindingId == "non-equipment-use" && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && TryGetHuoxinUse(candidate.OwnerSeat, context, out var window) && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != candidate.OwnerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuoxinStartedEvent>().Any(e => e.ActionId == window.Action.ActionId && e.Source.OwnerSeat == candidate.OwnerSeat);
     }
 
     internal SkillProgramStepOutcome BeginHuoxin(ProgramSkillFrame supplied)

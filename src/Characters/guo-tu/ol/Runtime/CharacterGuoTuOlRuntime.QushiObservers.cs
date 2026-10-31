@@ -5,7 +5,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
 {
     internal bool ValidQushi(ProgramSkillFrame f)
     {
-        if (f.Qushi is not { } r || r.Source != QushiSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || r.ParentId != (f.WindowContext?.ParentFrameId ?? 0) || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.ProgramEventHistory<QushiStartedEvent>().Count(e => e == new QushiStartedEvent(f.Id, r.Source, r.GameplayHash, r.Op, r.ActualTurn, r.TurnOwner, r.ParentId)) != 1)
+        if (f.Qushi is not { } r || r.Source != QushiSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || r.ParentId != (f.WindowContext?.ParentFrameId ?? 0) || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiStartedEvent>().Count(e => e == new QushiStartedEvent(f.Id, r.Source, r.GameplayHash, r.Op, r.ActualTurn, r.TurnOwner, r.ParentId)) != 1)
             return false;
         if (r.Op == SkillProgramEffectOp.ResolveQushiDrawAndPrivateSeal)
         {
@@ -20,7 +20,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
 
         if (!r.Paid)
             return false;
-        var invoice = _coreProgramEventHistoryOperations.ProgramEventHistory<QushiMovementPaidEvent>().Where(e => e.FrameId == f.Id && e.Step == r.Step).ToArray();
+        var invoice = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiMovementPaidEvent>().Where(e => e.FrameId == f.Id && e.Step == r.Step).ToArray();
         if (invoice is not [var m] || m.Before != r.Before || m.After != r.After || m.Count < 0)
             return false;
         if (f.PendingMovementContinuation is { } p && !IsQushiMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p))
@@ -29,7 +29,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
             return false;
         if (r.Stage is QushiStage.RemoveChildren or QushiStage.RewardChildren)
         {
-            if (r.Seal is not { } s || _coreProgramEventHistoryOperations.ProgramEventHistory<QushiSealRemovedEvent>().Count(e => e.FrameId == f.Id && e.SealId == s.SealId && e.HolderSeat == s.HolderSeat && e.CardId == s.CardId && !e.HolderDeath && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(v => v.Sequence == e.Sequence && v.CardId == s.CardId && v.From == s.Location && v.To == CardLocation.DiscardPile && v.Reason.Value == QushiRemoveReason)) != 1)
+            if (r.Seal is not { } s || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiSealRemovedEvent>().Count(e => e.FrameId == f.Id && e.SealId == s.SealId && e.HolderSeat == s.HolderSeat && e.CardId == s.CardId && !e.HolderDeath && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(v => v.Sequence == e.Sequence && v.CardId == s.CardId && v.From == s.Location && v.To == CardLocation.DiscardPile && v.Reason.Value == QushiRemoveReason)) != 1)
                 return false;
         }
 

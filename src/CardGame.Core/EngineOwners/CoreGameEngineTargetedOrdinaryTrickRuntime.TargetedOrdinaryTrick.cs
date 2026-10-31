@@ -102,7 +102,7 @@ internal sealed partial class CoreGameEngineTargetedOrdinaryTrickRuntime
             WindowFrameId = window.Id,
             CardUseFrameId = use.Id,
             ActionId = use.Action!.ActionId,
-            Source = _coreUnequalHandHpEndingOperations.TargetedTrickHandHpSource(f),
+            Source = _coreUnequalHandHpEndingOperations.Value.TargetedTrickHandHpSource(f),
             GameplayHash = f.GameplayHash,
             InstructionIndex = f.InstructionIndex,
             OriginalTargets = use.TargetSeats,

@@ -10,7 +10,7 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         if (!owner.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, CardKind.Alcohol, CardActionType.Use) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(owner.Seat, CardKind.Alcohol, [])) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner.Seat, owner.Seat, CardKind.Alcohol) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, CardKind.Alcohol, Suit.None) || _coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat))
             return false;
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying is { } d && d.VictimSeat == owner.Seat && owner.Hp <= 0;
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && d.VictimSeat == owner.Seat && owner.Hp <= 0;
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var a = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, owner.Seat, owner.Seat, null, null, null, CardKind.Alcohol, [owner.Seat], [], [r.Source], effectiveSuit: Suit.None, effectiveRank: 0));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouDongZhuoOl = r with { WineUseId = id } });
@@ -35,7 +35,7 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
         var n = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id);
         if (n < 1 || _resolutionStackOperations._resolutionStack[n - 1] is not ProgramSkillFrame { MouDongZhuoOl: { Paid: true, Stage: MouDongZhuoOlStage.Wine } p } f || f.Id != r.ParentId || f.InstructionIndex != r.Instruction || p.WineUseId != id || p.Source != r.Source || p.GameplayHash != r.Hash || !MouDongZhuoOl.Valid(f))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhuoOlWineIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == id && e.ActionId == a.ActionId && e.SelfDying == r.SelfDying) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhuoOlWineIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == id && e.ActionId == a.ActionId && e.SelfDying == r.SelfDying) == 1;
     }
 
     internal bool ContinueMouDongZhuoOlWine(long id, ProgramSimpleCardContinuation c)

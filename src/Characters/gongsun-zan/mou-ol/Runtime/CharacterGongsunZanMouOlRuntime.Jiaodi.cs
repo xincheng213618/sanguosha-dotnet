@@ -13,7 +13,7 @@ internal sealed partial class CharacterGongsunZanMouOlRuntime
     {
         if (gate.WindowContext?.CardUse is not { } c || _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } a } use)
             return false;
-        return a.ActorSeat == gate.Candidate.OwnerSeat && a.ActionId == c.CardActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && a.EffectiveDesignatedTargetSeats is [var target] && target != a.ActorSeat && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == a.ActorSeat);
+        return a.ActorSeat == gate.Candidate.OwnerSeat && a.ActionId == c.CardActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && a.EffectiveDesignatedTargetSeats is [var target] && target != a.ActorSeat && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == a.ActorSeat);
     }
 
     internal CardUseFrame? MouGszUse(ProgramSkillFrame f)
@@ -27,7 +27,7 @@ internal sealed partial class CharacterGongsunZanMouOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var use = MouGszUse(f) ?? throw new InvalidOperationException("Jiaodi lost its native Slash designation parent.");
-        if (f.InstructionIndex != 1 || f.MouGongsunZan is not null || use.Action!.EffectiveDesignatedTargetSeats is not [var target] || target == f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == f.OwnerSeat))
+        if (f.InstructionIndex != 1 || f.MouGongsunZan is not null || use.Action!.EffectiveDesignatedTargetSeats is not [var target] || target == f.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Jiaodi requires its one original other target exactly once.");
         var ownRange = _coreNativeRuleQueriesOperations.GetAttackRange(f.OwnerSeat);
         var targetRange = _coreNativeRuleQueriesOperations.GetAttackRange(target);

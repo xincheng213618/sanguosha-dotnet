@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MobileOrdinaryQiangxiQueries(Func<RuntimeEntries.CharacterDianWeiMobileEntries> getCharacterDianWeiMobileRuntime) : IMobileOrdinaryQiangxiQueries
+internal sealed class MobileOrdinaryQiangxiQueries(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDianWeiMobileRuntime>> getCharacterDianWeiMobileRuntime) : IMobileOrdinaryQiangxiQueries
 {
-    public bool AllowsWeaponTarget(int ownerSeat, int weaponId, int targetSeat) => getCharacterDianWeiMobileRuntime().AllowsMobileOrdinaryQiangxiWeaponTarget(ownerSeat, weaponId, targetSeat);
+    public bool AllowsWeaponTarget(int ownerSeat, int weaponId, int targetSeat) => getCharacterDianWeiMobileRuntime().Value.AllowsMobileOrdinaryQiangxiWeaponTarget(ownerSeat, weaponId, targetSeat);
 }

@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineProgramRevealsRuntime
             throw new InvalidOperationException("A hand reveal requires exactly one selected target.");
         var chooserSeat = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(active, chooserRef);
         var holderSeat = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(active, cardOwnerRef);
-        if (chooserSeat != frame.OwnerSeat || holderSeat == frame.OwnerSeat && mode != SkillProgramRevealMode.SelfChoiceOtherwiseRandom && !(mode == SkillProgramRevealMode.Chooser && _characterLuMengHappyGodOperations.IsExactHappyGongxinSelfReveal(active)))
+        if (chooserSeat != frame.OwnerSeat || holderSeat == frame.OwnerSeat && mode != SkillProgramRevealMode.SelfChoiceOtherwiseRandom && !(mode == SkillProgramRevealMode.Chooser && _characterLuMengHappyGodOperations.Value.IsExactHappyGongxinSelfReveal(active)))
             throw new InvalidOperationException("A hand reveal must target another character's hand and be chosen by the skill owner.");
         var candidates = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holderSeat]).Select(card => card.Id).ToArray();
         if (candidates.Length == 0)

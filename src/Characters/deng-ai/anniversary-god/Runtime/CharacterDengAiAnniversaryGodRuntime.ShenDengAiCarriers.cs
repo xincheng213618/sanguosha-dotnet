@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiAnniversaryGodRuntime
 {
-    internal bool IsShenDaCarrier(int id) => id > 0 && _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess._generatedPhysicalCardIds.Contains(id) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiCarrierCreatedEvent>().Where(e => e.CardId == id).ToArray()is [var f] && CharacterDengAiHappyGodRuntime.IsShenDaCuixin(f.Source.SkillId) && _contentRegistryOperations._contentRegistry.GetSkill(f.Source.SkillId).Program?.GameplayHash == f.GameplayHash && _coreAdvancedLifecycleOperations.GetAdvancedCard(id)is { Suit: Suit.None, Rank: 0 } c && c.Kind == f.Kind && CoreNativeCardClassificationsRuntime.IsDelayedCard(c.Kind);
+    internal bool IsShenDaCarrier(int id) => id > 0 && _coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess._generatedPhysicalCardIds.Contains(id) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiCarrierCreatedEvent>().Where(e => e.CardId == id).ToArray()is [var f] && CharacterDengAiHappyGodRuntime.IsShenDaCuixin(f.Source.SkillId) && _contentRegistryOperations._contentRegistry.GetSkill(f.Source.SkillId).Program?.GameplayHash == f.GameplayHash && _coreAdvancedLifecycleOperations.GetAdvancedCard(id)is { Suit: Suit.None, Rank: 0 } c && c.Kind == f.Kind && CoreNativeCardClassificationsRuntime.IsDelayedCard(c.Kind);
     internal CardLocation NormalizeShenDaCarrierDestination(Card card, CardLocation from, CardLocation to)
     {
         if (!IsShenDaCarrier(card.Id) || from == to || to == CardLocation.OutsideGame)
@@ -19,12 +19,12 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
     {
         if (m.To != CardLocation.OutsideGame || !IsShenDaCarrier(m.CardId))
             return;
-        if (m.From == CardLocation.OutsideGame || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiCarrierDestroyedEvent>().Any(e => e.CardId == m.CardId))
+        if (m.From == CardLocation.OutsideGame || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiCarrierDestroyedEvent>().Any(e => e.CardId == m.CardId))
             throw new InvalidOperationException("A Cuixin delayed-card carrier cannot be destroyed twice or re-enter a reusable zone.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenDengAiCarrierDestroyedEvent(m.CardId, m.Sequence, m.From, m.Reason));
     }
 
-    internal bool IsShenDaCarrierDestroyedMaterial(CardMovementRecord m) => m.To == CardLocation.OutsideGame && IsShenDaCarrier(m.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiCarrierDestroyedEvent>().Where(e => e.CardId == m.CardId).ToArray()is [var f] && f.MovementSequence == m.Sequence && f.From == m.From && f.Reason == m.Reason;
+    internal bool IsShenDaCarrierDestroyedMaterial(CardMovementRecord m) => m.To == CardLocation.OutsideGame && IsShenDaCarrier(m.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiCarrierDestroyedEvent>().Where(e => e.CardId == m.CardId).ToArray()is [var f] && f.MovementSequence == m.Sequence && f.From == m.From && f.Reason == m.Reason;
     internal bool IsShenDaCarrierDestroyedMaterial(int id, CardLocation from, CardLocation to) => to == CardLocation.OutsideGame && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.From == from && m.To == to && IsShenDaCarrierDestroyedMaterial(m));
     internal bool IsShenDaCarrierDestroyedMaterial(long use, int id) => _coreCardUseLifecycleOperations.LifecycleCardUse(use)?.Action?.PhysicalCards.SingleOrDefault(c => c.CardId == id)is { } c && IsShenDaCarrierDestroyedMaterial(id, c.From, CardLocation.OutsideGame);
     internal void RetireUnplacedShenDaCarrier(long id)

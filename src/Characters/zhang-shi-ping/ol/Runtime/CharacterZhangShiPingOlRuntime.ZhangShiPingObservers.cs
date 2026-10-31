@@ -10,7 +10,7 @@ internal sealed partial class CharacterZhangShiPingOlRuntime
             return false;
         return moved.Batch.Movements.All(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && (r.Stage switch
         {
-            XingGuStage.InitialChildren => m.From == CardLocation.DrawPile && m.To == r.PileLocation && m.Reason.Value == XingGuStoreReason && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangShiPingXingGuCardStoredEvent>().Any(e => e.FrameId == f.Id && e.CardId == m.CardId && e.MovementSequence == m.Sequence),
+            XingGuStage.InitialChildren => m.From == CardLocation.DrawPile && m.To == r.PileLocation && m.Reason.Value == XingGuStoreReason && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangShiPingXingGuCardStoredEvent>().Any(e => e.FrameId == f.Id && e.CardId == m.CardId && e.MovementSequence == m.Sequence),
             XingGuStage.PlacementChildren => m.CardId == r.CardId && m.From == r.PileLocation && m.To == CardLocation.Equipment(r.RecipientSeat!.Value) && m.Reason == CardMoveReasons.EquipmentEnter || m.From == CardLocation.Equipment(r.RecipientSeat!.Value) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.EquipmentReplace,
             XingGuStage.DiamondChildren => m.CardId == r.DiamondCardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == XingGuDiamondReason,
             _ => false

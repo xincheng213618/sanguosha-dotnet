@@ -134,7 +134,7 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
     internal bool TryQirangExtraParent(int owner, string skill, string instance, ProgramSkillWindowContext context, out CardUseFrame use)
     {
         use = null !;
-        if (!_coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(owner, context, out var actual, out _) || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(actual.CardKind) || actual.QirangQualification is not { } q || q.CardUseFrameId != actual.Id || q.Lease.Source.SkillId != skill || q.Lease.Source.SkillInstanceId != instance || q.Lease.OwnerSeat != owner || actual.Action is not { Type: CardActionType.Use } action || action.ActorSeat != owner || action.ProviderSeat != owner || action.PhysicalCards is not [var physical] || physical.CardId != q.Lease.CardId || physical.From != CardLocation.Hand(owner) || physical.CardKind != q.Lease.PrintedKind || action.EffectiveKind != q.Lease.PrintedKind || action.ActionId != q.OriginalAction.ActionId || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(q.OriginalAction, action) || !ValidQirangQualification(q) || _coreRoundGainedTrickTargetsOperations.RoundGainedOriginalTargets(actual).Count != (actual.CardKind == CardKind.BorrowedSword ? 2 : 1))
+        if (!_coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(owner, context, out var actual, out _) || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(actual.CardKind) || actual.QirangQualification is not { } q || q.CardUseFrameId != actual.Id || q.Lease.Source.SkillId != skill || q.Lease.Source.SkillInstanceId != instance || q.Lease.OwnerSeat != owner || actual.Action is not { Type: CardActionType.Use } action || action.ActorSeat != owner || action.ProviderSeat != owner || action.PhysicalCards is not [var physical] || physical.CardId != q.Lease.CardId || physical.From != CardLocation.Hand(owner) || physical.CardKind != q.Lease.PrintedKind || action.EffectiveKind != q.Lease.PrintedKind || action.ActionId != q.OriginalAction.ActionId || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(q.OriginalAction, action) || !ValidQirangQualification(q) || _coreRoundGainedTrickTargetsOperations.Value.RoundGainedOriginalTargets(actual).Count != (actual.CardKind == CardKind.BorrowedSword ? 2 : 1))
             return false;
         use = actual;
         return true;
@@ -143,7 +143,7 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
     internal IReadOnlyList<PromptChoice> QirangExtraChoices(ProgramSkillFrame f)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(f.ZhugeGuo!.UseId!.Value)!;
-        var originals = _coreRoundGainedTrickTargetsOperations.RoundGainedOriginalTargets(use);
+        var originals = _coreRoundGainedTrickTargetsOperations.Value.RoundGainedOriginalTargets(use);
         var choices = new List<PromptChoice>();
         var primary = originals.Where((_, index) => use.CardKind != CardKind.BorrowedSword || index % 2 == 0).ToHashSet();
         foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(p => !primary.Contains(p.Seat) && _coreUniqueLeaderTrickTargetsOperations.CanBeUniqueLeaderTrickTarget(use, p)).OrderBy(p => p.Seat))
@@ -184,7 +184,7 @@ internal sealed partial class CharacterZhugeGuoOlRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (choice.Targets.Count > 0)
         {
-            var targets = _coreRoundGainedTrickTargetsOperations.RoundGainedOriginalTargets(use).Concat(choice.Targets).ToArray();
+            var targets = _coreRoundGainedTrickTargetsOperations.Value.RoundGainedOriginalTargets(use).Concat(choice.Targets).ToArray();
             var action = _coreDesignatedExtraTargetsOperations.CloneDesignatedExtraTargetAction(use.Action!, targets);
             _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(use with { TargetSeats = Array.AsReadOnly(targets), Action = action, TargetsAdjusted = true, Enhancements = use.Enhancements | CurrentCardEnhancement.ExtraTarget }, action);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardUseTargetAddedEvent(f.Id, f.SkillId, f.OwnerSeat, use.Id, choice.Targets[0]));

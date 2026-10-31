@@ -111,6 +111,6 @@ internal sealed partial class CoreGameEngineShanheMuluRuntime
             return 0;
         var owner = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var instances = _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(instance => instance.SkillId == ElephantYangshengSkill).Select(instance => instance.SkillInstanceId).ToHashSet(StringComparer.Ordinal);
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheElephantDamageFrozenEvent>().Where(item => item.Source.OwnerSeat == owner.Seat && instances.Contains(item.Source.SkillInstanceId)).GroupBy(item => item.Source.SkillInstanceId).Select(group => group.Last().Amount).Sum();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheElephantDamageFrozenEvent>().Where(item => item.Source.OwnerSeat == owner.Seat && instances.Contains(item.Source.SkillInstanceId)).GroupBy(item => item.Source.SkillInstanceId).Select(group => group.Last().Amount).Sum();
     }
 }

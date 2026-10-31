@@ -31,8 +31,8 @@ internal sealed partial class CharacterZhangFeiOlMagicRuntime
     IReadOnlyList<ProgramTriggerCandidate> IMoZhangFeiFacts.Candidates(int seat, SkillProgramTriggerWindow window) => _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[seat], window);
     SkillProgramTrigger IMoZhangFeiFacts.Trigger(ProgramTriggerCandidate c) => _coreProgramLifecycleOperations.GetProgramTrigger2(c);
     SkillProgram IMoZhangFeiFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    IEnumerable<T> IMoZhangFeiFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
-    CardKind? IMoZhangFeiFacts.DamageKind(long windowId) => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id == windowId ? _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.EffectiveCardKind ?? _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.Card?.Kind : null;
+    IEnumerable<T> IMoZhangFeiFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
+    CardKind? IMoZhangFeiFacts.DamageKind(long windowId) => _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id == windowId ? _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.EffectiveCardKind ?? _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.Card?.Kind : null;
     IReadOnlyList<Card> IMoZhangFeiFacts.DrawPileSlashes(int maximum) => Array.AsReadOnly(_cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Where(c => c.Kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash).Take(maximum).ToArray());
     void IMoZhangFeiOperations.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     void IMoZhangFeiOperations.Recover(ProgramSkillFrame f, int amount) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, amount, null, null);

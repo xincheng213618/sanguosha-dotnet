@@ -113,7 +113,7 @@ internal sealed partial class CoreGameEngineForeignPublicPileSlashesRuntime
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(resolutionId, frame => frame with { ForeignPublicPileSlashBaseDamage = 1 + actor.AlcoholDamageBonus });
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(resolutionId, actor.Seat, ownerSeat, card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[ownerSeat], CardKind.Slash));
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(resolutionId, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(resolutionId, actor);
         actor.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, ownerSeat));

@@ -16,7 +16,7 @@ internal sealed partial class CoreNativeMultiTargetActionsRuntime
 
     internal void AddFangtianHalberdSlashActions(ICollection<LegalAction> actions, CharacterState actor, Card physicalCard, IReadOnlyList<CharacterState> legalTargets, string slashName, CardKind? playedCardKind, CardConversionSource? conversionSource = null, IReadOnlyList<CardConversionSource>? additionalConversionSources = null)
     {
-        if (!_coreNativeDamageHandlesOperations.UsesFormalFangtianHalberd || _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count != 1 || _corePhysicalOwnedCardQueriesOperations.GetHand(actor)[0].Id != physicalCard.Id || !_coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.FangtianHalberd) || legalTargets.Count < 2)
+        if (!_coreNativeDamageHandlesOperations.Value.UsesFormalFangtianHalberd || _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count != 1 || _corePhysicalOwnedCardQueriesOperations.GetHand(actor)[0].Id != physicalCard.Id || !_coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.FangtianHalberd) || legalTargets.Count < 2)
         {
             return;
         }

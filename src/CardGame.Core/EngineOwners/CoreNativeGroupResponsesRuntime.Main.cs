@@ -59,7 +59,7 @@ internal sealed partial class CoreNativeGroupResponsesRuntime
             throw new InvalidOperationException("The Zhangba group response is not current.");
         }
 
-        var responseCosts = _coreResponseCompletionZhangbaOperations.CaptureZhangbaResponseCompletionCosts(responder, pair);
+        var responseCosts = _coreResponseCompletionZhangbaOperations.Value.CaptureZhangbaResponseCompletionCosts(responder, pair);
         MoveZhangbaResponseCards(responder, pair, group.ResolutionId, group.SourceSeat);
         _coreMatchLogOperations.AddLog("CardResponded", $"{(responder.Name)} 发动【丈八蛇矛】，将两张手牌当【杀】响应【{(group.Card.DisplayName)}】。", responder.Seat, group.SourceSeat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(responder.Seat, CardKind.Slash);

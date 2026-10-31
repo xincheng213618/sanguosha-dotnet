@@ -9,13 +9,13 @@ internal sealed partial class CharacterXiangChongOlRuntime
     internal static CardConversionSource XiangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_xiang_chong_ol_XiangChong.XiangSource(f);
     internal int XiangDebtCount(int owner)
     {
-        var through = _coreProgramEventHistoryOperations.ProgramEventHistory<XiangChongDebtConsumedEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.ThroughFrameId).DefaultIfEmpty(0).Max();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<XiangChongGuyingInvokedEvent>().Count(e => e.OwnerSeat == owner && e.FrameId > through);
+        var through = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiangChongDebtConsumedEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.ThroughFrameId).DefaultIfEmpty(0).Max();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiangChongGuyingInvokedEvent>().Count(e => e.OwnerSeat == owner && e.FrameId > through);
     }
 
     internal CardMovementRecord? XiangLoss(int owner, ProgramSkillWindowContext context)
     {
-        if (context.Window != SkillProgramTriggerWindow.CardsMoved || context.MovementBatch is not { } b || b.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || b.MovementTiming is not { } t || t.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || t.ActualTurnOwnerSeat == owner || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || !_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<XiangChongGuyingInvokedEvent>().Any(e => e.OwnerSeat == owner && e.ActualTurn == b.TurnNumber))
+        if (context.Window != SkillProgramTriggerWindow.CardsMoved || context.MovementBatch is not { } b || b.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || b.MovementTiming is not { } t || t.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || t.ActualTurnOwnerSeat == owner || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || !_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiangChongGuyingInvokedEvent>().Any(e => e.OwnerSeat == owner && e.ActualTurn == b.TurnNumber))
             return null;
         var lost = b.Movements.Where(m => m.From.OwnerSeat == owner && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.From != m.To && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)).ToArray();
         return lost is [var single] ? single : null;
@@ -75,7 +75,7 @@ internal sealed partial class CharacterXiangChongOlRuntime
         if (branch == "debt")
         {
             var count = XiangDebtCount(f.OwnerSeat);
-            var through = _coreProgramEventHistoryOperations.ProgramEventHistory<XiangChongGuyingInvokedEvent>().Where(x => x.OwnerSeat == f.OwnerSeat).Select(x => x.FrameId).DefaultIfEmpty(0).Max();
+            var through = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiangChongGuyingInvokedEvent>().Where(x => x.OwnerSeat == f.OwnerSeat).Select(x => x.FrameId).DefaultIfEmpty(0).Max();
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiangChongDebtConsumedEvent(f.Id, f.OwnerSeat, count, through));
             if (r.Required == 0)
             {

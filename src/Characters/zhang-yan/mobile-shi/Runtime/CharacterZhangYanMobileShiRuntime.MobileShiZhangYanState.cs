@@ -20,8 +20,8 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
             }
             else
             {
-                Add("xiaoge-prevented", _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZyPreventedEvent>().Count(e => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZyStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == owner.Seat && s.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber)));
-                Add("xiaoge-duels", _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZyDuelIssuedEvent>().Count(e => e.Origin.OwnerSeat == owner.Seat && e.Origin.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber));
+                Add("xiaoge-prevented", _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZyPreventedEvent>().Count(e => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZyStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == owner.Seat && s.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber)));
+                Add("xiaoge-duels", _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZyDuelIssuedEvent>().Count(e => e.Origin.OwnerSeat == owner.Seat && e.Origin.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber));
             }
         }
 

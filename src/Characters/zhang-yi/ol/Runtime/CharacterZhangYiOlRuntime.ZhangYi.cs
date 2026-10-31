@@ -13,20 +13,20 @@ internal sealed partial class CharacterZhangYiOlRuntime
     {
         if (!HasZhangYiCapability || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber <= 0 || payload is not DamageAppliedEvent { Amount: > 0 } e || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack || damage.ParentFrameId != attack.ResolutionId || damage.SourceSeat != e.SourceSeat || damage.TargetSeat != e.TargetSeat || damage.Amount != e.Amount || attack.SourceSeat != e.SourceSeat || attack.TargetSeat != e.TargetSeat || attack.IsSourceLess != e.SourceLess || !attack.DamageWasApplied)
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiActualDamageFactEvent>().Any(x => x.DamageFrameId == damage.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiActualDamageFactEvent>().Any(x => x.DamageFrameId == damage.Id))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangYiActualDamageFactEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, damage.Id, attack.ResolutionId, e.SourceSeat, e.TargetSeat, e.Amount, e.SourceLess));
         if (!e.SourceLess)
-            foreach (var grant in _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiArmedEvent>().Where(g => g.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.RecipientSeat == e.SourceSeat).ToArray())
-                if (!_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiHandLimitSetEvent>().Any(x => x.GrantFrameId == grant.FrameId))
+            foreach (var grant in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiKangruiArmedEvent>().Where(g => g.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.RecipientSeat == e.SourceSeat).ToArray())
+                if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiKangruiHandLimitSetEvent>().Any(x => x.GrantFrameId == grant.FrameId))
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangYiKangruiHandLimitSetEvent(grant.FrameId, damage.Id, e.SourceSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber));
     }
 
     internal bool IsFirstZhangYiOwnTurnDamage(ProgramSkillWindowContext c)
     {
-        if (c.Window != SkillProgramTriggerWindow.AfterDamageApplied || c.TargetSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || c.Amount <= 0 || c.DamageFrameId is not { } damageId || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id != c.ParentFrameId)
+        if (c.Window != SkillProgramTriggerWindow.AfterDamageApplied || c.TargetSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || c.Amount <= 0 || c.DamageFrameId is not { } damageId || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id != c.ParentFrameId)
             return false;
-        var first = _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiActualDamageFactEvent>().FirstOrDefault(e => e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.TargetSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat);
+        var first = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiActualDamageFactEvent>().FirstOrDefault(e => e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.TargetSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat);
         return first is not null && first.DamageFrameId == damageId && first.ActualTurnOwnerSeat == c.TargetSeat && first.Amount == c.Amount;
     }
 
@@ -188,7 +188,7 @@ internal sealed partial class CharacterZhangYiOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26400)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26400)]
-    internal bool ContinuePaidZhangYi(ProgramSkillFrame f) => f.ZhangYi is { } r && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiResolutionStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ParentWindowId == r.ParentWindowId && e.ActualTurnNumber == r.ActualTurnNumber && e.RecipientSeat == r.RecipientSeat && e.DamageFrameId == r.DamageFrameId) == 1;
+    internal bool ContinuePaidZhangYi(ProgramSkillFrame f) => f.ZhangYi is { } r && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiResolutionStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ParentWindowId == r.ParentWindowId && e.ActualTurnNumber == r.ActualTurnNumber && e.RecipientSeat == r.RecipientSeat && e.DamageFrameId == r.DamageFrameId) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveKangruiFirstOwnTurnDamage)]
     internal PromptChoice AiZhangYi(PendingDecision p, ProgramSkillFrame f) => p.Choices.First(c => c.Parameters["branch"] == (_coreMatchParticipantsPlayersAccess._players[f.ZhangYi!.RecipientSeat].Hp < _coreMatchParticipantsPlayersAccess._players[f.ZhangYi.RecipientSeat].MaxHp ? "recover" : "damage"));
 }

@@ -11,11 +11,11 @@ internal sealed partial class CoreGameEngineGuanduEquipmentRuntime
         if (payload is not CardMovedEvent { CardKind: CardKind.ThunderChariot, From: { Zone: CardZoneKind.Equipment, OwnerSeat: { } owner }, To: { Zone: CardZoneKind.OutsideGame } } moved)
             return;
         var movement = _coreCardMovementJournalCardMovementsAccess._cardMovements.Last(m => m.CardId == moved.CardId);
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<GuanduChariotDestroyedEvent>().Any(e => e.MovementSequence == movement.Sequence))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduChariotDestroyedEvent>().Any(e => e.MovementSequence == movement.Sequence))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduChariotDestroyedEvent(moved.CardId, movement.Sequence, owner));
     }
 
-    internal bool IsGuanduDestroyedChariotMaterial(long useId, int cardId) => cardId > 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action is { } action && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && action.PhysicalCards.Any(material => material.CardId == cardId && material.CardKind == CardKind.ThunderChariot && material.From is { Zone: CardZoneKind.Equipment, OwnerSeat: { } owner } && _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduChariotDestroyedEvent>().Any(e => e.CardId == cardId && e.FormerOwnerSeat == owner && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence == e.MovementSequence && m.From == material.From && m.To == CardLocation.OutsideGame)));
+    internal bool IsGuanduDestroyedChariotMaterial(long useId, int cardId) => cardId > 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action is { } action && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && action.PhysicalCards.Any(material => material.CardId == cardId && material.CardKind == CardKind.ThunderChariot && material.From is { Zone: CardZoneKind.Equipment, OwnerSeat: { } owner } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduChariotDestroyedEvent>().Any(e => e.CardId == cardId && e.FormerOwnerSeat == owner && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence == e.MovementSequence && m.From == material.From && m.To == CardLocation.OutsideGame)));
     internal void ContinueGuanduPolu(ProgramSkillFrame f)
     {
         if (f.WindowContext!.Window == SkillProgramTriggerWindow.AfterDamageApplied)

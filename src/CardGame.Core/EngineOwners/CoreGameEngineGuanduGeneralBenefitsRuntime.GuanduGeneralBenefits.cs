@@ -125,10 +125,10 @@ internal sealed partial class CoreGameEngineGuanduGeneralBenefitsRuntime
 
     internal GuanduDiscardFactEvent[] GuanduClaimableDiscards(int target)
     {
-        var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Discard, ActorSeat: var actor } current && actor == target ? current : _coreProgramEventHistoryOperations.ProgramEventHistory<ActualDiscardPhaseExecutionConfirmedEvent>().LastOrDefault(e => e.Phase.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Phase.ActorSeat == target)?.Phase;
+        var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Discard, ActorSeat: var actor } current && actor == target ? current : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualDiscardPhaseExecutionConfirmedEvent>().LastOrDefault(e => e.Phase.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Phase.ActorSeat == target)?.Phase;
         if (phase is null)
             return[];
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduDiscardFactEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.PhaseActor == target && e.PhaseToken == phase.Token && _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.DiscardPile && !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == e.CardId && m.Sequence > e.MovementSequence && m.From == CardLocation.DiscardPile)).DistinctBy(e => e.CardId).ToArray();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduDiscardFactEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.PhaseActor == target && e.PhaseToken == phase.Token && _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.DiscardPile && !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == e.CardId && m.Sequence > e.MovementSequence && m.From == CardLocation.DiscardPile)).DistinctBy(e => e.CardId).ToArray();
     }
 
     internal void ContinueGuanduJieliangClaim(ProgramSkillFrame f)
@@ -223,7 +223,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralBenefitsRuntime
 
     internal void ContinueGuanduHengjiangReward(ProgramSkillFrame f)
     {
-        var count = _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduHengjiangPaidEvent>().Count(e => e.OwnerSeat == f.OwnerSeat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
+        var count = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduHengjiangPaidEvent>().Count(e => e.OwnerSeat == f.OwnerSeat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
         if (count == 0 || _coreGuanduGeneralsOperations.GuanduTurnDiscarded(_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat))
         {
             _coreGuanduGeneralsOperations.FinishGuanduGeneral(f, false);
@@ -281,8 +281,8 @@ internal sealed partial class CoreGameEngineGuanduGeneralBenefitsRuntime
     {
         if (!_coreGuanduActivitiesOperations.IsGuanduActivity || payload is not TurnStartedEvent turn)
             return;
-        var consumed = _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduBeizhanConsumedEvent>().Select(e => e.ProducerFrameId).ToHashSet();
-        foreach (var armed in _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduBeizhanArmedEvent>().Where(e => e.TargetSeat == turn.ActorSeat && e.CreatedTurn < _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && !consumed.Contains(e.FrameId)).ToArray())
+        var consumed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduBeizhanConsumedEvent>().Select(e => e.ProducerFrameId).ToHashSet();
+        foreach (var armed in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduBeizhanArmedEvent>().Where(e => e.TargetSeat == turn.ActorSeat && e.CreatedTurn < _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && !consumed.Contains(e.FrameId)).ToArray())
         {
             var player = _coreMatchParticipantsPlayersAccess._players[turn.ActorSeat];
             var restricted = player.IsAlive && _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).All(p => _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count <= _corePhysicalOwnedCardQueriesOperations.GetHand(player).Count);

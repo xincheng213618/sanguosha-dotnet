@@ -15,7 +15,7 @@ internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
         }
     }
 
-    internal bool HasCardPolicy(CharacterState owner, SkillProgramCardPolicyKind kind, CardKind? effectiveKind = null) => kind == SkillProgramCardPolicyKind.UnlimitedAlcoholUse && _coreProgramAlcoholQuotaOperations.HasAdditionalAlcoholUse(owner) || (kind is SkillProgramCardPolicyKind.IgnoreUseDistance or SkillProgramCardPolicyKind.UnlimitedAlcoholUse) && _characterHanSongAnniversaryOperations.HasAnniversaryHanSongUniqueHand(owner) || (kind is SkillProgramCardPolicyKind.IgnoreUseDistance or SkillProgramCardPolicyKind.UnlimitedAlcoholUse) && _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(owner) || kind == SkillProgramCardPolicyKind.UnlimitedAlcoholUse && _characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(owner) || _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetCardPolicies(kind).Count != 0 && CardPolicies(owner, kind, effectiveKind).Any();
+    internal bool HasCardPolicy(CharacterState owner, SkillProgramCardPolicyKind kind, CardKind? effectiveKind = null) => kind == SkillProgramCardPolicyKind.UnlimitedAlcoholUse && _coreProgramAlcoholQuotaOperations.Value.HasAdditionalAlcoholUse(owner) || (kind is SkillProgramCardPolicyKind.IgnoreUseDistance or SkillProgramCardPolicyKind.UnlimitedAlcoholUse) && _characterHanSongAnniversaryOperations.Value.HasAnniversaryHanSongUniqueHand(owner) || (kind is SkillProgramCardPolicyKind.IgnoreUseDistance or SkillProgramCardPolicyKind.UnlimitedAlcoholUse) && _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(owner) || kind == SkillProgramCardPolicyKind.UnlimitedAlcoholUse && _characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(owner) || _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetCardPolicies(kind).Count != 0 && CardPolicies(owner, kind, effectiveKind).Any();
     internal bool HasOutsideAttackRangeSlashQuota(CharacterState owner, CharacterState target, CardKind kind, EquipmentSlot? excludedEquipmentSlot = null) => owner.IsAlive && target.IsAlive && owner.Seat != target.Seat && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && !_characterSunYuanOlOperations.HasSayingRoundRange(owner.Seat, target.Seat) && HasCardPolicy(owner, SkillProgramCardPolicyKind.BypassSlashLimitAgainstOutsideAttackRange, kind) && (excludedEquipmentSlot is null ? _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, target.Seat) > _coreNativeRuleQueriesOperations.GetAttackRange(owner.Seat) : CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(owner, target, excludedEquipmentSlot: excludedEquipmentSlot)) > CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(owner, excludedEquipmentSlot: excludedEquipmentSlot)));
     internal bool IsNearbyTargetResponseProhibited(int sourceSeat, int responderSeat, CardKind incomingKind, IReadOnlyList<int> targetSeats)
     {
@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
             return true;
         if (_characterZhangFeiAnniversaryGodOperations.ShenZfCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats))
             return true;
-        if (_characterSunCeMobileGodOperations.ShenSunCeCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats))
+        if (_characterSunCeMobileGodOperations.Value.ShenSunCeCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats))
             return true;
         if (_coreWushuangSkillsBAuditOperations.WushuangFuqiCannotRespond(sourceSeat, responderSeat))
             return true;
@@ -39,9 +39,9 @@ internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
             return true;
         if (_characterXiahouBaMobileShiOperations.ShiXbPoxiCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats))
             return true;
-        if (_characterSunShaoMobileShiOperations.ShiSsGanjueCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats))
+        if (_characterSunShaoMobileShiOperations.Value.ShiSsGanjueCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats))
             return true;
-        if (_characterLvYiMobileShiOperations.ShiLyShishiCannotRespond(sourceSeat, responderSeat))
+        if (_characterLvYiMobileShiOperations.Value.ShiLyShishiCannotRespond(sourceSeat, responderSeat))
             return true;
         if ((!CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) && !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(incomingKind)) || sourceSeat == responderSeat || !_coreMatchParticipantsPlayersAccess._players[sourceSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[responderSeat].IsAlive)
             return false;
@@ -65,7 +65,7 @@ internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
         var attackerSide = sourceSeat == owner.Seat ? CardPolicies(owner, SkillProgramCardPolicyKind.MinimumResponseCount, incomingKind, requiredKind, eventTargetIsFemale: _coreMatchParticipantsPlayersAccess._players[responderSeat].Gender == GeneralGender.Female, eventSourceIsFemale: _coreMatchParticipantsPlayersAccess._players[sourceSeat].Gender == GeneralGender.Female).Select(item => item.Policy.Value).DefaultIfEmpty(1).Max() : 1;
         var targetSide = CardPolicies(_coreMatchParticipantsPlayersAccess._players[responderSeat], SkillProgramCardPolicyKind.MinimumResponseCountAsTarget, incomingKind, requiredKind, eventTargetIsFemale: _coreMatchParticipantsPlayersAccess._players[responderSeat].Gender == GeneralGender.Female, eventSourceIsFemale: _coreMatchParticipantsPlayersAccess._players[sourceSeat].Gender == GeneralGender.Female).Select(item => item.Policy.Value).DefaultIfEmpty(0).Max();
         var shortRange = sourceSeat == owner.Seat && CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) && requiredKind == CardKind.Dodge && _coreNativeRuleQueriesOperations.GetCombatDistance(sourceSeat, responderSeat) == 1 ? CardPolicies(owner, SkillProgramCardPolicyKind.MinimumSlashResponseAtDistanceOne, incomingKind, requiredKind).Select(item => item.Policy.Value).DefaultIfEmpty(1).Max() : 1;
-        return Math.Max(_coreShanheBossProgramsOperations.GetBattleSlashCountResponseRequirement(owner, sourceSeat, incomingKind, requiredKind), Math.Max(shortRange, Math.Max(attackerSide, targetSide)));
+        return Math.Max(_coreShanheBossProgramsOperations.Value.GetBattleSlashCountResponseRequirement(owner, sourceSeat, incomingKind, requiredKind), Math.Max(shortRange, Math.Max(attackerSide, targetSide)));
     }
 
     internal Suit GetProgramEffectiveSuit(CharacterState owner, Card card, CardLocation? identityLocation = null)

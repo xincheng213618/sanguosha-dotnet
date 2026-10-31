@@ -17,7 +17,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
     internal void ReclaimDongxin(ProgramSkillFrame f)
     {
         var r = f.SunYuan!;
-        var eligible = r.Materials.Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.EffectiveKind) && _cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, c.CardId) && _coreProgramEventHistoryOperations.ProgramEventHistory<SunYuanEntityMovedEvent>().SingleOrDefault(e => e.FrameId == f.Id && e.Stage == SunYuanStage.DiscardChildren && e.CardId == c.CardId)is { } paid && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == c.CardId).Sequence == paid.Sequence).Select(c => c.CardId).ToArray();
+        var eligible = r.Materials.Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.EffectiveKind) && _cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, c.CardId) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunYuanEntityMovedEvent>().SingleOrDefault(e => e.FrameId == f.Id && e.Stage == SunYuanStage.DiscardChildren && e.CardId == c.CardId)is { } paid && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == c.CardId).Sequence == paid.Sequence).Select(c => c.CardId).ToArray();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || eligible.Length == 0)
         {
             FinishSunYuan(f, true);

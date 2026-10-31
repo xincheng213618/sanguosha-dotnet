@@ -24,7 +24,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
         if (!_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m))
             return false;
         if (r.Stage == XieLingYuStage.CostChildren)
-            return m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == XinyouDiscardReason && r.Materials.Any(c => c.CardId == m.CardId && c.PrintedKind == m.CardKind && c.From == m.From) && _coreProgramEventHistoryOperations.ProgramEventHistory<XinyouMaterialDiscardedEvent>().Any(e => e.FrameId == f.Id && e.CardId == m.CardId && e.MovementSequence == m.Sequence);
+            return m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == XinyouDiscardReason && r.Materials.Any(c => c.CardId == m.CardId && c.PrintedKind == m.CardKind && c.From == m.From) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XinyouMaterialDiscardedEvent>().Any(e => e.FrameId == f.Id && e.CardId == m.CardId && e.MovementSequence == m.Sequence);
         if (r.Stage != XieLingYuStage.DrawChildren || r.Outcome is not { } o)
             return false;
         return r.Gains.Any(c => c.CardId == m.CardId && c.PrintedKind == m.CardKind && c.MovementSequence == m.Sequence && m.To == CardLocation.Hand(f.OwnerSeat)) || m.Sequence > o.SequenceBefore && m.Sequence <= o.SequenceAfter && m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle;
@@ -39,7 +39,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
-            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
+            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
         return child is CardsMovedTriggerWindowFrame moved && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsXieLingYuPaidMovement(f, m));
     }
 

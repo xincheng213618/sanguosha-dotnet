@@ -25,7 +25,7 @@ internal sealed partial class CoreGameEngineProgramCardUseNullificationRuntime
 
     internal bool IsProgramUseIneffective(CardUseFrame use)
     {
-        if (_characterCaoZhenBoundaryMobileOperations.IsBoundarySidiUseIneffective(use) || _characterHuangQuanMouOperations.IsMouHqUseIneffective(use) || _coreWushuangOriginalSkillRulesOperations.IsWushuangCiweiIneffective(use))
+        if (_characterCaoZhenBoundaryMobileOperations.Value.IsBoundarySidiUseIneffective(use) || _characterHuangQuanMouOperations.IsMouHqUseIneffective(use) || _coreWushuangOriginalSkillRulesOperations.Value.IsWushuangCiweiIneffective(use))
             return true;
         if (use.ProgramUseNullification is null)
             return false;

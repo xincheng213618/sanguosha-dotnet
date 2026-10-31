@@ -7,7 +7,7 @@ internal sealed partial class CoreNativeWeaponResponsesRuntime
     {
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
-        if (!_coreNativeDamageHandlesOperations.UsesFormalCixiongDoubleSwords || attack.CixiongDoubleSwordsResolved || !source.IsAlive || !target.IsAlive || source.Gender == target.Gender || !_coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.CixiongDoubleSwords))
+        if (!_coreNativeDamageHandlesOperations.Value.UsesFormalCixiongDoubleSwords || attack.CixiongDoubleSwordsResolved || !source.IsAlive || !target.IsAlive || source.Gender == target.Gender || !_coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.CixiongDoubleSwords))
         {
             return false;
         }

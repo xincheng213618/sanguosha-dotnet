@@ -12,7 +12,7 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.CaptureMovement, 47600)]
     internal void CaptureShiCzFirstDiscard(CardMovementBatchContext batch)
     {
-        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing) || batch.TurnNumber < 1 || batch.DiscardRecoveryPhase is { Kind: ActualDiscardRecoveryPhaseKind.Discard } || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().Any(e => e.ActualTurn == batch.TurnNumber))
+        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing) || batch.TurnNumber < 1 || batch.DiscardRecoveryPhase is { Kind: ActualDiscardRecoveryPhaseKind.Discard } || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().Any(e => e.ActualTurn == batch.TurnNumber))
             return;
         var first = batch.Movements.FirstOrDefault(m => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is { } from && CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(from));
         if (first is not null)
@@ -24,7 +24,7 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
     {
         if (!features.HasOperation(SkillProgramEffectOp.ResolveMobileShiChenZhiRenxing))
             return null;
-        var first = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().SingleOrDefault(e => e.ActualTurn == batch.TurnNumber);
+        var first = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().SingleOrDefault(e => e.ActualTurn == batch.TurnNumber);
         if (first?.BatchId != batch.Id)
             return[];
         return batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.Sequence == first.MovementSequence).Select(x => x.i).ToArray();
@@ -32,9 +32,9 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
 
     internal MobileShiChenZhiExtraGrantedEvent? ShiCzPendingExtra(int owner)
     {
-        if (_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Extra || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat != owner || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramExtraTurnPendedEvent>().LastOrDefault()is not { SkillId: ShiCzQuanchong } last || last.Seat != owner)
+        if (_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Extra || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat != owner || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramExtraTurnPendedEvent>().LastOrDefault()is not { SkillId: ShiCzQuanchong } last || last.Seat != owner)
             return null;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenZhiExtraGrantedEvent>().SingleOrDefault(e => e.FrameId == last.FrameId && e.Source.OwnerSeat == owner && e.Source.SkillId == ShiCzQuanchong && e.IssuedTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(ShiCzQuanchong).Program!.GameplayHash && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenZhiExtraEnteredEvent>().Any(x => x.GrantFrameId == e.FrameId));
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiExtraGrantedEvent>().SingleOrDefault(e => e.FrameId == last.FrameId && e.Source.OwnerSeat == owner && e.Source.SkillId == ShiCzQuanchong && e.IssuedTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(ShiCzQuanchong).Program!.GameplayHash && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiExtraEnteredEvent>().Any(x => x.GrantFrameId == e.FrameId));
     }
 
     // A paid extra-turn obligation survives loss of its original skill. It is
@@ -61,7 +61,7 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
             return gate.Trigger.Id == "quanchong-ending" ? gate.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat : ShiCzPendingExtra(gate.OwnerSeat)is not null;
         if (gate.SkillId != ShiCzRenxing)
             return true;
-        return gate.WindowContext?.MovementBatch is { } batch && batch.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().SingleOrDefault(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber)?.BatchId == batch.Id;
+        return gate.WindowContext?.MovementBatch is { } batch && batch.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().SingleOrDefault(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber)?.BatchId == batch.Id;
     }
 
     internal SkillProgramStepOutcome BeginShiCz(ProgramSkillFrame input, SkillProgramEffectOp op)
@@ -207,7 +207,7 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
             return;
         }
 
-        if (r.Stage == MobileShiChenZhiStage.ExtraStartChildren && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenZhiExtraEnteredEvent>().Single(e => e.GrantFrameId == r.GrantFrameId).LostHp && !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId))
+        if (r.Stage == MobileShiChenZhiStage.ExtraStartChildren && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiExtraEnteredEvent>().Single(e => e.GrantFrameId == r.GrantFrameId).LostHp && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId))
         {
             // Identity appearance can suspend before the loss is actually paid.
             // A Dying return, by contrast, already carries the native loss fact.
@@ -286,7 +286,7 @@ internal sealed partial class CharacterChenZhiMobileShiRuntime
         var states = _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(i => i.SkillId == skillId).Select(i => new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, binding, ProgramPublicRuleStateKind.ActivationLimit, limit, _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, skillId, $"{(binding)}@{(i.SkillInstanceId)}", SkillUsageScope.Round), SkillUsageScope.Round)).ToList();
         if (skillId == ShiCzRenxing)
             foreach (var i in _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(i => i.SkillId == skillId))
-                states.Add(new(i.SkillInstanceId, "turn-first-discard", ProgramPublicRuleStateKind.ActivationLimit, 1, _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber) ? 1 : 0, SkillUsageScope.Turn));
+                states.Add(new(i.SkillInstanceId, "turn-first-discard", ProgramPublicRuleStateKind.ActivationLimit, 1, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiChenZhiFirstDiscardEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber) ? 1 : 0, SkillUsageScope.Turn));
         return Array.AsReadOnly(states.ToArray());
     }
 }

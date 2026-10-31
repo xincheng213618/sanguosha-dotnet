@@ -40,7 +40,7 @@ internal sealed partial class CharacterYaDanOlRuntime
         {
             if (op != SkillProgramEffectOp.ResolveQingyaNextActualPhaseUse || !IsIssuedQingyaCandidate(candidate, context) || context.ActualPhaseEnd is not { } due)
                 throw new InvalidOperationException("Qingya cannot borrow another actual phase's issued opportunity.");
-            var grant = _coreProgramEventHistoryOperations.ProgramEventHistory<QingyaGrantIssuedEvent>().Single(g => g.GrantId == due.EntitlementId);
+            var grant = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyaGrantIssuedEvent>().Single(g => g.GrantId == due.EntitlementId);
             r = new(grant.Source, grant.GameplayHash, op, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, context.ParentFrameId, QingyaStage.NativeChoice)
             {
                 GrantId = grant.GrantId,
@@ -198,7 +198,7 @@ internal sealed partial class CharacterYaDanOlRuntime
         var r = f.YaDan!;
         if (r.Op == SkillProgramEffectOp.ResolveQingyaBetweenHandDiscards && r.Entities.Count > 0)
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<QingyaGrantIssuedEvent>().Any(e => e.GrantId == f.Id))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<QingyaGrantIssuedEvent>().Any(e => e.GrantId == f.Id))
                 throw new InvalidOperationException("Qingya cannot issue its next-phase obligation twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QingyaGrantIssuedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.IssuedPhase, r.IssuedHistoryCutoff, r.Entities.Count));
         }

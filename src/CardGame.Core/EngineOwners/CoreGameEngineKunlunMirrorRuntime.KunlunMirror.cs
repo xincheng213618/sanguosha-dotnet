@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineKunlunMirrorRuntime
 {
     internal const string KunlunMirrorSkill = "shanhe:kunlun-mirror-14080";
     internal bool HasEffectiveKunlunMirror(int owner, string instance) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _characterHuCheErMouOperations.KongwuEffectiveEquipment(_coreMatchParticipantsPlayersAccess._players[owner]).Any(card => card.Kind == CardKind.KunlunMirror && _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, KunlunMirrorSkill, instance, card));
-    internal bool KnowsKunlunMirrorName(int owner, string name) => _coreProgramEventHistoryOperations.ProgramEventHistory<KunlunMirrorTrickLearnedEvent>().Any(fact => fact.Receipt.Source.OwnerSeat == owner && string.Equals(fact.Receipt.Origin.CardName, name, StringComparison.Ordinal));
+    internal bool KnowsKunlunMirrorName(int owner, string name) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KunlunMirrorTrickLearnedEvent>().Any(fact => fact.Receipt.Source.OwnerSeat == owner && string.Equals(fact.Receipt.Origin.CardName, name, StringComparison.Ordinal));
     internal bool TryKunlunMirrorOrigin(GameEngine.IDamageAttempt? attack, out KunlunMirrorDamageOrigin origin)
     {
         origin = null !;
@@ -41,9 +41,9 @@ internal sealed partial class CoreGameEngineKunlunMirrorRuntime
         {
             if (frame.TriggerId != "remember-real-trick-damage" || _resolutionStackOperations._resolutionStack.Count < 3 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.TriggerWindow != context.Window || window.ParentFrameId != context.DamageFrameId || _resolutionStackOperations._resolutionStack[^3] is not DamageFrame damage || damage.Id != window.ParentFrameId || damage.TargetSeat != frame.OwnerSeat || damage.Amount != context.Amount || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
                 throw new InvalidOperationException("Kunlun Mirror cannot learn before a real positive applied-damage window.");
-            attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+            attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window);
             damageId = damage.Id;
-            if (attack.ResolutionId != damage.ParentFrameId || attack.SourceSeat != damage.SourceSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<DamageRequestedEvent>().Count(fact => fact.ResolutionId == damage.Id && fact.SourceSeat == damage.SourceSeat && fact.TargetSeat == frame.OwnerSeat && fact.Amount == damage.Amount && fact.SourceCard == attack.EffectiveCardKind && fact.SourceLess == attack.IsSourceLess) != 1)
+            if (attack.ResolutionId != damage.ParentFrameId || attack.SourceSeat != damage.SourceSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageRequestedEvent>().Count(fact => fact.ResolutionId == damage.Id && fact.SourceSeat == damage.SourceSeat && fact.TargetSeat == frame.OwnerSeat && fact.Amount == damage.Amount && fact.SourceCard == attack.EffectiveCardKind && fact.SourceLess == attack.IsSourceLess) != 1)
                 throw new InvalidOperationException("Kunlun Mirror lost the original actual damage receipt.");
         }
         else

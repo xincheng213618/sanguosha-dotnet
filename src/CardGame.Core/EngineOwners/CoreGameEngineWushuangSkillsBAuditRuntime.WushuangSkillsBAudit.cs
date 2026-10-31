@@ -17,9 +17,9 @@ internal sealed partial class CoreGameEngineWushuangSkillsBAuditRuntime
     internal bool CanTriggerWushuangBAudit(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (c.SkillId == BJiushi && trigger.Id == "flip-back-after-damage")
-            return _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsFaceDown && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangJiushiDamageFaceEvent>().Any(e => e.OwnerSeat == c.OwnerSeat && e.DamageFrameId == context.DamageFrameId && e.WasFaceDown);
+            return _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsFaceDown && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangJiushiDamageFaceEvent>().Any(e => e.OwnerSeat == c.OwnerSeat && e.DamageFrameId == context.DamageFrameId && e.WasFaceDown);
         if (c.SkillId == BLonghun)
-            return context.CardUse is { } use && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.CardActionId == use.CardActionId);
+            return context.CardUse is { } use && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.CardActionId == use.CardActionId);
         if (c.SkillId == BGuzheng)
             return context.SourceSeat is { } seat && WushuangGuzhengCards(seat).Count > 0;
         return true;
@@ -30,7 +30,7 @@ internal sealed partial class CoreGameEngineWushuangSkillsBAuditRuntime
     {
         if (_coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } window)
             return false;
-        var source = window.ChainDepth == 0 ? window.SourceSeat : _coreProgramEventHistoryOperations.ProgramEventHistory<NullificationRespondedEvent>().LastOrDefault(e => e.ResolutionId == window.ParentFrameId && e.ChainDepth == window.ChainDepth)?.ResponderSeat ?? -1;
+        var source = window.ChainDepth == 0 ? window.SourceSeat : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NullificationRespondedEvent>().LastOrDefault(e => e.ResolutionId == window.ParentFrameId && e.ChainDepth == window.ChainDepth)?.ResponderSeat ?? -1;
         return WushuangFuqiCannotRespond(source, responder);
     }
 
@@ -38,7 +38,7 @@ internal sealed partial class CoreGameEngineWushuangSkillsBAuditRuntime
     internal bool WushuangFuqiNativeResponseForbidden(ProgramNativeResponseQuery query) => !query.DyingUse && query.Kind == CardKind.Nullification && WushuangFuqiNullificationBanned(query.Provider.Seat);
     internal IReadOnlyList<int> WushuangGuzhengCards(int phaseOwner)
     {
-        var boundary = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangDiscardPhaseBoundaryEvent>().LastOrDefault(e => e.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.ActorSeat == phaseOwner);
+        var boundary = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangDiscardPhaseBoundaryEvent>().LastOrDefault(e => e.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.ActorSeat == phaseOwner);
         if (boundary is null)
             return[];
         return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > boundary.MovementSequence && m.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && m.To == CardLocation.DiscardPile && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is not null && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile).Select(m => m.CardId).Distinct().Order().ToArray();

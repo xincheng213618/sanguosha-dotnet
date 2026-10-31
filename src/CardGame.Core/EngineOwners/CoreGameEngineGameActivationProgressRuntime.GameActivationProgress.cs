@@ -38,13 +38,13 @@ internal sealed partial class CoreGameEngineGameActivationProgressRuntime
         var weiYanStates = _characterWeiYanMobileShiOperations.MobileShiWeiYanPublicStates(owner, skillId);
         if (weiYanStates.Count > 0)
             (states ??= []).AddRange(weiYanStates);
-        var chenQunStates = _characterChenQunMobileShiOperations.MobileShiChenQunPublicStates(owner, skillId);
+        var chenQunStates = _characterChenQunMobileShiOperations.Value.MobileShiChenQunPublicStates(owner, skillId);
         if (chenQunStates.Count > 0)
             (states ??= []).AddRange(chenQunStates);
-        var wangChangStates = _characterWangChangMobileShiOperations.MobileShiWangChangPublicStates(owner, skillId);
+        var wangChangStates = _characterWangChangMobileShiOperations.Value.MobileShiWangChangPublicStates(owner, skillId);
         if (wangChangStates.Count > 0)
             (states ??= []).AddRange(wangChangStates);
-        var tianFengStates = _characterTianFengMobileShiOperations.MobileShiTianFengPublicStates(owner, skillId);
+        var tianFengStates = _characterTianFengMobileShiOperations.Value.MobileShiTianFengPublicStates(owner, skillId);
         if (tianFengStates.Count > 0)
             (states ??= []).AddRange(tianFengStates);
         var chenZhiStates = _characterChenZhiMobileShiOperations.MobileShiChenZhiPublicStates(owner, skillId);
@@ -53,7 +53,7 @@ internal sealed partial class CoreGameEngineGameActivationProgressRuntime
         var dongZhaoStates = _characterDongZhaoMobileShiOperations.MobileShiDongZhaoPublicStates(owner, skillId);
         if (dongZhaoStates.Count > 0)
             (states ??= []).AddRange(dongZhaoStates);
-        var chenDaoStates = _characterChenDaoMobileShiOperations.MobileShiChenDaoPublicStates(owner, skillId);
+        var chenDaoStates = _characterChenDaoMobileShiOperations.Value.MobileShiChenDaoPublicStates(owner, skillId);
         if (chenDaoStates.Count > 0)
             (states ??= []).AddRange(chenDaoStates);
         var huangZuStates = _characterHuangZuMobileShiOperations.MobileShiHuangZuPublicStates(owner, skillId);
@@ -71,32 +71,32 @@ internal sealed partial class CoreGameEngineGameActivationProgressRuntime
         var luSuStates = _characterLuSuMobileShiOperations.MobileShiLuSuPublicStates(owner, skillId);
         if (luSuStates.Count > 0)
             (states ??= []).AddRange(luSuStates);
-        var luYuShengStates = _characterLuYuShengMobileShiOperations.MobileShiLuYuShengPublicStates(owner, skillId);
+        var luYuShengStates = _characterLuYuShengMobileShiOperations.Value.MobileShiLuYuShengPublicStates(owner, skillId);
         if (luYuShengStates.Count > 0)
             (states ??= []).AddRange(luYuShengStates);
-        var sunChenStates = _characterSunChenMobileShiOperations.MobileShiSunChenPublicStates(owner, skillId);
+        var sunChenStates = _characterSunChenMobileShiOperations.Value.MobileShiSunChenPublicStates(owner, skillId);
         if (sunChenStates.Count > 0)
             (states ??= []).AddRange(sunChenStates);
-        var sunJunStates = _characterSunJunMobileShiOperations.MobileShiSunJunPublicStates(owner, skillId);
+        var sunJunStates = _characterSunJunMobileShiOperations.Value.MobileShiSunJunPublicStates(owner, skillId);
         if (sunJunStates.Count > 0)
         {
             states?.RemoveAll(state => sunJunStates.Any(actual => actual.SkillInstanceId == state.SkillInstanceId && actual.StateId == state.StateId && actual.Kind == state.Kind && actual.Scope == state.Scope));
             (states ??= []).AddRange(sunJunStates);
         }
 
-        var xiaoQiaoStates = _characterXiaoQiaoMobileShiOperations.MobileShiXiaoQiaoPublicStates(owner, skillId);
+        var xiaoQiaoStates = _characterXiaoQiaoMobileShiOperations.Value.MobileShiXiaoQiaoPublicStates(owner, skillId);
         if (xiaoQiaoStates.Count > 0)
             (states ??= []).AddRange(xiaoQiaoStates);
-        var zhangYanStates = _characterZhangYanMobileShiOperations.MobileShiZhangYanPublicStates(owner, skillId);
+        var zhangYanStates = _characterZhangYanMobileShiOperations.Value.MobileShiZhangYanPublicStates(owner, skillId);
         if (zhangYanStates.Count > 0)
             (states ??= []).AddRange(zhangYanStates);
         var dengAiStates = _characterDengAiMobileShiOperations.MobileShiDengAiPublicStates(owner, skillId);
         if (dengAiStates.Count > 0)
             (states ??= []).AddRange(dengAiStates);
-        var taiShiCiStates = _characterTaiShiCiMobileShiOperations.ShiTaiShiCiPublicStates(owner, skillId);
+        var taiShiCiStates = _characterTaiShiCiMobileShiOperations.Value.ShiTaiShiCiPublicStates(owner, skillId);
         if (taiShiCiStates.Count > 0)
             (states ??= []).AddRange(taiShiCiStates);
-        var quanCongStates = _characterQuanCongBoundaryMobileOperations.BoundaryQuanCongPublicStates(owner, skillId);
+        var quanCongStates = _characterQuanCongBoundaryMobileOperations.Value.BoundaryQuanCongPublicStates(owner, skillId);
         if (quanCongStates.Count > 0)
             (states ??= []).AddRange(quanCongStates);
         var zhuZhiStates = _characterZhuZhiBoundaryMobileOperations.BoundaryZhuZhiPublicStates(owner, skillId);

@@ -5,7 +5,7 @@ using System.Globalization;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouShiMouMobileRuntime
 {
-    internal bool MouXiahouShiQiaoshiSpent(int owner, MouXiahouShiTurnKey turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouShiQiaoshiBranchAcceptedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == MouXiahouShiComposition.Qiaoshi && e.Turn == turn && e.Branch == "recover-and-draw");
+    internal bool MouXiahouShiQiaoshiSpent(int owner, MouXiahouShiTurnKey turn) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouShiQiaoshiBranchAcceptedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == MouXiahouShiComposition.Qiaoshi && e.Turn == turn && e.Branch == "recover-and-draw");
     [ProgramIssuedTrigger(60, ProgramIssuedTriggerMatch.RejectWhenFalse)]
     internal bool CanMouXiahouShiCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
@@ -22,7 +22,7 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
         if (f.MouXiahouShiQiaoshi is not null || !ExactMouXiahouShiDamageContext(f) || CurrentMouXiahouShiTurn()is not { } turn || f.WindowContext!.SourceSeat is not { } source || source == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[source].IsAlive || MouXiahouShiQiaoshiSpent(f.OwnerSeat, turn) || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             throw new InvalidOperationException("Qiaoshi requires its exact native foreign after-damage occurrence and unused actual turn.");
         var w = (DamageTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(i => i.Id == f.WindowContext.ParentFrameId);
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(w);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(w);
         var r = new MouXiahouShiQiaoshiReceipt(MouXiahouShiSource(f), f.GameplayHash, turn, w.Id, w.ParentFrameId, attack.ResolutionId, source, f.WindowContext.Amount)
         {
             Stage = MouXiahouShiQiaoshiStage.SourceChoice,

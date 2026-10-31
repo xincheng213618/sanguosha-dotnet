@@ -6,10 +6,10 @@ internal sealed partial class CoreGameEngineNianRevivalRuntime
     internal const string NianReviveSkill = "nian:revive";
     SkillProgramStepOutcome INianRevivalHost.ReviveNianAlly(ProgramSkillFrame frame) => BeginNianRevival(frame);
     IReadOnlyList<int> INianRevivalSelectionQuery.DeadAllies(int ownerSeat) => NianDeadAllies(ownerSeat);
-    internal int NianUsedRevives => _coreNianChallengeHostOperations.NianFeature?.UsedRevives ?? 0;
+    internal int NianUsedRevives => _coreNianChallengeHostOperations.Value.NianFeature?.UsedRevives ?? 0;
 
-    internal bool IsNianAlliedSeat(int seat) => _coreNianChallengeHostOperations.NianFeature?.IsAlliedSeat(seat) == true;
-    internal IReadOnlyList<int> NianDeadAllies(int ownerSeat) => _coreNianChallengeHostOperations.NianFeature?.DeadAllies(ownerSeat) ?? [];
+    internal bool IsNianAlliedSeat(int seat) => _coreNianChallengeHostOperations.Value.NianFeature?.IsAlliedSeat(seat) == true;
+    internal IReadOnlyList<int> NianDeadAllies(int ownerSeat) => _coreNianChallengeHostOperations.Value.NianFeature?.DeadAllies(ownerSeat) ?? [];
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 27930, SkillProgramEffectOp.ReviveNianAlly)]
     internal bool AllowsNianRevival(ProgramActivationLegalityContext gate) => gate.SkillId == NianReviveSkill && gate.Activation is { Id: "revive", MinCards: 0, MaxCards: 0, MinTargets: 1, MaxTargets: 1, TargetKind: SkillProgramTargetKind.NianDeadAlly } && NianDeadAllies(gate.OwnerSeat).Count != 0;
     internal SkillProgramStepOutcome BeginNianRevival(ProgramSkillFrame input)
@@ -131,7 +131,7 @@ internal sealed partial class CoreGameEngineNianRevivalRuntime
 
     internal void RequireNianRevival(ProgramSkillFrame f)
     {
-        if (f.NianRevival is not { } r || f.SkillId != NianReviveSkill || f.ActivationId != "revive" || f.TriggerId is not null || r.InstructionIndex != f.InstructionIndex || f.SelectedCardIds.Count != 0 || !f.SelectedTargetSeats.SequenceEqual([r.TargetSeat]) || !IsNianAlliedSeat(r.TargetSeat) || r.MaximumHp <= 0 || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Count < 0 || !Enum.IsDefined(r.Stage) || r.UsedRevives <= 0 || r.UsedRevives > (_coreNianChallengeHostOperations.NianFeature?.SharedRevives ?? 0))
+        if (f.NianRevival is not { } r || f.SkillId != NianReviveSkill || f.ActivationId != "revive" || f.TriggerId is not null || r.InstructionIndex != f.InstructionIndex || f.SelectedCardIds.Count != 0 || !f.SelectedTargetSeats.SequenceEqual([r.TargetSeat]) || !IsNianAlliedSeat(r.TargetSeat) || r.MaximumHp <= 0 || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Count < 0 || !Enum.IsDefined(r.Stage) || r.UsedRevives <= 0 || r.UsedRevives > (_coreNianChallengeHostOperations.Value.NianFeature?.SharedRevives ?? 0))
             throw new InvalidOperationException("Nian revival lost its exact owning instruction and original participant.");
         var paid = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<NianRevivalPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (paid is not [var payment] || payment.ActorSeat != f.OwnerSeat || payment.TargetSeat != r.TargetSeat || payment.UsedRevives != r.UsedRevives || payment.MaximumHp != r.MaximumHp || NianUsedRevives < r.UsedRevives)

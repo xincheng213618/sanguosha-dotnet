@@ -7,17 +7,17 @@ internal sealed partial class CharacterRuanYuOlRuntime
     {
         if (f.RuanYu is not { } r)
             return false;
-        if (f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || r.Source != RuanYuSource(f) || r.GameplayHash != f.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || !RuanYuComposition.Handles(r.Op) || r.ParentId != context.ParentFrameId || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !Enum.IsDefined(r.Stage) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Recipient) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<RuanYuStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Op == r.Op && e.ParentId == r.ParentId && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner) != 1)
+        if (f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || r.Source != RuanYuSource(f) || r.GameplayHash != f.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || !RuanYuComposition.Handles(r.Op) || r.ParentId != context.ParentFrameId || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !Enum.IsDefined(r.Stage) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Recipient) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<RuanYuStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Op == r.Op && e.ParentId == r.ParentId && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner) != 1)
             return false;
         if (r.Op == SkillProgramEffectOp.ResolveXingzuoIssuedEndingExchange)
         {
             var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
-            if (CurrentRuanYuEndingDebt(c, context)is not { } debt || r.DebtId != debt.DebtId || _coreProgramEventHistoryOperations.ProgramEventHistory<XingzuoEndingConsumedEvent>().Count(e => e.DebtId == debt.DebtId && e.FrameId == f.Id && e.ParentId == r.ParentId) != 1)
+            if (CurrentRuanYuEndingDebt(c, context)is not { } debt || r.DebtId != debt.DebtId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XingzuoEndingConsumedEvent>().Count(e => e.DebtId == debt.DebtId && e.FrameId == f.Id && e.ParentId == r.ParentId) != 1)
                 return false;
         }
         else if (r.Op == SkillProgramEffectOp.ResolveMiaoxianUniqueRedUseDraw)
         {
-            if (r.ActionId is not { } action || context.CardUse?.CardActionId != action || _coreProgramEventHistoryOperations.ProgramEventHistory<MiaoxianRedDrawIssuedEvent>().Count(e => e.FrameId == f.Id && e.ActionId == action && e.Source == r.Source && e.ActualTurn == r.ActualTurn) != 1 || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == r.ParentId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex] is not { } candidate || candidate.OwnerSeat != f.OwnerSeat || candidate.SkillId != f.SkillId || candidate.TriggerId != f.TriggerId || candidate.SkillInstanceId != f.SkillInstanceId || candidate.GameplayHash != r.GameplayHash || !HasRuanYuRedPayment(window.Action, r.Source, r.GameplayHash, window.ParentFrameId))
+            if (r.ActionId is not { } action || context.CardUse?.CardActionId != action || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MiaoxianRedDrawIssuedEvent>().Count(e => e.FrameId == f.Id && e.ActionId == action && e.Source == r.Source && e.ActualTurn == r.ActualTurn) != 1 || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == r.ParentId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex] is not { } candidate || candidate.OwnerSeat != f.OwnerSeat || candidate.SkillId != f.SkillId || candidate.TriggerId != f.TriggerId || candidate.SkillInstanceId != f.SkillInstanceId || candidate.GameplayHash != r.GameplayHash || !HasRuanYuRedPayment(window.Action, r.Source, r.GameplayHash, window.ParentFrameId))
                 return false;
         }
         else
@@ -32,9 +32,9 @@ internal sealed partial class CharacterRuanYuOlRuntime
         var moving = r.Stage is RuanYuStage.FrontChildren or RuanYuStage.EndingChildren or RuanYuStage.RedChildren;
         if (moving)
         {
-            if (!r.Paid || f.PendingMovementContinuation is not { } p || !IsRuanYuMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) || r.Step <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<RuanYuMovementPaidEvent>().Count(e => e.FrameId == f.Id && e.Step == r.Step && e.Stage == r.Stage && e.Before == r.Before && e.After == r.After && e.Count == r.ActualCount) != 1)
+            if (!r.Paid || f.PendingMovementContinuation is not { } p || !IsRuanYuMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) || r.Step <= 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<RuanYuMovementPaidEvent>().Count(e => e.FrameId == f.Id && e.Step == r.Step && e.Stage == r.Stage && e.Before == r.Before && e.After == r.After && e.Count == r.ActualCount) != 1)
                 return false;
-            var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<RuanYuEntityMovedEvent>().Where(e => e.FrameId == f.Id && e.Step == r.Step).ToArray();
+            var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<RuanYuEntityMovedEvent>().Where(e => e.FrameId == f.Id && e.Step == r.Step).ToArray();
             if (paid.Any(e => e.Sequence <= r.Before || e.Sequence > r.After || !r.Entities.Any(c => c.CardId == e.CardId && c.Kind == e.Kind && c.From == e.From) || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.Sequence && m.CardId == e.CardId && m.CardKind == e.Kind && m.From == e.From && m.To == e.To && m.Reason.Value == RuanYuExchangeReason)) || r.Stage != RuanYuStage.RedChildren && paid.Length != r.ActualCount)
                 return false;
         }
@@ -42,10 +42,10 @@ internal sealed partial class CharacterRuanYuOlRuntime
             return false;
         if (r.Stage is RuanYuStage.LoseHpIssuing or RuanYuStage.LoseHpChildren)
         {
-            if (!r.Paid || r.Op != SkillProgramEffectOp.ResolveXingzuoIssuedEndingExchange || r.SelectedHand.Count <= 3 || _coreProgramEventHistoryOperations.ProgramEventHistory<RuanYuMovementPaidEvent>().Count(e => e.FrameId == f.Id && e.Step == r.Step && e.Stage == RuanYuStage.EndingChildren && e.Before == r.Before && e.After == r.After && e.Count == r.ActualCount) != 1)
+            if (!r.Paid || r.Op != SkillProgramEffectOp.ResolveXingzuoIssuedEndingExchange || r.SelectedHand.Count <= 3 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<RuanYuMovementPaidEvent>().Count(e => e.FrameId == f.Id && e.Step == r.Step && e.Stage == RuanYuStage.EndingChildren && e.Before == r.Before && e.After == r.After && e.Count == r.ActualCount) != 1)
                 return false;
-            var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Where(e => e.FrameId == f.Id).ToArray();
-            var own = _coreProgramEventHistoryOperations.ProgramEventHistory<XingzuoHpLossPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
+            var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Where(e => e.FrameId == f.Id).ToArray();
+            var own = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XingzuoHpLossPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
             if (r.Stage == RuanYuStage.LoseHpIssuing ? paid.Length != 0 || own.Length != 0 : paid is not [var hp] || hp.SkillId != f.SkillId || hp.TargetSeat != f.OwnerSeat || hp.Amount != 1 || own is not [var receipt] || receipt.RemainingHp != hp.RemainingHp)
                 return false;
         }
@@ -58,11 +58,11 @@ internal sealed partial class CharacterRuanYuOlRuntime
         if (f.RuanYu is not { Paid: true } r || !ValidRuanYu(f))
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && (r.Stage == RuanYuStage.RedChildren ? m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MiaoxianDrawReason || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle : _coreProgramEventHistoryOperations.ProgramEventHistory<RuanYuEntityMovedEvent>().Any(e => e.FrameId == f.Id && e.Step == r.Step && e.Sequence == m.Sequence && e.CardId == m.CardId && e.From == m.From && e.To == m.To)));
+            return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && (r.Stage == RuanYuStage.RedChildren ? m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MiaoxianDrawReason || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<RuanYuEntityMovedEvent>().Any(e => e.FrameId == f.Id && e.Step == r.Step && e.Sequence == m.Sequence && e.CardId == m.CardId && e.From == m.From && e.To == m.To)));
         if (child is HpChangedTriggerWindowFrame hp)
             return r.Stage == RuanYuStage.LoseHpChildren && hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.SourceSeat is null && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Kind == HpChangeKind.Loss && hp.Change.Amount == 1;
         if (child is DyingFrame dying)
-            return r.Stage == RuanYuStage.LoseHpChildren && dying.ParentFrameId == f.Id && dying.VictimSeat == f.OwnerSeat && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.Amount == 1 && e.RemainingHp <= 0) == 1;
+            return r.Stage == RuanYuStage.LoseHpChildren && dying.ParentFrameId == f.Id && dying.VictimSeat == f.OwnerSeat && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.Amount == 1 && e.RemainingHp <= 0) == 1;
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 

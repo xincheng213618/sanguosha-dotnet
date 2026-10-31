@@ -66,5 +66,5 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveryObserversRuntim
         return root;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 570)]
-    internal bool IsActualEquipmentOrDiscardProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => (f.CapturedEquipmentDraw is not null || f.ActualDiscardRecovery is not null) && ActualEquipmentOrDiscardObserverRoot(f.Id)is not null && _resolutionStackOperations._resolutionStack.FindIndex(d => d.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(r => r.Id == f.Id));
+    internal bool IsActualEquipmentOrDiscardProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => (f.CapturedEquipmentDraw is not null || f.ActualDiscardRecovery is not null) && ActualEquipmentOrDiscardObserverRoot(f.Id)is not null && _resolutionStackOperations._resolutionStack.FindIndex(d => d.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(r => r.Id == f.Id));
 }

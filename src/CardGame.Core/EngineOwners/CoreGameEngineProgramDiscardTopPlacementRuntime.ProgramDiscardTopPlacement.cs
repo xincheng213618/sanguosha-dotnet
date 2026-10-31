@@ -11,7 +11,7 @@ internal sealed partial class CoreGameEngineProgramDiscardTopPlacementRuntime
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (active.WindowContext is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } || active.DiscardTopPlacement is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             throw new InvalidOperationException("Discard-top placement requires a clean frozen movement window.");
-        var ids = batch.Movements.Where(move => _coreNeighborDiscardOpportunitiesOperations.IsProgramDiscardTopMovement(active, move) && _cardZonesOperations._cardZones.GetLocation(move.CardId) == CardLocation.DiscardPile).Select(move => move.CardId).Distinct().ToArray();
+        var ids = batch.Movements.Where(move => _coreNeighborDiscardOpportunitiesOperations.Value.IsProgramDiscardTopMovement(active, move) && _cardZonesOperations._cardZones.GetLocation(move.CardId) == CardLocation.DiscardPile).Select(move => move.CardId).Distinct().ToArray();
         if (ids.Length == 0 || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
         active = active with

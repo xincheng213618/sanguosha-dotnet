@@ -12,14 +12,14 @@ internal sealed partial class CoreGameEngineProgramChoicesRuntime
     [ProgramAiChoice(SkillProgramEffectOp.ChooseOption)]
     internal PromptChoice SelectAiProgramOption(PendingDecision decision, ProgramSkillFrame frame)
     {
-        if (_characterXuChuBoundaryMobileOperations.TrySelectBoundaryXuChuAiOption(decision, frame, out var xuChuChoice))
+        if (_characterXuChuBoundaryMobileOperations.Value.TrySelectBoundaryXuChuAiOption(decision, frame, out var xuChuChoice))
             return xuChuChoice;
         var program = _contentRegistryOperations._contentRegistry!.GetSkill(frame.SkillId).Program!;
         var plan = ProgramInstructionResolver.Default.Resolve(frame, program);
         var effect = plan.GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (_characterPanZhangMaZhongBoundaryMobileOperations.TrySelectBoundaryAnjianOption(decision, frame, out var anjianChoice))
+        if (_characterPanZhangMaZhongBoundaryMobileOperations.Value.TrySelectBoundaryAnjianOption(decision, frame, out var anjianChoice))
             return anjianChoice;
-        if (_coreShanheS5XuchuAiOperations.TrySelectShanheS5LuoyiAiOption(decision, frame, plan, out var luoyiChoice))
+        if (_coreShanheS5XuchuAiOperations.Value.TrySelectShanheS5LuoyiAiOption(decision, frame, plan, out var luoyiChoice))
             return luoyiChoice;
         var alternating = plan.Instructions.Skip(frame.InstructionIndex).FirstOrDefault(e => e.Op == SkillProgramEffectOp.ApplyAlternatingChoiceBenefit && e.SourceBind == effect.ResultBind);
         if (alternating is not null)

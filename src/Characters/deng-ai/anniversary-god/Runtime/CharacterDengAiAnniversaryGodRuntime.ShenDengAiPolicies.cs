@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDengAiAnniversaryGodRuntime
 {
     internal bool ShenDaHasMaterialDomain(int actor, IReadOnlyList<int>? ids, ShenDengAiDomain domain) => ids is { Count: > 0 } && _characterDengAiHappyGodOperations.ShenDaTuoYuId(_coreMatchParticipantsPlayersAccess._players[actor])is not null && ids.Any(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(actor) && ShenDaAssignment(actor, id)?.Domain == domain);
-    internal bool ShenDaHasIssuedDomain(long? id, int actor, ShenDengAiDomain domain) => id is { } useId && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { ShenDengAiDomain: { } r, Action: { } a } && r.ActorSeat == actor && r.ActionId == a.ActionId && (r.DomainMask & (1 << (int)domain)) != 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiDomainIssuedEvent>().Count(e => e.UseId == useId && e.ActionId == r.ActionId && e.ActorSeat == actor && e.DomainMask == r.DomainMask) == 1;
+    internal bool ShenDaHasIssuedDomain(long? id, int actor, ShenDengAiDomain domain) => id is { } useId && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { ShenDengAiDomain: { } r, Action: { } a } && r.ActorSeat == actor && r.ActionId == a.ActionId && (r.DomainMask & (1 << (int)domain)) != 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiDomainIssuedEvent>().Count(e => e.UseId == useId && e.ActionId == r.ActionId && e.ActorSeat == actor && e.DomainMask == r.DomainMask) == 1;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 38500)]
     internal void IssueShenDengAiDomains(CardUseDeclaredEvent declared)
     {

@@ -18,7 +18,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             throw new InvalidOperationException("Juewu must retain the exact native rank-two payment and once-paid output allowance.");
         var receipt = new JuewuUseReceipt(use.Id, action.ActionId, source, program.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, rule.OutputKind, action.EffectiveKind, card.Id, card.Kind, card.Rank, cost.From, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, cost.From == CardLocation.Hand(source.OwnerSeat) ? JuewuForeignHandEntry(source.OwnerSeat, card.Id)?.Sequence : null)
         {
-            Grains = _coreNativeDamageHandlesOperations.UsesFormalWoodenOx && card.Kind == CardKind.WoodenOx && cost.From == CardLocation.Equipment(source.OwnerSeat) ? _cardZonesOperations._cardZones.CardsAt(CardLocation.WoodenOxGrain(source.OwnerSeat)).Select(grain => new JuewuPaymentGrain(grain.Id, grain.Kind, CardLocation.WoodenOxGrain(source.OwnerSeat))).ToArray() : []
+            Grains = _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && card.Kind == CardKind.WoodenOx && cost.From == CardLocation.Equipment(source.OwnerSeat) ? _cardZonesOperations._cardZones.CardsAt(CardLocation.WoodenOxGrain(source.OwnerSeat)).Select(grain => new JuewuPaymentGrain(grain.Id, grain.Kind, CardLocation.WoodenOxGrain(source.OwnerSeat))).ToArray() : []
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { Juewu = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JuewuUseIssuedEvent(receipt.UseId, receipt.ActionId, receipt.Source, receipt.GameplayHash, receipt.ActualTurn, receipt.TurnOwner, receipt.OutputKind, receipt.NativeKind, receipt.CardId, receipt.PrintedKind, receipt.PrintedRank, receipt.From, receipt.SequenceBefore, receipt.ForeignHandEntrySequence));
@@ -74,7 +74,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     internal bool IsJuewuUsePaymentBatch(CardUseFrame use, CardMovementBatchContext batch)
     {
         var issued = use.Juewu?.PaymentBatches.SingleOrDefault(receipt => receipt.Batch.Id == batch.Id);
-        return issued is not null && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch, issued) && JuewuPaymentMaterialsMatch(use, batch) && _coreProgramEventHistoryOperations.ProgramEventHistory<JuewuPaymentBatchIssuedEvent>().Count(e => e.UseId == use.Id && e.ActionId == issued.ActionId && e.BatchId == batch.Id && e.ParentBatchId == batch.ParentBatchId && e.MaterialCount == batch.Movements.Count && e.SequenceBefore == issued.SequenceBefore && e.SequenceAfter == issued.SequenceAfter && e.Primary == (batch.Id == use.Juewu!.PaymentBatchId)) == 1;
+        return issued is not null && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch, issued) && JuewuPaymentMaterialsMatch(use, batch) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JuewuPaymentBatchIssuedEvent>().Count(e => e.UseId == use.Id && e.ActionId == issued.ActionId && e.BatchId == batch.Id && e.ParentBatchId == batch.ParentBatchId && e.MaterialCount == batch.Movements.Count && e.SequenceBefore == issued.SequenceBefore && e.SequenceAfter == issued.SequenceAfter && e.Primary == (batch.Id == use.Juewu!.PaymentBatchId)) == 1;
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.TrailingTail, 70)]
@@ -94,17 +94,17 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
 
     internal bool ValidJuewuUse(CardUseFrame use, bool requirePayment)
     {
-        if (use.Juewu is not { } r || use.Id != r.UseId || !IsJuewuSource(r.Source) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash != r.GameplayHash || use.Action is not { Type: CardActionType.Use } a || a.ActionId != r.ActionId || !JuewuIssuedActorMatches(use, r) || a.ProviderSeat != r.Source.OwnerSeat || !a.ConversionChain.Contains(r.Source) || a.EffectiveRank != 2 || a.PhysicalCards is not [var cost] || cost.CardId != r.CardId || cost.CardKind != r.PrintedKind || cost.From != r.From || use.PhysicalCardIds is not [var id] || id != r.CardId || _coreProgramEventHistoryOperations.ProgramEventHistory<JuewuUseIssuedEvent>().Count(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.CardId == r.CardId && e.From == r.From && e.OutputKind == r.OutputKind && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner) != 1)
+        if (use.Juewu is not { } r || use.Id != r.UseId || !IsJuewuSource(r.Source) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash != r.GameplayHash || use.Action is not { Type: CardActionType.Use } a || a.ActionId != r.ActionId || !JuewuIssuedActorMatches(use, r) || a.ProviderSeat != r.Source.OwnerSeat || !a.ConversionChain.Contains(r.Source) || a.EffectiveRank != 2 || a.PhysicalCards is not [var cost] || cost.CardId != r.CardId || cost.CardKind != r.PrintedKind || cost.From != r.From || use.PhysicalCardIds is not [var id] || id != r.CardId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JuewuUseIssuedEvent>().Count(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.CardId == r.CardId && e.From == r.From && e.OutputKind == r.OutputKind && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner) != 1)
             return false;
         if (r.PaymentSequence == 0)
             return !requirePayment;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<JuewuMaterialPaidEvent>().Where(e => e.UseId == use.Id).ToArray()is [var paid] && paid.ActionId == a.ActionId && paid.CardId == r.CardId && paid.From == r.From && paid.To == CardLocation.Processing && paid.Reason == CardMoveReasons.Use && paid.MovementSequence == r.PaymentSequence && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == r.PaymentSequence && m.CardId == r.CardId && m.From == r.From && m.To == paid.To && m.Reason == paid.Reason) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JuewuMaterialPaidEvent>().Where(e => e.UseId == use.Id).ToArray()is [var paid] && paid.ActionId == a.ActionId && paid.CardId == r.CardId && paid.From == r.From && paid.To == CardLocation.Processing && paid.Reason == CardMoveReasons.Use && paid.MovementSequence == r.PaymentSequence && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == r.PaymentSequence && m.CardId == r.CardId && m.From == r.From && m.To == paid.To && m.Reason == paid.Reason) == 1;
     }
 
     internal bool JuewuIssuedActorMatches(CardUseFrame use, JuewuUseReceipt receipt)
     {
         var actor = receipt.Source.OwnerSeat;
-        foreach (var replacement in _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == use.Id))
+        foreach (var replacement in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == use.Id))
         {
             if (replacement.PreviousActorSeat != actor || replacement.ProviderSeat != receipt.Source.OwnerSeat)
                 return false;
@@ -119,7 +119,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     {
         if (payload is not CardUseFinishedEvent finished || !HasWuGuanYuJuewuCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(finished.ResolutionId)is not { Juewu: { } receipt } use)
             return;
-        if (!ValidJuewuUse(use, requirePayment: true) || _coreProgramEventHistoryOperations.ProgramEventHistory<JuewuUseFinishedEvent>().Any(e => e.UseId == use.Id))
+        if (!ValidJuewuUse(use, requirePayment: true) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JuewuUseFinishedEvent>().Any(e => e.UseId == use.Id))
             throw new InvalidOperationException("Juewu's original native use must complete once after its one actual payment.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JuewuUseFinishedEvent(use.Id, receipt.ActionId, receipt.Source, receipt.OutputKind, receipt.CardId, receipt.PaymentSequence));
     }

@@ -54,7 +54,7 @@ internal sealed partial class CoreGameEngineBoundDiscardSlashBenefitsRuntime
     }
 
     internal bool HasTurnSlashSuitAllowance(int owner, Suit? suit) => _turnCardUseEffectsOperations._turnCardUseEffects.HasSlashSuitAllowance(_coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, owner, suit) || _characterXinXianYingMobileShiOperations.HasShiXxySuitAllowance(owner, suit);
-    internal bool HasTurnAlcoholSuitAllowance(CharacterState actor, Card? material = null, CardConversionSource? conversion = null) => _characterSunJunMobileShiOperations.HasShiSunJunFirstSuitAllowance(actor, material, conversion) || (material is null ? new[]
+    internal bool HasTurnAlcoholSuitAllowance(CharacterState actor, Card? material = null, CardConversionSource? conversion = null) => _characterSunJunMobileShiOperations.Value.HasShiSunJunFirstSuitAllowance(actor, material, conversion) || (material is null ? new[]
     {
         Suit.Spade,
         Suit.Heart,

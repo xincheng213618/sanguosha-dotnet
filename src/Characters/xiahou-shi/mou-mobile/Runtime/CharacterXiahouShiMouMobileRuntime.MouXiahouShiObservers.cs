@@ -11,12 +11,12 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
         foreach (var m in _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > before && m.Sequence <= after))
         {
             var fact = new MouXiahouShiMovementSignedEvent(id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence);
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouShiMovementSignedEvent>().Contains(fact))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouShiMovementSignedEvent>().Contains(fact))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(fact);
         }
     }
 
-    internal bool MouXiahouShiMovementSigned(ProgramSkillFrame f, CardMovementRecord m) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouShiMovementSignedEvent>().Count(e => e == new MouXiahouShiMovementSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1;
+    internal bool MouXiahouShiMovementSigned(ProgramSkillFrame f, CardMovementRecord m) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouShiMovementSignedEvent>().Count(e => e == new MouXiahouShiMovementSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1;
     internal bool IsMouXiahouShiMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => e is not null && MouXiahouShiComposition.Handles(e.Op) && ValidMouXiahouShi(f) && pending == f.PendingMovementContinuation && pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (f.MouXiahouShiYanyu?.Stage is MouXiahouShiYanyuStage.DiscardChildren or MouXiahouShiYanyuStage.DrawChildren || f.MouXiahouShiQiaoshi?.Stage is MouXiahouShiQiaoshiStage.RecoveryChildren or MouXiahouShiQiaoshiStage.DrawChildren);
     internal bool DrainMouXiahouShiChildren(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     internal bool MouXiahouShiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -36,7 +36,7 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
             return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => m.Sequence > before && m.Sequence <= after && MouXiahouShiMovementSigned(f, m));
         }
 
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
+        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
     internal bool IsMouXiahouShiDirectRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => f.MouXiahouShiQiaoshi is { Stage: MouXiahouShiQiaoshiStage.RecoveryChildren, Branch: "recover-and-draw", RecoveryReturned: false } q && ValidMouXiahouShiQiaoshi(f) && recovery.ParentFrameId == f.Id && recovery.Attempt.SourceSeat == q.DamageSourceSeat && recovery.Attempt.TargetSeat == f.OwnerSeat && recovery.Attempt.HpBefore == q.RecoveryHpBefore && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
@@ -44,7 +44,7 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
     internal bool MouXiahouShiObserverSuffix(int index) => _resolutionStackOperations._resolutionStack[index + 1] is DyingFrame dying && index + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(index + 1, dying) || _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => this.MouXiahouShiObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     internal ProgramSkillFrame? MouXiahouShiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.MouXiahouShiFirstChild(f, c), (n) => this.MouXiahouShiObserverSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 760)]
-    internal bool IsMouXiahouShiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouXiahouShiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsMouXiahouShiDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && MouXiahouShiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 540)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 530)]
     internal bool IsMouXiahouShiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)
@@ -89,8 +89,8 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
         {
             if (q.RecoveryReturned)
                 throw new InvalidOperationException("Qiaoshi cannot resume an already returned recovery twice.");
-            var requests = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramRecoveryRequestedEvent>().Where(e => e.ProgramFrameId == f.Id && e.InstructionIndex == f.InstructionIndex).ToArray();
-            var direct = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramRecoveryAppliedEvent>().Where(e => e.ProgramFrameId == f.Id && e.Receipt.InstructionIndex == f.InstructionIndex).ToArray();
+            var requests = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramRecoveryRequestedEvent>().Where(e => e.ProgramFrameId == f.Id && e.InstructionIndex == f.InstructionIndex).ToArray();
+            var direct = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramRecoveryAppliedEvent>().Where(e => e.ProgramFrameId == f.Id && e.Receipt.InstructionIndex == f.InstructionIndex).ToArray();
             if (q.BaseRecovery > 0 && requests.Length + direct.Length != 1 || q.BaseRecovery == 0 && requests.Length + direct.Length != 0 || requests.Any(e => e.GameplayHash != f.GameplayHash || e.SourceSeat != q.DamageSourceSeat || e.TargetSeat != f.OwnerSeat || e.HpBefore != q.RecoveryHpBefore) || direct.Any(e => e.Receipt.GameplayHash != f.GameplayHash || e.Receipt.SourceSeat != q.DamageSourceSeat || e.Receipt.TargetSeat != f.OwnerSeat || e.Receipt.HpBefore != q.RecoveryHpBefore))
                 throw new InvalidOperationException("Qiaoshi must return its single genuine native recovery attempt before drawing.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouXiahouShiQiaoshi = q with { RecoveryReturned = true }, PendingMovementContinuation = null });

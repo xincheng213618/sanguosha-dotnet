@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineResponseUseCompletionRuntime
                 pending = suspended;
             if (pending is null || window.ParentFrameId != pending.Id || window.Action.OpponentSeat != pending.SourceSeat)
                 return false;
-            return _coreDelayedNullificationOperations.HasNullificationEffectOwner(pending) && window.Action.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(pending);
+            return _coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(pending) && window.Action.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(pending);
         }
 
         if (window.CompletedResponseReturn?.Kind != ProgramCompletedResponseKind.Dodge || window.AttackOwnerFrameId is not { } ownerId || window.ParentFrameId != ownerId)

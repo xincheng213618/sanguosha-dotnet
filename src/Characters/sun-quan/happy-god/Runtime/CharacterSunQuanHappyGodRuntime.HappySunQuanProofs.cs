@@ -28,7 +28,7 @@ internal sealed partial class CharacterSunQuanHappyGodRuntime
 
     internal ProgramSkillFrame? HappySunQuanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.HappySunQuanFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40940)]
-    internal bool HappySunQuanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HappySunQuanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool HappySunQuanDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && HappySunQuanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40940)]
     internal bool AdvanceHappySunQuanChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HappySunQuanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40940)]
@@ -40,6 +40,6 @@ internal sealed partial class CharacterSunQuanHappyGodRuntime
             return true;
         }
 
-        return f.SkillId == HappySunQuanComposition.Learning && f.TriggerId == "resolve-study" && f.InstructionIndex == 0 && f.WindowContext is { } w && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId) == 1 && IsIssuedHappyLearning(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority), w);
+        return f.SkillId == HappySunQuanComposition.Learning && f.TriggerId == "resolve-study" && f.InstructionIndex == 0 && f.WindowContext is { } w && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId) == 1 && IsIssuedHappyLearning(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority), w);
     }
 }

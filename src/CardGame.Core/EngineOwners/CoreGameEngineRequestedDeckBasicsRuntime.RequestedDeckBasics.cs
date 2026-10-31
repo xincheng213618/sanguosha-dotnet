@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
         if (top is null || top is RequestedDeckBasicFrame)
             return null;
         long owner = top is ResponseWindowFrame response ? response.ParentFrameId : top.Id;
-        if (p.Kind == DecisionKind.RescueDying && _coreDyingCursorRuntimeOperations.ActiveDying is { } d && d.ResponderSeat == p.PlayerSeat && top.Id == d.Id)
+        if (p.Kind == DecisionKind.RescueDying && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && d.ResponderSeat == p.PlayerSeat && top.Id == d.Id)
             return (RequestedDeckBasicIntent.Dying, d.Id, top.Id, d.ResponderIndex);
         if (p.Kind == DecisionKind.RespondDodge)
         {
@@ -80,7 +80,7 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
             return p;
         var actor = _coreMatchParticipantsPlayersAccess._players[p.PlayerSeat];
         var required = RequestedDeckBasicKind(p, context.Intent);
-        if (context.Intent == RequestedDeckBasicIntent.Dying ? !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(actor.Seat, _coreDyingCursorRuntimeOperations.ActiveDying!.VictimSeat) && !(actor.Seat == _coreDyingCursorRuntimeOperations.ActiveDying.VictimSeat && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, CardKind.Alcohol, CardActionType.Use)) : _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, required, _coreRequestedDeckBasicOwnershipOperations.RequestedDeckBasicActionType(context.Intent)))
+        if (context.Intent == RequestedDeckBasicIntent.Dying ? !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(actor.Seat, _coreDyingCursorRuntimeOperations.Value.ActiveDying!.VictimSeat) && !(actor.Seat == _coreDyingCursorRuntimeOperations.Value.ActiveDying.VictimSeat && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, CardKind.Alcohol, CardActionType.Use)) : _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, required, _coreRequestedDeckBasicOwnershipOperations.RequestedDeckBasicActionType(context.Intent)))
             return p;
         var owner = _resolutionStackOperations._resolutionStack.Single(f => f.Id == context.OwnerId);
         if (owner.RequestedDeckBasicMaterial is { } seen && seen.OriginalPromptId == p.PromptId && seen.RequestFrameId == context.RequestId && seen.ActorSeat == actor.Seat && seen.Cursor == context.Cursor)
@@ -444,7 +444,7 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
         var activate = prompt.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("deck-basic-source") == "activate");
         if (activate is null)
         {
-            if (prompt.Kind != DecisionKind.RescueDying || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != dying.Id || dying.ResponderSeat != prompt.PlayerSeat || !(HasRequestedDeckBasicSource(_coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat], CardKind.Peach) || dying.RequestedDeckBasicMaterial is { Intent: RequestedDeckBasicIntent.Dying, Claiming: false } attempted && attempted.ActorSeat == prompt.PlayerSeat && attempted.Cursor == dying.ResponderIndex && attempted.OriginalPromptId == prompt.PromptId))
+            if (prompt.Kind != DecisionKind.RescueDying || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != dying.Id || dying.ResponderSeat != prompt.PlayerSeat || !(HasRequestedDeckBasicSource(_coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat], CardKind.Peach) || dying.RequestedDeckBasicMaterial is { Intent: RequestedDeckBasicIntent.Dying, Claiming: false } attempted && attempted.ActorSeat == prompt.PlayerSeat && attempted.Cursor == dying.ResponderIndex && attempted.OriginalPromptId == prompt.PromptId))
                 return false;
             // The original request remains declined on its Dying owner. Consume
             // the mature native response while skipping this opt-in entry once.

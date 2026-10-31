@@ -26,7 +26,7 @@ internal sealed partial class CharacterSimaYiMobileGodRuntime
     bool IMobileSimaRenjieFacts.WenjiResponseForbidden(long useId, int actor) => _characterLiuQiOlOperations.IsWenjiResponseForbidden2(useId, actor);
     bool IMobileSimaRenjieFacts.LegalBorrowedSwordTarget(int owner, int target) => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target]);
     int IMobileSimaRenjieFacts.ExtraEffectOrdinal(long useId) => _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(useId);
-    bool IMobileSimaRenjieFacts.NullificationEffectOwner(NullificationWindowFrame frame) => _coreDelayedNullificationOperations.HasNullificationEffectOwner(frame);
+    bool IMobileSimaRenjieFacts.NullificationEffectOwner(NullificationWindowFrame frame) => _coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(frame);
     int IMobileSimaRenjieFacts.MarkerSourceCount(int owner, PlayerMarkerKind marker, int source) => _coreMatchParticipantsPlayersAccess._players[owner].MarkerSourceCounts.GetValueOrDefault((marker, source));
     bool IMobileSimaRenjieFacts.InvocationStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => _characterHuaTuoAnniversaryGodOperations.SkillInvocationStructuralEdge(parent, child);
     bool IMobileSimaRenjieFacts.InvocationObserverSuffix(long invocationFrameId) => _characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObserverSuffix(_resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == invocationFrameId));
@@ -39,7 +39,7 @@ internal sealed partial class CharacterSimaYiMobileGodRuntime
     Winner IMobileSimaCommonFacts.Winner => _coreMatchOutcomeWinnerAccess._winner;
 
     ContentSkillDefinition IMobileSimaCommonFacts.Skill(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId);
-    IEnumerable<T> IMobileSimaCommonFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMobileSimaCommonFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     void IMobileSimaYiOperations.GrantSkills(ProgramSkillFrame frame, IReadOnlyList<string> skillIds) => _coreProgramSkillChangesOperations.GrantProgramSkills(frame, skillIds);
     void IMobileSimaYiOperations.PayMarker(int owner, SkillProgramMarkerCost cost, string skillId, string bindingId) => _coreProgramMarkerPaymentsOperations.PayProgramMarkerCost(_coreMatchParticipantsPlayersAccess._players[owner], cost, skillId, bindingId);
     void IMobileSimaYiOperations.ExtraTurn(ProgramSkillFrame frame, int target) => _coreSkillProgramsOperations.PendProgramExtraTurn(frame, target);

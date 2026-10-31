@@ -20,7 +20,7 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
                 return false;
         }
 
-        return b.Movements.Any(m => m.From.Zone == CardZoneKind.Hand && m.From.OwnerSeat is { } provider && provider != a.ActorSeat && b.SourceCounts.Any(c => c.Location == m.From && c.CountBefore > 0 && c.CountAfter == 0) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsMaterialAuthorizedEvent>().Any(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.Actor == a.ActorSeat && e.CardId == m.CardId && e.From == m.From && e.Before < m.Sequence));
+        return b.Movements.Any(m => m.From.Zone == CardZoneKind.Hand && m.From.OwnerSeat is { } provider && provider != a.ActorSeat && b.SourceCounts.Any(c => c.Location == m.From && c.CountBefore > 0 && c.CountAfter == 0) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLsMaterialAuthorizedEvent>().Any(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.Actor == a.ActorSeat && e.CardId == m.CardId && e.From == m.From && e.Before < m.Sequence));
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.CaptureMovement, 48900)]
@@ -28,14 +28,14 @@ internal sealed partial class CharacterLuSuMobileShiRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || !ShiLsUseMaterialsMatch(use, b) || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !LiveShiLsGrants().Any(g => ShiLsRefillGrant(g.Source.OwnerSeat, g.Source.SkillInstanceId, b)?.GrantId == g.GrantId))
             return;
-        if (use.ShiLuSuPayment is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsUsePaymentCapturedEvent>().Any(e => e.UseId == use.Id))
+        if (use.ShiLuSuPayment is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLsUsePaymentCapturedEvent>().Any(e => e.UseId == use.Id))
             throw new InvalidOperationException("One Haoshi-observed native use cannot pay its original physical materials twice.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { ShiLuSuPayment = new(use.Id, use.Action!.ActionId, b.Movements[0].Sequence - 1, b.Movements[^1].Sequence) { Batch = b } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiLsUsePaymentCapturedEvent(use.Id, use.Action!.ActionId, b.Id));
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MatchBatch, 48900)]
-    internal bool IsShiLsUsePaymentBatch(CardUseFrame use, CardMovementBatchContext b) => use.ShiLuSuPayment is { } paid && ShiLsUseMaterialsMatch(use, b) && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, b, paid) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsUsePaymentCapturedEvent>().Count(e => e.UseId == use.Id && e.ActionId == use.Action!.ActionId && e.BatchId == b.Id) == 1;
+    internal bool IsShiLsUsePaymentBatch(CardUseFrame use, CardMovementBatchContext b) => use.ShiLuSuPayment is { } paid && ShiLsUseMaterialsMatch(use, b) && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, b, paid) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLsUsePaymentCapturedEvent>().Count(e => e.UseId == use.Id && e.ActionId == use.Action!.ActionId && e.BatchId == b.Id) == 1;
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.TrailingTail, 48900)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.HpObserverTail, 48900)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SharedProcessingTail, 48900)]

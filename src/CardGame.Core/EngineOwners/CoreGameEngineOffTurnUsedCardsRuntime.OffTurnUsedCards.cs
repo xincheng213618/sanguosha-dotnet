@@ -63,7 +63,7 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
         kind = default;
         if (action.Type != CardActionType.Response || action.ActorSeat != action.ProviderSeat && !_characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(action) || action.RequesterSeat is not null || action.ResponderSeat != action.ActorSeat)
             return false;
-        if (action.EffectiveKind == CardKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { DelayedReturn: not null } delayed && _coreDelayedNullificationOperations.HasNullificationEffectOwner(delayed) && action.ParentActionId is null && action.OpponentSeat == delayed.SourceSeat)
+        if (action.EffectiveKind == CardKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { DelayedReturn: not null } delayed && _coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(delayed) && action.ParentActionId is null && action.OpponentSeat == delayed.SourceSeat)
         {
             useId = delayed.Id;
             kind = OffTurnUsedCardKind.NullificationUse;

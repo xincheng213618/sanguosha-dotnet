@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtObserversRuntime
 {
     internal bool FixedDistanceDebtFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
-        if (!_coreFixedDistanceOneDebtOperations.ValidFixedDistanceDebtPayment(root) || root.FixedDistanceDebtPayment is not { CardId: not null } r)
+        if (!_coreFixedDistanceOneDebtOperations.Value.ValidFixedDistanceDebtPayment(root) || root.FixedDistanceDebtPayment is not { CardId: not null } r)
             return false;
         if (child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged)
             return skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex <= skills.Candidates.Count;
@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineFixedDistanceOneDebtObserversRuntime
 
     internal ProgramSkillFrame? FixedDistanceDebtObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.FixedDistanceDebtFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 170)]
-    internal bool IsFixedDistanceDebtProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && FixedDistanceDebtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsFixedDistanceDebtProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && FixedDistanceDebtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 30)]
     internal bool TryAdvanceFixedDistanceDebtSubtree()
     {

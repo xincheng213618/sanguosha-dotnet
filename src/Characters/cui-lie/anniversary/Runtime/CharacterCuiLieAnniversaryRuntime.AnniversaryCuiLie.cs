@@ -7,14 +7,14 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
 {
     internal const string CuiLieAction = "anniversary-cui-lie", CuiLieGive = "skill-program.anniversary:zijue.give", CuiLieDraw = "skill-program.anniversary:zijue.draw", CuiLieClaim = "skill-program.anniversary:chibi.claim", CuiLieContest = "anniversary-cui-lie-contest";
     internal static CardConversionSource CuiLieSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal bool CuiLieDisabled(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuiLieDisabledEvent>().Any(d => d.Source.OwnerSeat == owner && d.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == d.Turn));
+    internal bool CuiLieDisabled(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieDisabledEvent>().Any(d => d.Source.OwnerSeat == owner && d.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == d.Turn));
     internal bool IsAnniversaryCuiLieGrantQualified(CharacterState owner, SkillGrant grant) => grant.SkillId != AnniversaryCuiLieComposition.Chibi || !CuiLieDisabled(owner.Seat);
     internal long CaptureAnniversaryCuiLieQualificationStamp(long underlying)
     {
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuiLieDisabledEvent>().Count;
+        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieDisabledEvent>().Count;
         if (issued == 0)
             return underlying;
-        var input = (underlying, issued, _coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Count);
+        var input = (underlying, issued, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Count);
         if (_characterCuiLieAnniversaryCuiLieQualificationInputsCuiLieQualificationStampAccess._cuiLieQualificationStamp == 0 || input != _characterCuiLieAnniversaryCuiLieQualificationInputsCuiLieQualificationStampAccess._cuiLieQualificationInputs)
         {
             _characterCuiLieAnniversaryCuiLieQualificationInputsCuiLieQualificationStampAccess._cuiLieQualificationInputs = input;
@@ -25,7 +25,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
     }
 
     SkillProgramStepOutcome IAnniversaryCuiLieHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginCuiLie(f, op);
-    internal AnniversaryCuiLieLeaseEvent[] CuiLieLeases(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuiLieLeaseEvent>().Where(l => l.Source.OwnerSeat == owner && l.Amount is >= 2 and <= 4 && l.Source.SkillId == AnniversaryCuiLieComposition.Zijue && l.Source.BindingId == "declare-number" && _contentRegistryOperations._contentRegistry.GetSkill(l.Source.SkillId).Program?.GameplayHash == l.Hash && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Any(t => t.ActorSeat == owner && t.TurnNumber > l.Turn) && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuiLieGiftEvent>().Count(g => g.FrameId == l.FrameId && g.Count == l.Amount) == 1).ToArray();
+    internal AnniversaryCuiLieLeaseEvent[] CuiLieLeases(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieLeaseEvent>().Where(l => l.Source.OwnerSeat == owner && l.Amount is >= 2 and <= 4 && l.Source.SkillId == AnniversaryCuiLieComposition.Zijue && l.Source.BindingId == "declare-number" && _contentRegistryOperations._contentRegistry.GetSkill(l.Source.SkillId).Program?.GameplayHash == l.Hash && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Any(t => t.ActorSeat == owner && t.TurnNumber > l.Turn) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieGiftEvent>().Count(g => g.FrameId == l.FrameId && g.Count == l.Amount) == 1).ToArray();
     internal int AnniversaryCuiLiePindianBonus(int owner) => CuiLieLeases(owner).Sum(l => l.Amount);
     [ProgramDistanceRule(ProgramDistanceStage.IncomingContributions, 46900)]
     internal IEnumerable<RuleQueryContribution> CuiLieIncoming(int target)
@@ -224,7 +224,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
                 throw new InvalidOperationException("Cui Lie lost his original paid frame or native return.");
             if (r.Stage == AnniversaryCuiLieStage.Pindian)
             {
-                var result = _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Single(e => e.FrameId == r.PindianId && e.SkillId == f.SkillId).Result;
+                var result = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().Single(e => e.FrameId == r.PindianId && e.SkillId == f.SkillId).Result;
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryCuiLie = r with { Stage = AnniversaryCuiLieStage.PindianChildren, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Result = result }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryCuiLiePindianReturnedEvent(f.Id, r.PindianId, result.SourceRank, result.OpponentRank, result.SourceWon));
                 continue;

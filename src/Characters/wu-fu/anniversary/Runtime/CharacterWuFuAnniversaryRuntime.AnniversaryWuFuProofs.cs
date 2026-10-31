@@ -5,7 +5,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
 {
     internal bool ValidWuFu(ProgramSkillFrame f)
     {
-        if (f.AnniversaryWuFu is not { } r || f.SkillId != AnniversaryWuFuComposition.Zhonge || f.ActivationId != "adjust-and-commit" || f.TriggerId is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != WuFuSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveAnniversaryWuFuZhonge || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Play || r.Phase.ActorSeat != f.OwnerSeat || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || !Enum.IsDefined(r.Stage) || r.Count < 0 || r.Cursor < 0 || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Cards.Distinct().Count() != r.Cards.Count || r.Cards.Any(id => id <= 0) || r.Cards.Count > r.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuStartedEvent>().Count(e => e == new AnniversaryWuFuStartedEvent(f.Id, r.Source, r.Hash, r.Phase)) != 1)
+        if (f.AnniversaryWuFu is not { } r || f.SkillId != AnniversaryWuFuComposition.Zhonge || f.ActivationId != "adjust-and-commit" || f.TriggerId is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != WuFuSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveAnniversaryWuFuZhonge || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Play || r.Phase.ActorSeat != f.OwnerSeat || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || !Enum.IsDefined(r.Stage) || r.Count < 0 || r.Cursor < 0 || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Cards.Distinct().Count() != r.Cards.Count || r.Cards.Any(id => id <= 0) || r.Cards.Count > r.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuStartedEvent>().Count(e => e == new AnniversaryWuFuStartedEvent(f.Id, r.Source, r.Hash, r.Phase)) != 1)
             return false;
         if (r.Votes.Count > 2 || r.Votes.Where((v, i) => v.Seat != (i == 0 ? f.OwnerSeat : r.Peer)).Any())
             return false;
@@ -22,12 +22,12 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
         {
             if (r.Votes.Count != 2 || r.Cursor > WuFuTasks(f).Length)
                 return false;
-            var reveal = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuVoteRevealedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
+            var reveal = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuVoteRevealedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
             if (reveal.Length != 2 || reveal.Where((e, i) => e.Index != i || e.Seat != r.Votes[i].Seat || e.Draw != r.Votes[i].Draw).Any())
                 return false;
             if (r.Stage != AnniversaryWuFuStage.Item && r.Cursor >= WuFuTasks(f).Length)
                 return false;
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuItemReturnedEvent>().Count(e => e.FrameId == f.Id) != r.Cursor)
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuItemReturnedEvent>().Count(e => e.FrameId == f.Id) != r.Cursor)
                 return false;
         }
 
@@ -36,17 +36,17 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
             if (f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } p || p.SubjectSeat != f.OwnerSeat)
                 return false;
             if (r.Stage == AnniversaryWuFuStage.NativeChildren)
-                return r.Returned && r.UseId > 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is null && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuSlashReturnedEvent>().Count(e => e.FrameId == f.Id && e.Cursor == r.Cursor && e.UseId == r.UseId && e.ActionId == r.ActionId) == 1;
+                return r.Returned && r.UseId > 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuSlashReturnedEvent>().Count(e => e.FrameId == f.Id && e.Cursor == r.Cursor && e.UseId == r.UseId && e.ActionId == r.ActionId) == 1;
             if (r.Stage == AnniversaryWuFuStage.AdjustChildren)
             {
-                if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuAdjustedEvent>().Count(e => e.FrameId == f.Id && e.Requested == r.Count && e.Before == r.Before && e.After == r.After && e.Draw == (r.Draw is not null)) != 1)
+                if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuAdjustedEvent>().Count(e => e.FrameId == f.Id && e.Requested == r.Count && e.Before == r.Before && e.After == r.After && e.Draw == (r.Draw is not null)) != 1)
                     return false;
                 if (r.Draw is { } adjust)
                     return adjust.RecipientSeat == f.OwnerSeat && adjust.RequestedCount == r.Count && adjust.SequenceBefore == r.Before && adjust.SequenceAfter == r.After;
                 return r.Cards.Count == r.Count && r.Cards.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason == WuFuDiscardReason && m.Sequence > r.Before && m.Sequence <= r.After) == 1);
             }
 
-            return r.Draw is { } d && WuFuTask(f).Draw && d.RecipientSeat == WuFuTask(f).Actor && d.RequestedCount == 1 && d.SequenceBefore == r.Before && d.SequenceAfter == r.After && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuDrawReturnedEvent>().Count(e => e.FrameId == f.Id && e.Cursor == r.Cursor && e.Recipient == d.RecipientSeat && e.Requested == 1 && e.Actual == d.ActualDrawIds.Count && e.Replacement == d.ReplacementGainedIds.Count && e.AttemptId == d.AttemptFrameId) == 1;
+            return r.Draw is { } d && WuFuTask(f).Draw && d.RecipientSeat == WuFuTask(f).Actor && d.RequestedCount == 1 && d.SequenceBefore == r.Before && d.SequenceAfter == r.After && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuDrawReturnedEvent>().Count(e => e.FrameId == f.Id && e.Cursor == r.Cursor && e.Recipient == d.RecipientSeat && e.Requested == 1 && e.Actual == d.ActualDrawIds.Count && e.Replacement == d.ReplacementGainedIds.Count && e.AttemptId == d.AttemptFrameId) == 1;
         }
 
         return f.PendingMovementContinuation is null;
@@ -88,7 +88,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
     internal bool WuFuObserverEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || WuFuNativeEdge(i) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && WuFuFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal ProgramSkillFrame? WuFuObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.WuFuFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => this.WuFuObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 46600)]
-    internal bool WuFuDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && WuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool WuFuDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && WuFuObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 46600)]
     internal bool AdvanceWuFuChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && WuFuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

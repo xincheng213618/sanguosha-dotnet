@@ -177,7 +177,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var(discardedCardIds, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[source.Seat].ChooseStoneAxeResponse(_corePlayerViewProjectionOperations.CreateSnapshot(source.Seat), attack.TargetSeat, ++_coreAiDiagnosticsAiGeneralThoughtsAiThoughtsThoughtSequenceAccess._thoughtSequence);
         AddThought(thought);
-        _coreNativeStoneAxeOperations.ResolveStoneAxeChoice(discardedCardIds);
+        _coreNativeStoneAxeOperations.Value.ResolveStoneAxeChoice(discardedCardIds);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     }
 
@@ -399,7 +399,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
         var(cardId, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[picker.Seat].ChooseHarvestCard(view, options, ++_coreAiDiagnosticsAiGeneralThoughtsAiThoughtsThoughtSequenceAccess._thoughtSequence);
         AddThought(thought);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        _coreNativeHarvestOperations.ResolveHarvestSelection(group, picker, cardId);
+        _coreNativeHarvestOperations.Value.ResolveHarvestSelection(group, picker, cardId);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     }
 
@@ -615,7 +615,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
 
     internal void ResolvePendingAiDodge()
     {
-        if (_coreRoundOnceCardlessReturnsOperations.TryResolveRoundOnceCardlessAiDodge())
+        if (_coreRoundOnceCardlessReturnsOperations.Value.TryResolveRoundOnceCardlessAiDodge())
             return;
         if (_characterXiaoQiaoMouOlOperations.TryMouXqJueyanAiResponse(CardKind.Dodge))
             return;
@@ -636,7 +636,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
         _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = null;
         var dodges = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(target, CardKind.Dodge);
-        if (_coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(attack)is { } requireRed)
+        if (_coreConvertedSlashResponseOperations.Value.ConvertedSlashSameColorResponseColor(attack)is { } requireRed)
             dodges = dodges.Where(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(target, card)) == requireRed).ToList();
         var dodge = dodges.FirstOrDefault();
         var hasBagua = !attack.IgnoresArmor && _coreNativeEquipmentAndFactionQueriesOperations.HasBagua(target) && responseDecision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("response") == "bagua");
@@ -708,16 +708,16 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
 
     internal void NotifyAiOfPublicAttack(CharacterState source, CharacterState target, PublicAttackKind kind)
     {
-        if (_coreNativeDamageHandlesOperations.IsSurvivalMode)
+        if (_coreNativeDamageHandlesOperations.Value.IsSurvivalMode)
             return;
-        if (_coreNativeDamageHandlesOperations.IsNationalWarMode)
+        if (_coreNativeDamageHandlesOperations.Value.IsNationalWarMode)
         {
             NotifyAiOfNationalAttack(source, target);
             return;
         }
 
-        var lordSeat = _coreNativeDamageHandlesOperations.IsTeamMode ? -1 : _coreMatchParticipantsPlayersAccess._players.Single(player => player.Role == Role.Lord).Seat;
-        var visibleTargetRole = _coreNativeDamageHandlesOperations.IsTeamMode ? null : target.RoleRevealed || target.Role == Role.Lord ? target.Role : (Role? )null;
+        var lordSeat = _coreNativeDamageHandlesOperations.Value.IsTeamMode ? -1 : _coreMatchParticipantsPlayersAccess._players.Single(player => player.Role == Role.Lord).Seat;
+        var visibleTargetRole = _coreNativeDamageHandlesOperations.Value.IsTeamMode ? null : target.RoleRevealed || target.Role == Role.Lord ? target.Role : (Role? )null;
         var evidence = new PublicAttackEvidence(kind, source.Seat, target.Seat, lordSeat, visibleTargetRole);
         foreach (var brain in _coreAiBrainsAiBrainsAccess._aiBrains.Values)
         {
@@ -734,7 +734,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
 
     internal void NotifyAiOfGroupAttack(CharacterState source, IReadOnlyList<int> targets)
     {
-        if (_coreNativeDamageHandlesOperations.IsNationalWarMode)
+        if (_coreNativeDamageHandlesOperations.Value.IsNationalWarMode)
         {
             foreach (var targetSeat in targets)
             {

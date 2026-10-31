@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashesRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.InspectedHandSlash is not { } d)
             return false;
-        if (!_coreInspectedHandSlashReturnsOperations.ValidInspectedHandSlash(f))
+        if (!_coreInspectedHandSlashReturnsOperations.Value.ValidInspectedHandSlash(f))
             throw new InvalidOperationException("HP hand inspection lost its original once-paid activation.");
         if (d.Stage == InspectedHandSlashStage.SlashIssued)
             throw new InvalidOperationException("An issued hand-inspection Slash requires its exact typed return.");
@@ -110,7 +110,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashesRuntime
     [ProgramAnswer("inspected-hand-slash")]
     internal void ResolveInspectedHandChoice(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.InspectedHandSlash is not { Stage: InspectedHandSlashStage.Viewing } d || !_coreInspectedHandSlashReturnsOperations.ValidInspectedHandSlash(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != f.OwnerSeat || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], InspectedHandChoices(f).Where(c => c.Id == choice.Id).ToArray()) || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[d.TargetSeat]).Select(c => c.Id).SequenceEqual(d.ViewedCardIds))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.InspectedHandSlash is not { Stage: InspectedHandSlashStage.Viewing } d || !_coreInspectedHandSlashReturnsOperations.Value.ValidInspectedHandSlash(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } prompt || prompt.PlayerSeat != f.OwnerSeat || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], InspectedHandChoices(f).Where(c => c.Id == choice.Id).ToArray()) || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[d.TargetSeat]).Select(c => c.Id).SequenceEqual(d.ViewedCardIds))
             throw new InvalidOperationException("The inspected hand choice must retain its private viewer, complete current hand and exact payment.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[d.TargetSeat].IsAlive)
@@ -121,7 +121,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashesRuntime
 
         if (d.ContainsPrintedDodge)
         {
-            _coreInspectedHandSlashReturnsOperations.IssueInspectedHandSlash(f);
+            _coreInspectedHandSlashReturnsOperations.Value.IssueInspectedHandSlash(f);
             return;
         }
 

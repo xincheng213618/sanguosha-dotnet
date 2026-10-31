@@ -1,8 +1,8 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class ShiGaoXiangCapability(Func<RuntimeEntries.CharacterGaoXiangMobileShiEntries> getCharacterGaoXiangMobileShiRuntime) : IShiGaoXiangHost
+internal sealed class ShiGaoXiangCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGaoXiangMobileShiRuntime>> getCharacterGaoXiangMobileShiRuntime) : IShiGaoXiangHost
 {
-    public SkillProgramStepOutcome ResolveChiyuan(ProgramSkillFrame frame) => getCharacterGaoXiangMobileShiRuntime().BeginShiZxChiyuan(frame);
-    public SkillProgramStepOutcome ResolveErdi(ProgramSkillFrame frame) => getCharacterGaoXiangMobileShiRuntime().BeginShiZxErdi(frame);
+    public SkillProgramStepOutcome ResolveChiyuan(ProgramSkillFrame frame) => getCharacterGaoXiangMobileShiRuntime().Value.BeginShiZxChiyuan(frame);
+    public SkillProgramStepOutcome ResolveErdi(ProgramSkillFrame frame) => getCharacterGaoXiangMobileShiRuntime().Value.BeginShiZxErdi(frame);
 }

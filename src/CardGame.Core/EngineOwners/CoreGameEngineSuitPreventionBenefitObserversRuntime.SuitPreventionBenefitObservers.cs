@@ -91,5 +91,5 @@ internal sealed partial class CoreGameEngineSuitPreventionBenefitObserversRuntim
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 530)]
-    internal bool IsSuitPlacementProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SuitPlacementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsSuitPlacementProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && SuitPlacementObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

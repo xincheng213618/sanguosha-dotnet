@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineTableOrderRuntime
 {
     internal IReadOnlyList<int> CurrentTableOrder()
     {
-        var movements = _coreProgramEventHistoryOperations.ProgramEventHistory<TableSeatMovedEvent>();
+        var movements = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TableSeatMovedEvent>();
         var last = movements.LastOrDefault();
         if (_coreGameEngineTableOrderCachedTableMovementCachedTableOrderAccess._cachedTableOrder is not null && ReferenceEquals(last, _coreGameEngineTableOrderCachedTableMovementCachedTableOrderAccess._cachedTableMovement))
             return _coreGameEngineTableOrderCachedTableMovementCachedTableOrderAccess._cachedTableOrder;

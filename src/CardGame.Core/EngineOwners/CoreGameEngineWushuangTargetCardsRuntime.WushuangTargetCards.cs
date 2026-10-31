@@ -46,7 +46,7 @@ internal sealed partial class CoreGameEngineWushuangTargetCardsRuntime
     {
         if (!_coreWushuangModeProjectionOperations.IsWushuangMode || !window.EffectNullified)
             return;
-        var response = _coreProgramEventHistoryOperations.ProgramEventHistory<NullificationRespondedEvent>().LastOrDefault(e => e.ResolutionId == window.ParentFrameId && e.ChainDepth == window.ChainDepth && e.EffectNullified);
+        var response = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NullificationRespondedEvent>().LastOrDefault(e => e.ResolutionId == window.ParentFrameId && e.ChainDepth == window.ChainDepth && e.EffectNullified);
         if (response is null || !_coreWushuangTacticRulesOperations.HasWushuangTactic(response.ResponderSeat, 2008) || !_coreMatchParticipantsPlayersAccess._players[response.ResponderSeat].IsAlive)
             return;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { } action } use || action.ActorSeat != window.SourceSeat || !(use.PhysicalCardIds ?? [use.CardId]).SequenceEqual(finishedPhysicalCards.Select(card => card.Id)))

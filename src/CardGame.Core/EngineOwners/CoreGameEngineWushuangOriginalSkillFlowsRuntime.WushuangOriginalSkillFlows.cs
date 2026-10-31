@@ -173,7 +173,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillFlowsRuntime
 
         if (r.Stage != "tairan-recovered")
             throw new InvalidOperationException("Tairan lost its once-recovered debt.");
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangTairanHealedEvent>().Any(e => e.FrameId == f.Id))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangTairanHealedEvent>().Any(e => e.FrameId == f.Id))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangTairanHealedEvent(f.Id, f.OwnerSeat, f.SkillInstanceId, _coreActualTurnProgressTurnNumberAccess._turnNumber, 0));
         _coreWushuangOriginalSkillsOperations.DrawWushuangOriginal(f, f.OwnerSeat, Math.Max(0, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp - _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count), "finish");
     }
@@ -183,9 +183,9 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillFlowsRuntime
         var r = f.WushuangOriginalSkill!;
         if (r.Stage == "begin")
         {
-            var settled = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangTairanSettledEvent>().Select(e => e.ProducerId).ToHashSet();
-            var healing = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangTairanHealedEvent>().Where(e => e.Owner == f.OwnerSeat && !settled.Contains(e.FrameId)).ToArray();
-            var drawn = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangTairanDrawnEvent>().Where(e => e.Owner == f.OwnerSeat && !settled.Contains(e.FrameId)).ToArray();
+            var settled = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangTairanSettledEvent>().Select(e => e.ProducerId).ToHashSet();
+            var healing = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangTairanHealedEvent>().Where(e => e.Owner == f.OwnerSeat && !settled.Contains(e.FrameId)).ToArray();
+            var drawn = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangTairanDrawnEvent>().Where(e => e.Owner == f.OwnerSeat && !settled.Contains(e.FrameId)).ToArray();
             foreach (var id in healing.Select(e => e.FrameId).Concat(drawn.Select(e => e.FrameId)).Distinct())
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangTairanSettledEvent(id, f.OwnerSeat, f.Id));
             f = _coreWushuangOriginalSkillsOperations.UpdateWushuangOriginal(f, r with { Stage = "tairan-discard", Count = healing.Sum(e => e.Recovered), Cards = drawn.SelectMany(e => e.CardIds).Distinct().ToArray() });

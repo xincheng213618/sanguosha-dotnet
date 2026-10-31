@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEnginePrepDiscardEndingPromisesRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var d = f.PrepDiscard!;
-        if (!_corePrepDiscardReceiptsOperations.ValidPrepDiscard(f) || d.Deferred != true || d.TargetPayment is not { } paid || d.TargetSeat is not { } target || !_corePrepDiscardPaymentsOperations.PrepDiscardCanContinue(f) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
+        if (!_corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(f) || d.Deferred != true || d.TargetPayment is not { } paid || d.TargetSeat is not { } target || !_corePrepDiscardPaymentsOperations.PrepDiscardCanContinue(f) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
             throw new InvalidOperationException("The Ending promise requires an exact committed preparation payment.");
         var candidate = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], SkillProgramTriggerWindow.TurnEnding).SingleOrDefault(c => c.SkillId == f.SkillId && c.BindingId == endingBinding && c.SkillInstanceId == f.SkillInstanceId && c.GameplayHash == f.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(c)is { Optional: false, TurnOwnerScope: SkillProgramTurnOwnerScope.PaidPrepDiscardEnding } t && t.Effects is [{ Op: SkillProgramEffectOp.DrawPrepDiscardEnding }]);
         if (candidate is null)

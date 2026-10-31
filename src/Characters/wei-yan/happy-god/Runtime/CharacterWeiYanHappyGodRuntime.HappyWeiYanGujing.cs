@@ -72,7 +72,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.HappyWeiYanGujing is not null).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat, p.Seat)))
         {
             var issue = owner.HappyWeiYanGujing!;
-            if (issue.Source.OwnerSeat != owner.Seat || issue.Source.SkillId != HappyWeiYanComposition.Gujing || issue.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(issue.Source.SkillId).Program!.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyWeiYanGujingIssuedEvent>().Count(e => e == new HappyWeiYanGujingIssuedEvent(issue.FrameId, issue.Source, issue.GameplayHash)) != 1)
+            if (issue.Source.OwnerSeat != owner.Seat || issue.Source.SkillId != HappyWeiYanComposition.Gujing || issue.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(issue.Source.SkillId).Program!.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyWeiYanGujingIssuedEvent>().Count(e => e == new HappyWeiYanGujingIssuedEvent(issue.FrameId, issue.Source, issue.GameplayHash)) != 1)
                 throw new InvalidOperationException("Gujing's permanent gain replacement lost its accepted limited issue.");
             return CardLocation.Hand(owner.Seat);
         }

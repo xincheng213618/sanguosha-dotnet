@@ -14,7 +14,7 @@ internal sealed partial class CharacterJuShouMouRuntime
     bool IMouJuShouFacts.Alive(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     bool IMouJuShouFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
     SkillProgram? IMouJuShouFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
-    IEnumerable<T> IMouJuShouFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouJuShouFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouJuShouFacts.Parent(ProgramSkillFrame f)
     {
         if (f.SkillId == MouJuShouRuntime.ZuoJun)
@@ -95,7 +95,7 @@ internal sealed partial class CharacterJuShouMouRuntime
     {
         if (!response || dying || kind == CardKind.Nullification)
             return true;
-        if (_characterSimaYiMouOperations.IsMouSmPlayedActor(_coreMatchParticipantsPlayersAccess._players[actor]) || _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MouLuSuAnniversary: { Yin: true, Operation: SkillProgramEffectOp.ResolveMouLuSuMengmou } played } f && played.Other == actor && _characterLuSuMouOperations.MouLuSuAnniversary.Valid(f))
+        if (_characterSimaYiMouOperations.IsMouSmPlayedActor(_coreMatchParticipantsPlayersAccess._players[actor]) || _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MouLuSuAnniversary: { Yin: true, Operation: SkillProgramEffectOp.ResolveMouLuSuMengmou } played } f && played.Other == actor && _characterLuSuMouOperations.Value.MouLuSuAnniversary.Valid(f))
             return false;
         return _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[actor], kind) || CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true } b && b.WeaponOwnerSeat == actor || _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.SourceSeat == actor);
     }

@@ -1,8 +1,8 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramHealthChildQueries(Func<RuntimeEntries.CoreDyingCursorRuntimeEntries> getCoreDyingCursorRuntimeRuntime, EngineStates.CoreGameEngineHpChangeProgramsState gameEngineHpChangeProgramsState, Func<RuntimeEntries.CoreGameEngineProgramRecoveryReceiptsEntries> getCoreGameEngineProgramRecoveryReceiptsRuntime, Func<RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries> getCoreGameEngineAlternatingBenefitsRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineObserverSubtreesEntries> getCoreGameEngineObserverSubtreesRuntime) : IProgramHealthChildQueries
+internal sealed class ProgramHealthChildQueries(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreDyingCursorRuntimeRuntime>> getCoreDyingCursorRuntimeRuntime, EngineStates.CoreGameEngineHpChangeProgramsState gameEngineHpChangeProgramsState, Func<RuntimeEntries.CoreGameEngineProgramRecoveryReceiptsEntries> getCoreGameEngineProgramRecoveryReceiptsRuntime, Func<RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries> getCoreGameEngineAlternatingBenefitsRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineObserverSubtreesEntries> getCoreGameEngineObserverSubtreesRuntime) : IProgramHealthChildQueries
 {
-    public DyingFrame? ActiveDying => getCoreDyingCursorRuntimeRuntime().ActiveDying;
+    public DyingFrame? ActiveDying => getCoreDyingCursorRuntimeRuntime().Value.ActiveDying;
 
     public HpChangeContext? LastPendingLoss(long parentFrameId, int targetSeat) => gameEngineHpChangeProgramsState.ReferenceToPendingHpChanges.LastOrDefault(c => c.ParentFrameId == parentFrameId && c.TargetSeat == targetSeat && c.Kind == HpChangeKind.Loss);
     public bool ProgramRecoveryChild(ProgramSkillFrame parent, ResolutionFrame child) => child switch

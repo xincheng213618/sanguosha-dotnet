@@ -46,11 +46,11 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
 
         var group = _coreNativeCardContinuationCursorsOperations.ActiveGroupCard!;
         if (r.GroupEffect == GroupCardEffect.ResponseAttack)
-            _coreNativeGroupAttackOperations.ContinueGroupAttackResponseAfterEffect(group);
+            _coreNativeGroupAttackOperations.Value.ContinueGroupAttackResponseAfterEffect(group);
         else if (r.GroupEffect == GroupCardEffect.PublicDraft)
-            _coreNativeHarvestOperations.BeginHarvestSelection(group);
+            _coreNativeHarvestOperations.Value.BeginHarvestSelection(group);
         else
-            _coreNativeGroupRecoveryOperations.RunOneGroupRecoveryStep();
+            _coreNativeGroupRecoveryOperations.Value.RunOneGroupRecoveryStep();
     }
 
     internal bool ResolveMouLuXunMultiIronChain(NullificationWindowFrame pending)

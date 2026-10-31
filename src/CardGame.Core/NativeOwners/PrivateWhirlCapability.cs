@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class PrivateWhirlCapability(Func<RuntimeEntries.CoreGameEnginePrivateWhirlEntries> getCoreGameEnginePrivateWhirlRuntime) : IPrivateWhirlHost
+internal sealed class PrivateWhirlCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePrivateWhirlRuntime>> getCoreGameEnginePrivateWhirlRuntime) : IPrivateWhirlHost
 {
-    public SkillProgramStepOutcome BeginPrivateWhirl(ProgramSkillFrame f, SkillProgramEffect effect) => getCoreGameEnginePrivateWhirlRuntime().BeginPrivateWhirl(f, effect);
+    public SkillProgramStepOutcome BeginPrivateWhirl(ProgramSkillFrame f, SkillProgramEffect effect) => getCoreGameEnginePrivateWhirlRuntime().Value.BeginPrivateWhirl(f, effect);
 }

@@ -7,8 +7,8 @@ internal sealed partial class CharacterZhouYuHappyGodRuntime
     internal static CardConversionSource HappyZySource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal (NativeLogicalDiscardInvocationRecordedEvent Invocation, NativeLogicalDiscardMaterialCompletedEvent Material)? HappyZyDiscard(int owner)
     {
-        foreach (var invocation in _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.ActualTurnOwnerSeat == owner && e.ExecutorSeat == owner && e.HandCount > 0))
-            foreach (var material in _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == invocation.InvocationId && e.From == CardLocation.Hand(owner) && e.To == CardLocation.DiscardPile))
+        foreach (var invocation in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.ActualTurnOwnerSeat == owner && e.ExecutorSeat == owner && e.HandCount > 0))
+            foreach (var material in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == invocation.InvocationId && e.From == CardLocation.Hand(owner) && e.To == CardLocation.DiscardPile))
                 if (_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == material.CompletionSequence && m.CardId == material.CardId && m.To == material.To && (m.From == material.From || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m) == material.From)))
                     return (invocation, material);
         return null;
@@ -179,7 +179,7 @@ internal sealed partial class CharacterZhouYuHappyGodRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveHappyZhouYuQinyin)]
     internal void ReturnHappyZyDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.HappyZhouYu is not { Stage: HappyZyStage.Drawing, Mode: "draw", Draw: null } r || outcome.RecipientSeat != r.Target || outcome.RequestedCount != 1 || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyZyDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Ordinal == r.Cursor))
+        if (f.HappyZhouYu is not { Stage: HappyZyStage.Drawing, Mode: "draw", Draw: null } r || outcome.RecipientSeat != r.Target || outcome.RequestedCount != 1 || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZyDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Ordinal == r.Cursor))
             throw new InvalidOperationException("Happy Qinyin lost its exact once-issued one-card native draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { HappyZhouYu = r with { Stage = HappyZyStage.Children, Draw = outcome }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyZyDrawReturnedEvent(f.Id, r.Cursor, r.Target, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));

@@ -18,7 +18,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         return _coreMatchSetupSetupCompleteAccess._setupComplete && _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == seat && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreMatchParticipantsPlayersAccess._players[seat].HasHpValue && phase is { Kind: ActualDiscardRecoveryPhaseKind.Play } && phase.ActorSeat == seat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) ? phase : null;
     }
 
-    internal int MouZuifengUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZuifengCostPaidEvent>().Count(e => e.Source.OwnerSeat == owner && e.Phase == phase);
+    internal int MouZuifengUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZuifengCostPaidEvent>().Count(e => e.Source.OwnerSeat == owner && e.Phase == phase);
     internal IReadOnlyList<Card> MouZuifengCosts(int owner)
     {
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]);

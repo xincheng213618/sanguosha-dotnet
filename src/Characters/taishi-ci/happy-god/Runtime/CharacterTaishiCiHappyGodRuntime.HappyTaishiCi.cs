@@ -6,12 +6,12 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
     internal const string HappyTscDulie = "happy:dulie", HappyTscChongwei = "happy:chongwei", HappyTscPowei = "happy:powei", HappyTscShenzhu = "happy:shenzhu";
     internal static bool IsShenTscPoweiFamily(string skill) => skill is "mobile-god:powei" or HappyTscChongwei;
     internal int HappyTscFieldWei() => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Sum(p => p.Markers.GetValueOrDefault(PlayerMarkerKind.ShenTaishiCiWei));
-    internal bool HappyTscAwakened(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<HappyTaishiCiAwakenedEvent>().Any(e => e.Source.OwnerSeat == owner);
+    internal bool HappyTscAwakened(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyTaishiCiAwakenedEvent>().Any(e => e.Source.OwnerSeat == owner);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 41740)]
     internal bool CanOfferHappyTaishiCi(ProgramTriggerLegalityContext g)
     {
         if (g.SkillId == HappyTscDulie)
-            return g.Trigger.Id == "other-slash-heart" ? g.Context.CardUse is { } use && use.ActorSeat != g.OwnerSeat : HappyTscFieldWei() > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.VictimSeat == g.OwnerSeat) == 1;
+            return g.Trigger.Id == "other-slash-heart" ? g.Context.CardUse is { } use && use.ActorSeat != g.OwnerSeat : HappyTscFieldWei() > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.VictimSeat == g.OwnerSeat) == 1;
         if (g.SkillId == HappyTscChongwei)
             return g.Trigger.Id switch
             {
@@ -49,7 +49,7 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var count = HappyTscFieldWei();
-        if (f.SkillId != HappyTscDulie || f.TriggerId != "first-dying-recover" || f.WindowContext?.Window != SkillProgramTriggerWindow.DyingEntering || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.VictimSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.VictimSeat == f.OwnerSeat) != 1 || count <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyTaishiCiDulieRecoveredEvent>().Any(e => e.OwnerSeat == f.OwnerSeat))
+        if (f.SkillId != HappyTscDulie || f.TriggerId != "first-dying-recover" || f.WindowContext?.Window != SkillProgramTriggerWindow.DyingEntering || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.VictimSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.VictimSeat == f.OwnerSeat) != 1 || count <= 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyTaishiCiDulieRecoveredEvent>().Any(e => e.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Happy Dulie requires its first actual dying entry and existing field Wei.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyTaishiCiDulieRecoveredEvent(f.Id, f.OwnerSeat, dying.FrameId, count));
         _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, Math.Max(0, Math.Min(count, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp) - _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp), null, null);
@@ -64,7 +64,7 @@ internal sealed partial class CharacterTaishiCiHappyGodRuntime
         var awake = op == SkillProgramEffectOp.AwakenHappyTaishiCiPowei;
         if (awake ? f.SkillId != HappyTscPowei || context.Window != SkillProgramTriggerWindow.AfterTurnEnded || HappyTscAwakened(f.OwnerSeat) || HappyTscFieldWei() != 0 : op != SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash || f.SkillId != HappyTscShenzhu || context.Window != SkillProgramTriggerWindow.TurnBeforeStart)
             throw new InvalidOperationException("Happy Taishi Ci lost its actual awakening or own-turn start.");
-        var count = awake ? _coreProgramEventHistoryOperations.ProgramEventHistory<HappyTaishiCiWeiRemovedEvent>().Where(e => e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber).Sum(e => e.Count) : 1;
+        var count = awake ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyTaishiCiWeiRemovedEvent>().Where(e => e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber).Sum(e => e.Count) : 1;
         var r = new HappyTaishiCiReceipt(CharacterTaishiCiMobileGodRuntime.ShenTscSource(f), f.GameplayHash, context.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreActualRoundProgressRoundNumberAccess._roundNumber, op, count, awake ? HappyTaishiCiStage.GrantChildren : HappyTaishiCiStage.MovementChildren, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyTaishiCi = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyTaishiCiStartedEvent(f.Id, r.Source, r.Hash, r.Parent, r.Turn, r.Round, r.Op, r.Count));

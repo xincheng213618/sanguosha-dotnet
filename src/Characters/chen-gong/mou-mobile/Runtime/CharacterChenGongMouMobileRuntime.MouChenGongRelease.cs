@@ -15,7 +15,7 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1].Id == parent.Id;
     }
 
-    internal bool MouChenGongReleaseRoot(ProgramSkillFrame f) => f.MouChenGongRelease is { } r && MouChenGongReleaseParent(f) && r.Source == MouChenGongSource(f) && r.GameplayHash == f.GameplayHash && r.WindowId == f.WindowContext!.ParentFrameId && r.Phase.ActorSeat == f.OwnerSeat && r.Phase.Kind == ActualDiscardRecoveryPhaseKind.Play && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenGongReleaseStartedEvent>().Count(e => e == new MouChenGongReleaseStartedEvent(f.Id, r.Source, r.GameplayHash, r.Phase, r.WindowId)) == 1;
+    internal bool MouChenGongReleaseRoot(ProgramSkillFrame f) => f.MouChenGongRelease is { } r && MouChenGongReleaseParent(f) && r.Source == MouChenGongSource(f) && r.GameplayHash == f.GameplayHash && r.WindowId == f.WindowContext!.ParentFrameId && r.Phase.ActorSeat == f.OwnerSeat && r.Phase.Kind == ActualDiscardRecoveryPhaseKind.Play && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenGongReleaseStartedEvent>().Count(e => e == new MouChenGongReleaseStartedEvent(f.Id, r.Source, r.GameplayHash, r.Phase, r.WindowId)) == 1;
     internal SkillProgramStepOutcome BeginMouChenGongRelease(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

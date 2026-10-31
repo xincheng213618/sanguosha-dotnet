@@ -21,20 +21,20 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
         }
     }
 
-    internal BiriPotentialGainEvent? FirstBiriGain(int turn, int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialGainEvent>().Where(e => e.ActualTurn == turn && e.TurnOwner == owner).OrderBy(e => e.Sequence).FirstOrDefault(e => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.SingleOrDefault(m => m.Sequence == e.Sequence)is { } m && m.CardId == e.CardId && m.To == CardLocation.Hand(e.RecipientSeat) && !_coreZhaoZhongProvenanceOperations.IsNativeDrawGainMovement(m));
+    internal BiriPotentialGainEvent? FirstBiriGain(int turn, int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BiriPotentialGainEvent>().Where(e => e.ActualTurn == turn && e.TurnOwner == owner).OrderBy(e => e.Sequence).FirstOrDefault(e => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.SingleOrDefault(m => m.Sequence == e.Sequence)is { } m && m.CardId == e.CardId && m.To == CardLocation.Hand(e.RecipientSeat) && !_coreZhaoZhongProvenanceOperations.Value.IsNativeDrawGainMovement(m));
     internal IReadOnlyList<ProgramTriggerCandidate> CollectBiriMovementCandidates(CardMovementBatchContext batch)
     {
         // Most classic tables have no current Biri holder, and an already paid
         // holder has nothing to collect. Avoid rebuilding every earlier native
         // draw's proof before discovering either case. Potential gain facts are
         // still captured, so a later skill grant cannot retroclaim this turn.
-        var holders = _coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialHolderEvent>().Where(e => e.BatchId == batch.Id && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive).ToArray();
+        var holders = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BiriPotentialHolderEvent>().Where(e => e.BatchId == batch.Id && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive).ToArray();
         if (holders.Length == 0)
             return[];
-        var potential = _coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialGainEvent>().FirstOrDefault(e => e.BatchId == batch.Id);
+        var potential = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BiriPotentialGainEvent>().FirstOrDefault(e => e.BatchId == batch.Id);
         if (potential is null)
             return[];
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<BiriDrawIssuedEvent>();
+        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BiriDrawIssuedEvent>();
         var eligible = holders.Where(e => !issued.Any(p => p.Source.OwnerSeat == e.Source.OwnerSeat && p.ActualTurn == potential.ActualTurn && p.TurnOwner == potential.TurnOwner)).ToArray();
         if (eligible.Length == 0 || FirstBiriGain(potential.ActualTurn, potential.TurnOwner)is not { } first || first.BatchId != batch.Id)
             return[];
@@ -45,10 +45,10 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
     [ProgramIssuedTrigger(170)]
     internal bool IsIssuedBiriCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (!IsBiriTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) || context.Window != SkillProgramTriggerWindow.CardsGained || context.OwnerSeat != c.OwnerSeat || context.MovementBatch is not { } batch || context.ParentFrameId != batch.Id || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == batch.Id)is not CardsMovedTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex] != c || !_coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialHolderEvent>().Any(e => e.BatchId == batch.Id && e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId) && e.GameplayHash == c.GameplayHash))
+        if (!IsBiriTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(c)) || context.Window != SkillProgramTriggerWindow.CardsGained || context.OwnerSeat != c.OwnerSeat || context.MovementBatch is not { } batch || context.ParentFrameId != batch.Id || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == batch.Id)is not CardsMovedTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex] != c || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BiriPotentialHolderEvent>().Any(e => e.BatchId == batch.Id && e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId) && e.GameplayHash == c.GameplayHash))
             return false;
-        var potential = _coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialGainEvent>().FirstOrDefault(e => e.BatchId == batch.Id);
-        return potential is not null && FirstBiriGain(potential.ActualTurn, potential.TurnOwner)is { } first && first.BatchId == batch.Id && !_coreProgramEventHistoryOperations.ProgramEventHistory<BiriDrawIssuedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.ActualTurn == first.ActualTurn && e.TurnOwner == first.TurnOwner);
+        var potential = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BiriPotentialGainEvent>().FirstOrDefault(e => e.BatchId == batch.Id);
+        return potential is not null && FirstBiriGain(potential.ActualTurn, potential.TurnOwner)is { } first && first.BatchId == batch.Id && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BiriDrawIssuedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.ActualTurn == first.ActualTurn && e.TurnOwner == first.TurnOwner);
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 1600)]

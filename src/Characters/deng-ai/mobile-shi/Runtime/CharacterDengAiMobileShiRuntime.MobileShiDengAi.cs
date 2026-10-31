@@ -10,7 +10,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
     internal static CardConversionSource ShiDaSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal (int Current, int Capacity) ShiDaCharge(int owner)
     {
-        var e = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaChargeChangedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner);
+        var e = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiDaChargeChangedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner);
         return e is null ? (0, 0) : (e.After, e.CapacityAfter);
     }
 
@@ -31,7 +31,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
     internal static bool ShiDaOwns(CardLocation location, int owner) => location.OwnerSeat == owner && location.Zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment;
     internal static bool ShiDaDamageCard(CardKind kind) => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(kind) || CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(kind) || kind == CardKind.Lightning;
     internal IReadOnlyList<CardMovementRecord> ShiDaLosses(int owner, CardMovementBatchContext? batch) => batch is null ? [] : batch.Movements.Where(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && ShiDaOwns(m.From, owner) && !ShiDaOwns(m.To, owner) && !ShiDaDamageCard(m.CardKind) && !IsShiDaDeferredEquipmentEntry(batch, m)).GroupBy(m => m.CardId).Select(group => group.OrderBy(m => m.Sequence).First()).ToArray();
-    internal IReadOnlyList<int> ShiDaHistoricalTargets(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaTargetRecordedEvent>().Where(e => e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Actor == owner && e.Target != owner).Select(e => e.Target).Distinct().ToArray();
+    internal IReadOnlyList<int> ShiDaHistoricalTargets(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiDaTargetRecordedEvent>().Where(e => e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Actor == owner && e.Target != owner).Select(e => e.Target).Distinct().ToArray();
     internal bool ShiDaHasJixiTarget(int owner) => !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Snatch, CardActionType.Use) && ShiDaHistoricalTargets(owner).Any(seat => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.HasTargetCard(_coreMatchParticipantsPlayersAccess._players[seat]) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Snatch, Suit.None, null) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, seat, CardKind.Snatch));
     internal IReadOnlyList<PromptChoice> ShiDaCostChoices(long id, int owner, int payer) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(id, owner, payer, [CardZoneKind.Hand, CardZoneKind.Equipment, CardZoneKind.Judgment], OwnedCardMoveIntent.Discard);
     internal bool ShiDaHasJixiDiscard(ProgramTriggerCandidate candidate, int payer) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(payer) && new[]
@@ -94,7 +94,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
     internal void RecordShiDaTargets(long useId, CardActionContext action)
     {
         foreach (var seat in action.EffectiveDesignatedTargetSeats.Where(seat => seat != action.ActorSeat).Distinct())
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaTargetRecordedEvent>().Any(e => e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.UseId == useId && e.ActionId == action.ActionId && e.Actor == action.ActorSeat && e.Target == seat))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiDaTargetRecordedEvent>().Any(e => e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.UseId == useId && e.ActionId == action.ActionId && e.Actor == action.ActorSeat && e.Target == seat))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiDaTargetRecordedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, action.ActorSeat, useId, action.ActionId, seat));
     }
 

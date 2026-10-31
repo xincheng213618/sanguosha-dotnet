@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineRevealedFireAttackPaymentRuntime
     [PublicHandRevealReturn("native-fire-attack-payment")]
     internal void ContinueRevealedFireAttackPayment(CardUseFrame use)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame current || current.Id != use.Id || current.FireAttackSelection is not { RevealedCardId: { } targetCardId, RevealedPaymentCardId: { } paymentId } || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardsRevealedEvent>().Any(fact => fact.ResolutionId == use.Id && fact.Cards.Any(card => card.Id == paymentId)))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame current || current.Id != use.Id || current.FireAttackSelection is not { RevealedCardId: { } targetCardId, RevealedPaymentCardId: { } paymentId } || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardsRevealedEvent>().Any(fact => fact.ResolutionId == use.Id && fact.Cards.Any(card => card.Id == paymentId)))
             throw new InvalidOperationException("The revealed Fire Attack payment lost its original card use and public entity.");
         CompleteNativeFireAttackPayment(current, _coreAdvancedLifecycleOperations.GetAdvancedCard(targetCardId), _coreAdvancedLifecycleOperations.GetAdvancedCard(paymentId), revealInstead: true);
     }

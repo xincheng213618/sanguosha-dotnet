@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangfuSongWumiaoRuntime
 {
-    internal WuHuangFuSongJiangxianArmedEvent? WuHfOutstandingArm(int owner) => !HasWuHuangFuSongCapability ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<WuHuangFuSongJiangxianArmedEvent>().SingleOrDefault(e => e.Source.OwnerSeat == owner && e.Turn == WuHfTurn() && !_coreProgramEventHistoryOperations.ProgramEventHistory<WuHuangFuSongJiangxianSettledEvent>().Any(s => s.OwnerSeat == owner && s.Turn == e.Turn));
+    internal WuHuangFuSongJiangxianArmedEvent? WuHfOutstandingArm(int owner) => !HasWuHuangFuSongCapability ? null : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHuangFuSongJiangxianArmedEvent>().SingleOrDefault(e => e.Source.OwnerSeat == owner && e.Turn == WuHfTurn() && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHuangFuSongJiangxianSettledEvent>().Any(s => s.OwnerSeat == owner && s.Turn == e.Turn));
     internal int WuHfPriorDamageCount(int owner)
     {
         var h = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();

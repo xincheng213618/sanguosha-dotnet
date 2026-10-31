@@ -6,8 +6,8 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
     internal bool HasMobileShenZhangLiao => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileDuoruiBorrowedSkill) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RestoreMobileZhitiEquipmentSlot);
 
     internal static CardConversionSource MobileZhangLiaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal bool MobileDuoruiActive(MobileDuoruiIssuedEvent e) => !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileDuoruiExpiredEvent>().Any(x => x.FrameId == e.FrameId);
-    internal IEnumerable<MobileDuoruiIssuedEvent> MobileDuoruiLeases => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileDuoruiIssuedEvent>().Where(MobileDuoruiActive);
+    internal bool MobileDuoruiActive(MobileDuoruiIssuedEvent e) => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileDuoruiExpiredEvent>().Any(x => x.FrameId == e.FrameId);
+    internal IEnumerable<MobileDuoruiIssuedEvent> MobileDuoruiLeases => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileDuoruiIssuedEvent>().Where(MobileDuoruiActive);
 
     internal EquipmentSlot[] MobileDuoruiSlots(int seat) => new[]
     {

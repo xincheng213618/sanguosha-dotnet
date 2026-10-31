@@ -5,17 +5,17 @@ internal sealed partial class CharacterChenQunBoundaryMobileRuntime
 {
     internal static CardConversionSource BoundaryDingpinSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool BoundaryDingpinActiveTurn(int turn, int owner) => turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && owner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
-    internal bool BoundaryDingpinCanTarget(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryDingpinTargetBannedEvent>().Any(e => e.Owner == owner && e.Target == target && BoundaryDingpinActiveTurn(e.Turn, e.TurnOwner));
+    internal bool BoundaryDingpinCanTarget(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryDingpinTargetBannedEvent>().Any(e => e.Owner == owner && e.Target == target && BoundaryDingpinActiveTurn(e.Turn, e.TurnOwner));
     internal bool BoundaryDingpinCanDiscard(int owner, Card card)
     {
         var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind);
         var mask = 1 << (int)category;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.ActorSeat == owner && BoundaryDingpinActiveTurn(e.TurnNumber, e.TurnOwnerSeat) && (e.CardCategoryMask & mask) != 0))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.ActorSeat == owner && BoundaryDingpinActiveTurn(e.TurnNumber, e.TurnOwnerSeat) && (e.CardCategoryMask & mask) != 0))
             return false;
-        foreach (var discard in _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => BoundaryDingpinActiveTurn(e.TurnNumber, e.ActualTurnOwnerSeat)))
-            foreach (var material in _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == discard.InvocationId && e.From.OwnerSeat == owner))
+        foreach (var discard in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => BoundaryDingpinActiveTurn(e.TurnNumber, e.ActualTurnOwnerSeat)))
+            foreach (var material in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == discard.InvocationId && e.From.OwnerSeat == owner))
             {
-                if (_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryDingpinHeartExceptionEvent>().Any(e => e.Owner == owner && e.InvocationId == discard.InvocationId && e.CardId == material.CardId && e.CostSequence == material.CompletionSequence && BoundaryDingpinActiveTurn(e.Turn, e.TurnOwner)))
+                if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryDingpinHeartExceptionEvent>().Any(e => e.Owner == owner && e.InvocationId == discard.InvocationId && e.CardId == material.CardId && e.CostSequence == material.CompletionSequence && BoundaryDingpinActiveTurn(e.Turn, e.TurnOwner)))
                     continue;
                 if (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId).Kind) == category)
                     return false;
@@ -43,10 +43,10 @@ internal sealed partial class CharacterChenQunBoundaryMobileRuntime
     internal (NativeLogicalDiscardInvocationRecordedEvent Invocation, NativeLogicalDiscardMaterialCompletedEvent Material)? BoundaryDingpinCost(ProgramSkillFrame f)
     {
         var r = f.BoundaryChenQunDingpin!;
-        var candidates = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ParentFrameId == f.Id && e.Reason.Value == $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.MoveBoundCards)}" && e.TurnNumber == r.Phase.TurnNumber && e.ActualTurnOwnerSeat == r.Phase.ActualTurnOwnerSeat && e.InitiatorSeat == f.OwnerSeat && e.ExecutorSeat == f.OwnerSeat && e.SequenceBefore >= r.Before && e.ActualCount == 1).ToArray();
+        var candidates = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ParentFrameId == f.Id && e.Reason.Value == $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.MoveBoundCards)}" && e.TurnNumber == r.Phase.TurnNumber && e.ActualTurnOwnerSeat == r.Phase.ActualTurnOwnerSeat && e.InitiatorSeat == f.OwnerSeat && e.ExecutorSeat == f.OwnerSeat && e.SequenceBefore >= r.Before && e.ActualCount == 1).ToArray();
         if (candidates is not [var invocation])
             return null;
-        var materials = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == invocation.InvocationId).ToArray();
+        var materials = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == invocation.InvocationId).ToArray();
         if (materials is not [var m] || m.CardId != r.CostId || m.From != r.From || m.CompletionSequence <= r.Before || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move => move.CardId == m.CardId && move.Sequence == m.CompletionSequence && move.To == m.To && (move.From == m.From || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move) == m.From)))
             return null;
         return (invocation, m);
@@ -88,7 +88,7 @@ internal sealed partial class CharacterChenQunBoundaryMobileRuntime
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id))
             return;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryDingpinTargetBannedEvent>().Any(e => e.FrameId == f.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryDingpinTargetBannedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Dingpin cannot repeat the same paid black-result target restriction.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryDingpinTargetBannedEvent(f.Id, f.OwnerSeat, r.Target, r.Phase.TurnNumber, r.Phase.ActualTurnOwnerSeat));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { BoundaryChenQunDingpin = r with { Stage = BoundaryDingpinStage.Resolved }, PendingMovementContinuation = null });

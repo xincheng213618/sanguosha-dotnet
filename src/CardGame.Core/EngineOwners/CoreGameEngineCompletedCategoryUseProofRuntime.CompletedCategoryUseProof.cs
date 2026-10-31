@@ -217,7 +217,7 @@ internal sealed partial class CoreGameEngineCompletedCategoryUseProofRuntime
                 IReadOnlyList<int> originalTargets = designated;
                 if (kind == CardKind.DrawTwo && designated.Count == 0 && actual.Count == 0 && roundTarget.OriginalTargetSeats is [var roundSelf] && roundSelf == actor)
                     originalTargets = [actor];
-                if (!actual.SequenceEqual(designated) || !_coreRoundGainedTrickTargetsOperations.IsRoundGainedTrickTargetFact(use, roundTarget, originalTargets))
+                if (!actual.SequenceEqual(designated) || !_coreRoundGainedTrickTargetsOperations.Value.IsRoundGainedTrickTargetFact(use, roundTarget, originalTargets))
                     return false;
                 designated = roundTarget.ResultTargetSeats.ToList();
                 actual = roundTarget.ResultTargetSeats.ToList();
@@ -314,7 +314,7 @@ internal sealed partial class CoreGameEngineCompletedCategoryUseProofRuntime
             }
             else if (fact is ProgramActualSlashTargetRedirectedEvent redirected && redirected.CardUseFrameId == use.Id)
             {
-                if (_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(e => e.ProgramFrameId == redirected.ProgramFrameId && e.CardUseFrameId == use.Id && e.ActionId == redirected.ActionId && e.Source == redirected.Source && e.GameplayHash == redirected.GameplayHash && e.InstructionIndex == redirected.InstructionIndex && e.TargetIndex == redirected.TargetIndex && e.PreviousTargetSeat == redirected.OriginalTargetSeat && e.NewTargetSeat == redirected.NewTargetSeat))
+                if (_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability && history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(e => e.ProgramFrameId == redirected.ProgramFrameId && e.CardUseFrameId == use.Id && e.ActionId == redirected.ActionId && e.Source == redirected.Source && e.GameplayHash == redirected.GameplayHash && e.InstructionIndex == redirected.InstructionIndex && e.TargetIndex == redirected.TargetIndex && e.PreviousTargetSeat == redirected.OriginalTargetSeat && e.NewTargetSeat == redirected.NewTargetSeat))
                     continue;
                 if (!_coreShortRangeSlashTargetsOperations.IsShortRangeSlashRedirectFact(use, redirected, actual))
                     return false;
@@ -324,7 +324,7 @@ internal sealed partial class CoreGameEngineCompletedCategoryUseProofRuntime
             }
             else if (fact is ProgramCurrentSlashFireRedirectedEvent fire && fire.CardUseFrameId == use.Id)
             {
-                if (_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(e => e.ProgramFrameId == fire.ProgramFrameId && e.CardUseFrameId == use.Id && e.ActionId == fire.ActionId && e.Source == fire.Source && e.TargetIndex == fire.TargetIndex && e.PreviousTargetSeat == fire.OriginalTargetSeat && e.NewTargetSeat == fire.NewTargetSeat))
+                if (_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability && history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(e => e.ProgramFrameId == fire.ProgramFrameId && e.CardUseFrameId == use.Id && e.ActionId == fire.ActionId && e.Source == fire.Source && e.TargetIndex == fire.TargetIndex && e.PreviousTargetSeat == fire.OriginalTargetSeat && e.NewTargetSeat == fire.NewTargetSeat))
                     continue;
                 if (use.CurrentSlashFirePolicy is null || fire.ActionId != completed.ActionId || fire.TargetIndex < 0 || fire.TargetIndex >= actual.Count || actual[fire.TargetIndex] != fire.OriginalTargetSeat || fire.Source.OwnerSeat != fire.OriginalTargetSeat || !ActualHandGainMutationBinding(fire.ProgramFrameId, fire.Source.SkillId, fire.Source.OwnerSeat, SkillProgramTriggerWindow.SlashTargetRedirecting, SkillProgramEffectOp.RedirectCurrentAttack))
                     return false;
@@ -334,7 +334,7 @@ internal sealed partial class CoreGameEngineCompletedCategoryUseProofRuntime
             }
             else if (fact is DesignatedExtraTargetRedirectedEvent redirectedExtra && redirectedExtra.CardUseFrameId == use.Id)
             {
-                if (_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(e => e.ProgramFrameId == redirectedExtra.ProgramFrameId && e.CardUseFrameId == use.Id && e.ActionId == redirectedExtra.ActionId && e.Source == redirectedExtra.Source && e.GameplayHash == redirectedExtra.GameplayHash && e.InstructionIndex == redirectedExtra.InstructionIndex && e.TargetIndex == redirectedExtra.TargetIndex && e.PreviousTargetSeat == redirectedExtra.OriginalTargetSeat && e.NewTargetSeat == redirectedExtra.NewTargetSeat))
+                if (_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability && history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(e => e.ProgramFrameId == redirectedExtra.ProgramFrameId && e.CardUseFrameId == use.Id && e.ActionId == redirectedExtra.ActionId && e.Source == redirectedExtra.Source && e.GameplayHash == redirectedExtra.GameplayHash && e.InstructionIndex == redirectedExtra.InstructionIndex && e.TargetIndex == redirectedExtra.TargetIndex && e.PreviousTargetSeat == redirectedExtra.OriginalTargetSeat && e.NewTargetSeat == redirectedExtra.NewTargetSeat))
                     continue;
                 if (!_coreDesignatedExtraTargetsOperations.IsDesignatedExtraTargetRedirectFact(use, redirectedExtra, actual))
                     return false;

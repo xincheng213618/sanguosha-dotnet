@@ -56,7 +56,7 @@ internal sealed partial class CoreGameEngineSlashSuitDiscardRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(frame);
         // A finalized-judgment claimant keeps its real card. Only our unclaimed Processing result is disposed.
-        if (_coreNativeDamageHandlesOperations.GetJudgmentCard(judgment)is { } card && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Processing)
+        if (_coreNativeDamageHandlesOperations.Value.GetJudgmentCard(judgment)is { } card && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Processing)
             _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.JudgmentFinish);
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
@@ -69,8 +69,8 @@ internal sealed partial class CoreGameEngineSlashSuitDiscardRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
         if (frame.SlashSuitDiscard is not { } draft)
             return false;
-        if (_coreShanheS5MaSiblingsOperations.IsShanheS5Tieqi(frame))
-            return _coreShanheS5MaSiblingsOperations.ResumeShanheS5Tieqi(frame);
+        if (_coreShanheS5MaSiblingsOperations.Value.IsShanheS5Tieqi(frame))
+            return _coreShanheS5MaSiblingsOperations.Value.ResumeShanheS5Tieqi(frame);
         if (frame.PendingMovementContinuation is not null)
             return true;
         _ = SlashSuitDiscardAttack(frame);

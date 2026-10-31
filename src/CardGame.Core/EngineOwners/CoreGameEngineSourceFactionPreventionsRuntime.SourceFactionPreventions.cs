@@ -111,7 +111,7 @@ internal sealed partial class CoreGameEngineSourceFactionPreventionsRuntime
 
         return null;
     }
-    internal bool HasSourceFactionYieldDying(long beforeDamageId) => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && SourceFactionYieldObserverRoot(beforeDamageId)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool HasSourceFactionYieldDying(long beforeDamageId) => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { ResumesProgramSkill: true } dying && SourceFactionYieldObserverRoot(beforeDamageId)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 430)]
     internal bool IsSourceFactionYieldProgramDying() => _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().Any(f => HasSourceFactionYieldDying(f.Id));
 

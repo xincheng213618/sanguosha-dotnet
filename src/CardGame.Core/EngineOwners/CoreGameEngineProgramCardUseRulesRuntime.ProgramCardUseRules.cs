@@ -60,7 +60,7 @@ internal sealed partial class CoreGameEngineProgramCardUseRulesRuntime
         var extraTargets = _coreProgramTargetRulesOperations.TargetRules.ExtraSlashTargets(new(actor.Seat, effectiveKind, _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, physicalCard), legalTargets.Select(p => p.Seat).ToArray()));
         if (programBonus <= 0 && extraTargets.Count == 0)
             return;
-        var usesFangtian = _coreNativeDamageHandlesOperations.UsesFormalFangtianHalberd && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count == 1 && _corePhysicalOwnedCardQueriesOperations.GetHand(actor)[0].Id == physicalCard.Id && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.FangtianHalberd);
+        var usesFangtian = _coreNativeDamageHandlesOperations.Value.UsesFormalFangtianHalberd && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count == 1 && _corePhysicalOwnedCardQueriesOperations.GetHand(actor)[0].Id == physicalCard.Id && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.FangtianHalberd);
         var existingMaximum = usesFangtian ? 3 : 1;
         var ordinaryMaximum = existingMaximum + Math.Max(0, programBonus);
         var maximum = Math.Min(ordinaryMaximum + extraTargets.Count, legalTargets.Count);
@@ -96,7 +96,7 @@ internal sealed partial class CoreGameEngineProgramCardUseRulesRuntime
 
     internal bool UsesProgramCardTargetCount(CharacterState source, Card physicalCard, CardKind effectiveKind, int targetCount)
     {
-        var usesFangtian = _coreNativeDamageHandlesOperations.UsesFormalFangtianHalberd && _corePhysicalOwnedCardQueriesOperations.GetHand(source).Count == 1 && _corePhysicalOwnedCardQueriesOperations.GetHand(source)[0].Id == physicalCard.Id && _coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.FangtianHalberd);
+        var usesFangtian = _coreNativeDamageHandlesOperations.Value.UsesFormalFangtianHalberd && _corePhysicalOwnedCardQueriesOperations.GetHand(source).Count == 1 && _corePhysicalOwnedCardQueriesOperations.GetHand(source)[0].Id == physicalCard.Id && _coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.FangtianHalberd);
         var existingMaximum = usesFangtian ? 3 : 1;
         return targetCount > existingMaximum && (((FiniteRuleQueryValue)_coreRuleQueriesOperations.EvaluateCardTargetCount(source, effectiveKind).Value).Value > 1 || HasNativeExtraSlashTargets(source, physicalCard, effectiveKind));
     }

@@ -199,7 +199,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(responder.Seat, kind);
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, f => f with { Qizheng = f.Qizheng!with { ResponseActionId = action.ActionId } });
             NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle2(use.Id);
-            if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.QizhengResponse) || _coreCardActionsOperations.TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardResponseAccepted, [use.SourceSeat], ProgramCardContinuation.QizhengResponse))
+            if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.QizhengResponse) || _coreCardActionsOperations.TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardResponseAccepted, [use.SourceSeat], ProgramCardContinuation.QizhengResponse))
                 return;
             _coreNativeDodgeOperations.ContinueAcceptedCardResponse(attack, action, ProgramCardContinuation.QizhengResponse);
             return;
@@ -326,11 +326,11 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     {
         if (use.Qizheng is not { } r)
             return;
-        if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.QizhengXiangsheng || use.Action?.ActionId != r.ActionId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) || r.TargetIndex != use.TargetIndex || r.EffectOrdinal != _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id) || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != r.Target || _coreProgramEventHistoryOperations.ProgramEventHistory<QizhengEffectStartedEvent>().Count(e => e == new QizhengEffectStartedEvent(use.Id, r.NullificationId, r.ActionId, r.Target, r.TargetIndex, r.EffectOrdinal)) != 1)
+        if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.QizhengXiangsheng || use.Action?.ActionId != r.ActionId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) || r.TargetIndex != use.TargetIndex || r.EffectOrdinal != _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id) || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != r.Target || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QizhengEffectStartedEvent>().Count(e => e == new QizhengEffectStartedEvent(use.Id, r.NullificationId, r.ActionId, r.Target, r.TargetIndex, r.EffectOrdinal)) != 1)
             throw new InvalidOperationException("Qizheng lost its original typed native effect receipt.");
-        if (r.Stage != QizhengStage.Designation && (r.Nonce.Length != 16 || r.Commitment != QizhengCommitment(use.Id, r.NullificationId, r.Ambush, r.Nonce) || _coreProgramEventHistoryOperations.ProgramEventHistory<QizhengSecretCommittedEvent>().Count(e => e.UseId == use.Id && e.NullificationId == r.NullificationId && e.Commitment == r.Commitment) != 1))
+        if (r.Stage != QizhengStage.Designation && (r.Nonce.Length != 16 || r.Commitment != QizhengCommitment(use.Id, r.NullificationId, r.Ambush, r.Nonce) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QizhengSecretCommittedEvent>().Count(e => e.UseId == use.Id && e.NullificationId == r.NullificationId && e.Commitment == r.Commitment) != 1))
             throw new InvalidOperationException("Qizheng's private designation no longer matches its issued commitment.");
-        if (r.ResponseKind is { } kind && (kind != CardKind.Dodge && !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreProgramEventHistoryOperations.ProgramEventHistory<QizhengResponsePaidEvent>().Count(e => e.UseId == use.Id && e.NullificationId == r.NullificationId && e.Kind == kind) != 1))
+        if (r.ResponseKind is { } kind && (kind != CardKind.Dodge && !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QizhengResponsePaidEvent>().Count(e => e.UseId == use.Id && e.NullificationId == r.NullificationId && e.Kind == kind) != 1))
             throw new InvalidOperationException("Qizheng lost its actual chosen response kind.");
     }
 }

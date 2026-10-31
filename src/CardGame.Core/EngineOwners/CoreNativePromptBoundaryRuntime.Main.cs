@@ -73,7 +73,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
                 return Array.Empty<PromptChoice>();
             var effectiveCardKind = effectiveCardKindSelector?.Invoke(card) ?? requiredCardKind;
             var cardDescription = CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, requiredCardKind) ? $"打出【{(responseName)}】" : $"将【{(card.DisplayName)}】当作【{(responseName)}】";
-            var description = isDodge ? isGroupAttack ? $"{(cardDescription)}，响应【{(incomingName)}】。" : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } uncancelable && _coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(uncancelable) ? $"{(cardDescription)}，响应这次{(incomingAttackName)}；此杀不能被抵消。" : $"{(cardDescription)}，抵消这次{(incomingAttackName)}。" : isGroupAttack ? $"{(cardDescription)}，响应【{(incomingName)}】。" : $"{(cardDescription)}，继续应战【决斗】。";
+            var description = isDodge ? isGroupAttack ? $"{(cardDescription)}，响应【{(incomingName)}】。" : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } uncancelable && _coreSlashSuitDiscardOperations.Value.IsSlashDodgeCancellationPrevented(uncancelable) ? $"{(cardDescription)}，响应这次{(incomingAttackName)}；此杀不能被抵消。" : $"{(cardDescription)}，抵消这次{(incomingAttackName)}。" : isGroupAttack ? $"{(cardDescription)}，响应【{(incomingName)}】。" : $"{(cardDescription)}，继续应战【决斗】。";
             var programSources = responder is null ? [] : _coreActionQueriesOperations.GetProgramViewAsConversions(responder, card, effectiveCardKind, forResponse: true);
             var hasIdentity = responder is not null && _coreCardConversionsOperations.HasProgramCardIdentity(responder, card);
             var identitySources = responder is null ? [] : _coreCardConversionsOperations.GetProgramCardIdentitySources(responder, card, effectiveCardKind, forResponse: true);
@@ -132,7 +132,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
             choices.AddRange(_coreProgramDodgeResponsesOperations.ProgramDodgeResponseChoices(responder));
         if (isDodge && includeBagua)
         {
-            choices.Add(new PromptChoice(new ChoiceId("respond.bagua"), isSlashAttack ? _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } uncancelableBagua && _coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(uncancelableBagua) ? $"发动【八卦阵】判定，红色牌视为打出【闪】响应{(incomingAttackName)}；此杀不能被抵消。" : $"发动【八卦阵】判定，红色牌视为打出【闪】抵消{(incomingAttackName)}。" : "发动【八卦阵】判定，红色牌视为打出【闪】。", [], [], new Dictionary<string, string> { ["response"] = "bagua", ["required-card"] = responseName, ["equipment"] = CardKind.BaguaFormation.ToString() }));
+            choices.Add(new PromptChoice(new ChoiceId("respond.bagua"), isSlashAttack ? _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } uncancelableBagua && _coreSlashSuitDiscardOperations.Value.IsSlashDodgeCancellationPrevented(uncancelableBagua) ? $"发动【八卦阵】判定，红色牌视为打出【闪】响应{(incomingAttackName)}；此杀不能被抵消。" : $"发动【八卦阵】判定，红色牌视为打出【闪】抵消{(incomingAttackName)}。" : "发动【八卦阵】判定，红色牌视为打出【闪】。", [], [], new Dictionary<string, string> { ["response"] = "bagua", ["required-card"] = responseName, ["equipment"] = CardKind.BaguaFormation.ToString() }));
             if (responder?.IsHuman == true)
                 choices.Add(CoreGameEngineBaguaResponsesRuntime.BaguaSkipChoice());
         }
@@ -155,7 +155,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
 
     internal void RefreshNationalResponseDecision()
     {
-        if (!_coreNativeDamageHandlesOperations.IsNationalWarMode || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondDodge or DecisionKind.RespondSlash } pending || pending.RequiredCardKind is not { } requiredCardKind)
+        if (!_coreNativeDamageHandlesOperations.Value.IsNationalWarMode || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.RespondDodge or DecisionKind.RespondSlash } pending || pending.RequiredCardKind is not { } requiredCardKind)
         {
             return;
         }
@@ -178,7 +178,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
     internal bool IsAiTargetCardSelectionPending() => _coreNativeCardContinuationCursorsOperations.ActiveTargetCardSelection is { } pending && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.SelectTargetCard, PlayerSeat: var playerSeat } decision && decision.PlayerSeat == pending.SourceSeat && !_coreMatchParticipantsPlayersAccess._players[playerSeat].IsHuman;
     internal bool IsAiFireAttackPending() => _coreNativeCardContinuationCursorsOperations.ActiveFireAttack is not null && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.FireAttackReveal or DecisionKind.FireAttackDiscard, PlayerSeat: var playerSeat } && !_coreMultiplayerOperations.IsHumanControlledSeat(playerSeat);
     internal bool IsAiSkipDiscardPolicyPending() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.SkipDiscardPolicy, PlayerSeat: var playerSeat } && playerSeat == _coreActualTurnProgressCurrentSeatStartedAccess._currentSeat && !_coreMatchParticipantsPlayersAccess._players[playerSeat].IsHuman;
-    internal bool IsAiDyingResponsePending() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && dying.ResponderIndex < dying.ResponderSeats.Count && !_coreMatchParticipantsPlayersAccess._players[dying.ResponderSeat].IsHuman;
+    internal bool IsAiDyingResponsePending() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && dying.ResponderIndex < dying.ResponderSeats.Count && !_coreMatchParticipantsPlayersAccess._players[dying.ResponderSeat].IsHuman;
     internal void RequireHumanDecision(DecisionKind expected)
     {
         EnsureStarted();

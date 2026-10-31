@@ -13,7 +13,7 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryZhangZhaoZhijianPaidEvent(f.Id, new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, target, e.CardId, m.Sequence));
     }
 
-    internal bool BoundaryZhangZhaoPlacementPaid(ProgramSkillFrame f) => f.SkillId == BoundaryZhangZhaoZhijian && f.TriggerId is null && f.InstructionIndex is 1 or 2 && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhangZhaoZhijianPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var e] && e.Source == new CardConversionSource(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId) && e.Hash == f.GameplayHash && f.SelectedTargetSeats.SequenceEqual([e.TargetSeat]) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Equipment(e.TargetSeat) && m.Reason.Value == "skill-program.boundary:zhijian-mobile.SelectAndMoveOwnedCard");
+    internal bool BoundaryZhangZhaoPlacementPaid(ProgramSkillFrame f) => f.SkillId == BoundaryZhangZhaoZhijian && f.TriggerId is null && f.InstructionIndex is 1 or 2 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhangZhaoZhijianPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var e] && e.Source == new CardConversionSource(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId) && e.Hash == f.GameplayHash && f.SelectedTargetSeats.SequenceEqual([e.TargetSeat]) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Equipment(e.TargetSeat) && m.Reason.Value == "skill-program.boundary:zhijian-mobile.SelectAndMoveOwnedCard");
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 66601)]
     internal bool KeepBoundaryZhangZhaoPlacement(ProgramSkillFrame f) => BoundaryZhangZhaoPlacementPaid(f);
     [ProgramContinuation(ProgramContinuationKind.Movement, 66601)]
@@ -37,7 +37,7 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryZhangZhaoPhaseDiscardEvent(phase, m.CardId, m.Sequence, from));
     }
 
-    internal IReadOnlyList<DiscardRecoveryEntity> BoundaryZhangZhaoPhaseEntities(ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhangZhaoPhaseDiscardEvent>().Where(e => e.Phase == phase).Select(e => new DiscardRecoveryEntity(e.CardId, e.MovementSequence, e.OriginalFrom)).Where(_coreActualDiscardRecoveryPhasesOperations.ActualDiscardEntityStillAvailable).GroupBy(e => e.CardId).Select(g => g.First()).OrderBy(e => e.MovementSequence).ToArray();
+    internal IReadOnlyList<DiscardRecoveryEntity> BoundaryZhangZhaoPhaseEntities(ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhangZhaoPhaseDiscardEvent>().Where(e => e.Phase == phase).Select(e => new DiscardRecoveryEntity(e.CardId, e.MovementSequence, e.OriginalFrom)).Where(_coreActualDiscardRecoveryPhasesOperations.ActualDiscardEntityStillAvailable).GroupBy(e => e.CardId).Select(g => g.First()).OrderBy(e => e.MovementSequence).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 66600)]
     internal bool QualifyBoundaryZhangZhaoMobile(ProgramTriggerCandidate b, ProgramSkillWindowContext c)
     {
@@ -151,7 +151,7 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
     internal bool ReturnBoundaryZhangZhaoPhase(ProgramSkillFrame f) => f.BoundaryZhangZhaoPhase is not null && ResumeBoundaryZhangZhaoPhase(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 66600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 66600)]
-    internal bool KeepBoundaryZhangZhaoPaidReturn(ProgramSkillFrame f) => f.BoundaryZhangZhaoPhase is { ReturnMovementSequence: > 0 } r && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhangZhaoReturnedEvent>().Count(e => e.FrameId == f.Id && e.PhaseOwnerSeat == r.PhaseOwnerSeat && e.CardId == r.ReturnedCardId && e.MovementSequence == r.ReturnMovementSequence) == 1;
+    internal bool KeepBoundaryZhangZhaoPaidReturn(ProgramSkillFrame f) => f.BoundaryZhangZhaoPhase is { ReturnMovementSequence: > 0 } r && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhangZhaoReturnedEvent>().Count(e => e.FrameId == f.Id && e.PhaseOwnerSeat == r.PhaseOwnerSeat && e.CardId == r.ReturnedCardId && e.MovementSequence == r.ReturnMovementSequence) == 1;
 
     [ProgramAiChoice(SkillProgramEffectOp.CaptureBoundaryZhangZhaoPhaseDiscards)]
     internal PromptChoice BoundaryZhangZhaoPhaseAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();

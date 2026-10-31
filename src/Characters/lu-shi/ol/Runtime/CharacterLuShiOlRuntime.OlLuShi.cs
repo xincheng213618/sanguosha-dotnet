@@ -24,14 +24,14 @@ internal sealed partial class CharacterLuShiOlRuntime
 
     internal void CaptureOlLuShiSnapshot(CharacterState player, long boundary, bool initial)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<OlLuShiSnapshotEvent>().Any(e => e.Seat == player.Seat && e.Initial == initial && e.BoundaryId == boundary))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<OlLuShiSnapshotEvent>().Any(e => e.Seat == player.Seat && e.Initial == initial && e.BoundaryId == boundary))
             return;
         var dual = player.HasHpValue ? player.HappyQiaoHealth : null;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OlLuShiSnapshotEvent(boundary, _coreActualTurnProgressTurnNumberAccess._turnNumber, player.Seat, initial, dual is null && player.HasHpValue ? player.Hp : null, dual, _corePhysicalOwnedCardQueriesOperations.GetHand(player).Count));
     }
 
-    internal OlLuShiSnapshotEvent? OlLuShiLastSnapshot(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<OlLuShiSnapshotEvent>().LastOrDefault(e => e.Seat == target);
-    internal bool OlLuShiUnused(int owner, int target, string item) => !_coreProgramEventHistoryOperations.ProgramEventHistory<OlLuShiAdjustmentIssuedEvent>().Any(e => e.Source.OwnerSeat == owner && e.TargetSeat == target && e.Item == item);
+    internal OlLuShiSnapshotEvent? OlLuShiLastSnapshot(int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<OlLuShiSnapshotEvent>().LastOrDefault(e => e.Seat == target);
+    internal bool OlLuShiUnused(int owner, int target, string item) => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<OlLuShiAdjustmentIssuedEvent>().Any(e => e.Source.OwnerSeat == owner && e.TargetSeat == target && e.Item == item);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 42700, SkillProgramEffectOp.ResolveOlLuShiZhuyan)]
     internal bool CanOfferOlLuShi(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => c.SkillId == "ol:zhuyan" && w.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && OlLuShiLastSnapshot(p.Seat)is { } snapshot && (OlLuShiUnused(c.OwnerSeat, p.Seat, "hand") || (snapshot.Hp is not null || snapshot.Dual is not null) && p.HasHpValue && OlLuShiUnused(c.OwnerSeat, p.Seat, "hp")));
     SkillProgramStepOutcome IOlLuShiHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginOlLuShi(f, op);

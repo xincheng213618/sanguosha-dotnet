@@ -37,7 +37,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
 
     internal bool IsMouZhangXiuOlSlash(CardUseFrame use)
     {
-        if (use.MouZhangXiuOlQiulie is not { } o || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || o.UseId != use.Id || a.ProviderSeat != o.Source.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouZhangXiuOl: { Stage: MouZhangXiuOlStage.NativeUse, NativeReturned: false } r } parent || !ValidMouZhangXiuOl(parent) || o.Source != r.Source || o.GameplayHash != parent.GameplayHash || r.UseId != use.Id || r.ActionId != a.ActionId || o.TargetSeat != r.TargetSeat || o.Phase != r.Phase || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlQiulieIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (use.MouZhangXiuOlQiulie is not { } o || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || o.UseId != use.Id || a.ProviderSeat != o.Source.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouZhangXiuOl: { Stage: MouZhangXiuOlStage.NativeUse, NativeReturned: false } r } parent || !ValidMouZhangXiuOl(parent) || o.Source != r.Source || o.GameplayHash != parent.GameplayHash || r.UseId != use.Id || r.ActionId != a.ActionId || o.TargetSeat != r.TargetSeat || o.Phase != r.Phase || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlQiulieIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat);
     }
@@ -75,7 +75,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MouZhangXiuOl!;
-        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Qiulie cannot repeat or bypass its whole native Slash return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouZhangXiuOl = r with { NativeReturned = true } });
         if (use.CardAttack is not { Active: true })
@@ -97,7 +97,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var r = f.MouZhangXiuOl!;
-        if (!r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlQiulieReturnedEvent>().Any(e => e.FrameId == id))
+        if (!r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlQiulieReturnedEvent>().Any(e => e.FrameId == id))
             throw new InvalidOperationException("Qiulie cannot pay or return its native Slash twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhangXiuOlQiulieReturnedEvent(id, r.UseId, r.ActionId));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouZhangXiuOl = r with { Stage = MouZhangXiuOlStage.Children }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -117,10 +117,10 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
         if (MouZhangXiuOlContextUse(c, w)is not { } use)
             return false;
         if (c.SkillId == MouZhangXiuOlComposition.Qiulie && c.BindingId == "defend-hunt" && w.Window == SkillProgramTriggerWindow.CardUseBeforeTargetEffects && use.MouZhangXiuOlQiulie is { } origin)
-            return c.OwnerSeat == origin.Source.OwnerSeat && c.SkillInstanceId == origin.Source.SkillInstanceId && c.GameplayHash == origin.GameplayHash && IsMouZhangXiuOlSlash(use) && _coreMatchParticipantsPlayersAccess._players[origin.TargetSeat].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash && e.UseId == use.Id);
+            return c.OwnerSeat == origin.Source.OwnerSeat && c.SkillInstanceId == origin.Source.SkillInstanceId && c.GameplayHash == origin.GameplayHash && IsMouZhangXiuOlSlash(use) && _coreMatchParticipantsPlayersAccess._players[origin.TargetSeat].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash && e.UseId == use.Id);
         if (c.SkillId != MouZhangXiuOlComposition.Zhuijiao || MouZhangXiuOlEntry(use, c)is not { } entry)
             return false;
-        return c.BindingId == "previous-undamaged" && w.Window == SkillProgramTriggerWindow.CardUseCommitted && !entry.Boosted && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || c.BindingId == "complete-undamaged" && w.Window == SkillProgramTriggerWindow.CardUseCompleted && entry.Boosted && entry.DrawReturned && !entry.PenaltyIssued && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && !MouZhangXiuOlUseDamaged(use.Id, null) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) == 1;
+        return c.BindingId == "previous-undamaged" && w.Window == SkillProgramTriggerWindow.CardUseCommitted && !entry.Boosted && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || c.BindingId == "complete-undamaged" && w.Window == SkillProgramTriggerWindow.CardUseCompleted && entry.Boosted && entry.DrawReturned && !entry.PenaltyIssued && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && !MouZhangXiuOlUseDamaged(use.Id, null) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) == 1;
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 33002, SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash, SkillProgramEffectOp.ResolveMouZhangXiuZhuijiao, SkillProgramEffectOp.CompleteMouZhangXiuZhuijiao)]
@@ -149,7 +149,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
     {
         if (use.MouZhangXiuOlQiulie is not { } origin || !IsMouZhangXiuOlSlash(use))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlQiulieNullifiedEvent>().Any(n => n.UseId == use.Id && n.TargetSeat == origin.TargetSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlStartedEvent>().Count(s => s.FrameId == n.FrameId && s.UseId == use.Id && s.Operation == SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash && s.Source.OwnerSeat == origin.Source.OwnerSeat && s.Source.SkillId == origin.Source.SkillId && s.Source.SkillInstanceId == origin.Source.SkillInstanceId && s.Source.BindingId == "defend-hunt" && s.GameplayHash == origin.GameplayHash) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlDiscardPaidEvent>().Count(p => p.FrameId == n.FrameId && p.CardId == n.PaidCardId && p.PayerSeat == origin.TargetSeat && p.Defense && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == p.CardId && m.From.OwnerSeat == p.PayerSeat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.Sequence > p.Before && m.Sequence <= p.After && m.Reason.Value == MouZhangXiuOlDefenseReason) == 1) == 1);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlQiulieNullifiedEvent>().Any(n => n.UseId == use.Id && n.TargetSeat == origin.TargetSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlStartedEvent>().Count(s => s.FrameId == n.FrameId && s.UseId == use.Id && s.Operation == SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash && s.Source.OwnerSeat == origin.Source.OwnerSeat && s.Source.SkillId == origin.Source.SkillId && s.Source.SkillInstanceId == origin.Source.SkillInstanceId && s.Source.BindingId == "defend-hunt" && s.GameplayHash == origin.GameplayHash) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlDiscardPaidEvent>().Count(p => p.FrameId == n.FrameId && p.CardId == n.PaidCardId && p.PayerSeat == origin.TargetSeat && p.Defense && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == p.CardId && m.From.OwnerSeat == p.PayerSeat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.Sequence > p.Before && m.Sequence <= p.After && m.Reason.Value == MouZhangXiuOlDefenseReason) == 1) == 1);
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 33000)]
@@ -165,7 +165,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
                 result.Add(new(source.OwnerSeat, target, source.SkillId, binding, hash, source.SkillInstanceId, trigger.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, source.OwnerSeat, target, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action))));
         }
 
-        if (window == SkillProgramTriggerWindow.CardUseBeforeTargetEffects && use.MouZhangXiuOlQiulie is { } o && IsMouZhangXiuOlSlash(use) && _coreMatchParticipantsPlayersAccess._players[o.TargetSeat].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash && e.UseId == use.Id))
+        if (window == SkillProgramTriggerWindow.CardUseBeforeTargetEffects && use.MouZhangXiuOlQiulie is { } o && IsMouZhangXiuOlSlash(use) && _coreMatchParticipantsPlayersAccess._players[o.TargetSeat].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash && e.UseId == use.Id))
             Add(o.Source, o.GameplayHash, "defend-hunt", o.TargetSeat);
         if (use.MouZhangXiuOlZhuijiao is not { } entries)
             return;

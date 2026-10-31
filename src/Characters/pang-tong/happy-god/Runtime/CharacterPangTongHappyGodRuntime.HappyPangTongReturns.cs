@@ -22,7 +22,7 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
     {
         if (window is not { Window: SkillProgramTriggerWindow.HappyPlanSettled, Continuation: ProgramLifecycleContinuation.HappyPlanSettled, HappyPlanReturn: { } ret } || window.ResumeProgramFrameId != ret.RootId || ret.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == ret.RootId)is not { HappyPangTong: { Stage: HappyPangTongStage.Settling } r } root || r.CurrentPlanId != ret.PlanId || window.OwnerSeat != root.OwnerSeat || !ValidHappyPt(root))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Count(e => e.RootFrameId == root.Id && e.PlanId == ret.PlanId && e.OwnerSeat == root.OwnerSeat && e.Success == ret.Success && e.ActualTurn == ret.ActualTurn) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Count(e => e.RootFrameId == root.Id && e.PlanId == ret.PlanId && e.OwnerSeat == root.OwnerSeat && e.Success == ret.Success && e.ActualTurn == ret.ActualTurn) == 1;
     }
 
     [ProgramTriggerProof(ProgramTriggerProofPhase.NativeWindow, 60, SkillProgramTriggerWindow.HappyPlanSettled)]
@@ -31,8 +31,8 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
         if (context.Window != SkillProgramTriggerWindow.HappyPlanSettled || context.OwnerSeat != candidate.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { HappyPlanReturn: { } ret } window || window.OwnerSeat != candidate.OwnerSeat || context.SourceSeat != window.OwnerSeat || context.TargetSeat != window.OwnerSeat || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex] != candidate || !HappyPtSettlementPaid(window))
             return false;
         if (candidate.SkillId == HappyPangTongComposition.Lanhai && candidate.BindingId == "settled-plan")
-            return ret.Success || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Count(e => e.OwnerSeat == candidate.OwnerSeat && !e.Success) % 2 == 0;
-        return candidate.SkillId == HappyPangTongComposition.Lunce && candidate.BindingId == "renew-plan" && ret.Success && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingResolvedEvent>().Any(e => e.FrameId == window.Id && e.SkillId == HappyPangTongComposition.Lanhai && e.BindingId == "settled-plan" && e.OwnerSeat == candidate.OwnerSeat && e.Completed);
+            return ret.Success || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Count(e => e.OwnerSeat == candidate.OwnerSeat && !e.Success) % 2 == 0;
+        return candidate.SkillId == HappyPangTongComposition.Lunce && candidate.BindingId == "renew-plan" && ret.Success && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingResolvedEvent>().Any(e => e.FrameId == window.Id && e.SkillId == HappyPangTongComposition.Lanhai && e.BindingId == "settled-plan" && e.OwnerSeat == candidate.OwnerSeat && e.Completed);
     }
 
     [ProgramWindowReturn(SkillProgramTriggerWindow.HappyPlanSettled)]
@@ -106,11 +106,11 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
     {
         if (completed.HappyPangTongUpper is not { } ret)
             return;
-        if (_resolutionStackOperations._resolutionStack.Any(f => f.Id == completed.Id) || completed.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyPangTong: { Stage: HappyPangTongStage.UpperUse } r } root || !HappyPtUpperRidesOn(completed, root) || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongUpperReturnedEvent>().Any(e => e.UseId == completed.Id))
+        if (_resolutionStackOperations._resolutionStack.Any(f => f.Id == completed.Id) || completed.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyPangTong: { Stage: HappyPangTongStage.UpperUse } r } root || !HappyPtUpperRidesOn(completed, root) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongUpperReturnedEvent>().Any(e => e.UseId == completed.Id))
             throw new InvalidOperationException("Upper-plan Slash cannot return twice or to a different issued plan.");
         _coreRuntimeOperations.ReplaceRuntimeTop(root with { HappyPangTong = r with { Stage = HappyPangTongStage.UpperReturned } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyPangTongUpperReturnedEvent(root.Id, r.CurrentPlanId, completed.Id, ret.ActionId));
     }
 
-    internal bool HappyPtUpperRidesOn(CardUseFrame use, ProgramSkillFrame root) => use.HappyPangTongUpper is { } ret && root.HappyPangTong is { } r && ret.RootId == root.Id && ret.PlanId == r.CurrentPlanId && ret.UseId == use.Id && ret.ActionId == use.Action?.ActionId && r.NativeUseId == use.Id && r.NativeActionId == ret.ActionId && use.SourceSeat == root.OwnerSeat && use.Action is { Type: CardActionType.Use } action && action.ActorSeat == root.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Contains(r.SlashTarget) && use.CardAttack?.ProgramSkillCardUseFrameId == root.Id && ValidHappyPt(root) && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongUpperBoundEvent>().Count(e => e == new HappyPangTongUpperBoundEvent(root.Id, r.CurrentPlanId, use.Id, ret.ActionId)) == 1;
+    internal bool HappyPtUpperRidesOn(CardUseFrame use, ProgramSkillFrame root) => use.HappyPangTongUpper is { } ret && root.HappyPangTong is { } r && ret.RootId == root.Id && ret.PlanId == r.CurrentPlanId && ret.UseId == use.Id && ret.ActionId == use.Action?.ActionId && r.NativeUseId == use.Id && r.NativeActionId == ret.ActionId && use.SourceSeat == root.OwnerSeat && use.Action is { Type: CardActionType.Use } action && action.ActorSeat == root.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Contains(r.SlashTarget) && use.CardAttack?.ProgramSkillCardUseFrameId == root.Id && ValidHappyPt(root) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongUpperBoundEvent>().Count(e => e == new HappyPangTongUpperBoundEvent(root.Id, r.CurrentPlanId, use.Id, ret.ActionId)) == 1;
 }

@@ -13,7 +13,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
         if (!XumingDamageEligible(f.OwnerSeat, c) || f.InstructionIndex != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not BeforeDamageProgramWindowFrame w || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not { } attack)
             throw new InvalidOperationException("Xuming requires the original other-character native damage attempt.");
         var source = ChengJiSource(f);
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<XumingPromiseIssuedEvent>().Any(e => e.DamageWindowId == w.Id && e.Source.OwnerSeat == f.OwnerSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<XumingDamageIncreasedEvent>().Any(e => e.DamageWindowId == w.Id && e.Source.OwnerSeat == f.OwnerSeat))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingPromiseIssuedEvent>().Any(e => e.DamageWindowId == w.Id && e.Source.OwnerSeat == f.OwnerSeat) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingDamageIncreasedEvent>().Any(e => e.DamageWindowId == w.Id && e.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Xuming cannot process the same owner's damage attempt twice.");
         // Alternative costs are payment entities, not the corresponding card of
         // this virtual Slash. In particular Tousui's bottom cards cause no damage.
@@ -34,7 +34,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    internal IReadOnlyList<XumingPromiseIssuedEvent> PendingXumingPromises(int owner) => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<XumingPromiseIssuedEvent>().Where(p => p.Source.OwnerSeat == owner && p.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && p.TurnOwnerSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<XumingPromiseSettledEvent>().Any(e => e.PromiseId == p.PromiseId && e.Source == p.Source && e.ActualTurn == p.ActualTurn)).ToArray());
+    internal IReadOnlyList<XumingPromiseIssuedEvent> PendingXumingPromises(int owner) => Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingPromiseIssuedEvent>().Where(p => p.Source.OwnerSeat == owner && p.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && p.TurnOwnerSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingPromiseSettledEvent>().Any(e => e.PromiseId == p.PromiseId && e.Source == p.Source && e.ActualTurn == p.ActualTurn)).ToArray());
     internal IReadOnlyList<TurnEndingBoundaryItem> IncludeXumingAfterTurnEndedItems(DeferredTurnEndFrame parent, IReadOnlyList<TurnEndingBoundaryItem> ordinary)
     {
         if (!HasChengJiChengCui || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(ChengJiChengCuiComposition.Xuming)?.Program is not { } program)
@@ -82,7 +82,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
 
     internal IReadOnlyList<Card> XumingCurrentMaterials(XumingPromiseIssuedEvent p)
     {
-        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<XumingMaterialFrozenEvent>().Where(e => e.PromiseId == p.PromiseId && e.Source == p.Source).OrderBy(e => e.Index).ToArray();
+        var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingMaterialFrozenEvent>().Where(e => e.PromiseId == p.PromiseId && e.Source == p.Source).OrderBy(e => e.Index).ToArray();
         if (facts.Length != p.MaterialCount || !facts.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, p.MaterialCount)) || facts.Select(e => e.CardId).Distinct().Count() != facts.Length || facts.Any(e => e.CardId <= 0 || _cardZonesOperations._cardZones.GetLocation(e.CardId).Zone is not (CardZoneKind.Processing or CardZoneKind.DiscardPile)))
             return[];
         var cards = facts.Select(e => _coreResponseEntityExchangeOperations.EntityAtCurrentLocation(e.CardId)).ToArray();
@@ -128,7 +128,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
     {
         var r = f.XumingEnding!;
         var p = r.Promises[r.PromiseIndex];
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<XumingPromiseSettledEvent>().Any(e => e.PromiseId == p.PromiseId && e.Source == p.Source))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingPromiseSettledEvent>().Any(e => e.PromiseId == p.PromiseId && e.Source == p.Source))
             throw new InvalidOperationException("Xuming cannot settle an original damage obligation twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XumingPromiseSettledEvent(f.Id, p.PromiseId, p.Source, r.ActualTurn, used, useId));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { XumingEnding = r with { PromiseIndex = r.PromiseIndex + 1, Stage = XumingStage.Choosing, UseId = null, ActionId = null, Plan = null } });

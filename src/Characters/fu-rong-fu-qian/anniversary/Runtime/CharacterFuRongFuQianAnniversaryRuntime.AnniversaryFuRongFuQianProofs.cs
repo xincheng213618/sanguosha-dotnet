@@ -34,7 +34,7 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
 
     internal ProgramSkillFrame? AnniversaryFuPairObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.AnniversaryFuPairFirstChild(root, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 44700)]
-    internal bool HasAnniversaryFuPairDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryFuPairObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool HasAnniversaryFuPairDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && AnniversaryFuPairObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 44700)]
     internal bool AdvanceAnniversaryFuPairObserver() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && AnniversaryFuPairObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

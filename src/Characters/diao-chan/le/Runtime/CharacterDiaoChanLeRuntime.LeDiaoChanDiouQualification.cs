@@ -9,7 +9,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     internal static CardConversionSource DiouSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_diao_chan_le_LeDiaoChanDiou_Qualification.DiouSource(f);
     internal void CaptureDiouQualification(ResolutionFrame supplied, CardActionContext action)
     {
-        if (!HasDiouCapability || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouQualificationAcceptedEvent>().Any(e => e.NativeParentId == supplied.Id && e.ActionId == action.ActionId))
+        if (!HasDiouCapability || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouQualificationAcceptedEvent>().Any(e => e.NativeParentId == supplied.Id && e.ActionId == action.ActionId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouQualificationAcceptedEvent(supplied.Id, action.ActionId, action.ActorSeat, action.ProviderSeat, action.EffectiveKind, action.PhysicalCards.Count));
         if (supplied.AcceptedDeclarationPayment is { DiouDeclarationClaims: { } prepaid } paid)
@@ -17,7 +17,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             var transferred = new List<DiouUseClaim>();
             foreach (var original in prepaid)
             {
-                if (original.NativeParentId != paid.DeclarationId || original.ActionId != 0 || original.ActorSeat != action.ActorSeat || original.ProviderSeat != action.ProviderSeat || action.PhysicalCards is not [var cost] || cost != paid.Cost || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouUseClaimedEvent>().Count(e => e.Claim == original) != 1)
+                if (original.NativeParentId != paid.DeclarationId || original.ActionId != 0 || original.ActorSeat != action.ActorSeat || original.ProviderSeat != action.ProviderSeat || action.PhysicalCards is not [var cost] || cost != paid.Cost || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouUseClaimedEvent>().Count(e => e.Claim == original) != 1)
                     throw new InvalidOperationException("Diou lost its exact prepayment Tanban declaration claim.");
                 var q = original with
                 {
@@ -26,7 +26,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
                 };
                 transferred.Add(q);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouUseClaimedEvent(q));
-                foreach (var m in _coreProgramEventHistoryOperations.ProgramEventHistory<DiouMaterialQualifiedEvent>().Where(e => e.NativeParentId == paid.DeclarationId && e.ActionId == 0 && e.Source == q.Source).ToArray())
+                foreach (var m in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouMaterialQualifiedEvent>().Where(e => e.NativeParentId == paid.DeclarationId && e.ActionId == 0 && e.Source == q.Source).ToArray())
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(m with { NativeParentId = supplied.Id, ActionId = action.ActionId });
             }
 
@@ -112,9 +112,9 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 
     internal bool ValidDiouClaim(DiouUseClaim q, CardActionContext action)
     {
-        if (q.Source.SkillId != DiouSkill || q.Source.BindingId != DiouBinding || q.Source.OwnerSeat != q.ActorSeat || q.ActionId != action.ActionId || q.ProviderSeat != action.ProviderSeat || q.TanbanMaterialCount < 1 || q.MaterialCount != action.PhysicalCards.Count || q.MovementSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash != q.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouUseClaimedEvent>().Count(e => e.Claim == q) != 1 || q.EffectiveKind != action.EffectiveKind && !(CoreNativeCardClassificationsRuntime.IsSlashCard(q.EffectiveKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind)) || !_characterZhouYuOlMouOperations.MouGuquActorLineageMatches(q.NativeParentId, q.ActionId, q.ActorSeat, action.ActorSeat, q.ProviderSeat, action.Type))
+        if (q.Source.SkillId != DiouSkill || q.Source.BindingId != DiouBinding || q.Source.OwnerSeat != q.ActorSeat || q.ActionId != action.ActionId || q.ProviderSeat != action.ProviderSeat || q.TanbanMaterialCount < 1 || q.MaterialCount != action.PhysicalCards.Count || q.MovementSequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash != q.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouUseClaimedEvent>().Count(e => e.Claim == q) != 1 || q.EffectiveKind != action.EffectiveKind && !(CoreNativeCardClassificationsRuntime.IsSlashCard(q.EffectiveKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind)) || !_characterZhouYuOlMouOperations.MouGuquActorLineageMatches(q.NativeParentId, q.ActionId, q.ActorSeat, action.ActorSeat, q.ProviderSeat, action.Type))
             return false;
-        var materials = _coreProgramEventHistoryOperations.ProgramEventHistory<DiouMaterialQualifiedEvent>().Where(e => e.NativeParentId == q.NativeParentId && e.ActionId == q.ActionId && e.Source == q.Source).OrderBy(e => e.Index).ToArray();
+        var materials = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouMaterialQualifiedEvent>().Where(e => e.NativeParentId == q.NativeParentId && e.ActionId == q.ActionId && e.Source == q.Source).OrderBy(e => e.Index).ToArray();
         return materials.Length == q.MaterialCount && materials.Count(m => m.Tanban) == q.TanbanMaterialCount && materials.Select(m => m.CardId).Distinct().Count() == materials.Length && materials.Select((m, i) => m.Index == i && action.PhysicalCards.Any(c => c.CardId == m.CardId && c.CardKind == m.PrintedKind && c.From == m.From)).All(b => b);
     }
 
@@ -126,7 +126,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     }
 
     [ProgramIssuedTrigger(80)]
-    internal bool IsIssuedDiouCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && CompletedDiouClaim(c, context)is { } q && !_coreProgramEventHistoryOperations.ProgramEventHistory<DiouStartedEvent>().Any(e => e.Claim.Source == q.Source && e.Claim.ActionId == q.ActionId);
+    internal bool IsIssuedDiouCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && CompletedDiouClaim(c, context)is { } q && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouStartedEvent>().Any(e => e.Claim.Source == q.Source && e.Claim.ActionId == q.ActionId);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 24)]
     internal void CollectIssuedDiouCandidates(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result)
     {
@@ -165,5 +165,5 @@ internal sealed partial class CharacterDiaoChanLeRuntime
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouPublicHandShownEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, frame, p.Seat, card.Id, card.Kind, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
     }
 
-    internal bool DiouWasShownThisTurn(int id) => _coreProgramEventHistoryOperations.ProgramEventHistory<DiouPublicHandShownEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.CardId == id);
+    internal bool DiouWasShownThisTurn(int id) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouPublicHandShownEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.CardId == id);
 }

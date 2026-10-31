@@ -7,7 +7,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         if (p.Source.SkillId != "ol:huanpei" || p.Source.BindingId != "adjust-and-use-basic" || p.Source.OwnerSeat != p.Request.ActorSeat || p.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash || !CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Contains(p.Kind) || p.SequenceBefore < 0 || p.SequenceAfter < p.SequenceBefore || p.Targets is not System.Collections.IList { IsReadOnly: true })
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<HuanShuJunStartedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Source == p.Source && e.GameplayHash == p.GameplayHash && e.Op == SkillProgramEffectOp.ResolveHuanpeiHandAdjustmentAndBasicUse) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiAdjustmentAcceptedEvent>().Where(e => e.FrameId == p.ProgramFrameId).ToArray()is [var paid] && paid.OwnerSeat == p.Source.OwnerSeat && paid.Round == p.Round && paid.HandCount == p.FrozenHandCount && paid.Hp == p.FrozenHp && paid.RequestedCount == p.AdjustmentCount && paid.Before == p.SequenceBefore && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiAdjustmentCompletedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Before == p.SequenceBefore && e.After == p.SequenceAfter) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiOutputChosenEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Kind == p.Kind && e.TargetCount == p.Targets.Count) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiTargetChosenEvent>().Where(e => e.FrameId == p.ProgramFrameId).OrderBy(e => e.Index).Select(e => e.TargetSeat).SequenceEqual(p.Targets);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanShuJunStartedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Source == p.Source && e.GameplayHash == p.GameplayHash && e.Op == SkillProgramEffectOp.ResolveHuanpeiHandAdjustmentAndBasicUse) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiAdjustmentAcceptedEvent>().Where(e => e.FrameId == p.ProgramFrameId).ToArray()is [var paid] && paid.OwnerSeat == p.Source.OwnerSeat && paid.Round == p.Round && paid.HandCount == p.FrozenHandCount && paid.Hp == p.FrozenHp && paid.RequestedCount == p.AdjustmentCount && paid.Before == p.SequenceBefore && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiAdjustmentCompletedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Before == p.SequenceBefore && e.After == p.SequenceAfter) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiOutputChosenEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Kind == p.Kind && e.TargetCount == p.Targets.Count) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiTargetChosenEvent>().Where(e => e.FrameId == p.ProgramFrameId).OrderBy(e => e.Index).Select(e => e.TargetSeat).SequenceEqual(p.Targets);
     }
 
     internal static bool SameHuanpeiPayment(HuanpeiPaidOrigin a, HuanpeiPaidOrigin b) => RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanpeiNative.SameHuanpeiPayment(a, b);
@@ -16,7 +16,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         if (p is null)
             return;
-        if (!ValidHuanpeiPayment(p) || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0, EffectiveIsRed: null } a || a.ActorSeat != p.Source.OwnerSeat || a.ProviderSeat != a.ActorSeat || a.RequesterSeat is not null || a.EffectiveKind != p.Kind || a.ConversionChain is not [var source] || source != p.Source || _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiIssuedEvent>().Any(e => e.PaymentFrameId == p.ProgramFrameId))
+        if (!ValidHuanpeiPayment(p) || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0, EffectiveIsRed: null } a || a.ActorSeat != p.Source.OwnerSeat || a.ProviderSeat != a.ActorSeat || a.RequesterSeat is not null || a.EffectiveKind != p.Kind || a.ConversionChain is not [var source] || source != p.Source || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiIssuedEvent>().Any(e => e.PaymentFrameId == p.ProgramFrameId))
             throw new InvalidOperationException("Huanpei requires its exact paid, zero-material native Use.");
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { HuanpeiUse = new(p, use.Id, a.ActionId) });
         if (p.Request.ParentFrameId is { } parentId && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == parentId)is ProgramSkillFrame parent)
@@ -36,7 +36,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         }
 
         var p = r.Payment;
-        return a.ActionId == r.CardActionId && a.ProviderSeat == p.Source.OwnerSeat && a.RequesterSeat is null && a.PhysicalCards.Count == 0 && a.ConversionChain is [var source] && source == p.Source && a.EffectiveKind == p.Kind && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed is null && (a.ActorSeat == p.Source.OwnerSeat && use.SourceSeat == a.ActorSeat || _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, a.ActorSeat, p.Source.OwnerSeat)) && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiIssuedEvent>().Count(e => e.PaymentFrameId == p.ProgramFrameId && e.UseId == use.Id && e.ActionId == a.ActionId && e.ActorSeat == p.Source.OwnerSeat && e.Kind == p.Kind && e.Intent == p.Request.Intent) == 1;
+        return a.ActionId == r.CardActionId && a.ProviderSeat == p.Source.OwnerSeat && a.RequesterSeat is null && a.PhysicalCards.Count == 0 && a.ConversionChain is [var source] && source == p.Source && a.EffectiveKind == p.Kind && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed is null && (a.ActorSeat == p.Source.OwnerSeat && use.SourceSeat == a.ActorSeat || _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, a.ActorSeat, p.Source.OwnerSeat)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiIssuedEvent>().Count(e => e.PaymentFrameId == p.ProgramFrameId && e.UseId == use.Id && e.ActionId == a.ActionId && e.ActorSeat == p.Source.OwnerSeat && e.Kind == p.Kind && e.Intent == p.Request.Intent) == 1;
     }
 
     internal bool IsHuanpeiUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedHuanpeiUse(use);
@@ -98,7 +98,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         if (use.HuanpeiUse is not { } r)
             return;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || use.Step != ResolutionFrameStep.Completed || _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiReturnedEvent>().Any(e => e.PaymentFrameId == r.Payment.ProgramFrameId))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || use.Step != ResolutionFrameStep.Completed || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiReturnedEvent>().Any(e => e.PaymentFrameId == r.Payment.ProgramFrameId))
             throw new InvalidOperationException("Huanpei can return only once after the real native Use.");
         if (r.Payment.Request.ParentFrameId is { } id && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == id)is ProgramSkillFrame { HuanpeiReturn: { } lease } p)
         {
@@ -122,7 +122,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             return false;
         if (use is not null && (use.HuanpeiUse is not { } u || !SameHuanpeiPayment(u.Payment, r.Payment) || u.OwnerFrameId != r.UseId || u.CardActionId != r.ActionId || !IsIssuedHuanpeiUse(use)))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiIssuedEvent>().Count(e => e.PaymentFrameId == r.Payment.ProgramFrameId && e.UseId == r.UseId && e.ActionId == r.ActionId) == 1 && (!r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is null && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiReturnedEvent>().Count(e => e.PaymentFrameId == r.Payment.ProgramFrameId && e.UseId == r.UseId && e.ActionId == r.ActionId) == 1);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiIssuedEvent>().Count(e => e.PaymentFrameId == r.Payment.ProgramFrameId && e.UseId == r.UseId && e.ActionId == r.ActionId) == 1 && (!r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiReturnedEvent>().Count(e => e.PaymentFrameId == r.Payment.ProgramFrameId && e.UseId == r.UseId && e.ActionId == r.ActionId) == 1);
     }
 
     internal void ExecuteHuanpeiPaid(HuanpeiPaidOrigin p)
@@ -141,7 +141,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 
         if (p.Request.Intent == HuanpeiIntent.Dying)
         {
-            var d = _coreDyingCursorRuntimeOperations.ActiveDying!;
+            var d = _coreDyingCursorRuntimeOperations.Value.ActiveDying!;
             var policies = kind == CardKind.Peach && actor.Seat != d.VictimSeat ? _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[d.VictimSeat], SkillProgramCardPolicyKind.RescueRecoveryBonus, CardKind.Peach).Where(policy => string.Equals(_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(actor), policy.Policy.FactionId, StringComparison.Ordinal)).ToArray() : [];
             _coreNativeDyingFramesOperations.SetDyingFrameStep(d.FrameId, ResolutionFrameStep.ResolvingEffect);
             _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(actor, _coreMatchParticipantsPlayersAccess._players[d.VictimSeat], card, kind == CardKind.Peach ? "桃" : "酒", kind, 1 + policies.Sum(policy => policy.Policy.Value), recoveryPolicySources: policies.Select(policy => (policy.Source.SkillId, policy.Policy.Id)).ToArray(), conversionSource: p.Source, dyingResponse: new(d.FrameId, actor.Seat, kind == CardKind.Peach, kind == CardKind.Peach ? 0 : null, kind == CardKind.Alcohol, kind == CardKind.Alcohol ? 0 : null), physicalCards: [], huanpeiOrigin: p);
@@ -240,7 +240,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         if (counts && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && actor.Seat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, p.Source))
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, p.Kind);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, p.Kind, actor.Seat, targets[0], IgnoresArmor: attack.IgnoresArmor));
         _coreNativeAiDecisionsOperations.NotifyAiOfSlash(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]]);

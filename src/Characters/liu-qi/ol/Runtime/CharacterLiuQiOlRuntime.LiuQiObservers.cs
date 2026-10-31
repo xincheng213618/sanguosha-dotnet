@@ -24,7 +24,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
         if (payload is CardActionAcceptedEvent { Action: { Type: CardActionType.Response, EffectiveKind: CardKind.Nullification } response } && _characterLiuQiOlHasIssuedLiuQiAccess._hasIssuedLiuQi)
         {
             var window = _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault();
-            if (window is null || window.ChainDepth <= 0 || !_coreDelayedNullificationOperations.HasNullificationEffectOwner(window) || response.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(window) || response.ActorSeat != response.ProviderSeat || response.ResponderSeat != response.ActorSeat || response.RequesterSeat is not null || response.OpponentSeat != window.SourceSeat)
+            if (window is null || window.ChainDepth <= 0 || !_coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(window) || response.ParentActionId != _coreDelayedNullificationOperations.Value.NullificationParentActionId(window) || response.ActorSeat != response.ProviderSeat || response.ResponderSeat != response.ActorSeat || response.RequesterSeat is not null || response.OpponentSeat != window.SourceSeat)
                 return;
             var grant = (_coreMatchParticipantsPlayersAccess._players[response.ActorSeat].WenjiTurnNameGrants ?? []).LastOrDefault(g => g.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.Source.OwnerSeat == response.ActorSeat && response.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && WenjiName(g.Name) == WenjiName(CardKind.Nullification));
             if (grant is null)

@@ -48,7 +48,7 @@ internal sealed partial class CharacterCaoCaoOlGodRuntime
             var r = f.OlGuixin!;
             if (r.Stage is OlGuixinStage.MovementChildren or OlGuixinStage.TurnoverChildren)
             {
-                if (_characterCaoCaoMobileGodOperations.DrainMobileGuixinChildren(f))
+                if (_characterCaoCaoMobileGodOperations.Value.DrainMobileGuixinChildren(f))
                     return true;
                 if (r.Stage == OlGuixinStage.TurnoverChildren)
                 {

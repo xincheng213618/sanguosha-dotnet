@@ -153,7 +153,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
     {
         if (p.MouSimaYiPrivate is not { } back)
             return false;
-        if (!ValidMouSmPrivateWindow(p) || _coreCardUseLifecycleOperations.LifecycleCardUse(back.UseId)is not { MouSimaYiSecret: { Released: true } } u || _resolutionStackOperations._resolutionStack[^1].Id != u.Id || _coreProgramEventHistoryOperations.ProgramEventHistory<MouSmTargetsDisclosedEvent>().Count(d => d.UseId == u.Id && d.ActionId == back.ActionId) != 1)
+        if (!ValidMouSmPrivateWindow(p) || _coreCardUseLifecycleOperations.LifecycleCardUse(back.UseId)is not { MouSimaYiSecret: { Released: true } } u || _resolutionStackOperations._resolutionStack[^1].Id != u.Id || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouSmTargetsDisclosedEvent>().Count(d => d.UseId == u.Id && d.ActionId == back.ActionId) != 1)
             throw new InvalidOperationException("Pingliao private target window did not disclose its exact paid Use once.");
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(u.Id);
         if (back.Call == MouSmPrivateCall.CommittedSlash && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, u.Action!, SkillProgramTriggerWindow.CardUseCommitted, u.Action!.TargetSeats, ProgramCardContinuation.CommittedSlash))

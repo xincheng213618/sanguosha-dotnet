@@ -19,7 +19,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(a);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(0, actor.Seat, attack.SourceSeat, CardKind.Dodge));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(a));
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(attack, a, ProgramCardContinuation.Dodge))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(attack, a, ProgramCardContinuation.Dodge))
             return;
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(attack, a, SkillProgramTriggerWindow.CardResponseAccepted, [attack.SourceSeat], ProgramCardContinuation.Dodge))
             return;
@@ -33,8 +33,8 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         var r = use.HuanpeiResponse ?? throw new InvalidOperationException("Huanpei's own Dodge has no issued receipt.");
         var p = r.Payment;
-        var accepted = _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Where(e => e.Action.ActionId == r.CardActionId).ToArray();
-        if (!ValidHuanpeiPayment(p) || r.OwnerFrameId != use.Id || p.Kind != CardKind.Dodge || p.Request.Intent != HuanpeiIntent.OwnSlashDodge || use.CardAttack is not { } attack || attack.TargetSeat != p.Source.OwnerSeat || attack.SuccessfulDodgeResponses != p.Request.Cursor || p.Request.ParentFrameId != use.Id || p.Request.ParentActionId != use.Action?.ActionId || accepted is not [var fact] || fact.Action is not { Type: CardActionType.Response, EffectiveKind: CardKind.Dodge, PhysicalCards.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0, EffectiveIsRed: null } a || a.ActorSeat != p.Source.OwnerSeat || a.ProviderSeat != a.ActorSeat || a.ResponderSeat != a.ActorSeat || a.RequesterSeat is not null || a.OpponentSeat != attack.SourceSeat || a.ConversionChain is not [var source] || source != p.Source || a.ParentActionId != use.Action?.ActionId || _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiIssuedEvent>().Count(e => e.PaymentFrameId == p.ProgramFrameId && e.ActionId == a.ActionId && e.UseId == use.Id && e.Intent == p.Request.Intent) != 1)
+        var accepted = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Where(e => e.Action.ActionId == r.CardActionId).ToArray();
+        if (!ValidHuanpeiPayment(p) || r.OwnerFrameId != use.Id || p.Kind != CardKind.Dodge || p.Request.Intent != HuanpeiIntent.OwnSlashDodge || use.CardAttack is not { } attack || attack.TargetSeat != p.Source.OwnerSeat || attack.SuccessfulDodgeResponses != p.Request.Cursor || p.Request.ParentFrameId != use.Id || p.Request.ParentActionId != use.Action?.ActionId || accepted is not [var fact] || fact.Action is not { Type: CardActionType.Response, EffectiveKind: CardKind.Dodge, PhysicalCards.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0, EffectiveIsRed: null } a || a.ActorSeat != p.Source.OwnerSeat || a.ProviderSeat != a.ActorSeat || a.ResponderSeat != a.ActorSeat || a.RequesterSeat is not null || a.OpponentSeat != attack.SourceSeat || a.ConversionChain is not [var source] || source != p.Source || a.ParentActionId != use.Action?.ActionId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiIssuedEvent>().Count(e => e.PaymentFrameId == p.ProgramFrameId && e.ActionId == a.ActionId && e.UseId == use.Id && e.Intent == p.Request.Intent) != 1)
             throw new InvalidOperationException("Huanpei's true Dodge changed its accepted action or original native cursor.");
         return a;
     }
@@ -52,7 +52,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 
     internal bool HuanpeiDyingRescueRide(int index, DyingFrame dying)
     {
-        if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index] != dying || _coreDyingCursorRuntimeOperations.ActiveDying?.FrameId != dying.Id)
+        if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index] != dying || _coreDyingCursorRuntimeOperations.Value.ActiveDying?.FrameId != dying.Id)
             return false;
         if (_resolutionStackOperations._resolutionStack[index + 1] is ProgramSkillFrame { HuanShuJun: { Op: SkillProgramEffectOp.ResolveHuanpeiHandAdjustmentAndBasicUse, Request: { Intent: HuanpeiIntent.Dying } n } } preparation)
             return n.ParentFrameId == dying.Id && n.RequestFrameId == dying.Id && n.ActorSeat == dying.ResponderSeat && n.Cursor == dying.ResponderIndex && n.FixedTargetSeat == dying.VictimSeat && HuanShuJunPaidOrPreparing(preparation) && HuanShuJunObserverSuffix(index + 1);

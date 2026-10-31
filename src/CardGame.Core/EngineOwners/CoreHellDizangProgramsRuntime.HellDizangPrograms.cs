@@ -13,7 +13,7 @@ internal sealed partial class CoreHellDizangProgramsRuntime
         if (gate.SkillId == "hell:bufo" && gate.Trigger.Id == "reduce-large-damage")
             return gate.Context.Window == SkillProgramTriggerWindow.BeforeDamageApplied && gate.Context.TargetSeat == gate.OwnerSeat && gate.Context.Amount >= 2;
         if (gate.Trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ChooseHellDayuanJudgment))
-            return gate.Trigger.Effects is [{ Op: SkillProgramEffectOp.ChooseHellDayuanJudgment }] && gate.Context.Window == SkillProgramTriggerWindow.JudgmentBeforeResult && gate.Context.Judgment is { } judgment && _coreJudgmentCursorRuntimeOperations.ActiveJudgment is { } pending && pending.Id == judgment.JudgmentFrameId && _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id == judgment.CardId;
+            return gate.Trigger.Effects is [{ Op: SkillProgramEffectOp.ChooseHellDayuanJudgment }] && gate.Context.Window == SkillProgramTriggerWindow.JudgmentBeforeResult && gate.Context.Judgment is { } judgment && _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is { } pending && pending.Id == judgment.JudgmentFrameId && _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)?.Id == judgment.CardId;
         return true;
     }
 
@@ -33,7 +33,7 @@ internal sealed partial class CoreHellDizangProgramsRuntime
             return ResumeHellBufo(frame.Id) ? SkillProgramStepOutcome.AwaitChild : SkillProgramStepOutcome.Continue;
         }
 
-        if (operation != SkillProgramEffectOp.ChooseHellDayuanJudgment || frame.HellDayuan is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.JudgmentBeforeResult, Judgment: { } judgment } window || _coreJudgmentCursorRuntimeOperations.ActiveJudgment is not { } pending || pending.Id != judgment.JudgmentFrameId || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id != judgment.CardId)
+        if (operation != SkillProgramEffectOp.ChooseHellDayuanJudgment || frame.HellDayuan is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.JudgmentBeforeResult, Judgment: { } judgment } window || _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is not { } pending || pending.Id != judgment.JudgmentFrameId || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)?.Id != judgment.CardId)
             throw new InvalidOperationException("Dayuan requires the exact final native judgment and unchanged physical card.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { HellDayuan = new(HellDizangSource(frame), frame.GameplayHash, frame.InstructionIndex, window.ParentFrameId, pending.Id, judgment.CardId) });
         PublishHellDayuanChoice(frame);
@@ -122,7 +122,7 @@ internal sealed partial class CoreHellDizangProgramsRuntime
             return;
         }
 
-        var pending = _coreJudgmentCursorRuntimeOperations.ActiveJudgment!;
+        var pending = _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment!;
         var overridden = new HellDayuanJudgmentOverride(frame.Id, pending.Id, receipt.Source, receipt.GameplayHash, receipt.CardId, receipt.SelectedSuit.Value, int.Parse(choice.Parameters["rank"], CultureInfo.InvariantCulture));
         _coreNativeJudgmentOperations.ReplaceJudgmentFrame(pending with { HellDayuanOverride = overridden, Suit = overridden.Suit });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HellDayuanJudgmentOverriddenEvent(overridden));
@@ -138,7 +138,7 @@ internal sealed partial class CoreHellDizangProgramsRuntime
             return choices.Single(choice => choice.Parameters.GetValueOrDefault("rank") == "5");
         var judgment = frame.WindowContext!.Judgment!;
         var ally = judgment.SubjectSeat == frame.OwnerSeat || _coreMatchDefinitionModeDefinitionPlayerCountAccess._modeDefinition.ModeKind == ContentModeKind.Team && _coreMatchParticipantsPlayersAccess._players[judgment.SubjectSeat].TeamId == _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].TeamId;
-        var desired = ally ? _coreJudgmentCursorRuntimeOperations.ActiveJudgment!.Continuation == JudgmentContinuationKind.SupplyShortage ? Suit.Club : Suit.Heart : Suit.Spade;
+        var desired = ally ? _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment!.Continuation == JudgmentContinuationKind.SupplyShortage ? Suit.Club : Suit.Heart : Suit.Spade;
         return choices.Single(choice => choice.Parameters.GetValueOrDefault("suit") == desired.ToString());
     }
 
@@ -155,7 +155,7 @@ internal sealed partial class CoreHellDizangProgramsRuntime
     internal int EffectiveHellDayuanRank(JudgmentFrame frame, int fallback) => EffectiveHellDayuanOverride(frame)?.Rank ?? fallback;
     internal bool IsExactHellDayuanBeforeResultProgramChild(ProgramJudgmentTriggerWindowFrame window, ProgramSkillFrame child)
     {
-        if (window.ZhenyiBeforeResult != true || !window.Activated || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || child.WindowContext is not { Window: SkillProgramTriggerWindow.JudgmentBeforeResult, Judgment: { } result } context || context.ParentFrameId != window.Id || result != window.Judgment || _coreJudgmentCursorRuntimeOperations.ActiveJudgment is not { } pending || pending.Id != window.ParentFrameId || pending.Id != result.JudgmentFrameId || pending.ZhenyiBeforeResultCompleted == true || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id != result.CardId)
+        if (window.ZhenyiBeforeResult != true || !window.Activated || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || child.WindowContext is not { Window: SkillProgramTriggerWindow.JudgmentBeforeResult, Judgment: { } result } context || context.ParentFrameId != window.Id || result != window.Judgment || _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is not { } pending || pending.Id != window.ParentFrameId || pending.Id != result.JudgmentFrameId || pending.ZhenyiBeforeResultCompleted == true || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)?.Id != result.CardId)
             return false;
         var candidate = window.Candidates[window.CandidateIndex];
         return candidate.OwnerSeat == child.OwnerSeat && candidate.SkillId == child.SkillId && candidate.TriggerId == child.TriggerId && candidate.SkillInstanceId == child.SkillInstanceId && candidate.GameplayHash == child.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger(child).Effects is [{ Op: SkillProgramEffectOp.ChooseHellDayuanJudgment }];

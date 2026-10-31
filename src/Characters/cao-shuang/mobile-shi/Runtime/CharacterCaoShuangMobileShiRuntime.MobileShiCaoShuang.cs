@@ -42,9 +42,9 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
             case ShiCaoShuangDianYiSkill:
                 return ShiCaoShuangRoundTriggers(true, candidate.OwnerSeat, windowKind) < 1 + ShiCaoShuangTimings(ShiCaoShuangDianYiSkill, windowKind);
             case ShiCaoShuangJianZhuanSkill:
-                return !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Any(entry => entry.WindowKind == windowKind && entry.OwnerSeat == candidate.OwnerSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count < ShiCaoShuangComposition.TimingCapacity && !_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.SkillId == ShiCaoShuangJianZhuanSkill && f.ShiCaoShuang is { Operation: "jianzhuan-timing" } r && r.WindowKind == windowKind);
+                return !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Any(entry => entry.WindowKind == windowKind && entry.OwnerSeat == candidate.OwnerSeat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count < ShiCaoShuangComposition.TimingCapacity && !_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.SkillId == ShiCaoShuangJianZhuanSkill && f.ShiCaoShuang is { Operation: "jianzhuan-timing" } r && r.WindowKind == windowKind);
             case ShiCaoShuangNiZunSkill when trigger.Id == ShiCaoShuangComposition.NiZunEndingTrigger:
-                return _coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoShuangOwnerCardUsedEvent>().Any(entry => entry.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber) && ShiCaoShuangStashableIds(candidate.OwnerSeat).Count > 0;
+                return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangOwnerCardUsedEvent>().Any(entry => entry.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber) && ShiCaoShuangStashableIds(candidate.OwnerSeat).Count > 0;
             default:
                 return true;
         }
@@ -123,7 +123,7 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
             throw new InvalidOperationException("JianZhuan requires its living owner.");
         var windowKind = ShiCaoShuangComposition.WindowKind(f.TriggerId!);
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count >= ShiCaoShuangComposition.TimingCapacity || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Any(entry => entry.WindowKind == windowKind && entry.OwnerSeat == f.OwnerSeat))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count >= ShiCaoShuangComposition.TimingCapacity || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Any(entry => entry.WindowKind == windowKind && entry.OwnerSeat == f.OwnerSeat))
             return new("jianzhuan-timing", _coreActualTurnProgressTurnNumberAccess._turnNumber)
             {
                 Source = ShiCaoShuangSource(f),
@@ -276,11 +276,11 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
         if (skillId is not (ShiCaoShuangComposition.SheQuanSkill or ShiCaoShuangComposition.DianYiSkill))
             throw new InvalidOperationException("JianZhuan timing targeted an unsupported skill.");
         var r = f.ShiCaoShuang!;
-        var ordinal = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count + 1;
+        var ordinal = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count + 1;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiCaoShuangJianZhuanTimingEvent(f.Id, f.OwnerSeat, skillId, r.WindowKind, ordinal));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Name)} 为{((skillId == ShiCaoShuangComposition.DianYiSkill ? "“典易”" : "“奢权”"))}增加了一个每轮限一次的触发时机。", f.OwnerSeat);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count >= ShiCaoShuangComposition.TimingCapacity)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count >= ShiCaoShuangComposition.TimingCapacity)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiCaoShuang = new("jianzhuan-lose", r.ActualTurn, 6) { Source = r.Source, GameplayHash = r.GameplayHash } });
             ContinueShiCaoShuang(f.Id);
@@ -294,7 +294,7 @@ internal sealed partial class CharacterCaoShuangMobileShiRuntime
     {
         if (lostSkillId is not (ShiCaoShuangComposition.SheQuanSkill or ShiCaoShuangComposition.DianYiSkill))
             throw new InvalidOperationException("JianZhuan awakening lost an unsupported skill.");
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count < ShiCaoShuangComposition.TimingCapacity)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoShuangJianZhuanTimingEvent>().Count < ShiCaoShuangComposition.TimingCapacity)
             throw new InvalidOperationException("JianZhuan awakening requires all three added timings.");
         var r = f.ShiCaoShuang!;
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];

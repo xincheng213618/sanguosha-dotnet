@@ -17,7 +17,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
     internal bool LeChengyanObserverSuffix(int index) => _resolutionStackOperations._resolutionStack[index + 1] is DyingFrame dying && index + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(index + 1, dying) || _coreObserverSubtreesOperations.HasObserverSuffix(index, (n) => this.LeChengyanObserverEdge(n), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d));
     internal ProgramSkillFrame? LeChengyanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.LeChengyanFirstChild(f, c), (n) => this.LeChengyanObserverSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 30200)]
-    internal bool IsLeChengyanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LeChengyanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsLeChengyanDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && LeChengyanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 30200)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 30200)]
     internal bool IsLeChengyanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

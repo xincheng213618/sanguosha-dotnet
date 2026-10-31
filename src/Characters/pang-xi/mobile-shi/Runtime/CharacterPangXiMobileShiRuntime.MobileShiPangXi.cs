@@ -51,7 +51,7 @@ internal sealed partial class CharacterPangXiMobileShiRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         if (f.PangXi is not null)
             throw new InvalidOperationException("Shi Pang Xi restarted a running operation.");
-        if (f.SkillId != ShiPxXuye || f.TriggerId != ShiPangXiComposition.XuyeTrigger || f.WindowContext?.TargetSeat is not { } victim || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[victim].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !ShiPxIsGlobalMinimumHand(victim) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiPxXuyeDrawEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat && entry.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber))
+        if (f.SkillId != ShiPxXuye || f.TriggerId != ShiPangXiComposition.XuyeTrigger || f.WindowContext?.TargetSeat is not { } victim || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[victim].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !ShiPxIsGlobalMinimumHand(victim) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiPxXuyeDrawEvent>().Any(entry => entry.OwnerSeat == f.OwnerSeat && entry.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber))
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PangXi = new("xuye", _coreActualTurnProgressTurnNumberAccess._turnNumber, ShiPxStage.XuyeAsk) { VictimSeat = victim } });
         PublishShiPx(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));

@@ -20,7 +20,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
         // The same current legal-action projection owns the target limit for
         // equipment and program modifiers, including every other living seat.
         var stillLegal = targetSeats.Length >= 2 && targetSeats.Length < _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive) && _coreNativeLegalActionsOperations.BuildLegalActions(source, selectedPhysicalCardId: slash.Id).Any(action => action.Kind == LegalActionKind.Slash && action.CardId == slash.Id && action.TargetSeats.SequenceEqual(targetSeats) && (action.PlayedCardKind ?? slash.Kind) == playedCardKind && action.ConversionSource == conversionSource && CoreNativeCardClassificationsRuntime.ConversionSourcesEqual(action.AdditionalConversionSources, additionalConversionSources));
-        var usesFangtian = _coreNativeDamageHandlesOperations.UsesFormalFangtianHalberd && _corePhysicalOwnedCardQueriesOperations.GetHand(source).Count == 1 && _corePhysicalOwnedCardQueriesOperations.GetHand(source)[0].Id == slash.Id && _coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.FangtianHalberd);
+        var usesFangtian = _coreNativeDamageHandlesOperations.Value.UsesFormalFangtianHalberd && _corePhysicalOwnedCardQueriesOperations.GetHand(source).Count == 1 && _corePhysicalOwnedCardQueriesOperations.GetHand(source)[0].Id == slash.Id && _coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.FangtianHalberd);
         var usesProgramTargetCount = _coreRedAdditionalTargetsOperations.HasNextCardTargetAdjustment(source) || _coreProgramCardUseRulesOperations.UsesProgramCardTargetCount(source, slash, playedCardKind, targetSeats.Length) || _characterLuBuOlMagicOperations.IsMoGangquanMultiSlash(source, slash, playedCardKind, conversionSource, targetSeats);
         if (!stillLegal || (!usesFangtian && !usesProgramTargetCount))
         {
@@ -39,7 +39,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
 
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(source.Seat, playedCardKind);
         var damageAmount = (1 + source.AlcoholDamageBonus) + nuzhan.DamageBonus;
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(resolutionId, source);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(resolutionId, source);
         source.HasAlcoholEffect = false;
         var pending = _kernelCoreMainOperations.CreateFangtianHalberdHandle(resolutionId, source.Seat, slash, playedCardKind, ignoresArmor, damageAmount, targetSeats, usesFangtian, countedTowardSlashLimit, conversionSource);
         _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd = pending;
@@ -103,7 +103,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
             _coreCardAttackStateOperations.UpdateCardAttackState(pending.ResolutionId, state => state!with { PhysicalCardIds = hpMaterials });
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { PhysicalCardIds: { } baitMaterials } baitUse && _characterGuanHaiOlOperations.IsXieweiMultiTargetUse(baitUse))
             _coreCardAttackStateOperations.UpdateCardAttackState(pending.ResolutionId, state => state!with { PhysicalCardIds = baitMaterials });
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { PhysicalCardIds: { } haoMengMaterials } haoMengUse && _characterHaoMengAnniversaryOperations.IsHaoMengNativeUse(haoMengUse))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)is { PhysicalCardIds: { } haoMengMaterials } haoMengUse && _characterHaoMengAnniversaryOperations.Value.IsHaoMengNativeUse(haoMengUse))
             _coreCardAttackStateOperations.UpdateCardAttackState(pending.ResolutionId, state => state!with { PhysicalCardIds = haoMengMaterials });
         pending.CurrentAttack = attack;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
@@ -167,7 +167,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
 
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(source.Seat, playedCardKind);
         var damageAmount = (1 + source.AlcoholDamageBonus) + nuzhan.DamageBonus;
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(resolutionId, source);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(resolutionId, source);
         source.HasAlcoholEffect = false;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(resolutionId, source.Seat, target.Seat, slash, damageAmount, playedCardKind, ignoresArmor, physicalCards: slashCards, conversionSource: conversionSource, programSkillCardUseFrameId: factionRequest?.ProgramSkillFrameId ?? programSkillCardUseFrameId);
         if (factionRequest is not null)
@@ -235,7 +235,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
             return;
         if (_characterLiuChengMouMobileOperations.TryBeginMouLiuChengLateSlashTargets(attack))
             return;
-        if (_characterYuanShaoMouMobileOperations.TryBeginMouYuanShaoLateSlashTarget(attack))
+        if (_characterYuanShaoMouMobileOperations.Value.TryBeginMouYuanShaoLateSlashTarget(attack))
             return;
         ContinueSlashAfterFinalizedTargets(attack);
     }
@@ -326,7 +326,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
         var ignoresArmor = attack.IgnoresArmor;
         var resolutionId = attack.ResolutionId;
         var slashName = CardCatalog.Get(playedCardKind).DisplayName;
-        if (_coreComparedBlackSlashPoliciesOperations.ApplyComparedBlackSlashPolicies(attack))
+        if (_coreComparedBlackSlashPoliciesOperations.Value.ApplyComparedBlackSlashPolicies(attack))
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(resolutionId, ResolutionFrameStep.ResolvingEffect);
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);
@@ -363,7 +363,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
             return;
         }
 
-        if (_coreNativeDamageHandlesOperations.UsesFormalTengjia && !ignoresArmor && playedCardKind == CardKind.Slash && _coreNativeEquipmentAndFactionQueriesOperations.HasTengjia(target))
+        if (_coreNativeDamageHandlesOperations.Value.UsesFormalTengjia && !ignoresArmor && playedCardKind == CardKind.Slash && _coreNativeEquipmentAndFactionQueriesOperations.HasTengjia(target))
         {
             _coreMatchLogOperations.AddLog("ArmorEffect", $"{(target.Name)} 的【藤甲】令这次普通【杀】无效。", target.Seat, source.Seat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ArmorEffectAppliedEvent(resolutionId, CardKind.Tengjia, source.Seat, target.Seat, playedCardKind));
@@ -394,7 +394,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
 
         var nearbyResponseProhibited = _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(attack.CardUserSeat, target.Seat, playedCardKind, [target.Seat]);
         var suitResponseProhibited = _coreProgramCardPoliciesOperations.IsSuitSlashResponseProhibited(attack);
-        var convertedColorlessProhibited = _coreConvertedSlashResponseOperations.HasConvertedSlashSameColorResponseRestriction(attack) && _coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(attack)is null;
+        var convertedColorlessProhibited = _coreConvertedSlashResponseOperations.Value.HasConvertedSlashSameColorResponseRestriction(attack) && _coreConvertedSlashResponseOperations.Value.ConvertedSlashSameColorResponseColor(attack)is null;
         var ghostBladeProhibited = _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.CardUserSeat], CardKind.GhostDragonCrescentBlade) && attack.PhysicalCards.Count > 0 && attack.PhysicalCards.All(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[attack.CardUserSeat], card)));
         if (attack.ProhibitsDodge || _coreWushuangCombatTacticsOperations.WushuangDrunkenSlashUnrespondable(attack) || nearbyResponseProhibited || suitResponseProhibited || ghostBladeProhibited || convertedColorlessProhibited)
         {
@@ -411,7 +411,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
 
         _characterSimaYiMobileGodOperations.MarkMobileSimaRenjieResponse(attack, target.Seat, CardKind.Dodge);
         var dodges = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(target, CardKind.Dodge);
-        if (_coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(attack)is { } requireRed)
+        if (_coreConvertedSlashResponseOperations.Value.ConvertedSlashSameColorResponseColor(attack)is { } requireRed)
             dodges = dodges.Where(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(target, card)) == requireRed).ToList();
         var hasBagua = !ignoresArmor && _coreNativeEquipmentAndFactionQueriesOperations.HasBagua(target) && !_coreIssuedPlayUsePoliciesOperations.HasIssuedPlayPhaseUseBan(target.Seat);
         var dodge = dodges.FirstOrDefault();

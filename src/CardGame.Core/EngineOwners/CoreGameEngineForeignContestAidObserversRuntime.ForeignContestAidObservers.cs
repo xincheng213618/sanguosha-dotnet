@@ -91,7 +91,7 @@ internal sealed partial class CoreGameEngineForeignContestAidObserversRuntime
             {
                 // Root and first ledger edge have already been proved. No global
                 // movement/Dying helper is widened by this local union.
-                if (!_corePaidColorDamageClaimObserversOperations.PaidColorDamageClaimObserverEdge(i))
+                if (!_corePaidColorDamageClaimObserversOperations.Value.PaidColorDamageClaimObserverEdge(i))
                 {
                     valid = false;
                     break;
@@ -108,7 +108,7 @@ internal sealed partial class CoreGameEngineForeignContestAidObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 620)]
-    internal bool IsForeignContestAidProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ForeignContestAidPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsForeignContestAidProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && ForeignContestAidPaidObserverRoot(_coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 
     internal bool TryGetSameTypeAidVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primary)
     {

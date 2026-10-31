@@ -9,8 +9,8 @@ internal sealed partial class CoreCommandResultProjectionRuntime
         return new EngineRunResult(_coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess._status, _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess._winner, state, state.PendingDecision, _kernelCoreGameEngineCommandSessionOperations._revision)
         {
             WinnerSeat = _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess._winnerSeat,
-            WinnerTeamId = _coreNativeDamageHandlesOperations.IsTeamMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess._winnerTeamId : null,
-            WinnerFactionId = _coreNativeDamageHandlesOperations.IsNationalWarMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess._winnerFactionId : null
+            WinnerTeamId = _coreNativeDamageHandlesOperations.Value.IsTeamMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess._winnerTeamId : null,
+            WinnerFactionId = _coreNativeDamageHandlesOperations.Value.IsNationalWarMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerSeatWinnerTeamIdAccess._winnerFactionId : null
         };
     }
 

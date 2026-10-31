@@ -9,7 +9,7 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
             return false;
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).ToArray();
         if (r.Stage == AnniversaryLiuYongStage.DrawChildren)
-            return r.Draw is { } draw && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuYongDrawReturnedEvent>().Count(e => e == new AnniversaryLiuYongDrawReturnedEvent(f.Id, draw.AttemptFrameId, r.Before, r.After, draw.ActualDrawIds.Count)) == 1 && draw.ActualDrawIds.All(id => moves.Count(m => m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason == AnniversaryLiuYongDrawReason) == 1);
+            return r.Draw is { } draw && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuYongDrawReturnedEvent>().Count(e => e == new AnniversaryLiuYongDrawReturnedEvent(f.Id, draw.AttemptFrameId, r.Before, r.After, draw.ActualDrawIds.Count)) == 1 && draw.ActualDrawIds.All(id => moves.Count(m => m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason == AnniversaryLiuYongDrawReason) == 1);
         return r.GiftPaid && r.Cards.Count == r.From.Count && r.Cards.Select((id, index) => (id, from: r.From[index])).All(x => moves.Count(m => m.CardId == x.id && m.From == x.from && m.To == CardLocation.Hand(r.Recipient) && m.Reason == AnniversaryLiuYongGiftReason) == 1);
     }
 
@@ -34,7 +34,7 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
 
     internal ProgramSkillFrame? AnniversaryLiuYongObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.AnniversaryLiuYongFirstChild(f, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 43400)]
-    internal bool AnniversaryLiuYongDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryLiuYongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool AnniversaryLiuYongDyingObserver() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && AnniversaryLiuYongObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43400)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 43400)]
     internal bool AnniversaryLiuYongRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

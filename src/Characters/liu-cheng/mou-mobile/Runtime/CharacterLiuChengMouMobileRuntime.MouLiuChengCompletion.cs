@@ -37,7 +37,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         }
     }
 
-    internal bool ValidMouLiuChengClaim(MouLiuChengUseClaim q, CardActionContext a) => MouLiuChengComposition.IsSkill(q.Source.SkillId) && q.Source.BindingId == "after-use" && q.Source.OwnerSeat == q.ActorSeat && q.ActionId == a.ActionId && q.ActorSeat == a.ActorSeat && q.ProviderSeat == a.ProviderSeat && q.EffectiveKind == a.EffectiveKind && MouLiuChengKind(q.Source.SkillId, a.EffectiveKind) && q.MovementSequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash == q.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengCompletionQualifiedEvent>().Count(e => e.Claim == q) == 1;
+    internal bool ValidMouLiuChengClaim(MouLiuChengUseClaim q, CardActionContext a) => MouLiuChengComposition.IsSkill(q.Source.SkillId) && q.Source.BindingId == "after-use" && q.Source.OwnerSeat == q.ActorSeat && q.ActionId == a.ActionId && q.ActorSeat == a.ActorSeat && q.ProviderSeat == a.ProviderSeat && q.EffectiveKind == a.EffectiveKind && MouLiuChengKind(q.Source.SkillId, a.EffectiveKind) && q.MovementSequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program?.GameplayHash == q.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengCompletionQualifiedEvent>().Count(e => e.Claim == q) == 1;
     internal MouLiuChengUseClaim? CompletedMouLiuChengClaim(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
     {
         if (!MouLiuChengComposition.IsSkill(candidate.SkillId) || candidate.BindingId != "after-use" || c.Window != SkillProgramTriggerWindow.CardUseCompleted || c.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramCardTriggerWindowFrame window || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != c.Window || window.Action.ActionId != identity.CardActionId || window.Action.Type == CardActionType.Response && window.CompletedResponseReturn is not { IsCommitted: false } || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == window.ParentFrameId)?.MouLiuChengClaims is not { } claims)
@@ -46,7 +46,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29401, SkillProgramEffectOp.ResolveMouLiuChengCompletion)]
-    internal bool CanCompleteMouLiuCheng(ProgramTriggerLegalityContext c) => c.Owner.IsAlive && MouLiuChengComposition.IsProgram(c.Program) && CompletedMouLiuChengClaim(c.Candidate, c.Context)is { } q && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.MouLiuChengChui) >= 2 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengCompletionStartedEvent>().Any(e => e.Claim.ActionId == q.ActionId && e.Claim.Source.OwnerSeat == c.OwnerSeat && e.Claim.Source.SkillId == c.SkillId);
+    internal bool CanCompleteMouLiuCheng(ProgramTriggerLegalityContext c) => c.Owner.IsAlive && MouLiuChengComposition.IsProgram(c.Program) && CompletedMouLiuChengClaim(c.Candidate, c.Context)is { } q && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.MouLiuChengChui) >= 2 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengCompletionStartedEvent>().Any(e => e.Claim.ActionId == q.ActionId && e.Claim.Source.OwnerSeat == c.OwnerSeat && e.Claim.Source.SkillId == c.SkillId);
     internal SkillProgramStepOutcome BeginMouLiuChengCompletion(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -56,7 +56,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
             throw new InvalidOperationException("Liu Cheng requires the exact completed true Use and its source-bound native parent.");
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var before = owner.Markers.GetValueOrDefault(PlayerMarkerKind.MouLiuChengChui);
-        if (before < 2 || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengCompletionStartedEvent>().Any(e => e.Claim.ActionId == claim.ActionId && e.Claim.Source.OwnerSeat == f.OwnerSeat && e.Claim.Source.SkillId == f.SkillId))
+        if (before < 2 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengCompletionStartedEvent>().Any(e => e.Claim.ActionId == claim.ActionId && e.Claim.Source.OwnerSeat == f.OwnerSeat && e.Claim.Source.SkillId == f.SkillId))
             throw new InvalidOperationException("Liu Cheng must pay exactly two shared Chui once per matching completion.");
         var r = new MouLiuChengCompletionReceipt(claim, w.Id)
         {
@@ -76,7 +76,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMouLiuChengCompletion)]
     internal void ReturnMouLiuChengDraw(ProgramSkillFrame f, NativeDrawOutcome o)
     {
-        if (f.MouLiuChengCompletion is not { Stage: MouLiuChengStage.Drawing } r || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.MouLiuChengCompletion is not { Stage: MouLiuChengStage.Drawing } r || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Liu Cheng cannot draw or pay its completed-use marks twice.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouLiuChengCompletion = r with { Stage = MouLiuChengStage.DrawChildren, DrawOutcome = o }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLiuChengDrawReturnedEvent(f.Id, 1, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId));

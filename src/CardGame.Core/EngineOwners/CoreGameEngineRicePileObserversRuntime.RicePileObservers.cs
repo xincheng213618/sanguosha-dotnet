@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineRicePileObserversRuntime
     {
         if (root.RicePile is not { } r)
             return false;
-        _coreRicePileReceiptsOperations.RequireRiceReceipt(root);
+        _coreRicePileReceiptsOperations.Value.RequireRiceReceipt(root);
         if (child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged)
             return skills.ResumeProgramFrameId == root.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex <= skills.Candidates.Count;
         if (root.PendingMovementContinuation is not null && child is CardsMovedTriggerWindowFrame moved)

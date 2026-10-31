@@ -36,7 +36,7 @@ internal sealed partial class CoreGameEngineEquipmentSlotGroupProgramsRuntime
             throw new InvalidOperationException("Recast entity is not equipment.");
         frame = _coreNativeRecastInvocationsOperations.BeginFrameNativeRecastInvocation(frame, owner.Seat, [card.Id]);
         _corePhysicalMovementFacadesOperations.MoveCard(card, location, CardLocation.DiscardPile, CardMoveReasons.RecastDiscard);
-        if (_coreProgramEquipmentRecastRecoveriesOperations.TryPauseProgramEquipmentRecast(frame, card))
+        if (_coreProgramEquipmentRecastRecoveriesOperations.Value.TryPauseProgramEquipmentRecast(frame, card))
             return;
         var drawn = _corePhysicalDrawFacadesOperations.DrawCards(owner, 1, true, CardMoveReasons.RecastDraw);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRecastEvent(owner.Seat, card.Id, card.Kind, drawn.Count));

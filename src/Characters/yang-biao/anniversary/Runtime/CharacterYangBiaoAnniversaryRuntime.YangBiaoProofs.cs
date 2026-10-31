@@ -5,7 +5,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
 {
     internal bool YangBiaoOriginal(ProgramSkillFrame f)
     {
-        if (f.ActivationId != f.TriggerId || f.WindowContext is not { } c || c.OwnerSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.OwnerSeat == f.OwnerSeat && e.SkillInstanceId == f.SkillInstanceId && e.Window == c.Window) != 1)
+        if (f.ActivationId != f.TriggerId || f.WindowContext is not { } c || c.OwnerSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.OwnerSeat == f.OwnerSeat && e.SkillInstanceId == f.SkillInstanceId && e.Window == c.Window) != 1)
             return false;
         if (f.SkillId == AnniversaryYangBiaoComposition.Juee)
             return f.TriggerId == "ending-random-uses" && c.Window == SkillProgramTriggerWindow.TurnEnding && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is TurnEndingBoundaryFrame w && w.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && w.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && c.SourceSeat == w.OwnerSeat && c.TargetSeat == w.OwnerSeat && w.ItemIndex >= 0 && w.ItemIndex < w.Items.Count && w.Items[w.ItemIndex] is { Kind: TurnEndingBoundaryItemKind.Program, Candidate: { } candidate } && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) && candidate.OccurrenceIndex == c.OccurrenceIndex;
@@ -13,17 +13,17 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
             return false;
         if (f.SkillId == AnniversaryYangBiaoComposition.Zhaohan)
             return (f.TriggerId, c.Window)is ("extra-normal-draw", SkillProgramTriggerWindow.DrawPhaseStarting) or ("settle-extra-draw", SkillProgramTriggerWindow.AfterNormalDraw) or ("settle-phase-draw", SkillProgramTriggerWindow.DrawPhaseEnded) && parent.OwnerSeat == f.OwnerSeat && c.SourceSeat == f.OwnerSeat && c.TargetSeat == f.OwnerSeat && _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat == f.OwnerSeat;
-        return f.SkillId == AnniversaryYangBiaoComposition.Jinjie && f.TriggerId == "dying-support" && c.Window == SkillProgramTriggerWindow.DyingEntering && c.TargetSeat == parent.OwnerSeat && parent.Continuation == ProgramLifecycleContinuation.ResumeDyingEntry && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == parent.ResumeDyingFrameId)is DyingFrame dying && dying.VictimSeat == parent.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == dying.Id && e.VictimSeat == dying.VictimSeat && e.KillerSeat == dying.KillerSeat) == 1;
+        return f.SkillId == AnniversaryYangBiaoComposition.Jinjie && f.TriggerId == "dying-support" && c.Window == SkillProgramTriggerWindow.DyingEntering && c.TargetSeat == parent.OwnerSeat && parent.Continuation == ProgramLifecycleContinuation.ResumeDyingEntry && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == parent.ResumeDyingFrameId)is DyingFrame dying && dying.VictimSeat == parent.OwnerSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == dying.Id && e.VictimSeat == dying.VictimSeat && e.KillerSeat == dying.KillerSeat) == 1;
     }
 
     internal bool YangBiaoPaymentProof(ProgramSkillFrame f)
     {
         var r = f.AnniversaryYangBiao!;
         if (!r.Paid)
-            return r.From.Count == 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoPaymentIssuedEvent>().Any(e => e.FrameId == f.Id);
+            return r.From.Count == 0 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoPaymentIssuedEvent>().Any(e => e.FrameId == f.Id);
         if (r.Branch == "gift" && !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target))
             return false;
-        if (r.Cards.Count != r.Amount || r.From.Count != r.Amount || r.From.Any(from => from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || r.Op == SkillProgramEffectOp.ResolveAnniversaryYangBiaoZhaohan && r.From.Any(from => from != CardLocation.Hand(f.OwnerSeat)) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoPaymentIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid != new AnniversaryYangBiaoPaymentIssuedEvent(f.Id, r.Branch, r.Target, r.Amount, r.Before))
+        if (r.Cards.Count != r.Amount || r.From.Count != r.Amount || r.From.Any(from => from.OwnerSeat != f.OwnerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || r.Op == SkillProgramEffectOp.ResolveAnniversaryYangBiaoZhaohan && r.From.Any(from => from != CardLocation.Hand(f.OwnerSeat)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoPaymentIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var paid] || paid != new AnniversaryYangBiaoPaymentIssuedEvent(f.Id, r.Branch, r.Target, r.Amount, r.Before))
             return false;
         for (var i = 0; i < r.Cards.Count; i++)
         {
@@ -48,7 +48,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
 
     internal bool ValidYangBiao(ProgramSkillFrame f)
     {
-        if (f.AnniversaryYangBiao is not { } r || !YangBiaoOriginal(f) || r.Source != YangBiaoSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || r.ParentId != f.WindowContext!.ParentFrameId || r.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.Round != _coreActualRoundProgressRoundNumberAccess._roundNumber || !Enum.IsDefined(r.Stage) || f.InstructionIndex < 1 || f.InstructionIndex > (r.Op == SkillProgramEffectOp.ResolveAnniversaryYangBiaoJinjie && r.Stage == AnniversaryYangBiaoStage.Completed ? 3 : 1) || f.SelectedCardIds.Count != 0 || r.Cards.Distinct().Count() != r.Cards.Count || r.Cards.Count > r.Amount || r.Amount is < 0 or > 3 || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var start] || start != new AnniversaryYangBiaoStartedEvent(f.Id, r.Source, r.Hash, r.Op, r.ParentId, r.Turn, r.Round, r.DyingId, r.ArmId))
+        if (f.AnniversaryYangBiao is not { } r || !YangBiaoOriginal(f) || r.Source != YangBiaoSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || r.ParentId != f.WindowContext!.ParentFrameId || r.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.Round != _coreActualRoundProgressRoundNumberAccess._roundNumber || !Enum.IsDefined(r.Stage) || f.InstructionIndex < 1 || f.InstructionIndex > (r.Op == SkillProgramEffectOp.ResolveAnniversaryYangBiaoJinjie && r.Stage == AnniversaryYangBiaoStage.Completed ? 3 : 1) || f.SelectedCardIds.Count != 0 || r.Cards.Distinct().Count() != r.Cards.Count || r.Cards.Count > r.Amount || r.Amount is < 0 or > 3 || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var start] || start != new AnniversaryYangBiaoStartedEvent(f.Id, r.Source, r.Hash, r.Op, r.ParentId, r.Turn, r.Round, r.DyingId, r.ArmId))
             return false;
         if (r.Op == SkillProgramEffectOp.ResolveAnniversaryYangBiaoJuee)
             return ValidYangBiaoUseCursor(f);
@@ -56,7 +56,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
             return false;
         if (r.Op == SkillProgramEffectOp.ResolveAnniversaryYangBiaoZhaohan)
         {
-            if (f.SkillId != AnniversaryYangBiaoComposition.Zhaohan || r.DyingId != 0 || r.Draw is not null || f.SelectedTargetSeats.Count != 0 || r.Amount > 2 || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoDrawArmedEvent>().SingleOrDefault(e => e.FrameId == r.ArmId)is not { } arm || arm.Source.SkillId != f.SkillId || arm.Source.OwnerSeat != f.OwnerSeat || arm.Source.SkillInstanceId != f.SkillInstanceId || arm.Hash != r.Hash || arm.Turn != r.Turn || arm.DrawPhaseId != YangBiaoDrawPhaseId(f.WindowContext) || arm.Source.BindingId != "extra-normal-draw" || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoStartedEvent>().Count(e => e.ArmId == r.ArmId) != 1)
+            if (f.SkillId != AnniversaryYangBiaoComposition.Zhaohan || r.DyingId != 0 || r.Draw is not null || f.SelectedTargetSeats.Count != 0 || r.Amount > 2 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoDrawArmedEvent>().SingleOrDefault(e => e.FrameId == r.ArmId)is not { } arm || arm.Source.SkillId != f.SkillId || arm.Source.OwnerSeat != f.OwnerSeat || arm.Source.SkillInstanceId != f.SkillInstanceId || arm.Hash != r.Hash || arm.Turn != r.Turn || arm.DrawPhaseId != YangBiaoDrawPhaseId(f.WindowContext) || arm.Source.BindingId != "extra-normal-draw" || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoStartedEvent>().Count(e => e.ArmId == r.ArmId) != 1)
                 return false;
             if (r.Stage == AnniversaryYangBiaoStage.ZhaohanBranch)
                 return !r.Paid && r.Branch == "" && r.Cards.Count == 0 && r.Target == -1;
@@ -69,13 +69,13 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
 
         if (r.Op != SkillProgramEffectOp.ResolveAnniversaryYangBiaoJinjie || f.SkillId != AnniversaryYangBiaoComposition.Jinjie || r.ArmId != 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) || f.WindowContext.TargetSeat != r.Target || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.ParentId)is not ProgramLifecycleTriggerWindowFrame entry || entry.ResumeDyingFrameId != r.DyingId || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.DyingId)is not DyingFrame dying || dying.VictimSeat != r.Target)
             return false;
-        if (r.Draw is { } draw && (draw.RecipientSeat != r.Target || draw.RequestedCount != r.Amount || draw.SequenceBefore < 0 || draw.SequenceAfter < draw.SequenceBefore || draw.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoDrawReturnedEvent>().Count(e => e == new AnniversaryYangBiaoDrawReturnedEvent(f.Id, r.Target, r.Amount, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter)) != 1))
+        if (r.Draw is { } draw && (draw.RecipientSeat != r.Target || draw.RequestedCount != r.Amount || draw.SequenceBefore < 0 || draw.SequenceAfter < draw.SequenceBefore || draw.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoDrawReturnedEvent>().Count(e => e == new AnniversaryYangBiaoDrawReturnedEvent(f.Id, r.Target, r.Amount, draw.ActualDrawIds.Count, draw.SequenceBefore, draw.SequenceAfter)) != 1))
             return false;
         if (r.Stage == AnniversaryYangBiaoStage.Completed)
         {
             if (!f.SelectedTargetSeats.SequenceEqual([r.Target]) || f.ChoiceBindings.Where(b => b.Name == "jinjie-pay").ToArray()is not [var choice] || choice.ChooserSeat != f.OwnerSeat || choice.OptionId is not ("paid" or "decline"))
                 return false;
-            return _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoRescueSelectedEvent>().Count(e => e == new AnniversaryYangBiaoRescueSelectedEvent(f.Id, r.DyingId, r.Target, r.Amount, choice.OptionId == "paid")) == 1 && (choice.OptionId != "paid" || r.Paid);
+            return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoRescueSelectedEvent>().Count(e => e == new AnniversaryYangBiaoRescueSelectedEvent(f.Id, r.DyingId, r.Target, r.Amount, choice.OptionId == "paid")) == 1 && (choice.OptionId != "paid" || r.Paid);
         }
 
         if (f.SelectedTargetSeats.Count != 0 || r.Stage is not (AnniversaryYangBiaoStage.Amount or AnniversaryYangBiaoStage.Drawing or AnniversaryYangBiaoStage.DrawChildren or AnniversaryYangBiaoStage.RescuePay or AnniversaryYangBiaoStage.Materials or AnniversaryYangBiaoStage.CostChildren))
@@ -98,16 +98,16 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
             return false;
         if (r.Stage == AnniversaryYangBiaoStage.FreezeBudget)
             return r.Budget == 0 && r.UseId == 0 && r.RandomKind is null;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoBudgetEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var budget] || budget != new AnniversaryYangBiaoBudgetEvent(f.Id, r.Target, r.DiscardCount, r.Maximum, r.Budget) || r.DiscardCount < 0 || r.Maximum < 0 || r.Budget != Math.Min(r.DiscardCount, r.Maximum))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoBudgetEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var budget] || budget != new AnniversaryYangBiaoBudgetEvent(f.Id, r.Target, r.DiscardCount, r.Maximum, r.Budget) || r.DiscardCount < 0 || r.Maximum < 0 || r.Budget != Math.Min(r.DiscardCount, r.Maximum))
             return false;
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoNativeIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        var returned = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoNativeReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoNativeIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var returned = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoNativeReturnedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         for (var i = 0; i < r.Cursor; i++)
-            if (issued.Where(e => e.Ordinal == i).ToArray()is not [var prior] || prior.Target != r.Target || returned.Count(e => e.Ordinal == i && e.UseId == prior.UseId) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == prior.UseId && e.CardId == 0 && e.CardKind == prior.Kind) != 1)
+            if (issued.Where(e => e.Ordinal == i).ToArray()is not [var prior] || prior.Target != r.Target || returned.Count(e => e.Ordinal == i && e.UseId == prior.UseId) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == prior.UseId && e.CardId == 0 && e.CardKind == prior.Kind) != 1)
                 return false;
         if (r.Stage is AnniversaryYangBiaoStage.NextUse or AnniversaryYangBiaoStage.Completed)
             return r.Plan is null && r.UseId == 0 && r.ActionId == 0 && r.RandomKind is null && issued.Length == r.Cursor && returned.Length == r.Cursor;
-        if (r.RandomKind is not (CardKind.Slash or CardKind.Dismantlement or CardKind.FiveGrains) || r.RandomKinds.Count == 0 || r.RandomKinds.Distinct().Count() != r.RandomKinds.Count || r.RandomKinds.Any(k => k is not (CardKind.Slash or CardKind.Dismantlement or CardKind.FiveGrains)) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYangBiaoRandomCardEvent>().Count(e => e.FrameId == f.Id && e.Ordinal == r.Cursor && e.Kind == r.RandomKind) != 1)
+        if (r.RandomKind is not (CardKind.Slash or CardKind.Dismantlement or CardKind.FiveGrains) || r.RandomKinds.Count == 0 || r.RandomKinds.Distinct().Count() != r.RandomKinds.Count || r.RandomKinds.Any(k => k is not (CardKind.Slash or CardKind.Dismantlement or CardKind.FiveGrains)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYangBiaoRandomCardEvent>().Count(e => e.FrameId == f.Id && e.Ordinal == r.Cursor && e.Kind == r.RandomKind) != 1)
             return false;
         var random = new DeterministicRandom(unchecked((int)r.RandomBefore));
         if (r.RandomKinds[random.Next(r.RandomKinds.Count)] != r.RandomKind || random.State != r.RandomAfter)
@@ -120,7 +120,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
             return r.UseId == 0 && r.ActionId == 0 && issued.Length == r.Cursor;
         if (r.Stage is not (AnniversaryYangBiaoStage.NativeUse or AnniversaryYangBiaoStage.ReturnedUse) || r.UseId <= f.Id || r.ActionId <= 0 || issued.Count(e => e == new AnniversaryYangBiaoNativeIssuedEvent(f.Id, r.Cursor, r.UseId, r.ActionId, p.Kind, r.Target)) != 1 || issued.Length != r.Cursor + 1)
             return false;
-        return r.Stage == AnniversaryYangBiaoStage.NativeUse ? returned.Length == r.Cursor : r.HadAttack == (p.Kind == CardKind.Slash) && returned.Length == r.Cursor + 1 && returned.Count(e => e == new AnniversaryYangBiaoNativeReturnedEvent(f.Id, r.Cursor, r.UseId, r.HadAttack)) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == p.Kind) == 1;
+        return r.Stage == AnniversaryYangBiaoStage.NativeUse ? returned.Length == r.Cursor : r.HadAttack == (p.Kind == CardKind.Slash) && returned.Length == r.Cursor + 1 && returned.Count(e => e == new AnniversaryYangBiaoNativeReturnedEvent(f.Id, r.Cursor, r.UseId, r.HadAttack)) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == p.Kind) == 1;
     }
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43700)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 43700)]

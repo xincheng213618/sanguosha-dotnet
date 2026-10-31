@@ -109,9 +109,9 @@ internal sealed partial class CharacterChengGongYingOlRuntime
         var gains = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(payer) && m.Reason.Value == KuangxiangDrawReason).ToArray();
         foreach (var move in gains)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KuangxiangCardObtainedEvent(f.Id, r.Source, payer, move.CardId, move.Sequence, _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[payer], _coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId))));
-        var reds = _coreProgramEventHistoryOperations.ProgramEventHistory<KuangxiangCardObtainedEvent>().Count(e => e.FrameId == f.Id && CoreNativeCardClassificationsRuntime.IsRedSuit(e.EffectiveSuit));
+        var reds = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KuangxiangCardObtainedEvent>().Count(e => e.FrameId == f.Id && CoreNativeCardClassificationsRuntime.IsRedSuit(e.EffectiveSuit));
         if (reds > 0)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KuangxiangRedDrawIssuedEvent(f.Id, payer, reds, _coreProgramEventHistoryOperations.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Select(e => e.Phase.Token).DefaultIfEmpty().Max()));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KuangxiangRedDrawIssuedEvent(f.Id, payer, reds, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Select(e => e.Phase.Token).DefaultIfEmpty().Max()));
         ContinueChengGongYing(f.Id);
     }
 
@@ -157,7 +157,7 @@ internal sealed partial class CharacterChengGongYingOlRuntime
 
     internal void FinishChengGongYing(ProgramSkillFrame f)
     {
-        var applied = _coreProgramEventHistoryOperations.ProgramEventHistory<KuangxiangAdjustmentIssuedEvent>().Any(e => e.FrameId == f.Id);
+        var applied = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KuangxiangAdjustmentIssuedEvent>().Any(e => e.FrameId == f.Id);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChengGongYingCompletedEvent(f.Id, applied));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ChengGongYing = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, applied);

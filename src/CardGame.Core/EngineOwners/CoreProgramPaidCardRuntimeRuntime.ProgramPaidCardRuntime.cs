@@ -26,7 +26,7 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     CardLocation IProgramPaidCardFacts.Location(int cardId) => _cardZonesOperations._cardZones.GetLocation(cardId);
     int IProgramPaidCardFacts.ProviderSeat(ProgramSkillFrame frame) => _characterGuanYuRuntimeOperations.GuanParentAction(frame).ProviderSeat;
     SkillProgramEffect IProgramPaidCardFacts.OwnedSelectionEffect(ProgramSkillFrame frame) => _coreProgramOwnedCardsOperations.GetOwnedSelectionEffect(frame);
-    bool IProgramPaidCardFacts.IsSatisfiedOwnHandReward(ProgramSkillFrame frame, SkillProgramEffect effect) => _characterLeiBoAnniversaryOperations.IsAnniversaryLeiBoSelfLoot(frame, effect);
+    bool IProgramPaidCardFacts.IsSatisfiedOwnHandReward(ProgramSkillFrame frame, SkillProgramEffect effect) => _characterLeiBoAnniversaryOperations.Value.IsAnniversaryLeiBoSelfLoot(frame, effect);
     bool IProgramPaidCardFacts.ForeignDiscardPrevented(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) => _coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, card, source, intent);
     bool IProgramPaidCardFacts.SelfDiscardForbidden(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) => _coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(chooser, card, source, intent);
     bool IProgramPaidCardFacts.AllowsOwnedCardPayment(ProgramSkillFrame frame, CardLocation source, Card card) => _characterDaQiaoMobileOperations.AllowsPostCostSlashRedirectPayment(frame, source, card);
@@ -42,7 +42,7 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     IReadOnlyList<int> IProgramPaidCardFacts.TargetSeats(int owner, SkillProgramTargetKind kind, ProgramSkillWindowContext? context) => _coreProgramLifecycleOperations.GetProgramTargetSeats(owner, kind, context);
     bool IProgramPaidCardFacts.CanSelectPindianOpponent(ProgramSkillFrame frame, int seat) => _coreEquipmentSlotGroupProgramsOperations.CanSelectProgramPindianOpponent(frame, seat);
     Card[] IProgramPaidCardFacts.ClaimableDamageCards(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.GetClaimableProgramDamageCards(frame);
-    bool IProgramPaidCardFacts.FrozenSuitMatchesChoice(ProgramSkillFrame frame, string cardBind, string choiceBind) => _coreProgramRandomTransfersOperations.DoesProgramFrozenSuitMatchChoice(frame, cardBind, choiceBind);
+    bool IProgramPaidCardFacts.FrozenSuitMatchesChoice(ProgramSkillFrame frame, string cardBind, string choiceBind) => _coreProgramRandomTransfersOperations.Value.DoesProgramFrozenSuitMatchChoice(frame, cardBind, choiceBind);
     bool IProgramPaidCardFacts.BoundCardsMatchCategories(ProgramSkillFrame frame, string bind, IReadOnlyList<SkillProgramCardCategory> categories) => _coreProgramCategoryChallengesOperations.DoProgramBoundCardsMatchCategories(frame, bind, categories);
     void IProgramPaidCardOperations.Cancel(ProgramSkillFrame frame, string reason) => _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, reason);
     void IProgramPaidCardOperations.SetCardSet(long frameId, string bind, IReadOnlyList<int> ids, SkillProgramCardSetVisibility visibility, IReadOnlyList<CardLocation>? locations, Suit? frozenSuit) => _coreProgramLifecycleOperations.SetProgramCardSet(frameId, bind, ids, visibility, locations, frozenSuit);

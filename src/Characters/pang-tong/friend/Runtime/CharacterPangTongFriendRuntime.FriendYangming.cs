@@ -24,7 +24,7 @@ internal sealed partial class CharacterPangTongFriendRuntime
         if (card.Id <= 0 || card.Kind != kind || frame.OwnerSeat != owner.Seat || !_coreDeckProgramsOperations.DeckProgramSourceValid(frame) || frame.FriendPangTong is not { Operation: SkillProgramEffectOp.UseFriendDeckSuitsAtPlayEnd, Stage: FriendPangTongStage.Use, UseId: null } receipt || receipt.InstructionIndex != frame.InstructionIndex || !receipt.Cards.Contains(card.Id) || receipt.UsedSuits.Contains(card.Suit) || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program is not { } program || program.GameplayHash != frame.GameplayHash || _cardZonesOperations._cardZones.GetLocation(card.Id) != FriendYangmingLocation(frame))
             return false;
         var effect = ProgramInstructionResolver.Default.Resolve(frame, program).GetPausedInstruction(frame.InstructionIndex).Effect;
-        return effect.Op == SkillProgramEffectOp.UseFriendDeckSuitsAtPlayEnd && _coreProgramEventHistoryOperations.ProgramEventHistory<FriendYangmingStoredEvent>().Count(e => e.ProgramFrameId == frame.Id && e.OwnerSeat == owner.Seat && e.Count == receipt.Cards.Count) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == card.Id && move.CardKind == card.Kind && move.From == CardLocation.DrawPile && move.To == FriendYangmingLocation(frame) && move.Reason.Value == "friend.yangming.place") == 1;
+        return effect.Op == SkillProgramEffectOp.UseFriendDeckSuitsAtPlayEnd && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FriendYangmingStoredEvent>().Count(e => e.ProgramFrameId == frame.Id && e.OwnerSeat == owner.Seat && e.Count == receipt.Cards.Count) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == card.Id && move.CardKind == card.Kind && move.From == CardLocation.DrawPile && move.To == FriendYangmingLocation(frame) && move.Reason.Value == "friend.yangming.place") == 1;
     }
 
     internal bool IsFriendYangmingOriginalUseChoice(CharacterState owner, Card card, CardKind kind) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame frame && IsFriendYangmingOriginalUseFrame(frame, owner, card, kind);
@@ -117,7 +117,7 @@ internal sealed partial class CharacterPangTongFriendRuntime
         {
             var target = _coreMatchParticipantsPlayersAccess._players[action.TargetSeats[0]];
             var damage = 1 + actor.AlcoholDamageBonus;
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
             actor.HasAlcoholEffect = false;
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, target.Seat, card, damageAmount: damage, playedCardKind: kind, physicalCards: [card], programSkillCardUseFrameId: frame.Id, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, kind));
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;

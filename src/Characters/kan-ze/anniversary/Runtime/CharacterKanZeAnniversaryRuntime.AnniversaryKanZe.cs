@@ -5,11 +5,11 @@ internal sealed partial class CharacterKanZeAnniversaryRuntime
 {
     internal bool HasAnniversaryKuanshi => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmAnniversaryKanZeKuanshi);
 
-    internal IEnumerable<AnniversaryKuanshiGrant> ActiveAnniversaryKuanshiGrants() => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiArmedEvent>().Select(e => e.Grant).Where(g => !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiExpiredEvent>().Any(e => e.GrantId == g.FrameId));
+    internal IEnumerable<AnniversaryKuanshiGrant> ActiveAnniversaryKuanshiGrants() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryKuanshiArmedEvent>().Select(e => e.Grant).Where(g => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryKuanshiExpiredEvent>().Any(e => e.GrantId == g.FrameId));
     internal void ArmAnniversaryKuanshi(ProgramSkillFrame supplied, int target)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != AnniversaryKanZeComposition.Kuanshi || f.TriggerId != AnniversaryKanZeComposition.Arm || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, SourceSeat: { } actor } w || actor != f.OwnerSeat || actor != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || f.SelectedTargetSeats is not [var selected] || selected != target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is not { } parent || parent.OwnerSeat != actor || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiArmedEvent>().Any(e => e.Grant.FrameId == f.Id))
+        if (f.SkillId != AnniversaryKanZeComposition.Kuanshi || f.TriggerId != AnniversaryKanZeComposition.Arm || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding, SourceSeat: { } actor } w || actor != f.OwnerSeat || actor != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || f.SelectedTargetSeats is not [var selected] || selected != target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is not { } parent || parent.OwnerSeat != actor || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate is not { } candidate || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryKuanshiArmedEvent>().Any(e => e.Grant.FrameId == f.Id))
             throw new InvalidOperationException("Anniversary Kuanshi lost its unpaid native own ending and actual living recipient.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryKuanshiArmedEvent(new(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, target)));
     }
@@ -28,7 +28,7 @@ internal sealed partial class CharacterKanZeAnniversaryRuntime
     {
         if (!HasAnniversaryKuanshi || fact.Amount <= 0)
             return;
-        var grants = ActiveAnniversaryKuanshiGrants().Where(g => g.TargetSeat == fact.TargetSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiDamageIssuedEvent>().Any(e => e.GrantId == g.FrameId && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber)).OrderBy(g => g.FrameId).ToArray();
+        var grants = ActiveAnniversaryKuanshiGrants().Where(g => g.TargetSeat == fact.TargetSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryKuanshiDamageIssuedEvent>().Any(e => e.GrantId == g.FrameId && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber)).OrderBy(g => g.FrameId).ToArray();
         if (grants.Length == 0)
             return;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
@@ -63,9 +63,9 @@ internal sealed partial class CharacterKanZeAnniversaryRuntime
         if (damage is null || !_coreMatchParticipantsPlayersAccess._players[damage.TargetSeat].IsAlive)
             return;
         var trigger = _contentRegistryOperations._contentRegistry.GetSkill(AnniversaryKanZeComposition.Kuanshi).Program!.Triggers.Single(t => t.Id == AnniversaryKanZeComposition.Reward);
-        foreach (var issued in _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiDamageIssuedEvent>().Where(e => e.DamageFrameId == damage.Id && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber))
+        foreach (var issued in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryKuanshiDamageIssuedEvent>().Where(e => e.DamageFrameId == damage.Id && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber))
         {
-            var grant = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiArmedEvent>().Single(e => e.Grant.FrameId == issued.GrantId).Grant;
+            var grant = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryKuanshiArmedEvent>().Single(e => e.Grant.FrameId == issued.GrantId).Grant;
             result.Add(new(grant.Source.OwnerSeat, $"anniversary-kuanshi:{(grant.FrameId)}:{(damage.Id)}", trigger.Priority, false, grant.Source.SkillId, trigger.Id, grant.Source.SkillInstanceId!, grant.GameplayHash, issued.Occurrence));
         }
     }
@@ -74,10 +74,10 @@ internal sealed partial class CharacterKanZeAnniversaryRuntime
     {
         if (c.SkillId != AnniversaryKanZeComposition.Kuanshi || c.BindingId != AnniversaryKanZeComposition.Reward || _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash != c.GameplayHash || w.Window != SkillProgramTriggerWindow.AfterDamageApplied || w.OwnerSeat != c.OwnerSeat || w.OccurrenceIndex != c.OccurrenceIndex || w.TargetSeat is not { } target || w.DamageFrameId is not { } damageId || w.Amount is not > 0 || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is not { } parent || parent.ParentFrameId != damageId || parent.TargetSeat != target || parent.TriggerWindow != w.Window || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex].ToProgramCandidate() != c || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damageId)is not { } damage || damage.TargetSeat != target || damage.Amount != w.Amount)
             return null;
-        var issues = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiDamageIssuedEvent>().Where(e => e.DamageFrameId == damageId && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TargetSeat == target && e.Occurrence == c.OccurrenceIndex && e.PreviousDamage < 2 && e.CurrentDamage >= 2 && e.CurrentDamage - e.PreviousDamage == damage.Amount).ToArray();
+        var issues = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryKuanshiDamageIssuedEvent>().Where(e => e.DamageFrameId == damageId && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TargetSeat == target && e.Occurrence == c.OccurrenceIndex && e.PreviousDamage < 2 && e.CurrentDamage >= 2 && e.CurrentDamage - e.PreviousDamage == damage.Amount).ToArray();
         foreach (var issued in issues)
         {
-            var grant = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiArmedEvent>().SingleOrDefault(e => e.Grant.FrameId == issued.GrantId)?.Grant;
+            var grant = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryKuanshiArmedEvent>().SingleOrDefault(e => e.Grant.FrameId == issued.GrantId)?.Grant;
             if (grant is not null && grant.Source.SkillId == c.SkillId && grant.Source.OwnerSeat == c.OwnerSeat && grant.Source.SkillInstanceId == c.SkillInstanceId && grant.GameplayHash == c.GameplayHash && grant.TargetSeat == target && grant.ActualTurn <= issued.ActualTurn)
                 return new(grant, issued, parent.Id, 0);
         }
@@ -86,11 +86,11 @@ internal sealed partial class CharacterKanZeAnniversaryRuntime
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 42900)]
-    internal bool IsIssuedAnniversaryKanZeKuanshiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => AnniversaryKuanshiWitness(c, w)is { } r && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiRecoveryBoundEvent>().Any(e => e.GrantId == r.Grant.FrameId && e.DamageFrameId == r.Damage.DamageFrameId);
+    internal bool IsIssuedAnniversaryKanZeKuanshiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => AnniversaryKuanshiWitness(c, w)is { } r && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryKuanshiRecoveryBoundEvent>().Any(e => e.GrantId == r.Grant.FrameId && e.DamageFrameId == r.Damage.DamageFrameId);
     internal void BindAnniversaryKuanshiDamage(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.WindowContext is not { } w || f.InstructionIndex != 1 || f.AnniversaryKuanshi is not null || AnniversaryKuanshiWitness(AnniversaryKanZeCandidate(f), w)is not { } receipt || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryKuanshiRecoveryBoundEvent>().Any(e => e.GrantId == receipt.Grant.FrameId && e.DamageFrameId == receipt.Damage.DamageFrameId))
+        if (f.WindowContext is not { } w || f.InstructionIndex != 1 || f.AnniversaryKuanshi is not null || AnniversaryKuanshiWitness(AnniversaryKanZeCandidate(f), w)is not { } receipt || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryKuanshiRecoveryBoundEvent>().Any(e => e.GrantId == receipt.Grant.FrameId && e.DamageFrameId == receipt.Damage.DamageFrameId))
             throw new InvalidOperationException("Anniversary Kuanshi lost its exact issued second actual damage point.");
         receipt = receipt with
         {

@@ -12,7 +12,7 @@ internal sealed partial class CoreForeignTurnContestRuntimePortsRuntime
     bool IForeignTurnContestContinuations.BeginHpChanged(long frameId) => _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frameId, PostEventContinuation.AwaitedProgramMovement);
     void IForeignTurnContestContinuations.GrantSelfOnly(ProgramSkillFrame frame, int subjectSeat) => _coreCardUseModulesOperations.GrantProgramTurnCardTargetRestriction(frame, SkillProgramCardTargetRestriction.SelfOnly, subjectSeat);
     void IForeignTurnContestContinuations.Finish(ProgramSkillFrame frame, bool completed) => _coreSkillProgramsOperations.FinishProgramSkill(frame, completed);
-    bool IForeignTurnContestSlashProducer.CanIssue(int actorSeat, int targetSeat) => _coreForeignTurnContestsOperations.CanUseForeignTurnContestSlash(actorSeat, targetSeat);
-    ForeignTurnContestSlashIssue IForeignTurnContestSlashProducer.Capture(long programFrameId, int instructionIndex, CardConversionSource source, ForeignTurnPindianOrigin origin) => _coreForeignTurnContestsOperations.CaptureForeignTurnContestSlash(programFrameId, instructionIndex, source, origin);
-    void IForeignTurnContestSlashProducer.Commit(ForeignTurnContestSlashIssue issue) => _coreForeignTurnContestsOperations.CommitForeignTurnContestSlash(issue);
+    bool IForeignTurnContestSlashProducer.CanIssue(int actorSeat, int targetSeat) => _coreForeignTurnContestsOperations.Value.CanUseForeignTurnContestSlash(actorSeat, targetSeat);
+    ForeignTurnContestSlashIssue IForeignTurnContestSlashProducer.Capture(long programFrameId, int instructionIndex, CardConversionSource source, ForeignTurnPindianOrigin origin) => _coreForeignTurnContestsOperations.Value.CaptureForeignTurnContestSlash(programFrameId, instructionIndex, source, origin);
+    void IForeignTurnContestSlashProducer.Commit(ForeignTurnContestSlashIssue issue) => _coreForeignTurnContestsOperations.Value.CommitForeignTurnContestSlash(issue);
 }

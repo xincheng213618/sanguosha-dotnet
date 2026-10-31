@@ -3,9 +3,9 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYongAnniversaryRuntime
 {
-    internal int AnniversaryLiuYongLimit(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuYongLimitExpandedEvent>().Any(e => e.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) ? 2 : 1;
+    internal int AnniversaryLiuYongLimit(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuYongLimitExpandedEvent>().Any(e => e.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) ? 2 : 1;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 43400, SkillProgramEffectOp.ResolveAnniversaryLiuYongZhuning)]
-    internal bool CanActivateAnniversaryLiuYong(CharacterState owner) => owner.IsAlive && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuYongStartedEvent>().Count(e => e.Source.OwnerSeat == owner.Seat && e.Mode == "gift" && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) < AnniversaryLiuYongLimit(owner.Seat);
+    internal bool CanActivateAnniversaryLiuYong(CharacterState owner) => owner.IsAlive && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuYongStartedEvent>().Count(e => e.Source.OwnerSeat == owner.Seat && e.Mode == "gift" && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) < AnniversaryLiuYongLimit(owner.Seat);
     SkillProgramStepOutcome IAnniversaryLiuYongHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryLiuYong(f, op);
     internal SkillProgramStepOutcome BeginAnniversaryLiuYong(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
@@ -188,7 +188,7 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
         var r = f.AnniversaryLiuYong!;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || r.Stage != AnniversaryLiuYongStage.NativeReturned)
             throw new InvalidOperationException("Zhuning cannot resume before its whole native use returns.");
-        if (!r.CausedDamage && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuYongLimitExpandedEvent>().Any(e => e.FrameId == f.Id))
+        if (!r.CausedDamage && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuYongLimitExpandedEvent>().Any(e => e.FrameId == f.Id))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuYongLimitExpandedEvent(f.Id, f.OwnerSeat, r.Turn, r.PhaseInstance));
         ContinueAnniversaryLiuYong(f.Id);
     }

@@ -21,7 +21,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
             _ => throw new InvalidOperationException($"Mode '{(_coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._modeDefinition.Id)}' does not define a supported team '{(teamId)}'.")};
     }
 
-    internal int GetStartingSeat() => _modeRulesOperations._modeRules.Opening.GetStartingSeat(_coreModeRulesOperations.CaptureModeLife(), _randomOperations._random.Next, _coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess._modeInitialActorSeat);
+    internal int GetStartingSeat() => _modeRulesOperations._modeRules.Opening.GetStartingSeat(_coreModeRulesOperations.Value.CaptureModeLife(), _randomOperations._random.Next, _coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess._modeInitialActorSeat);
     internal static IReadOnlyList<GeneralDefinition> CreateRuntimeGeneralPool(ContentRegistry contentRegistry, ContentModeDefinition mode) => MatchContentFactory.CreateGeneralPool(contentRegistry, mode);
     internal static ContentDeckRecipe ResolveDeckDefinition(ContentRegistry contentRegistry, string? deckId) => MatchContentFactory.ResolveDeck(contentRegistry, deckId);
     internal void SetupPlayers() => _coreModeSetupOperations.ApplyModeSetupPlan(_coreModeSetupOperations.ModeSetup.BuildPlayers());
@@ -34,7 +34,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
         _corePhysicalCardPopulationInitialCardCountAccess._initialCardCount = _cardZonesOperations._cardZones.TotalCards;
         if (!_coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._options.UseInteractiveSetup)
         {
-            if (_coreNativeDamageHandlesOperations.UsesFormalWoodenOx && cards.Count(card => card.Kind == CardKind.WoodenOx) == 1)
+            if (_coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && cards.Count(card => card.Kind == CardKind.WoodenOx) == 1)
             {
                 _cardZonesOperations._cardZones.ShuffleKeepingSingleKindAtBottom(CardLocation.DrawPile, _randomOperations._random, CardKind.WoodenOx);
             }
@@ -47,7 +47,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
 
     internal void DealInitialHands()
     {
-        _coreModeSetupEquipmentOperations.PrepareModeSelectedEquipmentAndDeck();
+        _coreModeSetupEquipmentOperations.Value.PrepareModeSelectedEquipmentAndDeck();
         _modeRuntimeOperations._modeRuntime.BeforeInitialDeal();
         var counts = _coreMatchParticipantsPlayersAccess._players.ToDictionary(player => player.Seat, _coreInitialHandModifiersOperations.GetInitialHandSize);
         var rounds = counts.Values.DefaultIfEmpty(0).Max();
@@ -161,8 +161,8 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
     internal void RequestHumanGeneralSelection(CharacterState player, IReadOnlyList<GeneralDefinition> candidates, IReadOnlyDictionary<string, string> candidateIds, bool fullRoster = false)
     {
         var facts = new ModeGeneralSelectionFacts(player.Role, player.GeneralSelected, player.General.Name, player.General.BaseHp);
-        var choices = candidates.Select(general => _coreModeRulesOperations.ModeSetupPresentation.GeneralChoice(facts, new(general.Id, general.Name, general.SkillSummary, general.FactionId, CoreMatchPresentationRuntime.GetFactionName(general.FactionId ?? string.Empty), general.BaseHp, general.InitialHp, candidateIds[general.Id]), fullRoster)).ToArray();
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.SelectGeneral, player.Seat, _coreModeRulesOperations.ModeSetupPresentation.SelectionPrompt(facts), [], [])
+        var choices = candidates.Select(general => _coreModeRulesOperations.Value.ModeSetupPresentation.GeneralChoice(facts, new(general.Id, general.Name, general.SkillSummary, general.FactionId, CoreMatchPresentationRuntime.GetFactionName(general.FactionId ?? string.Empty), general.BaseHp, general.InitialHp, candidateIds[general.Id]), fullRoster)).ToArray();
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.SelectGeneral, player.Seat, _coreModeRulesOperations.Value.ModeSetupPresentation.SelectionPrompt(facts), [], [])
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             Choices = choices,
@@ -183,7 +183,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
         var retiredCandidates = _coreModeSetupOperations.ModeSetup.RemoveGeneralIdsAfterSelection(general.Id);
         if (retiredCandidates.Count != 0)
             _coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess._availableGenerals.RemoveAll(candidate => retiredCandidates.Contains(candidate.Id, StringComparer.Ordinal));
-        if (_coreNativeDamageHandlesOperations.IsNationalWarMode)
+        if (_coreNativeDamageHandlesOperations.Value.IsNationalWarMode)
         {
             if (string.IsNullOrWhiteSpace(general.FactionId) || !string.Equals(general.FactionId, player.NationalFactionId, StringComparison.Ordinal))
             {
@@ -221,7 +221,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
             player.General = general;
             player.GeneralSelected = true;
             _coreModeSetupOperations.ApplyModeSelectedGeneral(player, general);
-            player.GeneralRevealed = !_coreNativeDamageHandlesOperations.IsTeamMode && player.Role == Role.Lord && !_coreIdentityConcealmentOperations.GeneralHasIdentityConcealment(general);
+            player.GeneralRevealed = !_coreNativeDamageHandlesOperations.Value.IsTeamMode && player.Role == Role.Lord && !_coreIdentityConcealmentOperations.GeneralHasIdentityConcealment(general);
             _coreMatchLogOperations.AddLog("GeneralSelected", player.GeneralRevealed ? $"主公 {(player.Name)} 选择了 {(general.Name)}。" : $"座位 {(player.Seat + 1)} 完成私有选将。", player.Seat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GeneralSelectedEvent(player.Seat, _coreIdentityConcealmentOperations.GeneralHasIdentityConcealment(general) ? "concealment:ol" : general.Id));
         }
@@ -237,7 +237,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
             return;
         }
 
-        if (_coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess._selectionIndex != _coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess._selectionOrder.Count || _coreMatchParticipantsPlayersAccess._players.Any(player => !player.GeneralSelected || _coreNativeDamageHandlesOperations.IsDualGeneralMode && !player.SecondaryGeneralSelected || _coreMatchSetupDefinitionsOperations.RequiresGodFactionSelection(player)))
+        if (_coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess._selectionIndex != _coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess._selectionOrder.Count || _coreMatchParticipantsPlayersAccess._players.Any(player => !player.GeneralSelected || _coreNativeDamageHandlesOperations.Value.IsDualGeneralMode && !player.SecondaryGeneralSelected || _coreMatchSetupDefinitionsOperations.RequiresGodFactionSelection(player)))
         {
             throw new InvalidOperationException("Setup cannot complete before every seat selects a general.");
         }
@@ -247,7 +247,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
         DealInitialHands();
         if (_coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._options.ConfirmOpeningHand && _coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._options.HumanSeat >= 0)
         {
-            _coreOpeningCustomizationOperations.RequestOpeningHandConfirmation();
+            _coreOpeningCustomizationOperations.Value.RequestOpeningHandConfirmation();
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
             return;
         }
@@ -259,7 +259,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
     {
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
             _characterDaQiaoXiaoQiaoHappyGodOperations.BindHappyQiaoHealth(player);
-        foreach (var player in _coreMatchParticipantsPlayersAccess._players.Where(player => !_coreNativeDamageHandlesOperations.IsNationalWarMode))
+        foreach (var player in _coreMatchParticipantsPlayersAccess._players.Where(player => !_coreNativeDamageHandlesOperations.Value.IsNationalWarMode))
         {
             player.GeneralRevealed = true;
             player.SecondaryGeneralRevealed = player.SecondaryGeneralSelected;
@@ -269,7 +269,7 @@ internal sealed partial class CoreMatchParticipantSetupRuntime
         _coreConversionStatesOperations.InitializeStructuredConversionSkills();
         _coreMatchSetupAvailableGeneralsModeInitialActorSeatSelectionIndexSelectionOrderSetupCompleteAccess._setupComplete = true;
         _coreMatchOutcomeStatusAccess._status = EngineStatus.Running;
-        _coreMatchLogOperations.AddLog("SetupCompleted", _coreModeRulesOperations.ModeSetupPresentation.SetupCompletedText(new(_coreMatchParticipantsPlayersAccess._players.OrderBy(player => player.Seat).Select(_coreMatchPresentationOperations.GetPublicGeneralName))), _coreActualTurnProgressCurrentSeatAccess._currentSeat);
+        _coreMatchLogOperations.AddLog("SetupCompleted", _coreModeRulesOperations.Value.ModeSetupPresentation.SetupCompletedText(new(_coreMatchParticipantsPlayersAccess._players.OrderBy(player => player.Seat).Select(_coreMatchPresentationOperations.GetPublicGeneralName))), _coreActualTurnProgressCurrentSeatAccess._currentSeat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GameStartedEvent(_coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._playerCount, _coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._modeDefinition.Id));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SetupCompletedEvent(_coreMatchParticipantsPlayersAccess._players.Count, _coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._modeDefinition.Id));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();

@@ -3,8 +3,8 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterRuanJiAnniversaryRuntime
 {
-    internal RuanJiShownEntityAuthorizedEvent? RuanJiAuthorization(int owner, string instance, int cardId, bool red) => _coreProgramEventHistoryOperations.ProgramEventHistory<RuanJiShownEntityAuthorizedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner && e.Source.SkillId == AnniversaryRuanJiComposition.Zhaowen && e.Source.SkillInstanceId == instance && e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.CardId == cardId && e.IsRed == red && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash);
-    internal bool RuanJiNameAvailable(int owner, CardKind kind) => !_coreProgramEventHistoryOperations.ProgramEventHistory<RuanJiNameUsedEvent>().Any(e => e.Source.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.Name == kind);
+    internal RuanJiShownEntityAuthorizedEvent? RuanJiAuthorization(int owner, string instance, int cardId, bool red) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<RuanJiShownEntityAuthorizedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner && e.Source.SkillId == AnniversaryRuanJiComposition.Zhaowen && e.Source.SkillInstanceId == instance && e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.CardId == cardId && e.IsRed == red && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash);
+    internal bool RuanJiNameAvailable(int owner, CardKind kind) => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<RuanJiNameUsedEvent>().Any(e => e.Source.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.Name == kind);
     internal bool RuanJiConversionAvailable(CharacterState owner, Card card, CardConversionSource source, CardKind kind) => source.OwnerSeat == owner.Seat && owner.IsAlive && card.Id > 0 && _cardZonesOperations._cardZones.Contains(CardLocation.Hand(owner.Seat), card.Id) && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, source.SkillId, source.SkillInstanceId) && RuanJiAuthorization(owner.Seat, source.SkillInstanceId!, card.Id, false)is not null && RuanJiNameAvailable(owner.Seat, kind);
     [ProgramCardLegality(ProgramCardLegalityStage.ConfiguredConversionBan, 42800)]
     internal bool BanUnavailableRuanJiConversion(ProgramConfiguredViewAsQuery q) => q.Instance.SkillId == AnniversaryRuanJiComposition.Zhaowen && !RuanJiConversionAvailable(q.Owner, q.Card, new(q.Instance.SkillId, q.Rule.Id, q.Owner.Seat, q.Instance.SkillInstanceId), q.Rule.OutputKind);
@@ -23,7 +23,7 @@ internal sealed partial class CharacterRuanJiAnniversaryRuntime
     {
         if (payload is not CardActionAcceptedEvent { Action: { } a } || a.ConversionChain.SingleOrDefault(s => s.SkillId == AnniversaryRuanJiComposition.Zhaowen)is not { } source)
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<RuanJiNameUsedEvent>().Any(e => e.ActionId == a.ActionId && e.Source == source))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<RuanJiNameUsedEvent>().Any(e => e.ActionId == a.ActionId && e.Source == source))
             return;
         if (!IsRuanJiActualUse(a) || a.ActorSeat != a.ProviderSeat || a.RequesterSeat is not null || source.OwnerSeat != a.ActorSeat || a.PhysicalCards is not [var material] || material.From != CardLocation.Hand(a.ActorSeat) || RuanJiAuthorization(a.ActorSeat, source.SkillInstanceId!, material.CardId, false)is null || !RuanJiNameAvailable(a.ActorSeat, a.EffectiveKind) || _corePlayCardHistoryOperations.ViewAsRule(source)?.OutputKind != a.EffectiveKind)
             throw new InvalidOperationException("Zhaowen's accepted use lost its genuine shown physical material or per-name actual-turn quota.");

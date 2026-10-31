@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class AnniversaryFengXiHost(Func<RuntimeEntries.CharacterFengXiAnniversaryEntries> getCharacterFengXiAnniversaryRuntime) : IAnniversaryFengXiHost
+internal sealed class AnniversaryFengXiHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterFengXiAnniversaryRuntime>> getCharacterFengXiAnniversaryRuntime) : IAnniversaryFengXiHost
 {
-    public SkillProgramStepOutcome Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterFengXiAnniversaryRuntime().BeginFengXi(f, op);
+    public SkillProgramStepOutcome Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterFengXiAnniversaryRuntime().Value.BeginFengXi(f, op);
 }

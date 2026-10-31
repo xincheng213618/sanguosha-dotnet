@@ -9,7 +9,7 @@ internal sealed partial class CoreProgramArmorOperationsRuntime
         var program = _contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Program!;
         var effect = ProgramInstructionResolver.Default.Resolve(active, program).GetPausedInstruction(active.InstructionIndex).Effect;
         var index = active.InstructionIndex - 1;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ArmorGrantedEvent>().Any(grant => grant.ProgramFrameId == active.Id && grant.InstructionIndex == index))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ArmorGrantedEvent>().Any(grant => grant.ProgramFrameId == active.Id && grant.InstructionIndex == index))
             throw new InvalidOperationException("An armor grant instruction cannot be paid twice.");
         IReadOnlyList<int> targets = effect.Target switch
         {

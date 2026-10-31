@@ -128,7 +128,7 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentsRuntime
         var after = cancel ? w.Amount : Math.Max(0, checked(w.Amount + r.Delta));
         if (!cancel)
         {
-            _coreRecipientScopedDamageOperations.AdjustExactRecipientDamage(f, r, after);
+            _coreRecipientScopedDamageOperations.Value.AdjustExactRecipientDamage(f, r, after);
             _coreRuntimeOperations.ReplaceRuntimeFrame(w.Id, w with { Amount = after, Prevented = after == 0 });
         }
 

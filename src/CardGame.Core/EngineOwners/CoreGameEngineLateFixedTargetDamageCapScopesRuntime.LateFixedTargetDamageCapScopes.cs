@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineLateFixedTargetDamageCapScopesRuntim
     internal static string FixedDamageCapChainHash(IReadOnlyList<int> targets) => RuntimeSkills.RuntimeRules_Core_LateFixedTargetDamageCapScopes.FixedDamageCapChainHash(targets);
     internal void CaptureLateFixedTargetDamageCapScope(DamageFrame damage)
     {
-        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasFixedTargetDamageCaps || _coreDamageArmorPaymentsOperations.DamageArmorPaymentOwner(damage)is not { } attack)
+        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasFixedTargetDamageCaps || _coreDamageArmorPaymentsOperations.Value.DamageArmorPaymentOwner(damage)is not { } attack)
             return;
         var chain = FixedDamageCapChain(attack);
         if (chain.Scope is not null || chain.Index < 0 || chain.Index >= chain.Targets.Count)
@@ -38,7 +38,7 @@ internal sealed partial class CoreGameEngineLateFixedTargetDamageCapScopesRuntim
         }
 
         var receipt = new LateFixedTargetDamageCapScopeReceipt(attack.ResolutionId, damage.Id, attack.IsSourceLess ? null : attack.SourceSeat, attack.IsSourceLess, damage.TargetSeat, damage.Amount, damage.Nature, attack.EffectiveCardKind, chain.Index, nextIndex, chain.Targets[nextIndex], chain.Targets.Count, FixedDamageCapChainHash(chain.Targets), requested, applied, completed, _coreProgramVirtualDuelOperations.DamageProgramUseInstructionIndex(attack), cap.Source, _contentRegistryOperations._contentRegistry.GetSkill(cap.Source.SkillId).Program!.GameplayHash, cap.Cap);
-        if (!IsValidLateFixedTargetDamageCapProof(receipt, attack.ResolutionId, chain.Targets) || damage.ArmorPayment is not null && !_coreDamageArmorPaymentsOperations.IsIssuedDamageArmorPayment(damage))
+        if (!IsValidLateFixedTargetDamageCapProof(receipt, attack.ResolutionId, chain.Targets) || damage.ArmorPayment is not null && !_coreDamageArmorPaymentsOperations.Value.IsIssuedDamageArmorPayment(damage))
             throw new InvalidOperationException("A late fixed damage cap lost its issued request, atomic payment or completed damage fact.");
         var scope = new RecipientScopedDamageState(damage.TargetSeat, damage.TargetSeat, damage.Amount)
         {

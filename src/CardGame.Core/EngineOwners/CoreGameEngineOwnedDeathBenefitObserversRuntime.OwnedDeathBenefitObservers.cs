@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineOwnedDeathBenefitObserversRuntime
 {
     internal bool OwnedDeathBenefitObserverPrefix(ProgramSkillFrame root)
     {
-        if (!_coreOwnedDeathBenefitReturnsOperations.ExactOwnedDeathBenefitReturn(root) || !_coreFixedRecipientBenefitsOperations.ValidFixedRecipientReceipt(root))
+        if (!_coreOwnedDeathBenefitReturnsOperations.Value.ExactOwnedDeathBenefitReturn(root) || !_coreFixedRecipientBenefitsOperations.ValidFixedRecipientReceipt(root))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
         if (index == _resolutionStackOperations._resolutionStack.Count - 1)
@@ -27,10 +27,10 @@ internal sealed partial class CoreGameEngineOwnedDeathBenefitObserversRuntime
 
     internal ProgramSkillFrame? OwnedDeathBenefitObserverRoot() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.OwnedDeathBenefitReturn is not null && OwnedDeathBenefitObserverPrefix(f));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 680)]
-    internal bool IsOwnedDeathBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OwnedDeathBenefitObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsOwnedDeathBenefitProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && OwnedDeathBenefitObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     internal bool OwnedDeathBenefitDeadDyingEdge(int index)
     {
-        if (_resolutionStackOperations._resolutionStack[index] is not DyingFrame dying || !_coreOwnedDeathBenefitReturnsOperations.IsOriginalDyingSuspendedByOwnedDeathBenefit(dying))
+        if (_resolutionStackOperations._resolutionStack[index] is not DyingFrame dying || !_coreOwnedDeathBenefitReturnsOperations.Value.IsOriginalDyingSuspendedByOwnedDeathBenefit(dying))
             return false;
         var parent = _resolutionStackOperations._resolutionStack[index - 1];
         return dying.Continuation switch

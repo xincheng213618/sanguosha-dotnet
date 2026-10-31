@@ -9,7 +9,7 @@ internal sealed partial class CoreGameEngineDeckCardsRuntime
     IReadOnlyList<ProgramDeckCard> IProgramDeckCardsFacts.DrawPile => Array.AsReadOnly(_cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Select(card => new ProgramDeckCard(card.Id, card.Kind)).ToArray());
 
     IReadOnlyList<CardMovementRecord> IProgramDeckCardsFacts.MovementRange(long before, long after) => Array.AsReadOnly(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > before && move.Sequence <= after).ToArray());
-    IEnumerable<DeckCardsObtainedEvent> IProgramDeckCardsFacts.ObtainedEvents => _coreProgramEventHistoryOperations.ProgramEventHistory<DeckCardsObtainedEvent>();
+    IEnumerable<DeckCardsObtainedEvent> IProgramDeckCardsFacts.ObtainedEvents => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DeckCardsObtainedEvent>();
 
     bool IProgramDeckCardsFacts.IsRedirectedGain(CardMovementRecord movement, CardLocation requested) => _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(movement, requested);
     bool IProgramDeckCardsFacts.IsDestroyedMaterial(CardMovementRecord movement) => _characterZuoCiHappyGodOperations.IsHappyZuoCiDestroyedMaterial(movement);

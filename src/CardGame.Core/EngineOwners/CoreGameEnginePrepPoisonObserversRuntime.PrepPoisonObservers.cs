@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEnginePrepPoisonObserversRuntime
         if (!r.HpLossApplied)
             return false;
         if (child is DyingFrame dying)
-            return r.HpAfter <= 0 && dying.ParentFrameId == root.Id && dying.VictimSeat == root.OwnerSeat && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == dying.Id && e.VictimSeat == root.OwnerSeat && e.KillerSeat is null) == 1;
+            return r.HpAfter <= 0 && dying.ParentFrameId == root.Id && dying.VictimSeat == root.OwnerSeat && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == dying.Id && e.VictimSeat == root.OwnerSeat && e.KillerSeat is null) == 1;
         return child is HpChangedTriggerWindowFrame hp && hp.ResumeFrameId == root.Id && hp.Change.ParentFrameId == root.Id && hp.Change.TargetSeat == root.OwnerSeat && hp.Change.SourceSeat is null && hp.Change.Kind == HpChangeKind.Loss && hp.Change.HpBefore == r.HpBefore && hp.Change.HpAfter == r.HpAfter && hp.Change.Amount == r.ActualHpLoss && hp.Continuation == PostEventContinuation.Program;
     }
 

@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineShanheGuideSkillsRuntime
     internal void ReturnShanheBuwuDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheBuwuDrawIssuedEvent>().Single(item => item.FrameId == frame.Id);
+        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheBuwuDrawIssuedEvent>().Single(item => item.FrameId == frame.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheBuwuDrawOutcome = outcome });
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);

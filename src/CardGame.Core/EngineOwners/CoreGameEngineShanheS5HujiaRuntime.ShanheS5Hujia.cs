@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineShanheS5HujiaRuntime
     internal void ClaimShanheS5JianxiongCards(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.SkillId != "shanhe:s5-jianxiong-14198" || frame.TriggerId != "lost-hp-draw-then-claim" || frame.InstructionIndex != 2 || frame.NativeDraw is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, ParentFrameId: var parentId, DamageFrameId: var damageId } || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } window || window.Id != parentId || window.ParentFrameId != damageId || window.TargetSeat != frame.OwnerSeat)
+        if (frame.SkillId != "shanhe:s5-jianxiong-14198" || frame.TriggerId != "lost-hp-draw-then-claim" || frame.InstructionIndex != 2 || frame.NativeDraw is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, ParentFrameId: var parentId, DamageFrameId: var damageId } || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } window || window.Id != parentId || window.ParentFrameId != damageId || window.TargetSeat != frame.OwnerSeat)
             throw new InvalidOperationException("S5 Jianxiong must return its native Draw before claiming the original damage's physical cards.");
         // This existing helper rechecks the causal attack and Processing zone,
         // retains group/extra-effect claim proofs, and returns normally if no

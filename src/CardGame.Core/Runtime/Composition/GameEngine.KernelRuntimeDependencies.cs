@@ -65,9 +65,9 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class KernelCaoXianContinuationAdapter(GameEngine engine) : IKernelCaoXianContinuation
     {
-        public bool CaoXianEdge(int i) => engine.CaoXianOlEntries.CaoXianEdge(i);
-        public bool CaoXianFirstChild(ProgramSkillFrame f, ResolutionFrame child) => engine.CaoXianOlEntries.CaoXianFirstChild(f, child);
-        public bool CaoXianSuffix(int n) => engine.CaoXianOlEntries.CaoXianSuffix(n);
+        public bool CaoXianEdge(int i) => engine.CaoXianOlEntries.Value.CaoXianEdge(i);
+        public bool CaoXianFirstChild(ProgramSkillFrame f, ResolutionFrame child) => engine.CaoXianOlEntries.Value.CaoXianFirstChild(f, child);
+        public bool CaoXianSuffix(int n) => engine.CaoXianOlEntries.Value.CaoXianSuffix(n);
         public NativeOwners.CaoXianFacts CreateCaoXianFacts() => engine.ComposeNativeCaoXianFacts();
     }
 
@@ -339,7 +339,7 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class KernelCreateMouHuangGaiFactsAndMouHgFirstChildOperationsAdapter(GameEngine engine) : IKernelCreateMouHuangGaiFactsAndMouHgFirstChildOperations
     {
-        public bool MouHgFirstChild(ProgramSkillFrame f, ResolutionFrame child) => engine.HuangGaiMouEntries.MouHgFirstChild(f, child);
+        public bool MouHgFirstChild(ProgramSkillFrame f, ResolutionFrame child) => engine.HuangGaiMouEntries.Value.MouHgFirstChild(f, child);
         public NativeOwners.MouHuangGaiFacts CreateMouHuangGaiFacts() => engine.ComposeNativeMouHuangGaiFacts();
     }
 
@@ -553,9 +553,9 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class KernelMouCaoShuangAnniversaryContinuationAdapter(GameEngine engine) : IKernelMouCaoShuangAnniversaryContinuation
     {
-        public bool MouCaoShuangAnniversaryEdge(int i) => engine.CaoShuangMouEntries.MouCaoShuangAnniversaryEdge(i);
-        public bool MouCaoShuangAnniversaryFirstChild(ProgramSkillFrame f, ResolutionFrame child) => engine.CaoShuangMouEntries.MouCaoShuangAnniversaryFirstChild(f, child);
-        public bool MouCaoShuangAnniversarySuffix(int n) => engine.CaoShuangMouEntries.MouCaoShuangAnniversarySuffix(n);
+        public bool MouCaoShuangAnniversaryEdge(int i) => engine.CaoShuangMouEntries.Value.MouCaoShuangAnniversaryEdge(i);
+        public bool MouCaoShuangAnniversaryFirstChild(ProgramSkillFrame f, ResolutionFrame child) => engine.CaoShuangMouEntries.Value.MouCaoShuangAnniversaryFirstChild(f, child);
+        public bool MouCaoShuangAnniversarySuffix(int n) => engine.CaoShuangMouEntries.Value.MouCaoShuangAnniversarySuffix(n);
         public NativeOwners.MouCaoShuangAnniversaryFacts CreateMouCaoShuangAnniversaryFacts() => engine.ComposeNativeMouCaoShuangAnniversaryFacts();
     }
 
@@ -644,9 +644,9 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class KernelMouJiangWeiAnniversaryContinuationAdapter(GameEngine engine) : IKernelMouJiangWeiAnniversaryContinuation
     {
-        public bool MouJiangWeiAnniversaryEdge(int i) => engine.JiangWeiMouEntries.MouJiangWeiAnniversaryEdge(i);
-        public bool MouJiangWeiAnniversaryFirstChild(ProgramSkillFrame f, ResolutionFrame child) => engine.JiangWeiMouEntries.MouJiangWeiAnniversaryFirstChild(f, child);
-        public bool MouJiangWeiAnniversarySuffix(int n) => engine.JiangWeiMouEntries.MouJiangWeiAnniversarySuffix(n);
+        public bool MouJiangWeiAnniversaryEdge(int i) => engine.JiangWeiMouEntries.Value.MouJiangWeiAnniversaryEdge(i);
+        public bool MouJiangWeiAnniversaryFirstChild(ProgramSkillFrame f, ResolutionFrame child) => engine.JiangWeiMouEntries.Value.MouJiangWeiAnniversaryFirstChild(f, child);
+        public bool MouJiangWeiAnniversarySuffix(int n) => engine.JiangWeiMouEntries.Value.MouJiangWeiAnniversarySuffix(n);
         public NativeOwners.MouJiangWeiAnniversaryFacts CreateMouJiangWeiAnniversaryFacts() => engine.ComposeNativeMouJiangWeiAnniversaryFacts();
     }
 
@@ -662,18 +662,18 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class KernelMouLiuXieContinuationAdapter(GameEngine engine) : IKernelMouLiuXieContinuation
     {
-        public bool MouLiuXieNativeEdge(int i) => engine.LiuXieMouEntries.MouLiuXieNativeEdge(i);
-        public bool MouLiuXieFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child) => engine.LiuXieMouEntries.MouLiuXieFirstNativeChild(f, child);
-        public bool MouLiuXieNativeSuffix(int n) => engine.LiuXieMouEntries.MouLiuXieNativeSuffix(n);
+        public bool MouLiuXieNativeEdge(int i) => engine.LiuXieMouEntries.Value.MouLiuXieNativeEdge(i);
+        public bool MouLiuXieFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child) => engine.LiuXieMouEntries.Value.MouLiuXieFirstNativeChild(f, child);
+        public bool MouLiuXieNativeSuffix(int n) => engine.LiuXieMouEntries.Value.MouLiuXieNativeSuffix(n);
         public NativeOwners.MouLiuXieFacts CreateMouLiuXieFacts() => engine.ComposeNativeMouLiuXieFacts();
     }
 
     [ProgramCapability]
     private sealed class KernelMouLuSuAnniversaryContinuationAdapter(GameEngine engine) : IKernelMouLuSuAnniversaryContinuation
     {
-        public bool MouLuSuEdge(int i) => engine.LuSuMouEntries.MouLuSuEdge(i);
-        public bool MouLuSuFirstChild(ProgramSkillFrame f, ResolutionFrame child) => engine.LuSuMouEntries.MouLuSuFirstChild(f, child);
-        public bool MouLuSuSuffix(int n) => engine.LuSuMouEntries.MouLuSuSuffix(n);
+        public bool MouLuSuEdge(int i) => engine.LuSuMouEntries.Value.MouLuSuEdge(i);
+        public bool MouLuSuFirstChild(ProgramSkillFrame f, ResolutionFrame child) => engine.LuSuMouEntries.Value.MouLuSuFirstChild(f, child);
+        public bool MouLuSuSuffix(int n) => engine.LuSuMouEntries.Value.MouLuSuSuffix(n);
         public NativeOwners.MouLuSuAnniversaryFacts CreateMouLuSuAnniversaryFacts() => engine.ComposeNativeMouLuSuAnniversaryFacts();
     }
 
@@ -689,9 +689,9 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class KernelMouXuShengContinuationAdapter(GameEngine engine) : IKernelMouXuShengContinuation
     {
-        public bool MouXuShengNativeEdge(int i) => engine.XuShengMouEntries.MouXuShengNativeEdge(i);
-        public bool MouXuShengFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child) => engine.XuShengMouEntries.MouXuShengFirstNativeChild(f, child);
-        public bool MouXuShengNativeSuffix(int n) => engine.XuShengMouEntries.MouXuShengNativeSuffix(n);
+        public bool MouXuShengNativeEdge(int i) => engine.XuShengMouEntries.Value.MouXuShengNativeEdge(i);
+        public bool MouXuShengFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child) => engine.XuShengMouEntries.Value.MouXuShengFirstNativeChild(f, child);
+        public bool MouXuShengNativeSuffix(int n) => engine.XuShengMouEntries.Value.MouXuShengNativeSuffix(n);
         public NativeOwners.MouXuShengFacts CreateMouXuShengFacts() => engine.ComposeNativeMouXuShengFacts();
     }
 
@@ -707,9 +707,9 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class KernelMouZhangHeContinuationAdapter(GameEngine engine) : IKernelMouZhangHeContinuation
     {
-        public bool MouQiaobianNativeEdge(int i) => engine.ZhangHeMouMobileEntries.MouQiaobianNativeEdge(i);
-        public bool MouQiaobianFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child) => engine.ZhangHeMouMobileEntries.MouQiaobianFirstNativeChild(f, child);
-        public bool MouQiaobianNativeSuffix(int n) => engine.ZhangHeMouMobileEntries.MouQiaobianNativeSuffix(n);
+        public bool MouQiaobianNativeEdge(int i) => engine.ZhangHeMouMobileEntries.Value.MouQiaobianNativeEdge(i);
+        public bool MouQiaobianFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child) => engine.ZhangHeMouMobileEntries.Value.MouQiaobianFirstNativeChild(f, child);
+        public bool MouQiaobianNativeSuffix(int n) => engine.ZhangHeMouMobileEntries.Value.MouQiaobianNativeSuffix(n);
         public NativeOwners.MouZhangHeFacts CreateMouZhangHeFacts() => engine.ComposeNativeMouZhangHeFacts();
     }
 
@@ -734,9 +734,9 @@ public sealed partial class GameEngine
     [ProgramCapability]
     private sealed class KernelMouZhuRanContinuationAdapter(GameEngine engine) : IKernelMouZhuRanContinuation
     {
-        public bool MouZhuRanNativeEdge(int i) => engine.ZhuRanMouMobileEntries.MouZhuRanNativeEdge(i);
-        public bool MouZhuRanFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child) => engine.ZhuRanMouMobileEntries.MouZhuRanFirstNativeChild(f, child);
-        public bool MouZhuRanNativeSuffix(int n) => engine.ZhuRanMouMobileEntries.MouZhuRanNativeSuffix(n);
+        public bool MouZhuRanNativeEdge(int i) => engine.ZhuRanMouMobileEntries.Value.MouZhuRanNativeEdge(i);
+        public bool MouZhuRanFirstNativeChild(ProgramSkillFrame f, ResolutionFrame child) => engine.ZhuRanMouMobileEntries.Value.MouZhuRanFirstNativeChild(f, child);
+        public bool MouZhuRanNativeSuffix(int n) => engine.ZhuRanMouMobileEntries.Value.MouZhuRanNativeSuffix(n);
         public NativeOwners.MouZhuRanFacts CreateMouZhuRanFacts() => engine.ComposeNativeMouZhuRanFacts();
     }
 

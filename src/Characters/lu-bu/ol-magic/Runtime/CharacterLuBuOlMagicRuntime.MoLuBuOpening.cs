@@ -9,7 +9,7 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     {
         if (!HasMoLuBu || !_coreMatchSetupSetupCompleteAccess._setupComplete || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Normal || _coreActualRoundProgressRoundNumberAccess._roundNumber != 0 || _resolutionStackOperations._resolutionStack.Count != 0 || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.MoLuBuOpening is not null)
             return false;
-        var request = _coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuInitializedEvent>().FirstOrDefault(e => _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoLuBuOpeningStartedEvent>().Any(s => s.IssuerFrameId == e.FrameId));
+        var request = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuInitializedEvent>().FirstOrDefault(e => _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuOpeningStartedEvent>().Any(s => s.IssuerFrameId == e.FrameId));
         if (request is null)
             return false;
         var normal = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat;

@@ -8,7 +8,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     internal static bool IsDuFuRenYiseTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_du_fu_ren_ol_Yise_Qualifications.IsDuFuRenYiseTrigger(t);
     internal void CaptureDuFuRenOwnedOrigin(CardMovementRecord m)
     {
-        if (!HasDuFuRenYise || !IsDuFuRenOwnedZone(m.From) || m.From == m.To || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenOwnedOriginEvent>().Any(p => p.MovementSequence == m.Sequence))
+        if (!HasDuFuRenYise || !IsDuFuRenOwnedZone(m.From) || m.From == m.To || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuFuRenOwnedOriginEvent>().Any(p => p.MovementSequence == m.Sequence))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuFuRenOwnedOriginEvent(m.Sequence, m.From.OwnerSeat!.Value, _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[m.From.OwnerSeat.Value], _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId))));
         if (m.To == CardLocation.Processing && _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { Action: { } a } use && a.ActorSeat == use.SourceSeat && a.ActorSeat != m.From.OwnerSeat && a.EffectiveKind == CardKind.Snatch && a.EffectiveDesignatedTargetSeats.Contains(m.From.OwnerSeat.Value) && m.Reason == CardMoveReasons.Snatch)
@@ -19,7 +19,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
 
     internal void RecordDuFuRenOwnedTransferProducer(CardMovementRecord m, int recipientSeat, long producerId)
     {
-        if (!HasDuFuRenYise || !IsDuFuRenOwnedZone(m.From) || m.To != CardLocation.Processing || m.From.OwnerSeat == recipientSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipientSeat) || producerId <= 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenTransferProducerEvent>().Any(p => p.EntrySequence == m.Sequence))
+        if (!HasDuFuRenYise || !IsDuFuRenOwnedZone(m.From) || m.To != CardLocation.Processing || m.From.OwnerSeat == recipientSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipientSeat) || producerId <= 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuFuRenTransferProducerEvent>().Any(p => p.EntrySequence == m.Sequence))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuFuRenTransferProducerEvent(m.Sequence, producerId, m.From.OwnerSeat!.Value, recipientSeat));
     }
@@ -35,13 +35,13 @@ internal sealed partial class CharacterDuFuRenOlRuntime
             if (entry is null && m.From == CardLocation.Processing)
             {
                 var previous = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(p => p.CardId == m.CardId && p.Sequence < m.Sequence);
-                if (previous is { To.Zone: CardZoneKind.Processing } && IsDuFuRenOwnedZone(previous.From) && _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenTransferProducerEvent>().Any(p => p.EntrySequence == previous.Sequence && p.OwnerSeat == previous.From.OwnerSeat && p.RecipientSeat == m.To.OwnerSeat))
+                if (previous is { To.Zone: CardZoneKind.Processing } && IsDuFuRenOwnedZone(previous.From) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuFuRenTransferProducerEvent>().Any(p => p.EntrySequence == previous.Sequence && p.OwnerSeat == previous.From.OwnerSeat && p.RecipientSeat == m.To.OwnerSeat))
                     entry = previous;
             }
 
             if (entry is null || entry.From.OwnerSeat is not { } owner || m.To.OwnerSeat == owner)
                 continue;
-            var origin = _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenOwnedOriginEvent>().SingleOrDefault(p => p.MovementSequence == entry.Sequence && p.OwnerSeat == owner);
+            var origin = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuFuRenOwnedOriginEvent>().SingleOrDefault(p => p.MovementSequence == entry.Sequence && p.OwnerSeat == owner);
             if (origin is null)
                 continue;
             gains.Add(new(batch.Id, owner, m.To.OwnerSeat!.Value, m.CardId, entry.Sequence, m.Sequence, entry.From, origin.Suit));

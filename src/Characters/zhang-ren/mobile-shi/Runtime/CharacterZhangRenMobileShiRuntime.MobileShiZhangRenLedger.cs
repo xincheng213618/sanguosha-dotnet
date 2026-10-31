@@ -58,7 +58,7 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
 
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 68200)]
     internal int ShiZrYinXianDamageBonus(GameEngine.IDamageAttempt attack) => attack is NativeOwners.CardAttackHandle card && card.CardUserSeat is { } user && user >= 0 && attack.EffectiveCardKind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && attack.TargetSeat is { } target && target != user && ShiZrYinXianFarthest(user, target) ? 1 : 0;
-    internal bool IsShiZrFuanStrikeUse(long useFrameId) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZrFuanStrikeIssuedEvent>().Any(entry => entry.UseId == useFrameId);
+    internal bool IsShiZrFuanStrikeUse(long useFrameId) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanStrikeIssuedEvent>().Any(entry => entry.UseId == useFrameId);
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 68200)]
     internal bool ShiZrFuanUseDistance(ProgramCardDistanceQuery query) => query.CardUseFrameId is { } id && IsShiZrFuanStrikeUse(id);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 68200)]
@@ -85,14 +85,14 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
         }
     }
 
-    internal bool ShiZrFuanSealActive(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZrFuanSealedEvent>().Any(stamped => stamped.TargetSeat == target && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiZrFuanSealExpiredEvent>().Any(expired => expired.FrameId == stamped.FrameId));
+    internal bool ShiZrFuanSealActive(int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanSealedEvent>().Any(stamped => stamped.TargetSeat == target && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanSealExpiredEvent>().Any(expired => expired.FrameId == stamped.FrameId));
     internal bool ShiZrFuanGrantQualified(CharacterState owner, SkillGrant grant) => !HasShiZrCapability || grant.IsModeRule || _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !ShiZrFuanSealActive(owner.Seat);
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 68201)]
     internal void ExpireShiZrFuanSeals(IGameEvent payload)
     {
         if (!HasShiZrCapability || payload is not TurnEndedEvent turn)
             return;
-        foreach (var sealedEntry in _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZrFuanSealedEvent>().Where(entry => entry.TargetSeat == turn.ActorSeat && turn.TurnNumber > entry.GrantedTurn && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiZrFuanSealExpiredEvent>().Any(expired => expired.FrameId == entry.FrameId)).ToArray())
+        foreach (var sealedEntry in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanSealedEvent>().Where(entry => entry.TargetSeat == turn.ActorSeat && turn.TurnNumber > entry.GrantedTurn && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanSealExpiredEvent>().Any(expired => expired.FrameId == entry.FrameId)).ToArray())
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZrFuanSealExpiredEvent(sealedEntry.FrameId, sealedEntry.TargetSeat, turn.TurnNumber));
             _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;

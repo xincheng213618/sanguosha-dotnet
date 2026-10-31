@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineProgramCategoryTargetLedgerRuntime
     void IControlProgramEffectHost.ConsumeCategoryTargetLedger(ProgramSkillFrame frame, string usageId) => ConsumeProgramCategoryTargetLedger(frame, usageId);
     void IControlProgramEffectHost.ReplaceCurrentCardUseActor(ProgramSkillFrame frame, int actorSeat) => _coreProgramCardUseRolesOperations.ReplaceCurrentProgramCardUseActor(frame, actorSeat);
     SkillProgramStepOutcome IControlProgramEffectHost.AddCurrentCardUseTarget(ProgramSkillFrame frame, int targetSeat) => _coreProgramCardUseRolesOperations.AddCurrentProgramCardUseTarget(frame, targetSeat);
-    void IControlProgramEffectHost.ReduceCurrentDamage(ProgramSkillFrame frame, int amount) => _coreProgramDamageReductionOperations.ReduceProgramCurrentDamage(frame, amount);
+    void IControlProgramEffectHost.ReduceCurrentDamage(ProgramSkillFrame frame, int amount) => _coreProgramDamageReductionOperations.Value.ReduceProgramCurrentDamage(frame, amount);
     internal bool CanActivateCategoryTargetLedger(int ownerSeat, string skillId, string usageId, IReadOnlyList<int> cardIds, IReadOnlyList<int> targetSeats)
     {
         if (cardIds.Count != 1 || targetSeats.Count != 1 || targetSeats[0] == ownerSeat || !_coreMatchParticipantsPlayersAccess._players[targetSeats[0]].IsAlive)

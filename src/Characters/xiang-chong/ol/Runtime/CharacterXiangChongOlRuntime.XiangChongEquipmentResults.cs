@@ -6,9 +6,9 @@ internal sealed partial class CharacterXiangChongOlRuntime
     internal bool XiangEquipmentActualActor(XiangChongEquipmentOrigin origin, int finalActor)
     {
         var actor = origin.ActorSeat;
-        foreach (var changed in _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == origin.CardUseFrameId))
+        foreach (var changed in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == origin.CardUseFrameId))
         {
-            if (changed.PreviousActorSeat != actor || changed.OwnerSeat != actor || changed.ProviderSeat != origin.ActorSeat || changed.FrameId <= origin.CardUseFrameId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(changed.ActorSeat) || changed.ActorSeat == actor || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.FrameId == changed.FrameId && e.SkillId == changed.SkillId && e.OwnerSeat == actor && e.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized))
+            if (changed.PreviousActorSeat != actor || changed.OwnerSeat != actor || changed.ProviderSeat != origin.ActorSeat || changed.FrameId <= origin.CardUseFrameId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(changed.ActorSeat) || changed.ActorSeat == actor || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.FrameId == changed.FrameId && e.SkillId == changed.SkillId && e.OwnerSeat == actor && e.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized))
                 return false;
             actor = changed.ActorSeat;
         }
@@ -19,16 +19,16 @@ internal sealed partial class CharacterXiangChongOlRuntime
     internal bool ValidXiangEquipmentResult(XiangChongEquipmentResult result)
     {
         var o = result.Origin;
-        if (!XiangEquipmentActualActor(o, result.ActorSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<XiangChongEquipmentResultEvent>().Count(e => e.Result == result) != 1)
+        if (!XiangEquipmentActualActor(o, result.ActorSeat) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiangChongEquipmentResultEvent>().Count(e => e.Result == result) != 1)
             return false;
         if (result.EntrySequence is not { } sequence)
             return result.ReplacedCardId is null && result.Termination is { } terminal && ValidXiangEquipmentTermination(result, terminal);
         if (result.Termination is not null)
             return false;
-        return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == sequence && m.CardId == o.CardId && m.CardKind == o.CardKind && m.From == CardLocation.Processing && m.To == CardLocation.Equipment(result.ActorSeat) && m.Reason == CardMoveReasons.EquipmentEnter) && _coreProgramEventHistoryOperations.ProgramEventHistory<EquipmentChangedEvent>().Count(e => e.ResolutionId == o.CardUseFrameId && e.PlayerSeat == result.ActorSeat && e.CardId == o.CardId && e.CardKind == o.CardKind && e.ReplacedCardId == result.ReplacedCardId) == 1;
+        return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == sequence && m.CardId == o.CardId && m.CardKind == o.CardKind && m.From == CardLocation.Processing && m.To == CardLocation.Equipment(result.ActorSeat) && m.Reason == CardMoveReasons.EquipmentEnter) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<EquipmentChangedEvent>().Count(e => e.ResolutionId == o.CardUseFrameId && e.PlayerSeat == result.ActorSeat && e.CardId == o.CardId && e.CardKind == o.CardKind && e.ReplacedCardId == result.ReplacedCardId) == 1;
     }
 
-    internal bool ValidXiangEquipmentTermination(XiangChongEquipmentResult result, XiangChongEquipmentTermination terminal) => terminal.Sequence > 0 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == terminal.Sequence && m.CardId == result.Origin.CardId && m.CardKind == result.Origin.CardKind && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason.Value == terminal.Reason) && (terminal.Reason == "area.abolished.equipment" && !terminal.ActorDead || terminal.Reason == CardMoveReasons.UseFinished.Value && terminal.ActorDead && _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDiedEvent>().Any(e => e.VictimSeat == result.ActorSeat)) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == result.Origin.CardUseFrameId && e.CardId == result.Origin.CardId && e.CardKind == result.Origin.CardKind) == 1;
+    internal bool ValidXiangEquipmentTermination(XiangChongEquipmentResult result, XiangChongEquipmentTermination terminal) => terminal.Sequence > 0 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == terminal.Sequence && m.CardId == result.Origin.CardId && m.CardKind == result.Origin.CardKind && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason.Value == terminal.Reason) && (terminal.Reason == "area.abolished.equipment" && !terminal.ActorDead || terminal.Reason == CardMoveReasons.UseFinished.Value && terminal.ActorDead && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDiedEvent>().Any(e => e.VictimSeat == result.ActorSeat)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == result.Origin.CardUseFrameId && e.CardId == result.Origin.CardId && e.CardKind == result.Origin.CardKind) == 1;
     internal void CaptureXiangChongEquipmentResult(CardUseFrame use)
     {
         var o = use.XiangChongGuyingEquipment!;
@@ -36,7 +36,7 @@ internal sealed partial class CharacterXiangChongOlRuntime
         if (!MatchesXiangChongEquipment(f, o) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) || f.XiangChong!.NativeResult is not null)
             throw new InvalidOperationException("Guying's final equipment result lost its original issuer or exact actual actor chain.");
         var r = f.XiangChong;
-        var changed = _coreProgramEventHistoryOperations.ProgramEventHistory<EquipmentChangedEvent>().SingleOrDefault(e => e.ResolutionId == use.Id && e.CardId == o.CardId && e.CardKind == o.CardKind);
+        var changed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<EquipmentChangedEvent>().SingleOrDefault(e => e.ResolutionId == use.Id && e.CardId == o.CardId && e.CardKind == o.CardKind);
         if (changed is not null && changed.PlayerSeat != use.SourceSeat)
             throw new InvalidOperationException("Guying's native equipment entry belongs to a different actual user.");
         var entry = changed is null ? null : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.SingleOrDefault(m => m.Sequence > r.Before && m.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && m.CardId == o.CardId && m.From == CardLocation.Processing && m.To == CardLocation.Equipment(changed.PlayerSeat) && m.Reason == CardMoveReasons.EquipmentEnter);

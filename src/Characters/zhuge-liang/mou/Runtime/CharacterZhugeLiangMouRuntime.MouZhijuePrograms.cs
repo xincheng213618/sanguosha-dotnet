@@ -25,7 +25,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
                     result.Add(new(LegalActionKind.Slash, 0, target.Seat, $"视为对 {(target.Name)} 使用【{(CardCatalog.Get(kind).DisplayName)}】", kind, TargetSeats: [target.Seat]));
             else if (kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None))
                 result.Add(new(LegalActionKind.Peach, 0, null, "视为使用【桃】", kind));
-            else if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && (!actor.UsedPlayPhaseAlcoholThisTurn || HasMouWujingAllowance(actor) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || _coreAdvancedPoliciesOperations.HasNextUnlimitedCard(actor) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None))
+            else if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && (!actor.UsedPlayPhaseAlcoholThisTurn || HasMouWujingAllowance(actor) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || _coreAdvancedPoliciesOperations.Value.HasNextUnlimitedCard(actor) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, kind)) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None))
                 result.Add(new(LegalActionKind.Alcohol, 0, null, "视为使用【酒】", kind));
             else if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
                 foreach (var option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: true))
@@ -232,7 +232,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
         {
             var target = _coreMatchParticipantsPlayersAccess._players[action.TargetSeats[0]];
             var damage = 1 + actor.AlcoholDamageBonus;
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
             actor.HasAlcoholEffect = false;
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true)
                 _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);

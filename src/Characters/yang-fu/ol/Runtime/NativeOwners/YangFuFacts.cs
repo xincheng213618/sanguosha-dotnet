@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class YangFuFacts(EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreMatchOutcomeState matchOutcomeState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<CardZoneStore> getCardZoneStore, Func<RuntimeEntries.CoreGameEngineCardUseLifecycleEntries> getCoreGameEngineCardUseLifecycleRuntime, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEnginePrivateOfferReturnsEntries> getCoreGameEnginePrivateOfferReturnsRuntime, Func<RuntimeEntries.CoreGameEngineCardUseDebitsEntries> getCoreGameEngineCardUseDebitsRuntime, Func<EquipmentContentRegistry> getEquipmentContentRegistry) : IYangFuFacts
+internal sealed class YangFuFacts(EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreMatchOutcomeState matchOutcomeState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime, Func<CardZoneStore> getCardZoneStore, Func<RuntimeEntries.CoreGameEngineCardUseLifecycleEntries> getCoreGameEngineCardUseLifecycleRuntime, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEnginePrivateOfferReturnsEntries> getCoreGameEnginePrivateOfferReturnsRuntime, Func<RuntimeEntries.CoreGameEngineCardUseDebitsEntries> getCoreGameEngineCardUseDebitsRuntime, Func<EquipmentContentRegistry> getEquipmentContentRegistry) : IYangFuFacts
 {
     public YangFuPlayer Player(int seat) => new(seat, matchParticipantsState.ReferenceToPlayers[seat].Name, matchParticipantsState.ReferenceToPlayers[seat].IsAlive, matchParticipantsState.ReferenceToPlayers[seat].IsHuman, matchParticipantsState.ReferenceToPlayers[seat].IsChained);
     public IReadOnlyList<YangFuPlayer> Players => Array.AsReadOnly(matchParticipantsState.ReferenceToPlayers.Select(player => Player(player.Seat)).ToArray());
@@ -15,7 +15,7 @@ internal sealed class YangFuFacts(EngineStates.CoreMatchParticipantsState matchP
     public IReadOnlyList<CardMovementRecord> Movements => cardMovementJournalState.ReferenceToCardMovements.AsReadOnly();
 
     public IEnumerable<T> History<T>()
-        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>();
+        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>();
     public CardLocation Location(int cardId) => getCardZoneStore().GetLocation(cardId);
     public CardUseFrame? CardUse(long useId) => getCoreGameEngineCardUseLifecycleRuntime().LifecycleCardUse(useId);
     public ContentSkillDefinition Skill(string skillId) => getContentRegistry().GetSkill(skillId);

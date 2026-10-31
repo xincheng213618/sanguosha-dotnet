@@ -259,7 +259,7 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id)
             return false;
         if (f.OriginalHandAwakening is not null)
-            return _coreOriginalHandAwakeningOperations.ResumeOriginalHandAwakening(id);
+            return _coreOriginalHandAwakeningOperations.Value.ResumeOriginalHandAwakening(id);
         if (f.OriginalHandBenefit is null && f.OriginalHandInheritance is null)
             return false;
         if (f.OriginalHandInheritance is not null || f.OriginalHandBenefit!.Stage is OriginalHandBenefitStage.ChoosingTarget or OriginalHandBenefitStage.ChoosingOption)
@@ -285,13 +285,13 @@ internal sealed partial class CoreGameEngineOriginalHandEntitiesRuntime
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 590)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 610)]
-    internal bool CanContinueOriginalHandEntityProgram(ProgramSkillFrame f) => f.OriginalHandBenefit is { DrawIssued: true } && _coreOriginalHandEntityObserversOperations.ValidOriginalHandBenefitReceipt(f) || f.OriginalHandInheritance is not null && _coreOriginalHandEntityObserversOperations.ValidOriginalHandInheritanceReceipt(f) || f.OriginalHandAwakening is not null && _coreOriginalHandAwakeningOperations.ValidOriginalHandAwakeningReceipt(f);
+    internal bool CanContinueOriginalHandEntityProgram(ProgramSkillFrame f) => f.OriginalHandBenefit is { DrawIssued: true } && _coreOriginalHandEntityObserversOperations.ValidOriginalHandBenefitReceipt(f) || f.OriginalHandInheritance is not null && _coreOriginalHandEntityObserversOperations.ValidOriginalHandInheritanceReceipt(f) || f.OriginalHandAwakening is not null && _coreOriginalHandAwakeningOperations.Value.ValidOriginalHandAwakeningReceipt(f);
     SkillProgramStepOutcome IOriginalHandEntitiesProgramHost.ExecuteOriginalHandEntityOperation(ProgramSkillFrame f, SkillProgramEffect e) => e.Op switch
     {
         SkillProgramEffectOp.InitializeOriginalHandEntities => InitializeOriginalHandEntities(f, e.StateId!),
         SkillProgramEffectOp.OfferOriginalHandLossBenefit => BeginOriginalHandBenefit(f, e.StateId!),
         SkillProgramEffectOp.InheritOriginalHandBonuses => BeginOriginalHandInheritance(f, e.StateId!),
-        SkillProgramEffectOp.AwakenWhenOriginalHandEmpty => _coreOriginalHandAwakeningOperations.BeginOriginalHandAwakening(f, e),
+        SkillProgramEffectOp.AwakenWhenOriginalHandEmpty => _coreOriginalHandAwakeningOperations.Value.BeginOriginalHandAwakening(f, e),
         _ => throw new InvalidOperationException("Unknown original-hand operation.")};
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeContributions, 40)]
     internal void AddGetOriginalHandAttackRangeBonusAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{(player.Seat)}:original-hand:attack-range", GetOriginalHandAttackRangeBonus(player.Seat));

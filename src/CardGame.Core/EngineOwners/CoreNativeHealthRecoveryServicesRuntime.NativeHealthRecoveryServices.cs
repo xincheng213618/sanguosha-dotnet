@@ -10,9 +10,9 @@ internal sealed partial class CoreNativeHealthRecoveryServicesRuntime
     int INativeHealthRecoveryFacts.FrameLastIndex(long id) => _resolutionStackOperations._resolutionStack.FindLastIndex(frame => frame.Id == id);
     IEnumerable<IGameEvent> INativeHealthRecoveryFacts.CompleteProgramEventHistory() => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory();
     int INativeHealthRecoveryFacts.ResolveProgramParticipant(ProgramSkillFrame frame, ProgramParticipantReference reference) => _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, reference);
-    bool INativeHealthRecoveryProtocols.HulaoActivityFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => _coreHulaoActivityProgramsOperations.HulaoActivityFrameRidesOn(child, parent);
+    bool INativeHealthRecoveryProtocols.HulaoActivityFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => _coreHulaoActivityProgramsOperations.Value.HulaoActivityFrameRidesOn(child, parent);
     bool INativeHealthRecoveryProtocols.RecoveryReplacementFrameRidesOn(ResolutionFrame child, ResolutionFrame parent) => _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent);
-    void INativeHealthRecoveryProtocols.ValidateHulaoPeachUse(CardUseFrame use) => _coreHulaoActivityProgramsOperations.ValidateHulaoPeachUse(use);
+    void INativeHealthRecoveryProtocols.ValidateHulaoPeachUse(CardUseFrame use) => _coreHulaoActivityProgramsOperations.Value.ValidateHulaoPeachUse(use);
     bool INativeHealthRecoveryProtocols.TypedRecoveryApplicationBoundsMatch(RecoveryReplacementFrame recovery, IReadOnlyList<IGameEvent> history) => _coreTypedRecoveryDamageCursorOperations.TypedRecoveryApplicationBoundsMatch(recovery, history);
     bool INativeHealthRecoveryProtocols.TypedDamagePostEventEdge(ResolutionFrame parent, ResolutionFrame child) => _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child);
     bool INativeHealthRecoveryProtocols.DamageProgramMatchesWindow(ProgramSkillFrame root, DamageTriggerWindowFrame window) => _coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(root, window);

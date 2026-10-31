@@ -6,7 +6,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheNullifiedClaimObserversRuntime
 {
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 62033)]
-    internal bool IsShanheNullifiedClaimProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } window && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(frame => frame.Id == dying.FrameId && frame.ParentFrameId == dying.ParentFrameId) && TryGetShanheNullifiedClaimRide(window, out _);
+    internal bool IsShanheNullifiedClaimProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } window && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(frame => frame.Id == dying.FrameId && frame.ParentFrameId == dying.ParentFrameId) && TryGetShanheNullifiedClaimRide(window, out _);
     internal bool TryGetShanheNullifiedClaimRide(NullificationWindowFrame window, out int[] childProcessingCosts)
     {
         childProcessingCosts = [];
@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineShanheNullifiedClaimObserversRuntime
         if (index < 0 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not CardsMovedTriggerWindowFrame root || root.ResumeShanheNullifiedClaimWindowId != window.Id || !CoreGameEngineShanheNullifiedTrickClaimsRuntime.HasOnlyShanheNullifiedClaimMovementReturn(root) || !_coreShanheNullifiedTrickClaimsOperations.IsShanheNullifiedClaimMovement(window, root.Batch) || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().Count(frame => frame.ResumeShanheNullifiedClaimWindowId == window.Id) != 1)
             return false;
         if (window.ShanheDelayedNullifiedTrickClaim is { } delayed)
-            _coreShanheDelayedNullifiedTrickClaimsOperations.ValidateShanheDelayedNullifiedTrickClaim(window, delayed);
+            _coreShanheDelayedNullifiedTrickClaimsOperations.Value.ValidateShanheDelayedNullifiedTrickClaim(window, delayed);
         else
         {
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)?.ShanheNullifiedTrickClaim is not { } receipt || receipt.WindowFrameId != window.Id || receipt.ChainDepth != window.ChainDepth)
@@ -94,6 +94,6 @@ internal sealed partial class CoreGameEngineShanheNullifiedClaimObserversRuntime
         return true;
     }
 
-    internal bool ShanheClaimProgramHpLossDying(ProgramSkillFrame producer, DyingFrame dying) => dying.Continuation == DyingContinuationKind.ProgramSkill && dying.ParentFrameId == producer.Id && dying.KillerSeat is null && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(producer.SkillId)?.Program is { } program && program.GameplayHash == producer.GameplayHash && producer.InstructionIndex > 0 && ProgramInstructionResolver.Default.Resolve(producer, program).GetPausedInstruction(producer.InstructionIndex).Effect is { Op: SkillProgramEffectOp.LoseHp } effect && CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(producer, effect.Target) == dying.VictimSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(fact => fact.FrameId == producer.Id && fact.SkillId == producer.SkillId && fact.TargetSeat == dying.VictimSeat && fact.Amount > 0 && fact.RemainingHp <= 0);
+    internal bool ShanheClaimProgramHpLossDying(ProgramSkillFrame producer, DyingFrame dying) => dying.Continuation == DyingContinuationKind.ProgramSkill && dying.ParentFrameId == producer.Id && dying.KillerSeat is null && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(producer.SkillId)?.Program is { } program && program.GameplayHash == producer.GameplayHash && producer.InstructionIndex > 0 && ProgramInstructionResolver.Default.Resolve(producer, program).GetPausedInstruction(producer.InstructionIndex).Effect is { Op: SkillProgramEffectOp.LoseHp } effect && CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(producer, effect.Target) == dying.VictimSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(fact => fact.FrameId == producer.Id && fact.SkillId == producer.SkillId && fact.TargetSeat == dying.VictimSeat && fact.Amount > 0 && fact.RemainingHp <= 0);
     internal int[] ShanheClaimProvenChildMaterials(int rootIndex) => _resolutionStackOperations._resolutionStack.Skip(rootIndex + 1).OfType<CardUseFrame>().Where(use => use.Action is { Type: CardActionType.Use } action && action.PhysicalCards.Select(cost => cost.CardId).SequenceEqual(use.PhysicalCardIds ?? [use.CardId])).SelectMany(use => use.Action!.PhysicalCards).Where(cost => _cardZonesOperations._cardZones.GetLocation(cost.CardId) == CardLocation.Processing).Select(cost => cost.CardId).Distinct().Order().ToArray();
 }

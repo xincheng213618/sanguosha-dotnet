@@ -150,7 +150,7 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
 
         if (r.Stage == MouMengHuoStage.DiscardChildren)
         {
-            if (r.Payment is not { } p || !_coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(e => e.InvocationId == p.InvocationId && e.ParentFrameId == f.Id && e.ActualCount == 1))
+            if (r.Payment is not { } p || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(e => e.InvocationId == p.InvocationId && e.ParentFrameId == f.Id && e.ActualCount == 1))
                 throw new InvalidOperationException("Zaiqi's recovery needs its actual logical recipient discard.");
             var recipient = r.Targets[r.Cursor];
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;

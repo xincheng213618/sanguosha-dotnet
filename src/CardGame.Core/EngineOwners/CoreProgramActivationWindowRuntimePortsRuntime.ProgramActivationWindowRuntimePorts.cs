@@ -3,10 +3,10 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramActivationWindowRuntimePortsRuntime
 {
-    DamageTriggerWindowFrame? IProgramActivationWindowFacts.ActiveDamageTrigger => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger;
+    DamageTriggerWindowFrame? IProgramActivationWindowFacts.ActiveDamageTrigger => _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger;
 
     bool IProgramActivationWindowFacts.TryGetMobileZhitiContestTrigger(out ProgramTriggerCandidate candidate, out ProgramSkillWindowContext context) => _characterZhangLiaoMobileGodOperations.TryGetMobileZhitiContestTrigger(out candidate, out context);
-    bool IProgramActivationWindowFacts.TryGetDrivenProgramTriggerCandidate(out ProgramTriggerCandidate candidate, out ProgramSkillWindowContext context) => _coreProgramTriggerWindowsOperations.TryGetDrivenProgramTriggerCandidate(out candidate, out context);
+    bool IProgramActivationWindowFacts.TryGetDrivenProgramTriggerCandidate(out ProgramTriggerCandidate candidate, out ProgramSkillWindowContext context) => _coreProgramTriggerWindowsOperations.Value.TryGetDrivenProgramTriggerCandidate(out candidate, out context);
     bool IProgramActivationWindowFacts.TryGetPindianRevealTrigger(out ProgramTriggerCandidate candidate, out ProgramSkillWindowContext context) => _corePindianRevealWindowsOperations.TryGetPindianRevealTrigger(out candidate, out context);
     ProgramTriggerCandidate IProgramActivationWindowFacts.AfterTurnEndedCandidate(DeferredTurnEndFrame frame) => _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(frame);
     ProgramSkillWindowContext IProgramActivationWindowFacts.CreateAfterTurnEndedContext(DeferredTurnEndFrame frame, ProgramTriggerCandidate candidate) => _coreAfterTurnEndedProgramsOperations.CreateAfterTurnEndedContext(frame, candidate);
@@ -15,13 +15,13 @@ internal sealed partial class CoreProgramActivationWindowRuntimePortsRuntime
     ProgramSkillWindowContext IProgramActivationWindowFacts.CreateBeforeDamageProgramContext(BeforeDamageProgramWindowFrame frame, BeforeDamageProgramCandidate item) => _coreDamagePreventionProgramsOperations.CreateBeforeDamageProgramContext(frame, item);
     ProgramSkillWindowContext IProgramActivationWindowFacts.CreateAfterDamageProgramContext(DamageTriggerWindowFrame frame, ProgramTriggerCandidate candidate) => _coreProgramLifecycleOperations.CreateAfterDamageProgramContext(frame, candidate);
     ProgramSkillWindowContext IProgramActivationWindowFacts.PindianRevealContext(PindianRevealWindowFrame frame, ProgramTriggerCandidate candidate) => _corePindianRevealWindowsOperations.PindianRevealContext(frame, candidate);
-    bool IProgramActivationWindowReturns.TryResolveTurnEndingOrder(PromptChoice selected) => _coreTurnEndingOrderOperations.TryResolveTurnEndingOrder(selected);
-    bool IProgramActivationWindowReturns.TryResolveDrivenProgramTriggerGroupChoice(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, PromptChoice selected, string? action) => _coreProgramTriggerWindowsOperations.TryResolveDrivenProgramTriggerGroupChoice(candidate, context, selected, action);
+    bool IProgramActivationWindowReturns.TryResolveTurnEndingOrder(PromptChoice selected) => _coreTurnEndingOrderOperations.Value.TryResolveTurnEndingOrder(selected);
+    bool IProgramActivationWindowReturns.TryResolveDrivenProgramTriggerGroupChoice(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, PromptChoice selected, string? action) => _coreProgramTriggerWindowsOperations.Value.TryResolveDrivenProgramTriggerGroupChoice(candidate, context, selected, action);
     bool IProgramActivationWindowReturns.TrySkipMobileZhitiContestTrigger(ProgramTriggerCandidate candidate) => _characterZhangLiaoMobileGodOperations.TrySkipMobileZhitiContestTrigger(candidate);
-    bool IProgramActivationWindowReturns.TrySkipDrivenProgramCandidate(ProgramTriggerCandidate candidate) => _coreProgramTriggerWindowsOperations.TrySkipDrivenProgramCandidate(candidate);
+    bool IProgramActivationWindowReturns.TrySkipDrivenProgramCandidate(ProgramTriggerCandidate candidate) => _coreProgramTriggerWindowsOperations.Value.TrySkipDrivenProgramCandidate(candidate);
     void IProgramActivationWindowReturns.CompletePindianRevealBinding(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _corePindianRevealWindowsOperations.CompletePindianRevealBinding2(candidate, context);
     void IProgramActivationWindowReturns.CompleteFirstLegacyBenefitCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _coreFirstSlashDuelLegacyWindowsOperations.CompleteFirstLegacyBenefitCandidate(candidate, context);
-    void IProgramActivationWindowReturns.AdvanceForeignActualTurnStartCandidate(ForeignActualTurnStartWindowFrame frame, bool activated, bool completed) => _coreForeignTurnContestsOperations.AdvanceForeignActualTurnStartCandidate(frame, activated, completed);
+    void IProgramActivationWindowReturns.AdvanceForeignActualTurnStartCandidate(ForeignActualTurnStartWindowFrame frame, bool activated, bool completed) => _coreForeignTurnContestsOperations.Value.AdvanceForeignActualTurnStartCandidate(frame, activated, completed);
     void IProgramActivationWindowReturns.AdvanceActualUseTargetCandidate(ActualUseTargetWindowFrame frame, bool activated, bool completed) => _coreActualUseTargetProgramsOperations.AdvanceActualUseTargetCandidate(frame, activated, completed);
     void IProgramActivationWindowReturns.CompleteCardEffectCandidate(ProgramSkillWindowContext context) => _coreCardEffectProgramsOperations.CompleteCardEffectCandidate(context);
     void IProgramActivationWindowReturns.AdvanceAfterTurnEndedCandidate(DeferredTurnEndFrame frame, ProgramTriggerCandidate candidate, bool activated, bool completed) => _coreAfterTurnEndedProgramsOperations.AdvanceAfterTurnEndedCandidate(frame, candidate, activated, completed);

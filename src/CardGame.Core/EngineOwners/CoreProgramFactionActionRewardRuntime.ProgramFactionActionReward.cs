@@ -11,7 +11,7 @@ internal sealed partial class CoreProgramFactionActionRewardRuntime
         if (action.Type == CardActionType.Response)
             action = _characterLuSuMobileShiOperations.NormalizeShiLsResponseAction(action);
         action = _coreWushuangJinzhiOperations.CaptureWushuangJinzhiAppearance(action);
-        action = _coreGouXiangArmorOperations.CaptureGouXiangActionAppearance(action);
+        action = _coreGouXiangArmorOperations.Value.CaptureGouXiangActionAppearance(action);
         if (!TracksFactionActionOrigin || action.FactionOrigin is not null || !(CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.EffectiveKind == CardKind.Dodge && _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RewardOutOfTurnFactionDodge)) || action.ActionId == 0)
             return action;
         return new(action.ActionId, action.ParentActionId, action.Type, action.ActorSeat, action.ProviderSeat, action.RequesterSeat, action.ResponderSeat, action.OpponentSeat, action.EffectiveKind, action.TargetSeats, action.PhysicalCards, action.ConversionChain, action.DesignatedTargetSeats, action.EffectiveSuit, action.EffectiveRank, action.EffectiveIsRed, new(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat]), _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[action.ProviderSeat])));

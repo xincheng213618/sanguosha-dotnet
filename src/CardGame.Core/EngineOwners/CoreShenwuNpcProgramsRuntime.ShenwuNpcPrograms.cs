@@ -112,7 +112,7 @@ internal sealed partial class CoreShenwuNpcProgramsRuntime
     {
         if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied } context || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId)is not { } window)
             throw new InvalidOperationException("Shenwu requires its actual applied-damage parent.");
-        return _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+        return _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window);
     }
 
     internal void BindShenwuParticipant(ProgramSkillFrame frame, SkillProgramEffect effect, int? seat, string choice) => _coreRuntimeOperations.ReplaceRuntimeTop(frame with { SelectedTargetSeats = seat is { } actual ? Array.AsReadOnly(new[] { actual }) : [], ChoiceBindings = Array.AsReadOnly(frame.ChoiceBindings.Append(new ProgramChoiceResultBinding(effect.ResultBind!, choice, frame.OwnerSeat)).ToArray()) });
@@ -122,7 +122,7 @@ internal sealed partial class CoreShenwuNpcProgramsRuntime
     internal IReadOnlyList<int> ShenwuMingwanVictims(int ownerSeat) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShenwuMingwanVictimRecordedEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.OwnerSeat == ownerSeat).Select(e => e.VictimSeat).Distinct().ToArray();
     internal bool ShenwuMingwanForbidsTarget(int actorSeat, int targetSeat) => ShenwuOwnActualTurn(actorSeat) && actorSeat != targetSeat && ShenwuEnabled(_coreMatchParticipantsPlayersAccess._players[actorSeat], "shenwu:mingwan") && ShenwuMingwanVictims(actorSeat)is { Count: > 0 } victims && !victims.Contains(targetSeat);
     internal bool ShenwuFutaiForbidsPeach(int actorSeat, CardKind kind, CardActionType type) => kind == CardKind.Peach && type == CardActionType.Use && _coreMatchParticipantsPlayersAccess._players.Any(p => p.Seat != actorSeat && !ShenwuOwnActualTurn(p.Seat) && ShenwuEnabled(p, "shenwu:futai"));
-    internal bool ShenwuCannotTurnOver(CharacterState target) => ShenwuEnabled(target, "shenwu:xiongshou") || _coreProgramShanheSourceWarElephantOperations.ShanheWarElephantCannotTurnOver(target);
+    internal bool ShenwuCannotTurnOver(CharacterState target) => ShenwuEnabled(target, "shenwu:xiongshou") || _coreProgramShanheSourceWarElephantOperations.Value.ShanheWarElephantCannotTurnOver(target);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 230)]
     internal int ShenwuNpcDamageBonus(GameEngine.IDamageAttempt attack)
     {

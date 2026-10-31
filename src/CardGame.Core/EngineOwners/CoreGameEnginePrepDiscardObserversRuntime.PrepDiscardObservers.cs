@@ -9,7 +9,7 @@ internal sealed partial class CoreGameEnginePrepDiscardObserversRuntime
         {
             if (_resolutionStackOperations._resolutionStack[rootIndex] is not ProgramSkillFrame root)
                 continue;
-            if (root.PrepDiscard is { Stage: PrepDiscardStage.ImmediateDrawAttempt } && _corePrepDiscardReceiptsOperations.ValidPrepDiscard(root))
+            if (root.PrepDiscard is { Stage: PrepDiscardStage.ImmediateDrawAttempt } && _corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(root))
             {
                 if (exactDamageWindow is { } requestedWindow && !_resolutionStackOperations._resolutionStack.Skip(rootIndex + 1).Any(f => f.Id == requestedWindow && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame))
                     continue;
@@ -28,7 +28,7 @@ internal sealed partial class CoreGameEnginePrepDiscardObserversRuntime
             PrepDiscardPayment? paid = null;
             string reason;
             int payer;
-            if (root.PrepDiscard is { Stage: PrepDiscardStage.TargetChildren or PrepDiscardStage.OwnerChildren } d && _corePrepDiscardReceiptsOperations.ValidPrepDiscard(root))
+            if (root.PrepDiscard is { Stage: PrepDiscardStage.TargetChildren or PrepDiscardStage.OwnerChildren } d && _corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(root))
             {
                 var ownerCost = d.Stage == PrepDiscardStage.OwnerChildren;
                 paid = ownerCost ? d.OwnerPayment : d.TargetPayment;
@@ -46,7 +46,7 @@ internal sealed partial class CoreGameEnginePrepDiscardObserversRuntime
                 payer = draw.Promise.TargetSeat;
                 reason = "program.preparation-discard.ending-draw";
             }
-            else if (root.PrepDiscard is { Stage: PrepDiscardStage.ImmediateDrawChildren, ImmediateDraw.Outcome: { } outcome } && _corePrepDiscardReceiptsOperations.ValidPrepDiscard(root))
+            else if (root.PrepDiscard is { Stage: PrepDiscardStage.ImmediateDrawChildren, ImmediateDraw.Outcome: { } outcome } && _corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(root))
             {
                 before = outcome.SequenceBefore;
                 after = outcome.SequenceAfter;
@@ -95,7 +95,7 @@ internal sealed partial class CoreGameEnginePrepDiscardObserversRuntime
         for (var index = rootIndex + 1; index < _resolutionStackOperations._resolutionStack.Count; index++)
         {
             // The exact paid or native-attempt root edge is checked above.
-            if (!CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) && !_corePaidColorDamageClaimObserversOperations.PaidColorDamageClaimObserverEdge(index))
+            if (!CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[index], _resolutionStackOperations._resolutionStack[index - 1]) && !_corePaidColorDamageClaimObserversOperations.Value.PaidColorDamageClaimObserverEdge(index))
                 return false;
             if (_resolutionStackOperations._resolutionStack[index] is DyingFrame dying && (_coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(index, dying) || _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(index, dying) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(index, dying) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(index, dying)))
                 break;
@@ -104,12 +104,12 @@ internal sealed partial class CoreGameEnginePrepDiscardObserversRuntime
         return true;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 650)]
-    internal bool IsPrepDiscardProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PrepDiscardPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsPrepDiscardProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && PrepDiscardPaidObserverRoot(_coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 20)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 20)]
     internal bool IsPrepDiscardRecoveryParent(ProgramSkillFrame root, RecoveryReplacementFrame recovery)
     {
-        if (root.PrepDiscard is not { Stage: PrepDiscardStage.TargetChildren or PrepDiscardStage.OwnerChildren } draft || !_corePrepDiscardReceiptsOperations.ValidPrepDiscard(root) || recovery.ParentFrameId != root.Id || recovery.Return.Continuation != PostEventContinuation.AwaitedProgramMovement || recovery.Attempt.Completion.Producer != RecoveryAttemptProducer.SilverLion || recovery.Attempt.Amount != 1)
+        if (root.PrepDiscard is not { Stage: PrepDiscardStage.TargetChildren or PrepDiscardStage.OwnerChildren } draft || !_corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(root) || recovery.ParentFrameId != root.Id || recovery.Return.Continuation != PostEventContinuation.AwaitedProgramMovement || recovery.Attempt.Completion.Producer != RecoveryAttemptProducer.SilverLion || recovery.Attempt.Amount != 1)
             return false;
         var ownerCost = draft.Stage == PrepDiscardStage.OwnerChildren;
         var paid = ownerCost ? draft.OwnerPayment! : draft.TargetPayment!;

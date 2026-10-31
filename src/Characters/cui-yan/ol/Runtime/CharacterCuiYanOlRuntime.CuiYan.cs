@@ -19,7 +19,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
     {
         if (context.Window != SkillProgramTriggerWindow.AfterTurnEnded || context.OwnerSeat != c.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } p || !_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(p) || _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(p) != c || p.TurnNumber != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || p.OwnerSeat != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || context.SourceSeat != p.OwnerSeat || context.TargetSeat != p.OwnerSeat)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CuiYanEndQualifiedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == p.OwnerSeat && e.OwnerSeat == c.OwnerSeat && e.UsedOrPlayed && e.WasTargeted);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CuiYanEndQualifiedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == p.OwnerSeat && e.OwnerSeat == c.OwnerSeat && e.UsedOrPlayed && e.WasTargeted);
     }
 
     internal IReadOnlyList<int> CuiYanDamageTargets(int owner) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && (_characterSunYuanOlOperations.HasSayingRoundRange(owner, p.Seat) || _coreNativeRuleQueriesOperations.GetCombatDistance(owner, p.Seat) <= _coreNativeRuleQueriesOperations.GetAttackRange(owner))).Select(p => p.Seat).ToArray());

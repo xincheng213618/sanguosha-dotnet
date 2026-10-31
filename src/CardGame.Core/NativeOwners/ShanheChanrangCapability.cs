@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class ShanheChanrangCapability(Func<RuntimeEntries.CoreGameEngineShanheChanrangEdictEntries> getCoreGameEngineShanheChanrangEdictRuntime) : IShanheChanrangHost
+internal sealed class ShanheChanrangCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheChanrangEdictRuntime>> getCoreGameEngineShanheChanrangEdictRuntime) : IShanheChanrangHost
 {
-    public SkillProgramStepOutcome Resolve(ProgramSkillFrame frame) => getCoreGameEngineShanheChanrangEdictRuntime().BeginShanheChanrang(frame);
+    public SkillProgramStepOutcome Resolve(ProgramSkillFrame frame) => getCoreGameEngineShanheChanrangEdictRuntime().Value.BeginShanheChanrang(frame);
 }

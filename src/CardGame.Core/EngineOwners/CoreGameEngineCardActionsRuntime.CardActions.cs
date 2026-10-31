@@ -44,7 +44,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
             return;
         }
 
-        if (playedCardKind is null && (_coreModeCardRecastsOperations.CanModeHandEquipmentRecast(card) || _coreHellDizangProgramsOperations.CanHellDitingMountRecast(actor, card)) && _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(actor, card) == CardLocation.Hand(actor.Seat))
+        if (playedCardKind is null && (_coreModeCardRecastsOperations.Value.CanModeHandEquipmentRecast(card) || _coreHellDizangProgramsOperations.CanHellDitingMountRecast(actor, card)) && _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(actor, card) == CardLocation.Hand(actor.Seat))
         {
             _coreEquipmentRecastsOperations.BeginEquipmentRecast(actor, card, card.Kind);
             return;
@@ -116,12 +116,12 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
 
         _coreProgramCardLegalityOperations.CardLegality.ValidateSubmittedUse(new(actorSeat, effectiveKind, physicalIds, conversionChain));
         _corePlayCardHistoryOperations.ConsumeProgramViewAsUsage(conversionChain);
-        var trackAppearance = _characterGuanYuHappyGodOperations.HasHappyGuanYuHeartSlashCapability && CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind) || _characterMaChaoAnniversaryGodOperations.HasHengwuCapability || _contentRegistryOperations._contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.NativeActionAppearance) || _characterLuBuOlMagicOperations.HasMoLuBu || _characterHuangfuSongWumiaoOperations.HasWuHuangFuSongCapability || _characterLuKangWumiaoOperations.HasWuLuKangDixianCapability || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuaXiongYaowu) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouGongsunZanJiaodi) || _characterZhangFeiWumiaoOperations.HasWuZhangFeiUseCapability || _characterZhouYuOlMouOperations.HasMouZuifengCapability || _characterLuXunWumiaoOperations.HasWuLuXunZhangcaiCapability || _characterZouShiLeOperations.HasLeZouShiCapability || _characterGuanYuWumiaoOperations.HasWuyouCapability || _characterGuanYuWumiaoOperations.HasWuGuanYuJuewuCapability || _characterMiHengLeOperations.HasSiruiCapability || _characterLiFengOlOperations.HasLiFengCapability || _characterCuiYanOlOperations.HasCuiYanCapability || conversionChain.Any(source => _corePlayCardHistoryOperations.ViewAsRule(source)?.SourcePileSkillId is not null) || _characterLiuYanOlOperations.HasLiuYanCapability || _characterQuHuangOlOperations.HasQuHuangCapability || _characterRuanYuOlOperations.HasRuanYuCapability || _characterLiuPanOlOperations.HasLiuPanCapability || _characterWuJingOlOperations.HasWuJingLiubing || _characterWuJingOlOperations.HasWuJingHeji || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveKenshangTargetRewrite) || _characterMaMiDiOlOperations.HasMaMiDiCapability || _characterWuAnGuoOlOperations.HasWuAnGuoCapability || _characterFeiYiOlOperations.HasFeiYiHezhong || _characterBianFuRenOlOperations.HasBianFuRenCapability || _coreDamageTargetBudgetOperations.TracksDamageTargetBudgetTargets || _coreAdjacentRedTargetsOperations.HasAdjacentRedTargetCapability || _coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RevealRecordedSuitSlash) || effectiveKind is CardKind.UnexpectedAssault or CardKind.WumiaoFlood or CardKind.QizhengXiangsheng || (_coreUniqueLeaderTrickTargetsOperations.TracksUniqueLeaderTrickTargets || _coreRoundGainedSourceUsesOperations.TracksRoundGainedSourceUses || _coreTargetedOrdinaryTrickOperations.HasTargetedOrdinaryTrickAdjustment) && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(effectiveKind) || _coreSourceCursesOperations.HasSourceCurseActionColors || _coreEndingHistoricalUsesOperations.TracksOwnPlayHistory || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferOriginalTargetAddition) || _coreDyingWindowSkillPoliciesOperations.HasBlackTrickTargetPolicy || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawByDamageCardColor) || _coreCurrentTurnShownCardBenefitsOperations.HasShownCardTurnCapability || _coreTurnRedSlashBenefitsOperations.HasTurnRedSlashCapability || _corePlayCardHistoryOperations.TracksPlayCardHistory || _coreCurrentTurnUseKindsOperations.TracksCurrentTurnUseKinds || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.AlternatingSuitDrawDiscard) || _corePaidColorConversionsOperations.TracksPaidColorUseAppearance(actorSeat, effectiveKind, conversionChain) || _coreSameTypeActualUseAidOperations.HasSameTypeActualUseAid && CoreGameEngineSameTypeActualUseAidRuntime.IsSameTypeAidEffectiveCard(effectiveKind) || (_coreComparedBlackSlashPoliciesOperations.HasComparedBlackSlashPolicies || _coreDirectedCardPolicyQueriesOperations.HasYuanchouCardPolicy) && CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind);
+        var trackAppearance = _characterGuanYuHappyGodOperations.HasHappyGuanYuHeartSlashCapability && CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind) || _characterMaChaoAnniversaryGodOperations.HasHengwuCapability || _contentRegistryOperations._contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.NativeActionAppearance) || _characterLuBuOlMagicOperations.HasMoLuBu || _characterHuangfuSongWumiaoOperations.HasWuHuangFuSongCapability || _characterLuKangWumiaoOperations.HasWuLuKangDixianCapability || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuaXiongYaowu) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouGongsunZanJiaodi) || _characterZhangFeiWumiaoOperations.HasWuZhangFeiUseCapability || _characterZhouYuOlMouOperations.HasMouZuifengCapability || _characterLuXunWumiaoOperations.HasWuLuXunZhangcaiCapability || _characterZouShiLeOperations.HasLeZouShiCapability || _characterGuanYuWumiaoOperations.HasWuyouCapability || _characterGuanYuWumiaoOperations.HasWuGuanYuJuewuCapability || _characterMiHengLeOperations.HasSiruiCapability || _characterLiFengOlOperations.HasLiFengCapability || _characterCuiYanOlOperations.HasCuiYanCapability || conversionChain.Any(source => _corePlayCardHistoryOperations.ViewAsRule(source)?.SourcePileSkillId is not null) || _characterLiuYanOlOperations.HasLiuYanCapability || _characterQuHuangOlOperations.Value.HasQuHuangCapability || _characterRuanYuOlOperations.HasRuanYuCapability || _characterLiuPanOlOperations.HasLiuPanCapability || _characterWuJingOlOperations.HasWuJingLiubing || _characterWuJingOlOperations.HasWuJingHeji || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveKenshangTargetRewrite) || _characterMaMiDiOlOperations.HasMaMiDiCapability || _characterWuAnGuoOlOperations.HasWuAnGuoCapability || _characterFeiYiOlOperations.HasFeiYiHezhong || _characterBianFuRenOlOperations.HasBianFuRenCapability || _coreDamageTargetBudgetOperations.TracksDamageTargetBudgetTargets || _coreAdjacentRedTargetsOperations.HasAdjacentRedTargetCapability || _coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RevealRecordedSuitSlash) || effectiveKind is CardKind.UnexpectedAssault or CardKind.WumiaoFlood or CardKind.QizhengXiangsheng || (_coreUniqueLeaderTrickTargetsOperations.TracksUniqueLeaderTrickTargets || _coreRoundGainedSourceUsesOperations.TracksRoundGainedSourceUses || _coreTargetedOrdinaryTrickOperations.HasTargetedOrdinaryTrickAdjustment) && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(effectiveKind) || _coreSourceCursesOperations.HasSourceCurseActionColors || _coreEndingHistoricalUsesOperations.TracksOwnPlayHistory || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferOriginalTargetAddition) || _coreDyingWindowSkillPoliciesOperations.HasBlackTrickTargetPolicy || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawByDamageCardColor) || _coreCurrentTurnShownCardBenefitsOperations.HasShownCardTurnCapability || _coreTurnRedSlashBenefitsOperations.HasTurnRedSlashCapability || _corePlayCardHistoryOperations.TracksPlayCardHistory || _coreCurrentTurnUseKindsOperations.TracksCurrentTurnUseKinds || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.AlternatingSuitDrawDiscard) || _corePaidColorConversionsOperations.TracksPaidColorUseAppearance(actorSeat, effectiveKind, conversionChain) || _coreSameTypeActualUseAidOperations.HasSameTypeActualUseAid && CoreGameEngineSameTypeActualUseAidRuntime.IsSameTypeAidEffectiveCard(effectiveKind) || (_coreComparedBlackSlashPoliciesOperations.Value.HasComparedBlackSlashPolicies || _coreDirectedCardPolicyQueriesOperations.HasYuanchouCardPolicy) && CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind);
         var usedSuit = _characterWuJingOlOperations.WuJingLiubingUsedSuit(actorSeat, card, effectiveKind, physicalIds, conversionChain, trackAppearance ? _corePlayCardHistoryOperations.CaptureUsedCardSuit(actorSeat, physicalIds, card) : null);
         if (_characterCuiYanOlOperations.IsCuiYanNextUseForbidden(actorSeat, physicalIds, usedSuit))
             throw new InvalidOperationException("The native use violates its issued next-use suit restriction.");
-        var captured = _characterHuangfuSongWumiaoOperations.CaptureWuHfUseAction(_characterZhangFeiWumiaoOperations.CaptureWuZhangFeiUseRankAction(_coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actorSeat, provider, provider == actorSeat ? null : actorSeat, null, null, effectiveKind, targets, costs, conversionChain, (designatedTargetSeats ?? targets), effectiveSuit: usedSuit, effectiveRank: _characterLuKangWumiaoOperations.CaptureWuLuKangDixianDeclarationRank(provider, physicalIds) ?? _characterGuanYuWumiaoOperations.CaptureJuewuActionRank(provider, physicalIds) ?? _coreAlcoholIdentityPoliciesOperations.CaptureAlcoholActionRank(provider, effectiveKind, physicalIds) ?? (_characterZhouQunOlOperations.HasZhouQunCapability && CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind) && physicalIds.Count == 1 ? card.Rank : (int? )null) ?? (_coreFinalTargetSlashOperations.HasRankSlashRange(_coreMatchParticipantsPlayersAccess._players[actorSeat], effectiveKind) || _characterHuangfuSongWumiaoOperations.HasWuHuangFuSongCapability ? physicalIds.Count == 1 && card.Rank > 0 ? card.Rank : isTrueZhangbaSlash && physicalIds.Count == 2 && conversionChain.Count == 0 ? _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(_coreMatchParticipantsPlayersAccess._players[actorSeat], physicalIds.Select(id => _coreCardAttackStateOperations.GetAttackCard(id)).ToArray(), _coreMatchParticipantsPlayersAccess._players[provider]) : null : trackAppearance && physicalIds.Count == 1 && card.Rank > 0 ? card.Rank : null), effectiveIsRed: _coreActionDiscardColorsOperations.CaptureActionColor(costs, usedSuit)))));
-        return _characterZhaoYunOlGod2016Operations.CaptureHpScaledCardUseAction(captured);
+        var captured = _characterHuangfuSongWumiaoOperations.CaptureWuHfUseAction(_characterZhangFeiWumiaoOperations.CaptureWuZhangFeiUseRankAction(_coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actorSeat, provider, provider == actorSeat ? null : actorSeat, null, null, effectiveKind, targets, costs, conversionChain, (designatedTargetSeats ?? targets), effectiveSuit: usedSuit, effectiveRank: _characterLuKangWumiaoOperations.CaptureWuLuKangDixianDeclarationRank(provider, physicalIds) ?? _characterGuanYuWumiaoOperations.CaptureJuewuActionRank(provider, physicalIds) ?? _coreAlcoholIdentityPoliciesOperations.CaptureAlcoholActionRank(provider, effectiveKind, physicalIds) ?? (_characterZhouQunOlOperations.Value.HasZhouQunCapability && CoreNativeCardClassificationsRuntime.IsSlashCard(effectiveKind) && physicalIds.Count == 1 ? card.Rank : (int? )null) ?? (_coreFinalTargetSlashOperations.HasRankSlashRange(_coreMatchParticipantsPlayersAccess._players[actorSeat], effectiveKind) || _characterHuangfuSongWumiaoOperations.HasWuHuangFuSongCapability ? physicalIds.Count == 1 && card.Rank > 0 ? card.Rank : isTrueZhangbaSlash && physicalIds.Count == 2 && conversionChain.Count == 0 ? _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(_coreMatchParticipantsPlayersAccess._players[actorSeat], physicalIds.Select(id => _coreCardAttackStateOperations.GetAttackCard(id)).ToArray(), _coreMatchParticipantsPlayersAccess._players[provider]) : null : trackAppearance && physicalIds.Count == 1 && card.Rank > 0 ? card.Rank : null), effectiveIsRed: _coreActionDiscardColorsOperations.CaptureActionColor(costs, usedSuit)))));
+        return _characterZhaoYunOlGod2016Operations.Value.CaptureHpScaledCardUseAction(captured);
     }
 
     internal bool TryBeginCardResponsePrograms(NativeOwners.CardAttackHandle attack, CharacterState actor, CharacterState provider, int? requesterSeat, int opponentSeat, CardKind effectiveKind, IReadOnlyList<CardActionCost> costs, ProgramCardContinuation continuation, CardConversionSource? conversionSource = null, Suit? completedResponseUseSuit = null)
@@ -155,7 +155,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
         _coreGuanduChariotResponsesOperations.CaptureGuanduChariotResponsePayments(action, attack.ResolutionId, continuation);
         _coreFriendEventsOperations.CaptureFriendMinimumHandUse(action);
         _coreOffTurnUsedCardsOperations.CaptureOffTurnResponseUseOrigin(attack.ResolutionId, action);
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(attack, action, continuation))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(attack, action, continuation))
             return true;
         if (TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardResponseAccepted, [opponentSeat], continuation))
             return true;
@@ -211,7 +211,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
     {
         if (window == SkillProgramTriggerWindow.CardUseCommitted && attack is not null && _characterSimaYiMouOperations.TryBeginMouSmPrivateWindow(attack, MouSmPrivateCall.CommittedSlash))
             return true;
-        if ((continuation is null) != (completedResponseReturn is not null) && !_characterSimaYiMouOperations.IsMouSmPlayedWindow(action, window) && !_characterLuSuMouOperations.IsMouLuSuPlayedWindow(action, window))
+        if ((continuation is null) != (completedResponseReturn is not null) && !_characterSimaYiMouOperations.IsMouSmPlayedWindow(action, window) && !_characterLuSuMouOperations.Value.IsMouLuSuPlayedWindow(action, window))
             throw new InvalidOperationException("A card trigger window needs exactly one return continuation.");
         _modeRuntimeOperations._modeRuntime.OnCardAction(action, window);
         if (window == SkillProgramTriggerWindow.CardUseCommitted && _characterLiuZanMobileOperations.TracksAlternateActualUseColor)
@@ -222,7 +222,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
         }
 
         if (window == SkillProgramTriggerWindow.CardUseCommitted)
-            _coreShanheLeizhenOperations.RecordShanheLeizhenCommittedUse(action);
+            _coreShanheLeizhenOperations.Value.RecordShanheLeizhenCommittedUse(action);
         if ((_characterWangYunOlOperations.HasWangYunPlanCapability || _characterWangYunOlOperations.HasWangYunTrickCapability) && window is SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.CardUseCommitted)
         {
             for (var nativeIndex = _resolutionStackOperations._resolutionStack.Count - 1; nativeIndex >= 0; nativeIndex--)
@@ -285,7 +285,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
         var frame = new ProgramCardTriggerWindowFrame(frameId, _resolutionStackOperations._resolutionStack[^1].Id, action, continuation, Array.AsReadOnly(candidates.ToArray()), TrickContinuation: trickContinuation, SimpleContinuation: simpleContinuation, CompletedResponseReturn: completedResponseReturn, AttackOwnerFrameId: attack?.ResolutionId)
         {
             CaoChunDebtBeforeEffects = caoChunDebtOnly ? true : null,
-            MouLuSuAnniversaryPlayed = _characterLuSuMouOperations.MouLuSuPlayedWindowReturn(action, window),
+            MouLuSuAnniversaryPlayed = _characterLuSuMouOperations.Value.MouLuSuPlayedWindowReturn(action, window),
             MouSimaYiPlayed = _characterSimaYiMouOperations.MouSmPlayedWindowReturn(action, window)
         };
         _coreRuntimeOperations.PushRuntimeFrame(frame);
@@ -332,7 +332,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
         _characterCaoZhiLeOperations.CaptureLeCaoZhiWenlanQualification(action, window);
         _characterLiuChengMouMobileOperations.CaptureMouLiuChengCompletion(action, window);
         _characterLiuChengMouMobileOperations.CaptureMouLiuChengAccrual(action, window);
-        _characterYuanShaoMouMobileOperations.CaptureMouYuanShaoDesignation(action, window);
+        _characterYuanShaoMouMobileOperations.Value.CaptureMouYuanShaoDesignation(action, window);
         var targets = eventTargets.Distinct().ToHashSet();
         var result = new List<ProgramCardTriggerCandidate>();
         var capturedOwnerFacts = new SkillProgramTriggerFacts? [_coreMatchParticipantsPlayersAccess._players.Count];
@@ -354,7 +354,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
                     continue;
                 if (!_coreFirstSlashDuelBenefitsOperations.CanCollectFirstSlashDuelCandidate(owner.Seat, trigger, action))
                     continue;
-                if (trigger.RequireNoCardConversion == true && !_coreUnconvertedCardUseQualificationOperations.IsUnconvertedActualCardUse(action, window, continuation))
+                if (trigger.RequireNoCardConversion == true && !_coreUnconvertedCardUseQualificationOperations.Value.IsUnconvertedActualCardUse(action, window, continuation))
                     continue;
                 var reward = trigger.Effects.Any(CoreProgramFactionActionRewardRuntime.IsFactionActionReward);
                 var rewardChooser = reward ? _coreProgramFactionActionRewardOperations.FactionActionRewardChooser(owner.Seat, trigger, action) : null;
@@ -486,8 +486,8 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
             return new(ProgramTriggerWindowFlow.Retry, frame);
         frame = _coreActorHandLimitTargetProgramsOperations.AppendActorHandLimitTargetCandidates(frame);
         frame = _characterLiuChengMouMobileOperations.AppendMouLiuChengAccrual(frame);
-        frame = _characterYuanShaoMouMobileOperations.AppendMouYuanShaoTargets(frame);
-        frame = _characterPangTongMouMobileOperations.AppendMouPtLateTargets(frame);
+        frame = _characterYuanShaoMouMobileOperations.Value.AppendMouYuanShaoTargets(frame);
+        frame = _characterPangTongMouMobileOperations.Value.AppendMouPtLateTargets(frame);
         frame = _coreFirstSlashDuelLegacyWindowsOperations.DeferFirstSlashDuelCandidates(frame);
         return new(ProgramTriggerWindowFlow.Ready, frame);
     }
@@ -506,7 +506,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
             return ProgramTriggerWindowFlow.Yield;
         if (_characterSimaYiMouOperations.TryReturnMouSmPlayedWindow(frame))
             return ProgramTriggerWindowFlow.Yield;
-        if (_characterLuSuMouOperations.TryReturnMouLuSuPlayedWindow(frame))
+        if (_characterLuSuMouOperations.Value.TryReturnMouLuSuPlayedWindow(frame))
             return ProgramTriggerWindowFlow.Yield;
         if (_characterLiuYanOlOperations.TryReturnLiuYanLegacyAlcohol(frame))
             return ProgramTriggerWindowFlow.Yield;
@@ -535,7 +535,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
         else if (frame.Continuation == ProgramCardContinuation.CompletedCard)
             _coreNativeCardUseCompletionOperations.PopFinishedCardUse(frame.ParentFrameId);
         else if (frame.CompletedResponseReturn is { IsCommitted: true })
-            _coreCommittedResponseUsesOperations.ContinueCommittedResponseUse(attack, frame);
+            _coreCommittedResponseUsesOperations.Value.ContinueCommittedResponseUse(attack, frame);
         else if (frame.CompletedResponseReturn is not null)
             _coreResponseUseCompletionOperations.ContinueCompletedResponseUse(attack, frame);
         else if (frame.Continuation == ProgramCardContinuation.CommittedSlash)
@@ -557,7 +557,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
         else if (frame.Continuation == ProgramCardContinuation.DelayedCard)
             ContinueAcceptedDelayedCardUse(frame);
         else if (frame.Continuation == ProgramCardContinuation.FinalizedDelayedPlacement)
-            _coreDelayedPlacementTargetProgramsOperations.ContinueFinalizedDelayedPlacement(frame);
+            _coreDelayedPlacementTargetProgramsOperations.Value.ContinueFinalizedDelayedPlacement(frame);
         else if (frame.Continuation == ProgramCardContinuation.NullificationResponse)
             _coreResponseUseCompletionOperations.ContinueNullificationAfterResponseUse(frame.Action);
         else

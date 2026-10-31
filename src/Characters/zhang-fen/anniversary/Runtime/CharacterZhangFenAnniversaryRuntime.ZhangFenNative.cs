@@ -25,7 +25,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, actor.Seat, targets[0], null, 1 + actor.AlcoholDamageBonus, CardKind.Slash, ignoresArmor: r.IgnoreRangeArmor || _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], CardKind.Slash), programSkillCardUseFrameId: f.Id);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(useId, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(useId, actor);
         actor.HasAlcoholEffect = false;
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, targets[0], IgnoresArmor: attack.IgnoresArmor));
@@ -33,7 +33,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
         if (!_coreCardActionsOperations.TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardUseCommitted, targets, ProgramCardContinuation.CommittedSlash))
             _coreNativeSlashUseOperations.BeginSlashTargetResolution(attack);
     }
-    internal bool ExactDagongCheUse(CardUseFrame use, ProgramSkillFrame f) => use.DagongCheSlash is { } o && f.ZhangFen is { } r && ValidZhangFen(f) && o.FrameId == f.Id && o.Instruction == f.InstructionIndex && o.Source == r.Source && o.Hash == f.GameplayHash && o.CartId == r.CartId && o.Turn == r.Turn && r.Stage == ZhangFenStage.NativeUse && r.UseId == use.Id && o.UseId == use.Id && o.ActionId == r.ActionId && use.CardId == 0 && use.CardKind == CardKind.Slash && use.PhysicalCardIds is { Count: 0 } && use.VirtualBasicReturn == new ProgramVirtualBasicReturn(f.Id, f.InstructionIndex) && use.Action is { Type: CardActionType.Use, EffectiveKind: CardKind.Slash, PhysicalCards.Count: 0, ConversionChain.Count: 0 } a && a.ActionId == o.ActionId && a.ActorSeat == f.OwnerSeat && a.ProviderSeat == f.OwnerSeat && a.RequesterSeat is null && _coreProgramEventHistoryOperations.ProgramEventHistory<DagongCheSlashIssuedEvent>().Count(e => e.Origin == o) == 1;
+    internal bool ExactDagongCheUse(CardUseFrame use, ProgramSkillFrame f) => use.DagongCheSlash is { } o && f.ZhangFen is { } r && ValidZhangFen(f) && o.FrameId == f.Id && o.Instruction == f.InstructionIndex && o.Source == r.Source && o.Hash == f.GameplayHash && o.CartId == r.CartId && o.Turn == r.Turn && r.Stage == ZhangFenStage.NativeUse && r.UseId == use.Id && o.UseId == use.Id && o.ActionId == r.ActionId && use.CardId == 0 && use.CardKind == CardKind.Slash && use.PhysicalCardIds is { Count: 0 } && use.VirtualBasicReturn == new ProgramVirtualBasicReturn(f.Id, f.InstructionIndex) && use.Action is { Type: CardActionType.Use, EffectiveKind: CardKind.Slash, PhysicalCards.Count: 0, ConversionChain.Count: 0 } a && a.ActionId == o.ActionId && a.ActorSeat == f.OwnerSeat && a.ProviderSeat == f.OwnerSeat && a.RequesterSeat is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DagongCheSlashIssuedEvent>().Count(e => e.Origin == o) == 1;
     [NativeUseValidation(43500)]
     internal void ValidateDagongCheUseReturn(CardUseFrame use)
     {
@@ -67,7 +67,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangFen: { Stage: ZhangFenStage.NativeReturned } r } f || completion.ResolutionId != r.UseId)
             return false;
-        if (completion.ProgramFrameId != f.Id || f.VirtualBasicDraft is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == CardKind.Slash) != 1)
+        if (completion.ProgramFrameId != f.Id || f.VirtualBasicDraft is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == CardKind.Slash) != 1)
             throw new InvalidOperationException("Dagong Che's completed native attack must return to its exact issued program parent.");
         FinishZhangFen(f);
         return true;

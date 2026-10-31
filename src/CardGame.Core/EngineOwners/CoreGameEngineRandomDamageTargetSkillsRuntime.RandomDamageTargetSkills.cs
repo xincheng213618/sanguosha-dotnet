@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
             return true;
         if (context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target } || source != ownerSeat || target == ownerSeat || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window)
             return false;
-        return TryGetRandomSkillDirectSlashUse(_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window), out _);
+        return TryGetRandomSkillDirectSlashUse(_coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window), out _);
     }
 
     internal bool TryGetRandomSkillDirectSlashUse(GameEngine.IDamageAttempt attack, out CardUseFrame use)
@@ -30,7 +30,7 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
             foreach (var grant in lease.RemovedGrants)
             {
                 var general = lease.TemplateSourceId == CharacterState.SecondarySkillSource ? owner.SecondaryGeneral : owner.General;
-                var loss = _coreProgramEventHistoryOperations.ProgramEventHistory<OrderedPrintedSkillGrantRemovedEvent>().Single(e => e.FrameId == lease.ProgramFrameId && e.Grant == grant);
+                var loss = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<OrderedPrintedSkillGrantRemovedEvent>().Single(e => e.FrameId == lease.ProgramFrameId && e.Grant == grant);
                 if (general?.Id == lease.GeneralId && !_coreAlcoholSlashSkillReplacementsOperations.WasGrantPermanentlyRevokedAfterLoss(owner.Seat, grant, loss) && !RandomDamageTargetSkillGrantExpired(grant))
                     ids.Add(grant.SkillId);
             }
@@ -41,7 +41,7 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
         return ids;
     }
 
-    internal bool RandomDamageTargetSkillGrantExpired(SkillGrant grant) => _coreNextActualTurnStartSkillGrantsOperations.HasNextActualTurnStartSkillGrantExpired(grant) || grant.TurnExpiry is { } turn && _coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == turn.TurnNumber && e.ActorSeat == turn.TurnOwnerSeat);
+    internal bool RandomDamageTargetSkillGrantExpired(SkillGrant grant) => _coreNextActualTurnStartSkillGrantsOperations.HasNextActualTurnStartSkillGrantExpired(grant) || grant.TurnExpiry is { } turn && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == turn.TurnNumber && e.ActorSeat == turn.TurnOwnerSeat);
     internal SkillProgramStepOutcome AcquireRandomDamageTargetSkill(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -98,7 +98,7 @@ internal sealed partial class CoreGameEngineRandomDamageTargetSkillsRuntime
         var selected = r.Candidates[replay.Next(r.Candidates.Count)];
         var source = RandomDamageTargetSkillGrantSource(f);
         var grantId = source + ":" + selected;
-        return r.RandomBefore != 0 && r.SelectedSkillId == selected && r.RandomAfter == replay.State && r.GrantedGrant == new SkillGrant(grantId, selected, grantId, source) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramRandomDamageTargetSkillAcquiredEvent>().Where(e => e.Receipt.ProgramFrameId == f.Id).ToArray()is [var issued] && SameRandomDamageTargetSkillReceipt(r, issued.Receipt) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == SkillProgramTriggerWindow.AfterDamageApplied) == 1;
+        return r.RandomBefore != 0 && r.SelectedSkillId == selected && r.RandomAfter == replay.State && r.GrantedGrant == new SkillGrant(grantId, selected, grantId, source) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramRandomDamageTargetSkillAcquiredEvent>().Where(e => e.Receipt.ProgramFrameId == f.Id).ToArray()is [var issued] && SameRandomDamageTargetSkillReceipt(r, issued.Receipt) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == SkillProgramTriggerWindow.AfterDamageApplied) == 1;
     }
 
     internal static bool SameRandomDamageTargetSkillReceipt(ProgramRandomDamageTargetSkillReceipt a, ProgramRandomDamageTargetSkillReceipt b) => RuntimeSkills.RuntimeRules_Core_RandomDamageTargetSkills.SameRandomDamageTargetSkillReceipt(a, b);

@@ -10,11 +10,11 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
     internal CardConversionSource HappyPtSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool HasHappyPangTong => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.IssueHappyPangTongPlan);
 
-    internal HappyPangTongPlanIssuedEvent HappyPtPlan(long id) => _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongPlanIssuedEvent>().Single(e => e.PlanId == id);
-    internal IEnumerable<HappyPangTongPlanIssuedEvent> HappyPtOutstanding(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongPlanIssuedEvent>().Where(p => p.Source.OwnerSeat == owner && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Any(s => s.PlanId == p.PlanId));
+    internal HappyPangTongPlanIssuedEvent HappyPtPlan(long id) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongPlanIssuedEvent>().Single(e => e.PlanId == id);
+    internal IEnumerable<HappyPangTongPlanIssuedEvent> HappyPtOutstanding(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongPlanIssuedEvent>().Where(p => p.Source.OwnerSeat == owner && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Any(s => s.PlanId == p.PlanId));
     internal long[] HappyPtDue(int owner, ProgramSkillWindowContext context)
     {
-        if (context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && context.CardUse is { } card && card.ActorSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(card.EffectiveKind) && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongSlashRecordedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.ActorSeat == card.ActorSeat && e.UseId == card.ParentCardUseFrameId && e.ActionId == card.CardActionId && e.Ordinal == 1))
+        if (context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && context.CardUse is { } card && card.ActorSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(card.EffectiveKind) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongSlashRecordedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.ActorSeat == card.ActorSeat && e.UseId == card.ParentCardUseFrameId && e.ActionId == card.CardActionId && e.Ordinal == 1))
             return HappyPtOutstanding(owner).Where(p => p.Kind == HappyPangTongPlanKind.Middle && p.TargetSeat == card.ActorSeat && p.PlanId < card.ParentCardUseFrameId && p.IssuedActionBoundary < card.CardActionId).Select(p => p.PlanId).Order().ToArray();
         if (context.Window == SkillProgramTriggerWindow.AfterTurnEnded && context.TargetSeat is { } actor && _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is { } parent && _coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent) && parent.OwnerSeat == actor)
             return HappyPtOutstanding(owner).Where(p => p.TargetSeat == actor && p.PlanId < parent.Id).Select(p => p.PlanId).Order().ToArray();
@@ -57,9 +57,9 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
     {
         if (!HasHappyPangTong)
             return;
-        if (payload is CardUseDeclaredEvent declared && _coreCurrentTurnUseKindsOperations.HasOngoingActualUseTurn && declared.SourceSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(declared.CardKind) && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { Action: { Type: CardActionType.Use } action } use && action.ActorSeat == declared.SourceSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongSlashRecordedEvent>().Any(e => e.UseId == use.Id))
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyPangTongSlashRecordedEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, use.Id, action.ActionId, 1 + _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongSlashRecordedEvent>().Count(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.ActorSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)));
-        if (payload is DamageAppliedEvent { Amount: > 0, SourceLess: false } damage && _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber > 0 && _resolutionStackOperations._resolutionStack.LastOrDefault()is DamageFrame d && d.SourceSeat == damage.SourceSeat && d.TargetSeat == damage.TargetSeat && d.Amount == damage.Amount && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } attack && d.ParentFrameId == attack.ResolutionId && attack.DamageWasApplied && !_coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongDamageRecordedEvent>().Any(e => e.DamageId == d.Id))
+        if (payload is CardUseDeclaredEvent declared && _coreCurrentTurnUseKindsOperations.HasOngoingActualUseTurn && declared.SourceSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(declared.CardKind) && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { Action: { Type: CardActionType.Use } action } use && action.ActorSeat == declared.SourceSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongSlashRecordedEvent>().Any(e => e.UseId == use.Id))
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyPangTongSlashRecordedEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, use.Id, action.ActionId, 1 + _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongSlashRecordedEvent>().Count(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.ActorSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)));
+        if (payload is DamageAppliedEvent { Amount: > 0, SourceLess: false } damage && _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber > 0 && _resolutionStackOperations._resolutionStack.LastOrDefault()is DamageFrame d && d.SourceSeat == damage.SourceSeat && d.TargetSeat == damage.TargetSeat && d.Amount == damage.Amount && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } attack && d.ParentFrameId == attack.ResolutionId && attack.DamageWasApplied && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongDamageRecordedEvent>().Any(e => e.DamageId == d.Id))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyPangTongDamageRecordedEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, d.Id, damage.SourceSeat, damage.Amount));
     }
 
@@ -300,7 +300,7 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
                     return;
                 }
 
-                var damaged = _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongDamageRecordedEvent>().Any(e => e.ActualTurn == r.ActualTurn && e.SourceSeat == plan.TargetSeat);
+                var damaged = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongDamageRecordedEvent>().Any(e => e.ActualTurn == r.ActualTurn && e.SourceSeat == plan.TargetSeat);
                 if (plan.Kind == HappyPangTongPlanKind.Middle || plan.Kind == HappyPangTongPlanKind.Upper && !damaged || plan.Kind == HappyPangTongPlanKind.Lower && damaged)
                 {
                     SettleHappyPt(f, false);
@@ -352,7 +352,7 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.HappyPangTong!;
         var plan = HappyPtPlan(r.CurrentPlanId);
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Any(e => e.PlanId == plan.PlanId))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Any(e => e.PlanId == plan.PlanId))
             throw new InvalidOperationException("An independently issued plan may settle exactly once.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyPangTong = r with { Stage = HappyPangTongStage.Settling } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyPangTongPlanSettledEvent(f.Id, plan.PlanId, f.OwnerSeat, plan.TargetSeat, plan.Kind, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, success));
@@ -367,7 +367,7 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyPangTong = f.HappyPangTong!with { CurrentPlanId = ret.PlanId } });
         if (ret.Success)
         {
-            var count = _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Count(e => e.OwnerSeat == f.OwnerSeat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Success);
+            var count = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Count(e => e.OwnerSeat == f.OwnerSeat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Success);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyPangTong = f.HappyPangTong!with { Stage = HappyPangTongStage.RewardDrawing, DrawCount = count } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyPangTongBenefitIssuedEvent(f.Id, ret.PlanId, "draw", count, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp));
             _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, count, new("skill-program.happy:lanhai.success-draw"));
@@ -377,7 +377,7 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var before = owner.MaxHp;
         f = HappyPtChildren(f, HappyPangTongStage.GrowthMaximumChildren);
-        var actualGrowth = _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongBenefitIssuedEvent>().Count(e => e.Branch == "grow" && e.MaximumAfter > e.MaximumBefore && _coreProgramEventHistoryOperations.ProgramEventHistory<HappyPangTongStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == f.OwnerSeat)) < 3;
+        var actualGrowth = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongBenefitIssuedEvent>().Count(e => e.Branch == "grow" && e.MaximumAfter > e.MaximumBefore && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == f.OwnerSeat)) < 3;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyPangTong = f.HappyPangTong!with { MaximumBefore = before, MaximumAfter = before + (actualGrowth ? 1 : 0) } });
         if (actualGrowth)
             _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().ChangeMaximumHp(f, 1);

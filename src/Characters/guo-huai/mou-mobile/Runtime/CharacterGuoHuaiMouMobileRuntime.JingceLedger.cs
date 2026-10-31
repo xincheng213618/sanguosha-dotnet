@@ -8,7 +8,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
     internal static CardConversionSource MouGhSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_guo_huai_mou_mobile_Jingce_Ledger.MouGhSource(f);
     internal static bool IsMouGuoHuaiGainTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_guo_huai_mou_mobile_Jingce_Ledger.IsMouGuoHuaiGainTrigger(t);
     internal bool LiveMouGhSource(CardConversionSource source, string hash) => _coreMatchParticipantsPlayersAccess._players[source.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], source.SkillId, source.SkillInstanceId) && _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash == hash;
-    internal IEnumerable<MouGuoHuaiPredictionIssuedEvent> UnverifiedMouGhPredictions() => _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Where(p => _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionPlacedEvent>().Any(e => e.PredictionId == p.PredictionId && e.CardId == p.CardId && e.To == CardLocation.DrawPile) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionVerifiedEvent>().Any(e => e.PredictionId == p.PredictionId) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionDueEvent>().Any(e => e.PredictionId == p.PredictionId) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == p.PredictionId));
+    internal IEnumerable<MouGuoHuaiPredictionIssuedEvent> UnverifiedMouGhPredictions() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Where(p => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionPlacedEvent>().Any(e => e.PredictionId == p.PredictionId && e.CardId == p.CardId && e.To == CardLocation.DrawPile) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionVerifiedEvent>().Any(e => e.PredictionId == p.PredictionId) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionDueEvent>().Any(e => e.PredictionId == p.PredictionId) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == p.PredictionId));
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 32000)]
     internal void FreezeMouGhActualStart(TurnStartedEvent turn)
     {
@@ -20,7 +20,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
 
     internal bool TryBeginMouGuoHuaiActualStart(CharacterState owner)
     {
-        if (!HasMouGuoHuaiMobile || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiStartedEvent>().Any(e => e.Op == SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart && e.Source.OwnerSeat == owner.Seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber))
+        if (!HasMouGuoHuaiMobile || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiStartedEvent>().Any(e => e.Op == SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart && e.Source.OwnerSeat == owner.Seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber))
             return false;
         var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(owner);
         var candidates = _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(owner, SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, facts).Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart }]).ToArray();
@@ -40,7 +40,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
         if (IsMouGuoHuaiGainTrigger(t))
             return MouGuoHuaiGainQualification(c, context)is not null;
         if (t.Effects is [{ Op: SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart }])
-            return context.SourceSeat == c.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiStartedEvent>().Any(e => e.Op == SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart && e.Source.OwnerSeat == c.OwnerSeat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
+            return context.SourceSeat == c.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiStartedEvent>().Any(e => e.Op == SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart && e.Source.OwnerSeat == c.OwnerSeat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
         return context.Window == SkillProgramTriggerWindow.AfterTurnEnded && context.SourceSeat == c.OwnerSeat && _corePublicPileSourcesOperations.PublicPileSources(c.OwnerSeat).Any(s => s.SkillId == c.SkillId && s.SkillInstanceId == c.SkillInstanceId && _corePublicPileSourcesOperations.PublicPileCards(s).Count != 0);
     }
 
@@ -50,7 +50,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
             return;
         foreach (var p in UnverifiedMouGhPredictions().ToArray())
         {
-            var placed = _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionPlacedEvent>().Single(e => e.PredictionId == p.PredictionId);
+            var placed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionPlacedEvent>().Single(e => e.PredictionId == p.PredictionId);
             var gain = batch.Movements.Select((m, i) => (m, i)).FirstOrDefault(x => x.m.CardId == p.CardId && x.m.Sequence > placed.Sequence && x.m.To is { Zone: CardZoneKind.Hand, OwnerSeat: not null } && _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(x.m, batch) != x.m.To);
             if (gain.m?.To.OwnerSeat is not { } recipient)
                 continue;
@@ -63,18 +63,18 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
         }
     }
 
-    internal IEnumerable<ProgramTriggerCandidate> CollectMouGuoHuaiGainCandidates(CardMovementBatchContext batch) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiGainQualifiedEvent>().Where(q => q.BatchId == batch.Id && LiveMouGhSource(q.Source, q.GameplayHash)).Select(q => new ProgramTriggerCandidate(q.Source.OwnerSeat, q.Source.SkillId, q.Source.BindingId, q.Source.SkillInstanceId, q.GameplayHash, _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program!.Triggers.Single(t => t.Id == q.Source.BindingId).Priority, q.MovementIndex)).ToArray();
+    internal IEnumerable<ProgramTriggerCandidate> CollectMouGuoHuaiGainCandidates(CardMovementBatchContext batch) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiGainQualifiedEvent>().Where(q => q.BatchId == batch.Id && LiveMouGhSource(q.Source, q.GameplayHash)).Select(q => new ProgramTriggerCandidate(q.Source.OwnerSeat, q.Source.SkillId, q.Source.BindingId, q.Source.SkillInstanceId, q.GameplayHash, _contentRegistryOperations._contentRegistry.GetSkill(q.Source.SkillId).Program!.Triggers.Single(t => t.Id == q.Source.BindingId).Priority, q.MovementIndex)).ToArray();
     internal MouGuoHuaiGainQualifiedEvent? MouGuoHuaiGainQualification(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
         if (context.Window != SkillProgramTriggerWindow.CardsGained || context.OwnerSeat != c.OwnerSeat || context.TargetSeat != c.OwnerSeat || context.MovementBatch is not { } batch || context.ParentFrameId != batch.Id || context.MovementIndex != c.OccurrenceIndex || context.OccurrenceIndex != c.OccurrenceIndex || c.OccurrenceIndex < 0 || c.OccurrenceIndex >= batch.Movements.Count || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == batch.Id)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != c || !parent.Batch.Movements.SequenceEqual(batch.Movements))
             return null;
-        var q = _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiGainQualifiedEvent>().SingleOrDefault(q => q.BatchId == batch.Id && q.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId) && q.GameplayHash == c.GameplayHash && q.MovementIndex == c.OccurrenceIndex);
-        return q is not null && context.SourceSeat == q.GainingSeat && batch.Movements[q.MovementIndex] is { } move && move.CardId == _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Single(p => p.PredictionId == q.PredictionId).CardId && move.Sequence == q.Sequence && move.To == CardLocation.Hand(q.GainingSeat) && _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(move, batch) != move.To && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionVerifiedEvent>().Count(e => e.PredictionId == q.PredictionId && e.Success && e.BatchId == batch.Id && e.Sequence == q.Sequence && e.GainingSeat == q.GainingSeat) == 1 ? q : null;
+        var q = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiGainQualifiedEvent>().SingleOrDefault(q => q.BatchId == batch.Id && q.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId) && q.GameplayHash == c.GameplayHash && q.MovementIndex == c.OccurrenceIndex);
+        return q is not null && context.SourceSeat == q.GainingSeat && batch.Movements[q.MovementIndex] is { } move && move.CardId == _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Single(p => p.PredictionId == q.PredictionId).CardId && move.Sequence == q.Sequence && move.To == CardLocation.Hand(q.GainingSeat) && _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(move, batch) != move.To && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionVerifiedEvent>().Count(e => e.PredictionId == q.PredictionId && e.Success && e.BatchId == batch.Id && e.Sequence == q.Sequence && e.GainingSeat == q.GainingSeat) == 1 ? q : null;
     }
 
     internal ProgramSkillWindowContext CreateMouGuoHuaiGainContext(CardsMovedTriggerWindowFrame parent, ProgramTriggerCandidate c)
     {
-        var q = _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiGainQualifiedEvent>().Single(q => q.BatchId == parent.Id && q.Source.OwnerSeat == c.OwnerSeat && q.Source.SkillId == c.SkillId && q.Source.SkillInstanceId == c.SkillInstanceId && q.MovementIndex == c.OccurrenceIndex);
+        var q = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiGainQualifiedEvent>().Single(q => q.BatchId == parent.Id && q.Source.OwnerSeat == c.OwnerSeat && q.Source.SkillId == c.SkillId && q.Source.SkillInstanceId == c.SkillInstanceId && q.MovementIndex == c.OccurrenceIndex);
         return new(SkillProgramTriggerWindow.CardsGained, parent.Id, c.OwnerSeat, SourceSeat: q.GainingSeat, TargetSeat: c.OwnerSeat, OccurrenceIndex: c.OccurrenceIndex, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat]), MovementBatch: parent.Batch, MovementIndex: q.MovementIndex);
     }
 

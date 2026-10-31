@@ -14,12 +14,12 @@ internal sealed partial class CoreGameEngineProgramSelectionValidationRuntime
     bool IForeignSlashSelectionQuery.CanSelect(int ownerSeat, int targetSeat) => _coreForeignSelectedCardSlashOperations.CanStartSelectedForeignCardSlash(_coreMatchParticipantsPlayersAccess._players[ownerSeat], targetSeat);
     bool ISelectedActorDuelSelectionQuery.CanSelect(int ownerSeat, int targetSeat) => _coreDamageColorDuelProgramsOperations.CanIssueSelectedActorDuel(ownerSeat, targetSeat);
     bool IEquipmentPlacementSelectionQuery.CanPlace(int ownerSeat, int targetSeat, int cardId) => _coreEquipmentPlacementAndHpPairOperations.CanPlaceActivationEquipment(ownerSeat, targetSeat, cardId);
-    bool ICapturedEquipmentPlacementSelectionQuery.CanPlace(int ownerSeat, int targetSeat, int cardId, string skillId) => _coreCapturedEquipmentDrawsOperations.CanPlaceCapturedEquipmentActivation(ownerSeat, targetSeat, cardId, skillId);
+    bool ICapturedEquipmentPlacementSelectionQuery.CanPlace(int ownerSeat, int targetSeat, int cardId, string skillId) => _coreCapturedEquipmentDrawsOperations.Value.CanPlaceCapturedEquipmentActivation(ownerSeat, targetSeat, cardId, skillId);
     bool IBlackGiftSelectionQuery.WasIssued(int ownerSeat, string skillId) => _coreRecipientConsequencesReceiptsOperations.BlackGiftGameIssued(ownerSeat, skillId);
     bool IDynamicDiscardDamageSelectionQuery.CanStart(int ownerSeat, string skillId) => _coreDynamicDiscardDamagePaymentsOperations.CanStartDynamicDiscardDamage(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId);
     bool IDynamicDiscardDamageSelectionQuery.CanTarget(int ownerSeat, string skillId, int targetSeat) => _coreDynamicDiscardDamagePaymentsOperations.CanSelectDynamicDiscardDamageTarget(_coreMatchParticipantsPlayersAccess._players[ownerSeat], skillId, targetSeat);
-    bool IGameHandHpSelectionQuery.CanTarget(int ownerSeat, string skillId, string stateId, int targetSeat) => _coreGameTargetHandHpChoicesOperations.CanSelectGameHandHpTarget(ownerSeat, skillId, stateId, targetSeat);
-    bool ICategoryRefundSelectionQuery.CanTarget(int ownerSeat, string skillId, string stateId, int targetSeat) => _coreDrawDiscardCategoryRefundOperations.DrawDiscardCategoryTargetAvailable(ownerSeat, skillId, stateId, targetSeat);
+    bool IGameHandHpSelectionQuery.CanTarget(int ownerSeat, string skillId, string stateId, int targetSeat) => _coreGameTargetHandHpChoicesOperations.Value.CanSelectGameHandHpTarget(ownerSeat, skillId, stateId, targetSeat);
+    bool ICategoryRefundSelectionQuery.CanTarget(int ownerSeat, string skillId, string stateId, int targetSeat) => _coreDrawDiscardCategoryRefundOperations.Value.DrawDiscardCategoryTargetAvailable(ownerSeat, skillId, stateId, targetSeat);
     bool INextActualUseSelectionQuery.HasHpLossTargets(int ownerSeat) => _coreHpLossSlashMaterialsOperations.HasHpLossSlashTargets(_coreMatchParticipantsPlayersAccess._players[ownerSeat]);
     SkillProgramEffect? INextActualUseSelectionQuery.HpLossProducer(ProgramExecutionPlan plan) => CoreGameEngineHpLossSlashMaterialsRuntime.HpLossSlashProgramProducer(plan);
     int INextActualUseSelectionQuery.HpLossMaximum(int ownerSeat, CardKind kind) => _coreHpLossSlashMaterialsOperations.HpLossSlashMaximum(_coreMatchParticipantsPlayersAccess._players[ownerSeat], kind);
@@ -30,7 +30,7 @@ internal sealed partial class CoreGameEngineProgramSelectionValidationRuntime
     bool INextActualUseSelectionQuery.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool INextActualUseSelectionQuery.CanUseSlash(int ownerSeat, int targetSeat, ProgramMultiCardViewAsSelection selection) => _coreNextActualUseTargetAdjustmentsOperations.CanUseNextActualUseSelectedSlash(_coreMatchParticipantsPlayersAccess._players[ownerSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat], selection);
     IReadOnlyList<int> INextActualUseSelectionQuery.Targets(int ownerSeat, ProgramExecutionPlan plan, ProgramMultiCardViewAsSelection selection) => Array.AsReadOnly(AdjustedUseSelection.SelectTargets(ownerSeat, plan, [], [selection], _coreProgramSelectionModulesOperations.ProgramSelectionQueries.Get<IProgramSelectionSourceQuery>()).ToArray());
-    bool IProvenanceSelectionQuery.TracksProvenance => _coreDiscardedProvenanceOperations.TracksDiscardedEntityProvenance;
+    bool IProvenanceSelectionQuery.TracksProvenance => _coreDiscardedProvenanceOperations.Value.TracksDiscardedEntityProvenance;
 
     bool IProvenanceSelectionQuery.IsFaceDown(int ownerSeat) => _coreMatchParticipantsPlayersAccess._players[ownerSeat].IsFaceDown;
     bool IProvenanceSelectionQuery.HasClaimedEntityPolicy(int ownerSeat) => _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[ownerSeat], SkillProgramCardPolicyKind.ClaimedEntitiesFaceDownUse).Any();

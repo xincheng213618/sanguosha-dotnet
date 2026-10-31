@@ -170,7 +170,7 @@ internal sealed partial class CharacterXieLingYuOlRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveYuandiDiscardNames, SkillProgramEffectOp.ResolveXinyouBasicCycle)]
     internal void ReturnXieLingYuDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.XieLingYu is not { Paid: true, Stage: XieLingYuStage.Drawing } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1 || r.Requests is < 1 or > 5 || _coreProgramEventHistoryOperations.ProgramEventHistory<XieLingYuDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Request == r.Requests))
+        if (f.XieLingYu is not { Paid: true, Stage: XieLingYuStage.Drawing } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1 || r.Requests is < 1 or > 5 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XieLingYuDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Request == r.Requests))
             throw new InvalidOperationException("Xie Ling Yu's draw must return to its unique real request cursor.");
         var ids = outcome.ActualDrawIds.Select(id => (Id: id, Replacement: false)).Concat(outcome.ReplacementGainedIds.Select(id => (Id: id, Replacement: true))).ToArray();
         if (ids.Select(c => c.Id).Distinct().Count() != ids.Length || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0)

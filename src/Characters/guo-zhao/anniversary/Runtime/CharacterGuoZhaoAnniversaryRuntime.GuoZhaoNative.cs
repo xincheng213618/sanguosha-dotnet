@@ -7,7 +7,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawAnniversaryGuoZhaoLostColor))
             yield break;
-        foreach (var source in _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Select(e => (e.Source.OwnerSeat, e.Source.SkillInstanceId, e.Hash)).Distinct())
+        foreach (var source in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Select(e => (e.Source.OwnerSeat, e.Source.SkillInstanceId, e.Hash)).Distinct())
         {
             if (!_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat].IsAlive || GuoZhaoLostBenefits(source.OwnerSeat, source.SkillInstanceId, source.Hash, batch).Count == 0)
                 continue;
@@ -19,7 +19,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
         }
     }
 
-    internal bool IsIssuedAnniversaryGuoZhaoCandidate(ProgramTriggerCandidate c) => c.SkillId == AnniversaryGuoZhaoComposition.Pianchong && c.BindingId == "lost-color-benefit" && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.Hash == c.GameplayHash);
+    internal bool IsIssuedAnniversaryGuoZhaoCandidate(ProgramTriggerCandidate c) => c.SkillId == AnniversaryGuoZhaoComposition.Pianchong && c.BindingId == "lost-color-benefit" && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.Hash == c.GameplayHash);
     internal bool CanRunIssuedAnniversaryGuoZhaoCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
         if (!IsIssuedAnniversaryGuoZhaoCandidate(c) || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || c.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash || context is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } || context.OwnerSeat != c.OwnerSeat || context.SourceSeat != c.OwnerSeat || context.TargetSeat != c.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } w || w.Batch.Id != batch.Id || !w.Batch.Movements.SequenceEqual(batch.Movements) || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex] != c)
@@ -74,7 +74,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
     {
         if (child is not CardUseFrame use || parent is not ProgramSkillFrame { AnniversaryGuoZhao: { Paid: true, Option: "equipment", Stage: AnniversaryGuoZhaoStage.NativeEquipment, Equipment: { } equipment } r } f || !ValidGuoZhao(f) || use.Id != equipment.UseId || use.CardId != equipment.CardId || use.CardKind != equipment.Kind || !(use.PhysicalCardIds ?? [use.CardId]).SequenceEqual([equipment.CardId]) || use.Action is not { Type: CardActionType.Use, PhysicalCards: [var cost] } action || action.ActionId != equipment.ActionId || action.ActorSeat != f.OwnerSeat || action.ProviderSeat != f.OwnerSeat || action.EffectiveKind != equipment.Kind || cost.CardId != equipment.CardId || cost.From != CardLocation.DrawPile || !action.ConversionChain.Contains(r.Source))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoEquipmentIssuedEvent>().Count(e => e == new AnniversaryGuoZhaoEquipmentIssuedEvent(f.Id, equipment.Ordinal, equipment.CardId, equipment.Kind, equipment.UseId, equipment.ActionId)) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryGuoZhaoEquipmentIssuedEvent>().Count(e => e == new AnniversaryGuoZhaoEquipmentIssuedEvent(f.Id, equipment.Ordinal, equipment.CardId, equipment.Kind, equipment.UseId, equipment.ActionId)) == 1;
     }
 
     [NativeUseValidation(44300)]
@@ -90,7 +90,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryGuoZhao: { Stage: AnniversaryGuoZhaoStage.NativeEquipment, Equipment: { } paid } r } f || paid.UseId != use.Id)
             return false;
-        if (_resolutionStackOperations._resolutionStack.Any(x => x.Id == use.Id) || !IsAnniversaryGuoZhaoNativeEquipment(use, f) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == paid.CardId) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoEquipmentReturnedEvent>().Any(e => e.FrameId == f.Id && e.Ordinal == paid.Ordinal))
+        if (_resolutionStackOperations._resolutionStack.Any(x => x.Id == use.Id) || !IsAnniversaryGuoZhaoNativeEquipment(use, f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == paid.CardId) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryGuoZhaoEquipmentReturnedEvent>().Any(e => e.FrameId == f.Id && e.Ordinal == paid.Ordinal))
             throw new InvalidOperationException("Zunwei must return one exact whole physical equipment Use before its next random choice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryGuoZhaoEquipmentReturnedEvent(f.Id, paid.Ordinal, use.Id, paid.ActionId));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { AnniversaryGuoZhao = r with { Stage = AnniversaryGuoZhaoStage.EquipmentChildren, Cursor = r.Cursor + 1, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });

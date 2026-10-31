@@ -8,7 +8,7 @@ internal sealed partial class CoreGameEngineRoundEndingRuntime
     internal bool TryBeginRoundEndingBoundary(CharacterState previous, bool skipped)
     {
         // Games without this boundary retain their existing event/sequence stream.
-        if (!TracksRoundEnding || _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber == 0 || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreProgramEventHistoryOperations.ProgramEventHistory<RoundEndedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber))
+        if (!TracksRoundEnding || _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber == 0 || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<RoundEndedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber))
             return false;
         var progress = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression;
         if (progress.PendingBeneficiarySeat is { } beneficiary && _coreMatchParticipantsPlayersAccess._players[beneficiary].IsAlive)

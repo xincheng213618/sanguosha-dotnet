@@ -133,7 +133,7 @@ internal sealed partial class CoreGameEngineMatchingRecastsRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Matching recast lost its choice owner.");
         var r = f.MatchingRecast!;
-        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_coreMatchingRecastObserversOperations.IsMatchingRecastChoice(f, prompt) || !MatchingRecastChoices(f).Any(c => CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, choice)))
+        if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_coreMatchingRecastObserversOperations.Value.IsMatchingRecastChoice(f, prompt) || !MatchingRecastChoices(f).Any(c => CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, choice)))
             throw new InvalidOperationException("Matching recast changed its exact participant-only private choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[r.Peer.Seat].IsAlive)
@@ -229,7 +229,7 @@ internal sealed partial class CoreGameEngineMatchingRecastsRuntime
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 610)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 630)]
-    internal bool CanContinueMatchingRecast(ProgramSkillFrame f) => f.MatchingRecast is { Owner.CostIssued: true } && _coreMatchingRecastObserversOperations.ValidMatchingRecastReceipt(f);
+    internal bool CanContinueMatchingRecast(ProgramSkillFrame f) => f.MatchingRecast is { Owner.CostIssued: true } && _coreMatchingRecastObserversOperations.Value.ValidMatchingRecastReceipt(f);
     [ProgramAiChoice(SkillProgramEffectOp.RecastMatchingCardsThenPeerChoice)]
     internal PromptChoice SelectAiMatchingRecast(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderBy(c => c.Parameters["step"] == "damage" ? 1 : 0).ThenBy(c => c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat]) : 0).ThenBy(c => c.Id.Value).First();
     SkillProgramStepOutcome IMatchingRecastProgramHost.RecastMatchingCardsThenPeerChoice(ProgramSkillFrame f, int peer, string ledger) => BeginMatchingRecast(f, peer, ledger);

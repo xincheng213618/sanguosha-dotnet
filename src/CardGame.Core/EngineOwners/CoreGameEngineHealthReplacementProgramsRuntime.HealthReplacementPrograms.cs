@@ -51,14 +51,14 @@ internal sealed partial class CoreGameEngineHealthReplacementProgramsRuntime
         _coreMatchLogOperations.AddLog("HpLost", $"{(target.Name)} 失去 {(amount)} 点体力，剩余 {(target.Hp)} 点体力。", target.Seat);
         if (target.Hp > 0)
             return false;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not null)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not null)
             throw new InvalidOperationException("An HP-loss attack cannot nest another dying victim.");
         var responders = Array.AsReadOnly(_coreNativeDyingOperations.BuildDyingResponderSeats(target.Seat).ToArray());
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         _coreRuntimeOperations.PushRuntimeFrame(new DyingFrame(id, attack.ResolutionId, target.Seat, null, responders, 0, DyingContinuationKind.AttackHpLoss) { HappyQiaoPool = _characterDaQiaoXiaoQiaoHappyGodOperations.CurrentHappyQiaoPool(target.Seat) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerDyingEvent(id, target.Seat, null));
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
-        if (!_coreProgramLifecycleOperations.TryBeginMandatorySelfDyingProgram(_coreDyingCursorRuntimeOperations.ActiveDying!) && !_coreDyingEntryProgramsOperations.TryBeginDyingEntryProgramWindow(_coreDyingCursorRuntimeOperations.ActiveDying!))
+        if (!_coreProgramLifecycleOperations.TryBeginMandatorySelfDyingProgram(_coreDyingCursorRuntimeOperations.Value.ActiveDying!) && !_coreDyingEntryProgramsOperations.TryBeginDyingEntryProgramWindow(_coreDyingCursorRuntimeOperations.Value.ActiveDying!))
             _coreNativeDyingOperations.ExposeHumanDyingPrompt();
         return true;
     }

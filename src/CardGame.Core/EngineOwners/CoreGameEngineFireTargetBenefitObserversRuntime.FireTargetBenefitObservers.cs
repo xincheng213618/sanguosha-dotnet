@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineFireTargetBenefitObserversRuntime
         var parent = _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == r.DamageWindowId);
         if (parent is null || parent.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || parent.ParentFrameId != r.DamageFrameId || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex].ToProgramCandidate()))
             return false;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(parent);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(parent);
         if (!attack.DamageWasApplied || attack.DamageAmount < 1 || attack.IsSourceLess || _coreNativeCardClassificationsOperations.GetDamageNature(attack) != DamageNature.Fire || attack.SourceSeat != f.OwnerSeat || attack.TargetSeat != r.TargetSeat || c.Amount != attack.DamageAmount)
             return false;
         if (r.Source != CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f) || r.GrantSequence < 0)
@@ -65,5 +65,5 @@ internal sealed partial class CoreGameEngineFireTargetBenefitObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 320)]
-    internal bool IsFireTargetBenefitProgramDying() => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } w && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && FireTargetBenefitObserverRoot(w.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(f => f.Id == dying.FrameId);
+    internal bool IsFireTargetBenefitProgramDying() => _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is { } w && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && FireTargetBenefitObserverRoot(w.Id)is not null && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(f => f.Id == dying.FrameId);
 }

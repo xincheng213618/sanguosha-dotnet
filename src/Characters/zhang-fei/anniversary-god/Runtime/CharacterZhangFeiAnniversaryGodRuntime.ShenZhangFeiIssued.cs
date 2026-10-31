@@ -30,7 +30,7 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 4600)]
     internal void AppendShenZfMovementCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> candidates)
     {
-        foreach (var loss in _coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhangFeiTuLossEvent>().Where(e => e.BatchId == batch.Id).DistinctBy(e => e.TargetSeat))
+        foreach (var loss in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenZhangFeiTuLossEvent>().Where(e => e.BatchId == batch.Id).DistinctBy(e => e.TargetSeat))
         {
             var seat = loss.TargetSeat;
             if (!_coreMatchParticipantsPlayersAccess._players[seat].IsAlive)
@@ -78,7 +78,7 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
         if (c.BindingId == "chi-damage")
             return w.Window == SkillProgramTriggerWindow.AfterDamageApplied && w.TargetSeat == c.OwnerSeat && w.Amount is> 0 && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is { } d && d.TargetSeat == c.OwnerSeat && d.CandidateIndex < d.Candidates.Count && d.Candidates[d.CandidateIndex].ProgramId == c.SkillId && d.Candidates[d.CandidateIndex].ProgramTriggerId == c.BindingId && d.Candidates[d.CandidateIndex].SkillInstanceId == c.SkillInstanceId;
         if (c.BindingId == "tu-hand-loss")
-            return w.Window == SkillProgramTriggerWindow.CardsMoved && w.MovementBatch is { } b && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhangFeiTuLossEvent>().Count(e => e.BatchId == b.Id && e.TargetSeat == c.OwnerSeat && e.GameplayHash == c.GameplayHash) == 1 && _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is { } moved && moved.Batch.Id == b.Id && moved.CandidateIndex < moved.Candidates.Count && moved.Candidates[moved.CandidateIndex] == c && b.Movements.Any(m => m.From == CardLocation.Hand(c.OwnerSeat) && m.To != m.From && !m.Reason.Value.StartsWith(ShenZfReason, StringComparison.Ordinal));
+            return w.Window == SkillProgramTriggerWindow.CardsMoved && w.MovementBatch is { } b && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenZhangFeiTuLossEvent>().Count(e => e.BatchId == b.Id && e.TargetSeat == c.OwnerSeat && e.GameplayHash == c.GameplayHash) == 1 && _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is { } moved && moved.Batch.Id == b.Id && moved.CandidateIndex < moved.Candidates.Count && moved.Candidates[moved.CandidateIndex] == c && b.Movements.Any(m => m.From == CardLocation.Hand(c.OwnerSeat) && m.To != m.From && !m.Reason.Value.StartsWith(ShenZfReason, StringComparison.Ordinal));
         if (c.BindingId == "liu-turn-ending")
             return w.Window == SkillProgramTriggerWindow.TurnEnding && c.OwnerSeat == _coreActualTurnProgressCurrentSeatAccess._currentSeat && _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId)is { } ending && ending.OwnerSeat == c.OwnerSeat && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate == c;
         if (c.BindingId == "si-turn-ended")

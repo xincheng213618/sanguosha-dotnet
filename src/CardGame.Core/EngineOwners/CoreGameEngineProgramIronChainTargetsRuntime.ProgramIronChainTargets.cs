@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramIronChainTargetsRuntime
 {
-    internal int GetProgramIronChainTargetLimit(CharacterState actor) => _characterPangTongMouMobileOperations.HasMouPangTongExpandedTargets(actor) ? _coreMatchParticipantsPlayersAccess._players.Count : checked(1 + ((FiniteRuleQueryValue)_coreRuleQueriesOperations.EvaluateCardTargetCount(actor, CardKind.IronChain).Value).Value);
+    internal int GetProgramIronChainTargetLimit(CharacterState actor) => _characterPangTongMouMobileOperations.Value.HasMouPangTongExpandedTargets(actor) ? _coreMatchParticipantsPlayersAccess._players.Count : checked(1 + ((FiniteRuleQueryValue)_coreRuleQueriesOperations.EvaluateCardTargetCount(actor, CardKind.IronChain).Value).Value);
     internal IEnumerable<IReadOnlyList<int>> EnumerateProgramIronChainTargets(CharacterState actor, IReadOnlyList<CharacterState> candidates)
     {
         var ordered = candidates.OrderBy(player => player.Seat).ToArray();

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class OwnedDeathBenefitProgramCapability(Func<RuntimeEntries.CoreGameEngineOwnedDeathBenefitReturnsEntries> getCoreGameEngineOwnedDeathBenefitReturnsRuntime) : IOwnedDeathBenefitProgramHost
+internal sealed class OwnedDeathBenefitProgramCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineOwnedDeathBenefitReturnsRuntime>> getCoreGameEngineOwnedDeathBenefitReturnsRuntime) : IOwnedDeathBenefitProgramHost
 {
-    public SkillProgramStepOutcome SelectIssuedFixedRecipientWithDeathReturn(ProgramSkillFrame frame, SkillProgramEffect effect) => getCoreGameEngineOwnedDeathBenefitReturnsRuntime().SelectIssuedFixedRecipientWithDeathReturn(frame, effect);
+    public SkillProgramStepOutcome SelectIssuedFixedRecipientWithDeathReturn(ProgramSkillFrame frame, SkillProgramEffect effect) => getCoreGameEngineOwnedDeathBenefitReturnsRuntime().Value.SelectIssuedFixedRecipientWithDeathReturn(frame, effect);
 }

@@ -31,7 +31,7 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
             return false;
         if (candidate.BindingId == "first-damage")
             return WuXiongmuFirstDamageEligible(candidate.OwnerSeat, context.ParentFrameId);
-        return _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Count == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<RoundStartedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber && e.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat) && !_coreProgramEventHistoryOperations.ProgramEventHistory<XiongmuStartedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber);
+        return _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Count == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<RoundStartedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber && e.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiongmuStartedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber);
     }
 
     internal SkillProgramStepOutcome BeginWuXiongmu(ProgramSkillFrame supplied)

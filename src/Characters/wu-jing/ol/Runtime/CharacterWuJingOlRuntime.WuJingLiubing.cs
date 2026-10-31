@@ -7,7 +7,7 @@ internal sealed partial class CharacterWuJingOlRuntime
 
     internal bool WuJingOwnsLiubing(int actor) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && (_coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[actor])?.GetInstanceTriggers(SkillProgramTriggerWindow.DiscardPileReceived) ?? []).Any(b => b.Trigger.Effects is [{ Op: SkillProgramEffectOp.ClaimLiubingUndamagingSlash }]);
     internal static bool WuJingPhysicalSlash(Card card, CardKind kind, IReadOnlyList<int> ids, IReadOnlyList<CardConversionSource>? conversions) => RuntimeSkills.RuntimeRules_wu_jing_ol_WuJingLiubing.WuJingPhysicalSlash(card, kind, ids, conversions);
-    internal bool WuJingFirstPhysicalSlash(int actor) => !_coreProgramEventHistoryOperations.ProgramEventHistory<WuJingActualPhysicalSlashEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && e.ActorSeat == actor);
+    internal bool WuJingFirstPhysicalSlash(int actor) => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingActualPhysicalSlashEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && e.ActorSeat == actor);
     internal Suit? WuJingLiubingUsedSuit(int actorSeat, Card card, CardKind effectiveKind, IReadOnlyList<int> ids, IReadOnlyList<CardConversionSource>? conversions, Suit? ordinary) => HasWuJingLiubing && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && WuJingOwnsLiubing(actorSeat) && WuJingPhysicalSlash(card, effectiveKind, ids, conversions) && WuJingFirstPhysicalSlash(actorSeat) ? Suit.Diamond : ordinary;
     internal Card WuJingLiubingUseCard(CharacterState actor, Card card, CardKind kind, CardConversionSource? conversion = null, IReadOnlyList<int>? ids = null, long? existingUseId = null)
     {
@@ -31,7 +31,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     {
         if (card is null || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { WuJingLiubing: { } r, Action: { } a } use || r.CardId != card.Id)
             return card;
-        if (r.UseId != use.Id || r.ActionId != a.ActionId || r.Kind != use.CardKind || a.EffectiveSuit != r.Suit || r.Suit != Suit.Diamond || _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingLiubingAppearanceIssuedEvent>().Count(e => e.Receipt == r) != 1)
+        if (r.UseId != use.Id || r.ActionId != a.ActionId || r.Kind != use.CardKind || a.EffectiveSuit != r.Suit || r.Suit != Suit.Diamond || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingLiubingAppearanceIssuedEvent>().Count(e => e.Receipt == r) != 1)
             throw new InvalidOperationException("Liubing lost its exact issued first physical Slash appearance.");
         return card with
         {
@@ -46,7 +46,7 @@ internal sealed partial class CharacterWuJingOlRuntime
             return;
         if (action.PhysicalCards is [var material] && WuJingPhysicalSlash(_coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId), action.EffectiveKind, [material.CardId], action.ConversionChain))
         {
-            var ordinal = _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingActualPhysicalSlashEvent>().Count(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && e.ActorSeat == action.ActorSeat) + 1;
+            var ordinal = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingActualPhysicalSlashEvent>().Count(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && e.ActorSeat == action.ActorSeat) + 1;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuJingActualPhysicalSlashEvent(use.Id, action.ActionId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat, action.ActorSeat, material.CardId, action.EffectiveKind, ordinal));
             if (ordinal == 1 && WuJingOwnsLiubing(action.ActorSeat))
             {
@@ -69,7 +69,7 @@ internal sealed partial class CharacterWuJingOlRuntime
 
     internal bool WuJingSettledMaterial(WuJingUseMaterialEvent fact, CardMovementRecord last)
     {
-        if (last.To != CardLocation.DiscardPile || _cardZonesOperations._cardZones.GetLocation(fact.CardId) != CardLocation.DiscardPile || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == fact.CardId).Sequence != last.Sequence || last.CardKind != fact.PrintedKind || _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingUseMaterialEvent>().Any(e => e.CardId == fact.CardId && e.UseId != fact.UseId && (e.Before > fact.Before || e.Before == fact.Before && e.UseId > fact.UseId)))
+        if (last.To != CardLocation.DiscardPile || _cardZonesOperations._cardZones.GetLocation(fact.CardId) != CardLocation.DiscardPile || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == fact.CardId).Sequence != last.Sequence || last.CardKind != fact.PrintedKind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingUseMaterialEvent>().Any(e => e.CardId == fact.CardId && e.UseId != fact.UseId && (e.Before > fact.Before || e.Before == fact.Before && e.UseId > fact.UseId)))
             return false;
         var paid = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.FirstOrDefault(m => m.CardId == fact.CardId && m.Sequence > fact.Before && m.From == fact.From && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use);
         return paid is not null && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.CardId == fact.CardId && m.Sequence > paid.Sequence && m.Sequence <= last.Sequence).ToArray()is [var finish] && finish == last && finish.From == CardLocation.Processing && finish.Reason == CardMoveReasons.UseFinished;
@@ -82,8 +82,8 @@ internal sealed partial class CharacterWuJingOlRuntime
         foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(u => u.Action is { Type: CardActionType.Use, PhysicalCards.Count: > 0 } && CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && !u.CausedDamage).ToArray())
         {
             var action = use.Action!;
-            var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingUseMaterialEvent>().Where(e => e.UseId == use.Id && e.ActionId == action.ActionId).OrderBy(e => e.Index).ToArray();
-            if (facts.Length == 0 || facts.Length != action.PhysicalCards.Count || facts[0].PlayToken is not { } token || facts.Any(e => e.PlayToken != token || e.Count != facts.Length || e.ActualTurn != batch.TurnNumber) || action.EffectiveIsRed == false || !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Any(e => e.Phase.Token == token && e.Phase.ActorSeat == action.ActorSeat && e.Phase.Kind == ActualDiscardRecoveryPhaseKind.Play) || facts.Any(e => _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.Processing) || _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingLiubingSettledEvent>().Any(e => e.UseId == use.Id))
+            var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingUseMaterialEvent>().Where(e => e.UseId == use.Id && e.ActionId == action.ActionId).OrderBy(e => e.Index).ToArray();
+            if (facts.Length == 0 || facts.Length != action.PhysicalCards.Count || facts[0].PlayToken is not { } token || facts.Any(e => e.PlayToken != token || e.Count != facts.Length || e.ActualTurn != batch.TurnNumber) || action.EffectiveIsRed == false || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Any(e => e.Phase.Token == token && e.Phase.ActorSeat == action.ActorSeat && e.Phase.Kind == ActualDiscardRecoveryPhaseKind.Play) || facts.Any(e => _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.Processing) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingLiubingSettledEvent>().Any(e => e.UseId == use.Id))
                 continue;
             var settled = facts.Select(e => (Fact: e, Move: _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == e.CardId))).Where(x => x.Move is not null && WuJingSettledMaterial(x.Fact, x.Move)).ToArray();
             if (!settled.Any(x => batch.Movements.Contains(x.Move!)))
@@ -98,17 +98,17 @@ internal sealed partial class CharacterWuJingOlRuntime
         if (c.OccurrenceIndex < 0 || c.OccurrenceIndex >= batch.Movements.Count)
             return[];
         var m = batch.Movements[c.OccurrenceIndex];
-        var anchor = _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingLiubingSettledEvent>().FirstOrDefault(e => e.BatchId == batch.Id && e.CardId == m.CardId && e.MovementSequence == m.Sequence && e.FinalActor != c.OwnerSeat);
+        var anchor = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingLiubingSettledEvent>().FirstOrDefault(e => e.BatchId == batch.Id && e.CardId == m.CardId && e.MovementSequence == m.Sequence && e.FinalActor != c.OwnerSeat);
         if (anchor is null)
             return[];
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingLiubingSettledEvent>().Where(e => e.BatchId == batch.Id && e.UseId == anchor.UseId && e.ActionId == anchor.ActionId).OrderBy(e => e.MovementSequence).ToArray();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingLiubingSettledEvent>().Where(e => e.BatchId == batch.Id && e.UseId == anchor.UseId && e.ActionId == anchor.ActionId).OrderBy(e => e.MovementSequence).ToArray();
     }
 
     internal IReadOnlyList<ProgramTriggerCandidate> CollectWuJingLiubingCandidates(CardMovementBatchContext batch)
     {
         if (!HasWuJingLiubing)
             return[];
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<WuJingLiubingSettledEvent>().Where(e => e.BatchId == batch.Id).GroupBy(e => e.UseId).SelectMany(group =>
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingLiubingSettledEvent>().Where(e => e.BatchId == batch.Id).GroupBy(e => e.UseId).SelectMany(group =>
         {
             var anchor = group.First(e => batch.Movements.Any(m => m.CardId == e.CardId && m.Sequence == e.MovementSequence));
             var occurrence = batch.Movements.ToList().FindIndex(m => m.CardId == anchor.CardId && m.Sequence == anchor.MovementSequence);

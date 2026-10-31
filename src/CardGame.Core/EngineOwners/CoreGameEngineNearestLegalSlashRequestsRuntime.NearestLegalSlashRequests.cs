@@ -33,16 +33,16 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
     internal SkillProgramStepOutcome RequestLegalSlashByNearestActor(ProgramSkillFrame frame, int actorSeat, int hpAmount, bool trickEffectReturned = false)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (active.NearestLegalSlashRequest is not null || active.AssistedSlashRequest is not null || actorSeat == active.OwnerSeat && !_coreWenheChaosOperations.IsExactWenheChaos(active))
+        if (active.NearestLegalSlashRequest is not null || active.AssistedSlashRequest is not null || actorSeat == active.OwnerSeat && !_coreWenheChaosOperations.Value.IsExactWenheChaos(active))
             throw new InvalidOperationException("A nearest legal Slash requires one clean other actor.");
-        if ((!_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId)) && !_coreWenheChaosOperations.IsExactWenheChaos(active))
+        if ((!_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat], active.SkillId, active.SkillInstanceId)) && !_coreWenheChaosOperations.Value.IsExactWenheChaos(active))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "技能来源已失效，剩余结算取消。");
             return SkillProgramStepOutcome.AwaitChild;
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(active = active with { SelectedTargetSeats = Array.AsReadOnly(new[] { actorSeat }) });
-        if (!trickEffectReturned && _characterLuXunMouMobileOperations.TryBeginMouLuXunWenheTarget(active, actorSeat, hpAmount))
+        if (!trickEffectReturned && _characterLuXunMouMobileOperations.Value.TryBeginMouLuXunWenheTarget(active, actorSeat, hpAmount))
             return SkillProgramStepOutcome.AwaitChild;
         var nearest = _coreProgramSlashRequestOperations.GetNearestLivingCharacterSeats(actorSeat);
         active = active with

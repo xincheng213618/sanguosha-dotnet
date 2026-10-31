@@ -18,7 +18,7 @@ internal sealed partial class CharacterDongChengMouRuntime
     double IMouDongChengFacts.TargetScore(int owner, int target) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), target, new(0, 0, 1, 0, 0, 0, false, false));
     int IMouDongChengFacts.KeepValue(int owner, int card) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(card), _coreMatchParticipantsPlayersAccess._players[owner]);
     SkillProgram? IMouDongChengFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
-    IEnumerable<T> IMouDongChengFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouDongChengFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouDongChengFacts.Parent(ProgramSkillFrame f) => MouDcParent(f);
     MouDcOccurrence? IMouDongChengFacts.Before(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => MouDcBefore(c, w);
     long IMouDongChengFacts.ClaimUse(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => MouDcClaimUse(c, w)?.Id ?? 0;
@@ -81,7 +81,7 @@ internal sealed partial class CharacterDongChengMouRuntime
         if (c.SkillId != MouDongChengRuntime.Baojia || c.BindingId != "claim-finished" || w.Window != SkillProgramTriggerWindow.CardUseCompleted || w.OwnerSeat != c.OwnerSeat || w.CardUse is not { } info || _coreCardUseLifecycleOperations.LifecycleCardUse(info.ParentCardUseFrameId)is not { Step: ResolutionFrameStep.Completed, Action: { } a, MouDongChengClaims: { } claims } u || a.ActionId != info.CardActionId || !claims.Any(p => p.Source.OwnerSeat == c.OwnerSeat && p.Source.SkillInstanceId == c.SkillInstanceId && p.GameplayHash == c.GameplayHash && (settled || !p.Settled)) || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(x => x.Id == w.ParentFrameId)is not { } window || window.ParentFrameId != u.Id || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
             return null;
         var active = window.Candidates[window.CandidateIndex];
-        return active.OwnerSeat == c.OwnerSeat && active.SkillId == c.SkillId && active.TriggerId == c.BindingId && active.SkillInstanceId == c.SkillInstanceId && active.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext2(window, active) == w && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) == 1 ? u : null;
+        return active.OwnerSeat == c.OwnerSeat && active.SkillId == c.SkillId && active.TriggerId == c.BindingId && active.SkillInstanceId == c.SkillInstanceId && active.GameplayHash == c.GameplayHash && _coreCardActionsOperations.CreateCardActionProgramContext2(window, active) == w && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) == 1 ? u : null;
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 37400)]
@@ -137,7 +137,7 @@ internal sealed partial class CharacterDongChengMouRuntime
     void IMouDongChengNative.Use(ProgramSkillFrame f) => IssueMouDcUse(f);
     void IMouDongChengNative.Recover(ProgramSkillFrame f)
     {
-        if (!MouDongCheng.Valid(f) || f.MouDongCheng is not { Stage: MouDongChengStage.RecoveryChildren, Returned: true, Dying.Count: 1 } r || (f.MouDongChengSettlement is { Reward: true } s ? !_characterDongChengMouOperations.CreateMouDcLightningFacts().SettlementParent(f) || s.DyingId != r.Dying[0] : r.Native is not { } n || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDcDyingEvent>().Count(x => x.FrameId == f.Id && x.UseId == n.UseId) != 1))
+        if (!MouDongCheng.Valid(f) || f.MouDongCheng is not { Stage: MouDongChengStage.RecoveryChildren, Returned: true, Dying.Count: 1 } r || (f.MouDongChengSettlement is { Reward: true } s ? !_characterDongChengMouOperations.CreateMouDcLightningFacts().SettlementParent(f) || s.DyingId != r.Dying[0] : r.Native is not { } n || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDcDyingEvent>().Count(x => x.FrameId == f.Id && x.UseId == n.UseId) != 1))
             throw new InvalidOperationException("Douwei's once-per-whole-use reward needs its actual first causal dying return.");
         _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, 1, null, null);
     }

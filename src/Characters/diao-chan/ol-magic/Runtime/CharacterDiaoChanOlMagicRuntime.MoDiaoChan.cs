@@ -17,11 +17,11 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         if (op == SkillProgramEffectOp.ResolveMoDiaoChanHuanhuoUse)
             return IsIssuedMoDiaoChanCandidate(c, context);
         if (op == SkillProgramEffectOp.ResolveMoDiaoChanHuanhuoRound)
-            return context.Window == SkillProgramTriggerWindow.RoundStarting && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanStartedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.Op == op && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber);
+            return context.Window == SkillProgramTriggerWindow.RoundStarting && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanStartedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.Op == op && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber);
         if (op == SkillProgramEffectOp.ResolveMoDiaoChanQingshiPrep)
             return context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && context.SourceSeat == c.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Preparation } phase && phase.ActorSeat == c.OwnerSeat && (!_characterSharedGameEngineOlMoRumoOperations.IsOlMoRumoEntered(c.OwnerSeat) || MoDcRefreshReady(c.OwnerSeat));
         if (op == SkillProgramEffectOp.ResolveMoDiaoChanQingshiRedirect)
-            return MoDcCurrentMarkedUse(c.OwnerSeat, context)is { } use && MoDcDiscardable(c.OwnerSeat).Length > 0 && MoDcRedirectTargets(use).Length > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanStartedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Op == op && e.WindowId == context.ParentFrameId);
+            return MoDcCurrentMarkedUse(c.OwnerSeat, context)is { } use && MoDcDiscardable(c.OwnerSeat).Length > 0 && MoDcRedirectTargets(use).Length > 0 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanStartedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Op == op && e.WindowId == context.ParentFrameId);
         if (op == SkillProgramEffectOp.ResolveMoDiaoChanQingshiDamage)
             return MoDcDamageEligible(c.OwnerSeat, context);
         return MoDcRecaptureCards(c.OwnerSeat, context).Length > 0;
@@ -177,7 +177,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         {
             var target = choice.Targets.Single();
             var targets = r.Targets.Append(target).ToArray();
-            var promise = _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanPromiseEvent>().Select(e => e.PromiseId).DefaultIfEmpty().Max() + 1;
+            var promise = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanPromiseEvent>().Select(e => e.PromiseId).DefaultIfEmpty().Max() + 1;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoDiaoChanPromiseEvent(promise, f.Id, r.Source, r.GameplayHash, target, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Count()));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MoDiaoChan = r with { Targets = targets } });
             if (targets.Length >= r.CostCount)
@@ -281,7 +281,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
 
         if (r.Stage == MoDiaoChanStage.CostChildren && r.Op == SkillProgramEffectOp.ResolveMoDiaoChanHuanhuoRound && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
         {
-            var count = _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanCostEvent>().Count(e => e.FrameId == f.Id);
+            var count = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanCostEvent>().Count(e => e.FrameId == f.Id);
             if (count > 0)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MoDiaoChan = r with { Stage = MoDiaoChanStage.TargetChoice, CostCount = Math.Min(count, _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive && p.Seat != f.OwnerSeat)) } });

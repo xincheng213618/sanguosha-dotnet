@@ -117,7 +117,7 @@ internal sealed partial class CoreGameEngineDrawDiscardCategoryRefundRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    internal bool IsDrawDiscardCategoryPaidDestination(ProgramSkillFrame frame, CardMovementRecord movement) => movement.To == CardLocation.DiscardPile || _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Where(e => e.CardId == movement.CardId).ToArray()is [var destroyed] && destroyed.MovementSequence == movement.Sequence && destroyed.ParentFrameId == frame.Id;
+    internal bool IsDrawDiscardCategoryPaidDestination(ProgramSkillFrame frame, CardMovementRecord movement) => movement.To == CardLocation.DiscardPile || _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Where(e => e.CardId == movement.CardId).ToArray()is [var destroyed] && destroyed.MovementSequence == movement.Sequence && destroyed.ParentFrameId == frame.Id;
     [ProgramContinuation(ProgramContinuationKind.Resume, 210)]
     internal bool ResumeDrawDiscardCategoryRefund(long frameId)
     {
@@ -308,7 +308,7 @@ internal sealed partial class CoreGameEngineDrawDiscardCategoryRefundRuntime
                     break;
                 }
 
-                if (_resolutionStackOperations._resolutionStack[child] is DyingFrame dying && child + 1 < _resolutionStackOperations._resolutionStack.Count && ((_coreDyingSuitsAndHistoricalUseObserversOperations.IsOriginalDyingSuspendedByDyingSuits(dying) || _coreRecipientCategoryMarkContinuationsOperations.IsOriginalDyingSuspendedByRecipientCategoryMark(dying)) || _coreOwnedDeathBenefitReturnsOperations.IsOriginalDyingSuspendedByOwnedDeathBenefit(dying) || _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(child, dying) || _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(child, dying) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(child, dying) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(child, dying)))
+                if (_resolutionStackOperations._resolutionStack[child] is DyingFrame dying && child + 1 < _resolutionStackOperations._resolutionStack.Count && ((_coreDyingSuitsAndHistoricalUseObserversOperations.IsOriginalDyingSuspendedByDyingSuits(dying) || _coreRecipientCategoryMarkContinuationsOperations.Value.IsOriginalDyingSuspendedByRecipientCategoryMark(dying)) || _coreOwnedDeathBenefitReturnsOperations.Value.IsOriginalDyingSuspendedByOwnedDeathBenefit(dying) || _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(child, dying) || _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(child, dying) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(child, dying) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(child, dying)))
                     break;
             }
 
@@ -319,6 +319,6 @@ internal sealed partial class CoreGameEngineDrawDiscardCategoryRefundRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 150)]
-    internal bool IsDrawDiscardCategoryProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && CategoryActivationObserverRoot(false)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsDrawDiscardCategoryProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && CategoryActivationObserverRoot(false)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     SkillProgramStepOutcome IDrawDiscardCategoryProgramHost.DrawThenDiscardDistinctCategories(ProgramSkillFrame f, int targetSeat, int amount, string stateId) => BeginDrawDiscardCategoryRefund(f, targetSeat, amount, stateId);
 }

@@ -25,7 +25,7 @@ internal sealed partial class CharacterYanJunOlRuntime
     {
         var ranks = new List<int?>();
         var seen = new HashSet<long>();
-        var responseUses = includeResponseUses ? _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramGuanchaoRankDrawEvent>().Where(e => e.CardActionId > 0).Select(e => e.CardActionId).ToHashSet() : null;
+        var responseUses = includeResponseUses ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramGuanchaoRankDrawEvent>().Where(e => e.CardActionId > 0).Select(e => e.CardActionId).ToHashSet() : null;
         foreach (var fact in _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Skip(phaseEventIndex + 1))
         {
             var action = fact switch

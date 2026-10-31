@@ -77,7 +77,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 34001)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 34001)]
-    internal bool PreserveMouXqRequestedSlash(ProgramSkillFrame f) => f.MouXiaoQiaoJueyanResponseGrant is { Request.DecisionKind: DecisionKind.ProgramTrigger } g && g.Request.ParentFrameId == f.Id && g.Request.RequestSource == new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && g.Request.RequestHash == f.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiaoQiaoJueyanResponseGrantedEvent>().Count(e => e.Grant == (g with { ActionId = 0, Returned = false })) == 1;
+    internal bool PreserveMouXqRequestedSlash(ProgramSkillFrame f) => f.MouXiaoQiaoJueyanResponseGrant is { Request.DecisionKind: DecisionKind.ProgramTrigger } g && g.Request.ParentFrameId == f.Id && g.Request.RequestSource == new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && g.Request.RequestHash == f.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiaoQiaoJueyanResponseGrantedEvent>().Count(e => e.Grant == (g with { ActionId = 0, Returned = false })) == 1;
     [NativeUseReturn(34001)]
     internal void ReturnMouXqProgramSlash(CardUseFrame use)
     {

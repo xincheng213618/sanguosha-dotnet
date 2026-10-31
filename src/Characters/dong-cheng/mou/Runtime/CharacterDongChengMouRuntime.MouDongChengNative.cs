@@ -29,7 +29,7 @@ internal sealed partial class CharacterDongChengMouRuntime
 
     internal void IssueMouDcUse(ProgramSkillFrame f)
     {
-        if (!MouDongCheng.Valid(f) || f.MouDongCheng is not { Stage: MouDongChengStage.IssuingUse, Native: null, Actual: 1 } r || r.Targets.Any(t => !MouDcTargets(f, r.Kind).Contains(t)) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDcMovementPaidEvent>().Count(e => e.FrameId == f.Id && e.CardId == r.CardId && e.Actual == 1 && e.Before == r.Before && e.After == r.After) != 1)
+        if (!MouDongCheng.Valid(f) || f.MouDongCheng is not { Stage: MouDongChengStage.IssuingUse, Native: null, Actual: 1 } r || r.Targets.Any(t => !MouDcTargets(f, r.Kind).Contains(t)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDcMovementPaidEvent>().Count(e => e.FrameId == f.Id && e.CardId == r.CardId && e.Actual == 1 && e.Before == r.Before && e.After == r.After) != 1)
             throw new InvalidOperationException("Douwei's zero-material Use requires the actual discarded cost and still-legal reverse-range target set.");
         var card = new Card(0, r.Kind, Suit.None, 0);
         var id = _coreNativeCardUseOperations.BeginCardUse(card, f.OwnerSeat, r.Targets, r.Kind, physicalCardIds: [], conversionSource: r.Source);
@@ -57,7 +57,7 @@ internal sealed partial class CharacterDongChengMouRuntime
             if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == actor.Seat && use.UnlimitedUse != true)
                 _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, r.Kind);
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
             actor.HasAlcoholEffect = false;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, r.Kind, actor.Seat, use.TargetSeats[0], IgnoresArmor: attack.IgnoresArmor));
             _coreNativeAiDecisionsOperations.NotifyAiOfSlash(actor, _coreMatchParticipantsPlayersAccess._players[use.TargetSeats[0]]);
@@ -96,7 +96,7 @@ internal sealed partial class CharacterDongChengMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDcUseIssuedEvent(f.Id, use.Id, a.ActionId, f.OwnerSeat, r.Kind));
     }
 
-    internal bool MouDcUseRidesOn(ProgramSkillFrame f, CardUseFrame u) => MouDongCheng.Valid(f) && f.MouDongCheng is { Native: { } n, Stage: MouDongChengStage.NativeUse or MouDongChengStage.ReturnedUse } r && u.MouDongChengDouwei is { } own && MouDongChengRuntime.SameUse(n, own) && n.FrameId == f.Id && u.Id == n.UseId && u.CardId == 0 && u.CardKind == n.Kind && u.PhysicalCardIds is { Count: 0 } && u.TargetSeats.SequenceEqual(n.Targets) && u.Action is { Type: CardActionType.Use, PhysicalCards.Count: 0 } a && a.ActionId == n.ActionId && a.ProviderSeat == f.OwnerSeat && a.RequesterSeat is null && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, f.OwnerSeat, f.OwnerSeat) && a.ConversionChain.SequenceEqual([r.Source]) && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed is null && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDcUseIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == u.Id && e.ActionId == a.ActionId && e.Owner == f.OwnerSeat && e.Kind == n.Kind) == 1;
+    internal bool MouDcUseRidesOn(ProgramSkillFrame f, CardUseFrame u) => MouDongCheng.Valid(f) && f.MouDongCheng is { Native: { } n, Stage: MouDongChengStage.NativeUse or MouDongChengStage.ReturnedUse } r && u.MouDongChengDouwei is { } own && MouDongChengRuntime.SameUse(n, own) && n.FrameId == f.Id && u.Id == n.UseId && u.CardId == 0 && u.CardKind == n.Kind && u.PhysicalCardIds is { Count: 0 } && u.TargetSeats.SequenceEqual(n.Targets) && u.Action is { Type: CardActionType.Use, PhysicalCards.Count: 0 } a && a.ActionId == n.ActionId && a.ProviderSeat == f.OwnerSeat && a.RequesterSeat is null && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, f.OwnerSeat, f.OwnerSeat) && a.ConversionChain.SequenceEqual([r.Source]) && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDcUseIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == u.Id && e.ActionId == a.ActionId && e.Owner == f.OwnerSeat && e.Kind == n.Kind) == 1;
     internal bool IsMouDcZeroUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouDongChengDouwei: { } n } u && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.FrameId)is { } parent && MouDcUseRidesOn(parent, u);
     internal bool MatchesMouDcNativeAction(long id, CardActionContext a, int card) => card == 0 && IsMouDcZeroUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.Action is { } original && a.ActionId == original.ActionId && a.Type == CardActionType.Use && a.ActorSeat == original.ActorSeat && a.ProviderSeat == original.ProviderSeat && a.RequesterSeat == original.RequesterSeat && a.EffectiveKind == original.EffectiveKind && a.PhysicalCards.Count == 0 && a.ConversionChain.SequenceEqual(original.ConversionChain);
     internal Card ReadMouDcUseAppearance(long id, CardAppearanceReference appearance)
@@ -162,7 +162,7 @@ internal sealed partial class CharacterDongChengMouRuntime
         if (u.MouDongChengDouwei is not { } n)
             return false;
         var parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(n.FrameId);
-        if (!MouDcUseRidesOn(parent, u) || _coreCardUseLifecycleOperations.LifecycleCardUse(u.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) != 1)
+        if (!MouDcUseRidesOn(parent, u) || _coreCardUseLifecycleOperations.LifecycleCardUse(u.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) != 1)
             throw new InvalidOperationException("Douwei must receive the unique finished original native Use.");
         MouDongCheng.UseReturned(n, u.CardAttack is { Active: true });
         return true;

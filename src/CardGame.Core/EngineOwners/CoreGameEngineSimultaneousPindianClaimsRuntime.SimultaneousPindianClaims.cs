@@ -53,7 +53,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianClaimsRuntime
             if (AvailableSimultaneousClaimCards(claims.Claims[claims.Index]).Length > 0)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimultaneousPindian = r with { Stage = SimultaneousPindianStage.Claiming, Claims = claims } });
-                _coreSimultaneousPindianOperations.PublishSimultaneousChoice(f);
+                _coreSimultaneousPindianOperations.Value.PublishSimultaneousChoice(f);
                 return true;
             }
 
@@ -87,7 +87,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianClaimsRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimultaneousPindian = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SimultaneousPindianClaimPaidEvent(f.Id, r.ComparisonIndex, r.Claims!.Index, claim.Source, taken, choice.Cards, before, r.MovementAfter));
-        if (!_coreSimultaneousPindianOperations.DrainSimultaneousChildren(f))
+        if (!_coreSimultaneousPindianOperations.Value.DrainSimultaneousChildren(f))
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 }

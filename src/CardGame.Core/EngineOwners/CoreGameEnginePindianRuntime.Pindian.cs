@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEnginePindianRuntime
         {
             OwnedPileSource = ownedPileSource
         };
-        _corePindianOwnedPileSourcesOperations.AssertOwnedPilePindianSource(frame);
+        _corePindianOwnedPileSourcesOperations.Value.AssertOwnedPilePindianSource(frame);
         _coreRuntimeOperations.PushRuntimeFrame(frame);
         PublishPindianSelection(frame);
     }
@@ -137,7 +137,7 @@ internal sealed partial class CoreGameEnginePindianRuntime
             return;
         var source = _coreMatchParticipantsPlayersAccess._players[frame.SourceSeat];
         var opponent = _coreMatchParticipantsPlayersAccess._players[frame.OpponentSeat!.Value];
-        _corePindianOwnedPileSourcesOperations.AssertOwnedPilePindianSource(frame);
+        _corePindianOwnedPileSourcesOperations.Value.AssertOwnedPilePindianSource(frame);
         var sourceLocation = frame.OwnedPileSource?.Pile.Location ?? (frame.SourceUsesDrawPileTop ? CardLocation.Processing : CardLocation.Hand(source.Seat));
         var sourceInput = _characterLuKangWumiaoOperations.WuLuKangActualInput(frame, source.Seat, frame.SourceCardId!.Value, sourceLocation, 0, frame.SourceUsesDrawPileTop);
         var opponentInput = _characterLuKangWumiaoOperations.WuLuKangActualInput(frame, opponent.Seat, opponentCardId, opponentTop ? CardLocation.DrawPile : CardLocation.Hand(opponent.Seat), 0, opponentTop);
@@ -177,7 +177,7 @@ internal sealed partial class CoreGameEnginePindianRuntime
     }.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToArray();
     internal void CompletePindian(PindianFrame frame)
     {
-        var foreignOrigin = _resolutionStackOperations._resolutionStack.Count >= 2 && _resolutionStackOperations._resolutionStack[^2] is ProgramSkillFrame owner ? _coreForeignTurnContestsOperations.FreezeForeignTurnPindianOrigin(owner, frame) : null;
+        var foreignOrigin = _resolutionStackOperations._resolutionStack.Count >= 2 && _resolutionStackOperations._resolutionStack[^2] is ProgramSkillFrame owner ? _coreForeignTurnContestsOperations.Value.FreezeForeignTurnPindianOrigin(owner, frame) : null;
         foreach (var id in AvailablePindianCards(frame.Result!))
         {
             var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == id);
@@ -227,7 +227,7 @@ internal sealed partial class CoreGameEnginePindianRuntime
     {
         var frames = _resolutionStackOperations._resolutionStack.OfType<PindianFrame>().ToArray();
         foreach (var owned in frames)
-            _corePindianOwnedPileSourcesOperations.AssertOwnedPilePindianSource(owned);
+            _corePindianOwnedPileSourcesOperations.Value.AssertOwnedPilePindianSource(owned);
         if (frames.Length == 0)
             return;
         if (frames.Length == 1 && _characterJianYongBoundaryMobileOperations.IsBoundaryJianYongZongshiSubtree(frames[0]))
@@ -261,14 +261,14 @@ internal sealed partial class CoreGameEnginePindianRuntime
         var contestCards = _corePindianPoliciesOperations.CurrentPindianProcessingIds(frame);
         if (_cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Select(card => card.Id).Order().SequenceEqual(parentCards.Concat(contestCards).Order()) == false || parentCards.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Processing))
             throw new InvalidOperationException("Pindian lost its parent card or acquired an unrelated processing card.");
-        var paidDouyuClaim = frame.PindianStep == PindianStep.ClaimResult && frame.Result is { } paidResult && (_characterPangJiOlOperations.IsDouyuPairAssignment(frame, paidResult) || _characterLuKangWumiaoOperations.IsWuLuKangAssignedPair(frame, paidResult)) && _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == frame.Id && e.SkillId == frame.SkillId && e.Result == paidResult) == 1 && (_characterLuKangWumiaoOperations.IsWuLuKangAssignedPair(frame, paidResult) || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuResultRecordedEvent>().Count(e => e.ContestId == frame.Id && e.ComparisonIndex == 0 && e.Result == paidResult) == 1);
+        var paidDouyuClaim = frame.PindianStep == PindianStep.ClaimResult && frame.Result is { } paidResult && (_characterPangJiOlOperations.IsDouyuPairAssignment(frame, paidResult) || _characterLuKangWumiaoOperations.IsWuLuKangAssignedPair(frame, paidResult)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == frame.Id && e.SkillId == frame.SkillId && e.Result == paidResult) == 1 && (_characterLuKangWumiaoOperations.IsWuLuKangAssignedPair(frame, paidResult) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuResultRecordedEvent>().Count(e => e.ContestId == frame.Id && e.ComparisonIndex == 0 && e.Result == paidResult) == 1);
         if ((!_coreMatchParticipantsPlayersAccess._players[frame.SourceSeat].IsAlive || frame.OpponentSeat is { } opponent && !_coreMatchParticipantsPlayersAccess._players[opponent].IsAlive) && !paidDouyuClaim || frame.OpponentSeat == frame.SourceSeat || !_coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat].IsAlive || _coreMatchOutcomeStatusAccess._status != (_coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat].IsHuman ? EngineStatus.AwaitingHumanResponse : EngineStatus.Running))
             throw new InvalidOperationException("Pindian prompt owner or participants are inconsistent.");
         if (_corePindianRandomSelectionsOperations.AssertPindianRandomSelection(frame, decision))
             return;
         if (frame.PindianStep == PindianStep.ClaimResult)
         {
-            _corePindianMaximumSlashClaimsOperations.AssertPindianPolicyClaims(frame);
+            _corePindianMaximumSlashClaimsOperations.Value.AssertPindianPolicyClaims(frame);
             var claimantSeat = frame.PolicyClaims is { } policyClaims ? (int? )policyClaims.Claims[policyClaims.Index].OwnerSeat : frame.ClaimSeats is { } seats && frame.ClaimIndex >= 0 && frame.ClaimIndex < seats.Count ? seats[frame.ClaimIndex] : null;
             if (frame.Result is null || decision.PlayerSeat != claimantSeat || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("action") != "pindian-claim" || choice.Cards.Any(id => !contestCards.Contains(id))))
                 throw new InvalidOperationException("Pindian claim lost its public card or claimant.");

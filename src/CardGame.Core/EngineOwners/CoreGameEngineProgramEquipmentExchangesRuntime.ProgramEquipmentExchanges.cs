@@ -53,7 +53,7 @@ internal sealed partial class CoreGameEngineProgramEquipmentExchangesRuntime
         }).ToArray();
         // Freeze both Ox stores before either transfers, so swapping two treasures
         // never merges one owner's grains into the other owner's outgoing store.
-        var moves = equipmentMoves.Concat(equipmentMoves.Where(move => _coreNativeDamageHandlesOperations.UsesFormalWoodenOx && move.Card.Kind == CardKind.WoodenOx).SelectMany(move => _cardZonesOperations._cardZones.CardsAt(CardLocation.WoodenOxGrain(move.From.OwnerSeat!.Value)).Select(card => (Card: card, From: CardLocation.WoodenOxGrain(move.From.OwnerSeat.Value), To: move.To.Zone == CardZoneKind.Equipment ? CardLocation.WoodenOxGrain(move.To.OwnerSeat!.Value) : CardLocation.DiscardPile)))).ToArray();
+        var moves = equipmentMoves.Concat(equipmentMoves.Where(move => _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && move.Card.Kind == CardKind.WoodenOx).SelectMany(move => _cardZonesOperations._cardZones.CardsAt(CardLocation.WoodenOxGrain(move.From.OwnerSeat!.Value)).Select(card => (Card: card, From: CardLocation.WoodenOxGrain(move.From.OwnerSeat.Value), To: move.To.Zone == CardZoneKind.Equipment ? CardLocation.WoodenOxGrain(move.To.OwnerSeat!.Value) : CardLocation.DiscardPile)))).ToArray();
         var reason = new CardMoveReason($"skill-program.{(frame.SkillId)}.equipment-exchange");
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { PendingMovementContinuation = new ProgramMovementContinuation(frame.OwnerSeat, 0, null) });
         var batch = _coreCardMovementProgramsOperations.BeginCardMovementBatch(moves.Select(move => move.From), moves.Select(move => move.To));

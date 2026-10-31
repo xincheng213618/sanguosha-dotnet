@@ -15,7 +15,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
         if (a.Type != CardActionType.Response || a.ActorSeat != a.ProviderSeat || a.RequesterSeat is not null || a.ResponderSeat != a.ActorSeat)
             return false;
         if (a.EffectiveKind == CardKind.Nullification)
-            return _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } n && a.OpponentSeat == n.SourceSeat && a.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(n);
+            return _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } n && a.OpponentSeat == n.SourceSeat && a.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(n);
         return a.EffectiveKind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.EffectiveCardKind is { } incoming && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == a.ActorSeat && a.OpponentSeat == attack.SourceSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId == a.ParentActionId;
     }
 

@@ -10,13 +10,13 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
     internal static CardConversionSource AnniversarySunQuanSource(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     internal bool HasAnniversaryMing => _contentRegistryOperations._contentRegistry.Skills.ContainsKey(AnniversarySunQuanComposition.Cangming);
 
-    internal IEnumerable<AnniversaryMingPileCreatedEvent> AnniversaryMingPiles() => !HasAnniversaryMing ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMingPileCreatedEvent>().Where(e => _coreTableSeatQueriesOperations.IsValidPlayerSeat(e.HolderSeat) && e.Location == new CardLocation(CardZoneKind.PrivatePersistentPile, e.HolderSeat, $"anniversary-ming:{(e.FrameId)}:{(e.HolderSeat)}") && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversarySunQuanStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source == e.Source && s.GameplayHash == e.GameplayHash && s.Operation is SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingSetup or SkillProgramEffectOp.ResolveAnniversarySunQuanJichao));
+    internal IEnumerable<AnniversaryMingPileCreatedEvent> AnniversaryMingPiles() => !HasAnniversaryMing ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryMingPileCreatedEvent>().Where(e => _coreTableSeatQueriesOperations.IsValidPlayerSeat(e.HolderSeat) && e.Location == new CardLocation(CardZoneKind.PrivatePersistentPile, e.HolderSeat, $"anniversary-ming:{(e.FrameId)}:{(e.HolderSeat)}") && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversarySunQuanStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source == e.Source && s.GameplayHash == e.GameplayHash && s.Operation is SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingSetup or SkillProgramEffectOp.ResolveAnniversarySunQuanJichao));
     internal IReadOnlyList<Card> AnniversaryMingCards(int holder) => AnniversaryMingPiles().Where(p => p.HolderSeat == holder).SelectMany(p => _cardZonesOperations._cardZones.CardsAt(p.Location)).ToArray();
     internal int[] AnniversaryJichaoPeers(int owner) => _coreTableOrderOperations.CurrentTableOrder().Where(s => s != owner && _coreMatchParticipantsPlayersAccess._players[s].IsAlive && (_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Count > 0 || _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[s]).Count > 0)).ToArray();
-    internal int AnniversaryDamageTotal(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Where(e => !e.SourceLess && e.SourceSeat == owner && e.Amount > 0).Sum(e => e.Amount);
+    internal int AnniversaryDamageTotal(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Where(e => !e.SourceLess && e.SourceSeat == owner && e.Amount > 0).Sum(e => e.Amount);
     internal bool AnniversaryJichaoUnlocked(int owner, string instance)
     {
-        var last = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryJichaoLockedEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillInstanceId == instance);
+        var last = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryJichaoLockedEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillInstanceId == instance);
         return last is null || AnniversaryDamageTotal(owner) - last.DamageTotal >= 3;
     }
 
@@ -165,7 +165,7 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveAnniversarySunQuanCangmingColors)]
     internal void ReturnAnniversarySunQuanColors(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.AnniversarySunQuan is not { Stage: AnniversarySunQuanStage.Drawing, DrawOutcome: null } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.ColorCount || outcome.SequenceBefore < r.Before || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversarySunQuanMovementPaidEvent>().Any(e => e.FrameId == f.Id))
+        if (f.AnniversarySunQuan is not { Stage: AnniversarySunQuanStage.Drawing, DrawOutcome: null } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.ColorCount || outcome.SequenceBefore < r.Before || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversarySunQuanMovementPaidEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Cangming colors lost its exact native draw producer and unique typed outcome.");
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.Reason.Value == AnniversaryMingDraw && m.To == CardLocation.Hand(f.OwnerSeat)).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversarySunQuan = r with { Stage = AnniversarySunQuanStage.MovementChildren, DrawOutcome = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter, Movements = moves }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -199,7 +199,7 @@ internal sealed partial class CharacterSunQuanAnniversaryGodRuntime
     internal bool ReturnAnniversarySunQuanMovement(ProgramSkillFrame f) => f.AnniversarySunQuan is not null && ResumeAnniversarySunQuan(f.Id);
     internal void FinishAnniversarySunQuan(ProgramSkillFrame f)
     {
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversarySunQuanMovementPaidEvent>().Any(e => e.FrameId == f.Id))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversarySunQuanMovementPaidEvent>().Any(e => e.FrameId == f.Id))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversarySunQuanMovementPaidEvent(f.Id, 0, 0, f.AnniversarySunQuan!.Before, f.AnniversarySunQuan.After));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, AnniversarySunQuan = f.AnniversarySunQuan!with { Stage = AnniversarySunQuanStage.Finished } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversarySunQuanCompletedEvent(f.Id));

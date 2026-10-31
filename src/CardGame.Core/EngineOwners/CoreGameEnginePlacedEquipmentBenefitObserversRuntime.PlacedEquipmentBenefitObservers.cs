@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEnginePlacedEquipmentBenefitObserversRunti
 {
     internal bool ValidPlacedEquipmentBenefit(ProgramSkillFrame f)
     {
-        if (!_corePlacedEquipmentBenefitsOperations.PlacedEquipmentParentMatches(f) || f.PlacedEquipmentBenefit is not { } r || !Enum.IsDefined(r.Stage) || r.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || r.EndingFrameId != f.WindowContext!.ParentFrameId || r.OccurrenceIndex != f.WindowContext.OccurrenceIndex || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlacedEquipmentBenefitStartedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.TurnNumber == r.TurnNumber && e.TurnOwnerSeat == r.TurnOwnerSeat && e.EndingFrameId == r.EndingFrameId && e.OccurrenceIndex == r.OccurrenceIndex) != 1)
+        if (!_corePlacedEquipmentBenefitsOperations.Value.PlacedEquipmentParentMatches(f) || f.PlacedEquipmentBenefit is not { } r || !Enum.IsDefined(r.Stage) || r.InstructionIndex != 1 || r.InstructionIndex != f.InstructionIndex || r.Source != new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) || r.GameplayHash != f.GameplayHash || r.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || r.EndingFrameId != f.WindowContext!.ParentFrameId || r.OccurrenceIndex != f.WindowContext.OccurrenceIndex || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlacedEquipmentBenefitStartedEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.TurnNumber == r.TurnNumber && e.TurnOwnerSeat == r.TurnOwnerSeat && e.EndingFrameId == r.EndingFrameId && e.OccurrenceIndex == r.OccurrenceIndex) != 1)
             return false;
         if ((r.SelectedCardId is null) != (r.SelectedFrom is null) || r.SelectedCardId is { } selected && (selected <= 0 || r.SelectedFrom!.Value.OwnerSeat != f.OwnerSeat || r.SelectedFrom.Value.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)))
             return false;
@@ -121,13 +121,13 @@ internal sealed partial class CoreGameEnginePlacedEquipmentBenefitObserversRunti
             // The incoming first edge was proved against this new receipt and actual payment ledger above.
             for (var child = index + 2; child < _resolutionStackOperations._resolutionStack.Count; child++)
             {
-                if (!_corePaidColorDamageClaimObserversOperations.PaidColorDamageClaimObserverEdge(child))
+                if (!_corePaidColorDamageClaimObserversOperations.Value.PaidColorDamageClaimObserverEdge(child))
                 {
                     valid = false;
                     break;
                 }
 
-                if (_resolutionStackOperations._resolutionStack[child] is DyingFrame dying && (_coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(child, dying) || _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(child, dying) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(child, dying) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(child, dying) || _coreLegacyDyingAlcoholReturnsOperations.ExactLegacyDyingAlcoholReturnRide(child, dying)))
+                if (_resolutionStackOperations._resolutionStack[child] is DyingFrame dying && (_coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(child, dying) || _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(child, dying) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(child, dying) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(child, dying) || _coreLegacyDyingAlcoholReturnsOperations.Value.ExactLegacyDyingAlcoholReturnRide(child, dying)))
                     break;
             }
 
@@ -138,5 +138,5 @@ internal sealed partial class CoreGameEnginePlacedEquipmentBenefitObserversRunti
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 310)]
-    internal bool IsPlacedEquipmentBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PlacedEquipmentObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsPlacedEquipmentBenefitProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && PlacedEquipmentObserverRoot(_coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

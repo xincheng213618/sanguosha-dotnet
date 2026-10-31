@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramDamageInsertionFacts(Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineProgramChildResolutionEntries> getCoreGameEngineProgramChildResolutionRuntime, Func<RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries> getCoreGameEngineProgramAttackAttemptRuntime, Func<RuntimeEntries.CoreDyingCursorRuntimeEntries> getCoreDyingCursorRuntimeRuntime) : IProgramDamageInsertionFacts
+internal sealed class ProgramDamageInsertionFacts(Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineProgramChildResolutionEntries> getCoreGameEngineProgramChildResolutionRuntime, Func<RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries> getCoreGameEngineProgramAttackAttemptRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreDyingCursorRuntimeRuntime>> getCoreDyingCursorRuntimeRuntime) : IProgramDamageInsertionFacts
 {
     public int FrameCount => getFrameStore().Count;
 
@@ -9,5 +9,5 @@ internal sealed class ProgramDamageInsertionFacts(Func<FrameStore> getFrameStore
     public bool HasIssuedLink(int index) => getFrameStore().HasIssuedLink(index);
     public bool HasConsistentChild(int index) => getCoreGameEngineProgramChildResolutionRuntime().ProgramChildResolutionEdge(index);
     public long? AttackOwnerFrameId => getCoreGameEngineProgramAttackAttemptRuntime().CurrentDamageAttempt?.ResolutionId;
-    public long? DyingFrameId => getCoreDyingCursorRuntimeRuntime().ActiveDying?.Id;
+    public long? DyingFrameId => getCoreDyingCursorRuntimeRuntime().Value.ActiveDying?.Id;
 }

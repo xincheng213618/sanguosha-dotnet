@@ -32,7 +32,7 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
         }
 
         var target = op == SkillProgramEffectOp.ResolveAnniversaryZhangLiaoDuorui ? w.TargetSeat!.Value : _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat;
-        if (op == SkillProgramEffectOp.ResolveAnniversaryZhangLiaoCuixi && !_coreForeignTurnContestsOperations.IsForeignActualTurnPindian(f))
+        if (op == SkillProgramEffectOp.ResolveAnniversaryZhangLiaoCuixi && !_coreForeignTurnContestsOperations.Value.IsForeignActualTurnPindian(f))
             throw new InvalidOperationException("Cuixi requires its exact actual foreign turn parent.");
         var r = new AnniversaryZhangLiaoReceipt(AnnZlSource(f), f.GameplayHash, op, w.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, target)
         {
@@ -40,7 +40,7 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
             Count = op == SkillProgramEffectOp.ResolveAnniversaryZhangLiaoZhiti ? AnnZlAbolished(target) : 1,
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
             After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
-            PhaseToken = _coreProgramEventHistoryOperations.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Select(e => e.Phase.Token).DefaultIfEmpty().Max()
+            PhaseToken = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Select(e => e.Phase.Token).DefaultIfEmpty().Max()
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryZhangLiao = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryZhangLiaoStartedEvent(f.Id, r.Source, r.GameplayHash, op, r.ParentId, r.ActualTurn, target, r.Count));
@@ -209,11 +209,11 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
     internal PromptChoice AiAnnZlZhiti(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();
     internal void ApplyAnniversaryCuixiDrawSkip(int currentSeat)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryCuixiBranchEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Target == currentSeat && e.Branch == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryZhangLiaoStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source == e.Source && s.ActualTurn == e.ActualTurn && s.Target == currentSeat && s.Operation == SkillProgramEffectOp.ResolveAnniversaryZhangLiaoCuixi)))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuixiBranchEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Target == currentSeat && e.Branch == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryZhangLiaoStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source == e.Source && s.ActualTurn == e.ActualTurn && s.Target == currentSeat && s.Operation == SkillProgramEffectOp.ResolveAnniversaryZhangLiaoCuixi)))
             _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= GameEngine.DelayedTurnEffects.SkipDrawPhase;
     }
 
-    internal IEnumerable<AnniversaryDuoruiLeaseEvent> ActiveAnnZlLeases() => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryDuoruiLeaseEvent>().Where(e => !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryDuoruiExpiredEvent>().Any(x => x.LeaseFrameId == e.FrameId));
+    internal IEnumerable<AnniversaryDuoruiLeaseEvent> ActiveAnnZlLeases() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryDuoruiLeaseEvent>().Where(e => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryDuoruiExpiredEvent>().Any(x => x.LeaseFrameId == e.FrameId));
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 40750)]
     internal void ObserveAnnZlLeases(IGameEvent payload)
     {

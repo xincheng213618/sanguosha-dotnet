@@ -42,7 +42,7 @@ internal sealed partial class CharacterHuangGaiMouRuntime
         if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && actor.Seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.UnlimitedUse != true)
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, shown.Kind);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(card.Id, shown.Kind, actor.Seat, targetSeat, IgnoresArmor: attack.IgnoresArmor));
         _coreNativeAiDecisionsOperations.NotifyAiOfSlash(actor, target);
@@ -50,7 +50,7 @@ internal sealed partial class CharacterHuangGaiMouRuntime
             _coreNativeSlashUseOperations.BeginSlashTargetResolution(attack);
     }
 
-    internal bool MouHgUseRidesOn(ProgramSkillFrame f, CardUseFrame u) => ValidMouHg(f) && f.MouHuangGai is { Stage: MouHgStage.NativeUse, Native: { } r, NativeReturned: false } && u.MouHgQuzhou == r && r.FrameId == f.Id && r.UseId == u.Id && u.CardId == r.CardId && u.Action is { Type: CardActionType.Use } a && a.ActionId == r.ActionId && a.ProviderSeat == r.Actor && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == r.CardId && from == CardLocation.Processing && u.PhysicalCardIds is [var physical] && physical == id && f.MouHuangGai.Reveals.Any(e => e.CardId == id && e.Kind == r.Kind) && CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, r.Actor, r.Actor) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHgNativeIssuedEvent>().Count(e => e.Origin == r) == 1;
+    internal bool MouHgUseRidesOn(ProgramSkillFrame f, CardUseFrame u) => ValidMouHg(f) && f.MouHuangGai is { Stage: MouHgStage.NativeUse, Native: { } r, NativeReturned: false } && u.MouHgQuzhou == r && r.FrameId == f.Id && r.UseId == u.Id && u.CardId == r.CardId && u.Action is { Type: CardActionType.Use } a && a.ActionId == r.ActionId && a.ProviderSeat == r.Actor && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == r.CardId && from == CardLocation.Processing && u.PhysicalCardIds is [var physical] && physical == id && f.MouHuangGai.Reveals.Any(e => e.CardId == id && e.Kind == r.Kind) && CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, r.Actor, r.Actor) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHgNativeIssuedEvent>().Count(e => e.Origin == r) == 1;
     [NativeUseValidation(35400)]
     internal void ValidateMouHgUse(CardUseFrame use)
     {
@@ -65,7 +65,7 @@ internal sealed partial class CharacterHuangGaiMouRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MouHuangGai!;
-        if (!MouHgUseRidesOn(f, use) || r.NativeReturned || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (!MouHgUseRidesOn(f, use) || r.NativeReturned || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Quzhou requires its once-completed original native Slash return.");
         MouHuangGaiRules.UseReturned(o, use.CardAttack is { Active: true });
     }
@@ -90,7 +90,7 @@ internal sealed partial class CharacterHuangGaiMouRuntime
 
     internal ProgramSkillFrame? MouHgObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterHuangGaiMouOperations.MouHgFirstChild(f, c), (i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d)));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35400)]
-    internal bool MouHgDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MouHgObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool MouHgDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && MouHgObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 35400)]
     internal bool AdvanceMouHgChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MouHgObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

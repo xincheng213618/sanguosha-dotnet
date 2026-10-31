@@ -8,7 +8,7 @@ internal sealed partial class CoreGameEngineZhaoZhongProvenanceRuntime
         // Typed history snapshots are immutable and change identity whenever
         // their committed/pending facts change. This index stores facts only;
         // every query still verifies the actual materials and active proof.
-        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawInvocationRecordedEvent>();
+        var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDrawInvocationRecordedEvent>();
         if (ReferenceEquals(facts, _coreGameEngineZhaoZhongProvenanceZhaoZhongDrawInvocationCountsZhaoZhongDrawInvoiceFactsZhaoZhongDrawInvoicesAccess._zhaoZhongDrawInvoiceFacts))
             return;
         _coreGameEngineZhaoZhongProvenanceZhaoZhongDrawInvocationCountsZhaoZhongDrawInvoiceFactsZhaoZhongDrawInvoicesAccess._zhaoZhongDrawInvoices = facts.GroupBy(fact => (fact.TurnNumber, fact.OwnerSeat)).ToDictionary(group => group.Key, group => group.ToArray());

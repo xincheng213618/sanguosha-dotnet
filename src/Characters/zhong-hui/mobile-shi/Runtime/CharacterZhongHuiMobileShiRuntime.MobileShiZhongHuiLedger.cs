@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhongHuiMobileShiRuntime
 {
     internal int ShiZhHuiCharge(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(PlayerMarkerKind.ShiZhHuiCharge);
-    internal int ShiZhHuiOverflowCount(int seat) => !HasShiZhHuiCapability ? 0 : _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhHuiXiezhiOverflowEvent>().Count(entry => entry.OwnerSeat == seat);
+    internal int ShiZhHuiOverflowCount(int seat) => !HasShiZhHuiCapability ? 0 : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiXiezhiOverflowEvent>().Count(entry => entry.OwnerSeat == seat);
     internal int ChangeShiZhHuiCharge(long frameId, int owner, int amount, string reason, out int excess)
     {
         var before = ShiZhHuiCharge(owner);

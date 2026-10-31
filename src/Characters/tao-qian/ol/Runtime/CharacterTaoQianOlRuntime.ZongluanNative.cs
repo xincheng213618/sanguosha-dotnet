@@ -27,7 +27,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, target, card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash), programSkillCardUseFrameId: f.Id);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, target, IgnoresArmor: attack.IgnoresArmor));
@@ -43,7 +43,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
         if (at < 1 || _resolutionStackOperations._resolutionStack[at - 1] is not ProgramSkillFrame { TaoQian: { Paid: true, Stage: TaoQianStage.SlashIssuing } r } f)
             return;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
-        if (r.Op != SkillProgramEffectOp.ResolveZongluanPreparationSlashAndDiscard || r.UseId != 0 || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActorSeat != r.ActorSeat || a.ProviderSeat != r.ActorSeat || a.RequesterSeat is not null || a.ConversionChain is not [var source] || source != r.Source || !use.TargetSeats.SequenceEqual(r.Targets) || !a.TargetSeats.SequenceEqual(r.Targets) || a.EffectiveSuit != Suit.None || a.EffectiveRank != 0 || a.EffectiveIsRed is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ZongluanCommittedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.ActorSeat == r.ActorSeat) != 1)
+        if (r.Op != SkillProgramEffectOp.ResolveZongluanPreparationSlashAndDiscard || r.UseId != 0 || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActorSeat != r.ActorSeat || a.ProviderSeat != r.ActorSeat || a.RequesterSeat is not null || a.ConversionChain is not [var source] || source != r.Source || !use.TargetSeats.SequenceEqual(r.Targets) || !a.TargetSeats.SequenceEqual(r.Targets) || a.EffectiveSuit != Suit.None || a.EffectiveRank != 0 || a.EffectiveIsRed is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZongluanCommittedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.ActorSeat == r.ActorSeat) != 1)
             throw new InvalidOperationException("Zongluan lost the exact source, actual actor, materials or paid multi-target request.");
         var origin = new ZongluanSlashOrigin(f.Id, r.Source, r.GameplayHash, r.ActorSeat, id, a.ActionId, r.ActualTurn, r.TurnOwner);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { TaoQian = r with { Stage = TaoQianStage.NativeSlash, UseId = id, ActionId = a.ActionId } });
@@ -55,7 +55,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
 
     internal bool IsIssuedZongluanUse(CardUseFrame use)
     {
-        if (use.ZongluanSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || o.UseId != use.Id || o.ActionId != a.ActionId || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<ZongluanSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { TaoQian: { Paid: true, Stage: TaoQianStage.NativeSlash, NativeReturned: false } r } || r.UseId != use.Id || r.ActionId != a.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.ActorSeat != o.ActorSeat || r.ActualTurn != o.ActualTurn || r.TurnOwner != o.TurnOwner)
+        if (use.ZongluanSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || o.UseId != use.Id || o.ActionId != a.ActionId || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZongluanSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { TaoQian: { Paid: true, Stage: TaoQianStage.NativeSlash, NativeReturned: false } r } || r.UseId != use.Id || r.ActionId != a.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.ActorSeat != o.ActorSeat || r.ActualTurn != o.ActualTurn || r.TurnOwner != o.TurnOwner)
             return false;
         var original = a;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -65,9 +65,9 @@ internal sealed partial class CharacterTaoQianOlRuntime
         }
         else if (use.CardKind != CardKind.Slash)
             return false;
-        if (original.EffectiveKind != CardKind.Slash || original.EffectiveSuit != Suit.None || original.EffectiveRank != 0 || original.EffectiveIsRed is not null || original.ConversionChain is not [var source] || source != o.Source || !_coreProgramEventHistoryOperations.ProgramEventHistory<ZongluanInitialTargetEvent>().Where(e => e.FrameId == o.ProgramFrameId && e.UseId == use.Id).OrderBy(e => e.Index).Select(e => e.TargetSeat).SequenceEqual(r.Targets))
+        if (original.EffectiveKind != CardKind.Slash || original.EffectiveSuit != Suit.None || original.EffectiveRank != 0 || original.EffectiveIsRed is not null || original.ConversionChain is not [var source] || source != o.Source || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZongluanInitialTargetEvent>().Where(e => e.FrameId == o.ProgramFrameId && e.UseId == use.Id).OrderBy(e => e.Index).Select(e => e.TargetSeat).SequenceEqual(r.Targets))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == o.ActorSeat && a.ActorSeat == o.ActorSeat;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == o.ActorSeat && a.ActorSeat == o.ActorSeat;
     }
 
     internal bool IsZongluanUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedZongluanUse(use);
@@ -97,7 +97,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
     {
         if (payload is not DamageAppliedEvent { Amount: > 0 } e || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame d || _coreProgramAttackAttemptOperations.CurrentDamageAttempt is not NativeOwners.CardAttackHandle a || a.ResolutionId != d.ParentFrameId || a.IsChainPropagation || a.DamageRedirected || a.IsProgramSkillDamage || a.IsProgramJudgmentDamage || d.SourceSeat != e.SourceSeat || d.TargetSeat != e.TargetSeat || d.Amount != e.Amount || _coreCardUseLifecycleOperations.LifecycleCardUse(a.ResolutionId)is not { ZongluanSlash: { } o } use || !IsIssuedZongluanUse(use))
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ZongluanDirectDamageEvent>().Any(x => x.DamageFrameId == d.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZongluanDirectDamageEvent>().Any(x => x.DamageFrameId == d.Id))
             throw new InvalidOperationException("Zongluan cannot account for one actual Slash damage occurrence twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZongluanDirectDamageEvent(o.ProgramFrameId, use.Id, d.Id, d.SourceSeat, d.TargetSeat, e.Amount));
     }
@@ -116,7 +116,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
         var r = f.TaoQian!;
-        if (r.Stage != TaoQianStage.NativeSlash || r.NativeReturned || r.UseId != use.Id || r.ActionId != o.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.Stage != TaoQianStage.NativeSlash || r.NativeReturned || r.UseId != use.Id || r.ActionId != o.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Zongluan lost its once-completed whole native Use return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { TaoQian = r with { NativeReturned = true } });
         if (use.CardAttack is not { Active: true })
@@ -130,7 +130,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
             return false;
         if (c.ProgramFrameId != f.Id)
             throw new InvalidOperationException("Zongluan's native Slash returned to another program.");
-        SettleZongluanNative(_coreProgramEventHistoryOperations.ProgramEventHistory<ZongluanSlashIssuedEvent>().Single(e => e.Origin.ProgramFrameId == f.Id).Origin);
+        SettleZongluanNative(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZongluanSlashIssuedEvent>().Single(e => e.Origin.ProgramFrameId == f.Id).Origin);
         return true;
     }
 
@@ -138,9 +138,9 @@ internal sealed partial class CharacterTaoQianOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
         var r = f.TaoQian!;
-        if (!r.NativeReturned || r.UseId != o.UseId || _coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ZongluanSlashReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (!r.NativeReturned || r.UseId != o.UseId || _coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZongluanSlashReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Zongluan cannot settle its whole Slash twice.");
-        var count = _coreProgramEventHistoryOperations.ProgramEventHistory<ZongluanDirectDamageEvent>().Where(e => e.FrameId == f.Id && e.UseId == o.UseId && e.Amount > 0).Select(e => e.TargetSeat).Distinct().Count();
+        var count = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZongluanDirectDamageEvent>().Where(e => e.FrameId == f.Id && e.UseId == o.UseId && e.Amount > 0).Select(e => e.TargetSeat).Distinct().Count();
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { TaoQian = r with { Stage = TaoQianStage.NativeChildren, DamageRecipientCount = count }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZongluanSlashReturnedEvent(f.Id, o.UseId, o.ActionId, count));
     }

@@ -122,7 +122,7 @@ internal sealed partial class CharacterTangJiOlRuntime
             return null;
         return frame;
     }
-    internal bool HasJielieGiftDying(long beforeDamageId) => JieliePaidObserverRoot(beforeDamageId)is { } frame && _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && dying.ParentFrameId == frame.Id && dying.VictimSeat == frame.OwnerSeat && _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == dying.Id)is var dyingIndex && dyingIndex > 0 && _resolutionStackOperations._resolutionStack[dyingIndex] is DyingFrame { KillerSeat: null } child && child.ParentFrameId == frame.Id && _resolutionStackOperations._resolutionStack[dyingIndex - 1].Id == frame.Id;
+    internal bool HasJielieGiftDying(long beforeDamageId) => JieliePaidObserverRoot(beforeDamageId)is { } frame && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { ResumesProgramSkill: true } dying && dying.ParentFrameId == frame.Id && dying.VictimSeat == frame.OwnerSeat && _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == dying.Id)is var dyingIndex && dyingIndex > 0 && _resolutionStackOperations._resolutionStack[dyingIndex] is DyingFrame { KillerSeat: null } child && child.ParentFrameId == frame.Id && _resolutionStackOperations._resolutionStack[dyingIndex - 1].Id == frame.Id;
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 720)]
     internal bool IsJielieGiftProgramDying() => _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().Any(window => HasJielieGiftDying(window.Id));
     [ProgramAiChoice(SkillProgramEffectOp.JieliePreventAndGift)]

@@ -10,12 +10,12 @@ internal sealed partial class CharacterTangTangOlRuntime
         if (!_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m))
             return false;
         if (r.Stage == TangTangStage.HpChildren)
-            return m.Sequence > r.Before && m.From.OwnerSeat == r.Peer && m.To == CardLocation.DiscardPile && m.Reason is var reason && (reason == CardMoveReasons.DeathDiscard || reason == CardMoveReasons.WoodenOxGrainDiscard) && !_coreMatchParticipantsPlayersAccess._players[r.Peer].IsAlive && _coreProgramEventHistoryOperations.ProgramEventHistory<ZexingHpLossIssuedEvent>().Any(e => e.FrameId == f.Id && e.Peer == r.Peer && e.After == 0);
+            return m.Sequence > r.Before && m.From.OwnerSeat == r.Peer && m.To == CardLocation.DiscardPile && m.Reason is var reason && (reason == CardMoveReasons.DeathDiscard || reason == CardMoveReasons.WoodenOxGrainDiscard) && !_coreMatchParticipantsPlayersAccess._players[r.Peer].IsAlive && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZexingHpLossIssuedEvent>().Any(e => e.FrameId == f.Id && e.Peer == r.Peer && e.After == 0);
         if (m.Sequence <= r.Before || m.Sequence > r.After)
             return false;
         if (r.Stage == TangTangStage.DrawChildren)
             return m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.Recipient) && m.Reason.Value == ZhiyiDrawReason || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<TangTangEntityMovedEvent>().Any(e => e.FrameId == f.Id && e.Step == r.Step && e.Stage == r.Stage && e.CardId == m.CardId && e.Kind == m.CardKind && e.From == m.From && e.To == m.To && e.Sequence == m.Sequence))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TangTangEntityMovedEvent>().Any(e => e.FrameId == f.Id && e.Step == r.Step && e.Stage == r.Stage && e.CardId == m.CardId && e.Kind == m.CardKind && e.From == m.From && e.To == m.To && e.Sequence == m.Sequence))
             return true;
         return r.Grain.Contains(m.CardId) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard && r.Materials.Any(c => c.Kind == CardKind.WoodenOx && c.From.Zone == CardZoneKind.Equipment && m.From == CardLocation.WoodenOxGrain(c.From.OwnerSeat!.Value));
     }
@@ -30,7 +30,7 @@ internal sealed partial class CharacterTangTangOlRuntime
         if (child is IdentityAppearanceFrame appearance)
             return r.Stage == TangTangStage.HpIssuing && appearance.Receipt.Entry == IdentityAppearanceEntry.ProgramHpLoss && appearance.Receipt.ParentFrameId == f.Id && appearance.Receipt.OwnerSeat == r.Peer && appearance.Receipt.RequestedDeduction == 1 && appearance.Receipt.OriginalInstructionIndex == f.InstructionIndex;
         if (child is DyingFrame dying)
-            return r.Stage == TangTangStage.HpChildren && dying.ParentFrameId == f.Id && dying.VictimSeat == r.Peer && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.ProgramEventHistory<ZexingHpLossIssuedEvent>().Any(e => e.FrameId == f.Id && e.Peer == r.Peer && e.After == 0);
+            return r.Stage == TangTangStage.HpChildren && dying.ParentFrameId == f.Id && dying.VictimSeat == r.Peer && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZexingHpLossIssuedEvent>().Any(e => e.FrameId == f.Id && e.Peer == r.Peer && e.After == 0);
         if (child is RecoveryReplacementFrame recovery)
             return IsTangTangRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
@@ -45,7 +45,7 @@ internal sealed partial class CharacterTangTangOlRuntime
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange)
-            return state.ResumeProgramFrameId == f.Id && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
+            return state.ResumeProgramFrameId == f.Id && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
         return child is CardsMovedTriggerWindowFrame moved && f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsTangTangPaidMovement(f, m));
     }
 

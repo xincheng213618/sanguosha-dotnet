@@ -3,13 +3,13 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangXiuMouOlRuntime
 {
-    internal bool MouZhangXiuOlUseDamaged(long origin, int? instruction) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlUseDamageEvent>().Any(e => e.OriginFrameId == origin && e.InstructionIndex == instruction && e.Amount > 0);
+    internal bool MouZhangXiuOlUseDamaged(long origin, int? instruction) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlUseDamageEvent>().Any(e => e.OriginFrameId == origin && e.InstructionIndex == instruction && e.Amount > 0);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 33001)]
     internal void CaptureMouZhangXiuOlPreviousUse(IGameEvent fact)
     {
         if (!HasMouZhangXiuOl || fact is not CurrentTurnCardUseKindsRecordedEvent { CardActionId: { } actionId, RoundActionType: CardActionType.Use } current || _coreCardUseLifecycleOperations.LifecycleCardUse(current.OriginFrameId)is not { Action: { Type: CardActionType.Use } action } use || action.ActionId != actionId || action.ActorSeat != current.ActorSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             return;
-        var previous = _coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().LastOrDefault(e => e.ActorSeat == current.ActorSeat && e.CardActionId != actionId);
+        var previous = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().LastOrDefault(e => e.ActorSeat == current.ActorSeat && e.CardActionId != actionId);
         // No previous true Use is not a zero-damage previous card. Pure Played
         // actions do not enter the common declaration ledger in the first place.
         if (previous is null || previous.RoundActionType == CardActionType.Use && MouZhangXiuOlUseDamaged(previous.OriginFrameId, previous.ProgramInstructionIndex))
@@ -27,13 +27,13 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
 
     internal bool ValidMouZhangXiuOlEntry(CardUseFrame use, MouZhangXiuOlZhuijiaoEntry e)
     {
-        if (use.Action is not { Type: CardActionType.Use } a || a.ActionId != e.ActionId || use.Id != e.UseId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || e.Source.SkillId != MouZhangXiuOlComposition.Zhuijiao || e.Source.BindingId != "previous-undamaged" || e.Source.OwnerSeat != e.Previous.ActorSeat || _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash != e.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlQualifiedEvent>().Count(q => q.Entry == e with { Boosted = false, DrawReturned = false, PenaltyIssued = false, PenaltyReturned = false }) != 1)
+        if (use.Action is not { Type: CardActionType.Use } a || a.ActionId != e.ActionId || use.Id != e.UseId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || e.Source.SkillId != MouZhangXiuOlComposition.Zhuijiao || e.Source.BindingId != "previous-undamaged" || e.Source.OwnerSeat != e.Previous.ActorSeat || _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash != e.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlQualifiedEvent>().Count(q => q.Entry == e with { Boosted = false, DrawReturned = false, PenaltyIssued = false, PenaltyReturned = false }) != 1)
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var index = Array.FindIndex(history, f => f is CurrentTurnCardUseKindsRecordedEvent c && c.CardActionId == e.ActionId && c.OriginFrameId == e.UseId && c.ActorSeat == e.Source.OwnerSeat);
         if (index < 0 || history.Take(index).OfType<CurrentTurnCardUseKindsRecordedEvent>().LastOrDefault(c => c.ActorSeat == e.Source.OwnerSeat) != e.Previous)
             return false;
-        return !e.Boosted || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlBoostedEvent>().Count(q => q.UseId == use.Id && q.Source == e.Source) == 1;
+        return !e.Boosted || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlBoostedEvent>().Count(q => q.UseId == use.Id && q.Source == e.Source) == 1;
     }
 
     internal MouZhangXiuOlZhuijiaoEntry? MouZhangXiuOlEntry(CardUseFrame use, ProgramTriggerCandidate c) => use.MouZhangXiuOlZhuijiao?.SingleOrDefault(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.Source.SkillInstanceId == c.SkillInstanceId && e.GameplayHash == c.GameplayHash && ValidMouZhangXiuOlEntry(use, e));
@@ -88,9 +88,9 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
             return false;
         var origin = attack.ResolutionId;
         var instruction = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == origin)is ProgramSkillFrame { CardAttack: { ProgramUseInstructionIndex: { } i } } ? i : (int? )null;
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.OriginFrameId == origin && e.ProgramInstructionIndex == instruction && e.RoundActionType == CardActionType.Use))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.OriginFrameId == origin && e.ProgramInstructionIndex == instruction && e.RoundActionType == CardActionType.Use))
             return false;
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouZhangXiuOlUseDamageEvent>().Any(e => e.DamageId == damageId))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlUseDamageEvent>().Any(e => e.DamageId == damageId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhangXiuOlUseDamageEvent(origin, instruction, damageId, damage.Amount));
         return false;
     }

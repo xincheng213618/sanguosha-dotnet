@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class PlacedEquipmentBenefitProgramCapability(Func<RuntimeEntries.CoreGameEnginePlacedEquipmentBenefitsEntries> getCoreGameEnginePlacedEquipmentBenefitsRuntime) : IPlacedEquipmentBenefitProgramHost
+internal sealed class PlacedEquipmentBenefitProgramCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePlacedEquipmentBenefitsRuntime>> getCoreGameEnginePlacedEquipmentBenefitsRuntime) : IPlacedEquipmentBenefitProgramHost
 {
-    public SkillProgramStepOutcome PlaceOwnedEquipmentThenResolveSlotBenefit(ProgramSkillFrame f) => getCoreGameEnginePlacedEquipmentBenefitsRuntime().BeginPlacedEquipmentBenefit(f);
+    public SkillProgramStepOutcome PlaceOwnedEquipmentThenResolveSlotBenefit(ProgramSkillFrame f) => getCoreGameEnginePlacedEquipmentBenefitsRuntime().Value.BeginPlacedEquipmentBenefit(f);
 }

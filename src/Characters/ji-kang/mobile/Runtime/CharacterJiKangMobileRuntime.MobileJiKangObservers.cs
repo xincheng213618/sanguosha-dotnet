@@ -10,7 +10,7 @@ internal sealed partial class CharacterJiKangMobileRuntime
             return false;
         if (f.SkillId == "mobile:juexiang")
             return f.WindowContext?.Window == SkillProgramTriggerWindow.OwnerDied;
-        return r.Targets.Count > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileJiKangProgressEvent>().Any(e => e.FrameId == f.Id && e.Step == "discard" && e.Subject == f.OwnerSeat && e.Value == r.Targets.Count && e.After > e.Before);
+        return r.Targets.Count > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileJiKangProgressEvent>().Any(e => e.FrameId == f.Id && e.Step == "discard" && e.Subject == f.OwnerSeat && e.Value == r.Targets.Count && e.After > e.Before);
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 80900)]
@@ -35,7 +35,7 @@ internal sealed partial class CharacterJiKangMobileRuntime
 
     internal ProgramSkillFrame? MobileJiKangObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.MobileJiKangObserverChild(f, child), (index) => _coreObserverSubtreesOperations.HasObserverSuffix(index, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying)));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 80900)]
-    internal bool MobileJiKangDyingProof() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && MobileJiKangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool MobileJiKangDyingProof() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && MobileJiKangObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 80900)]
     internal bool AdvanceMobileJiKangHealth() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && MobileJiKangObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineProgramSelectionPredicatesRuntime
     int? IProgramSelectionCardState.UniqueMaximumHandCardId(int ownerSeat) => _coreFriendEventsOperations.UniqueMaximumHandCard(ownerSeat)?.Id;
     int IProgramSelectionDiamondState.PlayerCount => _coreMatchParticipantsPlayersAccess._players.Count;
 
-    bool IProgramSelectionDiamondState.HasDelayedDiamondJudgment() => _coreDiamondDelayedProgramsOperations.DiamondJudgments().Any();
+    bool IProgramSelectionDiamondState.HasDelayedDiamondJudgment() => _coreDiamondDelayedProgramsOperations.Value.DiamondJudgments().Any();
     bool IProgramSelectionDiamondState.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool IProgramSelectionDiamondState.JudgmentAreaAbolished(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].JudgmentAreaAbolished;
     bool IProgramSelectionDiamondState.HasIndulgenceJudgment(int seat) => _coreActualTurnsOperations.HasJudgmentEffectiveCard(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Indulgence);

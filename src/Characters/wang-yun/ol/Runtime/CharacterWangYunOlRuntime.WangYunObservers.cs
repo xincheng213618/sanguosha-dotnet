@@ -110,7 +110,7 @@ internal sealed partial class CharacterWangYunOlRuntime
         // A purchased equipment entity is destroyed by its normal Use movement.
         // Credit only this accepted source and owning native Use, never an
         // arbitrary outside-game destination or an earlier destruction.
-        return material.From == CardLocation.Equipment(origin.Actor) && movement.CardKind == material.CardKind && movement.Reason == CardMoveReasons.Use && _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangShopEquipmentCreatedEvent>().Where(e => e.CardId == material.CardId).ToArray()is [var created] && created.Seat == origin.Actor && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Where(e => e.CardId == material.CardId).ToArray()is [var destroyed] && destroyed.MovementSequence == movement.Sequence && destroyed.ParentFrameId == origin.UseId;
+        return material.From == CardLocation.Equipment(origin.Actor) && movement.CardKind == material.CardKind && movement.Reason == CardMoveReasons.Use && _coreWushuangShopCardsOperations.IsWushuangShopDestroyedMaterial(movement) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangShopEquipmentCreatedEvent>().Where(e => e.CardId == material.CardId).ToArray()is [var created] && created.Seat == origin.Actor && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Where(e => e.CardId == material.CardId).ToArray()is [var destroyed] && destroyed.MovementSequence == movement.Sequence && destroyed.ParentFrameId == origin.UseId;
     }
 
     internal bool ValidWangYunRoundOnceStoredUse(CardUseFrame use, WangYunNativeUseOrigin origin)

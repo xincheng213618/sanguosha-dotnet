@@ -48,9 +48,9 @@ internal sealed partial class CharacterSunJianMouOlRuntime
 
     internal bool IsMouSunJianOlCounterUse(CardUseFrame use)
     {
-        if (use.MouSunJianOlCounter is not { } o || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || o.UseId != use.Id || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouSunJianOlHulie: { Stage: MouSunJianOlHulieStage.NativeUse, Accepted: true, NativeReturned: false } r } parent || !ValidMouSunJianOlHulie(parent) || o.Source != MouSunJianOlSource(parent) || o.GameplayHash != parent.GameplayHash || r.UseId != use.Id || r.ActionId != a.ActionId || o.OriginalUseId != r.Entry.UseId || o.OriginalActionId != r.Entry.ActionId || o.ActorSeat != r.Entry.TargetSeat || o.TargetSeat != parent.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<MouSunJianOlCounterIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (use.MouSunJianOlCounter is not { } o || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || o.UseId != use.Id || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouSunJianOlHulie: { Stage: MouSunJianOlHulieStage.NativeUse, Accepted: true, NativeReturned: false } r } parent || !ValidMouSunJianOlHulie(parent) || o.Source != MouSunJianOlSource(parent) || o.GameplayHash != parent.GameplayHash || r.UseId != use.Id || r.ActionId != a.ActionId || o.OriginalUseId != r.Entry.UseId || o.OriginalActionId != r.Entry.ActionId || o.ActorSeat != r.Entry.TargetSeat || o.TargetSeat != parent.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouSunJianOlCounterIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) : use.SourceSeat == o.ActorSeat && a.ActorSeat == o.ActorSeat;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) : use.SourceSeat == o.ActorSeat && a.ActorSeat == o.ActorSeat;
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 32501)]
@@ -86,7 +86,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MouSunJianOlHulie!;
-        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Hulie lost its exact whole-Use typed return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouSunJianOlHulie = r with { NativeReturned = true } });
         if (use.CardAttack is not { Active: true })
@@ -108,7 +108,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
         var r = f.MouSunJianOlHulie!;
-        if (!r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouSunJianOlCounterReturnedEvent>().Any(e => e.FrameId == frameId))
+        if (!r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouSunJianOlCounterReturnedEvent>().Any(e => e.FrameId == frameId))
             throw new InvalidOperationException("Hulie cannot repeat a returned counter Use.");
         if (r.OuterWasActive && _coreCardUseLifecycleOperations.LifecycleCardUse(r.Entry.UseId)?.CardAttack is { Active: false })
             _coreCardAttackStateOperations.UpdateCardAttackState(r.Entry.UseId, a => a!with { Active = true });

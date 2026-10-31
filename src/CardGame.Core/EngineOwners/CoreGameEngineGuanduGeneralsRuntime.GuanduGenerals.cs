@@ -25,7 +25,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralsRuntime
     : [];
     internal bool GuanduShicaiReady(int ownerSeat, string instance)
     {
-        var acquired = _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduShicaiObtainedEvent>().LastOrDefault(e => e.OwnerSeat == ownerSeat && e.InstanceId == instance);
+        var acquired = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduShicaiObtainedEvent>().LastOrDefault(e => e.OwnerSeat == ownerSeat && e.InstanceId == instance);
         return acquired is null || _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == acquired.CardId && m.Sequence > acquired.MovementSequence && m.From == CardLocation.Hand(ownerSeat) && m.To != m.From);
     }
 
@@ -43,15 +43,15 @@ internal sealed partial class CoreGameEngineGuanduGeneralsRuntime
         if (!_coreGuanduActivitiesOperations.IsGuanduActivity || batch.DiscardRecoveryPhase is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase)
             return;
         foreach (var movement in batch.Movements)
-            if (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement)is { OwnerSeat: { } owner } from && owner == phase.ActorSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<GuanduDiscardFactEvent>().Any(e => e.MovementSequence == movement.Sequence))
+            if (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement)is { OwnerSeat: { } owner } from && owner == phase.ActorSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduDiscardFactEvent>().Any(e => e.MovementSequence == movement.Sequence))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduDiscardFactEvent(batch.Id, phase.TurnNumber, owner, phase.Token, movement.CardId, movement.Sequence, from));
     }
 
-    internal bool GuanduTurnDiscarded(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduDiscardFactEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseActor == seat);
+    internal bool GuanduTurnDiscarded(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduDiscardFactEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseActor == seat);
     internal Card[] GuanduOwnedCards(int seat, bool judgment = false) => (judgment ? _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat])).Concat(_cardZonesOperations._cardZones.CardsAt(CardLocation.Judgment(seat))) : _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat]))).ToArray();
     internal Card[] GuanduDiscardable(int chooser, int owner) => GuanduOwnedCards(owner).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard)).ToArray();
     internal static IReadOnlyList<int> FreezeGuanduSeats(IEnumerable<int> seats) => RuntimeSkills.RuntimeRules_Core_GuanduGenerals.FreezeGuanduSeats(seats);
-    internal bool IsGuanduGeneralContextAllowed(string skillId, SkillProgramEffectOp operation) => _coreGuanduActivitiesOperations.IsGuanduActivity || _coreMatchDefinitionOptionsAccess._options.ShanheBattle is not null && skillId == "guandu:moushi" && operation == SkillProgramEffectOp.ResolveGuanduMoushi || _coreShanheSourceGrainOperations.IsShanheSourceGrainContext(skillId, operation);
+    internal bool IsGuanduGeneralContextAllowed(string skillId, SkillProgramEffectOp operation) => _coreGuanduActivitiesOperations.IsGuanduActivity || _coreMatchDefinitionOptionsAccess._options.ShanheBattle is not null && skillId == "guandu:moushi" && operation == SkillProgramEffectOp.ResolveGuanduMoushi || _coreShanheSourceGrainOperations.Value.IsShanheSourceGrainContext(skillId, operation);
     internal SkillProgramStepOutcome BeginGuanduGeneral(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -172,7 +172,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralsRuntime
     internal void ReturnGuanduGeneralDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
         var r = f.GuanduGeneral ?? throw new InvalidOperationException("Activity draw lost its producer.");
-        if (r.Stage != "draw-attempt" || outcome.RecipientSeat != r.DrawRecipient || outcome.RequestedCount != r.DrawRequested || _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduGeneralDrawEvent>().Any(e => e.FrameId == f.Id && e.Ordinal == r.DrawOrdinal))
+        if (r.Stage != "draw-attempt" || outcome.RecipientSeat != r.DrawRecipient || outcome.RequestedCount != r.DrawRequested || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduGeneralDrawEvent>().Any(e => e.FrameId == f.Id && e.Ordinal == r.DrawOrdinal))
             throw new InvalidOperationException("Activity draw changed its once-paid recipient or count.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduGeneralDrawEvent(f.Id, r.DrawOrdinal, outcome.RecipientSeat, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId, outcome.Replacement is not null));
         GuanduUpdate(f, r with { Stage = r.NextStage!, NextStage = null, Draw = outcome });

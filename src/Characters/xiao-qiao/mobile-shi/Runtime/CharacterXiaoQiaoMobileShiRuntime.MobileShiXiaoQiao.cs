@@ -19,7 +19,7 @@ internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
         if (player.SecondaryGeneral is { } second && player.SecondaryGeneralSelected && (player.SecondaryGeneralRevealed || viewer == seat))
             visible.AddRange(_coreNationalSkillsOperations.OwnedRuntimeSkills(player, second, includeAcquired: false));
         var owned = _coreNationalSkillsOperations.GetSkillBindingShard(player).ActiveGrants.Select(g => g.SkillId).ToHashSet(StringComparer.Ordinal);
-        return visible.Where(s => _coreMatchDefinitionModeDefinitionAccess._modeDefinition.WenheActivity is null || _coreWenheActivitiesOperations.IsWenhePlayerSkillVisible(player, s, viewer, false)).Select(s => s.ContentId).OfType<string>().Where(owned.Contains).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
+        return visible.Where(s => _coreMatchDefinitionModeDefinitionAccess._modeDefinition.WenheActivity is null || _coreWenheActivitiesOperations.Value.IsWenhePlayerSkillVisible(player, s, viewer, false)).Select(s => s.ContentId).OfType<string>().Where(owned.Contains).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
     }
 
     internal string[] ShiXqLosableSkills(int owner)
@@ -37,7 +37,7 @@ internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
     }
 
     internal (int Seat, string Skill)[] ShiXqCopyOptions(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner).SelectMany(p => ShiXqVisibleOwnedSkills(owner, p.Seat).Select(id => (p.Seat, Skill: id))).ToArray();
-    internal ShiXqCopiedEvent[] ShiXqGrantLedger(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiXqCopiedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillId == ShiXqYinhui && e.GrantSourceId == ShiXqGrantSource(owner, e.FrameId) && e.GrantId == e.GrantSourceId + ":" + e.SkillId).ToArray();
+    internal ShiXqCopiedEvent[] ShiXqGrantLedger(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiXqCopiedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillId == ShiXqYinhui && e.GrantSourceId == ShiXqGrantSource(owner, e.FrameId) && e.GrantId == e.GrantSourceId + ":" + e.SkillId).ToArray();
     internal ShiXqCopiedEvent[] ShiXqLiveCopies(int owner) => ShiXqGrantLedger(owner).Where(e => _coreMatchParticipantsPlayersAccess._players[owner].SkillGrants.Grants.Any(g => g.GrantId == e.GrantId && g.SourceId == e.GrantSourceId && g.SkillId == e.SkillId && g.SkillInstanceId == e.SkillInstanceId)).ToArray();
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 50400, SkillProgramEffectOp.ResolveMobileShiXiaoQiaoHeyun)]
     internal bool CanActivateShiXqHeyun(CharacterState owner) => ShiXqHeyunTargets(owner.Seat).Length != 0;
@@ -59,7 +59,7 @@ internal sealed partial class CharacterXiaoQiaoMobileShiRuntime
         if (copying)
             r = r with
             {
-                RevokeIds = ShiXqGrantLedger(f.OwnerSeat).Where(e => !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiXqGrantClearedEvent>().Any(c => c.Owner == f.OwnerSeat && c.GrantId == e.GrantId)).Select(e => e.GrantId).Distinct(StringComparer.Ordinal).ToArray()
+                RevokeIds = ShiXqGrantLedger(f.OwnerSeat).Where(e => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiXqGrantClearedEvent>().Any(c => c.Owner == f.OwnerSeat && c.GrantId == e.GrantId)).Select(e => e.GrantId).Distinct(StringComparer.Ordinal).ToArray()
             };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiXiaoQiao = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiXqStartedEvent(f.Id, r.Source, r.Hash, r.Turn, r.Round, r.ParentId, operation));

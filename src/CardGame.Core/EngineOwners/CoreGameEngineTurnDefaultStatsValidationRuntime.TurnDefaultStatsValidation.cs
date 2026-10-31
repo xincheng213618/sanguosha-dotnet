@@ -32,7 +32,7 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsValidationRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         if (index < 2 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame w || w.Id != c.ParentFrameId || w.ParentFrameId != damageId || w.TriggerWindow != c.Window || w.TargetSeat != f.OwnerSeat || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack[index - 2] is not DamageFrame d || d.Id != damageId || d.TargetSeat != f.OwnerSeat || d.Amount != c.Amount || d.Amount <= 0)
             return false;
-        var a = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(w);
+        var a = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(w);
         if (a.ResolutionId != d.ParentFrameId || !a.DamageWasApplied || a.TargetSeat != f.OwnerSeat || a.SourceSeat != d.SourceSeat || a.DamageAmount != d.Amount || _coreNativeCardClassificationsOperations.GetDamageNature(a) != d.Nature || c.SourceSeat != (a.IsSourceLess ? null : a.SourceSeat) || w.SourceSeat != d.SourceSeat)
             return false;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();

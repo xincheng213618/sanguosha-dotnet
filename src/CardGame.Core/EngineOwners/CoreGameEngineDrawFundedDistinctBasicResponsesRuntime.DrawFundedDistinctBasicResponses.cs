@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicResponsesRunt
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(0, actor.Seat, attack.SourceSeat, CardKind.Dodge));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(action));
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.Dodge))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.Dodge))
             return;
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardResponseAccepted, [attack.SourceSeat], ProgramCardContinuation.Dodge))
             return;
@@ -66,7 +66,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicResponsesRunt
             use = decision.Item1;
             _coreNativeAiDecisionsOperations.AddThought(decision.Item3);
         }
-        else if (prompt.Kind == DecisionKind.RescueDying && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying)
+        else if (prompt.Kind == DecisionKind.RescueDying && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying)
         {
             var decision = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseProgramDyingRescue(_corePlayerViewProjectionOperations.CreateSnapshot(actor.Seat), dying.VictimSeat, _coreCardConversionsOperations.ProgramConversionName(CoreGameEngineCardConversionsRuntime.RequireConversionSource(choices[0])), ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
             use = decision.UseRescue;
@@ -87,7 +87,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicResponsesRunt
     internal bool TryResolveDrawFundedDistinctBasicAiForcedSlash() => _corePendingDecisionPolicyPipelineOperations._pendingDecision?.Kind is DecisionKind.RespondSlash or DecisionKind.QinglongCrescentBlade && TryAdvanceDrawFundedDistinctBasicAi();
     internal bool TryResolveDrawFundedDistinctBasicAiDying()
     {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || _coreMatchParticipantsPlayersAccess._players[dying.ResponderSeat].IsHuman || !_coreDrawFundedDistinctBasicOffersOperations.HasDrawFundedDistinctBasicDyingResponse(_coreMatchParticipantsPlayersAccess._players[dying.ResponderSeat]))
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || _coreMatchParticipantsPlayersAccess._players[dying.ResponderSeat].IsHuman || !_coreDrawFundedDistinctBasicOffersOperations.HasDrawFundedDistinctBasicDyingResponse(_coreMatchParticipantsPlayersAccess._players[dying.ResponderSeat]))
             return false;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return _corePendingDecisionPolicyPipelineOperations._pendingDecision.Kind == DecisionKind.RescueDying && TryAdvanceDrawFundedDistinctBasicAi();

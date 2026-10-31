@@ -13,7 +13,7 @@ internal sealed partial class CoreProgramLostHpChainedPaymentsRuntime
 
     internal ProgramSkillFrame FreezeLostHpChainedPayment(ProgramSkillFrame frame, string sourceBind, string? exceptBind, SkillProgramCardDestination destination)
     {
-        if (!_coreNamedAcquisitionObserversOperations.HasLostHpTargetSelection(frame))
+        if (!_coreNamedAcquisitionObserversOperations.Value.HasLostHpTargetSelection(frame))
             return frame;
         if (!IsLostHpChainedComposition(frame) || frame.InstructionIndex != 2 || frame.LostHpChainedPayment is not null || destination != SkillProgramCardDestination.DiscardPile || exceptBind is not null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
             throw new InvalidOperationException("A lost-HP chain payment requires its still-qualified original seven-node activation.");

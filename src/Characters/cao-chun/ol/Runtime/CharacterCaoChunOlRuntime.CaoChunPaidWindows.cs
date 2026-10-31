@@ -40,7 +40,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
     internal bool CaoChunResponseParentMatches(NativeOwners.CardAttackHandle? attack, CardActionContext action, ProgramCompletedResponseKind kind)
     {
         if (kind == ProgramCompletedResponseKind.Nullification)
-            return _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } n && action.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(n) && action.OpponentSeat == n.SourceSeat;
+            return _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } n && action.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(n) && action.OpponentSeat == n.SourceSeat;
         return attack is not null && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) && attack.TargetSeat == action.ActorSeat && attack.SourceSeat == action.OpponentSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId == action.ParentActionId;
     }
 

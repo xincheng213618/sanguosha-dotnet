@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRecipientContestObserversRuntime
 {
-    internal bool IsRecipientContestMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending.BeforeCount == 0 && pending.CoverageResultBind is null && (f.UniqueHpPeer is { Stage: UniqueHpPeerStage.CostChildren or UniqueHpPeerStage.DrawChildren } peer && effect?.Op == SkillProgramEffectOp.DiscardDrawAndOfferUniqueHpPeer && pending.SubjectSeat == peer.ChooserSeat && _coreRecipientContestReceiptsOperations.ValidUniqueHpPeer(f) || f.RecipientContest is { Stage: RecipientContestStage.GiftChildren } && effect?.Op == SkillProgramEffectOp.GiveAllHandAndStartRecipientPindian && pending.SubjectSeat == f.OwnerSeat && _coreRecipientContestReceiptsOperations.ValidRecipientContest(f));
+    internal bool IsRecipientContestMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => pending.BeforeCount == 0 && pending.CoverageResultBind is null && (f.UniqueHpPeer is { Stage: UniqueHpPeerStage.CostChildren or UniqueHpPeerStage.DrawChildren } peer && effect?.Op == SkillProgramEffectOp.DiscardDrawAndOfferUniqueHpPeer && pending.SubjectSeat == peer.ChooserSeat && _coreRecipientContestReceiptsOperations.Value.ValidUniqueHpPeer(f) || f.RecipientContest is { Stage: RecipientContestStage.GiftChildren } && effect?.Op == SkillProgramEffectOp.GiveAllHandAndStartRecipientPindian && pending.SubjectSeat == f.OwnerSeat && _coreRecipientContestReceiptsOperations.Value.ValidRecipientContest(f));
     [ProgramContinuation(ProgramContinuationKind.Movement, 400)]
     internal bool ReturnRecipientContestMovement(ProgramSkillFrame f)
     {
@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineRecipientContestObserversRuntime
         string reason;
         bool draw;
         UniqueHpPeerInvoice? invoice = null;
-        if (f.UniqueHpPeer is { Stage: UniqueHpPeerStage.CostChildren or UniqueHpPeerStage.DrawChildren } peer && _coreRecipientContestReceiptsOperations.ValidUniqueHpPeer(f))
+        if (f.UniqueHpPeer is { Stage: UniqueHpPeerStage.CostChildren or UniqueHpPeerStage.DrawChildren } peer && _coreRecipientContestReceiptsOperations.Value.ValidUniqueHpPeer(f))
         {
             invoice = peer.ChooserSeat == f.OwnerSeat ? peer.OwnerInvoice : peer.PeerInvoice;
             if (invoice is null)
@@ -34,7 +34,7 @@ internal sealed partial class CoreGameEngineRecipientContestObserversRuntime
             after = draw ? invoice.DrawAfter : invoice.CostAfter;
             reason = draw ? CoreGameEngineUniqueHpPeerProgramsRuntime.UniqueHpPeerDrawReason(f, actor) : CoreGameEngineUniqueHpPeerProgramsRuntime.UniqueHpPeerCostReason(f);
         }
-        else if (f.RecipientContest is { Stage: RecipientContestStage.GiftChildren } gift && _coreRecipientContestReceiptsOperations.ValidRecipientContest(f))
+        else if (f.RecipientContest is { Stage: RecipientContestStage.GiftChildren } gift && _coreRecipientContestReceiptsOperations.Value.ValidRecipientContest(f))
         {
             before = gift.SequenceBefore;
             after = gift.SequenceAfter;
@@ -81,10 +81,10 @@ internal sealed partial class CoreGameEngineRecipientContestObserversRuntime
     internal bool HasUniqueHpPeerActualTargetObserver(long useId)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x is ActualUseTargetWindowFrame w && w.ParentFrameId == useId);
-        if (index < 1 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame f || f.UniqueHpPeer is not { CardUseFrameId: var original } || original != useId || !_coreRecipientContestReceiptsOperations.ValidUniqueHpPeer(f))
+        if (index < 1 || index + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramSkillFrame f || f.UniqueHpPeer is not { CardUseFrameId: var original } || original != useId || !_coreRecipientContestReceiptsOperations.Value.ValidUniqueHpPeer(f))
             return false;
         return index + 2 == _resolutionStackOperations._resolutionStack.Count || RecipientContestPaidPrefix(index + 1, _resolutionStackOperations._resolutionStack.Count - 1);
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 370)]
-    internal bool IsRecipientContestProgramDying() => _coreRecipientConsequencesObserversOperations.IsRecipientConsequencesProgramDying() || _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && RecipientContestPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsRecipientContestProgramDying() => _coreRecipientConsequencesObserversOperations.Value.IsRecipientConsequencesProgramDying() || _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && RecipientContestPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

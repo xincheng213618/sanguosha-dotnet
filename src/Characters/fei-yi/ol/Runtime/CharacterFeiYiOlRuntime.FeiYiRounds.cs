@@ -16,7 +16,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
         var acceptedActor = FeiYiAcceptedActor(use);
         if (acceptedActor is not { } originalActor)
             throw new InvalidOperationException("Hezhong lost the original accepted actor or its exact native replacement chain.");
-        var grants = _coreProgramEventHistoryOperations.ProgramEventHistory<FeiYiRankEffectIssuedEvent>().Where(g => g.Source.OwnerSeat == originalActor && g.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && g.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && (g.Greater ? rank > g.Rank : rank < g.Rank) && !_coreProgramEventHistoryOperations.ProgramEventHistory<FeiYiRankEffectBoundEvent>().Any(e => e.GrantId == g.FrameId)).ToArray();
+        var grants = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeiYiRankEffectIssuedEvent>().Where(g => g.Source.OwnerSeat == originalActor && g.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && g.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && (g.Greater ? rank > g.Rank : rank < g.Rank) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeiYiRankEffectBoundEvent>().Any(e => e.GrantId == g.FrameId)).ToArray();
         if (grants.Length == 0)
             return;
         var old = use.FeiYiRounds;
@@ -37,7 +37,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
 
     internal int? FeiYiAcceptedActor(CardUseFrame use)
     {
-        var declared = _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Where(e => e.ResolutionId == use.Id && e.CardId == use.CardId && e.CardKind == use.CardKind).ToArray();
+        var declared = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Where(e => e.ResolutionId == use.Id && e.CardId == use.CardId && e.CardKind == use.CardKind).ToArray();
         return declared is [var original] && use.Action is { Type: CardActionType.Use } action && action.ActorSeat == use.SourceSeat && _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, action.ActorSeat, action.ProviderSeat) ? original.SourceSeat : null;
     }
 

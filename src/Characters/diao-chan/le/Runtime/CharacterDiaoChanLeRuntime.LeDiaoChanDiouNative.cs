@@ -40,7 +40,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             var selfLegal = !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, actor.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None);
             if (selfLegal && kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor))
                 Add(LegalActionKind.Peach, [actor.Seat], "视为对自己使用【桃】");
-            if (selfLegal && kind == CardKind.Alcohol && !actor.HasAlcoholEffect && (_characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || _coreAdvancedPoliciesOperations.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.HasFriendQihuiAllowance(actor) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, kind)))
+            if (selfLegal && kind == CardKind.Alcohol && !actor.HasAlcoholEffect && (_characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || _coreAdvancedPoliciesOperations.Value.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.Value.HasFriendQihuiAllowance(actor) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, kind)))
                 Add(LegalActionKind.Alcohol, [actor.Seat], "视为对自己使用【酒】");
         }
         else if (kind is CardKind.Zong or CardKind.RealgarWine)
@@ -144,7 +144,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && actor.Seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.UnlimitedUse != true && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source))
                 _coreCardUseDebitsOperations.RecordSlashUseDebit(useId, actor.Seat);
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, p.Kind);
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(useId, actor);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(useId, actor);
             actor.HasAlcoholEffect = false;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, p.Kind, actor.Seat, targets[0], IgnoresArmor: attack.IgnoresArmor));
             _coreCardUseLifecycleOperations.TryMarkProgramUseCommitted(useId);
@@ -187,7 +187,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     {
         if (use.DiouOrigin is not { } o || use.Action is not { Type: CardActionType.Use } a || o.UseId != use.Id || o.ActionId != a.ActionId || o.Kind != use.CardKind || a.EffectiveKind != use.CardKind || use.SourceSeat != a.ActorSeat || use.CardId != o.CarrierId || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || a.PhysicalCards.Count != 0 || use.PhysicalCardIds is not { Count: 0 } || a.EffectiveSuit != Suit.None || a.EffectiveRank != 0 || a.EffectiveIsRed is not null || !a.ConversionChain.SequenceEqual([o.Source]) || !_characterZhouYuOlMouOperations.MouGuquActorLineageMatches(use.Id, a.ActionId, o.ActorSeat, a.ActorSeat, a.ProviderSeat, a.Type) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ProgramFrameId)is not ProgramSkillFrame { Diou: { } r } f || !DiouRootMatches(f) || r.UseId != use.Id || r.ActionId != a.ActionId || r.CarrierId != o.CarrierId || o.Source != DiouSource(f) || o.GameplayHash != f.GameplayHash)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<DiouNativeIssuedEvent>().Count(e => e == new DiouNativeIssuedEvent(f.Id, use.Id, a.ActionId, o.ActorSeat, o.Kind, o.CarrierId)) == 1 && (o.CarrierId == 0 || IsDiouCarrier(o.CarrierId));
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeIssuedEvent>().Count(e => e == new DiouNativeIssuedEvent(f.Id, use.Id, a.ActionId, o.ActorSeat, o.Kind, o.CarrierId)) == 1 && (o.CarrierId == 0 || IsDiouCarrier(o.CarrierId));
     }
 
     internal bool IsDiouUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedDiouUse(use);
@@ -258,7 +258,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     {
         if (use.DiouOrigin is not { } o)
             return;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || use.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Diou: { } r } f || f.Id != o.ProgramFrameId || r.UseId != use.Id || r.ActionId != o.ActionId || r.Returned || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouNativeReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || use.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Diou: { } r } f || f.Id != o.ProgramFrameId || r.UseId != use.Id || r.ActionId != o.ActionId || r.Returned || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Diou can return only once to its original paid native parent.");
         var batches = SignDiouNativeBatches(f, use);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Diou = r with { Stage = DiouStage.NativeChildren, Returned = true, NativeBatchIds = batches }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -280,7 +280,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         return Array.AsReadOnly(batches.Select(b => b.Id).ToArray());
     }
 
-    internal bool IsDiouNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => f.Diou is { Stage: DiouStage.NativeChildren, Returned: true } r && DiouRootMatches(f) && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.Movements.Count > 0 && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.OriginOwnerSeat == f.OwnerSeat && r.NativeBatchIds.Contains(b.Id) && _coreProgramEventHistoryOperations.ProgramEventHistory<DiouNativeBatchSignedEvent>().Count(e => e == new DiouNativeBatchSignedEvent(f.Id, r.UseId, b.Id, b.ParentBatchId, b.Movements.Count)) == 1 && b.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.ProgramEventHistory<DiouNativeMovementSignedEvent>().Count(e => e == new DiouNativeMovementSignedEvent(f.Id, r.UseId, b.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1);
+    internal bool IsDiouNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => f.Diou is { Stage: DiouStage.NativeChildren, Returned: true } r && DiouRootMatches(f) && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.Movements.Count > 0 && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.OriginOwnerSeat == f.OwnerSeat && r.NativeBatchIds.Contains(b.Id) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeBatchSignedEvent>().Count(e => e == new DiouNativeBatchSignedEvent(f.Id, r.UseId, b.Id, b.ParentBatchId, b.Movements.Count)) == 1 && b.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeMovementSignedEvent>().Count(e => e == new DiouNativeMovementSignedEvent(f.Id, r.UseId, b.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1);
     [ProgramPipelineHook(ProgramPipelinePhase.IsProgramMovementSettlement, 800)]
     internal bool WindowSettlement_IsDiouNativeSettlementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => IsDiouNativeSettlementBatch(frame, batch);
 }

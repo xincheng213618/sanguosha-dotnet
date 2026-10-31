@@ -89,6 +89,6 @@ internal sealed partial class CoreGameEngineGameActivationAwakeningRuntime
         return r.Stage == GameActivationAwakeningStage.GrantsIssued && child is ProgramLifecycleTriggerWindowFrame skills && skills.Window == SkillProgramTriggerWindow.SkillsChanged && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && skills.CandidateIndex >= 0 && skills.CandidateIndex <= skills.Candidates.Count;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 160)]
-    internal bool IsGameActivationAwakeningProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _coreDrawDiscardCategoryRefundOperations.CategoryActivationObserverRoot(true)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsGameActivationAwakeningProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && _coreDrawDiscardCategoryRefundOperations.Value.CategoryActivationObserverRoot(true)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     SkillProgramStepOutcome IGameActivationAwakeningProgramHost.BeginGameActivationAwakening(ProgramSkillFrame f, SkillProgramEffect e) => BeginGameActivationAwakening(f, e);
 }

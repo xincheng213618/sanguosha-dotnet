@@ -23,9 +23,9 @@ internal sealed partial class CoreNativeHarvestRuntime
         }
 
         var picker = _coreMatchParticipantsPlayersAccess._players[group.TargetSeats[group.TargetIndex]];
-        if (_coreGroupTargetNullificationOperations.TryBeginGroupTargetNullification(group))
+        if (_coreGroupTargetNullificationOperations.Value.TryBeginGroupTargetNullification(group))
             return;
-        if (_characterLuXunMouMobileOperations.TryBeginMouLuXunGroupEffect(group))
+        if (_characterLuXunMouMobileOperations.Value.TryBeginMouLuXunGroupEffect(group))
             return;
         var processing = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing);
         var revealed = group.RevealedCardIds.Select(cardId => processing.Single(card => card.Id == cardId)).ToArray();
@@ -83,7 +83,7 @@ internal sealed partial class CoreNativeHarvestRuntime
             throw new InvalidOperationException("The FiveGrains draft is not the current card resolution.");
         }
 
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || group.TargetIndex < group.TargetSeats.Count)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || group.TargetIndex < group.TargetSeats.Count)
         {
             throw new InvalidOperationException("FiveGrains cannot finish while a picker or child resolution is pending.");
         }

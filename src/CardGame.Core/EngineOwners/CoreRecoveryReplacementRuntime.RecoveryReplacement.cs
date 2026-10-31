@@ -5,15 +5,15 @@ internal sealed partial class CoreRecoveryReplacementRuntime
 {
     internal bool HasRecoveryReplacementCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.RedirectOwnTurnFactionRecovery);
 
-    internal bool TryQueueHengyeRecovery(CharacterState player) => _coreMouLuMengOperations.UsesFormalMouLuMeng && player.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(player, "mou:hengye") && _characterLuMengMouOperations.GetHengyeGrowth(player) >= 3 && player.Hp < player.MaxHp && TryQueueRecoveryReplacement(0, player.Seat, player.Seat, 1, new(RecoveryAttemptProducer.Hengye));
+    internal bool TryQueueHengyeRecovery(CharacterState player) => _coreMouLuMengOperations.Value.UsesFormalMouLuMeng && player.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(player, "mou:hengye") && _characterLuMengMouOperations.GetHengyeGrowth(player) >= 3 && player.Hp < player.MaxHp && TryQueueRecoveryReplacement(0, player.Seat, player.Seat, 1, new(RecoveryAttemptProducer.Hengye));
     internal bool TryPauseRecoveryPaidCardUse(long useId, RecoveryPaidCardUseContinuation continuation)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(useId);
         if (use is null)
             return false;
-        continuation = _coreNativePublicPileEquipmentChildrenOperations.FreezeNativePublicPileEquipmentChildren(use, continuation);
+        continuation = _coreNativePublicPileEquipmentChildrenOperations.Value.FreezeNativePublicPileEquipmentChildren(use, continuation);
         var observesPayment = _coreProgramCardUsePaymentsOperations.ObservesPaidCardUseChildren(use, continuation);
-        var paymentOwner = _coreNativePublicPileEquipmentChildrenOperations.HasNativePublicPileEquipmentTail(use, continuation) ? use with
+        var paymentOwner = _coreNativePublicPileEquipmentChildrenOperations.Value.HasNativePublicPileEquipmentTail(use, continuation) ? use with
         {
             RecoveryPaidContinuation = continuation
         }
@@ -162,11 +162,11 @@ internal sealed partial class CoreRecoveryReplacementRuntime
         if (amount <= 0 || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[targetSeat].HasHpValue || !_characterDaQiaoXiaoQiaoHappyGodOperations.HappyQiaoAnyWounded(targetSeat))
             return false;
         var qiao = _coreMatchParticipantsPlayersAccess._players[targetSeat].HappyQiaoHealth;
-        if (qiao is null && !HasRecoveryReplacementCapability && !_characterCaoSongOlOperations.HasRecoveryAmountSupport(targetSeat) && !_coreRecoveryAmountBonusesOperations.HasOwnRecoveryAmountSupport(targetSeat))
+        if (qiao is null && !HasRecoveryReplacementCapability && !_characterCaoSongOlOperations.HasRecoveryAmountSupport(targetSeat) && !_coreRecoveryAmountBonusesOperations.Value.HasOwnRecoveryAmountSupport(targetSeat))
             return false;
         var parent = parentFrameId > 0 ? _resolutionStackOperations._resolutionStack.Single(f => f.Id == parentFrameId) : null;
         var candidates = _characterSunQuanBoundaryMobileOperations.BoundarySunQuanMobileRecoveryCandidates(parentFrameId, sourceSeat, targetSeat, completion, RecoveryReplacementCandidates(targetSeat));
-        if (qiao is null && candidates.Count == 0 && !_characterCaoSongOlOperations.HasRecoveryAmountSupport(targetSeat) && !_coreRecoveryAmountBonusesOperations.HasOwnRecoveryAmountSupport(targetSeat) && parent?.PendingRecoveryAttempts is not { Count: > 0 })
+        if (qiao is null && candidates.Count == 0 && !_characterCaoSongOlOperations.HasRecoveryAmountSupport(targetSeat) && !_coreRecoveryAmountBonusesOperations.Value.HasOwnRecoveryAmountSupport(targetSeat) && parent?.PendingRecoveryAttempts is not { Count: > 0 })
             return false;
         var request = new RecoveryAttempt(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, sourceSeat, targetSeat, amount, qiao is null ? _coreMatchParticipantsPlayersAccess._players[targetSeat].Hp : null, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, candidates, completion with { Policies = completion.Policies is { } policies ? Array.AsReadOnly(policies.ToArray()) : null })
         {
@@ -298,7 +298,7 @@ internal sealed partial class CoreRecoveryReplacementRuntime
             return;
         // No child or cost is opened between the live passive decision and this
         // single HP payment. Existing paid Cao Song support has already returned.
-        var bonus = _coreRecoveryAmountBonusesOperations.PrepareOwnRecoveryAmountBonus(application);
+        var bonus = _coreRecoveryAmountBonusesOperations.Value.PrepareOwnRecoveryAmountBonus(application);
         var requested = bonus?.ModifiedRequestedAmount ?? application.RequestedAmount;
         var amount = recipient.IsAlive && recipient.HasHpValue && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? Math.Min(requested, Math.Max(0, recipient.MaxHp - recipient.Hp)) : 0;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { CandidateIndex = candidateIndex, Stage = RecoveryReplacementStage.RecoveryApplied, OriginalRecovered = candidate is null ? amount : 0, PendingApplication = null, AmountBonus = bonus, Step = ResolutionFrameStep.ResolvingEffect });
@@ -375,7 +375,7 @@ internal sealed partial class CoreRecoveryReplacementRuntime
 
     internal void ResumeRecoveryReplacementProducer(RecoveryReplacementFrame completed)
     {
-        if (_coreResponseCompletionHealthOperations.ReturnCardResponseCompletionRecovery(completed))
+        if (_coreResponseCompletionHealthOperations.Value.ReturnCardResponseCompletionRecovery(completed))
             return;
         if (_coreCardSupplyCompletionOperations.ReturnCardSupplyCompletionRecovery(completed))
             return;
@@ -427,7 +427,7 @@ internal sealed partial class CoreRecoveryReplacementRuntime
                 _coreVirtualBasicOffersOperations.FinishVirtualBasicUse(continuation.ResumeFrameId!.Value);
                 break;
             case PostEventContinuation.GroupRecovery:
-                _coreNativeGroupRecoveryOperations.CompleteGroupRecoveryTarget();
+                _coreNativeGroupRecoveryOperations.Value.CompleteGroupRecoveryTarget();
                 break;
             case PostEventContinuation.ColdDamageReplacement:
                 _coreRuntimeOperations.AdvanceRuntimeFrame(continuation.ResumeFrameId!.Value);

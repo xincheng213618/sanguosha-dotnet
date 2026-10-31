@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEndingPairSlashObserversRuntime
 {
-    internal bool IsEndingPairMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (e?.Op == SkillProgramEffectOp.DrawEndingPairThenBlockRoundIfUnequal && f.EndingPairDraw is { AwaitingMovement: true } && _coreEndingPairDrawsOperations.ValidEndingPairDraw(f) || e?.Op == SkillProgramEffectOp.RecastSelectedPhysicalSlash && f.PlaySlashRecast is { AwaitingMovement: true } && _corePlaySlashRecastsOperations.ValidPlaySlashRecast(f));
+    internal bool IsEndingPairMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation pending) => pending.SubjectSeat == f.OwnerSeat && pending.BeforeCount == 0 && pending.CoverageResultBind is null && (e?.Op == SkillProgramEffectOp.DrawEndingPairThenBlockRoundIfUnequal && f.EndingPairDraw is { AwaitingMovement: true } && _coreEndingPairDrawsOperations.Value.ValidEndingPairDraw(f) || e?.Op == SkillProgramEffectOp.RecastSelectedPhysicalSlash && f.PlaySlashRecast is { AwaitingMovement: true } && _corePlaySlashRecastsOperations.Value.ValidPlaySlashRecast(f));
     [ProgramContinuation(ProgramContinuationKind.MovementTail, 70)]
     internal bool ReturnEndingPairMovement(ProgramSkillFrame f)
     {
@@ -24,7 +24,7 @@ internal sealed partial class CoreGameEngineEndingPairSlashObserversRuntime
         CardLocation from, to;
         CardMoveReason reason;
         int? id = null;
-        if (f.EndingPairDraw is { AwaitingMovement: true } pair && _coreEndingPairDrawsOperations.ValidEndingPairDraw(f))
+        if (f.EndingPairDraw is { AwaitingMovement: true } pair && _coreEndingPairDrawsOperations.Value.ValidEndingPairDraw(f))
         {
             var draw = pair.Cursor == 0 ? pair.FirstDraw : pair.SecondDraw;
             if (draw is null || draw.ActualCount != 1)
@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEngineEndingPairSlashObserversRuntime
             to = CardLocation.Hand(draw.RecipientSeat);
             reason = new($"skill-program.{(f.SkillId)}.ending-pair.{(pair.Cursor)}");
         }
-        else if (f.PlaySlashRecast is { AwaitingMovement: true } recast && _corePlaySlashRecastsOperations.ValidPlaySlashRecast(f))
+        else if (f.PlaySlashRecast is { AwaitingMovement: true } recast && _corePlaySlashRecastsOperations.Value.ValidPlaySlashRecast(f))
         {
             if (recast.DrawIssued)
             {
@@ -88,5 +88,5 @@ internal sealed partial class CoreGameEngineEndingPairSlashObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 640)]
-    internal bool IsEndingPairSlashProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && EndingPairPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsEndingPairSlashProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && EndingPairPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

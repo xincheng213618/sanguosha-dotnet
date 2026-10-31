@@ -54,14 +54,14 @@ internal sealed partial class CharacterChengYuMouOlRuntime
     {
         if (f.MouDanchi is not { Suspension: { } s } r)
             return;
-        if (!MouDanchiSuspensionMatches(f) || !MouDanchi.Valid(f) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || r.Stage is MouDanchiStage.NativeUse or MouDanchiStage.DrawIssuing or MouDanchiStage.SlashIssuing || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDanchiCursorRestoredEvent>().Any(e => e.FrameId == f.Id))
+        if (!MouDanchiSuspensionMatches(f) || !MouDanchi.Valid(f) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || r.Stage is MouDanchiStage.NativeUse or MouDanchiStage.DrawIssuing or MouDanchiStage.SlashIssuing || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDanchiCursorRestoredEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Danchi lost its exact suspended original attack before returning.");
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(s.UseId, u => u with { CardAttack = s.AttackActive ? u.CardAttack!with { Active = true } : u.CardAttack, Continuations = u.Continuations with { Duel = s.DuelActive ? u.Continuations.Duel!with { Active = true } : u.Continuations.Duel, GroupCard = s.GroupActive ? u.Continuations.GroupCard!with { Active = true } : u.Continuations.GroupCard } });
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouDanchi = r with { Suspension = null } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDanchiCursorRestoredEvent(f.Id, s.UseId, s.ActionId));
     }
 
-    internal bool MouDanchiSuspensionMatches(ProgramSkillFrame f) => f.MouDanchi?.Suspension is not { } s || _coreCardUseLifecycleOperations.LifecycleCardUse(s.UseId)is { Action: { } a } use && a.ActionId == s.ActionId && use.CardKind == s.Kind && use.SourceSeat == s.SourceSeat && use.TargetIndex == s.TargetIndex && (!s.AttackActive || use.CardAttack is { Active: false }) && (!s.DuelActive || use.Continuations.Duel is { Active: false }) && (!s.GroupActive || use.Continuations.GroupCard is { Active: false }) && (use.FireAttackSelection is not null) == s.HasFireSelection && use.FireAttackSelection?.RevealedCardId == s.FireRevealedCardId && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDanchiCursorSuspendedEvent>().Count(e => e.FrameId == f.Id && e.Suspension == s) == 1;
+    internal bool MouDanchiSuspensionMatches(ProgramSkillFrame f) => f.MouDanchi?.Suspension is not { } s || _coreCardUseLifecycleOperations.LifecycleCardUse(s.UseId)is { Action: { } a } use && a.ActionId == s.ActionId && use.CardKind == s.Kind && use.SourceSeat == s.SourceSeat && use.TargetIndex == s.TargetIndex && (!s.AttackActive || use.CardAttack is { Active: false }) && (!s.DuelActive || use.Continuations.Duel is { Active: false }) && (!s.GroupActive || use.Continuations.GroupCard is { Active: false }) && (use.FireAttackSelection is not null) == s.HasFireSelection && use.FireAttackSelection?.RevealedCardId == s.FireRevealedCardId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDanchiCursorSuspendedEvent>().Count(e => e.FrameId == f.Id && e.Suspension == s) == 1;
 
     internal CardActionContext PrepareMouDanchiAction(CardActionContext action)
     {
@@ -88,7 +88,7 @@ internal sealed partial class CharacterChengYuMouOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDanchiNativeIssuedEvent(origin));
     }
 
-    internal bool IsMouDanchiUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouDanchiOrigin: { } o, Action: { } a } use && use.Id == o.UseId && a.ActionId == o.ActionId && use.CardId == 0 && use.CardKind == o.Kind && a.EffectiveKind == o.Kind && use.PhysicalCardIds is { Count: 0 } && a.PhysicalCards.Count == 0 && a.ConversionChain.Count == 0 && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.ProviderSeat == o.ActorSeat && a.RequesterSeat is null && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { MouDanchi: { Stage: MouDanchiStage.NativeUse } r } f && MouDanchi.Valid(f) && r.UseId == use.Id && r.ActionId == a.ActionId && r.Source == o.Source && r.GameplayHash == o.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDanchiNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
+    internal bool IsMouDanchiUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouDanchiOrigin: { } o, Action: { } a } use && use.Id == o.UseId && a.ActionId == o.ActionId && use.CardId == 0 && use.CardKind == o.Kind && a.EffectiveKind == o.Kind && use.PhysicalCardIds is { Count: 0 } && a.PhysicalCards.Count == 0 && a.ConversionChain.Count == 0 && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.ProviderSeat == o.ActorSeat && a.RequesterSeat is null && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { MouDanchi: { Stage: MouDanchiStage.NativeUse } r } f && MouDanchi.Valid(f) && r.UseId == use.Id && r.ActionId == a.ActionId && r.Source == o.Source && r.GameplayHash == o.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDanchiNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
     internal bool IsMouDanchiDrawTwo(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.CardKind == CardKind.DrawTwo && IsMouDanchiUse(id);
     internal Card ReadMouDanchiAppearance(long id, CardAppearanceReference appearance)
     {
@@ -97,7 +97,7 @@ internal sealed partial class CharacterChengYuMouOlRuntime
         return new(0, appearance.Kind, Suit.None, 0);
     }
 
-    internal bool IsMouDanchiSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => f.MouDanchi is { Stage: MouDanchiStage.Children, Returned: true } r && MouDanchi.Valid(f) && r.Batches.Contains(batch.Id) && batch.ParentFrameId == r.UseId && batch.AwaitingProgramFrameId is null && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.OriginOwnerSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDanchiNativeBatchEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.BatchId == batch.Id) == 1 && batch.Movements.Count > 0 && batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m));
+    internal bool IsMouDanchiSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => f.MouDanchi is { Stage: MouDanchiStage.Children, Returned: true } r && MouDanchi.Valid(f) && r.Batches.Contains(batch.Id) && batch.ParentFrameId == r.UseId && batch.AwaitingProgramFrameId is null && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.OriginOwnerSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDanchiNativeBatchEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.BatchId == batch.Id) == 1 && batch.Movements.Count > 0 && batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m));
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 34101)]
     internal bool FinishMouDanchiSlash(NativeOwners.CardAttackHandle attack, out bool paused)
     {
@@ -131,7 +131,7 @@ internal sealed partial class CharacterChengYuMouOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MouDanchi!;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || r.UseId != use.Id || r.Returned || r.ActionId != o.ActionId || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || r.UseId != use.Id || r.Returned || r.ActionId != o.ActionId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Danchi cannot return another Use or repeat its reward.");
         var batches = _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Where(b => b.ParentFrameId == use.Id && b.AwaitingProgramFrameId is null && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.OriginOwnerSeat == f.OwnerSeat).ToArray();
         foreach (var b in batches)

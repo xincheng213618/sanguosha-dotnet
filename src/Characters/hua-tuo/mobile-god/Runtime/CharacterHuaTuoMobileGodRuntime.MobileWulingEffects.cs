@@ -60,7 +60,7 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
 
     internal void EndMobileHtCourse(long id, long frameId)
     {
-        var course = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingTaughtEvent>().Single(c => c.CourseId == id);
+        var course = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileWulingTaughtEvent>().Single(c => c.CourseId == id);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileWulingAdvancedEvent(frameId, id, MobileHtCourseOrder(id).Length, false));
         SetMobileHtMarker(frameId, course.TargetSeat, course.Source.OwnerSeat, PlayerMarkerKind.MobileWuling, 0);
         foreach (var animal in Enum.GetValues<MobileWulingAnimal>())
@@ -72,7 +72,7 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
     internal void ApplyMobileHtAnimal(ProgramSkillFrame f)
     {
         var r = f.MobileHuaTuo!;
-        var course = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingTaughtEvent>().Single(c => c.CourseId == r.CourseId);
+        var course = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileWulingTaughtEvent>().Single(c => c.CourseId == r.CourseId);
         if (!_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[course.Source.OwnerSeat].IsAlive)
         {
             EndMobileHtCourse(r.CourseId, f.Id);
@@ -164,7 +164,7 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
     {
         if (payload is not PlayerDiedEvent died)
             return;
-        var live = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingTaughtEvent>().Where(c => c.Source.OwnerSeat == died.VictimSeat || c.TargetSeat == died.VictimSeat).Where(c => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileWulingAdvancedEvent>().LastOrDefault(e => e.CourseId == c.CourseId)?.Active == true).ToArray();
+        var live = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileWulingTaughtEvent>().Where(c => c.Source.OwnerSeat == died.VictimSeat || c.TargetSeat == died.VictimSeat).Where(c => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileWulingAdvancedEvent>().LastOrDefault(e => e.CourseId == c.CourseId)?.Active == true).ToArray();
         foreach (var c in live)
             EndMobileHtCourse(c.CourseId, _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id ?? c.CourseId);
     }

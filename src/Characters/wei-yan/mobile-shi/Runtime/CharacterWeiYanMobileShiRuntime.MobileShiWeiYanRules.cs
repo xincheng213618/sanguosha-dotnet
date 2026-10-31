@@ -6,17 +6,17 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
     internal bool HasMobileShiZhuangshiDistance(int seat, long? existingUse = null)
     {
         if (existingUse is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.Action is { } action)
-            return _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.OwnerSeat == seat && e.DistanceAndNoResponse);
+            return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.OwnerSeat == seat && e.DistanceAndNoResponse);
         return ShiWyPhaseGrant(seat)is { } grant && ShiWyPhaseUses(seat, grant.TurnNumber, grant.PhaseInstanceId) < grant.DiscardedCards;
     }
 
     internal bool HasMobileShiZhuangshiQuota(int seat) => ShiWyPhaseGrant(seat)is { } grant && ShiWyPhaseUses(seat, grant.TurnNumber, grant.PhaseInstanceId) < grant.LostHp;
     internal CardConversionSource? MobileShiZhuangshiCounterspellSource(CharacterState owner, IReadOnlyList<int> physicalCardIds) => HasMobileShiZhuangshiDistance(owner.Seat) ? ShiWyPhaseGrant(owner.Seat)?.Source : null;
-    internal bool IsMobileShiZhuangshiUnrespondable(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } action } && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.DistanceAndNoResponse);
+    internal bool IsMobileShiZhuangshiUnrespondable(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } action } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.DistanceAndNoResponse);
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeAlcoholDebit, 47100)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 47100)]
-    internal bool IsIssuedMobileShiZhuangshiNoCount(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } action } && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.OwnerSeat == actor && e.NoCount);
-    internal int MobileShiWeiYanPhaseSlashBonus(int seat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat ? _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiKuangguSlashGrantedEvent>().Count(e => e.OwnerSeat == seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) : 0;
+    internal bool IsIssuedMobileShiZhuangshiNoCount(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } action } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.OwnerSeat == actor && e.NoCount);
+    internal int MobileShiWeiYanPhaseSlashBonus(int seat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiKuangguSlashGrantedEvent>().Count(e => e.OwnerSeat == seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) : 0;
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 47100)]
     internal bool MobileShiZhuangshiCardDistance(ProgramCardDistanceQuery q) => HasMobileShiZhuangshiDistance(q.Actor.Seat, q.CardUseFrameId);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 47100)]
@@ -37,7 +37,7 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
         if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { } use && use.SourceSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && use.Action is { Type: CardActionType.Use } action)
         {
             var grant = ShiWyPhaseGrant(use.SourceSeat);
-            if (grant is null || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.ActionId == action.ActionId))
+            if (grant is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.ActionId == action.ActionId))
                 return;
             var ordinal = ShiWyPhaseUses(use.SourceSeat, grant.TurnNumber, grant.PhaseInstanceId) + 1;
             var noCount = ordinal <= grant.LostHp;
@@ -52,7 +52,7 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
         else if (payload is CardActionAcceptedEvent { Action.Type: CardActionType.Response } response)
         {
             var a = response.Action;
-            if (a.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || a.ProviderSeat != a.ActorSeat || a.RequesterSeat is not null || !(a.EffectiveKind == CardKind.Nullification || a.EffectiveKind == CardKind.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat], a.EffectiveKind)) || ShiWyPhaseGrant(a.ActorSeat)is not { } grant || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.ActionId == a.ActionId))
+            if (a.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || a.ProviderSeat != a.ActorSeat || a.RequesterSeat is not null || !(a.EffectiveKind == CardKind.Nullification || a.EffectiveKind == CardKind.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat], a.EffectiveKind)) || ShiWyPhaseGrant(a.ActorSeat)is not { } grant || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.ActionId == a.ActionId))
                 return;
             var ordinal = ShiWyPhaseUses(a.ActorSeat, grant.TurnNumber, grant.PhaseInstanceId) + 1;
             var owner = a.EffectiveKind == CardKind.Nullification ? _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow?.Id ?? 0 : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.ResolutionId ?? 0;
@@ -78,7 +78,7 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
     {
         if (damage.SourceCardUseResolutionId is not { } useId || damage.Amount <= 0 || damage.SourceLess)
             return;
-        var qualification = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiYinzhanQualifiedEvent>().LastOrDefault(e => e.UseId == useId && e.OwnerSeat == damage.SourceSeat && e.TargetSeat == damage.TargetSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiYinzhanAppliedEvent>().Any(a => a.QualificationId == e.Id));
+        var qualification = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiYinzhanQualifiedEvent>().LastOrDefault(e => e.UseId == useId && e.OwnerSeat == damage.SourceSeat && e.TargetSeat == damage.TargetSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiYinzhanAppliedEvent>().Any(a => a.QualificationId == e.Id));
         if (qualification is not null)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiYinzhanAppliedEvent(qualification.Id));
     }

@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
 {
     internal void PublishShanheStartingResourceOrigins()
     {
-        if (_coreMatchDefinitionOptionsAccess._options.ShanheBattle is not { StartingResourcesExpireOnUse: true } setup || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheStartingResourceCreatedEvent>().Count != 0)
+        if (_coreMatchDefinitionOptionsAccess._options.ShanheBattle is not { StartingResourcesExpireOnUse: true } setup || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceCreatedEvent>().Count != 0)
             return;
         // Noninteractive initial dealing runs in the constructor, before the
         // event journal is open. Bind those exact generated initial-deal moves
@@ -25,9 +25,9 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
 
     internal bool IsShanheStartingResource(int id)
     {
-        if (_coreShanheMarketApplicationOperations.IsShanheMarketResource(id))
+        if (_coreShanheMarketApplicationOperations.Value.IsShanheMarketResource(id))
             return true;
-        if (_coreMatchDefinitionOptionsAccess._options.ShanheBattle is not { StartingResourcesExpireOnUse: true } setup || !_coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess._generatedPhysicalCardIds.Contains(id) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheStartingResourceCreatedEvent>().Where(e => e.CardId == id).ToArray()is not [var origin])
+        if (_coreMatchDefinitionOptionsAccess._options.ShanheBattle is not { StartingResourcesExpireOnUse: true } setup || !_coreGameEngineAdvancedWeaponsGeneratedPhysicalCardIdsAccess._generatedPhysicalCardIds.Contains(id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceCreatedEvent>().Where(e => e.CardId == id).ToArray()is not [var origin])
             return false;
         var recipe = origin.EquipmentResource ? setup.StartingEquipment : setup.StartingCards;
         if (origin.RecipeIndex < 0 || origin.RecipeIndex >= recipe.Count)
@@ -69,7 +69,7 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
         actionId = 0;
         if (!IsShanheStartingResource(cardId) || ShanheStartingResourceWasAcquired(cardId, before))
             return false;
-        var used = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheStartingResourceUseEnteredEvent>().LastOrDefault(e => e.CardId == cardId && e.EntrySequence < before);
+        var used = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceUseEnteredEvent>().LastOrDefault(e => e.CardId == cardId && e.EntrySequence < before);
         if (from.Zone is CardZoneKind.Equipment or CardZoneKind.Judgment && used is not null)
         {
             entrySequence = used.EntrySequence;
@@ -107,7 +107,7 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
         if (reason != CardMoveReasons.ResponseFinished && reason != CardMoveReasons.NullificationFinished)
             return false;
         var current = _resolutionStackOperations._resolutionStack.LastOrDefault();
-        var response = _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.Type == CardActionType.Response && a.PhysicalCards.Any(c => c.CardId == cardId && c.From == entry.From && c.CardKind == entry.CardKind) && (current is CardUseFrame incoming && a.ParentActionId == incoming.Action?.ActionId || current is ProgramSkillFrame program && _coreResponseCompletionOperations.IsResponseCompletionProgramDuelParent(program, ProgramCardContinuation.DuelSlash) || current is NullificationWindowFrame counter && a.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(counter)));
+        var response = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.Type == CardActionType.Response && a.PhysicalCards.Any(c => c.CardId == cardId && c.From == entry.From && c.CardKind == entry.CardKind) && (current is CardUseFrame incoming && a.ParentActionId == incoming.Action?.ActionId || current is ProgramSkillFrame program && _coreResponseCompletionOperations.IsResponseCompletionProgramDuelParent(program, ProgramCardContinuation.DuelSlash) || current is NullificationWindowFrame counter && a.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(counter)));
         var claimedDeclaration = entry.Reason.Value == "conversion.declaration.pay" && current?.AcceptedDeclarationPayment is { Claimed: true } paid && paid.OwnerFrameId == current.Id && paid.Cost.CardId == cardId && paid.Cost.CardKind == entry.CardKind && paid.Cost.From == entry.From;
         if (response is not null && (entry.Reason == CardMoveReasons.Respond || entry.Reason == CardMoveReasons.Nullification || claimedDeclaration && current!.AcceptedDeclarationPayment is { } responsePaid && response.ConversionChain.Contains(responsePaid.Source)))
         {
@@ -119,7 +119,7 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
 
         // The single native counterspell records its accepted response after its
         // physical finish. Its exact current cursor owns both movements already.
-        if (current is NullificationWindowFrame n && (entry.Reason == CardMoveReasons.Nullification || claimedDeclaration && n.AcceptedDeclarationPayment!.DeclaredKind == CardKind.Nullification) && reason == CardMoveReasons.NullificationFinished && entry.From.OwnerSeat is { } provider && n.CandidateIndex >= 0 && n.CandidateIndex < n.CandidateSeats.Count && n.CandidateSeats[n.CandidateIndex] == provider && _coreDelayedNullificationOperations.HasNullificationEffectOwner(n))
+        if (current is NullificationWindowFrame n && (entry.Reason == CardMoveReasons.Nullification || claimedDeclaration && n.AcceptedDeclarationPayment!.DeclaredKind == CardKind.Nullification) && reason == CardMoveReasons.NullificationFinished && entry.From.OwnerSeat is { } provider && n.CandidateIndex >= 0 && n.CandidateIndex < n.CandidateSeats.Count && n.CandidateSeats[n.CandidateIndex] == provider && _coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(n))
         {
             entrySequence = entry.Sequence;
             parentFrame = n.Id;
@@ -133,13 +133,13 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
     {
         if (!IsShanheStartingResource(card.Id))
             return to;
-        if (from == CardLocation.OutsideGame && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Any(e => e.CardId == card.Id))
+        if (from == CardLocation.OutsideGame && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Any(e => e.CardId == card.Id))
             return from;
         if (to != CardLocation.DiscardPile)
             return to;
         // Pure proof callers omit a reason only when forecasting a continuing
         // field departure. Processing exits always require the actual finish.
-        return (reason is { } actual && TryDescribeShanheResourceExit(card.Id, from, actual, int.MaxValue, out _, out _, out _) || reason is null && from.Zone is CardZoneKind.Equipment or CardZoneKind.Judgment && !ShanheStartingResourceWasAcquired(card.Id) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheStartingResourceUseEnteredEvent>().Any(e => e.CardId == card.Id)) ? CardLocation.OutsideGame : to;
+        return (reason is { } actual && TryDescribeShanheResourceExit(card.Id, from, actual, int.MaxValue, out _, out _, out _) || reason is null && from.Zone is CardZoneKind.Equipment or CardZoneKind.Judgment && !ShanheStartingResourceWasAcquired(card.Id) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceUseEnteredEvent>().Any(e => e.CardId == card.Id)) ? CardLocation.OutsideGame : to;
     }
 
     internal void RecordShanheStartingResourceDestruction(CardMovementRecord move)
@@ -148,14 +148,14 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
             return;
         if (!TryDescribeShanheResourceExit(move.CardId, move.From, move.Reason, move.Sequence, out var entry, out var parent, out var action))
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Any(e => e.CardId == move.CardId))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Any(e => e.CardId == move.CardId))
             throw new InvalidOperationException("A starting resource exit needs its exact native use/response or continuing field provenance.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheStartingResourceDestroyedEvent(move.CardId, move.Sequence, entry, parent, action));
     }
 
-    internal bool IsShanheStartingResourceDestroyedMaterial(CardMovementRecord move) => move.To == CardLocation.OutsideGame && IsShanheStartingResource(move.CardId) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Where(e => e.CardId == move.CardId).ToArray()is [var fact] && fact.MovementSequence == move.Sequence && !ShanheStartingResourceWasAcquired(move.CardId, move.Sequence) && _coreCardMovementJournalCardMovementsAccess._cardMovements.SingleOrDefault(m => m.Sequence == fact.EntrySequence)is { } entry && entry.CardId == move.CardId && entry.To == CardLocation.Processing && (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheStartingResourceUseEnteredEvent>().Any(e => e.CardId == move.CardId && e.EntrySequence == entry.Sequence && e.UseFrameId == fact.ParentFrameId && e.ActionId == fact.ActionId) || move.From == CardLocation.Processing && entry.Sequence < move.Sequence && (entry.Reason == CardMoveReasons.Respond || entry.Reason == CardMoveReasons.Nullification || entry.Reason.Value == "conversion.declaration.pay") && (move.Reason == CardMoveReasons.ResponseFinished || move.Reason == CardMoveReasons.NullificationFinished) || _coreShanheBossCancelledMaterialsOperations.TryDescribeShanheBossCancelledMaterial(move.CardId, entry, move.Reason, out var cancelled) && cancelled.FrameId == fact.ParentFrameId && cancelled.ActionId == fact.ActionId);
-    internal bool IsShanheStartingResourceResponseFinish(CardActionContext action, CardActionCost cost, CardMovementRecord finish) => action.Type == CardActionType.Response && action.PhysicalCards.Contains(cost) && finish.CardId == cost.CardId && finish.CardKind == cost.CardKind && IsShanheStartingResourceDestroyedMaterial(finish) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Single(e => e.CardId == cost.CardId)is { } fact && (fact.ActionId == 0 || fact.ActionId == action.ActionId) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Single(m => m.Sequence == fact.EntrySequence)is { } entry && entry.From == cost.From && entry.Sequence < finish.Sequence;
-    internal bool IsShanheStartingResourceDestroyedUseMaterial(long useId, int cardId) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Any(e => e.CardId == cardId && e.ParentFrameId == useId && _coreCardMovementJournalCardMovementsAccess._cardMovements.SingleOrDefault(m => m.Sequence == e.MovementSequence)is { } m && IsShanheStartingResourceDestroyedMaterial(m));
+    internal bool IsShanheStartingResourceDestroyedMaterial(CardMovementRecord move) => move.To == CardLocation.OutsideGame && IsShanheStartingResource(move.CardId) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(move) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Where(e => e.CardId == move.CardId).ToArray()is [var fact] && fact.MovementSequence == move.Sequence && !ShanheStartingResourceWasAcquired(move.CardId, move.Sequence) && _coreCardMovementJournalCardMovementsAccess._cardMovements.SingleOrDefault(m => m.Sequence == fact.EntrySequence)is { } entry && entry.CardId == move.CardId && entry.To == CardLocation.Processing && (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceUseEnteredEvent>().Any(e => e.CardId == move.CardId && e.EntrySequence == entry.Sequence && e.UseFrameId == fact.ParentFrameId && e.ActionId == fact.ActionId) || move.From == CardLocation.Processing && entry.Sequence < move.Sequence && (entry.Reason == CardMoveReasons.Respond || entry.Reason == CardMoveReasons.Nullification || entry.Reason.Value == "conversion.declaration.pay") && (move.Reason == CardMoveReasons.ResponseFinished || move.Reason == CardMoveReasons.NullificationFinished) || _coreShanheBossCancelledMaterialsOperations.TryDescribeShanheBossCancelledMaterial(move.CardId, entry, move.Reason, out var cancelled) && cancelled.FrameId == fact.ParentFrameId && cancelled.ActionId == fact.ActionId);
+    internal bool IsShanheStartingResourceResponseFinish(CardActionContext action, CardActionCost cost, CardMovementRecord finish) => action.Type == CardActionType.Response && action.PhysicalCards.Contains(cost) && finish.CardId == cost.CardId && finish.CardKind == cost.CardKind && IsShanheStartingResourceDestroyedMaterial(finish) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Single(e => e.CardId == cost.CardId)is { } fact && (fact.ActionId == 0 || fact.ActionId == action.ActionId) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Single(m => m.Sequence == fact.EntrySequence)is { } entry && entry.From == cost.From && entry.Sequence < finish.Sequence;
+    internal bool IsShanheStartingResourceDestroyedUseMaterial(long useId, int cardId) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Any(e => e.CardId == cardId && e.ParentFrameId == useId && _coreCardMovementJournalCardMovementsAccess._cardMovements.SingleOrDefault(m => m.Sequence == e.MovementSequence)is { } m && IsShanheStartingResourceDestroyedMaterial(m));
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 4200)]
     internal CardMovementBatchContext CompleteMovementBatchCaptureShanheStartingResourceUseEntries(CardMovementBatchBuilder batch, CardMovementBatchContext completed)
     {

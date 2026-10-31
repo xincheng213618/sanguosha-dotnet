@@ -199,7 +199,7 @@ internal sealed partial class CharacterCaoYingOlRuntime
     internal bool ValidMobileCaoYingGrantTail(ProgramSkillFrame f)
     {
         var r = f.CaoYing!;
-        var grants = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramTurnSkillsGrantedEvent>().Where(e => e.FrameId == f.Id && e.SkillId == f.SkillId).ToArray();
+        var grants = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramTurnSkillsGrantedEvent>().Where(e => e.FrameId == f.Id && e.SkillId == f.SkillId).ToArray();
         return (f.PendingMovementContinuation is null ? grants.Length <= 1 : grants.Length == 1) && grants.All(grant => grant.OwnerSeat == f.OwnerSeat && grant.RecipientSeat == f.OwnerSeat && grant.BindingId == f.TriggerId && grant.GrantSourceId == $"turn:{(r.TurnNumber)}:{(r.TurnOwner)}:mobile-cao-ying:{(f.OwnerSeat)}:{(f.SkillInstanceId)}:frame:{(f.Id)}" && grant.TurnExpiry is null && grant.NextActualTurnStartExpiry == new SkillGrantNextActualTurnStartExpiry(r.TurnNumber, r.TurnOwner, f.OwnerSeat) && grant.GrantedSkillIds.SequenceEqual(_coreProgramLifecycleOperations.GetProgramTrigger(f).Effects.Single().SkillIds));
     }
 

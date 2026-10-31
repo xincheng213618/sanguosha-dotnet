@@ -14,7 +14,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
             return r.Stage == MouSmStage.Drawing && f.NativeDraw is not null;
         if (child is ProgramCardTriggerWindowFrame card)
             return card.MouSimaYiPlayed is { } back && back.FrameId == f.Id && card.ParentFrameId == f.Id && back.ActionId == r.ResponseActionId && ValidMouSmPlayedWindow(card);
-        if (r.Stage == MouSmStage.DamageChildren && r.Cursor > 0 && r.Cursor <= r.Targets.Count && f.AttackAttempt is { } attack && attack.TargetSeat == r.Targets[r.Cursor - 1] && _coreProgramEventHistoryOperations.ProgramEventHistory<MouSmDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.Cursor == r.Cursor - 1 && e.Target == attack.TargetSeat) == 1)
+        if (r.Stage == MouSmStage.DamageChildren && r.Cursor > 0 && r.Cursor <= r.Targets.Count && f.AttackAttempt is { } attack && attack.TargetSeat == r.Targets[r.Cursor - 1] && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouSmDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.Cursor == r.Cursor - 1 && e.Target == attack.TargetSeat) == 1)
         {
             if (child is BeforeDamageProgramWindowFrame before)
                 return before.ParentFrameId == f.Id && before.SourceSeat == f.OwnerSeat && before.TargetSeat == attack.TargetSeat && before.Amount == 1;
@@ -33,14 +33,14 @@ internal sealed partial class CharacterSimaYiMouRuntime
                 return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.TargetSeat == holder;
         }
 
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
+        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
     internal bool MouSmEdge(int i) => MouSmDeclarationEdge(i) || _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && MouSmFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal bool MouSmSuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterSimaYiMouOperations.MouSmEdge(i), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? MouSmRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterSimaYiMouOperations.MouSmFirstChild(f, c), (n) => _characterSimaYiMouOperations.MouSmSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 36200)]
-    internal bool MouSmDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouSmRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
+    internal bool MouSmDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && MouSmRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 36200)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 36200)]
     internal bool MouSmRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

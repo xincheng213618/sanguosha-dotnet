@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineProvenanceCardPoliciesRuntime
     internal bool HasProvenanceGrainCounterspellMaterials(CharacterState owner, IReadOnlyList<int> validIds) => validIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.WoodenOxGrain(owner.Seat) && FreezeProvenanceCardSource(owner, [id])is not null);
     internal CardConversionSource? FreezeProvenanceCardSource(CharacterState owner, IReadOnlyList<int> ids)
     {
-        if (!_coreDiscardedProvenanceOperations.TracksDiscardedEntityProvenance || !owner.IsAlive || !owner.IsFaceDown || ids.Count == 0 || ids.Distinct().Count() != ids.Count)
+        if (!_coreDiscardedProvenanceOperations.Value.TracksDiscardedEntityProvenance || !owner.IsAlive || !owner.IsFaceDown || ids.Count == 0 || ids.Distinct().Count() != ids.Count)
             return null;
         foreach (var policy in _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.ClaimedEntitiesFaceDownUse))
         {
@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEngineProvenanceCardPoliciesRuntime
     }
 
     internal bool HasProvenanceUseDistance(CharacterState owner, IReadOnlyList<int>? physicalIds) => physicalIds is { Count: > 0 } && FreezeProvenanceCardSource(owner, physicalIds)is not null;
-    internal bool HasPotentialProvenanceSlash(CharacterState owner) => _coreDiscardedProvenanceOperations.TracksDiscardedEntityProvenance && owner.IsFaceDown && (_coreActionQueriesOperations.GetSlashUseCards(owner).Any(c => HasProvenanceUseDistance(owner, c)) || _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner).Any(pair => HasProvenanceUseDistance(owner, pair.Select(c => c.Id).ToArray())) || _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(owner, CardKind.Slash, false).Any(s => HasProvenanceUseDistance(owner, s.Cards.Select(c => c.Id).ToArray())));
+    internal bool HasPotentialProvenanceSlash(CharacterState owner) => _coreDiscardedProvenanceOperations.Value.TracksDiscardedEntityProvenance && owner.IsFaceDown && (_coreActionQueriesOperations.GetSlashUseCards(owner).Any(c => HasProvenanceUseDistance(owner, c)) || _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner).Any(pair => HasProvenanceUseDistance(owner, pair.Select(c => c.Id).ToArray())) || _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(owner, CardKind.Slash, false).Any(s => HasProvenanceUseDistance(owner, s.Cards.Select(c => c.Id).ToArray())));
     internal bool HasProvenanceUseDistance(CharacterState owner, Card card) => card.Id > 0 && HasProvenanceUseDistance(owner, new[] { card.Id });
     internal bool HasIssuedProvenanceUseDistance(long? useId, int owner) => useId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ProvenanceUseSource: { } source, Action: { } action } && source.OwnerSeat == owner && action.ActorSeat == owner && action.ProviderSeat == owner;
     internal void ClearProvenanceUseOnActorChange(long useId, int actor)

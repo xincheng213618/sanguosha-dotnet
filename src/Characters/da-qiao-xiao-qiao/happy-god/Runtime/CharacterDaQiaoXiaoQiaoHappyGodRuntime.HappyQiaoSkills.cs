@@ -42,7 +42,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         return Array.AsReadOnly(ordinary.Where(c => c.SkillId != HappyQiaoComposition.Tongxin).Concat(peers).DistinctBy(c => (c.OwnerSeat, c.SkillId, c.BindingId, c.SkillInstanceId)).ToArray());
     }
 
-    internal bool HappyQiaoRedQualification(int owner, string instance, HpChangeContext change) => _coreProgramEventHistoryOperations.ProgramEventHistory<HappyQiaoRedHealthQualifiedEvent>().Count(e => e.ChangeId == change.Id && e.Owner == owner && e.Instance == instance && e.Target == change.TargetSeat && e.Kind == change.Kind) == 1;
+    internal bool HappyQiaoRedQualification(int owner, string instance, HpChangeContext change) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyQiaoRedHealthQualifiedEvent>().Count(e => e.ChangeId == change.Id && e.Owner == owner && e.Instance == instance && e.Target == change.TargetSeat && e.Kind == change.Kind) == 1;
     [ProgramTriggerProof(ProgramTriggerProofPhase.HpChangeOwner, 110)]
     internal bool IsHappyQiaoForeignHealthCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => candidate.SkillId == HappyQiaoComposition.Tongxin && candidate.BindingId == "pool-health" && context is { Window: SkillProgramTriggerWindow.AfterHealthChanged, HpChange: { } change } && context.OwnerSeat == candidate.OwnerSeat && context.TargetSeat == change.TargetSeat && context.ParentFrameId == change.Id && HasHappyQiaoHealth(candidate.OwnerSeat) && HappyQiaoRedQualification(candidate.OwnerSeat, candidate.SkillInstanceId, change) && _resolutionStackOperations._resolutionStack.OfType<HpChangedTriggerWindowFrame>().LastOrDefault()is { } window && window.Id == context.ParentFrameId && window.Change == change && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && window.Candidates[window.CandidateIndex] == candidate;
     internal bool HappyQiaoShutuChange(int owner, HpChangeContext change) => HasHappyQiaoHealth(owner) && change.TargetSeat == owner && change.HpBefore != change.HpAfter && (change is { Kind: HpChangeKind.Recovery, HappyQiaoPool: HappyQiaoPool.DaQiao } && change.HpAfter > change.HpBefore || change is { Kind: HpChangeKind.Damage, HappyQiaoPool: HappyQiaoPool.XiaoQiao } && change.HpAfter < change.HpBefore);
@@ -289,7 +289,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
 
             if (receipt.Stage == HappyQiaoStage.DiscardChildren)
             {
-                if (receipt.CostBatch is null || !_coreProgramEventHistoryOperations.ProgramEventHistory<HappyQiaoCostPaidEvent>().Any(e => e.FrameId == frame.Id && e.BatchId == receipt.CostBatch && e.CardId == receipt.CardId && e.Sequence == receipt.After))
+                if (receipt.CostBatch is null || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyQiaoCostPaidEvent>().Any(e => e.FrameId == frame.Id && e.BatchId == receipt.CostBatch && e.CardId == receipt.CardId && e.Sequence == receipt.After))
                     throw new InvalidOperationException("Tongxin cannot damage before its actual red logical discard completes.");
                 if (!_coreMatchParticipantsPlayersAccess._players[receipt.Target].IsAlive)
                 {

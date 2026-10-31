@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEnginePairObtainShownGiftsRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PairObtainStartedEvent(f.Id, draft.Source, draft.GameplayHash, draft.ActualTurnNumber, draft.ActualTurnOwnerSeat, draft.PhaseInstanceId, a, b));
         }
 
-        if (!_corePairObtainFixedRecipientReceiptsOperations.ValidPairObtain(f))
+        if (!_corePairObtainFixedRecipientReceiptsOperations.Value.ValidPairObtain(f))
             throw new InvalidOperationException("The pair obtain lost its original scalar receipt or actual ledger.");
         var d = f.PairObtain!;
         if (d.AwaitingMovement)
@@ -92,7 +92,7 @@ internal sealed partial class CoreGameEnginePairObtainShownGiftsRuntime
         var d = f.PairObtain ?? throw new InvalidOperationException("Missing pair obtain receipt.");
         var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
         var target = d.Cursor == 0 ? d.FirstSeat : d.SecondSeat;
-        if (!_corePairObtainFixedRecipientReceiptsOperations.ValidPairObtain(f) || d.Cursor is < 0 or > 1 || d.AwaitingMovement || effect.Op != SkillProgramEffectOp.ObtainOneFromEachSelectedTarget || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } decision || decision.PlayerSeat != f.OwnerSeat || !decision.Choices.Any(c => c.Id == choice.Id) || choice.Parameters.GetValueOrDefault("cursor") != d.Cursor.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("card-owner-seat") != target.ToString(CultureInfo.InvariantCulture) || !Enum.TryParse<CardZoneKind>(choice.Parameters.GetValueOrDefault("source-zone"), out var zone) || !effect.Zones.Contains(zone) || !int.TryParse(choice.Parameters.GetValueOrDefault("slot-index"), out var slot))
+        if (!_corePairObtainFixedRecipientReceiptsOperations.Value.ValidPairObtain(f) || d.Cursor is < 0 or > 1 || d.AwaitingMovement || effect.Op != SkillProgramEffectOp.ObtainOneFromEachSelectedTarget || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } decision || decision.PlayerSeat != f.OwnerSeat || !decision.Choices.Any(c => c.Id == choice.Id) || choice.Parameters.GetValueOrDefault("cursor") != d.Cursor.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("card-owner-seat") != target.ToString(CultureInfo.InvariantCulture) || !Enum.TryParse<CardZoneKind>(choice.Parameters.GetValueOrDefault("source-zone"), out var zone) || !effect.Zones.Contains(zone) || !int.TryParse(choice.Parameters.GetValueOrDefault("slot-index"), out var slot))
             throw new InvalidOperationException("The opaque pair choice lost its original frame, cursor or source slot.");
         var expected = PairObtainChoices(f, target, effect.Zones).SingleOrDefault(c => c.Id == choice.Id);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -160,7 +160,7 @@ internal sealed partial class CoreGameEnginePairObtainShownGiftsRuntime
     internal SkillProgramStepOutcome GiveShownCardToLeastOriginalTarget(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.InstructionIndex != 4 || !_corePairObtainFixedRecipientReceiptsOperations.ValidPairObtain(f) || f.PairObtain is not { Cursor: 2, AwaitingMovement: false } d)
+        if (f.InstructionIndex != 4 || !_corePairObtainFixedRecipientReceiptsOperations.Value.ValidPairObtain(f) || f.PairObtain is not { Cursor: 2, AwaitingMovement: false } d)
             throw new InvalidOperationException("A shown pair gift must follow both original obtain payments.");
         if (f.ShownPairGift is null)
         {
@@ -170,7 +170,7 @@ internal sealed partial class CoreGameEnginePairObtainShownGiftsRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShownPairGift = new(3, effect.SourceBind!, id, suit, d.FirstSeat, d.SecondSeat, _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[d.FirstSeat]).Count, _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[d.SecondSeat]).Count, null, ProgramShownPairGiftStage.ChoosingRecipient, PairBenefitSequence, PairBenefitSequence) });
         }
 
-        if (!_corePairObtainFixedRecipientReceiptsOperations.ValidShownPairGift(f))
+        if (!_corePairObtainFixedRecipientReceiptsOperations.Value.ValidShownPairGift(f))
             throw new InvalidOperationException("The shown pair gift lost its original binding or payment.");
         var r = f.ShownPairGift!;
         if (r.Stage == ProgramShownPairGiftStage.AwaitingGift)
@@ -232,7 +232,7 @@ internal sealed partial class CoreGameEnginePairObtainShownGiftsRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Missing shown pair gift owner.");
         var r = f.ShownPairGift ?? throw new InvalidOperationException("Missing shown pair gift receipt.");
-        if (!_corePairObtainFixedRecipientReceiptsOperations.ValidShownPairGift(f) || f.InstructionIndex != 4 || r.Stage != ProgramShownPairGiftStage.ChoosingRecipient || choice.Cards.Count != 0 || choice.Targets is not [var target] || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } decision || decision.PlayerSeat != f.OwnerSeat || !decision.Choices.Any(c => c.Id == choice.Id && c.Targets.SequenceEqual(choice.Targets)) || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture))
+        if (!_corePairObtainFixedRecipientReceiptsOperations.Value.ValidShownPairGift(f) || f.InstructionIndex != 4 || r.Stage != ProgramShownPairGiftStage.ChoosingRecipient || choice.Cards.Count != 0 || choice.Targets is not [var target] || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { IsPrivate: true } decision || decision.PlayerSeat != f.OwnerSeat || !decision.Choices.Any(c => c.Id == choice.Id && c.Targets.SequenceEqual(choice.Targets)) || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture))
             throw new InvalidOperationException("The shown recipient choice lost its frozen original pair.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!PairBenefitSourceCurrent(f) || !_coreMatchParticipantsPlayersAccess._players[r.FirstSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.SecondSeat].IsAlive || target != r.FirstSeat && target != r.SecondSeat || _cardZonesOperations._cardZones.GetLocation(r.CardId) != CardLocation.Hand(f.OwnerSeat) || (target == r.FirstSeat ? r.FrozenFirstHandCount : r.FrozenSecondHandCount) != Math.Min(r.FrozenFirstHandCount, r.FrozenSecondHandCount))
@@ -268,7 +268,7 @@ internal sealed partial class CoreGameEnginePairObtainShownGiftsRuntime
     {
         if (f.PendingMovementContinuation is null || f.PairObtain is not { AwaitingMovement: true } && f.ShownPairGift?.Stage is not (ProgramShownPairGiftStage.AwaitingGift or ProgramShownPairGiftStage.AwaitingReward))
             return false;
-        if (!_corePairObtainFixedRecipientReceiptsOperations.ValidPairObtain(f) || f.ShownPairGift is not null && !_corePairObtainFixedRecipientReceiptsOperations.ValidShownPairGift(f) || f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat)
+        if (!_corePairObtainFixedRecipientReceiptsOperations.Value.ValidPairObtain(f) || f.ShownPairGift is not null && !_corePairObtainFixedRecipientReceiptsOperations.Value.ValidShownPairGift(f) || f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat)
             throw new InvalidOperationException("Pair benefit movement lost its real payment proof.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

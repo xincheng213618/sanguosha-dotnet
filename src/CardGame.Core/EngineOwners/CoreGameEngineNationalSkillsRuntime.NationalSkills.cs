@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineNationalSkillsRuntime
     internal static int DualGeneralMaxHp(GeneralDefinition primary, GeneralDefinition secondary) => RuntimeSkills.RuntimeRules_Core_NationalSkills.DualGeneralMaxHp(primary, secondary);
     internal void InitializeDualGeneralHealth()
     {
-        if (!_coreNativeDamageHandlesOperations.IsDualGeneralMode)
+        if (!_coreNativeDamageHandlesOperations.Value.IsDualGeneralMode)
             return;
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
         {

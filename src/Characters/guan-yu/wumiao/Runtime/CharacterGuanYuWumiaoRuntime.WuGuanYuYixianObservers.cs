@@ -8,7 +8,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     {
         if (!MatchesWuYixianRoot(f) || f.Yixian is not { Paid: true, Branch: { } branch } r)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<YixianPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var paid] && paid == new YixianPaidEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, branch, r.BatchId, r.Entities.Count, r.Recipients.Count, r.SequenceBefore, r.SequenceAfter);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YixianPaidEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var paid] && paid == new YixianPaidEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, branch, r.BatchId, r.Entities.Count, r.Recipients.Count, r.SequenceBefore, r.SequenceAfter);
     }
 
     internal bool CanContinueIssuedWuYixian(ProgramSkillFrame f)
@@ -58,7 +58,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
-            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
+            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
         return child is CardsMovedTriggerWindowFrame moved && f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => WuYixianPaidMovement(f, m));
     }
 

@@ -24,9 +24,9 @@ internal sealed partial class CoreGameEngineAlcoholSlashSuppressionsRuntime
     internal bool TryAlcoholSlashSuppressionUse(ProgramSkillWindowContext context, int ownerSeat, out CardUseFrame use)
     {
         use = null !;
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.OwnerSeat != ownerSeat || context.SourceSeat != ownerSeat || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().LastOrDefault(f => f.Id == context.ParentFrameId)is not { } window || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || window.SourceSeat != ownerSeat || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id != window.Id)
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.OwnerSeat != ownerSeat || context.SourceSeat != ownerSeat || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().LastOrDefault(f => f.Id == context.ParentFrameId)is not { } window || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || window.SourceSeat != ownerSeat || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id != window.Id)
             return false;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window);
         var original = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId);
         if (attack.IsSourceLess || attack.IsChainPropagation || attack.SourceSeat != ownerSeat || attack.CardUserSeat != ownerSeat || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || original is not { ConsumedAlcoholBoost: true, Action: { Type: CardActionType.Use } action } || action.ActorSeat != ownerSeat || action.EffectiveKind != kind || original.SourceSeat != ownerSeat || original.CardKind != kind || window.TargetSeat != attack.TargetSeat || context.TargetSeat != attack.TargetSeat)
             return false;
@@ -67,5 +67,5 @@ internal sealed partial class CoreGameEngineAlcoholSlashSuppressionsRuntime
     }
 
     void IAlcoholSlashSuppressionProgramHost.SuppressOwnSkillAfterAlcoholSlashDamage(ProgramSkillFrame frame, string skillId) => SuppressOwnSkillAfterAlcoholSlashDamage(frame, skillId);
-    SkillProgramStepOutcome IAlcoholSlashSuppressionProgramHost.StartOwnedDamagePointJudgment(ProgramSkillFrame frame, SkillProgramEffect effect) => _coreOwnedDamagePointJudgmentsOperations.BeginOwnedDamagePointJudgment(frame, effect);
+    SkillProgramStepOutcome IAlcoholSlashSuppressionProgramHost.StartOwnedDamagePointJudgment(ProgramSkillFrame frame, SkillProgramEffect effect) => _coreOwnedDamagePointJudgmentsOperations.Value.BeginOwnedDamagePointJudgment(frame, effect);
 }

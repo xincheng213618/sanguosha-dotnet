@@ -17,7 +17,7 @@ internal sealed partial class CoreNativeQinglongRuntime
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
         var effectiveKind = CoreNativeDamagePoliciesRuntime.RequireAttackCardKind(attack);
-        if (!_coreNativeDamageHandlesOperations.UsesFormalQinglongCrescentBlade || effectiveKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash))
+        if (!_coreNativeDamageHandlesOperations.Value.UsesFormalQinglongCrescentBlade || effectiveKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash))
         {
             return false;
         }

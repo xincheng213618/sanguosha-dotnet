@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineShanheS5QiangxiRuntime
         {
             if (f.InstructionIndex != 1 || f.ShanheS5Qiangxi is not null || f.TriggerId is not null || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualRoundProgressRoundNumberAccess._roundNumber < 1 || _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId <= 0)
                 throw new InvalidOperationException("S5 Qiangxi lost its original real Play activation and other living target.");
-            var prior = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5QiangxiPaidEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == f.SkillId && e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
+            var prior = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5QiangxiPaidEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == f.SkillId && e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
             var weaponId = f.ActivationId == "discard-weapon" ? f.SelectedCardIds.Single() : (int? )null;
             var from = weaponId is { } id ? _cardZonesOperations._cardZones.GetLocation(id) : (CardLocation? )null;
             if (weaponId is { } weapon && (from!.Value.OwnerSeat != f.OwnerSeat || from.Value.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || _coreEquipmentContentOperations.EquipmentRules.Get(_coreCardAttackStateOperations.GetAttackCard(weapon).Kind).Slot != EquipmentSlot.Weapon))
@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineShanheS5QiangxiRuntime
         }
 
         var r = f.ShanheS5Qiangxi ?? throw new InvalidOperationException("S5 Qiangxi lost its frozen activation.");
-        if (f.InstructionIndex != 3 || r.Paid || !HasShanheS5QiangxiPayment(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5QiangxiPaidEvent>().Any(e => e.FrameId == f.Id))
+        if (f.InstructionIndex != 3 || r.Paid || !HasShanheS5QiangxiPayment(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5QiangxiPaidEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("S5 Qiangxi requires one completed real cost on its owning frame.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheS5Qiangxi = r with { Paid = true } });
         var damage = checked(r.ActivationCount + 1);
@@ -33,11 +33,11 @@ internal sealed partial class CoreGameEngineShanheS5QiangxiRuntime
         if (f.ShanheS5Qiangxi is not { } r)
             return false;
         if (r.WeaponCardId is not { } id)
-            return _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == f.OwnerSeat && e.Amount == 1 && e.RemainingHp == r.CostHpBefore - 1) == 1;
+            return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == f.OwnerSeat && e.Amount == 1 && e.RemainingHp == r.CostHpBefore - 1) == 1;
         if (f.SelectedCardPayment is not { InstructionIndex: 2, Operation: SkillProgramEffectOp.DiscardSelected, MovementCommitted: true } paid || !paid.CardIds.SequenceEqual([id]) || f.SelectedCardPaymentResult is not { InstructionIndex: 2, Operation: SkillProgramEffectOp.DiscardSelected, Completed: true })
             return false;
-        var invoices = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ParentFrameId == f.Id && e.InitiatorSeat == f.OwnerSeat && e.ExecutorSeat == f.OwnerSeat && e.SubjectSeat == f.OwnerSeat && e.ActualCount == 1 && e.Reason.Value == $"skill-program.{(f.SkillId)}.DiscardSelected").ToArray();
-        return invoices is [var invoice] && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(e => e.InvocationId == invoice.InvocationId && e.CardId == id && e.From == r.WeaponFrom && e.CompletionSequence > invoice.SequenceBefore && e.CompletionSequence <= invoice.SequenceAfter) == 1;
+        var invoices = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ParentFrameId == f.Id && e.InitiatorSeat == f.OwnerSeat && e.ExecutorSeat == f.OwnerSeat && e.SubjectSeat == f.OwnerSeat && e.ActualCount == 1 && e.Reason.Value == $"skill-program.{(f.SkillId)}.DiscardSelected").ToArray();
+        return invoices is [var invoice] && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(e => e.InvocationId == invoice.InvocationId && e.CardId == id && e.From == r.WeaponFrom && e.CompletionSequence > invoice.SequenceBefore && e.CompletionSequence <= invoice.SequenceAfter) == 1;
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 59100)]

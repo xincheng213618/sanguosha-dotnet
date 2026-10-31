@@ -46,7 +46,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
             throw new InvalidOperationException("Jueman cannot actively use an otherwise unplayable basic card.");
         var current = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, current.TargetSeats[0], null, 1 + actor.AlcoholDamageBonus, o.CardKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[current.TargetSeats[0]], o.CardKind));
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
@@ -149,7 +149,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     {
         if (!HasAHuiNanCapability)
             return;
-        var ids = _coreProgramEventHistoryOperations.ProgramEventHistory<AHuiNanJuemanUseIssuedEvent>().Where(e => e.Origin.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Origin.CardKind == CardKind.Alcohol).Select(e => e.Origin.CardUseFrameId).ToHashSet();
+        var ids = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AHuiNanJuemanUseIssuedEvent>().Where(e => e.Origin.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Origin.CardKind == CardKind.Alcohol).Select(e => e.Origin.CardUseFrameId).ToHashSet();
         var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         foreach (var group in facts.OfType<AlcoholAppliedEvent>().Where(e => ids.Contains(e.ResolutionId)).GroupBy(e => e.SourceSeat))
         {

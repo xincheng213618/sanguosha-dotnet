@@ -7,14 +7,14 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
 
     internal MouDaQiaoLiuliMarkGrantedEvent? LiveMouDaQiaoMark()
     {
-        var last = _coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoLiuliMarkGrantedEvent>().LastOrDefault();
-        return last is not null && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoLiuliMarkConsumedEvent>().Any(e => e.GrantId == last.GrantId) ? last : null;
+        var last = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDaQiaoLiuliMarkGrantedEvent>().LastOrDefault();
+        return last is not null && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDaQiaoLiuliMarkConsumedEvent>().Any(e => e.GrantId == last.GrantId) ? last : null;
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.UnissuedTurnStartObligation, 1)]
-    internal bool HasUnissuedMouDaQiaoPhase(int owner) => HasMouDaQiaoLiuli && LiveMouDaQiaoMark()is { } grant && grant.RecipientSeat == owner && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoLiuliPhaseIssuedEvent>().Any(e => e.GrantId == grant.GrantId);
-    internal bool PaidMouDaQiaoLiuli(ProgramSkillFrame f) => f.SkillId == MouDaQiaoComposition.Liuli && f.TriggerId == "redirect-slash" && f.WindowContext is { Window: SkillProgramTriggerWindow.SlashTargetRedirecting } && f.InstructionIndex is >= 2 and <= 5 && f.CardSetBindings.SingleOrDefault(b => b.Name == "liuli-cost")is { CardIds: [var id], FrozenRevealedSuit: not null } && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(e => e.ParentFrameId == f.Id && e.ExecutorSeat == f.OwnerSeat && e.SubjectSeat == f.OwnerSeat && e.ActualCount == 1 && e.Reason.Value == "skill-program.mou-mobile:liuli.SelectAndMoveOwnedCard" && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.Sequence > e.SequenceBefore && m.Sequence <= e.SequenceAfter && m.From.OwnerSeat == f.OwnerSeat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment));
-    internal bool MouDaQiaoHeartAvailable(int owner, int actualTurn) => !_coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoLiuliMarkGrantedEvent>().Any(e => e.Source.OwnerSeat == owner && e.ActualTurn == actualTurn);
+    internal bool HasUnissuedMouDaQiaoPhase(int owner) => HasMouDaQiaoLiuli && LiveMouDaQiaoMark()is { } grant && grant.RecipientSeat == owner && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDaQiaoLiuliPhaseIssuedEvent>().Any(e => e.GrantId == grant.GrantId);
+    internal bool PaidMouDaQiaoLiuli(ProgramSkillFrame f) => f.SkillId == MouDaQiaoComposition.Liuli && f.TriggerId == "redirect-slash" && f.WindowContext is { Window: SkillProgramTriggerWindow.SlashTargetRedirecting } && f.InstructionIndex is >= 2 and <= 5 && f.CardSetBindings.SingleOrDefault(b => b.Name == "liuli-cost")is { CardIds: [var id], FrozenRevealedSuit: not null } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Any(e => e.ParentFrameId == f.Id && e.ExecutorSeat == f.OwnerSeat && e.SubjectSeat == f.OwnerSeat && e.ActualCount == 1 && e.Reason.Value == "skill-program.mou-mobile:liuli.SelectAndMoveOwnedCard" && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.Sequence > e.SequenceBefore && m.Sequence <= e.SequenceAfter && m.From.OwnerSeat == f.OwnerSeat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment));
+    internal bool MouDaQiaoHeartAvailable(int owner, int actualTurn) => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDaQiaoLiuliMarkGrantedEvent>().Any(e => e.Source.OwnerSeat == owner && e.ActualTurn == actualTurn);
     internal SkillProgramStepOutcome ResolveMouDaQiaoHeart(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -125,7 +125,7 @@ internal sealed partial class CharacterDaQiaoMouMobileRuntime
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.ContinueDetachedProgramBinding, 1)]
-    internal bool IsReturningMouDaQiaoLiuliPhase(ProgramSkillFrame f) => f.MouDaQiaoLiuliPhase is { } r && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramPhaseScheduledEvent>().Any(e => e.FrameId == f.Id && !e.Started && e.Phase == TurnPhase.Play) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDaQiaoLiuliPhaseIssuedEvent>().Count(e => e.FrameId == f.Id && e.GrantId == r.GrantId && e.RecipientSeat == f.OwnerSeat && e.ActualTurn == r.ActualTurn) == 1;
+    internal bool IsReturningMouDaQiaoLiuliPhase(ProgramSkillFrame f) => f.MouDaQiaoLiuliPhase is { } r && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramPhaseScheduledEvent>().Any(e => e.FrameId == f.Id && !e.Started && e.Phase == TurnPhase.Play) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDaQiaoLiuliPhaseIssuedEvent>().Count(e => e.FrameId == f.Id && e.GrantId == r.GrantId && e.RecipientSeat == f.OwnerSeat && e.ActualTurn == r.ActualTurn) == 1;
     internal void FinishMouDaQiaoLiuliPhase(ProgramSkillFrame f)
     {
         if (!IsReturningMouDaQiaoLiuliPhase(f))

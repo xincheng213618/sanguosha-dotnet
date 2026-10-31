@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineModeRulesRuntime
     internal void AddModeDistanceBaseTerms(ProgramDistanceQuery query, List<RuleQueryBaseTerm> terms) => terms.AddRange(_modeRuntimeOperations._modeRuntime.BaseDistanceTerms(query.Source.Seat, query.Target.Seat));
     internal void ApplyModeDeathOutcome(long deathFrameId, CharacterState victim, CharacterState? killer)
     {
-        var outcome = _modeRulesOperations._modeRules.Death.Evaluate(CaptureModeLife(), _modeRulesOperations._modeRules.Death.EvaluatesIdentityVictory && _characterDongZhaoOlOperations.ZaowangRebelDeathWins(victim, killer));
+        var outcome = _modeRulesOperations._modeRules.Death.Evaluate(CaptureModeLife(), _modeRulesOperations._modeRules.Death.EvaluatesIdentityVictory && _characterDongZhaoOlOperations.Value.ZaowangRebelDeathWins(victim, killer));
         switch (outcome.Kind)
         {
             case ModeDeathOutcomeKind.Preserve:

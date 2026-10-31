@@ -9,7 +9,7 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
     internal bool HasHappyZhenJi => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveHappyZhenJiShenfu) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.StoreHappyZhenJiQixian) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.CollectHappyZhenJiFeifu);
 
     internal static CardConversionSource HappyZjSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal IEnumerable<HappyZjStartedEvent> HappyShenfuUses(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<HappyZjStartedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Op == SkillProgramEffectOp.ResolveHappyZhenJiShenfu && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
+    internal IEnumerable<HappyZjStartedEvent> HappyShenfuUses(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZjStartedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Op == SkillProgramEffectOp.ResolveHappyZhenJiShenfu && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
     internal bool HappyShenfuTarget(int owner, int target) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !HappyShenfuUses(owner).Any(e => e.Target == target);
     internal IEnumerable<PublicPersistentPileSource> HappyZjPiles(int owner) => _corePublicPileSourcesOperations.PublicPileSources(owner).Where(p => p.SkillId is HappyQixian or HappyFeifu);
     internal HappyZjEntity[] HappyZjPileEntities(int owner) => HappyZjPiles(owner).SelectMany(p => _corePublicPileSourcesOperations.PublicPileCards(p).Select(c => new HappyZjEntity(c.Id, c.Kind, p.Location))).ToArray();
@@ -25,7 +25,7 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
     };
     internal CardActionCost? HappyFeifuCost(ProgramCardTriggerWindowFrame w, int owner, string instance)
     {
-        if (w.ResponseCompletion is not { CostsDrained: true } || !_coreResponseCompletionOperations.ValidResponseCompletionWindow(w) || w.Action.EffectiveKind != CardKind.Dodge || w.Action.PhysicalCards is not [var card] || card.From.OwnerSeat != owner || card.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !w.Action.ConversionChain.Contains(new CardConversionSource(HappyFeifu, "black-as-dodge", owner, instance)) || !_coreResponseCompletionOperations.IsResponseCompletionCostFinished(w, card) || _cardZonesOperations._cardZones.GetLocation(card.CardId) != CardLocation.DiscardPile || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyZjFeifuClaimedEvent>().Any(e => e.ActionId == w.Action.ActionId && e.CardId == card.CardId))
+        if (w.ResponseCompletion is not { CostsDrained: true } || !_coreResponseCompletionOperations.ValidResponseCompletionWindow(w) || w.Action.EffectiveKind != CardKind.Dodge || w.Action.PhysicalCards is not [var card] || card.From.OwnerSeat != owner || card.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !w.Action.ConversionChain.Contains(new CardConversionSource(HappyFeifu, "black-as-dodge", owner, instance)) || !_coreResponseCompletionOperations.IsResponseCompletionCostFinished(w, card) || _cardZonesOperations._cardZones.GetLocation(card.CardId) != CardLocation.DiscardPile || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZjFeifuClaimedEvent>().Any(e => e.ActionId == w.Action.ActionId && e.CardId == card.CardId))
             return null;
         return card;
     }
@@ -244,7 +244,7 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
             return true;
         }
 
-        if (_characterZhenJiOlGodOperations.DrainOlShenfu(id))
+        if (_characterZhenJiOlGodOperations.Value.DrainOlShenfu(id))
             return true;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         r = f.HappyZhenJi!;

@@ -21,13 +21,13 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
 
     internal bool ValidQiaoRui(ProgramSkillFrame f)
     {
-        if (f.AnniversaryQiaoRui is not { } r || f.InstructionIndex != 1 || !QiaoRuiOriginal(f, r.Operation) || r.Source != QiaoRuiSource(f) || r.Hash != f.GameplayHash || r.ParentId != f.WindowContext!.ParentFrameId || r.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Requested < 0 || r.Cards.Any(id => id <= 0) || r.Cards.Distinct().Count() != r.Cards.Count || r.NativeBatches.Distinct().Count() != r.NativeBatches.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiStartedEvent>().Count(e => e == new AnniversaryQiaoRuiStartedEvent(f.Id, r.Source, r.Hash, r.Operation, r.ParentId, r.Turn)) != 1)
+        if (f.AnniversaryQiaoRui is not { } r || f.InstructionIndex != 1 || !QiaoRuiOriginal(f, r.Operation) || r.Source != QiaoRuiSource(f) || r.Hash != f.GameplayHash || r.ParentId != f.WindowContext!.ParentFrameId || r.Turn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Requested < 0 || r.Cards.Any(id => id <= 0) || r.Cards.Distinct().Count() != r.Cards.Count || r.NativeBatches.Distinct().Count() != r.NativeBatches.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryQiaoRuiStartedEvent>().Count(e => e == new AnniversaryQiaoRuiStartedEvent(f.Id, r.Source, r.Hash, r.Operation, r.ParentId, r.Turn)) != 1)
             return false;
         if (r.Operation == SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouDraw)
         {
             if (r.Cards.Count != 0 || r.Plan is not null || r.UseId != 0 || r.ActionId != 0 || r.Damaged || r.Returned || r.NativeBatches.Count != 0 || r.Stage is not (AnniversaryQiaoRuiStage.Drawing or AnniversaryQiaoRuiStage.DrawChildren or AnniversaryQiaoRuiStage.Completed))
                 return false;
-            if (r.Draw is { } d && (d.RecipientSeat != f.OwnerSeat || d.RequestedCount != r.Requested || d.SequenceBefore != r.Before || d.SequenceAfter != r.After || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiDrawReturnedEvent>().Count(e => e == new AnniversaryQiaoRuiDrawReturnedEvent(f.Id, r.Requested, d.ActualDrawIds.Count, r.Before, r.After)) != 1))
+            if (r.Draw is { } d && (d.RecipientSeat != f.OwnerSeat || d.RequestedCount != r.Requested || d.SequenceBefore != r.Before || d.SequenceAfter != r.After || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryQiaoRuiDrawReturnedEvent>().Count(e => e == new AnniversaryQiaoRuiDrawReturnedEvent(f.Id, r.Requested, d.ActualDrawIds.Count, r.Before, r.After)) != 1))
                 return false;
         }
         else if (r.Operation is SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouPrepare or SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouLastLoss)
@@ -53,11 +53,11 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
                 return false;
             if (r.Stage is AnniversaryQiaoRuiStage.Issuing or AnniversaryQiaoRuiStage.NativeSlash or AnniversaryQiaoRuiStage.NativeTail or AnniversaryQiaoRuiStage.ClaimChildren && r.Plan is null)
                 return false;
-            if (r.UseId != 0 && (r.UseId <= f.Id || r.ActionId <= 0 || r.Plan is not { } plan || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiUseIssuedEvent>().Count(e => e.Origin == new AnniversaryQiaoRuiUseOrigin(f.Id, r.Source, r.Hash, plan.CardId, plan.From, r.UseId, r.ActionId)) != 1))
+            if (r.UseId != 0 && (r.UseId <= f.Id || r.ActionId <= 0 || r.Plan is not { } plan || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryQiaoRuiUseIssuedEvent>().Count(e => e.Origin == new AnniversaryQiaoRuiUseOrigin(f.Id, r.Source, r.Hash, plan.CardId, plan.From, r.UseId, r.ActionId)) != 1))
                 return false;
-            if (r.Returned && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiUseReturnedEvent>().Count(e => e == new AnniversaryQiaoRuiUseReturnedEvent(f.Id, r.UseId, r.ActionId)) != 1)
+            if (r.Returned && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryQiaoRuiUseReturnedEvent>().Count(e => e == new AnniversaryQiaoRuiUseReturnedEvent(f.Id, r.UseId, r.ActionId)) != 1)
                 return false;
-            if (r.Damaged != _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryQiaoRuiDamageEvent>().Any(e => e.FrameId == f.Id && e.UseId == r.UseId && e.Amount > 0))
+            if (r.Damaged != _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryQiaoRuiDamageEvent>().Any(e => e.FrameId == f.Id && e.UseId == r.UseId && e.Amount > 0))
                 return false;
         }
 
@@ -95,7 +95,7 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
 
     internal bool QiaoRuiObserverSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => _coreObserverSubtreesOperations.IsMovementObserverEdge(n) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(n) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(n) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[n - 1], _resolutionStackOperations2._resolutionStack()[n]) || _coreDamageObserverCursorQueriesOperations.DamageFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || CoreDamageObserverCursorQueriesRuntime.DamageObserverRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || this.QiaoRuiNativeEdge(n) || _resolutionStackOperations2._resolutionStack()[n - 1] is ProgramSkillFrame f && this.QiaoRuiFirstChild(f, _resolutionStackOperations2._resolutionStack()[n]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[n], _resolutionStackOperations2._resolutionStack()[n - 1]), (n, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, d) || _coreTieredRoundZeroReturnsOperations.TieredRoundZeroDyingRescueRide(n, d) || _coreDrawFundedDistinctBasicReturnsOperations.DrawFundedDistinctBasicDyingRescueRide(n, d) || _characterHuanShuJunOlOperations.HuanpeiDyingRescueRide(n, d));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 49400)]
-    internal bool QiaoRuiDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && QiaoRuiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool QiaoRuiDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && QiaoRuiObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 49400)]
     internal bool AdvanceQiaoRuiChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && QiaoRuiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 49400)]

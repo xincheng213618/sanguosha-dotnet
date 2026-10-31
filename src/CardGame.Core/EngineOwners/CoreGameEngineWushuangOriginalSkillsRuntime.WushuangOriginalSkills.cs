@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillsRuntime
                 _coreWushuangOriginalSkillFlowsOperations.ContinueWushuangTairanSettlement(f);
                 break;
             case SkillProgramEffectOp.NullifyWushuangSecondUse:
-                _coreWushuangOriginalSkillRulesOperations.NullifyWushuangCiweiUse(f);
+                _coreWushuangOriginalSkillRulesOperations.Value.NullifyWushuangCiweiUse(f);
                 break;
             case SkillProgramEffectOp.ResolveWushuangOriginalJieming:
                 _coreWushuangOriginalSkillFlowsOperations.ContinueWushuangJieming(f);
@@ -80,10 +80,10 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillsRuntime
                 _coreWushuangJinzhiOperations.ContinueWushuangJinzhi(f);
                 break;
             case SkillProgramEffectOp.SkipWushuangFenliPhase:
-                _coreWushuangOriginalSkillRulesOperations.SkipWushuangFenliPhase(f);
+                _coreWushuangOriginalSkillRulesOperations.Value.SkipWushuangFenliPhase(f);
                 break;
             case SkillProgramEffectOp.RestrictWushuangQianxiJudgmentColor:
-                _coreWushuangOriginalSkillRulesOperations.RestrictWushuangQianxiJudgmentColor(f);
+                _coreWushuangOriginalSkillRulesOperations.Value.RestrictWushuangQianxiJudgmentColor(f);
                 break;
             default:
                 throw new InvalidOperationException("Unknown official Wushuang skill operation.");
@@ -114,7 +114,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillsRuntime
     internal void ReturnWushuangOriginalDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
         var r = f.WushuangOriginalSkill ?? throw new InvalidOperationException("The official skill draw lost its producer.");
-        if (r.Stage != "draw-attempt" || outcome.RecipientSeat != r.DrawRecipient || outcome.RequestedCount != r.DrawRequested || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangOriginalSkillDrawEvent>().Any(e => e.FrameId == f.Id && e.Ordinal == r.DrawOrdinal))
+        if (r.Stage != "draw-attempt" || outcome.RecipientSeat != r.DrawRecipient || outcome.RequestedCount != r.DrawRequested || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangOriginalSkillDrawEvent>().Any(e => e.FrameId == f.Id && e.Ordinal == r.DrawOrdinal))
             throw new InvalidOperationException("The official skill draw changed its paid recipient or requested count.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangOriginalSkillDrawEvent(f.Id, r.DrawOrdinal, outcome.RecipientSeat, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId, outcome.Replacement is not null));
         if (r.Operation == SkillProgramEffectOp.ResolveWushuangTairan)

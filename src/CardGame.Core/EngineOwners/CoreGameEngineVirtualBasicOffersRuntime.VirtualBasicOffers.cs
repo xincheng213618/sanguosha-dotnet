@@ -14,11 +14,11 @@ internal sealed partial class CoreGameEngineVirtualBasicOffersRuntime
                 yield return (kind, target.Seat);
         if (_coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Peach, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, owner, CardKind.Peach))
             yield return (CardKind.Peach, owner);
-        if (!actor.HasAlcoholEffect && (!actor.UsedPlayPhaseAlcoholThisTurn || _characterWeiYanMobileShiOperations.HasMobileShiZhuangshiQuota(actor.Seat) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || (_coreAdvancedPoliciesOperations.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.HasFriendQihuiAllowance(actor)) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, CardKind.Alcohol)) && !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Alcohol, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, owner, CardKind.Alcohol))
+        if (!actor.HasAlcoholEffect && (!actor.UsedPlayPhaseAlcoholThisTurn || _characterWeiYanMobileShiOperations.HasMobileShiZhuangshiQuota(actor.Seat) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || (_coreAdvancedPoliciesOperations.Value.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.Value.HasFriendQihuiAllowance(actor)) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, CardKind.Alcohol)) && !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Alcohol, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, owner, CardKind.Alcohol))
             yield return (CardKind.Alcohol, owner);
     }
 
-    internal IEnumerable<(CardKind Kind, int Target)> VirtualBasicOptions(ProgramSkillFrame frame) => frame.ZhaoguMirror is not null ? _coreZhaoguMirrorOperations.ZhaoguVirtualBasicOptions(frame) : frame.SkillId == "guandu:choulue" ? _coreGuanduGeneralNativeCardsOperations.GuanduChoulueFrozenBasicKind(frame)is { } kind ? VirtualBasicOptions(frame.OwnerSeat).Where(o => o.Kind == kind) : [] : VirtualBasicOptions(frame.OwnerSeat, anyRegisteredBasic: true);
+    internal IEnumerable<(CardKind Kind, int Target)> VirtualBasicOptions(ProgramSkillFrame frame) => frame.ZhaoguMirror is not null ? _coreZhaoguMirrorOperations.Value.ZhaoguVirtualBasicOptions(frame) : frame.SkillId == "guandu:choulue" ? _coreGuanduGeneralNativeCardsOperations.GuanduChoulueFrozenBasicKind(frame)is { } kind ? VirtualBasicOptions(frame.OwnerSeat).Where(o => o.Kind == kind) : [] : VirtualBasicOptions(frame.OwnerSeat, anyRegisteredBasic: true);
     internal SkillProgramStepOutcome OfferVirtualBasicCard(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
@@ -80,7 +80,7 @@ internal sealed partial class CoreGameEngineVirtualBasicOffersRuntime
                 _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, chosen.Kind);
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, chosen.Target, null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: chosen.Kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[chosen.Target], chosen.Kind));
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
             actor.HasAlcoholEffect = false;
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, chosen.Kind, actor.Seat, chosen.Target));
@@ -163,7 +163,7 @@ internal sealed partial class CoreGameEngineVirtualBasicOffersRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(receipt.ParentFrameId);
         if (frame.VirtualBasicDraft is not { } draft || draft.ChildFrameId != childId || draft.InstructionIndex != receipt.InstructionIndex || frame.InstructionIndex != receipt.InstructionIndex || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id)
             throw new InvalidOperationException("The virtual basic child lost its exact paid program return.");
-        frame = _coreZhaoguMirrorOperations.CompleteZhaoguVirtualBasicReceipt(frame, childId);
+        frame = _coreZhaoguMirrorOperations.Value.CompleteZhaoguVirtualBasicReceipt(frame, childId);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { VirtualBasicDraft = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }

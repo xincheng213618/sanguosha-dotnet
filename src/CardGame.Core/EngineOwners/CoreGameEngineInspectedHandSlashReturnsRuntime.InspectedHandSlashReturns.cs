@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashReturnsRuntime
 {
     internal bool ValidInspectedHandSlash(ProgramSkillFrame f)
     {
-        if (f.InspectedHandSlash is not { } d || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || d.InstructionIndex != f.InstructionIndex || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var target] || target != d.TargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || target == f.OwnerSeat || d.Source != _coreInspectedHandSlashesOperations.InspectedHandSource(f) || d.GameplayHash != f.GameplayHash || d.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || d.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || d.TurnOwnerSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || d.HpBefore < 1 || d.HpAfter != d.HpBefore - 1 || !Enum.IsDefined(d.Stage) || d.ViewedCardIds.Any(id => id <= 0) || d.ViewedCardIds.Distinct().Count() != d.ViewedCardIds.Count || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } program || program.GameplayHash != f.GameplayHash)
+        if (f.InspectedHandSlash is not { } d || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || d.InstructionIndex != f.InstructionIndex || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var target] || target != d.TargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || target == f.OwnerSeat || d.Source != _coreInspectedHandSlashesOperations.Value.InspectedHandSource(f) || d.GameplayHash != f.GameplayHash || d.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || d.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || d.TurnOwnerSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || d.HpBefore < 1 || d.HpAfter != d.HpBefore - 1 || !Enum.IsDefined(d.Stage) || d.ViewedCardIds.Any(id => id <= 0) || d.ViewedCardIds.Distinct().Count() != d.ViewedCardIds.Count || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } program || program.GameplayHash != f.GameplayHash)
             return false;
         var plan = ProgramInstructionResolver.Default.Resolve(f, program);
         if (plan.Activation is not { UsesPerPhase: 1, MinCards: 0, MaxCards: 0, MinTargets: 1, MaxTargets: 1, TargetKind: SkillProgramTargetKind.OtherLivingWithHand } || plan.Instructions is not [{ Op: SkillProgramEffectOp.PayHpInspectHandThenDiscardOrSlash }])
@@ -40,7 +40,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashReturnsRuntime
             throw new InvalidOperationException("The forced Slash lost its inspected Dodge branch.");
         if (!CanIssueInspectedHandSlash(f))
         {
-            _coreInspectedHandSlashesOperations.FinishInspectedHandSlash(f, false);
+            _coreInspectedHandSlashesOperations.Value.FinishInspectedHandSlash(f, false);
             return;
         }
 
@@ -65,7 +65,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashReturnsRuntime
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, actor.Seat, target.Seat, card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), programSkillCardUseFrameId: f.Id);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(useId, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(useId, actor);
         actor.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, target.Seat));
@@ -88,7 +88,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashReturnsRuntime
         var returned = completion.InspectedHandSlashReturn ?? throw new InvalidOperationException("Missing inspected Slash return.");
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != returned.ProgramFrameId || completion.ProgramFrameId != f.Id || completion.ResolutionId != returned.CardUseFrameId || !ValidInspectedHandSlash(f) || f.InspectedHandSlash?.SlashReturn != returned || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => u.Id == returned.CardUseFrameId) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Any(e => e.ResolutionId == returned.CardUseFrameId))
             throw new InvalidOperationException("The inspected Slash lost its exact retired Use and once-paid program parent.");
-        _coreInspectedHandSlashesOperations.FinishInspectedHandSlash(f, true);
+        _coreInspectedHandSlashesOperations.Value.FinishInspectedHandSlash(f, true);
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.DistanceProjection, 30)]

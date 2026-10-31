@@ -15,7 +15,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     {
         if (!HasAHuiNanCapability || !_coreCurrentTurnUseKindsOperations.HasOngoingActualUseTurn)
             return;
-        var recorded = _coreProgramEventHistoryOperations.ProgramEventHistory<AHuiNanBasicUseRecordedEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat).ToArray();
+        var recorded = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AHuiNanBasicUseRecordedEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat).ToArray();
         if (recorded.Length >= 3)
             return;
         if (payload is CardUseDeclaredEvent d)
@@ -58,7 +58,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         return _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(d => d.Id == context.ParentFrameId)is { } dying && dying.VictimSeat == use.SourceSeat && dying.ResponderIndex >= 0 && dying.ResponderIndex < dying.ResponderSeats.Count && dying.ResponderSeats[dying.ResponderIndex] == use.SourceSeat;
     }
 
-    internal AHuiNanBasicUseSnapshot[] AHuiNanHistory(int turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<AHuiNanBasicUseRecordedEvent>().Where(e => e.ActualTurn == turn).OrderBy(e => e.Index).Select(e => new AHuiNanBasicUseSnapshot(e, _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCurrentSlashFireChangedEvent>().LastOrDefault(c => c.CardUseFrameId == e.OriginFrameId && c.ActionId == e.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(e.Kind))?.FinalKind ?? e.Kind)).ToArray();
+    internal AHuiNanBasicUseSnapshot[] AHuiNanHistory(int turn) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AHuiNanBasicUseRecordedEvent>().Where(e => e.ActualTurn == turn).OrderBy(e => e.Index).Select(e => new AHuiNanBasicUseSnapshot(e, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCurrentSlashFireChangedEvent>().LastOrDefault(c => c.CardUseFrameId == e.OriginFrameId && c.ActionId == e.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(e.Kind))?.FinalKind ?? e.Kind)).ToArray();
     internal bool AHuiNanEndingParent(ProgramTriggerCandidate c, ProgramSkillWindowContext context, out DeferredTurnEndFrame? parent)
     {
         parent = _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId);
@@ -71,7 +71,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         if (f.SkillId != "ol:jueman" || f.TriggerId is null || f.ActivationId != f.TriggerId || f.WindowContext is not { } context)
             return false;
         var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
-        return AHuiNanEndingParent(c, context, out var parent) && parent!.AfterTurnEnded?.CurrentChild?.FrameId == f.Id && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.OwnerSeat == f.OwnerSeat && e.Window == SkillProgramTriggerWindow.AfterTurnEnded) == 1;
+        return AHuiNanEndingParent(c, context, out var parent) && parent!.AfterTurnEnded?.CurrentChild?.FrameId == f.Id && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, c) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.OwnerSeat == f.OwnerSeat && e.Window == SkillProgramTriggerWindow.AfterTurnEnded) == 1;
     }
 
     SkillProgramStepOutcome IAHuiNanHost.Resolve(ProgramSkillFrame f) => BeginAHuiNan(f);

@@ -12,7 +12,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
             throw new InvalidOperationException("Dici cannot give another person's card or give to a dead recipient.");
         if (!next)
         {
-            if (r.Paid || r.Phase is not { } phase || _coreProgramEventHistoryOperations.ProgramEventHistory<DiciAcceptedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == phase))
+            if (r.Paid || r.Phase is not { } phase || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiciAcceptedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == phase))
                 throw new InvalidOperationException("Dici repeated its actual Play-phase payment.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiciAcceptedEvent(f.Id, r.Source, r.GameplayHash, r.TargetSeat, phase));
         }

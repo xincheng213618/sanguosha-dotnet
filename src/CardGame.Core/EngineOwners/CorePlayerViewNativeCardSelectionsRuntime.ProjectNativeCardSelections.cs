@@ -9,11 +9,11 @@ internal sealed partial class CorePlayerViewNativeCardSelectionsRuntime
     {
         if (decision.RequiredCardCount > 0 || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(decision.PlayerSeat))
             return decision;
-        if (_characterSunChenMobileShiOperations.ProjectShiScCardSelection(decision, f)is { } sunChenChoice)
+        if (_characterSunChenMobileShiOperations.Value.ProjectShiScCardSelection(decision, f)is { } sunChenChoice)
             return sunChenChoice;
-        if (_characterSunJunMobileShiOperations.ProjectShiSjCardSelection(decision, f)is { } sunJunChoice)
+        if (_characterSunJunMobileShiOperations.Value.ProjectShiSjCardSelection(decision, f)is { } sunJunChoice)
             return sunJunChoice;
-        if (_characterZhangYanMobileShiOperations.ProjectShiZyCardSelection(decision, f)is { } zhangYanChoice)
+        if (_characterZhangYanMobileShiOperations.Value.ProjectShiZyCardSelection(decision, f)is { } zhangYanChoice)
             return zhangYanChoice;
         if (_characterLuSuMobileShiOperations.ProjectShiLsCardSelection(decision, f)is { } sharedHandChoice)
             return sharedHandChoice;

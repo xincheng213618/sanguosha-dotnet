@@ -30,7 +30,7 @@ internal sealed partial class CoreGameEngineProgramVirtualDuelRuntime
         int originalTarget;
         if (operation == SkillProgramEffectOp.JuanxiaDeclareTricks)
         {
-            if (!_characterYangYiOlOperations.IsJuanxiaDuelOrigin(owner, out originalTarget))
+            if (!_characterYangYiOlOperations.Value.IsJuanxiaDuelOrigin(owner, out originalTarget))
                 return false;
             originalSource = owner.OwnerSeat;
         }

@@ -133,7 +133,7 @@ internal sealed partial class CharacterKongShuOlRuntime
     {
         if (selection.OutputKind != CardKind.Alcohol || !IsLeiluanSelection(selection))
             return false;
-        if (!LeiluanSelections(owner, CardKind.Alcohol, true).Any(s => s.Source == selection.Source && s.Cards.Select(c => c.Id).Order().SequenceEqual(selection.Cards.Select(c => c.Id).Order())) || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.VictimSeat != owner.Seat)
+        if (!LeiluanSelections(owner, CardKind.Alcohol, true).Any(s => s.Source == selection.Source && s.Cards.Select(c => c.Id).Order().SequenceEqual(selection.Cards.Select(c => c.Id).Order())) || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.VictimSeat != owner.Seat)
             throw new InvalidOperationException("累卵酒必须保留真实自救与未使用牌名资格。");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(owner, owner, selection.Cards[0], "酒", CardKind.Alcohol, conversionSource: selection.Source, dyingResponse: new(dying.FrameId, owner.Seat, false, null, true, selection.Cards[0].Id), physicalCards: selection.Cards);

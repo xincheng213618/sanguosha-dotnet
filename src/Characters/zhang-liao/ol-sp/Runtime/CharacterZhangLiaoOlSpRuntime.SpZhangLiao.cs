@@ -13,7 +13,7 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
             return !HasDiaolingAwakened(c.OwnerSeat) && (MubingMilitaryCount(c.OwnerSeat) >= 6 || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(c.OwnerSeat, c.SkillId, c.BindingId));
         if (!t.Effects.Any(e => e.Op == SkillProgramEffectOp.PreventDamageForHighestRankGift))
             return true;
-        return context is { SourceSeat: { } source, TargetSeat: { } target } && source == c.OwnerSeat && target != source && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<ZiquDamagePreventedEvent>().Any(e => e.Source.OwnerSeat == source && e.VictimSeat == target);
+        return context is { SourceSeat: { } source, TargetSeat: { } target } && source == c.OwnerSeat && target != source && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZiquDamagePreventedEvent>().Any(e => e.Source.OwnerSeat == source && e.VictimSeat == target);
     }
 
     internal SkillProgramStepOutcome BeginSpZhangLiao(ProgramSkillFrame supplied, SkillProgramEffectOp op)

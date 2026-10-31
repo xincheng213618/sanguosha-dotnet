@@ -61,7 +61,7 @@ internal sealed partial class CoreGameEngineShanheSourceKeshouRuntime
             return SkillProgramStepOutcome.AwaitChoice;
         }
 
-        if (step != "after-cost" || !ValidSourceKeshou(f) || !SourceKeshouWasPaid(f) || f.SourceKeshou!.SoleFactionAfterCost is not null || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageReducedEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == f.OwnerSeat && e.AmountBefore == f.SourceKeshou.OriginalAmount && e.AmountAfter == Math.Max(0, e.AmountBefore - 1)))
+        if (step != "after-cost" || !ValidSourceKeshou(f) || !SourceKeshouWasPaid(f) || f.SourceKeshou!.SoleFactionAfterCost is not null || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramDamageReducedEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == f.OwnerSeat && e.AmountBefore == f.SourceKeshou.OriginalAmount && e.AmountAfter == Math.Max(0, e.AmountBefore - 1)))
             throw new InvalidOperationException("Source993's faction branch requires its actual pair payment and original native reduction.");
         var faction = _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]);
         var sole = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && faction is not null && !_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != f.OwnerSeat && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(p) == faction);

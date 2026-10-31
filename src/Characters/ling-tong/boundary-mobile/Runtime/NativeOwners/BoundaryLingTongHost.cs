@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class BoundaryLingTongHost(Func<RuntimeEntries.CharacterLingTongBoundaryMobileEntries> getCharacterLingTongBoundaryMobileRuntime) : IBoundaryLingTongHost
+internal sealed class BoundaryLingTongHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLingTongBoundaryMobileRuntime>> getCharacterLingTongBoundaryMobileRuntime) : IBoundaryLingTongHost
 {
-    public SkillProgramStepOutcome SelectEquipmentPair(ProgramSkillFrame frame) => getCharacterLingTongBoundaryMobileRuntime().SelectBoundaryLingTongEquipmentPair(frame);
+    public SkillProgramStepOutcome SelectEquipmentPair(ProgramSkillFrame frame) => getCharacterLingTongBoundaryMobileRuntime().Value.SelectBoundaryLingTongEquipmentPair(frame);
 }

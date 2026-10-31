@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineDeferredBenefitsProgramsRuntime
         var program = _contentRegistryOperations._contentRegistry.GetSkill(first.SkillId).Program!;
         var trigger = ProgramInstructionResolver.Default.Resolve(program, ProgramInstructionSourceKind.Trigger, first.BindingId).Trigger!;
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-        var debtReturn = new FactionRecoveryDebtReturn(dying.FrameId, dying.ParentFrameId, dying.VictimSeat, dying.Continuation, survived, _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId, _coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id);
+        var debtReturn = new FactionRecoveryDebtReturn(dying.FrameId, dying.ParentFrameId, dying.VictimSeat, dying.Continuation, survived, _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId, _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id);
         _coreRuntimeOperations.PushRuntimeFrame(new ProgramSkillFrame(id, first.OwnerSeat, first.SkillId, first.BindingId, program.GameplayHash, trigger.Effects.Count, [], []) { TriggerId = first.BindingId, SkillInstanceId = first.SkillInstanceId, FactionRecoveryDebtReturn = debtReturn, WindowContext = new(trigger.Window, dying.FrameId, first.OwnerSeat), FactionRecoveryDraft = new(dying.FrameId, debts.Select(item => item.ResponderSeat).ToArray(), 0, debts.Select(item => item.ResponderSeat).ToArray(), SettlingDebts: true) });
         TryContinueFactionRecoveryDebts(id);
         return true;
@@ -32,9 +32,9 @@ internal sealed partial class CoreGameEngineDeferredBenefitsProgramsRuntime
         if (cursor >= draft.ResponderSeats.Count)
         {
             _coreRuntimeOperations.PopResolutionFrame(frameId, ResolutionFrameKind.ProgramSkill);
-            if (frame.AttackAttempt is not null || _coreDyingCursorRuntimeOperations.ActiveDying is not null)
+            if (frame.AttackAttempt is not null || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not null)
                 throw new InvalidOperationException("Settled faction damage retained an unfinished child resolution.");
-            if (_coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId != continuation.ParentAttackOwnerFrameId || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id != continuation.ParentDamageWindowFrameId)
+            if (_coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId != continuation.ParentAttackOwnerFrameId || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id != continuation.ParentDamageWindowFrameId)
                 throw new InvalidOperationException("Settled faction damage lost its outer damage frame.");
             _coreNativeDyingOperations.ContinueDyingAfterFactionRecoveryDebts(new GameEngine.DyingCompletionReceipt(continuation.DyingFrameId, continuation.DyingParentFrameId, continuation.DyingVictimSeat, continuation.DyingContinuation), continuation.Survived);
             return true;
@@ -87,7 +87,7 @@ internal sealed partial class CoreGameEngineDeferredBenefitsProgramsRuntime
 
     internal SkillProgramStepOutcome RequestProgramFactionRecovery(ProgramSkillFrame frame, string factionId)
     {
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("Faction recovery has no dying occurrence.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("Faction recovery has no dying occurrence.");
         if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering } context || context.ParentFrameId != _resolutionStackOperations._resolutionStack[^2].Id || dying.VictimSeat != frame.OwnerSeat)
             throw new InvalidOperationException("Faction recovery lost its entering dying owner.");
         var responders = Enumerable.Range(1, _coreMatchDefinitionPlayerCountAccess._playerCount - 1).Select(offset => _coreTableOrderOperations.TableStepSeat(frame.OwnerSeat, offset)).Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[seat]) == factionId).ToArray();

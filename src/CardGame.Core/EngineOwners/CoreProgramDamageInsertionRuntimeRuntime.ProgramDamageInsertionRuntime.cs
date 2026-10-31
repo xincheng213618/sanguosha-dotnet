@@ -13,7 +13,7 @@ internal sealed partial class CoreProgramDamageInsertionRuntimeRuntime
     bool IProgramDamageInsertionFacts.HasConsistentChild(int index) => _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
     long? IProgramDamageInsertionFacts.AttackOwnerFrameId => _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId;
 
-    long? IProgramDamageInsertionFacts.DyingFrameId => _coreDyingCursorRuntimeOperations.ActiveDying?.Id;
+    long? IProgramDamageInsertionFacts.DyingFrameId => _coreDyingCursorRuntimeOperations.Value.ActiveDying?.Id;
 
     internal bool IsOriginalDyingSuspendedByProgramInsertion(DyingFrame dying) => DamageInsertions.IsSuspended(dying);
 }

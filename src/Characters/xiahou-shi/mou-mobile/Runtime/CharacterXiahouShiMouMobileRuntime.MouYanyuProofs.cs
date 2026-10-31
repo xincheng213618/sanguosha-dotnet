@@ -8,14 +8,14 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
         if (f.MouXiahouShiYanyu is not { } r || f.MouXiahouShiQiaoshi is not null || r.Source != MouXiahouShiSource(f) || r.GameplayHash != f.GameplayHash || f.SkillId != MouXiahouShiComposition.Yanyu || f.InstructionIndex != 1 || !Enum.IsDefined(r.Stage) || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !MouXiahouShiComposition.IsYanyu(p) || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Play || r.Phase.ActorSeat != f.OwnerSeat || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || r.Phase.TurnNumber != r.Turn.TurnNumber || r.Phase.ActualTurnOwnerSeat != r.Turn.OwnerSeat)
             return false;
         var started = new MouXiahouShiYanyuStartedEvent(f.Id, r.Source, r.GameplayHash, r.Turn, r.Phase, r.Support, r.WindowId, r.FrozenDiscardCount);
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouShiYanyuStartedEvent>().Count(e => e == started) == 1 && MouXiahouShiTurnBefore(started, r.Turn) && (r.Support ? ExactMouXiahouShiSupportContext(f) && r.WindowId == f.WindowContext!.ParentFrameId && r.FrozenDiscardCount > 0 && f.SelectedCardIds.Count == 0 : f.ActivationId == "discard-slash" && f.TriggerId is null && f.WindowContext is null && f.SelectedCardIds.Count == 1 && f.SelectedTargetSeats.Count == 0 && r.WindowId == 0 && r.FrozenDiscardCount == 0);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouShiYanyuStartedEvent>().Count(e => e == started) == 1 && MouXiahouShiTurnBefore(started, r.Turn) && (r.Support ? ExactMouXiahouShiSupportContext(f) && r.WindowId == f.WindowContext!.ParentFrameId && r.FrozenDiscardCount > 0 && f.SelectedCardIds.Count == 0 : f.ActivationId == "discard-slash" && f.TriggerId is null && f.WindowContext is null && f.SelectedCardIds.Count == 1 && f.SelectedTargetSeats.Count == 0 && r.WindowId == 0 && r.FrozenDiscardCount == 0);
     }
 
     internal bool ValidMouXiahouShiYanyu(ProgramSkillFrame f)
     {
         if (f.MouXiahouShiYanyu is not { } r || !MouXiahouShiYanyuRoot(f) || r.Before < 0 || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             return false;
-        var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouShiYanyuDiscardPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouShiYanyuDiscardPaidEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (!r.Support)
         {
             if (r.TargetSeat is not null || r.Stage == MouXiahouShiYanyuStage.TargetChoice)
@@ -29,7 +29,7 @@ internal sealed partial class CharacterXiahouShiMouMobileRuntime
         {
             if (paid.Length != 0 || r.Payment is not null || r.Stage is MouXiahouShiYanyuStage.Discarding or MouXiahouShiYanyuStage.DiscardChildren || r.FrozenDiscardCount != MouXiahouShiTurnDiscards(f.OwnerSeat, r.Turn))
                 return false;
-            var accepted = _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouShiYanyuTargetAcceptedEvent>().Where(e => e.FrameId == f.Id).ToArray();
+            var accepted = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouShiYanyuTargetAcceptedEvent>().Where(e => e.FrameId == f.Id).ToArray();
             if (r.TargetSeat is null)
                 return r.Stage == MouXiahouShiYanyuStage.TargetChoice && accepted.Length == 0 && r.Draw is null;
             if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat.Value) || r.TargetSeat == f.OwnerSeat || accepted is not [var target] || target != new MouXiahouShiYanyuTargetAcceptedEvent(f.Id, r.TargetSeat.Value, r.FrozenDiscardCount, checked(r.FrozenDiscardCount * 3)))

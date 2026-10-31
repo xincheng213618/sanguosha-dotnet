@@ -136,7 +136,7 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
     internal void ResolvePairedColorDisposition(PromptChoice selected)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The paired-color chooser lost its owning frame.");
-        if (f.PairedColorDisposition is not { Stage: PairedColorDispositionStage.ChoosingCard } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_corePairedColorResponseObserversOperations.IsPairedColorDispositionChoice(f, prompt) || !PairedColorDispositionChoices(f).Any(c => CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, selected)) || !Enum.TryParse<CardZoneKind>(selected.Parameters.GetValueOrDefault("source-zone"), out var zone) || zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !int.TryParse(selected.Parameters.GetValueOrDefault("slot-index"), out var slot))
+        if (f.PairedColorDisposition is not { Stage: PairedColorDispositionStage.ChoosingCard } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !_corePairedColorResponseObserversOperations.Value.IsPairedColorDispositionChoice(f, prompt) || !PairedColorDispositionChoices(f).Any(c => CoreGameEngineSameNameHandDiscardOrDamageRuntime.SameNameHandChoicesEqual(c, selected)) || !Enum.TryParse<CardZoneKind>(selected.Parameters.GetValueOrDefault("source-zone"), out var zone) || zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !int.TryParse(selected.Parameters.GetValueOrDefault("slot-index"), out var slot))
             throw new InvalidOperationException("Paired-color disposition requires its current exact owner-only published card slot.");
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.CounterpartSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
         {
@@ -216,7 +216,7 @@ internal sealed partial class CoreGameEnginePairedColorResponsesRuntime
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 510)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 530)]
-    internal bool CanContinuePairedColorDisposition(ProgramSkillFrame f) => f.PairedColorDisposition is { Stage: PairedColorDispositionStage.MovementChildren } && _corePairedColorResponseObserversOperations.ValidPairedColorDispositionReceipt(f);
+    internal bool CanContinuePairedColorDisposition(ProgramSkillFrame f) => f.PairedColorDisposition is { Stage: PairedColorDispositionStage.MovementChildren } && _corePairedColorResponseObserversOperations.Value.ValidPairedColorDispositionReceipt(f);
     [ProgramAiChoice(SkillProgramEffectOp.OfferPairedColorCardDisposition)]
     internal PromptChoice SelectAiPairedColorDisposition(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.OrderByDescending(c => c.Parameters.GetValueOrDefault("source-zone") == "Equipment" && c.Cards.Count == 1 ? CoreNativeAiDecisionsRuntime.GetKeepValue(_coreCardAttackStateOperations.GetAttackCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.PairedColorDisposition!.CounterpartSeat]) : 3).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     SkillProgramStepOutcome IPairedColorResponseHost.OfferPairedColorCardDisposition(ProgramSkillFrame frame, string stateId) => OfferPairedColorCardDisposition(frame, stateId);

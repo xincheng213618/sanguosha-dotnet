@@ -10,7 +10,7 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
     internal static ProgramTriggerCandidate AnniversaryFuPairCandidate(ProgramSkillFrame f) => new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
     internal bool HasAnniversaryFuPair => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmAnniversaryFuRongFuQianXuewei);
 
-    internal IEnumerable<AnniversaryXueweiGrant> ActiveAnniversaryXueweiGrants() => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXueweiArmedEvent>().Select(e => e.Grant).Where(g => !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXueweiExpiredEvent>().Any(e => e.GrantFrameId == g.FrameId));
+    internal IEnumerable<AnniversaryXueweiGrant> ActiveAnniversaryXueweiGrants() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXueweiArmedEvent>().Select(e => e.Grant).Where(g => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXueweiExpiredEvent>().Any(e => e.GrantFrameId == g.FrameId));
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 44700)]
     internal void ExpireAnniversaryXuewei(TurnStartedEvent fact)
     {
@@ -22,7 +22,7 @@ internal sealed partial class CharacterFuRongFuQianAnniversaryRuntime
 
     internal IEnumerable<BeforeDamageProgramCandidate> CollectAnniversaryFuRongFuQianXueweiCandidates(int sourceSeat, int targetSeat, bool rangeChainOnly)
     {
-        if (!HasAnniversaryFuPair || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXueweiArmedEvent>().Count == 0)
+        if (!HasAnniversaryFuPair || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXueweiArmedEvent>().Count == 0)
             yield break;
         var trigger = _contentRegistryOperations._contentRegistry.GetSkill(AnniversaryFuRongFuQianComposition.Xuewei).Program!.Triggers.Single(t => t.Id == AnniversaryFuRongFuQianComposition.Protect);
         foreach (var grant in ActiveAnniversaryXueweiGrants().Where(g => g.TargetSeat == targetSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(g.Source.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[g.Source.OwnerSeat].IsAlive && g.Hash == _contentRegistryOperations._contentRegistry.GetSkill(g.Source.SkillId).Program?.GameplayHash).GroupBy(g => (g.Source.OwnerSeat, g.Source.SkillInstanceId)).Select(g => g.OrderByDescending(x => x.FrameId).First()))

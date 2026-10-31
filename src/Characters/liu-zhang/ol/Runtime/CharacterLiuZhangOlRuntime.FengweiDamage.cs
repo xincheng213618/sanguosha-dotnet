@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuZhangOlRuntime
 {
-    internal bool IsFengweiCardDamage(GameEngine.IDamageAttempt attack) => attack.Card is not null || attack.PhysicalCards.Count > 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } use && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) && use.CardKind == attack.EffectiveCardKind;
+    internal bool IsFengweiCardDamage(GameEngine.IDamageAttempt attack) => attack.Card is not null || attack.PhysicalCards.Count > 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { } use && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) && use.CardKind == attack.EffectiveCardKind;
     internal FengweiDamageReceipt? FengweiDamageState(long id) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == id) switch
     {
         CardUseFrame f => f.FengweiDamage,
@@ -91,7 +91,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             var r = FengweiDamageState(frame.Id);
             if (r is null)
                 continue;
-            if (!HasFengweiCapability || r.AttackId != frame.Id || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Cursor < -1 || r.InheritedAmount < 0 || r.Bonus != 1 || r.InvoiceId <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<FengweiDamageFrozenEvent>().Count(e => e == new FengweiDamageFrozenEvent(r.AttackId, r.TargetSeat, r.Cursor, r.InheritedAmount, r.Bonus, r.InvoiceId)) != 1 || (r.TransferredTarget is { } target ? !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || r.TransferWindowId is not { } window || _coreProgramEventHistoryOperations.ProgramEventHistory<FengweiDamageTransferredEvent>().Count(e => e.AttackId == r.AttackId && e.OriginalSeat == r.TargetSeat && e.TargetSeat == target && e.Cursor == r.Cursor && e.WindowId == window) != 1 : r.TransferWindowId is not null))
+            if (!HasFengweiCapability || r.AttackId != frame.Id || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Cursor < -1 || r.InheritedAmount < 0 || r.Bonus != 1 || r.InvoiceId <= 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FengweiDamageFrozenEvent>().Count(e => e == new FengweiDamageFrozenEvent(r.AttackId, r.TargetSeat, r.Cursor, r.InheritedAmount, r.Bonus, r.InvoiceId)) != 1 || (r.TransferredTarget is { } target ? !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || r.TransferWindowId is not { } window || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FengweiDamageTransferredEvent>().Count(e => e.AttackId == r.AttackId && e.OriginalSeat == r.TargetSeat && e.TargetSeat == target && e.Cursor == r.Cursor && e.WindowId == window) != 1 : r.TransferWindowId is not null))
                 throw new InvalidOperationException("Fengwei lost its actual native recipient's once-issued modifier invoice.");
         }
     }

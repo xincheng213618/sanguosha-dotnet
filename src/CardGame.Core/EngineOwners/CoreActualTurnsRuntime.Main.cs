@@ -28,7 +28,7 @@ internal sealed partial class CoreActualTurnsRuntime
             return;
         if (_characterBeiMiHuOlOperations.TryBeginBeiMiHuActualTurnPrelude(current))
             return;
-        _coreMouLuMengOperations.BeginRoundForTurn(current);
+        _coreMouLuMengOperations.Value.BeginRoundForTurn(current);
         BeginTurnAfterBeforeTurnPrelude(current);
     }
 
@@ -49,7 +49,7 @@ internal sealed partial class CoreActualTurnsRuntime
         _coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerPlayPhaseKillCountByCurrentPlayerSlashCountThisTurnUsedOrPlayedSlashDuringPlayPhaseWoodenOxUsedThisTurnAccess._woodenOxUsedThisTurn = false;
         current.UsedPlayPhaseAlcoholThisTurn = false;
         _skillRuntimeStateOperations._skillRuntimeState.ResetTurn();
-        _coreNamedUseConversionsOperations.ResetTurnProgramBooleanStates();
+        _coreNamedUseConversionsOperations.Value.ResetTurnProgramBooleanStates();
         foreach (var character in _coreMatchParticipantsPlayersAccess._players)
             foreach (var grant in character.SkillGrants.Grants.Where(grant => grant.TurnExpiry is null && grant.NextActualTurnStartExpiry is null && grant.SourceId.StartsWith("turn:", StringComparison.Ordinal)))
                 character.SkillGrants.RemoveGrant(grant.GrantId);
@@ -65,7 +65,7 @@ internal sealed partial class CoreActualTurnsRuntime
 
     internal void ContinueTurnAfterActualStart(CharacterState current)
     {
-        if (_characterSunQuanHappyGodOperations.TryBeginHappyLearningActualStart(current))
+        if (_characterSunQuanHappyGodOperations.Value.TryBeginHappyLearningActualStart(current))
             return;
         if (_characterLuBuHappyGodOperations.TryBeginHappyLuBuActualStart(current))
             return;
@@ -82,7 +82,7 @@ internal sealed partial class CoreActualTurnsRuntime
 
     internal void ContinueTurnAfterHengye(CharacterState current)
     {
-        if (_characterGuoHuaiMouMobileOperations.TryBeginMouGuoHuaiActualStart(current))
+        if (_characterGuoHuaiMouMobileOperations.Value.TryBeginMouGuoHuaiActualStart(current))
             return;
         if (_coreProgramLifecycleOperations.TryBeginRoundStartingProgramWindow(current))
             return;
@@ -91,7 +91,7 @@ internal sealed partial class CoreActualTurnsRuntime
 
     internal void ContinueTurnAfterRoundPrograms(CharacterState current)
     {
-        if (_coreForeignTurnContestsOperations.TryBeginForeignActualTurnStart(current))
+        if (_coreForeignTurnContestsOperations.Value.TryBeginForeignActualTurnStart(current))
             return;
         ContinueTurnAfterForeignActualContests(current);
     }
@@ -116,7 +116,7 @@ internal sealed partial class CoreActualTurnsRuntime
         _coreDeferredCardsOperations.ConsumeSkippedNextTurnDrawBenefits(current);
         _coreDeferredHandAlignmentsOperations.CleanupDeferredHandAlignments();
         _coreDeferredCardsOperations.CleanupLostDeferredPileSources();
-        _corePublicPersistentPilesOperations.CleanupLostPublicPersistentPiles();
+        _corePublicPersistentPilesOperations.Value.CleanupLostPublicPersistentPiles();
         if (current.IsFaceDown)
         {
             _coreActualDiscardRecoveryPhasesOperations.ClearActualDiscardRecoveryPhase();
@@ -175,7 +175,7 @@ internal sealed partial class CoreActualTurnsRuntime
         if (delayedCard is not null)
         {
             var effectiveKind = GetJudgmentEffectiveCardKind(delayedCard);
-            _coreDelayedNullificationOperations.BeginDelayedNullificationWindow(current, delayedCard, effectiveKind);
+            _coreDelayedNullificationOperations.Value.BeginDelayedNullificationWindow(current, delayedCard, effectiveKind);
             return;
         }
 
@@ -243,7 +243,7 @@ internal sealed partial class CoreActualTurnsRuntime
         _coreNianActivityProgramsOperations.RecordNianActualPhaseSkips(current.Seat, delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase), delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase));
         if (delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) && _programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, SkillProgramTurnPhase.Draw, (int)delayedEffects, afterNormalDrawProgramsCompleted, drawPhaseEndedProgramsCompleted, actualDrawCompletionCompleted)))
             return;
-        if (!drawPhaseEndedProgramsCompleted && !actualDrawCompletionCompleted && _coreDrawPhaseObligationsOperations.TryBeginActualDrawCompletion(current, delayedEffects))
+        if (!drawPhaseEndedProgramsCompleted && !actualDrawCompletionCompleted && _coreDrawPhaseObligationsOperations.Value.TryBeginActualDrawCompletion(current, delayedEffects))
             return;
         if (!drawPhaseEndedProgramsCompleted && !delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) && _coreProgramLifecycleOperations.TryBeginDrawPhaseEndedProgramWindow(current, delayedEffects))
             return;
@@ -364,8 +364,8 @@ internal sealed partial class CoreActualTurnsRuntime
         _characterKeBiNengOlOperations.ExpireKeBiNengPingduanAlcohol(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, previous.Seat);
         _coreCardUseModulesOperations.ExpireTurnCardUseEffects(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, previous.Seat);
         _coreStrategicProgramsOperations.ExpireProgramSuppressions(previous.Seat);
-        _coreProgramHoldCardsOperations.ReturnProgramPojunHoldsAtTurnEnd();
-        _corePrivateTurnHoldsOperations.ReturnPrivateTurnHoldsAtTurnEnd();
+        _coreProgramHoldCardsOperations.Value.ReturnProgramPojunHoldsAtTurnEnd();
+        _corePrivateTurnHoldsOperations.Value.ReturnPrivateTurnHoldsAtTurnEnd();
         _coreConvertingGiftsOperations.ExpireGiftRetentionObligations();
         _characterQianZhaoOlOperations.ExpireWeifuActualTurnGrants();
     }
@@ -379,7 +379,7 @@ internal sealed partial class CoreActualTurnsRuntime
 
     internal void ContinueAfterWushuangShopping(CharacterState previous, bool skipped)
     {
-        if (_coreRoundEndingOperations.TryBeginRoundEndingBoundary(previous, skipped))
+        if (_coreRoundEndingOperations.Value.TryBeginRoundEndingBoundary(previous, skipped))
             return;
         CompleteActualTurnCursorAfterRoundEnding(previous, skipped);
     }
@@ -390,9 +390,9 @@ internal sealed partial class CoreActualTurnsRuntime
             return;
         // Per-general tracking opts in declaratively through descriptor TracksActualTurnCursorReturn
         // markers; only engine-level aggregates and non-op dependencies stay listed here.
-        if (_coreRoundEndingOperations.TracksRoundEnding || _coreActualPhaseEndsOperations.TracksActualPhaseEnds || _coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal || _coreTreatedWoundedOperations.UsesTreatedWounded || _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesLeiluanBasicUse || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveJueshengLimitedDuel) || ProgramOperationCatalog.Default.TracksActualTurnCursorReturn(_contentRegistryOperations._contentRegistry.ProgramDependencies))
+        if (_coreRoundEndingOperations.Value.TracksRoundEnding || _coreActualPhaseEndsOperations.TracksActualPhaseEnds || _coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal || _coreTreatedWoundedOperations.UsesTreatedWounded || _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesLeiluanBasicUse || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveJueshengLimitedDuel) || ProgramOperationCatalog.Default.TracksActualTurnCursorReturn(_contentRegistryOperations._contentRegistry.ProgramDependencies))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ActualTurnCursorReturnedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, previous.Seat));
-        _coreActualTurnProgressionOperations.AdvanceActualTurnProgression(previous);
+        _coreActualTurnProgressionOperations.Value.AdvanceActualTurnProgression(previous);
         _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase = TurnPhase.NotStarted;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     }

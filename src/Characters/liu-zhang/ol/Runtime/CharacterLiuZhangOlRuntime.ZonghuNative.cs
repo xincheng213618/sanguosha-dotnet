@@ -8,7 +8,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         if (p is null)
             return;
-        if (!ValidZonghuPayment(p) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuAttemptResolvedEvent>().Count(e => e.FrameId == p.AttemptId && e.Matched && e.NativeLegal) != 1 || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.CardKind != p.OutputKind || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActorSeat != p.Need.ActorSeat || a.ProviderSeat != p.Need.ProviderSeat || a.RequesterSeat != p.Need.RequesterSeat || a.ConversionChain is not [var source] || source != p.Source || !use.TargetSeats.SequenceEqual([p.TargetSeat]) && !(p.OutputKind == CardKind.Alcohol && use.TargetSeats.Count == 0) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuUseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuResponseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId))
+        if (!ValidZonghuPayment(p) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZonghuAttemptResolvedEvent>().Count(e => e.FrameId == p.AttemptId && e.Matched && e.NativeLegal) != 1 || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.CardKind != p.OutputKind || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActorSeat != p.Need.ActorSeat || a.ProviderSeat != p.Need.ProviderSeat || a.RequesterSeat != p.Need.RequesterSeat || a.ConversionChain is not [var source] || source != p.Source || !use.TargetSeats.SequenceEqual([p.TargetSeat]) && !(p.OutputKind == CardKind.Alcohol && use.TargetSeats.Count == 0) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZonghuUseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZonghuResponseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId))
             throw new InvalidOperationException("Zonghu cannot issue a second zero-entity basic or change its real payer, actor or original native target.");
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { ZonghuOrigin = p });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZonghuUseIssuedEvent(p.AttemptId, use.Id, a.ActionId, a.ActorSeat, a.ProviderSeat, a.RequesterSeat, p.OutputKind));
@@ -31,10 +31,10 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             a = fire.OriginalAction;
         }
 
-        return (use.CardKind == p.OutputKind || use.CurrentSlashFirePolicy is not null && CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind)) && a.EffectiveKind == p.OutputKind && a.ConversionChain is [var source] && source == p.Source && a.ProviderSeat == p.Need.ProviderSeat && a.RequesterSeat == p.Need.RequesterSeat && a.ResponderSeat is null && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed is null && ZonghuIssuedActorMatches(use, p) && _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuAttemptResolvedEvent>().Count(e => e.FrameId == p.AttemptId && e.Matched && e.NativeLegal) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuUseIssuedEvent>().Where(e => e.AttemptId == p.AttemptId).ToArray()is [var issued] && issued.UseId == use.Id && issued.ActionId == a.ActionId && issued.ActorSeat == p.Need.ActorSeat && issued.ProviderSeat == p.Need.ProviderSeat && issued.RequesterSeat == p.Need.RequesterSeat && issued.OutputKind == p.OutputKind;
+        return (use.CardKind == p.OutputKind || use.CurrentSlashFirePolicy is not null && CoreNativeCardClassificationsRuntime.IsSlashCard(p.OutputKind)) && a.EffectiveKind == p.OutputKind && a.ConversionChain is [var source] && source == p.Source && a.ProviderSeat == p.Need.ProviderSeat && a.RequesterSeat == p.Need.RequesterSeat && a.ResponderSeat is null && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed is null && ZonghuIssuedActorMatches(use, p) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZonghuAttemptResolvedEvent>().Count(e => e.FrameId == p.AttemptId && e.Matched && e.NativeLegal) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZonghuUseIssuedEvent>().Where(e => e.AttemptId == p.AttemptId).ToArray()is [var issued] && issued.UseId == use.Id && issued.ActionId == a.ActionId && issued.ActorSeat == p.Need.ActorSeat && issued.ProviderSeat == p.Need.ProviderSeat && issued.RequesterSeat == p.Need.RequesterSeat && issued.OutputKind == p.OutputKind;
     }
 
-    internal bool ZonghuIssuedActorMatches(CardUseFrame use, ZonghuPaidOrigin p) => _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, p.Need.ActorSeat, p.Need.ProviderSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == p.Need.ActorSeat && use.Action?.ActorSeat == p.Need.ActorSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Any(e => e.CardUseFrameId == use.Id);
+    internal bool ZonghuIssuedActorMatches(CardUseFrame use, ZonghuPaidOrigin p) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, p.Need.ActorSeat, p.Need.ProviderSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == p.Need.ActorSeat && use.Action?.ActorSeat == p.Need.ActorSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Any(e => e.CardUseFrameId == use.Id);
     internal Card ZonghuRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } u && IsIssuedZonghuUse(u) ? new(0, u.CardKind, Suit.None, 0) : throw new InvalidOperationException("Zonghu representation requires its exact once-paid native zero use.");
     internal void DispatchZonghu(ZonghuPaidOrigin p)
     {
@@ -175,7 +175,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
             faction.ActiveAttack = attack;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         if (counts && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && actor.Seat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat && actual.UnlimitedUse != true && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, p.Source))
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
@@ -257,7 +257,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         if (use.ZonghuOrigin is not { } p)
             return;
-        if (!IsIssuedZonghuUse(use) || _resolutionStackOperations._resolutionStack.Any(f => f.Id == use.Id) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuUseReturnedEvent>().Any(e => e.AttemptId == p.AttemptId))
+        if (!IsIssuedZonghuUse(use) || _resolutionStackOperations._resolutionStack.Any(f => f.Id == use.Id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZonghuUseReturnedEvent>().Any(e => e.AttemptId == p.AttemptId))
             throw new InvalidOperationException("Zonghu native return is not its exact once completed use.");
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == p.Need.OwnerFrameId)is ProgramSkillFrame { ZonghuReturn: { } r } parent && r.Origin == p && r.UseId == use.Id)
             _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { ZonghuReturn = r with { Returned = true } });
@@ -269,7 +269,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZonghuReturn: { Returned: true } r } parent || parent.Id != id)
             return false;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ZonghuUseReturnedEvent>().Count(e => e.AttemptId == r.Origin.AttemptId && e.UseId == r.UseId && e.ActionId == r.ActionId) != 1)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZonghuUseReturnedEvent>().Count(e => e.AttemptId == r.Origin.AttemptId && e.UseId == r.UseId && e.ActionId == r.ActionId) != 1)
             throw new InvalidOperationException("Zonghu caller lost its once-completed typed return.");
         if (parent.SunYuan is not null || parent.Chanshuang is not null || parent.WuJing is not null || parent.LvKuangLvXiang is not null || parent.CaoChun is not null || parent.KeBiNengPingduan is not null)
             return false;

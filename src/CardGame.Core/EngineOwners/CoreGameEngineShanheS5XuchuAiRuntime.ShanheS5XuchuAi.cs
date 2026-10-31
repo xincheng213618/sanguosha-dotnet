@@ -15,7 +15,7 @@ internal sealed partial class CoreGameEngineShanheS5XuchuAiRuntime
             return false;
         var parent = _coreShanheS5XuchuOperations.ShanheS5LuoyiDrawPlan(frame);
         var frozen = _coreShanheS5XuchuOperations.ShanheS5LuoyiFrozen(frame, apply.SourceBind!);
-        var revealed = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardsRevealedEvent>().Single(e => e.FrameId == frame.Id && e.Bind == apply.SourceBind);
+        var revealed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardsRevealedEvent>().Single(e => e.FrameId == frame.Id && e.Bind == apply.SourceBind);
         var gained = revealed.Cards.Where(c => ProgramCardSetFilter.Matches(c.Kind, c.Suit, [], [SkillProgramCardCategory.Basic], [EquipmentSlot.Weapon], [CardKind.Duel])).ToArray();
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var normalCount = Math.Max(0, checked((parent.FrozenBaseDrawCount ?? _coreActualTurnsOperations.GetTurnDrawCount(owner)) + parent.NormalDrawAdjustment));

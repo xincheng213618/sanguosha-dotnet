@@ -14,8 +14,8 @@ internal sealed partial class CharacterRuanHuiOlRuntime
             return CanRunIssuedRuanHuiCandidate(c, context);
         if (e.Op == SkillProgramEffectOp.ResolveMingchaRevealDrawChoice)
             return context.Window == SkillProgramTriggerWindow.DrawPhaseStarting && context.OwnerSeat == c.OwnerSeat;
-        var phase = _coreProgramEventHistoryOperations.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Select(e => e.Phase).LastOrDefault(p => p.Kind == ActualDiscardRecoveryPhaseKind.Discard && p.ActorSeat == c.OwnerSeat && p.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber);
-        return context.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && phase is not null && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != c.OwnerSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<JingzhongDiscardEvent>().Count(e => e.PhaseToken == phase.Token && e.OwnerSeat == c.OwnerSeat) >= 2 && !_coreProgramEventHistoryOperations.ProgramEventHistory<JingzhongLeaseEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.AfterPhaseToken == phase.Token);
+        var phase = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Select(e => e.Phase).LastOrDefault(p => p.Kind == ActualDiscardRecoveryPhaseKind.Discard && p.ActorSeat == c.OwnerSeat && p.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber);
+        return context.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && phase is not null && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != c.OwnerSeat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongDiscardEvent>().Count(e => e.PhaseToken == phase.Token && e.OwnerSeat == c.OwnerSeat) >= 2 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongLeaseEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.AfterPhaseToken == phase.Token);
     }
 
     internal SkillProgramStepOutcome BeginRuanHui(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -155,7 +155,7 @@ internal sealed partial class CharacterRuanHuiOlRuntime
         var target = choice.Targets.Single();
         if (r.Op == SkillProgramEffectOp.ArmJingzhongNextActualPlay)
         {
-            var phase = _coreProgramEventHistoryOperations.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Select(e => e.Phase).Last(p => p.ActorSeat == f.OwnerSeat && p.Kind == ActualDiscardRecoveryPhaseKind.Discard && p.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber);
+            var phase = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Select(e => e.Phase).Last(p => p.ActorSeat == f.OwnerSeat && p.Kind == ActualDiscardRecoveryPhaseKind.Discard && p.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JingzhongLeaseEvent(f.Id, r.Source, r.GameplayHash, target, phase.Token, _coreActualTurnProgressTurnNumberAccess._turnNumber));
             FinishRuanHui(f);
             return;

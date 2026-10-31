@@ -49,7 +49,7 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
         if (parent.AcceptedDeclarationPayment != payment)
             throw new InvalidOperationException("A declaration payment lost its actual continuation owner.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { AcceptedDeclarationPayment = payment with { Claimed = true } });
-        _coreNativeUsedDiscardOriginsOperations.CaptureClaimedDeclarationTrueUse(payment);
+        _coreNativeUsedDiscardOriginsOperations.Value.CaptureClaimedDeclarationTrueUse(payment);
         _coreShanheStartingResourcesOperations.CaptureShanheClaimedDeclarationUse(payment);
         // A Dodge/Played response may be owned by the incoming card's frame.
         // Its receipt is not a payment for that frame's attacking Use action.
@@ -126,7 +126,7 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
             return _corePlayCardHistoryOperations.ViewAsRule(selected)?.DeclarationValidation is not null ? selected : null;
         if (hasPublishedSource || CoreNativeCardClassificationsRuntime.MatchesRequiredCard(card.Kind, kind))
             return null;
-        return _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, !use, _coreDyingCursorRuntimeOperations.ActiveDying is not null).FirstOrDefault(source => _corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is not null);
+        return _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, !use, _coreDyingCursorRuntimeOperations.Value.ActiveDying is not null).FirstOrDefault(source => _corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is not null);
     }
 
     internal CardDeclarationParentReturn DeclarationReturn(CardDeclarationPurpose purpose, int actor, LegalAction? action = null, int? target = null, int recovery = 1, IReadOnlyList<ProgramRecoveryPolicySource>? policies = null, DyingResponseEvent? dying = null, bool fan = false, CardKind? finalKind = null)
@@ -351,13 +351,13 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
         _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.CardDeclaration);
         if (_characterLvKuangLvXiangOlOperations.TryReturnQigongDeclaration(frame, success))
             return;
-        if (_coreJianjiDeclarationsOperations.TryReturnJianjiDeclaration(frame, success))
+        if (_coreJianjiDeclarationsOperations.Value.TryReturnJianjiDeclaration(frame, success))
             return;
-        if (_characterSunHuanAnniversaryOperations.TryReturnAnniversarySunHuanDeclaration(frame, success))
+        if (_characterSunHuanAnniversaryOperations.Value.TryReturnAnniversarySunHuanDeclaration(frame, success))
             return;
         if (_characterGuoYuanMobileShiOperations.TryReturnShiGyDeclaration(frame, success))
             return;
-        if (_characterGuoYouZhiMouMobileOperations.ReturnMouGyzDeclaration(frame, success))
+        if (_characterGuoYouZhiMouMobileOperations.Value.ReturnMouGyzDeclaration(frame, success))
             return;
         if (_characterKeBiNengOlOperations.TryReturnKeBiNengPingduanDeclaration(frame, success))
             return;
@@ -365,7 +365,7 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
             return;
         if (_characterJuShouMouOperations.ReturnMouJsDeclaration(frame, success) || _characterDaQiaoXiaoQiaoHappyGodOperations.ReturnHappyQiaoShutuDeclaration(frame, success))
             return;
-        if (_characterLuSuMouOperations.ReturnMouLuSuPlayedDeclaration(frame, success))
+        if (_characterLuSuMouOperations.Value.ReturnMouLuSuPlayedDeclaration(frame, success))
             return;
         if (cancelled)
             return;

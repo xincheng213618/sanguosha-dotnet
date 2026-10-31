@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuanShuJunOlRuntime
 {
-    internal bool WenyiActualTurnOpen => _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.TurnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
+    internal bool WenyiActualTurnOpen => _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.TurnNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
 
     internal bool IsWenyiHpTrigger(SkillProgramTrigger t) => t.Effects is [{ Op: SkillProgramEffectOp.ResolveWenyiHealthOneAid }];
     internal bool HasWenyiHealthSubject(int targetSeat) => HasHuanShuJunCapability && _coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && WenyiRemaining(p.Seat) > 0 && _coreNationalSkillsOperations.GetSkillBindingShard(p).ProgramInstances.Any(i => i.Program.Triggers.Any(IsWenyiHpTrigger)));
@@ -60,7 +60,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         if (materials.Count == 0 && sources.Length == 0)
             throw new InvalidOperationException("Wenyi cannot invent an unprovided virtual Peach.");
         var r = f.HuanShuJun!;
-        if (paidWeijie is not null && _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieAttemptResolvedEvent>().Count(e => e.FrameId == paidWeijie.AttemptId && e.Matched && e.NativeLegal) != 1)
+        if (paidWeijie is not null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieAttemptResolvedEvent>().Count(e => e.FrameId == paidWeijie.AttemptId && e.Matched && e.NativeLegal) != 1)
             throw new InvalidOperationException("Wenyi cannot accept an unsuccessful paid Peach supply.");
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id && (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame child || !HuanpeiDraftRidesOn(child, f)))
             throw new InvalidOperationException("Wenyi cannot reserve another program's secondary cost.");
@@ -123,7 +123,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         if (use.WenyiUse is not { } o || use.Action is not { Type: CardActionType.Use } a || o.UseId != use.Id || a.ActionId != o.ActionId || use.CardKind != o.Kind || !a.PhysicalCards.SequenceEqual(o.OriginalAction.PhysicalCards) || !a.ConversionChain.SequenceEqual(o.OriginalAction.ConversionChain) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ProgramFrameId)is not ProgramSkillFrame { HuanShuJun: { Stage: HuanShuJunStage.NativeUse, NativeReturned: false, Native: { } n } } f || n.UseId != o.UseId || n.ActionId != o.ActionId || !SameHuanShuJunAction(n.OriginalAction, o.OriginalAction) || !WenyiHpRoot(f))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<WenyiNativeIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == use.Id && e.ActionId == a.ActionId && e.ActorSeat == o.ActorSeat && e.ProviderSeat == o.ProviderSeat && e.TargetSeat == o.TargetSeat && e.Kind == o.Kind) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenyiNativeIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == use.Id && e.ActionId == a.ActionId && e.ActorSeat == o.ActorSeat && e.ProviderSeat == o.ProviderSeat && e.TargetSeat == o.TargetSeat && e.Kind == o.Kind) == 1;
     }
 
     [NativeUseValidation(28101)]
@@ -140,7 +140,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
         var r = f.HuanShuJun!;
-        if (r.NativeReturned || r.Native?.UseId != use.Id || r.Native.ActionId != o.ActionId || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.NativeReturned || r.Native?.UseId != use.Id || r.Native.ActionId != o.ActionId || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Wenyi's native use returned before completion or more than once.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HuanShuJun = r with { NativeReturned = true, Stage = HuanShuJunStage.NativeChildren, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenyiNativeReturnedEvent(f.Id, use.Id, o.ActionId));

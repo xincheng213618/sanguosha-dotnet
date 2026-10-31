@@ -35,10 +35,10 @@ internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
                 parentAction = action.ActionId;
                 provider = action.ProviderSeat;
             }
-            else if (parent is NullificationWindowFrame counterspell && (move.Reason == CardMoveReasons.Nullification || move.Reason == CardMoveReasons.Respond) && move.From.OwnerSeat is { } counterspellProvider && counterspell.CandidateIndex >= 0 && counterspell.CandidateIndex < counterspell.CandidateSeats.Count && counterspell.CandidateSeats[counterspell.CandidateIndex] == counterspellProvider && _coreDelayedNullificationOperations.HasNullificationEffectOwner(counterspell))
+            else if (parent is NullificationWindowFrame counterspell && (move.Reason == CardMoveReasons.Nullification || move.Reason == CardMoveReasons.Respond) && move.From.OwnerSeat is { } counterspellProvider && counterspell.CandidateIndex >= 0 && counterspell.CandidateIndex < counterspell.CandidateSeats.Count && counterspell.CandidateSeats[counterspell.CandidateIndex] == counterspellProvider && _coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(counterspell))
             {
                 kind = NativeTrueUseDiscardKind.Nullification;
-                parentAction = _coreDelayedNullificationOperations.NullificationParentActionId(counterspell) ?? 0;
+                parentAction = _coreDelayedNullificationOperations.Value.NullificationParentActionId(counterspell) ?? 0;
                 provider = counterspellProvider;
             }
             else if (parent is CardUseFrame { Action: { } incoming, CardAttack: { Active: true } attack } && move.Reason == CardMoveReasons.Respond && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && (move.From.OwnerSeat == attack.TargetSeat || move.From == CardLocation.DrawPile && parent.RequestedDeckBasicMaterial is { Claiming: true, Intent: RequestedDeckBasicIntent.Dodge } requested && requested.OwnerFrameId == parentId && requested.ActorSeat == attack.TargetSeat && requested.SelectedCardId == move.CardId && requested.SelectedKind == move.CardKind && requested.PaidMovementSequence == move.Sequence && _coreRequestedDeckBasicOwnershipOperations.HasValidRequestedDeckBasicMaterial(parent)) && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
@@ -62,14 +62,14 @@ internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
         if (entered is null || entered.To != CardLocation.Processing || entered.From == entered.To || entered.CardKind != move.CardKind)
             return false;
         var parent = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == parentId);
-        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeTrueUseProcessingEntryEvent>().Where(e => e.ParentFrameId == parentId && e.CardId == move.CardId && e.CardKind == move.CardKind && e.EntrySequence == entered.Sequence && e.From == entered.From).ToArray();
+        var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeTrueUseProcessingEntryEvent>().Where(e => e.ParentFrameId == parentId && e.CardId == move.CardId && e.CardKind == move.CardKind && e.EntrySequence == entered.Sequence && e.From == entered.From).ToArray();
         if (facts is [var fact])
         {
             if (fact.Kind == NativeTrueUseDiscardKind.Use)
                 return IsNativeUseFinishReason(move.Reason) && parent is CardUseFrame { Action: { Type: CardActionType.Use } action } use && action.ActionId == fact.ParentActionId && action.EffectiveKind == use.CardKind && action.ProviderSeat == fact.ProviderSeat && action.PhysicalCards.Any(cost => cost.CardId == move.CardId && cost.CardKind == move.CardKind && cost.From == entered.From);
             if (fact.Kind == NativeTrueUseDiscardKind.Dodge)
                 return move.Reason == CardMoveReasons.ResponseFinished && parent is CardUseFrame { Action: { } incoming, CardAttack: { Active: true } attack } && incoming.ActionId == fact.ParentActionId && attack.TargetSeat == fact.ProviderSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge);
-            return fact.Kind == NativeTrueUseDiscardKind.Nullification && (move.Reason == CardMoveReasons.NullificationFinished || entered.Reason == CardMoveReasons.Respond && move.Reason == CardMoveReasons.ResponseFinished) && parent is NullificationWindowFrame counterspell && _coreDelayedNullificationOperations.HasNullificationEffectOwner(counterspell) && (_coreDelayedNullificationOperations.NullificationParentActionId(counterspell) ?? 0) == fact.ParentActionId;
+            return fact.Kind == NativeTrueUseDiscardKind.Nullification && (move.Reason == CardMoveReasons.NullificationFinished || entered.Reason == CardMoveReasons.Respond && move.Reason == CardMoveReasons.ResponseFinished) && parent is NullificationWindowFrame counterspell && _coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(counterspell) && (_coreDelayedNullificationOperations.Value.NullificationParentActionId(counterspell) ?? 0) == fact.ParentActionId;
         }
 
         if (facts.Length != 0 || entered.Reason.Value != "conversion.declaration.pay")
@@ -81,10 +81,10 @@ internal sealed partial class CoreGameEngineNativeUsedDiscardOriginsRuntime
         if (parent is CardUseFrame { Action: { Type: CardActionType.Use } declared } declaredUse && declared.PhysicalCards.Contains(paid.Cost))
             return IsNativeUseFinishReason(move.Reason) && declared.EffectiveKind == declaredUse.CardKind && paid.ActorSeat == declared.ActorSeat && paid.ProviderSeat == declared.ProviderSeat && declared.ConversionChain.Contains(paid.Source);
         if (parent is NullificationWindowFrame pending)
-            return paid.DeclaredKind == CardKind.Nullification && paid.ActorSeat == paid.ProviderSeat && move.Reason == CardMoveReasons.NullificationFinished && _coreDelayedNullificationOperations.HasNullificationEffectOwner(pending);
+            return paid.DeclaredKind == CardKind.Nullification && paid.ActorSeat == paid.ProviderSeat && move.Reason == CardMoveReasons.NullificationFinished && _coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(pending);
         if (parent is not CardUseFrame { CardAttack: { Active: true } slash } || !CoreNativeCardClassificationsRuntime.IsSlashCard(slash.EffectiveCardKind ?? CardKind.Dodge) || slash.TargetSeat != paid.ProviderSeat || paid.ActorSeat != paid.ProviderSeat || paid.DeclaredKind != CardKind.Dodge || move.Reason != CardMoveReasons.ResponseFinished)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => _coreResponseUseCompletionOperations.IsCompletedResponseUse(e.Action, ProgramCardContinuation.Dodge) && e.Action.PhysicalCards.Contains(paid.Cost) && e.Action.ConversionChain.Contains(paid.Source) && _coreResponseCompletionOperations.IsResponseCompletionEntry(e.Action, ProgramCardContinuation.Dodge, parentId, paid.Cost, entered));
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => _coreResponseUseCompletionOperations.IsCompletedResponseUse(e.Action, ProgramCardContinuation.Dodge) && e.Action.PhysicalCards.Contains(paid.Cost) && e.Action.ConversionChain.Contains(paid.Source) && _coreResponseCompletionOperations.IsResponseCompletionEntry(e.Action, ProgramCardContinuation.Dodge, parentId, paid.Cost, entered));
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 4000)]

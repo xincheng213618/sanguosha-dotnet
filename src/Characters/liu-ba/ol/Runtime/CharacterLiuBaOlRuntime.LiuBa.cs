@@ -263,7 +263,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
                         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LiuBaCoinMintedEvent(f.Id, draw.Source, draw.GameplayHash, r.Recipient, card, m.Sequence));
                 }
 
-                var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<LiuBaEntityMovedEvent>().Single(e => e.FrameId == id && e.Step == 1);
+                var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiuBaEntityMovedEvent>().Single(e => e.FrameId == id && e.Step == 1);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRecastEvent(r.Recipient, paid.CardId, paid.Kind, drawn.Count));
                 f = _coreNativeRecastInvocationsOperations.CompleteFrameNativeRecastInvocation(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), drawn.Count);
                 CompleteLiuBaMovement(f, drawn.Count);
@@ -309,7 +309,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
             return true;
         }
 
-        if (f.TriggerId is null || f.WindowContext is not { } c || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.FrameId == f.Id && e.SkillInstanceId == f.SkillInstanceId && e.BindingId == f.TriggerId))
+        if (f.TriggerId is null || f.WindowContext is not { } c || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.FrameId == f.Id && e.SkillInstanceId == f.SkillInstanceId && e.BindingId == f.TriggerId))
             return false;
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
         return IsIssuedTongduCandidate(candidate, c) || IsIssuedLiuBaCoinEndingCandidate(candidate, c);

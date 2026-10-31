@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHanDangMouMobileRuntime
 {
-    internal int MouHanDangPhaseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouHanDangStartedEvent>().Count(e => !e.Gongqi && e.Source.OwnerSeat == owner && e.Phase == phase);
+    internal int MouHanDangPhaseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHanDangStartedEvent>().Count(e => !e.Gongqi && e.Source.OwnerSeat == owner && e.Phase == phase);
     internal bool MouHanDangJiefanDisabled(int owner)
     {
         if (!HasMouHanDangCapability)

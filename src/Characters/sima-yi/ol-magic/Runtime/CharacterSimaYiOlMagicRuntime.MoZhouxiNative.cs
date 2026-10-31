@@ -24,7 +24,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
 
     internal bool IsMoSimaYiRetaliation(CardUseFrame use)
     {
-        if (use.MoSimaYiSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { MoSimaYi: { Stage: MoSimaYiStage.NativeSlash } r } f || !MoSimaYi.Valid(f) || o.Source != r.Source || o.GameplayHash != f.GameplayHash || o.Index != r.Index || r.NativeUseId != use.Id || r.NativeActionId != a.ActionId || o.Actor != r.Targets[r.Index] || o.Target != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (use.MoSimaYiSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { MoSimaYi: { Stage: MoSimaYiStage.NativeSlash } r } f || !MoSimaYi.Valid(f) || o.Source != r.Source || o.GameplayHash != f.GameplayHash || o.Index != r.Index || r.NativeUseId != use.Id || r.NativeActionId != a.ActionId || o.Actor != r.Targets[r.Index] || o.Target != f.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoSimaYiSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor);
     }
@@ -62,7 +62,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MoSimaYi!;
-        if (r.NativeUseId != use.Id || r.NativeActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.NativeUseId != use.Id || r.NativeActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Zhouxi cannot return a repeated or unrelated native Slash.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MoSimaYi = r with { NativeReturned = true } });
         if (use.CardAttack is not { Active: true })

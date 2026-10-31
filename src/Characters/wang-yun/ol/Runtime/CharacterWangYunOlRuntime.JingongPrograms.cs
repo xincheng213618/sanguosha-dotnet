@@ -106,7 +106,7 @@ internal sealed partial class CharacterWangYunOlRuntime
         _corePhysicalMovementFacadesOperations.MoveCard(card, r.From, CardLocation.Processing, CardMoveReasons.Use);
         CompleteWangYunNativePayment(id);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramViewAsConvertedEvent(id, f.SkillId, f.ActivationId, f.OwnerSeat, [card.Id], CardKind.Lightning, true, [owner.Seat]));
-        if (!_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && _coreCardActionsOperations.TryBeginDelayedCardUsePrograms(id))
+        if (!_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability && _coreCardActionsOperations.TryBeginDelayedCardUsePrograms(id))
             return;
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(id, card, owner.Seat, [owner.Seat], LegalActionKind.Lightning, playedCardKind: CardKind.Lightning);
     }

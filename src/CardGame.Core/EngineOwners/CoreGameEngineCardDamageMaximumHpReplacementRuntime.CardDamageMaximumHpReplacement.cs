@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineCardDamageMaximumHpReplacementRuntim
             throw new InvalidOperationException("Card damage must be selected before damage-only modifiers and prevention.");
         var turn = _turnCardUseEffectsOperations._turnCardUseEffects.GetDamageModifiers(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, attack.SourceSeat, attack.CardUserSeat, kind, false).Sum(m => m.Amount);
         var passive = _coreNativeDamagePoliciesOperations.GetPassiveProgramDamageModifiers(attack, cardDamageOnly: true).Sum(m => m.Amount);
-        var amount = checked(attack.DamageAmount + _coreExtendedViewAsOperations.ProgramConversionDamageBonus(card) + turn + passive + _characterPanZhangMaZhongBoundaryMobileOperations.BoundaryAnjianDamage(attack) + _characterChengPuBoundaryMobileOperations.BoundaryChengPuLihuoDamage(attack) + _characterHuangZhongBoundaryMobileOperations.BoundaryHuangZhongCardDamage(attack) + _characterZhangFeiBoundaryMobileOperations.BoundaryZhangFeiLiyongCardDamage(attack));
+        var amount = checked(attack.DamageAmount + _coreExtendedViewAsOperations.ProgramConversionDamageBonus(card) + turn + passive + _characterPanZhangMaZhongBoundaryMobileOperations.Value.BoundaryAnjianDamage(attack) + _characterChengPuBoundaryMobileOperations.Value.BoundaryChengPuLihuoDamage(attack) + _characterHuangZhongBoundaryMobileOperations.Value.BoundaryHuangZhongCardDamage(attack) + _characterZhangFeiBoundaryMobileOperations.Value.BoundaryZhangFeiLiyongCardDamage(attack));
         _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, state => state!with { CardDamageLayerAmount = amount });
         return amount;
     }
@@ -90,6 +90,6 @@ internal sealed partial class CoreGameEngineCardDamageMaximumHpReplacementRuntim
     {
         if (parent.Id != death.ParentFrameId || parent is not (CardUseFrame or ProgramSkillFrame) || _coreCardAttackStateOperations.GetCardAttackState(parent.Id)is not { MaximumHpReplacement: { } receipt } state)
             return false;
-        return receipt.MaximumHpAfter == 0 && receipt.TargetSeat == death.VictimSeat && death.KillerSeat is null && state.SourceSeat == receipt.SourceSeat && state.TargetSeat == receipt.TargetSeat && !state.DamageWasApplied && !state.DamageAmountFinalized && !state.IsChainPropagation && _coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].MaxHp == 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<CardDamageReplacedWithMaximumHpLossEvent>().Count(e => e.ParentResolutionId == parent.Id && e.Receipt == receipt) == 1;
+        return receipt.MaximumHpAfter == 0 && receipt.TargetSeat == death.VictimSeat && death.KillerSeat is null && state.SourceSeat == receipt.SourceSeat && state.TargetSeat == receipt.TargetSeat && !state.DamageWasApplied && !state.DamageAmountFinalized && !state.IsChainPropagation && _coreMatchParticipantsPlayersAccess._players[receipt.TargetSeat].MaxHp == 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardDamageReplacedWithMaximumHpLossEvent>().Count(e => e.ParentResolutionId == parent.Id && e.Receipt == receipt) == 1;
     }
 }

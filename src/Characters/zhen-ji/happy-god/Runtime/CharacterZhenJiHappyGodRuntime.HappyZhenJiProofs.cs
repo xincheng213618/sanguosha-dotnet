@@ -30,7 +30,7 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
 
     internal ProgramSkillFrame? HappyZjObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.HappyZjFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 41240)]
-    internal bool HappyZjDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HappyZjObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool HappyZjDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && HappyZjObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 41240)]
     internal bool AdvanceHappyZjChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HappyZjObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 41240)]

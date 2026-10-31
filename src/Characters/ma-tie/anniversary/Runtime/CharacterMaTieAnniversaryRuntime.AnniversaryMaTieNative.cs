@@ -99,18 +99,18 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         var r = f.AnniversaryMaTie!;
         if (r.Stage != AnniversaryMaTieStage.SlashChoice || r.OriginalDecision is not { } prompt || action.ActorSeat != r.Actors[r.Cursor] || action.ProviderSeat != action.ActorSeat || action.RequesterSeat is not null || !action.TargetSeats.SequenceEqual(new[] { r.Target }) || action.ConversionChain is not [var source])
             return false;
-        var ks = _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangRequestStartedEvent>().LastOrDefault(e => e.OwnerFrameId == f.Id && e.ActorSeat == action.ActorSeat && e.TargetSeat == r.Target && e.Source == source && e.RequestOp == SkillProgramEffectOp.ResolveAnniversaryMaTieQuxian);
-        var ts = _coreProgramEventHistoryOperations.ProgramEventHistory<TousuiRequestStartedEvent>().LastOrDefault(e => e.OwnerFrameId == f.Id && e.ActorSeat == action.ActorSeat && e.TargetSeat == r.Target && e.Source == source && e.RequestOp == SkillProgramEffectOp.ResolveAnniversaryMaTieQuxian);
+        var ks = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KenshangRequestStartedEvent>().LastOrDefault(e => e.OwnerFrameId == f.Id && e.ActorSeat == action.ActorSeat && e.TargetSeat == r.Target && e.Source == source && e.RequestOp == SkillProgramEffectOp.ResolveAnniversaryMaTieQuxian);
+        var ts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TousuiRequestStartedEvent>().LastOrDefault(e => e.OwnerFrameId == f.Id && e.ActorSeat == action.ActorSeat && e.TargetSeat == r.Target && e.Source == source && e.RequestOp == SkillProgramEffectOp.ResolveAnniversaryMaTieQuxian);
         if (ks is not null)
         {
-            var materials = _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangRequestMaterialSelectedEvent>().Where(e => e.OwnerFrameId == f.Id && e.OriginalPromptId == ks.OriginalPromptId).OrderBy(e => e.Index).ToArray();
-            if (ks.ActorSeat != action.ActorSeat || ks.TargetSeat != r.Target || materials.Length < 2 || !materials.Select(e => e.CardId).SequenceEqual(action.PhysicalCards.Select(c => c.CardId)) || _coreProgramEventHistoryOperations.ProgramEventHistory<KenshangRequestFinishedEvent>().LastOrDefault(e => e.OwnerFrameId == f.Id && e.ActorSeat == action.ActorSeat)is not { Accepted: true } accepted || accepted.MaterialCount != materials.Length)
+            var materials = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KenshangRequestMaterialSelectedEvent>().Where(e => e.OwnerFrameId == f.Id && e.OriginalPromptId == ks.OriginalPromptId).OrderBy(e => e.Index).ToArray();
+            if (ks.ActorSeat != action.ActorSeat || ks.TargetSeat != r.Target || materials.Length < 2 || !materials.Select(e => e.CardId).SequenceEqual(action.PhysicalCards.Select(c => c.CardId)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<KenshangRequestFinishedEvent>().LastOrDefault(e => e.OwnerFrameId == f.Id && e.ActorSeat == action.ActorSeat)is not { Accepted: true } accepted || accepted.MaterialCount != materials.Length)
                 return false;
         }
         else if (ts is not null)
         {
-            var materials = _coreProgramEventHistoryOperations.ProgramEventHistory<TousuiRequestMaterialSelectedEvent>().Where(e => e.OwnerFrameId == f.Id && e.OriginalPromptId == ts.OriginalPromptId).OrderBy(e => e.Index).ToArray();
-            if (ts.ActorSeat != action.ActorSeat || ts.TargetSeat != r.Target || materials.Length < 1 || !materials.Select(e => e.CardId).SequenceEqual(action.PhysicalCards.Select(c => c.CardId)) || _coreProgramEventHistoryOperations.ProgramEventHistory<TousuiRequestFinishedEvent>().LastOrDefault(e => e.OwnerFrameId == f.Id && e.ActorSeat == action.ActorSeat)is not { Accepted: true } accepted || accepted.MaterialCount != materials.Length)
+            var materials = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TousuiRequestMaterialSelectedEvent>().Where(e => e.OwnerFrameId == f.Id && e.OriginalPromptId == ts.OriginalPromptId).OrderBy(e => e.Index).ToArray();
+            if (ts.ActorSeat != action.ActorSeat || ts.TargetSeat != r.Target || materials.Length < 1 || !materials.Select(e => e.CardId).SequenceEqual(action.PhysicalCards.Select(c => c.CardId)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TousuiRequestFinishedEvent>().LastOrDefault(e => e.OwnerFrameId == f.Id && e.ActorSeat == action.ActorSeat)is not { Accepted: true } accepted || accepted.MaterialCount != materials.Length)
                 return false;
         }
         else
@@ -142,7 +142,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryMaTieSlashIssuedEvent(origin));
     }
 
-    internal bool MaTieNativeMatches(CardUseFrame use, ProgramSkillFrame f) => use.AnniversaryMaTieOrigin is { } n && f.AnniversaryMaTie is { Stage: AnniversaryMaTieStage.NativeUse } r && ValidMaTie(f) && n.FrameId == f.Id && n.Source == r.Source && n.Hash == r.Hash && n.Index == r.Cursor && n.UseId == use.Id && n.UseId == r.UseId && n.ActionId == r.ActionId && n.Target == r.Target && use.Action is { Type: CardActionType.Use } a && a.ActionId == n.ActionId && a.ActorSeat == n.Actor && n.Actor == r.Actors[r.Cursor] && a.ProviderSeat == n.Provider && n.Provider == r.Provider && a.RequesterSeat == (n.Actor == n.Provider ? (int? )null : n.Actor) && a.PhysicalCards.Select(c => c.CardId).SequenceEqual(r.Materials) && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaTieSlashIssuedEvent>().Count(e => e.Origin == n) == 1;
+    internal bool MaTieNativeMatches(CardUseFrame use, ProgramSkillFrame f) => use.AnniversaryMaTieOrigin is { } n && f.AnniversaryMaTie is { Stage: AnniversaryMaTieStage.NativeUse } r && ValidMaTie(f) && n.FrameId == f.Id && n.Source == r.Source && n.Hash == r.Hash && n.Index == r.Cursor && n.UseId == use.Id && n.UseId == r.UseId && n.ActionId == r.ActionId && n.Target == r.Target && use.Action is { Type: CardActionType.Use } a && a.ActionId == n.ActionId && a.ActorSeat == n.Actor && n.Actor == r.Actors[r.Cursor] && a.ProviderSeat == n.Provider && n.Provider == r.Provider && a.RequesterSeat == (n.Actor == n.Provider ? (int? )null : n.Actor) && a.PhysicalCards.Select(c => c.CardId).SequenceEqual(r.Materials) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryMaTieSlashIssuedEvent>().Count(e => e.Origin == n) == 1;
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 46700)]
     internal bool MaTieNoDebit(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { AnniversaryMaTieOrigin: { } n } use && n.Actor == actor && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.FrameId)is { } parent && MaTieNativeMatches(use, parent);
     [NativeUseValidation(46700)]
@@ -160,7 +160,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         var deferred = _characterLiuFengBoundaryOperations.BoundaryLiuFengReturnedProgramParent(n.FrameId, use);
         var f = deferred ?? _coreProgramLifecycleOperations.GetActiveProgramFrame(n.FrameId);
         var r = f.AnniversaryMaTie!;
-        if (!MaTieNativeMatches(use, f) || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryMaTieSlashReturnedEvent>().Any(e => e.UseId == use.Id))
+        if (!MaTieNativeMatches(use, f) || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryMaTieSlashReturnedEvent>().Any(e => e.UseId == use.Id))
             throw new InvalidOperationException("Quxian cannot repeat or substitute a native return.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { AnniversaryMaTie = r with { Stage = AnniversaryMaTieStage.NativeReturned, Used = r.Used.Contains(n.Actor) ? r.Used : r.Used.Append(n.Actor).ToArray() } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryMaTieSlashReturnedEvent(f.Id, n.Index, n.UseId, n.ActionId));

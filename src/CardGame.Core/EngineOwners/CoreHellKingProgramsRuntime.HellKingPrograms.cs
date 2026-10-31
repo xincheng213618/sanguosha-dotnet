@@ -41,9 +41,9 @@ internal sealed partial class CoreHellKingProgramsRuntime
             {
                 if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, DamageFrameId: { } damage })
                     throw new InvalidOperationException("Fanshi requires one actual damage instance.");
-                if (_coreProgramEventHistoryOperations.ProgramEventHistory<HellFanshiDamageCountedEvent>().Any(e => e.OwnerSeat == frame.OwnerSeat && e.DamageFrameId == damage))
+                if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellFanshiDamageCountedEvent>().Any(e => e.OwnerSeat == frame.OwnerSeat && e.DamageFrameId == damage))
                     throw new InvalidOperationException("Fanshi cannot count the same damage twice.");
-                var later = _coreProgramEventHistoryOperations.ProgramEventHistory<HellFanshiDamageCountedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.OwnerSeat == frame.OwnerSeat);
+                var later = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellFanshiDamageCountedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.OwnerSeat == frame.OwnerSeat);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HellFanshiDamageCountedEvent(_coreActualTurnProgressTurnNumberAccess._turnNumber, frame.OwnerSeat, damage));
                 BindHellParticipant(frame, effect, later ? RandomHellSeat(HellOtherSeats(frame.OwnerSeat)) : null);
                 break;
@@ -186,7 +186,7 @@ internal sealed partial class CoreHellKingProgramsRuntime
         var producers = plan.Instructions.Take(frame.InstructionIndex).Select((e, i) => (Effect: e, Index: i + 1)).Where(p => p.Effect.ResultBind == binding.Name && (IsHellTargetOp(p.Effect.Op) || p.Effect.Op is SkillProgramEffectOp.RollHellElement or SkillProgramEffectOp.RollHellAssault)).ToArray();
         if (producers is not [var producer] || binding.ChooserSeat != frame.OwnerSeat)
             return false;
-        var receipt = _coreProgramEventHistoryOperations.ProgramEventHistory<HellKingChoiceRecordedEvent>().SingleOrDefault(e => e.ProgramFrameId == frame.Id && e.InstructionIndex == producer.Index && e.ResultBind == binding.Name);
+        var receipt = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellKingChoiceRecordedEvent>().SingleOrDefault(e => e.ProgramFrameId == frame.Id && e.InstructionIndex == producer.Index && e.ResultBind == binding.Name);
         return receipt is not null && receipt.OwnerSeat == frame.OwnerSeat && receipt.OptionId == binding.OptionId && (IsHellTargetOp(producer.Effect.Op) ? receipt.OptionId == (receipt.TargetSeat is null ? "none" : "eligible") && (receipt.TargetSeat is null || _coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.TargetSeat.Value) && receipt.TargetSeat != frame.OwnerSeat) : receipt.TargetSeat is null && (producer.Effect.Op == SkillProgramEffectOp.RollHellElement ? receipt.OptionId is "fire" or "thunder" or "none" : receipt.OptionId is "nanman" or "wanjian"));
     }
 
@@ -198,7 +198,7 @@ internal sealed partial class CoreHellKingProgramsRuntime
         var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
         var recipient = effect.Op == SkillProgramEffectOp.DrawHellPreparation ? frame.OwnerSeat : frame.WindowContext?.HpChange?.SourceSeat;
         var amount = effect.Op == SkillProgramEffectOp.DrawHellPreparation ? 2 : 1;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || frame.NativeDraw is not null || recipient is null || outcome.RecipientSeat != recipient || outcome.RequestedCount != amount || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter > _coreOutsidePhaseDrawDiscardOperations.OutsidePhaseMovementSequence || outcome.ActualDrawIds.Count > amount || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || outcome.AttemptFrameId is { } attempt && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == attempt && e.ParentFrameId == frame.Id && e.RecipientSeat == recipient && e.RequestedCount == amount && e.Replaced == (outcome.Replacement is not null)) != 1)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || frame.NativeDraw is not null || recipient is null || outcome.RecipientSeat != recipient || outcome.RequestedCount != amount || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter > _coreOutsidePhaseDrawDiscardOperations.OutsidePhaseMovementSequence || outcome.ActualDrawIds.Count > amount || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || outcome.AttemptFrameId is { } attempt && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == attempt && e.ParentFrameId == frame.Id && e.RecipientSeat == recipient && e.RequestedCount == amount && e.Replaced == (outcome.Replacement is not null)) != 1)
             throw new InvalidOperationException("A Hell draw lost its exact recipient, operation or typed native return.");
         _coreProgramLifecycleOperations.CompleteProgramDrawCards(frame.Id, recipient.Value, null, SkillProgramCardSetVisibility.Private, new($"skill-program.{(frame.SkillId)}.{(effect.Op)}"), 0, outcome.ActualDrawIds);
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
@@ -236,7 +236,7 @@ internal sealed partial class CoreHellKingProgramsRuntime
             return false;
         if (move.From != CardLocation.DrawPile)
             return true;
-        var invocations = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(e => e.OwnerSeat == gainer && e.ParentFrameId == batch.ParentFrameId && e.TurnNumber == batch.TurnNumber && e.Reason == move.Reason && move.Sequence > e.SequenceBefore && move.Sequence <= e.SequenceAfter).ToArray();
+        var invocations = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(e => e.OwnerSeat == gainer && e.ParentFrameId == batch.ParentFrameId && e.TurnNumber == batch.TurnNumber && e.Reason == move.Reason && move.Sequence > e.SequenceBefore && move.Sequence <= e.SequenceAfter).ToArray();
         // Taking a particular deck card is a gain, but is not necessarily DrawCards.
         if (invocations.Length == 0)
             return true;
@@ -267,7 +267,7 @@ internal sealed partial class CoreHellKingProgramsRuntime
             return false;
         if (death.ReturnKind == DeathReturnKind.ProgramSkill)
             return _resolutionStackOperations._resolutionStack[index - 3] is ProgramSkillFrame causer && HasExactHellWuhunDirectDeath(causer, death) && HasExactHellDeathOriginalCursor(causer, out originalDying, out originalAttack, directDepth + 1);
-        if (death.ReturnKind != DeathReturnKind.Dying || _resolutionStackOperations._resolutionStack[index - 3] is not DyingFrame dying || dying.Id != death.ParentFrameId || dying.VictimSeat != death.VictimSeat || dying.KillerSeat != death.KillerSeat || dying.ResponderIndex != dying.ResponderSeats.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == dying.Id && e.VictimSeat == dying.VictimSeat && e.KillerSeat == dying.KillerSeat) != 1)
+        if (death.ReturnKind != DeathReturnKind.Dying || _resolutionStackOperations._resolutionStack[index - 3] is not DyingFrame dying || dying.Id != death.ParentFrameId || dying.VictimSeat != death.VictimSeat || dying.KillerSeat != death.KillerSeat || dying.ResponderIndex != dying.ResponderSeats.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == dying.Id && e.VictimSeat == dying.VictimSeat && e.KillerSeat == dying.KillerSeat) != 1)
             return false;
         if (dying.Continuation == DyingContinuationKind.Damage)
         {
@@ -288,7 +288,7 @@ internal sealed partial class CoreHellKingProgramsRuntime
         }
         else if (dying.Continuation == DyingContinuationKind.ProgramSkill)
         {
-            if (index < 4 || _resolutionStackOperations._resolutionStack[index - 4] is not ProgramSkillFrame loss || loss.Id != dying.ParentFrameId || dying.KillerSeat is not null || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(e => e.FrameId == loss.Id && e.SkillId == loss.SkillId && e.TargetSeat == dying.VictimSeat && e.Amount > 0 && e.RemainingHp <= 0))
+            if (index < 4 || _resolutionStackOperations._resolutionStack[index - 4] is not ProgramSkillFrame loss || loss.Id != dying.ParentFrameId || dying.KillerSeat is not null || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(e => e.FrameId == loss.Id && e.SkillId == loss.SkillId && e.TargetSeat == dying.VictimSeat && e.Amount > 0 && e.RemainingHp <= 0))
                 return false;
         }
         else if (dying.Continuation == DyingContinuationKind.AttackHpLoss)
@@ -306,7 +306,7 @@ internal sealed partial class CoreHellKingProgramsRuntime
             var target = attack?.TargetSeat ?? cardAttack?.TargetSeat;
             var source = attack?.SourceSeat ?? cardAttack?.SourceSeat;
             var amount = attack?.DamageAmount ?? cardAttack?.DamageAmount;
-            if (target != dying.VictimSeat || amount is not > 0 || !_coreProgramEventHistoryOperations.ProgramEventHistory<DamageReplacedWithHpLossEvent>().Any(e => e.ParentResolutionId == parent.Id && e.TargetSeat == target && e.PolicyOwnerSeat == source && e.Amount == amount && e.RemainingHp <= 0) || _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == dying.Id && e.VictimSeat == target && e.KillerSeat is null) != 1)
+            if (target != dying.VictimSeat || amount is not > 0 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageReplacedWithHpLossEvent>().Any(e => e.ParentResolutionId == parent.Id && e.TargetSeat == target && e.PolicyOwnerSeat == source && e.Amount == amount && e.RemainingHp <= 0) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == dying.Id && e.VictimSeat == target && e.KillerSeat is null) != 1)
                 return false;
             originalAttack = parent.Id;
         }
@@ -323,8 +323,8 @@ internal sealed partial class CoreHellKingProgramsRuntime
         var effect = ProgramInstructionResolver.Default.Resolve(causer, _contentRegistryOperations._contentRegistry.GetSkill(causer.SkillId).Program!).GetPausedInstruction(causer.InstructionIndex).Effect;
         if (effect is not { Op: SkillProgramEffectOp.CauseDeathUnlessBoundCardKind, Target: SkillProgramEffectTarget.SelectedTarget, Condition.Kind: SkillProgramConditionKind.Always, SourceBind: { } bind } || !effect.CardKinds.SequenceEqual([CardKind.Peach, CardKind.PeachGarden]) || causer.CardSetBindings.SingleOrDefault(b => b.Name == bind)is not { Visibility: SkillProgramCardSetVisibility.Public, CardIds: [var cardId], SourceLocations: [var from] })
             return false;
-        var judgment = _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Where(e => e.ParentResolutionId == causer.Id && e.TargetSeat == death.VictimSeat && e.Reason == "skill.wuhun.death").ToArray();
-        return judgment is [var result] && result.CardId == cardId && result.CardKind is { } kind && !effect.CardKinds.Contains(kind) && _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentRequestedEvent>().Count(e => e.ResolutionId == result.ResolutionId && e.ParentResolutionId == causer.Id && e.TargetSeat == death.VictimSeat && e.Reason == result.Reason) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillCauseDeathDeclaredEvent>().Count(e => e.FrameId == causer.Id && e.SkillId == causer.SkillId && e.BindingId == causer.TriggerId && e.SourceSeat == causer.OwnerSeat && e.TargetSeat == death.VictimSeat) == 1 && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.CardKind == kind && m.From == from && m.To == CardLocation.DiscardPile && m.Reason.Value == $"skill-program.{(causer.SkillId)}.{(causer.TriggerId)}.judgment-finish");
+        var judgment = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentResolvedEvent>().Where(e => e.ParentResolutionId == causer.Id && e.TargetSeat == death.VictimSeat && e.Reason == "skill.wuhun.death").ToArray();
+        return judgment is [var result] && result.CardId == cardId && result.CardKind is { } kind && !effect.CardKinds.Contains(kind) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentRequestedEvent>().Count(e => e.ResolutionId == result.ResolutionId && e.ParentResolutionId == causer.Id && e.TargetSeat == death.VictimSeat && e.Reason == result.Reason) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillCauseDeathDeclaredEvent>().Count(e => e.FrameId == causer.Id && e.SkillId == causer.SkillId && e.BindingId == causer.TriggerId && e.SourceSeat == causer.OwnerSeat && e.TargetSeat == death.VictimSeat) == 1 && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.CardKind == kind && m.From == from && m.To == CardLocation.DiscardPile && m.Reason.Value == $"skill-program.{(causer.SkillId)}.{(causer.TriggerId)}.judgment-finish");
     }
 
     internal bool IsOriginalDyingSuspendedByHellKing(DyingFrame dying) => !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(root => HasExactHellKingDeathPrefix(root, out var original, out _) && original?.Id == dying.Id);

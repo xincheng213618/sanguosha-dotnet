@@ -5,7 +5,7 @@ internal sealed partial class CharacterChenDengOlRuntime
 {
     internal bool IsXuanhuiDisabledByOwnSwap(int ownerSeat)
     {
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramXuanhuiEffectsSwappedEvent>().Any(item => item.OwnerSeat == ownerSeat))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramXuanhuiEffectsSwappedEvent>().Any(item => item.OwnerSeat == ownerSeat))
             return false;
         var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var swapIndex = Array.FindLastIndex(facts, item => item is ProgramXuanhuiEffectsSwappedEvent swapped && swapped.OwnerSeat == ownerSeat);

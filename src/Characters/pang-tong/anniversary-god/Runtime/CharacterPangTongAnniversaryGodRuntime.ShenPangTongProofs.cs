@@ -3,16 +3,16 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterPangTongAnniversaryGodRuntime
 {
-    internal bool ShenPtPaidRemoval(long frame, long death, int card, long before, long after, long batch) => card > 0 && batch > 0 && after > before && after <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreAdvancedLifecycleOperations.GetAdvancedCard(card).Kind is CardKind.FireSlash or CardKind.FireAttack && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenPangTongRemovalPaidEvent>().Count(e => e == new ShenPangTongRemovalPaidEvent(frame, death, batch, before, after)) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == card && m.Sequence > before && m.Sequence == after && m.From == CardLocation.DrawPile && m.To == CardLocation.OutsideGame && m.Reason.Value == ShenPangTongRemovalReason) == 1;
+    internal bool ShenPtPaidRemoval(long frame, long death, int card, long before, long after, long batch) => card > 0 && batch > 0 && after > before && after <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreAdvancedLifecycleOperations.GetAdvancedCard(card).Kind is CardKind.FireSlash or CardKind.FireAttack && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenPangTongRemovalPaidEvent>().Count(e => e == new ShenPangTongRemovalPaidEvent(frame, death, batch, before, after)) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == card && m.Sequence > before && m.Sequence == after && m.From == CardLocation.DrawPile && m.To == CardLocation.OutsideGame && m.Reason.Value == ShenPangTongRemovalReason) == 1;
     internal void RequireShenPtRevival(DeathFrame death, ShenPangTongRevivalReceipt r)
     {
-        if (death.VictimSeat != r.Source.OwnerSeat || r.Source.SkillId != ShenPangTongComposition.Kunyu || r.Source.BindingId != "death-rebirth" || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash != r.GameplayHash || !ShenPtPaidRemoval(r.ProgramFrameId, death.Id, r.RemovedCardId, r.Before, r.After, r.BatchId) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenPangTongStartedEvent>().Count(e => e.FrameId == r.ProgramFrameId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Operation == SkillProgramEffectOp.ResolveShenPangTongKunyu && e.DeathId == death.Id && e.ParentId == r.WindowId) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenPangTongRevivalGrantedEvent>().Count(e => e == new ShenPangTongRevivalGrantedEvent(r.ProgramFrameId, death.Id, death.VictimSeat)) != 1)
+        if (death.VictimSeat != r.Source.OwnerSeat || r.Source.SkillId != ShenPangTongComposition.Kunyu || r.Source.BindingId != "death-rebirth" || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash != r.GameplayHash || !ShenPtPaidRemoval(r.ProgramFrameId, death.Id, r.RemovedCardId, r.Before, r.After, r.BatchId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenPangTongStartedEvent>().Count(e => e.FrameId == r.ProgramFrameId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Operation == SkillProgramEffectOp.ResolveShenPangTongKunyu && e.DeathId == death.Id && e.ParentId == r.WindowId) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenPangTongRevivalGrantedEvent>().Count(e => e == new ShenPangTongRevivalGrantedEvent(r.ProgramFrameId, death.Id, death.VictimSeat)) != 1)
             throw new InvalidOperationException("Kunyu lost its original death, paid fire removal or typed revival entitlement.");
     }
 
     internal bool ShenPtActualDamageTarget(ProgramSkillFrame f, ShenPangTongReceipt r, AttackAttemptState a)
     {
-        var transferred = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramDamageTransferredEvent>().Where(e => e.ResolutionId == f.Id && e.SourceSeat == f.OwnerSeat && e.Nature == DamageNature.Fire).ToArray();
+        var transferred = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramDamageTransferredEvent>().Where(e => e.ResolutionId == f.Id && e.SourceSeat == f.OwnerSeat && e.Nature == DamageNature.Fire).ToArray();
         var initial = r.TargetSeat;
         if (a.DamageRedirected && transferred.FirstOrDefault(e => e.OwnerSeat == initial)is { } redirect)
             initial = redirect.TargetSeat;
@@ -22,7 +22,7 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
         var cursor = a.ChainedTargetIndex;
         if (targets.Count == 0 || targets.Distinct().Count() != targets.Count || targets.Contains(initial) || cursor < 1 || cursor > targets.Count || targets[cursor - 1] != a.TargetSeat)
             return false;
-        var steps = _coreProgramEventHistoryOperations.ProgramEventHistory<ChainedDamagePropagatedEvent>().Where(e => e.ResolutionId == f.Id).ToArray();
+        var steps = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChainedDamagePropagatedEvent>().Where(e => e.ResolutionId == f.Id).ToArray();
         var previous = initial;
         var previousIndex = -1;
         foreach (var step in steps)
@@ -61,7 +61,7 @@ internal sealed partial class CharacterPangTongAnniversaryGodRuntime
 
     internal ProgramSkillFrame? ShenPtObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.ShenPtFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 39200)]
-    internal bool ShenPtDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShenPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool ShenPtDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && ShenPtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 39200)]
     internal bool AdvanceShenPtChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ShenPtObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

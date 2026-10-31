@@ -74,7 +74,7 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
             yield return new FiniteRuleQueryContribution("persistent:" + g.Key, SkillRuleOperation.Add, g.Sum(e => e.Amount), 0);
     }
 
-    internal bool HasSelfCardTargetProhibition(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSelfCardTargetsProhibitedEvent>().Any(e => e.OwnerSeat == seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], e.SkillId, e.SkillInstanceId));
+    internal bool HasSelfCardTargetProhibition(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSelfCardTargetsProhibitedEvent>().Any(e => e.OwnerSeat == seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], e.SkillId, e.SkillInstanceId));
     internal bool IsImplicitSelfCardUse(CardKind kind) => kind is CardKind.Peach or CardKind.Alcohol or CardKind.DrawTwo or CardKind.Lightning || _coreEquipmentContentOperations.EquipmentRules.IsEquipment(kind);
     internal bool IsSelfTargetForbiddenAction(CharacterState actor, CardKind kind, IReadOnlyList<int> targets)
     {

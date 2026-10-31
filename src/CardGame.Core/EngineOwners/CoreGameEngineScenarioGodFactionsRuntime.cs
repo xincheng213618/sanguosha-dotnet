@@ -2,6 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineScenarioGodFactionsRuntime(RuntimeEntries.CoreGameEngineModeRulesEntries _coreModeRulesOperations)
+internal sealed partial class CoreGameEngineScenarioGodFactionsRuntime(RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineModeRulesRuntime> _coreModeRulesOperations)
 {
 }

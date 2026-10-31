@@ -11,7 +11,7 @@ internal sealed partial class CharacterNiuFuOlRuntime
         if (cards.Count > 0 && cards.All(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)))
             return false;
         if (use.Action is { } action)
-            return action.Type == CardActionType.Use && action.ActorSeat == owner && action.EffectiveKind == use.CardKind && action.PhysicalCards.Select(x => x.CardId).SequenceEqual(cards.Select(x => x.Id)) && action.PhysicalCards.Select(x => x.CardKind).SequenceEqual(cards.Select(x => x.Kind)) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == action.ActionId && e.Action.PhysicalCards.SequenceEqual(action.PhysicalCards));
-        return use.CardId == 0 && cards.Count == 0 && use.PhysicalCardIds is { Count: 0 } && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == use.CardKind && e.SourceSeat == owner);
+            return action.Type == CardActionType.Use && action.ActorSeat == owner && action.EffectiveKind == use.CardKind && action.PhysicalCards.Select(x => x.CardId).SequenceEqual(cards.Select(x => x.Id)) && action.PhysicalCards.Select(x => x.CardKind).SequenceEqual(cards.Select(x => x.Kind)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == action.ActionId && e.Action.PhysicalCards.SequenceEqual(action.PhysicalCards));
+        return use.CardId == 0 && cards.Count == 0 && use.PhysicalCardIds is { Count: 0 } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == use.CardKind && e.SourceSeat == owner);
     }
 }

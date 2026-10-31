@@ -12,7 +12,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
             return receipt.Draw is { } draw && ValidHappyWeiYanDraw(draw, frame.OwnerSeat, frame.Id);
         }
 
-        if (receipt.Paid.Count == 0 || receipt.Stage != HappyWeiYanStage.GujingDiscardChildren && receipt.Paid.Count != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<HappyWeiYanMovementEvent>().Count(e => e == new HappyWeiYanMovementEvent(frame.Id, receipt.Stage, receipt.Before, receipt.After, receipt.Paid.Count)) != 1)
+        if (receipt.Paid.Count == 0 || receipt.Stage != HappyWeiYanStage.GujingDiscardChildren && receipt.Paid.Count != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyWeiYanMovementEvent>().Count(e => e == new HappyWeiYanMovementEvent(frame.Id, receipt.Stage, receipt.Before, receipt.After, receipt.Paid.Count)) != 1)
             return false;
         return true;
     }
@@ -34,7 +34,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
 
     internal ProgramSkillFrame? HappyWeiYanObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => this.HappyWeiYanFirstChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 42300)]
-    internal bool HappyWeiYanDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && HappyWeiYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool HappyWeiYanDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && HappyWeiYanObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 42300)]
     internal bool AdvanceHappyWeiYanObserver() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && HappyWeiYanObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 42300)]

@@ -158,9 +158,9 @@ internal sealed partial class CharacterGaoXiangMobileShiRuntime
     internal void IssueShiZxSlash(ProgramSkillFrame f, int targetSeat, bool revenge)
     {
         var r = f.GaoXiang!;
-        var actorSeat = revenge ? _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZxChiyuanSlashIssuedEvent>().First(issue => issue.FrameId == f.Id).TargetSeat : f.OwnerSeat;
+        var actorSeat = revenge ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZxChiyuanSlashIssuedEvent>().First(issue => issue.FrameId == f.Id).TargetSeat : f.OwnerSeat;
         var target = revenge ? f.OwnerSeat : targetSeat;
-        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { GaoXiang = r with { Stage = revenge ? ShiZxStage.RevengeSettling : ShiZxStage.SlashSettling, DamageEventsBefore = _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Count(), Revenge = revenge } });
+        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { GaoXiang = r with { Stage = revenge ? ShiZxStage.RevengeSettling : ShiZxStage.SlashSettling, DamageEventsBefore = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Count(), Revenge = revenge } });
         var id = _coreNativeCardUseOperations.BeginCardUse(new Card(0, CardKind.Slash, Suit.None, 0), actorSeat, [target], CardKind.Slash, physicalCardIds: []);
         var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actorSeat, targets[0], card: null, damageAmount: 1 + _coreMatchParticipantsPlayersAccess._players[actorSeat].AlcoholDamageBonus, playedCardKind: CardKind.Slash, programSkillCardUseFrameId: f.Id);
@@ -349,8 +349,8 @@ internal sealed partial class CharacterGaoXiangMobileShiRuntime
     internal void SettleShiZxChiyuanSlash(ProgramSkillFrame f)
     {
         var r = f.GaoXiang!;
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZxChiyuanSlashIssuedEvent>().Last(issue => issue.FrameId == f.Id);
-        var fresh = _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Skip(r.DamageEventsBefore);
+        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZxChiyuanSlashIssuedEvent>().Last(issue => issue.FrameId == f.Id);
+        var fresh = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Skip(r.DamageEventsBefore);
         var damaged = fresh.Any(e => e.SourceCardUseResolutionId == issued.UseId || !r.Revenge && e.SourceSeat == f.OwnerSeat && e.TargetSeat == issued.TargetSeat || r.Revenge && e.SourceSeat == issued.TargetSeat && e.TargetSeat == f.OwnerSeat);
         if (damaged)
         {

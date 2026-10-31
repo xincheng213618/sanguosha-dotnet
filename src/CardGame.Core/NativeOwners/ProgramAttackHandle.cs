@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramAttackHandle(Func<RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries> getCoreGameEngineProgramAttackAttemptRuntime, Func<RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime, long ownerFrameId) : GameEngine.IDamageAttempt
+internal sealed class ProgramAttackHandle(Func<RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries> getCoreGameEngineProgramAttackAttemptRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRecipientScopedDamageRuntime>> getCoreGameEngineRecipientScopedDamageRuntime, long ownerFrameId) : GameEngine.IDamageAttempt
 {
     private AttackAttemptState State => getCoreGameEngineProgramAttackAttemptRuntime().GetProgramAttackState(ownerFrameId);
 
@@ -120,7 +120,7 @@ internal sealed class ProgramAttackHandle(Func<RuntimeEntries.CoreGameEngineProg
             if (!isAlive(next))
                 continue;
             Update(current => current with { TargetSeat = next, ChainedTargetIndex = cursor, IsChainPropagation = true, DamageAmountFinalized = resetDamageForTargetModifiers ? false : current.DamageAmountFinalized });
-            getCoreGameEngineRecipientScopedDamageRuntime().RestoreRecipientScopedDamageBase(this, fromSeat);
+            getCoreGameEngineRecipientScopedDamageRuntime().Value.RestoreRecipientScopedDamageBase(this, fromSeat);
             return true;
         }
 

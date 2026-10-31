@@ -249,7 +249,7 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardRuntime
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 620)]
-    internal bool CanContinueOutsidePhaseDrawDiscard(ProgramSkillFrame f) => f.OutsidePhaseDrawDiscard is { MovementIssued: true } && _coreOutsidePhaseDrawDiscardObserversOperations.ValidOutsidePhaseDrawDiscardReceipt(f);
+    internal bool CanContinueOutsidePhaseDrawDiscard(ProgramSkillFrame f) => f.OutsidePhaseDrawDiscard is { MovementIssued: true } && _coreOutsidePhaseDrawDiscardObserversOperations.Value.ValidOutsidePhaseDrawDiscardReceipt(f);
     [ProgramAiChoice(SkillProgramEffectOp.DrawAfterActualOutsideDraw, SkillProgramEffectOp.DiscardAfterActualOutsideDiscard)]
     internal PromptChoice SelectAiOutsidePhaseDrawDiscard(PendingDecision decision, ProgramSkillFrame f)
     {

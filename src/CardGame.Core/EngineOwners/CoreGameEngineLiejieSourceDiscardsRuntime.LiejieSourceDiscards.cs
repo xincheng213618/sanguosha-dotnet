@@ -276,6 +276,6 @@ internal sealed partial class CoreGameEngineLiejieSourceDiscardsRuntime
 
     internal ProgramSkillFrame? LiejieSourceDiscardObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.LiejieSourceDiscardFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 290)]
-    internal bool IsLiejieSourceDiscardProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && LiejieSourceDiscardObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsLiejieSourceDiscardProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && LiejieSourceDiscardObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     internal PromptChoice SelectAiLiejieDiscardChoice(PendingDecision decision) => decision.Choices.OrderBy(c => c.Parameters.GetValueOrDefault("program-action") == "liejie-pick" ? 0 : 1).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 }

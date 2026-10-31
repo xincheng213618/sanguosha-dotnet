@@ -12,7 +12,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         gameplayHash = "";
         if (!HasMoQiangangCapability || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat))
             return false;
-        var entries = _coreProgramEventHistoryOperations.ProgramEventHistory<MoQiangangEnteredEvent>().Where(e => e.Source.OwnerSeat == ownerSeat).ToArray();
+        var entries = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQiangangEnteredEvent>().Where(e => e.Source.OwnerSeat == ownerSeat).ToArray();
         if (entries.Length == 0)
             return false;
         if (entries.Length != 1 || !IsPaidQiangangRumoOrigin(entries[0].FrameId, entries[0].Source, entries[0].GameplayHash))
@@ -94,23 +94,23 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
 
     internal bool IsPaidQiangangRumoOrigin(long frameId, CardConversionSource source, string gameplayHash)
     {
-        if (source.SkillId != "ol:mo-qiangang" || source.BindingId != "lose-tianen-enter-rumo" || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source.OwnerSeat) || _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash != gameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQiangangStartedEvent>().Where(e => e.FrameId == frameId).ToArray()is not [var start] || start.Source != source || start.GameplayHash != gameplayHash || start.GrantCount < 1 || start.Phase.Kind != ActualDiscardRecoveryPhaseKind.Play || start.Phase.ActorSeat != source.OwnerSeat || start.Phase.TurnNumber != start.ActualTurn || start.Phase.ActualTurnOwnerSeat != start.TurnOwner || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(start.Phase) || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == frameId && e.OwnerSeat == source.OwnerSeat && e.SkillId == source.SkillId && e.ActivationId == source.BindingId) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MoQiangangTianenLossPaidEvent>().Where(e => e.FrameId == frameId).ToArray()is not [var paid] || paid.Source != source || paid.GameplayHash != gameplayHash || paid.GrantCount != start.GrantCount || paid.RevisionBefore != start.RevisionBefore || paid.RevisionAfter != paid.RevisionBefore + paid.GrantCount)
+        if (source.SkillId != "ol:mo-qiangang" || source.BindingId != "lose-tianen-enter-rumo" || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source.OwnerSeat) || _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash != gameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQiangangStartedEvent>().Where(e => e.FrameId == frameId).ToArray()is not [var start] || start.Source != source || start.GameplayHash != gameplayHash || start.GrantCount < 1 || start.Phase.Kind != ActualDiscardRecoveryPhaseKind.Play || start.Phase.ActorSeat != source.OwnerSeat || start.Phase.TurnNumber != start.ActualTurn || start.Phase.ActualTurnOwnerSeat != start.TurnOwner || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(start.Phase) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillStartedEvent>().Count(e => e.FrameId == frameId && e.OwnerSeat == source.OwnerSeat && e.SkillId == source.SkillId && e.ActivationId == source.BindingId) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQiangangTianenLossPaidEvent>().Where(e => e.FrameId == frameId).ToArray()is not [var paid] || paid.Source != source || paid.GameplayHash != gameplayHash || paid.GrantCount != start.GrantCount || paid.RevisionBefore != start.RevisionBefore || paid.RevisionAfter != paid.RevisionBefore + paid.GrantCount)
             return false;
-        var removed = _coreProgramEventHistoryOperations.ProgramEventHistory<MoQiangangTianenGrantRemovedEvent>().Where(e => e.FrameId == frameId).OrderBy(e => e.Index).ToArray();
+        var removed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQiangangTianenGrantRemovedEvent>().Where(e => e.FrameId == frameId).OrderBy(e => e.Index).ToArray();
         return removed.Length == paid.GrantCount && removed.Select(e => e.GrantId).Distinct(StringComparer.Ordinal).Count() == removed.Length && removed.Where((e, i) => e.Index != i || string.IsNullOrEmpty(e.GrantId) || string.IsNullOrEmpty(e.SkillInstanceId) || string.IsNullOrEmpty(e.SourceId)).Any() == false;
     }
 
-    internal bool IsPaidQiangangRumoEntry(ProgramSkillFrame f) => f.MoQiangang is { Stage: MoQiangangStage.EnteringRumo } r && ValidMoQiangang(f) && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && f.PendingMovementContinuation is null && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoQiangangEnteredEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat) && IsPaidQiangangRumoOrigin(f.Id, r.Source, r.GameplayHash);
+    internal bool IsPaidQiangangRumoEntry(ProgramSkillFrame f) => f.MoQiangang is { Stage: MoQiangangStage.EnteringRumo } r && ValidMoQiangang(f) && _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == f.Id && f.PendingMovementContinuation is null && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQiangangEnteredEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat) && IsPaidQiangangRumoOrigin(f.Id, r.Source, r.GameplayHash);
     internal bool ValidMoQiangang(ProgramSkillFrame f)
     {
         if (f.MoQiangang is not { } r || f.SkillId != "ol:mo-qiangang" || f.ActivationId != "lose-tianen-enter-rumo" || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != MoQiangangSource(f) || r.GameplayHash != f.GameplayHash || !Enum.IsDefined(r.Stage) || r.RemovedGrants is not System.Collections.IList { IsReadOnly: true } || !IsPaidQiangangRumoOrigin(f.Id, r.Source, r.GameplayHash))
             return false;
-        var start = _coreProgramEventHistoryOperations.ProgramEventHistory<MoQiangangStartedEvent>().Single(e => e.FrameId == f.Id);
-        var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<MoQiangangTianenLossPaidEvent>().Single(e => e.FrameId == f.Id);
-        var removed = _coreProgramEventHistoryOperations.ProgramEventHistory<MoQiangangTianenGrantRemovedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
+        var start = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQiangangStartedEvent>().Single(e => e.FrameId == f.Id);
+        var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQiangangTianenLossPaidEvent>().Single(e => e.FrameId == f.Id);
+        var removed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQiangangTianenGrantRemovedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
         if (start.Phase != r.Phase || start.ActualTurn != r.ActualTurn || start.TurnOwner != r.TurnOwner || r.RevisionBefore != paid.RevisionBefore || r.RevisionAfter != paid.RevisionAfter || r.RemovedGrants.Count != removed.Length || removed.Where((e, i) => r.RemovedGrants[i] != new MoQiangangRemovedGrant(e.GrantId, e.SkillInstanceId, e.SourceId)).Any())
             return false;
-        var entries = _coreProgramEventHistoryOperations.ProgramEventHistory<MoQiangangEnteredEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var entries = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoQiangangEnteredEvent>().Where(e => e.FrameId == f.Id).ToArray();
         return r.Stage == MoQiangangStage.EntryChildren ? entries is [var entered] && entered == new MoQiangangEnteredEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner) : entries.Length == 0;
     }
 

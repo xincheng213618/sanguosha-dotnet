@@ -144,7 +144,7 @@ internal sealed partial class CharacterCaoSongOlRuntime
             var recipient = receipt.RecipientSeat!.Value;
             if (ids.Count == 0 || ids.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(frame.OwnerSeat)) || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive)
                 throw new InvalidOperationException("Lilu must commit at least one current physical hand card to the selected other recipient.");
-            var previous = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongLiluGiftCommittedEvent>().LastOrDefault(e => e.Source.OwnerSeat == frame.OwnerSeat)?.GiftCount;
+            var previous = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongLiluGiftCommittedEvent>().LastOrDefault(e => e.Source.OwnerSeat == frame.OwnerSeat)?.GiftCount;
             var grows = previous is null || ids.Count > previous;
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { CaoSongLilu = receipt with { Stage = CaoSongLiluStage.GiftChildren, GiftCount = ids.Count, PreviousGiftCount = previous, Grows = grows, SequenceBefore = before, SequenceAfter = before }, Step = ResolutionFrameStep.ResolvingEffect });
@@ -168,7 +168,7 @@ internal sealed partial class CharacterCaoSongOlRuntime
         var receipt = frame.CaoSongLilu!;
         if (receipt.Stage == CaoSongLiluStage.Recipient)
             return decision.Choices.First();
-        var previous = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongLiluGiftCommittedEvent>().LastOrDefault(e => e.Source.OwnerSeat == frame.OwnerSeat)?.GiftCount ?? 0;
+        var previous = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongLiluGiftCommittedEvent>().LastOrDefault(e => e.Source.OwnerSeat == frame.OwnerSeat)?.GiftCount ?? 0;
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]);
         var desired = previous < hand.Count ? previous + 1 : 1;
         if (receipt.SelectedCardIds.Count >= desired)
@@ -193,5 +193,5 @@ internal sealed partial class CharacterCaoSongOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26030)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26030)]
-    internal bool CanContinuePaidCaoSongLilu(ProgramSkillFrame frame) => frame.CaoSongLilu is { GiftCount: > 0 } && _coreProgramEventHistoryOperations.ProgramEventHistory<CaoSongLiluGiftCommittedEvent>().Any(e => e.ProgramFrameId == frame.Id && e.Source == frame.CaoSongLilu.Source);
+    internal bool CanContinuePaidCaoSongLilu(ProgramSkillFrame frame) => frame.CaoSongLilu is { GiftCount: > 0 } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoSongLiluGiftCommittedEvent>().Any(e => e.ProgramFrameId == frame.Id && e.Source == frame.CaoSongLilu.Source);
 }

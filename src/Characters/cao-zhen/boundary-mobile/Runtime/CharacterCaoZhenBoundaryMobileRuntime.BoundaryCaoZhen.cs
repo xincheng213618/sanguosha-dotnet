@@ -19,7 +19,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
     {
         var action = window.Action;
         var targets = action.EffectiveDesignatedTargetSeats;
-        if (targets.Count != 0 || action.Type != CardActionType.Use || action.EffectiveKind is not (CardKind.DrawTwo or CardKind.Alcohol) && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Equipment || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { } original } use || original.ActionId != action.ActionId || use.SourceSeat != action.ActorSeat || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(declared => declared.ResolutionId == use.Id && declared.SourceSeat == action.ActorSeat && declared.CardKind == action.EffectiveKind))
+        if (targets.Count != 0 || action.Type != CardActionType.Use || action.EffectiveKind is not (CardKind.DrawTwo or CardKind.Alcohol) && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) != SkillProgramCardCategory.Equipment || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { } original } use || original.ActionId != action.ActionId || use.SourceSeat != action.ActorSeat || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(declared => declared.ResolutionId == use.Id && declared.SourceSeat == action.ActorSeat && declared.CardKind == action.EffectiveKind))
             return targets;
         // These native producers encode a self target as empty command targets.
         // Name the real effect recipient locally, retaining the accepted action.
@@ -163,7 +163,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
             var proof = new BoundarySidiCancelledEvent(frame.Id, use.Id, draft.ActionId, frame.OwnerSeat, frame.SkillInstanceId, frame.GameplayHash);
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { BoundarySidiCancellation = proof });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(proof);
-            outcome = _coreDyingCursorRuntimeOperations.ActiveDying is null && !_coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && player.HasHpValue && player.Hp <= 0) ? "cancel-damage" : "cancel-only";
+            outcome = _coreDyingCursorRuntimeOperations.Value.ActiveDying is null && !_coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && player.HasHpValue && player.Hp <= 0) ? "cancel-damage" : "cancel-only";
         }
 
         CommitBoundarySidiResult(frame, draft.ResultBind!, draft.ActionId, outcome);
@@ -180,7 +180,7 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
     {
         if (use.BoundarySidiCancellation is not { } proof)
             return false;
-        if (use.Action?.ActionId != proof.ActionId || use.Id != proof.UseFrameId || proof.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(BoundarySidiSkill).Program?.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundarySidiCancelledEvent>().Count(record => record == proof) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<BoundarySidiResultEvent>().Any(record => record.FrameId == proof.ProgramFrameId && record.ActionId == proof.ActionId && record.Outcome is "cancel-only" or "cancel-damage"))
+        if (use.Action?.ActionId != proof.ActionId || use.Id != proof.UseFrameId || proof.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(BoundarySidiSkill).Program?.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundarySidiCancelledEvent>().Count(record => record == proof) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundarySidiResultEvent>().Any(record => record.FrameId == proof.ProgramFrameId && record.ActionId == proof.ActionId && record.Outcome is "cancel-only" or "cancel-damage"))
             throw new InvalidOperationException("Sidi cancellation lost its exact original use and committed result.");
         return true;
     }

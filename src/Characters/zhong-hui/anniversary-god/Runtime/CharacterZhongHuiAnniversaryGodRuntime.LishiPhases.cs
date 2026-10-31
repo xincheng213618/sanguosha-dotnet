@@ -14,10 +14,10 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
     };
     internal IEnumerable<LishiPunishmentIssuedEvent> LishiActiveEffects(ActualDiscardRecoveryPhaseKey phase)
     {
-        if (!HasLishiCapability || _coreProgramEventHistoryOperations.ProgramEventHistory<ActualPhaseEndedEvent>().Any(e => e.Phase == phase))
+        if (!HasLishiCapability || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualPhaseEndedEvent>().Any(e => e.Phase == phase))
             return[];
-        var applied = _coreProgramEventHistoryOperations.ProgramEventHistory<LishiPhaseAppliedEvent>().Where(e => e.Phase == phase).ToArray();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<LishiPunishmentIssuedEvent>().Where(e => e.TargetSeat == phase.ActorSeat && applied.Any(a => a.IssueFrameId == e.FrameId && a.TargetSeat == e.TargetSeat && a.Option == e.Option));
+        var applied = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiPhaseAppliedEvent>().Where(e => e.Phase == phase).ToArray();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiPunishmentIssuedEvent>().Where(e => e.TargetSeat == phase.ActorSeat && applied.Any(a => a.IssueFrameId == e.FrameId && a.TargetSeat == e.TargetSeat && a.Option == e.Option));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 39300)]
@@ -32,9 +32,9 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
         if (payload is ActualDiscardRecoveryPhaseStartedEvent started)
         {
             var phase = started.Phase;
-            foreach (var issue in _coreProgramEventHistoryOperations.ProgramEventHistory<LishiPunishmentIssuedEvent>().Where(e => e.TargetSeat == phase.ActorSeat && e.PhaseToken < phase.Token && LishiOptionMatchesPhase(e.Option, phase.Kind)).ToArray())
+            foreach (var issue in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiPunishmentIssuedEvent>().Where(e => e.TargetSeat == phase.ActorSeat && e.PhaseToken < phase.Token && LishiOptionMatchesPhase(e.Option, phase.Kind)).ToArray())
             {
-                if (_coreProgramEventHistoryOperations.ProgramEventHistory<LishiPhaseAppliedEvent>().Any(a => a.IssueFrameId == issue.FrameId && a.TargetSeat == issue.TargetSeat && a.Option == issue.Option && a.Phase.Kind == phase.Kind))
+                if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiPhaseAppliedEvent>().Any(a => a.IssueFrameId == issue.FrameId && a.TargetSeat == issue.TargetSeat && a.Option == issue.Option && a.Phase.Kind == phase.Kind))
                     continue;
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LishiPhaseAppliedEvent(issue.FrameId, issue.TargetSeat, issue.Option, phase));
                 if (issue.Option == 1)
@@ -42,7 +42,7 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
             }
         }
 
-        if (payload is ActualPhaseEndedEvent ended && _coreProgramEventHistoryOperations.ProgramEventHistory<LishiPhaseAppliedEvent>().Any(a => a.Option == 1 && a.Phase == ended.Phase))
+        if (payload is ActualPhaseEndedEvent ended && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiPhaseAppliedEvent>().Any(a => a.Option == 1 && a.Phase == ended.Phase))
             _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
     }
 
@@ -61,7 +61,7 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
         var hasHand = ids.Any(id => id > 0 && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(actor));
         if (!LishiActiveEffects(phase).Any(e => e.Option == 4 && (hasHand || e.Source.SkillId == ShenZhongHuiComposition.HappyLishi)))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<LishiHandTypeUsedEvent>().Any(e => e.Phase == phase && e.ActorSeat == actor && e.Category == LishiCategory(kind) && e.ActionId != existing);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiHandTypeUsedEvent>().Any(e => e.Phase == phase && e.ActorSeat == actor && e.Category == LishiCategory(kind) && e.ActionId != existing);
     }
 
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeTurnUseBan, 42100)]
@@ -83,7 +83,7 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.AcceptedConversionCost, 39301)]
     internal void RecordLishiHandUse(CardActionContext action)
     {
-        if (!HasLishiCapability || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != action.ActorSeat || action.Type != CardActionType.Use && !(IsLishiResponseUse(action.ActorSeat, action.EffectiveKind) && _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, action.EffectiveKind == CardKind.Nullification ? ProgramCardContinuation.NullificationResponse : ProgramCardContinuation.Dodge)) || !LishiActiveEffects(phase).Any(e => e.Option == 4 && (e.Source.SkillId == ShenZhongHuiComposition.HappyLishi || action.PhysicalCards.Any(c => c.From == CardLocation.Hand(action.ActorSeat)))) || _coreProgramEventHistoryOperations.ProgramEventHistory<LishiHandTypeUsedEvent>().Any(e => e.ActionId == action.ActionId))
+        if (!HasLishiCapability || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != action.ActorSeat || action.Type != CardActionType.Use && !(IsLishiResponseUse(action.ActorSeat, action.EffectiveKind) && _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, action.EffectiveKind == CardKind.Nullification ? ProgramCardContinuation.NullificationResponse : ProgramCardContinuation.Dodge)) || !LishiActiveEffects(phase).Any(e => e.Option == 4 && (e.Source.SkillId == ShenZhongHuiComposition.HappyLishi || action.PhysicalCards.Any(c => c.From == CardLocation.Hand(action.ActorSeat)))) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiHandTypeUsedEvent>().Any(e => e.ActionId == action.ActionId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LishiHandTypeUsedEvent(action.ActionId, action.ActorSeat, LishiCategory(action.EffectiveKind), phase));
     }
@@ -108,17 +108,17 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
 
     internal void RecordLishiDiscardRedirection(CardMovementRecord move)
     {
-        if (!HasLishiCapability || move.To.Zone != CardZoneKind.Hand || LishiDiscardOrigin(move.CardId, move.From, move.Reason, move.Sequence - 1)is not { OwnerSeat: { } target } original || LishiDiscardClaim(target)is not { } claim || move.To != CardLocation.Hand(claim.Source.OwnerSeat) || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { } phase || _coreProgramEventHistoryOperations.ProgramEventHistory<LishiDiscardRedirectedEvent>().Any(e => e.MovementSequence == move.Sequence))
+        if (!HasLishiCapability || move.To.Zone != CardZoneKind.Hand || LishiDiscardOrigin(move.CardId, move.From, move.Reason, move.Sequence - 1)is not { OwnerSeat: { } target } original || LishiDiscardClaim(target)is not { } claim || move.To != CardLocation.Hand(claim.Source.OwnerSeat) || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { } phase || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiDiscardRedirectedEvent>().Any(e => e.MovementSequence == move.Sequence))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LishiDiscardRedirectedEvent(move.Sequence, claim.FrameId, claim.Source.OwnerSeat, target, move.CardId, original, move.From, move.Reason, phase));
     }
 
-    internal bool IsLishiPaidDiscardMovement(CardMovementRecord move, CardLocation expectedSource, CardMoveReason expectedReason) => HasLishiCapability && move.Reason == expectedReason && _coreProgramEventHistoryOperations.ProgramEventHistory<LishiDiscardRedirectedEvent>().Any(e => e.MovementSequence == move.Sequence && e.CardId == move.CardId && e.OriginalFrom == expectedSource && e.ActualFrom == move.From && e.Reason == expectedReason && move.To == CardLocation.Hand(e.SourceSeat) && e.TargetSeat == e.Phase.ActorSeat && e.Phase.Kind == ActualDiscardRecoveryPhaseKind.Discard && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(e.Phase) && _coreProgramEventHistoryOperations.ProgramEventHistory<LishiPunishmentIssuedEvent>().Any(i => i.FrameId == e.IssueFrameId && i.Source.OwnerSeat == e.SourceSeat && i.TargetSeat == e.TargetSeat && i.Option == 5));
+    internal bool IsLishiPaidDiscardMovement(CardMovementRecord move, CardLocation expectedSource, CardMoveReason expectedReason) => HasLishiCapability && move.Reason == expectedReason && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiDiscardRedirectedEvent>().Any(e => e.MovementSequence == move.Sequence && e.CardId == move.CardId && e.OriginalFrom == expectedSource && e.ActualFrom == move.From && e.Reason == expectedReason && move.To == CardLocation.Hand(e.SourceSeat) && e.TargetSeat == e.Phase.ActorSeat && e.Phase.Kind == ActualDiscardRecoveryPhaseKind.Discard && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(e.Phase) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LishiPunishmentIssuedEvent>().Any(i => i.FrameId == e.IssueFrameId && i.Source.OwnerSeat == e.SourceSeat && i.TargetSeat == e.TargetSeat && i.Option == 5));
     internal void SettleLishiDrawPhase(ProgramSkillFrame f)
     {
         var r = f.ShenZhongHui!;
         var phase = r.Phase!;
-        var invoices = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(e => e.OwnerSeat == f.OwnerSeat && e.Phase == phase).ToArray();
+        var invoices = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(e => e.OwnerSeat == f.OwnerSeat && e.Phase == phase).ToArray();
         var drawn = invoices.SelectMany(d => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason == d.Reason)).Select(m => m.CardId).Distinct().Select(_coreAdvancedLifecycleOperations.GetAdvancedCard).ToArray();
         var allowed = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand], OwnedCardMoveIntent.Discard).SelectMany(c => c.Cards).ToHashSet();
         var discard = drawn.Length > 0 && drawn.Select(c => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c))).Distinct().Count() == 1 ? drawn.Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.Hand(f.OwnerSeat) && allowed.Contains(c.Id) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, c, CardLocation.Hand(f.OwnerSeat), OwnedCardMoveIntent.Discard)).ToArray() : [];
@@ -152,7 +152,7 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodRuntime
             return false;
         if (!IsLishiJudgment(j, f) || _resolutionStackOperations._resolutionStack.Any(x => x.Id == j.Id))
             throw new InvalidOperationException("Lishi's native judgment lost its exact original phase return.");
-        var results = _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Where(e => e.ResolutionId == j.Id && e.ParentResolutionId == f.Id && e.TargetSeat == f.OwnerSeat && e.Reason == LishiJudgmentReason(r)).ToArray();
+        var results = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentResolvedEvent>().Where(e => e.ResolutionId == j.Id && e.ParentResolutionId == f.Id && e.TargetSeat == f.OwnerSeat && e.Reason == LishiJudgmentReason(r)).ToArray();
         if (results is not [var result])
             throw new InvalidOperationException("Lishi needs one real final judgment outcome.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenZhongHui = r with { Stage = ShenZhongHuiStage.PhaseResult, ResultId = result.CardId, ResultSuit = result.Suit ?? Suit.None, ResultRank = result.Rank ?? 0 } });

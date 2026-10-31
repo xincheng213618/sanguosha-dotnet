@@ -52,6 +52,11 @@ internal sealed class MatchRuntime
         if (_entries.TryGet<TEntry>(out var existing)) return existing;
         return _entries.Add(create(() => (TOwner)_modules.Get(typeof(TOwner))));
     }
+    internal RuntimeEntries.DeferredRuntime<TOwner> GetDeferredModule<TOwner>() where TOwner : class
+    {
+        if (_entries.TryGet<RuntimeEntries.DeferredRuntime<TOwner>>(out var existing)) return existing;
+        return _entries.Add(new RuntimeEntries.DeferredRuntime<TOwner>(() => (TOwner)_modules.Get(typeof(TOwner))));
+    }
     internal object GetModule(Type type) => _modules.Get(type);
     internal Delegate BindHandler(MethodInfo method, Type delegateType) => _modules.Bind(method, delegateType, _adapters.BindCoreHandler);
     internal object? HandlerTarget(MethodInfo method) => method.IsStatic ? null : method.DeclaringType == typeof(GameEngine) ? _adapters.CoreHandlerTarget(method) : _modules.Get(method.DeclaringType!);

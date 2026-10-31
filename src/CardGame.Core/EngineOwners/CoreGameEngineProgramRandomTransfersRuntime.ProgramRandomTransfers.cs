@@ -21,9 +21,9 @@ internal sealed partial class CoreGameEngineProgramRandomTransfersRuntime
         if (hand.Length == 0)
             throw new InvalidOperationException("A random card transfer requires an owner hand card.");
         var card = hand[_randomOperations._random.Next(hand.Length)];
-        var revealPolicy = _characterZhouYuMobileOperations.RandomTransferRevealPolicy(active, resultBind);
+        var revealPolicy = _characterZhouYuMobileOperations.Value.RandomTransferRevealPolicy(active, resultBind);
         if (revealPolicy == SkillProgramRandomTransferRevealPolicy.RecipientAfterGain)
-            return _characterZhouYuMobileOperations.BeginRecipientRandomTransfer(active, targetSeat, resultBind, card);
+            return _characterZhouYuMobileOperations.Value.BeginRecipientRandomTransfer(active, targetSeat, resultBind, card);
         if (revealPolicy is not null)
             throw new InvalidOperationException("Unknown random transfer reveal policy.");
         var snapshot = _coreSnapshotValueProjectionOperations.ToSnapshot(card);

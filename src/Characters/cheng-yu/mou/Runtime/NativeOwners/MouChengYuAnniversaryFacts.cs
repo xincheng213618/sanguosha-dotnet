@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouChengYuAnniversaryFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreActualRoundProgressState actualRoundProgressState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, EngineStates.CoreMatchParticipantsState matchParticipantsState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CharacterChengYuMouEntries> getCharacterChengYuMouRuntime, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, Func<FrameStore> getFrameStore, Func<CardZoneStore> getCardZoneStore) : IMouChengYuAnniversaryFacts
+internal sealed class MouChengYuAnniversaryFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreActualRoundProgressState actualRoundProgressState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, EngineStates.CoreMatchParticipantsState matchParticipantsState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CharacterChengYuMouEntries> getCharacterChengYuMouRuntime, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, Func<FrameStore> getFrameStore, Func<CardZoneStore> getCardZoneStore) : IMouChengYuAnniversaryFacts
 {
     public int Turn => actualTurnProgressState.ReferenceToTurnNumber;
     public int Round => actualRoundProgressState.ReferenceToRoundNumber;
@@ -16,7 +16,7 @@ internal sealed class MouChengYuAnniversaryFacts(EngineStates.CoreActualTurnProg
     public CardKind CardName(CardKind k) => EngineOwners.CoreGameEngineNamedAmbushRuntime.AmbushCardName(k);
     public SkillProgram? Program(string id) => getContentRegistry().Skills.GetValueOrDefault(id)?.Program;
     public IEnumerable<T> History<T>()
-        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>();
+        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>();
     public IReadOnlyList<int> Living() => Array.AsReadOnly(matchParticipantsState.ReferenceToPlayers.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
     public IReadOnlyList<ProgramTriggerCandidate> Candidates(int owner, SkillProgramTriggerWindow window) => getCoreGameEngineProgramLifecycleRuntime().CollectProgramTriggerCandidates(matchParticipantsState.ReferenceToPlayers[owner], window);
     public bool Parent(ProgramSkillFrame f)

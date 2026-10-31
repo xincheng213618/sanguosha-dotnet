@@ -9,9 +9,9 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
     internal const string DamageJudgmentSourceDiscardReason = "skill-program.damage-judgment-suit.source-discard";
     internal CardUseFrame? ActualDamageJudgmentUse(ProgramSkillWindowContext context)
     {
-        if (context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target } || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || damage.Id != context.ParentFrameId || damage.ParentFrameId != context.DamageFrameId)
+        if (context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target } || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } damage || damage.Id != context.ParentFrameId || damage.ParentFrameId != context.DamageFrameId)
             return null;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage);
         if (attack.IsSourceLess || !attack.DamageWasApplied || attack.SourceSeat != source || attack.TargetSeat != target || attack.EffectiveCardKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash))
             return null;
         return _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(use => use.Id == attack.ResolutionId && use.SourceSeat == source && (use.Action is { Type: CardActionType.Use } action && action.ActorSeat == source && action.EffectiveKind == attack.EffectiveCardKind || use.Action is null && use.CardKind == attack.EffectiveCardKind && LegacyDamageJudgmentVirtualProducer(use, target)is not null));
@@ -44,12 +44,12 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
         return _coreProgramLifecycleOperations.StartProgramJudgment(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id), target, effect.JudgmentReason!, effect.ResultBind!, SkillProgramCardSetVisibility.Public, use.SourceSeat);
     }
 
-    internal bool IsDamageJudgmentInstructionTarget(ProgramSkillFrame frame, int target) => frame.DamageJudgmentSuitPayment is { Stage: ProgramDamageJudgmentPaymentStage.Judging } draft && target == draft.TargetSeat && _coreDamageJudgmentSuitPaymentObserversOperations.IsValidDamageJudgmentSuitPayment(frame);
+    internal bool IsDamageJudgmentInstructionTarget(ProgramSkillFrame frame, int target) => frame.DamageJudgmentSuitPayment is { Stage: ProgramDamageJudgmentPaymentStage.Judging } draft && target == draft.TargetSeat && _coreDamageJudgmentSuitPaymentObserversOperations.Value.IsValidDamageJudgmentSuitPayment(frame);
     internal void CaptureDamageJudgmentSuitResult(JudgmentFrame judgment, Card card, Suit suit)
     {
         if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == judgment.ParentFrameId)is not { DamageJudgmentSuitPayment: { Stage: ProgramDamageJudgmentPaymentStage.Judging } draft } frame)
             return;
-        if (!_coreDamageJudgmentSuitPaymentObserversOperations.IsValidDamageJudgmentSuitPayment(frame) || judgment.Id != draft.JudgmentFrameId || judgment.TargetSeat != draft.TargetSeat || judgment.SourceSeat != draft.SourceSeat || judgment.Reason != draft.Reason || judgment.ProgramResultBind != draft.ResultBind || judgment.Continuation != JudgmentContinuationKind.ProgramSkill || draft.JudgmentCardId is not null)
+        if (!_coreDamageJudgmentSuitPaymentObserversOperations.Value.IsValidDamageJudgmentSuitPayment(frame) || judgment.Id != draft.JudgmentFrameId || judgment.TargetSeat != draft.TargetSeat || judgment.SourceSeat != draft.SourceSeat || judgment.Reason != draft.Reason || judgment.ProgramResultBind != draft.ResultBind || judgment.Continuation != JudgmentContinuationKind.ProgramSkill || draft.JudgmentCardId is not null)
             throw new InvalidOperationException("The finalized damage judgment changed its owning parent or result.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { DamageJudgmentSuitPayment = draft with { JudgmentCardId = card.Id, JudgmentCardKind = card.Kind, JudgmentSuit = suit, JudgmentRank = _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentRank(judgment, card.Rank) } });
     }
@@ -58,7 +58,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
     {
         if (_coreProgramLifecycleOperations.GetActiveProgramFrame(judgment.ParentFrameId)is not { DamageJudgmentSuitPayment: { } draft } frame)
             return false;
-        if (!_coreDamageJudgmentSuitPaymentObserversOperations.IsValidDamageJudgmentSuitPayment(frame) || draft.Stage != ProgramDamageJudgmentPaymentStage.Judging || draft.JudgmentFrameId != judgment.Id || judgment.TargetSeat != draft.TargetSeat || judgment.SourceSeat != draft.SourceSeat || judgment.Reason != draft.Reason)
+        if (!_coreDamageJudgmentSuitPaymentObserversOperations.Value.IsValidDamageJudgmentSuitPayment(frame) || draft.Stage != ProgramDamageJudgmentPaymentStage.Judging || draft.JudgmentFrameId != judgment.Id || judgment.TargetSeat != draft.TargetSeat || judgment.SourceSeat != draft.SourceSeat || judgment.Reason != draft.Reason)
             throw new InvalidOperationException("A damage judgment returned without its exact frozen result.");
         if (draft.JudgmentCardId is null && judgment.CardId is null)
         {
@@ -108,7 +108,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Damage judgment payment lost its owner.");
         var draft = frame.DamageJudgmentSuitPayment ?? throw new InvalidOperationException("Damage judgment payment lost its frozen facts.");
         var sourceDiscard = draft.Stage == ProgramDamageJudgmentPaymentStage.ChoosingSourceDiscard;
-        if (!_coreDamageJudgmentSuitPaymentObserversOperations.IsValidDamageJudgmentSuitPayment(frame) || !sourceDiscard && draft.Stage != ProgramDamageJudgmentPaymentStage.ChoosingPayment || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (sourceDiscard ? draft.SourceSeat : frame.OwnerSeat) || !DamageJudgmentPaymentChoices(frame, sourceDiscard).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
+        if (!_coreDamageJudgmentSuitPaymentObserversOperations.Value.IsValidDamageJudgmentSuitPayment(frame) || !sourceDiscard && draft.Stage != ProgramDamageJudgmentPaymentStage.ChoosingPayment || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (sourceDiscard ? draft.SourceSeat : frame.OwnerSeat) || !DamageJudgmentPaymentChoices(frame, sourceDiscard).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [selected])))
             throw new InvalidOperationException("Damage judgment payment changed its published actor, slot or original result.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (!sourceDiscard && (selected.Parameters["payment-kind"] == "decline" || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId)))
@@ -154,7 +154,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
         if (frame.DamageJudgmentSuitPayment is not { } draft)
             return false;
-        if (!_coreDamageJudgmentSuitPaymentObserversOperations.IsValidDamageJudgmentSuitPayment(frame))
+        if (!_coreDamageJudgmentSuitPaymentObserversOperations.Value.IsValidDamageJudgmentSuitPayment(frame))
             throw new InvalidOperationException("The damage judgment lost its original candidate or paid ledger.");
         if (frame.PendingMovementContinuation is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return true;
@@ -255,7 +255,7 @@ internal sealed partial class CoreGameEngineDamageJudgmentSuitPaymentsRuntime
         if (frame.DamageJudgmentSuitPayment is null)
             return false;
         var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Instructions.Single();
-        if (frame.PendingMovementContinuation is not { } movement || !_coreDamageJudgmentSuitPaymentObserversOperations.IsDamageJudgmentSuitPaymentMovement(frame, effect, movement))
+        if (frame.PendingMovementContinuation is not { } movement || !_coreDamageJudgmentSuitPaymentObserversOperations.Value.IsDamageJudgmentSuitPaymentMovement(frame, effect, movement))
             throw new InvalidOperationException("The suit payment movement lost its exact owning cost or cleanup stage.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { PendingMovementContinuation = null });
         // Source loss cannot erase an already paid atomic tail. Before payment

@@ -42,7 +42,7 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionRuntime
         while (true)
         {
             frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-            _coreRandomAreaAcquisitionProofsOperations.RequireRandomAreaAcquisition(frame);
+            _coreRandomAreaAcquisitionProofsOperations.Value.RequireRandomAreaAcquisition(frame);
             var receipt = frame.RandomAreaAcquisition!;
             if (receipt.Stage is RandomAreaAcquisitionStage.MovementChildren or RandomAreaAcquisitionStage.TurnoverChildren)
             {
@@ -129,6 +129,6 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionRuntime
     internal bool ReturnRandomAreaMovement(ProgramSkillFrame frame) => frame.RandomAreaAcquisition is not null && ResumeRandomAreaAcquisition(frame.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 1245)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1245)]
-    internal bool CanContinueRandomAreaAcquisition(ProgramSkillFrame frame) => frame.RandomAreaAcquisition is { } r && (r.Steps.Count > 0 || r.TurnoverIssued) && _coreRandomAreaAcquisitionProofsOperations.ValidRandomAreaAcquisition(frame);
+    internal bool CanContinueRandomAreaAcquisition(ProgramSkillFrame frame) => frame.RandomAreaAcquisition is { } r && (r.Steps.Count > 0 || r.TurnoverIssued) && _coreRandomAreaAcquisitionProofsOperations.Value.ValidRandomAreaAcquisition(frame);
     SkillProgramStepOutcome IRandomAreaAcquisitionHost.ObtainRandomAreaFromEachOtherThenTurnOver(ProgramSkillFrame frame) => ObtainRandomAreaFromEachOtherThenTurnOver(frame);
 }

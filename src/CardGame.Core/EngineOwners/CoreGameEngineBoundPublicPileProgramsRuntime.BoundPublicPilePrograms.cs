@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineBoundPublicPileProgramsRuntime
     SkillProgramStepOutcome IBoundPublicPileProgramHost.DistributeBoundCards(SkillProgramEffect effect, ProgramSkillFrame frame) => DistributeProgramBoundPublicPile(effect, frame);
     internal SkillProgramStepOutcome SelectProgramPublicPile(SkillProgramEffect effect, ProgramSkillFrame frame)
     {
-        var sources = _corePublicPileSourcesOperations.ReferencedPublicPileSources(frame.OwnerSeat, effect.SkillIds.Single(), frame.SkillInstanceId).Where(source => source.Capacity == effect.Amount && _corePublicPileSourcesOperations.PublicPileCards(source).Count > 0 && _corePublicPersistentPilesOperations.PublicPileSourceSatisfiesFrozenTrigger(frame, source)).ToArray();
+        var sources = _corePublicPileSourcesOperations.ReferencedPublicPileSources(frame.OwnerSeat, effect.SkillIds.Single(), frame.SkillInstanceId).Where(source => source.Capacity == effect.Amount && _corePublicPileSourcesOperations.PublicPileCards(source).Count > 0 && _corePublicPersistentPilesOperations.Value.PublicPileSourceSatisfiesFrozenTrigger(frame, source)).ToArray();
         if (sources.Length == 0)
         {
             BindSelectedPublicPile(frame, effect, null);
@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineBoundPublicPileProgramsRuntime
         if (frame.PublicPileDraft is not null)
             throw new InvalidOperationException("A public pile source is already being selected.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { PublicPileDraft = new(frame.OwnerSeat, effect.SkillIds.Single(), "source", -1, [], [], [], []) });
-        _corePublicPersistentPilesOperations.PublishPublicPileChoice(frame);
+        _corePublicPersistentPilesOperations.Value.PublishPublicPileChoice(frame);
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
@@ -58,7 +58,7 @@ internal sealed partial class CoreGameEngineBoundPublicPileProgramsRuntime
             return SkillProgramStepOutcome.Continue;
         }
 
-        _corePublicPersistentPilesOperations.PublishPublicPileChoice(frame);
+        _corePublicPersistentPilesOperations.Value.PublishPublicPileChoice(frame);
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
@@ -107,7 +107,7 @@ internal sealed partial class CoreGameEngineBoundPublicPileProgramsRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         }
         else
-            _corePublicPersistentPilesOperations.PublishPublicPileChoice(frame);
+            _corePublicPersistentPilesOperations.Value.PublishPublicPileChoice(frame);
         return true;
     }
 }

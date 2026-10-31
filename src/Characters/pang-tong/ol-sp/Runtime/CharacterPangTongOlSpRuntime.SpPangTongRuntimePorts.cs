@@ -5,7 +5,7 @@ internal sealed partial class CharacterPangTongOlSpRuntime
 {
     Winner ISpPangTongNativeFacts.Winner => _coreMatchOutcomeWinnerAccess._winner;
 
-    bool ISpPangTongNativeFacts.UsesFormalWoodenOx => _coreNativeDamageHandlesOperations.UsesFormalWoodenOx;
+    bool ISpPangTongNativeFacts.UsesFormalWoodenOx => _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx;
 
     bool ISpPangTongNativeFacts.UsesTreatedWounded => _coreTreatedWoundedOperations.UsesTreatedWounded;
 

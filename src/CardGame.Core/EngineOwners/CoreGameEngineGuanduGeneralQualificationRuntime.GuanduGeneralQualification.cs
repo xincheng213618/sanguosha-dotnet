@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralQualificationRuntime
             case "guandu:jieliang":
                 if (c.Window == SkillProgramTriggerWindow.DrawPhaseStarting)
                     return c.SourceSeat != owner.Seat && _coreGuanduGeneralsOperations.GuanduDiscardable(owner.Seat, owner.Seat).Length > 0;
-                return c.SourceSeat is { } discarded && _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduJieliangPaidEvent>().Any(e => e.OwnerSeat == owner.Seat && e.TargetSeat == discarded && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber) && _coreGuanduGeneralBenefitsOperations.GuanduClaimableDiscards(discarded).Length > 0;
+                return c.SourceSeat is { } discarded && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduJieliangPaidEvent>().Any(e => e.OwnerSeat == owner.Seat && e.TargetSeat == discarded && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber) && _coreGuanduGeneralBenefitsOperations.GuanduClaimableDiscards(discarded).Length > 0;
             case "guandu:cangchu":
                 return c.Window == SkillProgramTriggerWindow.GameStarting || c.TargetSeat == owner.Seat && c.Amount > 0 && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } fire && _coreNativeCardClassificationsOperations.GetDamageNature(fire) == DamageNature.Fire;
             case "guandu:polu":
@@ -47,7 +47,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralQualificationRuntime
             case "guandu:fuyuan":
                 return _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat != owner.Seat && _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat].IsAlive;
             case "guandu:hengjiang":
-                return c.Window == SkillProgramTriggerWindow.AfterDamageApplied ? c.Amount > 0 && _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber > 0 : _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduHengjiangPaidEvent>().Any(e => e.OwnerSeat == owner.Seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber) && !_coreGuanduGeneralsOperations.GuanduTurnDiscarded(_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
+                return c.Window == SkillProgramTriggerWindow.AfterDamageApplied ? c.Amount > 0 && _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber > 0 : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduHengjiangPaidEvent>().Any(e => e.OwnerSeat == owner.Seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber) && !_coreGuanduGeneralsOperations.GuanduTurnDiscarded(_coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
             case "guandu:xiying":
                 return _coreGuanduGeneralsOperations.GuanduDiscardable(owner.Seat, owner.Seat).Length > 0;
             case "guandu:choulue":
@@ -57,7 +57,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralQualificationRuntime
             case "guandu:suishi":
                 if (c.TargetSeat is not { } other || other == owner.Seat)
                     return false;
-                return c.Window == SkillProgramTriggerWindow.DyingEntering ? _coreDyingCursorRuntimeOperations.ActiveDying is { DamageFrameId: not null } dying && dying.VictimSeat == other && _coreNativeDamageHandlesOperations.GetDyingAttack(dying)is { IsSourceLess: false } causal && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[causal.SourceSeat])is { } faction && faction == _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(owner) : _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[other])is { } deadFaction && deadFaction == _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(owner);
+                return c.Window == SkillProgramTriggerWindow.DyingEntering ? _coreDyingCursorRuntimeOperations.Value.ActiveDying is { DamageFrameId: not null } dying && dying.VictimSeat == other && _coreNativeDamageHandlesOperations.Value.GetDyingAttack(dying)is { IsSourceLess: false } causal && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[causal.SourceSeat])is { } faction && faction == _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(owner) : _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[other])is { } deadFaction && deadFaction == _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(owner);
             case "guandu:moushi":
                 return _coreGuanduGeneralNativeCardsOperations.GuanduMoushiQualifies(gate.OwnerSeat, gate.Candidate.SkillInstanceId, c);
             default:
@@ -67,12 +67,12 @@ internal sealed partial class CoreGameEngineGuanduGeneralQualificationRuntime
 
     internal void IssueGuanduAllCardBan(ProgramSkillFrame f, int target)
     {
-        if (!_coreGuanduActivitiesOperations.IsGuanduActivity || f.GuanduGeneral?.Operation != SkillProgramEffectOp.ResolveGuanduXiying || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduAllCardBanIssuedEvent>().Any(e => e.ProgramFrameId == f.Id && e.TargetSeat == target))
+        if (!_coreGuanduActivitiesOperations.IsGuanduActivity || f.GuanduGeneral?.Operation != SkillProgramEffectOp.ResolveGuanduXiying || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduAllCardBanIssuedEvent>().Any(e => e.ProgramFrameId == f.Id && e.TargetSeat == target))
             throw new InvalidOperationException("Xiying requires its exact once-paid other-character decision.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduAllCardBanIssuedEvent(f.Id, f.OwnerSeat, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f)));
     }
 
-    internal bool IsGuanduCardActionForbidden(int actorSeat, CardKind kind, CardActionType type) => _coreGuanduActivitiesOperations.IsGuanduActivity && _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduAllCardBanIssuedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TargetSeat == actorSeat);
+    internal bool IsGuanduCardActionForbidden(int actorSeat, CardKind kind, CardActionType type) => _coreGuanduActivitiesOperations.IsGuanduActivity && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduAllCardBanIssuedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TargetSeat == actorSeat);
     internal bool TryGetGuanduIncomingHpReplacement(GameEngine.IDamageAttempt attack, out CardUseEffectSource source)
     {
         source = null !;

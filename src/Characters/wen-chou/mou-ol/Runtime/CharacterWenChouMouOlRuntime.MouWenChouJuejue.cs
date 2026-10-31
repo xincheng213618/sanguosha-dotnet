@@ -3,13 +3,13 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWenChouMouOlRuntime
 {
-    internal int MouWenChouTargetCount(int owner, int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouTargetDeclaredEvent>().Count(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.ActorSeat == owner && e.TargetSeat == target);
+    internal int MouWenChouTargetCount(int owner, int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouWenChouTargetDeclaredEvent>().Count(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.ActorSeat == owner && e.TargetSeat == target);
     internal void RecordMouWenChouTargets(CardActionContext action)
     {
-        if (!_coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn || !_coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.CardActionId == action.ActionId && e.ActorSeat == action.ActorSeat))
+        if (!_coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.CardActionId == action.ActionId && e.ActorSeat == action.ActorSeat))
             return;
         foreach (var target in action.TargetSeats.Distinct())
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouTargetDeclaredEvent>().Any(e => e.ActionId == action.ActionId && e.TargetSeat == target))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouWenChouTargetDeclaredEvent>().Any(e => e.ActionId == action.ActionId && e.TargetSeat == target))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouWenChouTargetDeclaredEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, action.ActorSeat, action.ActionId, target));
     }
 
@@ -38,7 +38,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
         if (count is null || count.CountBefore != ids.Length || !batch.Movements.Where(m => m.From == CardLocation.Hand(a.ActorSeat) && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use).Select(m => m.CardId).Order().SequenceEqual(ids))
             return;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { MouWenChouAllHand = true });
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouAllHandPaidEvent>().Any(e => e.UseId == use.Id && e.ActionId == a.ActionId))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouWenChouAllHandPaidEvent>().Any(e => e.UseId == use.Id && e.ActionId == a.ActionId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouWenChouAllHandPaidEvent(use.Id, a.ActionId, a.ActorSeat, ids.Length));
     }
 
@@ -56,8 +56,8 @@ internal sealed partial class CharacterWenChouMouOlRuntime
         if (MouWenChouContextUse(c, w)is not { Action: { } a } use || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive)
             return false;
         if (c.SkillId == MouWenChouOlComposition.Lunzhan)
-            return c.BindingId == "reward" && w.Window == SkillProgramTriggerWindow.CardUseCompleted && use.MouWenChouLunzhan is { } o && o.Source.OwnerSeat == c.OwnerSeat && o.Source.SkillInstanceId == c.SkillInstanceId && o.GameplayHash == c.GameplayHash && IsMouWenChouDuel(use.Id) && use.TargetSeats is [var target] && target != c.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouUseDamageEvent>().Any(d => d.UseId == use.Id && d.SourceSeat == c.OwnerSeat && d.TargetSeat == target && d.Amount > 0) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.RewardMouWenChouLunzhan && e.UseId == use.Id);
-        return c.SkillId == MouWenChouOlComposition.Juejue && c.BindingId == "all-hand" && w.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && _coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == c.OwnerSeat && a.ActorSeat == c.OwnerSeat && MouWenChouAllHandUse(use) && use.TargetSeats is [var sole] && sole != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[sole].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouJuejueQualifiedEvent>().Any(e => e.Entry.Source.OwnerSeat == c.OwnerSeat && e.Entry.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
+            return c.BindingId == "reward" && w.Window == SkillProgramTriggerWindow.CardUseCompleted && use.MouWenChouLunzhan is { } o && o.Source.OwnerSeat == c.OwnerSeat && o.Source.SkillInstanceId == c.SkillInstanceId && o.GameplayHash == c.GameplayHash && IsMouWenChouDuel(use.Id) && use.TargetSeats is [var target] && target != c.OwnerSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouWenChouUseDamageEvent>().Any(d => d.UseId == use.Id && d.SourceSeat == c.OwnerSeat && d.TargetSeat == target && d.Amount > 0) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouWenChouStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.RewardMouWenChouLunzhan && e.UseId == use.Id);
+        return c.SkillId == MouWenChouOlComposition.Juejue && c.BindingId == "all-hand" && w.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && _coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == c.OwnerSeat && a.ActorSeat == c.OwnerSeat && MouWenChouAllHandUse(use) && use.TargetSeats is [var sole] && sole != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[sole].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouWenChouJuejueQualifiedEvent>().Any(e => e.Entry.Source.OwnerSeat == c.OwnerSeat && e.Entry.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 33100, SkillProgramEffectOp.RewardMouWenChouLunzhan, SkillProgramEffectOp.ResolveMouWenChouJuejue)]
@@ -105,7 +105,7 @@ internal sealed partial class CharacterWenChouMouOlRuntime
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 33100)]
     internal bool CaptureMouWenChouDamage(GameEngine.IDamageAttempt attack, long damageId)
     {
-        if (HasMouWenChouOl && attack.DamageWasApplied && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { MouWenChouLunzhan: not null } use && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == damageId)is DamageFrame { Amount: > 0 } damage && damage.ParentFrameId == use.Id && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouWenChouUseDamageEvent>().Any(e => e.DamageId == damageId))
+        if (HasMouWenChouOl && attack.DamageWasApplied && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { MouWenChouLunzhan: not null } use && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == damageId)is DamageFrame { Amount: > 0 } damage && damage.ParentFrameId == use.Id && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouWenChouUseDamageEvent>().Any(e => e.DamageId == damageId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouWenChouUseDamageEvent(use.Id, damageId, damage.SourceSeat, damage.TargetSeat, damage.Amount));
         return false;
     }

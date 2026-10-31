@@ -8,9 +8,9 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     internal const string ShenTscPowei = "mobile-god:powei", ShenTscDulie = "mobile-god:dulie", ShenTscShenzhu = "mobile-god:shenzhu";
     internal const string ShenTscDiscard = "skill-program.shen-taishi-ci.powei.discard", ShenTscTake = "skill-program.shen-taishi-ci.powei.take";
     internal static CardConversionSource ShenTscSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal bool ShenTscMissionOver(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiPoweiMissionEvent>().Any(e => e.OwnerSeat == owner);
+    internal bool ShenTscMissionOver(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenTaishiCiPoweiMissionEvent>().Any(e => e.OwnerSeat == owner);
     internal int ShenTscWei(int seat, int owner) => _coreMatchParticipantsPlayersAccess._players[seat].MarkerSourceCounts.GetValueOrDefault((PlayerMarkerKind.ShenTaishiCiWei, owner));
-    internal bool HasShenTaishiCiPoweiRange(int actor, int target) => _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiPoweiRangeEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.AttackerSeat == actor && e.OwnerSeat == target) && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.ActorSeat == actor);
+    internal bool HasShenTaishiCiPoweiRange(int actor, int target) => _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenTaishiCiPoweiRangeEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.AttackerSeat == actor && e.OwnerSeat == target) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.ActorSeat == actor);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 38200)]
     [ProgramDistanceRule(ProgramDistanceStage.VirtualSlash, 38200)]
     [ProgramDistanceRule(ProgramDistanceStage.ProvidedSlash, 38200)]
@@ -264,7 +264,7 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 38200)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 38200)]
-    internal bool ContinuePaidShenTscPowei(ProgramSkillFrame f) => f.ShenTaishiCiPowei is { Stage: not ShenTaishiCiPoweiStage.Choice } || f.SkillId == ShenTscPowei && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiPoweiMissionEvent>().Any(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat);
+    internal bool ContinuePaidShenTscPowei(ProgramSkillFrame f) => f.ShenTaishiCiPowei is { Stage: not ShenTaishiCiPoweiStage.Choice } || f.SkillId == ShenTscPowei && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenTaishiCiPoweiMissionEvent>().Any(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat);
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveShenTaishiCiPowei)]
     internal PromptChoice ChooseShenTscPowei(PendingDecision p, ProgramSkillFrame f)
@@ -292,7 +292,7 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
 
     internal bool TryCompleteShenTaishiCiCancelledSlash(ProgramCardTriggerWindowFrame window)
     {
-        if (CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { } action } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenTaishiCiDulieCancelledEvent>().Any(e => e.UseId == use.Id && e.ActionId == action.ActionId))
+        if (CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseTargetsFinalized || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { } action } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenTaishiCiDulieCancelledEvent>().Any(e => e.UseId == use.Id && e.ActionId == action.ActionId))
             return false;
         if (use.TargetSeats.Count > 0)
         {

@@ -18,10 +18,10 @@ internal sealed partial class CharacterCaoZhiBoundaryMobileRuntime
     {
         if (c.SkillId is not (BoundaryCaoZhiComposition.Jiushi or BoundaryCaoZhiComposition.Upgraded) || c.BindingId != BoundaryCaoZhiComposition.Damage)
             return true;
-        return context.Window == SkillProgramTriggerWindow.AfterDamageApplied && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsFaceDown && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryCaoZhiDamageFaceEvent>().Any(e => e.DamageFrameId == context.DamageFrameId && e.OwnerSeat == c.OwnerSeat && e.WasFaceDown);
+        return context.Window == SkillProgramTriggerWindow.AfterDamageApplied && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsFaceDown && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryCaoZhiDamageFaceEvent>().Any(e => e.DamageFrameId == context.DamageFrameId && e.OwnerSeat == c.OwnerSeat && e.WasFaceDown);
     }
 
-    internal int BoundaryCaoZhiGameDamage(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Sum(e => (e.TargetSeat == owner ? e.Amount : 0) + (!e.SourceLess && e.SourceSeat == owner ? e.Amount : 0));
+    internal int BoundaryCaoZhiGameDamage(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Sum(e => (e.TargetSeat == owner ? e.Amount : 0) + (!e.SourceLess && e.SourceSeat == owner ? e.Amount : 0));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 56701, SkillProgramEffectOp.UpgradeBoundaryCaoZhiJiushi)]
     internal bool QualifyBoundaryCaoZhiChengzhang(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == BoundaryCaoZhiComposition.Chengzhang && context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && context.OwnerSeat == c.OwnerSeat && _coreActualTurnProgressCurrentSeatAccess._currentSeat == c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && BoundaryCaoZhiGameDamage(c.OwnerSeat) >= 7;
     void IBoundaryCaoZhiHost.SelectTrick(ProgramSkillFrame frame, string bind) => SelectBoundaryCaoZhiTrick(frame, bind);

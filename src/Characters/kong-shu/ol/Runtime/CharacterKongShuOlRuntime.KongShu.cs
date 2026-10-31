@@ -33,7 +33,7 @@ internal sealed partial class CharacterKongShuOlRuntime
         }
         else if (op == SkillProgramEffectOp.ResolveFuchaoRoundEndingDrawAndDiscard)
         {
-            if (!_coreRoundEndingOperations.IsExactRoundEndingCandidate(candidate, context))
+            if (!_coreRoundEndingOperations.Value.IsExactRoundEndingCandidate(candidate, context))
                 throw new InvalidOperationException("Fuchao requires the real RoundEnding current candidate.");
             r = r with
             {
@@ -292,7 +292,7 @@ internal sealed partial class CharacterKongShuOlRuntime
 
             var payer = r.DiscardRecipients[r.Cursor];
             var available = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, payer, payer, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard).Count;
-            var count = Math.Min(_coreProgramEventHistoryOperations.ProgramEventHistory<KongShuDiscardRecipientFrozenEvent>().First(e => e.FrameId == id).X, available);
+            var count = Math.Min(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<KongShuDiscardRecipientFrozenEvent>().First(e => e.FrameId == id).X, available);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { KongShu = r with { Payer = payer, DiscardCount = count } });
             if (count == 0)
             {

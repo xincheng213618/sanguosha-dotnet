@@ -9,7 +9,7 @@ internal sealed partial class CoreNativeDamageHandlesRuntime
     {
         if (frame.Continuation is JudgmentContinuationKind.Indulgence or JudgmentContinuationKind.SupplyShortage or JudgmentContinuationKind.Lightning)
             return null;
-        if (frame.Continuation == JudgmentContinuationKind.ProgramSkill && frame.ParentAttackId is null && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(parent => parent.Id == frame.ParentFrameId)is { ZhouQun: not null } ningwu && _characterZhouQunOlOperations.IsNingwuJudgment(frame, ningwu))
+        if (frame.Continuation == JudgmentContinuationKind.ProgramSkill && frame.ParentAttackId is null && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(parent => parent.Id == frame.ParentFrameId)is { ZhouQun: not null } ningwu && _characterZhouQunOlOperations.Value.IsNingwuJudgment(frame, ningwu))
             return null;
         if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.ResolutionId != frame.ParentAttackId || (frame.Continuation is JudgmentContinuationKind.Bagua or JudgmentContinuationKind.FactionDefenseBagua && frame.ParentAttackId != frame.ParentFrameId))
             throw new InvalidOperationException("A judgment lost its parent attack.");
@@ -32,7 +32,7 @@ internal sealed partial class CoreNativeDamageHandlesRuntime
         return attack;
     }
 
-    internal GameEngine.IDamageAttempt GetDamageTriggerAttack(DamageTriggerWindowFrame frame) => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } active && active.Id == frame.Id && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } attack ? attack : throw new InvalidOperationException("The damage trigger lost its active attack.");
+    internal GameEngine.IDamageAttempt GetDamageTriggerAttack(DamageTriggerWindowFrame frame) => _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is { } active && active.Id == frame.Id && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } attack ? attack : throw new InvalidOperationException("The damage trigger lost its active attack.");
     internal bool SupportsGodFactionSelection => _modeRulesOperations._modeRules.SupportsGodFactionSelection;
     internal bool IsClassicIdentityMode => _modeRulesOperations._modeRules.IsClassicIdentityContext;
     internal bool UsesClassicBattleRules => _modeRulesOperations._modeRules.UsesClassicBattleRules;

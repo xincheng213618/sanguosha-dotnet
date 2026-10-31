@@ -22,7 +22,7 @@ internal sealed partial class CharacterSunShangxiangMouMobileRuntime
     CardLocation IMouSunShangxiangFacts.Location(int id) => _cardZonesOperations._cardZones.GetLocation(id);
     IReadOnlyList<MouSsxEntity> IMouSunShangxiangFacts.Field(int owner, bool equipmentOnly) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && (!equipmentOnly || p.Seat != owner)).SelectMany(p => (equipmentOnly ? new[] { CardZoneKind.Equipment } : new[] { CardZoneKind.Equipment, CardZoneKind.Judgment }).SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, p.Seat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, c, new(zone, p.Seat), equipmentOnly ? OwnedCardMoveIntent.Transfer : OwnedCardMoveIntent.Discard)).Select(c => new MouSsxEntity(c.Id, c.Kind, new(zone, p.Seat))))).ToArray());
     IReadOnlyList<MouSsxEntity> IMouSunShangxiangFacts.Zhuang(int owner) => Array.AsReadOnly(_corePublicPileSourcesOperations.PublicPileSources(owner).Where(p => p.SkillId == MouSunShangxiangRuntime.Liangzhu).SelectMany(p => _corePublicPileSourcesOperations.PublicPileCards(p).Select(c => new MouSsxEntity(c.Id, c.Kind, p.Location))).ToArray());
-    IEnumerable<T> IMouSunShangxiangFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouSunShangxiangFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouSunShangxiangFacts.ParentMatches(ProgramSkillFrame f) => MouSsxParentMatches(f);
     bool IMouSunShangxiangFacts.MovementRecoveryChild(ProgramSkillFrame f, ResolutionFrame child)
     {
@@ -34,7 +34,7 @@ internal sealed partial class CharacterSunShangxiangMouMobileRuntime
             return false;
         if (child is RecoveryReplacementFrame recovery)
             return _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.Program && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == reason && recovery.Attempt.Amount == 1 && recovery.Attempt.SourceSeat == seat && recovery.Attempt.TargetSeat == seat;
-        return child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount > 0 && hp.Change.SourceSeat == seat && hp.Change.TargetSeat == seat && _coreProgramEventHistoryOperations.ProgramEventHistory<SilverLionRemovedRecoveryEvent>().Any(x => x.ResolutionId > f.Id && x.ResolutionId < hp.Change.Id && x.PlayerSeat == seat && x.Reason.Value == reason && x.RecoveredAmount == hp.Change.Amount && x.RemainingHp == hp.Change.HpAfter);
+        return child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount > 0 && hp.Change.SourceSeat == seat && hp.Change.TargetSeat == seat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SilverLionRemovedRecoveryEvent>().Any(x => x.ResolutionId > f.Id && x.ResolutionId < hp.Change.Id && x.PlayerSeat == seat && x.Reason.Value == reason && x.RecoveredAmount == hp.Change.Amount && x.RemainingHp == hp.Change.HpAfter);
     }
 
     double IMouSunShangxiangFacts.HelpValue(int actor, int target) => _coreAiBrainsAiBrainsAccess._aiBrains[actor].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(actor), target, new(0, 0, 0, 0, 1, 0, true, false));
@@ -148,7 +148,7 @@ internal sealed partial class CharacterSunShangxiangMouMobileRuntime
 
     internal void GrantMouSsxArmor(ProgramSkillFrame f, int seat)
     {
-        if (f.MouSsx is not { Stage: MouSsxStage.GiftChildren, Paid: true } r || !MouSunShangxiang.Valid(f) || r.HolderSeat != seat || _coreProgramEventHistoryOperations.ProgramEventHistory<ArmorGrantedEvent>().Any(e => e.ProgramFrameId == f.Id))
+        if (f.MouSsx is not { Stage: MouSsxStage.GiftChildren, Paid: true } r || !MouSunShangxiang.Valid(f) || r.HolderSeat != seat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ArmorGrantedEvent>().Any(e => e.ProgramFrameId == f.Id))
             throw new InvalidOperationException("Jieyin cannot grant armor twice or to a different giver.");
         if (_coreWushuangModeProjectionOperations.IsWushuangMode || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || r.Selected.Any(id => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == CardLocation.Hand(seat) && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MouSsxGiveReason)))
             return;
@@ -160,7 +160,7 @@ internal sealed partial class CharacterSunShangxiangMouMobileRuntime
     internal bool IsIssuedMouSsxZhuang(PublicPersistentPileSource source) => source.SkillId == MouSunShangxiangRuntime.Liangzhu && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.OwnerSeat == source.OwnerSeat && f.MouSsx is { Paid: true, Stage: MouSsxStage.FailureRecoverChildren or MouSsxStage.FailureObtainChildren } && MouSunShangxiang.Valid(f));
     internal void ChangeMouSsxFailureFaction(ProgramSkillFrame f)
     {
-        if (!_coreNativeFactionChangesOperations.TracksNativeEffectiveFactionChanges || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || !MouSunShangxiang.Valid(f) || f.SkillId != MouSunShangxiangRuntime.Jieyin || f.MouSsx is not { Stage: MouSsxStage.FailureFaction, Paid: true } || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouSsxMissionFailedEvent>().Any(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat))
+        if (!_coreNativeFactionChangesOperations.TracksNativeEffectiveFactionChanges || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || !MouSunShangxiang.Valid(f) || f.SkillId != MouSunShangxiangRuntime.Jieyin || f.MouSsx is not { Stage: MouSsxStage.FailureFaction, Paid: true } || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouSsxMissionFailedEvent>().Any(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Jieyin faction change requires its actual once-paid failed mission parent.");
         _coreNativeFactionChangesOperations.SynchronizeNativeEffectiveFactions();
         var p = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];

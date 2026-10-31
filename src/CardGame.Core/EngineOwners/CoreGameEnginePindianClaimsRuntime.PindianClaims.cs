@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEnginePindianClaimsRuntime
 {
     internal bool BeginPindianClaims(PindianFrame frame)
     {
-        if (_characterSunCeBoundaryMobileOperations.TryBeginBoundarySunCeZhibaClaim(frame))
+        if (_characterSunCeBoundaryMobileOperations.Value.TryBeginBoundarySunCeZhibaClaim(frame))
             return true;
         if (_characterJianYongBoundaryMobileOperations.TryBeginBoundaryJianYongZongshi(frame))
             return true;
@@ -13,8 +13,8 @@ internal sealed partial class CoreGameEnginePindianClaimsRuntime
             return true;
         if (frame.Result is { } wuResult && _characterLuKangWumiaoOperations.TryBeginWuLuKangPostComparison(frame, wuResult, 0))
             return true;
-        if (_corePindianMaximumSlashClaimsOperations.HasMaximumSlashPindianClaim(frame))
-            return _corePindianMaximumSlashClaimsOperations.BeginMaximumSlashPindianClaims(frame);
+        if (_corePindianMaximumSlashClaimsOperations.Value.HasMaximumSlashPindianClaim(frame))
+            return _corePindianMaximumSlashClaimsOperations.Value.BeginMaximumSlashPindianClaims(frame);
         var result = frame.Result ?? throw new InvalidOperationException("Pindian claim requires a revealed result.");
         var seats = frame.ClaimSeats ?? new[]
         {
@@ -72,7 +72,7 @@ internal sealed partial class CoreGameEnginePindianClaimsRuntime
         var frame = (PindianFrame)_resolutionStackOperations._resolutionStack[^1];
         if (frame.PolicyClaims is not null)
         {
-            _corePindianMaximumSlashClaimsOperations.ResolveMaximumSlashPindianClaim(frame, selected);
+            _corePindianMaximumSlashClaimsOperations.Value.ResolveMaximumSlashPindianClaim(frame, selected);
             return;
         }
 

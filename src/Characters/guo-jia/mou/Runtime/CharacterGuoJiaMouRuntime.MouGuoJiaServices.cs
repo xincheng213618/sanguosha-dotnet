@@ -15,7 +15,7 @@ internal sealed partial class CharacterGuoJiaMouRuntime
     bool IMouGuoJiaFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
     string IMouGuoJiaFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
     SkillProgram? IMouGuoJiaFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
-    IEnumerable<T> IMouGuoJiaFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouGuoJiaFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouGuoJiaFacts.Parent(ProgramSkillFrame f) => MouGjParent(f);
     bool IMouGuoJiaFacts.Yin(int s, string instance) => _coreProgramPersistentStateOperations.GetProgramBooleanState2(s, MouGuoJiaRuntime.Xianmou, instance, "yin");
     IReadOnlyList<int> IMouGuoJiaFacts.Living => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
@@ -100,7 +100,7 @@ internal sealed partial class CharacterGuoJiaMouRuntime
     void IMouGuoJiaNative.Judge(ProgramSkillFrame f) => BeginMouGjJudgment(f);
     void IMouGuoJiaNative.Damage(ProgramSkillFrame f)
     {
-        if (!MouGuoJia.Valid(f) || f.MouGuoJia is not { Stage: MouGuoJiaStage.DamageChildren, LightningHit: true } r || _coreProgramEventHistoryOperations.ProgramEventHistory<MouGjLightningIssuedEvent>().Count(p => p.FrameId == f.Id && p.JudgmentId == r.JudgmentId && p.Target == f.OwnerSeat && p.Amount == 3) != 1)
+        if (!MouGuoJia.Valid(f) || f.MouGuoJia is not { Stage: MouGuoJiaStage.DamageChildren, LightningHit: true } r || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGjLightningIssuedEvent>().Count(p => p.FrameId == f.Id && p.JudgmentId == r.JudgmentId && p.Target == f.OwnerSeat && p.Amount == 3) != 1)
             throw new InvalidOperationException("Xianmou requires his exact finalized Lightning hit once.");
         _coreSkillProgramsOperations.BeginProgramSkillDamage(f, f.OwnerSeat, 3, nature: DamageNature.Thunder, sourceLess: true);
     }

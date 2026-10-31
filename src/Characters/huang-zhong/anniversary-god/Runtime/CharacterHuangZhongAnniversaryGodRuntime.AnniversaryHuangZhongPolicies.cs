@@ -32,7 +32,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
         };
         if (target is null)
             return;
-        foreach (var issue in _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzBodyIssuedEvent>().Where(e => e.Target == target && e.Body is AnniversaryHzBody.Diji or AnniversaryHzBody.Zhongshu or AnniversaryHzBody.Qihai && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzStatusExpiredEvent>().Any(x => x.Id == e.Id)).ToArray())
+        foreach (var issue in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzBodyIssuedEvent>().Where(e => e.Target == target && e.Body is AnniversaryHzBody.Diji or AnniversaryHzBody.Zhongshu or AnniversaryHzBody.Qihai && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzStatusExpiredEvent>().Any(x => x.Id == e.Id)).ToArray())
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryHzStatusExpiredEvent(issue.Id, target.Value, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber));
     }
 
@@ -45,10 +45,10 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
         {
             if (use.Action is { } action)
                 IssueAnniversaryHzActualUse(action, use.Id);
-            else if (_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) && _coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.OriginFrameId == use.Id && e.CardActionId is null))
+            else if (_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.OriginFrameId == use.Id && e.CardActionId is null))
                 IssueAnniversaryHzLegacyUse(use);
         }
-        else if (payload is CardActionAcceptedEvent accepted && _coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.CardActionId == accepted.Action.ActionId))
+        else if (payload is CardActionAcceptedEvent accepted && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.CardActionId == accepted.Action.ActionId))
         {
             var a = accepted.Action;
             var parent = a.Type == CardActionType.Use ? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.Action?.ActionId == a.ActionId)?.Id : a.EffectiveKind == CardKind.Nullification ? _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow?.Id : _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.Action?.ActionId == a.ParentActionId && f.CardAttack?.TargetSeat == a.ActorSeat)?.Id;
@@ -109,7 +109,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
         var actor = legacy ? proof.Actor : proof.Action!.ActorSeat;
         if (legacy ? action is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(parent)is not { Action: null } use || use.SourceSeat != actor || use.CardKind != proof.LegacyKind || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) : action is null || !SameAnniversaryHzAction(proof.Action!, action))
             return false;
-        return proof.StatusIds.All(id => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzBodyIssuedEvent>().Count(s => s.Id == id && s.Target == actor && s.Body == AnniversaryHzBody.Zhongshu) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzStatusConsumedEvent>().Count(s => s.Id == id && s.Reason == (legacy ? "legacy-use" : "use") && s.Origin == (legacy ? parent : action!.ActionId)) == 1);
+        return proof.StatusIds.All(id => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzBodyIssuedEvent>().Count(s => s.Id == id && s.Target == actor && s.Body == AnniversaryHzBody.Zhongshu) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzStatusConsumedEvent>().Count(s => s.Id == id && s.Reason == (legacy ? "legacy-use" : "use") && s.Origin == (legacy ? parent : action!.ActionId)) == 1);
     }
 
     internal static bool SameAnniversaryHzAction(CardActionContext a, CardActionContext b) => (a.ActionId, a.ParentActionId, a.Type, a.ActorSeat, a.ProviderSeat, a.RequesterSeat, a.ResponderSeat, a.OpponentSeat, a.EffectiveKind, a.EffectiveSuit, a.EffectiveRank) == (b.ActionId, b.ParentActionId, b.Type, b.ActorSeat, b.ProviderSeat, b.RequesterSeat, b.ResponderSeat, b.OpponentSeat, b.EffectiveKind, b.EffectiveSuit, b.EffectiveRank) && a.PhysicalCards.SequenceEqual(b.PhysicalCards) && a.ConversionChain.SequenceEqual(b.ConversionChain);
@@ -141,7 +141,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
         _coreRoundOnceCardlessNativeResponsesOperations.ClearRoundOnceCardlessDodgeResponse(attack);
         _coreTieredRoundZeroResponsesOperations.ClearTieredRoundDodgeResponse(attack);
         _coreChainedStateBasicReturnsOperations.ClearChainedStateBasicDodgeResponse(attack);
-        _coreDrawFundedDistinctBasicResponsesOperations.ClearDrawFundedDistinctBasicDodgeResponse(attack);
+        _coreDrawFundedDistinctBasicResponsesOperations.Value.ClearDrawFundedDistinctBasicDodgeResponse(attack);
         _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);
         if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);

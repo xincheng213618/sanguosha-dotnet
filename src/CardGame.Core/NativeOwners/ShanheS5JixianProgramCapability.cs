@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ShanheS5JixianProgramCapability(Func<RuntimeEntries.CoreGameEngineShanheS5ZhulingEntries> getCoreGameEngineShanheS5ZhulingRuntime) : IShanheS5JixianProgramHost
+internal sealed class ShanheS5JixianProgramCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5ZhulingRuntime>> getCoreGameEngineShanheS5ZhulingRuntime) : IShanheS5JixianProgramHost
 {
-    public SkillProgramStepOutcome ResolveShanheS5Jixian(ProgramSkillFrame frame, string stage) => getCoreGameEngineShanheS5ZhulingRuntime().ResolveShanheS5Jixian(frame, stage);
+    public SkillProgramStepOutcome ResolveShanheS5Jixian(ProgramSkillFrame frame, string stage) => getCoreGameEngineShanheS5ZhulingRuntime().Value.ResolveShanheS5Jixian(frame, stage);
 }

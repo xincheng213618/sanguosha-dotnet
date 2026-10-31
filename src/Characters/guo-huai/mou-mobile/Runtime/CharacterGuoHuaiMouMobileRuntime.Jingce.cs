@@ -18,7 +18,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
         {
             if (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { Continuation: ProgramLifecycleContinuation.MouGuoHuaiActualStart } || c.SourceSeat != f.OwnerSeat)
                 throw new InvalidOperationException("Jingce start requires its real pre-round actual-start window.");
-            var rewards = _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionDueEvent>().Where(d => d.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && d.NoneSuccess && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Any(p => p.PredictionId == d.PredictionId && p.Source.OwnerSeat == f.OwnerSeat && p.Source.SkillInstanceId == f.SkillInstanceId && p.GameplayHash == f.GameplayHash) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == d.PredictionId)).Select(d => d.PredictionId).ToArray();
+            var rewards = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionDueEvent>().Where(d => d.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && d.NoneSuccess && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Any(p => p.PredictionId == d.PredictionId && p.Source.OwnerSeat == f.OwnerSeat && p.Source.SkillInstanceId == f.SkillInstanceId && p.GameplayHash == f.GameplayHash) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == d.PredictionId)).Select(d => d.PredictionId).ToArray();
             r = r with
             {
                 Stage = MouGuoHuaiStage.StartRewards,
@@ -41,7 +41,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
         {
             var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
             var q = MouGuoHuaiGainQualification(candidate, c) ?? throw new InvalidOperationException("Jingce gain reward lost the first actual Hand gain.");
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == q.PredictionId))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == q.PredictionId))
                 return SkillProgramStepOutcome.Continue;
             r = r with
             {
@@ -192,8 +192,8 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
         if (r.Index < r.Rewards.Count)
         {
             var predictionId = r.Rewards[r.Index];
-            var p = _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Single(p => p.PredictionId == predictionId);
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == predictionId))
+            var p = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Single(p => p.PredictionId == predictionId);
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == predictionId))
                 throw new InvalidOperationException("A prediction reward cannot be issued twice.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouGuoHuai = r with { Stage = MouGuoHuaiStage.Drawing, PredictionId = predictionId, Requested = p.Ordinal, Paid = true } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGuoHuaiPredictionConsumedEvent(predictionId, f.Id, r.Op == SkillProgramEffectOp.ResolveMouGuoHuaiJingceStart ? "none-at-next-start" : "first-hand-gain"));
@@ -208,7 +208,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
             return;
         }
 
-        foreach (var due in _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionDueEvent>().Where(d => d.ActualTurn == r.ActualTurn && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Any(p => p.PredictionId == d.PredictionId && p.Source.OwnerSeat == f.OwnerSeat && p.Source.SkillInstanceId == f.SkillInstanceId) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == d.PredictionId)).ToArray())
+        foreach (var due in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionDueEvent>().Where(d => d.ActualTurn == r.ActualTurn && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionIssuedEvent>().Any(p => p.PredictionId == d.PredictionId && p.Source.OwnerSeat == f.OwnerSeat && p.Source.SkillInstanceId == f.SkillInstanceId) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuoHuaiPredictionConsumedEvent>().Any(e => e.PredictionId == d.PredictionId)).ToArray())
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGuoHuaiPredictionConsumedEvent(due.PredictionId, f.Id, "clear-unverified-at-next-start"));
         if (_corePublicPileSourcesOperations.PublicPileSources(f.OwnerSeat).Any(s => s.SkillId == f.SkillId && _corePublicPileSourcesOperations.PublicPileCards(s).Count != 0))
         {

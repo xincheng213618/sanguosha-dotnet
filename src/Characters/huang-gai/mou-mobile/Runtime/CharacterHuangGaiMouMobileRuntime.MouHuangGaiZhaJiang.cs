@@ -48,8 +48,8 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
         {
             if (group.ToArray()is not [var p] || p.MouZhaJiang is not { } q || !ValidMouZhaJiangDeclaration(p, q))
                 throw new InvalidOperationException("ZhaJiang's pending declaration must have one exact live payment owner.");
-            var nativeUses = _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhaJiangUseAdmittedEvent>().Where(e => e.DeclarationId == p.DeclarationId).ToArray();
-            var nativeResponses = _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhaJiangResponseAdmittedEvent>().Where(e => e.DeclarationId == p.DeclarationId).ToArray();
+            var nativeUses = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhaJiangUseAdmittedEvent>().Where(e => e.DeclarationId == p.DeclarationId).ToArray();
+            var nativeResponses = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhaJiangResponseAdmittedEvent>().Where(e => e.DeclarationId == p.DeclarationId).ToArray();
             if (nativeUses.Length + nativeResponses.Length > 1)
                 throw new InvalidOperationException("A ZhaJiang declaration cannot admit more than one native true Use.");
             var recorded = nativeUses is [var use] ? facts.Count(f => f.RoundActionType == CardActionType.Use && f.OriginFrameId == use.UseId && f.CardActionId == (use.ActionId > 0 ? use.ActionId : null) && f.ProgramInstructionIndex == use.ProgramInstructionIndex) : nativeResponses is [var response] ? facts.Count(f => f.RoundActionType == CardActionType.Response && f.OriginFrameId == response.OwnerFrameId && f.CardActionId == response.ActionId) : 0;
@@ -109,7 +109,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
         };
     }
 
-    internal bool ValidMouZhaJiangDeclaration(DeclaredCardPayment p, MouZhaJiangAdmission q) => ValidMouZhaJiangAdmission(q) && p.MouZhaJiang == q && p.ActorSeat == q.ActorSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == p.OwnerFrameId)is { } owner && (owner.AcceptedDeclarationPayment == p || owner is CardDeclarationFrame d && d.Payment == p) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhaJiangDeclarationAdmittedEvent>().Count(e => e == new MouZhaJiangDeclarationAdmittedEvent(p.DeclarationId, p.DeclarationId, p.ProviderSeat, p.Cost.CardId, p.Cost.CardKind, p.Cost.From, p.DeclaredKind, q)) == 1;
+    internal bool ValidMouZhaJiangDeclaration(DeclaredCardPayment p, MouZhaJiangAdmission q) => ValidMouZhaJiangAdmission(q) && p.MouZhaJiang == q && p.ActorSeat == q.ActorSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == p.OwnerFrameId)is { } owner && (owner.AcceptedDeclarationPayment == p || owner is CardDeclarationFrame d && d.Payment == p) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhaJiangDeclarationAdmittedEvent>().Count(e => e == new MouZhaJiangDeclarationAdmittedEvent(p.DeclarationId, p.DeclarationId, p.ProviderSeat, p.Cost.CardId, p.Cost.CardKind, p.Cost.From, p.DeclaredKind, q)) == 1;
     internal void IssueMouZhaJiangUse(CardUseFrame use)
     {
         if (!HasMouZhaJiangCapability || use.MouZhaJiangUse is not null || use.Action is { Type: not CardActionType.Use } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat))
@@ -136,7 +136,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 80)]
     internal bool HasIssuedMouZhaJiangUse(long useId, int actorSeat)
     {
-        if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == useId)is not { MouZhaJiangUse: { } r } owner || r.UseId != owner.Id || !r.Admission.Applies || r.Admission.ActorSeat != actorSeat || !ValidMouZhaJiangAdmission(r.Admission) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhaJiangUseAdmittedEvent>().Count(e => e == new MouZhaJiangUseAdmittedEvent(useId, r.ActionId, r.OriginalKind, r.Admission, r.DeclarationId, r.ProgramInstructionIndex)) != 1)
+        if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == useId)is not { MouZhaJiangUse: { } r } owner || r.UseId != owner.Id || !r.Admission.Applies || r.Admission.ActorSeat != actorSeat || !ValidMouZhaJiangAdmission(r.Admission) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhaJiangUseAdmittedEvent>().Count(e => e == new MouZhaJiangUseAdmittedEvent(useId, r.ActionId, r.OriginalKind, r.Admission, r.DeclarationId, r.ProgramInstructionIndex)) != 1)
             return false;
         if (owner is ProgramSkillFrame { CardAttack: { } attack } program)
             return r.ActionId == 0 && r.DeclarationId is null && r.OriginalKind == CardKind.Duel && r.ProgramInstructionIndex == program.InstructionIndex && attack.ProgramUseInstructionIndex == r.ProgramInstructionIndex && attack.CardUserSeat == actorSeat && attack.EffectiveCardKind == CardKind.Duel && attack.CardId is null;
@@ -214,7 +214,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
 
         if (payload is not CardActionAcceptedEvent { Action: { Type: CardActionType.Response } a } || a.EffectiveKind is not (CardKind.Dodge or CardKind.Nullification) || a.ActorSeat != a.ProviderSeat || a.ResponderSeat != a.ActorSeat || a.RequesterSeat is not null || MouZhaJiangResponseOwner(a.ActorSeat, a.EffectiveKind)is not { } owner)
             return;
-        var parentAction = owner is NullificationWindowFrame n ? _coreDelayedNullificationOperations.NullificationParentActionId(n) : (owner as CardUseFrame)?.Action?.ActionId;
+        var parentAction = owner is NullificationWindowFrame n ? _coreDelayedNullificationOperations.Value.NullificationParentActionId(n) : (owner as CardUseFrame)?.Action?.ActionId;
         if (a.ParentActionId != parentAction)
             return;
         if (owner.MouZhaJiangResponses?.Any(r => r.ActionId == a.ActionId) == true)
@@ -244,14 +244,14 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
         foreach (var use in _resolutionStackOperations._resolutionStack.Where(u => u.MouZhaJiangUse is not null))
         {
             var r = use.MouZhaJiangUse!;
-            if (!ValidMouZhaJiangAdmission(r.Admission) || r.UseId != use.Id || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhaJiangUseAdmittedEvent>().Count(e => e == new MouZhaJiangUseAdmittedEvent(use.Id, r.ActionId, r.OriginalKind, r.Admission, r.DeclarationId, r.ProgramInstructionIndex)) != 1)
+            if (!ValidMouZhaJiangAdmission(r.Admission) || r.UseId != use.Id || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhaJiangUseAdmittedEvent>().Count(e => e == new MouZhaJiangUseAdmittedEvent(use.Id, r.ActionId, r.OriginalKind, r.Admission, r.DeclarationId, r.ProgramInstructionIndex)) != 1)
                 throw new InvalidOperationException("ZhaJiang lost the exact native Use admission frozen before its costs.");
         }
 
         foreach (var owner in _resolutionStackOperations._resolutionStack.Where(f => f.MouZhaJiangResponses is not null))
             foreach (var r in owner.MouZhaJiangResponses!)
             {
-                if (!ValidMouZhaJiangAdmission(r.Admission) || r.ActorSeat != r.Admission.ActorSeat || r.DeclarationId is { } declarationId && (r.Materials is not [var material] || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhaJiangDeclarationAdmittedEvent>().Count(e => e.DeclarationId == declarationId && e.OwnerFrameId == declarationId && e.ProviderSeat == r.ActorSeat && e.CardId == material.CardId && e.PrintedKind == material.CardKind && e.From == material.From && e.DeclaredKind == r.Kind && e.Admission == r.Admission) != 1) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhaJiangResponsePreparedEvent>().Count(e => e == new MouZhaJiangResponsePreparedEvent(owner.Id, r.Index, r.ActorSeat, r.Kind, r.Admission, r.Materials.Count, r.DeclarationId)) != 1 || r.Materials.Select((c, i) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhaJiangResponseMaterialEvent>().Count(e => e == new MouZhaJiangResponseMaterialEvent(owner.Id, r.Index, i, c.CardId, c.CardKind, c.From)) == 1).Any(ok => !ok) || r.ActionId > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhaJiangResponseAdmittedEvent>().Count(e => e == new MouZhaJiangResponseAdmittedEvent(owner.Id, r.Index, r.ActionId, r.ActorSeat, r.Kind, r.Admission, r.DeclarationId)) != 1)
+                if (!ValidMouZhaJiangAdmission(r.Admission) || r.ActorSeat != r.Admission.ActorSeat || r.DeclarationId is { } declarationId && (r.Materials is not [var material] || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhaJiangDeclarationAdmittedEvent>().Count(e => e.DeclarationId == declarationId && e.OwnerFrameId == declarationId && e.ProviderSeat == r.ActorSeat && e.CardId == material.CardId && e.PrintedKind == material.CardKind && e.From == material.From && e.DeclaredKind == r.Kind && e.Admission == r.Admission) != 1) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhaJiangResponsePreparedEvent>().Count(e => e == new MouZhaJiangResponsePreparedEvent(owner.Id, r.Index, r.ActorSeat, r.Kind, r.Admission, r.Materials.Count, r.DeclarationId)) != 1 || r.Materials.Select((c, i) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhaJiangResponseMaterialEvent>().Count(e => e == new MouZhaJiangResponseMaterialEvent(owner.Id, r.Index, i, c.CardId, c.CardKind, c.From)) == 1).Any(ok => !ok) || r.ActionId > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhaJiangResponseAdmittedEvent>().Count(e => e == new MouZhaJiangResponseAdmittedEvent(owner.Id, r.Index, r.ActionId, r.ActorSeat, r.Kind, r.Admission, r.DeclarationId)) != 1)
                     throw new InvalidOperationException("ZhaJiang lost its owning native response preparation and true-Use return.");
             }
     }

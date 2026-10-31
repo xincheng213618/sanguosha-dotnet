@@ -94,7 +94,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
         _coreAlternativeViewAsCostsOperations.RecordProgramUsedBasicCard(actor.Seat, p.Kind);
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, target.Seat, null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: p.Kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, p.Kind));
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, p.Kind);
@@ -107,7 +107,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
     {
         if (use.VirtualOrdinaryTrickOrigin is not { SkillId: AnniversaryYangBiaoComposition.Juee } o || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ParentProgramFrameId)is not ProgramSkillFrame { AnniversaryYangBiao: { Plan: { } p } r } f || !ValidYangBiao(f) || r.Stage is not (AnniversaryYangBiaoStage.IssuingUse or AnniversaryYangBiaoStage.NativeUse) || p.Kind is not (CardKind.Dismantlement or CardKind.FiveGrains) || use.CardKind != p.Kind || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0, RequesterSeat: null, ResponderSeat: null, OpponentSeat: null } a || a.ActionId != o.CardActionId || a.ProviderSeat != f.OwnerSeat || a.EffectiveKind != p.Kind || a.EffectiveSuit is not (null or Suit.None) || a.EffectiveRank is not (null or 0) || a.EffectiveIsRed == true || !a.TargetSeats.SequenceEqual(use.TargetSeats) || o.OwnerSeat != f.OwnerSeat || o.InitialActorSeat != f.OwnerSeat || o.InitialTargetSeat != f.OwnerSeat || o.BindingId != f.ActivationId || o.SkillInstanceId != f.SkillInstanceId || o.GameplayHash != f.GameplayHash || o.InstructionIndex != f.InstructionIndex || o.LifecycleFrameId != 0 || o.TurnNumber != r.Turn || r.UseId != 0 && (r.UseId != use.Id || r.ActionId != a.ActionId))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, f.OwnerSeat, f.OwnerSeat) : a.ActorSeat == f.OwnerSeat;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, f.OwnerSeat, f.OwnerSeat) : a.ActorSeat == f.OwnerSeat;
     }
 
     internal bool IsAnniversaryYangBiaoFiveGrainsUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { CardKind: CardKind.FiveGrains } use && IsAnniversaryYangBiaoVirtualUse(use);
@@ -126,7 +126,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
     internal void CompleteYangBiaoNative(ProgramSkillFrame f, bool? hadAttack = null)
     {
         var r = f.AnniversaryYangBiao!;
-        if (!ValidYangBiao(f) || r.Stage != AnniversaryYangBiaoStage.NativeUse || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == r.Plan!.Kind) != 1)
+        if (!ValidYangBiao(f) || r.Stage != AnniversaryYangBiaoStage.NativeUse || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == r.Plan!.Kind) != 1)
             throw new InvalidOperationException("Juee must return the same whole native Use once before advancing its ordinal.");
         // A basic Slash returns after its CardUse frame has been popped, so
         // ActiveCardAttack can no longer project it. Its native attack cleanup

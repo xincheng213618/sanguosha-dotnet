@@ -79,7 +79,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiangWeiSlashIssuedEvent(origin));
     }
 
-    internal bool ValidMouJwUse(CardUseFrame use, ProgramSkillFrame f) => use.MouJiangWeiRequest is { } n && f.MouJiangWei is { Stage: MouJiangWeiStage.NativeUse } r && n.FrameId == f.Id && n.Source == r.Source && n.GameplayHash == r.GameplayHash && n.Index == r.Cursor && n.UseId == use.Id && n.UseId == r.UseId && n.ActionId == r.ActionId && use.Action is { Type: CardActionType.Use } a && a.ActionId == n.ActionId && a.ProviderSeat == n.ProviderSeat && n.ProviderSeat == r.ProviderSeat && a.RequesterSeat == (n.ProviderSeat == n.ActorSeat ? (int? )null : n.ActorSeat) && n.ActorSeat == r.Targets[r.Cursor] && n.TargetSeat == f.OwnerSeat && a.PhysicalCards.Select(c => c.CardId).SequenceEqual(r.Materials) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiSlashIssuedEvent>().Count(e => e.Origin == n) == 1;
+    internal bool ValidMouJwUse(CardUseFrame use, ProgramSkillFrame f) => use.MouJiangWeiRequest is { } n && f.MouJiangWei is { Stage: MouJiangWeiStage.NativeUse } r && n.FrameId == f.Id && n.Source == r.Source && n.GameplayHash == r.GameplayHash && n.Index == r.Cursor && n.UseId == use.Id && n.UseId == r.UseId && n.ActionId == r.ActionId && use.Action is { Type: CardActionType.Use } a && a.ActionId == n.ActionId && a.ProviderSeat == n.ProviderSeat && n.ProviderSeat == r.ProviderSeat && a.RequesterSeat == (n.ProviderSeat == n.ActorSeat ? (int? )null : n.ActorSeat) && n.ActorSeat == r.Targets[r.Cursor] && n.TargetSeat == f.OwnerSeat && a.PhysicalCards.Select(c => c.CardId).SequenceEqual(r.Materials) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiSlashIssuedEvent>().Count(e => e.Origin == n) == 1;
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 33200)]
     internal bool MouJwRequestedNoDebit(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouJiangWeiRequest: { } n } u && n.ActorSeat == actor && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.FrameId)is { } p && ValidMouJwUse(u, p);
     [NativeUseValidation(33200)]
@@ -95,7 +95,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         if (use.MouJiangWeiRequest is not { } n)
             return;
         var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(x => x.Id == n.FrameId);
-        if (!ValidMouJwUse(use, f) || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiSlashReturnedEvent>().Any(e => e.UseId == use.Id))
+        if (!ValidMouJwUse(use, f) || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiSlashReturnedEvent>().Any(e => e.UseId == use.Id))
             throw new InvalidOperationException("Tiaoxin cannot repeat a native return or pay again.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MouJiangWei = f.MouJiangWei!with { Stage = MouJiangWeiStage.NativeReturned } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiangWeiSlashReturnedEvent(f.Id, n.Index, n.UseId, n.ActionId));

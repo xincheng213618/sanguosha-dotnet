@@ -48,9 +48,9 @@ internal sealed partial class CoreGameEnginePlayCardHistoryRuntime
             if (_characterMiHengLeOperations.IsSiruiSource(source))
                 continue;
             _coreProgramTieredRoundConversionOperations.ConsumeTieredRoundConversion(source);
-            _coreNamedUseConversionsOperations.ConsumeNamedUseConversion(source);
+            _coreNamedUseConversionsOperations.Value.ConsumeNamedUseConversion(source);
             _coreGuanduEventProgramsOperations.ConsumeGuanduRoundConversion(source);
-            _coreActualTurnViewAsOperations.ConsumeActualTurnLimitedViewAs(source);
+            _coreActualTurnViewAsOperations.Value.ConsumeActualTurnLimitedViewAs(source);
             if (ViewAsRule(source)is not { UsesPerPhase: { } limit } rule)
                 continue;
             if (rule.ActivationUsageGroup is { } activationGroup)

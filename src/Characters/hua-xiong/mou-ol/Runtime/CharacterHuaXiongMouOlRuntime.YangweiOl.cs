@@ -17,7 +17,7 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
             turn = draw.TurnNumber;
             invocation = draw.InvocationId;
             outgoing = true;
-            total = draw.ActualCount + _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(e => e.OwnerSeat == owner && e.TurnNumber == turn && e.InvocationId != invocation && e.Phase?.Kind != ActualDiscardRecoveryPhaseKind.Draw).Sum(e => e.ActualCount);
+            total = draw.ActualCount + _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(e => e.OwnerSeat == owner && e.TurnNumber == turn && e.InvocationId != invocation && e.Phase?.Kind != ActualDiscardRecoveryPhaseKind.Draw).Sum(e => e.ActualCount);
         }
         else if (fact is NativeLogicalDiscardInvocationRecordedEvent discard)
         {
@@ -27,17 +27,17 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
             turn = discard.TurnNumber;
             invocation = discard.InvocationId;
             outgoing = false;
-            total = discard.ActualCount + _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ExecutorSeat == owner && e.TurnNumber == turn && e.InvocationId != invocation && e.Phase?.Kind != ActualDiscardRecoveryPhaseKind.Discard).Sum(e => e.ActualCount);
+            total = discard.ActualCount + _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ExecutorSeat == owner && e.TurnNumber == turn && e.InvocationId != invocation && e.Phase?.Kind != ActualDiscardRecoveryPhaseKind.Discard).Sum(e => e.ActualCount);
         }
         else
             return;
-        if (turn < 1 || total < 2 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[owner], MouHuaXiongOlComposition.Yangwei) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHxYangweiTicketEvent>().Any(e => e.Source.OwnerSeat == owner && e.Turn == turn && e.Outgoing == outgoing))
+        if (turn < 1 || total < 2 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[owner], MouHuaXiongOlComposition.Yangwei) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHxYangweiTicketEvent>().Any(e => e.Source.OwnerSeat == owner && e.Turn == turn && e.Outgoing == outgoing))
             return;
         var source = new CardConversionSource(MouHuaXiongOlComposition.Yangwei, outgoing ? "outside-draw" : "outside-discard", owner, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[owner], MouHuaXiongOlComposition.Yangwei));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHxYangweiTicketEvent(source, turn, outgoing, invocation, total));
     }
 
-    internal IReadOnlyList<MouHxYangweiTicketEvent> ActiveMouHxYangweiTickets(int owner, bool outgoing) => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<MouHxYangweiTicketEvent>().Where(e => e.Source.OwnerSeat == owner && e.Outgoing == outgoing && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouHxYangweiConsumedEvent>().Any(c => c.Source == e.Source && c.IssuedTurn == e.Turn && c.Outgoing == e.Outgoing && c.InvocationId == e.InvocationId)).ToArray());
+    internal IReadOnlyList<MouHxYangweiTicketEvent> ActiveMouHxYangweiTickets(int owner, bool outgoing) => Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHxYangweiTicketEvent>().Where(e => e.Source.OwnerSeat == owner && e.Outgoing == outgoing && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHxYangweiConsumedEvent>().Any(c => c.Source == e.Source && c.IssuedTurn == e.Turn && c.Outgoing == e.Outgoing && c.InvocationId == e.InvocationId)).ToArray());
     internal string? MouHxYangweiPublicDescription(int owner)
     {
         var outgoing = ActiveMouHxYangweiTickets(owner, true).Count;
@@ -77,7 +77,7 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
         if (!attack.IsChainPropagation)
             return;
         var cursor = MouHxYangweiChainCursor(attack);
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouHxYangweiChainIssuedEvent>().SingleOrDefault(e => e.AttackId == attack.ResolutionId && e.Cursor == cursor)is not { } issued || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouHxYangweiConsumedEvent>().Any(e => e.AttackId == attack.ResolutionId && e.Chain && e.Cursor == cursor) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHxYangweiChainReturnedEvent>().Any(e => e.AttackId == attack.ResolutionId && e.Cursor == cursor))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHxYangweiChainIssuedEvent>().SingleOrDefault(e => e.AttackId == attack.ResolutionId && e.Cursor == cursor)is not { } issued || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHxYangweiConsumedEvent>().Any(e => e.AttackId == attack.ResolutionId && e.Chain && e.Cursor == cursor) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHxYangweiChainReturnedEvent>().Any(e => e.AttackId == attack.ResolutionId && e.Cursor == cursor))
             return;
         // Earlier native rebasers may already have removed their own temporary increment.
         // Never reintroduce it when removing this chain target's newly consumed tickets.

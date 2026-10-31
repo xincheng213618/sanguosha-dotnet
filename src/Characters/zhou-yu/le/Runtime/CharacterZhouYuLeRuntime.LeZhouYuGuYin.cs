@@ -20,7 +20,7 @@ internal sealed partial class CharacterZhouYuLeRuntime
     {
         if (!HasGuYinCapability)
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<GuYinOpeningCapturedEvent>().Any())
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuYinOpeningCapturedEvent>().Any())
             throw new InvalidOperationException("GuYin global opening identities are captured only once.");
         var entities = _coreMatchParticipantsPlayersAccess._players.SelectMany(p => _corePhysicalOwnedCardQueriesOperations.GetHand(p).Select(c =>
         {
@@ -47,13 +47,13 @@ internal sealed partial class CharacterZhouYuLeRuntime
         };
     }
 
-    internal bool IsIssuedGuYinInitialCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => HasGuYinCapability && c.SkillId == "le:guyin" && c.BindingId == "mark-initial-entities" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash == c.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.InitializeGuYinInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == c.OwnerSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, GuYinInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == c && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<GuYinInitializedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat);
+    internal bool IsIssuedGuYinInitialCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => HasGuYinCapability && c.SkillId == "le:guyin" && c.BindingId == "mark-initial-entities" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash == c.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.InitializeGuYinInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == c.OwnerSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, GuYinInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == c && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuYinInitializedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat);
     SkillProgramStepOutcome ILeZhouYuGuYinHost.Initialize(ProgramSkillFrame f) => InitializeGuYin(f);
     SkillProgramStepOutcome ILeZhouYuGuYinHost.Draw(ProgramSkillFrame f) => BeginGuYinDraw(f);
     internal SkillProgramStepOutcome InitializeGuYin(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.InstructionIndex != 1 || !CanContinueIssuedGuYin(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<GuYinInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
+        if (f.InstructionIndex != 1 || !CanContinueIssuedGuYin(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuYinInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("GuYin initialization needs its exact frozen native opening mother.");
         var parent = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == f.WindowContext!.ParentFrameId);
         var entities = parent.GuYinInitialEntities!.Where(e => e.OriginalOwnerSeat != f.OwnerSeat).ToArray();
@@ -68,9 +68,9 @@ internal sealed partial class CharacterZhouYuLeRuntime
     internal bool ValidGuYinInitialEntry(GuYinInitialEntity e) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(e.OriginalOwnerSeat) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == e.EntrySequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.To == CardLocation.Hand(e.OriginalOwnerSeat)) == 1;
     internal IReadOnlyList<GuYinInitialEntity> GuYinOriginalEntities()
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<GuYinOpeningCapturedEvent>().ToArray()is not [var captured])
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuYinOpeningCapturedEvent>().ToArray()is not [var captured])
             return[];
-        var entities = _coreProgramEventHistoryOperations.ProgramEventHistory<GuYinOpeningEntityEvent>().Where(e => e.SnapshotId == captured.SnapshotId).Select(e => new GuYinInitialEntity(e.OriginalOwnerSeat, e.CardId, e.PrintedKind, e.EntrySequence)).ToArray();
+        var entities = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuYinOpeningEntityEvent>().Where(e => e.SnapshotId == captured.SnapshotId).Select(e => new GuYinInitialEntity(e.OriginalOwnerSeat, e.CardId, e.PrintedKind, e.EntrySequence)).ToArray();
         if (entities.Length != captured.EntityCount || entities.Select(e => e.CardId).Distinct().Count() != entities.Length || entities.Any(e => !ValidGuYinInitialEntry(e)))
             throw new InvalidOperationException("GuYin opening registry lost its original immutable entry invoices.");
         return Array.AsReadOnly(entities);
@@ -82,7 +82,7 @@ internal sealed partial class CharacterZhouYuLeRuntime
         if (!HasGuYinCapability || sources.Count == 0)
             return;
         var initial = GuYinOriginalEntities();
-        foreach (var m in batch.Movements.Where(m => m.To == CardLocation.DiscardPile && (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is not null || _coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(batch, m))))
+        foreach (var m in batch.Movements.Where(m => m.To == CardLocation.DiscardPile && (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is not null || _coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, m))))
         {
             var origin = initial.SingleOrDefault(e => e.CardId == m.CardId && e.PrintedKind == m.CardKind);
             if (origin is null || !ValidGuYinInitialEntry(origin))
@@ -96,17 +96,17 @@ internal sealed partial class CharacterZhouYuLeRuntime
     {
         if (source.SkillId != "le:guyin" || source.BindingId != "initial-entity-discard-draw" || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source.OwnerSeat) || _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash != hash)
             return[];
-        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<GuYinDiscardQualifiedEvent>().Where(e => e.BatchId == batch.Id && e.Source == source).OrderBy(e => e.MovementSequence).ToArray();
+        var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuYinDiscardQualifiedEvent>().Where(e => e.BatchId == batch.Id && e.Source == source).OrderBy(e => e.MovementSequence).ToArray();
         if (facts.Length == 0 || facts.Select(e => e.MovementSequence).Distinct().Count() != facts.Length || facts.Any(e => e.GameplayHash != hash || e.ActualTurn != batch.TurnNumber || e.OriginalOwnerSeat == source.OwnerSeat || !GuYinOriginalEntities().Any(o => o.OriginalOwnerSeat == e.OriginalOwnerSeat && o.CardId == e.CardId && o.PrintedKind == e.PrintedKind && ValidGuYinInitialEntry(o)) || batch.Movements.Count(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.To == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(x => x == m) == 1) != 1))
             return[];
         return facts;
     }
 
-    internal IReadOnlyList<ProgramTriggerCandidate> CollectGuYinDiscardCandidates(CardMovementBatchContext batch) => !HasGuYinCapability ? [] : Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<GuYinDiscardQualifiedEvent>().Where(e => e.BatchId == batch.Id).Select(e => new GuYinSourceSnapshot(e.Source, e.GameplayHash)).Distinct().Where(s => _coreMatchParticipantsPlayersAccess._players[s.Source.OwnerSeat].IsAlive && ExactGuYinQualifications(batch, s.Source, s.GameplayHash).Length > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<GuYinDrawStartedEvent>().Any(e => e.BatchId == batch.Id && e.Source == s.Source)).Select(s => new ProgramTriggerCandidate(s.Source.OwnerSeat, s.Source.SkillId, s.Source.BindingId, s.Source.SkillInstanceId, s.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger2(new ProgramTriggerCandidate(s.Source.OwnerSeat, s.Source.SkillId, s.Source.BindingId, s.Source.SkillInstanceId, s.GameplayHash, 0)).Priority)).ToArray());
+    internal IReadOnlyList<ProgramTriggerCandidate> CollectGuYinDiscardCandidates(CardMovementBatchContext batch) => !HasGuYinCapability ? [] : Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuYinDiscardQualifiedEvent>().Where(e => e.BatchId == batch.Id).Select(e => new GuYinSourceSnapshot(e.Source, e.GameplayHash)).Distinct().Where(s => _coreMatchParticipantsPlayersAccess._players[s.Source.OwnerSeat].IsAlive && ExactGuYinQualifications(batch, s.Source, s.GameplayHash).Length > 0 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuYinDrawStartedEvent>().Any(e => e.BatchId == batch.Id && e.Source == s.Source)).Select(s => new ProgramTriggerCandidate(s.Source.OwnerSeat, s.Source.SkillId, s.Source.BindingId, s.Source.SkillInstanceId, s.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger2(new ProgramTriggerCandidate(s.Source.OwnerSeat, s.Source.SkillId, s.Source.BindingId, s.Source.SkillInstanceId, s.GameplayHash, 0)).Priority)).ToArray());
     internal ProgramSkillWindowContext CreateGuYinMovementContext(CardsMovedTriggerWindowFrame window, ProgramTriggerCandidate c) => new(SkillProgramTriggerWindow.CardsMoved, window.Id, c.OwnerSeat, SourceSeat: c.OwnerSeat, TargetSeat: c.OwnerSeat, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat]), MovementBatch: window.Batch, OccurrenceIndex: c.OccurrenceIndex);
     internal bool GuYinMotherMatches(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == "le:guyin" && c.BindingId == "initial-entity-discard-draw" && c.OccurrenceIndex == 0 && context.Window == SkillProgramTriggerWindow.CardsMoved && context.OwnerSeat == c.OwnerSeat && context.SourceSeat == c.OwnerSeat && context.TargetSeat == c.OwnerSeat && context.OccurrenceIndex == 0 && context.MovementBatch is { } batch && context.ParentFrameId == batch.Id && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == batch.Id)is CardsMovedTriggerWindowFrame window && window.Batch == batch && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && window.Candidates[window.CandidateIndex] == c && ExactGuYinQualifications(batch, new(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId), c.GameplayHash).Length > 0;
     [ProgramIssuedTrigger(240)]
-    internal bool IsIssuedGuYinCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => IsIssuedGuYinInitialCandidate(c, context) || HasGuYinCapability && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && GuYinMotherMatches(c, context) && !_coreProgramEventHistoryOperations.ProgramEventHistory<GuYinDrawStartedEvent>().Any(e => e.BatchId == context.ParentFrameId && e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId));
+    internal bool IsIssuedGuYinCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => IsIssuedGuYinInitialCandidate(c, context) || HasGuYinCapability && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && GuYinMotherMatches(c, context) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuYinDrawStartedEvent>().Any(e => e.BatchId == context.ParentFrameId && e.Source == new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28810, SkillProgramEffectOp.InitializeGuYinInitialEntities, SkillProgramEffectOp.ResolveGuYinInitialEntityDiscardDraw)]
     internal bool CanOfferGuYin(ProgramTriggerLegalityContext g) => IsIssuedGuYinCandidate(g.Candidate, g.Context);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 1900)]

@@ -24,7 +24,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
         var r = new ZhaoZhongReceipt(ZhaoZhongSource(f), f.GameplayHash, op, c?.ParentFrameId ?? 0, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, stage);
         if (op == SkillProgramEffectOp.ResolveDiciGiftRecoveryAndNeighborChain)
         {
-            if (f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Count == 0 || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<DiciAcceptedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == phase))
+            if (f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Count == 0 || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiciAcceptedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == phase))
                 throw new InvalidOperationException("Dici requires a living other true Hand donor and an unspent actual Play phase.");
             r = r with
             {
@@ -47,7 +47,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
         else if (op == SkillProgramEffectOp.ResolveBiriFirstNonDrawGain)
         {
             var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c!.OccurrenceIndex);
-            if (!IsIssuedBiriCandidate(candidate, c) || c.MovementBatch is not { } batch || _coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialGainEvent>().FirstOrDefault(e => e.BatchId == batch.Id)is not { } potential || FirstBiriGain(potential.ActualTurn, potential.TurnOwner)is not { } first)
+            if (!IsIssuedBiriCandidate(candidate, c) || c.MovementBatch is not { } batch || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BiriPotentialGainEvent>().FirstOrDefault(e => e.BatchId == batch.Id)is not { } potential || FirstBiriGain(potential.ActualTurn, potential.TurnOwner)is not { } first)
                 throw new InvalidOperationException("Biri lost the first actual non-draw acquisition of this actual turn.");
             r = r with
             {
@@ -65,7 +65,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiciLeaseStartedEvent(r.LeaseId, r.WindowId, f.Id));
         if (op == SkillProgramEffectOp.ResolveBiriFirstNonDrawGain)
         {
-            var potential = _coreProgramEventHistoryOperations.ProgramEventHistory<BiriPotentialGainEvent>().First(e => e.BatchId == r.WindowId);
+            var potential = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BiriPotentialGainEvent>().First(e => e.BatchId == r.WindowId);
             var first = FirstBiriGain(potential.ActualTurn, potential.TurnOwner)!;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BiriDrawIssuedEvent(f.Id, r.WindowId, first.Sequence, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner));
         }
@@ -306,7 +306,7 @@ internal sealed partial class CharacterZhaoZhongOlRuntime
                     continue;
                 }
 
-                var ordinal = _coreProgramEventHistoryOperations.ProgramEventHistory<DiciLeaseIssuedEvent>().Count();
+                var ordinal = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiciLeaseIssuedEvent>().Count();
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiciLeaseIssuedEvent(f.Id, r.Source, r.GameplayHash, f.OwnerSeat, r.TargetSeat, ordinal, r.ActualTurn));
                 FinishZhaoZhong(f);
                 return;

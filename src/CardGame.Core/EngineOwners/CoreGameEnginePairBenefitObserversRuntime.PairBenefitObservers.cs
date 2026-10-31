@@ -28,7 +28,7 @@ internal sealed partial class CoreGameEnginePairBenefitObserversRuntime
 
     internal bool PairBenefitFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
-        if (f.PairObtain is not null && !_corePairObtainFixedRecipientReceiptsOperations.ValidPairObtain(f) || f.ShownPairGift is not null && !_corePairObtainFixedRecipientReceiptsOperations.ValidShownPairGift(f) || f.FixedRecipient is not null && !_coreFixedRecipientBenefitsOperations.ValidFixedRecipientReceipt(f))
+        if (f.PairObtain is not null && !_corePairObtainFixedRecipientReceiptsOperations.Value.ValidPairObtain(f) || f.ShownPairGift is not null && !_corePairObtainFixedRecipientReceiptsOperations.Value.ValidShownPairGift(f) || f.FixedRecipient is not null && !_coreFixedRecipientBenefitsOperations.ValidFixedRecipientReceipt(f))
             return false;
         if ((f.PairObtain is { AwaitingMovement: true } || f.ShownPairGift?.Stage is ProgramShownPairGiftStage.AwaitingGift or ProgramShownPairGiftStage.AwaitingReward) && (f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat))
             return false;
@@ -110,5 +110,5 @@ internal sealed partial class CoreGameEnginePairBenefitObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 630)]
-    internal bool IsPairBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PairBenefitObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsPairBenefitProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && PairBenefitObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

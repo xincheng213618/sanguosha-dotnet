@@ -14,28 +14,28 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
     internal int MobileMaChaoSourceDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && !attack.IsChainPropagation && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], MobileMaChaoYuli) && _coreNativeDamagePoliciesOperations.GetDamageNatureBeforeMobileMaChao(attack) == DamageNature.Thunder ? 1 : 0;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 40626)]
     internal int MobileTingweiCardDamageBonus(GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? 0 : (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MobileTingweiBoosts ?? []).Count(b => b.Target == attack.TargetSeat && b.UseId == attack.ResolutionId && _coreCardUseLifecycleOperations.LifecycleCardUse(b.UseId)?.Action?.ActionId == b.ActionId);
-    internal bool IsMobileMaChaoTingweiGrantQualified(CharacterState owner, SkillGrant grant) => !HasMobileShenMaChao || _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileTingweiSuppressedEvent>().Any(e => e.Target == owner.Seat && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileTingweiExpiredEvent>().Any(x => x.FrameId == e.FrameId));
+    internal bool IsMobileMaChaoTingweiGrantQualified(CharacterState owner, SkillGrant grant) => !HasMobileShenMaChao || _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileTingweiSuppressedEvent>().Any(e => e.Target == owner.Seat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileTingweiExpiredEvent>().Any(x => x.FrameId == e.FrameId));
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 40625)]
     internal void ExpireMobileTingwei(IGameEvent fact)
     {
         if (!HasMobileShenMaChao || fact is not (TurnEndedEvent or PlayerDiedEvent))
             return;
-        foreach (var e in _coreProgramEventHistoryOperations.ProgramEventHistory<MobileTingweiSuppressedEvent>().Where(e => !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileTingweiExpiredEvent>().Any(x => x.FrameId == e.FrameId) && (fact is TurnEndedEvent t && t.ActorSeat == e.Target && t.TurnNumber > e.ActualTurn || fact is PlayerDiedEvent d && d.VictimSeat == e.Target)).ToArray())
+        foreach (var e in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileTingweiSuppressedEvent>().Where(e => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileTingweiExpiredEvent>().Any(x => x.FrameId == e.FrameId) && (fact is TurnEndedEvent t && t.ActorSeat == e.Target && t.TurnNumber > e.ActualTurn || fact is PlayerDiedEvent d && d.VictimSeat == e.Target)).ToArray())
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileTingweiExpiredEvent(e.FrameId, e.Target, _coreActualTurnProgressTurnNumberAccess._turnNumber));
             _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
         }
     }
 
-    internal long LastMobileJimieUse(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileMaChaoJimieUsedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner)?.FrameId ?? 0;
-    internal bool CanMobileJimie(int owner) => LastMobileJimieUse(owner)is 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileMaChaoJimieRefreshedEvent>().Any(e => e.Owner == owner && e.UseFrameId == LastMobileJimieUse(owner));
+    internal long LastMobileJimieUse(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileMaChaoJimieUsedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner)?.FrameId ?? 0;
+    internal bool CanMobileJimie(int owner) => LastMobileJimieUse(owner)is 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileMaChaoJimieRefreshedEvent>().Any(e => e.Owner == owner && e.UseFrameId == LastMobileJimieUse(owner));
     internal void RecordMobileYuli(ProgramSkillFrame f, int part)
     {
         var last = LastMobileJimieUse(f.OwnerSeat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileMaChaoYuliExecutedEvent(f.Id, f.OwnerSeat, part, last));
         if (last == 0 || CanMobileJimie(f.OwnerSeat))
             return;
-        var used = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileMaChaoYuliExecutedEvent>().Where(e => e.Owner == f.OwnerSeat && e.JimieUseFrameId == last).Select(e => e.Part).ToHashSet();
+        var used = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileMaChaoYuliExecutedEvent>().Where(e => e.Owner == f.OwnerSeat && e.JimieUseFrameId == last).Select(e => e.Part).ToHashSet();
         if (used.SetEquals([1, 2]))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileMaChaoJimieRefreshedEvent(last, f.OwnerSeat));
     }
@@ -298,7 +298,7 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMobileShenMaChaoYuli)]
     internal void ReturnMobileMaChaoDraw(ProgramSkillFrame f, NativeDrawOutcome o)
     {
-        if (f.MobileShenMaChao is not { Stage: MobileMaChaoStage.Drawing } r || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.DrawCount || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileMaChaoDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.MobileShenMaChao is not { Stage: MobileMaChaoStage.Drawing } r || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.DrawCount || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileMaChaoDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Yuli lost its exact prevented native damage producer return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MobileShenMaChao = r with { Stage = MobileMaChaoStage.Children } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileMaChaoDrawReturnedEvent(f.Id, f.OwnerSeat, o.RequestedCount, o.ActualDrawIds.Count, o.SequenceBefore, o.SequenceAfter));

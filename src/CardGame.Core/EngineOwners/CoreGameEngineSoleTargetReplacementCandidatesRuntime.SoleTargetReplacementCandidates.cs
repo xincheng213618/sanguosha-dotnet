@@ -13,6 +13,6 @@ internal sealed partial class CoreGameEngineSoleTargetReplacementCandidatesRunti
         // current main targets before an original candidate can run.
         if (context.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || trigger.OwnerRelation != SkillProgramCardActionOwnerRelation.Target || context.CardUse is not { } identity || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { TargetsAdjusted: true, Action: { } action, SoleTargetProtectionOrigin: { } origin } use || identity.CardActionId != action.ActionId || origin.CardUseFrameId != use.Id || origin.ActionId != action.ActionId || origin.ActorSeat != use.SourceSeat || origin.ProviderSeat != action.ProviderSeat || origin.EffectiveKind != use.CardKind || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SoleTargetReplacedEvent>().Any(fact => _coreSoleTargetQuarantineOperations.IsSoleTargetReplacementFact(use, fact, fact.BeforeTargets)))
             return true;
-        return _coreSoleTargetProtectionOperations.SoleProtectionMainTargets(use).Contains(candidate.OwnerSeat);
+        return _coreSoleTargetProtectionOperations.Value.SoleProtectionMainTargets(use).Contains(candidate.OwnerSeat);
     }
 }

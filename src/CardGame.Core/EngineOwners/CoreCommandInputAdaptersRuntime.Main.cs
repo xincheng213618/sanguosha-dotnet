@@ -172,7 +172,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
             return _coreRequestedDeckBasicsOperations.SubmitRequestedDeckBasicAnswer(actorSeat, prompt, choice);
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.Kind == DecisionKind.ProgramJudgmentTrigger)
         {
-            return _coreJudgmentProgramsOperations.SubmitProgramJudgmentTriggerAnswer(actorSeat, prompt, choice);
+            return _coreJudgmentProgramsOperations.Value.SubmitProgramJudgmentTriggerAnswer(actorSeat, prompt, choice);
         }
 
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.Kind == DecisionKind.ProgramJudgmentReplacement)
@@ -225,7 +225,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
         }
 
         if (pending.Kind == DecisionKind.OpeningHand)
-            return _kernelCoreMainOperations.Accept(() => _coreOpeningCustomizationOperations.ResolveOpeningHandChoice(selected));
+            return _kernelCoreMainOperations.Accept(() => _coreOpeningCustomizationOperations.Value.ResolveOpeningHandChoice(selected));
         if (_resolutionStackOperations._resolutionStack.LastOrDefault() is RecoveryReplacementFrame && pending.Kind == DecisionKind.RecoveryReplacement)
             return _coreRecoveryReplacementOperations.SubmitRecoveryReplacementAnswer(selected);
         if (_resolutionStackOperations._resolutionStack.LastOrDefault() is CardDeclarationChallengeFrame)
@@ -273,7 +273,7 @@ internal sealed partial class CoreCommandInputAdaptersRuntime
         if (pending.Kind == DecisionKind.ProgramTopReorder && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { TopReorder.Population: not null })
             return _coreProgramTopReorderOperations.SubmitProgramTopReorderAnswer(selected);
         if (pending.SkillPrompt is not null)
-            return _coreSkillPromptsOperations.SubmitPindianPromptAnswer(selected);
+            return _coreSkillPromptsOperations.Value.SubmitPindianPromptAnswer(selected);
         if (pending.Kind is DecisionKind.RespondDodge or DecisionKind.RespondSlash)
             _coreCardConversionsOperations.CaptureSelectedResponseConversion(selected);
         if (pending.Kind == DecisionKind.RescueDying)

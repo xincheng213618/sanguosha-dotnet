@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEnginePrivateOfferObserversRuntime
             if (r.Stage == PrivateOfferStage.HpLoss)
             {
                 if (child is DyingFrame dying)
-                    return dying.ParentFrameId == root.Id && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.VictimSeat == r.Location.PrivateTurnHold!.DeferredOffer!.TargetSeat && _coreDyingCursorRuntimeOperations.ActiveDying?.FrameId == dying.Id && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSkillHpLostEvent>().Count(e => e.FrameId == root.Id && e.SkillId == root.SkillId && e.TargetSeat == dying.VictimSeat && e.RemainingHp == 0) == 1;
+                    return dying.ParentFrameId == root.Id && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.VictimSeat == r.Location.PrivateTurnHold!.DeferredOffer!.TargetSeat && _coreDyingCursorRuntimeOperations.Value.ActiveDying?.FrameId == dying.Id && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSkillHpLostEvent>().Count(e => e.FrameId == root.Id && e.SkillId == root.SkillId && e.TargetSeat == dying.VictimSeat && e.RemainingHp == 0) == 1;
                 return child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == root.Id && hp.ResumeFrameId == root.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.TargetSeat == r.Location.PrivateTurnHold!.DeferredOffer!.TargetSeat && hp.Change.Kind == HpChangeKind.Loss;
             }
 
@@ -24,7 +24,7 @@ internal sealed partial class CoreGameEnginePrivateOfferObserversRuntime
             actor = r.Stage == PrivateOfferStage.DepositChildren ? root.OwnerSeat : r.Location.PrivateTurnHold!.DeferredOffer!.TargetSeat;
             draw = false;
         }
-        else if (root.GameTargetHandHp is { Stage: "children" } game && _coreGameTargetHandHpChoicesOperations.ValidGameHandHpReceipt(root) && root.PendingMovementContinuation is not null)
+        else if (root.GameTargetHandHp is { Stage: "children" } game && _coreGameTargetHandHpChoicesOperations.Value.ValidGameHandHpReceipt(root) && root.PendingMovementContinuation is not null)
         {
             before = game.SequenceBefore;
             after = game.SequenceAfter;
@@ -70,5 +70,5 @@ internal sealed partial class CoreGameEnginePrivateOfferObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 300)]
-    internal bool IsPrivateOfferProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PrivateOfferObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsPrivateOfferProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && PrivateOfferObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

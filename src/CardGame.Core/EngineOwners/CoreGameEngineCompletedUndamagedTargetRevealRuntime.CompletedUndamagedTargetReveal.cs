@@ -111,7 +111,7 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
     internal SkillProgramStepOutcome BeginCompletedUndamagedTargetReveal(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.CompletedUndamagedTargetReveal is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || CompletedUndamagedUse(context)is not { Action: { } action } use || use.SourceSeat != f.OwnerSeat || !_coreCompletedUndamagedTargetRevealObserversOperations.ExactCompletedUndamagedParent(f, context, use) || !CompletedUndamagedSourceUseQualifies(f.SkillId, use))
+        if (f.CompletedUndamagedTargetReveal is not null || f.InstructionIndex != 1 || f.WindowContext is not { } context || CompletedUndamagedUse(context)is not { Action: { } action } use || use.SourceSeat != f.OwnerSeat || !_coreCompletedUndamagedTargetRevealObserversOperations.Value.ExactCompletedUndamagedParent(f, context, use) || !CompletedUndamagedSourceUseQualifies(f.SkillId, use))
             throw new InvalidOperationException("Completed-target reveal lost its original completed Use and current optional candidate.");
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             return SkillProgramStepOutcome.Continue;
@@ -301,7 +301,7 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealRuntim
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 540)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 560)]
-    internal bool CanContinueCompletedUndamagedTargetReveal(ProgramSkillFrame f) => f.CompletedUndamagedTargetReveal is { SelectionIssued: true } && _coreCompletedUndamagedTargetRevealObserversOperations.ValidCompletedUndamagedTargetRevealReceipt(f);
+    internal bool CanContinueCompletedUndamagedTargetReveal(ProgramSkillFrame f) => f.CompletedUndamagedTargetReveal is { SelectionIssued: true } && _coreCompletedUndamagedTargetRevealObserversOperations.Value.ValidCompletedUndamagedTargetRevealReceipt(f);
     SkillProgramStepOutcome ICompletedUndamagedTargetRevealProgramHost.CompletedUndamagedTargetReveal(ProgramSkillFrame f) => BeginCompletedUndamagedTargetReveal(f);
     [PublicHandRevealReturn("completed-target-hand-reveal")]
     internal void ContinueCompletedTargetPublicReveal(ProgramSkillFrame f)

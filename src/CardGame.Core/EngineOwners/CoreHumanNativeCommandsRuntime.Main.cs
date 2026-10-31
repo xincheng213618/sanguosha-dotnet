@@ -29,7 +29,7 @@ internal sealed partial class CoreHumanNativeCommandsRuntime
         }
 
         _coreNativePromptBoundaryOperations.RequireHumanDecision(pendingKind);
-        if (!_coreNativeDamageHandlesOperations.IsNationalWarMode)
+        if (!_coreNativeDamageHandlesOperations.Value.IsNationalWarMode)
         {
             throw new InvalidOperationException("General reveal is only available in national-war lite mode.");
         }
@@ -260,7 +260,7 @@ internal sealed partial class CoreHumanNativeCommandsRuntime
     internal void HumanStoneAxeCore(IReadOnlyList<int> discardedCardIds, bool advanceToHumanBoundary)
     {
         _coreNativePromptBoundaryOperations.RequireHumanDecision(DecisionKind.StoneAxe);
-        _coreNativeStoneAxeOperations.ResolveStoneAxeChoice(discardedCardIds);
+        _coreNativeStoneAxeOperations.Value.ResolveStoneAxeChoice(discardedCardIds);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
         if (advanceToHumanBoundary)
             _kernelCoreGameEngineRuntimeOperations.AdvanceToHumanBoundary();
@@ -315,7 +315,7 @@ internal sealed partial class CoreHumanNativeCommandsRuntime
     internal void HumanDyingResponseCore(bool usePeach, int? requestedPeachCardId, bool useAlcohol, int? requestedAlcoholCardId, bool advanceToHumanBoundary, CardConversionSource? peachConversionSource = null, CardConversionSource? alcoholConversionSource = null)
     {
         _coreNativePromptBoundaryOperations.RequireHumanDecision(DecisionKind.RescueDying);
-        var pending = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("There is no dying response awaiting resolution.");
+        var pending = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("There is no dying response awaiting resolution.");
         var responder = _coreMatchParticipantsPlayersAccess._players[pending.ResponderSeat];
         if (responder.Seat != _coreMultiplayerOperations.HumanDecisionSeat)
         {
@@ -355,7 +355,7 @@ internal sealed partial class CoreHumanNativeCommandsRuntime
                 throw new InvalidOperationException("The responding player has no requested Alcohol card.");
             }
 
-            _coreProgramAlcoholConversionsOperations.ValidateAlcoholConversion(responder, alcohol, alcoholConversionSource, forResponse: true);
+            _coreProgramAlcoholConversionsOperations.Value.ValidateAlcoholConversion(responder, alcohol, alcoholConversionSource, forResponse: true);
         }
 
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -368,7 +368,7 @@ internal sealed partial class CoreHumanNativeCommandsRuntime
     internal void HumanDyingProgramTriggerCore(PromptChoice selected, bool advanceToHumanBoundary)
     {
         _coreNativePromptBoundaryOperations.RequireHumanDecision(DecisionKind.RescueDying);
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("There is no dying program response awaiting resolution.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("There is no dying program response awaiting resolution.");
         var responder = _coreMatchParticipantsPlayersAccess._players[dying.ResponderSeat];
         var candidate = _coreProgramLifecycleOperations.GetDyingProgramCandidates(responder, dying).SingleOrDefault(item => item.SkillId == selected.Parameters.GetValueOrDefault("skill-id") && item.BindingId == selected.Parameters.GetValueOrDefault("binding-id") && item.SkillInstanceId == selected.Parameters.GetValueOrDefault("skill-instance-id")) ?? throw new InvalidOperationException("The selected dying program binding is no longer eligible.");
         _coreProgramLifecycleOperations.BeginDyingProgramBinding(candidate, dying);
@@ -393,7 +393,7 @@ internal sealed partial class CoreHumanNativeCommandsRuntime
         }
 
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        _coreNativeHarvestOperations.ResolveHarvestSelection(group, picker, cardId);
+        _coreNativeHarvestOperations.Value.ResolveHarvestSelection(group, picker, cardId);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
         if (advanceToHumanBoundary)
             _kernelCoreGameEngineRuntimeOperations.AdvanceToHumanBoundary();

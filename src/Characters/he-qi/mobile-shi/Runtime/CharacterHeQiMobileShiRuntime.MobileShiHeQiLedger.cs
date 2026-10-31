@@ -8,11 +8,11 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
     internal bool HasShiHqCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiHeQiQizhouMark);
 
     internal static CardConversionSource ShiHqSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal ShiHqYingjiMarkedEvent? ShiHqMark(int id) => !HasShiHqCapability ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHqYingjiMarkedEvent>().LastOrDefault(m => m.CardId == id && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiHqYingjiClearedEvent>().Any(c => c.MarkId == m.MarkId));
+    internal ShiHqYingjiMarkedEvent? ShiHqMark(int id) => !HasShiHqCapability ? null : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiHqYingjiMarkedEvent>().LastOrDefault(m => m.CardId == id && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiHqYingjiClearedEvent>().Any(c => c.MarkId == m.MarkId));
     internal bool HasShiHqYingji(int id) => ShiHqMark(id)is not null;
     [ProgramPipelineHook(ProgramPipelinePhase.CardEntitySkillLabel, 49000)]
     internal string? ShiHqYingjiLabel(int id) => HasShiHqYingji(id) ? "应机" : null;
-    internal bool ShiHqTargetUsed(int owner, int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiHqShanxiUsedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && e.Target == target);
+    internal bool ShiHqTargetUsed(int owner, int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiHqShanxiUsedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && e.Target == target);
     [ProgramCardLegality(ProgramCardLegalityStage.ConversionSourceBan, 49000)]
     internal bool BanShiHqUnmarkedConversion(ProgramViewAsSourceQuery q) => q.Source.SkillId == ShiHqShanxi && (q.Source.BindingId != ShiHqView || q.ForResponse || q.DyingUse || q.Source.OwnerSeat != q.Owner.Seat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != q.Owner.Seat || _cardZonesOperations._cardZones.GetLocation(q.Card.Id) != CardLocation.Hand(q.Owner.Seat) && !_characterLuSuMobileShiOperations.IsShiLsHandAccess2(q.Owner.Seat, q.Card.Id) || !HasShiHqYingji(q.Card.Id));
     [ProgramCardLegality(ProgramCardLegalityStage.AfterLegalActionKind, 49000)]
@@ -29,7 +29,7 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiHqShanxiUsedEvent(use.Id, a.ActionId, source, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, target, id));
     }
 
-    internal bool IsShiHqOriginalHandPayment(CardUseFrame use, CardActionContext action, int actor, int cardId, CardLocation from) => from == CardLocation.Hand(actor) && action.ProviderSeat == actor || from.Zone == CardZoneKind.Hand && from.OwnerSeat == action.ProviderSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsMaterialAuthorizedEvent>().Any(e => e.UseId == use.Id && e.ActionId == action.ActionId && e.Actor == actor && e.CardId == cardId && e.From == from);
+    internal bool IsShiHqOriginalHandPayment(CardUseFrame use, CardActionContext action, int actor, int cardId, CardLocation from) => from == CardLocation.Hand(actor) && action.ProviderSeat == actor || from.Zone == CardZoneKind.Hand && from.OwnerSeat == action.ProviderSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLsMaterialAuthorizedEvent>().Any(e => e.UseId == use.Id && e.ActionId == action.ActionId && e.Actor == actor && e.CardId == cardId && e.From == from);
     internal static bool IsShiHqMarkTrigger(SkillProgramTrigger t) => t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMobileShiHeQiQizhouMark);
     internal static bool ShiHqEntersField(CardMovementRecord m, int owner) => m.To.OwnerSeat == owner && m.To.Zone is CardZoneKind.Equipment or CardZoneKind.Judgment && m.From != m.To;
     internal IEnumerable<ProgramTriggerCandidate> CollectShiHqMovementCandidates(CardMovementBatchContext batch)
@@ -70,7 +70,7 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
         if (!HasShiHqCapability)
             return ordinary;
         var items = parent.AfterTurnEnded is null ? ordinary.Where(i => i.Candidate is not { SkillId: ShiHqQizhou, BindingId: "global-yingji-cleanup" }).ToList() : ordinary.ToList();
-        if (!items.Any(i => i.Candidate is { SkillId: ShiHqQizhou, BindingId: "global-yingji-cleanup" }) && ShiHqCleanupSource()is { } mark && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiHqCleanupIssuedEvent>().Any(e => e.Turn == parent.TurnNumber && e.TurnOwner == parent.OwnerSeat))
+        if (!items.Any(i => i.Candidate is { SkillId: ShiHqQizhou, BindingId: "global-yingji-cleanup" }) && ShiHqCleanupSource()is { } mark && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiHqCleanupIssuedEvent>().Any(e => e.Turn == parent.TurnNumber && e.TurnOwner == parent.OwnerSeat))
         {
             var trigger = _contentRegistryOperations._contentRegistry.GetSkill(ShiHqQizhou).Program!.Triggers.Single(t => t.Id == "global-yingji-cleanup");
             var c = new ProgramTriggerCandidate(mark.Source.OwnerSeat, ShiHqQizhou, trigger.Id, mark.Source.SkillInstanceId, mark.Hash, trigger.Priority);
@@ -87,7 +87,7 @@ internal sealed partial class CharacterHeQiMobileShiRuntime
             return false;
         if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.ShiHeQi is { Operation: SkillProgramEffectOp.ResolveMobileShiHeQiYingjiCleanup } r && r.ParentId == p.Id && r.Source.OwnerSeat == c.OwnerSeat && r.Source.SkillInstanceId == c.SkillInstanceId && r.Hash == c.GameplayHash && f.WindowContext == w))
             return true;
-        return ShiHqCleanupSource()is { } mark && mark.Source.OwnerSeat == c.OwnerSeat && mark.Source.SkillInstanceId == c.SkillInstanceId && mark.Hash == c.GameplayHash && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiHqCleanupIssuedEvent>().Any(e => e.Turn == p.TurnNumber && e.TurnOwner == p.OwnerSeat);
+        return ShiHqCleanupSource()is { } mark && mark.Source.OwnerSeat == c.OwnerSeat && mark.Source.SkillInstanceId == c.SkillInstanceId && mark.Hash == c.GameplayHash && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiHqCleanupIssuedEvent>().Any(e => e.Turn == p.TurnNumber && e.TurnOwner == p.OwnerSeat);
     }
 
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiHeQiPublicStates(CharacterState owner, string skillId)

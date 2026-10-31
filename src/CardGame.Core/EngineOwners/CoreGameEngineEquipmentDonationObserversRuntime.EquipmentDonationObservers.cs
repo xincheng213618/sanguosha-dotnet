@@ -168,5 +168,5 @@ internal sealed partial class CoreGameEngineEquipmentDonationObserversRuntime
         return false;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 520)]
-    internal bool IsEquipmentDonationProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } && (HasEquipmentDonationDamageObserver() || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => (f.EquipmentDonation is not null || f.ActualEndedEquipment is not null) && f.AttackAttempt is null && EquipmentDonationObserverRoot(f.Id)is not null));
+    internal bool IsEquipmentDonationProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { ResumesProgramSkill: true } && (HasEquipmentDonationDamageObserver() || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => (f.EquipmentDonation is not null || f.ActualEndedEquipment is not null) && f.AttackAttempt is null && EquipmentDonationObserverRoot(f.Id)is not null));
 }

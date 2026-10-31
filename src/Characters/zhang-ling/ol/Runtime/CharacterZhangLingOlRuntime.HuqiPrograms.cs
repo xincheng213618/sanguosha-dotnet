@@ -42,7 +42,7 @@ internal sealed partial class CharacterZhangLingOlRuntime
             _coreCardAttackStateOperations.UpdateCardAttackState(attackId, state => state!with { Active = false });
         if (duel is { } duelId)
             _coreCardAttackStateOperations.UpdateCardContinuations(duelId, state => state with { Duel = state.Duel!with { Active = false } });
-        return _coreTriggeredCardProgramsOperations.UseTriggeredProgramVirtualSlash(frame, source);
+        return _coreTriggeredCardProgramsOperations.Value.UseTriggeredProgramVirtualSlash(frame, source);
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 26050)]

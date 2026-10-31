@@ -9,7 +9,7 @@ internal sealed partial class CharacterHuJinDingOlRuntime
     {
         if (rule.RoundGainedRedHandOnly != true)
             return true;
-        if (!owner.IsAlive || card.IsGeneralWeapon || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Hand(owner.Seat) || CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)) != true || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhongshenRoundBoundaryEvent>().SingleOrDefault(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber)is not { } round)
+        if (!owner.IsAlive || card.IsGeneralWeapon || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Hand(owner.Seat) || CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card)) != true || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhongshenRoundBoundaryEvent>().SingleOrDefault(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber)is not { } round)
             return false;
         return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == card.Id && m.Sequence > round.MovementSequence && m.To == CardLocation.Hand(owner.Seat) && _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(m) != CardLocation.Hand(owner.Seat));
     }

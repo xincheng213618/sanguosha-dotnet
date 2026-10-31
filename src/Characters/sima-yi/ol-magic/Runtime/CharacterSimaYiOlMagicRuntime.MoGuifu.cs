@@ -9,7 +9,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     internal string? MoGuifuEntityLabel(int id) => HasMoSimaYi && MoSimaYi.IsMarked(id) ? "诡伏" : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 33901, SkillProgramEffectOp.AcquireMoSimaYiGuifuDodge)]
     internal bool CanAcquireMoGuifu(ProgramTriggerLegalityContext gate) => gate.Context.Window != SkillProgramTriggerWindow.AfterHealthChanged || gate.Context.HpChange is { } change && change.TargetSeat == gate.Candidate.OwnerSeat && change.HpBefore != change.HpAfter;
-    internal bool HasMoGuifuNativeUse(int actor, int id, CardKind kind) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(use => use.Action is { Type: CardActionType.Use } action && action.ActorSeat == actor && action.PhysicalCards is [var physical] && physical.CardId == id && action.EffectiveKind == kind && action.ConversionChain.Any(IsMoGuifuSource) && _coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiNameUsedEvent>().Any(e => e.ActionId == action.ActionId && e.ActorSeat == actor && e.Kind == kind));
+    internal bool HasMoGuifuNativeUse(int actor, int id, CardKind kind) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(use => use.Action is { Type: CardActionType.Use } action && action.ActorSeat == actor && action.PhysicalCards is [var physical] && physical.CardId == id && action.EffectiveKind == kind && action.ConversionChain.Any(IsMoGuifuSource) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoSimaYiNameUsedEvent>().Any(e => e.ActionId == action.ActionId && e.ActorSeat == actor && e.Kind == kind));
     internal bool MoGuifuMaterial(CharacterState owner, int id, CardKind kind) => HasMoSimaYi && id > 0 && _coreNationalSkillsOperations.HasRuntimeSkill(owner, MoSimaYiComposition.Guifu) && MoSimaYi.IsOwnMarked(owner.Seat, id) && (_cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(owner.Seat) && MoSimaYi.NameAvailable(owner.Seat, kind) || HasMoGuifuNativeUse(owner.Seat, id, kind));
     [ProgramCardLegality(ProgramCardLegalityStage.ConfiguredConversionBan, 33900)]
     internal bool MoGuifuConversionUnavailable(ProgramConfiguredViewAsQuery q)
@@ -21,7 +21,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
         if (q.RequestedUseTarget is not null)
             return q.Rule.OutputKind != CardKind.Peach || q.ForResponse || q.DyingUse || !_coreWenyiPeachSuppliesOperations.IsWenyiPeachSupplyQuery(q.Owner, q.RequestedUseTarget.Value);
         if (q.DyingUse || q.ForResponse && q.Rule.OutputKind is CardKind.Peach or CardKind.Alcohol)
-            return _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.ResponderSeat != q.Owner.Seat || q.Rule.OutputKind == CardKind.Alcohol && dying.VictimSeat != q.Owner.Seat;
+            return _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.ResponderSeat != q.Owner.Seat || q.Rule.OutputKind == CardKind.Alcohol && dying.VictimSeat != q.Owner.Seat;
         if (!q.ForResponse)
             return false;
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(q.Rule.OutputKind))
@@ -40,7 +40,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
             CardActionAcceptedEvent accepted => accepted.Action,
             _ => null
         };
-        if (action is not { Type: CardActionType.Use } || !action.ConversionChain.Any(IsMoGuifuSource) || _coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiNameUsedEvent>().Any(e => e.ActionId == action.ActionId))
+        if (action is not { Type: CardActionType.Use } || !action.ConversionChain.Any(IsMoGuifuSource) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoSimaYiNameUsedEvent>().Any(e => e.ActionId == action.ActionId))
             return;
         if (action.PhysicalCards is not [var physical] || !MoSimaYi.IsOwnMarked(action.ActorSeat, physical.CardId) || !MoSimaYi.NameAvailable(action.ActorSeat, action.EffectiveKind))
             throw new InvalidOperationException("Guifu must consume one marked entity and one unused recorded name of its actual user.");
@@ -53,7 +53,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     internal bool MoGuifuAlcoholPrivilege(ProgramNativeUseMaterialQuery q) => q.Kind == CardKind.Alcohol && q.PhysicalCardIds is [var id] && _coreTableSeatQueriesOperations.IsValidPlayerSeat(q.ActorSeat) && (q.Source is null || IsMoGuifuSource(q.Source) && q.Source.OwnerSeat == q.ActorSeat && q.Source.BindingId == "recorded-" + q.Kind && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[q.ActorSeat], q.Source.SkillId, q.Source.SkillInstanceId)) && MoGuifuMaterial(_coreMatchParticipantsPlayersAccess._players[q.ActorSeat], id, q.Kind);
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 33900)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeAlcoholDebit, 33900)]
-    internal bool MoGuifuSlashDebitExempt(long useId, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action is { Type: CardActionType.Use } a && a.ActorSeat == actor && a.ConversionChain.Any(IsMoGuifuSource) && _coreProgramEventHistoryOperations.ProgramEventHistory<MoSimaYiNameUsedEvent>().Any(e => e.ActionId == a.ActionId && e.ActorSeat == actor);
+    internal bool MoGuifuSlashDebitExempt(long useId, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action is { Type: CardActionType.Use } a && a.ActorSeat == actor && a.ConversionChain.Any(IsMoGuifuSource) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoSimaYiNameUsedEvent>().Any(e => e.ActionId == a.ActionId && e.ActorSeat == actor);
     [ProgramCardLegality(ProgramCardLegalityStage.NativeSlashAliasAllowance, 33900)]
     internal bool MoGuifuNativeSlashAlias(ProgramNativeSlashAliasQuery q) => q.Instance.SkillId == MoSimaYiComposition.Guifu && q.RequestedKind == CardKind.Slash && CoreNativeCardClassificationsRuntime.IsSlashCard(q.Rule.OutputKind) && _coreProgramNativeSlashQueriesOperations.IsNativeForcedSlashUseFrontier(q.Owner);
     [ProgramCardLegality(ProgramCardLegalityStage.NativeSlashVariants, 33900)]

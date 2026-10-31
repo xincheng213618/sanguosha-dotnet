@@ -61,7 +61,7 @@ internal sealed partial class CharacterHuBanOlRuntime
     internal bool SameHuiyunNative(HuiyunNativeInvoice a, HuiyunNativeInvoice b) => a.ProgramFrameId == b.ProgramFrameId && a.OpportunityIndex == b.OpportunityIndex && a.Source == b.Source && a.GameplayHash == b.GameplayHash && a.ActorSeat == b.ActorSeat && a.CardId == b.CardId && a.Kind == b.Kind && a.BeforePayment == b.BeforePayment && a.UseId == b.UseId && a.ActionId == b.ActionId && System.Text.Json.JsonSerializer.Serialize(a.Plan) == System.Text.Json.JsonSerializer.Serialize(b.Plan);
     internal bool HuiyunNativeUseRidesOn(CardUseFrame use, ProgramSkillFrame f)
     {
-        if (use.HuiyunFollowup is not { } n || f.Huiyun is not { Stage: HuiyunStage.NativeUse, Native: { } pending } r || !SameHuiyunNative(n, pending) || r.NativeCompleted || n.ProgramFrameId != f.Id || n.OpportunityIndex != r.Index || n.ActorSeat != HuiyunCurrent(r).TargetSeat || n.Source != r.Origin.Source || n.GameplayHash != f.GameplayHash || use.Id != n.UseId || use.CardId != n.CardId || use.Action is not { Type: CardActionType.Use } current || current.ActionId != n.ActionId || current.ProviderSeat != n.ActorSeat || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, n.ActorSeat, n.ActorSeat) || use.PhysicalCardIds is not [var id] || id != n.CardId || _coreProgramEventHistoryOperations.ProgramEventHistory<HuiyunNativeIssuedEvent>().Count(e => SameHuiyunNative(e.Invoice, n)) != 1)
+        if (use.HuiyunFollowup is not { } n || f.Huiyun is not { Stage: HuiyunStage.NativeUse, Native: { } pending } r || !SameHuiyunNative(n, pending) || r.NativeCompleted || n.ProgramFrameId != f.Id || n.OpportunityIndex != r.Index || n.ActorSeat != HuiyunCurrent(r).TargetSeat || n.Source != r.Origin.Source || n.GameplayHash != f.GameplayHash || use.Id != n.UseId || use.CardId != n.CardId || use.Action is not { Type: CardActionType.Use } current || current.ActionId != n.ActionId || current.ProviderSeat != n.ActorSeat || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, n.ActorSeat, n.ActorSeat) || use.PhysicalCardIds is not [var id] || id != n.CardId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuiyunNativeIssuedEvent>().Count(e => SameHuiyunNative(e.Invoice, n)) != 1)
             return false;
         var a = current;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -88,7 +88,7 @@ internal sealed partial class CharacterHuBanOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(n.ProgramFrameId);
         var r = f.Huiyun!;
-        if (r.Stage != HuiyunStage.NativeUse || r.NativeCompleted || r.Native is null || !SameHuiyunNative(r.Native, n) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<HuiyunNativeReturnedEvent>().Any(e => e.Invoice.UseId == n.UseId))
+        if (r.Stage != HuiyunStage.NativeUse || r.NativeCompleted || r.Native is null || !SameHuiyunNative(r.Native, n) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuiyunNativeReturnedEvent>().Any(e => e.Invoice.UseId == n.UseId))
             throw new InvalidOperationException("Huiyun cannot return or pay its natural-card use twice.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Huiyun = r with { NativeCompleted = true } });
         if (use.CardAttack is { Active: true })
@@ -119,7 +119,7 @@ internal sealed partial class CharacterHuBanOlRuntime
     {
         if (fact is not ActualTurnCursorReturnedEvent ended || !HasHuBanCapability)
             return;
-        foreach (var actor in _coreProgramEventHistoryOperations.ProgramEventHistory<HuiyunNativeIssuedEvent>().Select(e => e.Invoice).Where(n => n.Plan.Kind == LegalActionKind.Alcohol && _coreProgramEventHistoryOperations.ProgramEventHistory<JianjiOrdinaryAlcoholPaidEvent>().Any(p => p.NativeUseId == n.UseId && p.ActualTurn == ended.ActualTurn)).Select(n => n.ActorSeat).Distinct().ToArray())
+        foreach (var actor in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuiyunNativeIssuedEvent>().Select(e => e.Invoice).Where(n => n.Plan.Kind == LegalActionKind.Alcohol && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JianjiOrdinaryAlcoholPaidEvent>().Any(p => p.NativeUseId == n.UseId && p.ActualTurn == ended.ActualTurn)).Select(n => n.ActorSeat).Distinct().ToArray())
             if (_coreMatchParticipantsPlayersAccess._players[actor].HasAlcoholEffect)
             {
                 _coreMatchParticipantsPlayersAccess._players[actor].HasAlcoholEffect = false;

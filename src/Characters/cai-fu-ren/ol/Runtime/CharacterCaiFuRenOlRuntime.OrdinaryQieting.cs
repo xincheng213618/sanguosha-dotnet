@@ -102,7 +102,7 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting, SkillProgramEffectOp.ResolveBoundaryMobileQieting)]
     internal void ReturnOrdinaryQietingDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.OrdinaryQieting is not { Paid: true, Stage: OrdinaryQietingStage.Draw, Option: "draw" } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryQietingDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.OrdinaryQieting is not { Paid: true, Stage: OrdinaryQietingStage.Draw, Option: "draw" } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<OrdinaryQietingDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Ordinary Qieting lost its one native draw and typed return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { OrdinaryQieting = r with { Stage = OrdinaryQietingStage.DrawChildren, DrawOutcome = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OrdinaryQietingDrawReturnedEvent(f.Id, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));

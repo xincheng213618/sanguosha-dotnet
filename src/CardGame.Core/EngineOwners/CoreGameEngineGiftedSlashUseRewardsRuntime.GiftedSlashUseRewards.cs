@@ -69,7 +69,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
     {
         if (!TracksGiftedSlash || _cardZonesOperations._cardZones.GetLocation(cardId) != CardLocation.Hand(recipient))
             return null;
-        var policies = _coreProgramEventHistoryOperations.ProgramEventHistory<GiftedSlashHandPolicyGrantedEvent>();
+        var policies = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GiftedSlashHandPolicyGrantedEvent>();
         if (policies.Count == 0)
             return null;
         var policy = policies.Select(e => e.Policy).Where(p => p.RecipientSeat == recipient && p.CardId == cardId).OrderByDescending(p => p.GiftMovementSequence).FirstOrDefault();
@@ -282,7 +282,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
 
     internal ProgramSkillFrame? GiftedSlashObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.GiftedSlashFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 270)]
-    internal bool IsGiftedSlashProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && GiftedSlashObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsGiftedSlashProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && GiftedSlashObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     SkillProgramStepOutcome IGiftedSlashUseRewardHost.BeginGiftedSlashGift(SkillProgramEffect effect, ProgramSkillFrame frame, int recipientSeat) => BeginGiftedSlashGift(effect, frame, recipientSeat);
     SkillProgramStepOutcome IGiftedSlashUseRewardHost.BeginGiftedSlashUseReward(SkillProgramEffect effect, ProgramSkillFrame frame) => BeginGiftedSlashUseReward(effect, frame);
 }

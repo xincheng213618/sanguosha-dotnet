@@ -9,7 +9,7 @@ internal sealed partial class CharacterGuYongOlRuntime
 
     internal bool IsOrdinaryGuYongBingyiTrigger(SkillProgramTrigger t) => t.Effects is [{ Op: SkillProgramEffectOp.ResolveOrdinaryGuYongBingyi }];
     internal static CardConversionSource OrdinaryGuYongSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_gu_yong_ol_OrdinaryGuYong.OrdinaryGuYongSource(f);
-    internal bool OrdinaryBingyiPhaseSpent(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryBingyiShownEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == "ol:bingyi" && e.Phase == phase);
+    internal bool OrdinaryBingyiPhaseSpent(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<OrdinaryBingyiShownEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == "ol:bingyi" && e.Phase == phase);
     internal bool IsOrdinaryBingyiDiscard(CardMovementRecord m, int owner) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is { OwnerSeat: { } seat, Zone: CardZoneKind.Hand or CardZoneKind.Equipment } && seat == owner;
     internal bool OrdinaryBingyiMovementRoot(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {

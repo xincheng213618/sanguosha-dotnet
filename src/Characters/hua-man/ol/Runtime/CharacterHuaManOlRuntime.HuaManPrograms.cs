@@ -13,7 +13,7 @@ internal sealed partial class CharacterHuaManOlRuntime
             throw new InvalidOperationException("Hua Man requires the current unpaid native source and original instruction.");
         if (op == SkillProgramEffectOp.DrawAndCountMansiActualBarbarianDamage)
         {
-            if (w.DamageFrameId is not { } damage || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(d => d.Id == w.ParentFrameId)is not { } window || window.ParentFrameId != damage || _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window)is not { EffectiveCardKind: CardKind.BarbarianAssault, DamageWasApplied: true } attack || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damage)is not { } paid || paid.Amount != w.Amount || paid.Amount < 1 || attack.ResolutionId != paid.ParentFrameId)
+            if (w.DamageFrameId is not { } damage || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(d => d.Id == w.ParentFrameId)is not { } window || window.ParentFrameId != damage || _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window)is not { EffectiveCardKind: CardKind.BarbarianAssault, DamageWasApplied: true } attack || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damage)is not { } paid || paid.Amount != w.Amount || paid.Amount < 1 || attack.ResolutionId != paid.ParentFrameId)
                 throw new InvalidOperationException("Mansi cannot claim another card kind, event or damage amount.");
             BeginHuaMan(f, HuaManStage.MansiDraw, op);
             PayHuaManDraw(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), f.OwnerSeat, 1, HuaManStage.MansiDraw);

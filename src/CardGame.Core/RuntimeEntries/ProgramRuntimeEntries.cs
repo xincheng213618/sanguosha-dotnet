@@ -15,7 +15,9 @@ internal sealed record ProgramRuntimeEntryRegistration(
 {
     internal static ProgramRuntimeEntryRegistration For(Type type)
     {
-        var owner = type.GetCustomAttribute<ProgramRuntimeEntryAttribute>()?.Owner;
+        var owner = type.IsConstructedGenericType && type.GetGenericTypeDefinition() == typeof(RuntimeEntries.DeferredRuntime<>)
+            ? type.GetGenericArguments()[0]
+            : type.GetCustomAttribute<ProgramRuntimeEntryAttribute>()?.Owner;
         var constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         if (owner is null || !type.IsSealed || type.IsAbstract || type.ContainsGenericParameters ||
             !ProgramRuntimeModuleCatalog.IsDeclared(owner) || owner.IsAbstract ||

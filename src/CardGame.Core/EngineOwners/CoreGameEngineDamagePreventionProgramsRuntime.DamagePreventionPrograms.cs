@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineDamagePreventionProgramsRuntime
                 SkillProgramTriggerSubject.Any => true,
                 _ => false
             }).Where(candidate => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Condition.Evaluate(facts, candidate.SkillId, candidate.SkillInstanceId)).Select(candidate => new BeforeDamageProgramCandidate(candidate, facts));
-        }).Concat(_characterLvQianOlOperations.CollectZengdaoDamageCandidates(sourceSeat, targetSeat, rangeChainOnly)).Concat(_characterFuRongFuQianAnniversaryOperations.CollectAnniversaryFuRongFuQianXueweiCandidates(sourceSeat, targetSeat, rangeChainOnly)).Concat(_characterXinPiOlOperations.CollectIssuedYinjuCandidates2(sourceSeat, targetSeat, rangeChainOnly)).Where(item => !_characterChenGongMouMobileOperations.IsMouChenGongZhichiBeforeCandidate(item.Candidate)).Concat(_characterChenGongMouMobileOperations.CollectIssuedMouChenGongZhichiCandidates(sourceSeat, targetSeat, rangeChainOnly)).OrderByDescending(item => item.Candidate.Priority).ThenBy(item => _coreTableOrderOperations.RelativeTableOrder(targetSeat, item.Candidate.OwnerSeat)).ThenBy(item => item.Candidate.SkillId, StringComparer.Ordinal).ThenBy(item => item.Candidate.SkillInstanceId, StringComparer.Ordinal).ThenBy(item => item.Candidate.BindingId, StringComparer.Ordinal).ToArray();
+        }).Concat(_characterLvQianOlOperations.CollectZengdaoDamageCandidates(sourceSeat, targetSeat, rangeChainOnly)).Concat(_characterFuRongFuQianAnniversaryOperations.Value.CollectAnniversaryFuRongFuQianXueweiCandidates(sourceSeat, targetSeat, rangeChainOnly)).Concat(_characterXinPiOlOperations.CollectIssuedYinjuCandidates2(sourceSeat, targetSeat, rangeChainOnly)).Where(item => !_characterChenGongMouMobileOperations.IsMouChenGongZhichiBeforeCandidate(item.Candidate)).Concat(_characterChenGongMouMobileOperations.CollectIssuedMouChenGongZhichiCandidates(sourceSeat, targetSeat, rangeChainOnly)).OrderByDescending(item => item.Candidate.Priority).ThenBy(item => _coreTableOrderOperations.RelativeTableOrder(targetSeat, item.Candidate.OwnerSeat)).ThenBy(item => item.Candidate.SkillId, StringComparer.Ordinal).ThenBy(item => item.Candidate.SkillInstanceId, StringComparer.Ordinal).ThenBy(item => item.Candidate.BindingId, StringComparer.Ordinal).ToArray();
         if (candidates.Length == 0 && (_coreProgramAttackAttemptOperations.CurrentDamageAttempt?.IsSourceLess == true || !_characterCaoSongOlOperations.HasDamageAmountSupport(sourceSeat, targetSeat)))
             return false;
         var parentFrameId = _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id ?? (continuation == BeforeDamageProgramContinuation.Attack ? _coreProgramAttackAttemptOperations.CurrentDamageAttempt?.ResolutionId : null) ?? throw new InvalidOperationException("Before-damage programs require an attack continuation.");
@@ -142,9 +142,9 @@ internal sealed partial class CoreGameEngineDamagePreventionProgramsRuntime
                 var attack = _coreProgramAttackAttemptOperations.CurrentDamageAttempt ?? throw new InvalidOperationException("The before-damage attack continuation is unavailable.");
                 if (frame.ContinuationAttackResolutionId is { } exactAttackId && attack.ResolutionId != exactAttackId || attack.SourceSeat != frame.SourceSeat || attack.TargetSeat != (frame.RedirectedTargetSeat ?? frame.TargetSeat))
                     throw new InvalidOperationException("The before-damage attack participants changed.");
-                if (_characterMangYaChangAnniversaryOperations.ResumeAnniversaryJiedaoSourceWindow(frame, attack))
+                if (_characterMangYaChangAnniversaryOperations.Value.ResumeAnniversaryJiedaoSourceWindow(frame, attack))
                     return;
-                if (_characterCaiYangAnniversaryOperations.ResumeAnniversaryCaiYangJiaofengSourceWindow(frame, attack))
+                if (_characterCaiYangAnniversaryOperations.Value.ResumeAnniversaryCaiYangJiaofengSourceWindow(frame, attack))
                     return;
                 if (frame.RedirectedTargetSeat is null)
                     attack.MarkBeforeDamageProgramsResolved();

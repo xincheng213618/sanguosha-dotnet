@@ -52,7 +52,7 @@ internal sealed partial class CoreNativeRecoveryCardsRuntime
             return;
         }
 
-        _characterSunQuanMobileOperations.ApplyNativePeachRecoveryScope(resolutionId, source, target, playedCardKind, ref recoveryAmount, ref recoveryPolicySources);
+        _characterSunQuanMobileOperations.Value.ApplyNativePeachRecoveryScope(resolutionId, source, target, playedCardKind, ref recoveryAmount, ref recoveryPolicySources);
         recoveryAmount = _coreCardRecoveryModifiersOperations.ApplyIssuedCardRecoveryModifiers(resolutionId, source.Seat, target.Seat, recoveryAmount);
         if (_coreRecoveryReplacementOperations.TryQueueRecoveryReplacement(resolutionId, source.Seat, target.Seat, recoveryAmount, new(RecoveryAttemptProducer.CardUse, CardId: card.Id, CardKind: playedCardKind, Policies: recoveryPolicySources)))
         {

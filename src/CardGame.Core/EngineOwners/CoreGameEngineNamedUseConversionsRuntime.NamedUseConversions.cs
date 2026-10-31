@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineNamedUseConversionsRuntime
 {
     internal static string NamedUseLedgerId(SkillProgramViewAs rule) => RuntimeSkills.RuntimeRules_Core_NamedUseConversions.NamedUseLedgerId(rule);
-    internal bool IsNamedUseConversionAvailable(CharacterState owner, IndexedSkillProgramInstance instance, SkillProgramViewAs rule) => (!rule.NoDying || _coreDyingCursorRuntimeOperations.ActiveDying is null && !_coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && player.Hp <= 0)) && (!rule.UnusedOutputNameThisGame || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, instance.SkillId, NamedUseLedgerId(rule), SkillUsageScope.Game) == 0);
+    internal bool IsNamedUseConversionAvailable(CharacterState owner, IndexedSkillProgramInstance instance, SkillProgramViewAs rule) => (!rule.NoDying || _coreDyingCursorRuntimeOperations.Value.ActiveDying is null && !_coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && player.Hp <= 0)) && (!rule.UnusedOutputNameThisGame || _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, instance.SkillId, NamedUseLedgerId(rule), SkillUsageScope.Game) == 0);
     internal void ConsumeNamedUseConversion(CardConversionSource source)
     {
         if (_corePlayCardHistoryOperations.ViewAsRule(source)is not { UnusedOutputNameThisGame: true } rule)

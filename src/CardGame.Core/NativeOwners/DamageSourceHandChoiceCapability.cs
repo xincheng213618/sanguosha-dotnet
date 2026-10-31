@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class DamageSourceHandChoiceCapability(Func<RuntimeEntries.CoreGameEngineDamageSourceHandChoiceEntries> getCoreGameEngineDamageSourceHandChoiceRuntime) : IDamageSourceHandChoiceHost
+internal sealed class DamageSourceHandChoiceCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDamageSourceHandChoiceRuntime>> getCoreGameEngineDamageSourceHandChoiceRuntime) : IDamageSourceHandChoiceHost
 {
-    public SkillProgramStepOutcome ResolveDamageSourceHandChoice(ProgramSkillFrame f) => getCoreGameEngineDamageSourceHandChoiceRuntime().BeginDamageSourceHandChoice(f);
+    public SkillProgramStepOutcome ResolveDamageSourceHandChoice(ProgramSkillFrame f) => getCoreGameEngineDamageSourceHandChoiceRuntime().Value.BeginDamageSourceHandChoice(f);
 }

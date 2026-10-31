@@ -21,7 +21,7 @@ internal sealed partial class CharacterJiangWeiMouRuntime
                 return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.TargetSeat == r.DamageSource;
         }
 
-        if (r.Stage == MouJiangWeiAnniversaryStage.Damage && f.AttackAttempt is { } a && f.AttackReturn is not null && a.SourceSeat == r.DamageSource && a.TargetSeat == r.Victim && !a.SourceLess && _coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiAnniversaryDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.Source == a.SourceSeat && e.Victim == a.TargetSeat) == 1)
+        if (r.Stage == MouJiangWeiAnniversaryStage.Damage && f.AttackAttempt is { } a && f.AttackReturn is not null && a.SourceSeat == r.DamageSource && a.TargetSeat == r.Victim && !a.SourceLess && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiAnniversaryDamageIssuedEvent>().Count(e => e.FrameId == f.Id && e.Source == a.SourceSeat && e.Victim == a.TargetSeat) == 1)
             return _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(f, child);
         if (r.Stage == MouJiangWeiAnniversaryStage.RecoveryChildren)
         {
@@ -31,14 +31,14 @@ internal sealed partial class CharacterJiangWeiMouRuntime
                 return hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Change.TargetSeat == f.OwnerSeat;
         }
 
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
+        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
     internal bool MouJiangWeiAnniversaryEdge(int i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && MouJiangWeiAnniversaryFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]);
     internal bool MouJiangWeiAnniversarySuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterJiangWeiMouOperations.MouJiangWeiAnniversaryEdge(i), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? MouJiangWeiAnniversaryRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterJiangWeiMouOperations.MouJiangWeiAnniversaryFirstChild(f, c), (n) => _characterJiangWeiMouOperations.MouJiangWeiAnniversarySuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 35200)]
-    internal bool MouJiangWeiAnniversaryDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouJiangWeiAnniversaryRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
+    internal bool MouJiangWeiAnniversaryDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && MouJiangWeiAnniversaryRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 35200)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 35200)]
     internal bool MouJiangWeiAnniversaryRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

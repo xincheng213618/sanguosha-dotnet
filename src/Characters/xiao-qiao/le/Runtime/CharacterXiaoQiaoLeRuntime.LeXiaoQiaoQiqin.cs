@@ -15,7 +15,7 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
             projection.Append(_characterDaQiaoLeOperations.ZixiQinJudgmentSlotLabel(cardId) ?? "琴");
     }
 
-    internal bool HasQiqinEntityMark(int id) => HasLeXiaoQiaoQiqinCapability && _coreProgramEventHistoryOperations.ProgramEventHistory<QiqinInitialEntityMarkedEvent>().Any(e => e.CardId == id);
+    internal bool HasQiqinEntityMark(int id) => HasLeXiaoQiaoQiqinCapability && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QiqinInitialEntityMarkedEvent>().Any(e => e.CardId == id);
     internal bool HasQiqinHandEntityMark(int owner, int id) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(owner) && HasQiqinEntityMark(id);
     internal bool IsQiqinHandLimitExempt(CharacterState owner, int id) => HasLeXiaoQiaoQiqinCapability && _coreNationalSkillsOperations.HasRuntimeSkill(owner, "le:qiqin") && HasQiqinHandEntityMark(owner.Seat, id);
     internal ProgramLifecycleTriggerWindowFrame CaptureQiqinInitialEntities(ProgramLifecycleTriggerWindowFrame window)
@@ -39,7 +39,7 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     }
 
     [ProgramIssuedTrigger(210)]
-    internal bool IsIssuedQiqinCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => HasLeXiaoQiaoQiqinCapability && c.SkillId == "le:qiqin" && c.BindingId == "mark-initial-entities" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash == c.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.InitializeQiqinInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == c.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.NotStarted && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, QiqinInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == c && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<QiqinInitializedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat);
+    internal bool IsIssuedQiqinCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => HasLeXiaoQiaoQiqinCapability && c.SkillId == "le:qiqin" && c.BindingId == "mark-initial-entities" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash == c.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.InitializeQiqinInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == c.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.NotStarted && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, QiqinInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == c && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<QiqinInitializedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28610, SkillProgramEffectOp.InitializeQiqinInitialEntities, SkillProgramEffectOp.ResolveQiqinDiscardPileQin)]
     internal bool CanOfferQiqin(ProgramTriggerLegalityContext gate) => gate.Trigger.Id == "mark-initial-entities" ? IsIssuedQiqinCandidate(gate.Candidate, gate.Context) : gate.Trigger.Id == "collect-discard-qin" && gate.Context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && gate.Context.OwnerSeat == gate.Candidate.OwnerSeat && gate.Context.SourceSeat == gate.Candidate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[gate.Candidate.OwnerSeat].IsAlive;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28610)]
@@ -53,7 +53,7 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
         if (f.TriggerId != "mark-initial-entities" || !_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.GameStarting))
             return false;
         var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
-        return IsIssuedQiqinCandidate(c, context) || f.InstructionIndex == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<QiqinInitializedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var issued] && issued.Source == QiqinSource(f) && issued.GameplayHash == f.GameplayHash;
+        return IsIssuedQiqinCandidate(c, context) || f.InstructionIndex == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QiqinInitializedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var issued] && issued.Source == QiqinSource(f) && issued.GameplayHash == f.GameplayHash;
     }
 
     SkillProgramStepOutcome ILeXiaoQiaoQiqinHost.Initialize(ProgramSkillFrame f) => InitializeQiqin(f);
@@ -61,7 +61,7 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     internal SkillProgramStepOutcome InitializeQiqin(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.InstructionIndex != 1 || !PermitIssuedQiqin(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<QiqinInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
+        if (f.InstructionIndex != 1 || !PermitIssuedQiqin(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QiqinInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Qiqin requires its one exact frozen opening mother.");
         var parent = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(s => s.Id == f.WindowContext!.ParentFrameId);
         var entities = parent.QiqinInitialEntities!.Where(e => e.OwnerSeat == f.OwnerSeat).ToArray();

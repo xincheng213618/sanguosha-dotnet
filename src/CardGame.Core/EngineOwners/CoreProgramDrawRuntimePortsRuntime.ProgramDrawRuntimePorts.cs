@@ -15,7 +15,7 @@ internal sealed partial class CoreProgramDrawRuntimePortsRuntime
     int IProgramDrawFacts.OwnerLostHp(ProgramSkillFrame frame) => _coreProgramOwnedCardsOperations.GetProgramOwnerLostHp(frame);
     int IProgramDrawFacts.CurrentTurnCategoryDrawCount(ProgramSkillFrame frame, int targetSeat) => _coreCurrentTurnUseKindsOperations.CurrentTurnCategoryDrawCount(frame, targetSeat);
     int IProgramDrawFacts.ActualTurnDeathDrawCount(ProgramSkillFrame frame, int targetSeat) => _coreForcedPhaseAlcoholOperations.ActualTurnDeathDrawCount(frame, targetSeat);
-    int IProgramDrawFacts.CommittedMijiCount(ProgramSkillFrame frame) => _characterWangYiBoundaryMobileOperations.BoundaryWangYiMijiDrawCount(frame);
+    int IProgramDrawFacts.CommittedMijiCount(ProgramSkillFrame frame) => _characterWangYiBoundaryMobileOperations.Value.BoundaryWangYiMijiDrawCount(frame);
     void IProgramDrawOperations.Cancel(ProgramSkillFrame frame, string reason) => _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, reason);
     IReadOnlyList<int> IProgramDrawOperations.DrawCards(int seat, int count, bool log, CardMoveReason reason) => _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[seat], count, log, reason);
     void IProgramDrawOperations.CaptureFixedRecipientDraw(long frameId, int targetSeat, CardMoveReason reason, long sequenceBefore, int actualCount) => _corePairBenefitObserversOperations.CaptureFixedRecipientDraw(frameId, targetSeat, reason, sequenceBefore, actualCount);

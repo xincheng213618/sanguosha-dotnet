@@ -13,12 +13,12 @@ internal sealed partial class CoreActualPhaseEndRuntimePortsRuntime
 
     bool IActualPhaseEndFacts.ModeTracksActualPhaseEnds => _modeRulesOperations._modeRules.RuntimeRequirements.TracksActualPhaseEnds;
 
-    bool IActualPhaseEndFacts.HasOlLuShi => _characterLuShiOlOperations.HasOlLuShi;
+    bool IActualPhaseEndFacts.HasOlLuShi => _characterLuShiOlOperations.Value.HasOlLuShi;
 
     IReadOnlyList<ActualPhaseEndItem> IActualPhaseEndIssuedItems.Qingya(ActualDiscardRecoveryPhaseKey phase) => _characterYaDanOlOperations.CollectQingyaPhaseEndCandidates(phase);
     IReadOnlyList<ActualPhaseEndItem> IActualPhaseEndIssuedItems.MouSimaShi(ActualDiscardRecoveryPhaseKey phase) => _characterSimaShiMouOperations.CollectMouSimaShiPhaseEndCandidates(phase);
     IReadOnlyList<ActualPhaseEndItem> IActualPhaseEndIssuedItems.ShiHuangZu(ActualDiscardRecoveryPhaseKey phase) => _characterHuangZuMobileShiOperations.CollectShiHzPhaseEndCandidates(phase);
-    IReadOnlyList<ActualPhaseEndItem> IActualPhaseEndIssuedItems.ShiLuYuSheng(ActualDiscardRecoveryPhaseKey phase) => _characterLuYuShengMobileShiOperations.CollectShiLysPhaseEndCandidates(phase);
+    IReadOnlyList<ActualPhaseEndItem> IActualPhaseEndIssuedItems.ShiLuYuSheng(ActualDiscardRecoveryPhaseKey phase) => _characterLuYuShengMobileShiOperations.Value.CollectShiLysPhaseEndCandidates(phase);
     void IActualPhaseEndNativeReturns.BeginTurnStartAfterProgramLifecycle(int actorSeat) => _coreActualTurnsOperations.BeginTurnStartAfterProgramLifecycle(_coreMatchParticipantsPlayersAccess._players[actorSeat]);
     void IActualPhaseEndNativeReturns.CompleteTurnStart(int actorSeat, int delayedEffects) => _coreActualTurnsOperations.CompleteTurnStart(_coreMatchParticipantsPlayersAccess._players[actorSeat], (GameEngine.DelayedTurnEffects)delayedEffects);
     void IActualPhaseEndNativeReturns.CompleteTurnStartAfterDraw(int actorSeat, int delayedEffects, bool afterNormalDrawProgramsCompleted, bool drawPhaseEndedProgramsCompleted, bool actualDrawCompletionCompleted) => _coreActualTurnsOperations.CompleteTurnStartAfterDraw(_coreMatchParticipantsPlayersAccess._players[actorSeat], (GameEngine.DelayedTurnEffects)delayedEffects, afterNormalDrawProgramsCompleted, drawPhaseEndedProgramsCompleted, actualDrawCompletionCompleted);

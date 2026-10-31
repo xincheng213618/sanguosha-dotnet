@@ -143,7 +143,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || p.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber || p.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat)
             return false;
         if (p.Intent == DrawFundedDistinctBasicIntent.Play)
-            return (_resolutionStackOperations._resolutionStack.Count == 1 && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat == actor.Seat || _characterKeBiNengOlOperations.IsKeBiNengPingduanPaymentFrame2(frame) || (_characterKongRongMouOlOperations.IsMouKrLiwenPaymentFrame2(frame) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTiePaymentFrame2(frame)) || _characterLuSuMouOperations.IsMouLuSuPaymentFrame2(frame)) && _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicNativePlayActions(actor, p.Source, p.EffectiveKind).Any(a => a.TargetSeats.SequenceEqual(frame.TargetSeats));
+            return (_resolutionStackOperations._resolutionStack.Count == 1 && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat == actor.Seat || _characterKeBiNengOlOperations.IsKeBiNengPingduanPaymentFrame2(frame) || (_characterKongRongMouOlOperations.Value.IsMouKrLiwenPaymentFrame(frame) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTiePaymentFrame2(frame)) || _characterLuSuMouOperations.Value.IsMouLuSuPaymentFrame(frame)) && _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicNativePlayActions(actor, p.Source, p.EffectiveKind).Any(a => a.TargetSeats.SequenceEqual(frame.TargetSeats));
         var request = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == p.RequestFrameId);
         if (request is null || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[_resolutionStackOperations._resolutionStack.Count - 2].Id != request.Id || _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicContext(frame.OriginalDecision, request)is not { } current || current.Intent != p.Intent || current.ParentFrameId != p.ParentFrameId || current.RequestFrameId != p.RequestFrameId || current.ParentActionId != p.ParentActionId || current.Cursor != p.Cursor)
             return false;
@@ -169,9 +169,9 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
             return;
         if (p.ParentFrameId is { } pingduanParent && _characterKeBiNengOlOperations.TryCancelKeBiNengPingduanBasicPayment(pingduanParent))
             return;
-        if (p.ParentFrameId is { } luSuParent && _characterLuSuMouOperations.TryCancelMouLuSuPayment(luSuParent))
+        if (p.ParentFrameId is { } luSuParent && _characterLuSuMouOperations.Value.TryCancelMouLuSuPayment(luSuParent))
             return;
-        if (p.ParentFrameId is { } liwenParent && (_characterKongRongMouOlOperations.TryCancelMouKrLiwenPayment(liwenParent) || _characterMaTieAnniversaryOperations.TryCancelAnniversaryMaTiePayment(liwenParent)))
+        if (p.ParentFrameId is { } liwenParent && (_characterKongRongMouOlOperations.Value.TryCancelMouKrLiwenPayment(liwenParent) || _characterMaTieAnniversaryOperations.TryCancelAnniversaryMaTiePayment(liwenParent)))
             return;
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return;
@@ -198,7 +198,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
             return;
         }
 
-        if (p.Intent == DrawFundedDistinctBasicIntent.Dying && _coreDyingCursorRuntimeOperations.ActiveDying is { } d && d.FrameId == p.ParentFrameId && d.ResponderIndex == p.Cursor)
+        if (p.Intent == DrawFundedDistinctBasicIntent.Dying && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && d.FrameId == p.ParentFrameId && d.ResponderIndex == p.Cursor)
         {
             _coreNativeDyingOperations.ApplyDyingResponse(_coreMatchParticipantsPlayersAccess._players[d.ResponderSeat], false, null, false, null);
             return;

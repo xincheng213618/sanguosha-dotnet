@@ -30,7 +30,7 @@ internal sealed partial class CoreGameEngineAllHandChallengesRuntime
         }
         else
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ReexecuteParticipantInstruction = true });
-        if (!_coreAllHandChallengeReceiptsOperations.ValidAllHandChallenge(f))
+        if (!_coreAllHandChallengeReceiptsOperations.Value.ValidAllHandChallenge(f))
             throw new InvalidOperationException("An all-hand challenge lost its original frame or paid child.");
         var current = f.SequentialDiscard!;
         if (current.Stage is ProgramSequentialDiscardStage.AwaitingMovement or ProgramSequentialDiscardStage.AwaitingDamage)
@@ -116,7 +116,7 @@ internal sealed partial class CoreGameEngineAllHandChallengesRuntime
     {
         var d = f.SequentialDiscard!;
         var effect = _coreSequentialDiscardProgramsOperations.SequentialDiscardEffect(f);
-        if (!_coreAllHandChallengeReceiptsOperations.ValidAllHandChallenge(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != d.ChooserSeat || !p.Choices.Any(c => c.Id == choice.Id) || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("cursor") != d.Cursor.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("stage") != d.Stage.ToString())
+        if (!_coreAllHandChallengeReceiptsOperations.Value.ValidAllHandChallenge(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p || p.PlayerSeat != d.ChooserSeat || !p.Choices.Any(c => c.Id == choice.Id) || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("cursor") != d.Cursor.ToString(CultureInfo.InvariantCulture) || choice.Parameters.GetValueOrDefault("stage") != d.Stage.ToString())
             throw new InvalidOperationException("An all-hand challenge choice belongs to its original private owner.");
         if (!_coreSequentialDiscardProgramsOperations.SequentialDiscardCanContinue(f) || !_coreMatchParticipantsPlayersAccess._players[d.ChooserSeat].IsAlive)
         {

@@ -9,7 +9,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     internal HashSet<CardKind> DinghanNames(int seat)
     {
         var result = new HashSet<CardKind>();
-        foreach (var e in _coreProgramEventHistoryOperations.ProgramEventHistory<DinghanNameChangedEvent>().Where(e => e.Owner == seat))
+        foreach (var e in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DinghanNameChangedEvent>().Where(e => e.Owner == seat))
             if (e.Added)
                 result.Add(e.Kind);
             else
@@ -18,7 +18,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     }
 
     internal CardActionContext? ShenXunYuAction(ProgramSkillWindowContext? context) => context is { ParentFrameId: > 0 } c ? _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)?.Action : null;
-    internal bool CanLingce(int seat, CardActionContext? a) => a is not null && CardCatalog.Get(a.EffectiveKind).CategoryName == "锦囊牌" && a.PhysicalCards.Count == 1 && a.ConversionChain.Count == 0 && a.PhysicalCards[0].CardKind == a.EffectiveKind && !_coreProgramEventHistoryOperations.ProgramEventHistory<LingceDrawIssuedEvent>().Any(e => e.Owner == seat && e.ActionId == a.ActionId) && (a.EffectiveKind is CardKind.DrawTwo or CardKind.Dismantlement or CardKind.Nullification or CardKind.QizhengXiangsheng || DinghanNames(seat).Contains(a.EffectiveKind));
+    internal bool CanLingce(int seat, CardActionContext? a) => a is not null && CardCatalog.Get(a.EffectiveKind).CategoryName == "锦囊牌" && a.PhysicalCards.Count == 1 && a.ConversionChain.Count == 0 && a.PhysicalCards[0].CardKind == a.EffectiveKind && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LingceDrawIssuedEvent>().Any(e => e.Owner == seat && e.ActionId == a.ActionId) && (a.EffectiveKind is CardKind.DrawTwo or CardKind.Dismantlement or CardKind.Nullification or CardKind.QizhengXiangsheng || DinghanNames(seat).Contains(a.EffectiveKind));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 38300, SkillProgramEffectOp.DrawLingceActualTrick, SkillProgramEffectOp.RecordAndCancelDinghanTarget)]
     internal bool CanTriggerShenXunYu(ProgramTriggerLegalityContext gate)
     {
@@ -52,7 +52,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
 
         if (op == SkillProgramEffectOp.AddTianzuoCards)
         {
-            if (f.TriggerId != "eight-qizheng" || f.WindowContext?.Window != SkillProgramTriggerWindow.GameStarting || _coreProgramEventHistoryOperations.ProgramEventHistory<TianzuoCardCreatedEvent>().Any(e => e.FrameId == f.Id))
+            if (f.TriggerId != "eight-qizheng" || f.WindowContext?.Window != SkillProgramTriggerWindow.GameStarting || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TianzuoCardCreatedEvent>().Any(e => e.FrameId == f.Id))
                 throw new InvalidOperationException("Tianzuo requires its original unpaid game-start instruction.");
             var next = checked(_coreTrustedCardZoneDiagnosticsOperations.CreateCardZoneDiagnostics().Select(c => c.CardId).DefaultIfEmpty(0).Max() + 1);
             var cards = new List<Card>();
@@ -126,6 +126,6 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     [ProgramAiChoice(SkillProgramEffectOp.EditDinghanNames)]
     internal PromptChoice ChooseDinghanEdit(PendingDecision prompt) => prompt.Choices.First(c => c.Parameters.GetValueOrDefault("kind") == "cancel");
     internal static int[] DinghanRetainedTargets(CardKind kind, IReadOnlyList<int> before, int owner) => kind == CardKind.BorrowedSword ? before.Chunk(2).Where(pair => pair[0] != owner).SelectMany(pair => pair).ToArray() : before.Where(seat => seat != owner).ToArray();
-    internal bool IsDinghanCancellationFact(CardUseFrame use, DinghanTargetCanceledEvent e, IReadOnlyList<int> before) => e.UseId == use.Id && e.ActionId == use.Action?.ActionId && e.Kind == use.CardKind && e.OriginalAction.TargetSeats.SequenceEqual(before) && before.Contains(e.Owner) && _coreCompletedCategoryUseProofOperations.ActualHandGainMutationBinding(e.FrameId, "mobile:dinghan", e.Owner, SkillProgramTriggerWindow.CardUseTargetsFinalized, SkillProgramEffectOp.RecordAndCancelDinghanTarget) && _coreProgramEventHistoryOperations.ProgramEventHistory<DinghanNameChangedEvent>().Count(n => n.FrameId == e.FrameId && n.Owner == e.Owner && n.Kind == e.Kind && n.Added) == 1;
-    internal bool HasDinghanCancellation(CardUseFrame use) => _coreProgramEventHistoryOperations.ProgramEventHistory<DinghanTargetCanceledEvent>().Any(e => e.UseId == use.Id && IsDinghanCancellationFact(use, e, e.OriginalAction.TargetSeats) && !use.TargetSeats.Contains(e.Owner));
+    internal bool IsDinghanCancellationFact(CardUseFrame use, DinghanTargetCanceledEvent e, IReadOnlyList<int> before) => e.UseId == use.Id && e.ActionId == use.Action?.ActionId && e.Kind == use.CardKind && e.OriginalAction.TargetSeats.SequenceEqual(before) && before.Contains(e.Owner) && _coreCompletedCategoryUseProofOperations.ActualHandGainMutationBinding(e.FrameId, "mobile:dinghan", e.Owner, SkillProgramTriggerWindow.CardUseTargetsFinalized, SkillProgramEffectOp.RecordAndCancelDinghanTarget) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DinghanNameChangedEvent>().Count(n => n.FrameId == e.FrameId && n.Owner == e.Owner && n.Kind == e.Kind && n.Added) == 1;
+    internal bool HasDinghanCancellation(CardUseFrame use) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DinghanTargetCanceledEvent>().Any(e => e.UseId == use.Id && IsDinghanCancellationFact(use, e, e.OriginalAction.TargetSeats) && !use.TargetSeats.Contains(e.Owner));
 }

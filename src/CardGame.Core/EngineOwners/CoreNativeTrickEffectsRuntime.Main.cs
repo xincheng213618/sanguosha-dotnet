@@ -27,7 +27,7 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
             Kind = pending.EffectCardKind
         };
         var group = _kernelCoreMainOperations.CreateGroupCardHandle(pending.ParentFrameId, source.Seat, effectiveCard, pending.TargetSeats, GroupCardEffect.ResponseAttack, requiredCardKind, physicalCards);
-        if (!_coreExtraCardEffectRoundsOperations.RestoreExtraGroupDamageSource(group) && !_characterMengHuoMouMobileOperations.RestoreMouMengHuoDamageSource(group) && effectiveCard.Kind == CardKind.BarbarianAssault)
+        if (!_coreExtraCardEffectRoundsOperations.RestoreExtraGroupDamageSource(group) && !_characterMengHuoMouMobileOperations.Value.RestoreMouMengHuoDamageSource(group) && effectiveCard.Kind == CardKind.BarbarianAssault)
         {
             var mengHuo = _coreMatchParticipantsPlayersAccess._players.FirstOrDefault(player => player.IsAlive && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.AttributeGlobalDamage, CardKind.BarbarianAssault));
             if (mengHuo is not null)
@@ -44,7 +44,7 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
         if (!_coreExtraCardEffectRoundsOperations.IsExtraCardEffectRound(pending.ParentFrameId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GroupCardUsedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, source.Seat, pending.TargetSeats));
         _coreNativeAiDecisionsOperations.NotifyAiOfGroupAttack(source, pending.TargetSeats);
-        _coreNativeGroupAttackOperations.BeginGroupAttackResponse(group);
+        _coreNativeGroupAttackOperations.Value.BeginGroupAttackResponse(group);
     }
 
     internal void ResolvePeachGardenEffect(NullificationWindowFrame pending)
@@ -89,11 +89,11 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(pending.ParentFrameId, group.RevealedCardIds.Select(cardId => _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == cardId)).Select(_coreSnapshotValueProjectionOperations.ToSnapshot).ToArray()));
         if (group.TargetSeats.Count == 0)
         {
-            _coreNativeHarvestOperations.FinishFiveGrains(group);
+            _coreNativeHarvestOperations.Value.FinishFiveGrains(group);
         }
         else
         {
-            _coreNativeHarvestOperations.BeginHarvestSelection(group);
+            _coreNativeHarvestOperations.Value.BeginHarvestSelection(group);
         }
     }
 
@@ -334,7 +334,7 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
 
     internal void ResolveIronChainEffect(NullificationWindowFrame pending)
     {
-        if (_characterLuXunMouMobileOperations.ResolveMouLuXunMultiIronChain(pending))
+        if (_characterLuXunMouMobileOperations.Value.ResolveMouLuXunMultiIronChain(pending))
             return;
         _coreNativeCardUseFramesOperations.SetCardUseStep(pending.ParentFrameId, ResolutionFrameStep.ResolvingEffect);
         var changes = new List<string>(pending.TargetSeats.Count);

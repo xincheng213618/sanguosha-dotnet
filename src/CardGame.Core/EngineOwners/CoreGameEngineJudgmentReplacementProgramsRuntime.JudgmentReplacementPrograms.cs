@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
     internal IReadOnlyList<Card> GetProgramJudgmentReplacementCards(CharacterState owner, SkillProgramTrigger trigger, int judgmentSubjectSeat, string judgmentReason, bool ignoreCurrentColor = false)
     {
         if (trigger.Effects is [{ Op: SkillProgramEffectOp.ReplaceJudgmentFromPublicRice }])
-            return _coreRiceJudgmentOperations.RiceJudgmentReplacementCards(owner, trigger);
+            return _coreRiceJudgmentOperations.Value.RiceJudgmentReplacementCards(owner, trigger);
         if (CharacterWangYiMobileRuntime.IsDeckTopJudgmentReplacement(trigger))
             return _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).TakeLast(1).ToArray();
         if (trigger.Window != SkillProgramTriggerWindow.JudgmentReplacing || trigger.Effects.Count == 0 || trigger.Effects[0] is not { Op: SkillProgramEffectOp.ReplaceJudgment or SkillProgramEffectOp.DelegateJudgmentReplacement } replacement || !replacement.Condition.Evaluate(_coreNativeSkillContextQueriesOperations.CreateSkillContext(owner)))
@@ -17,7 +17,7 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
         bool? currentColor = null;
         if (replacement.RequireDifferentColor == true && !ignoreCurrentColor)
         {
-            if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment is not { } current || current.TargetSeat != judgmentSubjectSeat || !string.Equals(current.Reason, judgmentReason, StringComparison.Ordinal) || _coreNativeDamageHandlesOperations.GetJudgmentCard(current)is not { } currentCard)
+            if (_coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is not { } current || current.TargetSeat != judgmentSubjectSeat || !string.Equals(current.Reason, judgmentReason, StringComparison.Ordinal) || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(current)is not { } currentCard)
                 return[];
             currentColor = CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[judgmentSubjectSeat], currentCard));
             if (currentColor is null)
@@ -29,7 +29,7 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
             cards.AddRange(_corePhysicalOwnedCardQueriesOperations.GetHand(owner));
         if (replacement.Zones.Contains(CardZoneKind.Equipment))
             cards.AddRange(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner));
-        return cards.Where(card => !_coreDelegatedJudgmentChoicesOperations.IsDelegatedJudgment(trigger) || !card.IsGeneralWeapon).Where(card => !_coreNativeJudgmentOperations.IsProtectedJudgmentSourceEquipment(owner, card, judgmentSubjectSeat, judgmentReason)).Where(card => replacement.Suits.Contains(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card))).Where(card => replacement.RequireDifferentColor != true || CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card))is { } candidateColor && (ignoreCurrentColor || candidateColor != currentColor)).OrderBy(card => card.Id).ToArray();
+        return cards.Where(card => !_coreDelegatedJudgmentChoicesOperations.Value.IsDelegatedJudgment(trigger) || !card.IsGeneralWeapon).Where(card => !_coreNativeJudgmentOperations.IsProtectedJudgmentSourceEquipment(owner, card, judgmentSubjectSeat, judgmentReason)).Where(card => replacement.Suits.Contains(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card))).Where(card => replacement.RequireDifferentColor != true || CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card))is { } candidateColor && (ignoreCurrentColor || candidateColor != currentColor)).OrderBy(card => card.Id).ToArray();
     }
 
     internal (SkillProgram Program, SkillProgramTrigger Trigger) GetProgramJudgmentReplacement(JudgmentTriggerCandidate candidate)
@@ -47,15 +47,15 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
 
     internal void BeginProgramJudgmentReplacementChoice(JudgmentFrame pending, JudgmentTriggerCandidate candidate)
     {
-        if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment?.Id != pending.Id || !ReferenceEquals(_coreNativeJudgmentOperations.CurrentJudgmentCandidate(pending), candidate) || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)is not { } judgmentCard)
+        if (_coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment?.Id != pending.Id || !ReferenceEquals(_coreNativeJudgmentOperations.CurrentJudgmentCandidate(pending), candidate) || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)is not { } judgmentCard)
             throw new InvalidOperationException("The configured judgment replacement is not current.");
         var(program, trigger) = GetProgramJudgmentReplacement(candidate);
         var owner = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat];
         var enabled = owner.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, program.Id, candidate.SkillInstanceId) && MatchesProgramJudgmentReplacement(owner, trigger, pending.TargetSeat, pending.Reason);
         if (CharacterWangYiMobileRuntime.IsDeckTopJudgmentReplacement(trigger))
         {
-            if (enabled && _characterWangYiMobileOperations.HasDeckTopJudgmentReplacementMaterial())
-                _characterWangYiMobileOperations.BeginDeckTopJudgmentReplacementChoice(pending, candidate, program, trigger);
+            if (enabled && _characterWangYiMobileOperations.Value.HasDeckTopJudgmentReplacementMaterial())
+                _characterWangYiMobileOperations.Value.BeginDeckTopJudgmentReplacementChoice(pending, candidate, program, trigger);
             else
                 _coreNativeJudgmentOperations.AdvanceJudgmentCandidate(pending);
             return;
@@ -68,9 +68,9 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
             return;
         }
 
-        if (_coreDelegatedJudgmentChoicesOperations.IsDelegatedJudgment(trigger))
+        if (_coreDelegatedJudgmentChoicesOperations.Value.IsDelegatedJudgment(trigger))
         {
-            _coreDelegatedJudgmentChoicesOperations.BeginDelegatedJudgmentChoice(pending, candidate, program, trigger, replacementCards);
+            _coreDelegatedJudgmentChoicesOperations.Value.BeginDelegatedJudgmentChoice(pending, candidate, program, trigger, replacementCards);
             return;
         }
 
@@ -108,14 +108,14 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
 
     internal void ResolveProgramJudgmentReplacementChoice(PromptChoice selected)
     {
-        if (_coreDelegatedJudgmentChoicesOperations.TryResolveDelegatedJudgmentChoice(selected))
+        if (_coreDelegatedJudgmentChoicesOperations.Value.TryResolveDelegatedJudgmentChoice(selected))
             return;
-        var pending = _coreJudgmentCursorRuntimeOperations.ActiveJudgment ?? throw new InvalidOperationException("The configured judgment replacement continuation is missing.");
+        var pending = _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment ?? throw new InvalidOperationException("The configured judgment replacement continuation is missing.");
         var candidate = _coreNativeJudgmentOperations.CurrentJudgmentCandidate(pending) ?? throw new InvalidOperationException("The configured judgment replacement candidate is missing.");
         var(program, trigger) = GetProgramJudgmentReplacement(candidate);
         var owner = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat];
-        var oldJudgmentCard = _coreNativeDamageHandlesOperations.GetJudgmentCard(pending) ?? throw new InvalidOperationException("The configured judgment replacement lost its current card.");
-        if (_characterWangYiMobileOperations.TryResolveDeckTopJudgmentReplacement(selected, pending, candidate, program, trigger))
+        var oldJudgmentCard = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending) ?? throw new InvalidOperationException("The configured judgment replacement lost its current card.");
+        if (_characterWangYiMobileOperations.Value.TryResolveDeckTopJudgmentReplacement(selected, pending, candidate, program, trigger))
             return;
         int? selectedCardId = selected.Parameters.GetValueOrDefault("action") switch
         {
@@ -142,13 +142,13 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
     internal void ReplaceProgramJudgment(ProgramSkillFrame frame, SkillProgramEffect effect)
     {
         var context = frame.WindowContext?.JudgmentReplacement ?? throw new InvalidOperationException("Replacement primitive requires its frozen judgment choice.");
-        var pending = _coreJudgmentCursorRuntimeOperations.ActiveJudgment ?? throw new InvalidOperationException("Replacement primitive lost its judgment continuation.");
-        if (pending.Id != context.JudgmentFrameId || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id != context.OldCardId || pending.TargetSeat != context.SubjectSeat || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
+        var pending = _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment ?? throw new InvalidOperationException("Replacement primitive lost its judgment continuation.");
+        if (pending.Id != context.JudgmentFrameId || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)?.Id != context.OldCardId || pending.TargetSeat != context.SubjectSeat || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
             throw new InvalidOperationException("Replacement primitive no longer matches its judgment.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(frame);
         var replacement = GetProgramJudgmentReplacementCards(owner, trigger, pending.TargetSeat, pending.Reason).SingleOrDefault(card => card.Id == context.ReplacementCardId) ?? throw new InvalidOperationException("The selected replacement card is no longer legal.");
-        var old = _coreNativeDamageHandlesOperations.GetJudgmentCard(pending) ?? throw new InvalidOperationException("The replacement primitive lost its judgment card.");
+        var old = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending) ?? throw new InvalidOperationException("The replacement primitive lost its judgment card.");
         var committedSuit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[pending.TargetSeat], replacement);
         var destination = effect.OldCardDestination ?? throw new InvalidOperationException("Replacement has no old-card destination.");
         CommitProgramJudgmentReplacement(pending, owner, old, replacement, committedSuit, destination);
@@ -161,7 +161,7 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
     internal void CompleteProgramJudgmentReplacementBinding(ProgramSkillFrame frame, bool completed)
     {
         var context = frame.WindowContext?.JudgmentReplacement ?? throw new InvalidOperationException("Replacement program lost its frozen judgment context.");
-        var pending = _coreJudgmentCursorRuntimeOperations.ActiveJudgment ?? throw new InvalidOperationException("Replacement program lost its judgment continuation.");
+        var pending = _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment ?? throw new InvalidOperationException("Replacement program lost its judgment continuation.");
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not JudgmentFrame parent || parent.Id != context.JudgmentFrameId || pending.Id != parent.Id)
             throw new InvalidOperationException("Replacement program did not return to its judgment frame.");
         var effect = _coreProgramLifecycleOperations.GetProgramTrigger(frame).Effects[0];
@@ -174,7 +174,7 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
         var oldFrom = CardLocation.Judgment(pending.TargetSeat);
         if (_cardZonesOperations._cardZones.GetLocation(oldJudgmentCard.Id) != oldFrom)
             throw new InvalidOperationException("The current judgment card is no longer in its judgment zone.");
-        var topInput = exactRiceLocation is null && _characterWangYiMobileOperations.IsDeckTopJudgmentReplacementInput(pending, owner, replacement);
+        var topInput = exactRiceLocation is null && _characterWangYiMobileOperations.Value.IsDeckTopJudgmentReplacementInput(pending, owner, replacement);
         var replacementFrom = exactRiceLocation ?? (topInput ? CardLocation.DrawPile : _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(owner, replacement));
         if (exactRiceLocation is not null ? replacementFrom.Zone != CardZoneKind.PublicPersistentPile || replacementFrom.OwnerSeat != owner.Seat || _cardZonesOperations._cardZones.GetLocation(replacement.Id) != replacementFrom || !_coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.Values.Any(p => p.Location == replacementFrom && _coreRicePileOperations.RiceProducer(p)) : !topInput && replacementFrom.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment))
             throw new InvalidOperationException("The configured replacement card is not in an owned input zone.");
@@ -220,16 +220,16 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
     internal bool IsAiProgramJudgmentReplacementPending() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramJudgmentReplacement, PlayerSeat: var playerSeat } && !_coreMatchParticipantsPlayersAccess._players[playerSeat].IsHuman;
     internal void ResolvePendingAiProgramJudgmentReplacement()
     {
-        if (_coreDelegatedJudgmentChoicesOperations.ResolveAiDelegatedJudgmentChoice())
+        if (_coreDelegatedJudgmentChoicesOperations.Value.ResolveAiDelegatedJudgmentChoice())
             return;
-        if (_characterWangYiMobileOperations.TryResolveAiDeckTopJudgmentReplacement())
+        if (_characterWangYiMobileOperations.Value.TryResolveAiDeckTopJudgmentReplacement())
             return;
-        var pending = _coreJudgmentCursorRuntimeOperations.ActiveJudgment ?? throw new InvalidOperationException("AI configured judgment replacement is missing.");
+        var pending = _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment ?? throw new InvalidOperationException("AI configured judgment replacement is missing.");
         var decision = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("AI configured judgment replacement prompt is missing.");
         var candidate = _coreNativeJudgmentOperations.CurrentJudgmentCandidate(pending) ?? throw new InvalidOperationException("AI configured judgment candidate is missing.");
         var(_, trigger) = GetProgramJudgmentReplacement(candidate);
         var owner = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat];
-        var judgmentCard = _coreNativeDamageHandlesOperations.GetJudgmentCard(pending) ?? throw new InvalidOperationException("AI configured judgment replacement lost its current card.");
+        var judgmentCard = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending) ?? throw new InvalidOperationException("AI configured judgment replacement lost its current card.");
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(frame => frame.Id == pending.ParentFrameId);
         var successSuits = parent is null ? null : _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program?.Triggers.SingleOrDefault(item => item.Id == parent.TriggerId)?.Effects.Select(effect => effect.Condition).FirstOrDefault(condition => condition.Kind == SkillProgramConditionKind.BoundCardsMatchSuits && condition.SourceBind == pending.ProgramResultBind)?.Suits;
         var(cardId, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[owner.Seat].ChooseJudgmentReplacement(_corePlayerViewProjectionOperations.CreateSnapshot(owner.Seat), pending.TargetSeat, pending.Reason, decision.ValidCardIds, judgmentCard.Kind, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[pending.TargetSeat], judgmentCard), judgmentCard.Rank, successSuits, ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);

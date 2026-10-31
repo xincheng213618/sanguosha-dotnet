@@ -7,7 +7,7 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
 {
     internal const string MouDuojingTakeReason = "skill-program.mou-mobile:duojing.obtain";
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29202, SkillProgramEffectOp.ResolveMouLuMengDuojing)]
-    internal bool CanOfferMouDuojing(ProgramTriggerLegalityContext c) => c.SkillId == MouDuojing && MouLuMengComposition.IsDuojing(c.Program) && c.Context is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } && identity.ActorSeat == c.OwnerSeat && c.Owner.IsAlive && c.Owner.Armor > 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } action } use && action.ActionId == identity.CardActionId && action.ActorSeat == c.OwnerSeat && use.SourceSeat == c.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Any(seat => seat != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive) && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not null && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingStartedEvent>().Any(e => e.CardUseId == use.Id && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == MouDuojing);
+    internal bool CanOfferMouDuojing(ProgramTriggerLegalityContext c) => c.SkillId == MouDuojing && MouLuMengComposition.IsDuojing(c.Program) && c.Context is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } && identity.ActorSeat == c.OwnerSeat && c.Owner.IsAlive && c.Owner.Armor > 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } action } use && action.ActionId == identity.CardActionId && action.ActorSeat == c.OwnerSeat && use.SourceSeat == c.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Any(seat => seat != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive) && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not null && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingStartedEvent>().Any(e => e.CardUseId == use.Id && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == MouDuojing);
     internal CardUseFrame? MouDuojingUse(ProgramSkillFrame f)
     {
         if (f.SkillId != MouDuojing || f.TriggerId != "after-slash-targets" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } context || context.SourceSeat != f.OwnerSeat || identity.ActorSeat != f.OwnerSeat || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program is not { } p || p.GameplayHash != f.GameplayHash || !MouLuMengComposition.IsDuojing(p) || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { Action: { Type: CardActionType.Use } action } use || action.ActionId != identity.CardActionId || action.ActorSeat != f.OwnerSeat || use.SourceSeat != f.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.EffectiveKind != use.CardKind || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != use.Id || window.Continuation != ProgramCardContinuation.Slash || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != context.Window || window.Action.ActionId != action.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])))
@@ -18,28 +18,28 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
 
     internal bool ValidMouDuojing(ProgramSkillFrame f)
     {
-        if (f.MouLuMengDuojing is not { } r || MouDuojingUse(f)is not { } use || r.Source != MouLuMengSource(f) || r.GameplayHash != f.GameplayHash || r.WindowId != f.WindowContext!.ParentFrameId || r.CardUseId != use.Id || r.ActionId != use.Action!.ActionId || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || r.Targets.Count == 0 || r.Targets.Distinct().Count() != r.Targets.Count || r.Targets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == f.OwnerSeat || !use.TargetSeats.Contains(s)) || r.TargetIndex < 0 || r.TargetIndex > r.Targets.Count || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingStartedEvent>().Count(e => e == new MouLuMengDuojingStartedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, r.CardUseId, r.ActionId, r.Phase, r.Targets.Count)) != 1)
+        if (f.MouLuMengDuojing is not { } r || MouDuojingUse(f)is not { } use || r.Source != MouLuMengSource(f) || r.GameplayHash != f.GameplayHash || r.WindowId != f.WindowContext!.ParentFrameId || r.CardUseId != use.Id || r.ActionId != use.Action!.ActionId || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || r.Targets.Count == 0 || r.Targets.Distinct().Count() != r.Targets.Count || r.Targets.Any(s => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(s) || s == f.OwnerSeat || !use.TargetSeats.Contains(s)) || r.TargetIndex < 0 || r.TargetIndex > r.Targets.Count || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingStartedEvent>().Count(e => e == new MouLuMengDuojingStartedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, r.CardUseId, r.ActionId, r.Phase, r.Targets.Count)) != 1)
             return false;
         if (r.Stage == MouLuMengDuojingStage.Complete)
-            return r.TargetIndex == r.Targets.Count && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingCompletedEvent>().Count(e => e.FrameId == f.Id) == 1;
+            return r.TargetIndex == r.Targets.Count && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingCompletedEvent>().Count(e => e.FrameId == f.Id) == 1;
         if (r.TargetIndex >= r.Targets.Count)
             return false;
         var target = r.Targets[r.TargetIndex];
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingOfferedEvent>().Count(e => e.FrameId == f.Id && e.TargetIndex == r.TargetIndex && e.TargetSeat == target) != 1)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingOfferedEvent>().Count(e => e.FrameId == f.Id && e.TargetIndex == r.TargetIndex && e.TargetSeat == target) != 1)
             return false;
         if (r.Stage == MouLuMengDuojingStage.Choosing)
-            return r.TakenCardId is null && r.MovementSequence is null && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingArmorPaidEvent>().Any(e => e.FrameId == f.Id && e.TargetIndex == r.TargetIndex);
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingArmorPaidEvent>().Where(e => e.FrameId == f.Id && e.TargetIndex == r.TargetIndex).ToArray()is not [var paid] || paid.TargetSeat != target || paid.CardUseId != use.Id || paid.ActionId != r.ActionId || paid.ArmorBefore < 1 || paid.ArmorAfter != paid.ArmorBefore - 1 || !use.IgnoresArmor || use.CardAttack?.IgnoresArmor != true || use.PreparedTargetAttacks?.Any(a => !a.IgnoresArmor) == true)
+            return r.TakenCardId is null && r.MovementSequence is null && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingArmorPaidEvent>().Any(e => e.FrameId == f.Id && e.TargetIndex == r.TargetIndex);
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingArmorPaidEvent>().Where(e => e.FrameId == f.Id && e.TargetIndex == r.TargetIndex).ToArray()is not [var paid] || paid.TargetSeat != target || paid.CardUseId != use.Id || paid.ActionId != r.ActionId || paid.ArmorBefore < 1 || paid.ArmorAfter != paid.ArmorBefore - 1 || !use.IgnoresArmor || use.CardAttack?.IgnoresArmor != true || use.PreparedTargetAttacks?.Any(a => !a.IgnoresArmor) == true)
             return false;
         if (r.Stage == MouLuMengDuojingStage.Taking)
             return r.TakenCardId is null && r.MovementSequence is null;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingTakenEvent>().Count(e => e == new MouLuMengDuojingTakenEvent(f.Id, r.TargetIndex, target, r.TakenCardId, r.MovementSequence)) == 1 && (r.TakenCardId is null && r.MovementSequence is null || r.TakenCardId is { } card && r.MovementSequence is { } sequence && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == sequence && m.CardId == card && m.From == CardLocation.Hand(target) && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MouDuojingTakeReason) == 1);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingTakenEvent>().Count(e => e == new MouLuMengDuojingTakenEvent(f.Id, r.TargetIndex, target, r.TakenCardId, r.MovementSequence)) == 1 && (r.TakenCardId is null && r.MovementSequence is null || r.TakenCardId is { } card && r.MovementSequence is { } sequence && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == sequence && m.CardId == card && m.From == CardLocation.Hand(target) && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MouDuojingTakeReason) == 1);
     }
 
     internal SkillProgramStepOutcome BeginMouDuojing(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (MouDuojingUse(f)is not { } use || f.MouLuMengDuojing is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingStartedEvent>().Any(e => e.CardUseId == use.Id && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == MouDuojing))
+        if (MouDuojingUse(f)is not { } use || f.MouLuMengDuojing is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingStartedEvent>().Any(e => e.CardUseId == use.Id && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == MouDuojing))
             throw new InvalidOperationException("Duojing needs one exact finalized actual Slash Use from its actor.");
         var targets = Array.AsReadOnly(use.TargetSeats.Where(s => s != f.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[s].IsAlive).Distinct().ToArray());
         if (targets.Count == 0)
@@ -72,7 +72,7 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
             return;
         }
 
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingOfferedEvent>().Any(e => e.FrameId == id && e.TargetIndex == r.TargetIndex))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingOfferedEvent>().Any(e => e.FrameId == id && e.TargetIndex == r.TargetIndex))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuMengDuojingOfferedEvent(id, r.TargetIndex, r.Targets[r.TargetIndex]));
         PublishMouDuojingChoice(f, MouDuojingChoices(f), "夺荆：是否失去1点护甲，令此杀无视防具并获得目标一张手牌？");
     }
@@ -162,7 +162,7 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
     internal void FinishMouDuojingTake(ProgramSkillFrame f, int? card, int? sequence)
     {
         var r = f.MouLuMengDuojing!;
-        if (r.Stage != MouLuMengDuojingStage.Taking || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingTakenEvent>().Any(e => e.FrameId == f.Id && e.TargetIndex == r.TargetIndex))
+        if (r.Stage != MouLuMengDuojingStage.Taking || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingTakenEvent>().Any(e => e.FrameId == f.Id && e.TargetIndex == r.TargetIndex))
             throw new InvalidOperationException("Duojing cannot take or finish the same target's paid reward twice.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouLuMengDuojing = r with { Stage = MouLuMengDuojingStage.MovementChildren, TakenCardId = card, MovementSequence = sequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuMengDuojingTakenEvent(f.Id, r.TargetIndex, r.Targets[r.TargetIndex], card, sequence));
@@ -178,7 +178,7 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
             return;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         r = f.MouLuMengDuojing!;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingPhaseCreditEvent>().Any(e => e.FrameId == id && e.TargetIndex == r.TargetIndex))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingPhaseCreditEvent>().Any(e => e.FrameId == id && e.TargetIndex == r.TargetIndex))
             throw new InvalidOperationException("Duojing cannot grant the original phase's Slash credit twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuMengDuojingPhaseCreditEvent(id, r.TargetIndex, f.OwnerSeat, r.CardUseId, r.Phase));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouLuMengDuojing = r with { TargetIndex = r.TargetIndex + 1, Stage = MouLuMengDuojingStage.Choosing, TakenCardId = null, MovementSequence = null } });
@@ -211,7 +211,7 @@ internal sealed partial class CharacterLuMengMouMobileRuntime
         return true;
     }
 
-    internal int MouDuojingPhaseSlashBonus(int owner) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { } phase ? 0 : _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingPhaseCreditEvent>().Count(e => e.OwnerSeat == owner && e.Phase == phase && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == owner && s.Source.SkillId == MouDuojing && s.CardUseId == e.CardUseId && s.Phase == phase) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuMengDuojingArmorPaidEvent>().Any(p => p.FrameId == e.FrameId && p.TargetIndex == e.TargetIndex && p.CardUseId == e.CardUseId));
+    internal int MouDuojingPhaseSlashBonus(int owner) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { } phase ? 0 : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingPhaseCreditEvent>().Count(e => e.OwnerSeat == owner && e.Phase == phase && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == owner && s.Source.SkillId == MouDuojing && s.CardUseId == e.CardUseId && s.Phase == phase) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuMengDuojingArmorPaidEvent>().Any(p => p.FrameId == e.FrameId && p.TargetIndex == e.TargetIndex && p.CardUseId == e.CardUseId));
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouLuMengDuojing)]
     internal PromptChoice SelectAiMouDuojing(PendingDecision p, ProgramSkillFrame f)
     {

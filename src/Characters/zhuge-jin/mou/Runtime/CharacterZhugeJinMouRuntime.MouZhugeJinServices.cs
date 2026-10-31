@@ -5,7 +5,7 @@ internal sealed partial class CharacterZhugeJinMouRuntime
 {
     internal MouZhugeJinRuntime MouZhugeJin => _mouZhugeJinOperations.Get();
 
-    internal bool MouZhugeJinCooling(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhugeJinCooldownIssuedEvent>().Any(e => e.Source.OwnerSeat == owner && e.DueRound > _coreActualRoundProgressRoundNumberAccess._roundNumber);
+    internal bool MouZhugeJinCooling(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhugeJinCooldownIssuedEvent>().Any(e => e.Source.OwnerSeat == owner && e.DueRound > _coreActualRoundProgressRoundNumberAccess._roundNumber);
     internal bool HasMouZhugeJinZijin(int seat) => _coreSkillProgramsOperations.EnabledSkillPrograms(_coreMatchParticipantsPlayersAccess._players[seat]).Any(p => p.Id == MouZhugeJinComposition.Zijin);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 35600, SkillProgramEffectOp.ResolveMouZhugeJinTaozhou)]
     internal bool MouZhugeJinCanActivate(ProgramActivationLegalityContext c) => c.SkillId == MouZhugeJinComposition.Taozhou && c.Owner.IsAlive && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == c.OwnerSeat && !MouZhugeJinCooling(c.OwnerSeat) && _characterZhugeJinMouOperations.CreateMouZhugeJinFacts().Targets(c.OwnerSeat).Count > 0;
@@ -25,7 +25,7 @@ internal sealed partial class CharacterZhugeJinMouRuntime
     int IMouZhugeJinFacts.Hp(int s) => _coreMatchParticipantsPlayersAccess._players[s].Hp;
     string IMouZhugeJinFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
     SkillProgram? IMouZhugeJinFacts.Program(string s) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(s)?.Program;
-    IEnumerable<T> IMouZhugeJinFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouZhugeJinFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     IReadOnlyList<int> IMouZhugeJinFacts.Targets(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0 && !HasMouZhugeJinZijin(p.Seat)).Select(p => p.Seat).Order().ToArray();
     IReadOnlyList<MouZhugeJinCard> IMouZhugeJinFacts.Hand(int s) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Select(c => new MouZhugeJinCard(c.Id, CardLocation.Hand(s), c.DisplayName)).ToArray());
     IReadOnlyList<MouZhugeJinCard> IMouZhugeJinFacts.Costs(int chooser, int holder) => !((IMouZhugeJinFacts)this).Alive(chooser) || !((IMouZhugeJinFacts)this).Alive(holder) ? [] : Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(zone => _cardZonesOperations._cardZones.CardsAt(new(zone, holder)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, c, new(zone, holder), OwnedCardMoveIntent.Discard) && (chooser != holder || !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(chooser, c, new(zone, holder), OwnedCardMoveIntent.Discard))).Select(c => new MouZhugeJinCard(c.Id, new(zone, holder), c.DisplayName))).ToArray());
@@ -118,7 +118,7 @@ internal sealed partial class CharacterZhugeJinMouRuntime
 
     void IMouZhugeJinNative.Grant(ProgramSkillFrame f)
     {
-        if (!MouZhugeJin.Valid(f) || f.MouZhugeJin is not { Stage: MouZhugeJinStage.GrantChildren } r || r.SecretNumber - r.Given < 2 || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhugeJinZijinGrantedEvent>().Any(p => p.FrameId == f.Id))
+        if (!MouZhugeJin.Valid(f) || f.MouZhugeJin is not { Stage: MouZhugeJinStage.GrantChildren } r || r.SecretNumber - r.Given < 2 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhugeJinZijinGrantedEvent>().Any(p => p.FrameId == f.Id))
             throw new InvalidOperationException("Taozhou grants derived Zijin only after its exact committed actual-gift shortfall.");
         _coreCharacterHostOperations.AcquireRuntimeSkills(_coreMatchParticipantsPlayersAccess._players[r.Target], $"taozhou:{(f.OwnerSeat)}:{(f.SkillInstanceId)}:{(f.Id)}", [MouZhugeJinComposition.Zijin]);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhugeJinZijinGrantedEvent(f.Id, r.Target));
@@ -134,7 +134,7 @@ internal sealed partial class CharacterZhugeJinMouRuntime
         return card;
     }
 
-    internal IEnumerable<MouZhugeJinBudgetIssuedEvent> MouZhugeJinBudgets(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhugeJinBudgetIssuedEvent>().Where(e => e.Target == target && e.Count > 0 && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhugeJinBudgetHitEvent>().Count(hit => hit.FrameId == e.FrameId) < e.Count);
+    internal IEnumerable<MouZhugeJinBudgetIssuedEvent> MouZhugeJinBudgets(int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhugeJinBudgetIssuedEvent>().Where(e => e.Target == target && e.Count > 0 && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhugeJinBudgetHitEvent>().Count(hit => hit.FrameId == e.FrameId) < e.Count);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 35600)]
     internal int MouZhugeJinDamageBonus(GameEngine.IDamageAttempt a) => MouZhugeJinBudgets(a.TargetSeat).Count();
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 35600)]
@@ -143,7 +143,7 @@ internal sealed partial class CharacterZhugeJinMouRuntime
         if (!a.DamageWasApplied || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == id)is not DamageFrame { Amount: > 0 } damage || damage.TargetSeat != a.TargetSeat)
             return false;
         foreach (var grant in MouZhugeJinBudgets(a.TargetSeat).ToArray())
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouZhugeJinBudgetHitEvent>().Any(hit => hit.FrameId == grant.FrameId && hit.DamageId == id))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhugeJinBudgetHitEvent>().Any(hit => hit.FrameId == grant.FrameId && hit.DamageId == id))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhugeJinBudgetHitEvent(grant.FrameId, id, a.TargetSeat));
         return false;
     }

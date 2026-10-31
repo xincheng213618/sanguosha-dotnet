@@ -26,8 +26,8 @@ internal sealed partial class CharacterZhangQiYingOlRuntime
             throw new InvalidOperationException("Zhenyi judgment lost its exact actual chooser.");
         AssertZhangQiYing(f);
         var j = f.WindowContext!.Judgment!;
-        var pending = _coreJudgmentCursorRuntimeOperations.ActiveJudgment!;
-        if (pending.Id != j.JudgmentFrameId || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id != j.CardId || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.Ziwei) != 1)
+        var pending = _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment!;
+        if (pending.Id != j.JudgmentFrameId || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)?.Id != j.CardId || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Markers.GetValueOrDefault(PlayerMarkerKind.Ziwei) != 1)
             throw new InvalidOperationException("Zhenyi judgment source/result changed before payment.");
         var receipt = new ZhenyiJudgmentOverride(f.Id, pending.Id, ZhangQiYingSource(f), f.GameplayHash, j.CardId, Enum.Parse<Suit>(choice.Parameters["suit"]), 5);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

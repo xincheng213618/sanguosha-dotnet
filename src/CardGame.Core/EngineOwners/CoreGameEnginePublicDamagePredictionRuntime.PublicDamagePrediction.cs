@@ -53,11 +53,11 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
         var ownHand = self.Hand;
         var paidHand = action.CardId is { } id && ownHand.Any(card => card.Id == id) ? 1 : 0;
         var amount = kind is { } card && CoreNativeCardClassificationsRuntime.IsSlashCard(card) ? checked(1 + (_coreMatchParticipantsPlayersAccess._players[viewerSeat].HasAlcoholEffect ? Math.Max(1, _coreMatchParticipantsPlayersAccess._players[viewerSeat].AlcoholDamageBonus) : 0)) : 1;
-        amount = checked(amount + _coreShanheLeizhenOperations.ShanheLeizhenPublicActionBonus(viewerSeat, kind));
-        if (damageKind == CardKind.Duel && _coreShanheS5ShuangxiongOperations.TryGetShanheS5ShuangxiongPublicDuelBaseDamage(viewerSeat, action, out var scaled))
+        amount = checked(amount + _coreShanheLeizhenOperations.Value.ShanheLeizhenPublicActionBonus(viewerSeat, kind));
+        if (damageKind == CardKind.Duel && _coreShanheS5ShuangxiongOperations.Value.TryGetShanheS5ShuangxiongPublicDuelBaseDamage(viewerSeat, action, out var scaled))
             amount = scaled;
-        amount = checked(amount + _characterChengPuBoundaryMobileOperations.BoundaryChengPuPublicActionBonus(viewerSeat, action, targetSeat));
-        var prediction = PredictVisibleDamage(view, viewerSeat, targetSeat, kind is null ? 0 : amount, kind, kind is not null, false, false, false, paidHand, _coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(_coreMatchParticipantsPlayersAccess._players[viewerSeat]), prospectiveSuit: _coreHeartSlashDamageOperations.PublicProposedSlashSuit(view, viewerSeat, action, damageKind));
+        amount = checked(amount + _characterChengPuBoundaryMobileOperations.Value.BoundaryChengPuPublicActionBonus(viewerSeat, action, targetSeat));
+        var prediction = PredictVisibleDamage(view, viewerSeat, targetSeat, kind is null ? 0 : amount, kind, kind is not null, false, false, false, paidHand, _coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(_coreMatchParticipantsPlayersAccess._players[viewerSeat]), prospectiveSuit: _coreHeartSlashDamageOperations.Value.PublicProposedSlashSuit(view, viewerSeat, action, damageKind));
         return _coreWushuangPublicPredictionOperations.AttachWushuangPublicCombatPrediction(view, viewerSeat, action, targetSeat, amount, damageKind, paidHand, prediction);
     }
 
@@ -73,7 +73,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
             return legacy;
         // The incoming use is already declared. Its public receipt freezes the
         // suit and use ordinal; never inspect an opponent's unplayed materials.
-        var use = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().LastOrDefault(fact => fact.CardUseFrameId == attack.ResolutionId);
+        var use = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCombatUseFactEvent>().LastOrDefault(fact => fact.CardUseFrameId == attack.ResolutionId);
         var payment = PredictVisibleDamage(view, source, target, amount, attack.EffectiveCardKind, cardUse, attack.IsSourceLess, attack.IsChainPropagation, attack.DamageAmountFinalized, 0, attack.IgnoresArmor, _coreNativeCardClassificationsOperations.GetDamageNature(attack), attack, wushuangTactics: true, prospectiveSuit: use?.Suit ?? Suit.None);
         return legacy with
         {
@@ -106,11 +106,11 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
                 {
                     if (modifier.CapsToAmount)
                         continue;
-                    var eligible = modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource ? modifier.Condition is SkillProgramDamageModifierCondition.SourcePreviousRoundNoDamage or SkillProgramDamageModifierCondition.SourcePreviousRoundDamageBelowThree ? _coreShanheBadaoOperations.MatchesShanheBadaoDamageModifier(modifier, sourceSeat, chain) : modifier.Condition == SkillProgramDamageModifierCondition.DirectSkillDamage ? issuedAttack is { } skillAttack && _coreDirectSkillDamageOperations.IsDirectSkillDamage(skillAttack) : CoreGameEnginePassiveRulePoliciesRuntime.MatchesPerOccurrenceSourceDamageModifier(modifier, !source.HpUndefined, source.Hp, Math.Max(0, source.HandCount - paidHandCards), modifier.Condition == SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan && sourceSeat != targetSeat ? _coreNativeRuleQueriesOperations.GetCombatDistance(sourceSeat, targetSeat) : 0, _coreActualRoundProgressRoundNumberAccess._roundNumber) : modifier.SourceScope == SkillProgramDamageModifierSourceScope.OwnerUsed && cardUse && !chain && kind is { } effective && ProgramCardKindMatch.MatchesDamageModifier(modifier, effective) && (modifier.Condition switch
+                    var eligible = modifier.SourceScope == SkillProgramDamageModifierSourceScope.DamageSource ? modifier.Condition is SkillProgramDamageModifierCondition.SourcePreviousRoundNoDamage or SkillProgramDamageModifierCondition.SourcePreviousRoundDamageBelowThree ? _coreShanheBadaoOperations.MatchesShanheBadaoDamageModifier(modifier, sourceSeat, chain) : modifier.Condition == SkillProgramDamageModifierCondition.DirectSkillDamage ? issuedAttack is { } skillAttack && _coreDirectSkillDamageOperations.Value.IsDirectSkillDamage(skillAttack) : CoreGameEnginePassiveRulePoliciesRuntime.MatchesPerOccurrenceSourceDamageModifier(modifier, !source.HpUndefined, source.Hp, Math.Max(0, source.HandCount - paidHandCards), modifier.Condition == SkillProgramDamageModifierCondition.SourceToTargetDistanceGreaterThan && sourceSeat != targetSeat ? _coreNativeRuleQueriesOperations.GetCombatDistance(sourceSeat, targetSeat) : 0, _coreActualRoundProgressRoundNumberAccess._roundNumber) : modifier.SourceScope == SkillProgramDamageModifierSourceScope.OwnerUsed && cardUse && !chain && kind is { } effective && ProgramCardKindMatch.MatchesDamageModifier(modifier, effective) && (modifier.Condition switch
                     {
                         SkillProgramDamageModifierCondition.Always => true,
                         SkillProgramDamageModifierCondition.OwnerUsedFromRound => _coreActualRoundProgressRoundNumberAccess._roundNumber >= modifier.MinimumRound,
-                        SkillProgramDamageModifierCondition.OwnerUsedHeartSlash => issuedAttack is null ? prospectiveSuit == Suit.Heart : _coreHeartSlashDamageOperations.MatchesOwnerUsedHeartSlash(issuedAttack),
+                        SkillProgramDamageModifierCondition.OwnerUsedHeartSlash => issuedAttack is null ? prospectiveSuit == Suit.Heart : _coreHeartSlashDamageOperations.Value.MatchesOwnerUsedHeartSlash(issuedAttack),
                         SkillProgramDamageModifierCondition.SourceHandBelowLimit => Math.Max(0, source.HandCount - paidHandCards) < modifier.SourceHandCountLimit,
                         SkillProgramDamageModifierCondition.SourceNotFewerHandAndEquipmentThanTarget => target.HandCount <= Math.Max(0, source.HandCount - paidHandCards) && target.Equipment.Count <= source.Equipment.Count,
                         SkillProgramDamageModifierCondition.SourceOutsideTargetAttackRange => !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(targetSeat, sourceSeat),
@@ -127,15 +127,15 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
         }
 
         if (!finalized && issuedAttack is { } originalAttack)
-            cardLayer = checked(cardLayer + _characterPanZhangMaZhongBoundaryMobileOperations.BoundaryAnjianDamage(originalAttack) + _characterChengPuBoundaryMobileOperations.BoundaryChengPuLihuoDamage(originalAttack) + _characterHuangZhongBoundaryMobileOperations.BoundaryHuangZhongCardDamage(originalAttack) + _characterZhangFeiBoundaryMobileOperations.BoundaryZhangFeiLiyongCardDamage(originalAttack));
+            cardLayer = checked(cardLayer + _characterPanZhangMaZhongBoundaryMobileOperations.Value.BoundaryAnjianDamage(originalAttack) + _characterChengPuBoundaryMobileOperations.Value.BoundaryChengPuLihuoDamage(originalAttack) + _characterHuangZhongBoundaryMobileOperations.Value.BoundaryHuangZhongCardDamage(originalAttack) + _characterZhangFeiBoundaryMobileOperations.Value.BoundaryZhangFeiLiyongCardDamage(originalAttack));
         if (!finalized)
-            additional = checked(additional + _coreShanheS5QuyiOperations.ShanheS5JiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards) + _characterQuYiClassicOperations.ClassicJiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards));
+            additional = checked(additional + _coreShanheS5QuyiOperations.ShanheS5JiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards) + _characterQuYiClassicOperations.Value.ClassicJiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards));
         if (!finalized && !sourceLess && !chain)
-            additional = checked(additional + _coreShanheSourceShennuOperations.ShanheShennuPublicDamageBonus(view, sourceSeat, sourceLess, chain, issuedAttack));
+            additional = checked(additional + _coreShanheSourceShennuOperations.Value.ShanheShennuPublicDamageBonus(view, sourceSeat, sourceLess, chain, issuedAttack));
         if (!finalized && issuedAttack is null && cardUse && !sourceLess && !chain)
-            additional = checked(additional + _coreWushuangAuditCombatOperations.WangongPublicProposedBonus(view, sourceSeat, kind));
+            additional = checked(additional + _coreWushuangAuditCombatOperations.Value.WangongPublicProposedBonus(view, sourceSeat, kind));
         if (!finalized && (issuedAttack is not null || cardUse))
-            additional = checked(additional + _coreShanheWoxinOperations.WoxinPublicBonus(view, sourceSeat, sourceLess, chain, issuedAttack));
+            additional = checked(additional + _coreShanheWoxinOperations.Value.WoxinPublicBonus(view, sourceSeat, sourceLess, chain, issuedAttack));
         if (wushuangTactics && !finalized && !sourceLess && !chain)
             additional = checked(additional + _coreWushuangPublicPredictionOperations.WushuangPublicNativeDamageBonus(view, sourceSeat, targetSeat, kind, prospectiveSuit, additionalIncomingSegments, priorTargetSegments, issuedAttack?.ResolutionId));
         cardLayer = Math.Max(0, cardLayer);
@@ -147,12 +147,12 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
         var fixedWushuang = wushuangTactics && !sourceLess && source.WushuangTacticIds?.Contains(2210) == true;
         if (fixedWushuang)
             full = 2;
-        if (!fixedWushuang && !finalized && _coreNativeDamageHandlesOperations.UsesFormalSilverLion && (chain || !ignoresEquipmentArmor) && _coreNativeEquipmentAndFactionQueriesOperations.HasSilverLion(targetState))
+        if (!fixedWushuang && !finalized && _coreNativeDamageHandlesOperations.Value.UsesFormalSilverLion && (chain || !ignoresEquipmentArmor) && _coreNativeEquipmentAndFactionQueriesOperations.HasSilverLion(targetState))
             full = Math.Min(1, full);
         if (!fixedWushuang && !finalized && _corePassiveDamageCapsOperations.FindPassiveProgramDamageCap(targetState, sourceLess ? null : sourceSeat, targetVisible)is { } damageCap)
             full = Math.Min(damageCap.Cap, full);
-        var bypass = _coreDuanhunOperations.DuanhunBypassesNativeDamageArmor(sourceSeat, sourceLess, sourceVisible) || sourceSeat != targetSeat && _coreNativeDamageArmorPoliciesOperations.HasNativeDamageArmorPolicy(sourceSeat, sourceLess, SkillProgramCardPolicyKind.BypassOtherParticipantArmor, sourceVisible);
-        var armorMultiplier = _coreNativeDamageArmorPoliciesOperations.HasNativeDamageArmorPolicy(sourceSeat, sourceLess, SkillProgramCardPolicyKind.DoubleArmorDamage, sourceVisible) ? 2 : 1;
+        var bypass = _coreDuanhunOperations.DuanhunBypassesNativeDamageArmor(sourceSeat, sourceLess, sourceVisible) || sourceSeat != targetSeat && _coreNativeDamageArmorPoliciesOperations.Value.HasNativeDamageArmorPolicy(sourceSeat, sourceLess, SkillProgramCardPolicyKind.BypassOtherParticipantArmor, sourceVisible);
+        var armorMultiplier = _coreNativeDamageArmorPoliciesOperations.Value.HasNativeDamageArmorPolicy(sourceSeat, sourceLess, SkillProgramCardPolicyKind.DoubleArmorDamage, sourceVisible) ? 2 : 1;
         return PublicDamagePrediction.Calculate(target.Hp, target.Armor, full, maxHp: target.MaxHp, bypassArmor: bypass, armorDamageMultiplier: armorMultiplier);
     }
 

@@ -105,5 +105,5 @@ internal sealed partial class CoreGameEnginePaidColorDamageClaimObserversRuntime
         return _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 560)]
-    internal bool IsPaidColorDamageClaimProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PaidColorDamageClaimObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsPaidColorDamageClaimProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && PaidColorDamageClaimObserverRoot(_coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouLuSuAnniversaryFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, EngineStates.CoreAiBrainsState aiBrainsState, KernelCreateSnapshotCall createSnapshot, Func<RuntimeEntries.CoreSnapshotValueProjectionEntries> getCoreSnapshotValueProjectionRuntime, Func<CardZoneStore> getCardZoneStore, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CoreGameEngineProgramPersistentStateEntries> getCoreGameEngineProgramPersistentStateRuntime, Func<RuntimeEntries.CoreGameEngineActualDiscardRecoveryPhasesEntries> getCoreGameEngineActualDiscardRecoveryPhasesRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreDamageObserverCursorQueriesEntries> getCoreDamageObserverCursorQueriesRuntime, Func<RuntimeEntries.CharacterLuSuMouEntries> getCharacterLuSuMouRuntime, Func<RuntimeEntries.CoreGameEngineCardUseLifecycleEntries> getCoreGameEngineCardUseLifecycleRuntime, Func<RuntimeEntries.CoreGameEnginePlayCardHistoryEntries> getCoreGameEnginePlayCardHistoryRuntime) : IMouLuSuAnniversaryFacts
+internal sealed class MouLuSuAnniversaryFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreCardMovementJournalState cardMovementJournalState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, EngineStates.CoreAiBrainsState aiBrainsState, KernelCreateSnapshotCall createSnapshot, Func<RuntimeEntries.CoreSnapshotValueProjectionEntries> getCoreSnapshotValueProjectionRuntime, Func<CardZoneStore> getCardZoneStore, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CoreGameEngineProgramPersistentStateEntries> getCoreGameEngineProgramPersistentStateRuntime, Func<RuntimeEntries.CoreGameEngineActualDiscardRecoveryPhasesEntries> getCoreGameEngineActualDiscardRecoveryPhasesRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreDamageObserverCursorQueriesEntries> getCoreDamageObserverCursorQueriesRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuSuMouRuntime>> getCharacterLuSuMouRuntime, Func<RuntimeEntries.CoreGameEngineCardUseLifecycleEntries> getCoreGameEngineCardUseLifecycleRuntime, Func<RuntimeEntries.CoreGameEnginePlayCardHistoryEntries> getCoreGameEnginePlayCardHistoryRuntime) : IMouLuSuAnniversaryFacts
 {
     public int Turn => actualTurnProgressState.ReferenceToTurnNumber;
     public long Sequence => cardMovementJournalState.ReferenceToMovementSequence;
@@ -17,7 +17,7 @@ internal sealed class MouLuSuAnniversaryFacts(EngineStates.CoreActualTurnProgres
     public bool InHand(int seat, int id) => getCardZoneStore().GetLocation(id) == CardLocation.Hand(seat);
     public SkillProgram Program(string id) => getContentRegistry().GetSkill(id).Program!;
     public IEnumerable<T> History<T>()
-        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>();
+        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>();
     public bool Yin(int owner, string instance) => getCoreGameEngineProgramPersistentStateRuntime().GetProgramBooleanState2(owner, MouLuSuAnniversaryRuntime.Mengmou, instance, "yin");
     public ActualDiscardRecoveryPhaseKey? Phase() => getCoreGameEngineActualDiscardRecoveryPhasesRuntime().CurrentActualDiscardRecoveryPhase();
     public bool Parent(ProgramSkillFrame f)
@@ -34,15 +34,15 @@ internal sealed class MouLuSuAnniversaryFacts(EngineStates.CoreActualTurnProgres
         };
     }
 
-    public int? Peer(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => getCharacterLuSuMouRuntime().MouLuSuGainPeer(c, w);
+    public int? Peer(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => getCharacterLuSuMouRuntime().Value.MouLuSuGainPeer(c, w);
     public (int Actor, int Amount, long UseId)? Damage(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
     {
-        if (w.Window != SkillProgramTriggerWindow.AfterDamageApplied || w.Amount <= 0 || getFrameStore().SingleOrDefault(f => f.Id == w.ParentFrameId)is not DamageTriggerWindowFrame p || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || p.Candidates[p.CandidateIndex].ToProgramCandidate() != c || getFrameStore().SingleOrDefault(x => x.Id == p.ParentFrameId)is not DamageFrame damage || w.DamageFrameId != damage.Id || w.Amount != damage.Amount || w.SourceSeat != damage.SourceSeat || w.TargetSeat != damage.TargetSeat || getCoreGameEngineCardUseLifecycleRuntime().LifecycleCardUse(damage.ParentFrameId)is not { MouLuSuAnniversary: { } o } use || o.Source.OwnerSeat != c.OwnerSeat || o.Source.SkillInstanceId != c.SkillInstanceId || o.Source.SkillId != c.SkillId || o.GameplayHash != c.GameplayHash || damage.SourceSeat != o.Actor || !getCharacterLuSuMouRuntime().MouLuSuNativeMatches(use))
+        if (w.Window != SkillProgramTriggerWindow.AfterDamageApplied || w.Amount <= 0 || getFrameStore().SingleOrDefault(f => f.Id == w.ParentFrameId)is not DamageTriggerWindowFrame p || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || p.Candidates[p.CandidateIndex].ToProgramCandidate() != c || getFrameStore().SingleOrDefault(x => x.Id == p.ParentFrameId)is not DamageFrame damage || w.DamageFrameId != damage.Id || w.Amount != damage.Amount || w.SourceSeat != damage.SourceSeat || w.TargetSeat != damage.TargetSeat || getCoreGameEngineCardUseLifecycleRuntime().LifecycleCardUse(damage.ParentFrameId)is not { MouLuSuAnniversary: { } o } use || o.Source.OwnerSeat != c.OwnerSeat || o.Source.SkillInstanceId != c.SkillInstanceId || o.Source.SkillId != c.SkillId || o.GameplayHash != c.GameplayHash || damage.SourceSeat != o.Actor || !getCharacterLuSuMouRuntime().Value.MouLuSuNativeMatches(use))
             return null;
         return (o.Actor, w.Amount, use.Id);
     }
 
-    public IReadOnlyList<LegalAction> Uses(ProgramSkillFrame f) => getCharacterLuSuMouRuntime().MouLuSuUseActions(f);
-    public IReadOnlyList<MouLuSuAnniversaryPlayedPlan> Plays(ProgramSkillFrame f) => getCharacterLuSuMouRuntime().MouLuSuPlayedPlans(f);
+    public IReadOnlyList<LegalAction> Uses(ProgramSkillFrame f) => getCharacterLuSuMouRuntime().Value.MouLuSuUseActions(f);
+    public IReadOnlyList<MouLuSuAnniversaryPlayedPlan> Plays(ProgramSkillFrame f) => getCharacterLuSuMouRuntime().Value.MouLuSuPlayedPlans(f);
     public bool Declaration(MouLuSuAnniversaryPlayedPlan plan) => plan.Source is { } source && getCoreGameEnginePlayCardHistoryRuntime().ViewAsRule(source)?.DeclarationValidation is not null;
 }

@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiJueOlRuntime
 {
     internal int[] LangxiTargets(int owner) => !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || !_coreMatchParticipantsPlayersAccess._players[owner].HasHpValue ? [] : _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.HasHpValue && p.Seat != owner && p.Hp <= _coreMatchParticipantsPlayersAccess._players[owner].Hp).Select(p => p.Seat).ToArray();
-    internal IReadOnlyList<PromptChoice> LangxiChoices(ProgramSkillFrame f) => Array.AsReadOnly(LangxiTargets(f.OwnerSeat).Select(s => new PromptChoice(new($"langxi.{(f.Id)}.target-{(s)}"), $"对 {(_coreMatchParticipantsPlayersAccess._players[s].Name)} 造成{(_coreShanheS5LiJueOperations.ShanheS5LangxiMinimumDamage(f))}至2点随机伤害。", [], [s], new Dictionary<string, string> { { "program-action", "langxi-target" } })).ToArray());
+    internal IReadOnlyList<PromptChoice> LangxiChoices(ProgramSkillFrame f) => Array.AsReadOnly(LangxiTargets(f.OwnerSeat).Select(s => new PromptChoice(new($"langxi.{(f.Id)}.target-{(s)}"), $"对 {(_coreMatchParticipantsPlayersAccess._players[s].Name)} 造成{(_coreShanheS5LiJueOperations.Value.ShanheS5LangxiMinimumDamage(f))}至2点随机伤害。", [], [s], new Dictionary<string, string> { { "program-action", "langxi-target" } })).ToArray());
     internal void PublishLangxi(ProgramSkillFrame f)
     {
         var choices = LangxiChoices(f);
@@ -34,7 +34,7 @@ internal sealed partial class CharacterLiJueOlRuntime
             throw new InvalidOperationException("Langxi changed its unpaid actual HP-qualified target.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var target = choice.Targets.Single();
-        var minimum = _coreShanheS5LiJueOperations.ShanheS5LangxiMinimumDamage(f);
+        var minimum = _coreShanheS5LiJueOperations.Value.ShanheS5LangxiMinimumDamage(f);
         var roll = minimum + _randomOperations._random.Next(3 - minimum);
         var r = f.LiJue with
         {

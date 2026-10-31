@@ -7,7 +7,7 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
 {
     internal const string ShiCdWanglie = "mobile:shi-wanglie", ShiCdHongyi = "mobile:shi-hongyi";
     internal static CardConversionSource ShiCdSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal int ShiCdMarks(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiHongyiMarksChangedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner)?.After ?? 0;
+    internal int ShiCdMarks(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiHongyiMarksChangedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner)?.After ?? 0;
     internal void ChangeShiCdMarks(ProgramSkillFrame f, int amount)
     {
         var before = ShiCdMarks(f.OwnerSeat);
@@ -15,14 +15,14 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiHongyiMarksChangedEvent(f.Id, ShiCdSource(f), before, after));
     }
 
-    internal MobileShiHongyiPreparedEvent? ShiCdPendingEnding(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiHongyiPreparedEvent>().SingleOrDefault(e => e.Source.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiHongyiEndingEvent>().Any(x => x.PreparationId == e.FrameId));
+    internal MobileShiHongyiPreparedEvent? ShiCdPendingEnding(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiHongyiPreparedEvent>().SingleOrDefault(e => e.Source.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiHongyiEndingEvent>().Any(x => x.PreparationId == e.FrameId));
     SkillProgramStepOutcome IMobileShiChenDaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveShiCd(f, op);
     internal SkillProgramStepOutcome ResolveShiCd(ProgramSkillFrame input, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         if (op == SkillProgramEffectOp.ResolveMobileShiWanglie && f.TriggerId == "wanglie-response-complete")
         {
-            if (f.SkillId != ShiCdWanglie || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } use } responseContext || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == responseContext.ParentFrameId)is not ProgramCardTriggerWindowFrame { Action.Type: CardActionType.Response, CompletedResponseReturn: { IsCommitted: false } } || !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWanglieUsedEvent>().Any(e => e.ActionId == use.CardActionId && e.OwnerSeat == f.OwnerSeat))
+            if (f.SkillId != ShiCdWanglie || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } use } responseContext || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == responseContext.ParentFrameId)is not ProgramCardTriggerWindowFrame { Action.Type: CardActionType.Response, CompletedResponseReturn: { IsCommitted: false } } || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWanglieUsedEvent>().Any(e => e.ActionId == use.CardActionId && e.OwnerSeat == f.OwnerSeat))
                 throw new InvalidOperationException("Wanglie lost its exact completed response use.");
             CompleteShiCdWanglie(use.CardActionId);
             return SkillProgramStepOutcome.Continue;
@@ -129,9 +129,9 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
             throw new InvalidOperationException("Shi Chen Dao lost its exact source, frozen X, actual turn or Play phase.");
     }
 
-    internal bool IsMobileShiChenDaoChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding b) => f.SkillId == ShiCdHongyi && b.Name == "hongyi-draw" && b.ChooserSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiHongyiDrawBoundEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && b.OptionId == "draw-" + e.Count) == 1;
+    internal bool IsMobileShiChenDaoChoiceResult(ProgramSkillFrame f, ProgramChoiceResultBinding b) => f.SkillId == ShiCdHongyi && b.Name == "hongyi-draw" && b.ChooserSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiHongyiDrawBoundEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && b.OptionId == "draw-" + e.Count) == 1;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 47800)]
-    internal bool CanOfferShiCd(ProgramTriggerLegalityContext g) => g.SkillId == ShiCdHongyi && g.Trigger.Id == "hongyi-ending" ? ShiCdPendingEnding(g.OwnerSeat)is not null : g.SkillId != ShiCdWanglie || g.Trigger.Id != "wanglie-response-complete" || g.Context.CardUse is { } c && _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == c.CardActionId && e.Action.Type == CardActionType.Response) && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiWanglieUsedEvent>().Any(e => e.OwnerSeat == g.OwnerSeat && e.ActionId == c.CardActionId);
+    internal bool CanOfferShiCd(ProgramTriggerLegalityContext g) => g.SkillId == ShiCdHongyi && g.Trigger.Id == "hongyi-ending" ? ShiCdPendingEnding(g.OwnerSeat)is not null : g.SkillId != ShiCdWanglie || g.Trigger.Id != "wanglie-response-complete" || g.Context.CardUse is { } c && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == c.CardActionId && e.Action.Type == CardActionType.Response) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWanglieUsedEvent>().Any(e => e.OwnerSeat == g.OwnerSeat && e.ActionId == c.CardActionId);
     [ProgramPipelineHook(ProgramPipelinePhase.IncludeTriggerCandidate, 47800)]
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeShiCdEnding(CharacterState owner, SkillProgramTriggerWindow window, IReadOnlyList<ProgramTriggerCandidate> ordinary)
     {

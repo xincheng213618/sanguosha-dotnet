@@ -6,8 +6,8 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
     internal const string GuoZhaoObtainReason = "skill-program.anniversary:pianchong.obtain", GuoZhaoColorDrawReason = "skill-program.anniversary:pianchong.draw", GuoZhaoZunweiDrawReason = "skill-program.anniversary:zunwei.draw";
     SkillProgramStepOutcome IAnniversaryGuoZhaoHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginGuoZhao(f, op);
     internal CardConversionSource GuoZhaoSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal int GuoZhaoOwnerStart(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().LastOrDefault(e => e.ActorSeat == owner)?.TurnNumber ?? 0;
-    internal IEnumerable<AnniversaryGuoZhaoLeaseEvent> GuoZhaoLeases(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Where(e => e.Source.OwnerSeat == owner && e.OwnerStartTurn == GuoZhaoOwnerStart(owner) && e.Turn <= _coreActualTurnProgressTurnNumberAccess._turnNumber);
+    internal int GuoZhaoOwnerStart(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().LastOrDefault(e => e.ActorSeat == owner)?.TurnNumber ?? 0;
+    internal IEnumerable<AnniversaryGuoZhaoLeaseEvent> GuoZhaoLeases(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Where(e => e.Source.OwnerSeat == owner && e.OwnerStartTurn == GuoZhaoOwnerStart(owner) && e.Turn <= _coreActualTurnProgressTurnNumberAccess._turnNumber);
     internal AnniversaryGuoZhaoLoss? CaptureAnniversaryGuoZhaoLoss(Card card, CardLocation from, CardLocation to, int sequence)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawAnniversaryGuoZhaoLostColor) || from.OwnerSeat is not { } owner || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || from == to)
@@ -23,7 +23,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
         if (batch is null)
             return Array.AsReadOnly(Array.Empty<AnniversaryGuoZhaoBenefit>());
         var result = new List<AnniversaryGuoZhaoBenefit>();
-        foreach (var lease in _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillInstanceId == instance && e.Hash == hash))
+        foreach (var lease in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Where(e => e.Source.OwnerSeat == owner && e.Source.SkillInstanceId == instance && e.Hash == hash))
         {
             var count = batch.Movements.Where(m => m.AnniversaryGuoZhaoLoss is { } loss && loss.OwnerSeat == owner && loss.Sequence == m.Sequence && loss.OwnerStartTurn == lease.OwnerStartTurn && loss.LastLeaseFrameId >= lease.FrameId && loss.IsRed == lease.LoseRed && lease.Turn <= m.TurnNumber && m.From.OwnerSeat == owner && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)).Select(m => m.CardId).Distinct().Count();
             if (count > 0)
@@ -33,7 +33,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
         return Array.AsReadOnly(result.OrderBy(b => b.LeaseId).ToArray());
     }
 
-    internal bool GuoZhaoOptionUsed(int owner, string option) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoOptionPaidEvent>().Any(e => e.Source.OwnerSeat == owner && e.Option == option);
+    internal bool GuoZhaoOptionUsed(int owner, string option) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryGuoZhaoOptionPaidEvent>().Any(e => e.Source.OwnerSeat == owner && e.Option == option);
     internal bool GuoZhaoHasAvailableOption(int owner) => new[]
     {
         "hand",
@@ -149,7 +149,7 @@ internal sealed partial class CharacterGuoZhaoAnniversaryRuntime
 
         if (r.Stage == AnniversaryGuoZhaoStage.ColorChoice)
         {
-            if (option is not ("lose-red" or "lose-black") || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Any(e => e.FrameId == f.Id))
+            if (option is not ("lose-red" or "lose-black") || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryGuoZhaoLeaseEvent>().Any(e => e.FrameId == f.Id))
                 throw new InvalidOperationException("Pianchong cannot issue the same color lease twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryGuoZhaoLeaseEvent(f.Id, r.Source, r.Hash, r.Turn, GuoZhaoOwnerStart(f.OwnerSeat), option == "lose-red"));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect, AnniversaryGuoZhao = r with { Option = option, Paid = true } });

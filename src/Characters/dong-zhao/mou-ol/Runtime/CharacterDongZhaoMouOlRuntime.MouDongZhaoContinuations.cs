@@ -9,11 +9,11 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
             return false;
         var signed = r.Operation switch
         {
-            SkillProgramEffectOp.ResolveMouDongZhaoShunji => f.TriggerId == "damage-draw-and-gift" && f.ActivationId == f.TriggerId && f.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, TargetSeat: { } target } c && target == r.TargetSeat && c.ParentFrameId == r.WindowId && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoShunjiAcceptedEvent>().Count(e => e == new MouDongZhaoShunjiAcceptedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, r.RoundNumber, r.TargetSeat)) == 1,
-            SkillProgramEffectOp.ResolveMouDongZhaoYishi => f.TriggerId is null && f.ActivationId == "keep-suits-and-move" && r.Phase is { } phase && phase.ActorSeat == f.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoYishiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Phase == phase && e.HandCount == r.Hand.Count) == 1,
-            _ => f.TriggerId == "follow-suit-loss" && f.ActivationId == f.TriggerId && f.WindowContext is { MovementBatch: { } batch } context && context.ParentFrameId == r.WindowId && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoYishiLossDrawIssuedEvent>().Count(e => e.FrameId == f.Id && e.GrantFrameId == r.GrantFrameId && e.BatchId == batch.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1
+            SkillProgramEffectOp.ResolveMouDongZhaoShunji => f.TriggerId == "damage-draw-and-gift" && f.ActivationId == f.TriggerId && f.WindowContext is { Window: SkillProgramTriggerWindow.AfterDamageApplied, TargetSeat: { } target } c && target == r.TargetSeat && c.ParentFrameId == r.WindowId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoShunjiAcceptedEvent>().Count(e => e == new MouDongZhaoShunjiAcceptedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, r.RoundNumber, r.TargetSeat)) == 1,
+            SkillProgramEffectOp.ResolveMouDongZhaoYishi => f.TriggerId is null && f.ActivationId == "keep-suits-and-move" && r.Phase is { } phase && phase.ActorSeat == f.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoYishiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Phase == phase && e.HandCount == r.Hand.Count) == 1,
+            _ => f.TriggerId == "follow-suit-loss" && f.ActivationId == f.TriggerId && f.WindowContext is { MovementBatch: { } batch } context && context.ParentFrameId == r.WindowId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoYishiLossDrawIssuedEvent>().Count(e => e.FrameId == f.Id && e.GrantFrameId == r.GrantFrameId && e.BatchId == batch.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1
         };
-        return signed && (r.Draw is null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoDrawReturnedEvent>().Count(e => e == new MouDongZhaoDrawReturnedEvent(f.Id, r.Draw.RequestedCount, r.Draw.ActualDrawIds.Count, r.Draw.ReplacementGainedIds.Count, r.Draw.SequenceBefore, r.Draw.SequenceAfter, r.Draw.AttemptFrameId)) == 1);
+        return signed && (r.Draw is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoDrawReturnedEvent>().Count(e => e == new MouDongZhaoDrawReturnedEvent(f.Id, r.Draw.RequestedCount, r.Draw.ActualDrawIds.Count, r.Draw.ReplacementGainedIds.Count, r.Draw.SequenceBefore, r.Draw.SequenceAfter, r.Draw.AttemptFrameId)) == 1);
     }
 
     internal void MutateMouDongZhao(ProgramSkillFrame f, MouDongZhaoStage stage, Action mutation)
@@ -33,7 +33,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
         foreach (var m in _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > before && m.Sequence <= after))
         {
             var fact = new MouDongZhaoMovementSignedEvent(frameId, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence);
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoMovementSignedEvent>().Contains(fact))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoMovementSignedEvent>().Contains(fact))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(fact);
         }
     }
@@ -94,7 +94,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
 
         if (r.Stage == MouDongZhaoStage.GiftChildren)
         {
-            if (_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoNameSpentEvent>().Any(e => e.FrameId == f.Id))
+            if (_coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoNameSpentEvent>().Any(e => e.FrameId == f.Id))
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouDongZhao = r with { Stage = MouDongZhaoStage.Damage } });
                 _coreSkillProgramsOperations.BeginProgramSkillDamage(f, r.TargetSeat, 1);
@@ -139,7 +139,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.ReturnCompletedProgramBinding, 33500)]
     internal bool ReturnedMouDongZhaoBinding(ProgramSkillFrame f, bool completed)
     {
-        if (completed && f.MouDongZhao is { Stage: MouDongZhaoStage.Damage } r && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoCompletedEvent>().Any(e => e.FrameId == f.Id))
+        if (completed && f.MouDongZhao is { Stage: MouDongZhaoStage.Damage } r && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoCompletedEvent>().Any(e => e.FrameId == f.Id))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhaoCompletedEvent(f.Id, r.Operation));
         return false;
     }

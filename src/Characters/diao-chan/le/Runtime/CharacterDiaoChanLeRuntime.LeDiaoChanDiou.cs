@@ -139,7 +139,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveDiouTanbanUse)]
     internal void ReturnDiouDraw(ProgramSkillFrame f, NativeDrawOutcome o)
     {
-        if (f.Diou is not { Stage: DiouStage.Drawing } r || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != 2 || _coreProgramEventHistoryOperations.ProgramEventHistory<DiouDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.Diou is not { Stage: DiouStage.Drawing } r || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != 2 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Diou cannot repeat its already issued native Draw2.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Diou = r with { Stage = DiouStage.DrawChildren, DrawOutcome = o }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouDrawReturnedEvent(f.Id, 2, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId));

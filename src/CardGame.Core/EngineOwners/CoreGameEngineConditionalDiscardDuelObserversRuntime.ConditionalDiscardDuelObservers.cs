@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelObserversRunti
     {
         for (var rootIndex = 0; rootIndex + 1 < _resolutionStackOperations._resolutionStack.Count; rootIndex++)
         {
-            if (_resolutionStackOperations._resolutionStack[rootIndex] is not ProgramSkillFrame root || root.ConditionalDiscardDuel is not { Stage: ConditionalDiscardDuelStage.OwnerChildren or ConditionalDiscardDuelStage.TargetChildren } d || root.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || !_coreConditionalDiscardDuelReturnsOperations.ValidConditionalDuelPayments(root))
+            if (_resolutionStackOperations._resolutionStack[rootIndex] is not ProgramSkillFrame root || root.ConditionalDiscardDuel is not { Stage: ConditionalDiscardDuelStage.OwnerChildren or ConditionalDiscardDuelStage.TargetChildren } d || root.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || !_coreConditionalDiscardDuelReturnsOperations.Value.ValidConditionalDuelPayments(root))
                 continue;
             var paid = d.Stage == ConditionalDiscardDuelStage.OwnerChildren ? d.OwnerPayment! : d.TargetPayment!;
             if (pending.SubjectSeat != paid.PayerSeat)
@@ -40,7 +40,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelObserversRunti
             var valid = true;
             for (var i = rootIndex + 1; i < _resolutionStackOperations._resolutionStack.Count; i++)
             {
-                if (!_corePaidColorDamageClaimObserversOperations.PaidColorDamageClaimObserverEdge(i))
+                if (!_corePaidColorDamageClaimObserversOperations.Value.PaidColorDamageClaimObserverEdge(i))
                 {
                     valid = false;
                     break;
@@ -57,5 +57,5 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelObserversRunti
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 350)]
-    internal bool IsConditionalDiscardDuelProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ConditionalDuelPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsConditionalDiscardDuelProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && ConditionalDuelPaidObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

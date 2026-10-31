@@ -5,7 +5,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
 {
     internal bool ValidMouLz(ProgramSkillFrame f)
     {
-        if (f.MouLuZhiOl is not { } r || f.InstructionIndex != 1 || f.ActivationId != f.TriggerId || r.Source != MouLzSource(f) || r.GameplayHash != f.GameplayHash || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Selected.Count != r.Selected.Distinct().Count() || f.WindowContext is not { } w || w.ParentFrameId != r.WindowId || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlStartedEvent>().Count(e => e == new MouLuZhiOlStartedEvent(f.Id, r.Source, r.GameplayHash, r.Op, r.OriginalId, r.OriginalActionId, r.ActorSeat, r.TargetSeat, r.Turn, r.BatchId)) != 1)
+        if (f.MouLuZhiOl is not { } r || f.InstructionIndex != 1 || f.ActivationId != f.TriggerId || r.Source != MouLzSource(f) || r.GameplayHash != f.GameplayHash || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Selected.Count != r.Selected.Distinct().Count() || f.WindowContext is not { } w || w.ParentFrameId != r.WindowId || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuZhiOlStartedEvent>().Count(e => e == new MouLuZhiOlStartedEvent(f.Id, r.Source, r.GameplayHash, r.Op, r.OriginalId, r.OriginalActionId, r.ActorSeat, r.TargetSeat, r.Turn, r.BatchId)) != 1)
             return false;
         var n = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         if (n < 1 || _resolutionStackOperations._resolutionStack[n - 1].Id != r.WindowId)
@@ -39,7 +39,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
             return false;
         if (child is RecoveryReplacementFrame recovery)
             return _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == MouLzDiscard && recovery.Attempt.SourceSeat == seat && recovery.Attempt.TargetSeat == seat && recovery.Attempt.Amount == 1;
-        return child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == seat && hp.Change.TargetSeat == seat && _coreProgramEventHistoryOperations.ProgramEventHistory<SilverLionRemovedRecoveryEvent>().Any(e => e.PlayerSeat == seat && e.Reason.Value == MouLzDiscard && e.ResolutionId > f.Id && e.ResolutionId < hp.Change.Id && e.RecoveredAmount == hp.Change.Amount && e.RemainingHp == hp.Change.HpAfter);
+        return child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == seat && hp.Change.TargetSeat == seat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SilverLionRemovedRecoveryEvent>().Any(e => e.PlayerSeat == seat && e.Reason.Value == MouLzDiscard && e.ResolutionId > f.Id && e.ResolutionId < hp.Change.Id && e.RecoveredAmount == hp.Change.Amount && e.RemainingHp == hp.Change.HpAfter);
     }
 
     internal bool MouLzFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -59,7 +59,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
         if (child is CardsMovedTriggerWindowFrame m)
             return f.PendingMovementContinuation is not null && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, m) && m.Batch.Movements.All(x => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(x) && x.Sequence > r.Before && x.Sequence <= r.After);
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
+        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
     internal bool MouLzNativeEdge(int n)
@@ -77,7 +77,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     internal bool MouLzSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => this.MouLzObserverEdge(i), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? MouLzRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.MouLzFirstChild(f, c), (n) => this.MouLzSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 32900)]
-    internal bool MouLzDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouLzRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
+    internal bool MouLzDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && MouLzRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 32900)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 32900)]
     internal bool MouLzRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame child)

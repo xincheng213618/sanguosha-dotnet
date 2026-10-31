@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
 {
-    internal bool AnniversaryYizanModified(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLongyuanAwakenedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == AnniversaryZhaoTongZhaoGuangComposition.Longyuan && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash);
+    internal bool AnniversaryYizanModified(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLongyuanAwakenedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == AnniversaryZhaoTongZhaoGuangComposition.Longyuan && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash);
     internal bool IsAnniversaryYizanSelection(ProgramMultiCardViewAsSelection s) => s.Source.SkillId == AnniversaryZhaoTongZhaoGuangComposition.Yizan && _corePlayCardHistoryOperations.ViewAsRule(s.Source)is { InputCount: 2 } r && r.OutputKind == s.OutputKind;
     internal bool AnniversaryYizanMaterials(CharacterState owner, CardConversionSource source, IReadOnlyList<int> ids)
     {
@@ -47,7 +47,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
             return;
         if (sources is not [var source] || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(source.OwnerSeat) || source.OwnerSeat != a.ProviderSeat || _corePlayCardHistoryOperations.ViewAsRule(source)is not { } r || a.PhysicalCards.Count != r.InputCount || a.PhysicalCards.Select(c => c.CardId).Distinct().Count() != r.InputCount || a.PhysicalCards.Any(c => c.From.OwnerSeat != source.OwnerSeat || c.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || r.OutputKind != a.EffectiveKind && !(a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Slash && r.OutputKind == CardKind.FireSlash))
             throw new InvalidOperationException("An accepted Yizan action lost its exact native provider, conversion binding or frozen physical costs.");
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYizanInvokedEvent>().Any(e => e.ActionId == a.ActionId))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYizanInvokedEvent>().Any(e => e.ActionId == a.ActionId))
             return;
         if (a.Type == CardActionType.Use && useId is null)
             throw new InvalidOperationException("An actual Yizan Use must retain its original native CardUse frame.");
@@ -58,7 +58,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
     {
         if (selection.OutputKind != CardKind.Alcohol || !IsAnniversaryYizanSelection(selection))
             return false;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.VictimSeat != owner.Seat || dying.ResponderSeat != owner.Seat || !AnniversaryYizanMaterials(owner, selection.Source, selection.Cards.Select(c => c.Id).ToArray()) || _coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) || _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, CardKind.Alcohol, CardActionType.Use))
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.VictimSeat != owner.Seat || dying.ResponderSeat != owner.Seat || !AnniversaryYizanMaterials(owner, selection.Source, selection.Cards.Select(c => c.Id).ToArray()) || _coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) || _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, CardKind.Alcohol, CardActionType.Use))
             throw new InvalidOperationException("Yizan Alcohol must be its actual owner's native self-rescue with the current pair cost.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(owner, owner, selection.Cards[0], "酒", CardKind.Alcohol, conversionSource: selection.Source, dyingResponse: new(dying.FrameId, owner.Seat, false, null, true, selection.Cards[0].Id), physicalCards: selection.Cards);
@@ -69,7 +69,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
     {
         if (use.CardKind != CardKind.Alcohol || use.Action is not { Type: CardActionType.Use } a || a.ConversionChain.SingleOrDefault(s => s.SkillId == AnniversaryZhaoTongZhaoGuangComposition.Yizan)is not { } source || _corePlayCardHistoryOperations.ViewAsRule(source)is not { InputCount: 2 })
             return false;
-        if (use.CardId != card.Id || use.PhysicalCardIds is not { Count: 2 } ids || !ids.SequenceEqual(a.PhysicalCards.Select(c => c.CardId)) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryYizanInvokedEvent>().Count(e => e.ActionId == a.ActionId && e.Source == source && e.NativeUseFrameId == use.Id && !e.Modified && e.MaterialCount == 2) != 1)
+        if (use.CardId != card.Id || use.PhysicalCardIds is not { Count: 2 } ids || !ids.SequenceEqual(a.PhysicalCards.Select(c => c.CardId)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryYizanInvokedEvent>().Count(e => e.ActionId == a.ActionId && e.Source == source && e.NativeUseFrameId == use.Id && !e.Modified && e.MaterialCount == 2) != 1)
             throw new InvalidOperationException("Yizan Alcohol lost its once-accepted native two-material invoice.");
         foreach (var id in ids)
             if (_cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).SingleOrDefault(c => c.Id == id)is { } material)

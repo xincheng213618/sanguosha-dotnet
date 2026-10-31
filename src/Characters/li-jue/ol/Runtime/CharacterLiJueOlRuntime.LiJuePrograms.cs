@@ -143,7 +143,7 @@ internal sealed partial class CharacterLiJueOlRuntime
 
         if (r.Stage == LiJueStage.DamageChildren)
         {
-            if (r.Roll is null || r.Roll.Value < _coreShanheS5LiJueOperations.ShanheS5LangxiMinimumDamage(f) || r.Roll.Value > 2 || r.TargetSeat is not { } target || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LangxiRandomResolvedEvent>().Count(e => e == new LangxiRandomResolvedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.WindowId, target, r.Roll.Value)) != 1)
+            if (r.Roll is null || r.Roll.Value < _coreShanheS5LiJueOperations.Value.ShanheS5LangxiMinimumDamage(f) || r.Roll.Value > 2 || r.TargetSeat is not { } target || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LangxiRandomResolvedEvent>().Count(e => e == new LangxiRandomResolvedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.WindowId, target, r.Roll.Value)) != 1)
                 throw new InvalidOperationException("Langxi cannot resume an unissued or changed true random result.");
             return;
         }

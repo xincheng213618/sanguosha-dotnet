@@ -14,7 +14,7 @@ internal sealed partial class CharacterWeiZiOlRuntime
                 ResolveYuanziDrawChoice(selected);
                 return;
             case "liejie-pick" or "liejie-finish" or "liejie-decline":
-                _coreLiejieSourceDiscardsOperations.ResolveLiejieDiscardChoice(selected);
+                _coreLiejieSourceDiscardsOperations.Value.ResolveLiejieDiscardChoice(selected);
                 return;
             default:
                 throw new InvalidOperationException("The Wei Zi choice lost its action parameter.");

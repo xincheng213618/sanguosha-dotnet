@@ -33,7 +33,7 @@ internal sealed partial class CharacterLiFengOlRuntime
             return SkillProgramStepOutcome.Continue;
         if (op != SkillProgramEffectOp.CollectJiyunCompletedUseEntities && !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId))
             return SkillProgramStepOutcome.Continue;
-        if (op == SkillProgramEffectOp.InitializeJiyunCategoryGrain && _coreProgramEventHistoryOperations.ProgramEventHistory<LiFengStartedEvent>().Any(e => e.Op == op && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId))
+        if (op == SkillProgramEffectOp.InitializeJiyunCategoryGrain && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiFengStartedEvent>().Any(e => e.Op == op && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId))
             throw new InvalidOperationException("Jiyun cannot initialize one source twice.");
         var stage = op switch
         {
@@ -209,7 +209,7 @@ internal sealed partial class CharacterLiFengOlRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveJiyunPreparationDrawLeases)]
     internal void ReturnJiyunPreparationDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.LiFeng is not { Paid: true, Stage: LiFengStage.PreparationDraw } r || r.Cursor < 0 || r.Cursor >= r.Recipients.Count || outcome.RecipientSeat != r.Recipients[r.Cursor] || outcome.RequestedCount != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunPreparationDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Index == r.Cursor))
+        if (f.LiFeng is not { Paid: true, Stage: LiFengStage.PreparationDraw } r || r.Cursor < 0 || r.Cursor >= r.Recipients.Count || outcome.RecipientSeat != r.Recipients[r.Cursor] || outcome.RequestedCount != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunPreparationDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Index == r.Cursor))
             throw new InvalidOperationException("Jiyun draw lost its exact frozen recipient cursor.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LiFeng = r with { Stage = LiFengStage.PreparationChildren, DrawOutcome = outcome, ActualDrawIds = outcome.ActualDrawIds, Before = outcome.SequenceBefore, After = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         foreach (var id in outcome.ActualDrawIds)
@@ -341,7 +341,7 @@ internal sealed partial class CharacterLiFengOlRuntime
     {
         var r = f.LiFeng!;
         if (r.CompletedUse is { } completed)
-            foreach (var e in r.CompletedEntities.Where(e => !_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(s => s.LeaseId == e.LeaseId)))
+            foreach (var e in r.CompletedEntities.Where(e => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(s => s.LeaseId == e.LeaseId)))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiyunLeaseResolvedEvent(f.Id, completed.ActionId, e.LeaseId, false));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LiFengCompletedEvent(f.Id, r.Op, r.Paid));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LiFeng = null, PendingMovementContinuation = null });

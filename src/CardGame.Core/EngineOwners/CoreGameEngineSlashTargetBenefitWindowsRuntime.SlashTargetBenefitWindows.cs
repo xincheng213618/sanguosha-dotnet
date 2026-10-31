@@ -105,7 +105,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
     internal bool TryBeginDodgeCancelledSlashBenefits(NativeOwners.CardAttackHandle attack)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId);
-        if (use is null || !HasSlashTargetBenefitCapability || attack.SuccessfulDodgeResponses < attack.RequiredDodgeResponses || _coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(attack))
+        if (use is null || !HasSlashTargetBenefitCapability || attack.SuccessfulDodgeResponses < attack.RequiredDodgeResponses || _coreSlashSuitDiscardOperations.Value.IsSlashDodgeCancellationPrevented(attack))
             return false;
         var offered = (use.SlashTargetBenefits ?? []).Where(r => r.Stage == SlashTargetBenefitStage.Paid && r.Use.TargetSeat == attack.TargetSeat).ToArray();
         if (offered.Length == 0)
@@ -115,7 +115,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
         var contexts = new List<ProgramSkillWindowContext>();
         foreach (var r in offered)
         {
-            if (!_coreSlashTargetBenefitObserversOperations.ValidSlashTargetBenefitReceipt(r) || !MatchesSlashTargetBenefitUse(r.Use))
+            if (!_coreSlashTargetBenefitObserversOperations.Value.ValidSlashTargetBenefitReceipt(r) || !MatchesSlashTargetBenefitUse(r.Use))
                 throw new InvalidOperationException("A Dodge cancellation lost its issued same-use benefit.");
             var qualified = r with
             {
@@ -139,7 +139,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
             return false;
         if (context.Window == SkillProgramTriggerWindow.ActualSlashTargetBenefit)
             return receipt.Stage == SlashTargetBenefitStage.Offered && c.BindingId == receipt.Source.BindingId && _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[receipt.Use.TargetSeat].IsAlive && _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.Use.CardUseFrameId)!.TargetSeats.Contains(receipt.Use.TargetSeat) && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat], c.SkillId, c.SkillInstanceId);
-        return receipt.Stage == SlashTargetBenefitStage.CancellationQualified && receipt.SettlementBinding == c.BindingId && _coreSlashTargetBenefitObserversOperations.ValidSlashTargetBenefitReceipt(receipt);
+        return receipt.Stage == SlashTargetBenefitStage.CancellationQualified && receipt.SettlementBinding == c.BindingId && _coreSlashTargetBenefitObserversOperations.Value.ValidSlashTargetBenefitReceipt(receipt);
     }
 
     [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.AfterOpening, 110, NativeFrameAutomaticPending.RequireNoneBeforeFrame, NativeFrameAutomaticPublish.AfterAdvance)]
@@ -196,7 +196,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitWindowsRuntime
             return;
         if (TryBeginSlashTargetBenefits(attack, legacy, afterActualTargets: true))
             return;
-        if (_coreUniqueHpTargetAnnouncementsOperations.TryBeginUnannouncedUniqueHpTargets(attack, legacy))
+        if (_coreUniqueHpTargetAnnouncementsOperations.Value.TryBeginUnannouncedUniqueHpTargets(attack, legacy))
             return;
         if (legacy)
         {

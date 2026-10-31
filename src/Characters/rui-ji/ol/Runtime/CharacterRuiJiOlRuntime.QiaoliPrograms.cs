@@ -42,7 +42,7 @@ internal sealed partial class CharacterRuiJiOlRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
         if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, ParentFrameId: { } parentFrameId, DamageFrameId: { } damageFrameId } || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame damageWindow || damageWindow.Id != parentFrameId || damageWindow.ParentFrameId != damageFrameId || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive)
             return SkillProgramStepOutcome.Continue;
-        var attempt = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damageWindow);
+        var attempt = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damageWindow);
         if (!attempt.DamageWasApplied || attempt.DamageAmount <= 0 || attempt.IsChainPropagation || attempt.SourceSeat != active.OwnerSeat || attempt.ConversionSource is not { } source || source.SkillId != active.SkillId || source.BindingId != QiaoliWeaponBinding || source.OwnerSeat != active.OwnerSeat)
             return SkillProgramStepOutcome.Continue;
         var range = QiaoliWeaponRange(attempt.PhysicalCards);

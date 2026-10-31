@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineWenheCardsRuntime
 {
-    internal IReadOnlyList<CardKind> WenheOrdinaryTrickKinds => _coreActivityBattleRulesOperations.WenheRules?.OrdinaryTrickKinds ?? Enum.GetValues<CardKind>().Where(IsWenheCard).ToArray();
+    internal IReadOnlyList<CardKind> WenheOrdinaryTrickKinds => _coreActivityBattleRulesOperations.Value.WenheRules?.OrdinaryTrickKinds ?? Enum.GetValues<CardKind>().Where(IsWenheCard).ToArray();
 
     internal static bool IsWenheCard(CardKind kind) => RuntimeSkills.RuntimeRules_Core_WenheCards.IsWenheCard(kind);
     internal static LegalActionKind WenheCardAction(CardKind kind) => RuntimeSkills.RuntimeRules_Core_WenheCards.WenheCardAction(kind);
@@ -75,7 +75,7 @@ internal sealed partial class CoreGameEngineWenheCardsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenheCardPlanIssuedEvent(use.Id, action.ActionId, pending.Id, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), use.SourceSeat, seat, receipt.Materials.Count, receipt.SourceHandCount, receipt.SourceHpBefore, receipt.TargetHpBefore, receipt.SourceHpAfter, receipt.TargetHpAfter));
         if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.WenheChaos)
         {
-            _coreWenheChaosOperations.BeginWenheCardChaos(use);
+            _coreWenheChaosOperations.Value.BeginWenheCardChaos(use);
             return;
         }
 
@@ -158,7 +158,7 @@ internal sealed partial class CoreGameEngineWenheCardsRuntime
 
         // One real Ox carries its original private store together with its own
         // destination; the stores are captured before either treasure moves.
-        if (_coreNativeDamageHandlesOperations.UsesFormalWoodenOx)
+        if (_coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx)
             foreach (var ox in moves.Where(move => move.PrintedKind == CardKind.WoodenOx && move.From != move.To).ToArray())
                 moves.AddRange(_cardZonesOperations._cardZones.CardsAt(CardLocation.WoodenOxGrain(ox.From.OwnerSeat!.Value)).Select(card => new WenheRedistributionMaterial(card.Id, card.Kind, CardLocation.WoodenOxGrain(ox.From.OwnerSeat.Value), CardLocation.WoodenOxGrain(ox.To.OwnerSeat!.Value))));
         return receipt with
@@ -204,7 +204,7 @@ internal sealed partial class CoreGameEngineWenheCardsRuntime
     {
         if (use.WenheCardEffect is not { } r)
             return;
-        if (!IsWenheCard(CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use)) || r.Kind != CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || use.Action?.ActionId != r.ActionId || r.NullificationFrameId <= 0 || r.TargetIndex != use.TargetIndex || use.TargetIndex < 0 || use.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != r.TargetSeat || !Enum.IsDefined(r.Stage) || r.Materials is not System.Collections.IList { IsReadOnly: true } || r.Materials.Select(m => m.CardId).Distinct().Count() != r.Materials.Count || r.MovementBefore < 0 || r.MovementAfter < r.MovementBefore || r.MovementAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<WenheCardPlanIssuedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.NullificationFrameId == r.NullificationFrameId && e.Kind == r.Kind && e.SourceSeat == use.SourceSeat && e.TargetSeat == r.TargetSeat && e.MaterialCount == r.Materials.Count && e.SourceHandCount == r.SourceHandCount && e.SourceHpBefore == r.SourceHpBefore && e.TargetHpBefore == r.TargetHpBefore && e.SourceHpAfter == r.SourceHpAfter && e.TargetHpAfter == r.TargetHpAfter) != 1)
+        if (!IsWenheCard(CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use)) || r.Kind != CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) || use.Action?.ActionId != r.ActionId || r.NullificationFrameId <= 0 || r.TargetIndex != use.TargetIndex || use.TargetIndex < 0 || use.TargetIndex >= CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use).Count || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != r.TargetSeat || !Enum.IsDefined(r.Stage) || r.Materials is not System.Collections.IList { IsReadOnly: true } || r.Materials.Select(m => m.CardId).Distinct().Count() != r.Materials.Count || r.MovementBefore < 0 || r.MovementAfter < r.MovementBefore || r.MovementAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenheCardPlanIssuedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.NullificationFrameId == r.NullificationFrameId && e.Kind == r.Kind && e.SourceSeat == use.SourceSeat && e.TargetSeat == r.TargetSeat && e.MaterialCount == r.Materials.Count && e.SourceHandCount == r.SourceHandCount && e.SourceHpBefore == r.SourceHpBefore && e.TargetHpBefore == r.TargetHpBefore && e.SourceHpAfter == r.SourceHpAfter && e.TargetHpAfter == r.TargetHpAfter) != 1)
             throw new InvalidOperationException("Wenhe lost its frozen random plan, exact action, target or original material set.");
         if (r.Stage == WenheCardEffectStage.AwaitingChaos)
         {
@@ -213,7 +213,7 @@ internal sealed partial class CoreGameEngineWenheCardsRuntime
             return;
         }
 
-        if (!r.Applied || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.WenheChaos && _coreProgramEventHistoryOperations.ProgramEventHistory<WenheCardChaosReturnedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.NullificationFrameId == r.NullificationFrameId) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<WenheCardEffectAppliedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.NullificationFrameId == r.NullificationFrameId && e.Kind == r.Kind && e.MovedCards == r.Materials.Count(m => m.From != m.To) && e.MovementBefore == r.MovementBefore && e.MovementAfter == r.MovementAfter) != 1 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter).Select(m => (m.CardId, m.CardKind, m.From, m.To)).SequenceEqual(r.Materials.Where(m => m.From != m.To).Select(m => (m.CardId, m.PrintedKind, m.From, m.To))))
+        if (!r.Applied || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.WenheChaos && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenheCardChaosReturnedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.NullificationFrameId == r.NullificationFrameId) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenheCardEffectAppliedEvent>().Count(e => e.CardUseFrameId == use.Id && e.ActionId == r.ActionId && e.NullificationFrameId == r.NullificationFrameId && e.Kind == r.Kind && e.MovedCards == r.Materials.Count(m => m.From != m.To) && e.MovementBefore == r.MovementBefore && e.MovementAfter == r.MovementAfter) != 1 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.MovementBefore && m.Sequence <= r.MovementAfter).Select(m => (m.CardId, m.CardKind, m.From, m.To)).SequenceEqual(r.Materials.Where(m => m.From != m.To).Select(m => (m.CardId, m.PrintedKind, m.From, m.To))))
             throw new InvalidOperationException("Wenhe changed its already applied entities or repeated a paid redistribution.");
     }
 }

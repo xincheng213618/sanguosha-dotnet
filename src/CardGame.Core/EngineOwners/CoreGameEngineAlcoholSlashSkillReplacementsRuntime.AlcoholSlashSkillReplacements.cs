@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
             return true;
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || context.OwnerSeat != ownerSeat || context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source } || source != ownerSeat || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(f => f.Id == context.ParentFrameId)is not { } window)
             return false;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window);
         return TryGetPermanentAlcoholSlashUse(attack, out _);
     }
 
@@ -21,7 +21,7 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
         use = null !;
         if (attack.IsSourceLess || !attack.DamageWasApplied || attack.DamageAmount <= 0 || attack.SourceSeat != attack.CardUserSeat || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { ConsumedAlcoholBoost: true, ConsumedAlcoholBonus: > 0, Action: { Type: CardActionType.Use } action } original || action.ActorSeat != attack.SourceSeat || original.SourceSeat != attack.SourceSeat || original.CardKind != kind || action.EffectiveKind != kind)
             return false;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseAlcoholConsumptionCapturedEvent>().Where(e => e.CardUseFrameId == original.Id).ToArray()is not [var fact] || fact.ActionId != action.ActionId || fact.ActorSeat != attack.SourceSeat || fact.AlcoholBonus != original.ConsumedAlcoholBonus)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseAlcoholConsumptionCapturedEvent>().Where(e => e.CardUseFrameId == original.Id).ToArray()is not [var fact] || fact.ActionId != action.ActionId || fact.ActorSeat != attack.SourceSeat || fact.AlcoholBonus != original.ConsumedAlcoholBonus)
             return false;
         use = original;
         return true;
@@ -44,7 +44,7 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
         // Later chain recipients share the original paid use but do not issue an already completed exchange again.
         if (existing is not null && revoked.Length == 0)
             return SkillProgramStepOutcome.Continue;
-        var priorIssuance = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramAlcoholSlashSkillsReplacedEvent>().Select(e => e.Receipt).FirstOrDefault(r => r.Source.OwnerSeat == f.OwnerSeat && r.GrantAdded && r.GrantedGrant.GrantId == grantId);
+        var priorIssuance = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramAlcoholSlashSkillsReplacedEvent>().Select(e => e.Receipt).FirstOrDefault(r => r.Source.OwnerSeat == f.OwnerSeat && r.GrantAdded && r.GrantedGrant.GrantId == grantId);
         var shared = existing is null ? _coreNationalSkillsOperations.GetSkillBindingShard(owner).ActiveGrants.Where(g => g.SkillId == effect.SourceBind).OrderBy(g => g.SourceId.StartsWith("turn:", StringComparison.Ordinal) ? 1 : 0).ThenBy(g => g.SkillInstanceId, StringComparer.Ordinal).FirstOrDefault() : priorIssuance?.SharedInstanceGrant;
         var instance = shared?.SkillInstanceId ?? grantId;
         var granted = existing ?? new SkillGrant(grantId, effect.SourceBind!, instance, sourceId);
@@ -97,7 +97,7 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
         var effect = _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects.Single();
         var source = AlcoholSlashReplacementGrantSource(f.OwnerSeat, f.SkillId, f.SkillInstanceId);
         var expectedGrantId = source + ":" + effect.SourceBind;
-        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramAlcoholSlashSkillsReplacedEvent>().Where(e => e.Receipt.ProgramFrameId == f.Id).ToArray();
+        var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramAlcoholSlashSkillsReplacedEvent>().Where(e => e.Receipt.ProgramFrameId == f.Id).ToArray();
         var expectedInstance = r.SharedInstanceGrant?.SkillInstanceId ?? expectedGrantId;
         var earlierIssuance = r.GrantAdded || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().TakeWhile(e => e is not ProgramAlcoholSlashSkillsReplacedEvent issued || issued.Receipt.ProgramFrameId != f.Id).OfType<ProgramAlcoholSlashSkillsReplacedEvent>().Any(e => e.Receipt.GrantAdded && e.Receipt.Source == r.Source && SamePermanentGrantIdentity(e.Receipt.GrantedGrant, r.GrantedGrant) && e.Receipt.SharedInstanceGrant == r.SharedInstanceGrant);
         return r.LostSkillIds.SequenceEqual(effect.SkillIds) && r.RemovedGrants.All(g => !g.IsModeRule && r.LostSkillIds.Contains(g.SkillId, StringComparer.Ordinal)) && r.RevokedGrants.All(g => !g.IsModeRule && r.LostSkillIds.Contains(g.SkillId, StringComparer.Ordinal)) && r.RemovedGrants.All(g => r.RevokedGrants.Any(revoked => SamePermanentGrantIdentity(g, revoked))) && r.RevokedGrants.Select(g => (g.GrantId, g.SkillId, g.SkillInstanceId, g.SourceId)).Distinct().Count() == r.RevokedGrants.Count && r.RemovedGrants.Select(g => g.GrantId).Distinct(StringComparer.Ordinal).Count() == r.RemovedGrants.Count && (r.SharedInstanceGrant is null || r.SharedInstanceGrant.IsEnabled && r.SharedInstanceGrant.SkillId == effect.SourceBind) && earlierIssuance && (r.GrantedGrant with
@@ -105,7 +105,7 @@ internal sealed partial class CoreGameEngineAlcoholSlashSkillReplacementsRuntime
             IsEnabled = true
         }
 
-        ) == new SkillGrant(expectedGrantId, effect.SourceBind!, expectedInstance, source) && (!r.GrantAdded || r.GrantedGrant.IsEnabled) && facts is [var issued] && SameAlcoholSlashReplacementReceipt(r, issued.Receipt) && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == SkillProgramTriggerWindow.AfterDamageApplied) == 1;
+        ) == new SkillGrant(expectedGrantId, effect.SourceBind!, expectedInstance, source) && (!r.GrantAdded || r.GrantedGrant.IsEnabled) && facts is [var issued] && SameAlcoholSlashReplacementReceipt(r, issued.Receipt) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId && e.Window == SkillProgramTriggerWindow.AfterDamageApplied) == 1;
     }
 
     internal static bool SamePermanentGrantIdentity(SkillGrant left, SkillGrant right) => RuntimeSkills.RuntimeRules_Core_AlcoholSlashSkillReplacements.SamePermanentGrantIdentity(left, right);

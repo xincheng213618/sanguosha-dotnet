@@ -46,7 +46,7 @@ internal sealed partial class CoreGameEngineRicePileRuntime
         if (op == SkillProgramEffectOp.DrawAndStoreTwoPublicRice)
             return c.Window == SkillProgramTriggerWindow.TurnEnding && f.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _resolutionStackOperations._resolutionStack[index - 1] is TurnEndingBoundaryFrame ending && ending.OwnerSeat == f.OwnerSeat && ending.ItemIndex >= 0 && ending.ItemIndex < ending.Items.Count && ending.Items[ending.ItemIndex].Candidate is { } candidate && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, candidate);
         if (op == SkillProgramEffectOp.OfferRiceAfterDamagePoint)
-            return c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.Amount > 0 && c.OccurrenceIndex >= 0 && c.OccurrenceIndex < c.Amount && _resolutionStackOperations._resolutionStack[index - 1] is DamageTriggerWindowFrame w && w.TriggerWindow == c.Window && w.ParentFrameId == c.DamageFrameId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) && w.TargetSeat == c.TargetSeat && (_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(w).IsSourceLess ? c.SourceSeat is null : w.SourceSeat == c.SourceSeat) && _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == w.ParentFrameId)is { } damage && damage.Amount == c.Amount && damage.TargetSeat == c.TargetSeat && (_coreProgramLifecycleOperations.GetProgramTrigger(f).Subject == SkillProgramTriggerSubject.Owner ? c.TargetSeat == f.OwnerSeat : c.SourceSeat == f.OwnerSeat && c.TargetSeat != f.OwnerSeat);
+            return c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.Amount > 0 && c.OccurrenceIndex >= 0 && c.OccurrenceIndex < c.Amount && _resolutionStackOperations._resolutionStack[index - 1] is DamageTriggerWindowFrame w && w.TriggerWindow == c.Window && w.ParentFrameId == c.DamageFrameId && w.CandidateIndex >= 0 && w.CandidateIndex < w.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, w.Candidates[w.CandidateIndex].ToProgramCandidate()) && w.TargetSeat == c.TargetSeat && (_coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(w).IsSourceLess ? c.SourceSeat is null : w.SourceSeat == c.SourceSeat) && _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == w.ParentFrameId)is { } damage && damage.Amount == c.Amount && damage.TargetSeat == c.TargetSeat && (_coreProgramLifecycleOperations.GetProgramTrigger(f).Subject == SkillProgramTriggerSubject.Owner ? c.TargetSeat == f.OwnerSeat : c.SourceSeat == f.OwnerSeat && c.TargetSeat != f.OwnerSeat);
         if (op == SkillProgramEffectOp.RecoverAfterLastPublicRice)
             return c.Window == SkillProgramTriggerWindow.CardsMoved && c.MovementBatch is { } batch && _resolutionStackOperations._resolutionStack[index - 1] is CardsMovedTriggerWindowFrame moved && moved.Batch.Id == batch.Id && moved.CandidateIndex >= 0 && moved.CandidateIndex < moved.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, moved.Candidates[moved.CandidateIndex]) && batch.SourceCounts.Any(n => n.Location == f.RicePile?.Pile.Location && n.CountBefore > 0 && n.CountAfter == 0);
         return c.Window == SkillProgramTriggerWindow.JudgmentReplacing && c.JudgmentReplacement is { } replacement && _resolutionStackOperations._resolutionStack[index - 1] is JudgmentFrame judged && judged.Id == replacement.JudgmentFrameId && judged.TargetSeat == replacement.SubjectSeat && _coreNativeJudgmentOperations.CurrentJudgmentCandidate(judged)is { } jc && jc.OwnerSeat == f.OwnerSeat && jc.ProgramId == f.SkillId && jc.ProgramTriggerId == f.TriggerId && jc.SkillInstanceId == f.SkillInstanceId && jc.GameplayHash == f.GameplayHash;
@@ -55,7 +55,7 @@ internal sealed partial class CoreGameEngineRicePileRuntime
     internal SkillProgramStepOutcome BeginRicePile(SkillProgramEffect effect, ProgramSkillFrame supplied)
     {
         if (effect.Op == SkillProgramEffectOp.ReplaceJudgmentFromPublicRice)
-            return _coreRiceJudgmentOperations.BeginRiceJudgmentReplacement(supplied, effect);
+            return _coreRiceJudgmentOperations.Value.BeginRiceJudgmentReplacement(supplied, effect);
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var context = f.WindowContext!;
         PublicPersistentPileSource? pile;
@@ -164,7 +164,7 @@ internal sealed partial class CoreGameEngineRicePileRuntime
     internal void ResolveRiceChoice(PromptChoice choice)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Rice choice lost owner.");
-        _coreRicePileReceiptsOperations.RequireRiceReceipt(f);
+        _coreRicePileReceiptsOperations.Value.RequireRiceReceipt(f);
         var r = f.RicePile!;
         if (r.Stage != RicePileStage.StoreSelection || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != r.BeneficiarySeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], r.Choices.Where(c => c.Id == choice.Id).ToArray()) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], RiceChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("Rice choice must retain its actual chooser and current exact physical entity.");
@@ -209,7 +209,7 @@ internal sealed partial class CoreGameEngineRicePileRuntime
     {
         if (f.RicePile is not { Stage: RicePileStage.DrawChildren or RicePileStage.MovementChildren } r || f.PendingMovementContinuation is null)
             return false;
-        _coreRicePileReceiptsOperations.RequireRiceReceipt(f);
+        _coreRicePileReceiptsOperations.Value.RequireRiceReceipt(f);
         if (DrainRiceChildren(f))
             return true;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
@@ -228,7 +228,7 @@ internal sealed partial class CoreGameEngineRicePileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { RicePile: { } r } f || f.Id != id)
             return false;
-        _coreRicePileReceiptsOperations.RequireRiceReceipt(f);
+        _coreRicePileReceiptsOperations.Value.RequireRiceReceipt(f);
         if (r.Stage == RicePileStage.StoreSelection)
         {
             if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
@@ -262,7 +262,7 @@ internal sealed partial class CoreGameEngineRicePileRuntime
     {
         if (f.RicePile is not { } r || r.Stage == RicePileStage.StoreSelection && r.Operation != SkillProgramEffectOp.DrawAndStoreTwoPublicRice)
             return false;
-        _coreRicePileReceiptsOperations.RequireRiceReceipt(f);
+        _coreRicePileReceiptsOperations.Value.RequireRiceReceipt(f);
         return true;
     }
 

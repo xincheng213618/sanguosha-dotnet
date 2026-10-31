@@ -6,7 +6,7 @@ internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
     SkillProgramStepOutcome IShenMaChaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenMaChao(f, op);
     internal static CardConversionSource ShenMcSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal CardActionContext? HengwuAction(ProgramSkillWindowContext? context) => context is null ? null : _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)?.Action;
-    internal bool CanHengwu(int owner, CardActionContext? a, SkillProgramTriggerWindow? window) => a is { EffectiveSuit: { } suit } && suit != Suit.None && window == (a.Type == CardActionType.Use ? SkillProgramTriggerWindow.CardUseCommitted : SkillProgramTriggerWindow.CardResponseAccepted) && (a.ActorSeat == owner || a.ProviderSeat == owner) && !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Any(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], c) == suit) && !_coreProgramEventHistoryOperations.ProgramEventHistory<HengwuDrawIssuedEvent>().Any(e => e.OwnerSeat == owner && e.ActionId == a.ActionId);
+    internal bool CanHengwu(int owner, CardActionContext? a, SkillProgramTriggerWindow? window) => a is { EffectiveSuit: { } suit } && suit != Suit.None && window == (a.Type == CardActionType.Use ? SkillProgramTriggerWindow.CardUseCommitted : SkillProgramTriggerWindow.CardResponseAccepted) && (a.ActorSeat == owner || a.ProviderSeat == owner) && !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Any(c => _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], c) == suit) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HengwuDrawIssuedEvent>().Any(e => e.OwnerSeat == owner && e.ActionId == a.ActionId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 39000, SkillProgramEffectOp.DrawHengwuFieldSuitEquipment)]
     internal bool CanTriggerHengwu(ProgramTriggerLegalityContext gate) => CanHengwu(gate.OwnerSeat, HengwuAction(gate.WindowContext), gate.WindowContext?.Window);
     internal SkillProgramStepOutcome BeginShenMaChao(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -112,7 +112,7 @@ internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenMaChao: { Stage: ShenMaChaoStage.EquipmentUse } r } f)
             return;
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Any(e => e.ResolutionId == r.UseId && e.CardId == r.CardId))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Any(e => e.ResolutionId == r.UseId && e.CardId == r.CardId))
             throw new InvalidOperationException("Shouli's starting mount did not return its exact native equipment use.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShouliStartingMountFinishedEvent(f.Id, r.Cursor, r.Seats[r.Cursor], r.CardId, r.UseId));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenMaChao = r with { Stage = ShenMaChaoStage.EquipmentChildren } });
@@ -125,7 +125,7 @@ internal sealed partial class CharacterMaChaoAnniversaryGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.ShenMaChao ?? throw new InvalidOperationException("Hengwu lost its original draw owner.");
-        if (r.Stage != ShenMaChaoStage.DrawAttempt || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.DrawCount || o.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<HengwuDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (r.Stage != ShenMaChaoStage.DrawAttempt || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.DrawCount || o.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HengwuDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Hengwu cannot change or repay its frozen native draw.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenMaChao = r with { Stage = ShenMaChaoStage.DrawChildren, Before = o.SequenceBefore, After = o.SequenceAfter } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HengwuDrawReturnedEvent(f.Id, f.OwnerSeat, r.DrawCount, o.ActualDrawIds.Count, o.SequenceBefore, o.SequenceAfter));

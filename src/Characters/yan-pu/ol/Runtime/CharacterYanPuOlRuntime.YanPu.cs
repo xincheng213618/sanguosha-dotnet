@@ -275,7 +275,7 @@ internal sealed partial class CharacterYanPuOlRuntime
     internal bool ContinuePaidYanPu(ProgramSkillFrame f)
     {
         if (f.YanPu is { } r)
-            return (r.Promise is not null || r.Exited is not null) && _coreProgramEventHistoryOperations.ProgramEventHistory<YanPuStartedEvent>().Any(e => e.ProgramFrameId == f.Id && e.Source == r.Source);
+            return (r.Promise is not null || r.Exited is not null) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YanPuStartedEvent>().Any(e => e.ProgramFrameId == f.Id && e.Source == r.Source);
         // An issued Ending must also be allowed to enter its first instruction
         // after the original skill instance disappeared. Its authority is the
         // exact unconsumed gift item, not the absent source or a parallel debt.

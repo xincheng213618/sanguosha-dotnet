@@ -249,6 +249,6 @@ internal sealed partial class CoreGameEngineDrawAdviceProgramsRuntime
 
     internal ProgramSkillFrame? DrawAdviceObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.DrawAdviceFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasPaidDamageObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 280)]
-    internal bool IsDrawAdviceProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && DrawAdviceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsDrawAdviceProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && DrawAdviceObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     SkillProgramStepOutcome IDrawAdviceProgramHost.BeginDrawAdvice(ProgramSkillFrame frame, int recipientSeat) => BeginDrawAdvice(frame, recipientSeat);
 }

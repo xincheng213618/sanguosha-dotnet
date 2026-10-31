@@ -14,7 +14,7 @@ internal sealed partial class CoreGameEngineNativePublicPileOriginalCardsRuntime
         ProgramCardContinuation? continuation = null;
         int? cursor = null, epoch = null;
         var direction = NativePublicPileDirection.Played;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == provider.Seat && kind is CardKind.Peach or CardKind.Alcohol)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.ResponderSeat == provider.Seat && kind is CardKind.Peach or CardKind.Alcohol)
         {
             ownerId = dying.FrameId;
             cursor = dying.ResponderIndex;
@@ -183,7 +183,7 @@ internal sealed partial class CoreGameEngineNativePublicPileOriginalCardsRuntime
             return;
         }
 
-        var request = use.CardKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == action.ActorSeat && action.ActorSeat == action.ProviderSeat ? NativePublicPileResponseRequest(_coreMatchParticipantsPlayersAccess._players[action.ProviderSeat], use.CardKind) : NativePublicPileUseRequest(action.ActorSeat, action.ProviderSeat, parent: use.Id);
+        var request = use.CardKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.ResponderSeat == action.ActorSeat && action.ActorSeat == action.ProviderSeat ? NativePublicPileResponseRequest(_coreMatchParticipantsPlayersAccess._players[action.ProviderSeat], use.CardKind) : NativePublicPileUseRequest(action.ActorSeat, action.ProviderSeat, parent: use.Id);
         var choice = GetNativePublicPileOriginalCards(request).SingleOrDefault(s => s.Card.Id == cost.CardId && s.Card.Kind == cost.CardKind && s.Pile.Location == cost.From) ?? throw new InvalidOperationException("An original public-pile use has no exact native source authorization.");
         PrepareNativePublicPilePayment(use, choice);
         var current = _resolutionStackOperations._resolutionStack.Single(f => f.Id == use.Id);
@@ -237,7 +237,7 @@ internal sealed partial class CoreGameEngineNativePublicPileOriginalCardsRuntime
             BindNativePublicPilePayment(parent, action);
     }
 
-    internal bool IsNativePublicPileOriginalActionCost(CardActionContext action, CardActionCost cost) => action.PhysicalCards is [var only] && only == cost && action.ConversionChain.Count == 0 && cost.From.Zone == CardZoneKind.PublicPersistentPile && cost.From.OwnerSeat == action.ProviderSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<NativePublicPileOriginalBoundEvent>().Where(e => e.ActionId == action.ActionId && e.CardId == cost.CardId).Any(bound => _coreProgramEventHistoryOperations.ProgramEventHistory<NativePublicPileOriginalPaidEvent>().Any(paid => paid.ParentFrameId == bound.ParentFrameId && paid.CardId == bound.CardId && paid.EntrySequence == bound.EntrySequence && paid.From == cost.From && paid.CardKind == cost.CardKind && paid.ActorSeat == action.ActorSeat && paid.ProviderSeat == action.ProviderSeat && paid.RequesterSeat == action.RequesterSeat));
+    internal bool IsNativePublicPileOriginalActionCost(CardActionContext action, CardActionCost cost) => action.PhysicalCards is [var only] && only == cost && action.ConversionChain.Count == 0 && cost.From.Zone == CardZoneKind.PublicPersistentPile && cost.From.OwnerSeat == action.ProviderSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativePublicPileOriginalBoundEvent>().Where(e => e.ActionId == action.ActionId && e.CardId == cost.CardId).Any(bound => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativePublicPileOriginalPaidEvent>().Any(paid => paid.ParentFrameId == bound.ParentFrameId && paid.CardId == bound.CardId && paid.EntrySequence == bound.EntrySequence && paid.From == cost.From && paid.CardKind == cost.CardKind && paid.ActorSeat == action.ActorSeat && paid.ProviderSeat == action.ProviderSeat && paid.RequesterSeat == action.RequesterSeat));
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 27590)]
     internal void AssertNativePublicPileOriginalPayments()
     {
@@ -249,10 +249,10 @@ internal sealed partial class CoreGameEngineNativePublicPileOriginalCardsRuntime
                 throw new InvalidOperationException("An original public-pile payment lost its owning frame and immutable native request.");
             if (paid.SequenceAfter == 0)
                 continue;
-            var records = _coreProgramEventHistoryOperations.ProgramEventHistory<NativePublicPileOriginalPaidEvent>().Where(e => e.ParentFrameId == parent.Id && e.EntrySequence == paid.SequenceAfter).ToArray();
+            var records = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativePublicPileOriginalPaidEvent>().Where(e => e.ParentFrameId == parent.Id && e.EntrySequence == paid.SequenceAfter).ToArray();
             if (records is not [var fact] || fact.Source != paid.Source || fact.CardId != paid.Card.Id || fact.CardKind != paid.Card.Kind || fact.From != paid.Pile.Location || fact.ActorSeat != paid.Request.ActorSeat || fact.ProviderSeat != paid.Request.ProviderSeat || fact.RequesterSeat != paid.Request.RequesterSeat || fact.ResponderSeat != paid.Request.ResponderSeat || fact.Direction != paid.Request.Direction || fact.ActualTurn != paid.ActualTurn || fact.TurnOwnerSeat != paid.TurnOwnerSeat || fact.RequestCursor != paid.Request.RequestCursor || fact.RequestEpoch != paid.Request.RequestEpoch || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == fact.EntrySequence && m.CardId == fact.CardId && m.CardKind == fact.CardKind && m.From == fact.From && m.To == CardLocation.Processing && m.Reason == fact.Reason))
                 throw new InvalidOperationException("An original public-pile payment lost its one actual native entry.");
-            if (paid.ActionId is { } actionId && _coreProgramEventHistoryOperations.ProgramEventHistory<NativePublicPileOriginalBoundEvent>().Count(e => e.ParentFrameId == parent.Id && e.ActionId == actionId && e.CardId == paid.Card.Id && e.EntrySequence == paid.SequenceAfter) != 1)
+            if (paid.ActionId is { } actionId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativePublicPileOriginalBoundEvent>().Count(e => e.ParentFrameId == parent.Id && e.ActionId == actionId && e.CardId == paid.Card.Id && e.EntrySequence == paid.SequenceAfter) != 1)
                 throw new InvalidOperationException("An original public-pile payment lost its exact accepted native action.");
         }
     }

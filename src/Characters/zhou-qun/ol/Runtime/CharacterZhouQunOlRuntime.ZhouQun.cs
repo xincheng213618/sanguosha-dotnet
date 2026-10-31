@@ -49,7 +49,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
         if (effect.Op == SkillProgramEffectOp.ResolveNingwuSingletonSlashJudgment)
             return NingwuEligibleUse(candidate.OwnerSeat, context)is not null;
         if (effect.Op == SkillProgramEffectOp.ResolveZhouyuThunderNeighbors)
-            return context.Amount > 0 && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is DamageTriggerWindowFrame d && _coreNativeCardClassificationsOperations.GetDamageNature(_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(d)) == DamageNature.Thunder;
+            return context.Amount > 0 && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is DamageTriggerWindowFrame d && _coreNativeCardClassificationsOperations.GetDamageNature(_coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(d)) == DamageNature.Thunder;
         if (effect.Op == SkillProgramEffectOp.ResolveTianhouTopExchangeAndGrant)
             return true;
         var target = context.TargetSeat ?? context.SourceSeat;

@@ -12,8 +12,8 @@ internal sealed partial class CoreGameEngineSourceBeigongRuntime
     {
         SkillProgramEffectOp.ResolveSourceDingxiUsedCard => _coreSourceDingxiOperations.StartSourceDingxi(f),
         SkillProgramEffectOp.DrawSourceDingxiPile => DrawSourceDingxi(f),
-        SkillProgramEffectOp.ResolveSourceHuojie => _coreSourceHuojieOperations.StartSourceHuojie(f),
-        SkillProgramEffectOp.ResolveSourceXingxia => _coreSourceXingxiaOperations.StartSourceXingxia(f),
+        SkillProgramEffectOp.ResolveSourceHuojie => _coreSourceHuojieOperations.Value.StartSourceHuojie(f),
+        SkillProgramEffectOp.ResolveSourceXingxia => _coreSourceXingxiaOperations.Value.StartSourceXingxia(f),
         _ => throw new InvalidOperationException("Unrecognized original Beigong instruction.")};
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 24510)]
     internal bool SourceBeigongCanOffer(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineSourceBeigongRuntime
         if (trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveSourceHuojie))
             return SourceDingxiCount(candidate.OwnerSeat) > _coreMatchParticipantsPlayersAccess._players.Count;
         if (trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveSourceXingxia))
-            return _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && _coreTeamActivityProgramsOperations.OtherRevealedPublicTeamAlly(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], p)) && _coreProgramEventHistoryOperations.ProgramEventHistory<SourceXingxiaIssuedEvent>().Where(e => e.OwnerSeat == candidate.OwnerSeat).All(e => _coreActualRoundProgressRoundNumberAccess._roundNumber - e.Round >= 2);
+            return _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && _coreTeamActivityProgramsOperations.OtherRevealedPublicTeamAlly(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], p)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SourceXingxiaIssuedEvent>().Where(e => e.OwnerSeat == candidate.OwnerSeat).All(e => _coreActualRoundProgressRoundNumberAccess._roundNumber - e.Round >= 2);
         return true;
     }
 
@@ -71,9 +71,9 @@ internal sealed partial class CoreGameEngineSourceBeigongRuntime
         if (f.SourceDingxi is not null)
             _coreSourceDingxiOperations.ContinueSourceDingxi(f);
         else if (f.SourceHuojie is not null)
-            _coreSourceHuojieOperations.ContinueSourceHuojie(f);
+            _coreSourceHuojieOperations.Value.ContinueSourceHuojie(f);
         else if (f.SourceXingxia is not null)
-            _coreSourceXingxiaOperations.ContinueSourceXingxia(f);
+            _coreSourceXingxiaOperations.Value.ContinueSourceXingxia(f);
     }
 
     internal void FinishSourceBeigong(ProgramSkillFrame f)

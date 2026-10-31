@@ -5,9 +5,9 @@ internal sealed partial class CharacterLiFengOlRuntime
 {
     internal bool IsJiyunPile(PublicPersistentPileSource p) => p.SkillId == "ol:jiyun" && p.Capacity == 3 && _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.GetValueOrDefault((p.OwnerSeat, p.SkillId, p.SkillInstanceId)) == p;
     internal bool IsLiveJiyunPile(PublicPersistentPileSource p) => IsJiyunPile(p) && _coreMatchParticipantsPlayersAccess._players[p.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[p.OwnerSeat].SkillGrants.Grants.Any(g => g.SkillId == p.SkillId && g.SkillInstanceId == p.SkillInstanceId);
-    internal IEnumerable<JiyunLeaseIssuedEvent> JiyunLeases() => _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseIssuedEvent>().OrderBy(e => e.LeaseId);
-    internal JiyunLeaseDepartedEvent? JiyunDeparture(long id) => _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseDepartedEvent>().SingleOrDefault(e => e.LeaseId == id);
-    internal bool HasLiveJiyunHandLease(JiyunLeaseIssuedEvent l) => !_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.LeaseId == l.LeaseId) && JiyunDeparture(l.LeaseId)is null && _cardZonesOperations._cardZones.GetLocation(l.CardId) == CardLocation.Hand(l.RecipientSeat);
+    internal IEnumerable<JiyunLeaseIssuedEvent> JiyunLeases() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunLeaseIssuedEvent>().OrderBy(e => e.LeaseId);
+    internal JiyunLeaseDepartedEvent? JiyunDeparture(long id) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunLeaseDepartedEvent>().SingleOrDefault(e => e.LeaseId == id);
+    internal bool HasLiveJiyunHandLease(JiyunLeaseIssuedEvent l) => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.LeaseId == l.LeaseId) && JiyunDeparture(l.LeaseId)is null && _cardZonesOperations._cardZones.GetLocation(l.CardId) == CardLocation.Hand(l.RecipientSeat);
     // Registration only; the query still belongs to legacy GameEngine.Jiyun.Ledger.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 250)]
     internal void ProjectJiyunCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
@@ -20,15 +20,15 @@ internal sealed partial class CharacterLiFengOlRuntime
     {
         if (!HasLiFengCapability)
             return;
-        foreach (var lease in JiyunLeases().Where(l => !_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.LeaseId == l.LeaseId)).ToArray())
+        foreach (var lease in JiyunLeases().Where(l => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.LeaseId == l.LeaseId)).ToArray())
             foreach (var m in batch.Movements.Where(m => m.CardId == lease.CardId && m.Sequence > lease.MovementSequence && m.From != m.To))
             {
-                if (_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseMovementEvent>().Any(e => e.LeaseId == lease.LeaseId && e.MovementSequence == m.Sequence))
+                if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunLeaseMovementEvent>().Any(e => e.LeaseId == lease.LeaseId && e.MovementSequence == m.Sequence))
                     continue;
                 var departure = JiyunDeparture(lease.LeaseId);
                 if (departure is null && m.From == CardLocation.Hand(lease.RecipientSeat))
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiyunLeaseDepartedEvent(lease.LeaseId, batch.Id, batch.ParentFrameId, m.CardId, m.From, m.To, m.Reason, m.Sequence));
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiyunLeaseMovementEvent(lease.LeaseId, batch.Id, batch.ParentFrameId, m.CardId, m.From, m.To, m.Reason, m.Sequence, m.To == CardLocation.DiscardPile && _coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(batch, m)));
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiyunLeaseMovementEvent(lease.LeaseId, batch.Id, batch.ParentFrameId, m.CardId, m.From, m.To, m.Reason, m.Sequence, m.To == CardLocation.DiscardPile && _coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, m)));
             }
     }
 
@@ -38,7 +38,7 @@ internal sealed partial class CharacterLiFengOlRuntime
             return false;
         if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.LiFeng is { Paid: true } r && r.Pile == pile && r.Op is SkillProgramEffectOp.ResolveJiyunPreparationDrawLeases or SkillProgramEffectOp.CollectJiyunCompletedUseEntities))
             return true;
-        foreach (var l in JiyunLeases().Where(l => l.Pile == pile && !_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.LeaseId == l.LeaseId)))
+        foreach (var l in JiyunLeases().Where(l => l.Pile == pile && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.LeaseId == l.LeaseId)))
         {
             if (HasLiveJiyunHandLease(l))
                 return true;
@@ -49,19 +49,19 @@ internal sealed partial class CharacterLiFengOlRuntime
         return false;
     }
 
-    internal bool IsIssuedJiyunRetainedEntity(PublicPersistentPileSource pile, int cardId) => _coreMatchParticipantsPlayersAccess._players[pile.OwnerSeat].IsAlive && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.LiFeng is { Paid: true, Stage: LiFengStage.CollectChildren } r && r.Pile == pile && r.ActiveCardId == cardId && f.PendingMovementContinuation is not null && _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunClaimedEntityEvent>().Any(e => e.FrameId == f.Id && e.CardId == cardId && e.To == pile.Location && ValidJiyunClaim(e)));
+    internal bool IsIssuedJiyunRetainedEntity(PublicPersistentPileSource pile, int cardId) => _coreMatchParticipantsPlayersAccess._players[pile.OwnerSeat].IsAlive && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.LiFeng is { Paid: true, Stage: LiFengStage.CollectChildren } r && r.Pile == pile && r.ActiveCardId == cardId && f.PendingMovementContinuation is not null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunClaimedEntityEvent>().Any(e => e.FrameId == f.Id && e.CardId == cardId && e.To == pile.Location && ValidJiyunClaim(e)));
     internal (long NativeId, ProgramCompletedResponseKind? ResponseKind)? JiyunCompletedOrigin(CardActionContext action, ProgramCardContinuation? continuation)
     {
         if (action.Type == CardActionType.Use)
         {
             var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == action.ActionId);
-            return use is { Step: ResolutionFrameStep.Completed } && use.Action!.ActorSeat == action.ActorSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Any(e => e.ResolutionId == use.Id) ? (use.Id, null) : null;
+            return use is { Step: ResolutionFrameStep.Completed } && use.Action!.ActorSeat == action.ActorSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Any(e => e.ResolutionId == use.Id) ? (use.Id, null) : null;
         }
 
         continuation ??= action.EffectiveKind == CardKind.Dodge ? ProgramCardContinuation.Dodge : action.EffectiveKind == CardKind.Nullification ? ProgramCardContinuation.NullificationResponse : null;
         if (continuation is null || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(action, continuation.Value))
             return null;
-        var completed = _coreProgramEventHistoryOperations.ProgramEventHistory<CardResponseCompletedEvent>().SingleOrDefault(e => e.ActionId == action.ActionId && e.ProviderSeat == action.ProviderSeat && e.NativeActorSeat == action.ActorSeat);
+        var completed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardResponseCompletedEvent>().SingleOrDefault(e => e.ActionId == action.ActionId && e.ProviderSeat == action.ProviderSeat && e.NativeActorSeat == action.ActorSeat);
         if (completed is null)
             return null;
         return (completed.ParentFrameId, continuation == ProgramCardContinuation.Dodge ? ProgramCompletedResponseKind.Dodge : ProgramCompletedResponseKind.Nullification);
@@ -94,7 +94,7 @@ internal sealed partial class CharacterLiFengOlRuntime
         var location = _cardZonesOperations._cardZones.GetLocation(lease.CardId);
         if (location.Zone is not (CardZoneKind.Equipment or CardZoneKind.DiscardPile) || location.Zone == CardZoneKind.Equipment && location.OwnerSeat != action.ActorSeat)
             return false;
-        var last = _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseMovementEvent>().Where(e => e.LeaseId == lease.LeaseId).OrderBy(e => e.MovementSequence).LastOrDefault();
+        var last = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunLeaseMovementEvent>().Where(e => e.LeaseId == lease.LeaseId).OrderBy(e => e.MovementSequence).LastOrDefault();
         if (last is null || last.To != location || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == lease.CardId)?.Sequence != last.MovementSequence)
             return false;
         if (location.Zone == CardZoneKind.Equipment)
@@ -110,7 +110,7 @@ internal sealed partial class CharacterLiFengOlRuntime
         if (nativeId is null)
             return false;
         var kind = continuation == ProgramCardContinuation.Dodge ? ProgramCompletedResponseKind.Dodge : ProgramCompletedResponseKind.Nullification;
-        return JiyunLeases().Any(l => _coreMatchParticipantsPlayersAccess._players[l.Source.OwnerSeat].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.LeaseId == l.LeaseId) && JiyunActualPayment(l, action, nativeId.Value, kind)is not null);
+        return JiyunLeases().Any(l => _coreMatchParticipantsPlayersAccess._players[l.Source.OwnerSeat].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.LeaseId == l.LeaseId) && JiyunActualPayment(l, action, nativeId.Value, kind)is not null);
     }
 
     internal IReadOnlyList<ProgramCardTriggerCandidate> CollectJiyunCompletedUseCandidates(CardActionContext action, ProgramCardContinuation? continuation)
@@ -118,7 +118,7 @@ internal sealed partial class CharacterLiFengOlRuntime
         if (!HasLiFengCapability || JiyunCompletedOrigin(action, continuation)is not { } origin)
             return[];
         var result = new List<ProgramCardTriggerCandidate>();
-        var leases = JiyunLeases().Where(l => _coreMatchParticipantsPlayersAccess._players[l.Source.OwnerSeat].IsAlive && IsJiyunPile(l.Pile) && !_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.LeaseId == l.LeaseId) && JiyunActualPayment(l, action, origin.NativeId, origin.ResponseKind)is not null && JiyunTerminalEntity(l, action, origin.NativeId, origin.ResponseKind)).ToArray();
+        var leases = JiyunLeases().Where(l => _coreMatchParticipantsPlayersAccess._players[l.Source.OwnerSeat].IsAlive && IsJiyunPile(l.Pile) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunLeaseResolvedEvent>().Any(e => e.LeaseId == l.LeaseId) && JiyunActualPayment(l, action, origin.NativeId, origin.ResponseKind)is not null && JiyunTerminalEntity(l, action, origin.NativeId, origin.ResponseKind)).ToArray();
         foreach (var group in leases.GroupBy(l => (l.Source.OwnerSeat, l.Source.SkillInstanceId, l.GameplayHash, l.Pile)))
         {
             var first = group.First();
@@ -127,7 +127,7 @@ internal sealed partial class CharacterLiFengOlRuntime
             {
                 var entry = JiyunActualPayment(l, action, origin.NativeId, origin.ResponseKind)!;
                 var fact = new JiyunCompletedUseLeaseIssuedEvent(l.Source, l.GameplayHash, l.Pile, origin.NativeId, action.ActionId, origin.ResponseKind, l.LeaseId, l.CardId, l.PrintedKind, entry.Sequence);
-                if (!_coreProgramEventHistoryOperations.ProgramEventHistory<JiyunCompletedUseLeaseIssuedEvent>().Contains(fact))
+                if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunCompletedUseLeaseIssuedEvent>().Contains(fact))
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(fact);
             }
 
@@ -141,7 +141,7 @@ internal sealed partial class CharacterLiFengOlRuntime
     {
         if (candidate.SkillId != "ol:jiyun" || candidate.TriggerId != "completed-drawn-entity")
             return ordinary;
-        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunCompletedUseLeaseIssuedEvent>().Where(e => e.ActionId == mother.Action.ActionId && e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillInstanceId == candidate.SkillInstanceId && e.GameplayHash == candidate.GameplayHash).OrderBy(e => e.LeaseId).ToArray();
+        var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunCompletedUseLeaseIssuedEvent>().Where(e => e.ActionId == mother.Action.ActionId && e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillInstanceId == candidate.SkillInstanceId && e.GameplayHash == candidate.GameplayHash).OrderBy(e => e.LeaseId).ToArray();
         if (facts.Length == 0)
             throw new InvalidOperationException("Jiyun lost its frozen completed-use lease entitlement.");
         var first = facts[0];
@@ -151,7 +151,7 @@ internal sealed partial class CharacterLiFengOlRuntime
         };
     }
 
-    internal JiyunCompletedEntity[] JiyunCompletedEntities(JiyunCompletedUseContext r) => _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunCompletedUseLeaseIssuedEvent>().Where(e => e.ActionId == r.ActionId && e.Source == r.Source && e.GameplayHash == r.GameplayHash).OrderBy(e => e.LeaseId).Select(e => new JiyunCompletedEntity(e.LeaseId, e.CardId, e.PrintedKind, e.PaymentSequence)).ToArray();
+    internal JiyunCompletedEntity[] JiyunCompletedEntities(JiyunCompletedUseContext r) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunCompletedUseLeaseIssuedEvent>().Where(e => e.ActionId == r.ActionId && e.Source == r.Source && e.GameplayHash == r.GameplayHash).OrderBy(e => e.LeaseId).Select(e => new JiyunCompletedEntity(e.LeaseId, e.CardId, e.PrintedKind, e.PaymentSequence)).ToArray();
     [ProgramIssuedTrigger(310)]
     internal bool IsIssuedJiyunCompletedUseCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
@@ -160,7 +160,7 @@ internal sealed partial class CharacterLiFengOlRuntime
         return JiyunCompletedEntities(r).Length == r.EntityCount && (_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.LiFeng is { Paid: true, CompletedUse: { } paid } && paid == r && f.WindowContext == context));
     }
 
-    internal bool ValidJiyunClaim(JiyunClaimedEntityEvent e) => _coreProgramEventHistoryOperations.ProgramEventHistory<LiFengStartedEvent>().SingleOrDefault(s => s.FrameId == e.FrameId && s.Op == SkillProgramEffectOp.CollectJiyunCompletedUseEntities)is { } started && _coreProgramEventHistoryOperations.ProgramEventHistory<LiFengPaidEvent>().Count(p => p.FrameId == e.FrameId && p.Op == started.Op) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunCompletedUseLeaseIssuedEvent>().Any(i => i.LeaseId == e.LeaseId && i.ActionId == e.ActionId && i.NativeUseId == e.NativeUseId && i.ResponseKind == e.ResponseKind && i.CardId == e.CardId && i.PrintedKind == e.PrintedKind && i.Source.OwnerSeat == started.Source.OwnerSeat && i.Source.SkillInstanceId == started.Source.SkillInstanceId && i.GameplayHash == started.GameplayHash && i.Pile == started.Pile && i.Pile.Location == e.To) && _coreProgramEventHistoryOperations.ProgramEventHistory<JiyunClaimedEntityEvent>().Count(c => c.LeaseId == e.LeaseId) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.From == e.From && m.To == e.To && m.Reason.Value == JiyunCollectReason);
+    internal bool ValidJiyunClaim(JiyunClaimedEntityEvent e) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiFengStartedEvent>().SingleOrDefault(s => s.FrameId == e.FrameId && s.Op == SkillProgramEffectOp.CollectJiyunCompletedUseEntities)is { } started && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiFengPaidEvent>().Count(p => p.FrameId == e.FrameId && p.Op == started.Op) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunCompletedUseLeaseIssuedEvent>().Any(i => i.LeaseId == e.LeaseId && i.ActionId == e.ActionId && i.NativeUseId == e.NativeUseId && i.ResponseKind == e.ResponseKind && i.CardId == e.CardId && i.PrintedKind == e.PrintedKind && i.Source.OwnerSeat == started.Source.OwnerSeat && i.Source.SkillInstanceId == started.Source.SkillInstanceId && i.GameplayHash == started.GameplayHash && i.Pile == started.Pile && i.Pile.Location == e.To) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiyunClaimedEntityEvent>().Count(c => c.LeaseId == e.LeaseId) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.MovementSequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.From == e.From && m.To == e.To && m.Reason.Value == JiyunCollectReason);
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 4900)]
     internal CardMovementBatchContext CompleteMovementBatchCaptureJiyunMovementBatch(CardMovementBatchBuilder batch, CardMovementBatchContext completed)
     {

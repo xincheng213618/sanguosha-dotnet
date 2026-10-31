@@ -5,9 +5,9 @@ internal sealed partial class CoreGameEngineShanheS5YimieObserversRuntime
 {
     internal bool ShanheS5YimieCostFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
-        if (root.ShanheS5YimieCost is not { } r || !_coreShanheS5YimieOperations.HasShanheS5YimieCostPaid(root))
+        if (root.ShanheS5YimieCost is not { } r || !_coreShanheS5YimieOperations.Value.HasShanheS5YimieCostPaid(root))
             return false;
-        _coreShanheS5YimieOperations.RequireShanheS5YimieOrigin(r);
+        _coreShanheS5YimieOperations.Value.RequireShanheS5YimieOrigin(r);
         if (child is DyingFrame dying)
             return r.CostHpBefore == 1 && dying.ParentFrameId == root.Id && dying.VictimSeat == root.OwnerSeat && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null;
         return child is HpChangedTriggerWindowFrame hp && hp.ResumeFrameId == root.Id && hp.Change.ParentFrameId == root.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Loss && hp.Change.SourceSeat is null && hp.Change.TargetSeat == root.OwnerSeat && hp.Change.HpBefore == r.CostHpBefore && hp.Change.HpAfter == r.CostHpBefore - 1 && hp.Change.Amount == 1;
@@ -32,7 +32,7 @@ internal sealed partial class CoreGameEngineShanheS5YimieObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 5795)]
-    internal bool HasShanheS5YimieDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && (ShanheS5YimieCostObserverRoot()is { } cost && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == cost.Id) || ShanheS5YimieRecoveryObserverRoot()is { } recovery && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == recovery.Id));
+    internal bool HasShanheS5YimieDyingObserver() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && (ShanheS5YimieCostObserverRoot()is { } cost && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == cost.Id) || ShanheS5YimieRecoveryObserverRoot()is { } recovery && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == recovery.Id));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 5795)]
     internal bool AdvanceShanheS5YimieChildren()
     {

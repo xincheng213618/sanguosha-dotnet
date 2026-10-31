@@ -19,7 +19,7 @@ internal sealed partial class CoreGameEngineShanheSourceXiyingRuntime
         if (f.SkillId != ShanheSourceXiyingContract.Skill || f.InstructionIndex != 1 || f.TriggerId is null || f.ActivationId != f.TriggerId || f.ShanheSourceXiying is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } c)
             throw new InvalidOperationException("Source1180 requires its original zero-input native phase binding.");
         if (f.TriggerId == ShanheSourceXiyingContract.Ending)
-            return _coreShanheSourceXiyingEndingOperations.BeginSourceXiyingReward(f);
+            return _coreShanheSourceXiyingEndingOperations.Value.BeginSourceXiyingReward(f);
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, c.OccurrenceIndex);
         if (!SourceXiyingPlayParent(f.OwnerSeat, candidate, c) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || SourceXiyingPaymentChoices(f, f.OwnerSeat, true).Count == 0)
             throw new InvalidOperationException("Source1180 must discard one actual non-basic hand entity at its real own Play start.");

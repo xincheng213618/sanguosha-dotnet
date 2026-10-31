@@ -20,13 +20,13 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
         }
 
         if (!attack.IsSourceLess && source.IsAlive && _coreProgramCardPoliciesOperations.HasCardPolicy(source, SkillProgramCardPolicyKind.DamageBecomesHpLoss))
-            return _coreHealthReplacementProgramsOperations.ApplyAttackAsHpLoss(attack);
-        if (_coreOtherParticipantHealthReplacementOperations.TryGetOtherParticipantHpReplacement(attack, out var replacementSource))
+            return _coreHealthReplacementProgramsOperations.Value.ApplyAttackAsHpLoss(attack);
+        if (_coreOtherParticipantHealthReplacementOperations.Value.TryGetOtherParticipantHpReplacement(attack, out var replacementSource))
         {
             if (_coreHealthQueriesOperations.TryBeginHappyQiaoAttackHpLossChoice(attack))
                 return true;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OtherParticipantDamageReplacedEvent(attack.ResolutionId, replacementSource, attack.SourceSeat, target.Seat, _coreCardDamageMaximumHpReplacementOperations.CalculateCardDamageLayer(attack), _coreNativeCardClassificationsOperations.GetDamageNature(attack), attack.IsChainPropagation));
-            return _coreHealthReplacementProgramsOperations.ApplyAttackAsHpLoss(attack);
+            return _coreHealthReplacementProgramsOperations.Value.ApplyAttackAsHpLoss(attack);
         }
 
         if (_coreCardDamageMaximumHpReplacementOperations.TryReplaceCardDamageWithMaximumHpLoss(attack, out var replacementPending))
@@ -35,9 +35,9 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
             attack.SetIgnoresArmor(true);
         if (!attack.DamageAmountFinalized && attack is NativeOwners.CardAttackHandle && (_contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.DamageBecomesHpLoss) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.OtherParticipantDamageBecomesHpLoss) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.FirstRoundCardDamageBecomesMaximumHpLoss)))
             _ = _coreCardDamageMaximumHpReplacementOperations.CalculateCardDamageLayer(attack);
-        if (_characterMangYaChangAnniversaryOperations.TryBeginAnniversaryJiedaoSourceWindow(attack))
+        if (_characterMangYaChangAnniversaryOperations.Value.TryBeginAnniversaryJiedaoSourceWindow(attack))
             return true;
-        if (_characterCaiYangAnniversaryOperations.TryBeginAnniversaryCaiYangJiaofengSourceWindow(attack))
+        if (_characterCaiYangAnniversaryOperations.Value.TryBeginAnniversaryCaiYangJiaofengSourceWindow(attack))
             return true;
         var nature = _coreNativeCardClassificationsOperations.GetDamageNature(attack);
         var amount = _coreNativeDamagePoliciesOperations.FinalizeAttackDamageAmount(attack);
@@ -57,7 +57,7 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
             return true;
         }
 
-        if (_coreColdDamageOperations.TryBeginColdDamageReplacement(attack, amount, nature))
+        if (_coreColdDamageOperations.Value.TryBeginColdDamageReplacement(attack, amount, nature))
             return true;
         if (attack is NativeOwners.CardAttackHandle iceSwordAttack && _coreNativeIceSwordOperations.TryBeginIceSwordChoice(iceSwordAttack, amount))
         {
@@ -85,7 +85,7 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
             {
                 target.Seat
             }.Concat(propagatedTargets).ToArray();
-            _coreRecipientScopedDamageOperations.CaptureRecipientScopedDamageBase(attack, propagatedTargets);
+            _coreRecipientScopedDamageOperations.Value.CaptureRecipientScopedDamageBase(attack, propagatedTargets);
             attack.SetChainedTargets(propagatedTargets);
             foreach (var chainSeat in chainMembers)
             {
@@ -112,7 +112,7 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
                 attack.PendingRedBladeDamageBonus = false;
             }
 
-            var armorPayment = _coreDamageArmorPaymentsOperations.PrepareDamageArmorPayment(damageFrameId, attack);
+            var armorPayment = _coreDamageArmorPaymentsOperations.Value.PrepareDamageArmorPayment(damageFrameId, attack);
             var healthBefore = target.Hp;
             _characterXuRongOlOperations.CaptureXuRongActualDamageHp(damageFrameId, attack, target.Hp, amount);
             if (armorPayment is not null)

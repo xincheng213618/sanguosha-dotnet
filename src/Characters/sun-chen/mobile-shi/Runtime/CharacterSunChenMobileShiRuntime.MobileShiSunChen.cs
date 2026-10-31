@@ -27,7 +27,7 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
         }
         else if (p.CompletedResponseReturn is not { IsCommitted: false } response || !_coreResponseUseCompletionOperations.IsCompletedResponseUse2(a, response.Kind) || !_coreResponseUseCompletionOperations.IsCompletedResponseParentConsistent(p))
             return null;
-        if (a.PhysicalCards.Count == 0 || a.PhysicalCards.Any(c => c.From.Zone != CardZoneKind.Hand || c.From.OwnerSeat != owner && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiLsMaterialAuthorizedEvent>().Any(e => e.Actor == owner && e.UseId == (a.Type == CardActionType.Use ? nativeId : 0) && e.ActionId == a.ActionId && e.CardId == c.CardId && e.From == c.From)))
+        if (a.PhysicalCards.Count == 0 || a.PhysicalCards.Any(c => c.From.Zone != CardZoneKind.Hand || c.From.OwnerSeat != owner && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiLsMaterialAuthorizedEvent>().Any(e => e.Actor == owner && e.UseId == (a.Type == CardActionType.Use ? nativeId : 0) && e.ActionId == a.ActionId && e.CardId == c.CardId && e.From == c.From)))
             return null;
         var targets = a.Type == CardActionType.Use ? _coreCardUseLifecycleOperations.LifecycleCardUse(nativeId)!.Action!.EffectiveDesignatedTargetSeats : a.TargetSeats;
         return new(nativeId, a, targets.Distinct().Where(_coreTableSeatQueriesOperations.IsValidPlayerSeat).ToArray());

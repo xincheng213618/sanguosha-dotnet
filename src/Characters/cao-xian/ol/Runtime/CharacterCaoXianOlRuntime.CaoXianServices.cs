@@ -20,7 +20,7 @@ internal sealed partial class CharacterCaoXianOlRuntime
     int ICaoXianFacts.Keep(int owner, int card) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(card), _coreMatchParticipantsPlayersAccess._players[owner]);
     bool ICaoXianFacts.Friendly(int owner, int other) => owner == other || (_coreAiBrainsAiBrainsAccess._aiBrains.TryGetValue(owner, out var brain) ? brain.ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), other, new(0, 0, 0, 1, 0, 0, false, false)) > 0 : _coreMatchParticipantsPlayersAccess._players[owner].TeamRevealed && _coreMatchParticipantsPlayersAccess._players[other].TeamRevealed && _coreMatchParticipantsPlayersAccess._players[owner].TeamId is { } team && _coreMatchParticipantsPlayersAccess._players[other].TeamId == team);
     SkillProgram ICaoXianFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    IEnumerable<T> ICaoXianFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> ICaoXianFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     IReadOnlyList<int> ICaoXianFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
     bool ICaoXianFacts.Parent(ProgramSkillFrame f)
     {

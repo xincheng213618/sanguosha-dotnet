@@ -53,7 +53,7 @@ internal sealed partial class CharacterDengAiMouOlRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == u.Id);
         if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame { MouDengAiOl: { Stage: MouDengAiOlStage.Issuing } r } f)
             return;
-        var o = _coreProgramEventHistoryOperations.ProgramEventHistory<MouDengAiSnatchIssuedEvent>().Single(e => e.Origin.FrameId == f.Id).Origin;
+        var o = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDengAiSnatchIssuedEvent>().Single(e => e.Origin.FrameId == f.Id).Origin;
         if (!ValidMouDengAiOl(f) || o.UseId != u.Id || o.ActionId != a.ActionId || u.CardKind != CardKind.Snatch || u.CardId != o.CardId || a.Type != CardActionType.Use || a.ActorSeat != f.OwnerSeat || a.ProviderSeat != f.OwnerSeat || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual([o.CardId]) || !a.ConversionChain.SequenceEqual([r.Source]))
             throw new InvalidOperationException("Jiewan cannot attach its receipt to another producer.");
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(u.Id, x => x with { MouDengAiJiewan = o });
@@ -62,7 +62,7 @@ internal sealed partial class CharacterDengAiMouOlRuntime
 
     internal bool IsMouDengAiSnatch(long id)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { MouDengAiJiewan: { } o, Action: { Type: CardActionType.Use } a } u || u.Id != o.UseId || u.CardId != o.CardId || u.CardKind != CardKind.Snatch || a.ActionId != o.ActionId || a.EffectiveKind != CardKind.Snatch || a.ProviderSeat != o.Source.OwnerSeat || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual([o.CardId]) || !a.ConversionChain.SequenceEqual([o.Source]) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { MouDengAiOl: { Stage: MouDengAiOlStage.NativeUse, NativeReturned: false } r } f || !ValidMouDengAiOl(f) || !r.Paid || r.UseId != id || r.ActionId != a.ActionId || r.CardId != o.CardId || r.Distance != o.Distance || r.Source != o.Source || r.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDengAiSnatchIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { MouDengAiJiewan: { } o, Action: { Type: CardActionType.Use } a } u || u.Id != o.UseId || u.CardId != o.CardId || u.CardKind != CardKind.Snatch || a.ActionId != o.ActionId || a.EffectiveKind != CardKind.Snatch || a.ProviderSeat != o.Source.OwnerSeat || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual([o.CardId]) || !a.ConversionChain.SequenceEqual([o.Source]) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { MouDengAiOl: { Stage: MouDengAiOlStage.NativeUse, NativeReturned: false } r } f || !ValidMouDengAiOl(f) || !r.Paid || r.UseId != id || r.ActionId != a.ActionId || r.CardId != o.CardId || r.Distance != o.Distance || r.Source != o.Source || r.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDengAiSnatchIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, o.Source.OwnerSeat, o.Source.OwnerSeat);
     }
@@ -91,7 +91,7 @@ internal sealed partial class CharacterDengAiMouOlRuntime
         ContinueMouDengAiOl(f.Id);
     }
 
-    internal bool IsMouDengAiNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => f.MouDengAiOl is { Stage: MouDengAiOlStage.Children, NativeReturned: true } r && ValidMouDengAiOl(f) && r.NativeBatches.Contains(b.Id) && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.OriginOwnerSeat == f.OwnerSeat && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouDengAiNativeBatchEvent>().Count(e => e == new MouDengAiNativeBatchEvent(f.Id, r.UseId, b.Id, b.ParentBatchId, b.Movements.Count)) == 1;
+    internal bool IsMouDengAiNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => f.MouDengAiOl is { Stage: MouDengAiOlStage.Children, NativeReturned: true } r && ValidMouDengAiOl(f) && r.NativeBatches.Contains(b.Id) && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.OriginOwnerSeat == f.OwnerSeat && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDengAiNativeBatchEvent>().Count(e => e == new MouDengAiNativeBatchEvent(f.Id, r.UseId, b.Id, b.ParentBatchId, b.Movements.Count)) == 1;
     [ProgramPipelineHook(ProgramPipelinePhase.IsProgramMovementSettlement, 1800)]
     internal bool WindowSettlement_IsMouDengAiNativeSettlementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => IsMouDengAiNativeSettlementBatch(frame, batch);
 }

@@ -11,7 +11,7 @@ internal sealed partial class CoreHellMengpoProgramsRuntime
     internal SkillProgramStepOutcome BeginHellWanghun(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.SkillId != "hell:wanghun" || frame.TriggerId != "forget-two-enemies" || frame.InstructionIndex != 1 || frame.HellWanghun is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.OwnerDied } context || _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().LastOrDefault()is not { } death || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramDeathTriggerWindowFrame window || death.VictimSeat != frame.OwnerSeat || context.ParentFrameId != window.Id || window.DeathFrameId != death.Id || window.OwnerSeat != frame.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<HellWanghunIssuedEvent>().Any(e => e.FrameId == frame.Id))
+        if (frame.SkillId != "hell:wanghun" || frame.TriggerId != "forget-two-enemies" || frame.InstructionIndex != 1 || frame.HellWanghun is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.OwnerDied } context || _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().LastOrDefault()is not { } death || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramDeathTriggerWindowFrame window || death.VictimSeat != frame.OwnerSeat || context.ParentFrameId != window.Id || window.DeathFrameId != death.Id || window.OwnerSeat != frame.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellWanghunIssuedEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("Wanghun requires its exact real Mengpo death and once-issued instruction.");
         var targets = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && HellEnemies(frame.OwnerSeat, p.Seat)).Select(p => p.Seat).ToList();
         _randomOperations._random.Shuffle(targets);
@@ -103,7 +103,7 @@ internal sealed partial class CoreHellMengpoProgramsRuntime
             throw new InvalidOperationException("Wangshi requires the exact real turn-start owner.");
         if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || !HellEnemies(frame.OwnerSeat, seat))
             return SkillProgramStepOutcome.Continue;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<HellWangshiCategoryBanEvent>().Any(e => e.FrameId == frame.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellWangshiCategoryBanEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("Wangshi cannot choose a different category after its actual issuance.");
         var category = new[]
         {
@@ -132,7 +132,7 @@ internal sealed partial class CoreHellMengpoProgramsRuntime
             CardUseCategories.Equipment => "equipment",
             _ => "trick"
         };
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<HellWangshiCategoryBanEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwnerSeat == actorSeat && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Category == category && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(end => end.TurnNumber == e.TurnNumber && end.ActorSeat == e.TurnOwnerSeat));
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellWangshiCategoryBanEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwnerSeat == actorSeat && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Category == category && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Any(end => end.TurnNumber == e.TurnNumber && end.ActorSeat == e.TurnOwnerSeat));
     }
 
     internal bool HasHellShiyouCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.HellShiyouIntercept);
@@ -190,14 +190,14 @@ internal sealed partial class CoreHellMengpoProgramsRuntime
         foreach (var receipt in plan.Redirects)
         {
             var actual = movements.Where(m => m.CardId == receipt.CardId && m.CardKind == receipt.CardKind && m.From == receipt.ActualFrom && m.To == receipt.Destination && m.Reason == receipt.Reason).ToArray();
-            if (plan.PlanId <= 0 || actual is not [var move] || receipt.Destination != CardLocation.Hand(receipt.Source.OwnerSeat) || receipt.OriginalSource.OwnerSeat != receipt.Phase.ActorSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<HellShiyouInterceptedEvent>().Any(e => e.PlanId == plan.PlanId && e.Receipt.CardId == receipt.CardId))
+            if (plan.PlanId <= 0 || actual is not [var move] || receipt.Destination != CardLocation.Hand(receipt.Source.OwnerSeat) || receipt.OriginalSource.OwnerSeat != receipt.Phase.ActorSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellShiyouInterceptedEvent>().Any(e => e.PlanId == plan.PlanId && e.Receipt.CardId == receipt.CardId))
                 throw new InvalidOperationException("Shiyou lost its exact pre-discard redirection and native movement.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HellShiyouInterceptedEvent(plan.PlanId, move.Sequence, receipt));
         }
     }
 
-    internal bool IsHellShiyouRedirectedDiscard(CardMovementRecord move) => _coreProgramEventHistoryOperations.ProgramEventHistory<HellShiyouInterceptedEvent>().Any(e => e.MovementSequence == move.Sequence && e.Receipt.CardId == move.CardId && e.Receipt.CardKind == move.CardKind && e.Receipt.ActualFrom == move.From && e.Receipt.Destination == move.To && e.Receipt.Reason == move.Reason && move.To == CardLocation.Hand(e.Receipt.Source.OwnerSeat) && e.Receipt.OriginalSource.OwnerSeat == e.Receipt.Phase.ActorSeat && e.Receipt.Phase.Kind == ActualDiscardRecoveryPhaseKind.Discard && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(e.Receipt.Phase));
-    internal bool IsHellShiyouPaidDiscardMovement(CardMovementRecord move, CardLocation expectedSource, CardMoveReason expectedReason) => move.Reason == expectedReason && IsHellShiyouRedirectedDiscard(move) && _coreProgramEventHistoryOperations.ProgramEventHistory<HellShiyouInterceptedEvent>().Any(e => e.MovementSequence == move.Sequence && e.Receipt.CardId == move.CardId && e.Receipt.OriginalSource == expectedSource && e.Receipt.Reason == expectedReason);
+    internal bool IsHellShiyouRedirectedDiscard(CardMovementRecord move) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellShiyouInterceptedEvent>().Any(e => e.MovementSequence == move.Sequence && e.Receipt.CardId == move.CardId && e.Receipt.CardKind == move.CardKind && e.Receipt.ActualFrom == move.From && e.Receipt.Destination == move.To && e.Receipt.Reason == move.Reason && move.To == CardLocation.Hand(e.Receipt.Source.OwnerSeat) && e.Receipt.OriginalSource.OwnerSeat == e.Receipt.Phase.ActorSeat && e.Receipt.Phase.Kind == ActualDiscardRecoveryPhaseKind.Discard && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(e.Receipt.Phase));
+    internal bool IsHellShiyouPaidDiscardMovement(CardMovementRecord move, CardLocation expectedSource, CardMoveReason expectedReason) => move.Reason == expectedReason && IsHellShiyouRedirectedDiscard(move) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellShiyouInterceptedEvent>().Any(e => e.MovementSequence == move.Sequence && e.Receipt.CardId == move.CardId && e.Receipt.OriginalSource == expectedSource && e.Receipt.Reason == expectedReason);
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeTurnUseBan, 30)]
     internal bool HellWangshiCardUseForbidden(ProgramCardUseQuery query) => IsHellWangshiActionForbidden(query.ActorSeat, query.Kind, query.ActionType);
 }

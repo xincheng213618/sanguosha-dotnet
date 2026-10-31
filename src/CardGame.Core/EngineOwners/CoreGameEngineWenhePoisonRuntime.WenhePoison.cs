@@ -79,12 +79,12 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
     {
         var p = use.WenhePoisonFireAttackPayment!;
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move => move.Sequence > p.SequenceBefore && move.Sequence <= p.SequenceAfter).ToArray();
-        if (_coreMatchDefinitionModeDefinitionAccess._modeDefinition.WenheActivity is null || use.CardKind != CardKind.FireAttack || use.FireAttackSelection?.RevealedCardId != p.RevealedCardId || CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use) != p.TargetSeat || p.BatchIds is not System.Collections.IList { IsReadOnly: true } || p.BatchIds.Count != 2 || p.BatchIds.Distinct().Count() != 2 || p.BatchCursor < 0 || p.BatchCursor > p.BatchIds.Count || p.ActiveChildId is not null && p.BatchCursor >= p.BatchIds.Count || moves.Length != 2 || moves.Any(move => move.CardId != p.CostCardId) || moves[0].From != CardLocation.Hand(use.SourceSeat) || moves[0].To != CardLocation.Processing || moves[0].Reason != CardMoveReasons.FireAttackDiscard || moves[0].Disclosure != CardMovementDisclosure.FaceUp || moves[1].From != CardLocation.Processing || moves[1].To != CardLocation.DiscardPile || moves[1].Reason != CardMoveReasons.FireAttackDiscardFinished || _coreCardAttackStateOperations.GetAttackCard(p.CostCardId).Kind != CardKind.Peach || _coreProgramEventHistoryOperations.ProgramEventHistory<WenhePoisonFireAttackPaidEvent>().Count(e => e == new WenhePoisonFireAttackPaidEvent(use.Id, p.CostCardId, p.TargetSeat, p.RevealedCardId, p.RevealedSuit, p.SequenceBefore, p.SequenceAfter)) != 1)
+        if (_coreMatchDefinitionModeDefinitionAccess._modeDefinition.WenheActivity is null || use.CardKind != CardKind.FireAttack || use.FireAttackSelection?.RevealedCardId != p.RevealedCardId || CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(use) != p.TargetSeat || p.BatchIds is not System.Collections.IList { IsReadOnly: true } || p.BatchIds.Count != 2 || p.BatchIds.Distinct().Count() != 2 || p.BatchCursor < 0 || p.BatchCursor > p.BatchIds.Count || p.ActiveChildId is not null && p.BatchCursor >= p.BatchIds.Count || moves.Length != 2 || moves.Any(move => move.CardId != p.CostCardId) || moves[0].From != CardLocation.Hand(use.SourceSeat) || moves[0].To != CardLocation.Processing || moves[0].Reason != CardMoveReasons.FireAttackDiscard || moves[0].Disclosure != CardMovementDisclosure.FaceUp || moves[1].From != CardLocation.Processing || moves[1].To != CardLocation.DiscardPile || moves[1].Reason != CardMoveReasons.FireAttackDiscardFinished || _coreCardAttackStateOperations.GetAttackCard(p.CostCardId).Kind != CardKind.Peach || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenhePoisonFireAttackPaidEvent>().Count(e => e == new WenhePoisonFireAttackPaidEvent(use.Id, p.CostCardId, p.TargetSeat, p.RevealedCardId, p.RevealedSuit, p.SequenceBefore, p.SequenceAfter)) != 1)
             throw new InvalidOperationException("Poison Fire Attack changed its exact paid discard or native effect continuation.");
     }
 
-    internal int? CaptureWenhePoisonRound() => _coreActivityBattleRulesOperations.WenheRules?.PoisonRound;
-    internal bool IsWenhePhysicalPoison(CharacterState owner, Card card) => _coreActivityBattleRulesOperations.WenheRules?.IsPhysicalPoison(card.Kind, card.Id, owner.IsAlive, card.Id > 0 && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Hand(owner.Seat)) ?? false;
+    internal int? CaptureWenhePoisonRound() => _coreActivityBattleRulesOperations.Value.WenheRules?.PoisonRound;
+    internal bool IsWenhePhysicalPoison(CharacterState owner, Card card) => _coreActivityBattleRulesOperations.Value.WenheRules?.IsPhysicalPoison(card.Kind, card.Id, owner.IsAlive, card.Id > 0 && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Hand(owner.Seat)) ?? false;
     internal CardKind EffectiveConversionInputKind(CharacterState owner, Card card) => IsWenhePhysicalPoison(owner, card) ? CardKind.Poison : card.Kind;
     [ProgramPipelineHook(ProgramPipelinePhase.HandCardProjection, 20)]
     internal CardSnapshot ProjectWenhePoisonHandCard(CharacterState owner, Card card, CardSnapshot snapshot) => IsWenhePhysicalPoison(owner, card) ? snapshot with
@@ -96,7 +96,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
     : snapshot;
     internal CardMovementBatchContext CaptureWenhePoisonDepartures(CardMovementBatchContext batch, int? poisonRound)
     {
-        if (poisonRound is not > 0 || _coreActivityBattleRulesOperations.WenheRules is not { } rules)
+        if (poisonRound is not > 0 || _coreActivityBattleRulesOperations.Value.WenheRules is not { } rules)
             return batch;
         var departures = batch.Movements.Where(move => move.From.OwnerSeat is { } owner && _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && rules.AllowsPoisonDeparture(new(_coreCardAttackStateOperations.GetAttackCard(move.CardId).Kind, move.Disclosure, move.From.Zone, owner, move.To.Zone, move.To.OwnerSeat, _coreMatchParticipantsPlayersAccess._players[owner].IsAlive))).OrderBy(move => move.Sequence).Select(move => new WenhePoisonDeparture(poisonRound.Value, move.Sequence, move.From.OwnerSeat!.Value, move.CardId)).ToArray();
         return departures.Length == 0 ? batch : batch with
@@ -130,7 +130,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.LeadingTail, 20)]
     internal bool HasWenhePoisonUsePaymentTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => continuation.Kind is RecoveryPaidCardUseKind.Trick or RecoveryPaidCardUseKind.Simple or RecoveryPaidCardUseKind.EquipmentUse && use.PaymentMovementReceipt is { } receipt && receipt.OwnerFrameId == use.Id && IsWenhePoisonUsePaymentBatch(use, receipt.Batch) && CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, receipt.Batch);
     internal bool IsPendingWenhePoisonWindow(CardsMovedTriggerWindowFrame frame) => HasWenhePoisonDepartures(frame.Batch) && frame.CandidateIndex == 0 && (frame.WenhePoisonLoss is null || frame.WenhePoisonLoss is { Stage: not WenhePoisonLossStage.Completed } receipt && receipt.Cursor >= 0 && receipt.Cursor < frame.Batch.WenhePoisonDepartures!.Count);
-    internal bool IsCurrentWenhePoisonDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id)is var index && index > 0 && IsWenhePoisonDyingChild(_resolutionStackOperations._resolutionStack[index - 1], dying);
+    internal bool IsCurrentWenhePoisonDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id)is var index && index > 0 && IsWenhePoisonDyingChild(_resolutionStackOperations._resolutionStack[index - 1], dying);
     internal bool IsOriginalDyingSuspendedByWenhePoison(DyingFrame original)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == original.Id);
@@ -171,7 +171,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
             {
                 var owner = _coreMatchParticipantsPlayersAccess._players[departure.OwnerSeat];
                 var before = owner.Hp;
-                var after = owner.IsAlive ? checked(before - _coreActivityBattleRulesOperations.WenheRules!.PoisonHpLoss) : before;
+                var after = owner.IsAlive ? checked(before - _coreActivityBattleRulesOperations.Value.WenheRules!.PoisonHpLoss) : before;
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { WenhePoisonLoss = receipt with { Stage = WenhePoisonLossStage.HealthChildren, HpBefore = before, HpAfter = after } });
                 owner.Hp = after;
                 _coreHpChangeProgramsOperations.RecordHpChange(frame.Id, null, owner.Seat, before, after, HpChangeKind.Loss);
@@ -202,7 +202,7 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
         _coreRuntimeOperations.PushRuntimeFrame(new DyingFrame(id, frame.Id, departure.OwnerSeat, null, Array.AsReadOnly(_coreNativeDyingOperations.BuildDyingResponderSeats(departure.OwnerSeat).ToArray()), 0, DyingContinuationKind.WenhePoison));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerDyingEvent(id, departure.OwnerSeat, null));
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
-        if (!_coreProgramLifecycleOperations.TryBeginMandatorySelfDyingProgram(_coreDyingCursorRuntimeOperations.ActiveDying!) && !_coreDyingEntryProgramsOperations.TryBeginDyingEntryProgramWindow(_coreDyingCursorRuntimeOperations.ActiveDying!))
+        if (!_coreProgramLifecycleOperations.TryBeginMandatorySelfDyingProgram(_coreDyingCursorRuntimeOperations.Value.ActiveDying!) && !_coreDyingEntryProgramsOperations.TryBeginDyingEntryProgramWindow(_coreDyingCursorRuntimeOperations.Value.ActiveDying!))
             _coreNativeDyingOperations.ExposeHumanDyingPrompt();
     }
 
@@ -223,15 +223,15 @@ internal sealed partial class CoreGameEngineWenhePoisonRuntime
             return;
         }
 
-        if (_coreMatchDefinitionModeDefinitionAccess._modeDefinition.WenheActivity is null || departures.Count == 0 || departures is not System.Collections.IList { IsReadOnly: true } || departures.Select(d => d.MovementSequence).Distinct().Count() != departures.Count || !departures.Select(d => d.MovementSequence).SequenceEqual(departures.Select(d => d.MovementSequence).Order()) || departures.Any(d => d.RoundNumber < 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(d.OwnerSeat) || frame.Batch.Movements.Count(move => move.Sequence == d.MovementSequence && move.CardId == d.CardId && _coreCardAttackStateOperations.GetAttackCard(move.CardId).Kind == CardKind.Peach && move.Disclosure == CardMovementDisclosure.FaceUp && move.From == CardLocation.Hand(d.OwnerSeat) && move.To != move.From) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<WenheRoundRuleChangedEvent>().Any(rule => rule.RoundNumber == d.RoundNumber && rule.Rule == WenheRuleKind.Poison)))
+        if (_coreMatchDefinitionModeDefinitionAccess._modeDefinition.WenheActivity is null || departures.Count == 0 || departures is not System.Collections.IList { IsReadOnly: true } || departures.Select(d => d.MovementSequence).Distinct().Count() != departures.Count || !departures.Select(d => d.MovementSequence).SequenceEqual(departures.Select(d => d.MovementSequence).Order()) || departures.Any(d => d.RoundNumber < 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(d.OwnerSeat) || frame.Batch.Movements.Count(move => move.Sequence == d.MovementSequence && move.CardId == d.CardId && _coreCardAttackStateOperations.GetAttackCard(move.CardId).Kind == CardKind.Peach && move.Disclosure == CardMovementDisclosure.FaceUp && move.From == CardLocation.Hand(d.OwnerSeat) && move.To != move.From) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenheRoundRuleChangedEvent>().Any(rule => rule.RoundNumber == d.RoundNumber && rule.Rule == WenheRuleKind.Poison)))
             throw new InvalidOperationException("Poison changed its frozen public physical departure proof.");
         if (frame.WenhePoisonLoss is not { } receipt)
             return;
         if (!Enum.IsDefined(receipt.Stage) || receipt.Cursor < 0 || receipt.Cursor > departures.Count || (receipt.Stage == WenhePoisonLossStage.Completed) != (receipt.Cursor == departures.Count) || (receipt.Stage == WenhePoisonLossStage.Dying) != (receipt.DyingFrameId is not null))
             throw new InvalidOperationException("Poison changed its serial departure cursor or native child.");
-        var applied = _coreProgramEventHistoryOperations.ProgramEventHistory<WenhePoisonLossAppliedEvent>().Where(e => e.WindowFrameId == frame.Id).ToArray();
-        var settled = _coreProgramEventHistoryOperations.ProgramEventHistory<WenhePoisonDepartureSettledEvent>().Where(e => e.WindowFrameId == frame.Id).ToArray();
-        var loss = _coreActivityBattleRulesOperations.WenheRules!.PoisonHpLoss;
+        var applied = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenhePoisonLossAppliedEvent>().Where(e => e.WindowFrameId == frame.Id).ToArray();
+        var settled = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenhePoisonDepartureSettledEvent>().Where(e => e.WindowFrameId == frame.Id).ToArray();
+        var loss = _coreActivityBattleRulesOperations.Value.WenheRules!.PoisonHpLoss;
         var activeIssued = receipt.Stage is WenhePoisonLossStage.HealthChildren or WenhePoisonLossStage.Dying ? 1 : 0;
         if (applied.Length != receipt.Cursor + activeIssued || settled.Length != receipt.Cursor || applied.Where((e, i) => e.BatchId != frame.Batch.Id || e.RoundNumber != departures[i].RoundNumber || e.MovementSequence != departures[i].MovementSequence || e.OwnerSeat != departures[i].OwnerSeat || e.CardId != departures[i].CardId || ((long)e.HpBefore - e.HpAfter < 0 || (long)e.HpBefore - e.HpAfter > loss)).Any() || settled.Where((e, i) => e.BatchId != frame.Batch.Id || e.MovementSequence != departures[i].MovementSequence || e.OwnerSeat != departures[i].OwnerSeat || e.CardId != departures[i].CardId).Any() || activeIssued != 0 && (applied[^1].HpBefore != receipt.HpBefore || applied[^1].HpAfter != receipt.HpAfter))
             throw new InvalidOperationException("Poison lost an exact once-issued HP loss or departure return.");

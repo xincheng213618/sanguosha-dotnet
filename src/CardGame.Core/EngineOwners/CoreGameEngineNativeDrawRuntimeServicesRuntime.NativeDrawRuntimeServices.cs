@@ -8,11 +8,11 @@ internal sealed partial class CoreGameEngineNativeDrawRuntimeServicesRuntime
     int INativeDrawProducerQueries.PhaseSkillUsage(ProgramSkillFrame frame, string usageId) => _coreProgramCategoryTargetLedgerOperations.GetProgramPhaseSkillUsage(frame, usageId);
     bool INativeDrawProducerQueries.HasAttemptCapability => _coreNativeDrawAttemptsOperations.HasNativeDrawAttemptCapability;
 
-    bool INativeDrawProducerQueries.IsLiushiClearDraw(ProgramSkillFrame frame) => _coreLiushiEffectsOperations.IsLiushiClearDraw(frame);
+    bool INativeDrawProducerQueries.IsLiushiClearDraw(ProgramSkillFrame frame) => _coreLiushiEffectsOperations.Value.IsLiushiClearDraw(frame);
     bool INativeDrawProducerQueries.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool INativeDrawProducerQueries.IsAlive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     bool INativeDrawProducerQueries.HasSkillInstance(int seat, string skillId, string skillInstanceId) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skillId, skillInstanceId);
-    bool INativeDrawProducerQueries.CanApplyPrepDiscardImmediateDraw(ProgramSkillFrame frame) => _corePrepDiscardImmediateDrawOperations.CanApplyPrepDiscardImmediateDraw(frame);
+    bool INativeDrawProducerQueries.CanApplyPrepDiscardImmediateDraw(ProgramSkillFrame frame) => _corePrepDiscardImmediateDrawOperations.Value.CanApplyPrepDiscardImmediateDraw(frame);
     Winner INativeDrawProducerQueries.Winner => _coreMatchOutcomeWinnerAccess._winner;
 
     long INativeDrawProducerQueries.PairBenefitSequence => _corePairObtainShownGiftsOperations.PairBenefitSequence;
@@ -26,7 +26,7 @@ internal sealed partial class CoreGameEngineNativeDrawRuntimeServicesRuntime
     void INativeDrawProducerOperations.DrawProgramCards(long id, int seat, int count, string? resultBind, SkillProgramCardSetVisibility visibility, CardMoveReason reason) => _coreProgramLifecycleOperations.DrawProgramCards(id, seat, count, null, resultBind, visibility, reason);
     IReadOnlyList<int> INativeDrawProducerOperations.DrawCards(int seat, int count, bool log, CardMoveReason reason) => _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[seat], count, log, reason);
     void INativeDrawProducerOperations.ReturnOperation(SkillProgramEffectOp operation, ProgramSkillFrame frame, NativeDrawOutcome outcome) => _nativeDrawReturnsOperations.ReturnOperation(operation, frame, outcome);
-    void INativeDrawProducerOperations.CaptureLiushiPayment(ProgramSkillFrame frame, int requested, long before, long after, int actual, long? attemptId, bool replaced) => _coreLiushiEffectsOperations.CaptureLiushiClearDrawPayment(frame, requested, before, after, actual, attemptId, replaced);
+    void INativeDrawProducerOperations.CaptureLiushiPayment(ProgramSkillFrame frame, int requested, long before, long after, int actual, long? attemptId, bool replaced) => _coreLiushiEffectsOperations.Value.CaptureLiushiClearDrawPayment(frame, requested, before, after, actual, attemptId, replaced);
     void INativeDrawProducerOperations.CompleteDrawCards(long id, int seat, string? resultBind, SkillProgramCardSetVisibility visibility, CardMoveReason reason, long fixedRecipientSequenceBefore, IReadOnlyList<int> drawn) => _coreProgramLifecycleOperations.CompleteProgramDrawCards(id, seat, resultBind, visibility, reason, fixedRecipientSequenceBefore, drawn);
     void INativeDrawProducerOperations.CancelBinding(ProgramSkillFrame frame, string reason) => _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, reason);
     bool INativeDrawProducerOperations.BeginRecoveryReplacement(long id) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.Program);
@@ -59,7 +59,7 @@ internal sealed partial class CoreGameEngineNativeDrawRuntimeServicesRuntime
     }
 
     bool INativeDrawAttemptQueries.IsRedirectedGain(CardMovementRecord movement, CardLocation expectedTo) => _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(movement, expectedTo);
-    NativeDrawPileSlashProof? INativeDrawAttemptQueries.DrawPileSlashReplacementProof(ProgramSkillFrame frame, NativeDrawAttemptContext context) => _characterZhangFeiOlMagicOperations.NativeDrawPileSlashReplacementProof(frame, context);
-    bool INativeDrawAttemptQueries.IsIssuedDrawPileSlashReplacement(NativeDrawAttemptContext context, NativeDrawReplacementResult replacement) => _characterZhangFeiOlMagicOperations.IsIssuedNativeDrawPileSlashReplacement(context, replacement);
+    NativeDrawPileSlashProof? INativeDrawAttemptQueries.DrawPileSlashReplacementProof(ProgramSkillFrame frame, NativeDrawAttemptContext context) => _characterZhangFeiOlMagicOperations.Value.NativeDrawPileSlashReplacementProof(frame, context);
+    bool INativeDrawAttemptQueries.IsIssuedDrawPileSlashReplacement(NativeDrawAttemptContext context, NativeDrawReplacementResult replacement) => _characterZhangFeiOlMagicOperations.Value.IsIssuedNativeDrawPileSlashReplacement(context, replacement);
     void INativeDrawAttemptOperations.CompleteLingkongReplacement(ProgramSkillFrame frame, NativeDrawAttemptFrame attempt, NativeDrawReplacementResult replacement) => _characterZhouFeiLeOperations.CompleteLingkongNativeDrawReplacement(frame, attempt, replacement);
 }

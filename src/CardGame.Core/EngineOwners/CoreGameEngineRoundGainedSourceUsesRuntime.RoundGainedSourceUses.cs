@@ -160,7 +160,7 @@ internal sealed partial class CoreGameEngineRoundGainedSourceUsesRuntime
     internal bool HasIssuedRoundGainedUseCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => ExactIssuedRoundGainedUseCandidate(candidate, context)is not null;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 490)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 750)]
-    internal bool CanContinueIssuedRoundGainedUse(ProgramSkillFrame frame) => frame.RoundGainedEquipmentDrawReceipt is not null && _coreRoundGainedEquipmentDrawsOperations.ValidRoundGainedEquipmentDraw(frame) || frame.TriggerId is { } trigger && frame.WindowContext is { } context && ExactIssuedRoundGainedUseCandidate(new(frame.OwnerSeat, frame.SkillId, trigger, frame.SkillInstanceId, frame.GameplayHash, 0), context)is not null;
+    internal bool CanContinueIssuedRoundGainedUse(ProgramSkillFrame frame) => frame.RoundGainedEquipmentDrawReceipt is not null && _coreRoundGainedEquipmentDrawsOperations.Value.ValidRoundGainedEquipmentDraw(frame) || frame.TriggerId is { } trigger && frame.WindowContext is { } context && ExactIssuedRoundGainedUseCandidate(new(frame.OwnerSeat, frame.SkillId, trigger, frame.SkillInstanceId, frame.GameplayHash, 0), context)is not null;
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 90)]
     internal bool DistancePhysicalSlash90HasIssuedRoundGainedBasicBonus(ProgramSlashDistanceQuery q) => q.ExistingUseFrameId is { } roundUseId && HasIssuedRoundGainedBasicBonus(roundUseId, q.Actor.Seat);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 110)]

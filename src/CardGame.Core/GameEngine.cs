@@ -101,7 +101,7 @@ public sealed partial class GameEngine
         _modeRuntime = CreateMatchModeRuntime();
         _modeRules = (_modeRuntime.Find<IMatchModeRuleProvider>() ?? throw new InvalidOperationException("The mode requires its installed rule profile.")).Rules;
         _modeRuntime.EnsureRequiredFeatures(_modeRules.RequiredFeatureContracts);
-        this.ProgramRuntimeHooksEntries.ValidateModeRuntimeHookPriorities();
+        this.ProgramRuntimeHooksEntries.Value.ValidateModeRuntimeHookPriorities();
         _programCapabilities = MatchRuntime.Capabilities;
         _programRuleObservers = new ProgramRuleObservers(EngineOwners.CoreGameEngineRuleProgressionDefinitions.ProgramRuleObserverRegistrations.Value, BindRuntimeHandler, _modeDefinition.Id, _modeRuntime.RuleObservers);
         _programPipelineHooks = new ProgramPipelineHooks(EngineOwners.CoreGameEnginePipelineHooksDefinitions.ProgramPipelineHookRegistrations.Value, this);
@@ -113,7 +113,7 @@ public sealed partial class GameEngine
         _nativeReturns = new(EngineOwners.CoreProgramNativeReturnsDefinitions.NativeReturnMetadata.Value, BindRuntimeHandler);
         (_modeRuntime.Find<IMatchModeConfigurationValidator>() ?? throw new InvalidOperationException("The mode requires its installed configuration validator.")).ValidateOptions();
         _matchDefinition.InitializeGeneralPool(EngineOwners.CoreMatchParticipantSetupRuntime.CreateRuntimeGeneralPool(contentRegistry, _modeDefinition));
-        _skillBindingIndex = new MatchSkillBindingIndex(this.ActivityOrdinaryTricksEntries.ActivityRuntimeSkillDefinition, this.NativeDamageHandlesEntries.IsNationalWarMode, player => player.SkillGrants.HasEnabledSkill(contentRegistry.ProgramDependencies.HpSensitiveSkillIds), (owner, grant) => this.WushuangEntries.IsWushuangSkillGrantQualified(grant) && (grant.IsModeRule || !owner.IdentityConcealed && this.CurrentTurnSkillSuppressionsEntries.IsCurrentTurnSkillGrantQualified(owner, grant) && this.HuCheErMouEntries.MouHuCheErEquipmentGrantQualified(owner, grant) && this.GuanduGeneralsEntries.GuanduGeneralGrantQualified(owner, grant) && this.LordSkillProjectionsEntries.IsProjectedGrantQualified(owner, grant) && this.PrivateGeneralLibrariesEntries.IsGeneralLibraryGrantQualified(owner, grant) && this.HpConditionalSkillGrantsEntries.IsHpConditionalGrantQualified(owner, grant) && this.HeQiOlEntries.IsEquipmentSuitGrantQualified(owner, grant) && this.DaQiaoXiaoQiaoOlEntries.IsDaQiaoXiaoQiaoLuoyanGrantQualified(owner, grant)), this.CurrentTurnSkillSuppressionsEntries.CaptureCurrentTurnQualificationStamp, this.PrivateGeneralLibrariesEntries.HasPrivateGeneralLibraryCapability ? this.PrivateGeneralLibrariesEntries.PrivateGeneralLibrarySuppressionInputs : null, derivedProjectionStamp: player => this.HuCheErMouEntries.CaptureMouHuCheErEquipmentQualificationStamp(this.DaQiaoXiaoQiaoOlEntries.CaptureDaQiaoXiaoQiaoLuoyanQualificationStamp(player, player.IdentityConcealed ? long.MinValue : player.SkillGrants.HasProjectedGrants ? this.PrivateGeneralLibrariesEntries.CaptureCombinedProjectionDependencyStamp() : 0)), dualGenerals: _modeDefinition.DualGenerals, additionalPrintedLordQualification: this.ScenarioPrintedLordQualificationsEntries.HasShanhePrintedLordQualifications ? this.ScenarioPrintedLordQualificationsEntries.IsShanhePrintedLordGrantQualified : null);
+        _skillBindingIndex = new MatchSkillBindingIndex(this.ActivityOrdinaryTricksEntries.ActivityRuntimeSkillDefinition, this.NativeDamageHandlesEntries.Value.IsNationalWarMode, player => player.SkillGrants.HasEnabledSkill(contentRegistry.ProgramDependencies.HpSensitiveSkillIds), (owner, grant) => this.WushuangEntries.IsWushuangSkillGrantQualified(grant) && (grant.IsModeRule || !owner.IdentityConcealed && this.CurrentTurnSkillSuppressionsEntries.IsCurrentTurnSkillGrantQualified(owner, grant) && this.HuCheErMouEntries.MouHuCheErEquipmentGrantQualified(owner, grant) && this.GuanduGeneralsEntries.GuanduGeneralGrantQualified(owner, grant) && this.LordSkillProjectionsEntries.IsProjectedGrantQualified(owner, grant) && this.PrivateGeneralLibrariesEntries.IsGeneralLibraryGrantQualified(owner, grant) && this.HpConditionalSkillGrantsEntries.Value.IsHpConditionalGrantQualified(owner, grant) && this.HeQiOlEntries.IsEquipmentSuitGrantQualified(owner, grant) && this.DaQiaoXiaoQiaoOlEntries.IsDaQiaoXiaoQiaoLuoyanGrantQualified(owner, grant)), this.CurrentTurnSkillSuppressionsEntries.CaptureCurrentTurnQualificationStamp, this.PrivateGeneralLibrariesEntries.HasPrivateGeneralLibraryCapability ? this.PrivateGeneralLibrariesEntries.PrivateGeneralLibrarySuppressionInputs : null, derivedProjectionStamp: player => this.HuCheErMouEntries.CaptureMouHuCheErEquipmentQualificationStamp(this.DaQiaoXiaoQiaoOlEntries.CaptureDaQiaoXiaoQiaoLuoyanQualificationStamp(player, player.IdentityConcealed ? long.MinValue : player.SkillGrants.HasProjectedGrants ? this.PrivateGeneralLibrariesEntries.CaptureCombinedProjectionDependencyStamp() : 0)), dualGenerals: _modeDefinition.DualGenerals, additionalPrintedLordQualification: this.ScenarioPrintedLordQualificationsEntries.HasShanhePrintedLordQualifications ? this.ScenarioPrintedLordQualificationsEntries.IsShanhePrintedLordGrantQualified : null);
         var deckDefinition = EngineOwners.CoreMatchParticipantSetupRuntime.ResolveDeckDefinition(contentRegistry, options.DeckId ?? _modeDefinition.DeckId);
         _initialHandSize = deckDefinition.InitialHandSize;
         _drawPerTurn = deckDefinition.DrawPerTurn;
@@ -221,7 +221,7 @@ public sealed partial class GameEngine
     /// </summary>
     public CommandResult Submit(GameCommand? command)
     {
-        if (this.CommandSessionQueriesEntries._isExecutingPublicOperation)
+        if (this.CommandSessionQueriesEntries.Value._isExecutingPublicOperation)
         {
             return Reject(CommandErrorCode.ReentrantOperation, "GameEngine is dispatching a committed operation; submit again after the callback returns.");
         }
@@ -280,7 +280,7 @@ public sealed partial class GameEngine
                 AdvanceCommand advance => this.CommandInputAdaptersEntries.SubmitAdvance(advance, singleStep: false),
                 AdvanceOneStepCommand step => this.CommandInputAdaptersEntries.SubmitAdvance(step, singleStep: true),
                 SelectGeneralCommand selectGeneral => this.CommandInputAdaptersEntries.SubmitSelectGeneral(selectGeneral),
-                RequestGeneralRosterCommand roster => this.OpeningCustomizationEntries.SubmitGeneralRoster(roster),
+                RequestGeneralRosterCommand roster => this.OpeningCustomizationEntries.Value.SubmitGeneralRoster(roster),
                 PlayCardCommand play => this.CommandInputAdaptersEntries.SubmitPlayCard(play),
                 RecastCardCommand recast => this.CardActionsEntries.SubmitRecast(recast),
                 UseProgramSkillCommand program => this.SkillProgramsEntries.SubmitUseProgramSkill(program),
@@ -322,7 +322,7 @@ public sealed partial class GameEngine
         return new CommandResult(true, null, _revision, result);
     }
 
-    private CommandResult Reject(CommandErrorCode code, string message) => new(false, new CommandError(code, message), _revision, _commandSession.ResultBeingDelivered ?? this.CommandResultProjectionEntries.BuildResult());
+    private CommandResult Reject(CommandErrorCode code, string message) => new(false, new CommandError(code, message), _revision, _commandSession.ResultBeingDelivered ?? this.CommandResultProjectionEntries.Value.BuildResult());
     public IReadOnlyList<LegalAction> GetLegalActions() => GetRuntimeModule<EngineOwners.CoreNativeLegalActionsRuntime>().GetLegalActions();
     public IReadOnlyList<LegalAction> GetHumanLegalActions() => GetRuntimeModule<EngineOwners.CoreNativeLegalActionsRuntime>().GetHumanLegalActions();
     /// <summary>
@@ -342,8 +342,8 @@ public sealed partial class GameEngine
         foreach (var player in _players)
         {
             player.RoleRevealed = true;
-            player.TeamRevealed = this.NativeDamageHandlesEntries.IsTeamMode;
-            if (this.NativeDamageHandlesEntries.IsNationalWarMode)
+            player.TeamRevealed = this.NativeDamageHandlesEntries.Value.IsTeamMode;
+            if (this.NativeDamageHandlesEntries.Value.IsNationalWarMode)
             {
                 this.NationalGeneralRevealEntries.RevealNationalInformation(player);
             }
@@ -354,8 +354,8 @@ public sealed partial class GameEngine
         this.PendingDecisionPolicyPipelineEntries._pendingDecision = null;
         _pendingCardsMovedBatches.Clear();
         _pendingHpChanges.Clear();
-        this.MatchLogEntries.AddLog("GameEnded", (_modeRuntime.Find<IMatchModePresentation>() ?? throw new InvalidOperationException("The mode requires its installed presentation feature.")).WinnerLog(this.ModePresentationEntries.CaptureModeWinnerPresentationContext()));
-        AdvanceEventRulesAndQueueFact(new GameEndedEvent(_winner, this.NativeDamageHandlesEntries.IsTeamMode ? _winnerTeamId : null, this.NativeDamageHandlesEntries.IsNationalWarMode ? _winnerFactionId : null) { WinnerSeat = _winnerSeat });
+        this.MatchLogEntries.AddLog("GameEnded", (_modeRuntime.Find<IMatchModePresentation>() ?? throw new InvalidOperationException("The mode requires its installed presentation feature.")).WinnerLog(this.ModePresentationEntries.Value.CaptureModeWinnerPresentationContext()));
+        AdvanceEventRulesAndQueueFact(new GameEndedEvent(_winner, this.NativeDamageHandlesEntries.Value.IsTeamMode ? _winnerTeamId : null, this.NativeDamageHandlesEntries.Value.IsNationalWarMode ? _winnerFactionId : null) { WinnerSeat = _winnerSeat });
     }
 
     private void PublishState()

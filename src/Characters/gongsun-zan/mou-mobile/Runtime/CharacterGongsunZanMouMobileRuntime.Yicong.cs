@@ -33,7 +33,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
     }
 
     internal IEnumerable<PublicPersistentPileSource> MouGszHuPiles(int owner) => _corePublicPileSourcesOperations.PublicPileSources(owner).Where(IsIssuedMouGszHuPile);
-    internal bool IsIssuedMouGszHuPile(PublicPersistentPileSource p) => p.SkillId == MouGongsunZanMobileComposition.Yicong && p.Capacity == 4 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanMobileStoredEvent>().Any(e => e.To == p.Location && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanMobileStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == p.OwnerSeat && s.Source.SkillId == p.SkillId && s.Source.SkillInstanceId == p.SkillInstanceId));
+    internal bool IsIssuedMouGszHuPile(PublicPersistentPileSource p) => p.SkillId == MouGongsunZanMobileComposition.Yicong && p.Capacity == 4 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanMobileStoredEvent>().Any(e => e.To == p.Location && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanMobileStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == p.OwnerSeat && s.Source.SkillId == p.SkillId && s.Source.SkillInstanceId == p.SkillInstanceId));
     internal bool IsLiveMouGszHuPile(PublicPersistentPileSource p) => IsIssuedMouGszHuPile(p) && _coreMatchParticipantsPlayersAccess._players[p.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[p.OwnerSeat], p.SkillId, p.SkillInstanceId);
     internal IReadOnlyList<Card> MouGszHuCards(CharacterState owner) => HasMouGszMobile ? MouGszHuPiles(owner.Seat).Where(IsLiveMouGszHuPile).SelectMany(_corePublicPileSourcesOperations.PublicPileCards).ToArray() : [];
     internal bool IsMouGszHuCard(CharacterState owner, int id) => id > 0 && MouGszHuCards(owner).Any(c => c.Id == id);
@@ -58,7 +58,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
         {
             if (c.Window != SkillProgramTriggerWindow.GameStarting || f.SkillId != MouGongsunZanMobileComposition.Yicong)
                 throw new InvalidOperationException("Yicong initial charge needs real setup.");
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanMobileInitializedEvent>().Any(e => e.OwnerSeat == f.OwnerSeat))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanMobileInitializedEvent>().Any(e => e.OwnerSeat == f.OwnerSeat))
             {
                 ChangeMouGszMobileCharge(f.Id, f.OwnerSeat, 2);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGongsunZanMobileInitializedEvent(f.Id, f.OwnerSeat, MouGszMobileSource(f), 2));

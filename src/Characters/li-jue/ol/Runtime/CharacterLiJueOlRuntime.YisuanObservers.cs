@@ -29,7 +29,7 @@ internal sealed partial class CharacterLiJueOlRuntime
             var native = _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault();
             if (native is null || native.ParentFrameId != responded.ResolutionId || native.ChainDepth != responded.ChainDepth)
                 return;
-            var recentAction = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Nullification && a.ActorSeat == responded.ResponderSeat && a.PhysicalCards.Any(c => c.CardId == responded.NullificationCardId) && a.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(native));
+            var recentAction = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Nullification && a.ActorSeat == responded.ResponderSeat && a.PhysicalCards.Any(c => c.CardId == responded.NullificationCardId) && a.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(native));
             if (recentAction is not null)
                 CaptureLiJueNullificationInvoice(native, recentAction, false, responded);
         }
@@ -45,7 +45,7 @@ internal sealed partial class CharacterLiJueOlRuntime
 
     internal void CaptureLiJueNullificationInvoice(NullificationWindowFrame window, CardActionContext action, bool incomingAccepted, NullificationRespondedEvent? incomingResponse)
     {
-        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1 || action.Type != CardActionType.Response || action.EffectiveKind != CardKind.Nullification || action.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || action.ProviderSeat != action.ActorSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || action.PhysicalCards.Count == 0 || !_coreDelayedNullificationOperations.HasNullificationEffectOwner(window) || window.ChainDepth < 1 || action.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(window) || action.OpponentSeat != window.SourceSeat)
+        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1 || action.Type != CardActionType.Response || action.EffectiveKind != CardKind.Nullification || action.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || action.ProviderSeat != action.ActorSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || action.PhysicalCards.Count == 0 || !_coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(window) || window.ChainDepth < 1 || action.ParentActionId != _coreDelayedNullificationOperations.Value.NullificationParentActionId(window) || action.OpponentSeat != window.SourceSeat)
             return;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         if (!incomingAccepted && !history.OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == action.ActionId && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, action)))

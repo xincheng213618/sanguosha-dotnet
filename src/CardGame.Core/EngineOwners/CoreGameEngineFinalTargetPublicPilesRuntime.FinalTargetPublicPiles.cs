@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEngineFinalTargetPublicPilesRuntime
     internal SkillProgramStepOutcome ExecuteFinalTargetPublicPile(SkillProgramEffect e, ProgramSkillFrame frame)
     {
         if (e.Op == SkillProgramEffectOp.ExchangePublicPileHand)
-            return _corePublicPersistentPilesOperations.ExecutePublicPile(e, frame);
+            return _corePublicPersistentPilesOperations.Value.ExecutePublicPile(e, frame);
         if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
         if (e.Op == SkillProgramEffectOp.ObtainPublicPileCard && !_corePublicPileSourcesOperations.ReferencedPublicPileSources(frame.OwnerSeat, e.SkillIds.Single(), frame.SkillInstanceId).Any(source => _corePublicPileSourcesOperations.PublicPileCards(source).Count > 0))

@@ -209,7 +209,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         if (f.Qushi is { Paid: true })
             return ValidQushi(f);
-        if (f.TriggerId != "issued-holder-ending" || f.Qushi is not null || f.WindowContext is not { } context || f.InstructionIndex is not (0 or 1) || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.FrameId == f.Id && e.SkillInstanceId == f.SkillInstanceId && e.BindingId == f.TriggerId))
+        if (f.TriggerId != "issued-holder-ending" || f.Qushi is not null || f.WindowContext is not { } context || f.InstructionIndex is not (0 or 1) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.FrameId == f.Id && e.SkillInstanceId == f.SkillInstanceId && e.BindingId == f.TriggerId))
             return false;
         return IsIssuedQushiEndingCandidate(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context);
     }

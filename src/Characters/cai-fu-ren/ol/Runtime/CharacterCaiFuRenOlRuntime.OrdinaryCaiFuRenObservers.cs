@@ -7,7 +7,7 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
     internal bool CanContinueIssuedOrdinaryCaiFuRen(ProgramSkillFrame f)
     {
         if (IsIssuedOrdinaryCaiFuRenXianzhou(f))
-            return _coreEquipmentDonationObserversOperations.IsValidAllEquipmentDonation(f);
+            return _coreEquipmentDonationObserversOperations.Value.IsValidAllEquipmentDonation(f);
         if (f.OrdinaryQieting is not { Paid: true })
             return false;
         return true;
@@ -36,7 +36,7 @@ internal sealed partial class CharacterCaiFuRenOlRuntime
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
-            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
+            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
         if (child is RecoveryReplacementFrame recovery)
             return IsOrdinaryCaiFuRenRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame mobileHp && CharacterCaiFuRenBoundaryMobileRuntime.IsBoundaryMobileQieting(f))

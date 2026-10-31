@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class OlShenCaoPiFacts(EngineStates.CoreMatchParticipantsState matchParticipantsState,EngineStates.CoreCardMovementJournalState cardMovementJournalState,EngineStates.CoreMatchOutcomeState matchOutcomeState,Func<ContentRegistry> getContentRegistry,Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime,Func<RuntimeEntries.CoreGameEnginePublicPileSourcesEntries> getCoreGameEnginePublicPileSourcesRuntime,Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime,Func<RuntimeEntries.CoreGameEnginePublicPileCashOutEntries> getCoreGameEnginePublicPileCashOutRuntime,Func<RuntimeEntries.CoreGameEngineGameActivationAwakeningEntries> getCoreGameEngineGameActivationAwakeningRuntime) : IOlShenCaoPiFacts
+internal sealed class OlShenCaoPiFacts(EngineStates.CoreMatchParticipantsState matchParticipantsState,EngineStates.CoreCardMovementJournalState cardMovementJournalState,EngineStates.CoreMatchOutcomeState matchOutcomeState,Func<ContentRegistry> getContentRegistry,Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime,Func<RuntimeEntries.CoreGameEnginePublicPileSourcesEntries> getCoreGameEnginePublicPileSourcesRuntime,Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime,Func<RuntimeEntries.CoreGameEnginePublicPileCashOutEntries> getCoreGameEnginePublicPileCashOutRuntime,Func<RuntimeEntries.CoreGameEngineGameActivationAwakeningEntries> getCoreGameEngineGameActivationAwakeningRuntime) : IOlShenCaoPiFacts
 {
     public OlCaoPiPlayer Player(int seat) => new(seat, matchParticipantsState.ReferenceToPlayers[seat].IsAlive, matchParticipantsState.ReferenceToPlayers[seat].IsHuman, matchParticipantsState.ReferenceToPlayers[seat].MaxHp);
     public long MovementSequence => cardMovementJournalState.ReferenceToMovementSequence;
@@ -8,7 +8,7 @@ internal sealed class OlShenCaoPiFacts(EngineStates.CoreMatchParticipantsState m
 
     public ContentSkillDefinition Skill(string skillId) => getContentRegistry().GetSkill(skillId);
     public IEnumerable<T> History<T>()
-        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>();
+        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>();
     public IReadOnlyList<CardMovementRecord> Movements => cardMovementJournalState.ReferenceToCardMovements.AsReadOnly();
 
     public IReadOnlyList<SkillGrant> Grants(int seat) => matchParticipantsState.ReferenceToPlayers[seat].SkillGrants.Grants;

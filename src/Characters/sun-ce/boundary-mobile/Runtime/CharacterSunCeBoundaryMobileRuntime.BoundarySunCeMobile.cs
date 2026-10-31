@@ -39,7 +39,7 @@ internal sealed partial class CharacterSunCeBoundaryMobileRuntime
         if (!BoundarySunCeLordQualified(lord, p.Id) || provider.Seat == lord.Seat || _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(provider) != "wu" || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(provider.Seat, lord.Seat) || !_corePhysicalOwnedCardQueriesOperations.GetHand(provider).Any(c => c.Id == card) || _coreGameEngineSkillProgramsProgramContributionUsesAccess._programContributionUses.GetValueOrDefault(key) != 0)
             throw new InvalidOperationException("Mobile Zhiba requires another Wu player's unused native Play-phase challenge and actual hand card.");
         var awakening = plan.Instructions[0].SkillIds.SingleOrDefault() ?? BoundarySunCeMobileHunzi;
-        var awake = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingResolvedEvent>().Any(e => e.OwnerSeat == lord.Seat && e.SkillId == awakening && e.Activated && e.Completed);
+        var awake = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingResolvedEvent>().Any(e => e.OwnerSeat == lord.Seat && e.SkillId == awakening && e.Activated && e.Completed);
         _coreGameEngineSkillProgramsProgramContributionUsesAccess._programContributionUses[key] = 1;
         var f = new ProgramSkillFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, lord.Seat, p.Id, plan.BindingId, p.GameplayHash, 0, [], [provider.Seat])
         {
@@ -137,7 +137,7 @@ internal sealed partial class CharacterSunCeBoundaryMobileRuntime
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 66300)]
-    internal bool KeepBoundarySunCeMobileContest(ProgramSkillFrame f) => f.BoundarySunCeChallenge is { Stage: "contest" } && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundarySunCeChallengeStartedEvent>().Count(e => e.FrameId == f.Id && e.Source.SkillId == f.SkillId && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId && e.GameplayHash == f.GameplayHash) == 1;
+    internal bool KeepBoundarySunCeMobileContest(ProgramSkillFrame f) => f.BoundarySunCeChallenge is { Stage: "contest" } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundarySunCeChallengeStartedEvent>().Count(e => e.FrameId == f.Id && e.Source.SkillId == f.SkillId && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillInstanceId == f.SkillInstanceId && e.GameplayHash == f.GameplayHash) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundarySunCeZhiba)]
     internal static PromptChoice BoundarySunCeChallengeAi(ProgramSkillFrame f) => BoundarySunCeChallengeChoices(f).First();
 }

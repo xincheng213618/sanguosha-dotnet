@@ -78,7 +78,7 @@ internal sealed partial class CoreGameEnginePairedHandRecastObserversRuntime
 
     internal ProgramSkillFrame? PairedHandRecastObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.PairedHandRecastFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 100)]
-    internal bool IsPairedHandRecastDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && PairedHandRecastObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsPairedHandRecastDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && PairedHandRecastObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 60)]
     internal bool TryAdvancePairedHandRecastSubtree()
     {

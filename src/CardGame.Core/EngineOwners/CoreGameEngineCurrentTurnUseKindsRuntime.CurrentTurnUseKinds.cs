@@ -31,7 +31,7 @@ internal sealed partial class CoreGameEngineCurrentTurnUseKindsRuntime
             if (response.Type != CardActionType.Response || response.EffectiveKind != CardKind.Nullification || response.ActorSeat != response.ProviderSeat && !_characterLuSuMobileShiOperations.IsShiLsAutonomousResponse(response) || response.ResponderSeat != response.ActorSeat || response.RequesterSeat is not null)
                 return;
             var window = _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault();
-            if (window is null || !_coreDelayedNullificationOperations.HasNullificationEffectOwner(window) || response.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(window) || response.OpponentSeat != window.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(response.ActorSeat))
+            if (window is null || !_coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(window) || response.ParentActionId != _coreDelayedNullificationOperations.Value.NullificationParentActionId(window) || response.OpponentSeat != window.SourceSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(response.ActorSeat))
                 throw new InvalidOperationException("Actual Nullification use requires its exact live counterspell window and parent use.");
             if (_coreCurrentRoundActualUsesOperations.CurrentUseKindDeduplicationHistory().OfType<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.CardActionId == response.ActionId))
                 return;

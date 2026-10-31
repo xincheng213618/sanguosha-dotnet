@@ -38,7 +38,7 @@ internal sealed partial class CharacterFanJiangZhangDaOlRuntime
         var r = f.Juesheng!;
         if (r.Targets.SingleOrDefault(t => t.TargetSeat == targetSeat)is { } frozen)
             return frozen.Amount;
-        var count = _coreLifetimeSlashUsesOperations.LifetimeSlashUseCount(targetSeat);
+        var count = _coreLifetimeSlashUsesOperations.Value.LifetimeSlashUseCount(targetSeat);
         var entry = new JueshengTargetDamage(targetSeat, count, Math.Max(1, count));
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { Juesheng = r with { Targets = r.Targets.Append(entry).ToArray() } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JueshengTargetDamageFrozenEvent(f.Id, useId, r.Targets.Count, targetSeat, entry.SlashCount, entry.Amount));
@@ -50,7 +50,7 @@ internal sealed partial class CharacterFanJiangZhangDaOlRuntime
         if (use.Action is not { } action || action.ProviderSeat != origin.ActorSeat)
             return false;
         var actor = origin.ActorSeat;
-        foreach (var e in _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == use.Id))
+        foreach (var e in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == use.Id))
         {
             if (e.PreviousActorSeat != actor || e.OwnerSeat != actor || e.ProviderSeat != origin.ActorSeat)
                 return false;
@@ -62,7 +62,7 @@ internal sealed partial class CharacterFanJiangZhangDaOlRuntime
 
     internal bool IsJueshengDuelUse(long id)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { JueshengDuel: { } origin, CardId: 0, CardKind: CardKind.Duel, PhysicalCardIds.Count: 0, Action: { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: null, EffectiveRank: null or 0, EffectiveIsRed: null } } use || origin.UseId != id || !JueshengActorMatches(use, origin) || _coreProgramEventHistoryOperations.ProgramEventHistory<JueshengDuelIssuedEvent>().Count(e => e.Origin == origin && e.InstructionIndex == 1) != 1)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { JueshengDuel: { } origin, CardId: 0, CardKind: CardKind.Duel, PhysicalCardIds.Count: 0, Action: { Type: CardActionType.Use, EffectiveKind: CardKind.Duel, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: null, EffectiveRank: null or 0, EffectiveIsRed: null } } use || origin.UseId != id || !JueshengActorMatches(use, origin) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JueshengDuelIssuedEvent>().Count(e => e.Origin == origin && e.InstructionIndex == 1) != 1)
             return false;
         var at = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == id);
         return at > 0 && _resolutionStackOperations._resolutionStack[at - 1] is ProgramSkillFrame { Juesheng: { Stage: JueshengStage.NativeUse, NativeCompleted: false } r } f && f.Id == origin.ProgramFrameId && r.Origin == origin && f.SkillId == origin.Source.SkillId && f.SkillInstanceId == origin.Source.SkillInstanceId && f.GameplayHash == origin.GameplayHash && r.InstructionIndex == f.InstructionIndex;
@@ -83,7 +83,7 @@ internal sealed partial class CharacterFanJiangZhangDaOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(origin.ProgramFrameId);
         var r = f.Juesheng;
-        if (r is not { Stage: JueshengStage.NativeUse, NativeCompleted: false } || r.Origin != origin || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardKind == CardKind.Duel && e.CardId == 0) != 1)
+        if (r is not { Stage: JueshengStage.NativeUse, NativeCompleted: false } || r.Origin != origin || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardKind == CardKind.Duel && e.CardId == 0) != 1)
             throw new InvalidOperationException("Juesheng must return once after the entire native Duel, every target and extra effect round.");
         var targets = use.TargetSeats.Distinct().ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { Juesheng = r with { NativeCompleted = true, FinalTargets = targets } });
@@ -109,7 +109,7 @@ internal sealed partial class CharacterFanJiangZhangDaOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(origin.ProgramFrameId);
         var r = f.Juesheng!;
-        if (!r.NativeCompleted || r.Origin != origin || _coreCardUseLifecycleOperations.LifecycleCardUse(origin.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<JueshengDuelReturnedEvent>().Any(e => e.UseId == origin.UseId))
+        if (!r.NativeCompleted || r.Origin != origin || _coreCardUseLifecycleOperations.LifecycleCardUse(origin.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JueshengDuelReturnedEvent>().Any(e => e.UseId == origin.UseId))
             throw new InvalidOperationException("Juesheng cannot issue the then-clause before or twice after its whole native Use.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { Juesheng = r with { Stage = JueshengStage.GrantChildren } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JueshengDuelReturnedEvent(f.Id, origin.UseId, r.FinalTargets.Count));

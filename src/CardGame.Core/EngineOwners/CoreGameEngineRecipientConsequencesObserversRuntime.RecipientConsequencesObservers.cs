@@ -76,7 +76,7 @@ internal sealed partial class CoreGameEngineRecipientConsequencesObserversRuntim
     }
 
     internal ProgramSkillFrame? RecipientConsequencesObserverRoot() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => (f.BlackGiftContest is not null || f.PrintedLordBenefit is not null) && RecipientConsequencesPrefix(f, _resolutionStackOperations._resolutionStack.Count - 1));
-    internal bool IsRecipientConsequencesProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && RecipientConsequencesObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
+    internal bool IsRecipientConsequencesProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && RecipientConsequencesObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 540)]
     internal bool TryAdvanceRecipientConsequencesSubtree()

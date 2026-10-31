@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class BoundaryGuoHuaiCapability(Func<RuntimeEntries.CharacterGuoHuaiBoundaryMobileEntries> getCharacterGuoHuaiBoundaryMobileRuntime) : IBoundaryGuoHuaiHost
+internal sealed class BoundaryGuoHuaiCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGuoHuaiBoundaryMobileRuntime>> getCharacterGuoHuaiBoundaryMobileRuntime) : IBoundaryGuoHuaiHost
 {
-    public void Prepare(ProgramSkillFrame frame) => getCharacterGuoHuaiBoundaryMobileRuntime().PrepareBoundaryGuoHuaiJingce(frame);
+    public void Prepare(ProgramSkillFrame frame) => getCharacterGuoHuaiBoundaryMobileRuntime().Value.PrepareBoundaryGuoHuaiJingce(frame);
 }

@@ -529,7 +529,7 @@ internal sealed partial class CoreGameEngineFriendTrioRuntime
             return ReturnFriendTrioMovement(f);
         if (r.Stage == FriendTrioStage.HpLoss)
         {
-            if (_coreDyingCursorRuntimeOperations.ActiveDying is not null)
+            if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not null)
                 return true;
             if (_coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.Program))
                 return true;

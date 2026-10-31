@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class AnniversaryXuJingHost(Func<RuntimeEntries.CharacterXuJingAnniversaryEntries> getCharacterXuJingAnniversaryRuntime) : IAnniversaryXuJingHost
+internal sealed class AnniversaryXuJingHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXuJingAnniversaryRuntime>> getCharacterXuJingAnniversaryRuntime) : IAnniversaryXuJingHost
 {
-    public SkillProgramStepOutcome Begin(ProgramSkillFrame frame, SkillProgramEffectOp operation) => getCharacterXuJingAnniversaryRuntime().BeginAnniversaryXuJing(frame, operation);
+    public SkillProgramStepOutcome Begin(ProgramSkillFrame frame, SkillProgramEffectOp operation) => getCharacterXuJingAnniversaryRuntime().Value.BeginAnniversaryXuJing(frame, operation);
 }

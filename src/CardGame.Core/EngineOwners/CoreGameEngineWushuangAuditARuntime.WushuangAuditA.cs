@@ -22,7 +22,7 @@ internal sealed partial class CoreGameEngineWushuangAuditARuntime
             throw new InvalidOperationException("The official Tiaoxin expansion lost its exact completed requested Slash.");
         if (answer.OptionId == RequestSlashByTargetProgramOperationDescriptor.UsedSlashOption && frame.RequestedSlashDamagedOwner == true)
             return;
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangTiaoxinPhaseExpandedEvent>().Any(e => e.FrameId == frame.Id))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangTiaoxinPhaseExpandedEvent>().Any(e => e.FrameId == frame.Id))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangTiaoxinPhaseExpandedEvent(frame.Id, frame.OwnerSeat, frame.SkillInstanceId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber));
     }
 }

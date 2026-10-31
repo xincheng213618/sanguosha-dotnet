@@ -38,7 +38,7 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
             if (response.EffectiveKind == CardKind.Nullification)
             {
                 var window = _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault();
-                if (window is null || !_coreDelayedNullificationOperations.HasNullificationEffectOwner(window) || response.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(window) || response.OpponentSeat != window.SourceSeat)
+                if (window is null || !_coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(window) || response.ParentActionId != _coreDelayedNullificationOperations.Value.NullificationParentActionId(window) || response.OpponentSeat != window.SourceSeat)
                     throw new InvalidOperationException("Liyong counterspell suit requires its exact native use node.");
             }
             else if (response.EffectiveKind == CardKind.Dodge)

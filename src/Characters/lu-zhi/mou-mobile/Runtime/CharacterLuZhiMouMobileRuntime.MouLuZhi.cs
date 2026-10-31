@@ -14,8 +14,8 @@ internal sealed partial class CharacterLuZhiMouMobileRuntime
     {
         if (!HasMouLuZhiCapability || !_cardZonesOperations._cardZones.HasPrivatePersistentCards(owner))
             return[];
-        var removed = _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiRenRemovedEvent>().Select(e => e.Ren).ToHashSet();
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiRenStoredEvent>().Select(e => e.Ren).Where(r => r.Source.OwnerSeat == owner && !removed.Contains(r) && _cardZonesOperations._cardZones.GetLocation(r.CardId) == r.Location).ToArray();
+        var removed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuZhiRenRemovedEvent>().Select(e => e.Ren).ToHashSet();
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuZhiRenStoredEvent>().Select(e => e.Ren).Where(r => r.Source.OwnerSeat == owner && !removed.Contains(r) && _cardZonesOperations._cardZones.GetLocation(r.CardId) == r.Location).ToArray();
     }
 
     internal MouLuZhiRen? MatchingMouLuZhiRen(int owner, string instance)

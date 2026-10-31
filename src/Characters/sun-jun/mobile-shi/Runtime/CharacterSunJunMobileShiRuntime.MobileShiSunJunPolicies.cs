@@ -4,9 +4,9 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunJunMobileShiRuntime
 {
     internal static bool ShiSjRealSuit(Suit? suit) => suit is Suit.Spade or Suit.Heart or Suit.Club or Suit.Diamond;
-    internal bool ShiSjSuitSeen(int actor, Suit suit) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiSunJunHandUseEvent>().Any(e => e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.Actor == actor && e.Suit == suit);
+    internal bool ShiSjSuitSeen(int actor, Suit suit) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiSunJunHandUseEvent>().Any(e => e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.Actor == actor && e.Suit == suit);
     internal bool ShiSjHandSource(int actor, CardLocation from) => from.Zone == CardZoneKind.Hand && from.OwnerSeat is { } owner && (owner == actor || _characterLuSuMobileShiOperations.HasShiLsHandView(actor, owner));
-    internal bool ShiSjOwnTurn(int actor) => _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat == actor && _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat == actor && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == actor);
+    internal bool ShiSjOwnTurn(int actor) => _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat == actor && _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat == actor && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == actor);
     internal bool HasShiSunJunFirstSuitAllowance(CharacterState actor, Card? material = null, CardConversionSource? conversion = null)
     {
         if (!actor.IsAlive || !ShiSjOwnTurn(actor.Seat) || !_coreNationalSkillsOperations.HasRuntimeSkill(actor, ShiSjXianshuai))
@@ -40,14 +40,14 @@ internal sealed partial class CharacterSunJunMobileShiRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 49200)]
     internal void CaptureShiSjActualHandUse(CardUseDeclaredEvent fact)
     {
-        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMobileShiXiongtu) || _coreCardUseLifecycleOperations.LifecycleCardUse(fact.ResolutionId)is not { Action: { Type: CardActionType.Use, EffectiveSuit: { } suit } a } || !ShiSjRealSuit(suit) || !ShiSjOwnTurn(a.ActorSeat) || a.PhysicalCards.Count == 0 || a.PhysicalCards.Any(c => !ShiSjHandSource(a.ActorSeat, c.From)) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiSunJunHandUseEvent>().Any(e => e.UseId == fact.ResolutionId))
+        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveMobileShiXiongtu) || _coreCardUseLifecycleOperations.LifecycleCardUse(fact.ResolutionId)is not { Action: { Type: CardActionType.Use, EffectiveSuit: { } suit } a } || !ShiSjRealSuit(suit) || !ShiSjOwnTurn(a.ActorSeat) || a.PhysicalCards.Count == 0 || a.PhysicalCards.Any(c => !ShiSjHandSource(a.ActorSeat, c.From)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiSunJunHandUseEvent>().Any(e => e.UseId == fact.ResolutionId))
             return;
         RecordShiSjHandAction(fact.ResolutionId, a, suit);
     }
 
     internal void RecordShiSjHandAction(long useId, CardActionContext a, Suit suit)
     {
-        if (!ShiSjOwnTurn(a.ActorSeat) || !ShiSjRealSuit(suit) || a.PhysicalCards.Count == 0 || a.PhysicalCards.Any(c => !ShiSjHandSource(a.ActorSeat, c.From)) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiSunJunHandUseEvent>().Any(e => e.ActionId == a.ActionId))
+        if (!ShiSjOwnTurn(a.ActorSeat) || !ShiSjRealSuit(suit) || a.PhysicalCards.Count == 0 || a.PhysicalCards.Any(c => !ShiSjHandSource(a.ActorSeat, c.From)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiSunJunHandUseEvent>().Any(e => e.ActionId == a.ActionId))
             return;
         var first = !ShiSjSuitSeen(a.ActorSeat, suit);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiSunJunHandUseEvent(useId, a.ActionId, a.ActorSeat, a.ProviderSeat, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, suit, first, first && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat], ShiSjXianshuai)));
@@ -75,5 +75,5 @@ internal sealed partial class CharacterSunJunMobileShiRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.AfterSlashDebitIdentity, 49200)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 49200)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeAlcoholDebit, 49200)]
-    internal bool ShiSjIssuedFirstSuitUse(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { Type: CardActionType.Use } a } && a.ActorSeat == actor && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiSunJunHandUseEvent>().Any(e => e.UseId == id && e.ActionId == a.ActionId && e.Actor == actor && e.Provider == a.ProviderSeat && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.Suit == a.EffectiveSuit && e.First && e.Exempt) && a.PhysicalCards.Count > 0 && a.PhysicalCards.All(c => c.From.Zone == CardZoneKind.Hand);
+    internal bool ShiSjIssuedFirstSuitUse(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { Type: CardActionType.Use } a } && a.ActorSeat == actor && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiSunJunHandUseEvent>().Any(e => e.UseId == id && e.ActionId == a.ActionId && e.Actor == actor && e.Provider == a.ProviderSeat && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.Suit == a.EffectiveSuit && e.First && e.Exempt) && a.PhysicalCards.Count > 0 && a.PhysicalCards.All(c => c.From.Zone == CardZoneKind.Hand);
 }

@@ -77,7 +77,7 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
         var origin = use.AnniversaryHaoMengUse!;
         var damaged = f.WindowContext!.Facts!.CardUseCausedDamage == true;
         var maximum = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHaoMengConsequenceEvent>().Any(e => e.UseId == use.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHaoMengConsequenceEvent>().Any(e => e.UseId == use.Id))
             throw new InvalidOperationException("Xiongmang cannot settle the same whole Slash twice.");
         if (damaged)
         {
@@ -216,5 +216,5 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 49700)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 49700)]
     internal bool KeepHaoMengIssued(ProgramSkillFrame f) => f.AnniversaryHaoMeng is { Stage: not (AnniversaryHaoMengStage.Cards or AnniversaryHaoMengStage.Targets) } && ValidHaoMeng(f) || f.TriggerId == AnniversaryHaoMengComposition.Consequence && f.WindowContext is { } c && HaoMengConsequenceUse(c)is not null;
-    internal IEnumerable<RuleQueryContribution> AnniversaryHaoMengSlashContributions(CharacterState player, SkillRuleQuery query) => query != SkillRuleQuery.SlashLimit || !HasAnniversaryHaoMengCapability || !player.IsAlive || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { } phase ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHaoMengPhaseQuotaEvent>().Where(e => e.Owner == player.Seat && e.Phase == phase).Select(e => (RuleQueryContribution)new FiniteRuleQueryContribution("anniversary:xiongmang:" + e.FrameId, SkillRuleOperation.Add, 1)).ToArray();
+    internal IEnumerable<RuleQueryContribution> AnniversaryHaoMengSlashContributions(CharacterState player, SkillRuleQuery query) => query != SkillRuleQuery.SlashLimit || !HasAnniversaryHaoMengCapability || !player.IsAlive || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { } phase ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHaoMengPhaseQuotaEvent>().Where(e => e.Owner == player.Seat && e.Phase == phase).Select(e => (RuleQueryContribution)new FiniteRuleQueryContribution("anniversary:xiongmang:" + e.FrameId, SkillRuleOperation.Add, 1)).ToArray();
 }

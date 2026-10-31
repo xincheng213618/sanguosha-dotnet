@@ -110,7 +110,7 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtProgramsRuntime
         var second = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[b]).Select(c => c.Id).Order().ToArray();
         var receipt = new ProgramPhaseHandExchangeReceipt(0, HalfHandDebtSource(frame), frame.GameplayHash, effect.StateId!, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, a, b, Math.Abs(first.Length - second.Length), first, second, HalfHandDebtSequence, HalfHandDebtSequence, false);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { PhaseHandExchange = receipt });
-        return _coreProgramHandExchangesOperations.ExchangeProgramSelectedTargetHands(frame);
+        return _coreProgramHandExchangesOperations.Value.ExchangeProgramSelectedTargetHands(frame);
     }
 
     internal void FinalizeDeferredHandExchange(long frameId)

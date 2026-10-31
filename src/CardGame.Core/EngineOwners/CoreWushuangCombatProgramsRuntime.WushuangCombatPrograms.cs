@@ -7,7 +7,7 @@ internal sealed partial class CoreWushuangCombatProgramsRuntime
     internal SkillProgramStepOutcome ExecuteWushuangCombat(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!_coreWushuangModeProjectionOperations.IsWushuangMode || f.SkillId != $"wushuang:tactic-{(effect.Amount)}" || f.WushuangCombat is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatIssuedEvent>().Any(e => e.ProgramFrameId == f.Id && e.InstructionIndex == f.InstructionIndex))
+        if (!_coreWushuangModeProjectionOperations.IsWushuangMode || f.SkillId != $"wushuang:tactic-{(effect.Amount)}" || f.WushuangCombat is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCombatIssuedEvent>().Any(e => e.ProgramFrameId == f.Id && e.InstructionIndex == f.InstructionIndex))
             throw new InvalidOperationException("A combat tactic requires its exact unpaid owner instruction.");
         var id = effect.Amount;
         var target = f.WindowContext?.SourceSeat ?? f.OwnerSeat;
@@ -53,7 +53,7 @@ internal sealed partial class CoreWushuangCombatProgramsRuntime
         {
             var context = f.WindowContext!;
             var parent = _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Single(w => w.Id == context.ParentFrameId);
-            GameEngine.IDamageAttempt attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(parent);
+            GameEngine.IDamageAttempt attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(parent);
             target = attack.SourceSeat;
             amount = attack.DamageAmount;
             nature = _coreNativeCardClassificationsOperations.GetDamageNature(attack);
@@ -150,7 +150,7 @@ internal sealed partial class CoreWushuangCombatProgramsRuntime
         // Draw2 can emit one physical batch per card. Its last batch carries
         // the full projection; an earlier card is linked to the real recorded
         // invocation and its still-active native producer receipt instead.
-        var invocations = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(invocation => invocation.ParentFrameId == producer.Id && invocation.OwnerSeat == recipient && invocation.TurnNumber == batch.TurnNumber && invocation.Reason == material.Reason && invocation.SequenceBefore < material.Sequence && invocation.SequenceAfter >= material.Sequence).ToArray();
+        var invocations = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDrawInvocationRecordedEvent>().Where(invocation => invocation.ParentFrameId == producer.Id && invocation.OwnerSeat == recipient && invocation.TurnNumber == batch.TurnNumber && invocation.Reason == material.Reason && invocation.SequenceBefore < material.Sequence && invocation.SequenceAfter >= material.Sequence).ToArray();
         if (invocations is not [var actualDraw] || actualDraw.InvocationId <= 0 || actualDraw.Requested < 1 || actualDraw.ActualCount < 1 || actualDraw.ActualCount > actualDraw.Requested || actualDraw.SequenceBefore < 0 || actualDraw.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || actualDraw.LastBatchId < batch.Id || batch.ParentFrameId != producer.Id || batch.OriginOwnerSeat != producer.OwnerSeat || batch.OriginSkillId != producer.SkillId || batch.OriginSkillInstanceId != producer.SkillInstanceId || material.From != CardLocation.DrawPile || material.To != CardLocation.Hand(recipient) || batch.Movements.Count == 0 || !batch.Movements.Contains(material) || batch.Movements.Any(move => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(move)))
             return false;
         var cursorMatches = producer.NativeDraw is { RecipientApplied: true } cursor && cursor.InstructionIndex == producer.InstructionIndex && cursor.RecipientIndex >= 0 && cursor.RecipientIndex < cursor.Recipients.Count && cursor.Recipients[cursor.RecipientIndex] == recipient && cursor.RequestedCount == actualDraw.Requested && cursor.Reason == actualDraw.Reason;
@@ -162,10 +162,10 @@ internal sealed partial class CoreWushuangCombatProgramsRuntime
 
     internal bool IsWushuangPaidTargetDrawInvocation(ProgramSkillFrame producer, NativeDrawInvocationRecordedEvent actualDraw, int recipient)
     {
-        if (producer.UniqueHpPeer is not { Stage: UniqueHpPeerStage.DrawChildren } paid || paid.ChooserSeat != recipient || !_coreRecipientContestReceiptsOperations.ValidUniqueHpPeer(producer))
+        if (producer.UniqueHpPeer is not { Stage: UniqueHpPeerStage.DrawChildren } paid || paid.ChooserSeat != recipient || !_coreRecipientContestReceiptsOperations.Value.ValidUniqueHpPeer(producer))
             return false;
         var invoice = recipient == producer.OwnerSeat ? paid.OwnerInvoice : paid.PeerInvoice;
-        return invoice is { DrawIssued: true, ActualDrawCount: > 0 and <= 2 } && invoice.ActorSeat == recipient && invoice.DrawBefore >= invoice.CostAfter && invoice.DrawAfter > invoice.DrawBefore && actualDraw.Requested == 2 && actualDraw.ActualCount == invoice.ActualDrawCount && actualDraw.TurnNumber == paid.TurnNumber && actualDraw.Reason.Value == CoreGameEngineUniqueHpPeerProgramsRuntime.UniqueHpPeerDrawReason(producer, recipient) && actualDraw.SequenceBefore == invoice.DrawBefore && actualDraw.SequenceAfter == invoice.DrawAfter && _coreProgramEventHistoryOperations.ProgramEventHistory<UniqueHpPeerDrawIssuedEvent>().Where(issued => issued.FrameId == producer.Id && issued.ActorSeat == recipient).ToArray()is [var issued] && issued.Before == invoice.DrawBefore && issued.After == invoice.DrawAfter && issued.ActualCount == invoice.ActualDrawCount;
+        return invoice is { DrawIssued: true, ActualDrawCount: > 0 and <= 2 } && invoice.ActorSeat == recipient && invoice.DrawBefore >= invoice.CostAfter && invoice.DrawAfter > invoice.DrawBefore && actualDraw.Requested == 2 && actualDraw.ActualCount == invoice.ActualDrawCount && actualDraw.TurnNumber == paid.TurnNumber && actualDraw.Reason.Value == CoreGameEngineUniqueHpPeerProgramsRuntime.UniqueHpPeerDrawReason(producer, recipient) && actualDraw.SequenceBefore == invoice.DrawBefore && actualDraw.SequenceAfter == invoice.DrawAfter && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<UniqueHpPeerDrawIssuedEvent>().Where(issued => issued.FrameId == producer.Id && issued.ActorSeat == recipient).ToArray()is [var issued] && issued.Before == invoice.DrawBefore && issued.After == invoice.DrawAfter && issued.ActualCount == invoice.ActualDrawCount;
     }
 
     internal bool IsWushuangNativeDrawDamageParent(ProgramSkillFrame producer)
@@ -259,7 +259,7 @@ internal sealed partial class CoreWushuangCombatProgramsRuntime
             return false;
         if (!IsWushuangLightningJudgment(f, judgment.TargetSeat, judgment.Reason, judgment.ProgramResultBind!, judgment.ProgramResultVisibility!.Value))
             throw new InvalidOperationException("Lightning tactic lost its exact judgment return.");
-        var card = _coreNativeDamageHandlesOperations.GetJudgmentCard(judgment);
+        var card = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(judgment);
         var hit = card is not null && _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentSuit(judgment, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[judgment.TargetSeat], card)) == Suit.Spade && card.Rank is >= 2 and <= 9;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WushuangCombat = r with { Stage = 0, TargetSeat = judgment.TargetSeat, Amount = hit ? 3 : 0, Nature = DamageNature.Thunder, Seats = hit ? [judgment.TargetSeat] : [] } });
         if (card is not null && _cardZonesOperations._cardZones.GetLocation(card.Id)is { Zone: CardZoneKind.Judgment or CardZoneKind.Processing } location)

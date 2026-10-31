@@ -20,7 +20,7 @@ internal sealed partial class CharacterGongsunZanMouOlRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal IEnumerable<MouGongsunZanBaojingGrantedEvent> ActiveMouGszBaojing(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanBaojingGrantedEvent>().Where(e => e.TargetSeat == target && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Any(p => p.Phase.Kind == ActualDiscardRecoveryPhaseKind.Play && p.Phase.ActorSeat == e.Source.OwnerSeat && p.Phase.Token > e.Phase.Token));
+    internal IEnumerable<MouGongsunZanBaojingGrantedEvent> ActiveMouGszBaojing(int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanBaojingGrantedEvent>().Where(e => e.TargetSeat == target && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Any(p => p.Phase.Kind == ActualDiscardRecoveryPhaseKind.Play && p.Phase.ActorSeat == e.Source.OwnerSeat && p.Phase.Token > e.Phase.Token));
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeContributions, 32700)]
     internal void AddMouGszBaojingRange(CharacterState player, List<RuleQueryContribution> contributions)
     {

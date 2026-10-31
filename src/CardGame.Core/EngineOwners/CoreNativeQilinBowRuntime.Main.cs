@@ -8,7 +8,7 @@ internal sealed partial class CoreNativeQilinBowRuntime
     {
         var source = _coreMatchParticipantsPlayersAccess._players[attack.SourceSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
-        if (!_coreNativeDamageHandlesOperations.UsesFormalQilinBow || attack.QilinBowAttempted || attack.IsChainPropagation || attack.EffectiveCardKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash) || !source.IsAlive || !target.IsAlive || !_coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.QilinBow) || GetQilinBowTargetMounts(target).Count == 0)
+        if (!_coreNativeDamageHandlesOperations.Value.UsesFormalQilinBow || attack.QilinBowAttempted || attack.IsChainPropagation || attack.EffectiveCardKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash) || !source.IsAlive || !target.IsAlive || !_coreAdvancedWeaponsOperations.HasWeaponAbility(source, CardKind.QilinBow) || GetQilinBowTargetMounts(target).Count == 0)
         {
             return false;
         }

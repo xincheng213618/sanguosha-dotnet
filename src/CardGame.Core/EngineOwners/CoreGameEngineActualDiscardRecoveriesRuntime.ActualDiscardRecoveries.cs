@@ -143,6 +143,6 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime
         return p.Choices.OrderBy(c => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     }
 
-    SkillProgramStepOutcome IActualDiscardRecoveryProgramHost.PlaceCapturedEquipmentAndDraw(ProgramSkillFrame f, int target, string bind, int draw) => _coreCapturedEquipmentDrawsOperations.BeginCapturedEquipmentAndDraw(f, target, bind, draw);
+    SkillProgramStepOutcome IActualDiscardRecoveryProgramHost.PlaceCapturedEquipmentAndDraw(ProgramSkillFrame f, int target, string bind, int draw) => _coreCapturedEquipmentDrawsOperations.Value.BeginCapturedEquipmentAndDraw(f, target, bind, draw);
     SkillProgramStepOutcome IActualDiscardRecoveryProgramHost.RestoreActualDiscardBatch(ProgramSkillFrame f, string stateId) => BeginActualDiscardRecovery(f, stateId);
 }

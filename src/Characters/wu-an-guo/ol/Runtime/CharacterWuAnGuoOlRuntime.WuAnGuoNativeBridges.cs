@@ -37,5 +37,5 @@ internal sealed partial class CharacterWuAnGuoOlRuntime
         return true;
     }
 
-    internal bool HasWuAnGuoLiyongCompletedUseParent(long useId) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { WuAnGuoLiyong: { Stage: WuAnGuoLiyongStage.DuelIssued, Duel: { } origin } } frame && origin.CardUseFrameId == useId && MatchesWuAnGuoLiyong(frame, origin) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == useId && e.CardId == 0 && e.CardKind == CardKind.Duel) == 1;
+    internal bool HasWuAnGuoLiyongCompletedUseParent(long useId) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { WuAnGuoLiyong: { Stage: WuAnGuoLiyongStage.DuelIssued, Duel: { } origin } } frame && origin.CardUseFrameId == useId && MatchesWuAnGuoLiyong(frame, origin) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == useId && e.CardId == 0 && e.CardKind == CardKind.Duel) == 1;
 }

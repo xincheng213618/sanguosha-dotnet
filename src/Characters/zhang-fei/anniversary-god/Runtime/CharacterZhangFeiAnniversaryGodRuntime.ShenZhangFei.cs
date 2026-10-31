@@ -10,9 +10,9 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
     internal int ShenZfMark(int seat, PlayerMarkerKind kind) => _coreMatchParticipantsPlayersAccess._players[seat].Markers.GetValueOrDefault(kind);
     internal string ShenZfIssuedInstance(int seat) => "shencai-issued:" + seat.ToString(CultureInfo.InvariantCulture);
     internal bool ShenZfValidSentence(ShenZhangFeiSentenceEvent e) => ShenZhangFeiComposition.IsShencai(e.Source.SkillId) && _contentRegistryOperations._contentRegistry.Skills.TryGetValue(e.Source.SkillId, out var skill) && e.GameplayHash == skill.Program?.GameplayHash;
-    internal string? ShenZfIssuedSkill(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) ? _coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhangFeiSentenceEvent>().LastOrDefault(e => e.TargetSeat == seat && ShenZfValidSentence(e))?.Source.SkillId : null;
+    internal string? ShenZfIssuedSkill(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenZhangFeiSentenceEvent>().LastOrDefault(e => e.TargetSeat == seat && ShenZfValidSentence(e))?.Source.SkillId : null;
     internal bool ShenZfIssued(int seat) => ShenZfIssuedSkill(seat)is not null;
-    internal int ShenZfLimit(int seat) => Math.Min(5, 1 + _coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhangFeiXunshiEvent>().Count(e => e.Source.OwnerSeat == seat));
+    internal int ShenZfLimit(int seat) => Math.Min(5, 1 + _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenZhangFeiXunshiEvent>().Count(e => e.Source.OwnerSeat == seat));
     SkillProgramStepOutcome IShenZhangFeiHost.Execute(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenZf(f, op);
     int IShenZhangFeiSelection.Limit(int owner) => ShenZfLimit(owner);
     internal SkillProgramStepOutcome BeginShenZf(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -25,7 +25,7 @@ internal sealed partial class CharacterZhangFeiAnniversaryGodRuntime
             var action = ShenZfUseAction(f.WindowContext!);
             if (action is null || !ShenZfColorless(action) || action.ActorSeat != f.OwnerSeat)
                 return SkillProgramStepOutcome.Continue;
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<ShenZhangFeiXunshiEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.ActionId == action.ActionId))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenZhangFeiXunshiEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.ActionId == action.ActionId))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenZhangFeiXunshiEvent(ShenZfSource(f), f.GameplayHash, action.ActionId, Math.Min(5, ShenZfLimit(f.OwnerSeat) + 1)));
             return SkillProgramStepOutcome.Continue;
         }

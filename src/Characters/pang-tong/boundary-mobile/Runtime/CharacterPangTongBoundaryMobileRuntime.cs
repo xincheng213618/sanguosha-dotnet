@@ -2,6 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CharacterPangTongBoundaryMobileRuntime(IKernelSkillRuntimeStateAccess _skillRuntimeStateOperations, RuntimeEntries.CoreGameEngineProgramEventHistoryEntries _coreProgramEventHistoryOperations)
+internal sealed partial class CharacterPangTongBoundaryMobileRuntime(IKernelSkillRuntimeStateAccess _skillRuntimeStateOperations, RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime> _coreProgramEventHistoryOperations)
 {
 }

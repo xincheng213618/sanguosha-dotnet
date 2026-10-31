@@ -4,29 +4,29 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXuHuangMouMobileRuntime
 {
     [ProgramPhaseUsedProjection(20)]
-    internal int MouXuHuangProjectedPhaseUses(int owner, string skill, int fallback) => skill == MouXuHuangComposition.Duanliang && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) ? _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangMouyiStartedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.Phase == phase) : fallback;
+    internal int MouXuHuangProjectedPhaseUses(int owner, string skill, int fallback) => skill == MouXuHuangComposition.Duanliang && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangMouyiStartedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.Phase == phase) : fallback;
     internal bool ValidMouXuHuangShipo(ProgramSkillFrame f)
     {
-        if (f.MouXuHuangShipo is not { } r || !MouXuHuangShipoRoot(f) || r.Source != MouXuHuangSource(f) || r.GameplayHash != f.GameplayHash || r.EndingWindowId != f.WindowContext!.ParentFrameId || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Ending || r.Phase.ActorSeat != f.OwnerSeat || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || !Enum.IsDefined(r.Stage) || r.Cursor < 0 || r.Cursor > r.Targets.Count || r.Targets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t) || t == f.OwnerSeat) || r.Targets.Distinct().Count() != r.Targets.Count || r.SelectedCardIds.Distinct().Count() != r.SelectedCardIds.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangShipoStartedEvent>().Count(e => e == new MouXuHuangShipoStartedEvent(f.Id, r.Source, r.GameplayHash, r.EndingWindowId, r.Phase, r.OwnerHp)) != 1)
+        if (f.MouXuHuangShipo is not { } r || !MouXuHuangShipoRoot(f) || r.Source != MouXuHuangSource(f) || r.GameplayHash != f.GameplayHash || r.EndingWindowId != f.WindowContext!.ParentFrameId || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Ending || r.Phase.ActorSeat != f.OwnerSeat || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || !Enum.IsDefined(r.Stage) || r.Cursor < 0 || r.Cursor > r.Targets.Count || r.Targets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t) || t == f.OwnerSeat) || r.Targets.Distinct().Count() != r.Targets.Count || r.SelectedCardIds.Distinct().Count() != r.SelectedCardIds.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangShipoStartedEvent>().Count(e => e == new MouXuHuangShipoStartedEvent(f.Id, r.Source, r.GameplayHash, r.EndingWindowId, r.Phase, r.OwnerHp)) != 1)
             return false;
         if (!r.Accepted)
             return r.Stage == MouXuHuangShipoStage.ModeChoice && r.Mode is null && r.Targets.Count == 0 && r.Gifts.Count == 0;
-        if (r.Mode is not ("mode-single" or "mode-all") || r.Targets.Count == 0 || r.Mode == "mode-single" && r.Targets.Count != 1 || !r.Targets.SequenceEqual(r.Targets.OrderBy(t => _coreTableOrderOperations.RelativeTableOrder(f.OwnerSeat, t))) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangShipoModeAcceptedEvent>().Count(e => e == new MouXuHuangShipoModeAcceptedEvent(f.Id, r.Mode, r.Targets.Count)) != 1)
+        if (r.Mode is not ("mode-single" or "mode-all") || r.Targets.Count == 0 || r.Mode == "mode-single" && r.Targets.Count != 1 || !r.Targets.SequenceEqual(r.Targets.OrderBy(t => _coreTableOrderOperations.RelativeTableOrder(f.OwnerSeat, t))) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangShipoModeAcceptedEvent>().Count(e => e == new MouXuHuangShipoModeAcceptedEvent(f.Id, r.Mode, r.Targets.Count)) != 1)
             return false;
-        var targets = _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangShipoTargetFrozenEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
+        var targets = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangShipoTargetFrozenEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
         if (targets.Length != r.Targets.Count || targets.Where((e, i) => e.Index != i || e.TargetSeat != r.Targets[i]).Any())
             return false;
-        var completed = _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangShipoRecipientCompletedEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var completed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangShipoRecipientCompletedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (completed.Length != r.Cursor || completed.Select(e => e.Cursor).Distinct().Count() != r.Cursor || completed.Any(e => e.Cursor < 0 || e.Cursor >= r.Cursor || e.TargetSeat != r.Targets[e.Cursor]))
             return false;
-        if (r.Gifts.Select(g => g.Cursor).Distinct().Count() != r.Gifts.Count || r.Gifts.Any(g => g.Cursor < 0 || g.Cursor >= r.Targets.Count || g.GiverSeat != r.Targets[g.Cursor] || g.From != CardLocation.Hand(g.GiverSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangShipoGiftPaidEvent>().Count(e => e == new MouXuHuangShipoGiftPaidEvent(f.Id, g.Cursor, g.GiverSeat, g.CardId, g.To, g.Sequence)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == g.Sequence && m.CardId == g.CardId && m.From == g.From && m.To == g.To && m.Reason.Value == MouXuHuangGiveReason) != 1))
+        if (r.Gifts.Select(g => g.Cursor).Distinct().Count() != r.Gifts.Count || r.Gifts.Any(g => g.Cursor < 0 || g.Cursor >= r.Targets.Count || g.GiverSeat != r.Targets[g.Cursor] || g.From != CardLocation.Hand(g.GiverSeat) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangShipoGiftPaidEvent>().Count(e => e == new MouXuHuangShipoGiftPaidEvent(f.Id, g.Cursor, g.GiverSeat, g.CardId, g.To, g.Sequence)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == g.Sequence && m.CardId == g.CardId && m.From == g.From && m.To == g.To && m.Reason.Value == MouXuHuangGiveReason) != 1))
             return false;
-        var damage = _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangShipoDamageIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var damage = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangShipoDamageIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (damage.Select(e => e.Cursor).Distinct().Count() != damage.Length || damage.Any(e => e.Cursor < 0 || e.Cursor >= r.Targets.Count || e.SourceSeat != f.OwnerSeat || e.TargetSeat != r.Targets[e.Cursor] || e.Amount != 1 || r.Gifts.Any(g => g.Cursor == e.Cursor)))
             return false;
         if (r.Stage == MouXuHuangShipoStage.Damage && damage.Count(e => e.Cursor == r.Cursor) != 1)
             return false;
-        var selected = _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangShipoTransferSelectedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
+        var selected = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangShipoTransferSelectedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
         return selected.Length == r.SelectedCardIds.Count && selected.Select((e, i) => e.Index == i && e.CardId == r.SelectedCardIds[i] && r.Gifts.Any(g => g.CardId == e.CardId && g.To == CardLocation.Hand(f.OwnerSeat))).All(v => v);
     }
 
@@ -44,11 +44,11 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
         if (!_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m))
             throw new InvalidOperationException("Xu Huang cannot sign a nonexistent native movement.");
         var fact = new MouXuHuangMovementSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence);
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangMovementSignedEvent>().Contains(fact))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangMovementSignedEvent>().Contains(fact))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(fact);
     }
 
-    internal bool MouXuHuangMovementSigned(ProgramSkillFrame f, CardMovementRecord m) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuHuangMovementSignedEvent>().Count(e => e == new MouXuHuangMovementSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1;
+    internal bool MouXuHuangMovementSigned(ProgramSkillFrame f, CardMovementRecord m) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuHuangMovementSignedEvent>().Count(e => e == new MouXuHuangMovementSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1;
     internal void SealMouXuHuangMovements(long id, long before)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
@@ -82,7 +82,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
             return true;
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
+        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
     internal bool MouXuHuangNativeWindowEdge(int index)

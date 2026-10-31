@@ -4,11 +4,11 @@ internal sealed class CardAttackHandle : GameEngine.IDamageAttempt
 {
     private readonly Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime;
     private readonly Func<RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime;
-    private readonly Func<RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime;
+    private readonly Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRecipientScopedDamageRuntime>> getCoreGameEngineRecipientScopedDamageRuntime;
     private CardAttackState State => getCoreGameEngineCardAttackStateRuntime().GetCardAttackState(ResolutionId);
 
     private void Update(Func<CardAttackState, CardAttackState> update) => getCoreGameEngineCardAttackStateRuntime().UpdateCardAttackState(ResolutionId, state => update(state ?? throw new InvalidOperationException("An attack handle lost its owned state.")));
-    internal CardAttackHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, Func<RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime, Func<RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime, long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = null, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = null, DamageNature? damageNatureOverride = null, IReadOnlyList<Card>? physicalCards = null, long? programJudgmentFrameId = null, long? programSkillFrameId = null, CardConversionSource? conversionSource = null, long? programSkillCardUseFrameId = null)
+    internal CardAttackHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, Func<RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRecipientScopedDamageRuntime>> getCoreGameEngineRecipientScopedDamageRuntime, long resolutionId, int sourceSeat, int targetSeat, Card? card, int damageAmount = 1, CardKind? playedCardKind = null, bool ignoresArmor = false, bool isDelayedJudgmentDamage = false, int? delayedJudgmentSeat = null, DamageNature? damageNatureOverride = null, IReadOnlyList<Card>? physicalCards = null, long? programJudgmentFrameId = null, long? programSkillFrameId = null, CardConversionSource? conversionSource = null, long? programSkillCardUseFrameId = null)
     {
         this.getCoreGameEngineCardAttackStateRuntime = getCoreGameEngineCardAttackStateRuntime;
         this.getCharacterWuJingOlRuntime = getCharacterWuJingOlRuntime;
@@ -18,7 +18,7 @@ internal sealed class CardAttackHandle : GameEngine.IDamageAttempt
         getCoreGameEngineCardAttackStateRuntime().InitializeCardAttackState(resolutionId, new CardAttackState { Active = false, SourceSeat = sourceSeat, CardUserSeat = sourceSeat, TargetSeat = targetSeat, DamageAmount = damageAmount, IgnoresArmor = ignoresArmor, EffectiveCardKind = playedCardKind ?? card?.Kind, IsDelayedJudgmentDamage = isDelayedJudgmentDamage, IsSourceLess = isDelayedJudgmentDamage && (playedCardKind ?? card?.Kind) == CardKind.Lightning, ProgramJudgmentFrameId = programJudgmentFrameId, ProgramSkillFrameId = programSkillFrameId, ProgramSkillCardUseFrameId = programSkillCardUseFrameId, DelayedJudgmentSeat = delayedJudgmentSeat, DamageNatureOverride = damageNatureOverride, ConversionSource = conversionSource, CardId = card?.Id, AppearanceKind = card?.Kind, AppearanceSuit = card?.Suit, AppearanceRank = card?.Rank, PhysicalCardIds = Array.AsReadOnly((physicalCards ?? (card is null ? [] : [card])).Select(item => item.Id).ToArray()), });
     }
 
-    internal CardAttackHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, Func<RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime, Func<RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries> getCoreGameEngineRecipientScopedDamageRuntime, long ownerId)
+    internal CardAttackHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, Func<RuntimeEntries.CharacterWuJingOlEntries> getCharacterWuJingOlRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRecipientScopedDamageRuntime>> getCoreGameEngineRecipientScopedDamageRuntime, long ownerId)
     {
         this.getCoreGameEngineCardAttackStateRuntime = getCoreGameEngineCardAttackStateRuntime;
         this.getCharacterWuJingOlRuntime = getCharacterWuJingOlRuntime;
@@ -250,7 +250,7 @@ internal sealed class CardAttackHandle : GameEngine.IDamageAttempt
                 DamageAmountFinalized = false;
             }
 
-            getCoreGameEngineRecipientScopedDamageRuntime().RestoreRecipientScopedDamageBase(this, fromSeat);
+            getCoreGameEngineRecipientScopedDamageRuntime().Value.RestoreRecipientScopedDamageBase(this, fromSeat);
             return true;
         }
 

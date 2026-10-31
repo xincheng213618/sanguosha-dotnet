@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashObserversRuntime
     {
         for (var index = 0; index < _resolutionStackOperations._resolutionStack.Count; index++)
         {
-            if (_resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.InspectedHandSlash is not { } d || d.Stage is not (InspectedHandSlashStage.HpChildren or InspectedHandSlashStage.DiscardChildren) || !_coreInspectedHandSlashReturnsOperations.ValidInspectedHandSlash(root))
+            if (_resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame root || root.InspectedHandSlash is not { } d || d.Stage is not (InspectedHandSlashStage.HpChildren or InspectedHandSlashStage.DiscardChildren) || !_coreInspectedHandSlashReturnsOperations.Value.ValidInspectedHandSlash(root))
                 continue;
             if (damageWindow is { } window && !_resolutionStackOperations._resolutionStack.Skip(index + 1).Any(f => f.Id == window && f is DamageTriggerWindowFrame or BeforeDamageProgramWindowFrame))
                 continue;
@@ -33,7 +33,7 @@ internal sealed partial class CoreGameEngineInspectedHandSlashObserversRuntime
                 var preceding = _resolutionStackOperations._resolutionStack[child - 1];
                 if (preceding is DyingFrame rescued && (_coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(child - 1, rescued) || _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(child - 1, rescued) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(child - 1, rescued) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(child - 1, rescued)))
                     break;
-                if (!_corePaidColorDamageClaimObserversOperations.PaidColorDamageClaimObserverEdge(child))
+                if (!_corePaidColorDamageClaimObserversOperations.Value.PaidColorDamageClaimObserverEdge(child))
                 {
                     valid = false;
                     break;
@@ -47,5 +47,5 @@ internal sealed partial class CoreGameEngineInspectedHandSlashObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 360)]
-    internal bool IsInspectedHandProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && InspectedHandPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsInspectedHandProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && InspectedHandPaidObserverRoot(_coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

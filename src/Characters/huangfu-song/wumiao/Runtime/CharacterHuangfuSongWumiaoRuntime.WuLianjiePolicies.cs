@@ -10,5 +10,5 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
         projection.Append(WuHfEntityMark(cardId));
     }
 
-    internal string? WuHfEntityMark(int cardId) => HasWuHuangFuSongCapability && WuHfTurnOpen(WuHfTurn()) && _coreProgramEventHistoryOperations.ProgramEventHistory<WuHuangFuSongLianjieEntityEvent>().Any(e => e.CardId == cardId && e.Turn == WuHfTurn()) ? "连捷" : null;
+    internal string? WuHfEntityMark(int cardId) => HasWuHuangFuSongCapability && WuHfTurnOpen(WuHfTurn()) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHuangFuSongLianjieEntityEvent>().Any(e => e.CardId == cardId && e.Turn == WuHfTurn()) ? "连捷" : null;
 }

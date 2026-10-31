@@ -22,7 +22,7 @@ internal sealed partial class CoreNativeDamageWindowsRuntime
 
     internal void BeginDamageTriggerWindow(GameEngine.IDamageAttempt attack, long damageFrameId, SkillProgramTriggerWindow window, IReadOnlyList<DamageTriggerCandidate> candidates)
     {
-        if (_coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not null)
+        if (_coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not null)
         {
             throw new InvalidOperationException("The engine cannot resolve two damage trigger windows at once.");
         }
@@ -39,7 +39,7 @@ internal sealed partial class CoreNativeDamageWindowsRuntime
 
     internal void RunOneDamageTriggerStep()
     {
-        var window = _coreDamageCursorRuntimeOperations.ActiveDamageTrigger ?? throw new InvalidOperationException("A damage trigger step has no pending window.");
+        var window = _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger ?? throw new InvalidOperationException("A damage trigger step has no pending window.");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
         {
             return;
@@ -74,8 +74,8 @@ internal sealed partial class CoreNativeDamageWindowsRuntime
         throw new InvalidOperationException("A damage trigger candidate has no configured program.");
     }
 
-    internal void AdvanceDamageTriggerCandidate(DamageTriggerWindowFrame window) => _coreDamageAdjacencyServicesOperations.DamageAdjacency.AdvanceDamageTriggerCandidate(window);
-    internal void CompleteDamageTriggerWindow(DamageTriggerWindowFrame window) => _coreDamageAdjacencyServicesOperations.DamageAdjacency.CompleteDamageTriggerWindow(window);
+    internal void AdvanceDamageTriggerCandidate(DamageTriggerWindowFrame window) => _coreDamageAdjacencyServicesOperations.Value.DamageAdjacency.AdvanceDamageTriggerCandidate(window);
+    internal void CompleteDamageTriggerWindow(DamageTriggerWindowFrame window) => _coreDamageAdjacencyServicesOperations.Value.DamageAdjacency.CompleteDamageTriggerWindow(window);
     internal IReadOnlyList<DamageTriggerCandidate> CollectDamageTriggerCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window)
     {
         var candidates = new List<DamageTriggerCandidate>();
@@ -96,7 +96,7 @@ internal sealed partial class CoreNativeDamageWindowsRuntime
                 };
                 if (ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.ApplyLiushiEffect) && (attack.ConversionSource is not { } liushiSource || liushiSource.OwnerSeat != candidate.OwnerSeat || liushiSource.SkillInstanceId != candidate.SkillInstanceId))
                     continue;
-                if (!ownsTiming || !_characterBeiMiHuOlOperations.CanDrawAfterKuiDamage(programOwnerSeat, trigger, attack.TargetSeat) || !_characterSimaHuiOlOperations.CanOfferSimaHuiDamage(programOwnerSeat, trigger, attack) || !_characterZhaoXiangOlOperations.CanGainMeiYingFromDamage(programOwnerSeat, trigger, attack.SourceSeat, attack.TargetSeat, attack.IsSourceLess) || !_characterXiZhiCaiOlOperations.CanOfferXianfuDamage(programOwnerSeat, trigger, attack) || !_characterHuangQuanOlOperations.CanOfferDianhuDamage(programOwnerSeat, trigger, attack) || !_coreLastDamageSourceReciprocityOperations.CanOfferLastDamageSourceReciprocity(programOwnerSeat, candidate.SkillId, trigger, attack) || !_coreOrderedPrintedSkillLossOperations.CanOfferOrderedPrintedSkillLoss(programOwnerSeat, trigger, attack) || !_coreDamageCounterpartAcquisitionOperations.CanOfferDamageCounterpartAcquisition2(programOwnerSeat, trigger, attack))
+                if (!ownsTiming || !_characterBeiMiHuOlOperations.CanDrawAfterKuiDamage(programOwnerSeat, trigger, attack.TargetSeat) || !_characterSimaHuiOlOperations.CanOfferSimaHuiDamage(programOwnerSeat, trigger, attack) || !_characterZhaoXiangOlOperations.CanGainMeiYingFromDamage(programOwnerSeat, trigger, attack.SourceSeat, attack.TargetSeat, attack.IsSourceLess) || !_characterXiZhiCaiOlOperations.CanOfferXianfuDamage(programOwnerSeat, trigger, attack) || !_characterHuangQuanOlOperations.CanOfferDianhuDamage(programOwnerSeat, trigger, attack) || !_coreLastDamageSourceReciprocityOperations.CanOfferLastDamageSourceReciprocity(programOwnerSeat, candidate.SkillId, trigger, attack) || !_coreOrderedPrintedSkillLossOperations.Value.CanOfferOrderedPrintedSkillLoss(programOwnerSeat, trigger, attack) || !_coreDamageCounterpartAcquisitionOperations.CanOfferDamageCounterpartAcquisition2(programOwnerSeat, trigger, attack))
                     continue;
                 var occurrenceIndexes = trigger.DamageOccurrence switch
                 {
@@ -111,9 +111,9 @@ internal sealed partial class CoreNativeDamageWindowsRuntime
 
         _characterZhangYanOlOperations.AppendZhangYanSujiDamageCandidates(attack, window, candidates);
         _characterGuanHaiOlOperations.AppendGuanHaiYouqueDamageCandidates(attack, window, candidates);
-        _characterLuSuMouOperations.AppendMouLuSuIssuedDamageCandidates(attack, window, candidates);
-        _characterKanZeAnniversaryOperations.AppendAnniversaryKanZeDamageCandidates(attack, window, candidates);
-        _characterMangYaChangAnniversaryOperations.AppendAnniversaryJiedaoDamageCandidates(attack, window, candidates);
+        _characterLuSuMouOperations.Value.AppendMouLuSuIssuedDamageCandidates(attack, window, candidates);
+        _characterKanZeAnniversaryOperations.Value.AppendAnniversaryKanZeDamageCandidates(attack, window, candidates);
+        _characterMangYaChangAnniversaryOperations.Value.AppendAnniversaryJiedaoDamageCandidates(attack, window, candidates);
         _characterZhangFenAnniversaryOperations.AppendDagongCheIssuedDamageCandidates(attack, window, candidates);
         _characterHuLieMouOperations.AppendMouHuLieDamageCandidates(attack, window, candidates);
         _characterTaoQianOlOperations.AppendZhaohuoDamageCandidates(attack, window, candidates);

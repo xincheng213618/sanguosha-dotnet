@@ -19,7 +19,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
             return false;
         if (!IsShenGuoJiaJudgment(judgment, frame) || _resolutionStackOperations._resolutionStack.Any(value => value.Id == judgment.Id))
             throw new InvalidOperationException("Huishi requires its completed own native judgment.");
-        var result = _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Single(fact => fact.ResolutionId == judgment.Id && fact.ParentResolutionId == frame.Id && fact.Reason == "mobile-huishi" && fact.TargetSeat == frame.OwnerSeat);
+        var result = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentResolvedEvent>().Single(fact => fact.ResolutionId == judgment.Id && fact.ParentResolutionId == frame.Id && fact.Reason == "mobile-huishi" && fact.TargetSeat == frame.OwnerSeat);
         var retained = result.CardId is { } id && _coreProgramJudgmentOutcomesOperations.IsUnclaimedJudgmentOutcomeCard(judgment, id) ? id : (int? )null;
         var handoff = retained is { } card ? _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(movement => movement.CardId == card).Sequence : (long? )null;
         var outcome = new ShenGuoJiaJudgment(judgment.Id, result.CardId, result.Suit, result.Rank, handoff);
@@ -65,7 +65,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
     {
         if (use.VirtualOrdinaryTrickOrigin is not { SkillId: ShenGuoJiaZuoxing } origin || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == origin.ParentProgramFrameId)is not { ShenGuoJia: { Plan: { } plan } receipt } frame || !ValidShenGuoJia(frame) || receipt.Stage is not (ShenGuoJiaStage.IssuingUse or ShenGuoJiaStage.NativeUse) || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0, RequesterSeat: null, ResponderSeat: null, OpponentSeat: null } action || action.ProviderSeat != frame.OwnerSeat || use.SourceSeat != action.ActorSeat || action.ActionId != origin.CardActionId || action.EffectiveKind != plan.Kind || use.CardKind != plan.Kind || action.EffectiveSuit is not (null or Suit.None) || action.EffectiveRank is not (null or 0) || action.EffectiveIsRed == true || !action.TargetSeats.SequenceEqual(use.TargetSeats) || origin.OwnerSeat != frame.OwnerSeat || origin.InitialActorSeat != frame.OwnerSeat || origin.InitialTargetSeat != frame.OwnerSeat || origin.BindingId != frame.ActivationId || origin.SkillInstanceId != frame.SkillInstanceId || origin.GameplayHash != frame.GameplayHash || origin.InstructionIndex != frame.InstructionIndex || origin.LifecycleFrameId != 0 || origin.TurnNumber != receipt.Turn || receipt.UseId != 0 && (receipt.UseId != use.Id || receipt.ActionId != action.ActionId))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ShenGuoJiaMaximumPaidEvent>().Count(fact => fact.FrameId == frame.Id && fact.Purpose == "zuoxing" && fact.Seat == receipt.Benefactor && fact.After == fact.Before - 1) == 1 && (_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(fact => fact.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, frame.OwnerSeat, frame.OwnerSeat) : action.ActorSeat == frame.OwnerSeat);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenGuoJiaMaximumPaidEvent>().Count(fact => fact.FrameId == frame.Id && fact.Purpose == "zuoxing" && fact.Seat == receipt.Benefactor && fact.After == fact.Before - 1) == 1 && (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(fact => fact.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, frame.OwnerSeat, frame.OwnerSeat) : action.ActorSeat == frame.OwnerSeat);
     }
 
     internal bool TryReturnShenGuoJiaVirtualUse(CardUseFrame use)
@@ -74,7 +74,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
             return false;
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(origin.ParentProgramFrameId);
         var receipt = frame.ShenGuoJia!;
-        if (!ValidShenGuoJia(frame) || receipt.Stage != ShenGuoJiaStage.NativeUse || receipt.UseId != use.Id || receipt.ActionId != use.Action?.ActionId || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenGuoJiaNativeReturnedEvent>().Any(fact => fact.FrameId == frame.Id) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == use.Id && fact.CardId == 0 && fact.CardKind == receipt.Plan!.Kind) != 1)
+        if (!ValidShenGuoJia(frame) || receipt.Stage != ShenGuoJiaStage.NativeUse || receipt.UseId != use.Id || receipt.ActionId != use.Action?.ActionId || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenGuoJiaNativeReturnedEvent>().Any(fact => fact.FrameId == frame.Id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(fact => fact.ResolutionId == use.Id && fact.CardId == 0 && fact.CardKind == receipt.Plan!.Kind) != 1)
             throw new InvalidOperationException("Zuoxing requires the same complete native zero-material Use once.");
         var hadAttack = use.CardAttack is { Active: true };
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShenGuoJia = receipt with { Stage = ShenGuoJiaStage.ReturnedUse } });
@@ -89,7 +89,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShenGuoJia: { Stage: ShenGuoJiaStage.ReturnedUse } receipt } frame)
             return false;
-        if (!ValidShenGuoJia(frame) || _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.UseId)is not null || !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenGuoJiaNativeReturnedEvent>().Any(fact => fact.FrameId == frame.Id && fact.HadAttack))
+        if (!ValidShenGuoJia(frame) || _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.UseId)is not null || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenGuoJiaNativeReturnedEvent>().Any(fact => fact.FrameId == frame.Id && fact.HadAttack))
             throw new InvalidOperationException("Zuoxing cannot resume before the native damage tail returns.");
         FinishShenGuoJia(frame);
         return true;

@@ -8,7 +8,7 @@ internal sealed partial class CharacterZhangYiOlRuntime
     {
         if (!HasZhangYiCapability || attack.IsSourceLess)
             return 0;
-        var grants = _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiArmedEvent>().Where(g => g.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.RecipientSeat == attack.SourceSeat && g.DamageBonus && !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiDamageConsumedEvent>().Any(e => e.GrantFrameId == g.FrameId)).ToArray();
+        var grants = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiKangruiArmedEvent>().Where(g => g.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.RecipientSeat == attack.SourceSeat && g.DamageBonus && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiKangruiDamageConsumedEvent>().Any(e => e.GrantFrameId == g.FrameId)).ToArray();
         foreach (var grant in grants)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangYiKangruiDamageConsumedEvent(grant.FrameId, attack.ResolutionId, attack.SourceSeat, attack.TargetSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, attack.IsChainPropagation, attack.IsChainPropagation ? ZhangYiChainCursor(attack) : 0));
         return grants.Length;
@@ -34,10 +34,10 @@ internal sealed partial class CharacterZhangYiOlRuntime
         var remaining = attack is NativeOwners.ProgramAttackHandle ? _coreProgramAttackAttemptOperations.GetProgramAttackState(attack.ResolutionId).ChainedTargetSeats : _coreCardAttackStateOperations.GetCardAttackState(attack.ResolutionId).ChainedTargetSeats;
         if (remaining is null || !remaining.Skip(cursor).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive))
             return;
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiChainInstanceIssuedEvent>().SingleOrDefault(e => e.AttackFrameId == attack.ResolutionId && e.ChainCursor == cursor);
-        if (issued is null || !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiDamageConsumedEvent>().Any(e => e.AttackFrameId == attack.ResolutionId && e.ChainPropagation && e.ChainCursor == cursor))
+        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiChainInstanceIssuedEvent>().SingleOrDefault(e => e.AttackFrameId == attack.ResolutionId && e.ChainCursor == cursor);
+        if (issued is null || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiKangruiDamageConsumedEvent>().Any(e => e.AttackFrameId == attack.ResolutionId && e.ChainPropagation && e.ChainCursor == cursor))
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiChainInstanceRebasedEvent>().Any(e => e.AttackFrameId == attack.ResolutionId && e.ChainCursor == cursor))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiChainInstanceRebasedEvent>().Any(e => e.AttackFrameId == attack.ResolutionId && e.ChainCursor == cursor))
             return;
         SetZhangYiChainAmount(attack, issued.InheritedAmount);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangYiChainInstanceRebasedEvent(attack.ResolutionId, cursor, attack.TargetSeat, issued.InheritedAmount));
@@ -46,10 +46,10 @@ internal sealed partial class CharacterZhangYiOlRuntime
     [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 10)]
     internal void ApplyZhangYiChainedDamageBonus(GameEngine.IDamageAttempt attack)
     {
-        if (!HasZhangYiCapability || !attack.IsChainPropagation || attack.IsSourceLess || !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiArmedEvent>().Any(g => g.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.RecipientSeat == attack.SourceSeat && g.DamageBonus && !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiDamageConsumedEvent>().Any(e => e.GrantFrameId == g.FrameId)))
+        if (!HasZhangYiCapability || !attack.IsChainPropagation || attack.IsSourceLess || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiKangruiArmedEvent>().Any(g => g.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.RecipientSeat == attack.SourceSeat && g.DamageBonus && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiKangruiDamageConsumedEvent>().Any(e => e.GrantFrameId == g.FrameId)))
             return;
         var cursor = ZhangYiChainCursor(attack);
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiChainInstanceIssuedEvent>().Any(e => e.AttackFrameId == attack.ResolutionId && e.ChainCursor == cursor))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiChainInstanceIssuedEvent>().Any(e => e.AttackFrameId == attack.ResolutionId && e.ChainCursor == cursor))
             throw new InvalidOperationException("A chained Kangrui instance cannot issue its increment twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangYiChainInstanceIssuedEvent(attack.ResolutionId, cursor, attack.TargetSeat, attack.DamageAmount));
         // Formal armor recomputes this recipient in the ordinary finalizer.
@@ -60,7 +60,7 @@ internal sealed partial class CharacterZhangYiOlRuntime
 
     internal RuleQueryEvaluation ApplyZhangYiKangruiHandLimit(CharacterState player, RuleQueryEvaluation ordinary)
     {
-        if (!HasZhangYiCapability || !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYiKangruiHandLimitSetEvent>().Any(e => e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.RecipientSeat == player.Seat))
+        if (!HasZhangYiCapability || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYiKangruiHandLimitSetEvent>().Any(e => e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.RecipientSeat == player.Seat))
             return ordinary;
         var set = new FiniteRuleQueryContribution($"turn:{(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber)}:zhang-yi:kangrui:{(player.Seat)}", SkillRuleOperation.Set, 0, 200);
         var frozen = Array.AsReadOnly(ordinary.Value.Contributions.Append(set).OrderBy(c => c.SourceId, StringComparer.Ordinal).ToArray());

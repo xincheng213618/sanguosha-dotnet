@@ -36,7 +36,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
                 throw new InvalidOperationException("Xiangxu death minimum changed its captured original source or causal population edge.");
             var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
             var source = new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId);
-            var index = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumTransitionEvent>().Count();
+            var index = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumTransitionEvent>().Count();
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoYuMinimumTransitionEvent(id, index, source, c.GameplayHash, null, r.ActualTurn, r.TurnOwner, r.HandCounts[c.OwnerSeat], r.HandCounts[c.OwnerSeat], before, after, death.Id));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoYuMinimumDeathRecordedEvent(id, death.Id, death.ParentFrameId, victimSeat, death.KillerSeat, r.ReturnKind));
             foreach (var p in _coreMatchParticipantsPlayersAccess._players)
@@ -75,7 +75,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
         {
             var owner = _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat];
             var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-            var index = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumTransitionEvent>().Count();
+            var index = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumTransitionEvent>().Count();
             var source = new CardConversionSource(c.SkillId, c.BindingId, c.OwnerSeat, c.SkillInstanceId);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoYuMinimumTransitionEvent(id, index, source, c.GameplayHash, batch.Id, batch.TurnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, before[owner.Seat], after[owner.Seat], minimumBefore, minimumAfter));
             foreach (var p in _coreMatchParticipantsPlayersAccess._players)
@@ -83,23 +83,23 @@ internal sealed partial class CharacterCaoYuOlRuntime
         }
     }
 
-    internal CaoYuMinimumTransitionEvent? CaoYuTransition(ProgramTriggerCandidate c, long? id = null) => _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumTransitionEvent>().SingleOrDefault(e => (id is null || e.OpportunityId == id) && e.Index == c.OccurrenceIndex && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.Source.SkillInstanceId == c.SkillInstanceId && e.GameplayHash == c.GameplayHash);
+    internal CaoYuMinimumTransitionEvent? CaoYuTransition(ProgramTriggerCandidate c, long? id = null) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumTransitionEvent>().SingleOrDefault(e => (id is null || e.OpportunityId == id) && e.Index == c.OccurrenceIndex && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.Source.SkillInstanceId == c.SkillInstanceId && e.GameplayHash == c.GameplayHash);
     internal bool ValidCaoYuTransition(CaoYuMinimumTransitionEvent e, CardMovementBatchContext? batch = null)
     {
         if (e.Source.SkillId != "ol:xiangxu" || e.Source.BindingId != "minimum-edge" || _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash != e.GameplayHash || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(e.Source.OwnerSeat) || e.HandAfter != e.MinimumAfter || e.HandBefore == e.HandAfter && e.HandBefore == e.MinimumBefore)
             return false;
-        var seats = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumSeatEvent>().Where(x => x.OpportunityId == e.OpportunityId).OrderBy(x => x.Seat).ToArray();
+        var seats = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumSeatEvent>().Where(x => x.OpportunityId == e.OpportunityId).OrderBy(x => x.Seat).ToArray();
         if (seats.Length != _coreMatchParticipantsPlayersAccess._players.Count || !seats.Select(x => x.Seat).SequenceEqual(Enumerable.Range(0, _coreMatchParticipantsPlayersAccess._players.Count)) || seats.Any(x => x.Before < 0 || x.After < 0) || !seats.Any(x => x.Alive) || seats.Where(x => x.Alive).Min(x => x.After) != e.MinimumAfter || seats[e.Source.OwnerSeat] is not { Alive: true } own || own.Before != e.HandBefore || own.After != e.HandAfter)
             return false;
         if (e.DeathFrameId is { } deathId)
         {
-            var deaths = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumDeathRecordedEvent>().Where(x => x.OpportunityId == e.OpportunityId).ToArray();
-            if (batch is not null || e.BatchId is not null || deaths is not [var d] || d.DeathFrameId != deathId || deathId < 1 || d.ParentFrameId < 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(d.VictimSeat) || d.VictimSeat == e.Source.OwnerSeat || !Enum.IsDefined(d.ReturnKind) || seats.Any(s => s.AliveBefore is null || s.Before != s.After || s.Alive != (s.Seat != d.VictimSeat && s.AliveBefore.Value)) || seats[d.VictimSeat].AliveBefore != true || seats.Where(s => s.AliveBefore == true).Min(s => s.Before) != e.MinimumBefore || _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumArmedEvent>().Count(a => a.FrameId == deathId && a.OpportunityId == e.OpportunityId && a.Source == e.Source && a.GameplayHash == e.GameplayHash) != 1)
+            var deaths = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumDeathRecordedEvent>().Where(x => x.OpportunityId == e.OpportunityId).ToArray();
+            if (batch is not null || e.BatchId is not null || deaths is not [var d] || d.DeathFrameId != deathId || deathId < 1 || d.ParentFrameId < 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(d.VictimSeat) || d.VictimSeat == e.Source.OwnerSeat || !Enum.IsDefined(d.ReturnKind) || seats.Any(s => s.AliveBefore is null || s.Before != s.After || s.Alive != (s.Seat != d.VictimSeat && s.AliveBefore.Value)) || seats[d.VictimSeat].AliveBefore != true || seats.Where(s => s.AliveBefore == true).Min(s => s.Before) != e.MinimumBefore || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumArmedEvent>().Count(a => a.FrameId == deathId && a.OpportunityId == e.OpportunityId && a.Source == e.Source && a.GameplayHash == e.GameplayHash) != 1)
                 return false;
             return true;
         }
 
-        if (e.BatchId is null || seats.Any(s => s.AliveBefore is not null) || seats.Where(x => x.Alive).Min(x => x.Before) != e.MinimumBefore || _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumDeathRecordedEvent>().Any(x => x.OpportunityId == e.OpportunityId))
+        if (e.BatchId is null || seats.Any(s => s.AliveBefore is not null) || seats.Where(x => x.Alive).Min(x => x.Before) != e.MinimumBefore || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumDeathRecordedEvent>().Any(x => x.OpportunityId == e.OpportunityId))
             return false;
         if (batch is null)
             return true;
@@ -120,7 +120,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
     {
         if (!HasCaoYuCapability)
             return;
-        foreach (var e in _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumTransitionEvent>().Where(e => e.BatchId == batch.Id && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive && ValidCaoYuTransition(e, batch)))
+        foreach (var e in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumTransitionEvent>().Where(e => e.BatchId == batch.Id && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive && ValidCaoYuTransition(e, batch)))
             result.Add(new(e.Source.OwnerSeat, e.Source.SkillId, e.Source.BindingId, e.Source.SkillInstanceId, e.GameplayHash, 0, e.Index));
     }
 
@@ -141,8 +141,8 @@ internal sealed partial class CharacterCaoYuOlRuntime
         return CreateXiangxuMinimumContext(w, c) == context;
     }
 
-    internal bool CaoYuOpportunityConsumed(long id) => _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuOpportunityConsumedEvent>().Any(e => e.OpportunityId == id);
-    internal IEnumerable<CaoYuMinimumTransitionEvent> CaoYuOutstanding(int turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumTransitionEvent>().Where(e => e.ActualTurn == turn && ValidCaoYuTransition(e) && !CaoYuOpportunityConsumed(e.OpportunityId) && _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumArmedEvent>().Count(a => a.OpportunityId == e.OpportunityId && a.Source == e.Source && a.GameplayHash == e.GameplayHash) == 1);
+    internal bool CaoYuOpportunityConsumed(long id) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuOpportunityConsumedEvent>().Any(e => e.OpportunityId == id);
+    internal IEnumerable<CaoYuMinimumTransitionEvent> CaoYuOutstanding(int turn) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumTransitionEvent>().Where(e => e.ActualTurn == turn && ValidCaoYuTransition(e) && !CaoYuOpportunityConsumed(e.OpportunityId) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumArmedEvent>().Count(a => a.OpportunityId == e.OpportunityId && a.Source == e.Source && a.GameplayHash == e.GameplayHash) == 1);
     internal IReadOnlyList<TurnEndingBoundaryItem> IncludeXiangxuAfterTurnEndedItems(DeferredTurnEndFrame parent, IReadOnlyList<TurnEndingBoundaryItem> ordinary)
     {
         if (!HasCaoYuCapability)

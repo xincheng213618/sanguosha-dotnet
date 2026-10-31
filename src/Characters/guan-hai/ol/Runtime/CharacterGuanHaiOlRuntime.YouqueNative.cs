@@ -7,7 +7,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { GuanHai: { Paid: true, Stage: GuanHaiStage.SlashIssuing } r } f || r.Op != SkillProgramEffectOp.ResolveYouqueMinimumBaitPindian)
             return action;
-        if (action.Type != CardActionType.Use || action.EffectiveKind != CardKind.Slash || action.ActorSeat != r.LoserSeat || action.ProviderSeat != r.LoserSeat || action.RequesterSeat is not null || action.PhysicalCards.Count != 0 || action.ConversionChain is not [var source] || source != r.Source || !action.TargetSeats.SequenceEqual([r.WinnerSeat]) || r.NativeUseId != 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<YouquePindianReturnedEvent>().Count(e => e.FrameId == f.Id) != 1)
+        if (action.Type != CardActionType.Use || action.EffectiveKind != CardKind.Slash || action.ActorSeat != r.LoserSeat || action.ProviderSeat != r.LoserSeat || action.RequesterSeat is not null || action.PhysicalCards.Count != 0 || action.ConversionChain is not [var source] || source != r.Source || !action.TargetSeats.SequenceEqual([r.WinnerSeat]) || r.NativeUseId != 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YouquePindianReturnedEvent>().Count(e => e.FrameId == f.Id) != 1)
             throw new InvalidOperationException("Youque cannot prepare a different actor, target, source or material group before native use recording.");
         return new(action.ActionId, action.ParentActionId, action.Type, action.ActorSeat, action.ProviderSeat, action.RequesterSeat, action.ResponderSeat, action.OpponentSeat, action.EffectiveKind, action.TargetSeats, action.PhysicalCards, action.ConversionChain, action.DesignatedTargetSeats, Suit.None, 0, null, action.FactionOrigin);
     }
@@ -31,7 +31,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, use.TargetSeats[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[use.TargetSeats[0]], CardKind.Slash), programSkillCardUseFrameId: f.Id);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, use.TargetSeats[0], IgnoresArmor: attack.IgnoresArmor));
@@ -46,7 +46,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         if (at < 1 || _resolutionStackOperations._resolutionStack[at - 1] is not ProgramSkillFrame { GuanHai: { Stage: GuanHaiStage.SlashIssuing } r } parent)
             return;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(supplied.Id)!;
-        if (r.Op != SkillProgramEffectOp.ResolveYouqueMinimumBaitPindian || !r.Paid || r.NativeUseId != 0 || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActorSeat != r.LoserSeat || a.ProviderSeat != r.LoserSeat || a.RequesterSeat is not null || a.ConversionChain is not [var source] || source != r.Source || !use.TargetSeats.SequenceEqual([r.WinnerSeat]) || !a.TargetSeats.SequenceEqual(use.TargetSeats) || a.EffectiveSuit != Suit.None || a.EffectiveRank != 0 || a.EffectiveIsRed is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<YouquePindianReturnedEvent>().Count(e => e.FrameId == parent.Id) != 1)
+        if (r.Op != SkillProgramEffectOp.ResolveYouqueMinimumBaitPindian || !r.Paid || r.NativeUseId != 0 || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActorSeat != r.LoserSeat || a.ProviderSeat != r.LoserSeat || a.RequesterSeat is not null || a.ConversionChain is not [var source] || source != r.Source || !use.TargetSeats.SequenceEqual([r.WinnerSeat]) || !a.TargetSeats.SequenceEqual(use.TargetSeats) || a.EffectiveSuit != Suit.None || a.EffectiveRank != 0 || a.EffectiveIsRed is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YouquePindianReturnedEvent>().Count(e => e.FrameId == parent.Id) != 1)
             throw new InvalidOperationException("Youque cannot change the real loser, winner, zero output or original Pindian payment.");
         var origin = new YouqueSlashOrigin(parent.Id, r.Source, r.GameplayHash, r.Phase!, r.LoserSeat, r.WinnerSeat, use.Id, a.ActionId);
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { GuanHai = r with { Stage = GuanHaiStage.NativeSlash, NativeUseId = use.Id, ActionId = a.ActionId, NativeReturned = false } });
@@ -56,7 +56,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
 
     internal bool IsIssuedYouqueUse(CardUseFrame use)
     {
-        if (use.YouqueSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || o.UseId != use.Id || o.ActionId != current.ActionId || current.ProviderSeat != o.ActorSeat || current.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<YouqueSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { GuanHai: { Stage: GuanHaiStage.NativeSlash, Paid: true, NativeReturned: false } r } parent || r.NativeUseId != use.Id || r.ActionId != o.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.LoserSeat != o.ActorSeat || r.WinnerSeat != o.TargetSeat || r.Phase != o.Phase)
+        if (use.YouqueSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || o.UseId != use.Id || o.ActionId != current.ActionId || current.ProviderSeat != o.ActorSeat || current.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YouqueSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { GuanHai: { Stage: GuanHaiStage.NativeSlash, Paid: true, NativeReturned: false } r } parent || r.NativeUseId != use.Id || r.ActionId != o.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.LoserSeat != o.ActorSeat || r.WinnerSeat != o.TargetSeat || r.Phase != o.Phase)
             return false;
         var original = current;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -68,7 +68,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
             return false;
         if (original.EffectiveKind != CardKind.Slash || original.EffectiveSuit != Suit.None || original.EffectiveRank != 0 || original.EffectiveIsRed is not null || original.ConversionChain is not [var source] || source != o.Source)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == o.ActorSeat && current.ActorSeat == o.ActorSeat;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == o.ActorSeat && current.ActorSeat == o.ActorSeat;
     }
 
     internal bool IsYouqueUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedYouqueUse(use);
@@ -107,7 +107,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
         var r = f.GuanHai!;
-        if (r.Stage != GuanHaiStage.NativeSlash || r.NativeReturned || r.NativeUseId != use.Id || r.ActionId != o.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.Stage != GuanHaiStage.NativeSlash || r.NativeReturned || r.NativeUseId != use.Id || r.ActionId != o.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Youque lost its unique typed native return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { GuanHai = r with { NativeReturned = true } });
         if (use.CardAttack is not { Active: true })
@@ -121,7 +121,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
             return false;
         if (c.ProgramFrameId != f.Id)
             throw new InvalidOperationException("Youque's native attack returned to a different program.");
-        var o = _coreProgramEventHistoryOperations.ProgramEventHistory<YouqueSlashIssuedEvent>().Single(e => e.Origin.ProgramFrameId == f.Id).Origin;
+        var o = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YouqueSlashIssuedEvent>().Single(e => e.Origin.ProgramFrameId == f.Id).Origin;
         SettleYouqueNative(o);
         return true;
     }
@@ -130,7 +130,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
         var r = f.GuanHai!;
-        if (!r.NativeReturned || r.NativeUseId != o.UseId || r.ActionId != o.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<YouqueSlashReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (!r.NativeReturned || r.NativeUseId != o.UseId || r.ActionId != o.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YouqueSlashReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Youque cannot settle its native Use twice.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { GuanHai = r with { Stage = GuanHaiStage.NativeChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YouqueSlashReturnedEvent(f.Id, o.UseId, o.ActionId));
@@ -158,7 +158,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     {
         if (YouqueRewardUse(context)is not { YouqueSlash: { } o } || c.OwnerSeat != o.Source.OwnerSeat || c.SkillId != o.Source.SkillId || c.SkillInstanceId != o.Source.SkillInstanceId || c.GameplayHash != o.GameplayHash || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ResolveYouqueIssuedSlashDamageBenefit }] || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not DamageTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex].ToProgramCandidate() != c)
             return false;
-        return !_coreProgramEventHistoryOperations.ProgramEventHistory<YouqueBenefitIssuedEvent>().Any(e => e.DamageFrameId == context.DamageFrameId && e.UseId == o.UseId);
+        return !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YouqueBenefitIssuedEvent>().Any(e => e.DamageFrameId == context.DamageFrameId && e.UseId == o.UseId);
     }
 
     internal bool TryGetXieweiResponseCostMovement(CardActionContext action, int cardId, out CardMovementRecord movement)

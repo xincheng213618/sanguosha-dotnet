@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEnginePrivateCardOffersRuntime
 {
     SkillProgramStepOutcome IPrivateOfferProgramHost.DepositPrivateCardOffer(ProgramSkillFrame f, string bind, string resolver) => DepositPrivateCardOffer(f, bind, resolver);
     SkillProgramStepOutcome IPrivateOfferProgramHost.ResolvePrivateCardOffer(ProgramSkillFrame f) => BeginDeferredPrivateOffer(f);
-    SkillProgramStepOutcome IPrivateOfferProgramHost.ResolveGameTargetHandHp(ProgramSkillFrame f, string state) => _coreGameTargetHandHpChoicesOperations.BeginGameTargetHandHp(f, state);
+    SkillProgramStepOutcome IPrivateOfferProgramHost.ResolveGameTargetHandHp(ProgramSkillFrame f, string state) => _coreGameTargetHandHpChoicesOperations.Value.BeginGameTargetHandHp(f, state);
     internal long PrivateOfferSequence => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
 
     internal static string PrivateOfferReason(ProgramSkillFrame f, string segment) => RuntimeSkills.RuntimeRules_Core_PrivateCardOffers.PrivateOfferReason(f, segment);

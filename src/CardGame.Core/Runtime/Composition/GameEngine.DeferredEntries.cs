@@ -3,31 +3,31 @@ namespace CardGame.Core;
 
 public sealed partial class GameEngine
 {
-    internal Core.RuntimeEntries.CharacterAHuiNanOlEntries AHuiNanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterAHuiNanOlEntries, EngineOwners.CharacterAHuiNanOlRuntime>(Core.RuntimeEntries.CharacterAHuiNanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterAHuiNanOlRuntime> AHuiNanOlEntries => GetDeferredModule<EngineOwners.CharacterAHuiNanOlRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineActionCategoryGiftsEntries ActionCategoryGiftsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActionCategoryGiftsEntries, EngineOwners.CoreGameEngineActionCategoryGiftsRuntime>(Core.RuntimeEntries.CoreGameEngineActionCategoryGiftsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineActionCategoryGiftsRuntime> ActionCategoryGiftsEntries => GetDeferredModule<EngineOwners.CoreGameEngineActionCategoryGiftsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineActionQueriesEntries ActionQueriesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActionQueriesEntries, EngineOwners.CoreGameEngineActionQueriesRuntime>(Core.RuntimeEntries.CoreGameEngineActionQueriesEntries.Create);
 
     internal Core.RuntimeEntries.CoreActiveNativeAttackQueriesEntries ActiveNativeAttackQueriesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreActiveNativeAttackQueriesEntries, EngineOwners.CoreActiveNativeAttackQueriesRuntime>(Core.RuntimeEntries.CoreActiveNativeAttackQueriesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineActivityBattleRulesEntries ActivityBattleRulesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActivityBattleRulesEntries, EngineOwners.CoreGameEngineActivityBattleRulesRuntime>(Core.RuntimeEntries.CoreGameEngineActivityBattleRulesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineActivityBattleRulesRuntime> ActivityBattleRulesEntries => GetDeferredModule<EngineOwners.CoreGameEngineActivityBattleRulesRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineActivityOrdinaryTricksEntries ActivityOrdinaryTricksEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActivityOrdinaryTricksEntries, EngineOwners.CoreGameEngineActivityOrdinaryTricksRuntime>(Core.RuntimeEntries.CoreGameEngineActivityOrdinaryTricksEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineActorHandLimitPenaltiesEntries ActorHandLimitPenaltiesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActorHandLimitPenaltiesEntries, EngineOwners.CoreGameEngineActorHandLimitPenaltiesRuntime>(Core.RuntimeEntries.CoreGameEngineActorHandLimitPenaltiesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineActorHandLimitPenaltiesRuntime> ActorHandLimitPenaltiesEntries => GetDeferredModule<EngineOwners.CoreGameEngineActorHandLimitPenaltiesRuntime>();
 
     internal Core.RuntimeEntries.CoreActualDiscardPhaseEntries ActualDiscardPhaseEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreActualDiscardPhaseEntries, EngineOwners.CoreActualDiscardPhaseRuntime>(Core.RuntimeEntries.CoreActualDiscardPhaseEntries.Create);
 
     internal Core.RuntimeEntries.CoreActualDiscardPhaseLedgerEntries ActualDiscardPhaseLedgerEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreActualDiscardPhaseLedgerEntries, EngineOwners.CoreActualDiscardPhaseLedgerRuntime>(Core.RuntimeEntries.CoreActualDiscardPhaseLedgerEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineActualDiscardRecoveriesEntries ActualDiscardRecoveriesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActualDiscardRecoveriesEntries, EngineOwners.CoreGameEngineActualDiscardRecoveriesRuntime>(Core.RuntimeEntries.CoreGameEngineActualDiscardRecoveriesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineActualDiscardRecoveriesRuntime> ActualDiscardRecoveriesEntries => GetDeferredModule<EngineOwners.CoreGameEngineActualDiscardRecoveriesRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineActualDiscardRecoveryPhasesEntries ActualDiscardRecoveryPhasesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActualDiscardRecoveryPhasesEntries, EngineOwners.CoreGameEngineActualDiscardRecoveryPhasesRuntime>(Core.RuntimeEntries.CoreGameEngineActualDiscardRecoveryPhasesEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineActualEndedTurnEquipmentEntries ActualEndedTurnEquipmentEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActualEndedTurnEquipmentEntries, EngineOwners.CoreGameEngineActualEndedTurnEquipmentRuntime>(Core.RuntimeEntries.CoreGameEngineActualEndedTurnEquipmentEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineActualHandGainObserversEntries ActualHandGainObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActualHandGainObserversEntries, EngineOwners.CoreGameEngineActualHandGainObserversRuntime>(Core.RuntimeEntries.CoreGameEngineActualHandGainObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineActualHandGainObserversRuntime> ActualHandGainObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineActualHandGainObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineActualHandGainProgramsEntries ActualHandGainProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActualHandGainProgramsEntries, EngineOwners.CoreGameEngineActualHandGainProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineActualHandGainProgramsEntries.Create);
 
@@ -35,9 +35,9 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineActualTurnDamageClaimsEntries ActualTurnDamageClaimsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActualTurnDamageClaimsEntries, EngineOwners.CoreGameEngineActualTurnDamageClaimsRuntime>(Core.RuntimeEntries.CoreGameEngineActualTurnDamageClaimsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineActualTurnSkillGrantsEntries ActualTurnSkillGrantsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActualTurnSkillGrantsEntries, EngineOwners.CoreGameEngineActualTurnSkillGrantsRuntime>(Core.RuntimeEntries.CoreGameEngineActualTurnSkillGrantsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineActualTurnSkillGrantsRuntime> ActualTurnSkillGrantsEntries => GetDeferredModule<EngineOwners.CoreGameEngineActualTurnSkillGrantsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineActualTurnTrickUsesEntries ActualTurnTrickUsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineActualTurnTrickUsesEntries, EngineOwners.CoreGameEngineActualTurnTrickUsesRuntime>(Core.RuntimeEntries.CoreGameEngineActualTurnTrickUsesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineActualTurnTrickUsesRuntime> ActualTurnTrickUsesEntries => GetDeferredModule<EngineOwners.CoreGameEngineActualTurnTrickUsesRuntime>();
 
     internal Core.RuntimeEntries.CoreActualTurnsEntries ActualTurnsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreActualTurnsEntries, EngineOwners.CoreActualTurnsRuntime>(Core.RuntimeEntries.CoreActualTurnsEntries.Create);
 
@@ -51,9 +51,9 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries AdvancedLifecycleEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries, EngineOwners.CoreGameEngineAdvancedLifecycleRuntime>(Core.RuntimeEntries.CoreGameEngineAdvancedLifecycleEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineAdvancedPoliciesEntries AdvancedPoliciesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAdvancedPoliciesEntries, EngineOwners.CoreGameEngineAdvancedPoliciesRuntime>(Core.RuntimeEntries.CoreGameEngineAdvancedPoliciesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineAdvancedPoliciesRuntime> AdvancedPoliciesEntries => GetDeferredModule<EngineOwners.CoreGameEngineAdvancedPoliciesRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineAdvancedPrerequisitesEntries AdvancedPrerequisitesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAdvancedPrerequisitesEntries, EngineOwners.CoreGameEngineAdvancedPrerequisitesRuntime>(Core.RuntimeEntries.CoreGameEngineAdvancedPrerequisitesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineAdvancedPrerequisitesRuntime> AdvancedPrerequisitesEntries => GetDeferredModule<EngineOwners.CoreGameEngineAdvancedPrerequisitesRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineAdvancedWeaponsEntries AdvancedWeaponsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAdvancedWeaponsEntries, EngineOwners.CoreGameEngineAdvancedWeaponsRuntime>(Core.RuntimeEntries.CoreGameEngineAdvancedWeaponsEntries.Create);
 
@@ -63,27 +63,27 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineAlcoholSlashSkillReplacementsEntries AlcoholSlashSkillReplacementsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAlcoholSlashSkillReplacementsEntries, EngineOwners.CoreGameEngineAlcoholSlashSkillReplacementsRuntime>(Core.RuntimeEntries.CoreGameEngineAlcoholSlashSkillReplacementsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineAlcoholSlashSuppressionsEntries AlcoholSlashSuppressionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAlcoholSlashSuppressionsEntries, EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime>(Core.RuntimeEntries.CoreGameEngineAlcoholSlashSuppressionsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime> AlcoholSlashSuppressionsEntries => GetDeferredModule<EngineOwners.CoreGameEngineAlcoholSlashSuppressionsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries AlternatingBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries, EngineOwners.CoreGameEngineAlternatingBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineAlternatingSuitAndCompletedTopEntries AlternatingSuitAndCompletedTopEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAlternatingSuitAndCompletedTopEntries, EngineOwners.CoreGameEngineAlternatingSuitAndCompletedTopRuntime>(Core.RuntimeEntries.CoreGameEngineAlternatingSuitAndCompletedTopEntries.Create);
 
-    internal Core.RuntimeEntries.CoreAlternativePhaseCostProgramsEntries AlternativePhaseCostProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreAlternativePhaseCostProgramsEntries, EngineOwners.CoreAlternativePhaseCostProgramsRuntime>(Core.RuntimeEntries.CoreAlternativePhaseCostProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreAlternativePhaseCostProgramsRuntime> AlternativePhaseCostProgramsEntries => GetDeferredModule<EngineOwners.CoreAlternativePhaseCostProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineAlternativeViewAsCostsEntries AlternativeViewAsCostsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAlternativeViewAsCostsEntries, EngineOwners.CoreGameEngineAlternativeViewAsCostsRuntime>(Core.RuntimeEntries.CoreGameEngineAlternativeViewAsCostsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineAnqiFeirenEntries AnqiFeirenEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAnqiFeirenEntries, EngineOwners.CoreGameEngineAnqiFeirenRuntime>(Core.RuntimeEntries.CoreGameEngineAnqiFeirenEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineAnqiFeirenRuntime> AnqiFeirenEntries => GetDeferredModule<EngineOwners.CoreGameEngineAnqiFeirenRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineAppliedDamageBenefitsEntries AppliedDamageBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAppliedDamageBenefitsEntries, EngineOwners.CoreGameEngineAppliedDamageBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineAppliedDamageBenefitsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineAppliedDamageReflectionEntries AppliedDamageReflectionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAppliedDamageReflectionEntries, EngineOwners.CoreGameEngineAppliedDamageReflectionRuntime>(Core.RuntimeEntries.CoreGameEngineAppliedDamageReflectionEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineAppliedDamageReflectionRuntime> AppliedDamageReflectionEntries => GetDeferredModule<EngineOwners.CoreGameEngineAppliedDamageReflectionRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineAssistedPhysicalCardsEntries AssistedPhysicalCardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAssistedPhysicalCardsEntries, EngineOwners.CoreGameEngineAssistedPhysicalCardsRuntime>(Core.RuntimeEntries.CoreGameEngineAssistedPhysicalCardsEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineAttributedMarkerEventsEntries AttributedMarkerEventsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineAttributedMarkerEventsEntries, EngineOwners.CoreGameEngineAttributedMarkerEventsRuntime>(Core.RuntimeEntries.CoreGameEngineAttributedMarkerEventsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreAwaitedBlindHandTakeProgramsEntries AwaitedBlindHandTakeProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreAwaitedBlindHandTakeProgramsEntries, EngineOwners.CoreAwaitedBlindHandTakeProgramsRuntime>(Core.RuntimeEntries.CoreAwaitedBlindHandTakeProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreAwaitedBlindHandTakeProgramsRuntime> AwaitedBlindHandTakeProgramsEntries => GetDeferredModule<EngineOwners.CoreAwaitedBlindHandTakeProgramsRuntime>();
 
     internal Core.RuntimeEntries.CharacterBaiLingYunAnniversaryEntries BaiLingYunAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterBaiLingYunAnniversaryEntries, EngineOwners.CharacterBaiLingYunAnniversaryRuntime>(Core.RuntimeEntries.CharacterBaiLingYunAnniversaryEntries.Create);
 
@@ -99,7 +99,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineBoundCardMovementContinuationEntries BoundCardMovementContinuationEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineBoundCardMovementContinuationEntries, EngineOwners.CoreGameEngineBoundCardMovementContinuationRuntime>(Core.RuntimeEntries.CoreGameEngineBoundCardMovementContinuationEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineBoundCardsRecastsEntries BoundCardsRecastsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineBoundCardsRecastsEntries, EngineOwners.CoreGameEngineBoundCardsRecastsRuntime>(Core.RuntimeEntries.CoreGameEngineBoundCardsRecastsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineBoundCardsRecastsRuntime> BoundCardsRecastsEntries => GetDeferredModule<EngineOwners.CoreGameEngineBoundCardsRecastsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineBoundDiscardSlashBenefitsEntries BoundDiscardSlashBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineBoundDiscardSlashBenefitsEntries, EngineOwners.CoreGameEngineBoundDiscardSlashBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineBoundDiscardSlashBenefitsEntries.Create);
 
@@ -107,31 +107,31 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineBoundRankBonusProgramsEntries BoundRankBonusProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineBoundRankBonusProgramsEntries, EngineOwners.CoreGameEngineBoundRankBonusProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineBoundRankBonusProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterBuLianShiBoundaryMobileEntries BuLianShiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterBuLianShiBoundaryMobileEntries, EngineOwners.CharacterBuLianShiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterBuLianShiBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterBuLianShiBoundaryMobileRuntime> BuLianShiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterBuLianShiBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterBuLianShiMobileEntries BuLianShiMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterBuLianShiMobileEntries, EngineOwners.CharacterBuLianShiMobileRuntime>(Core.RuntimeEntries.CharacterBuLianShiMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterBuLianShiMobileRuntime> BuLianShiMobileEntries => GetDeferredModule<EngineOwners.CharacterBuLianShiMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterBuZhiOlEntries BuZhiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterBuZhiOlEntries, EngineOwners.CharacterBuZhiOlRuntime>(Core.RuntimeEntries.CharacterBuZhiOlEntries.Create);
 
     internal Core.RuntimeEntries.CharacterCaiFuRenOlEntries CaiFuRenOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaiFuRenOlEntries, EngineOwners.CharacterCaiFuRenOlRuntime>(Core.RuntimeEntries.CharacterCaiFuRenOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterCaiMaoOlEntries CaiMaoOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaiMaoOlEntries, EngineOwners.CharacterCaiMaoOlRuntime>(Core.RuntimeEntries.CharacterCaiMaoOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaiMaoOlRuntime> CaiMaoOlEntries => GetDeferredModule<EngineOwners.CharacterCaiMaoOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterCaiWenJiLeEntries CaiWenJiLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaiWenJiLeEntries, EngineOwners.CharacterCaiWenJiLeRuntime>(Core.RuntimeEntries.CharacterCaiWenJiLeEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterCaiYangAnniversaryEntries CaiYangAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaiYangAnniversaryEntries, EngineOwners.CharacterCaiYangAnniversaryRuntime>(Core.RuntimeEntries.CharacterCaiYangAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaiYangAnniversaryRuntime> CaiYangAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterCaiYangAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterCaiYongLeEntries CaiYongLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaiYongLeEntries, EngineOwners.CharacterCaiYongLeRuntime>(Core.RuntimeEntries.CharacterCaiYongLeEntries.Create);
 
     internal Core.RuntimeEntries.CharacterCaoAngMouEntries CaoAngMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoAngMouEntries, EngineOwners.CharacterCaoAngMouRuntime>(Core.RuntimeEntries.CharacterCaoAngMouEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterCaoCaoHappyGodEntries CaoCaoHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoCaoHappyGodEntries, EngineOwners.CharacterCaoCaoHappyGodRuntime>(Core.RuntimeEntries.CharacterCaoCaoHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoCaoHappyGodRuntime> CaoCaoHappyGodEntries => GetDeferredModule<EngineOwners.CharacterCaoCaoHappyGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterCaoCaoMobileGodEntries CaoCaoMobileGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoCaoMobileGodEntries, EngineOwners.CharacterCaoCaoMobileGodRuntime>(Core.RuntimeEntries.CharacterCaoCaoMobileGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoCaoMobileGodRuntime> CaoCaoMobileGodEntries => GetDeferredModule<EngineOwners.CharacterCaoCaoMobileGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterCaoCaoOlGodEntries CaoCaoOlGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoCaoOlGodEntries, EngineOwners.CharacterCaoCaoOlGodRuntime>(Core.RuntimeEntries.CharacterCaoCaoOlGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoCaoOlGodRuntime> CaoCaoOlGodEntries => GetDeferredModule<EngineOwners.CharacterCaoCaoOlGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterCaoCaoOlMagicEntries CaoCaoOlMagicEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoCaoOlMagicEntries, EngineOwners.CharacterCaoCaoOlMagicRuntime>(Core.RuntimeEntries.CharacterCaoCaoOlMagicEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoCaoOlMagicRuntime> CaoCaoOlMagicEntries => GetDeferredModule<EngineOwners.CharacterCaoCaoOlMagicRuntime>();
 
     internal Core.RuntimeEntries.CharacterCaoChunOlEntries CaoChunOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoChunOlEntries, EngineOwners.CharacterCaoChunOlRuntime>(Core.RuntimeEntries.CharacterCaoChunOlEntries.Create);
 
@@ -139,17 +139,17 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterCaoPiAnniversaryGodEntries CaoPiAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoPiAnniversaryGodEntries, EngineOwners.CharacterCaoPiAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterCaoPiAnniversaryGodEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterCaoPiBoundaryMobileEntries CaoPiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoPiBoundaryMobileEntries, EngineOwners.CharacterCaoPiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterCaoPiBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoPiBoundaryMobileRuntime> CaoPiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterCaoPiBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterCaoPiMouEntries CaoPiMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoPiMouEntries, EngineOwners.CharacterCaoPiMouRuntime>(Core.RuntimeEntries.CharacterCaoPiMouEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterCaoRenBoundaryEntries CaoRenBoundaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoRenBoundaryEntries, EngineOwners.CharacterCaoRenBoundaryRuntime>(Core.RuntimeEntries.CharacterCaoRenBoundaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoRenBoundaryRuntime> CaoRenBoundaryEntries => GetDeferredModule<EngineOwners.CharacterCaoRenBoundaryRuntime>();
 
-    internal Core.RuntimeEntries.CharacterCaoShuangMobileShiEntries CaoShuangMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoShuangMobileShiEntries, EngineOwners.CharacterCaoShuangMobileShiRuntime>(Core.RuntimeEntries.CharacterCaoShuangMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoShuangMobileShiRuntime> CaoShuangMobileShiEntries => GetDeferredModule<EngineOwners.CharacterCaoShuangMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterCaoShuangMouEntries CaoShuangMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoShuangMouEntries, EngineOwners.CharacterCaoShuangMouRuntime>(Core.RuntimeEntries.CharacterCaoShuangMouEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoShuangMouRuntime> CaoShuangMouEntries => GetDeferredModule<EngineOwners.CharacterCaoShuangMouRuntime>();
 
-    internal Core.RuntimeEntries.CharacterCaoShuangOlEntries CaoShuangOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoShuangOlEntries, EngineOwners.CharacterCaoShuangOlRuntime>(Core.RuntimeEntries.CharacterCaoShuangOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoShuangOlRuntime> CaoShuangOlEntries => GetDeferredModule<EngineOwners.CharacterCaoShuangOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterCaoSongOlEntries CaoSongOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoSongOlEntries, EngineOwners.CharacterCaoSongOlRuntime>(Core.RuntimeEntries.CharacterCaoSongOlEntries.Create);
 
@@ -157,33 +157,33 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterCaoXiOlEntries CaoXiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoXiOlEntries, EngineOwners.CharacterCaoXiOlRuntime>(Core.RuntimeEntries.CharacterCaoXiOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterCaoXianOlEntries CaoXianOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoXianOlEntries, EngineOwners.CharacterCaoXianOlRuntime>(Core.RuntimeEntries.CharacterCaoXianOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoXianOlRuntime> CaoXianOlEntries => GetDeferredModule<EngineOwners.CharacterCaoXianOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterCaoXiuBoundaryMobileEntries CaoXiuBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoXiuBoundaryMobileEntries, EngineOwners.CharacterCaoXiuBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterCaoXiuBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoXiuBoundaryMobileRuntime> CaoXiuBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterCaoXiuBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterCaoYingOlEntries CaoYingOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoYingOlEntries, EngineOwners.CharacterCaoYingOlRuntime>(Core.RuntimeEntries.CharacterCaoYingOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoYingOlRuntime> CaoYingOlEntries => GetDeferredModule<EngineOwners.CharacterCaoYingOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterCaoYuOlEntries CaoYuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoYuOlEntries, EngineOwners.CharacterCaoYuOlRuntime>(Core.RuntimeEntries.CharacterCaoYuOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterCaoZhangBoundaryMobileEntries CaoZhangBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoZhangBoundaryMobileEntries, EngineOwners.CharacterCaoZhangBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterCaoZhangBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoZhangBoundaryMobileRuntime> CaoZhangBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterCaoZhangBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterCaoZhenBoundaryMobileEntries CaoZhenBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoZhenBoundaryMobileEntries, EngineOwners.CharacterCaoZhenBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterCaoZhenBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoZhenBoundaryMobileRuntime> CaoZhenBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterCaoZhenBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterCaoZhenMobileEntries CaoZhenMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoZhenMobileEntries, EngineOwners.CharacterCaoZhenMobileRuntime>(Core.RuntimeEntries.CharacterCaoZhenMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoZhenMobileRuntime> CaoZhenMobileEntries => GetDeferredModule<EngineOwners.CharacterCaoZhenMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterCaoZhenMobileShiEntries CaoZhenMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoZhenMobileShiEntries, EngineOwners.CharacterCaoZhenMobileShiRuntime>(Core.RuntimeEntries.CharacterCaoZhenMobileShiEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterCaoZhiBoundaryMobileEntries CaoZhiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoZhiBoundaryMobileEntries, EngineOwners.CharacterCaoZhiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterCaoZhiBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCaoZhiBoundaryMobileRuntime> CaoZhiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterCaoZhiBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterCaoZhiLeEntries CaoZhiLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCaoZhiLeEntries, EngineOwners.CharacterCaoZhiLeRuntime>(Core.RuntimeEntries.CharacterCaoZhiLeEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineCappedConversionBenefitsEntries CappedConversionBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCappedConversionBenefitsEntries, EngineOwners.CoreGameEngineCappedConversionBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineCappedConversionBenefitsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineCappedConversionBenefitsRuntime> CappedConversionBenefitsEntries => GetDeferredModule<EngineOwners.CoreGameEngineCappedConversionBenefitsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineCappedHandRefreshProgramsEntries CappedHandRefreshProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCappedHandRefreshProgramsEntries, EngineOwners.CoreGameEngineCappedHandRefreshProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineCappedHandRefreshProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineCappedHandRefreshProgramsRuntime> CappedHandRefreshProgramsEntries => GetDeferredModule<EngineOwners.CoreGameEngineCappedHandRefreshProgramsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineCapturedEquipmentDrawsEntries CapturedEquipmentDrawsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCapturedEquipmentDrawsEntries, EngineOwners.CoreGameEngineCapturedEquipmentDrawsRuntime>(Core.RuntimeEntries.CoreGameEngineCapturedEquipmentDrawsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineCapturedEquipmentDrawsRuntime> CapturedEquipmentDrawsEntries => GetDeferredModule<EngineOwners.CoreGameEngineCapturedEquipmentDrawsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineCardActionContestsEntries CardActionContestsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCardActionContestsEntries, EngineOwners.CoreGameEngineCardActionContestsRuntime>(Core.RuntimeEntries.CoreGameEngineCardActionContestsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineCardActionContestsRuntime> CardActionContestsEntries => GetDeferredModule<EngineOwners.CoreGameEngineCardActionContestsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineCardActionsEntries CardActionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCardActionsEntries, EngineOwners.CoreGameEngineCardActionsRuntime>(Core.RuntimeEntries.CoreGameEngineCardActionsEntries.Create);
 
@@ -219,23 +219,23 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineCharacterTurnedOverProgramsEntries CharacterTurnedOverProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCharacterTurnedOverProgramsEntries, EngineOwners.CoreGameEngineCharacterTurnedOverProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineCharacterTurnedOverProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterCheZhouAnniversaryEntries CheZhouAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterCheZhouAnniversaryEntries, EngineOwners.CharacterCheZhouAnniversaryRuntime>(Core.RuntimeEntries.CharacterCheZhouAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCheZhouAnniversaryRuntime> CheZhouAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterCheZhouAnniversaryRuntime>();
 
-    internal Core.RuntimeEntries.CharacterChenDaoMobileShiEntries ChenDaoMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChenDaoMobileShiEntries, EngineOwners.CharacterChenDaoMobileShiRuntime>(Core.RuntimeEntries.CharacterChenDaoMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterChenDaoMobileShiRuntime> ChenDaoMobileShiEntries => GetDeferredModule<EngineOwners.CharacterChenDaoMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CharacterChenDengOlEntries ChenDengOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChenDengOlEntries, EngineOwners.CharacterChenDengOlRuntime>(Core.RuntimeEntries.CharacterChenDengOlEntries.Create);
 
     internal Core.RuntimeEntries.CharacterChenGongMouMobileEntries ChenGongMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChenGongMouMobileEntries, EngineOwners.CharacterChenGongMouMobileRuntime>(Core.RuntimeEntries.CharacterChenGongMouMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterChenJiaoMobileShiEntries ChenJiaoMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChenJiaoMobileShiEntries, EngineOwners.CharacterChenJiaoMobileShiRuntime>(Core.RuntimeEntries.CharacterChenJiaoMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterChenJiaoMobileShiRuntime> ChenJiaoMobileShiEntries => GetDeferredModule<EngineOwners.CharacterChenJiaoMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CharacterChenLinMouEntries ChenLinMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChenLinMouEntries, EngineOwners.CharacterChenLinMouRuntime>(Core.RuntimeEntries.CharacterChenLinMouEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterChenQunBoundaryMobileEntries ChenQunBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChenQunBoundaryMobileEntries, EngineOwners.CharacterChenQunBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterChenQunBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterChenQunBoundaryMobileRuntime> ChenQunBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterChenQunBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterChenQunMobileEntries ChenQunMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChenQunMobileEntries, EngineOwners.CharacterChenQunMobileRuntime>(Core.RuntimeEntries.CharacterChenQunMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterChenQunMobileRuntime> ChenQunMobileEntries => GetDeferredModule<EngineOwners.CharacterChenQunMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterChenQunMobileShiEntries ChenQunMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChenQunMobileShiEntries, EngineOwners.CharacterChenQunMobileShiRuntime>(Core.RuntimeEntries.CharacterChenQunMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterChenQunMobileShiRuntime> ChenQunMobileShiEntries => GetDeferredModule<EngineOwners.CharacterChenQunMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CharacterChenZhiMobileShiEntries ChenZhiMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChenZhiMobileShiEntries, EngineOwners.CharacterChenZhiMobileShiRuntime>(Core.RuntimeEntries.CharacterChenZhiMobileShiEntries.Create);
 
@@ -243,9 +243,9 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterChengJiChengCuiOlEntries ChengJiChengCuiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChengJiChengCuiOlEntries, EngineOwners.CharacterChengJiChengCuiOlRuntime>(Core.RuntimeEntries.CharacterChengJiChengCuiOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterChengPuBoundaryMobileEntries ChengPuBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChengPuBoundaryMobileEntries, EngineOwners.CharacterChengPuBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterChengPuBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterChengPuBoundaryMobileRuntime> ChengPuBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterChengPuBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterChengPuMobileShiEntries ChengPuMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChengPuMobileShiEntries, EngineOwners.CharacterChengPuMobileShiRuntime>(Core.RuntimeEntries.CharacterChengPuMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterChengPuMobileShiRuntime> ChengPuMobileShiEntries => GetDeferredModule<EngineOwners.CharacterChengPuMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CharacterChengYuMouEntries ChengYuMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterChengYuMouEntries, EngineOwners.CharacterChengYuMouRuntime>(Core.RuntimeEntries.CharacterChengYuMouEntries.Create);
 
@@ -255,25 +255,25 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreCommandInputAdaptersEntries CommandInputAdaptersEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreCommandInputAdaptersEntries, EngineOwners.CoreCommandInputAdaptersRuntime>(Core.RuntimeEntries.CoreCommandInputAdaptersEntries.Create);
 
-    internal Core.RuntimeEntries.CoreCommandResultProjectionEntries CommandResultProjectionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreCommandResultProjectionEntries, EngineOwners.CoreCommandResultProjectionRuntime>(Core.RuntimeEntries.CoreCommandResultProjectionEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreCommandResultProjectionRuntime> CommandResultProjectionEntries => GetDeferredModule<EngineOwners.CoreCommandResultProjectionRuntime>();
 
-    internal Core.RuntimeEntries.CoreCommandSessionQueriesEntries CommandSessionQueriesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreCommandSessionQueriesEntries, EngineOwners.CoreCommandSessionQueriesRuntime>(Core.RuntimeEntries.CoreCommandSessionQueriesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreCommandSessionQueriesRuntime> CommandSessionQueriesEntries => GetDeferredModule<EngineOwners.CoreCommandSessionQueriesRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineCompletedCardGiftsEntries CompletedCardGiftsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCompletedCardGiftsEntries, EngineOwners.CoreGameEngineCompletedCardGiftsRuntime>(Core.RuntimeEntries.CoreGameEngineCompletedCardGiftsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineCompletedCardGiftsRuntime> CompletedCardGiftsEntries => GetDeferredModule<EngineOwners.CoreGameEngineCompletedCardGiftsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineCompletedCategoryUseProofEntries CompletedCategoryUseProofEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCompletedCategoryUseProofEntries, EngineOwners.CoreGameEngineCompletedCategoryUseProofRuntime>(Core.RuntimeEntries.CoreGameEngineCompletedCategoryUseProofEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineCompletedUndamagedTargetRevealEntries CompletedUndamagedTargetRevealEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCompletedUndamagedTargetRevealEntries, EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealRuntime>(Core.RuntimeEntries.CoreGameEngineCompletedUndamagedTargetRevealEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineCompletedUndamagedTargetRevealObserversEntries CompletedUndamagedTargetRevealObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCompletedUndamagedTargetRevealObserversEntries, EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealObserversRuntime>(Core.RuntimeEntries.CoreGameEngineCompletedUndamagedTargetRevealObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealObserversRuntime> CompletedUndamagedTargetRevealObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineCompletedUndamagedTargetRevealObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineCompletedUseChildReturnsEntries CompletedUseChildReturnsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCompletedUseChildReturnsEntries, EngineOwners.CoreGameEngineCompletedUseChildReturnsRuntime>(Core.RuntimeEntries.CoreGameEngineCompletedUseChildReturnsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineCompletedUseChildReturnsRuntime> CompletedUseChildReturnsEntries => GetDeferredModule<EngineOwners.CoreGameEngineCompletedUseChildReturnsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineCompletedUsePaymentsEntries CompletedUsePaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCompletedUsePaymentsEntries, EngineOwners.CoreGameEngineCompletedUsePaymentsRuntime>(Core.RuntimeEntries.CoreGameEngineCompletedUsePaymentsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineCompletedUsePaymentsRuntime> CompletedUsePaymentsEntries => GetDeferredModule<EngineOwners.CoreGameEngineCompletedUsePaymentsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineConditionalDiscardDuelsEntries ConditionalDiscardDuelsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineConditionalDiscardDuelsEntries, EngineOwners.CoreGameEngineConditionalDiscardDuelsRuntime>(Core.RuntimeEntries.CoreGameEngineConditionalDiscardDuelsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineConditionalDiscardDuelsRuntime> ConditionalDiscardDuelsEntries => GetDeferredModule<EngineOwners.CoreGameEngineConditionalDiscardDuelsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineConfiguredConversionsEntries ConfiguredConversionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineConfiguredConversionsEntries, EngineOwners.CoreGameEngineConfiguredConversionsRuntime>(Core.RuntimeEntries.CoreGameEngineConfiguredConversionsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineConfiguredConversionsRuntime> ConfiguredConversionsEntries => GetDeferredModule<EngineOwners.CoreGameEngineConfiguredConversionsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineConversionStatesEntries ConversionStatesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineConversionStatesEntries, EngineOwners.CoreGameEngineConversionStatesRuntime>(Core.RuntimeEntries.CoreGameEngineConversionStatesEntries.Create);
 
@@ -289,7 +289,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineCurrentSlashFireOffersEntries CurrentSlashFireOffersEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCurrentSlashFireOffersEntries, EngineOwners.CoreGameEngineCurrentSlashFireOffersRuntime>(Core.RuntimeEntries.CoreGameEngineCurrentSlashFireOffersEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineCurrentTurnHandExchangeEntries CurrentTurnHandExchangeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCurrentTurnHandExchangeEntries, EngineOwners.CoreGameEngineCurrentTurnHandExchangeRuntime>(Core.RuntimeEntries.CoreGameEngineCurrentTurnHandExchangeEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineCurrentTurnHandExchangeRuntime> CurrentTurnHandExchangeEntries => GetDeferredModule<EngineOwners.CoreGameEngineCurrentTurnHandExchangeRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineCurrentTurnShownCardBenefitsEntries CurrentTurnShownCardBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineCurrentTurnShownCardBenefitsEntries, EngineOwners.CoreGameEngineCurrentTurnShownCardBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineCurrentTurnShownCardBenefitsEntries.Create);
 
@@ -303,7 +303,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterDaQiaoMobileEntries DaQiaoMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDaQiaoMobileEntries, EngineOwners.CharacterDaQiaoMobileRuntime>(Core.RuntimeEntries.CharacterDaQiaoMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterDaQiaoMouMobileEntries DaQiaoMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDaQiaoMouMobileEntries, EngineOwners.CharacterDaQiaoMouMobileRuntime>(Core.RuntimeEntries.CharacterDaQiaoMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDaQiaoMouMobileRuntime> DaQiaoMouMobileEntries => GetDeferredModule<EngineOwners.CharacterDaQiaoMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries DaQiaoXiaoQiaoHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries, EngineOwners.CharacterDaQiaoXiaoQiaoHappyGodRuntime>(Core.RuntimeEntries.CharacterDaQiaoXiaoQiaoHappyGodEntries.Create);
 
@@ -315,17 +315,17 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineDamageCounterpartAcquisitionEntries DamageCounterpartAcquisitionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDamageCounterpartAcquisitionEntries, EngineOwners.CoreGameEngineDamageCounterpartAcquisitionRuntime>(Core.RuntimeEntries.CoreGameEngineDamageCounterpartAcquisitionEntries.Create);
 
-    internal Core.RuntimeEntries.CoreDamageCursorRuntimeEntries DamageCursorRuntimeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreDamageCursorRuntimeEntries, EngineOwners.CoreDamageCursorRuntimeRuntime>(Core.RuntimeEntries.CoreDamageCursorRuntimeEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreDamageCursorRuntimeRuntime> DamageCursorRuntimeEntries => GetDeferredModule<EngineOwners.CoreDamageCursorRuntimeRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDamageJudgmentSuitPaymentsEntries DamageJudgmentSuitPaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDamageJudgmentSuitPaymentsEntries, EngineOwners.CoreGameEngineDamageJudgmentSuitPaymentsRuntime>(Core.RuntimeEntries.CoreGameEngineDamageJudgmentSuitPaymentsEntries.Create);
 
     internal Core.RuntimeEntries.CoreDamageObserverCursorQueriesEntries DamageObserverCursorQueriesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreDamageObserverCursorQueriesEntries, EngineOwners.CoreDamageObserverCursorQueriesRuntime>(Core.RuntimeEntries.CoreDamageObserverCursorQueriesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDamagePreventionDrawEntries DamagePreventionDrawEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDamagePreventionDrawEntries, EngineOwners.CoreGameEngineDamagePreventionDrawRuntime>(Core.RuntimeEntries.CoreGameEngineDamagePreventionDrawEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDamagePreventionDrawRuntime> DamagePreventionDrawEntries => GetDeferredModule<EngineOwners.CoreGameEngineDamagePreventionDrawRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDamagePreventionProgramsEntries DamagePreventionProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDamagePreventionProgramsEntries, EngineOwners.CoreGameEngineDamagePreventionProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineDamagePreventionProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDamageSourceHandChoiceEntries DamageSourceHandChoiceEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDamageSourceHandChoiceEntries, EngineOwners.CoreGameEngineDamageSourceHandChoiceRuntime>(Core.RuntimeEntries.CoreGameEngineDamageSourceHandChoiceEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDamageSourceHandChoiceRuntime> DamageSourceHandChoiceEntries => GetDeferredModule<EngineOwners.CoreGameEngineDamageSourceHandChoiceRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDamageTargetBudgetEntries DamageTargetBudgetEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDamageTargetBudgetEntries, EngineOwners.CoreGameEngineDamageTargetBudgetRuntime>(Core.RuntimeEntries.CoreGameEngineDamageTargetBudgetEntries.Create);
 
@@ -335,13 +335,13 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineDamageTargetSkillRoundDrawEntries DamageTargetSkillRoundDrawEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDamageTargetSkillRoundDrawEntries, EngineOwners.CoreGameEngineDamageTargetSkillRoundDrawRuntime>(Core.RuntimeEntries.CoreGameEngineDamageTargetSkillRoundDrawEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDamageZoneAcquisitionEntries DamageZoneAcquisitionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDamageZoneAcquisitionEntries, EngineOwners.CoreGameEngineDamageZoneAcquisitionRuntime>(Core.RuntimeEntries.CoreGameEngineDamageZoneAcquisitionEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDamageZoneAcquisitionRuntime> DamageZoneAcquisitionEntries => GetDeferredModule<EngineOwners.CoreGameEngineDamageZoneAcquisitionRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineDamageZoneAcquisitionObserversEntries DamageZoneAcquisitionObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDamageZoneAcquisitionObserversEntries, EngineOwners.CoreGameEngineDamageZoneAcquisitionObserversRuntime>(Core.RuntimeEntries.CoreGameEngineDamageZoneAcquisitionObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDamageZoneAcquisitionObserversRuntime> DamageZoneAcquisitionObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineDamageZoneAcquisitionObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineDeathGrowthSkillObserversEntries DeathGrowthSkillObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDeathGrowthSkillObserversEntries, EngineOwners.CoreGameEngineDeathGrowthSkillObserversRuntime>(Core.RuntimeEntries.CoreGameEngineDeathGrowthSkillObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDeathGrowthSkillObserversRuntime> DeathGrowthSkillObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineDeathGrowthSkillObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineDeathGrowthSkillsEntries DeathGrowthSkillsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDeathGrowthSkillsEntries, EngineOwners.CoreGameEngineDeathGrowthSkillsRuntime>(Core.RuntimeEntries.CoreGameEngineDeathGrowthSkillsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDeathGrowthSkillsRuntime> DeathGrowthSkillsEntries => GetDeferredModule<EngineOwners.CoreGameEngineDeathGrowthSkillsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDeathProgramsEntries DeathProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDeathProgramsEntries, EngineOwners.CoreGameEngineDeathProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineDeathProgramsEntries.Create);
 
@@ -357,37 +357,37 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineDeferredTurnEndPreludesEntries DeferredTurnEndPreludesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDeferredTurnEndPreludesEntries, EngineOwners.CoreGameEngineDeferredTurnEndPreludesRuntime>(Core.RuntimeEntries.CoreGameEngineDeferredTurnEndPreludesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDelayedNullificationEntries DelayedNullificationEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDelayedNullificationEntries, EngineOwners.CoreGameEngineDelayedNullificationRuntime>(Core.RuntimeEntries.CoreGameEngineDelayedNullificationEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDelayedNullificationRuntime> DelayedNullificationEntries => GetDeferredModule<EngineOwners.CoreGameEngineDelayedNullificationRuntime>();
 
     internal Core.RuntimeEntries.CharacterDengAiAnniversaryGodEntries DengAiAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDengAiAnniversaryGodEntries, EngineOwners.CharacterDengAiAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterDengAiAnniversaryGodEntries.Create);
 
     internal Core.RuntimeEntries.CharacterDengAiMobileShiEntries DengAiMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDengAiMobileShiEntries, EngineOwners.CharacterDengAiMobileShiRuntime>(Core.RuntimeEntries.CharacterDengAiMobileShiEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterDengAiMouOlEntries DengAiMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDengAiMouOlEntries, EngineOwners.CharacterDengAiMouOlRuntime>(Core.RuntimeEntries.CharacterDengAiMouOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDengAiMouOlRuntime> DengAiMouOlEntries => GetDeferredModule<EngineOwners.CharacterDengAiMouOlRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries DesignatedExtraTargetsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries, EngineOwners.CoreGameEngineDesignatedExtraTargetsRuntime>(Core.RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDiamondDelayedProgramsEntries DiamondDelayedProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDiamondDelayedProgramsEntries, EngineOwners.CoreGameEngineDiamondDelayedProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineDiamondDelayedProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDiamondDelayedProgramsRuntime> DiamondDelayedProgramsEntries => GetDeferredModule<EngineOwners.CoreGameEngineDiamondDelayedProgramsRuntime>();
 
-    internal Core.RuntimeEntries.CharacterDianWeiBoundaryMobileEntries DianWeiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDianWeiBoundaryMobileEntries, EngineOwners.CharacterDianWeiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterDianWeiBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDianWeiBoundaryMobileRuntime> DianWeiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterDianWeiBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterDianWeiHappyGodEntries DianWeiHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDianWeiHappyGodEntries, EngineOwners.CharacterDianWeiHappyGodRuntime>(Core.RuntimeEntries.CharacterDianWeiHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDianWeiHappyGodRuntime> DianWeiHappyGodEntries => GetDeferredModule<EngineOwners.CharacterDianWeiHappyGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterDianWeiMobileEntries DianWeiMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDianWeiMobileEntries, EngineOwners.CharacterDianWeiMobileRuntime>(Core.RuntimeEntries.CharacterDianWeiMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDianWeiMobileRuntime> DianWeiMobileEntries => GetDeferredModule<EngineOwners.CharacterDianWeiMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterDianWeiMouEntries DianWeiMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDianWeiMouEntries, EngineOwners.CharacterDianWeiMouRuntime>(Core.RuntimeEntries.CharacterDianWeiMouEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterDiaoChanHappyGodEntries DiaoChanHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDiaoChanHappyGodEntries, EngineOwners.CharacterDiaoChanHappyGodRuntime>(Core.RuntimeEntries.CharacterDiaoChanHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDiaoChanHappyGodRuntime> DiaoChanHappyGodEntries => GetDeferredModule<EngineOwners.CharacterDiaoChanHappyGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterDiaoChanLeEntries DiaoChanLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDiaoChanLeEntries, EngineOwners.CharacterDiaoChanLeRuntime>(Core.RuntimeEntries.CharacterDiaoChanLeEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterDiaoChanMouMobileEntries DiaoChanMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDiaoChanMouMobileEntries, EngineOwners.CharacterDiaoChanMouMobileRuntime>(Core.RuntimeEntries.CharacterDiaoChanMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDiaoChanMouMobileRuntime> DiaoChanMouMobileEntries => GetDeferredModule<EngineOwners.CharacterDiaoChanMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterDiaoChanOlMagicEntries DiaoChanOlMagicEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDiaoChanOlMagicEntries, EngineOwners.CharacterDiaoChanOlMagicRuntime>(Core.RuntimeEntries.CharacterDiaoChanOlMagicEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterDingFengMobileEntries DingFengMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDingFengMobileEntries, EngineOwners.CharacterDingFengMobileRuntime>(Core.RuntimeEntries.CharacterDingFengMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDingFengMobileRuntime> DingFengMobileEntries => GetDeferredModule<EngineOwners.CharacterDingFengMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterDingYuanOlEntries DingYuanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDingYuanOlEntries, EngineOwners.CharacterDingYuanOlRuntime>(Core.RuntimeEntries.CharacterDingYuanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDingYuanOlRuntime> DingYuanOlEntries => GetDeferredModule<EngineOwners.CharacterDingYuanOlRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDirectedCardPolicyQueriesEntries DirectedCardPolicyQueriesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDirectedCardPolicyQueriesEntries, EngineOwners.CoreGameEngineDirectedCardPolicyQueriesRuntime>(Core.RuntimeEntries.CoreGameEngineDirectedCardPolicyQueriesEntries.Create);
 
@@ -397,7 +397,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineDiscardEntries DiscardEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDiscardEntries, EngineOwners.CoreGameEngineDiscardRuntime>(Core.RuntimeEntries.CoreGameEngineDiscardEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDiscardedProvenanceEntries DiscardedProvenanceEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDiscardedProvenanceEntries, EngineOwners.CoreGameEngineDiscardedProvenanceRuntime>(Core.RuntimeEntries.CoreGameEngineDiscardedProvenanceEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDiscardedProvenanceRuntime> DiscardedProvenanceEntries => GetDeferredModule<EngineOwners.CoreGameEngineDiscardedProvenanceRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDistinctFactionDiscardsEntries DistinctFactionDiscardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDistinctFactionDiscardsEntries, EngineOwners.CoreGameEngineDistinctFactionDiscardsRuntime>(Core.RuntimeEntries.CoreGameEngineDistinctFactionDiscardsEntries.Create);
 
@@ -409,9 +409,9 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterDongZhaoMobileShiEntries DongZhaoMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDongZhaoMobileShiEntries, EngineOwners.CharacterDongZhaoMobileShiRuntime>(Core.RuntimeEntries.CharacterDongZhaoMobileShiEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterDongZhaoMouOlEntries DongZhaoMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDongZhaoMouOlEntries, EngineOwners.CharacterDongZhaoMouOlRuntime>(Core.RuntimeEntries.CharacterDongZhaoMouOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDongZhaoMouOlRuntime> DongZhaoMouOlEntries => GetDeferredModule<EngineOwners.CharacterDongZhaoMouOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterDongZhaoOlEntries DongZhaoOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDongZhaoOlEntries, EngineOwners.CharacterDongZhaoOlRuntime>(Core.RuntimeEntries.CharacterDongZhaoOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDongZhaoOlRuntime> DongZhaoOlEntries => GetDeferredModule<EngineOwners.CharacterDongZhaoOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterDongZhuoMouOlEntries DongZhuoMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDongZhuoMouOlEntries, EngineOwners.CharacterDongZhuoMouOlRuntime>(Core.RuntimeEntries.CharacterDongZhuoMouOlEntries.Create);
 
@@ -419,21 +419,21 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineDragonBoatGeneralsEntries DragonBoatGeneralsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDragonBoatGeneralsEntries, EngineOwners.CoreGameEngineDragonBoatGeneralsRuntime>(Core.RuntimeEntries.CoreGameEngineDragonBoatGeneralsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDrawAdviceProgramsEntries DrawAdviceProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDrawAdviceProgramsEntries, EngineOwners.CoreGameEngineDrawAdviceProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineDrawAdviceProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDrawAdviceProgramsRuntime> DrawAdviceProgramsEntries => GetDeferredModule<EngineOwners.CoreGameEngineDrawAdviceProgramsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineDrawDiscardCategoryRefundEntries DrawDiscardCategoryRefundEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDrawDiscardCategoryRefundEntries, EngineOwners.CoreGameEngineDrawDiscardCategoryRefundRuntime>(Core.RuntimeEntries.CoreGameEngineDrawDiscardCategoryRefundEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDrawDiscardCategoryRefundRuntime> DrawDiscardCategoryRefundEntries => GetDeferredModule<EngineOwners.CoreGameEngineDrawDiscardCategoryRefundRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicObserversEntries DrawFundedDistinctBasicObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicObserversEntries, EngineOwners.CoreGameEngineDrawFundedDistinctBasicObserversRuntime>(Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicObserversEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicPaymentEntries DrawFundedDistinctBasicPaymentEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicPaymentEntries, EngineOwners.CoreGameEngineDrawFundedDistinctBasicPaymentRuntime>(Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicPaymentEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicResponsesEntries DrawFundedDistinctBasicResponsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicResponsesEntries, EngineOwners.CoreGameEngineDrawFundedDistinctBasicResponsesRuntime>(Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicResponsesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDrawFundedDistinctBasicResponsesRuntime> DrawFundedDistinctBasicResponsesEntries => GetDeferredModule<EngineOwners.CoreGameEngineDrawFundedDistinctBasicResponsesRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicReturnsEntries DrawFundedDistinctBasicReturnsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicReturnsEntries, EngineOwners.CoreGameEngineDrawFundedDistinctBasicReturnsRuntime>(Core.RuntimeEntries.CoreGameEngineDrawFundedDistinctBasicReturnsEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineDrawPhaseDrawHandLimitEntries DrawPhaseDrawHandLimitEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDrawPhaseDrawHandLimitEntries, EngineOwners.CoreGameEngineDrawPhaseDrawHandLimitRuntime>(Core.RuntimeEntries.CoreGameEngineDrawPhaseDrawHandLimitEntries.Create);
 
-    internal Core.RuntimeEntries.CoreDrawPhaseObligationsEntries DrawPhaseObligationsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreDrawPhaseObligationsEntries, EngineOwners.CoreDrawPhaseObligationsRuntime>(Core.RuntimeEntries.CoreDrawPhaseObligationsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreDrawPhaseObligationsRuntime> DrawPhaseObligationsEntries => GetDeferredModule<EngineOwners.CoreDrawPhaseObligationsRuntime>();
 
     internal Core.RuntimeEntries.CharacterDuFuRenOlEntries DuFuRenOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDuFuRenOlEntries, EngineOwners.CharacterDuFuRenOlRuntime>(Core.RuntimeEntries.CharacterDuFuRenOlEntries.Create);
 
@@ -441,37 +441,37 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterDuXiOlEntries DuXiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDuXiOlEntries, EngineOwners.CharacterDuXiOlRuntime>(Core.RuntimeEntries.CharacterDuXiOlEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDualColorDuelProgramsEntries DualColorDuelProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDualColorDuelProgramsEntries, EngineOwners.CoreGameEngineDualColorDuelProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineDualColorDuelProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDualColorDuelProgramsRuntime> DualColorDuelProgramsEntries => GetDeferredModule<EngineOwners.CoreGameEngineDualColorDuelProgramsRuntime>();
 
     internal Core.RuntimeEntries.CharacterDuanJiongOlEntries DuanJiongOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDuanJiongOlEntries, EngineOwners.CharacterDuanJiongOlRuntime>(Core.RuntimeEntries.CharacterDuanJiongOlEntries.Create);
 
-    internal Core.RuntimeEntries.CoreDyingCursorRuntimeEntries DyingCursorRuntimeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreDyingCursorRuntimeEntries, EngineOwners.CoreDyingCursorRuntimeRuntime>(Core.RuntimeEntries.CoreDyingCursorRuntimeEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreDyingCursorRuntimeRuntime> DyingCursorRuntimeEntries => GetDeferredModule<EngineOwners.CoreDyingCursorRuntimeRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDyingEntryProgramsEntries DyingEntryProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDyingEntryProgramsEntries, EngineOwners.CoreGameEngineDyingEntryProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineDyingEntryProgramsEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineDyingOwnedCardSelectionsEntries DyingOwnedCardSelectionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDyingOwnedCardSelectionsEntries, EngineOwners.CoreGameEngineDyingOwnedCardSelectionsRuntime>(Core.RuntimeEntries.CoreGameEngineDyingOwnedCardSelectionsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDyingOwnerSkillReplacementEntries DyingOwnerSkillReplacementEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDyingOwnerSkillReplacementEntries, EngineOwners.CoreGameEngineDyingOwnerSkillReplacementRuntime>(Core.RuntimeEntries.CoreGameEngineDyingOwnerSkillReplacementEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDyingOwnerSkillReplacementRuntime> DyingOwnerSkillReplacementEntries => GetDeferredModule<EngineOwners.CoreGameEngineDyingOwnerSkillReplacementRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDyingProgramsEntries DyingProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDyingProgramsEntries, EngineOwners.CoreGameEngineDyingProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineDyingProgramsEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineDyingSuitsAndHistoricalUseObserversEntries DyingSuitsAndHistoricalUseObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDyingSuitsAndHistoricalUseObserversEntries, EngineOwners.CoreGameEngineDyingSuitsAndHistoricalUseObserversRuntime>(Core.RuntimeEntries.CoreGameEngineDyingSuitsAndHistoricalUseObserversEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineDyingSuitsPeachProgramsEntries DyingSuitsPeachProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDyingSuitsPeachProgramsEntries, EngineOwners.CoreGameEngineDyingSuitsPeachProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineDyingSuitsPeachProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDyingSuitsPeachProgramsRuntime> DyingSuitsPeachProgramsEntries => GetDeferredModule<EngineOwners.CoreGameEngineDyingSuitsPeachProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineDynamicDiscardDamagePaymentsEntries DynamicDiscardDamagePaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineDynamicDiscardDamagePaymentsEntries, EngineOwners.CoreGameEngineDynamicDiscardDamagePaymentsRuntime>(Core.RuntimeEntries.CoreGameEngineDynamicDiscardDamagePaymentsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineEarnedActualEndingBenefitsEntries EarnedActualEndingBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineEarnedActualEndingBenefitsEntries, EngineOwners.CoreGameEngineEarnedActualEndingBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineEarnedActualEndingBenefitsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineEarnedActualEndingBenefitsRuntime> EarnedActualEndingBenefitsEntries => GetDeferredModule<EngineOwners.CoreGameEngineEarnedActualEndingBenefitsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineEndRefillNextTurnEntries EndRefillNextTurnEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineEndRefillNextTurnEntries, EngineOwners.CoreGameEngineEndRefillNextTurnRuntime>(Core.RuntimeEntries.CoreGameEngineEndRefillNextTurnEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineEndRefillNextTurnObserversEntries EndRefillNextTurnObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineEndRefillNextTurnObserversEntries, EngineOwners.CoreGameEngineEndRefillNextTurnObserversRuntime>(Core.RuntimeEntries.CoreGameEngineEndRefillNextTurnObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineEndRefillNextTurnObserversRuntime> EndRefillNextTurnObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineEndRefillNextTurnObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreEndingHandCountProgramsEntries EndingHandCountProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreEndingHandCountProgramsEntries, EngineOwners.CoreEndingHandCountProgramsRuntime>(Core.RuntimeEntries.CoreEndingHandCountProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreEndingHandCountProgramsRuntime> EndingHandCountProgramsEntries => GetDeferredModule<EngineOwners.CoreEndingHandCountProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineEndingHistoricalUsesEntries EndingHistoricalUsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineEndingHistoricalUsesEntries, EngineOwners.CoreGameEngineEndingHistoricalUsesRuntime>(Core.RuntimeEntries.CoreGameEngineEndingHistoricalUsesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineEndingPairDrawsEntries EndingPairDrawsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineEndingPairDrawsEntries, EngineOwners.CoreGameEngineEndingPairDrawsRuntime>(Core.RuntimeEntries.CoreGameEngineEndingPairDrawsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineEndingPairDrawsRuntime> EndingPairDrawsEntries => GetDeferredModule<EngineOwners.CoreGameEngineEndingPairDrawsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineEphemeralCardMaterialsEntries EphemeralCardMaterialsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineEphemeralCardMaterialsEntries, EngineOwners.CoreGameEngineEphemeralCardMaterialsRuntime>(Core.RuntimeEntries.CoreGameEngineEphemeralCardMaterialsEntries.Create);
 
@@ -485,51 +485,51 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineEquipmentSlotGroupProgramsEntries EquipmentSlotGroupProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineEquipmentSlotGroupProgramsEntries, EngineOwners.CoreGameEngineEquipmentSlotGroupProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineEquipmentSlotGroupProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineEquipmentSuitHandLimitEntries EquipmentSuitHandLimitEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineEquipmentSuitHandLimitEntries, EngineOwners.CoreGameEngineEquipmentSuitHandLimitRuntime>(Core.RuntimeEntries.CoreGameEngineEquipmentSuitHandLimitEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineEquipmentSuitHandLimitRuntime> EquipmentSuitHandLimitEntries => GetDeferredModule<EngineOwners.CoreGameEngineEquipmentSuitHandLimitRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineExactRepeatedJudgmentEntries ExactRepeatedJudgmentEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineExactRepeatedJudgmentEntries, EngineOwners.CoreGameEngineExactRepeatedJudgmentRuntime>(Core.RuntimeEntries.CoreGameEngineExactRepeatedJudgmentEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineExactRepeatedJudgmentRuntime> ExactRepeatedJudgmentEntries => GetDeferredModule<EngineOwners.CoreGameEngineExactRepeatedJudgmentRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineExtendedViewAsEntries ExtendedViewAsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineExtendedViewAsEntries, EngineOwners.CoreGameEngineExtendedViewAsRuntime>(Core.RuntimeEntries.CoreGameEngineExtendedViewAsEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineExtraEffectMaterialClaimsEntries ExtraEffectMaterialClaimsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineExtraEffectMaterialClaimsEntries, EngineOwners.CoreGameEngineExtraEffectMaterialClaimsRuntime>(Core.RuntimeEntries.CoreGameEngineExtraEffectMaterialClaimsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineExtraEffectsAndRankGuessObserversEntries ExtraEffectsAndRankGuessObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineExtraEffectsAndRankGuessObserversEntries, EngineOwners.CoreGameEngineExtraEffectsAndRankGuessObserversRuntime>(Core.RuntimeEntries.CoreGameEngineExtraEffectsAndRankGuessObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineExtraEffectsAndRankGuessObserversRuntime> ExtraEffectsAndRankGuessObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineExtraEffectsAndRankGuessObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineExtraEffectsAndRankGuessingEntries ExtraEffectsAndRankGuessingEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineExtraEffectsAndRankGuessingEntries, EngineOwners.CoreGameEngineExtraEffectsAndRankGuessingRuntime>(Core.RuntimeEntries.CoreGameEngineExtraEffectsAndRankGuessingEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterFaZhengMouMobileEntries FaZhengMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterFaZhengMouMobileEntries, EngineOwners.CharacterFaZhengMouMobileRuntime>(Core.RuntimeEntries.CharacterFaZhengMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterFaZhengMouMobileRuntime> FaZhengMouMobileEntries => GetDeferredModule<EngineOwners.CharacterFaZhengMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineFactionRequestCostRecoveriesEntries FactionRequestCostRecoveriesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFactionRequestCostRecoveriesEntries, EngineOwners.CoreGameEngineFactionRequestCostRecoveriesRuntime>(Core.RuntimeEntries.CoreGameEngineFactionRequestCostRecoveriesEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterFanChouOlEntries FanChouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterFanChouOlEntries, EngineOwners.CharacterFanChouOlRuntime>(Core.RuntimeEntries.CharacterFanChouOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterFanChouOlRuntime> FanChouOlEntries => GetDeferredModule<EngineOwners.CharacterFanChouOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterFanJiangZhangDaOlEntries FanJiangZhangDaOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterFanJiangZhangDaOlEntries, EngineOwners.CharacterFanJiangZhangDaOlRuntime>(Core.RuntimeEntries.CharacterFanJiangZhangDaOlEntries.Create);
 
     internal Core.RuntimeEntries.CharacterFeiYiOlEntries FeiYiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterFeiYiOlEntries, EngineOwners.CharacterFeiYiOlRuntime>(Core.RuntimeEntries.CharacterFeiYiOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterFengXiAnniversaryEntries FengXiAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterFengXiAnniversaryEntries, EngineOwners.CharacterFengXiAnniversaryRuntime>(Core.RuntimeEntries.CharacterFengXiAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterFengXiAnniversaryRuntime> FengXiAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterFengXiAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineFieldEquipmentEntries FieldEquipmentEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFieldEquipmentEntries, EngineOwners.CoreGameEngineFieldEquipmentRuntime>(Core.RuntimeEntries.CoreGameEngineFieldEquipmentEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineFinalTargetGiftsEntries FinalTargetGiftsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFinalTargetGiftsEntries, EngineOwners.CoreGameEngineFinalTargetGiftsRuntime>(Core.RuntimeEntries.CoreGameEngineFinalTargetGiftsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineFinalTargetGiftsRuntime> FinalTargetGiftsEntries => GetDeferredModule<EngineOwners.CoreGameEngineFinalTargetGiftsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineFinalTargetPublicPilesEntries FinalTargetPublicPilesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFinalTargetPublicPilesEntries, EngineOwners.CoreGameEngineFinalTargetPublicPilesRuntime>(Core.RuntimeEntries.CoreGameEngineFinalTargetPublicPilesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineFinalTargetPublicPilesRuntime> FinalTargetPublicPilesEntries => GetDeferredModule<EngineOwners.CoreGameEngineFinalTargetPublicPilesRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineFinalTargetSlashEntries FinalTargetSlashEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFinalTargetSlashEntries, EngineOwners.CoreGameEngineFinalTargetSlashRuntime>(Core.RuntimeEntries.CoreGameEngineFinalTargetSlashEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineFinalTargetTurnCountsEntries FinalTargetTurnCountsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFinalTargetTurnCountsEntries, EngineOwners.CoreGameEngineFinalTargetTurnCountsRuntime>(Core.RuntimeEntries.CoreGameEngineFinalTargetTurnCountsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineFinalTargetTurnCountsRuntime> FinalTargetTurnCountsEntries => GetDeferredModule<EngineOwners.CoreGameEngineFinalTargetTurnCountsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineFireTargetBenefitsEntries FireTargetBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFireTargetBenefitsEntries, EngineOwners.CoreGameEngineFireTargetBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineFireTargetBenefitsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineFirstSlashDuelBenefitObserversEntries FirstSlashDuelBenefitObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFirstSlashDuelBenefitObserversEntries, EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime>(Core.RuntimeEntries.CoreGameEngineFirstSlashDuelBenefitObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime> FirstSlashDuelBenefitObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineFirstSlashDuelBenefitObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineFirstSlashDuelBenefitsEntries FirstSlashDuelBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFirstSlashDuelBenefitsEntries, EngineOwners.CoreGameEngineFirstSlashDuelBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineFirstSlashDuelBenefitsEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineFirstSlashDuelLegacyWindowsEntries FirstSlashDuelLegacyWindowsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFirstSlashDuelLegacyWindowsEntries, EngineOwners.CoreGameEngineFirstSlashDuelLegacyWindowsRuntime>(Core.RuntimeEntries.CoreGameEngineFirstSlashDuelLegacyWindowsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineFixedDistanceOneDebtEntries FixedDistanceOneDebtEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFixedDistanceOneDebtEntries, EngineOwners.CoreGameEngineFixedDistanceOneDebtRuntime>(Core.RuntimeEntries.CoreGameEngineFixedDistanceOneDebtEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineFixedDistanceOneDebtRuntime> FixedDistanceOneDebtEntries => GetDeferredModule<EngineOwners.CoreGameEngineFixedDistanceOneDebtRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineFixedDistanceOneDebtObserversEntries FixedDistanceOneDebtObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFixedDistanceOneDebtObserversEntries, EngineOwners.CoreGameEngineFixedDistanceOneDebtObserversRuntime>(Core.RuntimeEntries.CoreGameEngineFixedDistanceOneDebtObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineFixedDistanceOneDebtObserversRuntime> FixedDistanceOneDebtObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineFixedDistanceOneDebtObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineFixedRecipientBenefitsEntries FixedRecipientBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFixedRecipientBenefitsEntries, EngineOwners.CoreGameEngineFixedRecipientBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineFixedRecipientBenefitsEntries.Create);
 
@@ -543,7 +543,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineForeignSelectedCardSlashReturnsEntries ForeignSelectedCardSlashReturnsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineForeignSelectedCardSlashReturnsEntries, EngineOwners.CoreGameEngineForeignSelectedCardSlashReturnsRuntime>(Core.RuntimeEntries.CoreGameEngineForeignSelectedCardSlashReturnsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineForeignTurnContestsEntries ForeignTurnContestsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineForeignTurnContestsEntries, EngineOwners.CoreGameEngineForeignTurnContestsRuntime>(Core.RuntimeEntries.CoreGameEngineForeignTurnContestsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineForeignTurnContestsRuntime> ForeignTurnContestsEntries => GetDeferredModule<EngineOwners.CoreGameEngineForeignTurnContestsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineFriendDuelResponsesEntries FriendDuelResponsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFriendDuelResponsesEntries, EngineOwners.CoreGameEngineFriendDuelResponsesRuntime>(Core.RuntimeEntries.CoreGameEngineFriendDuelResponsesEntries.Create);
 
@@ -551,13 +551,13 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineFriendTrioEntries FriendTrioEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFriendTrioEntries, EngineOwners.CoreGameEngineFriendTrioRuntime>(Core.RuntimeEntries.CoreGameEngineFriendTrioEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineFrozenFactionRecoveryEntries FrozenFactionRecoveryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFrozenFactionRecoveryEntries, EngineOwners.CoreGameEngineFrozenFactionRecoveryRuntime>(Core.RuntimeEntries.CoreGameEngineFrozenFactionRecoveryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineFrozenFactionRecoveryRuntime> FrozenFactionRecoveryEntries => GetDeferredModule<EngineOwners.CoreGameEngineFrozenFactionRecoveryRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineFrozenHandRosterEntries FrozenHandRosterEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFrozenHandRosterEntries, EngineOwners.CoreGameEngineFrozenHandRosterRuntime>(Core.RuntimeEntries.CoreGameEngineFrozenHandRosterEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineFrozenHandRosterRuntime> FrozenHandRosterEntries => GetDeferredModule<EngineOwners.CoreGameEngineFrozenHandRosterRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineFrozenHandRosterObserversEntries FrozenHandRosterObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineFrozenHandRosterObserversEntries, EngineOwners.CoreGameEngineFrozenHandRosterObserversRuntime>(Core.RuntimeEntries.CoreGameEngineFrozenHandRosterObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineFrozenHandRosterObserversRuntime> FrozenHandRosterObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineFrozenHandRosterObserversRuntime>();
 
-    internal Core.RuntimeEntries.CharacterFuRongFuQianAnniversaryEntries FuRongFuQianAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterFuRongFuQianAnniversaryEntries, EngineOwners.CharacterFuRongFuQianAnniversaryRuntime>(Core.RuntimeEntries.CharacterFuRongFuQianAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterFuRongFuQianAnniversaryRuntime> FuRongFuQianAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterFuRongFuQianAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterFuRongOlEntries FuRongOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterFuRongOlEntries, EngineOwners.CharacterFuRongOlRuntime>(Core.RuntimeEntries.CharacterFuRongOlEntries.Create);
 
@@ -567,47 +567,47 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineGameDomainsEntries GameDomainsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineGameDomainsEntries, EngineOwners.CoreGameEngineGameDomainsRuntime>(Core.RuntimeEntries.CoreGameEngineGameDomainsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineGameTargetHandHpChoicesEntries GameTargetHandHpChoicesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineGameTargetHandHpChoicesEntries, EngineOwners.CoreGameEngineGameTargetHandHpChoicesRuntime>(Core.RuntimeEntries.CoreGameEngineGameTargetHandHpChoicesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineGameTargetHandHpChoicesRuntime> GameTargetHandHpChoicesEntries => GetDeferredModule<EngineOwners.CoreGameEngineGameTargetHandHpChoicesRuntime>();
 
-    internal Core.RuntimeEntries.CharacterGanNingHappyGodEntries GanNingHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGanNingHappyGodEntries, EngineOwners.CharacterGanNingHappyGodRuntime>(Core.RuntimeEntries.CharacterGanNingHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGanNingHappyGodRuntime> GanNingHappyGodEntries => GetDeferredModule<EngineOwners.CharacterGanNingHappyGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterGanNingMobileGodEntries GanNingMobileGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGanNingMobileGodEntries, EngineOwners.CharacterGanNingMobileGodRuntime>(Core.RuntimeEntries.CharacterGanNingMobileGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGanNingMobileGodRuntime> GanNingMobileGodEntries => GetDeferredModule<EngineOwners.CharacterGanNingMobileGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterGanNingMouMobileEntries GanNingMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGanNingMouMobileEntries, EngineOwners.CharacterGanNingMouMobileRuntime>(Core.RuntimeEntries.CharacterGanNingMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGanNingMouMobileRuntime> GanNingMouMobileEntries => GetDeferredModule<EngineOwners.CharacterGanNingMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterGaoGanOlEntries GaoGanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGaoGanOlEntries, EngineOwners.CharacterGaoGanOlRuntime>(Core.RuntimeEntries.CharacterGaoGanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGaoGanOlRuntime> GaoGanOlEntries => GetDeferredModule<EngineOwners.CharacterGaoGanOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterGaoLanOlEntries GaoLanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGaoLanOlEntries, EngineOwners.CharacterGaoLanOlRuntime>(Core.RuntimeEntries.CharacterGaoLanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGaoLanOlRuntime> GaoLanOlEntries => GetDeferredModule<EngineOwners.CharacterGaoLanOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterGaoShunBoundaryMobileEntries GaoShunBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGaoShunBoundaryMobileEntries, EngineOwners.CharacterGaoShunBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterGaoShunBoundaryMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterGaoXiangAnniversaryEntries GaoXiangAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGaoXiangAnniversaryEntries, EngineOwners.CharacterGaoXiangAnniversaryRuntime>(Core.RuntimeEntries.CharacterGaoXiangAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGaoXiangAnniversaryRuntime> GaoXiangAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterGaoXiangAnniversaryRuntime>();
 
-    internal Core.RuntimeEntries.CharacterGaoXiangMobileShiEntries GaoXiangMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGaoXiangMobileShiEntries, EngineOwners.CharacterGaoXiangMobileShiRuntime>(Core.RuntimeEntries.CharacterGaoXiangMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGaoXiangMobileShiRuntime> GaoXiangMobileShiEntries => GetDeferredModule<EngineOwners.CharacterGaoXiangMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CoreGhostActivityProgramsEntries GhostActivityProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGhostActivityProgramsEntries, EngineOwners.CoreGhostActivityProgramsRuntime>(Core.RuntimeEntries.CoreGhostActivityProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGhostActivityProgramsRuntime> GhostActivityProgramsEntries => GetDeferredModule<EngineOwners.CoreGhostActivityProgramsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineGiftedSlashUseRewardsEntries GiftedSlashUseRewardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineGiftedSlashUseRewardsEntries, EngineOwners.CoreGameEngineGiftedSlashUseRewardsRuntime>(Core.RuntimeEntries.CoreGameEngineGiftedSlashUseRewardsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineGiftedSlashUseRewardsRuntime> GiftedSlashUseRewardsEntries => GetDeferredModule<EngineOwners.CoreGameEngineGiftedSlashUseRewardsRuntime>();
 
     internal Core.RuntimeEntries.CharacterGongsunZanMouMobileEntries GongsunZanMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGongsunZanMouMobileEntries, EngineOwners.CharacterGongsunZanMouMobileRuntime>(Core.RuntimeEntries.CharacterGongsunZanMouMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterGongsunZanMouOlEntries GongsunZanMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGongsunZanMouOlEntries, EngineOwners.CharacterGongsunZanMouOlRuntime>(Core.RuntimeEntries.CharacterGongsunZanMouOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGongsunZanMouOlRuntime> GongsunZanMouOlEntries => GetDeferredModule<EngineOwners.CharacterGongsunZanMouOlRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineGouXiangArmorEntries GouXiangArmorEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineGouXiangArmorEntries, EngineOwners.CoreGameEngineGouXiangArmorRuntime>(Core.RuntimeEntries.CoreGameEngineGouXiangArmorEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineGouXiangArmorRuntime> GouXiangArmorEntries => GetDeferredModule<EngineOwners.CoreGameEngineGouXiangArmorRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineGrantedEntityPhasesEntries GrantedEntityPhasesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineGrantedEntityPhasesEntries, EngineOwners.CoreGameEngineGrantedEntityPhasesRuntime>(Core.RuntimeEntries.CoreGameEngineGrantedEntityPhasesEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterGuYongBoundaryMobileEntries GuYongBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuYongBoundaryMobileEntries, EngineOwners.CharacterGuYongBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterGuYongBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGuYongBoundaryMobileRuntime> GuYongBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterGuYongBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterGuYongOlEntries GuYongOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuYongOlEntries, EngineOwners.CharacterGuYongOlRuntime>(Core.RuntimeEntries.CharacterGuYongOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGuYongOlRuntime> GuYongOlEntries => GetDeferredModule<EngineOwners.CharacterGuYongOlRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineGuanHaiBridgesEntries GuanHaiBridgesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineGuanHaiBridgesEntries, EngineOwners.CoreGameEngineGuanHaiBridgesRuntime>(Core.RuntimeEntries.CoreGameEngineGuanHaiBridgesEntries.Create);
 
     internal Core.RuntimeEntries.CharacterGuanHaiOlEntries GuanHaiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuanHaiOlEntries, EngineOwners.CharacterGuanHaiOlRuntime>(Core.RuntimeEntries.CharacterGuanHaiOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterGuanPingMouEntries GuanPingMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuanPingMouEntries, EngineOwners.CharacterGuanPingMouRuntime>(Core.RuntimeEntries.CharacterGuanPingMouEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGuanPingMouRuntime> GuanPingMouEntries => GetDeferredModule<EngineOwners.CharacterGuanPingMouRuntime>();
 
-    internal Core.RuntimeEntries.CharacterGuanYuAnniversaryGodEntries GuanYuAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuanYuAnniversaryGodEntries, EngineOwners.CharacterGuanYuAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterGuanYuAnniversaryGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGuanYuAnniversaryGodRuntime> GuanYuAnniversaryGodEntries => GetDeferredModule<EngineOwners.CharacterGuanYuAnniversaryGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterGuanYuHappyGodEntries GuanYuHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuanYuHappyGodEntries, EngineOwners.CharacterGuanYuHappyGodRuntime>(Core.RuntimeEntries.CharacterGuanYuHappyGodEntries.Create);
 
@@ -625,13 +625,13 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineGuanduGeneralsEntries GuanduGeneralsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineGuanduGeneralsEntries, EngineOwners.CoreGameEngineGuanduGeneralsRuntime>(Core.RuntimeEntries.CoreGameEngineGuanduGeneralsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterGuoHuaiBoundaryMobileEntries GuoHuaiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuoHuaiBoundaryMobileEntries, EngineOwners.CharacterGuoHuaiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterGuoHuaiBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGuoHuaiBoundaryMobileRuntime> GuoHuaiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterGuoHuaiBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterGuoHuaiMobileEntries GuoHuaiMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuoHuaiMobileEntries, EngineOwners.CharacterGuoHuaiMobileRuntime>(Core.RuntimeEntries.CharacterGuoHuaiMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterGuoHuaiMouMobileEntries GuoHuaiMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuoHuaiMouMobileEntries, EngineOwners.CharacterGuoHuaiMouMobileRuntime>(Core.RuntimeEntries.CharacterGuoHuaiMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGuoHuaiMouMobileRuntime> GuoHuaiMouMobileEntries => GetDeferredModule<EngineOwners.CharacterGuoHuaiMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterGuoJiaHappyGodEntries GuoJiaHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuoJiaHappyGodEntries, EngineOwners.CharacterGuoJiaHappyGodRuntime>(Core.RuntimeEntries.CharacterGuoJiaHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGuoJiaHappyGodRuntime> GuoJiaHappyGodEntries => GetDeferredModule<EngineOwners.CharacterGuoJiaHappyGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterGuoJiaMobileGodEntries GuoJiaMobileGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuoJiaMobileGodEntries, EngineOwners.CharacterGuoJiaMobileGodRuntime>(Core.RuntimeEntries.CharacterGuoJiaMobileGodEntries.Create);
 
@@ -641,11 +641,11 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterGuoTuOlEntries GuoTuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuoTuOlEntries, EngineOwners.CharacterGuoTuOlRuntime>(Core.RuntimeEntries.CharacterGuoTuOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterGuoYouZhiMouMobileEntries GuoYouZhiMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuoYouZhiMouMobileEntries, EngineOwners.CharacterGuoYouZhiMouMobileRuntime>(Core.RuntimeEntries.CharacterGuoYouZhiMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGuoYouZhiMouMobileRuntime> GuoYouZhiMouMobileEntries => GetDeferredModule<EngineOwners.CharacterGuoYouZhiMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterGuoYuanMobileShiEntries GuoYuanMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuoYuanMobileShiEntries, EngineOwners.CharacterGuoYuanMobileShiRuntime>(Core.RuntimeEntries.CharacterGuoYuanMobileShiEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterGuoZhaoAnniversaryEntries GuoZhaoAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterGuoZhaoAnniversaryEntries, EngineOwners.CharacterGuoZhaoAnniversaryRuntime>(Core.RuntimeEntries.CharacterGuoZhaoAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterGuoZhaoAnniversaryRuntime> GuoZhaoAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterGuoZhaoAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineHalfHandPhaseDebtDamageObserversEntries HalfHandPhaseDebtDamageObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHalfHandPhaseDebtDamageObserversEntries, EngineOwners.CoreGameEngineHalfHandPhaseDebtDamageObserversRuntime>(Core.RuntimeEntries.CoreGameEngineHalfHandPhaseDebtDamageObserversEntries.Create);
 
@@ -657,13 +657,13 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterHanDangMouMobileEntries HanDangMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHanDangMouMobileEntries, EngineOwners.CharacterHanDangMouMobileRuntime>(Core.RuntimeEntries.CharacterHanDangMouMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHanFuOlEntries HanFuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHanFuOlEntries, EngineOwners.CharacterHanFuOlRuntime>(Core.RuntimeEntries.CharacterHanFuOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHanFuOlRuntime> HanFuOlEntries => GetDeferredModule<EngineOwners.CharacterHanFuOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterHanSongAnniversaryEntries HanSongAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHanSongAnniversaryEntries, EngineOwners.CharacterHanSongAnniversaryRuntime>(Core.RuntimeEntries.CharacterHanSongAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHanSongAnniversaryRuntime> HanSongAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterHanSongAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineHandComparisonEntries HandComparisonEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHandComparisonEntries, EngineOwners.CoreGameEngineHandComparisonRuntime>(Core.RuntimeEntries.CoreGameEngineHandComparisonEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHaoMengAnniversaryEntries HaoMengAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHaoMengAnniversaryEntries, EngineOwners.CharacterHaoMengAnniversaryRuntime>(Core.RuntimeEntries.CharacterHaoMengAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHaoMengAnniversaryRuntime> HaoMengAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterHaoMengAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterHaoPuOlEntries HaoPuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHaoPuOlEntries, EngineOwners.CharacterHaoPuOlRuntime>(Core.RuntimeEntries.CharacterHaoPuOlEntries.Create);
 
@@ -671,23 +671,23 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterHeJinOlEntries HeJinOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHeJinOlEntries, EngineOwners.CharacterHeJinOlRuntime>(Core.RuntimeEntries.CharacterHeJinOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHeQiMobileEntries HeQiMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHeQiMobileEntries, EngineOwners.CharacterHeQiMobileRuntime>(Core.RuntimeEntries.CharacterHeQiMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHeQiMobileRuntime> HeQiMobileEntries => GetDeferredModule<EngineOwners.CharacterHeQiMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterHeQiMobileShiEntries HeQiMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHeQiMobileShiEntries, EngineOwners.CharacterHeQiMobileShiRuntime>(Core.RuntimeEntries.CharacterHeQiMobileShiEntries.Create);
 
     internal Core.RuntimeEntries.CharacterHeQiOlEntries HeQiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHeQiOlEntries, EngineOwners.CharacterHeQiOlRuntime>(Core.RuntimeEntries.CharacterHeQiOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHeYanAnniversaryEntries HeYanAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHeYanAnniversaryEntries, EngineOwners.CharacterHeYanAnniversaryRuntime>(Core.RuntimeEntries.CharacterHeYanAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHeYanAnniversaryRuntime> HeYanAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterHeYanAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineHealthQueriesEntries HealthQueriesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHealthQueriesEntries, EngineOwners.CoreGameEngineHealthQueriesRuntime>(Core.RuntimeEntries.CoreGameEngineHealthQueriesEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineHellActivitiesEntries HellActivitiesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHellActivitiesEntries, EngineOwners.CoreGameEngineHellActivitiesRuntime>(Core.RuntimeEntries.CoreGameEngineHellActivitiesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreHellActivityProgramsEntries HellActivityProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreHellActivityProgramsEntries, EngineOwners.CoreHellActivityProgramsRuntime>(Core.RuntimeEntries.CoreHellActivityProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreHellActivityProgramsRuntime> HellActivityProgramsEntries => GetDeferredModule<EngineOwners.CoreHellActivityProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreHellDizangProgramsEntries HellDizangProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreHellDizangProgramsEntries, EngineOwners.CoreHellDizangProgramsRuntime>(Core.RuntimeEntries.CoreHellDizangProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreHellKingProgramsEntries HellKingProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreHellKingProgramsEntries, EngineOwners.CoreHellKingProgramsRuntime>(Core.RuntimeEntries.CoreHellKingProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreHellKingProgramsRuntime> HellKingProgramsEntries => GetDeferredModule<EngineOwners.CoreHellKingProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreHellMengpoProgramsEntries HellMengpoProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreHellMengpoProgramsEntries, EngineOwners.CoreHellMengpoProgramsRuntime>(Core.RuntimeEntries.CoreHellMengpoProgramsEntries.Create);
 
@@ -697,7 +697,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineHpChangeProgramsEntries HpChangeProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHpChangeProgramsEntries, EngineOwners.CoreGameEngineHpChangeProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineHpChangeProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineHpConditionalSkillGrantsEntries HpConditionalSkillGrantsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHpConditionalSkillGrantsEntries, EngineOwners.CoreGameEngineHpConditionalSkillGrantsRuntime>(Core.RuntimeEntries.CoreGameEngineHpConditionalSkillGrantsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineHpConditionalSkillGrantsRuntime> HpConditionalSkillGrantsEntries => GetDeferredModule<EngineOwners.CoreGameEngineHpConditionalSkillGrantsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineHpDamageShieldsEntries HpDamageShieldsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHpDamageShieldsEntries, EngineOwners.CoreGameEngineHpDamageShieldsRuntime>(Core.RuntimeEntries.CoreGameEngineHpDamageShieldsEntries.Create);
 
@@ -709,35 +709,35 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterHuCheErMouEntries HuCheErMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuCheErMouEntries, EngineOwners.CharacterHuCheErMouRuntime>(Core.RuntimeEntries.CharacterHuCheErMouEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHuJinDingOlEntries HuJinDingOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuJinDingOlEntries, EngineOwners.CharacterHuJinDingOlRuntime>(Core.RuntimeEntries.CharacterHuJinDingOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuJinDingOlRuntime> HuJinDingOlEntries => GetDeferredModule<EngineOwners.CharacterHuJinDingOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterHuLieMouEntries HuLieMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuLieMouEntries, EngineOwners.CharacterHuLieMouRuntime>(Core.RuntimeEntries.CharacterHuLieMouEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHuZhaoAnniversaryEntries HuZhaoAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuZhaoAnniversaryEntries, EngineOwners.CharacterHuZhaoAnniversaryRuntime>(Core.RuntimeEntries.CharacterHuZhaoAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuZhaoAnniversaryRuntime> HuZhaoAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterHuZhaoAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterHuaManOlEntries HuaManOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuaManOlEntries, EngineOwners.CharacterHuaManOlRuntime>(Core.RuntimeEntries.CharacterHuaManOlEntries.Create);
 
     internal Core.RuntimeEntries.CharacterHuaTuoAnniversaryGodEntries HuaTuoAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuaTuoAnniversaryGodEntries, EngineOwners.CharacterHuaTuoAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterHuaTuoAnniversaryGodEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHuaTuoBoundaryMobileEntries HuaTuoBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuaTuoBoundaryMobileEntries, EngineOwners.CharacterHuaTuoBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterHuaTuoBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuaTuoBoundaryMobileRuntime> HuaTuoBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterHuaTuoBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterHuaTuoHappyGodEntries HuaTuoHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuaTuoHappyGodEntries, EngineOwners.CharacterHuaTuoHappyGodRuntime>(Core.RuntimeEntries.CharacterHuaTuoHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuaTuoHappyGodRuntime> HuaTuoHappyGodEntries => GetDeferredModule<EngineOwners.CharacterHuaTuoHappyGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterHuaTuoMobileGodEntries HuaTuoMobileGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuaTuoMobileGodEntries, EngineOwners.CharacterHuaTuoMobileGodRuntime>(Core.RuntimeEntries.CharacterHuaTuoMobileGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuaTuoMobileGodRuntime> HuaTuoMobileGodEntries => GetDeferredModule<EngineOwners.CharacterHuaTuoMobileGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterHuaXiongMouMobileEntries HuaXiongMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuaXiongMouMobileEntries, EngineOwners.CharacterHuaXiongMouMobileRuntime>(Core.RuntimeEntries.CharacterHuaXiongMouMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHuaXiongMouOlEntries HuaXiongMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuaXiongMouOlEntries, EngineOwners.CharacterHuaXiongMouOlRuntime>(Core.RuntimeEntries.CharacterHuaXiongMouOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuaXiongMouOlRuntime> HuaXiongMouOlEntries => GetDeferredModule<EngineOwners.CharacterHuaXiongMouOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterHuanJieMobileShiEntries HuanJieMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuanJieMobileShiEntries, EngineOwners.CharacterHuanJieMobileShiRuntime>(Core.RuntimeEntries.CharacterHuanJieMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuanJieMobileShiRuntime> HuanJieMobileShiEntries => GetDeferredModule<EngineOwners.CharacterHuanJieMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CharacterHuanShuJunOlEntries HuanShuJunOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuanShuJunOlEntries, EngineOwners.CharacterHuanShuJunOlRuntime>(Core.RuntimeEntries.CharacterHuanShuJunOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHuangChengYanOlEntries HuangChengYanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuangChengYanOlEntries, EngineOwners.CharacterHuangChengYanOlRuntime>(Core.RuntimeEntries.CharacterHuangChengYanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuangChengYanOlRuntime> HuangChengYanOlEntries => GetDeferredModule<EngineOwners.CharacterHuangChengYanOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterHuangChongMobileShiEntries HuangChongMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuangChongMobileShiEntries, EngineOwners.CharacterHuangChongMobileShiRuntime>(Core.RuntimeEntries.CharacterHuangChongMobileShiEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHuangGaiMouEntries HuangGaiMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuangGaiMouEntries, EngineOwners.CharacterHuangGaiMouRuntime>(Core.RuntimeEntries.CharacterHuangGaiMouEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuangGaiMouRuntime> HuangGaiMouEntries => GetDeferredModule<EngineOwners.CharacterHuangGaiMouRuntime>();
 
     internal Core.RuntimeEntries.CharacterHuangGaiMouMobileEntries HuangGaiMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuangGaiMouMobileEntries, EngineOwners.CharacterHuangGaiMouMobileRuntime>(Core.RuntimeEntries.CharacterHuangGaiMouMobileEntries.Create);
 
@@ -757,63 +757,63 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterHuangfuSongWumiaoEntries HuangfuSongWumiaoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuangfuSongWumiaoEntries, EngineOwners.CharacterHuangfuSongWumiaoRuntime>(Core.RuntimeEntries.CharacterHuangfuSongWumiaoEntries.Create);
 
-    internal Core.RuntimeEntries.CoreHulaoActivityProgramsEntries HulaoActivityProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreHulaoActivityProgramsEntries, EngineOwners.CoreHulaoActivityProgramsRuntime>(Core.RuntimeEntries.CoreHulaoActivityProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreHulaoActivityProgramsRuntime> HulaoActivityProgramsEntries => GetDeferredModule<EngineOwners.CoreHulaoActivityProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreHumanNativeCommandsEntries HumanNativeCommandsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreHumanNativeCommandsEntries, EngineOwners.CoreHumanNativeCommandsRuntime>(Core.RuntimeEntries.CoreHumanNativeCommandsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterHuoJunOlEntries HuoJunOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterHuoJunOlEntries, EngineOwners.CharacterHuoJunOlRuntime>(Core.RuntimeEntries.CharacterHuoJunOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuoJunOlRuntime> HuoJunOlEntries => GetDeferredModule<EngineOwners.CharacterHuoJunOlRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineHuxinMirrorEntries HuxinMirrorEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHuxinMirrorEntries, EngineOwners.CoreGameEngineHuxinMirrorRuntime>(Core.RuntimeEntries.CoreGameEngineHuxinMirrorEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineIdentityConcealmentEntries IdentityConcealmentEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineIdentityConcealmentEntries, EngineOwners.CoreGameEngineIdentityConcealmentRuntime>(Core.RuntimeEntries.CoreGameEngineIdentityConcealmentEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineIncomingDistanceCourtesyEntries IncomingDistanceCourtesyEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineIncomingDistanceCourtesyEntries, EngineOwners.CoreGameEngineIncomingDistanceCourtesyRuntime>(Core.RuntimeEntries.CoreGameEngineIncomingDistanceCourtesyEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineIncomingDistanceCourtesyRuntime> IncomingDistanceCourtesyEntries => GetDeferredModule<EngineOwners.CoreGameEngineIncomingDistanceCourtesyRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineIncomingDistanceCourtesyObserversEntries IncomingDistanceCourtesyObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineIncomingDistanceCourtesyObserversEntries, EngineOwners.CoreGameEngineIncomingDistanceCourtesyObserversRuntime>(Core.RuntimeEntries.CoreGameEngineIncomingDistanceCourtesyObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineIncomingDistanceCourtesyObserversRuntime> IncomingDistanceCourtesyObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineIncomingDistanceCourtesyObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineInspectedHandSlashesEntries InspectedHandSlashesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineInspectedHandSlashesEntries, EngineOwners.CoreGameEngineInspectedHandSlashesRuntime>(Core.RuntimeEntries.CoreGameEngineInspectedHandSlashesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineInspectedHandSlashesRuntime> InspectedHandSlashesEntries => GetDeferredModule<EngineOwners.CoreGameEngineInspectedHandSlashesRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineIssuedPlayUsePoliciesEntries IssuedPlayUsePoliciesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineIssuedPlayUsePoliciesEntries, EngineOwners.CoreGameEngineIssuedPlayUsePoliciesRuntime>(Core.RuntimeEntries.CoreGameEngineIssuedPlayUsePoliciesEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterJiKangMobileEntries JiKangMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterJiKangMobileEntries, EngineOwners.CharacterJiKangMobileRuntime>(Core.RuntimeEntries.CharacterJiKangMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterJiKangMobileRuntime> JiKangMobileEntries => GetDeferredModule<EngineOwners.CharacterJiKangMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterJiaXuMouEntries JiaXuMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterJiaXuMouEntries, EngineOwners.CharacterJiaXuMouRuntime>(Core.RuntimeEntries.CharacterJiaXuMouEntries.Create);
 
     internal Core.RuntimeEntries.CharacterJianYongBoundaryMobileEntries JianYongBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterJianYongBoundaryMobileEntries, EngineOwners.CharacterJianYongBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterJianYongBoundaryMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterJiangGanOlEntries JiangGanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterJiangGanOlEntries, EngineOwners.CharacterJiangGanOlRuntime>(Core.RuntimeEntries.CharacterJiangGanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterJiangGanOlRuntime> JiangGanOlEntries => GetDeferredModule<EngineOwners.CharacterJiangGanOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterJiangJiMouEntries JiangJiMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterJiangJiMouEntries, EngineOwners.CharacterJiangJiMouRuntime>(Core.RuntimeEntries.CharacterJiangJiMouEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterJiangWeiAnniversaryGodEntries JiangWeiAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterJiangWeiAnniversaryGodEntries, EngineOwners.CharacterJiangWeiAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterJiangWeiAnniversaryGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterJiangWeiAnniversaryGodRuntime> JiangWeiAnniversaryGodEntries => GetDeferredModule<EngineOwners.CharacterJiangWeiAnniversaryGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterJiangWeiMobileGodEntries JiangWeiMobileGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterJiangWeiMobileGodEntries, EngineOwners.CharacterJiangWeiMobileGodRuntime>(Core.RuntimeEntries.CharacterJiangWeiMobileGodEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterJiangWeiMouEntries JiangWeiMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterJiangWeiMouEntries, EngineOwners.CharacterJiangWeiMouRuntime>(Core.RuntimeEntries.CharacterJiangWeiMouEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterJiangWeiMouRuntime> JiangWeiMouEntries => GetDeferredModule<EngineOwners.CharacterJiangWeiMouRuntime>();
 
     internal Core.RuntimeEntries.CharacterJiangWeiMouMobileEntries JiangWeiMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterJiangWeiMouMobileEntries, EngineOwners.CharacterJiangWeiMouMobileRuntime>(Core.RuntimeEntries.CharacterJiangWeiMouMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineJianjiDeclarationsEntries JianjiDeclarationsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineJianjiDeclarationsEntries, EngineOwners.CoreGameEngineJianjiDeclarationsRuntime>(Core.RuntimeEntries.CoreGameEngineJianjiDeclarationsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineJianjiDeclarationsRuntime> JianjiDeclarationsEntries => GetDeferredModule<EngineOwners.CoreGameEngineJianjiDeclarationsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineJiqiaoObserversEntries JiqiaoObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineJiqiaoObserversEntries, EngineOwners.CoreGameEngineJiqiaoObserversRuntime>(Core.RuntimeEntries.CoreGameEngineJiqiaoObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineJiqiaoObserversRuntime> JiqiaoObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineJiqiaoObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineJiqiaoProgramsEntries JiqiaoProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineJiqiaoProgramsEntries, EngineOwners.CoreGameEngineJiqiaoProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineJiqiaoProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineJoinedTrickDamageObserversEntries JoinedTrickDamageObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineJoinedTrickDamageObserversEntries, EngineOwners.CoreGameEngineJoinedTrickDamageObserversRuntime>(Core.RuntimeEntries.CoreGameEngineJoinedTrickDamageObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineJoinedTrickDamageObserversRuntime> JoinedTrickDamageObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineJoinedTrickDamageObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineJoinedTrickDamageRewardsEntries JoinedTrickDamageRewardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineJoinedTrickDamageRewardsEntries, EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime>(Core.RuntimeEntries.CoreGameEngineJoinedTrickDamageRewardsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime> JoinedTrickDamageRewardsEntries => GetDeferredModule<EngineOwners.CoreGameEngineJoinedTrickDamageRewardsRuntime>();
 
     internal Core.RuntimeEntries.CharacterJuShouMouEntries JuShouMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterJuShouMouEntries, EngineOwners.CharacterJuShouMouRuntime>(Core.RuntimeEntries.CharacterJuShouMouEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineJudgedRankSlashPoliciesEntries JudgedRankSlashPoliciesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineJudgedRankSlashPoliciesEntries, EngineOwners.CoreGameEngineJudgedRankSlashPoliciesRuntime>(Core.RuntimeEntries.CoreGameEngineJudgedRankSlashPoliciesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreJudgmentCursorRuntimeEntries JudgmentCursorRuntimeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreJudgmentCursorRuntimeEntries, EngineOwners.CoreJudgmentCursorRuntimeRuntime>(Core.RuntimeEntries.CoreJudgmentCursorRuntimeEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreJudgmentCursorRuntimeRuntime> JudgmentCursorRuntimeEntries => GetDeferredModule<EngineOwners.CoreJudgmentCursorRuntimeRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineJudgmentProgramsEntries JudgmentProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineJudgmentProgramsEntries, EngineOwners.CoreGameEngineJudgmentProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineJudgmentProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineJudgmentProgramsRuntime> JudgmentProgramsEntries => GetDeferredModule<EngineOwners.CoreGameEngineJudgmentProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineJudgmentReplacementProgramsEntries JudgmentReplacementProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineJudgmentReplacementProgramsEntries, EngineOwners.CoreGameEngineJudgmentReplacementProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineJudgmentReplacementProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterKanZeAnniversaryEntries KanZeAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterKanZeAnniversaryEntries, EngineOwners.CharacterKanZeAnniversaryRuntime>(Core.RuntimeEntries.CharacterKanZeAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterKanZeAnniversaryRuntime> KanZeAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterKanZeAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterKanZeOlEntries KanZeOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterKanZeOlEntries, EngineOwners.CharacterKanZeOlRuntime>(Core.RuntimeEntries.CharacterKanZeOlEntries.Create);
 
@@ -821,53 +821,53 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineKenshangPaymentsEntries KenshangPaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineKenshangPaymentsEntries, EngineOwners.CoreGameEngineKenshangPaymentsRuntime>(Core.RuntimeEntries.CoreGameEngineKenshangPaymentsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterKongRongMouOlEntries KongRongMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterKongRongMouOlEntries, EngineOwners.CharacterKongRongMouOlRuntime>(Core.RuntimeEntries.CharacterKongRongMouOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterKongRongMouOlRuntime> KongRongMouOlEntries => GetDeferredModule<EngineOwners.CharacterKongRongMouOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterKongShuOlEntries KongShuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterKongShuOlEntries, EngineOwners.CharacterKongShuOlRuntime>(Core.RuntimeEntries.CharacterKongShuOlEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineKuangfuEntries KuangfuEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineKuangfuEntries, EngineOwners.CoreGameEngineKuangfuRuntime>(Core.RuntimeEntries.CoreGameEngineKuangfuEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineKuangfuRuntime> KuangfuEntries => GetDeferredModule<EngineOwners.CoreGameEngineKuangfuRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineKunlunMirrorEntries KunlunMirrorEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineKunlunMirrorEntries, EngineOwners.CoreGameEngineKunlunMirrorRuntime>(Core.RuntimeEntries.CoreGameEngineKunlunMirrorEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineKunlunMirrorRuntime> KunlunMirrorEntries => GetDeferredModule<EngineOwners.CoreGameEngineKunlunMirrorRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineLastDamageSourceReciprocityEntries LastDamageSourceReciprocityEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineLastDamageSourceReciprocityEntries, EngineOwners.CoreGameEngineLastDamageSourceReciprocityRuntime>(Core.RuntimeEntries.CoreGameEngineLastDamageSourceReciprocityEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineLateFixedTargetDamageCapScopesEntries LateFixedTargetDamageCapScopesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineLateFixedTargetDamageCapScopesEntries, EngineOwners.CoreGameEngineLateFixedTargetDamageCapScopesRuntime>(Core.RuntimeEntries.CoreGameEngineLateFixedTargetDamageCapScopesEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLeJiuAnniversaryEntries LeJiuAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLeJiuAnniversaryEntries, EngineOwners.CharacterLeJiuAnniversaryRuntime>(Core.RuntimeEntries.CharacterLeJiuAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLeJiuAnniversaryRuntime> LeJiuAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterLeJiuAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CoreLeastHandMarkerDrawProgramsEntries LeastHandMarkerDrawProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreLeastHandMarkerDrawProgramsEntries, EngineOwners.CoreLeastHandMarkerDrawProgramsRuntime>(Core.RuntimeEntries.CoreLeastHandMarkerDrawProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLeiBoAnniversaryEntries LeiBoAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLeiBoAnniversaryEntries, EngineOwners.CharacterLeiBoAnniversaryRuntime>(Core.RuntimeEntries.CharacterLeiBoAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLeiBoAnniversaryRuntime> LeiBoAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterLeiBoAnniversaryRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLiDianMobileEntries LiDianMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiDianMobileEntries, EngineOwners.CharacterLiDianMobileRuntime>(Core.RuntimeEntries.CharacterLiDianMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiDianMobileRuntime> LiDianMobileEntries => GetDeferredModule<EngineOwners.CharacterLiDianMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterLiFengOlEntries LiFengOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiFengOlEntries, EngineOwners.CharacterLiFengOlRuntime>(Core.RuntimeEntries.CharacterLiFengOlEntries.Create);
 
     internal Core.RuntimeEntries.CharacterLiJueOlEntries LiJueOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiJueOlEntries, EngineOwners.CharacterLiJueOlRuntime>(Core.RuntimeEntries.CharacterLiJueOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLiRuBoundaryMobileEntries LiRuBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiRuBoundaryMobileEntries, EngineOwners.CharacterLiRuBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterLiRuBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiRuBoundaryMobileRuntime> LiRuBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterLiRuBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLiWanOlEntries LiWanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiWanOlEntries, EngineOwners.CharacterLiWanOlRuntime>(Core.RuntimeEntries.CharacterLiWanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiWanOlRuntime> LiWanOlEntries => GetDeferredModule<EngineOwners.CharacterLiWanOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLiYanMobileEntries LiYanMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiYanMobileEntries, EngineOwners.CharacterLiYanMobileRuntime>(Core.RuntimeEntries.CharacterLiYanMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiYanMobileRuntime> LiYanMobileEntries => GetDeferredModule<EngineOwners.CharacterLiYanMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterLiYiOlEntries LiYiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiYiOlEntries, EngineOwners.CharacterLiYiOlRuntime>(Core.RuntimeEntries.CharacterLiYiOlEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineLianZhuCountsEntries LianZhuCountsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineLianZhuCountsEntries, EngineOwners.CoreGameEngineLianZhuCountsRuntime>(Core.RuntimeEntries.CoreGameEngineLianZhuCountsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLiangXingOlEntries LiangXingOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiangXingOlEntries, EngineOwners.CharacterLiangXingOlRuntime>(Core.RuntimeEntries.CharacterLiangXingOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiangXingOlRuntime> LiangXingOlEntries => GetDeferredModule<EngineOwners.CharacterLiangXingOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLiaoHuaBoundaryMobileEntries LiaoHuaBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiaoHuaBoundaryMobileEntries, EngineOwners.CharacterLiaoHuaBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterLiaoHuaBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiaoHuaBoundaryMobileRuntime> LiaoHuaBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterLiaoHuaBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineLiejieSourceDiscardsEntries LiejieSourceDiscardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineLiejieSourceDiscardsEntries, EngineOwners.CoreGameEngineLiejieSourceDiscardsRuntime>(Core.RuntimeEntries.CoreGameEngineLiejieSourceDiscardsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineLiejieSourceDiscardsRuntime> LiejieSourceDiscardsEntries => GetDeferredModule<EngineOwners.CoreGameEngineLiejieSourceDiscardsRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLingTongBoundaryMobileEntries LingTongBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLingTongBoundaryMobileEntries, EngineOwners.CharacterLingTongBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterLingTongBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLingTongBoundaryMobileRuntime> LingTongBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterLingTongBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLiuBaOlEntries LiuBaOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuBaOlEntries, EngineOwners.CharacterLiuBaOlRuntime>(Core.RuntimeEntries.CharacterLiuBaOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiuBaOlRuntime> LiuBaOlEntries => GetDeferredModule<EngineOwners.CharacterLiuBaOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLiuBeiSpOl664Entries LiuBeiSpOl664Entries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuBeiSpOl664Entries, EngineOwners.CharacterLiuBeiSpOl664Runtime>(Core.RuntimeEntries.CharacterLiuBeiSpOl664Entries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiuBeiSpOl664Runtime> LiuBeiSpOl664Entries => GetDeferredModule<EngineOwners.CharacterLiuBeiSpOl664Runtime>();
 
-    internal Core.RuntimeEntries.CharacterLiuBianOlEntries LiuBianOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuBianOlEntries, EngineOwners.CharacterLiuBianOlRuntime>(Core.RuntimeEntries.CharacterLiuBianOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiuBianOlRuntime> LiuBianOlEntries => GetDeferredModule<EngineOwners.CharacterLiuBianOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterLiuChengMouMobileEntries LiuChengMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuChengMouMobileEntries, EngineOwners.CharacterLiuChengMouMobileRuntime>(Core.RuntimeEntries.CharacterLiuChengMouMobileEntries.Create);
 
@@ -879,83 +879,83 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterLiuPanOlEntries LiuPanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuPanOlEntries, EngineOwners.CharacterLiuPanOlRuntime>(Core.RuntimeEntries.CharacterLiuPanOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLiuPiOlEntries LiuPiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuPiOlEntries, EngineOwners.CharacterLiuPiOlRuntime>(Core.RuntimeEntries.CharacterLiuPiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiuPiOlRuntime> LiuPiOlEntries => GetDeferredModule<EngineOwners.CharacterLiuPiOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterLiuQiOlEntries LiuQiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuQiOlEntries, EngineOwners.CharacterLiuQiOlRuntime>(Core.RuntimeEntries.CharacterLiuQiOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLiuShanBoundaryMobileEntries LiuShanBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuShanBoundaryMobileEntries, EngineOwners.CharacterLiuShanBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterLiuShanBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiuShanBoundaryMobileRuntime> LiuShanBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterLiuShanBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLiuXieMouEntries LiuXieMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuXieMouEntries, EngineOwners.CharacterLiuXieMouRuntime>(Core.RuntimeEntries.CharacterLiuXieMouEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiuXieMouRuntime> LiuXieMouEntries => GetDeferredModule<EngineOwners.CharacterLiuXieMouRuntime>();
 
     internal Core.RuntimeEntries.CharacterLiuYanOlEntries LiuYanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuYanOlEntries, EngineOwners.CharacterLiuYanOlRuntime>(Core.RuntimeEntries.CharacterLiuYanOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLiuYongAnniversaryEntries LiuYongAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuYongAnniversaryEntries, EngineOwners.CharacterLiuYongAnniversaryRuntime>(Core.RuntimeEntries.CharacterLiuYongAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiuYongAnniversaryRuntime> LiuYongAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterLiuYongAnniversaryRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLiuYouAnniversaryEntries LiuYouAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuYouAnniversaryEntries, EngineOwners.CharacterLiuYouAnniversaryRuntime>(Core.RuntimeEntries.CharacterLiuYouAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiuYouAnniversaryRuntime> LiuYouAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterLiuYouAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterLiuZanMobileEntries LiuZanMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuZanMobileEntries, EngineOwners.CharacterLiuZanMobileRuntime>(Core.RuntimeEntries.CharacterLiuZanMobileEntries.Create);
 
     internal Core.RuntimeEntries.CharacterLiuZhangOlEntries LiuZhangOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLiuZhangOlEntries, EngineOwners.CharacterLiuZhangOlRuntime>(Core.RuntimeEntries.CharacterLiuZhangOlEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineLiushiActivationCardsEntries LiushiActivationCardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineLiushiActivationCardsEntries, EngineOwners.CoreGameEngineLiushiActivationCardsRuntime>(Core.RuntimeEntries.CoreGameEngineLiushiActivationCardsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineLiushiActivationCardsRuntime> LiushiActivationCardsEntries => GetDeferredModule<EngineOwners.CoreGameEngineLiushiActivationCardsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineLiushiEffectsEntries LiushiEffectsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineLiushiEffectsEntries, EngineOwners.CoreGameEngineLiushiEffectsRuntime>(Core.RuntimeEntries.CoreGameEngineLiushiEffectsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineLiushiEffectsRuntime> LiushiEffectsEntries => GetDeferredModule<EngineOwners.CoreGameEngineLiushiEffectsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineLordSkillProjectionsEntries LordSkillProjectionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineLordSkillProjectionsEntries, EngineOwners.CoreGameEngineLordSkillProjectionsRuntime>(Core.RuntimeEntries.CoreGameEngineLordSkillProjectionsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineLostHpOwnedGiftsEntries LostHpOwnedGiftsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineLostHpOwnedGiftsEntries, EngineOwners.CoreGameEngineLostHpOwnedGiftsRuntime>(Core.RuntimeEntries.CoreGameEngineLostHpOwnedGiftsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineLostHpOwnedGiftsRuntime> LostHpOwnedGiftsEntries => GetDeferredModule<EngineOwners.CoreGameEngineLostHpOwnedGiftsRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLouGuiMobileShiEntries LouGuiMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLouGuiMobileShiEntries, EngineOwners.CharacterLouGuiMobileShiRuntime>(Core.RuntimeEntries.CharacterLouGuiMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLouGuiMobileShiRuntime> LouGuiMobileShiEntries => GetDeferredModule<EngineOwners.CharacterLouGuiMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CharacterLuBuHappyGodEntries LuBuHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuBuHappyGodEntries, EngineOwners.CharacterLuBuHappyGodRuntime>(Core.RuntimeEntries.CharacterLuBuHappyGodEntries.Create);
 
     internal Core.RuntimeEntries.CharacterLuBuMobileGodEntries LuBuMobileGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuBuMobileGodEntries, EngineOwners.CharacterLuBuMobileGodRuntime>(Core.RuntimeEntries.CharacterLuBuMobileGodEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLuBuMouMobileEntries LuBuMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuBuMouMobileEntries, EngineOwners.CharacterLuBuMouMobileRuntime>(Core.RuntimeEntries.CharacterLuBuMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuBuMouMobileRuntime> LuBuMouMobileEntries => GetDeferredModule<EngineOwners.CharacterLuBuMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterLuBuOlMagicEntries LuBuOlMagicEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuBuOlMagicEntries, EngineOwners.CharacterLuBuOlMagicRuntime>(Core.RuntimeEntries.CharacterLuBuOlMagicEntries.Create);
 
     internal Core.RuntimeEntries.CharacterLuKangWumiaoEntries LuKangWumiaoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuKangWumiaoEntries, EngineOwners.CharacterLuKangWumiaoRuntime>(Core.RuntimeEntries.CharacterLuKangWumiaoEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLuMengHappyGodEntries LuMengHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuMengHappyGodEntries, EngineOwners.CharacterLuMengHappyGodRuntime>(Core.RuntimeEntries.CharacterLuMengHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuMengHappyGodRuntime> LuMengHappyGodEntries => GetDeferredModule<EngineOwners.CharacterLuMengHappyGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterLuMengMouEntries LuMengMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuMengMouEntries, EngineOwners.CharacterLuMengMouRuntime>(Core.RuntimeEntries.CharacterLuMengMouEntries.Create);
 
     internal Core.RuntimeEntries.CharacterLuMengMouMobileEntries LuMengMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuMengMouMobileEntries, EngineOwners.CharacterLuMengMouMobileRuntime>(Core.RuntimeEntries.CharacterLuMengMouMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLuShiOlEntries LuShiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuShiOlEntries, EngineOwners.CharacterLuShiOlRuntime>(Core.RuntimeEntries.CharacterLuShiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuShiOlRuntime> LuShiOlEntries => GetDeferredModule<EngineOwners.CharacterLuShiOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLuSuHappyGodEntries LuSuHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuSuHappyGodEntries, EngineOwners.CharacterLuSuHappyGodRuntime>(Core.RuntimeEntries.CharacterLuSuHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuSuHappyGodRuntime> LuSuHappyGodEntries => GetDeferredModule<EngineOwners.CharacterLuSuHappyGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterLuSuMobileGodEntries LuSuMobileGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuSuMobileGodEntries, EngineOwners.CharacterLuSuMobileGodRuntime>(Core.RuntimeEntries.CharacterLuSuMobileGodEntries.Create);
 
     internal Core.RuntimeEntries.CharacterLuSuMobileShiEntries LuSuMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuSuMobileShiEntries, EngineOwners.CharacterLuSuMobileShiRuntime>(Core.RuntimeEntries.CharacterLuSuMobileShiEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLuSuMouEntries LuSuMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuSuMouEntries, EngineOwners.CharacterLuSuMouRuntime>(Core.RuntimeEntries.CharacterLuSuMouEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuSuMouRuntime> LuSuMouEntries => GetDeferredModule<EngineOwners.CharacterLuSuMouRuntime>();
 
-    internal Core.RuntimeEntries.CharacterLuXunMouMobileEntries LuXunMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuXunMouMobileEntries, EngineOwners.CharacterLuXunMouMobileRuntime>(Core.RuntimeEntries.CharacterLuXunMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuXunMouMobileRuntime> LuXunMouMobileEntries => GetDeferredModule<EngineOwners.CharacterLuXunMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterLuXunWumiaoEntries LuXunWumiaoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuXunWumiaoEntries, EngineOwners.CharacterLuXunWumiaoRuntime>(Core.RuntimeEntries.CharacterLuXunWumiaoEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLuYuShengMobileShiEntries LuYuShengMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuYuShengMobileShiEntries, EngineOwners.CharacterLuYuShengMobileShiRuntime>(Core.RuntimeEntries.CharacterLuYuShengMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuYuShengMobileShiRuntime> LuYuShengMobileShiEntries => GetDeferredModule<EngineOwners.CharacterLuYuShengMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CharacterLuYuShengOlEntries LuYuShengOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuYuShengOlEntries, EngineOwners.CharacterLuYuShengOlRuntime>(Core.RuntimeEntries.CharacterLuYuShengOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLuZhiMouMobileEntries LuZhiMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuZhiMouMobileEntries, EngineOwners.CharacterLuZhiMouMobileRuntime>(Core.RuntimeEntries.CharacterLuZhiMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuZhiMouMobileRuntime> LuZhiMouMobileEntries => GetDeferredModule<EngineOwners.CharacterLuZhiMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterLuZhiMouOlEntries LuZhiMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuZhiMouOlEntries, EngineOwners.CharacterLuZhiMouOlRuntime>(Core.RuntimeEntries.CharacterLuZhiMouOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLuZhiWeiOlEntries LuZhiWeiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuZhiWeiOlEntries, EngineOwners.CharacterLuZhiWeiOlRuntime>(Core.RuntimeEntries.CharacterLuZhiWeiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLuZhiWeiOlRuntime> LuZhiWeiOlEntries => GetDeferredModule<EngineOwners.CharacterLuZhiWeiOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterLuoXianOlEntries LuoXianOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLuoXianOlEntries, EngineOwners.CharacterLuoXianOlRuntime>(Core.RuntimeEntries.CharacterLuoXianOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLvKaiOlEntries LvKaiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLvKaiOlEntries, EngineOwners.CharacterLvKaiOlRuntime>(Core.RuntimeEntries.CharacterLvKaiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLvKaiOlRuntime> LvKaiOlEntries => GetDeferredModule<EngineOwners.CharacterLvKaiOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterLvKuangLvXiangOlEntries LvKuangLvXiangOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLvKuangLvXiangOlEntries, EngineOwners.CharacterLvKuangLvXiangOlRuntime>(Core.RuntimeEntries.CharacterLvKuangLvXiangOlEntries.Create);
 
     internal Core.RuntimeEntries.CharacterLvQianOlEntries LvQianOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLvQianOlEntries, EngineOwners.CharacterLvQianOlRuntime>(Core.RuntimeEntries.CharacterLvQianOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterLvYiMobileShiEntries LvYiMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterLvYiMobileShiEntries, EngineOwners.CharacterLvYiMobileShiRuntime>(Core.RuntimeEntries.CharacterLvYiMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLvYiMobileShiRuntime> LvYiMobileShiEntries => GetDeferredModule<EngineOwners.CharacterLvYiMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CharacterMaChaoAnniversaryGodEntries MaChaoAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMaChaoAnniversaryGodEntries, EngineOwners.CharacterMaChaoAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterMaChaoAnniversaryGodEntries.Create);
 
@@ -963,11 +963,11 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterMaChengOlEntries MaChengOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMaChengOlEntries, EngineOwners.CharacterMaChengOlRuntime>(Core.RuntimeEntries.CharacterMaChengOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterMaDaiMobileEntries MaDaiMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMaDaiMobileEntries, EngineOwners.CharacterMaDaiMobileRuntime>(Core.RuntimeEntries.CharacterMaDaiMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterMaDaiMobileRuntime> MaDaiMobileEntries => GetDeferredModule<EngineOwners.CharacterMaDaiMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterMaMiDiOlEntries MaMiDiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMaMiDiOlEntries, EngineOwners.CharacterMaMiDiOlRuntime>(Core.RuntimeEntries.CharacterMaMiDiOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterMaMiaoAnniversaryEntries MaMiaoAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMaMiaoAnniversaryEntries, EngineOwners.CharacterMaMiaoAnniversaryRuntime>(Core.RuntimeEntries.CharacterMaMiaoAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterMaMiaoAnniversaryRuntime> MaMiaoAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterMaMiaoAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterMaTieAnniversaryEntries MaTieAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMaTieAnniversaryEntries, EngineOwners.CharacterMaTieAnniversaryRuntime>(Core.RuntimeEntries.CharacterMaTieAnniversaryEntries.Create);
 
@@ -975,13 +975,13 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterMaXiuMaTieOlEntries MaXiuMaTieOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMaXiuMaTieOlEntries, EngineOwners.CharacterMaXiuMaTieOlRuntime>(Core.RuntimeEntries.CharacterMaXiuMaTieOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterMaYuanYiOlEntries MaYuanYiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMaYuanYiOlEntries, EngineOwners.CharacterMaYuanYiOlRuntime>(Core.RuntimeEntries.CharacterMaYuanYiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterMaYuanYiOlRuntime> MaYuanYiOlEntries => GetDeferredModule<EngineOwners.CharacterMaYuanYiOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterMaZhongMobileEntries MaZhongMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMaZhongMobileEntries, EngineOwners.CharacterMaZhongMobileRuntime>(Core.RuntimeEntries.CharacterMaZhongMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterMaZhongMobileRuntime> MaZhongMobileEntries => GetDeferredModule<EngineOwners.CharacterMaZhongMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterManChongBoundaryMobileEntries ManChongBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterManChongBoundaryMobileEntries, EngineOwners.CharacterManChongBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterManChongBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterManChongBoundaryMobileRuntime> ManChongBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterManChongBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterMangYaChangAnniversaryEntries MangYaChangAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMangYaChangAnniversaryEntries, EngineOwners.CharacterMangYaChangAnniversaryRuntime>(Core.RuntimeEntries.CharacterMangYaChangAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterMangYaChangAnniversaryRuntime> MangYaChangAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterMangYaChangAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineMantianGuohaiEntries MantianGuohaiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineMantianGuohaiEntries, EngineOwners.CoreGameEngineMantianGuohaiRuntime>(Core.RuntimeEntries.CoreGameEngineMantianGuohaiEntries.Create);
 
@@ -993,37 +993,37 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreMatchSetupDefinitionsEntries MatchSetupDefinitionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreMatchSetupDefinitionsEntries, EngineOwners.CoreMatchSetupDefinitionsRuntime>(Core.RuntimeEntries.CoreMatchSetupDefinitionsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineMatchedJudgmentPlacementsEntries MatchedJudgmentPlacementsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineMatchedJudgmentPlacementsEntries, EngineOwners.CoreGameEngineMatchedJudgmentPlacementsRuntime>(Core.RuntimeEntries.CoreGameEngineMatchedJudgmentPlacementsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineMatchedJudgmentPlacementsRuntime> MatchedJudgmentPlacementsEntries => GetDeferredModule<EngineOwners.CoreGameEngineMatchedJudgmentPlacementsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineMatchingRecastObserversEntries MatchingRecastObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineMatchingRecastObserversEntries, EngineOwners.CoreGameEngineMatchingRecastObserversRuntime>(Core.RuntimeEntries.CoreGameEngineMatchingRecastObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineMatchingRecastObserversRuntime> MatchingRecastObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineMatchingRecastObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineMatchingRecastsEntries MatchingRecastsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineMatchingRecastsEntries, EngineOwners.CoreGameEngineMatchingRecastsRuntime>(Core.RuntimeEntries.CoreGameEngineMatchingRecastsEntries.Create);
 
     internal Core.RuntimeEntries.CharacterMengDaOlEntries MengDaOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMengDaOlEntries, EngineOwners.CharacterMengDaOlRuntime>(Core.RuntimeEntries.CharacterMengDaOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterMengHuoMouMobileEntries MengHuoMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMengHuoMouMobileEntries, EngineOwners.CharacterMengHuoMouMobileRuntime>(Core.RuntimeEntries.CharacterMengHuoMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterMengHuoMouMobileRuntime> MengHuoMouMobileEntries => GetDeferredModule<EngineOwners.CharacterMengHuoMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterMiHengLeEntries MiHengLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMiHengLeEntries, EngineOwners.CharacterMiHengLeRuntime>(Core.RuntimeEntries.CharacterMiHengLeEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineModeMatchLimitsEntries ModeMatchLimitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineModeMatchLimitsEntries, EngineOwners.CoreGameEngineModeMatchLimitsRuntime>(Core.RuntimeEntries.CoreGameEngineModeMatchLimitsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineModeMatchLimitsRuntime> ModeMatchLimitsEntries => GetDeferredModule<EngineOwners.CoreGameEngineModeMatchLimitsRuntime>();
 
-    internal Core.RuntimeEntries.CoreModeNativeFrameRuntimeEntries ModeNativeFrameRuntimeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreModeNativeFrameRuntimeEntries, EngineOwners.CoreModeNativeFrameRuntimeRuntime>(Core.RuntimeEntries.CoreModeNativeFrameRuntimeEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreModeNativeFrameRuntimeRuntime> ModeNativeFrameRuntimeEntries => GetDeferredModule<EngineOwners.CoreModeNativeFrameRuntimeRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineModePresentationEntries ModePresentationEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineModePresentationEntries, EngineOwners.CoreGameEngineModePresentationRuntime>(Core.RuntimeEntries.CoreGameEngineModePresentationEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineModePresentationRuntime> ModePresentationEntries => GetDeferredModule<EngineOwners.CoreGameEngineModePresentationRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineModeRulesEntries ModeRulesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineModeRulesEntries, EngineOwners.CoreGameEngineModeRulesRuntime>(Core.RuntimeEntries.CoreGameEngineModeRulesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineModeRulesRuntime> ModeRulesEntries => GetDeferredModule<EngineOwners.CoreGameEngineModeRulesRuntime>();
 
-    internal Core.RuntimeEntries.CharacterMuShunAnniversaryEntries MuShunAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterMuShunAnniversaryEntries, EngineOwners.CharacterMuShunAnniversaryRuntime>(Core.RuntimeEntries.CharacterMuShunAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterMuShunAnniversaryRuntime> MuShunAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterMuShunAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineMultiplayerEntries MultiplayerEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineMultiplayerEntries, EngineOwners.CoreGameEngineMultiplayerRuntime>(Core.RuntimeEntries.CoreGameEngineMultiplayerEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineNamedAmbushEntries NamedAmbushEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNamedAmbushEntries, EngineOwners.CoreGameEngineNamedAmbushRuntime>(Core.RuntimeEntries.CoreGameEngineNamedAmbushEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineNamedCardAcquisitionsEntries NamedCardAcquisitionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNamedCardAcquisitionsEntries, EngineOwners.CoreGameEngineNamedCardAcquisitionsRuntime>(Core.RuntimeEntries.CoreGameEngineNamedCardAcquisitionsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineNamedCardAcquisitionsRuntime> NamedCardAcquisitionsEntries => GetDeferredModule<EngineOwners.CoreGameEngineNamedCardAcquisitionsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineNamedDefenseAndPublicDraftEntries NamedDefenseAndPublicDraftEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNamedDefenseAndPublicDraftEntries, EngineOwners.CoreGameEngineNamedDefenseAndPublicDraftRuntime>(Core.RuntimeEntries.CoreGameEngineNamedDefenseAndPublicDraftEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineNamedHandChoiceObserversEntries NamedHandChoiceObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNamedHandChoiceObserversEntries, EngineOwners.CoreGameEngineNamedHandChoiceObserversRuntime>(Core.RuntimeEntries.CoreGameEngineNamedHandChoiceObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineNamedHandChoiceObserversRuntime> NamedHandChoiceObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineNamedHandChoiceObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreNationalGeneralRevealEntries NationalGeneralRevealEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreNationalGeneralRevealEntries, EngineOwners.CoreNationalGeneralRevealRuntime>(Core.RuntimeEntries.CoreNationalGeneralRevealEntries.Create);
 
@@ -1051,7 +1051,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreNativeDamageFramesEntries NativeDamageFramesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreNativeDamageFramesEntries, EngineOwners.CoreNativeDamageFramesRuntime>(Core.RuntimeEntries.CoreNativeDamageFramesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreNativeDamageHandlesEntries NativeDamageHandlesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreNativeDamageHandlesEntries, EngineOwners.CoreNativeDamageHandlesRuntime>(Core.RuntimeEntries.CoreNativeDamageHandlesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreNativeDamageHandlesRuntime> NativeDamageHandlesEntries => GetDeferredModule<EngineOwners.CoreNativeDamageHandlesRuntime>();
 
     internal Core.RuntimeEntries.CoreNativeDamagePoliciesEntries NativeDamagePoliciesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreNativeDamagePoliciesEntries, EngineOwners.CoreNativeDamagePoliciesRuntime>(Core.RuntimeEntries.CoreNativeDamagePoliciesEntries.Create);
 
@@ -1061,9 +1061,9 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineNativeDrawAttemptsEntries NativeDrawAttemptsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNativeDrawAttemptsEntries, EngineOwners.CoreGameEngineNativeDrawAttemptsRuntime>(Core.RuntimeEntries.CoreGameEngineNativeDrawAttemptsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineNativeDrawOrdinalsEntries NativeDrawOrdinalsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNativeDrawOrdinalsEntries, EngineOwners.CoreGameEngineNativeDrawOrdinalsRuntime>(Core.RuntimeEntries.CoreGameEngineNativeDrawOrdinalsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineNativeDrawOrdinalsRuntime> NativeDrawOrdinalsEntries => GetDeferredModule<EngineOwners.CoreGameEngineNativeDrawOrdinalsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineNativeDrawThresholdEntries NativeDrawThresholdEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNativeDrawThresholdEntries, EngineOwners.CoreGameEngineNativeDrawThresholdRuntime>(Core.RuntimeEntries.CoreGameEngineNativeDrawThresholdEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineNativeDrawThresholdRuntime> NativeDrawThresholdEntries => GetDeferredModule<EngineOwners.CoreGameEngineNativeDrawThresholdRuntime>();
 
     internal Core.RuntimeEntries.CoreNativeDyingEntries NativeDyingEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreNativeDyingEntries, EngineOwners.CoreNativeDyingRuntime>(Core.RuntimeEntries.CoreNativeDyingEntries.Create);
 
@@ -1077,7 +1077,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreNativeFireAttackEntries NativeFireAttackEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreNativeFireAttackEntries, EngineOwners.CoreNativeFireAttackRuntime>(Core.RuntimeEntries.CoreNativeFireAttackEntries.Create);
 
-    internal Core.RuntimeEntries.CoreNativeGroupRecoveryEntries NativeGroupRecoveryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreNativeGroupRecoveryEntries, EngineOwners.CoreNativeGroupRecoveryRuntime>(Core.RuntimeEntries.CoreNativeGroupRecoveryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreNativeGroupRecoveryRuntime> NativeGroupRecoveryEntries => GetDeferredModule<EngineOwners.CoreNativeGroupRecoveryRuntime>();
 
     internal Core.RuntimeEntries.CoreNativeJudgmentEntries NativeJudgmentEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreNativeJudgmentEntries, EngineOwners.CoreNativeJudgmentRuntime>(Core.RuntimeEntries.CoreNativeJudgmentEntries.Create);
 
@@ -1117,9 +1117,9 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineNearestLegalSlashRequestsEntries NearestLegalSlashRequestsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNearestLegalSlashRequestsEntries, EngineOwners.CoreGameEngineNearestLegalSlashRequestsRuntime>(Core.RuntimeEntries.CoreGameEngineNearestLegalSlashRequestsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineNeighborDiscardOpportunitiesEntries NeighborDiscardOpportunitiesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNeighborDiscardOpportunitiesEntries, EngineOwners.CoreGameEngineNeighborDiscardOpportunitiesRuntime>(Core.RuntimeEntries.CoreGameEngineNeighborDiscardOpportunitiesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineNeighborDiscardOpportunitiesRuntime> NeighborDiscardOpportunitiesEntries => GetDeferredModule<EngineOwners.CoreGameEngineNeighborDiscardOpportunitiesRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineNextActualUsePindianAiEntries NextActualUsePindianAiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNextActualUsePindianAiEntries, EngineOwners.CoreGameEngineNextActualUsePindianAiRuntime>(Core.RuntimeEntries.CoreGameEngineNextActualUsePindianAiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineNextActualUsePindianAiRuntime> NextActualUsePindianAiEntries => GetDeferredModule<EngineOwners.CoreGameEngineNextActualUsePindianAiRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineNextActualUseTargetAdjustmentsEntries NextActualUseTargetAdjustmentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNextActualUseTargetAdjustmentsEntries, EngineOwners.CoreGameEngineNextActualUseTargetAdjustmentsRuntime>(Core.RuntimeEntries.CoreGameEngineNextActualUseTargetAdjustmentsEntries.Create);
 
@@ -1129,11 +1129,11 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreNianActivityProgramsEntries NianActivityProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreNianActivityProgramsEntries, EngineOwners.CoreNianActivityProgramsRuntime>(Core.RuntimeEntries.CoreNianActivityProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineNianRevivalEntries NianRevivalEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNianRevivalEntries, EngineOwners.CoreGameEngineNianRevivalRuntime>(Core.RuntimeEntries.CoreGameEngineNianRevivalEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineNianRevivalRuntime> NianRevivalEntries => GetDeferredModule<EngineOwners.CoreGameEngineNianRevivalRuntime>();
 
-    internal Core.RuntimeEntries.CharacterNiuFuOlEntries NiuFuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterNiuFuOlEntries, EngineOwners.CharacterNiuFuOlRuntime>(Core.RuntimeEntries.CharacterNiuFuOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterNiuFuOlRuntime> NiuFuOlEntries => GetDeferredModule<EngineOwners.CharacterNiuFuOlRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineNumericRuleAurasEntries NumericRuleAurasEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineNumericRuleAurasEntries, EngineOwners.CoreGameEngineNumericRuleAurasRuntime>(Core.RuntimeEntries.CoreGameEngineNumericRuleAurasEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineNumericRuleAurasRuntime> NumericRuleAurasEntries => GetDeferredModule<EngineOwners.CoreGameEngineNumericRuleAurasRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries ObserverSubtreesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries, EngineOwners.CoreGameEngineObserverSubtreesRuntime>(Core.RuntimeEntries.CoreGameEngineObserverSubtreesEntries.Create);
 
@@ -1141,17 +1141,17 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineOldHandDispositionEntries OldHandDispositionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOldHandDispositionEntries, EngineOwners.CoreGameEngineOldHandDispositionRuntime>(Core.RuntimeEntries.CoreGameEngineOldHandDispositionEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineOldHandDispositionObserversEntries OldHandDispositionObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOldHandDispositionObserversEntries, EngineOwners.CoreGameEngineOldHandDispositionObserversRuntime>(Core.RuntimeEntries.CoreGameEngineOldHandDispositionObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineOldHandDispositionObserversRuntime> OldHandDispositionObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineOldHandDispositionObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineOpeningCustomizationEntries OpeningCustomizationEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOpeningCustomizationEntries, EngineOwners.CoreGameEngineOpeningCustomizationRuntime>(Core.RuntimeEntries.CoreGameEngineOpeningCustomizationEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineOpeningCustomizationRuntime> OpeningCustomizationEntries => GetDeferredModule<EngineOwners.CoreGameEngineOpeningCustomizationRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineOrderedPrintedSkillLossEntries OrderedPrintedSkillLossEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOrderedPrintedSkillLossEntries, EngineOwners.CoreGameEngineOrderedPrintedSkillLossRuntime>(Core.RuntimeEntries.CoreGameEngineOrderedPrintedSkillLossEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineOrderedPrintedSkillLossRuntime> OrderedPrintedSkillLossEntries => GetDeferredModule<EngineOwners.CoreGameEngineOrderedPrintedSkillLossRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineOrderedPrintedSkillLossObserversEntries OrderedPrintedSkillLossObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOrderedPrintedSkillLossObserversEntries, EngineOwners.CoreGameEngineOrderedPrintedSkillLossObserversRuntime>(Core.RuntimeEntries.CoreGameEngineOrderedPrintedSkillLossObserversEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineOrderedSelectedActorDuelsEntries OrderedSelectedActorDuelsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOrderedSelectedActorDuelsEntries, EngineOwners.CoreGameEngineOrderedSelectedActorDuelsRuntime>(Core.RuntimeEntries.CoreGameEngineOrderedSelectedActorDuelsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineOriginalHandAwakeningEntries OriginalHandAwakeningEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOriginalHandAwakeningEntries, EngineOwners.CoreGameEngineOriginalHandAwakeningRuntime>(Core.RuntimeEntries.CoreGameEngineOriginalHandAwakeningEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineOriginalHandAwakeningRuntime> OriginalHandAwakeningEntries => GetDeferredModule<EngineOwners.CoreGameEngineOriginalHandAwakeningRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineOriginalHandEntitiesEntries OriginalHandEntitiesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOriginalHandEntitiesEntries, EngineOwners.CoreGameEngineOriginalHandEntitiesRuntime>(Core.RuntimeEntries.CoreGameEngineOriginalHandEntitiesEntries.Create);
 
@@ -1163,7 +1163,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineOutsidePhaseDrawDiscardEntries OutsidePhaseDrawDiscardEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOutsidePhaseDrawDiscardEntries, EngineOwners.CoreGameEngineOutsidePhaseDrawDiscardRuntime>(Core.RuntimeEntries.CoreGameEngineOutsidePhaseDrawDiscardEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineOutsidePhaseDrawDiscardObserversEntries OutsidePhaseDrawDiscardObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOutsidePhaseDrawDiscardObserversEntries, EngineOwners.CoreGameEngineOutsidePhaseDrawDiscardObserversRuntime>(Core.RuntimeEntries.CoreGameEngineOutsidePhaseDrawDiscardObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineOutsidePhaseDrawDiscardObserversRuntime> OutsidePhaseDrawDiscardObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineOutsidePhaseDrawDiscardObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineOverflowTargetCancellationEntries OverflowTargetCancellationEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOverflowTargetCancellationEntries, EngineOwners.CoreGameEngineOverflowTargetCancellationRuntime>(Core.RuntimeEntries.CoreGameEngineOverflowTargetCancellationEntries.Create);
 
@@ -1171,9 +1171,9 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineOwnTrickDrawTargetsEntries OwnTrickDrawTargetsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOwnTrickDrawTargetsEntries, EngineOwners.CoreGameEngineOwnTrickDrawTargetsRuntime>(Core.RuntimeEntries.CoreGameEngineOwnTrickDrawTargetsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineOwnedDamagePointJudgmentsEntries OwnedDamagePointJudgmentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOwnedDamagePointJudgmentsEntries, EngineOwners.CoreGameEngineOwnedDamagePointJudgmentsRuntime>(Core.RuntimeEntries.CoreGameEngineOwnedDamagePointJudgmentsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineOwnedDamagePointJudgmentsRuntime> OwnedDamagePointJudgmentsEntries => GetDeferredModule<EngineOwners.CoreGameEngineOwnedDamagePointJudgmentsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineOwnedDeathBenefitReturnsEntries OwnedDeathBenefitReturnsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOwnedDeathBenefitReturnsEntries, EngineOwners.CoreGameEngineOwnedDeathBenefitReturnsRuntime>(Core.RuntimeEntries.CoreGameEngineOwnedDeathBenefitReturnsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineOwnedDeathBenefitReturnsRuntime> OwnedDeathBenefitReturnsEntries => GetDeferredModule<EngineOwners.CoreGameEngineOwnedDeathBenefitReturnsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineOwnedExactCountAndNamedTargetsEntries OwnedExactCountAndNamedTargetsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineOwnedExactCountAndNamedTargetsEntries, EngineOwners.CoreGameEngineOwnedExactCountAndNamedTargetsRuntime>(Core.RuntimeEntries.CoreGameEngineOwnedExactCountAndNamedTargetsEntries.Create);
 
@@ -1181,7 +1181,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEnginePaidColorConversionsEntries PaidColorConversionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePaidColorConversionsEntries, EngineOwners.CoreGameEnginePaidColorConversionsRuntime>(Core.RuntimeEntries.CoreGameEnginePaidColorConversionsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePaidHpLossProgramsEntries PaidHpLossProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePaidHpLossProgramsEntries, EngineOwners.CoreGameEnginePaidHpLossProgramsRuntime>(Core.RuntimeEntries.CoreGameEnginePaidHpLossProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePaidHpLossProgramsRuntime> PaidHpLossProgramsEntries => GetDeferredModule<EngineOwners.CoreGameEnginePaidHpLossProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEnginePaidOwnTargetObserversEntries PaidOwnTargetObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePaidOwnTargetObserversEntries, EngineOwners.CoreGameEnginePaidOwnTargetObserversRuntime>(Core.RuntimeEntries.CoreGameEnginePaidOwnTargetObserversEntries.Create);
 
@@ -1189,7 +1189,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEnginePairObtainShownGiftsEntries PairObtainShownGiftsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePairObtainShownGiftsEntries, EngineOwners.CoreGameEnginePairObtainShownGiftsRuntime>(Core.RuntimeEntries.CoreGameEnginePairObtainShownGiftsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePairedColorResponseObserversEntries PairedColorResponseObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePairedColorResponseObserversEntries, EngineOwners.CoreGameEnginePairedColorResponseObserversRuntime>(Core.RuntimeEntries.CoreGameEnginePairedColorResponseObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePairedColorResponseObserversRuntime> PairedColorResponseObserversEntries => GetDeferredModule<EngineOwners.CoreGameEnginePairedColorResponseObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEnginePairedColorResponsesEntries PairedColorResponsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePairedColorResponsesEntries, EngineOwners.CoreGameEnginePairedColorResponsesRuntime>(Core.RuntimeEntries.CoreGameEnginePairedColorResponsesEntries.Create);
 
@@ -1197,9 +1197,9 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEnginePairedHandRecastObserversEntries PairedHandRecastObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePairedHandRecastObserversEntries, EngineOwners.CoreGameEnginePairedHandRecastObserversRuntime>(Core.RuntimeEntries.CoreGameEnginePairedHandRecastObserversEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterPanShuOlEntries PanShuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterPanShuOlEntries, EngineOwners.CharacterPanShuOlRuntime>(Core.RuntimeEntries.CharacterPanShuOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterPanShuOlRuntime> PanShuOlEntries => GetDeferredModule<EngineOwners.CharacterPanShuOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterPanZhangMaZhongBoundaryMobileEntries PanZhangMaZhongBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterPanZhangMaZhongBoundaryMobileEntries, EngineOwners.CharacterPanZhangMaZhongBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterPanZhangMaZhongBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterPanZhangMaZhongBoundaryMobileRuntime> PanZhangMaZhongBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterPanZhangMaZhongBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterPangJiOlEntries PangJiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterPangJiOlEntries, EngineOwners.CharacterPangJiOlRuntime>(Core.RuntimeEntries.CharacterPangJiOlEntries.Create);
 
@@ -1207,17 +1207,17 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterPangTongFriendEntries PangTongFriendEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterPangTongFriendEntries, EngineOwners.CharacterPangTongFriendRuntime>(Core.RuntimeEntries.CharacterPangTongFriendEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterPangTongHappyGodEntries PangTongHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterPangTongHappyGodEntries, EngineOwners.CharacterPangTongHappyGodRuntime>(Core.RuntimeEntries.CharacterPangTongHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterPangTongHappyGodRuntime> PangTongHappyGodEntries => GetDeferredModule<EngineOwners.CharacterPangTongHappyGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterPangTongMouMobileEntries PangTongMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterPangTongMouMobileEntries, EngineOwners.CharacterPangTongMouMobileRuntime>(Core.RuntimeEntries.CharacterPangTongMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterPangTongMouMobileRuntime> PangTongMouMobileEntries => GetDeferredModule<EngineOwners.CharacterPangTongMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterPangXiMobileShiEntries PangXiMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterPangXiMobileShiEntries, EngineOwners.CharacterPangXiMobileShiRuntime>(Core.RuntimeEntries.CharacterPangXiMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterPangXiMobileShiRuntime> PangXiMobileShiEntries => GetDeferredModule<EngineOwners.CharacterPangXiMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineParticipantAndReserveProgramsEntries ParticipantAndReserveProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineParticipantAndReserveProgramsEntries, EngineOwners.CoreGameEngineParticipantAndReserveProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineParticipantAndReserveProgramsEntries.Create);
 
     internal Core.RuntimeEntries.CoreParticipantHandProgramsEntries ParticipantHandProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreParticipantHandProgramsEntries, EngineOwners.CoreParticipantHandProgramsRuntime>(Core.RuntimeEntries.CoreParticipantHandProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineParticipantPreventionEntries ParticipantPreventionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineParticipantPreventionEntries, EngineOwners.CoreGameEngineParticipantPreventionRuntime>(Core.RuntimeEntries.CoreGameEngineParticipantPreventionEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineParticipantPreventionRuntime> ParticipantPreventionEntries => GetDeferredModule<EngineOwners.CoreGameEngineParticipantPreventionRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEnginePassiveDamageCapsEntries PassiveDamageCapsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePassiveDamageCapsEntries, EngineOwners.CoreGameEnginePassiveDamageCapsRuntime>(Core.RuntimeEntries.CoreGameEnginePassiveDamageCapsEntries.Create);
 
@@ -1231,11 +1231,11 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEnginePhaseNamePredictionEntries PhaseNamePredictionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePhaseNamePredictionEntries, EngineOwners.CoreGameEnginePhaseNamePredictionRuntime>(Core.RuntimeEntries.CoreGameEnginePhaseNamePredictionEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePhaseNamePredictionObserversEntries PhaseNamePredictionObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePhaseNamePredictionObserversEntries, EngineOwners.CoreGameEnginePhaseNamePredictionObserversRuntime>(Core.RuntimeEntries.CoreGameEnginePhaseNamePredictionObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePhaseNamePredictionObserversRuntime> PhaseNamePredictionObserversEntries => GetDeferredModule<EngineOwners.CoreGameEnginePhaseNamePredictionObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEnginePhaseStartCardControlEntries PhaseStartCardControlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePhaseStartCardControlEntries, EngineOwners.CoreGameEnginePhaseStartCardControlRuntime>(Core.RuntimeEntries.CoreGameEnginePhaseStartCardControlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePhaseStartCardControlRuntime> PhaseStartCardControlEntries => GetDeferredModule<EngineOwners.CoreGameEnginePhaseStartCardControlRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEnginePhaseStartCardControlObserversEntries PhaseStartCardControlObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePhaseStartCardControlObserversEntries, EngineOwners.CoreGameEnginePhaseStartCardControlObserversRuntime>(Core.RuntimeEntries.CoreGameEnginePhaseStartCardControlObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePhaseStartCardControlObserversRuntime> PhaseStartCardControlObserversEntries => GetDeferredModule<EngineOwners.CoreGameEnginePhaseStartCardControlObserversRuntime>();
 
     internal Core.RuntimeEntries.CorePhysicalDrawFacadesEntries PhysicalDrawFacadesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CorePhysicalDrawFacadesEntries, EngineOwners.CorePhysicalDrawFacadesRuntime>(Core.RuntimeEntries.CorePhysicalDrawFacadesEntries.Create);
 
@@ -1251,17 +1251,17 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEnginePindianRevealWindowsEntries PindianRevealWindowsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePindianRevealWindowsEntries, EngineOwners.CoreGameEnginePindianRevealWindowsRuntime>(Core.RuntimeEntries.CoreGameEnginePindianRevealWindowsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePlacedEquipmentBenefitsEntries PlacedEquipmentBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePlacedEquipmentBenefitsEntries, EngineOwners.CoreGameEnginePlacedEquipmentBenefitsRuntime>(Core.RuntimeEntries.CoreGameEnginePlacedEquipmentBenefitsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePlacedEquipmentBenefitsRuntime> PlacedEquipmentBenefitsEntries => GetDeferredModule<EngineOwners.CoreGameEnginePlacedEquipmentBenefitsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEnginePlannedPhaseQuantitiesEntries PlannedPhaseQuantitiesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePlannedPhaseQuantitiesEntries, EngineOwners.CoreGameEnginePlannedPhaseQuantitiesRuntime>(Core.RuntimeEntries.CoreGameEnginePlannedPhaseQuantitiesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePlannedPhaseQuantitiesRuntime> PlannedPhaseQuantitiesEntries => GetDeferredModule<EngineOwners.CoreGameEnginePlannedPhaseQuantitiesRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEnginePlayCardHistoryEntries PlayCardHistoryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePlayCardHistoryEntries, EngineOwners.CoreGameEnginePlayCardHistoryRuntime>(Core.RuntimeEntries.CoreGameEnginePlayCardHistoryEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEnginePlayPhaseSkillGrantsEntries PlayPhaseSkillGrantsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePlayPhaseSkillGrantsEntries, EngineOwners.CoreGameEnginePlayPhaseSkillGrantsRuntime>(Core.RuntimeEntries.CoreGameEnginePlayPhaseSkillGrantsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePlaySlashRecastsEntries PlaySlashRecastsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePlaySlashRecastsEntries, EngineOwners.CoreGameEnginePlaySlashRecastsRuntime>(Core.RuntimeEntries.CoreGameEnginePlaySlashRecastsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePlaySlashRecastsRuntime> PlaySlashRecastsEntries => GetDeferredModule<EngineOwners.CoreGameEnginePlaySlashRecastsRuntime>();
 
-    internal Core.RuntimeEntries.CorePlayerViewCardPaymentsEntries PlayerViewCardPaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CorePlayerViewCardPaymentsEntries, EngineOwners.CorePlayerViewCardPaymentsRuntime>(Core.RuntimeEntries.CorePlayerViewCardPaymentsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CorePlayerViewCardPaymentsRuntime> PlayerViewCardPaymentsEntries => GetDeferredModule<EngineOwners.CorePlayerViewCardPaymentsRuntime>();
 
     internal Core.RuntimeEntries.CorePlayerViewNativeCardSelectionsEntries PlayerViewNativeCardSelectionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CorePlayerViewNativeCardSelectionsEntries, EngineOwners.CorePlayerViewNativeCardSelectionsRuntime>(Core.RuntimeEntries.CorePlayerViewNativeCardSelectionsEntries.Create);
 
@@ -1269,15 +1269,15 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEnginePrepDiscardEndingPromisesEntries PrepDiscardEndingPromisesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrepDiscardEndingPromisesEntries, EngineOwners.CoreGameEnginePrepDiscardEndingPromisesRuntime>(Core.RuntimeEntries.CoreGameEnginePrepDiscardEndingPromisesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePrepDiscardImmediateDrawEntries PrepDiscardImmediateDrawEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrepDiscardImmediateDrawEntries, EngineOwners.CoreGameEnginePrepDiscardImmediateDrawRuntime>(Core.RuntimeEntries.CoreGameEnginePrepDiscardImmediateDrawEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePrepDiscardImmediateDrawRuntime> PrepDiscardImmediateDrawEntries => GetDeferredModule<EngineOwners.CoreGameEnginePrepDiscardImmediateDrawRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEnginePrepDiscardPaymentsEntries PrepDiscardPaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrepDiscardPaymentsEntries, EngineOwners.CoreGameEnginePrepDiscardPaymentsRuntime>(Core.RuntimeEntries.CoreGameEnginePrepDiscardPaymentsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePrepPoisonObserversEntries PrepPoisonObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrepPoisonObserversEntries, EngineOwners.CoreGameEnginePrepPoisonObserversRuntime>(Core.RuntimeEntries.CoreGameEnginePrepPoisonObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePrepPoisonObserversRuntime> PrepPoisonObserversEntries => GetDeferredModule<EngineOwners.CoreGameEnginePrepPoisonObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEnginePrepPoisonOutcomesEntries PrepPoisonOutcomesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrepPoisonOutcomesEntries, EngineOwners.CoreGameEnginePrepPoisonOutcomesRuntime>(Core.RuntimeEntries.CoreGameEnginePrepPoisonOutcomesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePrintedLordBenefitsEntries PrintedLordBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrintedLordBenefitsEntries, EngineOwners.CoreGameEnginePrintedLordBenefitsRuntime>(Core.RuntimeEntries.CoreGameEnginePrintedLordBenefitsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePrintedLordBenefitsRuntime> PrintedLordBenefitsEntries => GetDeferredModule<EngineOwners.CoreGameEnginePrintedLordBenefitsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEnginePrivateCardOffersEntries PrivateCardOffersEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrivateCardOffersEntries, EngineOwners.CoreGameEnginePrivateCardOffersRuntime>(Core.RuntimeEntries.CoreGameEnginePrivateCardOffersEntries.Create);
 
@@ -1285,17 +1285,17 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEnginePrivateOfferReturnsEntries PrivateOfferReturnsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrivateOfferReturnsEntries, EngineOwners.CoreGameEnginePrivateOfferReturnsRuntime>(Core.RuntimeEntries.CoreGameEnginePrivateOfferReturnsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePrivateTurnHoldsEntries PrivateTurnHoldsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrivateTurnHoldsEntries, EngineOwners.CoreGameEnginePrivateTurnHoldsRuntime>(Core.RuntimeEntries.CoreGameEnginePrivateTurnHoldsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePrivateTurnHoldsRuntime> PrivateTurnHoldsEntries => GetDeferredModule<EngineOwners.CoreGameEnginePrivateTurnHoldsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEnginePrivateWhirlEntries PrivateWhirlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrivateWhirlEntries, EngineOwners.CoreGameEnginePrivateWhirlRuntime>(Core.RuntimeEntries.CoreGameEnginePrivateWhirlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePrivateWhirlRuntime> PrivateWhirlEntries => GetDeferredModule<EngineOwners.CoreGameEnginePrivateWhirlRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEnginePrivateWhirlObserversEntries PrivateWhirlObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePrivateWhirlObserversEntries, EngineOwners.CoreGameEnginePrivateWhirlObserversRuntime>(Core.RuntimeEntries.CoreGameEnginePrivateWhirlObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePrivateWhirlObserversRuntime> PrivateWhirlObserversEntries => GetDeferredModule<EngineOwners.CoreGameEnginePrivateWhirlObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreProgramAbolishAreasOperationEntries ProgramAbolishAreasOperationEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramAbolishAreasOperationEntries, EngineOwners.CoreProgramAbolishAreasOperationRuntime>(Core.RuntimeEntries.CoreProgramAbolishAreasOperationEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramActivationLedgerEntries ProgramActivationLedgerEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramActivationLedgerEntries, EngineOwners.CoreGameEngineProgramActivationLedgerRuntime>(Core.RuntimeEntries.CoreGameEngineProgramActivationLedgerEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramActivationLedgerRuntime> ProgramActivationLedgerEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramActivationLedgerRuntime>();
 
-    internal Core.RuntimeEntries.CoreProgramActualPlaySlashLossEntries ProgramActualPlaySlashLossEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramActualPlaySlashLossEntries, EngineOwners.CoreProgramActualPlaySlashLossRuntime>(Core.RuntimeEntries.CoreProgramActualPlaySlashLossEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramActualPlaySlashLossRuntime> ProgramActualPlaySlashLossEntries => GetDeferredModule<EngineOwners.CoreProgramActualPlaySlashLossRuntime>();
 
     internal Core.RuntimeEntries.CoreProgramArmorOperationsEntries ProgramArmorOperationsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramArmorOperationsEntries, EngineOwners.CoreProgramArmorOperationsRuntime>(Core.RuntimeEntries.CoreProgramArmorOperationsEntries.Create);
 
@@ -1303,7 +1303,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries ProgramAttackAttemptEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries, EngineOwners.CoreGameEngineProgramAttackAttemptRuntime>(Core.RuntimeEntries.CoreGameEngineProgramAttackAttemptEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramAttackEffectsEntries ProgramAttackEffectsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramAttackEffectsEntries, EngineOwners.CoreGameEngineProgramAttackEffectsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramAttackEffectsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramAttackEffectsRuntime> ProgramAttackEffectsEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramAttackEffectsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramAttackRangeAidEntries ProgramAttackRangeAidEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramAttackRangeAidEntries, EngineOwners.CoreGameEngineProgramAttackRangeAidRuntime>(Core.RuntimeEntries.CoreGameEngineProgramAttackRangeAidEntries.Create);
 
@@ -1313,9 +1313,9 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineProgramCardTargetEffectsEntries ProgramCardTargetEffectsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramCardTargetEffectsEntries, EngineOwners.CoreGameEngineProgramCardTargetEffectsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramCardTargetEffectsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramCardUseNullificationEntries ProgramCardUseNullificationEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramCardUseNullificationEntries, EngineOwners.CoreGameEngineProgramCardUseNullificationRuntime>(Core.RuntimeEntries.CoreGameEngineProgramCardUseNullificationEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramCardUseNullificationRuntime> ProgramCardUseNullificationEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramCardUseNullificationRuntime>();
 
-    internal Core.RuntimeEntries.CoreProgramCardUsePaymentsEntries ProgramCardUsePaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramCardUsePaymentsEntries, EngineOwners.CoreProgramCardUsePaymentsRuntime>(Core.RuntimeEntries.CoreProgramCardUsePaymentsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramCardUsePaymentsRuntime> ProgramCardUsePaymentsEntries => GetDeferredModule<EngineOwners.CoreProgramCardUsePaymentsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramCardUseRolesEntries ProgramCardUseRolesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramCardUseRolesEntries, EngineOwners.CoreGameEngineProgramCardUseRolesRuntime>(Core.RuntimeEntries.CoreGameEngineProgramCardUseRolesEntries.Create);
 
@@ -1327,7 +1327,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineProgramChoicesEntries ProgramChoicesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramChoicesEntries, EngineOwners.CoreGameEngineProgramChoicesRuntime>(Core.RuntimeEntries.CoreGameEngineProgramChoicesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramContinuationPermissionsEntries ProgramContinuationPermissionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramContinuationPermissionsEntries, EngineOwners.CoreGameEngineProgramContinuationPermissionsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramContinuationPermissionsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramContinuationPermissionsRuntime> ProgramContinuationPermissionsEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramContinuationPermissionsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramContinuationsEntries ProgramContinuationsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramContinuationsEntries, EngineOwners.CoreGameEngineProgramContinuationsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramContinuationsEntries.Create);
 
@@ -1335,39 +1335,39 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreProgramDamageHooksEntries ProgramDamageHooksEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramDamageHooksEntries, EngineOwners.CoreProgramDamageHooksRuntime>(Core.RuntimeEntries.CoreProgramDamageHooksEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramDamageReductionEntries ProgramDamageReductionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramDamageReductionEntries, EngineOwners.CoreGameEngineProgramDamageReductionRuntime>(Core.RuntimeEntries.CoreGameEngineProgramDamageReductionEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramDamageReductionRuntime> ProgramDamageReductionEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramDamageReductionRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramDamageTransferEntries ProgramDamageTransferEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramDamageTransferEntries, EngineOwners.CoreGameEngineProgramDamageTransferRuntime>(Core.RuntimeEntries.CoreGameEngineProgramDamageTransferEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramDamageTransferRuntime> ProgramDamageTransferEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramDamageTransferRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramDiscardChallengesEntries ProgramDiscardChallengesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramDiscardChallengesEntries, EngineOwners.CoreGameEngineProgramDiscardChallengesRuntime>(Core.RuntimeEntries.CoreGameEngineProgramDiscardChallengesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramDiscardChallengesRuntime> ProgramDiscardChallengesEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramDiscardChallengesRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramDiscardOriginsEntries ProgramDiscardOriginsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramDiscardOriginsEntries, EngineOwners.CoreGameEngineProgramDiscardOriginsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramDiscardOriginsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramDiscardTopPlacementEntries ProgramDiscardTopPlacementEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramDiscardTopPlacementEntries, EngineOwners.CoreGameEngineProgramDiscardTopPlacementRuntime>(Core.RuntimeEntries.CoreGameEngineProgramDiscardTopPlacementEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramDiscardTopPlacementRuntime> ProgramDiscardTopPlacementEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramDiscardTopPlacementRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramDodgeResponsesEntries ProgramDodgeResponsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramDodgeResponsesEntries, EngineOwners.CoreGameEngineProgramDodgeResponsesRuntime>(Core.RuntimeEntries.CoreGameEngineProgramDodgeResponsesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramEquipmentExchangesEntries ProgramEquipmentExchangesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramEquipmentExchangesEntries, EngineOwners.CoreGameEngineProgramEquipmentExchangesRuntime>(Core.RuntimeEntries.CoreGameEngineProgramEquipmentExchangesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEquipmentExchangesRuntime> ProgramEquipmentExchangesEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramEquipmentExchangesRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries ProgramEventHistoryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries, EngineOwners.CoreGameEngineProgramEventHistoryRuntime>(Core.RuntimeEntries.CoreGameEngineProgramEventHistoryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime> ProgramEventHistoryEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramExpressionsEntries ProgramExpressionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramExpressionsEntries, EngineOwners.CoreGameEngineProgramExpressionsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramExpressionsEntries.Create);
 
     internal Core.RuntimeEntries.CoreProgramFactionActionRewardEntries ProgramFactionActionRewardEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramFactionActionRewardEntries, EngineOwners.CoreProgramFactionActionRewardRuntime>(Core.RuntimeEntries.CoreProgramFactionActionRewardEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramHandControlEntries ProgramHandControlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramHandControlEntries, EngineOwners.CoreGameEngineProgramHandControlRuntime>(Core.RuntimeEntries.CoreGameEngineProgramHandControlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramHandControlRuntime> ProgramHandControlEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramHandControlRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramHandExchangesEntries ProgramHandExchangesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramHandExchangesEntries, EngineOwners.CoreGameEngineProgramHandExchangesRuntime>(Core.RuntimeEntries.CoreGameEngineProgramHandExchangesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramHandExchangesRuntime> ProgramHandExchangesEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramHandExchangesRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramHoldCardsEntries ProgramHoldCardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramHoldCardsEntries, EngineOwners.CoreGameEngineProgramHoldCardsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramHoldCardsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramHoldCardsRuntime> ProgramHoldCardsEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramHoldCardsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramJudgmentClaimsEntries ProgramJudgmentClaimsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramJudgmentClaimsEntries, EngineOwners.CoreGameEngineProgramJudgmentClaimsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramJudgmentClaimsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramJudgmentClaimsRuntime> ProgramJudgmentClaimsEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramJudgmentClaimsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries ProgramLifecycleEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries, EngineOwners.CoreGameEngineProgramLifecycleRuntime>(Core.RuntimeEntries.CoreGameEngineProgramLifecycleEntries.Create);
 
-    internal Core.RuntimeEntries.CoreProgramLoseDeathSourceSkillsOperationEntries ProgramLoseDeathSourceSkillsOperationEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramLoseDeathSourceSkillsOperationEntries, EngineOwners.CoreProgramLoseDeathSourceSkillsOperationRuntime>(Core.RuntimeEntries.CoreProgramLoseDeathSourceSkillsOperationEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramLoseDeathSourceSkillsOperationRuntime> ProgramLoseDeathSourceSkillsOperationEntries => GetDeferredModule<EngineOwners.CoreProgramLoseDeathSourceSkillsOperationRuntime>();
 
-    internal Core.RuntimeEntries.CoreProgramLostHpChainedPaymentsEntries ProgramLostHpChainedPaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramLostHpChainedPaymentsEntries, EngineOwners.CoreProgramLostHpChainedPaymentsRuntime>(Core.RuntimeEntries.CoreProgramLostHpChainedPaymentsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramLostHpChainedPaymentsRuntime> ProgramLostHpChainedPaymentsEntries => GetDeferredModule<EngineOwners.CoreProgramLostHpChainedPaymentsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramMarkerPaymentsEntries ProgramMarkerPaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramMarkerPaymentsEntries, EngineOwners.CoreGameEngineProgramMarkerPaymentsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramMarkerPaymentsEntries.Create);
 
@@ -1379,9 +1379,9 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineProgramOtherOwnedCardDiscardsEntries ProgramOtherOwnedCardDiscardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramOtherOwnedCardDiscardsEntries, EngineOwners.CoreGameEngineProgramOtherOwnedCardDiscardsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramOtherOwnedCardDiscardsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramOwnCardDiscardsEntries ProgramOwnCardDiscardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramOwnCardDiscardsEntries, EngineOwners.CoreGameEngineProgramOwnCardDiscardsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramOwnCardDiscardsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramOwnCardDiscardsRuntime> ProgramOwnCardDiscardsEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramOwnCardDiscardsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramOwnedCardDistributionsEntries ProgramOwnedCardDistributionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramOwnedCardDistributionsEntries, EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramOwnedCardDistributionsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime> ProgramOwnedCardDistributionsEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramOwnedCardDistributionsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramOwnedCardsEntries ProgramOwnedCardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramOwnedCardsEntries, EngineOwners.CoreGameEngineProgramOwnedCardsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramOwnedCardsEntries.Create);
 
@@ -1395,15 +1395,15 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineProgramPhaseColorRestrictionsEntries ProgramPhaseColorRestrictionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramPhaseColorRestrictionsEntries, EngineOwners.CoreGameEngineProgramPhaseColorRestrictionsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramPhaseColorRestrictionsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramPhaseHandDiscardsEntries ProgramPhaseHandDiscardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramPhaseHandDiscardsEntries, EngineOwners.CoreGameEngineProgramPhaseHandDiscardsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramPhaseHandDiscardsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramPhaseHandDiscardsRuntime> ProgramPhaseHandDiscardsEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramPhaseHandDiscardsRuntime>();
 
-    internal Core.RuntimeEntries.CoreProgramPopulationAndArrowBarrageOperationsEntries ProgramPopulationAndArrowBarrageOperationsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramPopulationAndArrowBarrageOperationsEntries, EngineOwners.CoreProgramPopulationAndArrowBarrageOperationsRuntime>(Core.RuntimeEntries.CoreProgramPopulationAndArrowBarrageOperationsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramPopulationAndArrowBarrageOperationsRuntime> ProgramPopulationAndArrowBarrageOperationsEntries => GetDeferredModule<EngineOwners.CoreProgramPopulationAndArrowBarrageOperationsRuntime>();
 
-    internal Core.RuntimeEntries.CoreProgramPopulationOperationsEntries ProgramPopulationOperationsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramPopulationOperationsEntries, EngineOwners.CoreProgramPopulationOperationsRuntime>(Core.RuntimeEntries.CoreProgramPopulationOperationsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramPopulationOperationsRuntime> ProgramPopulationOperationsEntries => GetDeferredModule<EngineOwners.CoreProgramPopulationOperationsRuntime>();
 
     internal Core.RuntimeEntries.CoreProgramPrivateDamageOfferOperationsEntries ProgramPrivateDamageOfferOperationsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramPrivateDamageOfferOperationsEntries, EngineOwners.CoreProgramPrivateDamageOfferOperationsRuntime>(Core.RuntimeEntries.CoreProgramPrivateDamageOfferOperationsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramRandomTransfersEntries ProgramRandomTransfersEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramRandomTransfersEntries, EngineOwners.CoreGameEngineProgramRandomTransfersRuntime>(Core.RuntimeEntries.CoreGameEngineProgramRandomTransfersEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramRandomTransfersRuntime> ProgramRandomTransfersEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramRandomTransfersRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramRecoveryReceiptsEntries ProgramRecoveryReceiptsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramRecoveryReceiptsEntries, EngineOwners.CoreGameEngineProgramRecoveryReceiptsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramRecoveryReceiptsEntries.Create);
 
@@ -1411,13 +1411,13 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineProgramRevealsEntries ProgramRevealsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramRevealsEntries, EngineOwners.CoreGameEngineProgramRevealsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramRevealsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreProgramRuntimeHooksEntries ProgramRuntimeHooksEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramRuntimeHooksEntries, EngineOwners.CoreProgramRuntimeHooksRuntime>(Core.RuntimeEntries.CoreProgramRuntimeHooksEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramRuntimeHooksRuntime> ProgramRuntimeHooksEntries => GetDeferredModule<EngineOwners.CoreProgramRuntimeHooksRuntime>();
 
-    internal Core.RuntimeEntries.CoreProgramShanheDeathEquipmentEntries ProgramShanheDeathEquipmentEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramShanheDeathEquipmentEntries, EngineOwners.CoreProgramShanheDeathEquipmentRuntime>(Core.RuntimeEntries.CoreProgramShanheDeathEquipmentEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramShanheDeathEquipmentRuntime> ProgramShanheDeathEquipmentEntries => GetDeferredModule<EngineOwners.CoreProgramShanheDeathEquipmentRuntime>();
 
-    internal Core.RuntimeEntries.CoreProgramShanheLuanxinEntries ProgramShanheLuanxinEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramShanheLuanxinEntries, EngineOwners.CoreProgramShanheLuanxinRuntime>(Core.RuntimeEntries.CoreProgramShanheLuanxinEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramShanheLuanxinRuntime> ProgramShanheLuanxinEntries => GetDeferredModule<EngineOwners.CoreProgramShanheLuanxinRuntime>();
 
-    internal Core.RuntimeEntries.CoreProgramShanheSourceWarElephantEntries ProgramShanheSourceWarElephantEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramShanheSourceWarElephantEntries, EngineOwners.CoreProgramShanheSourceWarElephantRuntime>(Core.RuntimeEntries.CoreProgramShanheSourceWarElephantEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreProgramShanheSourceWarElephantRuntime> ProgramShanheSourceWarElephantEntries => GetDeferredModule<EngineOwners.CoreProgramShanheSourceWarElephantRuntime>();
 
     internal Core.RuntimeEntries.CoreProgramShanheSourceZhaoranEntries ProgramShanheSourceZhaoranEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreProgramShanheSourceZhaoranEntries, EngineOwners.CoreProgramShanheSourceZhaoranRuntime>(Core.RuntimeEntries.CoreProgramShanheSourceZhaoranEntries.Create);
 
@@ -1427,11 +1427,11 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineProgramStateProjectionEntries ProgramStateProjectionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramStateProjectionEntries, EngineOwners.CoreGameEngineProgramStateProjectionRuntime>(Core.RuntimeEntries.CoreGameEngineProgramStateProjectionEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramTargetCommitEntries ProgramTargetCommitEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramTargetCommitEntries, EngineOwners.CoreGameEngineProgramTargetCommitRuntime>(Core.RuntimeEntries.CoreGameEngineProgramTargetCommitEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramTargetCommitRuntime> ProgramTargetCommitEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramTargetCommitRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramTopReorderEntries ProgramTopReorderEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramTopReorderEntries, EngineOwners.CoreGameEngineProgramTopReorderRuntime>(Core.RuntimeEntries.CoreGameEngineProgramTopReorderEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProgramTriggerWindowsEntries ProgramTriggerWindowsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramTriggerWindowsEntries, EngineOwners.CoreGameEngineProgramTriggerWindowsRuntime>(Core.RuntimeEntries.CoreGameEngineProgramTriggerWindowsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramTriggerWindowsRuntime> ProgramTriggerWindowsEntries => GetDeferredModule<EngineOwners.CoreGameEngineProgramTriggerWindowsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineProgramTurnPhaseEntries ProgramTurnPhaseEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProgramTurnPhaseEntries, EngineOwners.CoreGameEngineProgramTurnPhaseRuntime>(Core.RuntimeEntries.CoreGameEngineProgramTurnPhaseEntries.Create);
 
@@ -1441,17 +1441,17 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineProvenanceCardPoliciesEntries ProvenanceCardPoliciesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProvenanceCardPoliciesEntries, EngineOwners.CoreGameEngineProvenanceCardPoliciesRuntime>(Core.RuntimeEntries.CoreGameEngineProvenanceCardPoliciesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineProvenanceClaimObserversEntries ProvenanceClaimObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProvenanceClaimObserversEntries, EngineOwners.CoreGameEngineProvenanceClaimObserversRuntime>(Core.RuntimeEntries.CoreGameEngineProvenanceClaimObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProvenanceClaimObserversRuntime> ProvenanceClaimObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineProvenanceClaimObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineProvenanceVirtualAlcoholEntries ProvenanceVirtualAlcoholEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineProvenanceVirtualAlcoholEntries, EngineOwners.CoreGameEngineProvenanceVirtualAlcoholRuntime>(Core.RuntimeEntries.CoreGameEngineProvenanceVirtualAlcoholEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProvenanceVirtualAlcoholRuntime> ProvenanceVirtualAlcoholEntries => GetDeferredModule<EngineOwners.CoreGameEngineProvenanceVirtualAlcoholRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEnginePublicFactionCountsEntries PublicFactionCountsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePublicFactionCountsEntries, EngineOwners.CoreGameEnginePublicFactionCountsRuntime>(Core.RuntimeEntries.CoreGameEnginePublicFactionCountsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePublicPersistentPilesEntries PublicPersistentPilesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePublicPersistentPilesEntries, EngineOwners.CoreGameEnginePublicPersistentPilesRuntime>(Core.RuntimeEntries.CoreGameEnginePublicPersistentPilesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePublicPersistentPilesRuntime> PublicPersistentPilesEntries => GetDeferredModule<EngineOwners.CoreGameEnginePublicPersistentPilesRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEnginePublicPileCashOutEntries PublicPileCashOutEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePublicPileCashOutEntries, EngineOwners.CoreGameEnginePublicPileCashOutRuntime>(Core.RuntimeEntries.CoreGameEnginePublicPileCashOutEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePublicPileCollectionEntries PublicPileCollectionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePublicPileCollectionEntries, EngineOwners.CoreGameEnginePublicPileCollectionRuntime>(Core.RuntimeEntries.CoreGameEnginePublicPileCollectionEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePublicPileCollectionRuntime> PublicPileCollectionEntries => GetDeferredModule<EngineOwners.CoreGameEnginePublicPileCollectionRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEnginePublicPileColorsEntries PublicPileColorsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePublicPileColorsEntries, EngineOwners.CoreGameEnginePublicPileColorsRuntime>(Core.RuntimeEntries.CoreGameEnginePublicPileColorsEntries.Create);
 
@@ -1461,11 +1461,11 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEnginePublicPileSourcesEntries PublicPileSourcesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePublicPileSourcesEntries, EngineOwners.CoreGameEnginePublicPileSourcesRuntime>(Core.RuntimeEntries.CoreGameEnginePublicPileSourcesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEnginePublicPlayedCardsEntries PublicPlayedCardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEnginePublicPlayedCardsEntries, EngineOwners.CoreGameEnginePublicPlayedCardsRuntime>(Core.RuntimeEntries.CoreGameEnginePublicPlayedCardsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEnginePublicPlayedCardsRuntime> PublicPlayedCardsEntries => GetDeferredModule<EngineOwners.CoreGameEnginePublicPlayedCardsRuntime>();
 
     internal Core.RuntimeEntries.CharacterQianZhaoOlEntries QianZhaoOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterQianZhaoOlEntries, EngineOwners.CharacterQianZhaoOlRuntime>(Core.RuntimeEntries.CharacterQianZhaoOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterQiaoRuiAnniversaryEntries QiaoRuiAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterQiaoRuiAnniversaryEntries, EngineOwners.CharacterQiaoRuiAnniversaryRuntime>(Core.RuntimeEntries.CharacterQiaoRuiAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterQiaoRuiAnniversaryRuntime> QiaoRuiAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterQiaoRuiAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterQiaoZhouOlEntries QiaoZhouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterQiaoZhouOlEntries, EngineOwners.CharacterQiaoZhouOlRuntime>(Core.RuntimeEntries.CharacterQiaoZhouOlEntries.Create);
 
@@ -1477,19 +1477,19 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineQinglongInsertionEntries QinglongInsertionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineQinglongInsertionEntries, EngineOwners.CoreGameEngineQinglongInsertionRuntime>(Core.RuntimeEntries.CoreGameEngineQinglongInsertionEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterQuanCongBoundaryMobileEntries QuanCongBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterQuanCongBoundaryMobileEntries, EngineOwners.CharacterQuanCongBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterQuanCongBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterQuanCongBoundaryMobileRuntime> QuanCongBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterQuanCongBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineQuotaTopProgramsEntries QuotaTopProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineQuotaTopProgramsEntries, EngineOwners.CoreGameEngineQuotaTopProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineQuotaTopProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineRandomAreaAcquisitionEntries RandomAreaAcquisitionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRandomAreaAcquisitionEntries, EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime>(Core.RuntimeEntries.CoreGameEngineRandomAreaAcquisitionEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime> RandomAreaAcquisitionEntries => GetDeferredModule<EngineOwners.CoreGameEngineRandomAreaAcquisitionRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineRandomAreaAcquisitionObserversEntries RandomAreaAcquisitionObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRandomAreaAcquisitionObserversEntries, EngineOwners.CoreGameEngineRandomAreaAcquisitionObserversRuntime>(Core.RuntimeEntries.CoreGameEngineRandomAreaAcquisitionObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRandomAreaAcquisitionObserversRuntime> RandomAreaAcquisitionObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineRandomAreaAcquisitionObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineRandomDamageTargetSkillsEntries RandomDamageTargetSkillsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRandomDamageTargetSkillsEntries, EngineOwners.CoreGameEngineRandomDamageTargetSkillsRuntime>(Core.RuntimeEntries.CoreGameEngineRandomDamageTargetSkillsEntries.Create);
 
     internal Core.RuntimeEntries.CoreRecastBoundCardProgramsEntries RecastBoundCardProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreRecastBoundCardProgramsEntries, EngineOwners.CoreRecastBoundCardProgramsRuntime>(Core.RuntimeEntries.CoreRecastBoundCardProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineRecipientCategoryMarkContinuationsEntries RecipientCategoryMarkContinuationsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRecipientCategoryMarkContinuationsEntries, EngineOwners.CoreGameEngineRecipientCategoryMarkContinuationsRuntime>(Core.RuntimeEntries.CoreGameEngineRecipientCategoryMarkContinuationsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRecipientCategoryMarkContinuationsRuntime> RecipientCategoryMarkContinuationsEntries => GetDeferredModule<EngineOwners.CoreGameEngineRecipientCategoryMarkContinuationsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineRecipientCategoryMarkObserversEntries RecipientCategoryMarkObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRecipientCategoryMarkObserversEntries, EngineOwners.CoreGameEngineRecipientCategoryMarkObserversRuntime>(Core.RuntimeEntries.CoreGameEngineRecipientCategoryMarkObserversEntries.Create);
 
@@ -1499,19 +1499,19 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineRecipientConsequencesReceiptsEntries RecipientConsequencesReceiptsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRecipientConsequencesReceiptsEntries, EngineOwners.CoreGameEngineRecipientConsequencesReceiptsRuntime>(Core.RuntimeEntries.CoreGameEngineRecipientConsequencesReceiptsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineRecipientContestsEntries RecipientContestsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRecipientContestsEntries, EngineOwners.CoreGameEngineRecipientContestsRuntime>(Core.RuntimeEntries.CoreGameEngineRecipientContestsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRecipientContestsRuntime> RecipientContestsEntries => GetDeferredModule<EngineOwners.CoreGameEngineRecipientContestsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries RecipientScopedDamageEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries, EngineOwners.CoreGameEngineRecipientScopedDamageRuntime>(Core.RuntimeEntries.CoreGameEngineRecipientScopedDamageEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRecipientScopedDamageRuntime> RecipientScopedDamageEntries => GetDeferredModule<EngineOwners.CoreGameEngineRecipientScopedDamageRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineRecordedSuitSlashEntries RecordedSuitSlashEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRecordedSuitSlashEntries, EngineOwners.CoreGameEngineRecordedSuitSlashRuntime>(Core.RuntimeEntries.CoreGameEngineRecordedSuitSlashEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineRecoveryAmountBonusesEntries RecoveryAmountBonusesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRecoveryAmountBonusesEntries, EngineOwners.CoreGameEngineRecoveryAmountBonusesRuntime>(Core.RuntimeEntries.CoreGameEngineRecoveryAmountBonusesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRecoveryAmountBonusesRuntime> RecoveryAmountBonusesEntries => GetDeferredModule<EngineOwners.CoreGameEngineRecoveryAmountBonusesRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries RecoveryReplacementDamageRidesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries, EngineOwners.CoreGameEngineRecoveryReplacementDamageRidesRuntime>(Core.RuntimeEntries.CoreGameEngineRecoveryReplacementDamageRidesEntries.Create);
 
     internal Core.RuntimeEntries.CoreRecoveryReplacementEntries RecoveryReplacementEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreRecoveryReplacementEntries, EngineOwners.CoreRecoveryReplacementRuntime>(Core.RuntimeEntries.CoreRecoveryReplacementEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineRedDiscardRecoveryEntries RedDiscardRecoveryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRedDiscardRecoveryEntries, EngineOwners.CoreGameEngineRedDiscardRecoveryRuntime>(Core.RuntimeEntries.CoreGameEngineRedDiscardRecoveryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRedDiscardRecoveryRuntime> RedDiscardRecoveryEntries => GetDeferredModule<EngineOwners.CoreGameEngineRedDiscardRecoveryRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineRequestedDeckBasicOwnershipEntries RequestedDeckBasicOwnershipEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRequestedDeckBasicOwnershipEntries, EngineOwners.CoreGameEngineRequestedDeckBasicOwnershipRuntime>(Core.RuntimeEntries.CoreGameEngineRequestedDeckBasicOwnershipEntries.Create);
 
@@ -1521,7 +1521,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineResponseCompletionEntries ResponseCompletionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineResponseCompletionEntries, EngineOwners.CoreGameEngineResponseCompletionRuntime>(Core.RuntimeEntries.CoreGameEngineResponseCompletionEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineResponseCompletionHealthEntries ResponseCompletionHealthEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineResponseCompletionHealthEntries, EngineOwners.CoreGameEngineResponseCompletionHealthRuntime>(Core.RuntimeEntries.CoreGameEngineResponseCompletionHealthEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineResponseCompletionHealthRuntime> ResponseCompletionHealthEntries => GetDeferredModule<EngineOwners.CoreGameEngineResponseCompletionHealthRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineResponseEntityExchangeEntries ResponseEntityExchangeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineResponseEntityExchangeEntries, EngineOwners.CoreGameEngineResponseEntityExchangeRuntime>(Core.RuntimeEntries.CoreGameEngineResponseEntityExchangeEntries.Create);
 
@@ -1529,33 +1529,33 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineRevealRecastProgramsEntries RevealRecastProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRevealRecastProgramsEntries, EngineOwners.CoreGameEngineRevealRecastProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineRevealRecastProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineRevealedCardHpComparisonEntries RevealedCardHpComparisonEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRevealedCardHpComparisonEntries, EngineOwners.CoreGameEngineRevealedCardHpComparisonRuntime>(Core.RuntimeEntries.CoreGameEngineRevealedCardHpComparisonEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRevealedCardHpComparisonRuntime> RevealedCardHpComparisonEntries => GetDeferredModule<EngineOwners.CoreGameEngineRevealedCardHpComparisonRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineRicePileEntries RicePileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRicePileEntries, EngineOwners.CoreGameEngineRicePileRuntime>(Core.RuntimeEntries.CoreGameEngineRicePileEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineRicePileObserversEntries RicePileObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRicePileObserversEntries, EngineOwners.CoreGameEngineRicePileObserversRuntime>(Core.RuntimeEntries.CoreGameEngineRicePileObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRicePileObserversRuntime> RicePileObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineRicePileObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineRoundEndingEntries RoundEndingEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRoundEndingEntries, EngineOwners.CoreGameEngineRoundEndingRuntime>(Core.RuntimeEntries.CoreGameEngineRoundEndingEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRoundEndingRuntime> RoundEndingEntries => GetDeferredModule<EngineOwners.CoreGameEngineRoundEndingRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineRoundFirstSlashTargetsEntries RoundFirstSlashTargetsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRoundFirstSlashTargetsEntries, EngineOwners.CoreGameEngineRoundFirstSlashTargetsRuntime>(Core.RuntimeEntries.CoreGameEngineRoundFirstSlashTargetsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRoundFirstSlashTargetsRuntime> RoundFirstSlashTargetsEntries => GetDeferredModule<EngineOwners.CoreGameEngineRoundFirstSlashTargetsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineRoundGainedEquipmentDrawsEntries RoundGainedEquipmentDrawsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRoundGainedEquipmentDrawsEntries, EngineOwners.CoreGameEngineRoundGainedEquipmentDrawsRuntime>(Core.RuntimeEntries.CoreGameEngineRoundGainedEquipmentDrawsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRoundGainedEquipmentDrawsRuntime> RoundGainedEquipmentDrawsEntries => GetDeferredModule<EngineOwners.CoreGameEngineRoundGainedEquipmentDrawsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineRoundGainedEquipmentObserversEntries RoundGainedEquipmentObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRoundGainedEquipmentObserversEntries, EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime>(Core.RuntimeEntries.CoreGameEngineRoundGainedEquipmentObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime> RoundGainedEquipmentObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineRoundGainedEquipmentObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineRoundGainedSourceUsesEntries RoundGainedSourceUsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRoundGainedSourceUsesEntries, EngineOwners.CoreGameEngineRoundGainedSourceUsesRuntime>(Core.RuntimeEntries.CoreGameEngineRoundGainedSourceUsesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineRoundGainedTrickTargetsEntries RoundGainedTrickTargetsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRoundGainedTrickTargetsEntries, EngineOwners.CoreGameEngineRoundGainedTrickTargetsRuntime>(Core.RuntimeEntries.CoreGameEngineRoundGainedTrickTargetsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineRoundGainedTrickTargetsRuntime> RoundGainedTrickTargetsEntries => GetDeferredModule<EngineOwners.CoreGameEngineRoundGainedTrickTargetsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineRoundPricedPileAlcoholEntries RoundPricedPileAlcoholEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRoundPricedPileAlcoholEntries, EngineOwners.CoreGameEngineRoundPricedPileAlcoholRuntime>(Core.RuntimeEntries.CoreGameEngineRoundPricedPileAlcoholEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterRuanHuiOlEntries RuanHuiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterRuanHuiOlEntries, EngineOwners.CharacterRuanHuiOlRuntime>(Core.RuntimeEntries.CharacterRuanHuiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterRuanHuiOlRuntime> RuanHuiOlEntries => GetDeferredModule<EngineOwners.CharacterRuanHuiOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterRuanJiAnniversaryEntries RuanJiAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterRuanJiAnniversaryEntries, EngineOwners.CharacterRuanJiAnniversaryRuntime>(Core.RuntimeEntries.CharacterRuanJiAnniversaryEntries.Create);
 
     internal Core.RuntimeEntries.CharacterRuanYuOlEntries RuanYuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterRuanYuOlEntries, EngineOwners.CharacterRuanYuOlRuntime>(Core.RuntimeEntries.CharacterRuanYuOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterRuiJiOlEntries RuiJiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterRuiJiOlEntries, EngineOwners.CharacterRuiJiOlRuntime>(Core.RuntimeEntries.CharacterRuiJiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterRuiJiOlRuntime> RuiJiOlEntries => GetDeferredModule<EngineOwners.CharacterRuiJiOlRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries RuleQueriesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries, EngineOwners.CoreGameEngineRuleQueriesRuntime>(Core.RuntimeEntries.CoreGameEngineRuleQueriesEntries.Create);
 
@@ -1567,7 +1567,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineSameTypeActualUseAidEntries SameTypeActualUseAidEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSameTypeActualUseAidEntries, EngineOwners.CoreGameEngineSameTypeActualUseAidRuntime>(Core.RuntimeEntries.CoreGameEngineSameTypeActualUseAidEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineScenarioGodFactionsEntries ScenarioGodFactionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineScenarioGodFactionsEntries, EngineOwners.CoreGameEngineScenarioGodFactionsRuntime>(Core.RuntimeEntries.CoreGameEngineScenarioGodFactionsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineScenarioGodFactionsRuntime> ScenarioGodFactionsEntries => GetDeferredModule<EngineOwners.CoreGameEngineScenarioGodFactionsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineScenarioPrintedLordQualificationsEntries ScenarioPrintedLordQualificationsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineScenarioPrintedLordQualificationsEntries, EngineOwners.CoreGameEngineScenarioPrintedLordQualificationsRuntime>(Core.RuntimeEntries.CoreGameEngineScenarioPrintedLordQualificationsEntries.Create);
 
@@ -1581,175 +1581,175 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineShanheCampaignsEntries ShanheCampaignsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheCampaignsEntries, EngineOwners.CoreGameEngineShanheCampaignsRuntime>(Core.RuntimeEntries.CoreGameEngineShanheCampaignsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheChanrangEdictEntries ShanheChanrangEdictEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheChanrangEdictEntries, EngineOwners.CoreGameEngineShanheChanrangEdictRuntime>(Core.RuntimeEntries.CoreGameEngineShanheChanrangEdictEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheChanrangEdictRuntime> ShanheChanrangEdictEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheChanrangEdictRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheDoubleStealEntries ShanheDoubleStealEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheDoubleStealEntries, EngineOwners.CoreGameEngineShanheDoubleStealRuntime>(Core.RuntimeEntries.CoreGameEngineShanheDoubleStealEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheDoubleStealRuntime> ShanheDoubleStealEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheDoubleStealRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheEmptySlotEquipmentEntries ShanheEmptySlotEquipmentEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheEmptySlotEquipmentEntries, EngineOwners.CoreGameEngineShanheEmptySlotEquipmentRuntime>(Core.RuntimeEntries.CoreGameEngineShanheEmptySlotEquipmentEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheEmptySlotEquipmentRuntime> ShanheEmptySlotEquipmentEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheEmptySlotEquipmentRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheGuangaoEntries ShanheGuangaoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheGuangaoEntries, EngineOwners.CoreGameEngineShanheGuangaoRuntime>(Core.RuntimeEntries.CoreGameEngineShanheGuangaoEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheGuangaoRuntime> ShanheGuangaoEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheGuangaoRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheGuideSkillsEntries ShanheGuideSkillsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheGuideSkillsEntries, EngineOwners.CoreGameEngineShanheGuideSkillsRuntime>(Core.RuntimeEntries.CoreGameEngineShanheGuideSkillsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheLeizhenEntries ShanheLeizhenEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheLeizhenEntries, EngineOwners.CoreGameEngineShanheLeizhenRuntime>(Core.RuntimeEntries.CoreGameEngineShanheLeizhenEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheLeizhenRuntime> ShanheLeizhenEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheLeizhenRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheMarketApplicationEntries ShanheMarketApplicationEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheMarketApplicationEntries, EngineOwners.CoreGameEngineShanheMarketApplicationRuntime>(Core.RuntimeEntries.CoreGameEngineShanheMarketApplicationEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheMarketApplicationRuntime> ShanheMarketApplicationEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheMarketApplicationRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheMarketEntries ShanheMarketEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheMarketEntries, EngineOwners.CoreGameEngineShanheMarketRuntime>(Core.RuntimeEntries.CoreGameEngineShanheMarketEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineShanheMarketOpeningEntries ShanheMarketOpeningEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheMarketOpeningEntries, EngineOwners.CoreGameEngineShanheMarketOpeningRuntime>(Core.RuntimeEntries.CoreGameEngineShanheMarketOpeningEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheMobilizationEntries ShanheMobilizationEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheMobilizationEntries, EngineOwners.CoreGameEngineShanheMobilizationRuntime>(Core.RuntimeEntries.CoreGameEngineShanheMobilizationEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheMobilizationRuntime> ShanheMobilizationEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheMobilizationRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheMuluEntries ShanheMuluEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheMuluEntries, EngineOwners.CoreGameEngineShanheMuluRuntime>(Core.RuntimeEntries.CoreGameEngineShanheMuluEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheMuluRuntime> ShanheMuluEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheMuluRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheNullifiedTrickClaimsEntries ShanheNullifiedTrickClaimsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheNullifiedTrickClaimsEntries, EngineOwners.CoreGameEngineShanheNullifiedTrickClaimsRuntime>(Core.RuntimeEntries.CoreGameEngineShanheNullifiedTrickClaimsEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineShanheQianlongEntries ShanheQianlongEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheQianlongEntries, EngineOwners.CoreGameEngineShanheQianlongRuntime>(Core.RuntimeEntries.CoreGameEngineShanheQianlongEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5GongsunZanEntries ShanheS5GongsunZanEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5GongsunZanEntries, EngineOwners.CoreGameEngineShanheS5GongsunZanRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5GongsunZanEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5GongsunZanRuntime> ShanheS5GongsunZanEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5GongsunZanRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5HuashenEntries ShanheS5HuashenEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5HuashenEntries, EngineOwners.CoreGameEngineShanheS5HuashenRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5HuashenEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5HuashenRuntime> ShanheS5HuashenEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5HuashenRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5HujiaEntries ShanheS5HujiaEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5HujiaEntries, EngineOwners.CoreGameEngineShanheS5HujiaRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5HujiaEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5HujiaRuntime> ShanheS5HujiaEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5HujiaRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5LiJueEntries ShanheS5LiJueEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5LiJueEntries, EngineOwners.CoreGameEngineShanheS5LiJueRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5LiJueEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5LiJueRuntime> ShanheS5LiJueEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5LiJueRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5QiangxiEntries ShanheS5QiangxiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5QiangxiEntries, EngineOwners.CoreGameEngineShanheS5QiangxiRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5QiangxiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5QiangxiRuntime> ShanheS5QiangxiEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5QiangxiRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheS5ShensuEntries ShanheS5ShensuEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5ShensuEntries, EngineOwners.CoreGameEngineShanheS5ShensuRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5ShensuEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5SimayiEntries ShanheS5SimayiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5SimayiEntries, EngineOwners.CoreGameEngineShanheS5SimayiRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5SimayiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5SimayiRuntime> ShanheS5SimayiEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5SimayiRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheS5XuchuEntries ShanheS5XuchuEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5XuchuEntries, EngineOwners.CoreGameEngineShanheS5XuchuRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5XuchuEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineShanheS5XuncanEntries ShanheS5XuncanEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5XuncanEntries, EngineOwners.CoreGameEngineShanheS5XuncanRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5XuncanEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5YimieEntries ShanheS5YimieEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5YimieEntries, EngineOwners.CoreGameEngineShanheS5YimieRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5YimieEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5YimieRuntime> ShanheS5YimieEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5YimieRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5YimieObserversEntries ShanheS5YimieObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5YimieObserversEntries, EngineOwners.CoreGameEngineShanheS5YimieObserversRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5YimieObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5YimieObserversRuntime> ShanheS5YimieObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5YimieObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5ZhangliangEntries ShanheS5ZhangliangEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5ZhangliangEntries, EngineOwners.CoreGameEngineShanheS5ZhangliangRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5ZhangliangEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5ZhangliangRuntime> ShanheS5ZhangliangEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5ZhangliangRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5ZhangxiuEntries ShanheS5ZhangxiuEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5ZhangxiuEntries, EngineOwners.CoreGameEngineShanheS5ZhangxiuRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5ZhangxiuEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5ZhangxiuRuntime> ShanheS5ZhangxiuEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5ZhangxiuRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheS5ZhulingEntries ShanheS5ZhulingEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheS5ZhulingEntries, EngineOwners.CoreGameEngineShanheS5ZhulingRuntime>(Core.RuntimeEntries.CoreGameEngineShanheS5ZhulingEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheS5ZhulingRuntime> ShanheS5ZhulingEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheS5ZhulingRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheSchoolTeamEntries ShanheSchoolTeamEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSchoolTeamEntries, EngineOwners.CoreGameEngineShanheSchoolTeamRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSchoolTeamEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSchoolTrickEntries ShanheSchoolTrickEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSchoolTrickEntries, EngineOwners.CoreGameEngineShanheSchoolTrickRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSchoolTrickEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSchoolTrickRuntime> ShanheSchoolTrickEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSchoolTrickRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSchoolVitalEntries ShanheSchoolVitalEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSchoolVitalEntries, EngineOwners.CoreGameEngineShanheSchoolVitalRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSchoolVitalEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSchoolVitalRuntime> ShanheSchoolVitalEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSchoolVitalRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheSchoolsEntries ShanheSchoolsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSchoolsEntries, EngineOwners.CoreGameEngineShanheSchoolsRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSchoolsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceBiriEntries ShanheSourceBiriEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceBiriEntries, EngineOwners.CoreGameEngineShanheSourceBiriRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceBiriEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceBiriRuntime> ShanheSourceBiriEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceBiriRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceBiriObserversEntries ShanheSourceBiriObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceBiriObserversEntries, EngineOwners.CoreGameEngineShanheSourceBiriObserversRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceBiriObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceBiriObserversRuntime> ShanheSourceBiriObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceBiriObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceCaoSongTrioEntries ShanheSourceCaoSongTrioEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceCaoSongTrioEntries, EngineOwners.CoreGameEngineShanheSourceCaoSongTrioRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceCaoSongTrioEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceCaoSongTrioRuntime> ShanheSourceCaoSongTrioEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceCaoSongTrioRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceChunlao3161Entries ShanheSourceChunlao3161Entries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceChunlao3161Entries, EngineOwners.CoreGameEngineShanheSourceChunlao3161Runtime>(Core.RuntimeEntries.CoreGameEngineShanheSourceChunlao3161Entries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceChunlao3161Runtime> ShanheSourceChunlao3161Entries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceChunlao3161Runtime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceChunlaoJudgment3161Entries ShanheSourceChunlaoJudgment3161Entries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceChunlaoJudgment3161Entries, EngineOwners.CoreGameEngineShanheSourceChunlaoJudgment3161Runtime>(Core.RuntimeEntries.CoreGameEngineShanheSourceChunlaoJudgment3161Entries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceChunlaoJudgment3161Runtime> ShanheSourceChunlaoJudgment3161Entries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceChunlaoJudgment3161Runtime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceKeshouEntries ShanheSourceKeshouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceKeshouEntries, EngineOwners.CoreGameEngineShanheSourceKeshouRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceKeshouEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceKeshouRuntime> ShanheSourceKeshouEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceKeshouRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceLihuo3160Entries ShanheSourceLihuo3160Entries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceLihuo3160Entries, EngineOwners.CoreGameEngineShanheSourceLihuo3160Runtime>(Core.RuntimeEntries.CoreGameEngineShanheSourceLihuo3160Entries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceLihuo3160Runtime> ShanheSourceLihuo3160Entries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceLihuo3160Runtime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceLiuSandaoEntries ShanheSourceLiuSandaoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceLiuSandaoEntries, EngineOwners.CoreGameEngineShanheSourceLiuSandaoRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceLiuSandaoEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceLiuSandaoRuntime> ShanheSourceLiuSandaoEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceLiuSandaoRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceLiuYanTrioEntries ShanheSourceLiuYanTrioEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceLiuYanTrioEntries, EngineOwners.CoreGameEngineShanheSourceLiuYanTrioRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceLiuYanTrioEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceLiuYanTrioRuntime> ShanheSourceLiuYanTrioEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceLiuYanTrioRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceMouDongZhuoChildrenEntries ShanheSourceMouDongZhuoChildrenEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceMouDongZhuoChildrenEntries, EngineOwners.CoreGameEngineShanheSourceMouDongZhuoChildrenRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceMouDongZhuoChildrenEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceMouDongZhuoChildrenRuntime> ShanheSourceMouDongZhuoChildrenEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceMouDongZhuoChildrenRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheSourceMouDongZhuoEntries ShanheSourceMouDongZhuoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceMouDongZhuoEntries, EngineOwners.CoreGameEngineShanheSourceMouDongZhuoRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceMouDongZhuoEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineShanheSourceMouDongZhuoWineEntries ShanheSourceMouDongZhuoWineEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceMouDongZhuoWineEntries, EngineOwners.CoreGameEngineShanheSourceMouDongZhuoWineRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceMouDongZhuoWineEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceNamanEntries ShanheSourceNamanEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceNamanEntries, EngineOwners.CoreGameEngineShanheSourceNamanRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceNamanEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceNamanRuntime> ShanheSourceNamanEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceNamanRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourcePojunEntries ShanheSourcePojunEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourcePojunEntries, EngineOwners.CoreGameEngineShanheSourcePojunRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourcePojunEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourcePojunRuntime> ShanheSourcePojunEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourcePojunRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceQingjianEntries ShanheSourceQingjianEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceQingjianEntries, EngineOwners.CoreGameEngineShanheSourceQingjianRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceQingjianEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceQingjianRuntime> ShanheSourceQingjianEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceQingjianRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceQuhuEntries ShanheSourceQuhuEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceQuhuEntries, EngineOwners.CoreGameEngineShanheSourceQuhuRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceQuhuEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceQuhuRuntime> ShanheSourceQuhuEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceQuhuRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceShennuEntries ShanheSourceShennuEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceShennuEntries, EngineOwners.CoreGameEngineShanheSourceShennuRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceShennuEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceShennuRuntime> ShanheSourceShennuEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceShennuRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceTiepaoEntries ShanheSourceTiepaoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceTiepaoEntries, EngineOwners.CoreGameEngineShanheSourceTiepaoRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceTiepaoEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceTiepaoRuntime> ShanheSourceTiepaoEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceTiepaoRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheSourceXiyingEntries ShanheSourceXiyingEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceXiyingEntries, EngineOwners.CoreGameEngineShanheSourceXiyingRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceXiyingEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceYanyuEntries ShanheSourceYanyuEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceYanyuEntries, EngineOwners.CoreGameEngineShanheSourceYanyuRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceYanyuEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceYanyuRuntime> ShanheSourceYanyuEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceYanyuRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheSourceZirunEntries ShanheSourceZirunEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSourceZirunEntries, EngineOwners.CoreGameEngineShanheSourceZirunRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSourceZirunEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourceZirunRuntime> ShanheSourceZirunEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheSourceZirunRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheStartingResourcesEntries ShanheStartingResourcesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheStartingResourcesEntries, EngineOwners.CoreGameEngineShanheStartingResourcesRuntime>(Core.RuntimeEntries.CoreGameEngineShanheStartingResourcesEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineShanheSteadyHandEntries ShanheSteadyHandEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheSteadyHandEntries, EngineOwners.CoreGameEngineShanheSteadyHandRuntime>(Core.RuntimeEntries.CoreGameEngineShanheSteadyHandEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheTerrainPoliciesEntries ShanheTerrainPoliciesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheTerrainPoliciesEntries, EngineOwners.CoreGameEngineShanheTerrainPoliciesRuntime>(Core.RuntimeEntries.CoreGameEngineShanheTerrainPoliciesEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheTerrainPoliciesRuntime> ShanheTerrainPoliciesEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheTerrainPoliciesRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheXiaoruiEntries ShanheXiaoruiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheXiaoruiEntries, EngineOwners.CoreGameEngineShanheXiaoruiRuntime>(Core.RuntimeEntries.CoreGameEngineShanheXiaoruiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheXiaoruiRuntime> ShanheXiaoruiEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheXiaoruiRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheXiashengEntries ShanheXiashengEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheXiashengEntries, EngineOwners.CoreGameEngineShanheXiashengRuntime>(Core.RuntimeEntries.CoreGameEngineShanheXiashengEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheXiashengRuntime> ShanheXiashengEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheXiashengRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheXingtianEntries ShanheXingtianEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheXingtianEntries, EngineOwners.CoreGameEngineShanheXingtianRuntime>(Core.RuntimeEntries.CoreGameEngineShanheXingtianEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheYingxiangEntries ShanheYingxiangEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheYingxiangEntries, EngineOwners.CoreGameEngineShanheYingxiangRuntime>(Core.RuntimeEntries.CoreGameEngineShanheYingxiangEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheYingxiangRuntime> ShanheYingxiangEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheYingxiangRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShanheYongzhanEntries ShanheYongzhanEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheYongzhanEntries, EngineOwners.CoreGameEngineShanheYongzhanRuntime>(Core.RuntimeEntries.CoreGameEngineShanheYongzhanEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShanheZhanhunDaoEntries ShanheZhanhunDaoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShanheZhanhunDaoEntries, EngineOwners.CoreGameEngineShanheZhanhunDaoRuntime>(Core.RuntimeEntries.CoreGameEngineShanheZhanhunDaoEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheZhanhunDaoRuntime> ShanheZhanhunDaoEntries => GetDeferredModule<EngineOwners.CoreGameEngineShanheZhanhunDaoRuntime>();
 
     internal Core.RuntimeEntries.CharacterSharedGameEngineOlMoRumoEntries SharedGameEngineOlMoRumoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSharedGameEngineOlMoRumoEntries, EngineOwners.CharacterSharedGameEngineOlMoRumoRuntime>(Core.RuntimeEntries.CharacterSharedGameEngineOlMoRumoEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterSharedGameEngineOlMoRumoObserversEntries SharedGameEngineOlMoRumoObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSharedGameEngineOlMoRumoObserversEntries, EngineOwners.CharacterSharedGameEngineOlMoRumoObserversRuntime>(Core.RuntimeEntries.CharacterSharedGameEngineOlMoRumoObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSharedGameEngineOlMoRumoObserversRuntime> SharedGameEngineOlMoRumoObserversEntries => GetDeferredModule<EngineOwners.CharacterSharedGameEngineOlMoRumoObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineSharedPhaseSkillsEntries SharedPhaseSkillsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSharedPhaseSkillsEntries, EngineOwners.CoreGameEngineSharedPhaseSkillsRuntime>(Core.RuntimeEntries.CoreGameEngineSharedPhaseSkillsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSharedPhaseSkillsRuntime> SharedPhaseSkillsEntries => GetDeferredModule<EngineOwners.CoreGameEngineSharedPhaseSkillsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineSharedSlashOffersEntries SharedSlashOffersEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSharedSlashOffersEntries, EngineOwners.CoreGameEngineSharedSlashOffersRuntime>(Core.RuntimeEntries.CoreGameEngineSharedSlashOffersEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineShenwuCardsEntries ShenwuCardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShenwuCardsEntries, EngineOwners.CoreGameEngineShenwuCardsRuntime>(Core.RuntimeEntries.CoreGameEngineShenwuCardsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreShenwuExpandedProgramsEntries ShenwuExpandedProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreShenwuExpandedProgramsEntries, EngineOwners.CoreShenwuExpandedProgramsRuntime>(Core.RuntimeEntries.CoreShenwuExpandedProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreShenwuExpandedProgramsRuntime> ShenwuExpandedProgramsEntries => GetDeferredModule<EngineOwners.CoreShenwuExpandedProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreShenwuNpcProgramsEntries ShenwuNpcProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreShenwuNpcProgramsEntries, EngineOwners.CoreShenwuNpcProgramsRuntime>(Core.RuntimeEntries.CoreShenwuNpcProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterShiXieMobileEntries ShiXieMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterShiXieMobileEntries, EngineOwners.CharacterShiXieMobileRuntime>(Core.RuntimeEntries.CharacterShiXieMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterShiXieMobileRuntime> ShiXieMobileEntries => GetDeferredModule<EngineOwners.CharacterShiXieMobileRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShortRangeSlashTargetsEntries ShortRangeSlashTargetsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShortRangeSlashTargetsEntries, EngineOwners.CoreGameEngineShortRangeSlashTargetsRuntime>(Core.RuntimeEntries.CoreGameEngineShortRangeSlashTargetsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineShownBoundGiftsEntries ShownBoundGiftsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShownBoundGiftsEntries, EngineOwners.CoreGameEngineShownBoundGiftsRuntime>(Core.RuntimeEntries.CoreGameEngineShownBoundGiftsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShownBoundGiftsRuntime> ShownBoundGiftsEntries => GetDeferredModule<EngineOwners.CoreGameEngineShownBoundGiftsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineShownEntityTurnPoliciesEntries ShownEntityTurnPoliciesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineShownEntityTurnPoliciesEntries, EngineOwners.CoreGameEngineShownEntityTurnPoliciesRuntime>(Core.RuntimeEntries.CoreGameEngineShownEntityTurnPoliciesEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineSignedDamagePaymentsEntries SignedDamagePaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSignedDamagePaymentsEntries, EngineOwners.CoreGameEngineSignedDamagePaymentsRuntime>(Core.RuntimeEntries.CoreGameEngineSignedDamagePaymentsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSignedDamagePaymentsRuntime> SignedDamagePaymentsEntries => GetDeferredModule<EngineOwners.CoreGameEngineSignedDamagePaymentsRuntime>();
 
     internal Core.RuntimeEntries.CharacterSimaHuiOlEntries SimaHuiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSimaHuiOlEntries, EngineOwners.CharacterSimaHuiOlRuntime>(Core.RuntimeEntries.CharacterSimaHuiOlEntries.Create);
 
     internal Core.RuntimeEntries.CharacterSimaShiMouEntries SimaShiMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSimaShiMouEntries, EngineOwners.CharacterSimaShiMouRuntime>(Core.RuntimeEntries.CharacterSimaShiMouEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterSimaYiHappyGodEntries SimaYiHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSimaYiHappyGodEntries, EngineOwners.CharacterSimaYiHappyGodRuntime>(Core.RuntimeEntries.CharacterSimaYiHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSimaYiHappyGodRuntime> SimaYiHappyGodEntries => GetDeferredModule<EngineOwners.CharacterSimaYiHappyGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterSimaYiMouEntries SimaYiMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSimaYiMouEntries, EngineOwners.CharacterSimaYiMouRuntime>(Core.RuntimeEntries.CharacterSimaYiMouEntries.Create);
 
     internal Core.RuntimeEntries.CharacterSimaYiOlMagicEntries SimaYiOlMagicEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSimaYiOlMagicEntries, EngineOwners.CharacterSimaYiOlMagicRuntime>(Core.RuntimeEntries.CharacterSimaYiOlMagicEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineSimultaneousPindianEntries SimultaneousPindianEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSimultaneousPindianEntries, EngineOwners.CoreGameEngineSimultaneousPindianRuntime>(Core.RuntimeEntries.CoreGameEngineSimultaneousPindianEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSimultaneousPindianRuntime> SimultaneousPindianEntries => GetDeferredModule<EngineOwners.CoreGameEngineSimultaneousPindianRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineSimultaneousPindianObserversEntries SimultaneousPindianObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSimultaneousPindianObserversEntries, EngineOwners.CoreGameEngineSimultaneousPindianObserversRuntime>(Core.RuntimeEntries.CoreGameEngineSimultaneousPindianObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSimultaneousPindianObserversRuntime> SimultaneousPindianObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineSimultaneousPindianObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineSkillOwnershipWindowsEntries SkillOwnershipWindowsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSkillOwnershipWindowsEntries, EngineOwners.CoreGameEngineSkillOwnershipWindowsRuntime>(Core.RuntimeEntries.CoreGameEngineSkillOwnershipWindowsEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineSkillProgramsEntries SkillProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSkillProgramsEntries, EngineOwners.CoreGameEngineSkillProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineSkillProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineSkillPromptsEntries SkillPromptsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSkillPromptsEntries, EngineOwners.CoreGameEngineSkillPromptsRuntime>(Core.RuntimeEntries.CoreGameEngineSkillPromptsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSkillPromptsRuntime> SkillPromptsEntries => GetDeferredModule<EngineOwners.CoreGameEngineSkillPromptsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineSlashSuitDiscardEntries SlashSuitDiscardEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSlashSuitDiscardEntries, EngineOwners.CoreGameEngineSlashSuitDiscardRuntime>(Core.RuntimeEntries.CoreGameEngineSlashSuitDiscardEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSlashSuitDiscardRuntime> SlashSuitDiscardEntries => GetDeferredModule<EngineOwners.CoreGameEngineSlashSuitDiscardRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineSlashTargetBenefitPaymentsEntries SlashTargetBenefitPaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSlashTargetBenefitPaymentsEntries, EngineOwners.CoreGameEngineSlashTargetBenefitPaymentsRuntime>(Core.RuntimeEntries.CoreGameEngineSlashTargetBenefitPaymentsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSlashTargetBenefitPaymentsRuntime> SlashTargetBenefitPaymentsEntries => GetDeferredModule<EngineOwners.CoreGameEngineSlashTargetBenefitPaymentsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineSlashTargetBenefitWindowsEntries SlashTargetBenefitWindowsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSlashTargetBenefitWindowsEntries, EngineOwners.CoreGameEngineSlashTargetBenefitWindowsRuntime>(Core.RuntimeEntries.CoreGameEngineSlashTargetBenefitWindowsEntries.Create);
 
@@ -1759,17 +1759,17 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreSnapshotValueProjectionEntries SnapshotValueProjectionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreSnapshotValueProjectionEntries, EngineOwners.CoreSnapshotValueProjectionRuntime>(Core.RuntimeEntries.CoreSnapshotValueProjectionEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineSoleIncomingEffectRepeatEntries SoleIncomingEffectRepeatEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSoleIncomingEffectRepeatEntries, EngineOwners.CoreGameEngineSoleIncomingEffectRepeatRuntime>(Core.RuntimeEntries.CoreGameEngineSoleIncomingEffectRepeatEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSoleIncomingEffectRepeatRuntime> SoleIncomingEffectRepeatEntries => GetDeferredModule<EngineOwners.CoreGameEngineSoleIncomingEffectRepeatRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineSoleIncomingRangeDrawEntries SoleIncomingRangeDrawEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSoleIncomingRangeDrawEntries, EngineOwners.CoreGameEngineSoleIncomingRangeDrawRuntime>(Core.RuntimeEntries.CoreGameEngineSoleIncomingRangeDrawEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineSoleTargetProtectionEntries SoleTargetProtectionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSoleTargetProtectionEntries, EngineOwners.CoreGameEngineSoleTargetProtectionRuntime>(Core.RuntimeEntries.CoreGameEngineSoleTargetProtectionEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSoleTargetProtectionRuntime> SoleTargetProtectionEntries => GetDeferredModule<EngineOwners.CoreGameEngineSoleTargetProtectionRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineSoleTargetProtectionObserversEntries SoleTargetProtectionObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSoleTargetProtectionObserversEntries, EngineOwners.CoreGameEngineSoleTargetProtectionObserversRuntime>(Core.RuntimeEntries.CoreGameEngineSoleTargetProtectionObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSoleTargetProtectionObserversRuntime> SoleTargetProtectionObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineSoleTargetProtectionObserversRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineSoleTargetQuarantineEntries SoleTargetQuarantineEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSoleTargetQuarantineEntries, EngineOwners.CoreGameEngineSoleTargetQuarantineRuntime>(Core.RuntimeEntries.CoreGameEngineSoleTargetQuarantineEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineSourceBeigongChildrenEntries SourceBeigongChildrenEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSourceBeigongChildrenEntries, EngineOwners.CoreGameEngineSourceBeigongChildrenRuntime>(Core.RuntimeEntries.CoreGameEngineSourceBeigongChildrenEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSourceBeigongChildrenRuntime> SourceBeigongChildrenEntries => GetDeferredModule<EngineOwners.CoreGameEngineSourceBeigongChildrenRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineSourceBeigongEntries SourceBeigongEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSourceBeigongEntries, EngineOwners.CoreGameEngineSourceBeigongRuntime>(Core.RuntimeEntries.CoreGameEngineSourceBeigongEntries.Create);
 
@@ -1779,15 +1779,15 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineSourceExecutionerHuanfuEntries SourceExecutionerHuanfuEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSourceExecutionerHuanfuEntries, EngineOwners.CoreGameEngineSourceExecutionerHuanfuRuntime>(Core.RuntimeEntries.CoreGameEngineSourceExecutionerHuanfuEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineSourceExecutionerYishiEntries SourceExecutionerYishiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSourceExecutionerYishiEntries, EngineOwners.CoreGameEngineSourceExecutionerYishiRuntime>(Core.RuntimeEntries.CoreGameEngineSourceExecutionerYishiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSourceExecutionerYishiRuntime> SourceExecutionerYishiEntries => GetDeferredModule<EngineOwners.CoreGameEngineSourceExecutionerYishiRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineSourceFactionPreventionsEntries SourceFactionPreventionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSourceFactionPreventionsEntries, EngineOwners.CoreGameEngineSourceFactionPreventionsRuntime>(Core.RuntimeEntries.CoreGameEngineSourceFactionPreventionsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSourceFactionPreventionsRuntime> SourceFactionPreventionsEntries => GetDeferredModule<EngineOwners.CoreGameEngineSourceFactionPreventionsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineSourceHuojieEntries SourceHuojieEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSourceHuojieEntries, EngineOwners.CoreGameEngineSourceHuojieRuntime>(Core.RuntimeEntries.CoreGameEngineSourceHuojieEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSourceHuojieRuntime> SourceHuojieEntries => GetDeferredModule<EngineOwners.CoreGameEngineSourceHuojieRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineSourceOwnerGainsEntries SourceOwnerGainsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSourceOwnerGainsEntries, EngineOwners.CoreGameEngineSourceOwnerGainsRuntime>(Core.RuntimeEntries.CoreGameEngineSourceOwnerGainsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSourceOwnerGainsRuntime> SourceOwnerGainsEntries => GetDeferredModule<EngineOwners.CoreGameEngineSourceOwnerGainsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineSourceXingxiaEntries SourceXingxiaEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSourceXingxiaEntries, EngineOwners.CoreGameEngineSourceXingxiaRuntime>(Core.RuntimeEntries.CoreGameEngineSourceXingxiaEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSourceXingxiaRuntime> SourceXingxiaEntries => GetDeferredModule<EngineOwners.CoreGameEngineSourceXingxiaRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineStrategicProgramsEntries StrategicProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineStrategicProgramsEntries, EngineOwners.CoreGameEngineStrategicProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineStrategicProgramsEntries.Create);
 
@@ -1795,41 +1795,41 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineSuitDamagePreventionBenefitsEntries SuitDamagePreventionBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSuitDamagePreventionBenefitsEntries, EngineOwners.CoreGameEngineSuitDamagePreventionBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineSuitDamagePreventionBenefitsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterSunCeBoundaryMobileEntries SunCeBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunCeBoundaryMobileEntries, EngineOwners.CharacterSunCeBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterSunCeBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunCeBoundaryMobileRuntime> SunCeBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterSunCeBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterSunCeMobileGodEntries SunCeMobileGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunCeMobileGodEntries, EngineOwners.CharacterSunCeMobileGodRuntime>(Core.RuntimeEntries.CharacterSunCeMobileGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunCeMobileGodRuntime> SunCeMobileGodEntries => GetDeferredModule<EngineOwners.CharacterSunCeMobileGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterSunChenMobileShiEntries SunChenMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunChenMobileShiEntries, EngineOwners.CharacterSunChenMobileShiRuntime>(Core.RuntimeEntries.CharacterSunChenMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunChenMobileShiRuntime> SunChenMobileShiEntries => GetDeferredModule<EngineOwners.CharacterSunChenMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterSunHaoOlEntries SunHaoOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunHaoOlEntries, EngineOwners.CharacterSunHaoOlRuntime>(Core.RuntimeEntries.CharacterSunHaoOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunHaoOlRuntime> SunHaoOlEntries => GetDeferredModule<EngineOwners.CharacterSunHaoOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterSunHongOlEntries SunHongOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunHongOlEntries, EngineOwners.CharacterSunHongOlRuntime>(Core.RuntimeEntries.CharacterSunHongOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterSunHuanAnniversaryEntries SunHuanAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunHuanAnniversaryEntries, EngineOwners.CharacterSunHuanAnniversaryRuntime>(Core.RuntimeEntries.CharacterSunHuanAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunHuanAnniversaryRuntime> SunHuanAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterSunHuanAnniversaryRuntime>();
 
-    internal Core.RuntimeEntries.CharacterSunJianBoundaryMobileEntries SunJianBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunJianBoundaryMobileEntries, EngineOwners.CharacterSunJianBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterSunJianBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunJianBoundaryMobileRuntime> SunJianBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterSunJianBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterSunJianMouOlEntries SunJianMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunJianMouOlEntries, EngineOwners.CharacterSunJianMouOlRuntime>(Core.RuntimeEntries.CharacterSunJianMouOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterSunJunMobileShiEntries SunJunMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunJunMobileShiEntries, EngineOwners.CharacterSunJunMobileShiRuntime>(Core.RuntimeEntries.CharacterSunJunMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunJunMobileShiRuntime> SunJunMobileShiEntries => GetDeferredModule<EngineOwners.CharacterSunJunMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterSunLuBanBoundaryMobileEntries SunLuBanBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunLuBanBoundaryMobileEntries, EngineOwners.CharacterSunLuBanBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterSunLuBanBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunLuBanBoundaryMobileRuntime> SunLuBanBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterSunLuBanBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterSunQuanAnniversaryGodEntries SunQuanAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunQuanAnniversaryGodEntries, EngineOwners.CharacterSunQuanAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterSunQuanAnniversaryGodEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterSunQuanHappyGodEntries SunQuanHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunQuanHappyGodEntries, EngineOwners.CharacterSunQuanHappyGodRuntime>(Core.RuntimeEntries.CharacterSunQuanHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunQuanHappyGodRuntime> SunQuanHappyGodEntries => GetDeferredModule<EngineOwners.CharacterSunQuanHappyGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterSunQuanOlMagicEntries SunQuanOlMagicEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunQuanOlMagicEntries, EngineOwners.CharacterSunQuanOlMagicRuntime>(Core.RuntimeEntries.CharacterSunQuanOlMagicEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterSunRuOlEntries SunRuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunRuOlEntries, EngineOwners.CharacterSunRuOlRuntime>(Core.RuntimeEntries.CharacterSunRuOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunRuOlRuntime> SunRuOlEntries => GetDeferredModule<EngineOwners.CharacterSunRuOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterSunShangxiangMouMobileEntries SunShangxiangMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunShangxiangMouMobileEntries, EngineOwners.CharacterSunShangxiangMouMobileRuntime>(Core.RuntimeEntries.CharacterSunShangxiangMouMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterSunShangxiangSpOlEntries SunShangxiangSpOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunShangxiangSpOlEntries, EngineOwners.CharacterSunShangxiangSpOlRuntime>(Core.RuntimeEntries.CharacterSunShangxiangSpOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunShangxiangSpOlRuntime> SunShangxiangSpOlEntries => GetDeferredModule<EngineOwners.CharacterSunShangxiangSpOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterSunShaoMobileShiEntries SunShaoMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunShaoMobileShiEntries, EngineOwners.CharacterSunShaoMobileShiRuntime>(Core.RuntimeEntries.CharacterSunShaoMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunShaoMobileShiRuntime> SunShaoMobileShiEntries => GetDeferredModule<EngineOwners.CharacterSunShaoMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterSunXiuBoundaryMobileEntries SunXiuBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunXiuBoundaryMobileEntries, EngineOwners.CharacterSunXiuBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterSunXiuBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterSunXiuBoundaryMobileRuntime> SunXiuBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterSunXiuBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterSunYuanOlEntries SunYuanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSunYuanOlEntries, EngineOwners.CharacterSunYuanOlRuntime>(Core.RuntimeEntries.CharacterSunYuanOlEntries.Create);
 
@@ -1839,17 +1839,17 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreTableSeatQueriesEntries TableSeatQueriesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreTableSeatQueriesEntries, EngineOwners.CoreTableSeatQueriesRuntime>(Core.RuntimeEntries.CoreTableSeatQueriesEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterTaishiCiHappyGodEntries TaishiCiHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterTaishiCiHappyGodEntries, EngineOwners.CharacterTaishiCiHappyGodRuntime>(Core.RuntimeEntries.CharacterTaishiCiHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterTaishiCiHappyGodRuntime> TaishiCiHappyGodEntries => GetDeferredModule<EngineOwners.CharacterTaishiCiHappyGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterTaishiCiMobileGodEntries TaishiCiMobileGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterTaishiCiMobileGodEntries, EngineOwners.CharacterTaishiCiMobileGodRuntime>(Core.RuntimeEntries.CharacterTaishiCiMobileGodEntries.Create);
 
     internal Core.RuntimeEntries.CharacterTangJiOlEntries TangJiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterTangJiOlEntries, EngineOwners.CharacterTangJiOlRuntime>(Core.RuntimeEntries.CharacterTangJiOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterTangTangOlEntries TangTangOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterTangTangOlEntries, EngineOwners.CharacterTangTangOlRuntime>(Core.RuntimeEntries.CharacterTangTangOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterTangTangOlRuntime> TangTangOlEntries => GetDeferredModule<EngineOwners.CharacterTangTangOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterTaoQianOlEntries TaoQianOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterTaoQianOlEntries, EngineOwners.CharacterTaoQianOlRuntime>(Core.RuntimeEntries.CharacterTaoQianOlEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineTargetHandVisibilityEntries TargetHandVisibilityEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTargetHandVisibilityEntries, EngineOwners.CoreGameEngineTargetHandVisibilityRuntime>(Core.RuntimeEntries.CoreGameEngineTargetHandVisibilityEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineTargetHandVisibilityRuntime> TargetHandVisibilityEntries => GetDeferredModule<EngineOwners.CoreGameEngineTargetHandVisibilityRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineTargetedOrdinaryTrickEntries TargetedOrdinaryTrickEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTargetedOrdinaryTrickEntries, EngineOwners.CoreGameEngineTargetedOrdinaryTrickRuntime>(Core.RuntimeEntries.CoreGameEngineTargetedOrdinaryTrickEntries.Create);
 
@@ -1857,15 +1857,15 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreTeamActivityProgramsEntries TeamActivityProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreTeamActivityProgramsEntries, EngineOwners.CoreTeamActivityProgramsRuntime>(Core.RuntimeEntries.CoreTeamActivityProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterTengFangLanOlEntries TengFangLanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterTengFangLanOlEntries, EngineOwners.CharacterTengFangLanOlRuntime>(Core.RuntimeEntries.CharacterTengFangLanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterTengFangLanOlRuntime> TengFangLanOlEntries => GetDeferredModule<EngineOwners.CharacterTengFangLanOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterTianChouOlEntries TianChouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterTianChouOlEntries, EngineOwners.CharacterTianChouOlRuntime>(Core.RuntimeEntries.CharacterTianChouOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterTianFengMobileShiEntries TianFengMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterTianFengMobileShiEntries, EngineOwners.CharacterTianFengMobileShiRuntime>(Core.RuntimeEntries.CharacterTianFengMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterTianFengMobileShiRuntime> TianFengMobileShiEntries => GetDeferredModule<EngineOwners.CharacterTianFengMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterTianYuMouMobileEntries TianYuMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterTianYuMouMobileEntries, EngineOwners.CharacterTianYuMouMobileRuntime>(Core.RuntimeEntries.CharacterTianYuMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterTianYuMouMobileRuntime> TianYuMouMobileEntries => GetDeferredModule<EngineOwners.CharacterTianYuMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterTianYuOlEntries TianYuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterTianYuOlEntries, EngineOwners.CharacterTianYuOlRuntime>(Core.RuntimeEntries.CharacterTianYuOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterTianYuOlRuntime> TianYuOlEntries => GetDeferredModule<EngineOwners.CharacterTianYuOlRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineTieredRoundZeroResponsesEntries TieredRoundZeroResponsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTieredRoundZeroResponsesEntries, EngineOwners.CoreGameEngineTieredRoundZeroResponsesRuntime>(Core.RuntimeEntries.CoreGameEngineTieredRoundZeroResponsesEntries.Create);
 
@@ -1875,17 +1875,17 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineTriggeredCardConversionsEntries TriggeredCardConversionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTriggeredCardConversionsEntries, EngineOwners.CoreGameEngineTriggeredCardConversionsRuntime>(Core.RuntimeEntries.CoreGameEngineTriggeredCardConversionsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineTriggeredCardProgramsEntries TriggeredCardProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTriggeredCardProgramsEntries, EngineOwners.CoreGameEngineTriggeredCardProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineTriggeredCardProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineTriggeredCardProgramsRuntime> TriggeredCardProgramsEntries => GetDeferredModule<EngineOwners.CoreGameEngineTriggeredCardProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineTurnDefaultStatsEntries TurnDefaultStatsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTurnDefaultStatsEntries, EngineOwners.CoreGameEngineTurnDefaultStatsRuntime>(Core.RuntimeEntries.CoreGameEngineTurnDefaultStatsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineTurnDiscardSuitHistoryEntries TurnDiscardSuitHistoryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTurnDiscardSuitHistoryEntries, EngineOwners.CoreGameEngineTurnDiscardSuitHistoryRuntime>(Core.RuntimeEntries.CoreGameEngineTurnDiscardSuitHistoryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineTurnDiscardSuitHistoryRuntime> TurnDiscardSuitHistoryEntries => GetDeferredModule<EngineOwners.CoreGameEngineTurnDiscardSuitHistoryRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineTurnDrawDebtsEntries TurnDrawDebtsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTurnDrawDebtsEntries, EngineOwners.CoreGameEngineTurnDrawDebtsRuntime>(Core.RuntimeEntries.CoreGameEngineTurnDrawDebtsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineTurnEndDamageMarkerEntries TurnEndDamageMarkerEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTurnEndDamageMarkerEntries, EngineOwners.CoreGameEngineTurnEndDamageMarkerRuntime>(Core.RuntimeEntries.CoreGameEngineTurnEndDamageMarkerEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineTurnEndDamageMarkerRuntime> TurnEndDamageMarkerEntries => GetDeferredModule<EngineOwners.CoreGameEngineTurnEndDamageMarkerRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineTurnEndingOrderEntries TurnEndingOrderEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTurnEndingOrderEntries, EngineOwners.CoreGameEngineTurnEndingOrderRuntime>(Core.RuntimeEntries.CoreGameEngineTurnEndingOrderEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineTurnEndingOrderRuntime> TurnEndingOrderEntries => GetDeferredModule<EngineOwners.CoreGameEngineTurnEndingOrderRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineTurnHandCategoryRestrictionsEntries TurnHandCategoryRestrictionsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTurnHandCategoryRestrictionsEntries, EngineOwners.CoreGameEngineTurnHandCategoryRestrictionsRuntime>(Core.RuntimeEntries.CoreGameEngineTurnHandCategoryRestrictionsEntries.Create);
 
@@ -1895,11 +1895,11 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries TypedRecoveryDamageCursorEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries, EngineOwners.CoreGameEngineTypedRecoveryDamageCursorRuntime>(Core.RuntimeEntries.CoreGameEngineTypedRecoveryDamageCursorEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineUnequalHandHpEndingEntries UnequalHandHpEndingEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineUnequalHandHpEndingEntries, EngineOwners.CoreGameEngineUnequalHandHpEndingRuntime>(Core.RuntimeEntries.CoreGameEngineUnequalHandHpEndingEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineUnequalHandHpEndingRuntime> UnequalHandHpEndingEntries => GetDeferredModule<EngineOwners.CoreGameEngineUnequalHandHpEndingRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineUnequalHandHpObserversEntries UnequalHandHpObserversEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineUnequalHandHpObserversEntries, EngineOwners.CoreGameEngineUnequalHandHpObserversRuntime>(Core.RuntimeEntries.CoreGameEngineUnequalHandHpObserversEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineUnequalHandHpObserversRuntime> UnequalHandHpObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineUnequalHandHpObserversRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineUniqueHpPeerProgramsEntries UniqueHpPeerProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineUniqueHpPeerProgramsEntries, EngineOwners.CoreGameEngineUniqueHpPeerProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineUniqueHpPeerProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineUniqueHpPeerProgramsRuntime> UniqueHpPeerProgramsEntries => GetDeferredModule<EngineOwners.CoreGameEngineUniqueHpPeerProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineUniqueLeaderTrickTargetsEntries UniqueLeaderTrickTargetsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineUniqueLeaderTrickTargetsEntries, EngineOwners.CoreGameEngineUniqueLeaderTrickTargetsRuntime>(Core.RuntimeEntries.CoreGameEngineUniqueLeaderTrickTargetsEntries.Create);
 
@@ -1909,25 +1909,25 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineVirtualOrdinaryTrickUsesEntries VirtualOrdinaryTrickUsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineVirtualOrdinaryTrickUsesEntries, EngineOwners.CoreGameEngineVirtualOrdinaryTrickUsesRuntime>(Core.RuntimeEntries.CoreGameEngineVirtualOrdinaryTrickUsesEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterWangCanMobileEntries WangCanMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangCanMobileEntries, EngineOwners.CharacterWangCanMobileRuntime>(Core.RuntimeEntries.CharacterWangCanMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWangCanMobileRuntime> WangCanMobileEntries => GetDeferredModule<EngineOwners.CharacterWangCanMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterWangCanOlEntries WangCanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangCanOlEntries, EngineOwners.CharacterWangCanOlRuntime>(Core.RuntimeEntries.CharacterWangCanOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterWangChangAnniversaryEntries WangChangAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangChangAnniversaryEntries, EngineOwners.CharacterWangChangAnniversaryRuntime>(Core.RuntimeEntries.CharacterWangChangAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWangChangAnniversaryRuntime> WangChangAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterWangChangAnniversaryRuntime>();
 
-    internal Core.RuntimeEntries.CharacterWangChangMobileShiEntries WangChangMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangChangMobileShiEntries, EngineOwners.CharacterWangChangMobileShiRuntime>(Core.RuntimeEntries.CharacterWangChangMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWangChangMobileShiRuntime> WangChangMobileShiEntries => GetDeferredModule<EngineOwners.CharacterWangChangMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterWangFuZhaoLeiMobileEntries WangFuZhaoLeiMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangFuZhaoLeiMobileEntries, EngineOwners.CharacterWangFuZhaoLeiMobileRuntime>(Core.RuntimeEntries.CharacterWangFuZhaoLeiMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWangFuZhaoLeiMobileRuntime> WangFuZhaoLeiMobileEntries => GetDeferredModule<EngineOwners.CharacterWangFuZhaoLeiMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterWangGuanOlEntries WangGuanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangGuanOlEntries, EngineOwners.CharacterWangGuanOlRuntime>(Core.RuntimeEntries.CharacterWangGuanOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterWangJiBoundaryMobileEntries WangJiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangJiBoundaryMobileEntries, EngineOwners.CharacterWangJiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterWangJiBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWangJiBoundaryMobileRuntime> WangJiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterWangJiBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterWangKuangOlEntries WangKuangOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangKuangOlEntries, EngineOwners.CharacterWangKuangOlRuntime>(Core.RuntimeEntries.CharacterWangKuangOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWangKuangOlRuntime> WangKuangOlEntries => GetDeferredModule<EngineOwners.CharacterWangKuangOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterWangLingMouEntries WangLingMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangLingMouEntries, EngineOwners.CharacterWangLingMouRuntime>(Core.RuntimeEntries.CharacterWangLingMouEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWangLingMouRuntime> WangLingMouEntries => GetDeferredModule<EngineOwners.CharacterWangLingMouRuntime>();
 
-    internal Core.RuntimeEntries.CharacterWangYiBoundaryMobileEntries WangYiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangYiBoundaryMobileEntries, EngineOwners.CharacterWangYiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterWangYiBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWangYiBoundaryMobileRuntime> WangYiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterWangYiBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterWangYunOlEntries WangYunOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWangYunOlEntries, EngineOwners.CharacterWangYunOlRuntime>(Core.RuntimeEntries.CharacterWangYunOlEntries.Create);
 
@@ -1935,21 +1935,21 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterWeiYanMobileShiEntries WeiYanMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWeiYanMobileShiEntries, EngineOwners.CharacterWeiYanMobileShiRuntime>(Core.RuntimeEntries.CharacterWeiYanMobileShiEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterWeiZiOlEntries WeiZiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWeiZiOlEntries, EngineOwners.CharacterWeiZiOlRuntime>(Core.RuntimeEntries.CharacterWeiZiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWeiZiOlRuntime> WeiZiOlEntries => GetDeferredModule<EngineOwners.CharacterWeiZiOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterWenChouMouOlEntries WenChouMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWenChouMouOlEntries, EngineOwners.CharacterWenChouMouOlRuntime>(Core.RuntimeEntries.CharacterWenChouMouOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterWenYangOlEntries WenYangOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWenYangOlEntries, EngineOwners.CharacterWenYangOlRuntime>(Core.RuntimeEntries.CharacterWenYangOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWenYangOlRuntime> WenYangOlEntries => GetDeferredModule<EngineOwners.CharacterWenYangOlRuntime>();
 
-    internal Core.RuntimeEntries.CoreWenheActivityProgramsEntries WenheActivityProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreWenheActivityProgramsEntries, EngineOwners.CoreWenheActivityProgramsRuntime>(Core.RuntimeEntries.CoreWenheActivityProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreWenheActivityProgramsRuntime> WenheActivityProgramsEntries => GetDeferredModule<EngineOwners.CoreWenheActivityProgramsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineWenheCardsEntries WenheCardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWenheCardsEntries, EngineOwners.CoreGameEngineWenheCardsRuntime>(Core.RuntimeEntries.CoreGameEngineWenheCardsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineWenheChaosEntries WenheChaosEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWenheChaosEntries, EngineOwners.CoreGameEngineWenheChaosRuntime>(Core.RuntimeEntries.CoreGameEngineWenheChaosEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineWenheChaosRuntime> WenheChaosEntries => GetDeferredModule<EngineOwners.CoreGameEngineWenheChaosRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineWenhePoisonEntries WenhePoisonEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWenhePoisonEntries, EngineOwners.CoreGameEngineWenhePoisonRuntime>(Core.RuntimeEntries.CoreGameEngineWenhePoisonEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineWenyiDamageHealthEntries WenyiDamageHealthEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWenyiDamageHealthEntries, EngineOwners.CoreGameEngineWenyiDamageHealthRuntime>(Core.RuntimeEntries.CoreGameEngineWenyiDamageHealthEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineWenyiDamageHealthRuntime> WenyiDamageHealthEntries => GetDeferredModule<EngineOwners.CoreGameEngineWenyiDamageHealthRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineWholeActualTurnUsesEntries WholeActualTurnUsesEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWholeActualTurnUsesEntries, EngineOwners.CoreGameEngineWholeActualTurnUsesRuntime>(Core.RuntimeEntries.CoreGameEngineWholeActualTurnUsesEntries.Create);
 
@@ -1957,29 +1957,29 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterWuAnGuoOlEntries WuAnGuoOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWuAnGuoOlEntries, EngineOwners.CharacterWuAnGuoOlRuntime>(Core.RuntimeEntries.CharacterWuAnGuoOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterWuFuAnniversaryEntries WuFuAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWuFuAnniversaryEntries, EngineOwners.CharacterWuFuAnniversaryRuntime>(Core.RuntimeEntries.CharacterWuFuAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWuFuAnniversaryRuntime> WuFuAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterWuFuAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterWuGuoTaiBoundaryMobileEntries WuGuoTaiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWuGuoTaiBoundaryMobileEntries, EngineOwners.CharacterWuGuoTaiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterWuGuoTaiBoundaryMobileEntries.Create);
 
     internal Core.RuntimeEntries.CharacterWuJingOlEntries WuJingOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWuJingOlEntries, EngineOwners.CharacterWuJingOlRuntime>(Core.RuntimeEntries.CharacterWuJingOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterWuTuGuOlEntries WuTuGuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWuTuGuOlEntries, EngineOwners.CharacterWuTuGuOlRuntime>(Core.RuntimeEntries.CharacterWuTuGuOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWuTuGuOlRuntime> WuTuGuOlEntries => GetDeferredModule<EngineOwners.CharacterWuTuGuOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterWuYiBoundaryMobileEntries WuYiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWuYiBoundaryMobileEntries, EngineOwners.CharacterWuYiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterWuYiBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWuYiBoundaryMobileRuntime> WuYiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterWuYiBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterWuYiMobileEntries WuYiMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterWuYiMobileEntries, EngineOwners.CharacterWuYiMobileRuntime>(Core.RuntimeEntries.CharacterWuYiMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWuYiMobileRuntime> WuYiMobileEntries => GetDeferredModule<EngineOwners.CharacterWuYiMobileRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineWushuangAcquisitionEntries WushuangAcquisitionEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWushuangAcquisitionEntries, EngineOwners.CoreGameEngineWushuangAcquisitionRuntime>(Core.RuntimeEntries.CoreGameEngineWushuangAcquisitionEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineWushuangAiEntries WushuangAiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWushuangAiEntries, EngineOwners.CoreGameEngineWushuangAiRuntime>(Core.RuntimeEntries.CoreGameEngineWushuangAiEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineWushuangAuditAEntries WushuangAuditAEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWushuangAuditAEntries, EngineOwners.CoreGameEngineWushuangAuditARuntime>(Core.RuntimeEntries.CoreGameEngineWushuangAuditAEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineWushuangAuditARuntime> WushuangAuditAEntries => GetDeferredModule<EngineOwners.CoreGameEngineWushuangAuditARuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineWushuangAuditCombatEntries WushuangAuditCombatEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWushuangAuditCombatEntries, EngineOwners.CoreGameEngineWushuangAuditCombatRuntime>(Core.RuntimeEntries.CoreGameEngineWushuangAuditCombatEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineWushuangAuditCombatRuntime> WushuangAuditCombatEntries => GetDeferredModule<EngineOwners.CoreGameEngineWushuangAuditCombatRuntime>();
 
-    internal Core.RuntimeEntries.CoreWushuangCombatProgramsEntries WushuangCombatProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreWushuangCombatProgramsEntries, EngineOwners.CoreWushuangCombatProgramsRuntime>(Core.RuntimeEntries.CoreWushuangCombatProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreWushuangCombatProgramsRuntime> WushuangCombatProgramsEntries => GetDeferredModule<EngineOwners.CoreWushuangCombatProgramsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineWushuangDeckCardsEntries WushuangDeckCardsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWushuangDeckCardsEntries, EngineOwners.CoreGameEngineWushuangDeckCardsRuntime>(Core.RuntimeEntries.CoreGameEngineWushuangDeckCardsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineWushuangDeckCardsRuntime> WushuangDeckCardsEntries => GetDeferredModule<EngineOwners.CoreGameEngineWushuangDeckCardsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineWushuangDyingExitEntries WushuangDyingExitEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineWushuangDyingExitEntries, EngineOwners.CoreGameEngineWushuangDyingExitRuntime>(Core.RuntimeEntries.CoreGameEngineWushuangDyingExitEntries.Create);
 
@@ -2003,19 +2003,19 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterXiahouBaMobileShiEntries XiahouBaMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiahouBaMobileShiEntries, EngineOwners.CharacterXiahouBaMobileShiRuntime>(Core.RuntimeEntries.CharacterXiahouBaMobileShiEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterXiahouDunBoundaryMobileEntries XiahouDunBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiahouDunBoundaryMobileEntries, EngineOwners.CharacterXiahouDunBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterXiahouDunBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXiahouDunBoundaryMobileRuntime> XiahouDunBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterXiahouDunBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterXiahouDunMouMobileEntries XiahouDunMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiahouDunMouMobileEntries, EngineOwners.CharacterXiahouDunMouMobileRuntime>(Core.RuntimeEntries.CharacterXiahouDunMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXiahouDunMouMobileRuntime> XiahouDunMouMobileEntries => GetDeferredModule<EngineOwners.CharacterXiahouDunMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterXiahouEnAnniversaryEntries XiahouEnAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiahouEnAnniversaryEntries, EngineOwners.CharacterXiahouEnAnniversaryRuntime>(Core.RuntimeEntries.CharacterXiahouEnAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXiahouEnAnniversaryRuntime> XiahouEnAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterXiahouEnAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterXiahouHuiAnniversaryEntries XiahouHuiAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiahouHuiAnniversaryEntries, EngineOwners.CharacterXiahouHuiAnniversaryRuntime>(Core.RuntimeEntries.CharacterXiahouHuiAnniversaryEntries.Create);
 
     internal Core.RuntimeEntries.CharacterXiahouJieAnniversaryEntries XiahouJieAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiahouJieAnniversaryEntries, EngineOwners.CharacterXiahouJieAnniversaryRuntime>(Core.RuntimeEntries.CharacterXiahouJieAnniversaryEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterXiahouShangMobileShiEntries XiahouShangMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiahouShangMobileShiEntries, EngineOwners.CharacterXiahouShangMobileShiRuntime>(Core.RuntimeEntries.CharacterXiahouShangMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXiahouShangMobileShiRuntime> XiahouShangMobileShiEntries => GetDeferredModule<EngineOwners.CharacterXiahouShangMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterXiahouShiMouMobileEntries XiahouShiMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiahouShiMouMobileEntries, EngineOwners.CharacterXiahouShiMouMobileRuntime>(Core.RuntimeEntries.CharacterXiahouShiMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXiahouShiMouMobileRuntime> XiahouShiMouMobileEntries => GetDeferredModule<EngineOwners.CharacterXiahouShiMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterXiangChongOlEntries XiangChongOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiangChongOlEntries, EngineOwners.CharacterXiangChongOlRuntime>(Core.RuntimeEntries.CharacterXiangChongOlEntries.Create);
 
@@ -2023,7 +2023,7 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterXiaoQiaoLeEntries XiaoQiaoLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiaoQiaoLeEntries, EngineOwners.CharacterXiaoQiaoLeRuntime>(Core.RuntimeEntries.CharacterXiaoQiaoLeEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterXiaoQiaoMobileShiEntries XiaoQiaoMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiaoQiaoMobileShiEntries, EngineOwners.CharacterXiaoQiaoMobileShiRuntime>(Core.RuntimeEntries.CharacterXiaoQiaoMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXiaoQiaoMobileShiRuntime> XiaoQiaoMobileShiEntries => GetDeferredModule<EngineOwners.CharacterXiaoQiaoMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CharacterXiaoQiaoMouOlEntries XiaoQiaoMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXiaoQiaoMouOlEntries, EngineOwners.CharacterXiaoQiaoMouOlRuntime>(Core.RuntimeEntries.CharacterXiaoQiaoMouOlEntries.Create);
 
@@ -2033,23 +2033,23 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterXinXianYingMobileShiEntries XinXianYingMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXinXianYingMobileShiEntries, EngineOwners.CharacterXinXianYingMobileShiRuntime>(Core.RuntimeEntries.CharacterXinXianYingMobileShiEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterXingDaoRongAnniversaryEntries XingDaoRongAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXingDaoRongAnniversaryEntries, EngineOwners.CharacterXingDaoRongAnniversaryRuntime>(Core.RuntimeEntries.CharacterXingDaoRongAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXingDaoRongAnniversaryRuntime> XingDaoRongAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterXingDaoRongAnniversaryRuntime>();
 
-    internal Core.RuntimeEntries.CharacterXuChuAnniversaryGodEntries XuChuAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXuChuAnniversaryGodEntries, EngineOwners.CharacterXuChuAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterXuChuAnniversaryGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXuChuAnniversaryGodRuntime> XuChuAnniversaryGodEntries => GetDeferredModule<EngineOwners.CharacterXuChuAnniversaryGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterXuChuBoundaryMobileEntries XuChuBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXuChuBoundaryMobileEntries, EngineOwners.CharacterXuChuBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterXuChuBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXuChuBoundaryMobileRuntime> XuChuBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterXuChuBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterXuHuangMouMobileEntries XuHuangMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXuHuangMouMobileEntries, EngineOwners.CharacterXuHuangMouMobileRuntime>(Core.RuntimeEntries.CharacterXuHuangMouMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterXuJingAnniversaryEntries XuJingAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXuJingAnniversaryEntries, EngineOwners.CharacterXuJingAnniversaryRuntime>(Core.RuntimeEntries.CharacterXuJingAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXuJingAnniversaryRuntime> XuJingAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterXuJingAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterXuRongOlEntries XuRongOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXuRongOlEntries, EngineOwners.CharacterXuRongOlRuntime>(Core.RuntimeEntries.CharacterXuRongOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterXuShengMouEntries XuShengMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXuShengMouEntries, EngineOwners.CharacterXuShengMouRuntime>(Core.RuntimeEntries.CharacterXuShengMouEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXuShengMouRuntime> XuShengMouEntries => GetDeferredModule<EngineOwners.CharacterXuShengMouRuntime>();
 
-    internal Core.RuntimeEntries.CharacterXuShuMobileEntries XuShuMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXuShuMobileEntries, EngineOwners.CharacterXuShuMobileRuntime>(Core.RuntimeEntries.CharacterXuShuMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXuShuMobileRuntime> XuShuMobileEntries => GetDeferredModule<EngineOwners.CharacterXuShuMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterXuanGongZhuOlEntries XuanGongZhuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXuanGongZhuOlEntries, EngineOwners.CharacterXuanGongZhuOlRuntime>(Core.RuntimeEntries.CharacterXuanGongZhuOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXuanGongZhuOlRuntime> XuanGongZhuOlEntries => GetDeferredModule<EngineOwners.CharacterXuanGongZhuOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterXunXuAnniversaryEntries XunXuAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterXunXuAnniversaryEntries, EngineOwners.CharacterXunXuAnniversaryRuntime>(Core.RuntimeEntries.CharacterXunXuAnniversaryEntries.Create);
 
@@ -2061,13 +2061,13 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterYanJunOlEntries YanJunOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYanJunOlEntries, EngineOwners.CharacterYanJunOlRuntime>(Core.RuntimeEntries.CharacterYanJunOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterYanLiangWenChouBoundaryMobileEntries YanLiangWenChouBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYanLiangWenChouBoundaryMobileEntries, EngineOwners.CharacterYanLiangWenChouBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterYanLiangWenChouBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYanLiangWenChouBoundaryMobileRuntime> YanLiangWenChouBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterYanLiangWenChouBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterYanPuOlEntries YanPuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYanPuOlEntries, EngineOwners.CharacterYanPuOlRuntime>(Core.RuntimeEntries.CharacterYanPuOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterYanRouOlEntries YanRouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYanRouOlEntries, EngineOwners.CharacterYanRouOlRuntime>(Core.RuntimeEntries.CharacterYanRouOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYanRouOlRuntime> YanRouOlEntries => GetDeferredModule<EngineOwners.CharacterYanRouOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYanXiangAnniversaryEntries YanXiangAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYanXiangAnniversaryEntries, EngineOwners.CharacterYanXiangAnniversaryRuntime>(Core.RuntimeEntries.CharacterYanXiangAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYanXiangAnniversaryRuntime> YanXiangAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterYanXiangAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterYanYanBoundaryMobileEntries YanYanBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYanYanBoundaryMobileEntries, EngineOwners.CharacterYanYanBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterYanYanBoundaryMobileEntries.Create);
 
@@ -2077,57 +2077,57 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterYangFuOlEntries YangFuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYangFuOlEntries, EngineOwners.CharacterYangFuOlRuntime>(Core.RuntimeEntries.CharacterYangFuOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterYangHongMobileShiEntries YangHongMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYangHongMobileShiEntries, EngineOwners.CharacterYangHongMobileShiRuntime>(Core.RuntimeEntries.CharacterYangHongMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYangHongMobileShiRuntime> YangHongMobileShiEntries => GetDeferredModule<EngineOwners.CharacterYangHongMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYangWanOlEntries YangWanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYangWanOlEntries, EngineOwners.CharacterYangWanOlRuntime>(Core.RuntimeEntries.CharacterYangWanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYangWanOlRuntime> YangWanOlEntries => GetDeferredModule<EngineOwners.CharacterYangWanOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYangYiOlEntries YangYiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYangYiOlEntries, EngineOwners.CharacterYangYiOlRuntime>(Core.RuntimeEntries.CharacterYangYiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYangYiOlRuntime> YangYiOlEntries => GetDeferredModule<EngineOwners.CharacterYangYiOlRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineYaodaoChitongEntries YaodaoChitongEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineYaodaoChitongEntries, EngineOwners.CoreGameEngineYaodaoChitongRuntime>(Core.RuntimeEntries.CoreGameEngineYaodaoChitongEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineYaodaoChitongRuntime> YaodaoChitongEntries => GetDeferredModule<EngineOwners.CoreGameEngineYaodaoChitongRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYiJiOlEntries YiJiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYiJiOlEntries, EngineOwners.CharacterYiJiOlRuntime>(Core.RuntimeEntries.CharacterYiJiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYiJiOlRuntime> YiJiOlEntries => GetDeferredModule<EngineOwners.CharacterYiJiOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYuJiMobileShiEntries YuJiMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYuJiMobileShiEntries, EngineOwners.CharacterYuJiMobileShiRuntime>(Core.RuntimeEntries.CharacterYuJiMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYuJiMobileShiRuntime> YuJiMobileShiEntries => GetDeferredModule<EngineOwners.CharacterYuJiMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYuJinMobileEntries YuJinMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYuJinMobileEntries, EngineOwners.CharacterYuJinMobileRuntime>(Core.RuntimeEntries.CharacterYuJinMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYuJinMobileRuntime> YuJinMobileEntries => GetDeferredModule<EngineOwners.CharacterYuJinMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYuJinMouMobileEntries YuJinMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYuJinMouMobileEntries, EngineOwners.CharacterYuJinMouMobileRuntime>(Core.RuntimeEntries.CharacterYuJinMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYuJinMouMobileRuntime> YuJinMouMobileEntries => GetDeferredModule<EngineOwners.CharacterYuJinMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYuanHuanOlEntries YuanHuanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYuanHuanOlEntries, EngineOwners.CharacterYuanHuanOlRuntime>(Core.RuntimeEntries.CharacterYuanHuanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYuanHuanOlRuntime> YuanHuanOlEntries => GetDeferredModule<EngineOwners.CharacterYuanHuanOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYuanJiOlEntries YuanJiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYuanJiOlEntries, EngineOwners.CharacterYuanJiOlRuntime>(Core.RuntimeEntries.CharacterYuanJiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYuanJiOlRuntime> YuanJiOlEntries => GetDeferredModule<EngineOwners.CharacterYuanJiOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYuanShaoBoundaryMobileEntries YuanShaoBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYuanShaoBoundaryMobileEntries, EngineOwners.CharacterYuanShaoBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterYuanShaoBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYuanShaoBoundaryMobileRuntime> YuanShaoBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterYuanShaoBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterYuanShaoMouMobileEntries YuanShaoMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYuanShaoMouMobileEntries, EngineOwners.CharacterYuanShaoMouMobileRuntime>(Core.RuntimeEntries.CharacterYuanShaoMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYuanShaoMouMobileRuntime> YuanShaoMouMobileEntries => GetDeferredModule<EngineOwners.CharacterYuanShaoMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterYuanTanYuanShangOlEntries YuanTanYuanShangOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYuanTanYuanShangOlEntries, EngineOwners.CharacterYuanTanYuanShangOlRuntime>(Core.RuntimeEntries.CharacterYuanTanYuanShangOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterYuanYinAnniversaryEntries YuanYinAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYuanYinAnniversaryEntries, EngineOwners.CharacterYuanYinAnniversaryRuntime>(Core.RuntimeEntries.CharacterYuanYinAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYuanYinAnniversaryRuntime> YuanYinAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterYuanYinAnniversaryRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZangHongMobileShiEntries ZangHongMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZangHongMobileShiEntries, EngineOwners.CharacterZangHongMobileShiRuntime>(Core.RuntimeEntries.CharacterZangHongMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZangHongMobileShiRuntime> ZangHongMobileShiEntries => GetDeferredModule<EngineOwners.CharacterZangHongMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhangChangPuOlEntries ZhangChangPuOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangChangPuOlEntries, EngineOwners.CharacterZhangChangPuOlRuntime>(Core.RuntimeEntries.CharacterZhangChangPuOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangChangPuOlRuntime> ZhangChangPuOlEntries => GetDeferredModule<EngineOwners.CharacterZhangChangPuOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhangFeiAnniversaryGodEntries ZhangFeiAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangFeiAnniversaryGodEntries, EngineOwners.CharacterZhangFeiAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterZhangFeiAnniversaryGodEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhangFeiBoundaryMobileEntries ZhangFeiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangFeiBoundaryMobileEntries, EngineOwners.CharacterZhangFeiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhangFeiBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangFeiBoundaryMobileRuntime> ZhangFeiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterZhangFeiBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhangFeiOlMagicEntries ZhangFeiOlMagicEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangFeiOlMagicEntries, EngineOwners.CharacterZhangFeiOlMagicRuntime>(Core.RuntimeEntries.CharacterZhangFeiOlMagicEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangFeiOlMagicRuntime> ZhangFeiOlMagicEntries => GetDeferredModule<EngineOwners.CharacterZhangFeiOlMagicRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhangFeiWumiaoEntries ZhangFeiWumiaoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangFeiWumiaoEntries, EngineOwners.CharacterZhangFeiWumiaoRuntime>(Core.RuntimeEntries.CharacterZhangFeiWumiaoEntries.Create);
 
     internal Core.RuntimeEntries.CharacterZhangFenAnniversaryEntries ZhangFenAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangFenAnniversaryEntries, EngineOwners.CharacterZhangFenAnniversaryRuntime>(Core.RuntimeEntries.CharacterZhangFenAnniversaryEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhangHeMouMobileEntries ZhangHeMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangHeMouMobileEntries, EngineOwners.CharacterZhangHeMouMobileRuntime>(Core.RuntimeEntries.CharacterZhangHeMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangHeMouMobileRuntime> ZhangHeMouMobileEntries => GetDeferredModule<EngineOwners.CharacterZhangHeMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhangHengAnniversaryEntries ZhangHengAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangHengAnniversaryEntries, EngineOwners.CharacterZhangHengAnniversaryRuntime>(Core.RuntimeEntries.CharacterZhangHengAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangHengAnniversaryRuntime> ZhangHengAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterZhangHengAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhangHuanAnniversaryEntries ZhangHuanAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangHuanAnniversaryEntries, EngineOwners.CharacterZhangHuanAnniversaryRuntime>(Core.RuntimeEntries.CharacterZhangHuanAnniversaryEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhangJiOlEntries ZhangJiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangJiOlEntries, EngineOwners.CharacterZhangJiOlRuntime>(Core.RuntimeEntries.CharacterZhangJiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangJiOlRuntime> ZhangJiOlEntries => GetDeferredModule<EngineOwners.CharacterZhangJiOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhangJiaoAnniversaryGodEntries ZhangJiaoAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangJiaoAnniversaryGodEntries, EngineOwners.CharacterZhangJiaoAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterZhangJiaoAnniversaryGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangJiaoAnniversaryGodRuntime> ZhangJiaoAnniversaryGodEntries => GetDeferredModule<EngineOwners.CharacterZhangJiaoAnniversaryGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhangLiaoAnniversaryGodEntries ZhangLiaoAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangLiaoAnniversaryGodEntries, EngineOwners.CharacterZhangLiaoAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterZhangLiaoAnniversaryGodEntries.Create);
 
@@ -2135,49 +2135,49 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterZhangLiaoMobileGodEntries ZhangLiaoMobileGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangLiaoMobileGodEntries, EngineOwners.CharacterZhangLiaoMobileGodRuntime>(Core.RuntimeEntries.CharacterZhangLiaoMobileGodEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhangLiaoOlSpEntries ZhangLiaoOlSpEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangLiaoOlSpEntries, EngineOwners.CharacterZhangLiaoOlSpRuntime>(Core.RuntimeEntries.CharacterZhangLiaoOlSpEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangLiaoOlSpRuntime> ZhangLiaoOlSpEntries => GetDeferredModule<EngineOwners.CharacterZhangLiaoOlSpRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhangLingOlEntries ZhangLingOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangLingOlEntries, EngineOwners.CharacterZhangLingOlRuntime>(Core.RuntimeEntries.CharacterZhangLingOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhangNiBoundaryMobileEntries ZhangNiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangNiBoundaryMobileEntries, EngineOwners.CharacterZhangNiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhangNiBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangNiBoundaryMobileRuntime> ZhangNiBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterZhangNiBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhangQiYingOlEntries ZhangQiYingOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangQiYingOlEntries, EngineOwners.CharacterZhangQiYingOlRuntime>(Core.RuntimeEntries.CharacterZhangQiYingOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhangRenMobileShiEntries ZhangRenMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangRenMobileShiEntries, EngineOwners.CharacterZhangRenMobileShiRuntime>(Core.RuntimeEntries.CharacterZhangRenMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangRenMobileShiRuntime> ZhangRenMobileShiEntries => GetDeferredModule<EngineOwners.CharacterZhangRenMobileShiRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhangShiPingOlEntries ZhangShiPingOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangShiPingOlEntries, EngineOwners.CharacterZhangShiPingOlRuntime>(Core.RuntimeEntries.CharacterZhangShiPingOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangShiPingOlRuntime> ZhangShiPingOlEntries => GetDeferredModule<EngineOwners.CharacterZhangShiPingOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhangWenAnniversaryEntries ZhangWenAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangWenAnniversaryEntries, EngineOwners.CharacterZhangWenAnniversaryRuntime>(Core.RuntimeEntries.CharacterZhangWenAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangWenAnniversaryRuntime> ZhangWenAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterZhangWenAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhangXiuMouEntries ZhangXiuMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangXiuMouEntries, EngineOwners.CharacterZhangXiuMouRuntime>(Core.RuntimeEntries.CharacterZhangXiuMouEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhangXiuMouOlEntries ZhangXiuMouOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangXiuMouOlEntries, EngineOwners.CharacterZhangXiuMouOlRuntime>(Core.RuntimeEntries.CharacterZhangXiuMouOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangXiuMouOlRuntime> ZhangXiuMouOlEntries => GetDeferredModule<EngineOwners.CharacterZhangXiuMouOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhangXunAnniversaryEntries ZhangXunAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangXunAnniversaryEntries, EngineOwners.CharacterZhangXunAnniversaryRuntime>(Core.RuntimeEntries.CharacterZhangXunAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangXunAnniversaryRuntime> ZhangXunAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterZhangXunAnniversaryRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhangYanMobileShiEntries ZhangYanMobileShiEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangYanMobileShiEntries, EngineOwners.CharacterZhangYanMobileShiRuntime>(Core.RuntimeEntries.CharacterZhangYanMobileShiEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangYanMobileShiRuntime> ZhangYanMobileShiEntries => GetDeferredModule<EngineOwners.CharacterZhangYanMobileShiRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhangYanOlEntries ZhangYanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangYanOlEntries, EngineOwners.CharacterZhangYanOlRuntime>(Core.RuntimeEntries.CharacterZhangYanOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhangYiOlEntries ZhangYiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangYiOlEntries, EngineOwners.CharacterZhangYiOlRuntime>(Core.RuntimeEntries.CharacterZhangYiOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangYiOlRuntime> ZhangYiOlEntries => GetDeferredModule<EngineOwners.CharacterZhangYiOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhangZhaoZhangHongBoundaryMobileEntries ZhangZhaoZhangHongBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhangZhaoZhangHongBoundaryMobileEntries, EngineOwners.CharacterZhangZhaoZhangHongBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhangZhaoZhangHongBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangZhaoZhangHongBoundaryMobileRuntime> ZhangZhaoZhangHongBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterZhangZhaoZhangHongBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhaoTongZhaoGuangAnniversaryEntries ZhaoTongZhaoGuangAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhaoTongZhaoGuangAnniversaryEntries, EngineOwners.CharacterZhaoTongZhaoGuangAnniversaryRuntime>(Core.RuntimeEntries.CharacterZhaoTongZhaoGuangAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhaoTongZhaoGuangAnniversaryRuntime> ZhaoTongZhaoGuangAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterZhaoTongZhaoGuangAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhaoXiangOlEntries ZhaoXiangOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhaoXiangOlEntries, EngineOwners.CharacterZhaoXiangOlRuntime>(Core.RuntimeEntries.CharacterZhaoXiangOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhaoYanOlEntries ZhaoYanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhaoYanOlEntries, EngineOwners.CharacterZhaoYanOlRuntime>(Core.RuntimeEntries.CharacterZhaoYanOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhaoYanOlRuntime> ZhaoYanOlEntries => GetDeferredModule<EngineOwners.CharacterZhaoYanOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhaoYunBoundaryMobileEntries ZhaoYunBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhaoYunBoundaryMobileEntries, EngineOwners.CharacterZhaoYunBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhaoYunBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhaoYunBoundaryMobileRuntime> ZhaoYunBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterZhaoYunBoundaryMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhaoZhongOlEntries ZhaoZhongOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhaoZhongOlEntries, EngineOwners.CharacterZhaoZhongOlRuntime>(Core.RuntimeEntries.CharacterZhaoZhongOlEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineZhaoguMirrorEntries ZhaoguMirrorEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineZhaoguMirrorEntries, EngineOwners.CoreGameEngineZhaoguMirrorRuntime>(Core.RuntimeEntries.CoreGameEngineZhaoguMirrorEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineZhaoguMirrorRuntime> ZhaoguMirrorEntries => GetDeferredModule<EngineOwners.CoreGameEngineZhaoguMirrorRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhenJiHappyGodEntries ZhenJiHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhenJiHappyGodEntries, EngineOwners.CharacterZhenJiHappyGodRuntime>(Core.RuntimeEntries.CharacterZhenJiHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhenJiHappyGodRuntime> ZhenJiHappyGodEntries => GetDeferredModule<EngineOwners.CharacterZhenJiHappyGodRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhenJiMouMobileEntries ZhenJiMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhenJiMouMobileEntries, EngineOwners.CharacterZhenJiMouMobileRuntime>(Core.RuntimeEntries.CharacterZhenJiMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhenJiMouMobileRuntime> ZhenJiMouMobileEntries => GetDeferredModule<EngineOwners.CharacterZhenJiMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhongHuiAnniversaryGodEntries ZhongHuiAnniversaryGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhongHuiAnniversaryGodEntries, EngineOwners.CharacterZhongHuiAnniversaryGodRuntime>(Core.RuntimeEntries.CharacterZhongHuiAnniversaryGodEntries.Create);
 
@@ -2185,19 +2185,19 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterZhongYaoMobileEntries ZhongYaoMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhongYaoMobileEntries, EngineOwners.CharacterZhongYaoMobileRuntime>(Core.RuntimeEntries.CharacterZhongYaoMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhouCangBoundaryMobileEntries ZhouCangBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhouCangBoundaryMobileEntries, EngineOwners.CharacterZhouCangBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhouCangBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhouCangBoundaryMobileRuntime> ZhouCangBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterZhouCangBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhouFangMobileEntries ZhouFangMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhouFangMobileEntries, EngineOwners.CharacterZhouFangMobileRuntime>(Core.RuntimeEntries.CharacterZhouFangMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhouFangMobileRuntime> ZhouFangMobileEntries => GetDeferredModule<EngineOwners.CharacterZhouFangMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhouFangOlEntries ZhouFangOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhouFangOlEntries, EngineOwners.CharacterZhouFangOlRuntime>(Core.RuntimeEntries.CharacterZhouFangOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhouFangOlRuntime> ZhouFangOlEntries => GetDeferredModule<EngineOwners.CharacterZhouFangOlRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhouFeiBoundaryMobileEntries ZhouFeiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhouFeiBoundaryMobileEntries, EngineOwners.CharacterZhouFeiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhouFeiBoundaryMobileEntries.Create);
 
     internal Core.RuntimeEntries.CharacterZhouFeiLeEntries ZhouFeiLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhouFeiLeEntries, EngineOwners.CharacterZhouFeiLeRuntime>(Core.RuntimeEntries.CharacterZhouFeiLeEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhouQunOlEntries ZhouQunOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhouQunOlEntries, EngineOwners.CharacterZhouQunOlRuntime>(Core.RuntimeEntries.CharacterZhouQunOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhouQunOlRuntime> ZhouQunOlEntries => GetDeferredModule<EngineOwners.CharacterZhouQunOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhouYuHappyGodEntries ZhouYuHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhouYuHappyGodEntries, EngineOwners.CharacterZhouYuHappyGodRuntime>(Core.RuntimeEntries.CharacterZhouYuHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhouYuHappyGodRuntime> ZhouYuHappyGodEntries => GetDeferredModule<EngineOwners.CharacterZhouYuHappyGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhouYuLeEntries ZhouYuLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhouYuLeEntries, EngineOwners.CharacterZhouYuLeRuntime>(Core.RuntimeEntries.CharacterZhouYuLeEntries.Create);
 
@@ -2209,41 +2209,41 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterZhuHuanBoundaryMobileEntries ZhuHuanBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuHuanBoundaryMobileEntries, EngineOwners.CharacterZhuHuanBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhuHuanBoundaryMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhuHuanMobileEntries ZhuHuanMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuHuanMobileEntries, EngineOwners.CharacterZhuHuanMobileRuntime>(Core.RuntimeEntries.CharacterZhuHuanMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhuHuanMobileRuntime> ZhuHuanMobileEntries => GetDeferredModule<EngineOwners.CharacterZhuHuanMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhuJunOlEntries ZhuJunOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuJunOlEntries, EngineOwners.CharacterZhuJunOlRuntime>(Core.RuntimeEntries.CharacterZhuJunOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhuLingOlEntries ZhuLingOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuLingOlEntries, EngineOwners.CharacterZhuLingOlRuntime>(Core.RuntimeEntries.CharacterZhuLingOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhuLingOlRuntime> ZhuLingOlEntries => GetDeferredModule<EngineOwners.CharacterZhuLingOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhuRanBoundaryMobileEntries ZhuRanBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuRanBoundaryMobileEntries, EngineOwners.CharacterZhuRanBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhuRanBoundaryMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhuRanBoundaryMobileRuntime> ZhuRanBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterZhuRanBoundaryMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhuRanMouMobileEntries ZhuRanMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuRanMouMobileEntries, EngineOwners.CharacterZhuRanMouMobileRuntime>(Core.RuntimeEntries.CharacterZhuRanMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhuRanMouMobileRuntime> ZhuRanMouMobileEntries => GetDeferredModule<EngineOwners.CharacterZhuRanMouMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhuRongBoundaryMobileEntries ZhuRongBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuRongBoundaryMobileEntries, EngineOwners.CharacterZhuRongBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhuRongBoundaryMobileEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhuRongMouMobileEntries ZhuRongMouMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuRongMouMobileEntries, EngineOwners.CharacterZhuRongMouMobileRuntime>(Core.RuntimeEntries.CharacterZhuRongMouMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhuRongMouMobileRuntime> ZhuRongMouMobileEntries => GetDeferredModule<EngineOwners.CharacterZhuRongMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhuZhiAnniversaryEntries ZhuZhiAnniversaryEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuZhiAnniversaryEntries, EngineOwners.CharacterZhuZhiAnniversaryRuntime>(Core.RuntimeEntries.CharacterZhuZhiAnniversaryEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhuZhiAnniversaryRuntime> ZhuZhiAnniversaryEntries => GetDeferredModule<EngineOwners.CharacterZhuZhiAnniversaryRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhuZhiBoundaryMobileEntries ZhuZhiBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuZhiBoundaryMobileEntries, EngineOwners.CharacterZhuZhiBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhuZhiBoundaryMobileEntries.Create);
 
     internal Core.RuntimeEntries.CharacterZhugeGuoLeEntries ZhugeGuoLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhugeGuoLeEntries, EngineOwners.CharacterZhugeGuoLeRuntime>(Core.RuntimeEntries.CharacterZhugeGuoLeEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhugeGuoMobileEntries ZhugeGuoMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhugeGuoMobileEntries, EngineOwners.CharacterZhugeGuoMobileRuntime>(Core.RuntimeEntries.CharacterZhugeGuoMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhugeGuoMobileRuntime> ZhugeGuoMobileEntries => GetDeferredModule<EngineOwners.CharacterZhugeGuoMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhugeGuoOlEntries ZhugeGuoOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhugeGuoOlEntries, EngineOwners.CharacterZhugeGuoOlRuntime>(Core.RuntimeEntries.CharacterZhugeGuoOlEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhugeGuoOlRuntime> ZhugeGuoOlEntries => GetDeferredModule<EngineOwners.CharacterZhugeGuoOlRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhugeJinMobileEntries ZhugeJinMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhugeJinMobileEntries, EngineOwners.CharacterZhugeJinMobileRuntime>(Core.RuntimeEntries.CharacterZhugeJinMobileEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhugeJinMobileRuntime> ZhugeJinMobileEntries => GetDeferredModule<EngineOwners.CharacterZhugeJinMobileRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhugeJinMouEntries ZhugeJinMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhugeJinMouEntries, EngineOwners.CharacterZhugeJinMouRuntime>(Core.RuntimeEntries.CharacterZhugeJinMouEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterZhugeLiangHappyGodEntries ZhugeLiangHappyGodEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhugeLiangHappyGodEntries, EngineOwners.CharacterZhugeLiangHappyGodRuntime>(Core.RuntimeEntries.CharacterZhugeLiangHappyGodEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhugeLiangHappyGodRuntime> ZhugeLiangHappyGodEntries => GetDeferredModule<EngineOwners.CharacterZhugeLiangHappyGodRuntime>();
 
     internal Core.RuntimeEntries.CharacterZhugeLiangMouEntries ZhugeLiangMouEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhugeLiangMouEntries, EngineOwners.CharacterZhugeLiangMouRuntime>(Core.RuntimeEntries.CharacterZhugeLiangMouEntries.Create);
 
     internal Core.RuntimeEntries.CharacterZhugeLiangWumiaoEntries ZhugeLiangWumiaoEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhugeLiangWumiaoEntries, EngineOwners.CharacterZhugeLiangWumiaoRuntime>(Core.RuntimeEntries.CharacterZhugeLiangWumiaoEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineZhuijiProgramsEntries ZhuijiProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineZhuijiProgramsEntries, EngineOwners.CoreGameEngineZhuijiProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineZhuijiProgramsEntries.Create);
+    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineZhuijiProgramsRuntime> ZhuijiProgramsEntries => GetDeferredModule<EngineOwners.CoreGameEngineZhuijiProgramsRuntime>();
 
     internal Core.RuntimeEntries.CharacterZouShiLeEntries ZouShiLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZouShiLeEntries, EngineOwners.CharacterZouShiLeRuntime>(Core.RuntimeEntries.CharacterZouShiLeEntries.Create);
 

@@ -29,7 +29,7 @@ internal sealed partial class CharacterXunYuMouRuntime
         return new(s.Id, s.Name, s.Name, s.Description);
     }
 
-    IEnumerable<T> IMouXunYuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouXunYuAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     IReadOnlyList<int> IMouXunYuAnniversaryFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
     IReadOnlyList<MouXyCard> IMouXunYuAnniversaryFacts.Hand(int s) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[s]).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(s, c, CardLocation.Hand(s), OwnedCardMoveIntent.Discard)).Select(c => new MouXyCard(c.Id, c.Kind, c.DisplayName)).ToArray());
     IReadOnlyList<MouXyPlan> IMouXunYuAnniversaryFacts.Plans(ProgramSkillFrame f) => MouXyPlans(f);
@@ -83,7 +83,7 @@ internal sealed partial class CharacterXunYuMouRuntime
     void IMouXunYuAnniversaryNative.Use(ProgramSkillFrame f) => IssueMouXyTrick(f);
     void IMouXunYuAnniversaryNative.Pend(ProgramSkillFrame f, MouXyBizuoGrant grant)
     {
-        if (!MouXyAnniversary.Valid(f) || f.MouXunYuAnniversary is not { Stage: MouXyStage.Beneficiary } || grant.FrameId != f.Id || grant.Source.OwnerSeat != f.OwnerSeat || grant.GameplayHash != f.GameplayHash || !_coreMatchParticipantsPlayersAccess._players[grant.Beneficiary].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<MouXyBizuoGrantedEvent>().Count(x => x.Grant == grant) != 1)
+        if (!MouXyAnniversary.Valid(f) || f.MouXunYuAnniversary is not { Stage: MouXyStage.Beneficiary } || grant.FrameId != f.Id || grant.Source.OwnerSeat != f.OwnerSeat || grant.GameplayHash != f.GameplayHash || !_coreMatchParticipantsPlayersAccess._players[grant.Beneficiary].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXyBizuoGrantedEvent>().Count(x => x.Grant == grant) != 1)
             throw new InvalidOperationException("Bizuo requires its own issued limited extra-turn source.");
         _coreSkillProgramsOperations.PendProgramExtraTurn(f, grant.Beneficiary);
         _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression with
@@ -94,7 +94,7 @@ internal sealed partial class CharacterXunYuMouRuntime
 
     void IMouXunYuAnniversaryNative.Suppress(MouXyBizuoGrant grant, int actualTurn, IReadOnlyList<int> targets)
     {
-        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Extra || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != grant.Beneficiary || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber != actualTurn || _coreProgramEventHistoryOperations.ProgramEventHistory<MouXyBizuoStartedEvent>().Count(s => s.Grant == grant && s.ActualTurn == actualTurn) != 1 || targets.Any(s => s == grant.Source.OwnerSeat || s == grant.Beneficiary || !_coreMatchParticipantsPlayersAccess._players[s].IsAlive))
+        if (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.Kind != ActualTurnKind.Extra || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != grant.Beneficiary || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber != actualTurn || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXyBizuoStartedEvent>().Count(s => s.Grant == grant && s.ActualTurn == actualTurn) != 1 || targets.Any(s => s == grant.Source.OwnerSeat || s == grant.Beneficiary || !_coreMatchParticipantsPlayersAccess._players[s].IsAlive))
             throw new InvalidOperationException("Bizuo suppression requires the exact claimed native extra actual turn.");
         foreach (var target in targets)
         {

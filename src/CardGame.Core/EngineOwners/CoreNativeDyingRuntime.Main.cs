@@ -5,7 +5,7 @@ internal sealed partial class CoreNativeDyingRuntime
 {
     internal void BeginDying(GameEngine.IDamageAttempt attack, long damageFrameId, CharacterState victim, CharacterState killer)
     {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not null)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not null)
         {
             throw new InvalidOperationException("The engine cannot resolve two dying players at once.");
         }
@@ -16,7 +16,7 @@ internal sealed partial class CoreNativeDyingRuntime
         _coreDynamicDiscardDamagePaymentsOperations.CaptureDynamicDiscardDamageDying(frameId, damageFrameId, victim.Seat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerDyingEvent(frameId, victim.Seat, attack.IsSourceLess ? null : killer.Seat));
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
-        if (_coreProgramLifecycleOperations.TryBeginMandatorySelfDyingProgram(_coreDyingCursorRuntimeOperations.ActiveDying!) || _coreDyingEntryProgramsOperations.TryBeginDyingEntryProgramWindow(_coreDyingCursorRuntimeOperations.ActiveDying!))
+        if (_coreProgramLifecycleOperations.TryBeginMandatorySelfDyingProgram(_coreDyingCursorRuntimeOperations.Value.ActiveDying!) || _coreDyingEntryProgramsOperations.TryBeginDyingEntryProgramWindow(_coreDyingCursorRuntimeOperations.Value.ActiveDying!))
         {
             return;
         }
@@ -43,17 +43,17 @@ internal sealed partial class CoreNativeDyingRuntime
     {
         if (_characterPangJiOlOperations.IsBiguoCategoryForbidden(responder.Seat, CardKind.Peach))
             return[];
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is { } dying && !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(responder.Seat, dying.VictimSeat))
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(responder.Seat, dying.VictimSeat))
             return[];
-        var handCandidates = _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(responder).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileResponseCards(responder, CardKind.Peach)).Where(card => !_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(responder.Seat, CardKind.Peach, [card.Id])).Where(card => _coreProgramCardLegalityOperations.IsProgramNativeResponseAllowed(responder, CardKind.Peach, [card.Id], dyingUse: true)).Where(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(responder, card)).Where(card => !_coreCardConversionsOperations.HasProgramCardIdentity(responder, card) || _characterGuanYuWumiaoOperations.IsWuyouIdentityKind(responder, card, CardKind.Peach)).Where(card => card.Kind == CardKind.Peach && !_coreWenhePoisonOperations.IsWenhePhysicalPoison(responder, card) && !_coreCuiYanNativeQueriesOperations.IsCuiYanSingleUseForbidden(responder, card) && (_coreDyingCursorRuntimeOperations.ActiveDying is not { } victim || !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(responder.Seat, victim.VictimSeat, _coreNativeCardAppearanceOperations.EffectiveSuit(responder, card))) || GetDyingPeachConversionSources(responder, card).Count != 0).ToArray();
+        var handCandidates = _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(responder).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileResponseCards(responder, CardKind.Peach)).Where(card => !_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(responder.Seat, CardKind.Peach, [card.Id])).Where(card => _coreProgramCardLegalityOperations.IsProgramNativeResponseAllowed(responder, CardKind.Peach, [card.Id], dyingUse: true)).Where(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(responder, card)).Where(card => !_coreCardConversionsOperations.HasProgramCardIdentity(responder, card) || _characterGuanYuWumiaoOperations.IsWuyouIdentityKind(responder, card, CardKind.Peach)).Where(card => card.Kind == CardKind.Peach && !_coreWenhePoisonOperations.IsWenhePhysicalPoison(responder, card) && !_coreCuiYanNativeQueriesOperations.IsCuiYanSingleUseForbidden(responder, card) && (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } victim || !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(responder.Seat, victim.VictimSeat, _coreNativeCardAppearanceOperations.EffectiveSuit(responder, card))) || GetDyingPeachConversionSources(responder, card).Count != 0).ToArray();
         return handCandidates.Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(responder).Where(card => GetDyingPeachConversionSources(responder, card).Count != 0)).ToArray();
     }
 
-    internal IReadOnlyList<CardConversionSource> GetDyingPeachConversionSources(CharacterState responder, Card card) => (_characterGuanYuWumiaoOperations.IsWuyouIdentityKind(responder, card, CardKind.Peach) ? _characterGuanYuWumiaoOperations.WuyouIdentitySources(responder, card, CardKind.Peach) : card.Kind == CardKind.Peach && !_coreWenhePoisonOperations.IsWenhePhysicalPoison(responder, card) && !_coreCardConversionsOperations.HasProgramCardIdentity(responder, card) ? [] : _coreActionQueriesOperations.GetProgramViewAsConversions(responder, card, CardKind.Peach, forResponse: true, dyingUse: true)).Where(source => _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(responder.Seat, dying.VictimSeat, _coreNativeCardAppearanceOperations.EffectiveSuit(responder, _corePlayCardHistoryOperations.ApplyProgramUseAppearance(responder, card, source)))).ToArray();
+    internal IReadOnlyList<CardConversionSource> GetDyingPeachConversionSources(CharacterState responder, Card card) => (_characterGuanYuWumiaoOperations.IsWuyouIdentityKind(responder, card, CardKind.Peach) ? _characterGuanYuWumiaoOperations.WuyouIdentitySources(responder, card, CardKind.Peach) : card.Kind == CardKind.Peach && !_coreWenhePoisonOperations.IsWenhePhysicalPoison(responder, card) && !_coreCardConversionsOperations.HasProgramCardIdentity(responder, card) ? [] : _coreActionQueriesOperations.GetProgramViewAsConversions(responder, card, CardKind.Peach, forResponse: true, dyingUse: true)).Where(source => _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(responder.Seat, dying.VictimSeat, _coreNativeCardAppearanceOperations.EffectiveSuit(responder, _corePlayCardHistoryOperations.ApplyProgramUseAppearance(responder, card, source)))).ToArray();
     internal Card[] GetDyingAlcohols(CharacterState responder, int victimSeat) => responder.Seat == victimSeat && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(responder.Seat) ? _corePhysicalOwnedCardQueriesOperations.GetHand(responder).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(responder)).Concat(_characterCaoZhiLeOperations.FuleDyingAlcoholGrainCards(responder)).Concat(_coreRequestedDeckBasicsOperations.SelectedRequestedDeckBasicCards(responder)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileResponseCards(responder, CardKind.Alcohol)).Where(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(responder, card) && !_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(responder.Seat, CardKind.Alcohol, [card.Id]) && _coreProgramCardLegalityOperations.IsProgramNativeResponseAllowed(responder, CardKind.Alcohol, [card.Id], dyingUse: true) && !_coreCardUseModulesOperations.IsCardUseForbidden(responder.Seat, CardKind.Alcohol, CardActionType.Use) && (!_coreCardConversionsOperations.HasProgramCardIdentity(responder, card) || _characterGuanYuWumiaoOperations.IsWuyouIdentityKind(responder, card, CardKind.Alcohol) || _characterHouChengAnniversaryOperations.IsAnniversaryHouChengWineCard(card.Id)) && (_characterGuanYuWumiaoOperations.IsWuyouIdentityKind(responder, card, CardKind.Alcohol) || (card.Kind == CardKind.Alcohol ? !_coreCuiYanNativeQueriesOperations.IsCuiYanSingleUseForbidden(responder, card) : _coreActionQueriesOperations.GetProgramViewAsConversions(responder, card, CardKind.Alcohol, forResponse: true, dyingUse: true).Count > 0))).ToArray() : [];
     internal void RunOneDyingStep(bool skipRequestedDeckBasic = false)
     {
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("A dying step requires a pending dying resolution.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("A dying step requires a pending dying resolution.");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
         {
             return;
@@ -115,7 +115,7 @@ internal sealed partial class CoreNativeDyingRuntime
             return;
         }
 
-        if (_coreDrawFundedDistinctBasicResponsesOperations.TryResolveDrawFundedDistinctBasicAiDying())
+        if (_coreDrawFundedDistinctBasicResponsesOperations.Value.TryResolveDrawFundedDistinctBasicAiDying())
             return;
         if (_characterXiaoQiaoMouOlOperations.TryMouXqJueyanAiResponse(CardKind.Peach, true) || _characterXiaoQiaoMouOlOperations.TryMouXqJueyanAiResponse(CardKind.Alcohol, true))
             return;
@@ -134,7 +134,7 @@ internal sealed partial class CoreNativeDyingRuntime
             }
         }
 
-        if (peaches.Length == 0 && alcohols.Length == 0 && dying.VictimSeat == responder.Seat && _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(responder, CardKind.Alcohol, true).FirstOrDefault(selection => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(selection) || _characterZhaoTongZhaoGuangAnniversaryOperations.IsAnniversaryYizanSelection(selection) || _characterXunXuAnniversaryOperations.IsAnniversaryXunXuBoqiaSource(selection.Source) || _corePlayCardHistoryOperations.ViewAsRule(selection.Source)is { RoundDistinctBasicUse: not null } or { LeiluanBasicUse: not null })is { } multiAlcohol)
+        if (peaches.Length == 0 && alcohols.Length == 0 && dying.VictimSeat == responder.Seat && _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(responder, CardKind.Alcohol, true).FirstOrDefault(selection => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(selection) || _characterZhaoTongZhaoGuangAnniversaryOperations.Value.IsAnniversaryYizanSelection(selection) || _characterXunXuAnniversaryOperations.IsAnniversaryXunXuBoqiaSource(selection.Source) || _corePlayCardHistoryOperations.ViewAsRule(selection.Source)is { RoundDistinctBasicUse: not null } or { LeiluanBasicUse: not null })is { } multiAlcohol)
         {
             var(useMultiAlcohol, multiAlcoholThought) = _coreAiBrainsAiBrainsAccess._aiBrains[responder.Seat].ChooseProgramDyingRescue(view, dying.VictimSeat, _coreCardConversionsOperations.ProgramConversionName(multiAlcohol.Source), ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
             _coreNativeAiDecisionsOperations.AddThought(multiAlcoholThought);
@@ -156,7 +156,7 @@ internal sealed partial class CoreNativeDyingRuntime
 
     internal void ExposeHumanDyingPrompt()
     {
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying;
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying;
         if (dying is null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || dying.ResponderIndex >= dying.ResponderSeats.Count)
         {
             return;
@@ -179,7 +179,7 @@ internal sealed partial class CoreNativeDyingRuntime
 
     internal void RequestHumanDyingResponse(CharacterState responder, IReadOnlyList<Card> peaches, IReadOnlyList<Card> alcohols)
     {
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("There is no dying resolution for the prompt.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("There is no dying resolution for the prompt.");
         var victim = _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat];
         var choices = peaches.SelectMany(peach =>
         {
@@ -239,7 +239,7 @@ internal sealed partial class CoreNativeDyingRuntime
 
     internal void ApplyDyingResponse(CharacterState responder, bool usePeach, int? peachCardId, bool useAlcohol, int? alcoholCardId, CardConversionSource? peachConversionSource = null, CardConversionSource? alcoholConversionSource = null)
     {
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("There is no dying response to apply.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("There is no dying response to apply.");
         if (responder.Seat != dying.ResponderSeat)
         {
             throw new InvalidOperationException("The response does not belong to the current dying responder.");
@@ -285,7 +285,7 @@ internal sealed partial class CoreNativeDyingRuntime
                 throw new InvalidOperationException("The requested Alcohol is not in the responder's hand.");
             }
 
-            _coreProgramAlcoholConversionsOperations.ValidateAlcoholConversion(responder, alcohol, alcoholConversionSource, forResponse: true);
+            _coreProgramAlcoholConversionsOperations.Value.ValidateAlcoholConversion(responder, alcohol, alcoholConversionSource, forResponse: true);
             usedAlcoholCardId = alcohol.Id;
             _coreNativeRecoveryCardsOperations.ResolveDyingAlcohol(responder, victim, alcohol, alcoholConversionSource, new DyingResponseEvent(dying.FrameId, responder.Seat, false, null, true, alcohol.Id));
             return;
@@ -296,7 +296,7 @@ internal sealed partial class CoreNativeDyingRuntime
 
     internal void CompleteDyingCardResponse(DyingResponseEvent response)
     {
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("The rescue use lost its dying parent.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("The rescue use lost its dying parent.");
         if (dying.FrameId != response.ResolutionId)
             throw new InvalidOperationException("The rescue use returned to a different dying parent.");
         var victim = _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat];
@@ -324,7 +324,7 @@ internal sealed partial class CoreNativeDyingRuntime
 
     internal void CompleteDying(DyingFrame dying, bool survived)
     {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying?.Id != dying.Id)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying?.Id != dying.Id)
         {
             throw new InvalidOperationException("The completed dying resolution is not current.");
         }
@@ -341,7 +341,7 @@ internal sealed partial class CoreNativeDyingRuntime
 
     internal void CompleteDyingAfterDeath(DyingFrame dying, bool survived)
     {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying?.Id != dying.Id)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying?.Id != dying.Id)
         {
             throw new InvalidOperationException("The completed dying continuation is not current.");
         }
@@ -373,7 +373,7 @@ internal sealed partial class CoreNativeDyingRuntime
 
         if (dying.Continuation == DyingContinuationKind.AttackHpLoss)
         {
-            _coreNativeDamageCompletionOperations.CompleteDamageAttack(_coreNativeDamageHandlesOperations.GetCompletedDyingAttack(dying)!);
+            _coreNativeDamageCompletionOperations.CompleteDamageAttack(_coreNativeDamageHandlesOperations.Value.GetCompletedDyingAttack(dying)!);
             return;
         }
 
@@ -389,7 +389,7 @@ internal sealed partial class CoreNativeDyingRuntime
     internal void CompleteDamageAfterDying(GameEngine.DyingCompletionReceipt dying)
     {
         var victim = _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat];
-        var attack = _coreNativeDamageHandlesOperations.GetCompletedDyingAttack(dying) ?? throw new InvalidOperationException("A damage dying continuation has no attack.");
+        var attack = _coreNativeDamageHandlesOperations.Value.GetCompletedDyingAttack(dying) ?? throw new InvalidOperationException("A damage dying continuation has no attack.");
         if (dying.Continuation != DyingContinuationKind.Damage)
             throw new InvalidOperationException("A damage dying continuation has no damage frame.");
         var damageFrameId = dying.ParentFrameId;

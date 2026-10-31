@@ -8,7 +8,7 @@ internal sealed partial class CoreGameEngineCharacterTurnedOverProgramsRuntime
         var isFaceDown = _coreMatchParticipantsPlayersAccess._players[targetSeat].IsFaceDown;
         if (wasFaceDown == isFaceDown)
             return;
-        _coreDiscardedProvenanceOperations.RecordProvenanceFaceUpReset(targetSeat, wasFaceDown);
+        _coreDiscardedProvenanceOperations.Value.RecordProvenanceFaceUpReset(targetSeat, wasFaceDown);
         _coreCharacterStateProgramsOperations.RecordCharacterStateChange(targetSeat, SkillProgramTriggerWindow.CharacterTurnedOver, turnedOver: new(wasFaceDown, isFaceDown));
     }
 

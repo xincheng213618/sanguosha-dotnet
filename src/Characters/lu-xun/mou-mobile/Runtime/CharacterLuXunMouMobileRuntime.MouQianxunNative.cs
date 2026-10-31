@@ -12,7 +12,7 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
         return _coreNextActualUseTargetAdjustmentsOperations.NextActualUseOrdinaryTrickOptions(actor, options, Suit.None, null, Suit.None, false);
     }
 
-    internal bool IsMouLuXunVirtualParent(ProgramSkillFrame f) => f.MouLuXun is { Operation: SkillProgramEffectOp.UseMouLuXunRecordedTrick, Paid: true, Kind: { } kind, Plan: not null } r && r.Stage is MouLuXunStage.IssuingUse or MouLuXunStage.NativeUse or MouLuXunStage.NativeReturned && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && ValidMouLuXun(f) && f.WindowContext?.Window == SkillProgramTriggerWindow.PlayPhaseStarting && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuXunNameRemovedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Kind == kind) == 1;
+    internal bool IsMouLuXunVirtualParent(ProgramSkillFrame f) => f.MouLuXun is { Operation: SkillProgramEffectOp.UseMouLuXunRecordedTrick, Paid: true, Kind: { } kind, Plan: not null } r && r.Stage is MouLuXunStage.IssuingUse or MouLuXunStage.NativeUse or MouLuXunStage.NativeReturned && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && ValidMouLuXun(f) && f.WindowContext?.Window == SkillProgramTriggerWindow.PlayPhaseStarting && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuXunNameRemovedEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Kind == kind) == 1;
     internal SkillProgramEffect MouLuXunVirtualInstruction(ProgramSkillFrame f)
     {
         if (!IsMouLuXunVirtualParent(f))
@@ -49,7 +49,7 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
     {
         if (use.VirtualOrdinaryTrickOrigin is not { } origin || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLuXun: { } r } f || origin.ParentProgramFrameId != f.Id || r.Operation != SkillProgramEffectOp.UseMouLuXunRecordedTrick)
             return false;
-        if (!IsMouLuXunVirtualParent(f) || r.Stage != MouLuXunStage.NativeUse || r.UseId != use.Id || use.Step != ResolutionFrameStep.Completed || use.Action?.ActionId != r.ActionId || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == r.Kind) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuXunNativeReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (!IsMouLuXunVirtualParent(f) || r.Stage != MouLuXunStage.NativeUse || r.UseId != use.Id || use.Step != ResolutionFrameStep.Completed || use.Action?.ActionId != r.ActionId || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == r.Kind) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuXunNativeReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Qianxun's record cannot pay or return a second native use.");
         var attack = use.CardAttack is { Active: true };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouLuXun = r with { Stage = MouLuXunStage.NativeReturned } });
@@ -64,7 +64,7 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLuXun: { Stage: MouLuXunStage.NativeReturned } r } f)
             return false;
-        if (!ValidMouLuXun(f) || _resolutionStackOperations._resolutionStack.Any(x => x.Id == r.UseId) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuXunNativeReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.HadAttack) != 1)
+        if (!ValidMouLuXun(f) || _resolutionStackOperations._resolutionStack.Any(x => x.Id == r.UseId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuXunNativeReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.HadAttack) != 1)
             throw new InvalidOperationException("Qianxun's native attack must clean up before its original Play-start returns.");
         FinishMouLuXun(f);
         return true;

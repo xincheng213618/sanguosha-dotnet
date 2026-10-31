@@ -12,7 +12,7 @@ internal sealed partial class CharacterTaishiCiMouOlRuntime
             return shortfall;
         // Player slots are fixed at setup, unlike the live-player set. A named
         // skill's prior issued grants remain spent across skill-instance changes.
-        var prior = _coreProgramEventHistoryOperations.ProgramEventHistory<SequentialDeckKindGrowthGrantedEvent>().TakeWhile(item => item.ProgramFrameId != frameId).Where(item => item.Source.OwnerSeat == source.OwnerSeat && item.Source.SkillId == source.SkillId).Aggregate(0, (sum, item) => checked(sum + item.Amount));
+        var prior = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SequentialDeckKindGrowthGrantedEvent>().TakeWhile(item => item.ProgramFrameId != frameId).Where(item => item.Source.OwnerSeat == source.OwnerSeat && item.Source.SkillId == source.SkillId).Aggregate(0, (sum, item) => checked(sum + item.Amount));
         return Math.Min(shortfall, Math.Max(0, _coreMatchParticipantsPlayersAccess._players.Count - prior));
     }
 }

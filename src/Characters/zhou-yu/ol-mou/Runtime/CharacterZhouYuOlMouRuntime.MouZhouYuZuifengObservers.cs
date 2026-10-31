@@ -18,7 +18,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
-            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
+            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window);
         return false;
     }
 
@@ -51,7 +51,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return false;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MouZuifeng: { Stage: MouZuifengStage.NativeChildren, UseReturned: true } } f && IsPaidMouZuifeng(f) && _coreCardUseLifecycleOperations.LifecycleCardUse(f.MouZuifeng.UseId)is null && _coreProgramEventHistoryOperations.ProgramEventHistory<MouZuifengAlcoholReturnedEvent>().Count(e => e == new MouZuifengAlcoholReturnedEvent(f.Id, f.MouZuifeng.UseId, f.MouZuifeng.ActionId)) == 1)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { MouZuifeng: { Stage: MouZuifengStage.NativeChildren, UseReturned: true } } f && IsPaidMouZuifeng(f) && _coreCardUseLifecycleOperations.LifecycleCardUse(f.MouZuifeng.UseId)is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZuifengAlcoholReturnedEvent>().Count(e => e == new MouZuifengAlcoholReturnedEvent(f.Id, f.MouZuifeng.UseId, f.MouZuifeng.ActionId)) == 1)
         {
             ContinueMouZuifeng(f.Id);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();

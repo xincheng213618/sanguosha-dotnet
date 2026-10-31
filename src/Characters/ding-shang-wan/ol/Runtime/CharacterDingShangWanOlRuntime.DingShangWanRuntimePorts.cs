@@ -9,7 +9,7 @@ internal sealed partial class CharacterDingShangWanOlRuntime
 
     bool IDingShangWanNativeFacts.CurrentDamageHasSource => _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsSourceLess: false };
 
-    DyingFrame? IDingShangWanNativeFacts.ActiveDying => _coreDyingCursorRuntimeOperations.ActiveDying;
+    DyingFrame? IDingShangWanNativeFacts.ActiveDying => _coreDyingCursorRuntimeOperations.Value.ActiveDying;
 
     bool IDingShangWanNativeFacts.ValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool IDingShangWanNativeFacts.HasSkillInstance(int seat, string skill, string instance) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skill, instance);

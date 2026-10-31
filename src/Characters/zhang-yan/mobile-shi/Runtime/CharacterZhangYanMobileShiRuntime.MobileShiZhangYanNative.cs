@@ -57,7 +57,7 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
             throw new InvalidOperationException("Xiaoge's native Duel lost its exact original completed-Slash program return.");
         if (use.CardAttack is { Active: true })
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Any(e => e.UseId == use.Id))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Any(e => e.UseId == use.Id))
                 throw new InvalidOperationException("Xiaoge Duel cannot return the same native attack twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramVirtualOrdinaryAttackReturnedEvent(use.Id, origin));
             return true;
@@ -70,7 +70,7 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
     [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 50500)]
     internal bool ResumeShiZyNativeDuel()
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiZhangYan: { Stage: ShiZyStage.DuelIssued, Duel: { } origin } r } f || r.Op != SkillProgramEffectOp.ResolveMobileShiZhangYanXiaogeDuel || _resolutionStackOperations._resolutionStack.Any(x => x.Id == r.NativeUseId) || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Any(e => e.UseId == r.NativeUseId && e.Origin == origin))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ShiZhangYan: { Stage: ShiZyStage.DuelIssued, Duel: { } origin } r } f || r.Op != SkillProgramEffectOp.ResolveMobileShiZhangYanXiaogeDuel || _resolutionStackOperations._resolutionStack.Any(x => x.Id == r.NativeUseId) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Any(e => e.UseId == r.NativeUseId && e.Origin == origin))
             return false;
         CompleteShiZyDuelReturn(f, r.NativeUseId, origin);
         return true;
@@ -78,18 +78,18 @@ internal sealed partial class CharacterZhangYanMobileShiRuntime
 
     internal void CompleteShiZyDuelReturn(ProgramSkillFrame f, long useId, ProgramVirtualOrdinaryTrickOrigin origin)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShiZyDuelReturnedEvent>().Any(e => e.UseId == useId))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZyDuelReturnedEvent>().Any(e => e.UseId == useId))
             throw new InvalidOperationException("Xiaoge's issued Duel already returned.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiZhangYan = f.ShiZhangYan!with { Stage = ShiZyStage.DuelChildren } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZyDuelReturnedEvent(useId, origin));
         ContinueShiZy(f.Id);
     }
 
-    internal CardUseFrame? FrozenShiZyCompletedSlash(ProgramSkillFrame f) => f.ShiZhangYan is { Op: SkillProgramEffectOp.ResolveMobileShiZhangYanXiaogeDuel, OriginalAttackActive: not null, OriginalTargetIndex: { } cursor } r && ValidShiZy(f) && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } action, CardAttack: not null } use && use.SourceSeat == f.OwnerSeat && action.ActorSeat == f.OwnerSeat && use.TargetIndex == cursor && action.ActionId == r.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveDesignatedTargetSeats is [var target] && target == r.Target && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == r.WindowId)is ProgramCardTriggerWindowFrame window && window.ParentFrameId == use.Id && window.AttackOwnerFrameId == use.Id && window.Continuation == ProgramCardContinuation.CompletedSlash && window.CompletedResponseReturn is null && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(window.Action, action) && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardKind == use.CardKind) == 1 ? use : null;
+    internal CardUseFrame? FrozenShiZyCompletedSlash(ProgramSkillFrame f) => f.ShiZhangYan is { Op: SkillProgramEffectOp.ResolveMobileShiZhangYanXiaogeDuel, OriginalAttackActive: not null, OriginalTargetIndex: { } cursor } r && ValidShiZy(f) && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } action, CardAttack: not null } use && use.SourceSeat == f.OwnerSeat && action.ActorSeat == f.OwnerSeat && use.TargetIndex == cursor && action.ActionId == r.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveDesignatedTargetSeats is [var target] && target == r.Target && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == r.WindowId)is ProgramCardTriggerWindowFrame window && window.ParentFrameId == use.Id && window.AttackOwnerFrameId == use.Id && window.Continuation == ProgramCardContinuation.CompletedSlash && window.CompletedResponseReturn is null && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(window.Action, action) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardKind == use.CardKind) == 1 ? use : null;
     internal void RestoreShiZyCompletedSlash(ProgramSkillFrame f)
     {
         var r = f.ShiZhangYan!;
-        if (r.Stage != ShiZyStage.DuelChildren || r.Duel is not { } origin || r.OriginalAttackActive is not { } active || FrozenShiZyCompletedSlash(f)is not { CardAttack.Active: false } original || _resolutionStackOperations._resolutionStack.Any(frame => frame.Id == r.NativeUseId) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZyDuelReturnedEvent>().Count(e => e.UseId == r.NativeUseId && e.Origin == origin) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZyAttackRestoredEvent>().Any(e => e.FrameId == f.Id))
+        if (r.Stage != ShiZyStage.DuelChildren || r.Duel is not { } origin || r.OriginalAttackActive is not { } active || FrozenShiZyCompletedSlash(f)is not { CardAttack.Active: false } original || _resolutionStackOperations._resolutionStack.Any(frame => frame.Id == r.NativeUseId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZyDuelReturnedEvent>().Count(e => e.UseId == r.NativeUseId && e.Origin == origin) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZyAttackRestoredEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Xiaoge cannot restore a different, unfinished or already restored original Slash attack.");
         if (active)
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(original.Id, use => use with { CardAttack = use.CardAttack!with { Active = true } });

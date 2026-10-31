@@ -148,7 +148,7 @@ internal sealed partial class CoreGameEngineZhaoguMirrorRuntime
     {
         if (frame.ZhaoguMirror is null)
             return frame;
-        if (!IsZhaoguVirtualBasicDraft(frame, frame.VirtualBasicDraft!) || frame.VirtualBasicDraft?.ChildFrameId != childId || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == childId && e.CardId == 0 && e.CardKind == frame.ZhaoguMirror.Template!.Kind) != 1)
+        if (!IsZhaoguVirtualBasicDraft(frame, frame.VirtualBasicDraft!) || frame.VirtualBasicDraft?.ChildFrameId != childId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == childId && e.CardId == 0 && e.CardKind == frame.ZhaoguMirror.Template!.Kind) != 1)
             throw new InvalidOperationException("Zhaogu Mirror basic child lost its actual once-completed generic return.");
         return frame with
         {
@@ -160,7 +160,7 @@ internal sealed partial class CoreGameEngineZhaoguMirrorRuntime
     {
         if (use.VirtualOrdinaryTrickOrigin is not { SkillId: ZhaoguMirrorSkill } origin || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == origin.ParentProgramFrameId)is not { ZhaoguMirror: { Template: { } template } receipt } frame || !ValidZhaoguHeader(frame) || receipt.Stage is not (ZhaoguMirrorStage.TrickIssuing or ZhaoguMirrorStage.TrickChild) || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.VirtualBasicReturn is not null || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0, EffectiveIsRed: null, RequesterSeat: null, ResponderSeat: null, OpponentSeat: null } action || action.ProviderSeat != frame.OwnerSeat || action.ActorSeat != use.SourceSeat || action.ActionId != origin.CardActionId || action.EffectiveKind != template.Kind || use.CardKind != template.Kind || !action.TargetSeats.SequenceEqual(use.TargetSeats) || use.TargetSeats.Count == 0 && !(_characterXunYuMobileGodOperations.HasDinghanCancellation(use) || _characterHuaManOlOperations.HasHuaManSouyingCancellation(use) || _coreOverflowTargetCancellationOperations.HasOverflowTargetCancellation(use)) || use.TargetSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat)) || use.TargetSeats.Distinct().Count() != use.TargetSeats.Count || origin.OwnerSeat != frame.OwnerSeat || origin.InitialActorSeat != frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(origin.InitialTargetSeat) || origin.BindingId != frame.TriggerId || origin.SkillInstanceId != frame.SkillInstanceId || origin.GameplayHash != frame.GameplayHash || origin.InstructionIndex != frame.InstructionIndex || origin.LifecycleFrameId != receipt.LifecycleFrameId || origin.TurnNumber != receipt.TurnNumber || origin.OutputKind != template.Kind || origin.ConditionKind != SkillProgramConditionKind.Always || origin.PindianBind is not null || origin.FrozenSourceWon is not null || receipt.Stage == ZhaoguMirrorStage.TrickChild && (receipt.TrickChildId != use.Id || receipt.TrickActionId != action.ActionId))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, action.ActorSeat, origin.InitialActorSeat) : receipt.Stage == ZhaoguMirrorStage.TrickIssuing && action.ActorSeat == frame.OwnerSeat;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, action.ActorSeat, origin.InitialActorSeat) : receipt.Stage == ZhaoguMirrorStage.TrickIssuing && action.ActorSeat == frame.OwnerSeat;
     }
 
     internal void ReturnZhaoguVirtualOrdinaryTrickUse(CardUseFrame use)
@@ -168,11 +168,11 @@ internal sealed partial class CoreGameEngineZhaoguMirrorRuntime
         var origin = use.VirtualOrdinaryTrickOrigin!;
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(origin.ParentProgramFrameId);
         var receipt = frame.ZhaoguMirror;
-        if (!IsZhaoguVirtualOrdinaryTrickUse(use) || receipt is not { Stage: ZhaoguMirrorStage.TrickChild } || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || use.Step != ResolutionFrameStep.Completed || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == origin.OutputKind) != 1)
+        if (!IsZhaoguVirtualOrdinaryTrickUse(use) || receipt is not { Stage: ZhaoguMirrorStage.TrickChild } || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || use.Step != ResolutionFrameStep.Completed || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == origin.OutputKind) != 1)
             throw new InvalidOperationException("Zhaogu Mirror trick lost its exact once-completed native return.");
         if (use.CardAttack is { Active: true })
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Any(e => e.UseId == use.Id))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Any(e => e.UseId == use.Id))
                 throw new InvalidOperationException("Zhaogu Mirror attack returned twice.");
             _coreRuntimeOperations.ReplaceRuntimeTop(frame with { ZhaoguMirror = receipt with { Stage = ZhaoguMirrorStage.TrickCleanup } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramVirtualOrdinaryAttackReturnedEvent(use.Id, origin));
@@ -187,7 +187,7 @@ internal sealed partial class CoreGameEngineZhaoguMirrorRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhaoguMirror: { Stage: ZhaoguMirrorStage.TrickCleanup } receipt } frame)
             return false;
-        if (!ValidZhaoguHeader(frame) || _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.TrickChildId)is not null || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Any(e => e.UseId == receipt.TrickChildId && e.Origin.ParentProgramFrameId == frame.Id && e.Origin.CardActionId == receipt.TrickActionId))
+        if (!ValidZhaoguHeader(frame) || _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.TrickChildId)is not null || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Any(e => e.UseId == receipt.TrickChildId && e.Origin.ParentProgramFrameId == frame.Id && e.Origin.CardActionId == receipt.TrickActionId))
             throw new InvalidOperationException("Zhaogu Mirror must wait for its original native attack cleanup.");
         CompleteZhaogu(frame);
         return true;

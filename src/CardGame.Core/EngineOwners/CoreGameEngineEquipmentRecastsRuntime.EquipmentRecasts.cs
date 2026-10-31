@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineEquipmentRecastsRuntime
     internal void BeginEquipmentRecast(CharacterState actor, Card card, CardKind effectiveKind)
     {
         var cost = _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(actor, card);
-        if (_resolutionStackOperations._resolutionStack.Count != 0 || cost != CardLocation.Equipment(actor.Seat) && !(cost == CardLocation.Hand(actor.Seat) && (_coreModeCardRecastsOperations.CanModeHandEquipmentRecast(card) || _coreHellDizangProgramsOperations.CanHellDitingMountRecast(actor, card) || _modeRulesOperations._modeRules.Cards.AllowsNativePhysicalRecast(card.Kind, effectiveKind))))
+        if (_resolutionStackOperations._resolutionStack.Count != 0 || cost != CardLocation.Equipment(actor.Seat) && !(cost == CardLocation.Hand(actor.Seat) && (_coreModeCardRecastsOperations.Value.CanModeHandEquipmentRecast(card) || _coreHellDizangProgramsOperations.CanHellDitingMountRecast(actor, card) || _modeRulesOperations._modeRules.Cards.AllowsNativePhysicalRecast(card.Kind, effectiveKind))))
             throw new InvalidOperationException("Equipment recast requires its fresh play boundary and owned equipment cost.");
         var frame = new EquipmentRecastFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, actor.Seat, card.Id, effectiveKind);
         frame = frame with

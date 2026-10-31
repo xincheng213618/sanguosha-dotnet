@@ -37,7 +37,7 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
             throw new InvalidOperationException("Shiwu requires its original unpaid trigger instruction.");
         if (operation == SkillProgramEffectOp.ResolveAnniversaryXiahouEnShiwu)
         {
-            if (!_coreForeignTurnContestsOperations.IsForeignActualTurnPindian(f) || context.SourceSeat is not { } other || !_coreDamageColorDuelProgramsOperations.CanIssueSelectedActorDuel(other, f.OwnerSeat))
+            if (!_coreForeignTurnContestsOperations.Value.IsForeignActualTurnPindian(f) || context.SourceSeat is not { } other || !_coreDamageColorDuelProgramsOperations.CanIssueSelectedActorDuel(other, f.OwnerSeat))
                 throw new InvalidOperationException("Shiwu requires the exact other actual turn start and legal owner-to-turn-owner Duel.");
             var origin = new XiahouEnShiwuOrigin(f.Id, f.InstructionIndex, XiahouEnSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, other, context.ParentFrameId, _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1, 0);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryXiahouEn = new(XiahouEnSource(f), f.GameplayHash, operation, context.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, other, AnniversaryXiahouEnStage.NativeUse, origin) });
@@ -136,7 +136,7 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
                 return;
             if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || _coreNativeCardContinuationCursorsOperations.ActiveDuel is not null)
                 throw new InvalidOperationException("Shiwu must wait for its native attack cleanup.");
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.Origin.UseId && e.CardId == 0 && e.CardKind == CardKind.Duel) != 1)
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.Origin.UseId && e.CardId == 0 && e.CardKind == CardKind.Duel) != 1)
                 throw new InvalidOperationException("Shiwu cannot finish an unreturned or different Duel.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryXiahouEn = r with { Stage = AnniversaryXiahouEnStage.NativeReturned } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiahouEnShiwuReturnedEvent(f.Id, r.Origin.UseId, r.Origin.ActionId));
@@ -154,8 +154,8 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryXiahouEnShiwuDamage))
             return;
-        var restored = _coreProgramEventHistoryOperations.ProgramEventHistory<XiahouEnChijianRestoredEvent>().Select(e => (e.FrameId, e.GrantId)).ToHashSet();
-        foreach (var loss in _coreProgramEventHistoryOperations.ProgramEventHistory<XiahouEnChijianLostGrantEvent>().Where(e => e.ActualTurn == ended.TurnNumber && e.TurnOwner == ended.ActorSeat && !restored.Contains((e.FrameId, e.Grant.GrantId))).ToArray())
+        var restored = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiahouEnChijianRestoredEvent>().Select(e => (e.FrameId, e.GrantId)).ToHashSet();
+        foreach (var loss in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiahouEnChijianLostGrantEvent>().Where(e => e.ActualTurn == ended.TurnNumber && e.TurnOwner == ended.ActorSeat && !restored.Contains((e.FrameId, e.Grant.GrantId))).ToArray())
         {
             var owner = _coreMatchParticipantsPlayersAccess._players[loss.OwnerSeat];
             var grant = loss.Grant;

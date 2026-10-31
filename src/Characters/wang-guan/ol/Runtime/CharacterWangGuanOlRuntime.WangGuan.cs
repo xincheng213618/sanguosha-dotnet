@@ -41,7 +41,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
         if (miuyan)
         {
             var use = _coreCardUseLifecycleOperations.LifecycleCardUse(native)!;
-            var positive = _coreProgramEventHistoryOperations.ProgramEventHistory<CompletedUndamagedUseDamageRecordedEvent>().Any(e => e.CardUseFrameId == native && e.Amount > 0);
+            var positive = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CompletedUndamagedUseDamageRecordedEvent>().Any(e => e.CardUseFrameId == native && e.Amount > 0);
             if (use.CausedDamage != positive)
                 throw new InvalidOperationException("Miuyan requires the actual positive whole-Use damage ledger, never an attempted Fire Attack damage fact.");
             if (invoice!.PreviousState == SkillPolarity.Yin && !positive)
@@ -158,7 +158,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
         if (!_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _characterLuoXianOlOperations.CurrentHandEntry(target, selected.CardId) != selected.Entry)
             throw new InvalidOperationException("Shilu cannot replace its frozen original opaque hand entity.");
         _coreProgramRevealsOperations.CommitProgramHandReveal(f.Id, target, ShiluRevealBind, [selected.CardId]);
-        var holderFact = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiluHolderChosenEvent>().Single(e => e.FrameId == f.Id);
+        var holderFact = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiluHolderChosenEvent>().Single(e => e.FrameId == f.Id);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiluHandIdentityGrantedEvent(f.Id, r.Source, r.GameplayHash, r.NativeId, target, selected.CardId, selected.Entry, holderFact.MovementCutoff));
         FinishWangGuan(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }

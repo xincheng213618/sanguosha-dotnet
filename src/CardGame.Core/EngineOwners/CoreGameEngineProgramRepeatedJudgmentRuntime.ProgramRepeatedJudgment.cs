@@ -22,11 +22,11 @@ internal sealed partial class CoreGameEngineProgramRepeatedJudgmentRuntime
         var state = frame.RepeatedJudgment ?? throw new InvalidOperationException("Repeated judgment lost its program state.");
         if (state.ClaimHandLimitExemption is not null)
         {
-            _coreExactRepeatedJudgmentOperations.ResumeProgramExactRepeatedJudgment(pending, frame, state);
+            _coreExactRepeatedJudgmentOperations.Value.ResumeProgramExactRepeatedJudgment(pending, frame, state);
             return;
         }
 
-        var card = _coreNativeDamageHandlesOperations.GetJudgmentCard(pending);
+        var card = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending);
         if (card is null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(frame with { RepeatedJudgment = null });

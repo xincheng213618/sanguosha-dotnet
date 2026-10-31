@@ -6,15 +6,15 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
     internal bool HasMouPangTongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouPangTongLianhuanTargets);
 
     internal static CardConversionSource MouPtSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_pang_tong_mou_mobile_MouPangTong.MouPtSource(f);
-    internal bool MouPtUpgraded(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongUpgradedEvent>().Any(e => e.Source.OwnerSeat == owner);
+    internal bool MouPtUpgraded(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouPangTongUpgradedEvent>().Any(e => e.Source.OwnerSeat == owner);
     internal bool HasMouPangTongExpandedTargets(CharacterState owner) => _coreNationalSkillsOperations.HasRuntimeSkill(owner, MouPangTongComposition.Lianhuan) && MouPtUpgraded(owner.Seat);
     internal CardUseFrame? MouPtUse(ProgramSkillWindowContext c) => c.CardUse is { } card ? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == card.CardActionId) : null;
-    internal bool MouPtPaidFor(CardUseFrame use, int owner) => use.Action is { Type: CardActionType.Use, EffectiveKind: CardKind.IronChain } a && a.ActorSeat == owner && _coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongLianhuanPaidEvent>().Any(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.Source.OwnerSeat == owner);
-    internal bool MouPtPaidBySource(CardUseFrame use, CardConversionSource source, string gameplayHash) => MouPtPaidFor(use, source.OwnerSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongLianhuanPaidEvent>().Any(e => e.UseId == use.Id && e.ActionId == use.Action!.ActionId && e.GameplayHash == gameplayHash && e.Source == (source with { BindingId = "pay-for-chain" }));
+    internal bool MouPtPaidFor(CardUseFrame use, int owner) => use.Action is { Type: CardActionType.Use, EffectiveKind: CardKind.IronChain } a && a.ActorSeat == owner && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouPangTongLianhuanPaidEvent>().Any(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.Source.OwnerSeat == owner);
+    internal bool MouPtPaidBySource(CardUseFrame use, CardConversionSource source, string gameplayHash) => MouPtPaidFor(use, source.OwnerSeat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouPangTongLianhuanPaidEvent>().Any(e => e.UseId == use.Id && e.ActionId == use.Action!.ActionId && e.GameplayHash == gameplayHash && e.Source == (source with { BindingId = "pay-for-chain" }));
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 30500)]
     internal void CaptureMouPtConversion(CardUseDeclaredEvent e)
     {
-        if (!HasMouPangTongCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)is not { Action: { Type: CardActionType.Use, EffectiveKind: CardKind.IronChain } a } || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != a.ActorSeat || a.ConversionChain.FirstOrDefault(s => s.SkillId == MouPangTongComposition.Lianhuan && s.BindingId == "club-hand-chain" && s.OwnerSeat == a.ActorSeat)is not { } source || _coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongConversionUsedEvent>().Any(f => f.UseId == e.ResolutionId))
+        if (!HasMouPangTongCapability || _coreCardUseLifecycleOperations.LifecycleCardUse(e.ResolutionId)is not { Action: { Type: CardActionType.Use, EffectiveKind: CardKind.IronChain } a } || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != a.ActorSeat || a.ConversionChain.FirstOrDefault(s => s.SkillId == MouPangTongComposition.Lianhuan && s.BindingId == "club-hand-chain" && s.OwnerSeat == a.ActorSeat)is not { } source || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouPangTongConversionUsedEvent>().Any(f => f.UseId == e.ResolutionId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouPangTongConversionUsedEvent(source, phase, e.ResolutionId, a.ActionId));
     }
@@ -24,7 +24,7 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
     {
         if (!HasMouPangTongCapability || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase)
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongConversionUsedEvent>().Any(e => e.Source.OwnerSeat == actor.Seat && e.Phase == phase))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouPangTongConversionUsedEvent>().Any(e => e.Source.OwnerSeat == actor.Seat && e.Phase == phase))
             actions.RemoveAll(a => a.Kind == LegalActionKind.IronChain && a.ConversionSource?.SkillId == MouPangTongComposition.Lianhuan);
     }
 
@@ -36,7 +36,7 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
         if (gate.Features.HasOperation(SkillProgramEffectOp.ArmMouPangTongLianhuan))
             return !MouPtUpgraded(gate.OwnerSeat) && !MouPtPaidFor(use, gate.OwnerSeat);
         var source = new CardConversionSource(gate.SkillId, gate.Trigger.Id, gate.OwnerSeat, gate.Candidate.SkillInstanceId);
-        return (MouPtUpgraded(gate.OwnerSeat) || MouPtPaidBySource(use, source, gate.Candidate.GameplayHash)) && (gate.Context.MouPangTongLateTargetSeat is not null ? MouPtLateNotification(gate.Context, use, source, gate.Candidate.GameplayHash) : !_coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongTargetsStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == gate.OwnerSeat));
+        return (MouPtUpgraded(gate.OwnerSeat) || MouPtPaidBySource(use, source, gate.Candidate.GameplayHash)) && (gate.Context.MouPangTongLateTargetSeat is not null ? MouPtLateNotification(gate.Context, use, source, gate.Candidate.GameplayHash) : !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouPangTongTargetsStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == gate.OwnerSeat));
     }
 
     SkillProgramStepOutcome IMouPangTongHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => ResolveMouPt(f, op);
@@ -58,7 +58,7 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
         {
             if (f.TriggerId != "pay-for-chain" || f.InstructionIndex != 2)
                 throw new InvalidOperationException("Lianhuan's paid Use must follow its original HP cost.");
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == f.OwnerSeat && e.Amount == 1) && !MouPtPaidFor(use, f.OwnerSeat))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.TargetSeat == f.OwnerSeat && e.Amount == 1) && !MouPtPaidFor(use, f.OwnerSeat))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouPangTongLianhuanPaidEvent(f.Id, MouPtSource(f), f.GameplayHash, use.Id, a.ActionId));
             return SkillProgramStepOutcome.Continue;
         }
@@ -79,7 +79,7 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal bool ValidMouPtTargets(ProgramSkillFrame f) => f.MouPangTongTargets is { } r && r.Source == MouPtSource(f) && r.GameplayHash == f.GameplayHash && f.InstructionIndex == 1 && f.SkillId == MouPangTongComposition.Lianhuan && f.TriggerId == "discard-unchained-targets" && f.WindowContext is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized } c && c.ParentFrameId == r.WindowId && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is { Action: { } a } && a.ActionId == r.ActionId && a.ActorSeat == f.OwnerSeat && a.EffectiveKind == CardKind.IronChain && r.Cursor >= 0 && r.Cursor <= r.Targets.Count && r.Targets.Distinct().Count() == r.Targets.Count && r.Targets.All(_coreTableSeatQueriesOperations.IsValidPlayerSeat) && r.Before >= 0 && r.After >= r.Before && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongTargetsStartedEvent>().Count(e => e == new MouPangTongTargetsStartedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, r.UseId, r.ActionId, r.Targets.Count)) == 1;
+    internal bool ValidMouPtTargets(ProgramSkillFrame f) => f.MouPangTongTargets is { } r && r.Source == MouPtSource(f) && r.GameplayHash == f.GameplayHash && f.InstructionIndex == 1 && f.SkillId == MouPangTongComposition.Lianhuan && f.TriggerId == "discard-unchained-targets" && f.WindowContext is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized } c && c.ParentFrameId == r.WindowId && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is { Action: { } a } && a.ActionId == r.ActionId && a.ActorSeat == f.OwnerSeat && a.EffectiveKind == CardKind.IronChain && r.Cursor >= 0 && r.Cursor <= r.Targets.Count && r.Targets.Distinct().Count() == r.Targets.Count && r.Targets.All(_coreTableSeatQueriesOperations.IsValidPlayerSeat) && r.Before >= 0 && r.After >= r.Before && r.After <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouPangTongTargetsStartedEvent>().Count(e => e == new MouPangTongTargetsStartedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, r.UseId, r.ActionId, r.Targets.Count)) == 1;
     internal void ContinueMouPtTargets(long id)
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouPangTongTargets: { } r } f || f.Id != id)
@@ -132,7 +132,7 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
     {
         if (!HasMouPangTongCapability || window != SkillProgramTriggerWindow.CardUseTargetsFinalized || action.Type != CardActionType.Use || action.EffectiveKind != CardKind.IronChain || !_coreMatchParticipantsPlayersAccess._players[action.ActorSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == action.ActionId)is not { } use)
             return;
-        foreach (var paid in _coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongLianhuanPaidEvent>().Where(e => e.UseId == use.Id && e.ActionId == action.ActionId && e.Source.OwnerSeat == action.ActorSeat))
+        foreach (var paid in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouPangTongLianhuanPaidEvent>().Where(e => e.UseId == use.Id && e.ActionId == action.ActionId && e.Source.OwnerSeat == action.ActorSeat))
         {
             if (result.Any(c => c.OwnerSeat == paid.Source.OwnerSeat && c.SkillId == paid.Source.SkillId && c.SkillInstanceId == paid.Source.SkillInstanceId && c.TriggerId == "discard-unchained-targets"))
                 continue;
@@ -146,6 +146,6 @@ internal sealed partial class CharacterPangTongMouMobileRuntime
     {
         if (candidate.SkillId != MouPangTongComposition.Lianhuan || candidate.BindingId != "discard-unchained-targets" || c.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || c.OwnerSeat != candidate.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !_coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, c, window) || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { Action: { Type: CardActionType.Use, EffectiveKind: CardKind.IronChain } a } use || a.ActorSeat != candidate.OwnerSeat || c.CardUse?.CardActionId != a.ActionId || _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program is not { } p || p.GameplayHash != candidate.GameplayHash)
             return false;
-        return (c.MouPangTongLateTargetSeat is not null ? MouPtLateNotification(c, use, new(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId), candidate.GameplayHash) : !_coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongTargetsStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == candidate.OwnerSeat)) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouPangTongLianhuanPaidEvent>().Any(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.GameplayHash == candidate.GameplayHash && e.Source == new CardConversionSource(candidate.SkillId, "pay-for-chain", candidate.OwnerSeat, candidate.SkillInstanceId));
+        return (c.MouPangTongLateTargetSeat is not null ? MouPtLateNotification(c, use, new(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId), candidate.GameplayHash) : !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouPangTongTargetsStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == candidate.OwnerSeat)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouPangTongLianhuanPaidEvent>().Any(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.GameplayHash == candidate.GameplayHash && e.Source == new CardConversionSource(candidate.SkillId, "pay-for-chain", candidate.OwnerSeat, candidate.SkillInstanceId));
     }
 }

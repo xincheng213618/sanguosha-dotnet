@@ -6,13 +6,13 @@ internal sealed partial class CharacterSunHaoMobileRuntime
     internal const string MobileSunHaoDrawReason = "skill-program.mobile:sun-hao-canshi.draw";
     internal bool HasQualifiedMobileGuiming(CharacterState owner)
     {
-        if (!owner.IsAlive || owner.IdentityConcealed || !_characterSunHaoOlOperations.SunHaoActualTurnOpen || owner.Seat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
+        if (!owner.IsAlive || owner.IdentityConcealed || !_characterSunHaoOlOperations.Value.SunHaoActualTurnOpen || owner.Seat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
             return false;
         var grants = owner.SkillGrants.Grants.Where(g => _contentRegistryOperations._contentRegistry.GetSkill(g.SkillId).Program?.CardPolicies.Any(p => p.Kind == SkillProgramCardPolicyKind.OtherWuTreatedWoundedForCanshi) == true).ToArray();
         if (grants.Length == 0)
             return false;
         var suppressors = _corePrivateGeneralLibrariesOperations.PrivateGeneralLibrarySuppressionInputs(owner);
-        return grants.Any(g => _corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, g) && _coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(owner, g) && _coreLordSkillProjectionsOperations.IsProjectedGrantQualified(owner, g) && _corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, g) && _coreHpConditionalSkillGrantsOperations.IsHpConditionalGrantQualified(owner, g) && _characterHeQiOlOperations.IsEquipmentSuitGrantQualified(owner, g) && (suppressors.Count == 0 || suppressors.Contains(g.SkillId) || g.SourceId.StartsWith("equipment:", StringComparison.Ordinal)) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(owner, g.SkillId, g.SkillInstanceId, Role.Lord));
+        return grants.Any(g => _corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, g) && _coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(owner, g) && _coreLordSkillProjectionsOperations.IsProjectedGrantQualified(owner, g) && _corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, g) && _coreHpConditionalSkillGrantsOperations.Value.IsHpConditionalGrantQualified(owner, g) && _characterHeQiOlOperations.IsEquipmentSuitGrantQualified(owner, g) && (suppressors.Count == 0 || suppressors.Contains(g.SkillId) || g.SourceId.StartsWith("equipment:", StringComparison.Ordinal)) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(owner, g.SkillId, g.SkillInstanceId, Role.Lord));
     }
 
     internal SkillProgramStepOutcome BeginMobileSunHaoDraw(ProgramSkillFrame frame)
@@ -43,11 +43,11 @@ internal sealed partial class CharacterSunHaoMobileRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         if (frame.MobileSunHaoDraw is not { Outcome: not null })
             return;
-        if (_characterSunHaoOlOperations.DrainSunHao(frame))
+        if (_characterSunHaoOlOperations.Value.DrainSunHao(frame))
             return;
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var receipt = frame.MobileSunHaoDraw!;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<SunHaoCanshiGrantedEvent>().Any(e => e.FrameId == id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunHaoCanshiGrantedEvent>().Any(e => e.FrameId == id))
             throw new InvalidOperationException("A mobile Canshi replacement cannot issue the same obligation twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SunHaoCanshiGrantedEvent(frame.Id, receipt.Source, receipt.Hash, receipt.ActualTurn, receipt.TurnOwner, receipt.WindowId, receipt.X));
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { MobileSunHaoDraw = null, PendingMovementContinuation = null });

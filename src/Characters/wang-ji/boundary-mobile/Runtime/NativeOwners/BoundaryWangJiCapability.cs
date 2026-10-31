@@ -1,8 +1,8 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class BoundaryWangJiCapability(Func<RuntimeEntries.CharacterWangJiBoundaryMobileEntries> getCharacterWangJiBoundaryMobileRuntime) : IBoundaryWangJiHost, IBoundaryWangJiSelection
+internal sealed class BoundaryWangJiCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterWangJiBoundaryMobileRuntime>> getCharacterWangJiBoundaryMobileRuntime) : IBoundaryWangJiHost, IBoundaryWangJiSelection
 {
-    public bool CanSpend(int owner, int target) => getCharacterWangJiBoundaryMobileRuntime().CanSpendBoundaryWj(owner, target);
-    public SkillProgramStepOutcome Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => getCharacterWangJiBoundaryMobileRuntime().BeginBoundaryWj(frame, operation);
+    public bool CanSpend(int owner, int target) => getCharacterWangJiBoundaryMobileRuntime().Value.CanSpendBoundaryWj(owner, target);
+    public SkillProgramStepOutcome Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => getCharacterWangJiBoundaryMobileRuntime().Value.BeginBoundaryWj(frame, operation);
 }

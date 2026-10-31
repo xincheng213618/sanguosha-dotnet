@@ -39,7 +39,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuZhiOlCounterIssuedEvent(o));
     }
 
-    internal bool IsMouLzCounterUse(CardUseFrame u) => u.MouLuZhiOlCounter is { } o && u.Id == o.UseId && u.CardId == 0 && u.CardKind == CardKind.Slash && u.PhysicalCardIds is { Count: 0 } && u.Action is { Type: CardActionType.Use, PhysicalCards.Count: 0 } a && a.ActionId == o.ActionId && a.ProviderSeat == o.ActorSeat && a.RequesterSeat is null && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { MouLuZhiOl: { Stage: MouLuZhiOlStage.NativeUse, Paid: true } r } f && ValidMouLz(f) && r.Source == o.Source && r.GameplayHash == o.GameplayHash && r.UseId == u.Id && r.ActionId == a.ActionId && r.CounterTarget == o.TargetSeat && o.ActorSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlCounterIssuedEvent>().Count(e => e.Origin == o) == 1 && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, o.ActorSeat, o.ActorSeat);
+    internal bool IsMouLzCounterUse(CardUseFrame u) => u.MouLuZhiOlCounter is { } o && u.Id == o.UseId && u.CardId == 0 && u.CardKind == CardKind.Slash && u.PhysicalCardIds is { Count: 0 } && u.Action is { Type: CardActionType.Use, PhysicalCards.Count: 0 } a && a.ActionId == o.ActionId && a.ProviderSeat == o.ActorSeat && a.RequesterSeat is null && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { MouLuZhiOl: { Stage: MouLuZhiOlStage.NativeUse, Paid: true } r } f && ValidMouLz(f) && r.Source == o.Source && r.GameplayHash == o.GameplayHash && r.UseId == u.Id && r.ActionId == a.ActionId && r.CounterTarget == o.TargetSeat && o.ActorSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuZhiOlCounterIssuedEvent>().Count(e => e.Origin == o) == 1 && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, o.ActorSeat, o.ActorSeat);
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 32901)]
     internal bool FinishMouLzCounterAttack(NativeOwners.CardAttackHandle attack, out bool paused)
@@ -74,7 +74,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MouLuZhiOl!;
-        if (r.UseId != u.Id || r.ActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(u.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) != 1)
+        if (r.UseId != u.Id || r.ActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(u.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) != 1)
             throw new InvalidOperationException("Sibing lost its exact counter Use return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouLuZhiOl = r with { NativeReturned = true } });
         if (u.CardAttack is not { Active: true })
@@ -96,7 +96,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var r = f.MouLuZhiOl!;
-        if (!r.NativeReturned || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlCounterReturnedEvent>().Any(e => e.FrameId == id))
+        if (!r.NativeReturned || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuZhiOlCounterReturnedEvent>().Any(e => e.FrameId == id))
             throw new InvalidOperationException("Sibing counter cannot return twice.");
         if (r.OuterWasActive && _coreCardUseLifecycleOperations.LifecycleCardUse(r.OriginalId)?.CardAttack is { Active: false })
             _coreCardAttackStateOperations.UpdateCardAttackState(r.OriginalId, a => a!with { Active = true });
@@ -129,7 +129,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         }
         else
             return false;
-        return targets.Contains(responder) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlResponseBannedEvent>().Any(e => e.Ban.UseId == id && e.Ban.ActionId == action && e.Ban.TargetSeat == responder && e.Ban.Instruction == instruction);
+        return targets.Contains(responder) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuZhiOlResponseBannedEvent>().Any(e => e.Ban.UseId == id && e.Ban.ActionId == action && e.Ban.TargetSeat == responder && e.Ban.Instruction == instruction);
     }
 
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 32900)]
@@ -141,7 +141,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         var direct = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == attack.ResolutionId && f.MouLuZhiOlDirectDuel is not null);
         if (use is null && direct is null || use is not null && !IsMouLzDamageCard(use.CardKind))
             return false;
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuZhiOlUseDamageEvent>().Any(e => e.DamageId == damageId))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuZhiOlUseDamageEvent>().Any(e => e.DamageId == damageId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuZhiOlUseDamageEvent(attack.ResolutionId, direct?.MouLuZhiOlDirectDuel?.Instruction ?? 0, damageId, d.TargetSeat, d.Amount));
         return false;
     }

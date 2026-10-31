@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ShanheXiaoruiCapability(Func<RuntimeEntries.CoreGameEngineShanheXiaoruiEntries> getCoreGameEngineShanheXiaoruiRuntime) : IShanheXiaoruiProgramHost
+internal sealed class ShanheXiaoruiCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheXiaoruiRuntime>> getCoreGameEngineShanheXiaoruiRuntime) : IShanheXiaoruiProgramHost
 {
-    public SkillProgramStepOutcome GrantActualTurnSlashQuota(ProgramSkillFrame frame) => getCoreGameEngineShanheXiaoruiRuntime().GrantShanheXiaoruiQuota(frame);
+    public SkillProgramStepOutcome GrantActualTurnSlashQuota(ProgramSkillFrame frame) => getCoreGameEngineShanheXiaoruiRuntime().Value.GrantShanheXiaoruiQuota(frame);
 }

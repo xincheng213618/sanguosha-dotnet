@@ -35,7 +35,7 @@ internal sealed partial class CharacterCaoCaoHappyGodRuntime
             var r = f.HappyGuixin!;
             if (r.Stage is HappyGuixinStage.MovementChildren or HappyGuixinStage.TurnoverChildren)
             {
-                if (_characterCaoCaoMobileGodOperations.DrainMobileGuixinChildren(f))
+                if (_characterCaoCaoMobileGodOperations.Value.DrainMobileGuixinChildren(f))
                     return true;
                 if (r.Stage == HappyGuixinStage.TurnoverChildren)
                 {
@@ -70,7 +70,7 @@ internal sealed partial class CharacterCaoCaoHappyGodRuntime
 
             var target = r.OtherSeats[r.Cursor];
             // The established HEJ obtain helper enforces current ownership, area access and pending-judgment exclusions.
-            var candidates = _coreMatchParticipantsPlayersAccess._players[target].IsAlive ? _characterCaoCaoOlGodOperations.OlGuixinCandidates(f, target) : [];
+            var candidates = _coreMatchParticipantsPlayersAccess._players[target].IsAlive ? _characterCaoCaoOlGodOperations.Value.OlGuixinCandidates(f, target) : [];
             if (candidates.Count == 0)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f with { HappyGuixin = r with { Cursor = r.Cursor + 1 } });

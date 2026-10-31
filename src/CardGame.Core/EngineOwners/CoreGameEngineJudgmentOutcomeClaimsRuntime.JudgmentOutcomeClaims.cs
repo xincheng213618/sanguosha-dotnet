@@ -25,13 +25,13 @@ internal sealed partial class CoreGameEngineJudgmentOutcomeClaimsRuntime
 
     internal bool HasExactJudgmentOutcomeClaimDisposition(JudgmentFrame judgment)
     {
-        if (judgment.OutcomeClaim is not { } receipt || JudgmentOutcomeRoot(judgment)is not { } root || receipt.JudgmentFrameId != judgment.Id || receipt.RootProgramFrameId != root.Id || receipt.RootInstructionIndex != root.InstructionIndex || receipt.OwnerSeat != judgment.TargetSeat || receipt.CardId != _coreNativeDamageHandlesOperations.GetJudgmentCard(judgment)?.Id || _coreProgramJudgmentOutcomesOperations.JudgmentOutcomeInstruction(root, root.InstructionIndex)?.OutcomeBind != receipt.OutcomeBind || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(receipt.SkillId)?.Program is not { } claimProgram || claimProgram.GameplayHash != receipt.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramJudgmentOutcomeClaimRecordedEvent>().Count(fact => fact.Receipt == receipt) != 1)
+        if (judgment.OutcomeClaim is not { } receipt || JudgmentOutcomeRoot(judgment)is not { } root || receipt.JudgmentFrameId != judgment.Id || receipt.RootProgramFrameId != root.Id || receipt.RootInstructionIndex != root.InstructionIndex || receipt.OwnerSeat != judgment.TargetSeat || receipt.CardId != _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(judgment)?.Id || _coreProgramJudgmentOutcomesOperations.JudgmentOutcomeInstruction(root, root.InstructionIndex)?.OutcomeBind != receipt.OutcomeBind || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(receipt.SkillId)?.Program is not { } claimProgram || claimProgram.GameplayHash != receipt.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramJudgmentOutcomeClaimRecordedEvent>().Count(fact => fact.Receipt == receipt) != 1)
             return false;
-        var results = _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Where(fact => fact.ResolutionId == judgment.Id).ToArray();
-        var claims = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramJudgmentCardClaimedEvent>().Where(fact => fact.JudgmentFrameId == judgment.Id && fact.CardId == receipt.CardId).ToArray();
+        var results = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentResolvedEvent>().Where(fact => fact.ResolutionId == judgment.Id).ToArray();
+        var claims = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramJudgmentCardClaimedEvent>().Where(fact => fact.JudgmentFrameId == judgment.Id && fact.CardId == receipt.CardId).ToArray();
         if (results is not [var result] || result.ParentResolutionId != root.Id || result.TargetSeat != receipt.OwnerSeat || result.CardId != receipt.CardId || result.Reason != judgment.Reason || result.Suit is null || claims is not [var claim] || claim.SkillId != receipt.SkillId || claim.OwnerSeat != receipt.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramJudgmentTriggerWindowFrame>().SingleOrDefault(candidateWindow => candidateWindow.ParentFrameId == judgment.Id)is not { } window || !window.Candidates.Take(window.CandidateIndex + 1).Any(candidate => candidate.OwnerSeat == receipt.OwnerSeat && candidate.SkillId == receipt.SkillId && candidate.TriggerId == receipt.BindingId && candidate.SkillInstanceId == receipt.SkillInstanceId && candidate.GameplayHash == receipt.GameplayHash && claimProgram.Triggers.Single(trigger => trigger.Id == candidate.TriggerId).Effects.ElementAtOrDefault(receipt.ClaimInstructionIndex - 1)?.Op == SkillProgramEffectOp.ClaimJudgmentCard))
             return false;
-        var started = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Where(fact => fact.FrameId == receipt.ClaimProgramFrameId).ToArray();
+        var started = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Where(fact => fact.FrameId == receipt.ClaimProgramFrameId).ToArray();
         if (started is not [var issued] || issued.SkillId != receipt.SkillId || issued.BindingId != receipt.BindingId || issued.SkillInstanceId != receipt.SkillInstanceId || issued.OwnerSeat != receipt.OwnerSeat || issued.Window != SkillProgramTriggerWindow.JudgmentFinalized)
             return false;
         var claimant = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == receipt.ClaimProgramFrameId);
@@ -42,13 +42,13 @@ internal sealed partial class CoreGameEngineJudgmentOutcomeClaimsRuntime
             if (claimant.InstructionIndex == receipt.ClaimInstructionIndex && (claimant.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } movement || movement.SubjectSeat != receipt.OwnerSeat))
                 return false;
         }
-        else if (!_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingResolvedEvent>().Any(fact => fact.FrameId == receipt.ClaimProgramFrameId && fact.SkillId == receipt.SkillId && fact.BindingId == receipt.BindingId && fact.SkillInstanceId == receipt.SkillInstanceId && fact.OwnerSeat == receipt.OwnerSeat && fact.Window == SkillProgramTriggerWindow.JudgmentFinalized && fact.Completed))
+        else if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingResolvedEvent>().Any(fact => fact.FrameId == receipt.ClaimProgramFrameId && fact.SkillId == receipt.SkillId && fact.BindingId == receipt.BindingId && fact.SkillInstanceId == receipt.SkillInstanceId && fact.OwnerSeat == receipt.OwnerSeat && fact.Window == SkillProgramTriggerWindow.JudgmentFinalized && fact.Completed))
             return false;
         var rootIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
         if (rootIndex < 0 || rootIndex + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[rootIndex + 1].Id != judgment.Id)
             return false;
         for (var index = rootIndex + 1; index < _resolutionStackOperations._resolutionStack.Count; index++)
-            if (!_coreJudgmentOutcomeDamageEdgesOperations.JudgmentOutcomeDamageEdge(index, root))
+            if (!_coreJudgmentOutcomeDamageEdgesOperations.Value.JudgmentOutcomeDamageEdge(index, root))
                 return false;
         var moves = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(move => move.CardId == receipt.CardId && move.Sequence >= receipt.MovementSequence).ToArray();
         if (moves.Length == 0 || moves[0].Sequence != receipt.MovementSequence || moves[0].From != CardLocation.Judgment(receipt.OwnerSeat) || moves[0].To != CardLocation.Hand(receipt.OwnerSeat) || moves[0].Reason.Value != $"skill-program.{(receipt.SkillId)}.claimJudgmentCard")
@@ -56,7 +56,7 @@ internal sealed partial class CoreGameEngineJudgmentOutcomeClaimsRuntime
         var location = moves[0].To;
         foreach (var move in moves.Skip(1))
         {
-            if (move.From != location || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardMovedEvent>().Any(fact => fact.CardId == move.CardId && fact.From == move.From && fact.To == move.To && fact.Reason == move.Reason))
+            if (move.From != location || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardMovedEvent>().Any(fact => fact.CardId == move.CardId && fact.From == move.From && fact.To == move.To && fact.Reason == move.Reason))
                 return false;
             location = move.To;
         }

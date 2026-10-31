@@ -1,5 +1,6 @@
 using System.Reflection;
 using CardGame.Core;
+using CardGame.Core.RuntimeEntries;
 
 internal static class DeferredCapabilityChecks
 {
@@ -27,6 +28,81 @@ internal static class DeferredCapabilityChecks
         Reject(() => new ProgramCapabilityCatalog([typeof(WrongFactoryPort)]));
         Reject(() => new ProgramCapabilityCatalog([typeof(UndeclaredTargetPort)]));
         CheckSharedEntries();
+        CheckDeferredModuleReferences();
+    }
+
+    private static void CheckDeferredModuleReferences()
+    {
+        var modules = new ProgramRuntimeModuleCatalog([typeof(ReferenceFirst), typeof(ReferenceSecond)]);
+        var value = new ValueStore(5);
+        var match = new MatchRuntime(modules, new ProgramCapabilityCatalog([]), new NoEngineAdapters(), [new(typeof(IValueStore), value)]);
+        var other = new MatchRuntime(modules, new ProgramCapabilityCatalog([]), new NoEngineAdapters(), [new(typeof(IValueStore), new ValueStore(20))]);
+        var first = match.GetDeferredModule<ReferenceFirst>();
+        Require(ModuleCount(match) == 0 && ReferenceEquals(first, match.GetDeferredModule<ReferenceFirst>()),
+            "A module reference is cached before its mutually dependent owners are constructed.");
+        var offset = 1;
+        Require(first.Value.Read(offset) == 7 && ModuleCount(match) == 2 &&
+                ReferenceEquals(((ReferenceSecond)match.GetModule(typeof(ReferenceSecond))).First, first),
+            "Direct owner calls and constructor injection share the match's deferred reference and actual owners.");
+        var input = 3;
+        Require(first.Value.Combine(ref input, out var total) && input == 8 && total == 13,
+            "Direct owner calls retain the caller's ref storage, output and result.");
+        first.Value.Number = 7;
+        Require(value.Number == 7 && first.Value.Read() == 8 && other.GetDeferredModule<ReferenceFirst>().Value.Read() == 21 &&
+                !ReferenceEquals(first, other.GetDeferredModule<ReferenceFirst>()),
+            "Module references reach actual state and remain isolated between matches.");
+
+        var attempts = 0;
+        var failure = new InvalidOperationException("transient reference dependency failure");
+        var retry = new MatchRuntime(modules, new ProgramCapabilityCatalog([typeof(ReferenceValueAdapter)]),
+            new ReferenceAdapters(_ =>
+            {
+                if (++attempts == 1) throw failure;
+                return new ReferenceValueAdapter(null!);
+            }));
+        var reference = retry.GetDeferredModule<ReferenceSecond>();
+        try { _ = reference.Value; throw new Exception("A dependency failure was swallowed."); }
+        catch (InvalidOperationException error)
+        { Require(ReferenceEquals(error, failure), "A deferred reference preserves the actual dependency exception."); }
+        Require(attempts == 1 && ModuleCount(retry) == 0 && reference.Value.Read() == 5 && attempts == 2 &&
+                ReferenceEquals(reference.Value, retry.GetModule(typeof(ReferenceSecond))),
+            "A failed reference resolution can retry and then caches one actual module.");
+        Reject(() => new ProgramRuntimeModuleCatalog([typeof(InvalidReference)]));
+    }
+
+    [ProgramRuntimeModule]
+    private sealed class ReferenceFirst(DeferredRuntime<ReferenceSecond> second)
+    {
+        internal int Read(int offset = 0) => second.Value.Read() + 1 + offset;
+        internal bool Combine(ref int input, out int total) => second.Value.Combine(ref input, out total);
+        internal ref int Number => ref second.Value.Number;
+    }
+    [ProgramRuntimeModule]
+    private sealed class ReferenceSecond(DeferredRuntime<ReferenceFirst> first, IValueStore value)
+    {
+        internal DeferredRuntime<ReferenceFirst> First => first;
+        internal int Read() => value.Number;
+        internal bool Combine(ref int input, out int total)
+        { input += value.Number; total = input + value.Number; return true; }
+        internal ref int Number => ref value.Number;
+    }
+    [ProgramRuntimeModule]
+    private sealed class InvalidReference(DeferredRuntime<ValueStore> value)
+    {
+        internal int Read() => value.Value.Number;
+    }
+    [ProgramCapability]
+    private sealed class ReferenceValueAdapter : IValueStore
+    {
+        private int _number = 5;
+        internal ReferenceValueAdapter(GameEngine engine) { }
+        public ref int Number => ref _number;
+    }
+    private sealed class ReferenceAdapters(Func<ProgramCapabilityCatalog.Registration, object> create) : IMatchRuntimeAdapterFactory
+    {
+        public object CreateAdapter(ProgramCapabilityCatalog.Registration registration) => create(registration);
+        public Delegate BindCoreHandler(MethodInfo method, Type delegateType) => throw new Exception("Unexpected engine binding.");
+        public object CoreHandlerTarget(MethodInfo method) => throw new Exception("Unexpected engine target.");
     }
 
     private static void CheckSharedEntries()

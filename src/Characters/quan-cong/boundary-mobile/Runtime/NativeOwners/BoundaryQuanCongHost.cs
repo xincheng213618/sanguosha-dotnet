@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class BoundaryQuanCongHost(Func<RuntimeEntries.CharacterQuanCongBoundaryMobileEntries> getCharacterQuanCongBoundaryMobileRuntime) : IBoundaryQuanCongProgramHost
+internal sealed class BoundaryQuanCongHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterQuanCongBoundaryMobileRuntime>> getCharacterQuanCongBoundaryMobileRuntime) : IBoundaryQuanCongProgramHost
 {
-    public SkillProgramStepOutcome Resolve(ProgramSkillFrame frame) => getCharacterQuanCongBoundaryMobileRuntime().BeginBoundaryYaoming(frame);
+    public SkillProgramStepOutcome Resolve(ProgramSkillFrame frame) => getCharacterQuanCongBoundaryMobileRuntime().Value.BeginBoundaryYaoming(frame);
 }

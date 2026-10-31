@@ -19,7 +19,7 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoZhibingRuntim
         {
             // The earlier shared true-Use observer proves Dodge against Slash
             // and Nullification. A pure played Slash/Dodge has no such fact.
-            var fact = _coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().LastOrDefault(e => e.CardActionId == response.Action.ActionId && e.ActorSeat == response.Action.ActorSeat && e.RoundActionType == CardActionType.Response);
+            var fact = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().LastOrDefault(e => e.CardActionId == response.Action.ActionId && e.ActorSeat == response.Action.ActorSeat && e.RoundActionType == CardActionType.Response);
             if (fact is not null)
             {
                 action = response.Action;
@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoZhibingRuntim
             }
         }
 
-        if (action is null || action.ActionId <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceMouBlackUseEvent>().Any(e => e.ActionId == action.ActionId))
+        if (action is null || action.ActionId <= 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceMouBlackUseEvent>().Any(e => e.ActionId == action.ActionId))
             return;
         // NativeActionAppearance is required by the descriptor, so physical
         // uses must already carry their pre-payment effective appearance.
@@ -45,7 +45,7 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoZhibingRuntim
     {
         if (!_coreShanheSourceMouDongZhuoOperations.IsSourceMouMode || !_coreCurrentTurnUseKindsOperations.HasOngoingActualUseTurn || context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } action || action.ActorSeat == owner)
             return null;
-        var history = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceMouBlackUseEvent>().ToArray();
+        var history = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceMouBlackUseEvent>().ToArray();
         var actual = history.SingleOrDefault(e => e.ActionId == action.CardActionId && e.Actor == action.ActorSeat && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
         if (actual is not { Black: true })
             return null;
@@ -53,7 +53,7 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoZhibingRuntim
         // prefix ending at this actual submission, excluding later nested uses.
         var index = Array.FindIndex(history, e => e == actual);
         var ordinal = history.Take(index + 1).Count(e => e.Actor == actual.Actor && e.Turn == actual.Turn && e.TurnOwner == actual.TurnOwner && e.Black);
-        if (ordinal is not (3 or 6 or 9) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceMouThresholdEvent>().Any(e => e.Owner == owner && e.ActionId == actual.ActionId))
+        if (ordinal is not (3 or 6 or 9) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceMouThresholdEvent>().Any(e => e.Owner == owner && e.ActionId == actual.ActionId))
             return null;
         return (actual, ordinal);
     }

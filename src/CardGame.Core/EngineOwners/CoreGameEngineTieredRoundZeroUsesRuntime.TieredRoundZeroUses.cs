@@ -15,7 +15,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
 
     internal IReadOnlyList<LegalAction> TieredRoundZeroPlayActions(CharacterState actor)
     {
-        if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.IsMouLuSuUseQuery(actor))
+        if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor))
             return[];
         var result = new List<LegalAction>();
         foreach (var(source, rule, _)in TieredRoundZeroRules(actor))
@@ -33,12 +33,12 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
                 _coreProgramCardUseRulesOperations.AddProgramTargetCountSlashActions(result, actor, card, targets, card.DisplayName, kind, source, null);
             }
             else if (kind == CardKind.Intoxication)
-                _coreGuanduBasicConversionsOperations.AddGuanduZeroBasicActions(result, actor, source);
+                _coreGuanduBasicConversionsOperations.Value.AddGuanduZeroBasicActions(result, actor, source);
             else if (kind is CardKind.Zong or CardKind.RealgarWine)
-                _coreDragonBoatBasicConversionsOperations.AddDragonBoatZeroBasicActions(result, actor, source, kind);
+                _coreDragonBoatBasicConversionsOperations.Value.AddDragonBoatZeroBasicActions(result, actor, source, kind);
             else if (kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None))
                 result.Add(new(LegalActionKind.Peach, 0, null, _coreCardConversionsOperations.DescribeConversion(source, "视为使用【桃】"), kind) { ConversionSource = source });
-            else if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && (_characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || (_coreAdvancedPoliciesOperations.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.HasFriendQihuiAllowance(actor)) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, CardKind.Alcohol)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None))
+            else if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && (_characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || (_coreAdvancedPoliciesOperations.Value.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.Value.HasFriendQihuiAllowance(actor)) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, CardKind.Alcohol)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None))
                 result.Add(new(LegalActionKind.Alcohol, 0, null, _coreCardConversionsOperations.DescribeConversion(source, "视为使用【酒】"), kind) { ConversionSource = source });
             else if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && kind != CardKind.Nullification)
                 foreach (var option in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: false))
@@ -164,7 +164,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
         if (countsTowardLimit && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && actor.Seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source))
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, kind);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, kind, actor.Seat, target.Seat, IgnoresArmor: attack.IgnoresArmor));
         _coreNativeAiDecisionsOperations.NotifyAiOfSlash(actor, target);
@@ -241,7 +241,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
             if (targets.Count == 0)
                 throw new InvalidOperationException("A virtual Slash requires its real selected targets.");
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, targets[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], kind));
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
             actor.HasAlcoholEffect = false;
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
@@ -266,7 +266,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
         var policy = rule.TieredRoundConversion!;
         if (source.OwnerSeat != use.SourceSeat || action.ActorSeat != use.SourceSeat || action.ProviderSeat != use.SourceSeat || action.RequesterSeat is not null || action.ConversionChain.Count != 1 || action.EffectiveKind != rule.OutputKind || action.PhysicalCards.Count != rule.InputCount || source.SkillInstanceId is null || _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program is not { } program)
             throw new InvalidOperationException("A tiered use lost its actual actor/provider/material and conversion tuple.");
-        var receipt = new TieredRoundConversionUseReceipt(source, program.GameplayHash, policy.StateId, policy.UsageId, _coreProgramTieredRoundConversionOperations.TieredRoundTier(use.SourceSeat, policy.StateId), _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, action.ActionId, use.Id, use.SourceSeat, use.CardKind, action.PhysicalCards.Count, use.CardKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == use.SourceSeat && use.TargetSeats.SequenceEqual([dying.VictimSeat]) ? dying.FrameId : null);
+        var receipt = new TieredRoundConversionUseReceipt(source, program.GameplayHash, policy.StateId, policy.UsageId, _coreProgramTieredRoundConversionOperations.TieredRoundTier(use.SourceSeat, policy.StateId), _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, action.ActionId, use.Id, use.SourceSeat, use.CardKind, action.PhysicalCards.Count, use.CardKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.ResponderSeat == use.SourceSeat && use.TargetSeats.SequenceEqual([dying.VictimSeat]) ? dying.FrameId : null);
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { TieredRoundConversionUse = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TieredRoundConversionUseIssuedEvent(receipt));
     }

@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineSourceHuojieRuntime
             return false;
         if (!IsSourceHuojieJudgment(j, f))
             throw new InvalidOperationException("Source3603 lost its exact current Lightning judgment return.");
-        var result = _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Single(e => e.ResolutionId == j.Id && e.ParentResolutionId == f.Id && e.Reason == JudgmentReasons.Lightning);
+        var result = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentResolvedEvent>().Single(e => e.ResolutionId == j.Id && e.ParentResolutionId == f.Id && e.Reason == JudgmentReasons.Lightning);
         var handoff = result.CardId is { } resultId && _cardZonesOperations._cardZones.GetLocation(resultId) == CardLocation.Processing ? _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == resultId) : null;
         if (handoff is not null && (handoff.From != CardLocation.Judgment(f.OwnerSeat) || handoff.To != CardLocation.Processing || handoff.Reason.Value != "skill-program.judgment.result"))
             throw new InvalidOperationException("Source3603 cannot retire an unrelated judgment entity.");
@@ -55,7 +55,7 @@ internal sealed partial class CoreGameEngineSourceHuojieRuntime
 
         if (r.Stage == SourceHuojieStage.DamageChildren)
         {
-            var received = _coreProgramEventHistoryOperations.ProgramEventHistory<SourceHuojieReceivedDamageEvent>().Any(e => e.ProgramFrameId == f.Id && e.JudgmentId == r.JudgmentId);
+            var received = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SourceHuojieReceivedDamageEvent>().Any(e => e.ProgramFrameId == f.Id && e.JudgmentId == r.JudgmentId);
             if (received)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SourceHuojie = r with { Stage = SourceHuojieStage.GainChildren, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -97,7 +97,7 @@ internal sealed partial class CoreGameEngineSourceHuojieRuntime
         var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == attempt.ResolutionId && p.SkillId == SourceBeigongIds.Huojie && p.SourceHuojie is { Stage: SourceHuojieStage.DamageChildren });
         if (f is null || fact.TargetSeat != f.OwnerSeat || attempt.TargetSeat != f.OwnerSeat || attempt.SourceSeat != f.OwnerSeat || f.AttackAttempt is not { SourceLess: true, Nature: DamageNature.Thunder })
             return;
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<SourceHuojieReceivedDamageEvent>().Any(e => e.ProgramFrameId == f.Id && e.JudgmentId == f.SourceHuojie!.JudgmentId))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<SourceHuojieReceivedDamageEvent>().Any(e => e.ProgramFrameId == f.Id && e.JudgmentId == f.SourceHuojie!.JudgmentId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SourceHuojieReceivedDamageEvent(f.Id, f.SourceHuojie!.JudgmentId, f.OwnerSeat, fact.Amount));
     }
 }

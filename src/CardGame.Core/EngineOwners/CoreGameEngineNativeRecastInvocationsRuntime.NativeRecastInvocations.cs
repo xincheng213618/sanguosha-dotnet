@@ -39,7 +39,7 @@ internal sealed partial class CoreGameEngineNativeRecastInvocationsRuntime
     {
         if (draft is null)
             return;
-        if (!TracksNativeRecastInvocations || draft.InvocationId <= 0 || draft.InvocationId > _coreResolutionIdentityBoundaryOperations._resolutionSequence || draft.Materials.Count == 0 || actualDrawCount < 0 || actualDrawCount > draft.Materials.Count || draft.Materials.Select(m => m.CardId).Distinct().Count() != draft.Materials.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<NativeRecastInvocationRecordedEvent>().Any(e => e.InvocationId == draft.InvocationId))
+        if (!TracksNativeRecastInvocations || draft.InvocationId <= 0 || draft.InvocationId > _coreResolutionIdentityBoundaryOperations._resolutionSequence || draft.Materials.Count == 0 || actualDrawCount < 0 || actualDrawCount > draft.Materials.Count || draft.Materials.Select(m => m.CardId).Distinct().Count() != draft.Materials.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeRecastInvocationRecordedEvent>().Any(e => e.InvocationId == draft.InvocationId))
             throw new InvalidOperationException("A native recast must complete its whole original participant group exactly once.");
         foreach (var material in draft.Materials)
         {

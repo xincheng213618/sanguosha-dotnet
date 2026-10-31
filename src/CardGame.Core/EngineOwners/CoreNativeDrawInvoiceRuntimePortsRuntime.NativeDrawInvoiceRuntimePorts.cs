@@ -22,19 +22,19 @@ internal sealed partial class CoreNativeDrawInvoiceRuntimePortsRuntime
 
     bool INativeDrawInvoiceFacts.HasZhaoZhongCapability => _characterZhaoZhongOlOperations.HasZhaoZhongCapability;
 
-    bool INativeDrawInvoiceFacts.HasHellZhiwangHolder => _coreHellKingProgramsOperations.HasHellZhiwangHolder;
+    bool INativeDrawInvoiceFacts.HasHellZhiwangHolder => _coreHellKingProgramsOperations.Value.HasHellZhiwangHolder;
 
     bool INativeDrawInvoiceFacts.HasFengweiCapability => _characterLiuZhangOlOperations.HasFengweiCapability;
 
     bool INativeDrawInvoiceFacts.HasFeiYiHezhong => _characterFeiYiOlOperations.HasFeiYiHezhong;
 
-    bool INativeDrawInvoiceFacts.HasTangTangZhiyi => _characterTangTangOlOperations.HasTangTangZhiyi;
+    bool INativeDrawInvoiceFacts.HasTangTangZhiyi => _characterTangTangOlOperations.Value.HasTangTangZhiyi;
 
-    bool INativeDrawInvoiceFacts.HasYuanJiCapability => _characterYuanJiOlOperations.HasYuanJiCapability;
+    bool INativeDrawInvoiceFacts.HasYuanJiCapability => _characterYuanJiOlOperations.Value.HasYuanJiCapability;
 
     bool INativeDrawInvoiceFacts.HasSanwenCapability => _characterWangCanOlOperations.HasSanwenCapability;
 
     void INativeDrawInvoiceCompletions.CompleteSanwenNativeDrawQualification(NativeDrawInvocationProof proof) => _characterWangCanOlOperations.CompleteSanwenNativeDrawQualification(proof);
-    void INativeDrawInvoiceCompletions.CompleteTangTangNativeDrawQualification(NativeDrawInvocationProof proof) => _characterTangTangOlOperations.CompleteTangTangNativeDrawQualification(proof);
+    void INativeDrawInvoiceCompletions.CompleteTangTangNativeDrawQualification(NativeDrawInvocationProof proof) => _characterTangTangOlOperations.Value.CompleteTangTangNativeDrawQualification(proof);
     void INativeDrawInvoiceCompletions.CompleteLingkongNativeDrawQualification(NativeDrawInvocationProof proof) => _characterZhouFeiLeOperations.CompleteLingkongNativeDrawQualification(proof);
 }

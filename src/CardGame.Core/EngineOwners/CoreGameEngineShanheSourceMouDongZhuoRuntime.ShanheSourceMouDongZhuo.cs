@@ -39,7 +39,7 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoRuntime
         };
     }
 
-    internal bool ValidSourceMou(ProgramSkillFrame f) => f.ShanheSourceMou is { } r && IsSourceMouMode && r.Source == SourceMouSource(f) && r.Hash == f.GameplayHash && r.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && r.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && r.Instruction == f.InstructionIndex && r.ParentId == (f.WindowContext?.ParentFrameId ?? 0) && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == r.Operation && SourceMouParent(f) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceMouStartedEvent>().Count(e => e == new ShanheSourceMouStartedEvent(f.Id, r.Source, r.Hash, r.Operation, r.Turn, r.TurnOwner, r.ParentId, r.Instruction)) == 1 && r.Cards.Select(card => card.Id).Distinct().Count() == r.Cards.Count && r.Cursor >= 0 && r.Cursor <= r.Participants.Count && r.Before >= 0 && r.After >= r.Before;
+    internal bool ValidSourceMou(ProgramSkillFrame f) => f.ShanheSourceMou is { } r && IsSourceMouMode && r.Source == SourceMouSource(f) && r.Hash == f.GameplayHash && r.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && r.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && r.Instruction == f.InstructionIndex && r.ParentId == (f.WindowContext?.ParentFrameId ?? 0) && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == r.Operation && SourceMouParent(f) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceMouStartedEvent>().Count(e => e == new ShanheSourceMouStartedEvent(f.Id, r.Source, r.Hash, r.Operation, r.Turn, r.TurnOwner, r.ParentId, r.Instruction)) == 1 && r.Cards.Select(card => card.Id).Distinct().Count() == r.Cards.Count && r.Cursor >= 0 && r.Cursor <= r.Participants.Count && r.Before >= 0 && r.After >= r.Before;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 62053, SkillProgramEffectOp.ResolveShanheSourceXiongni, SkillProgramEffectOp.ResolveShanheSourceFengshang, SkillProgramEffectOp.ResolveShanheSourceZhibing)]
     internal bool SourceMouTrigger(ProgramTriggerLegalityContext c) => IsSourceMouMode && c.WindowContext is { } window && (c.SkillId switch
     {
@@ -358,7 +358,7 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoRuntime
     internal PromptChoice SourceMouAi(PendingDecision decision, ProgramSkillFrame f)
     {
         var r = f.ShanheSourceMou!;
-        var selfDying = _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.VictimSeat == f.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp <= 0;
+        var selfDying = _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.VictimSeat == f.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp <= 0;
         if (r.Stage == ShanheSourceMouStage.GiftRecipient)
         {
             var self = decision.Choices.FirstOrDefault(choice => choice.Targets.SequenceEqual([f.OwnerSeat]));

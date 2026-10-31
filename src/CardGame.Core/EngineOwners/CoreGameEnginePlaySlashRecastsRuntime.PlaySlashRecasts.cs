@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEnginePlaySlashRecastsRuntime
 {
-    SkillProgramStepOutcome IEndingPairSlashLossHost.DrawEndingPair(ProgramSkillFrame f, string state) => _coreEndingPairDrawsOperations.BeginEndingPairDraw(f, state);
+    SkillProgramStepOutcome IEndingPairSlashLossHost.DrawEndingPair(ProgramSkillFrame f, string state) => _coreEndingPairDrawsOperations.Value.BeginEndingPairDraw(f, state);
     SkillProgramStepOutcome IEndingPairSlashLossHost.RecastSelectedPhysicalSlash(ProgramSkillFrame f) => BeginActualPlaySlashRecast(f);
     internal SkillProgramStepOutcome BeginActualPlaySlashRecast(ProgramSkillFrame supplied)
     {
@@ -20,11 +20,11 @@ internal sealed partial class CoreGameEnginePlaySlashRecastsRuntime
         var card = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Single(c => c.Id == id);
         if (!CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))
             throw new InvalidOperationException("The active recast requires a printed physical Slash, Fire Slash or Thunder Slash.");
-        var before = _coreEndingPairDrawsOperations.EndingPairSequence;
+        var before = _coreEndingPairDrawsOperations.Value.EndingPairSequence;
         f = _coreNativeRecastInvocationsOperations.BeginFrameNativeRecastInvocation(f, f.OwnerSeat, [id]);
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null), PlaySlashRecast = new(f.InstructionIndex, _coreEndingPairDrawsOperations.EndingPairSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, f.OwnerSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, id, card.Kind, before, before) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null), PlaySlashRecast = new(f.InstructionIndex, _coreEndingPairDrawsOperations.Value.EndingPairSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, f.OwnerSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, id, card.Kind, before, before) });
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(f.OwnerSeat), CardLocation.DiscardPile, CardMoveReasons.RecastDiscard);
-        var after = _coreEndingPairDrawsOperations.EndingPairSequence;
+        var after = _coreEndingPairDrawsOperations.Value.EndingPairSequence;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { PlaySlashRecast = f.PlaySlashRecast!with { SequenceAfter = after } });
         var r = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id).PlaySlashRecast!;
@@ -40,7 +40,7 @@ internal sealed partial class CoreGameEnginePlaySlashRecastsRuntime
             return false;
         if (f.EndingPairDraw is not null)
         {
-            _coreEndingPairDrawsOperations.ContinueEndingPairDraw(id);
+            _coreEndingPairDrawsOperations.Value.ContinueEndingPairDraw(id);
             return true;
         }
 
@@ -71,12 +71,12 @@ internal sealed partial class CoreGameEnginePlaySlashRecastsRuntime
                 return true;
             }
 
-            var before = _coreEndingPairDrawsOperations.EndingPairSequence;
+            var before = _coreEndingPairDrawsOperations.Value.EndingPairSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null), PlaySlashRecast = r with { DrawIssued = true, AwaitingMovement = true, DrawSequenceBefore = before } });
             var count = _corePhysicalDrawFacadesOperations.DrawCards(owner, 1, true, CardMoveReasons.RecastDraw).Count;
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-            _coreRuntimeOperations.ReplaceRuntimeTop(f with { PlaySlashRecast = f.PlaySlashRecast!with { DrawSequenceAfter = _coreEndingPairDrawsOperations.EndingPairSequence, ActualDrawCount = count } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlaySlashRecastDrawIssuedEvent(id, owner.Seat, before, _coreEndingPairDrawsOperations.EndingPairSequence, count));
+            _coreRuntimeOperations.ReplaceRuntimeTop(f with { PlaySlashRecast = f.PlaySlashRecast!with { DrawSequenceAfter = _coreEndingPairDrawsOperations.Value.EndingPairSequence, ActualDrawCount = count } });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlaySlashRecastDrawIssuedEvent(id, owner.Seat, before, _coreEndingPairDrawsOperations.Value.EndingPairSequence, count));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRecastEvent(owner.Seat, r.CardId, r.CardKind, count));
             _coreNativeRecastInvocationsOperations.CompleteFrameNativeRecastInvocation(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), count);
             _coreRuntimeOperations.AdvanceRuntimeProgram(id);
@@ -96,7 +96,7 @@ internal sealed partial class CoreGameEnginePlaySlashRecastsRuntime
 
     internal bool ValidPlaySlashRecast(ProgramSkillFrame f)
     {
-        if (f.PlaySlashRecast is not { } r || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 || f.TriggerId is not null || r.Source != _coreEndingPairDrawsOperations.EndingPairSource(f) || r.GameplayHash != f.GameplayHash || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.PhaseActorSeat != f.OwnerSeat || r.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != f.OwnerSeat || !f.SelectedCardIds.SequenceEqual([r.CardId]) || f.SelectedTargetSeats.Count != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(r.CardKind) || r.SequenceBefore < 0 || r.SequenceAfter <= r.SequenceBefore || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is not [{ Op: SkillProgramEffectOp.RecastSelectedPhysicalSlash }] || _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.CardId == r.CardId && m.CardKind == r.CardKind && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.RecastDiscard) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlaySlashRecastPaidEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurnNumber == r.ActualTurnNumber && e.ActualTurnOwnerSeat == r.ActualTurnOwnerSeat && e.PhaseActorSeat == r.PhaseActorSeat && e.PhaseInstanceId == r.PhaseInstanceId && e.CardId == r.CardId && e.CardKind == r.CardKind && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter) != 1)
+        if (f.PlaySlashRecast is not { } r || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 || f.TriggerId is not null || r.Source != _coreEndingPairDrawsOperations.Value.EndingPairSource(f) || r.GameplayHash != f.GameplayHash || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || r.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.PhaseActorSeat != f.OwnerSeat || r.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != f.OwnerSeat || !f.SelectedCardIds.SequenceEqual([r.CardId]) || f.SelectedTargetSeats.Count != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(r.CardKind) || r.SequenceBefore < 0 || r.SequenceAfter <= r.SequenceBefore || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).Instructions is not [{ Op: SkillProgramEffectOp.RecastSelectedPhysicalSlash }] || _coreCardMovementJournalCardMovementsAccess._cardMovements.Count(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.CardId == r.CardId && m.CardKind == r.CardKind && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.RecastDiscard) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PlaySlashRecastPaidEvent>().Count(e => e.ProgramFrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurnNumber == r.ActualTurnNumber && e.ActualTurnOwnerSeat == r.ActualTurnOwnerSeat && e.PhaseActorSeat == r.PhaseActorSeat && e.PhaseInstanceId == r.PhaseInstanceId && e.CardId == r.CardId && e.CardKind == r.CardKind && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter) != 1)
             return false;
         if (r.AwaitingMovement && (f.PendingMovementContinuation is not { SubjectSeat: var subject, BeforeCount: 0, CoverageResultBind: null } || subject != f.OwnerSeat))
             return false;

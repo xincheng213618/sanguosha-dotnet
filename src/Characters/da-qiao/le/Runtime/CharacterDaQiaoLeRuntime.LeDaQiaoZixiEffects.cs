@@ -48,7 +48,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
     {
         if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveZixiUniqueTargetJudgmentEffects))
             return true;
-        return candidate.SkillId == "le:zixi" && candidate.BindingId == "unique-target-judgment-effects" && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && TryGetZixiEffectsUse(candidate.OwnerSeat, context, out var use, out var window, out var target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && ZixiJudgmentAreaCards(target).Count is >= 1 and <= 3 && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window) && !_coreProgramEventHistoryOperations.ProgramEventHistory<ZixiEffectsStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == candidate.OwnerSeat);
+        return candidate.SkillId == "le:zixi" && candidate.BindingId == "unique-target-judgment-effects" && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && TryGetZixiEffectsUse(candidate.OwnerSeat, context, out var use, out var window, out var target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && ZixiJudgmentAreaCards(target).Count is >= 1 and <= 3 && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZixiEffectsStartedEvent>().Any(e => e.UseId == use.Id && e.Source.OwnerSeat == candidate.OwnerSeat);
     }
 
     internal SkillProgramStepOutcome BeginZixiEffects(ProgramSkillFrame supplied)

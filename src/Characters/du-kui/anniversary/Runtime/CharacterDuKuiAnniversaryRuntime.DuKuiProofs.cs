@@ -5,7 +5,7 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
 {
     internal bool ValidDuKuiFrame(ProgramSkillFrame f)
     {
-        if (f.DuKui is not { } r || f.WindowContext is not { } w || f.InstructionIndex != 1 || r.Source != DuKuiSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ParentId != w.ParentFrameId || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<DuKuiStartedEvent>().Count(e => e == new DuKuiStartedEvent(f.Id, r.Source, r.GameplayHash, r.ParentId, r.ActualTurn, r.Operation)) != 1)
+        if (f.DuKui is not { } r || f.WindowContext is not { } w || f.InstructionIndex != 1 || r.Source != DuKuiSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ParentId != w.ParentFrameId || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuKuiStartedEvent>().Count(e => e == new DuKuiStartedEvent(f.Id, r.Source, r.GameplayHash, r.ParentId, r.ActualTurn, r.Operation)) != 1)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == f.Id);
         if (index < 1)
@@ -22,7 +22,7 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
 
     internal bool DuKuiShownPaid(ProgramSkillFrame f)
     {
-        if (f.DuKui is not { } r || r.Operation != SkillProgramEffectOp.ResolveAnniversaryDuKuiFanyin || r.Iteration < 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<DuKuiRevealedEvent>().Where(e => e.FrameId == f.Id && e.Iteration == r.Iteration).ToArray()is not [var shown] || shown.CardId != r.CardId || shown.Rank != r.Rank || shown.Sequence <= 0 || shown.Sequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !_coreProgramLifecycleOperations.GetProgramCardSet(f, DuKuiShownBind(r)).CardIds.SequenceEqual([r.CardId]))
+        if (f.DuKui is not { } r || r.Operation != SkillProgramEffectOp.ResolveAnniversaryDuKuiFanyin || r.Iteration < 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuKuiRevealedEvent>().Where(e => e.FrameId == f.Id && e.Iteration == r.Iteration).ToArray()is not [var shown] || shown.CardId != r.CardId || shown.Rank != r.Rank || shown.Sequence <= 0 || shown.Sequence > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !_coreProgramLifecycleOperations.GetProgramCardSet(f, DuKuiShownBind(r)).CardIds.SequenceEqual([r.CardId]))
             return false;
         return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == shown.Sequence && m.CardId == r.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason.Value == "anniversary.fanyin.reveal") == 1;
     }

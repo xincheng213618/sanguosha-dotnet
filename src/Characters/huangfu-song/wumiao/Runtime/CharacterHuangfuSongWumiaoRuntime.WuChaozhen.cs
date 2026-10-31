@@ -13,5 +13,5 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
         return all.Where(x => x.Card.Rank == rank && x.From != CardLocation.DrawPile).Concat(all.Where(x => x.Card.Rank == rank && x.From == CardLocation.DrawPile).TakeLast(1)).ToArray();
     }
 
-    internal bool WuHfChaozhenAvailable(int owner) => !_coreProgramEventHistoryOperations.ProgramEventHistory<WuHuangFuSongChaozhenDisabledEvent>().Any(e => e.OwnerSeat == owner && e.Turn == WuHfTurn()) && WuHfMinimumPool().Length > 0;
+    internal bool WuHfChaozhenAvailable(int owner) => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHuangFuSongChaozhenDisabledEvent>().Any(e => e.OwnerSeat == owner && e.Turn == WuHfTurn()) && WuHfMinimumPool().Length > 0;
 }

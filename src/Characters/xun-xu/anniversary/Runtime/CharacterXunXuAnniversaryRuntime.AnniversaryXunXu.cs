@@ -17,11 +17,11 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
             foreach (var candidate in _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(owner, SkillProgramTriggerWindow.DiscardPileReceived).Where(c => c.SkillId == AnniversaryXunXuComposition.Diyin && c.BindingId == "next-discard"))
             {
                 var source = new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId);
-                var prior = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuLossEvent>().LastOrDefault(e => e.Source == source)?.Occurrence ?? 0;
-                var claimed = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuClaimEvent>().Where(e => e.Source == source).Select(e => e.ThroughSeventh).DefaultIfEmpty().Max();
+                var prior = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuLossEvent>().LastOrDefault(e => e.Source == source)?.Occurrence ?? 0;
+                var claimed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuClaimEvent>().Where(e => e.Source == source).Select(e => e.ThroughSeventh).DefaultIfEmpty().Max();
                 if (prior / 7 > claimed && batch.Movements.Any(m => m.To == CardLocation.DiscardPile && m.From != m.To))
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXunXuClaimEvent(source, batch.Id, prior / 7, batch.Movements.Min(m => m.Sequence) - 1, batch.Movements.Max(m => m.Sequence)));
-                if (batch.Movements.Any(m => m.From.OwnerSeat == owner.Seat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.From != m.To) && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuLossEvent>().Any(e => e.Source == source && e.BatchId == batch.Id))
+                if (batch.Movements.Any(m => m.From.OwnerSeat == owner.Seat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.From != m.To) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuLossEvent>().Any(e => e.Source == source && e.BatchId == batch.Id))
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXunXuLossEvent(source, batch.Id, prior + 1, batch.Movements.Max(m => m.Sequence)));
             }
     }
@@ -29,7 +29,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     internal int[] XunXuDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate)
     {
         var source = new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId);
-        return !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuClaimEvent>().Any(e => e.Source == source && e.BatchId == batch.Id) ? [] : batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From != x.m.To && _cardZonesOperations._cardZones.GetLocation(x.m.CardId) == CardLocation.DiscardPile).Select(x => x.i).ToArray();
+        return !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuClaimEvent>().Any(e => e.Source == source && e.BatchId == batch.Id) ? [] : batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From != x.m.To && _cardZonesOperations._cardZones.GetLocation(x.m.CardId) == CardLocation.DiscardPile).Select(x => x.i).ToArray();
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 46100)]
@@ -38,7 +38,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     internal bool CanOfferXunXu(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (c.SkillId == AnniversaryXunXuComposition.Boqia)
-            return context.CardUse is { } u && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuUseEvent>().Any(e => e.ActionId == u.CardActionId && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.Reward) && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuRearmedEvent>().Any(e => e.ActionId == u.CardActionId);
+            return context.CardUse is { } u && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuUseEvent>().Any(e => e.ActionId == u.CardActionId && e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillInstanceId == c.SkillInstanceId && e.Reward) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuRearmedEvent>().Any(e => e.ActionId == u.CardActionId);
         return trigger.Id == "same-hp" ? context.TargetSeat == c.OwnerSeat && context.Amount > 0 && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].HasHpValue : context.MovementBatch is { } b && XunXuDiscardIndexes(b, c).Length > 0;
     }
 
@@ -270,7 +270,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     internal void FinishXunXu(ProgramSkillFrame f)
     {
         var r = f.AnniversaryXunXu!;
-        if (r.Mode == "boqia" && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuRearmedEvent>().Any(e => e.ActionId == r.ActionId))
+        if (r.Mode == "boqia" && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuRearmedEvent>().Any(e => e.ActionId == r.ActionId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXunXuRearmedEvent(f.Id, f.OwnerSeat, r.ActionId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, r.Target));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryXunXu = null, PendingMovementContinuation = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

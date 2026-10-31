@@ -252,5 +252,5 @@ internal sealed partial class CoreGameEngineSuitDamagePreventionBenefitsRuntime
     }
 
     SkillProgramStepOutcome ISuitPreventionAndJudgmentPlacementHost.DiscardSuitPreventDamageAndBenefit(ProgramSkillFrame f) => BeginSuitPreventionBenefit(f);
-    SkillProgramStepOutcome ISuitPreventionAndJudgmentPlacementHost.PlaceMatchedJudgmentCard(ProgramSkillFrame f, string bind, IReadOnlyList<Suit> suits) => _coreMatchedJudgmentPlacementsOperations.BeginMatchedJudgmentPlacement(f, bind, suits);
+    SkillProgramStepOutcome ISuitPreventionAndJudgmentPlacementHost.PlaceMatchedJudgmentCard(ProgramSkillFrame f, string bind, IReadOnlyList<Suit> suits) => _coreMatchedJudgmentPlacementsOperations.Value.BeginMatchedJudgmentPlacement(f, bind, suits);
 }

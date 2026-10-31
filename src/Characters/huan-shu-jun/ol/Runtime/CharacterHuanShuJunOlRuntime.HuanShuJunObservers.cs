@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuanShuJunOlRuntime
 {
     internal static string HuanShuJunDecisionHash(PendingDecision p) => RuntimeSkills.RuntimeRules_huan_shu_jun_ol_HuanShuJunObservers.HuanShuJunDecisionHash(p);
-    internal bool HuanShuJunPaidOrPreparing(ProgramSkillFrame f) => f.HuanShuJun is not null && HuanShuJunComposition.Handles(f.HuanShuJun.Op) && f.HuanShuJun.Source == HuanShuJunSource(f) && f.HuanShuJun.GameplayHash == f.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<HuanShuJunStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == f.HuanShuJun.Source && e.GameplayHash == f.GameplayHash && e.Op == f.HuanShuJun.Op && e.WindowId == f.HuanShuJun.WindowId) == 1;
+    internal bool HuanShuJunPaidOrPreparing(ProgramSkillFrame f) => f.HuanShuJun is not null && HuanShuJunComposition.Handles(f.HuanShuJun.Op) && f.HuanShuJun.Source == HuanShuJunSource(f) && f.HuanShuJun.GameplayHash == f.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanShuJunStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == f.HuanShuJun.Source && e.GameplayHash == f.GameplayHash && e.Op == f.HuanShuJun.Op && e.WindowId == f.HuanShuJun.WindowId) == 1;
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28100)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28100)]
@@ -19,9 +19,9 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         var r = f.HuanShuJun!;
         if (!_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m))
             return false;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiCostEntityEvent>().Any(e => e.FrameId == f.Id && e.CardId == m.CardId && e.Kind == m.CardKind && e.From == m.From && e.Sequence == m.Sequence) && m.Reason.Value == HuanpeiDiscardReason)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiCostEntityEvent>().Any(e => e.FrameId == f.Id && e.CardId == m.CardId && e.Kind == m.CardKind && e.From == m.From && e.Sequence == m.Sequence) && m.Reason.Value == HuanpeiDiscardReason)
             return true;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<WenyiEquipmentGivenEvent>().Any(e => e.FrameId == f.Id && e.CardId == m.CardId && e.Sequence == m.Sequence && m.To == CardLocation.Hand(e.RecipientSeat)) && m.Reason.Value == "skill-program.huan-shu-jun.wenyi.give")
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenyiEquipmentGivenEvent>().Any(e => e.FrameId == f.Id && e.CardId == m.CardId && e.Sequence == m.Sequence && m.To == CardLocation.Hand(e.RecipientSeat)) && m.Reason.Value == "skill-program.huan-shu-jun.wenyi.give")
             return true;
         if (r.DrawOutcome is { } o && m.Sequence > o.SequenceBefore && m.Sequence <= o.SequenceAfter)
             return o.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == (r.Op == SkillProgramEffectOp.ResolveMiaoxinDamageDrawAndRefresh ? MiaoxinDrawReason : HuanpeiDrawReason) || o.ReplacementGainedIds.Contains(m.CardId) && m.To == CardLocation.Hand(f.OwnerSeat) || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle;
@@ -58,11 +58,11 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
-            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
+            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
         if (child is not CardsMovedTriggerWindowFrame moved || !CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || moved.Batch.OriginOwnerSeat != f.OwnerSeat || moved.Batch.OriginSkillId != f.SkillId || moved.Batch.OriginSkillInstanceId != f.SkillInstanceId || moved.Batch.Movements.Count == 0)
             return false;
         if (r.Stage == HuanShuJunStage.NativeChildren && r.NativeReturned && r.Native is { } native)
-            return moved.Batch.ParentFrameId == native.UseId && _coreProgramEventHistoryOperations.ProgramEventHistory<WenyiNativeReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == native.UseId && e.ActionId == native.ActionId) == 1;
+            return moved.Batch.ParentFrameId == native.UseId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenyiNativeReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == native.UseId && e.ActionId == native.ActionId) == 1;
         return moved.Batch.ParentFrameId == f.Id && moved.Batch.Movements.All(m => HuanShuJunPaidMovement(f, m));
     }
 

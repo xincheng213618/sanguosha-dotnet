@@ -8,7 +8,7 @@ internal sealed partial class CharacterSunRuOlRuntime
     SkillProgramStepOutcome ISunRuOlProgramHost.RewardCurrentTurnLastZoneLoss(ProgramSkillFrame f) => BeginSunRuOlChishi(f);
     SkillProgramStepOutcome ISunRuOlProgramHost.AbolishEquipmentSlotsForDistinctBenefits(ProgramSkillFrame f) => BeginSunRuOlWeimian(f);
     internal static bool IsSunRuOlChishiTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlChishi.IsSunRuOlChishiTrigger(t);
-    internal bool SunRuOlActualTurn(SunRuOlTurnToken t) => t.TurnNumber > 0 && t.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && t.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(t.OwnerSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Any(e => e.TurnNumber == t.TurnNumber && e.ActorSeat == t.OwnerSeat);
+    internal bool SunRuOlActualTurn(SunRuOlTurnToken t) => t.TurnNumber > 0 && t.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && t.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(t.OwnerSeat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Any(e => e.TurnNumber == t.TurnNumber && e.ActorSeat == t.OwnerSeat);
     internal static bool SunRuOlLostLastZone(CardMovementBatchContext batch, int seat) => RuntimeSkills.RuntimeRules_sun_ru_ol_SunRuOlChishi.SunRuOlLostLastZone(batch, seat);
     internal CardMovementBatchContext CaptureSunRuOlChishiBatch(CardMovementBatchContext batch)
     {
@@ -23,7 +23,7 @@ internal sealed partial class CharacterSunRuOlRuntime
         : batch;
     }
 
-    internal bool SunRuOlChishiUsed(int owner, string skill, SunRuOlTurnToken turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<SunRuOlChishiAppliedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.Turn == turn);
+    internal bool SunRuOlChishiUsed(int owner, string skill, SunRuOlTurnToken turn) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunRuOlChishiAppliedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == skill && e.Turn == turn);
     internal IEnumerable<ProgramTriggerCandidate> CollectSunRuOlChishiCandidates(CardMovementBatchContext batch)
     {
         if (batch.SunRuOlLastZoneLoss is not { } turn || !SunRuOlActualTurn(turn) || !_coreMatchParticipantsPlayersAccess._players[turn.OwnerSeat].IsAlive || !SunRuOlLostLastZone(batch, turn.OwnerSeat))

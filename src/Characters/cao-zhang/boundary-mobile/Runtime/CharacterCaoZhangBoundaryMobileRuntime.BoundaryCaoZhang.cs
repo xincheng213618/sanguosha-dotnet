@@ -22,7 +22,7 @@ internal sealed partial class CharacterCaoZhangBoundaryMobileRuntime
             return SkillProgramStepOutcome.Continue;
         }
 
-        if (f.InstructionIndex != 3 || f.BoundaryJiangchi is not { } paid || !ValidBoundaryJiangchiPreparation(f, paid) || paid.Mode != e.StateId || f.PendingMovementContinuation is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryJiangchiIssuedEvent>().Any(g => g.FrameId == f.Id))
+        if (f.InstructionIndex != 3 || f.BoundaryJiangchi is not { } paid || !ValidBoundaryJiangchiPreparation(f, paid) || paid.Mode != e.StateId || f.PendingMovementContinuation is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryJiangchiIssuedEvent>().Any(g => g.FrameId == f.Id))
             throw new InvalidOperationException("Jiangchi must issue once after its original completed native draw or paid discard child.");
         int? cost = null;
         if (paid.Mode == "assault")
@@ -43,7 +43,7 @@ internal sealed partial class CharacterCaoZhangBoundaryMobileRuntime
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmBoundaryCaoZhangJiangchi) || _coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != owner)
             return null;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryJiangchiIssuedEvent>().SingleOrDefault(g => g.Source.OwnerSeat == owner && g.Phase == phase && g.DebitPhase == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryJiangchiIssuedEvent>().SingleOrDefault(g => g.Source.OwnerSeat == owner && g.Phase == phase && g.DebitPhase == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
     }
 
     internal IEnumerable<RuleQueryContribution> BoundaryCaoZhangPhaseContributions(CharacterState player, SkillRuleQuery query)

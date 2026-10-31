@@ -60,7 +60,7 @@ internal sealed partial class CoreGameEngineShanheSourceYanyuRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var receipt = frame.ShanheSourceYanyu!;
-        if (frame.AttackAttempt is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceYanyuCardSettledEvent>().Any(fact => fact.ProgramFrameId == frame.Id && fact.InstructionIndex == receipt.InstructionIndex))
+        if (frame.AttackAttempt is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceYanyuCardSettledEvent>().Any(fact => fact.ProgramFrameId == frame.Id && fact.InstructionIndex == receipt.InstructionIndex))
             throw new InvalidOperationException("Source Yanyu cannot claim before damage returns or settle its material twice.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheSourceYanyu = receipt with { Stage = ShanheSourceYanyuStage.Movement }, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
         if (receipt.RetainedCardId is { } cardId && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Processing && (!receipt.Red || _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive))

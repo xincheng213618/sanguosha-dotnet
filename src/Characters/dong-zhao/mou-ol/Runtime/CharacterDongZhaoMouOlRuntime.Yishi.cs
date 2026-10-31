@@ -28,7 +28,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
                     }
     }
 
-    internal int MouYishiPhaseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhaoYishiStartedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Phase == phase);
+    internal int MouYishiPhaseUses(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhaoYishiStartedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Phase == phase);
     [ProgramPhaseUsedProjection(33500)]
     internal int MouYishiPublicPhaseUses(int owner, string skill, int previous) => skill == MouDongZhaoComposition.Yishi && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == owner ? MouYishiPhaseUses(owner, phase) : previous;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 33500, SkillProgramEffectOp.ResolveMouDongZhaoYishi)]
@@ -128,7 +128,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
     {
         var r = f.MouDongZhao!;
         if (!r.LostHand && r.FieldMoved && r.MovedSuit is { } suit && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhaoYishiGrantedEvent(f.Id, r.Source, r.GameplayHash, suit, _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == f.OwnerSeat), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhaoYishiGrantedEvent(f.Id, r.Source, r.GameplayHash, suit, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == f.OwnerSeat), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
     }
 
     [PublicHandRevealReturn("yishi-kept-hand")]

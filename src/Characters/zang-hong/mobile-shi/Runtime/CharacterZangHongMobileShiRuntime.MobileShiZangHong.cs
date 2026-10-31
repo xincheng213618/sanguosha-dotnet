@@ -54,7 +54,7 @@ internal sealed partial class CharacterZangHongMobileShiRuntime
         if (f.SkillId != ShiZhJuegu || f.TriggerId != ShiZangHongComposition.JueguTrigger || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return SkillProgramStepOutcome.Continue;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZhJueguUsedEvent(f.Id, f.OwnerSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber));
-        var discardCount = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhJueguUsedEvent>().Count(entry => entry.OwnerSeat == f.OwnerSeat && entry.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
+        var discardCount = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhJueguUsedEvent>().Count(entry => entry.OwnerSeat == f.OwnerSeat && entry.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
         _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], 2, log: true);
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { ZangHong = new("juegu", ShiZhStage.Discarding) { DiscardCount = discardCount } });
         if (DrainShiZh(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)))

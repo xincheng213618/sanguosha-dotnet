@@ -5,7 +5,7 @@ internal sealed partial class CoreNativeAttackCompletionRuntime
 {
     internal void CompleteAttack(NativeOwners.CardAttackHandle attack)
     {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not null)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not null)
         {
             throw new InvalidOperationException("A card cannot finish while its dying resolution is pending.");
         }
@@ -29,7 +29,7 @@ internal sealed partial class CoreNativeAttackCompletionRuntime
             _corePendingDecisionPolicyPipelineOperations._pendingDecision = null;
             group.TargetIndex++;
             _coreNativeNullificationFramesOperations.SetCardUseTargetIndex(group.ResolutionId, group.TargetIndex);
-            _coreNativeGroupAttackOperations.BeginGroupAttackResponse(group);
+            _coreNativeGroupAttackOperations.Value.BeginGroupAttackResponse(group);
             return;
         }
 
@@ -83,14 +83,14 @@ internal sealed partial class CoreNativeAttackCompletionRuntime
             return;
         if (_characterDongChengMouOperations.ContinueMouDcSlash(attack))
             return;
-        if (_corePaidVirtualSlashTargetsOperations.TryContinuePaidVirtualSlashTargets(attack))
+        if (_corePaidVirtualSlashTargetsOperations.Value.TryContinuePaidVirtualSlashTargets(attack))
             return;
         if (_coreCurrentCardEnhancementsOperations.TryContinueEnhancedSlashTargets(attack))
             return;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not null)
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(attack.ResolutionId, frame => frame with { ProgramAdjustedSlashBaseDamage = null });
         var completion = _coreCardAttackStateOperations.CaptureAttackCompletion(attack);
-        if (_coreNativeSlashCompletionOperations.FinishAttack(attack))
+        if (_coreNativeSlashCompletionOperations.Value.FinishAttack(attack))
         {
             return;
         }
@@ -129,7 +129,7 @@ internal sealed partial class CoreNativeAttackCompletionRuntime
             if (_coreProgramNativeReturnsOperations.NativeReturns.ReturnAttack(NativeAttackReturnPhase.BeforeParentResume, completion))
                 return;
             if (completion.RequestedSlashChild && frame.WangYunPlan is null)
-                _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { RequestedSlashDamagedOwner = frame.RoundOnceCardlessProgramRequest is not null ? _coreRoundOnceCardlessReturnsOperations.RoundOnceCardlessRequestedOwnerWasDamaged(frame, completion) : completion.DamageWasApplied && completion.FinalTargetSeat == frame.OwnerSeat });
+                _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { RequestedSlashDamagedOwner = frame.RoundOnceCardlessProgramRequest is not null ? _coreRoundOnceCardlessReturnsOperations.Value.RoundOnceCardlessRequestedOwnerWasDamaged(frame, completion) : completion.DamageWasApplied && completion.FinalTargetSeat == frame.OwnerSeat });
             if (_coreRoundOnceCardlessProgramRequestsOperations.ResumeRoundOnceCardlessProgramRequest(frameId))
                 return;
             _coreRuntimeOperations.AdvanceRuntimeProgram(frameId);

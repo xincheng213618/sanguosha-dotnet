@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentObserversRuntime
 {
     internal bool SignedDamagePaymentFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
-        if (!_coreSignedDamagePaymentsOperations.IsValidSignedDamagePayment(root, true) || root.SignedDamagePayment is not { Stage: SignedDamagePaymentStage.Paid } r || root.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != root.OwnerSeat)
+        if (!_coreSignedDamagePaymentsOperations.Value.IsValidSignedDamagePayment(root, true) || root.SignedDamagePayment is not { Stage: SignedDamagePaymentStage.Paid } r || root.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null } pending || pending.SubjectSeat != root.OwnerSeat)
             return false;
         if (child is CardsMovedTriggerWindowFrame movement)
             return movement.Batch.Id == movement.Id && movement.Batch.ParentFrameId == root.Id && (movement.Batch.AwaitingProgramFrameId is null || movement.Batch.AwaitingProgramFrameId == root.Id) && movement.Batch.OriginOwnerSeat == root.OwnerSeat && movement.Batch.OriginSkillId == root.SkillId && movement.Batch.OriginSkillInstanceId == root.SkillInstanceId && movement.Batch.Movements.Count == 1 && movement.Batch.Movements.All(m => m.Sequence == r.CostMovementSequence && m.CardId == r.CostCardId && m.From == r.CostFrom && m.To == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m));
@@ -46,7 +46,7 @@ internal sealed partial class CoreGameEngineSignedDamagePaymentObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 540)]
-    internal bool IsSignedDamagePaymentProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SignedDamagePaymentObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsSignedDamagePaymentProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && SignedDamagePaymentObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 570)]
     internal bool TryAdvanceSignedDamagePaymentSubtree()
     {

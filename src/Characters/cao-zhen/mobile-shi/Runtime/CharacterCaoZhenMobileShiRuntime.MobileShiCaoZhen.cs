@@ -221,7 +221,7 @@ internal sealed partial class CharacterCaoZhenMobileShiRuntime
 
         if (r.Stage == ShiCaoZStage.UseRemovalChildren)
         {
-            var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiCaoZUseIssuedEvent>().Single(e => e.FrameId == id);
+            var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiCaoZUseIssuedEvent>().Single(e => e.FrameId == id);
             if (issued.DifferentColor && _coreMatchParticipantsPlayersAccess._players[r.Holder].IsAlive)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiCaoZhen = r with { Stage = ShiCaoZStage.Discard } });

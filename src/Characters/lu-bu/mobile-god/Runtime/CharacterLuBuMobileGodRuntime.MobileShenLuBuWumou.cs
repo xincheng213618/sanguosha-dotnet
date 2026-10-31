@@ -68,7 +68,7 @@ internal sealed partial class CharacterLuBuMobileGodRuntime
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, kind);
         var amount = 1 + actor.AlcoholDamageBonus + nuzhan.DamageBonus;
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         var pending = _kernelCoreMainOperations.CreateFangtianHalberdHandle(id, actor.Seat, card, kind, _coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(actor), amount, action.TargetSeats, usesFangtian: false, countedTowardSlashLimit: counted, conversionSource: action.ConversionSource);
         _coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd = pending;

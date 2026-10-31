@@ -19,13 +19,13 @@ internal sealed partial class CoreNativeGroupRecoveryRuntime
         }
 
         var target = _coreMatchParticipantsPlayersAccess._players[group.TargetSeats[group.TargetIndex]];
-        if (target.IsAlive && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(group.ResolutionId, target.Seat) && _coreGroupTargetNullificationOperations.TryBeginGroupTargetNullification(group))
+        if (target.IsAlive && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(group.ResolutionId, target.Seat) && _coreGroupTargetNullificationOperations.Value.TryBeginGroupTargetNullification(group))
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
             return;
         }
 
-        if (_characterLuXunMouMobileOperations.TryBeginMouLuXunGroupEffect(group))
+        if (_characterLuXunMouMobileOperations.Value.TryBeginMouLuXunGroupEffect(group))
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
             return;

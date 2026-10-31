@@ -150,7 +150,7 @@ internal sealed partial class CharacterHuBanOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuiyunMovementPaidEvent(f.Id, r.Index, stage, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, actual));
         if (recast)
         {
-            var costs = _coreProgramEventHistoryOperations.ProgramEventHistory<HuiyunRecastCardEvent>().Where(e => e.FrameId == f.Id && e.Index == r.Index).ToArray();
+            var costs = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuiyunRecastCardEvent>().Where(e => e.FrameId == f.Id && e.Index == r.Index).ToArray();
             for (var i = 0; i < costs.Length; i++)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRecastEvent(actor, costs[i].CardId, costs[i].Kind, i < actual ? 1 : 0));
             _coreNativeRecastInvocationsOperations.CompleteFrameNativeRecastInvocation(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), actual);
@@ -198,7 +198,7 @@ internal sealed partial class CharacterHuBanOlRuntime
 
             if (r.Stage == HuiyunStage.RecastCostChildren)
             {
-                IssueHuiyunDraw(f, _coreProgramEventHistoryOperations.ProgramEventHistory<HuiyunRecastCardEvent>().Count(e => e.FrameId == f.Id && e.Index == r.Index), true);
+                IssueHuiyunDraw(f, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuiyunRecastCardEvent>().Count(e => e.FrameId == f.Id && e.Index == r.Index), true);
                 return;
             }
 

@@ -27,7 +27,7 @@ internal sealed partial class CharacterXiahouEnAnniversaryRuntime
 
     internal ProgramSkillFrame? XiahouEnObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.XiahouEnFirstObserverChild(f, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 45000)]
-    internal bool HasXiahouEnObserverDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && XiahouEnObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool HasXiahouEnObserverDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && XiahouEnObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 45000)]
     internal bool AdvanceXiahouEnObserver() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XiahouEnObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
 }

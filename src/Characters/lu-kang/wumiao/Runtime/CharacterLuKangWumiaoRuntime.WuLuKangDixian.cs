@@ -22,7 +22,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     internal SkillProgramStepOutcome BeginWuLuKangDixian(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!HasWuLuKangDixianOriginalPayment(f) || f.WuLuKangDixian is not null || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangDixianStartedEvent>().Any(e => e.FrameId == f.Id))
+        if (!HasWuLuKangDixianOriginalPayment(f) || f.WuLuKangDixian is not null || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != f.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuLuKangDixianStartedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Dixian requires its exact once-paid native Play activation.");
         var r = new WuLuKangDixianReceipt(WuLuKangDixianSource(f), f.GameplayHash, phase, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
         {
@@ -65,7 +65,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveWuLuKangDixian)]
     internal void ReturnWuLuKangDixianDraw(ProgramSkillFrame f, NativeDrawOutcome o)
     {
-        if (f.WuLuKangDixian is not { Stage: WuLuKangDixianStage.Drawing, AllAtLeast: true } r || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.Rank || _coreProgramEventHistoryOperations.ProgramEventHistory<WuLuKangDixianDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.WuLuKangDixian is not { Stage: WuLuKangDixianStage.Drawing, AllAtLeast: true } r || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.Rank || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuLuKangDixianDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Dixian requires its exact once-returned requested native draw.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuLuKangDixian = r with { DrawOutcome = o, Stage = WuLuKangDixianStage.DrawChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuLuKangDixianDrawReturnedEvent(f.Id, o.RequestedCount, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId));

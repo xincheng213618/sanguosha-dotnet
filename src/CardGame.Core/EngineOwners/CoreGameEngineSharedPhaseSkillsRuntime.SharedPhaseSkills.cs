@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineSharedPhaseSkillsRuntime
             foreach (var program in _coreSkillProgramsOperations.EnabledActivationPrograms(owner))
                 foreach (var activation in program.Activations.Where(activation => activation.OtherCharactersOnly))
                 {
-                    if (_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSharedActivationStartedEvent>().Count(item => item.ActorSeat == actor.Seat && item.Source.OwnerSeat == owner.Seat && item.Source.SkillId == program.Id && item.Source.BindingId == activation.Id && item.Phase == CurrentSharedSkillPhase) >= activation.UsesPerPhase || activation.Effects.Any(effect => effect.Op == SkillProgramEffectOp.LoseHp && (!actor.HasHpValue || actor.Hp <= 0)))
+                    if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSharedActivationStartedEvent>().Count(item => item.ActorSeat == actor.Seat && item.Source.OwnerSeat == owner.Seat && item.Source.SkillId == program.Id && item.Source.BindingId == activation.Id && item.Phase == CurrentSharedSkillPhase) >= activation.UsesPerPhase || activation.Effects.Any(effect => effect.Op == SkillProgramEffectOp.LoseHp && (!actor.HasHpValue || actor.Hp <= 0)))
                         continue;
                     yield return new(LegalActionKind.UseProgramSkill, null, null, $"发动 {(_coreMatchParticipantsPlayersAccess._players[owner.Seat].General.Name)} 的【{(_contentRegistryOperations._contentRegistry.GetSkill(program.Id).Name)}】")
                     {
@@ -65,7 +65,7 @@ internal sealed partial class CoreGameEngineSharedPhaseSkillsRuntime
     }
 
     SkillProgramStepOutcome IRandomPhaseSkillHost.Offer(ProgramSkillFrame frame, SkillProgramEffect effect, int recipientSeat) => OfferRandomPhaseSkill(frame, effect, recipientSeat);
-    internal bool IsLiveRandomPhaseSkillRecipient(ProgramSkillFrame frame, int recipientSeat, SkillGrantPhaseExpiry phase) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && CurrentSharedSkillPhase == phase && recipientSeat == phase.PhaseActorSeat && _coreMatchParticipantsPlayersAccess._players[recipientSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramPlayPhaseSkillBoundaryClosedEvent>().Any(item => item.Expiry == phase);
+    internal bool IsLiveRandomPhaseSkillRecipient(ProgramSkillFrame frame, int recipientSeat, SkillGrantPhaseExpiry phase) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && CurrentSharedSkillPhase == phase && recipientSeat == phase.PhaseActorSeat && _coreMatchParticipantsPlayersAccess._players[recipientSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramPlayPhaseSkillBoundaryClosedEvent>().Any(item => item.Expiry == phase);
     internal SkillProgramStepOutcome OfferRandomPhaseSkill(ProgramSkillFrame supplied, SkillProgramEffect effect, int recipientSeat)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

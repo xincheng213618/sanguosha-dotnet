@@ -8,7 +8,7 @@ internal sealed partial class CoreGameEngineFrozenFactionRecoveryRuntime
     internal void FreezeProgramLivingFactionRecovery(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        if (f.FrozenFactionRecovery is not null || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || context.ParentFrameId != dying.Id || context.TargetSeat != f.OwnerSeat || dying.VictimSeat != f.OwnerSeat || dying.ResponderSeat != f.OwnerSeat || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp > 0)
+        if (f.FrozenFactionRecovery is not null || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || context.ParentFrameId != dying.Id || context.TargetSeat != f.OwnerSeat || dying.VictimSeat != f.OwnerSeat || dying.ResponderSeat != f.OwnerSeat || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp > 0)
             throw new InvalidOperationException("Frozen faction recovery lost its exact fresh self-dying producer.");
         var x = _coreRuleQueriesOperations.GetLivingFactionCount();
         var points = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DamageAppliedEvent>().Where(e => !e.SourceLess && e.SourceSeat == f.OwnerSeat && e.Amount > 0).Sum(e => e.Amount);

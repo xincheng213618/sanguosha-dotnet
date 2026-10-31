@@ -32,7 +32,7 @@ internal sealed partial class CharacterHuoJunOlRuntime
     {
         if (ride is not CardUseFrame use || beneath is not ProgramSkillFrame { HuoJunFenrui: { Stage: HuoJunFenruiStage.NativeEquipment } r } f || r.Source != HuoJunSource(f) || r.NativeUseId != use.Id || r.NativeActionId != use.Action?.ActionId || r.EquipmentCardId != use.CardId || r.EquipmentKind != use.CardKind || r.RestoredSlot is not { } slot || _coreEquipmentContentOperations.EquipmentRules.Get(use.CardKind).Slot != slot || use.Action is not { Type: CardActionType.Use } action || action.ActorSeat != f.OwnerSeat || action.ProviderSeat != f.OwnerSeat || action.EffectiveKind != use.CardKind || action.PhysicalCards is not [var cost] || cost.CardId != use.CardId || cost.CardKind != use.CardKind || cost.From != CardLocation.DrawPile || !action.ConversionChain.Contains(r.Source))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<HuoJunFenruiEquipmentIssuedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Slot == slot && e.CardId == use.CardId && e.CardKind == use.CardKind && e.NativeUseId == use.Id && e.NativeActionId == action.ActionId) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuoJunFenruiEquipmentIssuedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Slot == slot && e.CardId == use.CardId && e.CardKind == use.CardKind && e.NativeUseId == use.Id && e.NativeActionId == action.ActionId) == 1;
     }
 
     [NativeUseValidation(26210)]
@@ -50,7 +50,7 @@ internal sealed partial class CharacterHuoJunOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HuoJunFenrui: { Stage: HuoJunFenruiStage.NativeEquipment } r } f || r.NativeUseId != use.Id)
             return false;
-        if (_resolutionStackOperations._resolutionStack.Any(frame => frame.Id == use.Id) || !IsHuoJunFenruiNativeEquipment(use, f) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == r.EquipmentCardId) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<HuoJunFenruiEquipmentReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (_resolutionStackOperations._resolutionStack.Any(frame => frame.Id == use.Id) || !IsHuoJunFenruiNativeEquipment(use, f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == r.EquipmentCardId) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuoJunFenruiEquipmentReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Fenrui random equipment may return only after the one actual native use finishes.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuoJunFenruiEquipmentReturnedEvent(f.Id, use.Id, r.NativeActionId));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { HuoJunFenrui = r with { Stage = HuoJunFenruiStage.EquipmentChildren } });

@@ -3,13 +3,13 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuBaOlRuntime
 {
-    internal bool ValidTongduGift(TongduGiftIssuedEvent e) => e.Source.SkillId == "ol:tongdu" && e.ActualTurn > 0 && e.TurnOwner == e.Source.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(e.DonorSeat) && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<LiuBaStartedEvent>().Count(s => s.FrameId == e.FrameId && s.Source == e.Source && s.GameplayHash == e.GameplayHash && s.Op == SkillProgramEffectOp.IssueTongduHandGift && s.ActualTurn == e.ActualTurn && s.TurnOwner == e.TurnOwner) == 1 && (e.DonorSeat == e.Source.OwnerSeat ? e.GiftSequence is null && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.HandEntry && m.CardId == e.CardId && m.To == CardLocation.Hand(e.DonorSeat)) : e.GiftSequence is { } seq && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == seq && m.CardId == e.CardId && m.CardKind == e.Kind && m.From == CardLocation.Hand(e.DonorSeat) && m.To == CardLocation.Hand(e.Source.OwnerSeat) && m.Reason.Value == TongduGiftReason));
-    internal bool TongduConsumed(long id) => _coreProgramEventHistoryOperations.ProgramEventHistory<TongduDebtConsumedEvent>().Any(e => e.DebtId == id);
+    internal bool ValidTongduGift(TongduGiftIssuedEvent e) => e.Source.SkillId == "ol:tongdu" && e.ActualTurn > 0 && e.TurnOwner == e.Source.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(e.DonorSeat) && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiuBaStartedEvent>().Count(s => s.FrameId == e.FrameId && s.Source == e.Source && s.GameplayHash == e.GameplayHash && s.Op == SkillProgramEffectOp.IssueTongduHandGift && s.ActualTurn == e.ActualTurn && s.TurnOwner == e.TurnOwner) == 1 && (e.DonorSeat == e.Source.OwnerSeat ? e.GiftSequence is null && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.HandEntry && m.CardId == e.CardId && m.To == CardLocation.Hand(e.DonorSeat)) : e.GiftSequence is { } seq && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == seq && m.CardId == e.CardId && m.CardKind == e.Kind && m.From == CardLocation.Hand(e.DonorSeat) && m.To == CardLocation.Hand(e.Source.OwnerSeat) && m.Reason.Value == TongduGiftReason));
+    internal bool TongduConsumed(long id) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TongduDebtConsumedEvent>().Any(e => e.DebtId == id);
     internal IEnumerable<ProgramTriggerCandidate> IssuedTongduPlayEndingCandidates(CharacterState owner)
     {
         if (!HasLiuBaCapability || !owner.IsAlive)
             yield break;
-        var debts = _coreProgramEventHistoryOperations.ProgramEventHistory<TongduGiftIssuedEvent>().ToArray();
+        var debts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TongduGiftIssuedEvent>().ToArray();
         for (var i = 0; i < debts.Length; i++)
         {
             var d = debts[i];
@@ -24,7 +24,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
     {
         if (!HasLiuBaCapability || c.SkillId != "ol:tongdu" || c.BindingId != "issued-play-end" || context.Window != SkillProgramTriggerWindow.PlayEnding || context.OwnerSeat != c.OwnerSeat || c.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || context.OccurrenceIndex != c.OccurrenceIndex || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Window: SkillProgramTriggerWindow.PlayEnding } parent || parent.OwnerSeat != c.OwnerSeat || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != c)
             return null;
-        var all = _coreProgramEventHistoryOperations.ProgramEventHistory<TongduGiftIssuedEvent>().ToArray();
+        var all = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TongduGiftIssuedEvent>().ToArray();
         if (c.OccurrenceIndex < 0 || c.OccurrenceIndex >= all.Length)
             return null;
         var d = all[c.OccurrenceIndex];

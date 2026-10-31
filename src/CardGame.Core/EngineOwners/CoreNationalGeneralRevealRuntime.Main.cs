@@ -5,7 +5,7 @@ internal sealed partial class CoreNationalGeneralRevealRuntime
 {
     internal void RevealNationalGeneral(CharacterState actor, GeneralSelectionSlot slot)
     {
-        if (!_coreNativeDamageHandlesOperations.IsNationalWarMode)
+        if (!_coreNativeDamageHandlesOperations.Value.IsNationalWarMode)
         {
             throw new InvalidOperationException("General reveal is only available in national-war lite mode.");
         }
@@ -43,7 +43,7 @@ internal sealed partial class CoreNationalGeneralRevealRuntime
 
     internal void RevealNationalInformation(CharacterState player)
     {
-        if (!_coreNativeDamageHandlesOperations.IsNationalWarMode || player.NationalFactionId is null)
+        if (!_coreNativeDamageHandlesOperations.Value.IsNationalWarMode || player.NationalFactionId is null)
         {
             return;
         }
@@ -70,7 +70,7 @@ internal sealed partial class CoreNationalGeneralRevealRuntime
     internal IReadOnlyList<LegalAction> BuildNationalRevealActions(CharacterState actor)
     {
         var actions = new List<LegalAction>();
-        if (!_coreNativeDamageHandlesOperations.IsNationalWarMode || !actor.IsAlive)
+        if (!_coreNativeDamageHandlesOperations.Value.IsNationalWarMode || !actor.IsAlive)
         {
             return actions;
         }

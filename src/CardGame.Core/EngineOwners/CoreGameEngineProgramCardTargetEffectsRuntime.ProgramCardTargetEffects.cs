@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEngineProgramCardTargetEffectsRuntime
     internal bool IsCardEffectIneffective(long resolutionId, int targetSeat)
     {
         var frame = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(item => item.Id == resolutionId);
-        if (_coreProgramCardUseNullificationOperations.IsProgramUseIneffective(frame) || _coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(frame) || _characterXinPiOlOperations.IsXinPiUseIneffective(frame) || _characterZhouQunOlOperations.IsNingwuUseIneffective(frame) || _characterZhangXiuMouOlOperations.IsMouZhangXiuOlQiulieIneffective(frame))
+        if (_coreProgramCardUseNullificationOperations.Value.IsProgramUseIneffective(frame) || _coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(frame) || _characterXinPiOlOperations.IsXinPiUseIneffective(frame) || _characterZhouQunOlOperations.Value.IsNingwuUseIneffective(frame) || _characterZhangXiuMouOlOperations.Value.IsMouZhangXiuOlQiulieIneffective(frame))
             return true;
         if (frame.IneffectiveTargetSeats?.Contains(targetSeat) == true)
             return true;

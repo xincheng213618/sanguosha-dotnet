@@ -8,8 +8,8 @@ internal sealed partial class CoreGameEngineShanheLeizhenRuntime
 
     internal ShanheLeizhenChargeEarnedEvent? PendingShanheLeizhenCharge(int owner)
     {
-        var spent = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLeizhenChargeSpentEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.EarningActionId).ToHashSet();
-        var earned = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLeizhenChargeEarnedEvent>().Where(e => e.OwnerSeat == owner && !spent.Contains(e.ActionId)).ToArray();
+        var spent = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheLeizhenChargeSpentEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.EarningActionId).ToHashSet();
+        var earned = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheLeizhenChargeEarnedEvent>().Where(e => e.OwnerSeat == owner && !spent.Contains(e.ActionId)).ToArray();
         if (earned.Length > 1)
             throw new InvalidOperationException("Leizhen's already-paid next-Slash benefit cannot stack.");
         return earned.SingleOrDefault();
@@ -36,9 +36,9 @@ internal sealed partial class CoreGameEngineShanheLeizhenRuntime
             var entry = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault(m => m.CardId == weapon.Id && m.To == CardLocation.Equipment(owner.Seat));
             if (entry is null)
                 throw new InvalidOperationException("Leizhen counting requires a real equipped entity and residence origin.");
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLeizhenHandUseCountedEvent>().Any(e => e.ActionId == action.ActionId && e.WeaponCardId == weapon.Id))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheLeizhenHandUseCountedEvent>().Any(e => e.ActionId == action.ActionId && e.WeaponCardId == weapon.Id))
                 continue;
-            var previous = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheLeizhenHandUseCountedEvent>().LastOrDefault(e => e.OwnerSeat == owner.Seat && e.WeaponCardId == weapon.Id && e.EquipmentEntrySequence == entry.Sequence)?.RemainderAfter ?? 0;
+            var previous = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheLeizhenHandUseCountedEvent>().LastOrDefault(e => e.OwnerSeat == owner.Seat && e.WeaponCardId == weapon.Id && e.EquipmentEntrySequence == entry.Sequence)?.RemainderAfter ?? 0;
             var total = checked(previous + count);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheLeizhenHandUseCountedEvent(action.ActionId, owner.Seat, weapon.Id, entry.Sequence, count, previous, total % 3));
             if (total >= 3 && PendingShanheLeizhenCharge(owner.Seat)is null)

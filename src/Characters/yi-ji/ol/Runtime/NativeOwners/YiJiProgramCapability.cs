@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class YiJiProgramCapability(Func<RuntimeEntries.CharacterYiJiOlEntries> getCharacterYiJiOlRuntime) : IYiJiProgramHost
+internal sealed class YiJiProgramCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYiJiOlRuntime>> getCharacterYiJiOlRuntime) : IYiJiProgramHost
 {
-    public SkillProgramStepOutcome GiveDrawPileBottomCard(ProgramSkillFrame frame) => getCharacterYiJiOlRuntime().BeginGiveDrawPileBottomCard(frame);
+    public SkillProgramStepOutcome GiveDrawPileBottomCard(ProgramSkillFrame frame) => getCharacterYiJiOlRuntime().Value.BeginGiveDrawPileBottomCard(frame);
 }

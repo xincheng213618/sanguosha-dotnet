@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineConfiguredConversionsRuntime
     {
         if (!_coreLastZoneConversionsOperations.MatchesLastSourceZoneConversion(owner, card, rule) || !_coreOwnPublicPileConversionsOperations.MatchesOwnPublicPileConversion(owner, card, instance, rule))
             return false;
-        if (rule.ExcludeOwnerEffects && (requestedUseTarget is { } requested ? requested == owner.Seat : dyingUse ? _coreDyingCursorRuntimeOperations.ActiveDying?.VictimSeat == owner.Seat : rule.OutputKind is CardKind.Peach or CardKind.Alcohol))
+        if (rule.ExcludeOwnerEffects && (requestedUseTarget is { } requested ? requested == owner.Seat : dyingUse ? _coreDyingCursorRuntimeOperations.Value.ActiveDying?.VictimSeat == owner.Seat : rule.OutputKind is CardKind.Peach or CardKind.Alcohol))
             return false;
         if (rule.ActivationUsageGroup is { } group && rule.UsesPerPhase is { } limit && _coreGameEngineSkillProgramsProgramPhaseUsesAccess._programPhaseUses.GetValueOrDefault((owner.Seat, instance.SkillId, group)) >= limit)
             return false;

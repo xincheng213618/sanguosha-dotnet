@@ -15,7 +15,7 @@ internal sealed partial class CoreMatchSetupRuntime
         _coreMatchOutcomeStatusAccess._status = EngineStatus.Running;
         _modeRuntimeOperations._modeRuntime.OnMatchStart(ModeMatchStartPhase.AfterRunning);
         var presentation = _modeRuntimeOperations._modeRuntime.Find<IMatchModePresentation>() ?? throw new InvalidOperationException("The mode requires its installed presentation feature.");
-        _coreMatchLogOperations.AddLog("GameStarted", presentation.StartLog(_coreModePresentationOperations.CaptureModePresentationContext()));
+        _coreMatchLogOperations.AddLog("GameStarted", presentation.StartLog(_coreModePresentationOperations.Value.CaptureModePresentationContext()));
         if (_coreMatchSetupSetupCompleteAccess._setupComplete)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GameStartedEvent(_coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._playerCount, _coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._modeDefinition.Id));
@@ -43,7 +43,7 @@ internal sealed partial class CoreMatchSetupRuntime
         var targetCardRules = ("过河拆桥和顺手牵羊的手牌效果由使用者选择不透明牌位，目标牌面不公开");
         var supplyShortageTargetRules = ("对距离为 1 的其他角色使用，奇才可忽略此距离限制");
         var delayedCardRules = ($"乐不思蜀置入目标判定区并在其下回合摸牌前判定，结果不为红桃时跳过出牌阶段；兵粮寸断{(supplyShortageTargetRules)}，置入目标判定区并在其下回合摸牌前判定，结果不为梅花时跳过摸牌阶段；闪电置于自己的判定区，判定为黑桃 2 至 9 时受到 3 点雷电伤害，否则移至下一名存活角色。");
-        var modeRules = presentation.RulesText(_coreModePresentationOperations.CaptureModePresentationContext());
+        var modeRules = presentation.RulesText(_coreModePresentationOperations.Value.CaptureModePresentationContext());
         var weaponRules = ("诸葛连弩攻击范围为 1 且杀不受次数限制，青釭剑攻击范围为 2 且使直接杀无视目标防具");
         var armorRules = ("八卦阵在需要使用或打出闪时可选择发动判定，红色判定牌视为闪，仁王盾使黑色杀在指定目标后无效");
         var fireAttackRules = ("火攻可对自己使用，展示牌仍留在目标手牌中");
@@ -53,7 +53,7 @@ internal sealed partial class CoreMatchSetupRuntime
         _coreMatchLogOperations.AddLog("Rules", delayedCardRules);
         _coreMatchLogOperations.AddLog("Rules", "闪电仅可对自己使用：黑桃 2 至 9 命中并造成 3 点雷电伤害，其他判定牌则移至下一名存活角色。 ");
         if (!_coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._options.UseInteractiveSetup && _coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._options.ConfirmOpeningHand && _coreMatchDefinitionModeDefinitionOptionsPlayerCountAccess._options.HumanSeat >= 0)
-            _coreOpeningCustomizationOperations.RequestOpeningHandConfirmation();
+            _coreOpeningCustomizationOperations.Value.RequestOpeningHandConfirmation();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
         _kernelCoreGameEngineRuntimeOperations.AdvanceToHumanBoundary();
     }

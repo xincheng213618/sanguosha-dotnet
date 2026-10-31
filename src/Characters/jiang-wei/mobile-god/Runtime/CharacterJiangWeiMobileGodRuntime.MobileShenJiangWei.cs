@@ -8,7 +8,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
     internal const string MobileJwAction = "mobile-jiang-wei";
     internal static CardConversionSource MobileJwSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     SkillProgramStepOutcome IMobileJiangWeiHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginMobileJw(f, op);
-    internal bool MobileJwHuitianUsed(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.OwnerSeat == owner && e.SkillId == "mobile:huitian" && e.BindingId == "higher-hp-extra-turn");
+    internal bool MobileJwHuitianUsed(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.OwnerSeat == owner && e.SkillId == "mobile:huitian" && e.BindingId == "higher-hp-extra-turn");
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 40600, SkillProgramEffectOp.ResolveMobileJiangWeiHuitianDeath)]
     internal bool AdmitMobileJwDeath(ProgramTriggerLegalityContext c) => MobileJwHuitianUsed(c.Owner.Seat);
     internal SkillProgramStepOutcome BeginMobileJw(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -16,7 +16,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.InstructionIndex != 1 || f.MobileJiangWei is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
             throw new InvalidOperationException("Mobile Jiang Wei requires his original unpaid zero-material instruction.");
-        var dying = op == SkillProgramEffectOp.ResolveMobileJiangWeiShenpei ? _coreDyingCursorRuntimeOperations.ActiveDying : null;
+        var dying = op == SkillProgramEffectOp.ResolveMobileJiangWeiShenpei ? _coreDyingCursorRuntimeOperations.Value.ActiveDying : null;
         if (op == SkillProgramEffectOp.ResolveMobileJiangWeiShenpei && (dying is null || dying.VictimSeat != f.OwnerSeat || f.WindowContext is not { Window: SkillProgramTriggerWindow.DyingEntering } w || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { Continuation: ProgramLifecycleContinuation.ResumeDyingEntry } p || p.ResumeDyingFrameId != dying.Id))
             throw new InvalidOperationException("Shenpei requires the genuine entering-Dying window and its actual victim.");
         var stage = op switch
@@ -26,7 +26,7 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
             SkillProgramEffectOp.ResolveMobileJiangWeiShenpei => MobileJiangWeiStage.RecoveryChildren,
             _ => MobileJiangWeiStage.DeathIssued
         };
-        var count = dying is null ? 0 : _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerDyingEvent>().Where(e => e.VictimSeat == f.OwnerSeat && e.ResolutionId <= dying.Id).Select(e => e.ResolutionId).Distinct().Count();
+        var count = dying is null ? 0 : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDyingEvent>().Where(e => e.VictimSeat == f.OwnerSeat && e.ResolutionId <= dying.Id).Select(e => e.ResolutionId).Distinct().Count();
         if (stage == MobileJiangWeiStage.Exchange)
             _corePhysicalDrawFacadesOperations.EnsureDrawPile();
         var r = new MobileJiangWeiReceipt(MobileJwSource(f), f.GameplayHash, op, f.WindowContext?.ParentFrameId ?? 0)
@@ -295,8 +295,8 @@ internal sealed partial class CharacterJiangWeiMobileGodRuntime
             _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, ids, new("mobile.tiantao.discard"));
             var parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var current = parent.MobileJiangWei!;
-            var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().SingleOrDefault(e => e.ParentFrameId == f.Id && e.Reason.Value == "mobile.tiantao.discard" && e.SequenceBefore == current.Before);
-            if (paid is { ActualCount: > 0 } && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == paid.InvocationId).All(e => !CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence == e.CompletionSequence).CardKind)))
+            var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().SingleOrDefault(e => e.ParentFrameId == f.Id && e.Reason.Value == "mobile.tiantao.discard" && e.SequenceBefore == current.Before);
+            if (paid is { ActualCount: > 0 } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => e.InvocationId == paid.InvocationId).All(e => !CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence == e.CompletionSequence).CardKind)))
                 _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, parent with { MobileJiangWei = current with { HpLossSeats = current.HpLossSeats.Append(r.Target).ToArray() } });
         });
     }

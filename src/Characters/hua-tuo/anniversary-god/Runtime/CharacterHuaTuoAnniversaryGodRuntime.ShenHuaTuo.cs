@@ -246,7 +246,7 @@ internal sealed partial class CharacterHuaTuoAnniversaryGodRuntime
             r = f.ShenHuaTuo!;
             if (r.Stage == ShenHuaTuoStage.RestoreChildren)
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShenHuaTuo = r with { Stage = ShenHuaTuoStage.AcceptSkill } });
-            else if (r.Stage == ShenHuaTuoStage.SkillChildren && r.GrantAdded && r.SelectedSkillId is not null && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenHuaTuoSkillRevokedEvent>().Any(e => e.FrameId == id))
+            else if (r.Stage == ShenHuaTuoStage.SkillChildren && r.GrantAdded && r.SelectedSkillId is not null && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenHuaTuoSkillRevokedEvent>().Any(e => e.FrameId == id))
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShenHuaTuo = r with { Stage = ShenHuaTuoStage.LoseSkill } });
             else
             {

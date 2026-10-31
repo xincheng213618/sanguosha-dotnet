@@ -8,7 +8,7 @@ internal sealed partial class CharacterZhuZhiBoundaryMobileRuntime
     internal const string BoundaryAnguoAction = "boundary-zhu-zhi-anguo";
     internal static CardConversionSource BoundaryAnguoSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     internal bool HasBoundaryAnguoMark(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _coreMatchParticipantsPlayersAccess._players[seat].Markers.GetValueOrDefault(PlayerMarkerKind.MobileBoundaryAnguo) > 0;
-    internal bool HadBoundaryAnguoMark(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerMarkerChangedEvent>().Any(e => e.Marker == PlayerMarkerKind.MobileBoundaryAnguo && e.PlayerSeat == seat && e.Delta > 0);
+    internal bool HadBoundaryAnguoMark(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerMarkerChangedEvent>().Any(e => e.Marker == PlayerMarkerKind.MobileBoundaryAnguo && e.PlayerSeat == seat && e.Delta > 0);
     internal int[] BoundaryAnguoNewRecipients(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && !HadBoundaryAnguoMark(p.Seat)).Select(p => p.Seat).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 53200)]
     internal bool CanOfferBoundaryAnguo(ProgramTriggerLegalityContext gate)
@@ -201,15 +201,15 @@ internal sealed partial class CharacterZhuZhiBoundaryMobileRuntime
     [ProgramContinuation(ProgramContinuationKind.Movement, 53200)]
     internal bool ReturnBoundaryAnguoPayment(ProgramSkillFrame frame) => frame.BoundaryZhuZhi is not null && ContinueBoundaryAnguoPayment(frame.Id);
 
-    internal bool ValidBoundaryAnguo(ProgramSkillFrame frame) => frame.BoundaryZhuZhi is { } receipt && frame.SkillId == BoundaryZhuZhiComposition.Skill && receipt.Source == BoundaryAnguoSource(frame) && receipt.GameplayHash == frame.GameplayHash && receipt.WindowId == frame.WindowContext?.ParentFrameId && receipt.Binding == frame.TriggerId && (receipt.Binding != "rescue-marked" || frame.SelectedTargetSeats.SequenceEqual([receipt.Victim]) && _coreDyingOwnedCardSelectionsOperations.ExactDyingOwnedCardEntry(frame, out var dying, out _) && dying.Id == receipt.DyingId && dying.VictimSeat == receipt.Victim) && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhuZhiStartedEvent>().Count(e => e.FrameId == frame.Id && e.Source == receipt.Source && e.GameplayHash == receipt.GameplayHash && e.WindowId == receipt.WindowId && e.Binding == receipt.Binding && e.Victim == receipt.Victim && e.DyingId == receipt.DyingId) == 1;
+    internal bool ValidBoundaryAnguo(ProgramSkillFrame frame) => frame.BoundaryZhuZhi is { } receipt && frame.SkillId == BoundaryZhuZhiComposition.Skill && receipt.Source == BoundaryAnguoSource(frame) && receipt.GameplayHash == frame.GameplayHash && receipt.WindowId == frame.WindowContext?.ParentFrameId && receipt.Binding == frame.TriggerId && (receipt.Binding != "rescue-marked" || frame.SelectedTargetSeats.SequenceEqual([receipt.Victim]) && _coreDyingOwnedCardSelectionsOperations.ExactDyingOwnedCardEntry(frame, out var dying, out _) && dying.Id == receipt.DyingId && dying.VictimSeat == receipt.Victim) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhuZhiStartedEvent>().Count(e => e.FrameId == frame.Id && e.Source == receipt.Source && e.GameplayHash == receipt.GameplayHash && e.WindowId == receipt.WindowId && e.Binding == receipt.Binding && e.Victim == receipt.Victim && e.DyingId == receipt.DyingId) == 1;
     internal bool HasExactBoundaryAnguoRescueTarget(ProgramSkillFrame frame)
     {
         if (frame.BoundaryZhuZhi is not { Binding: "rescue-marked" } receipt || frame.TriggerId != "rescue-marked" || frame.InstructionIndex is < 1 or > 4 || frame.SelectedCardIds.Count != 0 || !ValidBoundaryAnguo(frame))
             return false;
-        var issues = _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryZhuZhiRescueIssuedEvent>().Where(e => e.FrameId == frame.Id && e.Victim == receipt.Victim && e.DyingId == receipt.DyingId && e.RemovedMarks > 0).ToArray();
+        var issues = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhuZhiRescueIssuedEvent>().Where(e => e.FrameId == frame.Id && e.Victim == receipt.Victim && e.DyingId == receipt.DyingId && e.RemovedMarks > 0).ToArray();
         if (issues is not [var issue])
             return false;
-        var removals = _coreProgramEventHistoryOperations.ProgramEventHistory<PlayerMarkerChangedEvent>().Where(e => e.ResolutionId == frame.Id && e.PlayerSeat == receipt.Victim && e.Marker == PlayerMarkerKind.MobileBoundaryAnguo && e.Delta < 0).ToArray();
+        var removals = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerMarkerChangedEvent>().Where(e => e.ResolutionId == frame.Id && e.PlayerSeat == receipt.Victim && e.Marker == PlayerMarkerKind.MobileBoundaryAnguo && e.Delta < 0).ToArray();
         return removals.Length > 0 && removals.Sum(e => -e.Delta) == issue.RemovedMarks && removals[^1].Count == 0;
     }
 

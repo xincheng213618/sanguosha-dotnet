@@ -23,9 +23,9 @@ internal sealed partial class CharacterHuangChengYanOlRuntime
     {
         var context = frame.WindowContext;
         var judgment = context?.Judgment;
-        var pending = _coreJudgmentCursorRuntimeOperations.ActiveJudgment;
+        var pending = _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment;
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (context is null || judgment is null || pending is null || context.Window != SkillProgramTriggerWindow.JudgmentFinalized || pending.Id != judgment.JudgmentFrameId || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)is not { } card || card.Id != judgment.CardId || active.PendingMovementContinuation is not null || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive)
+        if (context is null || judgment is null || pending is null || context.Window != SkillProgramTriggerWindow.JudgmentFinalized || pending.Id != judgment.JudgmentFrameId || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)is not { } card || card.Id != judgment.CardId || active.PendingMovementContinuation is not null || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
         var from = CardLocation.Judgment(judgment.SubjectSeat);
         if (_cardZonesOperations._cardZones.GetLocation(card.Id) != from)

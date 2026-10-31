@@ -16,10 +16,10 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
         return i > 0 && _resolutionStackOperations._resolutionStack[i - 1].Id == parent.Id;
     }
 
-    internal bool MouJieyueArmorGranted(ProgramSkillFrame f) => f.MouYuJinJieyue is { } r && _coreProgramEventHistoryOperations.ProgramEventHistory<ArmorGrantedEvent>().Where(e => e.ProgramFrameId == f.Id && e.InstructionIndex == 2).ToArray()is [var grant] && grant.PlayerSeat == r.RecipientSeat && grant.Amount == 1 && grant.ArmorAfter == checked(grant.ArmorBefore + 1) && grant.Source == CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f);
+    internal bool MouJieyueArmorGranted(ProgramSkillFrame f) => f.MouYuJinJieyue is { } r && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ArmorGrantedEvent>().Where(e => e.ProgramFrameId == f.Id && e.InstructionIndex == 2).ToArray()is [var grant] && grant.PlayerSeat == r.RecipientSeat && grant.Amount == 1 && grant.ArmorAfter == checked(grant.ArmorBefore + 1) && grant.Source == CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f);
     internal bool ValidMouJieyue(ProgramSkillFrame f)
     {
-        if (!MouJieyueRoot(f) || f.MouYuJinJieyue is not { } r || r.Source != MouYuJinSource(f) || r.GameplayHash != f.GameplayHash || r.OriginalEndingWindowId != f.WindowContext!.ParentFrameId || !f.SelectedTargetSeats.SequenceEqual([r.RecipientSeat]) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.RecipientSeat) || r.RecipientSeat == f.OwnerSeat || r.Phase.ActorSeat != f.OwnerSeat || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Ending || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouYuJinJieyueReservedEvent>().Count(e => e == new MouYuJinJieyueReservedEvent(f.Id, r.Source, r.GameplayHash, r.OriginalEndingWindowId, r.Phase, r.RecipientSeat)) != 1)
+        if (!MouJieyueRoot(f) || f.MouYuJinJieyue is not { } r || r.Source != MouYuJinSource(f) || r.GameplayHash != f.GameplayHash || r.OriginalEndingWindowId != f.WindowContext!.ParentFrameId || !f.SelectedTargetSeats.SequenceEqual([r.RecipientSeat]) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.RecipientSeat) || r.RecipientSeat == f.OwnerSeat || r.Phase.ActorSeat != f.OwnerSeat || r.Phase.Kind != ActualDiscardRecoveryPhaseKind.Ending || !_coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(r.Phase) || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuJinJieyueReservedEvent>().Count(e => e == new MouYuJinJieyueReservedEvent(f.Id, r.Source, r.GameplayHash, r.OriginalEndingWindowId, r.Phase, r.RecipientSeat)) != 1)
             return false;
         if (r.Stage == MouYuJinJieyueStage.ArmorReserved)
             return r.GiftCardId is null && r.GiftFrom is null && r.GiftTo is null && r.GiftMovementSequence is null;
@@ -27,12 +27,12 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
             return false;
         if (r.GiftCardId is { } id)
         {
-            if (r.GiftFrom is not { } from || from.OwnerSeat != r.RecipientSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || r.GiftTo is not { } to || to != CardLocation.Hand(f.OwnerSeat) && to != CardLocation.OutsideGame || r.GiftMovementSequence is not { } sequence || _coreProgramEventHistoryOperations.ProgramEventHistory<MouYuJinJieyueGiftPaidEvent>().Count(e => e == new MouYuJinJieyueGiftPaidEvent(f.Id, r.RecipientSeat, id, from, to, sequence)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence == sequence && m.From == from && m.To == to && m.Reason.Value == MouJieyueGiftReason) != 1)
+            if (r.GiftFrom is not { } from || from.OwnerSeat != r.RecipientSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || r.GiftTo is not { } to || to != CardLocation.Hand(f.OwnerSeat) && to != CardLocation.OutsideGame || r.GiftMovementSequence is not { } sequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuJinJieyueGiftPaidEvent>().Count(e => e == new MouYuJinJieyueGiftPaidEvent(f.Id, r.RecipientSeat, id, from, to, sequence)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence == sequence && m.From == from && m.To == to && m.Reason.Value == MouJieyueGiftReason) != 1)
                 return false;
         }
         else if (r.GiftFrom is not null || r.GiftTo is not null || r.GiftMovementSequence is not null || r.Stage == MouYuJinJieyueStage.GiftChildren)
             return false;
-        return r.Stage != MouYuJinJieyueStage.Complete || _coreProgramEventHistoryOperations.ProgramEventHistory<MouYuJinJieyueCompletedEvent>().Count(e => e.FrameId == f.Id) == 1;
+        return r.Stage != MouYuJinJieyueStage.Complete || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouYuJinJieyueCompletedEvent>().Count(e => e.FrameId == f.Id) == 1;
     }
 
     internal SkillProgramStepOutcome ResolveMouJieyue(ProgramSkillFrame supplied)

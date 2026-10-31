@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEnginePrepDiscardReceiptsRuntime
             return false;
         if ((d.Stage is PrepDiscardStage.TargetChildren or PrepDiscardStage.ChoosingBenefit or PrepDiscardStage.SelectingOwnerCards or PrepDiscardStage.OwnerChildren or PrepDiscardStage.ImmediateDrawAttempt or PrepDiscardStage.ImmediateDrawChildren) && d.TargetPayment is null || d.Stage == PrepDiscardStage.OwnerChildren && d.OwnerPayment is null || d.Stage != PrepDiscardStage.Complete && !f.ReexecuteParticipantInstruction)
             return false;
-        if (!_corePrepDiscardImmediateDrawOperations.ValidPrepDiscardImmediateDraw(f))
+        if (!_corePrepDiscardImmediateDrawOperations.Value.ValidPrepDiscardImmediateDraw(f))
             return false;
         var payment = d.Stage == PrepDiscardStage.TargetChildren ? d.TargetPayment : d.Stage == PrepDiscardStage.OwnerChildren ? d.OwnerPayment : null;
         return f.PendingMovementContinuation is not { } pending || pending.BeforeCount == 0 && pending.CoverageResultBind is null && (payment is not null && pending.SubjectSeat == payment.PayerSeat || d.Stage == PrepDiscardStage.ImmediateDrawChildren && d.ImmediateDraw?.TargetSeat == pending.SubjectSeat);

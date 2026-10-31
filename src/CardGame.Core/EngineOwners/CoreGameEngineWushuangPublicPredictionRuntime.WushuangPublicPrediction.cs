@@ -60,7 +60,7 @@ internal sealed partial class CoreGameEngineWushuangPublicPredictionRuntime
                 retaliation = PublicDamageSequencePrediction.Calculate(actor.Hp, actor.MaxHp, actor.Armor, returned);
         }
 
-        var reductions = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangIncomingReductionIssuedEvent>().Count(fact => fact.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && fact.TargetSeat == targetSeat);
+        var reductions = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangIncomingReductionIssuedEvent>().Count(fact => fact.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && fact.TargetSeat == targetSeat);
         var remainingReduction = Math.Max(target.WushuangTacticIds?.Contains(2196) == true ? Math.Max(0, 2 - reductions) : 0, target.WushuangTacticIds?.Contains(2197) == true ? Math.Max(0, 3 - reductions) : 0);
         return legacy with
         {
@@ -78,23 +78,23 @@ internal sealed partial class CoreGameEngineWushuangPublicPredictionRuntime
         if (kind is { } slash && CoreNativeCardClassificationsRuntime.IsSlashCard(slash))
         {
             bonus += (Own(2150) && _coreActualRoundProgressRoundNumberAccess._roundNumber >= 3 ? 1 : 0) + (Own(2151) && _coreActualRoundProgressRoundNumberAccess._roundNumber >= 5 ? 1 : 0) + (Own(2152) && _coreActualRoundProgressRoundNumberAccess._roundNumber >= 7 ? 1 : 0);
-            var ordinal = issuedUseId is { } useId ? _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().LastOrDefault(fact => fact.CardUseFrameId == useId)?.SlashOrdinal : 1 + _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().Count(fact => fact.OwnerSeat == sourceSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(fact.Kind));
+            var ordinal = issuedUseId is { } useId ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCombatUseFactEvent>().LastOrDefault(fact => fact.CardUseFrameId == useId)?.SlashOrdinal : 1 + _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCombatUseFactEvent>().Count(fact => fact.OwnerSeat == sourceSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(fact.Kind));
             if ((Own(2042) || Own(2043)) && ordinal is> 0 && ordinal % 3 == 0)
                 bonus += (Own(2042) ? 1 : 0) + (Own(2043) ? 2 : 0);
             if (Own(2045) && suit == Suit.Heart)
                 bonus += 2;
-            if (Own(2115) && sourceSeat == view.CurrentSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().LastOrDefault(turn => turn.ActorSeat == sourceSeat && turn.TurnNumber < view.TurnNumber)is { } previous && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatUseFactEvent>().Any(fact => fact.OwnerSeat == sourceSeat && fact.Turn == previous.TurnNumber && CoreNativeCardClassificationsRuntime.IsSlashCard(fact.Kind)))
+            if (Own(2115) && sourceSeat == view.CurrentSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().LastOrDefault(turn => turn.ActorSeat == sourceSeat && turn.TurnNumber < view.TurnNumber)is { } previous && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCombatUseFactEvent>().Any(fact => fact.OwnerSeat == sourceSeat && fact.Turn == previous.TurnNumber && CoreNativeCardClassificationsRuntime.IsSlashCard(fact.Kind)))
                 bonus++;
         }
 
         if (kind is null)
             bonus += (Own(2171) ? 1 : 0) + (Own(2172) ? 2 : 0);
-        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCombatDamageFactEvent>();
+        var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCombatDamageFactEvent>();
         if (Own(2127))
         {
             var last = facts.LastOrDefault(fact => fact.SourceSeat == sourceSeat && !fact.SourceLess);
             var tail = last is null ? facts : facts.SkipWhile(fact => !ReferenceEquals(fact, last)).Skip(1);
-            bonus += additionalIncomingSegments + tail.Count(fact => fact.TargetSeat == sourceSeat && fact.Amount > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().LastOrDefault(turn => turn.TurnNumber == fact.Turn)?.ActorSeat != sourceSeat);
+            bonus += additionalIncomingSegments + tail.Count(fact => fact.TargetSeat == sourceSeat && fact.Amount > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().LastOrDefault(turn => turn.TurnNumber == fact.Turn)?.ActorSeat != sourceSeat);
         }
 
         if (_coreActualRoundProgressRoundNumberAccess._roundNumber > 1 && (Own(2188) || Own(2189)))
@@ -111,7 +111,7 @@ internal sealed partial class CoreGameEngineWushuangPublicPredictionRuntime
             bonus += (Defends(2333) ? 1 : 0) + (Defends(2334) ? 2 : 0);
         if (Defends(2196) || Defends(2197))
         {
-            var received = priorTargetSegments + _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangIncomingReductionIssuedEvent>().Count(fact => fact.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && fact.TargetSeat == targetSeat);
+            var received = priorTargetSegments + _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangIncomingReductionIssuedEvent>().Count(fact => fact.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && fact.TargetSeat == targetSeat);
             bonus -= (Defends(2196) && received < 2 ? 1 : 0) + (Defends(2197) && received < 3 ? 2 : 0);
         }
 

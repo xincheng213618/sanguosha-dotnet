@@ -15,9 +15,9 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
     internal void RunOneEngineStep() => _matchStepDispatcherOperations.Get().Run();
     int IMatchStepFacts.FrameCount => _resolutionStackOperations._resolutionStack.Count;
 
-    DyingFrame? IMatchStepFacts.ActiveDying => _coreDyingCursorRuntimeOperations.ActiveDying;
+    DyingFrame? IMatchStepFacts.ActiveDying => _coreDyingCursorRuntimeOperations.Value.ActiveDying;
 
-    bool IMatchStepFacts.HasDamageTrigger => _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not null;
+    bool IMatchStepFacts.HasDamageTrigger => _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not null;
 
     bool IMatchStepFacts.HasGroupRecovery => _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { Effect: GroupCardEffect.Recovery };
 
@@ -53,7 +53,7 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
     void IMatchStepProtocols.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     void IMatchStepProtocols.RunDyingStep() => _coreNativeDyingOperations.RunOneDyingStep();
     void IMatchStepProtocols.RunDamageTriggerStep() => _coreNativeDamageWindowsOperations.RunOneDamageTriggerStep();
-    void IMatchStepProtocols.RunGroupRecoveryStep() => _coreNativeGroupRecoveryOperations.RunOneGroupRecoveryStep();
+    void IMatchStepProtocols.RunGroupRecoveryStep() => _coreNativeGroupRecoveryOperations.Value.RunOneGroupRecoveryStep();
     void IMatchStepProtocols.RunSetupStep() => _coreMatchParticipantSetupOperations.RunOneSetupStep();
     bool IMatchStepProtocols.BeginGameStartingPrograms() => _coreParticipantAndReserveProgramsOperations.BeginGameStartingPrograms();
     bool IMatchStepDecisions.Pending(MatchAutomaticDecision kind) => kind switch
@@ -61,12 +61,12 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
         MatchAutomaticDecision.RecoveryReplacement => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.RecoveryReplacement } recovery && !_coreMatchParticipantsPlayersAccess._players[recovery.PlayerSeat].IsHuman,
         MatchAutomaticDecision.ProgramTrigger => _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } trigger && !_coreMatchParticipantsPlayersAccess._players[trigger.PlayerSeat].IsHuman,
         MatchAutomaticDecision.ProgramTopReorder => _coreProgramTopReorderOperations.IsAiProgramTopReorderPending(),
-        MatchAutomaticDecision.ProgramJudgment => _coreJudgmentProgramsOperations.IsAiProgramJudgmentPending(),
+        MatchAutomaticDecision.ProgramJudgment => _coreJudgmentProgramsOperations.Value.IsAiProgramJudgmentPending(),
         MatchAutomaticDecision.ProgramRepeatJudgment => _coreProgramRepeatedJudgmentOperations.IsAiProgramRepeatJudgmentPending(),
         MatchAutomaticDecision.ProgramJudgmentReplacement => _coreJudgmentReplacementProgramsOperations.IsAiProgramJudgmentReplacementPending(),
         MatchAutomaticDecision.Yingbo => _characterLuMengMouOperations.IsAiYingboPending(),
         MatchAutomaticDecision.SkipDiscardPolicy => _coreNativePromptBoundaryOperations.IsAiSkipDiscardPolicyPending(),
-        MatchAutomaticDecision.Pindian => _coreSkillPromptsOperations.IsAiPindianPending(),
+        MatchAutomaticDecision.Pindian => _coreSkillPromptsOperations.Value.IsAiPindianPending(),
         MatchAutomaticDecision.TargetCardSelection => _coreNativePromptBoundaryOperations.IsAiTargetCardSelectionPending(),
         MatchAutomaticDecision.FireAttack => _coreNativePromptBoundaryOperations.IsAiFireAttackPending(),
         MatchAutomaticDecision.Nullification => _coreNativePromptBoundaryOperations.IsAiNullificationPending(),
@@ -88,7 +88,7 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
                 _coreProgramTopReorderOperations.ResolvePendingAiProgramTopReorder();
                 break;
             case MatchAutomaticDecision.ProgramJudgment:
-                _coreJudgmentProgramsOperations.ResolvePendingAiProgramJudgment();
+                _coreJudgmentProgramsOperations.Value.ResolvePendingAiProgramJudgment();
                 break;
             case MatchAutomaticDecision.ProgramRepeatJudgment:
                 _coreProgramRepeatedJudgmentOperations.ResolvePendingAiProgramRepeatJudgment();
@@ -132,7 +132,7 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
         MatchSpecialRequest.BoundaryLiuFeng => _characterLiuFengBoundaryOperations.TryAdvanceBoundaryLiuFengAi(),
         MatchSpecialRequest.Weijie => _characterGuoTuOlOperations.TryAdvanceWeijieAi(),
         MatchSpecialRequest.RequestedDeckBasic => _coreRequestedDeckBasicsOperations.TryAdvanceRequestedDeckBasicAi(),
-        MatchSpecialRequest.DrawFundedDistinctBasic => _coreDrawFundedDistinctBasicResponsesOperations.TryAdvanceDrawFundedDistinctBasicAi(),
+        MatchSpecialRequest.DrawFundedDistinctBasic => _coreDrawFundedDistinctBasicResponsesOperations.Value.TryAdvanceDrawFundedDistinctBasicAi(),
         MatchSpecialRequest.ChainedStateBasic => _coreChainedStateBasicConversionsOperations.TryAdvanceChainedStateBasicAi(),
         _ => throw new ArgumentOutOfRangeException("kind")};
     void IMatchStepDecisions.ContinueDeclaration(long frameId) => _coreCardDeclarationsOperations.ContinueCardDeclarationChallenge(frameId);
@@ -166,7 +166,7 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
     bool IProgramCompletionFacts.Alive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     bool IProgramCompletionFacts.HasSkillInstance(int seat, string skillId, string instanceId) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[seat], skillId, instanceId);
     bool IProgramCompletionFacts.CanContinueEquipmentSuit(ProgramSkillFrame frame) => _characterHeQiOlOperations.CanContinueEquipmentSuitProgram(frame);
-    bool IProgramCompletionFacts.CanContinueHpConditional(ProgramSkillFrame frame) => _coreHpConditionalSkillGrantsOperations.CanContinueHpConditionalProgram(frame);
+    bool IProgramCompletionFacts.CanContinueHpConditional(ProgramSkillFrame frame) => _coreHpConditionalSkillGrantsOperations.Value.CanContinueHpConditionalProgram(frame);
     bool IProgramCompletionFacts.CanContinuePhaseAlcohol(ProgramSkillFrame frame) => _coreForcedPhaseAlcoholOperations.CanContinuePhaseAlcohol(frame);
     bool IProgramCompletionFacts.ValidDamageTargetObtain(ProgramSkillFrame frame) => _coreDamageTargetObtainProgramsOperations.IsValidDamageTargetObtain(frame);
     bool IProgramCompletionFacts.ValidDamageTargetMount(ProgramSkillFrame frame) => _coreDamageTargetMountProgramsOperations.IsValidDamageTargetMount(frame);
@@ -175,10 +175,10 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
     bool IProgramCompletionProtocols.CompleteMantianGift(ProgramSkillFrame frame, bool completed) => _coreMantianGuohaiOperations.TryCompleteMantianGuohaiGift(frame, completed);
     bool IProgramCompletionProtocols.CompleteShenwuTransplant(ProgramSkillFrame frame, bool completed) => _coreShenwuCardsOperations.TryCompleteShenwuTransplantProgram(frame, completed);
     bool IProgramCompletionProtocols.CompleteHellSoul(ProgramSkillFrame frame, bool completed) => _coreHellSoulCardsOperations.TryCompleteHellSoulProgram(frame, completed);
-    bool IProgramCompletionProtocols.CompleteWenheChaos(ProgramSkillFrame frame, bool completed) => _coreWenheChaosOperations.TryCompleteWenheChaosProgram(frame, completed);
+    bool IProgramCompletionProtocols.CompleteWenheChaos(ProgramSkillFrame frame, bool completed) => _coreWenheChaosOperations.Value.TryCompleteWenheChaosProgram(frame, completed);
     void IProgramCompletionProtocols.CompleteGame() => _kernelCoreMainOperations.CompleteGame();
     void IProgramCompletionProtocols.FinishPaidOwnTarget(ProgramSkillFrame frame) => _corePaidOwnTargetObserversOperations.FinishPaidOwnTargetBeforeProgramCompletion(frame);
-    void IProgramCompletionProtocols.FinishOwnedDeathBenefit(ProgramSkillFrame frame, bool completed) => _coreOwnedDeathBenefitReturnsOperations.FinishOwnedDeathBenefitReturn(frame, completed);
+    void IProgramCompletionProtocols.FinishOwnedDeathBenefit(ProgramSkillFrame frame, bool completed) => _coreOwnedDeathBenefitReturnsOperations.Value.FinishOwnedDeathBenefitReturn(frame, completed);
     bool IProgramCompletionProtocols.CompleteDeferredTurnEnd(ProgramSkillFrame frame, ProgramSkillWindowContext context) => _coreDeferredHandAlignmentsOperations.CompleteDeferredTurnEndBinding(frame, context);
     bool IProgramCompletionProtocols.ReturnCompletedBinding(ProgramSkillFrame frame, bool completed) => _programPipelineHooksOperations._programPipelineHooks.ReturnCompletedProgramBinding(frame, completed);
     void IProgramCompletionProtocols.CompleteFirstLegacyCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _coreFirstSlashDuelLegacyWindowsOperations.CompleteFirstLegacyBenefitCandidate(candidate, context);

@@ -124,7 +124,7 @@ internal sealed partial class CoreNativeDuelRuntime
             throw new InvalidOperationException("The Zhangba Duel response does not belong to the current responder.");
         }
 
-        var responseCosts = _coreResponseCompletionZhangbaOperations.CaptureZhangbaResponseCompletionCosts(responder, pair);
+        var responseCosts = _coreResponseCompletionZhangbaOperations.Value.CaptureZhangbaResponseCompletionCosts(responder, pair);
         _coreNativeGroupResponsesOperations.MoveZhangbaResponseCards(responder, pair, duel.ResolutionId, duel.OpponentSeat);
         _coreMatchLogOperations.AddLog("CardResponded", $"{(responder.Name)} 发动【丈八蛇矛】，将两张手牌当【杀】应战【决斗】。", responder.Seat, duel.OpponentSeat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(responder.Seat, CardKind.Slash);

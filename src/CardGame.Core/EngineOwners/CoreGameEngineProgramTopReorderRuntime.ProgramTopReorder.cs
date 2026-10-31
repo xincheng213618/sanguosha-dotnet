@@ -37,9 +37,9 @@ internal sealed partial class CoreGameEngineProgramTopReorderRuntime
     {
         var order = frame.TopReorder ?? throw new InvalidOperationException("Top ordering lost its state.");
         if (order.RequiredTopCount is not null)
-            _coreExactTopReorderProgramsOperations.ValidateExactTopReorder(frame);
+            _coreExactTopReorderProgramsOperations.Value.ValidateExactTopReorder(frame);
         if (order.Population is not null)
-            _corePopulationTopReorderProgramsOperations.ValidatePopulationTopReorder(frame);
+            _corePopulationTopReorderProgramsOperations.Value.ValidatePopulationTopReorder(frame);
         var used = order.TopCardIds.Concat(order.BottomCardIds).ToHashSet();
         var choices = order.ViewedCardIds.Where(id => !used.Contains(id)).Select(id =>
         {
@@ -96,7 +96,7 @@ internal sealed partial class CoreGameEngineProgramTopReorderRuntime
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTopReorder, PlayerSeat: var seat } decision || seat != frame.OwnerSeat || !decision.Choices.Any(item => item.Id == choice.Id))
             throw new InvalidOperationException("Top ordering choice is not current.");
         if (state.RequiredTopCount is not null)
-            _coreExactTopReorderProgramsOperations.ValidateExactTopReorder(frame);
+            _coreExactTopReorderProgramsOperations.Value.ValidateExactTopReorder(frame);
         if (_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.Op == SkillProgramEffectOp.ReorderTopByCurrentFaluTokens && (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId)))
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -106,7 +106,7 @@ internal sealed partial class CoreGameEngineProgramTopReorderRuntime
 
         if (state.Population is not null)
         {
-            _corePopulationTopReorderProgramsOperations.ValidatePopulationTopReorder(frame);
+            _corePopulationTopReorderProgramsOperations.Value.ValidatePopulationTopReorder(frame);
             if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId))
             {
                 _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -160,7 +160,7 @@ internal sealed partial class CoreGameEngineProgramTopReorderRuntime
             _cardZonesOperations._cardZones.ReorderDrawPileTop(state.ViewedCardIds, state.TopCardIds, state.BottomCardIds);
             if (frame.ZhugeGuo is not null)
             {
-                _characterZhugeGuoOlOperations.MarkYuhuaTopPlacement(frame, state);
+                _characterZhugeGuoOlOperations.Value.MarkYuhuaTopPlacement(frame, state);
                 frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             }
 

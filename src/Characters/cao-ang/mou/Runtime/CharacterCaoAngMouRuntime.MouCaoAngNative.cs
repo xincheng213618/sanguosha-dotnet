@@ -72,7 +72,7 @@ internal sealed partial class CharacterCaoAngMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouCaUseIssuedEvent(f.Id, use.Id, a.ActionId, id, n.Actor));
     }
 
-    internal bool MouCaUseRidesOn(CardUseFrame u, ProgramSkillFrame f) => MouCaoAng.Valid(f) && u.MouCaoAngZhiwang is { } n && f.MouCaoAng is { Stage: MouCaoAngStage.NativeUse or MouCaoAngStage.ReturnedUse, Native: { } p } && MouCaoAngRuntime.SameUse(n, p) && n.FrameId == f.Id && n.Instruction == f.InstructionIndex && n.Source == f.MouCaoAng.Source && n.GameplayHash == f.GameplayHash && n.Turn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && u.Id == n.UseId && u.CardId == n.CardId && u.CardKind == n.Kind && u.Action is { Type: CardActionType.Use } a && a.ActionId == n.ActionId && a.ProviderSeat == n.Actor && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, n.Actor, n.Actor) && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == n.CardId && from == CardLocation.DiscardPile && u.PhysicalCardIds is [var material] && material == id && _coreProgramEventHistoryOperations.ProgramEventHistory<MouCaUseIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == u.Id && e.ActionId == a.ActionId && e.CardId == id && e.Actor == n.Actor) == 1;
+    internal bool MouCaUseRidesOn(CardUseFrame u, ProgramSkillFrame f) => MouCaoAng.Valid(f) && u.MouCaoAngZhiwang is { } n && f.MouCaoAng is { Stage: MouCaoAngStage.NativeUse or MouCaoAngStage.ReturnedUse, Native: { } p } && MouCaoAngRuntime.SameUse(n, p) && n.FrameId == f.Id && n.Instruction == f.InstructionIndex && n.Source == f.MouCaoAng.Source && n.GameplayHash == f.GameplayHash && n.Turn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && u.Id == n.UseId && u.CardId == n.CardId && u.CardKind == n.Kind && u.Action is { Type: CardActionType.Use } a && a.ActionId == n.ActionId && a.ProviderSeat == n.Actor && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, n.Actor, n.Actor) && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == n.CardId && from == CardLocation.DiscardPile && u.PhysicalCardIds is [var material] && material == id && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouCaUseIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == u.Id && e.ActionId == a.ActionId && e.CardId == id && e.Actor == n.Actor) == 1;
     [NativeUseValidation(36700)]
     internal void ValidateMouCaUse(CardUseFrame u)
     {
@@ -86,7 +86,7 @@ internal sealed partial class CharacterCaoAngMouRuntime
         if (u.MouCaoAngZhiwang is not { } n)
             return false;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(n.FrameId);
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(u.Id)is not null || u.Step != ResolutionFrameStep.Completed || !MouCaUseRidesOn(u, f) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) != 1)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(u.Id)is not null || u.Step != ResolutionFrameStep.Completed || !MouCaUseRidesOn(u, f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == u.Id) != 1)
             throw new InvalidOperationException("Zhiwang requires its one completed original native child.");
         MouCaoAng.Returned(n, u.CardAttack is { Active: true });
         return true;
@@ -108,7 +108,7 @@ internal sealed partial class CharacterCaoAngMouRuntime
         // A chain target may reuse the preceding target's owned attack state.
         // Recompute for this actual victim, preserving native Lightning semantics.
         _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, s => s!with { IsSourceLess = attack.TargetSeat == parent.OwnerSeat || s.IsDelayedJudgmentDamage && s.EffectiveCardKind == CardKind.Lightning });
-        if (attack.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouCaSourceLessEvent>().Any(e => e.UseId == use.Id && e.ActionId == n.ActionId && e.Target == parent.OwnerSeat))
+        if (attack.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouCaSourceLessEvent>().Any(e => e.UseId == use.Id && e.ActionId == n.ActionId && e.Target == parent.OwnerSeat))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouCaSourceLessEvent(use.Id, n.ActionId, parent.OwnerSeat, n.CardId));
     }
 }

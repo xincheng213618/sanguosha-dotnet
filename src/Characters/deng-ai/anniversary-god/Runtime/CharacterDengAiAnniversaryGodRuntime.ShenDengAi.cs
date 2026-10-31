@@ -7,12 +7,12 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
 {
     internal const string ShenDaTuoYu = "anniversary-god:tuoyu", ShenDaXianjin = "anniversary-god:xianjin", ShenDaQijing = "anniversary-god:qijing", ShenDaCuixin = "anniversary-god:cuixin";
     internal static CardConversionSource ShenDaSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal ShenDengAiDomain[] ShenDaDeveloped(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiDevelopedEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.Domain).Distinct().ToArray();
-    internal int ShenDaDamageCount(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Count(e => e.Amount > 0 && (e.TargetSeat == owner || !e.SourceLess && e.SourceSeat == owner));
-    internal bool ShenDaAwakened(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiAwakenedEvent>().Any(e => e.OwnerSeat == owner);
+    internal ShenDengAiDomain[] ShenDaDeveloped(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiDevelopedEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.Domain).Distinct().ToArray();
+    internal int ShenDaDamageCount(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Count(e => e.Amount > 0 && (e.TargetSeat == owner || !e.SourceLess && e.SourceSeat == owner));
+    internal bool ShenDaAwakened(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiAwakenedEvent>().Any(e => e.OwnerSeat == owner);
     internal ShenDengAiAssignedEvent? ShenDaAssignment(int owner, int card, bool beforePayment = false)
     {
-        var a = _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiAssignedEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.CardId == card);
+        var a = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiAssignedEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.CardId == card);
         if (a is null)
             return null;
         var exits = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.CardId == card && m.Sequence > a.MovementSequence && m.From == CardLocation.Hand(owner) && m.To != m.From).ToArray();
@@ -45,7 +45,7 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
         if (CharacterDengAiHappyGodRuntime.IsShenDaXianjin(g.SkillId))
         {
             var count = ShenDaDamageCount(g.OwnerSeat);
-            return count > 0 && count % 2 == 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiXianjinReservedEvent>().Any(e => e.OwnerSeat == g.OwnerSeat && e.DamageCount >= count) && (g.Context.SourceSeat == g.OwnerSeat || g.Context.TargetSeat == g.OwnerSeat);
+            return count > 0 && count % 2 == 0 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiXianjinReservedEvent>().Any(e => e.OwnerSeat == g.OwnerSeat && e.DamageCount >= count) && (g.Context.SourceSeat == g.OwnerSeat || g.Context.TargetSeat == g.OwnerSeat);
         }
 
         if (CharacterDengAiHappyGodRuntime.IsShenDaQijing(g.SkillId))
@@ -297,7 +297,7 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 38500)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 38500)]
-    internal bool ContinueIssuedShenDa(ProgramSkillFrame f) => f.ShenDengAi is { Stage: ShenDengAiStage.DrawAttempt or ShenDengAiStage.DrawChildren or ShenDengAiStage.NativeUse or ShenDengAiStage.NativeChildren } || CharacterDengAiHappyGodRuntime.IsShenDaQijing(f.SkillId) && _coreProgramEventHistoryOperations.ProgramEventHistory<ShenDengAiAwakenedEvent>().Any(e => e.FrameId == f.Id);
+    internal bool ContinueIssuedShenDa(ProgramSkillFrame f) => f.ShenDengAi is { Stage: ShenDengAiStage.DrawAttempt or ShenDengAiStage.DrawChildren or ShenDengAiStage.NativeUse or ShenDengAiStage.NativeChildren } || CharacterDengAiHappyGodRuntime.IsShenDaQijing(f.SkillId) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiAwakenedEvent>().Any(e => e.FrameId == f.Id);
 
     [ProgramAiChoice(SkillProgramEffectOp.AllocateShenDengAiTuoYu)]
     internal PromptChoice ChooseShenDaAllocation(PendingDecision p, ProgramSkillFrame f) => ChooseShenDa(p, f);

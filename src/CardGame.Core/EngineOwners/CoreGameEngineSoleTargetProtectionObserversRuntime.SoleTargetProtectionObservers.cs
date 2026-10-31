@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineSoleTargetProtectionObserversRuntime
 {
     internal bool SoleTargetProtectionFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
-        if (!_coreSoleTargetProtectionOperations.HasExactSoleProtectionRoot(f) || f.SoleTargetProtection is not { Cost: not null } r)
+        if (!_coreSoleTargetProtectionOperations.Value.HasExactSoleProtectionRoot(f) || f.SoleTargetProtection is not { Cost: not null } r)
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
         {

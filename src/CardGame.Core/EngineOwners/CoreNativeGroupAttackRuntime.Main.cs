@@ -32,12 +32,12 @@ internal sealed partial class CoreNativeGroupAttackRuntime
             return;
         }
 
-        if (_coreGroupTargetNullificationOperations.TryBeginGroupTargetNullification(group))
+        if (_coreGroupTargetNullificationOperations.Value.TryBeginGroupTargetNullification(group))
             return;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(group.ResolutionId, group.DamageSourceSeat, target.Seat, (_characterZhugeLiangMouOperations.IsZeroEntityUse(group.ResolutionId) || _characterZhugeLiangMouOperations.IsMouZhijueZeroUse(group.ResolutionId) || _coreVirtualOrdinaryTrickUsesOperations.IsProgramVirtualOrdinaryTrickUse(group.ResolutionId)) ? null : group.Card, playedCardKind: group.Card.Kind, physicalCards: group.PhysicalCards, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasDirectedCardArmorBypass(group.ResolutionId, target.Seat));
         group.CurrentAttack = attack;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
-        _coreRequiredGroupDodgesOperations.FreezeRequiredGroupDodgeResponses(group, attack);
+        _coreRequiredGroupDodgesOperations.Value.FreezeRequiredGroupDodgeResponses(group, attack);
         if (_coreHellActivitiesOperations.HasHellRemenImmunity(target, group.Card.Kind))
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(group.ResolutionId, ResolutionFrameStep.ResolvingEffect);
@@ -45,7 +45,7 @@ internal sealed partial class CoreNativeGroupAttackRuntime
             return;
         }
 
-        if (_coreNativeDamageHandlesOperations.UsesFormalTengjia && !attack.IgnoresArmor && _coreNativeEquipmentAndFactionQueriesOperations.HasTengjia(target) && group.Card.Kind is CardKind.BarbarianAssault or CardKind.ArrowBarrage)
+        if (_coreNativeDamageHandlesOperations.Value.UsesFormalTengjia && !attack.IgnoresArmor && _coreNativeEquipmentAndFactionQueriesOperations.HasTengjia(target) && group.Card.Kind is CardKind.BarbarianAssault or CardKind.ArrowBarrage)
         {
             _coreMatchLogOperations.AddLog("ArmorEffect", $"{(target.Name)} 的【藤甲】令【{(CardCatalog.Get(group.Card.Kind).DisplayName)}】对其无效。", target.Seat, group.SourceSeat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ArmorEffectAppliedEvent(group.ResolutionId, CardKind.Tengjia, group.SourceSeat, target.Seat, group.Card.Kind));
@@ -54,7 +54,7 @@ internal sealed partial class CoreNativeGroupAttackRuntime
             return;
         }
 
-        if (_characterLuXunMouMobileOperations.TryBeginMouLuXunGroupEffect(group))
+        if (_characterLuXunMouMobileOperations.Value.TryBeginMouLuXunGroupEffect(group))
             return;
         ContinueGroupAttackResponseAfterEffect(group);
     }

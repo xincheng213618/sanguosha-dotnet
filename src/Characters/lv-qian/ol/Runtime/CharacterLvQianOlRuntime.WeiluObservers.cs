@@ -50,7 +50,7 @@ internal sealed partial class CharacterLvQianOlRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         if (index < 2 || f.WindowContext is not { } context || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.ParentFrameId != damageId || window.TriggerWindow != SkillProgramTriggerWindow.AfterDamageApplied || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()) || _resolutionStackOperations._resolutionStack[index - 2] is not DamageFrame damage || damage.Id != damageId || damage.SourceSeat != attacker || damage.TargetSeat != f.OwnerSeat || damage.Amount != amount)
             return false;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window);
         return attack.ResolutionId == damage.ParentFrameId && attack.DamageWasApplied && !attack.IsSourceLess && !attack.IsDelayedJudgmentDamage && attack.SourceSeat == attacker && attack.TargetSeat == f.OwnerSeat && attack.DamageAmount == amount && CoreGameEngineTurnDefaultStatsValidationRuntime.TurnDefaultStatDamageRequestMatches(_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray(), damageId, attacker, f.OwnerSeat, amount, damage.Nature, false);
     }
 }

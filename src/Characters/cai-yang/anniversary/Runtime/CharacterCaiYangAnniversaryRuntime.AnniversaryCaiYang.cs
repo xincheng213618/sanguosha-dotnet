@@ -11,7 +11,7 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
             throw new InvalidOperationException("Cai Yang requires his original unpaid instruction.");
         if (operation == SkillProgramEffectOp.ArmAnniversaryCaiYangXunji)
         {
-            if (f.TriggerId is not null || f.ActivationId != AnniversaryCaiYangComposition.Arm || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreProgramEventHistoryOperations.ProgramEventHistory<CaiYangXunjiArmedEvent>().Any(e => e.Grant.FrameId == f.Id))
+            if (f.TriggerId is not null || f.ActivationId != AnniversaryCaiYangComposition.Arm || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaiYangXunjiArmedEvent>().Any(e => e.Grant.FrameId == f.Id))
                 throw new InvalidOperationException("Xunji designation requires its real once-per-Play selected other living target.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaiYangXunjiArmedEvent(new(f.Id, CaiYangSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, target)));
             return SkillProgramStepOutcome.Continue;
@@ -80,7 +80,7 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
         {
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(r.Duel!.UseId)is not null)
                 return;
-            if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || _coreNativeCardContinuationCursorsOperations.ActiveDuel is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.Duel.UseId && e.CardKind == CardKind.Duel && e.CardId == 0) != 1)
+            if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || _coreNativeCardContinuationCursorsOperations.ActiveDuel is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.Duel.UseId && e.CardKind == CardKind.Duel && e.CardId == 0) != 1)
                 throw new InvalidOperationException("Xunji must wait until its original native Duel is fully cleaned up.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaiYangXunjiReturnedEvent(f.Id, r.Duel.UseId, r.Duel.ActionId));
             FinishCaiYang(f);
@@ -146,7 +146,7 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryCaiYang: { Stage: AnniversaryCaiYangStage.Duel, Duel: { } o } } f || completion.ResolutionId != o.UseId)
             return false;
-        if (completion.ProgramFrameId != f.Id || _coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CaiYangXunjiIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (completion.ProgramFrameId != f.Id || _coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaiYangXunjiIssuedEvent>().Count(e => e.Origin == o) != 1)
             throw new InvalidOperationException("Xunji lost its exact original Duel cleanup return.");
         ContinueCaiYang(f.Id);
         return true;

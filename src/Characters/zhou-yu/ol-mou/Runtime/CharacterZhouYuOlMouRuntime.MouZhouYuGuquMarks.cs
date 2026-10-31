@@ -6,7 +6,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     internal const string MouGuquSkill = "mou-ol:guqu";
     internal const string MouGuquBinding = "completed-que-use";
     internal bool HasMouGuquCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouZhouYuGuqu);
-    internal bool MouGuquTurnOpen => HasMouGuquCapability && _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreTableSeatQueriesOperations.IsValidPlayerSeat(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && !_coreProgramEventHistoryOperations.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
+    internal bool MouGuquTurnOpen => HasMouGuquCapability && _coreMatchSetupSetupCompleteAccess._setupComplete && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreTableSeatQueriesOperations.IsValidPlayerSeat(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
 
     internal IReadOnlyList<(CardConversionSource Source, string Hash)> CurrentMouGuquSources()
     {
@@ -16,7 +16,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     }
 
     internal bool IsCurrentMouGuquSource(CardConversionSource source, string hash) => CurrentMouGuquSources().Any(s => s.Source == source && s.Hash == hash);
-    internal bool IsMouGuquQueForSource(CardConversionSource source, int cardId) => MouGuquTurnOpen && _coreProgramEventHistoryOperations.ProgramEventHistory<GuquQueMarkedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Source == source && e.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash && e.CardId == cardId);
+    internal bool IsMouGuquQueForSource(CardConversionSource source, int cardId) => MouGuquTurnOpen && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquQueMarkedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Source == source && e.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash && e.CardId == cardId);
     // Registration only; the query still belongs to legacy GameEngine.MouZhouYuGuqu.Marks.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 210)]
     internal void ProjectMouGuquCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
@@ -24,9 +24,9 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         projection.Append(HasMouGuquEntityMark(cardId) ? "阙" : null);
     }
 
-    internal bool HasMouGuquEntityMark(int cardId) => HasMouGuquCapability && _coreProgramEventHistoryOperations.ProgramEventHistory<GuquQueMarkedEvent>().Any(e => e.CardId == cardId && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && CurrentMouGuquSources().Any(s => IsMouGuquQueForSource(s.Source, cardId));
+    internal bool HasMouGuquEntityMark(int cardId) => HasMouGuquCapability && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquQueMarkedEvent>().Any(e => e.CardId == cardId && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && CurrentMouGuquSources().Any(s => IsMouGuquQueForSource(s.Source, cardId));
     internal bool HasMouGuquHandEntityMark(int holder, int cardId) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(holder) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]).Any(c => c.Id == cardId) && HasMouGuquEntityMark(cardId);
-    internal IReadOnlyList<(CardConversionSource Source, string Hash)> MouGuquRestrictingSources(int actor) => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) || !HasMouGuquCapability || !_coreProgramEventHistoryOperations.ProgramEventHistory<GuquQueMarkedEvent>().Any() ? [] : CurrentMouGuquSources().Where(s => s.Source.OwnerSeat != actor && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[actor]).Any(c => IsMouGuquQueForSource(s.Source, c.Id))).ToArray();
+    internal IReadOnlyList<(CardConversionSource Source, string Hash)> MouGuquRestrictingSources(int actor) => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) || !HasMouGuquCapability || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquQueMarkedEvent>().Any() ? [] : CurrentMouGuquSources().Where(s => s.Source.OwnerSeat != actor && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[actor]).Any(c => IsMouGuquQueForSource(s.Source, c.Id))).ToArray();
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 29021)]
     internal void CaptureMouGuquPublicHandReveals(IGameEvent payload)
     {
@@ -56,7 +56,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
             foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetHand(player).Where(c => shown.Contains(c.Id)))
                 foreach (var source in sources)
                 {
-                    if (_coreProgramEventHistoryOperations.ProgramEventHistory<GuquQueMarkedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Source == source.Source && e.GameplayHash == source.Hash && e.CardId == card.Id))
+                    if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquQueMarkedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Source == source.Source && e.GameplayHash == source.Hash && e.CardId == card.Id))
                         continue;
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuquQueMarkedEvent(source.Source, source.Hash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, frame, player.Seat, card.Id, card.Kind, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
                 }

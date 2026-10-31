@@ -3,8 +3,8 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiahouDunMouMobileRuntime
 {
-    internal int[] MouXiahouDunGanglieTargets(int seat) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Any(e => !e.SourceLess && e.Amount > 0 && e.TargetSeat == seat && e.SourceSeat == p.Seat) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouDunMobileGanglieSpentEvent>().Any(e => e.OwnerSeat == seat && e.TargetSeat == p.Seat)).Select(p => p.Seat).ToArray();
-    internal int MouXiahouDunPhaseUses(int seat, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouDunMobileStartedEvent>().Count(e => e.Source.OwnerSeat == seat && e.Op == SkillProgramEffectOp.ResolveMouXiahouDunGanglie && e.Phase == phase);
+    internal int[] MouXiahouDunGanglieTargets(int seat) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Any(e => !e.SourceLess && e.Amount > 0 && e.TargetSeat == seat && e.SourceSeat == p.Seat) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouDunMobileGanglieSpentEvent>().Any(e => e.OwnerSeat == seat && e.TargetSeat == p.Seat)).Select(p => p.Seat).ToArray();
+    internal int MouXiahouDunPhaseUses(int seat, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouDunMobileStartedEvent>().Count(e => e.Source.OwnerSeat == seat && e.Op == SkillProgramEffectOp.ResolveMouXiahouDunGanglie && e.Phase == phase);
     [ProgramPhaseUsedProjection(60)]
     internal int MouXiahouDunProjectedUses(int seat, string skill, int fallback) => skill == MouXiahouDunGanglie && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase ? MouXiahouDunPhaseUses(seat, phase) : fallback;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 31200, SkillProgramEffectOp.ResolveMouXiahouDunGanglie)]

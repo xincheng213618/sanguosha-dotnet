@@ -36,7 +36,7 @@ internal sealed partial class CoreGameEngineProgramSkillChangesRuntime
     int IProgramSkillChangeFacts.ConversionTier(int seat, string state) => _coreGameEngineConfiguredConversionsConfiguredConversionTiersAccess._configuredConversionTiers.GetValueOrDefault((seat, state));
     void IProgramSkillChangeFacts.RequireSkill(string skillId) => _ = _contentRegistryOperations._contentRegistry.GetSkill(skillId);
     bool IProgramSkillChangeFacts.IsAwakening(string skillId) => (_contentRegistryOperations._contentRegistry.GetSkill(skillId).Tags & SkillTag.Awakening) != 0;
-    bool IProgramSkillChangeFacts.IsDyingOwnerReplacement(ProgramSkillFrame frame) => _coreDyingOwnerSkillReplacementOperations.IsDyingOwnerReplacementBinding(frame);
+    bool IProgramSkillChangeFacts.IsDyingOwnerReplacement(ProgramSkillFrame frame) => _coreDyingOwnerSkillReplacementOperations.Value.IsDyingOwnerReplacementBinding(frame);
     IReadOnlyList<string> IProgramSkillChangeFacts.EnabledSkillIds(int seat) => _coreNationalSkillsOperations.EnabledContentSkillIds(_coreMatchParticipantsPlayersAccess._players[seat]);
     IReadOnlyList<SkillGrant> IProgramSkillGrantQueries.Grants(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants;
     IReadOnlyList<SkillGrant> IProgramSkillGrantQueries.ActiveGrants(int seat) => _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[seat]).ActiveGrants;
@@ -49,8 +49,8 @@ internal sealed partial class CoreGameEngineProgramSkillChangesRuntime
     void IProgramSkillChangeOperations.InvalidateBindings(int seat) => _skillBindingIndexOperations._skillBindingIndex.Invalidate(seat);
     void IProgramSkillChangeOperations.RegisterTaggedConversionSkill(int seat, string skillId) => _coreConversionStatesOperations.RegisterTaggedConversionSkill(_coreMatchParticipantsPlayersAccess._players[seat], skillId);
     void IProgramSkillChangeOperations.AdvanceFact(IGameEvent fact) => _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(fact);
-    IReadOnlyList<string> IProgramSkillChangeOperations.AcquireDyingOwnerReplacementSkills(ProgramSkillFrame frame, IReadOnlyList<string> skillIds) => _coreDyingOwnerSkillReplacementOperations.AcquireDyingOwnerReplacementSkills(frame, skillIds);
-    ProgramReplacedPaidHpContinuation? IProgramSkillChangeOperations.CaptureDyingReplacementContinuation(ProgramSkillFrame frame, SkillProgramEffect effect) => _coreDyingOwnerSkillReplacementOperations.CaptureDyingOwnerReplacementContinuation(frame, effect);
-    void IProgramSkillChangeOperations.IssueReplacedPaidHpContinuation(ProgramReplacedPaidHpContinuation continuation) => _coreDyingOwnerSkillReplacementOperations.IssueReplacedPaidHpContinuation(continuation);
+    IReadOnlyList<string> IProgramSkillChangeOperations.AcquireDyingOwnerReplacementSkills(ProgramSkillFrame frame, IReadOnlyList<string> skillIds) => _coreDyingOwnerSkillReplacementOperations.Value.AcquireDyingOwnerReplacementSkills(frame, skillIds);
+    ProgramReplacedPaidHpContinuation? IProgramSkillChangeOperations.CaptureDyingReplacementContinuation(ProgramSkillFrame frame, SkillProgramEffect effect) => _coreDyingOwnerSkillReplacementOperations.Value.CaptureDyingOwnerReplacementContinuation(frame, effect);
+    void IProgramSkillChangeOperations.IssueReplacedPaidHpContinuation(ProgramReplacedPaidHpContinuation continuation) => _coreDyingOwnerSkillReplacementOperations.Value.IssueReplacedPaidHpContinuation(continuation);
     void IProgramSkillChangeOperations.Finish(ProgramSkillFrame frame) => _coreSkillProgramsOperations.FinishProgramSkill(frame, completed: true);
 }

@@ -5,7 +5,7 @@ internal sealed partial class CharacterSunJianBoundaryMobileRuntime
 {
     internal const string MobileSunJianPolu = "boundary:polu-mobile";
     SkillProgramStepOutcome IMobileSunJianPoluHost.Draw(ProgramSkillFrame frame) => BeginMobileSunJianPolu(frame);
-    internal int MobileSunJianInvocationCount(ProgramSkillFrame frame) => _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.SkillId == MobileSunJianPolu && e.OwnerSeat == frame.OwnerSeat && e.FrameId <= frame.Id);
+    internal int MobileSunJianInvocationCount(ProgramSkillFrame frame) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.SkillId == MobileSunJianPolu && e.OwnerSeat == frame.OwnerSeat && e.FrameId <= frame.Id);
     internal SkillProgramStepOutcome BeginMobileSunJianPolu(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

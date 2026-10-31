@@ -6,17 +6,17 @@ internal sealed partial class CharacterSunHongOlRuntime
     internal static bool XianbiChildren(XianbiStage stage) => RuntimeSkills.RuntimeRules_sun_hong_ol_SunHongObservers.XianbiChildren(stage);
     internal bool ValidXianbi(ProgramSkillFrame f)
     {
-        if (f.Xianbi is not { } r || f.InstructionIndex != 1 || f.SkillId != "ol:xianbi" || f.TriggerId is not null || f.WindowContext is not null || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "adjust-and-return" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != XianbiSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveXianbiHandAdjustmentAndRandomReturns || !Enum.IsDefined(r.Stage) || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Cursor < 0 || r.Cursor > r.Primary.Count || r.Hand.Select(c => c.CardId).Distinct().Count() != r.Hand.Count || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Any(id => !r.Hand.Any(c => c.CardId == id)) || r.Primary.Select(c => c.CardId).Distinct().Count() != r.Primary.Count || r.Primary.Any(c => !r.Hand.Contains(c)) || _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner && e.PlayPhase == r.PlayPhase) != 1)
+        if (f.Xianbi is not { } r || f.InstructionIndex != 1 || f.SkillId != "ol:xianbi" || f.TriggerId is not null || f.WindowContext is not null || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) != "adjust-and-return" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Source != XianbiSource(f) || r.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.GameplayHash || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveXianbiHandAdjustmentAndRandomReturns || !Enum.IsDefined(r.Stage) || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.TargetSeat) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Cursor < 0 || r.Cursor > r.Primary.Count || r.Hand.Select(c => c.CardId).Distinct().Count() != r.Hand.Count || r.Selected.Distinct().Count() != r.Selected.Count || r.Selected.Any(id => !r.Hand.Any(c => c.CardId == id)) || r.Primary.Select(c => c.CardId).Distinct().Count() != r.Primary.Count || r.Primary.Any(c => !r.Hand.Contains(c)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurn == r.ActualTurn && e.TurnOwner == r.TurnOwner && e.PlayPhase == r.PlayPhase) != 1)
             return false;
-        var target = _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiTargetFrozenEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var target = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiTargetFrozenEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (!r.Issued)
             return r.Stage == XianbiStage.Target && target.Length == 0 && r.Hand.Count == 0 && r.Primary.Count == 0 && r.Selected.Count == 0 && r.Revision == 0 && r.MovementStep == 0 && f.PendingMovementContinuation is null;
         if (target is not [var frozen] || frozen.TargetSeat != r.TargetSeat || frozen.HandBefore != r.HandBefore || frozen.EquipmentCount != r.EquipmentCount || r.HandBefore != r.Hand.Count || r.HandBefore == r.EquipmentCount || r.Required != Math.Abs(r.HandBefore - r.EquipmentCount) || r.Selected.Count > r.Required)
             return false;
-        var hand = _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiHandEntityEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
+        var hand = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiHandEntityEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
         if (!hand.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, r.Hand.Count)) || !hand.Select(e => new XianbiEntity(e.CardId, e.Kind, e.EffectiveKind)).SequenceEqual(r.Hand))
             return false;
-        var selections = _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiSelectionChangedEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var selections = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiSelectionChangedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (selections.Length != r.Revision)
             return false;
         var selected = new List<int>();
@@ -33,7 +33,7 @@ internal sealed partial class CharacterSunHongOlRuntime
 
         if (!selected.SequenceEqual(r.Selected))
             return false;
-        var committed = _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiPrimaryCommittedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
+        var committed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiPrimaryCommittedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
         if (!committed.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, r.Primary.Count)) || !committed.Select(e => new XianbiEntity(e.CardId, e.Kind, e.EffectiveKind)).SequenceEqual(r.Primary))
             return false;
         if (r.HandBefore < r.EquipmentCount)
@@ -45,13 +45,13 @@ internal sealed partial class CharacterSunHongOlRuntime
             return false;
         if (XianbiChildren(r.Stage))
         {
-            if (f.PendingMovementContinuation is not { } pending || !IsSunHongMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending) || r.MovementStep < 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiMovementIssuedEvent>().Count(e => e.FrameId == f.Id && e.Step == r.MovementStep && e.Stage == r.Stage && e.Cursor == r.Cursor && e.Before == r.Before && e.After == r.After && e.Count == r.ActualCount) != 1)
+            if (f.PendingMovementContinuation is not { } pending || !IsSunHongMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending) || r.MovementStep < 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiMovementIssuedEvent>().Count(e => e.FrameId == f.Id && e.Step == r.MovementStep && e.Stage == r.Stage && e.Cursor == r.Cursor && e.Before == r.Before && e.After == r.After && e.Count == r.ActualCount) != 1)
                 return false;
-            var moves = _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiEntityMovedEvent>().Where(e => e.FrameId == f.Id && e.Step == r.MovementStep).ToArray();
+            var moves = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiEntityMovedEvent>().Where(e => e.FrameId == f.Id && e.Step == r.MovementStep).ToArray();
             if (r.Stage == XianbiStage.DrawChildren)
             {
-                var drawn = _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiDrawnEntityEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
-                if (_coreProgramEventHistoryOperations.ProgramEventHistory<XianbiDrawReturnedEvent>().Count(e => e.FrameId == f.Id && e.SequenceBefore == r.Before && e.SequenceAfter == r.After && e.ActualDrawCount == r.ActualCount) != 1)
+                var drawn = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiDrawnEntityEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).ToArray();
+                if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiDrawReturnedEvent>().Count(e => e.FrameId == f.Id && e.SequenceBefore == r.Before && e.SequenceAfter == r.After && e.ActualDrawCount == r.ActualCount) != 1)
                     return false;
                 if (moves.Length != 0 || drawn.Length != r.ActualCount || drawn.Select(e => e.CardId).Distinct().Count() != drawn.Length || !drawn.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, drawn.Length)) || drawn.Length > r.Required || drawn.Any(e => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == e.CardId && m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == XianbiDrawReason)))
                     return false;
@@ -65,8 +65,8 @@ internal sealed partial class CharacterSunHongOlRuntime
         {
             if (r.Cursor >= r.Primary.Count || r.ChosenCard is not { } chosen || r.Eligible.Count == 0 || r.Eligible.Distinct().Count() != r.Eligible.Count || r.Eligible.Contains(r.Primary[r.Cursor].CardId))
                 return false;
-            var candidates = _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiRandomCandidateEvent>().Where(e => e.FrameId == f.Id && e.Cursor == r.Cursor).OrderBy(e => e.Index).ToArray();
-            var random = _coreProgramEventHistoryOperations.ProgramEventHistory<XianbiRandomIssuedEvent>().Where(e => e.FrameId == f.Id && e.Cursor == r.Cursor).ToArray();
+            var candidates = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiRandomCandidateEvent>().Where(e => e.FrameId == f.Id && e.Cursor == r.Cursor).OrderBy(e => e.Index).ToArray();
+            var random = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XianbiRandomIssuedEvent>().Where(e => e.FrameId == f.Id && e.Cursor == r.Cursor).ToArray();
             var replay = new DeterministicRandom(unchecked((int)r.RandomBefore));
             var index = replay.Next(r.Eligible.Count);
             if (!candidates.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, r.Eligible.Count)) || !candidates.Select(e => e.CardId).SequenceEqual(r.Eligible) || index != r.RandomIndex || replay.State != r.RandomAfter || chosen != r.Eligible[index] || random is not [var issued] || issued.OriginalCardId != r.Primary[r.Cursor].CardId || issued.CardId != chosen || issued.Index != index || issued.Count != r.Eligible.Count || issued.Before != r.RandomBefore || issued.After != r.RandomAfter)

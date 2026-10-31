@@ -13,15 +13,15 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.RecipientContest is not null || f.InstructionIndex != 1 || f.TriggerId is not null || f.WindowContext is not null || f.SelectedTargetSeats is not [var selected] || selected != recipient || recipient == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipient) || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play)
             throw new InvalidOperationException("A recipient contest requires its original one-other-target actual Play activation.");
-        if (!_coreUniqueHpPeerProgramsOperations.RecipientContestUnissuedSource(f) || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !CanStartRecipientContest(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))
+        if (!_coreUniqueHpPeerProgramsOperations.Value.RecipientContestUnissuedSource(f) || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !CanStartRecipientContest(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "原赠牌来源或受赠者失效，未支付。");
             return SkillProgramStepOutcome.AwaitChild;
         }
 
         var ids = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(c => c.Id).ToArray();
-        var before = _coreUniqueHpPeerProgramsOperations.RecipientContestSequence;
-        var r = new RecipientContestReceipt(1, _coreUniqueHpPeerProgramsOperations.RecipientContestSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, recipient, bind, ids, before, before);
+        var before = _coreUniqueHpPeerProgramsOperations.Value.RecipientContestSequence;
+        var r = new RecipientContestReceipt(1, _coreUniqueHpPeerProgramsOperations.Value.RecipientContestSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, recipient, bind, ids, before, before);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { RecipientContest = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(RecipientContestGiftReason(f)), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, ids, _coreCardMovementJournalMovementSequenceAccess._movementSequence, (_, records) =>
         {
@@ -70,7 +70,7 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
         if (r.Stage != RecipientContestStage.ChoosingThird || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || choice.Cards.Count != 0 || choice.Targets is not [var third] || !RecipientContestThirds(f).Contains(third) || choice.Id.Value != $"recipient-contest.{(f.Id)}.third-{(third)}")
             throw new InvalidOperationException("The recipient contest lost its exact published third participant.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreUniqueHpPeerProgramsOperations.RecipientContestUnissuedSource(f) || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
+        if (!_coreUniqueHpPeerProgramsOperations.Value.RecipientContestUnissuedSource(f) || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "保留赠牌，取消尚未发行的拼点。");
             return;
@@ -93,7 +93,7 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
             if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id))
                 return true;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
-            if (!_coreUniqueHpPeerProgramsOperations.RecipientContestUnissuedSource(f) || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
+            if (!_coreUniqueHpPeerProgramsOperations.Value.RecipientContestUnissuedSource(f) || !_coreMatchParticipantsPlayersAccess._players[r.RecipientSeat].IsAlive)
             {
                 _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "已赠实体和孩子保留，未发行拼点取消。");
                 return true;
@@ -159,7 +159,7 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
 
         var actor = result.SourceWon ? result.SourceSeat : result.OpponentSeat;
         var target = result.SourceWon ? result.OpponentSeat : result.SourceSeat;
-        if (!_coreUniqueHpPeerProgramsOperations.RecipientContestUnissuedSource(f) || !_coreForeignTurnContestsOperations.CanUseForeignTurnContestSlash(actor, target))
+        if (!_coreUniqueHpPeerProgramsOperations.Value.RecipientContestUnissuedSource(f) || !_coreForeignTurnContestsOperations.Value.CanUseForeignTurnContestSlash(actor, target))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "真实拼点结果保留，尚未发行的赢家杀取消。");
             return SkillProgramStepOutcome.AwaitChild;
@@ -183,7 +183,7 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor, CardKind.Slash);
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, actor, target, card: null, damageAmount: 1 + winner.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(winner, _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash), programSkillCardUseFrameId: f.Id);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(useId, winner);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(useId, winner);
         winner.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor, target));
@@ -207,14 +207,14 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
         var returned = completion.PindianWinnerSlashReturn ?? throw new InvalidOperationException("Missing recipient winner typed return.");
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(returned.ProgramFrameId);
         var r = f.RecipientContest;
-        if (completion.ProgramFrameId != f.Id || completion.ResolutionId != returned.CardUseFrameId || r is not { Stage: RecipientContestStage.SlashIssued } || r.SlashReturn != returned || returned.Source != _coreUniqueHpPeerProgramsOperations.RecipientContestSource(f) || returned.GameplayHash != f.GameplayHash || f.InstructionIndex != 2 || !RecipientContestResultMatches(f, out _) || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => u.Id == returned.CardUseFrameId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == returned.CardUseFrameId) != 1)
+        if (completion.ProgramFrameId != f.Id || completion.ResolutionId != returned.CardUseFrameId || r is not { Stage: RecipientContestStage.SlashIssued } || r.SlashReturn != returned || returned.Source != _coreUniqueHpPeerProgramsOperations.Value.RecipientContestSource(f) || returned.GameplayHash != f.GameplayHash || f.InstructionIndex != 2 || !RecipientContestResultMatches(f, out _) || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => u.Id == returned.CardUseFrameId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == returned.CardUseFrameId) != 1)
             throw new InvalidOperationException("The winner Slash returned outside its original paid gift/result and owning use.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { RecipientContest = r with { Stage = RecipientContestStage.Complete } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PindianWinnerSlashReturnedEvent(returned));
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
 
-    SkillProgramStepOutcome IRecipientContestProgramHost.DiscardDrawPeer(ProgramSkillFrame f) => _coreUniqueHpPeerProgramsOperations.BeginUniqueHpPeer(f);
+    SkillProgramStepOutcome IRecipientContestProgramHost.DiscardDrawPeer(ProgramSkillFrame f) => _coreUniqueHpPeerProgramsOperations.Value.BeginUniqueHpPeer(f);
     SkillProgramStepOutcome IRecipientContestProgramHost.GiveAllHandContest(ProgramSkillFrame f, int seat, string bind) => BeginRecipientContest(f, seat, bind);
     SkillProgramStepOutcome IRecipientContestProgramHost.UseContestWinnerSlash(ProgramSkillFrame f, string bind) => UseRecipientContestWinner(f, bind);
 }

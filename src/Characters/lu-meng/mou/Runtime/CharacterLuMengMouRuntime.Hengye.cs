@@ -5,10 +5,10 @@ internal sealed partial class CharacterLuMengMouRuntime
 {
     internal const string HengyeSkillId = "mou:hengye";
     internal const string HengyeGrowthUsageId = "growth";
-    internal int GetHengyeGrowth(CharacterState player) => _coreMouLuMengOperations.UsesFormalMouLuMeng && _coreNationalSkillsOperations.HasRuntimeSkill(player, HengyeSkillId) ? _skillRuntimeStateOperations._skillRuntimeState.GetUsage(player.Seat, HengyeSkillId, HengyeGrowthUsageId, SkillUsageScope.Game) : 0;
+    internal int GetHengyeGrowth(CharacterState player) => _coreMouLuMengOperations.Value.UsesFormalMouLuMeng && _coreNationalSkillsOperations.HasRuntimeSkill(player, HengyeSkillId) ? _skillRuntimeStateOperations._skillRuntimeState.GetUsage(player.Seat, HengyeSkillId, HengyeGrowthUsageId, SkillUsageScope.Game) : 0;
     internal void ApplyHengyeGrowth(long damageFrameId, CharacterState source, CharacterState target, int amount)
     {
-        if (!_coreMouLuMengOperations.UsesFormalMouLuMeng || amount <= 0 || !source.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(source, HengyeSkillId))
+        if (!_coreMouLuMengOperations.Value.UsesFormalMouLuMeng || amount <= 0 || !source.IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(source, HengyeSkillId))
             return;
         var previous = GetHengyeGrowth(source);
         if (!_skillRuntimeStateOperations._skillRuntimeState.TryConsumeUsage(source.Seat, HengyeSkillId, HengyeGrowthUsageId, SkillUsageScope.Game, limit: 3))
@@ -38,7 +38,7 @@ internal sealed partial class CharacterLuMengMouRuntime
 
     internal void ResetHengyeAfterKill(CharacterState? killer)
     {
-        if (!_coreMouLuMengOperations.UsesFormalMouLuMeng || killer is not { IsAlive: true } || !_coreNationalSkillsOperations.HasRuntimeSkill(killer, HengyeSkillId))
+        if (!_coreMouLuMengOperations.Value.UsesFormalMouLuMeng || killer is not { IsAlive: true } || !_coreNationalSkillsOperations.HasRuntimeSkill(killer, HengyeSkillId))
             return;
         var previous = GetHengyeGrowth(killer);
         _skillRuntimeStateOperations._skillRuntimeState.ResetSkill(killer.Seat, HengyeSkillId);

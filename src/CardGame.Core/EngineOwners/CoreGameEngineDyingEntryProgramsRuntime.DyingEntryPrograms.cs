@@ -21,7 +21,7 @@ internal sealed partial class CoreGameEngineDyingEntryProgramsRuntime
 
     internal void CompleteDyingEntryProgramWindow(ProgramLifecycleTriggerWindowFrame frame)
     {
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("Dying entry lost its resolution.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("Dying entry lost its resolution.");
         if (dying.FrameId != frame.ResumeDyingFrameId || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != dying.FrameId)
             throw new InvalidOperationException("Dying entry lost its parent continuation.");
         if (_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp > 0)

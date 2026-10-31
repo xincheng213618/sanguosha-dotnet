@@ -13,7 +13,7 @@ internal sealed partial class CharacterZhangJiOlRuntime
         if (!IsZhangJiJudgment(j, f))
             throw new InvalidOperationException("Lueming received a foreign judgment return.");
         var result = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<JudgmentResolvedEvent>().Single(e => e.ResolutionId == j.Id);
-        var finalCard = _coreNativeDamageHandlesOperations.GetJudgmentCard(j);
+        var finalCard = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(j);
         _coreProgramLifecycleOperations.SetProgramCardSet(f.Id, "zhang-ji-rank", finalCard is null ? [] : [finalCard.Id], SkillProgramCardSetVisibility.Public, finalCard is null ? [] : [_cardZonesOperations._cardZones.GetLocation(finalCard.Id)], finalCard is null ? null : _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentSuit(j, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[j.TargetSeat], finalCard)));
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var r = f.ZhangJi!;

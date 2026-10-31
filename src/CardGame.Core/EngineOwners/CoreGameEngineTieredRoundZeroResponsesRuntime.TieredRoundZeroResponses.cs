@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
 {
     internal IReadOnlyList<PromptChoice> TieredRoundZeroResponseChoices(CharacterState actor, CardKind kind, bool dyingUse = false)
     {
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying;
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying;
         if (dyingUse)
         {
             if (dying is null || dying.ResponderSeat != actor.Seat || !_coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp > 0 || kind == CardKind.Peach && !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(actor.Seat, dying.VictimSeat) || kind == CardKind.Alcohol && (dying.VictimSeat != actor.Seat || _coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, dying.VictimSeat, Suit.None))
@@ -45,7 +45,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
             return;
         if (dyingUse)
         {
-            var dying = _coreDyingCursorRuntimeOperations.ActiveDying!;
+            var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying!;
             var card = new Card(0, kind, Suit.None, 0);
             var victim = _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat];
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -88,7 +88,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
         // Policy preparation attaches its response admission to the live frame.
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == pending.Id);
         pending = _characterChengYuMouOperations.HasMouCyMatchingName(actor.Seat, CardKind.Nullification) || _characterHuangZhongAnniversaryGodOperations.HasAnniversaryHzPendingInvalidation(actor.Seat) ? _coreNamedAmbushInvalidationOperations.PrepareNamedAmbushCounterspell(pending, actor.Seat, 0) : _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { EffectNullified = !pending.EffectNullified, ChainDepth = pending.ChainDepth + 1, CandidateSeats = _coreNativeNullificationOperations.BuildNullificationCandidateSeats(actor.Seat), CandidateIndex = 0, Step = ResolutionFrameStep.AwaitingResponse });
-        var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _coreDelayedNullificationOperations.NullificationParentActionId(pending), CardActionType.Response, actor.Seat, actor.Seat, null, actor.Seat, pending.SourceSeat, CardKind.Nullification, [], [], [source], effectiveSuit: Suit.None, effectiveRank: 0));
+        var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _coreDelayedNullificationOperations.Value.NullificationParentActionId(pending), CardActionType.Response, actor.Seat, actor.Seat, null, actor.Seat, pending.SourceSeat, CardKind.Nullification, [], [], [source], effectiveSuit: Suit.None, effectiveRank: 0));
         IssueTieredRoundResponse(pending, action, source);
         if (pending.NamedAmbushResponse is not null)
             _coreNamedAmbushInvalidationOperations.BindNamedAmbushCounterspell(pending.Id, action);
@@ -102,7 +102,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == pending.Id);
         if (_coreUnrespondableCounterspellsOperations.TryBeginPolicyCounterspellPayment(pending, action, policy, []))
             return;
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(null, action, ProgramCardContinuation.NullificationResponse))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(null, action, ProgramCardContinuation.NullificationResponse))
             return;
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(null, action, SkillProgramTriggerWindow.CardResponseAccepted, [], ProgramCardContinuation.NullificationResponse))
             return;
@@ -125,7 +125,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(0, actor.Seat, attack.SourceSeat, CardKind.Dodge));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(action));
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.Dodge))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.Dodge))
             return;
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardResponseAccepted, [attack.SourceSeat], ProgramCardContinuation.Dodge))
             return;
@@ -154,7 +154,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
             return false;
         return owner switch
         {
-            NullificationWindowFrame n => r.EffectiveKind == CardKind.Nullification && _coreDelayedNullificationOperations.HasNullificationEffectOwner(n) && action.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(n) && action.OpponentSeat == n.SourceSeat,
+            NullificationWindowFrame n => r.EffectiveKind == CardKind.Nullification && _coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(n) && action.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(n) && action.OpponentSeat == n.SourceSeat,
             CardUseFrame use => r.EffectiveKind == CardKind.Dodge && use.CardAttack is { } attack && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.ParentActionId == use.Action?.ActionId && action.ActorSeat == attack.TargetSeat && action.OpponentSeat == attack.SourceSeat,
             _ => false
         };
@@ -209,7 +209,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
 
     internal bool TryResolveTieredRoundZeroAiDying()
     {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || _coreMatchParticipantsPlayersAccess._players[dying.ResponderSeat].IsHuman)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || _coreMatchParticipantsPlayersAccess._players[dying.ResponderSeat].IsHuman)
             return false;
         var actor = _coreMatchParticipantsPlayersAccess._players[dying.ResponderSeat];
         var choices = TieredRoundZeroResponseChoices(actor, CardKind.Peach, true).Concat(TieredRoundZeroResponseChoices(actor, CardKind.Alcohol, true)).ToArray();

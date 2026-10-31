@@ -22,7 +22,7 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
             return false;
         if (identity.ActionId is { } actionId)
             return identity.LegacyProducerProgramId is null && use.Action is { Type: CardActionType.Use } action && action.ActionId == actionId && action.ActorSeat == identity.ActorSeat && action.ProviderSeat == identity.ProviderSeat && action.EffectiveKind == identity.EffectiveKind;
-        return identity.LegacyProducerProgramId is { } producer && use.Action is null && (_coreDamageJudgmentSuitPaymentsOperations.LegacyDamageJudgmentVirtualProducer(use, identity.TargetSeat) == producer || _coreUniqueHpTargetAnnouncementsOperations.MatchesAnnouncedUniqueHpLegacyTarget(identity));
+        return identity.LegacyProducerProgramId is { } producer && use.Action is null && (_coreDamageJudgmentSuitPaymentsOperations.LegacyDamageJudgmentVirtualProducer(use, identity.TargetSeat) == producer || _coreUniqueHpTargetAnnouncementsOperations.Value.MatchesAnnouncedUniqueHpLegacyTarget(identity));
     }
 
     internal bool TryBeginActualUseTargetPrograms(NativeOwners.CardAttackHandle attack, ActualUseTargetReturnKind kind)
@@ -59,7 +59,7 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
 
         _coreShortRangeSlashTargetsOperations.AppendShortRangeLegacyCandidate(use, id, entries);
         var previouslyAnnounced = use.UniqueHpAnnouncedTargets?.Count ?? 0;
-        _coreUniqueHpTargetAnnouncementsOperations.AppendUnannouncedUniqueHpTargets(use, id, entries);
+        _coreUniqueHpTargetAnnouncementsOperations.Value.AppendUnannouncedUniqueHpTargets(use, id, entries);
         if (entries.Count == 0 && (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)?.UniqueHpAnnouncedTargets?.Count ?? 0) == previouslyAnnounced)
             return false;
         entries = entries.OrderByDescending(e => e.Candidate.Priority).ThenBy(e => _coreTableOrderOperations.RelativeTableOrder(0, e.Candidate.OwnerSeat)).ThenBy(e => e.Candidate.SkillId, StringComparer.Ordinal).ToList();
@@ -86,7 +86,7 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ActualUseTargetWindowFrame parent)
         {
-            parent = _coreUniqueHpTargetAnnouncementsOperations.AppendUniqueHpTargetsToCurrentWindow(parent);
+            parent = _coreUniqueHpTargetAnnouncementsOperations.Value.AppendUniqueHpTargetsToCurrentWindow(parent);
             if (parent.CandidateIndex >= parent.Candidates.Count || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             {
                 _coreRuntimeOperations.PopResolutionFrame(parent.Id, ResolutionFrameKind.ActualUseTargetWindow);

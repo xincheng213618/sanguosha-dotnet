@@ -105,7 +105,7 @@ internal sealed partial class CharacterGuYongOlRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveOrdinaryGuYongBingyi)]
     internal void ReturnOrdinaryBingyiDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.OrdinaryBingyi is not { Paid: true, RecipientsCommitted: true, Stage: OrdinaryBingyiStage.Drawing } r || r.Cursor < 0 || r.Cursor >= r.Recipients.Count || outcome.RecipientSeat != r.Recipients[r.Cursor] || outcome.RequestedCount != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<OrdinaryBingyiDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.DrawIndex == r.Cursor))
+        if (f.OrdinaryBingyi is not { Paid: true, RecipientsCommitted: true, Stage: OrdinaryBingyiStage.Drawing } r || r.Cursor < 0 || r.Cursor >= r.Recipients.Count || outcome.RecipientSeat != r.Recipients[r.Cursor] || outcome.RequestedCount != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<OrdinaryBingyiDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.DrawIndex == r.Cursor))
             throw new InvalidOperationException("Ordinary Bingyi lost or repeated its exact native recipient draw.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { OrdinaryBingyi = r with { Stage = OrdinaryBingyiStage.DrawChildren, DrawOutcome = outcome }, PendingMovementContinuation = new(outcome.RecipientSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OrdinaryBingyiDrawReturnedEvent(f.Id, r.Cursor, outcome.RecipientSeat, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId));

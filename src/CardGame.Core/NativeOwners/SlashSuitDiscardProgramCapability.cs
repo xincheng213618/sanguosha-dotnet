@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class SlashSuitDiscardProgramCapability(Func<RuntimeEntries.CoreGameEngineSlashSuitDiscardEntries> getCoreGameEngineSlashSuitDiscardRuntime) : ISlashSuitDiscardProgramHost
+internal sealed class SlashSuitDiscardProgramCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineSlashSuitDiscardRuntime>> getCoreGameEngineSlashSuitDiscardRuntime) : ISlashSuitDiscardProgramHost
 {
-    public SkillProgramStepOutcome SuppressCurrentSlashTargetAndJudgeSuitDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => getCoreGameEngineSlashSuitDiscardRuntime().BeginProgramSlashSuitDiscard(frame, effect);
+    public SkillProgramStepOutcome SuppressCurrentSlashTargetAndJudgeSuitDiscard(ProgramSkillFrame frame, SkillProgramEffect effect) => getCoreGameEngineSlashSuitDiscardRuntime().Value.BeginProgramSlashSuitDiscard(frame, effect);
 }

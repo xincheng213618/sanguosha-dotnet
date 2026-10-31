@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEnginePrepDiscardImmediateDrawRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var draft = frame.PrepDiscard!;
-        if (!_corePrepDiscardPaymentsOperations.IsImmediatePrepDiscard(frame) || !_corePrepDiscardReceiptsOperations.ValidPrepDiscard(frame) || draft.Stage != PrepDiscardStage.ChoosingBenefit || draft.TargetPayment is not { NonEquipmentCount: > 0 } paid || draft.TargetSeat is not { } target || draft.ImmediateDraw is not null || !_corePrepDiscardPaymentsOperations.PrepDiscardCanContinue(frame) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PrepDiscardImmediateBenefitChosenEvent>().Count(e => e.ProgramFrameId == frame.Id && e.DrawTarget && e.TargetSeat == target && e.Count == paid.NonEquipmentCount) != 1)
+        if (!_corePrepDiscardPaymentsOperations.IsImmediatePrepDiscard(frame) || !_corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(frame) || draft.Stage != PrepDiscardStage.ChoosingBenefit || draft.TargetPayment is not { NonEquipmentCount: > 0 } paid || draft.TargetSeat is not { } target || draft.ImmediateDraw is not null || !_corePrepDiscardPaymentsOperations.PrepDiscardCanContinue(frame) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PrepDiscardImmediateBenefitChosenEvent>().Count(e => e.ProgramFrameId == frame.Id && e.DrawTarget && e.TargetSeat == target && e.Count == paid.NonEquipmentCount) != 1)
             throw new InvalidOperationException("An immediate preparation draw requires its exact paid target and chosen frozen amount.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { PrepDiscard = draft with { Stage = PrepDiscardStage.ImmediateDrawAttempt, ImmediateDraw = new(target, paid.NonEquipmentCount) }, ReexecuteParticipantInstruction = true });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PrepDiscardImmediateDrawRequestedEvent(frame.Id, target, paid.NonEquipmentCount));
@@ -18,7 +18,7 @@ internal sealed partial class CoreGameEnginePrepDiscardImmediateDrawRuntime
     {
         if (frame.PrepDiscard is not { Stage: PrepDiscardStage.ImmediateDrawAttempt, ImmediateDraw: not null } || !_corePrepDiscardPaymentsOperations.IsImmediatePrepDiscard(frame))
             return true;
-        if (!_corePrepDiscardReceiptsOperations.ValidPrepDiscard(frame))
+        if (!_corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(frame))
             throw new InvalidOperationException("An immediate preparation draw lost its paid owning instruction before payment.");
         return _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreMatchOutcomeWinnerAccess._winner == Winner.None;
     }
@@ -28,7 +28,7 @@ internal sealed partial class CoreGameEnginePrepDiscardImmediateDrawRuntime
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var draft = frame.PrepDiscard!;
-        if (!_corePrepDiscardReceiptsOperations.ValidPrepDiscard(frame) || frame.NativeDraw is not null || draft.Stage != PrepDiscardStage.ImmediateDrawAttempt || draft.ImmediateDraw is not { Outcome: null } draw || outcome.RecipientSeat != draw.TargetSeat || outcome.RequestedCount != draw.RequestedCount || outcome.SequenceAfter != _corePrepDiscardPaymentsOperations.PrepDiscardSequence || outcome.SequenceBefore > outcome.SequenceAfter || outcome.ActualDrawIds.Count > draw.RequestedCount || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(draw.TargetSeat) && m.Reason == CoreGameEnginePrepDiscardImmediateDrawDefinitions.PrepDiscardImmediateDrawReason).OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
+        if (!_corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(frame) || frame.NativeDraw is not null || draft.Stage != PrepDiscardStage.ImmediateDrawAttempt || draft.ImmediateDraw is not { Outcome: null } draw || outcome.RecipientSeat != draw.TargetSeat || outcome.RequestedCount != draw.RequestedCount || outcome.SequenceAfter != _corePrepDiscardPaymentsOperations.PrepDiscardSequence || outcome.SequenceBefore > outcome.SequenceAfter || outcome.ActualDrawIds.Count > draw.RequestedCount || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(draw.TargetSeat) && m.Reason == CoreGameEnginePrepDiscardImmediateDrawDefinitions.PrepDiscardImmediateDrawReason).OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
             throw new InvalidOperationException("An immediate preparation draw lost its exact native request and actual material return.");
         var cancelled = !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draw.TargetSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None;
         if (cancelled && outcome.ActualDrawIds.Count != 0)
@@ -42,7 +42,7 @@ internal sealed partial class CoreGameEnginePrepDiscardImmediateDrawRuntime
     internal SkillProgramStepOutcome ContinuePrepDiscardImmediateDraw(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!_corePrepDiscardReceiptsOperations.ValidPrepDiscard(frame) || frame.PrepDiscard is not { Stage: PrepDiscardStage.ImmediateDrawChildren, ImmediateDraw.Outcome: not null })
+        if (!_corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(frame) || frame.PrepDiscard is not { Stage: PrepDiscardStage.ImmediateDrawChildren, ImmediateDraw.Outcome: not null })
             throw new InvalidOperationException("An immediate preparation draw cannot bypass its exact native draw return.");
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frame.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(frame.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(frame.Id))
             return SkillProgramStepOutcome.AwaitChild;
@@ -72,5 +72,5 @@ internal sealed partial class CoreGameEnginePrepDiscardImmediateDrawRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 1246)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1246)]
-    internal bool ContinuePaidImmediatePrepDiscard(ProgramSkillFrame frame) => frame.PrepDiscard is { TargetPayment: not null } && _corePrepDiscardPaymentsOperations.IsImmediatePrepDiscard(frame) && _corePrepDiscardReceiptsOperations.ValidPrepDiscard(frame);
+    internal bool ContinuePaidImmediatePrepDiscard(ProgramSkillFrame frame) => frame.PrepDiscard is { TargetPayment: not null } && _corePrepDiscardPaymentsOperations.IsImmediatePrepDiscard(frame) && _corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(frame);
 }

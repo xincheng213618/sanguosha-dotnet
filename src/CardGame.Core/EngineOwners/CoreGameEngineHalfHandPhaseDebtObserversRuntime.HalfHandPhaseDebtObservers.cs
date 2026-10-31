@@ -11,7 +11,7 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtObserversRuntime
         string reason;
         int source, target;
         IReadOnlyList<int> ids;
-        if (f.HalfHandDraw is { } drawn && _coreHalfHandPhaseDebtReceiptsOperations.ValidHalfHandDraw(f))
+        if (f.HalfHandDraw is { } drawn && _coreHalfHandPhaseDebtReceiptsOperations.Value.ValidHalfHandDraw(f))
         {
             before = drawn.SequenceBefore;
             after = drawn.SequenceAfter;
@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtObserversRuntime
             ids = [];
             reason = $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.DrawExtraAndArmHalfHandSupport)}";
         }
-        else if (f.HalfHandGift is { } gift && _coreHalfHandPhaseDebtReceiptsOperations.ValidHalfHandGift(f))
+        else if (f.HalfHandGift is { } gift && _coreHalfHandPhaseDebtReceiptsOperations.Value.ValidHalfHandGift(f))
         {
             before = gift.SequenceBefore;
             after = gift.SequenceAfter;
@@ -29,7 +29,7 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtObserversRuntime
             ids = gift.CardIds;
             reason = $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.GiveHalfHandAndIssueTargetSupport)}";
         }
-        else if (f.PhaseHandExchange is { Issued: true } exchange && _coreHalfHandPhaseDebtReceiptsOperations.ValidPhaseHandExchange(f))
+        else if (f.PhaseHandExchange is { Issued: true } exchange && _coreHalfHandPhaseDebtReceiptsOperations.Value.ValidPhaseHandExchange(f))
         {
             before = exchange.SequenceBefore;
             after = exchange.SequenceAfter;
@@ -47,7 +47,7 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtObserversRuntime
             ids = [cardId];
             reason = $"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.OfferHalfHandRecipientSupport)}";
         }
-        else if (f.PhaseHandDebtPayment is { } paid && _coreHalfHandPhaseDebtReceiptsOperations.ValidPhaseHandDebtPayment(f) && f.InstructionIndex is 2 or 3 && f.CardSetBindings.SingleOrDefault(b => b.Name == paid.ResultBind)is { } binding && binding.CardIds.Count == paid.RequiredPaymentCount && binding.SourceLocations.Count == binding.CardIds.Count && binding.SourceLocations.All(l => l.OwnerSeat == f.OwnerSeat && l.Zone is CardZoneKind.Hand or CardZoneKind.Equipment))
+        else if (f.PhaseHandDebtPayment is { } paid && _coreHalfHandPhaseDebtReceiptsOperations.Value.ValidPhaseHandDebtPayment(f) && f.InstructionIndex is 2 or 3 && f.CardSetBindings.SingleOrDefault(b => b.Name == paid.ResultBind)is { } binding && binding.CardIds.Count == paid.RequiredPaymentCount && binding.SourceLocations.Count == binding.CardIds.Count && binding.SourceLocations.All(l => l.OwnerSeat == f.OwnerSeat && l.Zone is CardZoneKind.Hand or CardZoneKind.Equipment))
         {
             before = paid.SequenceBefore;
             after = _coreHalfHandPhaseDebtProgramsOperations.HalfHandDebtSequence;
@@ -102,5 +102,5 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtObserversRuntime
         return index >= 0 && index + 1 < _resolutionStackOperations._resolutionStack.Count && _coreHalfHandTargetSupportOperations.HalfHandSupportPaymentMatches(f, parent, true) && HalfHandPhaseFirstChild(f, _resolutionStackOperations._resolutionStack[index + 1]);
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 550)]
-    internal bool IsHalfHandPhaseDebtProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && (HalfHandPhaseDebtObserverRoot() ?? _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().Select(w => _corePaidOwnTargetObserversOperations.ActualUseTargetObserverRoot(w.ParentFrameId)).LastOrDefault(f => f?.HalfHandSupport is { Paid: true }))is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsHalfHandPhaseDebtProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && (HalfHandPhaseDebtObserverRoot() ?? _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().Select(w => _corePaidOwnTargetObserversOperations.ActualUseTargetObserverRoot(w.ParentFrameId)).LastOrDefault(f => f?.HalfHandSupport is { Paid: true }))is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

@@ -12,7 +12,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
         return d is not null && d.SourceSeat == owner && d.Amount > 0 && w is { SourceCard: { } kind } && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && w.ParentFrameId == d.Id ? d : null;
     }
 
-    internal IEnumerable<MouGongsunZanMobileDistanceEvent> ActiveMouGszMobileDistance(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanMobileDistanceEvent>().Where(e => e.Source.OwnerSeat == owner && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<RoundEndedEvent>().Any(r => r.RoundNumber == e.Round));
+    internal IEnumerable<MouGongsunZanMobileDistanceEvent> ActiveMouGszMobileDistance(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanMobileDistanceEvent>().Where(e => e.Source.OwnerSeat == owner && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<RoundEndedEvent>().Any(r => r.RoundNumber == e.Round));
     [ProgramDistanceRule(ProgramDistanceStage.DistanceBaseTerms, 33600)]
     internal void AddMouGszMobileDistance(ProgramDistanceQuery q, List<RuleQueryBaseTerm> terms)
     {

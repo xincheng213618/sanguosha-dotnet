@@ -22,7 +22,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     {
         if (f.MouGanNing is not { Stage: MouGanNingStage.Discard })
             throw new InvalidOperationException("Qixi lost its accepted correct-guess reveal.");
-        _characterGanNingMouMobileOperations.PublishMouGn(f);
+        _characterGanNingMouMobileOperations.Value.PublishMouGn(f);
     }
 
     [PublicHandRevealReturn("phase-name-hand")]
@@ -49,7 +49,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     {
         if (f.RuiJiQingliang is not { Stage: "option" })
             throw new InvalidOperationException("Qingliang lost its issued whole-Hand reveal.");
-        _characterRuiJiOlOperations.PresentQingliangOptionPrompt(f);
+        _characterRuiJiOlOperations.Value.PresentQingliangOptionPrompt(f);
     }
 
     [PublicHandRevealReturn("diou-retained-hand")]

@@ -49,7 +49,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitObserversRuntime
 
     internal bool ValidSlashBenefitDraftPayment(ProgramSkillFrame f)
     {
-        if (!_coreSlashTargetBenefitPaymentsOperations.SlashBenefitProgramParentMatches(f) || f.SlashTargetBenefitDraft is not { } d || _coreSlashTargetBenefitWindowsOperations.SlashTargetBenefitCurrent(d.Receipt)is not { } paid || !ValidSlashTargetBenefitReceipt(paid))
+        if (!_coreSlashTargetBenefitPaymentsOperations.Value.SlashBenefitProgramParentMatches(f) || f.SlashTargetBenefitDraft is not { } d || _coreSlashTargetBenefitWindowsOperations.SlashTargetBenefitCurrent(d.Receipt)is not { } paid || !ValidSlashTargetBenefitReceipt(paid))
             return false;
         if (!d.Settlement)
             return paid.ProducerProgramId == f.Id && d.Receipt == paid && d.SequenceBefore == paid.SequenceBefore && d.SequenceAfter == paid.SequenceAfter && (paid.DrawBenefit ? d.PaidCardId is null && d.PaidFrom is null : d.PaidCardId == paid.PaidCardId && d.PaidFrom == paid.PaidFrom);
@@ -95,7 +95,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitObserversRuntime
             var valid = true;
             for (var i = rootIndex + 1; i < _resolutionStackOperations._resolutionStack.Count; i++)
             {
-                if (!_corePaidColorDamageClaimObserversOperations.PaidColorDamageClaimObserverEdge(i))
+                if (!_corePaidColorDamageClaimObserversOperations.Value.PaidColorDamageClaimObserverEdge(i))
                 {
                     valid = false;
                     break;
@@ -112,7 +112,7 @@ internal sealed partial class CoreGameEngineSlashTargetBenefitObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 660)]
-    internal bool IsSlashTargetBenefitProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && SlashBenefitPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsSlashTargetBenefitProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && SlashBenefitPaidObserverRoot(_coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     internal bool SlashBenefitWindowMatches(SlashTargetBenefitWindowFrame w)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == w.Id);

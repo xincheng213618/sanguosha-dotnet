@@ -17,7 +17,7 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
     internal SkillProgramStepOutcome RunSequentialDiscard(ProgramSkillFrame supplied, SkillProgramEffect effect, int selectedTarget)
     {
         if (CoreGameEngineAllHandChallengesRuntime.IsAllHandChallengeOp(effect.Op))
-            return _coreAllHandChallengesOperations.RunAllHandChallenge(supplied, effect);
+            return _coreAllHandChallengesOperations.Value.RunAllHandChallenge(supplied, effect);
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (!IsSequentialDiscardOp(effect.Op) || effect.Target != (effect.Op == SkillProgramEffectOp.EscalatingDiscardOrDamageFromSelected ? SkillProgramEffectTarget.Owner : SkillProgramEffectTarget.SelectedTarget) || frame.TriggerId is not null || frame.WindowContext is not null || frame.SelectedTargetSeats is not [var start] || start == frame.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(start))
             throw new InvalidOperationException("A sequential discard requires its original one-target activation.");
@@ -140,7 +140,7 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
         var d = f.SequentialDiscard ?? throw new InvalidOperationException("Missing sequential discard receipt.");
         if (CoreGameEngineAllHandChallengesRuntime.IsAllHandChallengeKind(d.Kind))
         {
-            _coreAllHandChallengesOperations.ResolveAllHandChallengeChoice(f, choice);
+            _coreAllHandChallengesOperations.Value.ResolveAllHandChallengeChoice(f, choice);
             return;
         }
 
@@ -246,7 +246,7 @@ internal sealed partial class CoreGameEngineSequentialDiscardProgramsRuntime
         var d = frame.SequentialDiscard!;
         var effect = SequentialDiscardEffect(frame);
         if (CoreGameEngineAllHandChallengesRuntime.IsAllHandChallengeKind(d.Kind))
-            return _coreAllHandChallengesOperations.SelectAiAllHandChallenge(decision, frame, effect);
+            return _coreAllHandChallengesOperations.Value.SelectAiAllHandChallenge(decision, frame, effect);
         var branches = decision.Choices.Where(c => c.Cards.Count == 0).ToArray();
         if (d.Stage == ProgramSequentialDiscardStage.BranchChoice)
         {

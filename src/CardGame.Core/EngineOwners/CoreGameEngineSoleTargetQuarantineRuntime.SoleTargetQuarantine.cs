@@ -46,7 +46,7 @@ internal sealed partial class CoreGameEngineSoleTargetQuarantineRuntime
 
     internal SoleTargetQuarantineReceipt[] OutstandingSoleTargetQuarantines(int? turn = null, int? owner = null)
     {
-        if (!_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability)
+        if (!_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability)
             return[];
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var settled = history.OfType<SoleTargetQuarantineSettledEvent>().Select(e => (e.CardUseFrameId, e.ActionId)).ToHashSet();
@@ -149,7 +149,7 @@ internal sealed partial class CoreGameEngineSoleTargetQuarantineRuntime
     internal void RefreshSoleProtectionObservers(CardUseFrame use)
     {
         var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Last(w => w.ParentFrameId == use.Id && CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) == SkillProgramTriggerWindow.CardUseTargetsFinalized);
-        var extra = _coreCardActionsOperations.CollectSharedCardActionCandidates(use.Action!, SkillProgramTriggerWindow.CardUseTargetsFinalized, _coreSoleTargetProtectionOperations.SoleProtectionMainTargets(use), null, window.Continuation).Where(c => _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program!.Triggers.Single(t => t.Id == c.TriggerId).Effects.Any(e => e.Op == SkillProgramEffectOp.ProtectOtherSoleCardTarget) && use.SoleTargetProtectionSources?.Contains(new(c.SkillId, c.TriggerId, c.OwnerSeat, c.SkillInstanceId)) != true && !window.Candidates.Skip(window.CandidateIndex + 1).Any(old => old.OwnerSeat == c.OwnerSeat && old.SkillId == c.SkillId && old.TriggerId == c.TriggerId && old.SkillInstanceId == c.SkillInstanceId)).Select(c => c with { FrozenContext = c.FrozenContext!with { ParentFrameId = window.Id, CardUse = c.FrozenContext.CardUse!with { ParentCardUseFrameId = use.Id } } }).ToArray();
+        var extra = _coreCardActionsOperations.CollectSharedCardActionCandidates(use.Action!, SkillProgramTriggerWindow.CardUseTargetsFinalized, _coreSoleTargetProtectionOperations.Value.SoleProtectionMainTargets(use), null, window.Continuation).Where(c => _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program!.Triggers.Single(t => t.Id == c.TriggerId).Effects.Any(e => e.Op == SkillProgramEffectOp.ProtectOtherSoleCardTarget) && use.SoleTargetProtectionSources?.Contains(new(c.SkillId, c.TriggerId, c.OwnerSeat, c.SkillInstanceId)) != true && !window.Candidates.Skip(window.CandidateIndex + 1).Any(old => old.OwnerSeat == c.OwnerSeat && old.SkillId == c.SkillId && old.TriggerId == c.TriggerId && old.SkillInstanceId == c.SkillInstanceId)).Select(c => c with { FrozenContext = c.FrozenContext!with { ParentFrameId = window.Id, CardUse = c.FrozenContext.CardUse!with { ParentCardUseFrameId = use.Id } } }).ToArray();
         if (extra.Length > 0)
             _coreRuntimeOperations.ReplaceRuntimeFrame(window.Id, window with { Candidates = Array.AsReadOnly(window.Candidates.Concat(extra).ToArray()) });
     }

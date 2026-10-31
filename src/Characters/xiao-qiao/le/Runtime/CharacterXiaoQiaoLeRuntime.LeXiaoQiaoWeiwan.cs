@@ -23,7 +23,7 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     SkillProgramStepOutcome ILeXiaoQiaoWeiwanHost.Resolve(ProgramSkillFrame f) => BeginWeiwan(f);
     bool ILeXiaoQiaoWeiwanSelectionQuery.CanDiscard(int owner, Card card) => CanPayWeiwanQin(owner, card);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 28620, SkillProgramEffectOp.ResolveWeiwanQinDiscardAndSuitObtain)]
-    internal bool CanActivateWeiwan(ProgramActivationLegalityContext gate) => WeiwanPlay(gate.OwnerSeat)is { } phase && !_coreProgramEventHistoryOperations.ProgramEventHistory<WeiwanStartedEvent>().Any(e => e.Source.OwnerSeat == gate.OwnerSeat && e.Phase == phase) && _corePhysicalOwnedCardQueriesOperations.GetHand(gate.Owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(gate.Owner)).Any(c => CanPayWeiwanQin(gate.OwnerSeat, c));
+    internal bool CanActivateWeiwan(ProgramActivationLegalityContext gate) => WeiwanPlay(gate.OwnerSeat)is { } phase && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeiwanStartedEvent>().Any(e => e.Source.OwnerSeat == gate.OwnerSeat && e.Phase == phase) && _corePhysicalOwnedCardQueriesOperations.GetHand(gate.Owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(gate.Owner)).Any(c => CanPayWeiwanQin(gate.OwnerSeat, c));
     internal SkillProgramStepOutcome BeginWeiwan(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -33,7 +33,7 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
             return SkillProgramStepOutcome.AwaitChild;
         }
 
-        if (f.SkillId != "le:weiwan" || f.ActivationId != "discard-qin-obtain-suits" || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || f.SelectedCardIds is not [var id] || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || WeiwanPlay(f.OwnerSeat)is not { } phase || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreProgramEventHistoryOperations.ProgramEventHistory<WeiwanStartedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == phase))
+        if (f.SkillId != "le:weiwan" || f.ActivationId != "discard-qin-obtain-suits" || f.TriggerId is not null || f.WindowContext is not null || f.InstructionIndex != 1 || f.SelectedCardIds is not [var id] || f.SelectedTargetSeats is not [var target] || target == f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || WeiwanPlay(f.OwnerSeat)is not { } phase || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeiwanStartedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat && e.Phase == phase))
             throw new InvalidOperationException("Weiwan lost its one real Qin discard, other target or actual Play allowance.");
         var from = _cardZonesOperations._cardZones.GetLocation(id);
         var card = _cardZonesOperations._cardZones.CardsAt(from).Single(c => c.Id == id);

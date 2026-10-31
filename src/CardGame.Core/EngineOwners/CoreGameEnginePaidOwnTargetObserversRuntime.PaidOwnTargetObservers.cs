@@ -76,7 +76,7 @@ internal sealed partial class CoreGameEnginePaidOwnTargetObserversRuntime
             return null;
         if (wi + 2 == _resolutionStackOperations._resolutionStack.Count)
             return root;
-        if (!PaidOwnTargetMatches(root, window, true) && !_coreHalfHandPhaseDebtObserversOperations.HalfHandSupportObserverRootMatches(root, window) && !_coreOwnTrickDrawTargetsOperations.OwnTrickDrawMatches(root, window))
+        if (!PaidOwnTargetMatches(root, window, true) && !_coreHalfHandPhaseDebtObserversOperations.Value.HalfHandSupportObserverRootMatches(root, window) && !_coreOwnTrickDrawTargetsOperations.OwnTrickDrawMatches(root, window))
             return null;
         if (root.OwnTrickDraw is not null && !_coreOwnTrickDrawTargetsOperations.OwnTrickDrawFirstChild(root, _resolutionStackOperations._resolutionStack[wi + 2]))
             return null;
@@ -84,7 +84,7 @@ internal sealed partial class CoreGameEnginePaidOwnTargetObserversRuntime
         {
             if (!(root.HalfHandSupport is { Paid: true } || root.OwnTrickDraw is not null ? _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(i) : _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(i)))
                 return null;
-            if (_resolutionStackOperations._resolutionStack[i] is DyingFrame d && (_coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(i, d) || _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(i, d) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(i, d) || (root.HalfHandSupport is { Paid: true } || root.OwnTrickDraw is not null) && _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(i, d) || root.OwnTrickDraw is not null && _coreOwnTrickDrawAlcoholObserversOperations.OwnTrickDrawLegacyAlcoholRide(root, window, i, d)))
+            if (_resolutionStackOperations._resolutionStack[i] is DyingFrame d && (_coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(i, d) || _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(i, d) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(i, d) || (root.HalfHandSupport is { Paid: true } || root.OwnTrickDraw is not null) && _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(i, d) || root.OwnTrickDraw is not null && _coreOwnTrickDrawAlcoholObserversOperations.Value.OwnTrickDrawLegacyAlcoholRide(root, window, i, d)))
                 break;
         }
 
@@ -92,9 +92,9 @@ internal sealed partial class CoreGameEnginePaidOwnTargetObserversRuntime
     }
 
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 480)]
-    internal bool IsPaidOwnTargetProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } && _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().Any(w => ActualUseTargetObserverRoot(w.ParentFrameId)is { PaidOwnTarget: not null });
+    internal bool IsPaidOwnTargetProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { ResumesProgramSkill: true } && _resolutionStackOperations._resolutionStack.OfType<ActualUseTargetWindowFrame>().Any(w => ActualUseTargetObserverRoot(w.ParentFrameId)is { PaidOwnTarget: not null });
 
     SkillProgramStepOutcome IPaidTargetEndingProgramHost.PayHpThenNullifyOwnActualUseTarget(ProgramSkillFrame f) => PayOwnActualUseTarget(f);
-    void IPaidTargetEndingProgramHost.ScheduleEarnedActualEndingBenefit(ProgramSkillFrame f, string skill, string binding) => _coreEarnedActualEndingBenefitsOperations.IssueEarnedActualEnding(f, skill, binding);
-    SkillProgramStepOutcome IPaidTargetEndingProgramHost.DrawLostHpThenOfferOwnedCardsUpTo(ProgramSkillFrame f) => _coreLostHpOwnedGiftsOperations.RunLostHpOwnedGift(f);
+    void IPaidTargetEndingProgramHost.ScheduleEarnedActualEndingBenefit(ProgramSkillFrame f, string skill, string binding) => _coreEarnedActualEndingBenefitsOperations.Value.IssueEarnedActualEnding(f, skill, binding);
+    SkillProgramStepOutcome IPaidTargetEndingProgramHost.DrawLostHpThenOfferOwnedCardsUpTo(ProgramSkillFrame f) => _coreLostHpOwnedGiftsOperations.Value.RunLostHpOwnedGift(f);
 }

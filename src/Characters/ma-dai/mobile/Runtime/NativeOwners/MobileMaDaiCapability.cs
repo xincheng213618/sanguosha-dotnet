@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MobileMaDaiCapability(Func<RuntimeEntries.CharacterMaDaiMobileEntries> getCharacterMaDaiMobileRuntime) : IMobileMaDaiProgramHost
+internal sealed class MobileMaDaiCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterMaDaiMobileRuntime>> getCharacterMaDaiMobileRuntime) : IMobileMaDaiProgramHost
 {
-    public SkillProgramStepOutcome ReduceDamageTargetMaximum(ProgramSkillFrame frame) => getCharacterMaDaiMobileRuntime().ReduceMobileMaDaiTargetMaximum(frame);
+    public SkillProgramStepOutcome ReduceDamageTargetMaximum(ProgramSkillFrame frame) => getCharacterMaDaiMobileRuntime().Value.ReduceMobileMaDaiTargetMaximum(frame);
 }

@@ -3,9 +3,9 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineMovementEquipmentEffectsRuntime
 {
-    bool IMovementEquipmentFacts.UsesStorageEquipment => _coreNativeDamageHandlesOperations.UsesFormalWoodenOx;
+    bool IMovementEquipmentFacts.UsesStorageEquipment => _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx;
 
-    bool IMovementEquipmentFacts.UsesRecoveryArmor => _coreNativeDamageHandlesOperations.UsesFormalSilverLion;
+    bool IMovementEquipmentFacts.UsesRecoveryArmor => _coreNativeDamageHandlesOperations.Value.UsesFormalSilverLion;
 
     CardMovementRecord? IMovementEquipmentFacts.LastMovement(int cardId, CardLocation from, CardLocation to) => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault(move => move.CardId == cardId && move.From == from && move.To == to);
     bool IMovementEquipmentFacts.WasBoneAt(int cardId, CardLocation location, int sequence) => _characterWeiYanHappyGodOperations.HappyBoneAt(cardId, location, sequence)is not null;

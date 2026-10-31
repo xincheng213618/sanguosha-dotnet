@@ -16,7 +16,7 @@ internal sealed partial class CharacterHeQiOlRuntime
 
     internal bool ValidateEquipmentSuitProgramSource(ProgramSkillFrame frame) => frame.EquipmentSuitSourceReceipt is { } receipt && receipt.FrameId == frame.Id && receipt.OwnerSeat == frame.OwnerSeat && receipt.SkillId == frame.SkillId && receipt.SkillInstanceId == frame.SkillInstanceId && receipt.GameplayHash == frame.GameplayHash && receipt.GrantId == EquipmentSuitGrantId(frame.OwnerSeat, receipt.Source) && _contentRegistryOperations._contentRegistry.GetSkill(receipt.Source.CapabilitySkillId).Program?.EquipmentSuitSkillGrants.Any(rule => rule.Id == receipt.Source.RuleId && rule.SkillId == frame.SkillId) == true;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 510)]
-    internal bool CanContinueEquipmentSuitProgram(ProgramSkillFrame frame) => ValidateEquipmentSuitProgramSource(frame) && frame.FrozenHandRoster is { Stage: "movement" } or { Stage: "damage-issued", DamageIssued: true } && _coreFrozenHandRosterOperations.ValidFrozenHandRoster(frame);
+    internal bool CanContinueEquipmentSuitProgram(ProgramSkillFrame frame) => ValidateEquipmentSuitProgramSource(frame) && frame.FrozenHandRoster is { Stage: "movement" } or { Stage: "damage-issued", DamageIssued: true } && _coreFrozenHandRosterOperations.Value.ValidFrozenHandRoster(frame);
     internal static string EquipmentSuitGrantId(int ownerSeat, EquipmentSuitSkillGrantSource source) => $"equipment-suit:{(ownerSeat)}:{(source.CapabilityGrantId.Length)}:{(source.CapabilityGrantId)}:{(source.CapabilitySkillInstanceId.Length)}:{(source.CapabilitySkillInstanceId)}:{(source.RuleId)}";
     internal bool IsEquipmentSuitGrantQualified(CharacterState owner, SkillGrant grant)
     {
@@ -34,7 +34,7 @@ internal sealed partial class CharacterHeQiOlRuntime
             return 0;
         // Build only source-independent rewrite bindings. Calling the final binding
         // shard here would recurse through this very qualification predicate.
-        var policies = owner.SkillGrants.Grants.Where(g => g.EquipmentSuitSource is null && _coreHpConditionalSkillGrantsOperations.HpConditionalSourceQualified(owner, g) && _coreHpConditionalSkillGrantsOperations.IsHpConditionalGrantQualified(owner, g)).GroupBy(g => (g.SkillId, g.SkillInstanceId)).OrderBy(g => g.Key.SkillId, StringComparer.Ordinal).ThenBy(g => g.Key.SkillInstanceId, StringComparer.Ordinal).SelectMany(g => _contentRegistryOperations._contentRegistry.GetSkill(g.Key.SkillId).Program?.CardPolicies.Where(p => p.Kind == SkillProgramCardPolicyKind.RewriteSuit) ?? []).ToArray();
+        var policies = owner.SkillGrants.Grants.Where(g => g.EquipmentSuitSource is null && _coreHpConditionalSkillGrantsOperations.Value.HpConditionalSourceQualified(owner, g) && _coreHpConditionalSkillGrantsOperations.Value.IsHpConditionalGrantQualified(owner, g)).GroupBy(g => (g.SkillId, g.SkillInstanceId)).OrderBy(g => g.Key.SkillId, StringComparer.Ordinal).ThenBy(g => g.Key.SkillInstanceId, StringComparer.Ordinal).SelectMany(g => _contentRegistryOperations._contentRegistry.GetSkill(g.Key.SkillId).Program?.CardPolicies.Where(p => p.Kind == SkillProgramCardPolicyKind.RewriteSuit) ?? []).ToArray();
         foreach (var policy in policies)
             if (policy.Condition.Kind != SkillProgramConditionKind.Always || policy.OwnerRole is not null)
                 throw new InvalidOperationException("Equipment suit qualification does not support context-dependent suit rewrites.");
@@ -50,7 +50,7 @@ internal sealed partial class CharacterHeQiOlRuntime
         return _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Select(SuitOf).Where(s => s != Suit.None).Distinct().Count();
     }
 
-    internal bool EquipmentSuitSourceQualified(CharacterState owner, SkillGrant source) => source.EquipmentSuitSource is null && _coreHpConditionalSkillGrantsOperations.HpConditionalSourceQualified(owner, source) && _coreHpConditionalSkillGrantsOperations.IsHpConditionalGrantQualified(owner, source);
+    internal bool EquipmentSuitSourceQualified(CharacterState owner, SkillGrant source) => source.EquipmentSuitSource is null && _coreHpConditionalSkillGrantsOperations.Value.HpConditionalSourceQualified(owner, source) && _coreHpConditionalSkillGrantsOperations.Value.IsHpConditionalGrantQualified(owner, source);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 60)]
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 40)]
     internal void SynchronizeEquipmentSuitSkillGrants()

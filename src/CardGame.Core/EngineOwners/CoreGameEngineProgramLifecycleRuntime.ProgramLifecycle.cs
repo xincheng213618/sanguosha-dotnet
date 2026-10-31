@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
     [ProgramAiChoice(SkillProgramEffectOp.ChooseHpBoundOtherAndDealRandomDamage)]
     internal PromptChoice SelectAiLangxiChoice(PendingDecision decision, ProgramSkillFrame frame, SkillProgramEffect effect) => _characterLiJueOlOperations.LangxiChoices(frame).First();
     [ProgramAiChoice(SkillProgramEffectOp.AddTargetForQirangPhysicalTrick)]
-    internal PromptChoice SelectAiQirangExtraChoice(PendingDecision decision, ProgramSkillFrame frame, SkillProgramEffect effect) => _characterZhugeGuoOlOperations.QirangExtraChoices(frame).Last();
+    internal PromptChoice SelectAiQirangExtraChoice(PendingDecision decision, ProgramSkillFrame frame, SkillProgramEffect effect) => _characterZhugeGuoOlOperations.Value.QirangExtraChoices(frame).Last();
     [ProgramAiChoice(SkillProgramEffectOp.SelectTargets)]
     internal PromptChoice SelectAiConfiguredProgramTargets(PendingDecision decision, ProgramSkillFrame frame, SkillProgramEffect effect) => effect.TargetAiOrder is { } order ? SelectAiProgramTargets(decision, order) : throw ProgramAiChoiceSelector.UnsupportedInstruction(effect);
     [ProgramAiChoice(SkillProgramEffectOp.SelectAndMoveOwnedCard)]
@@ -184,15 +184,15 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         if (error is not null)
             return _kernelCoreMainOperations.Reject(error.Code, error.Message);
         var selected = _coreProgramParticipantPromptsOperations.GetPendingDecisionForActor(actorSeat)?.Choices.SingleOrDefault(choice => choice.Id == choiceId);
-        if (selected?.Parameters.GetValueOrDefault("program-action") == "diamond-delayed" && !_coreDiamondDelayedProgramsOperations.IsDiamondDelayedChoiceLegal(selected))
+        if (selected?.Parameters.GetValueOrDefault("program-action") == "diamond-delayed" && !_coreDiamondDelayedProgramsOperations.Value.IsDiamondDelayedChoiceLegal(selected))
             return _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The diamond delayed payment or target is no longer legal.");
         if (selected is null)
             return _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The program choice is unavailable.");
         if (selected.Parameters.GetValueOrDefault("program-action") == "phase-hand-debt-return" && !_corePhaseHandSeizureReceiptsOperations.IsPhaseHandDebtChoiceLegal(selected))
             return _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The issued phase-hand return is no longer legal.");
-        if (selected.Parameters.GetValueOrDefault("program-action")is "alternative-phase-cost-card" or "alternative-phase-cost-marker" && !_coreAlternativePhaseCostProgramsOperations.IsAlternativePhaseCostChoiceLegal(selected))
+        if (selected.Parameters.GetValueOrDefault("program-action")is "alternative-phase-cost-card" or "alternative-phase-cost-marker" && !_coreAlternativePhaseCostProgramsOperations.Value.IsAlternativePhaseCostChoiceLegal(selected))
             return _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The alternative phase cost is no longer payable.");
-        if (selected.Parameters.GetValueOrDefault("program-action") == "slash-suit-discard" && !_coreSlashSuitDiscardOperations.IsProgramSlashSuitDiscardChoiceLegal(selected))
+        if (selected.Parameters.GetValueOrDefault("program-action") == "slash-suit-discard" && !_coreSlashSuitDiscardOperations.Value.IsProgramSlashSuitDiscardChoiceLegal(selected))
             return _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The actual HE suit discard is no longer legal.");
         if (selected.Parameters.GetValueOrDefault("program-action") == "choose-option" && !_coreProgramChoicesOperations.IsClaimableProgramOptionStillAvailable(selected))
             return _kernelCoreMainOperations.Reject(CommandErrorCode.InvalidChoice, "The damage cards are no longer available for this choice.");
@@ -209,7 +209,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
     internal void ResolveCurrentTurnHandExchangeAnswer(PromptChoice selected)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The current-turn hand exchange choice lost its owning program.");
-        _coreCurrentTurnHandExchangeOperations.ResolveCurrentTurnHandExchangeChoice(frame, selected);
+        _coreCurrentTurnHandExchangeOperations.Value.ResolveCurrentTurnHandExchangeChoice(frame, selected);
     }
 
     [ProgramAnswer("prep-discard-ending")]
@@ -233,7 +233,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         switch (action)
         {
             case "sole-target-protection":
-                _coreSoleTargetProtectionOperations.ResolveSoleProtectionChoice(selected);
+                _coreSoleTargetProtectionOperations.Value.ResolveSoleProtectionChoice(selected);
                 return;
             case "pair-obtain":
                 _corePairObtainShownGiftsOperations.ResolvePairObtainChoice(selected);
@@ -249,7 +249,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
                 return;
             case "limited-owned-gift":
             case "finish-limited-owned-gift":
-                _coreLostHpOwnedGiftsOperations.ResolveLostHpOwnedGift(frame, effect, selected);
+                _coreLostHpOwnedGiftsOperations.Value.ResolveLostHpOwnedGift(frame, effect, selected);
                 return;
             case "select-target":
                 _programTargetSelectionOperations.Get().ResolveTargetChoice(frame, effect, selected);
@@ -278,7 +278,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
                 {
                     if (selected.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || frame.InstructionIndex == 0)
                         throw new InvalidOperationException("The card-hold choice has a stale frame identity.");
-                    _coreProgramHoldCardsOperations.ResolveProgramHoldCardSelection(frame, selected);
+                    _coreProgramHoldCardsOperations.Value.ResolveProgramHoldCardSelection(frame, selected);
                     return;
                 }
 
@@ -286,7 +286,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
                 return;
             case "distribute-owned-card":
             case "decline-owned-card-distribution":
-                _coreProgramOwnedCardDistributionsOperations.ResolveProgramOwnedCardDistribution(frame, effect, selected);
+                _coreProgramOwnedCardDistributionsOperations.Value.ResolveProgramOwnedCardDistribution(frame, effect, selected);
                 return;
             case "attack-range-aid-discard-weapon":
             case "attack-range-aid-draw":
@@ -306,7 +306,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
                 return;
             case "restore-phase-hand-discard":
             case "restore-phase-hand-decline":
-                _coreProgramPhaseHandDiscardsOperations.ResolveProgramPhaseHandDiscardChoice(selected);
+                _coreProgramPhaseHandDiscardsOperations.Value.ResolveProgramPhaseHandDiscardChoice(selected);
                 return;
             case "request-slash":
             case "request-slash-decline":
@@ -326,7 +326,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
                 _coreProgramSlashRequestOperations.ResolveProgramRequestSlashByNearestChoice(selected);
                 return;
             case "choose-own-card-discard":
-                _coreProgramOwnCardDiscardsOperations.ResolveProgramOwnCardDiscardChoice(selected);
+                _coreProgramOwnCardDiscardsOperations.Value.ResolveProgramOwnCardDiscardChoice(selected);
                 return;
             case "give-bound-card":
             case "keep-bound-cards":
@@ -344,7 +344,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
     {
         var decision = _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger } current ? current : throw new InvalidOperationException("The AI program prompt is unavailable.");
         PromptChoice selected;
-        if (_coreColdDamageOperations.TryChooseColdDamageAi(decision, out var coldChoice))
+        if (_coreColdDamageOperations.Value.TryChooseColdDamageAi(decision, out var coldChoice))
             selected = coldChoice;
         else if (_characterChengJiChengCuiOlOperations.TryChooseTousuiAi(decision, out var tousuiChoice))
             selected = tousuiChoice;
@@ -475,9 +475,9 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
             {
                 TurnCriterionQuota = _coreQuotaTopProgramsOperations.ComputeTurnCriterionQuota(owner.Seat)
             };
-        if (trigger.Window == SkillProgramTriggerWindow.AfterDamageApplied && ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.ReflectAppliedDamage) && _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } reflectionWindow)
+        if (trigger.Window == SkillProgramTriggerWindow.AfterDamageApplied && ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.ReflectAppliedDamage) && _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is { } reflectionWindow)
         {
-            var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(reflectionWindow);
+            var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(reflectionWindow);
             return _coreAttributedMarkerEventsOperations.CreateAttributedPaymentAiContext(owner, trigger)with
             {
                 AfterDamageAmount = attack.DamageWasApplied ? attack.DamageAmount : 0,
@@ -485,9 +485,9 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
             };
         }
 
-        if (trigger.Window == SkillProgramTriggerWindow.AfterDamageApplied && trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.Recover && effect.NumberExpression == SkillProgramNumberExpression.AfterDamageAmount) && _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } afterDamage)
+        if (trigger.Window == SkillProgramTriggerWindow.AfterDamageApplied && trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.Recover && effect.NumberExpression == SkillProgramNumberExpression.AfterDamageAmount) && _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is { } afterDamage)
         {
-            var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(afterDamage);
+            var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(afterDamage);
             return _coreAttributedMarkerEventsOperations.CreateAttributedPaymentAiContext(owner, trigger)with
             {
                 AfterDamageAmount = attack.DamageAmount,
@@ -510,9 +510,9 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
                 Actor = _corePublicDamagePredictionOperations.CreateAiSkillContext(_coreMatchParticipantsPlayersAccess._players[parent.Action.ActorSeat], ownerSeat, actionSnapshot),
                 CardActionActorIsOwner = parent.Action.ActorSeat == ownerSeat,
                 CardUseEffectiveKind = parent.Action.EffectiveKind,
-                WholeCardUseNullificationScore = ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.NullifyCurrentCardUse) || ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.RepeatIncomingSoleCardEffectAndDrawByRange) ? _coreProgramCardUseNullificationOperations.GetWholeCardUseNullificationAiScore(ownerSeat, parent) : null,
+                WholeCardUseNullificationScore = ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.NullifyCurrentCardUse) || ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.RepeatIncomingSoleCardEffectAndDrawByRange) ? _coreProgramCardUseNullificationOperations.Value.GetWholeCardUseNullificationAiScore(ownerSeat, parent) : null,
                 CardEffectInterventionScore = parent.Action.Type == CardActionType.Use && (ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.NullifySelectedCardEffects) || ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.RemoveSelectedCurrentArrowBarrageTarget)) ? parent.Action.EffectiveDesignatedTargetSeats.Distinct().Where(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(item => item.Id == parent.ParentFrameId).IneffectiveTargetSeats?.Contains(seat) != true).Select(seat => Math.Max(0d, _coreAiBrainsAiBrainsAccess._aiBrains[ownerSeat].ScoreCardEffectIntervention(actionSnapshot ??= _corePlayerViewProjectionOperations.CreateSnapshot(ownerSeat), parent.Action.EffectiveKind, seat))).Aggregate(0d, (total, score) => ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.RemoveSelectedCurrentArrowBarrageTarget) ? Math.Max(total, score) : total + score) : 0d,
-                PairedColorDispositionScore = _coreProgramPairedColorResponseAiOperations.GetPairedColorDispositionAiScore(trigger, ownerSeat, parent),
+                PairedColorDispositionScore = _coreProgramPairedColorResponseAiOperations.Value.GetPairedColorDispositionAiScore(trigger, ownerSeat, parent),
                 CardUseDebitActive = _coreCardUseDebitsOperations.IsCardUseDebitActive(parent.Action.ActionId)
             };
         }
@@ -555,7 +555,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         if (effects is [{ Op: SkillProgramEffectOp.ResolveWushuangZengou }])
             return _characterQingheGongzhuOlOperations.EstimateActualDodgeZengouForAi(owner, windowContext);
         if (effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouYuJinXiayuan))
-            return _characterYuJinMouMobileOperations.EstimateMouXiayuanForAi(owner, publicContext, windowContext);
+            return _characterYuJinMouMobileOperations.Value.EstimateMouXiayuanForAi(owner, publicContext, windowContext);
         if (effects is [{ Op: SkillProgramEffectOp.ResolveMouHuangGaiKurouGift }])
             return _characterHuangGaiMouMobileOperations.EstimateMouKurouGiftForAi(owner, publicContext);
         if (effects.FirstOrDefault(e => e.Op is SkillProgramEffectOp.SelectAllPublicTeamTargets or SkillProgramEffectOp.SelectRandomPublicTeamTarget)is { TargetKind: { } teamKind } teamSelection)
@@ -587,7 +587,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
                 ActualTurnDeathBenefits = checked(effects.Single(e => e.NumberExpression == SkillProgramNumberExpression.ActualTurnDeathBenefits).ActualTurnDeathOwnerKillsOnly == true ? 3 * kills : deaths + 2 * kills)
             };
         publishedTargets ??= _coreFixedRecipientBenefitsOperations.PublishedFixedRecipientForAi(owner, effects, windowContext);
-        publishedTargets ??= _coreEndingPairDrawsOperations.PublishedEndingPairActorForAi(owner, effects, windowContext);
+        publishedTargets ??= _coreEndingPairDrawsOperations.Value.PublishedEndingPairActorForAi(owner, effects, windowContext);
         if (publishedTargets is null && effects.Any(effect => effect.Op == SkillProgramEffectOp.YuanziResolve) && windowContext is { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, SourceSeat: { } yuanziTurnSeat } && yuanziTurnSeat != owner.Seat)
             publishedTargets = [yuanziTurnSeat];
         if (publishedTargets is null && effects.Any(effect => effect.Op == SkillProgramEffectOp.GrantTurnSkills && effect.TargetReference is { Kind: ProgramParticipantRef.Actor }) && windowContext?.CardUse is { } grantedUse)
@@ -674,8 +674,8 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
     internal PromptChoice SelectAiProgramOwnedCards(PendingDecision decision, ProgramSkillFrame frame)
     {
         var draft = frame.OwnedCardSelection ?? throw new InvalidOperationException("The configured owned-card choice lost its draft.");
-        if (frame.MouYuJinXiayuan is not null && draft.ResultBind == "xiayuan-cost" && _characterYuJinMouMobileOperations.ValidMouXiayuan(frame))
-            return _characterYuJinMouMobileOperations.SelectAiMouXiayuanCost(decision, frame);
+        if (frame.MouYuJinXiayuan is not null && draft.ResultBind == "xiayuan-cost" && _characterYuJinMouMobileOperations.Value.ValidMouXiayuan(frame))
+            return _characterYuJinMouMobileOperations.Value.SelectAiMouXiayuanCost(decision, frame);
         if (draft.MinimumCount > 0 && draft.SelectedCardIds.Count >= draft.MinimumCount)
             return decision.Choices.Single(choice => choice.Parameters.GetValueOrDefault("program-action") == "finish-owned-cards");
         return decision.Choices.Where(choice => choice.Parameters.GetValueOrDefault("program-action") == "select-owned-cards").OrderBy(choice => _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(choice.Cards.Single())).Single(card => card.Id == choice.Cards[0]).Kind is CardKind.Peach ? 1 : 0).ThenBy(choice => choice.Cards[0]).First();
@@ -690,7 +690,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
 
     internal void CompleteDyingProgramBinding(ProgramSkillFrame frame, bool completed)
     {
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("The dying program lost its dying resolution.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("The dying program lost its dying resolution.");
         if (dying.FrameId != frame.WindowContext!.ParentFrameId || dying.VictimSeat != frame.WindowContext.TargetSeat || dying.ResponderSeat != frame.OwnerSeat)
             throw new InvalidOperationException("The dying program returned to the wrong responder or victim.");
         var victim = _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat];
@@ -715,7 +715,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
             return;
         }
 
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreDyingRescueContinuationsOperations.ProgramPaidDyingRescue(frame, dying))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreDyingRescueContinuationsOperations.Value.ProgramPaidDyingRescue(frame, dying))
             dying = _coreNativeDyingFramesOperations.UpdateDyingFrame(dying.Id, current => current with { ResponderIndex = current.ResponderIndex + 1 });
         if (dying.ResponderIndex >= dying.ResponderSeats.Count)
             _coreNativeDyingOperations.CompleteDying(dying, survived: false);
@@ -727,7 +727,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         }
     }
 
-    internal ProgramSkillWindowContext CreateDyingProgramContext(DyingFrame dying, ProgramTriggerCandidate candidate) => new(GetProgramTrigger(candidate).Window, dying.FrameId, candidate.OwnerSeat, SourceSeat: _coreNativeDamageHandlesOperations.GetDyingAttack(dying)is { IsSourceLess: false } attack ? attack.SourceSeat : null, TargetSeat: dying.VictimSeat, DamageFrameId: dying.DamageFrameId, OccurrenceIndex: candidate.OccurrenceIndex);
+    internal ProgramSkillWindowContext CreateDyingProgramContext(DyingFrame dying, ProgramTriggerCandidate candidate) => new(GetProgramTrigger(candidate).Window, dying.FrameId, candidate.OwnerSeat, SourceSeat: _coreNativeDamageHandlesOperations.Value.GetDyingAttack(dying)is { IsSourceLess: false } attack ? attack.SourceSeat : null, TargetSeat: dying.VictimSeat, DamageFrameId: dying.DamageFrameId, OccurrenceIndex: candidate.OccurrenceIndex);
     internal IReadOnlyList<ProgramTriggerCandidate> GetDyingProgramCandidates(CharacterState responder, DyingFrame dying) => new[]
     {
         SkillProgramTriggerWindow.SelfDyingResponse,
@@ -755,7 +755,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
             return _characterXiZhiCaiOlOperations.CreateXianfuDamageContext(damage, candidate);
         if (_characterHuangQuanOlOperations.IsDianhuDrawTrigger(GetProgramTrigger(candidate)))
             return _characterHuangQuanOlOperations.CreateDianhuDamageContext(damage, candidate);
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage);
         var owner = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat];
         var appearanceSourceLess = attack.IsDelayedJudgmentDamage && ProgramInstructionResolver.Default.Features(GetProgramTrigger(candidate)).HasOperation(SkillProgramEffectOp.DrawByDamageCardColor);
         var facts = CaptureProgramTriggerFacts(owner)with

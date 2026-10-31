@@ -26,7 +26,7 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
     CardLocation IMouDongZhuoOlFacts.Location(int id) => _cardZonesOperations._cardZones.GetLocation(id);
     IReadOnlyList<MouDongZhuoOlCard> IMouDongZhuoOlFacts.Discardable(int seat) => Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, seat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, new(z, seat), OwnedCardMoveIntent.Discard)).Select(c => new MouDongZhuoOlCard(c.Id, new(z, seat), _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], c)))).ToArray());
     IReadOnlyList<MouDongZhuoOlCard> IMouDongZhuoOlFacts.CurrentDiscard() => Array.AsReadOnly(_cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == c.Id && m.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && m.To == CardLocation.DiscardPile)).Select(c => new MouDongZhuoOlCard(c.Id, CardLocation.DiscardPile, c.Suit)).ToArray());
-    IEnumerable<T> IMouDongZhuoOlFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouDongZhuoOlFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouDongZhuoOlFacts.ExactStart(ProgramSkillFrame f, SkillProgramEffectOp op)
     {
         if (f.InstructionIndex != 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != op || ((IMouDongZhuoOlFacts)this).Program(f.SkillId).GameplayHash != f.GameplayHash || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
@@ -127,7 +127,7 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
             // The earlier shared observer has already published the exact
             // Slash-defense Dodge / Nullification true-Use fact. Pure played
             // responses never get that fact and cannot add to this total.
-            var proof = _coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().LastOrDefault(e => e.CardActionId == accepted.Action.ActionId && e.ActorSeat == accepted.Action.ActorSeat && e.RoundActionType == CardActionType.Response);
+            var proof = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().LastOrDefault(e => e.CardActionId == accepted.Action.ActionId && e.ActorSeat == accepted.Action.ActorSeat && e.RoundActionType == CardActionType.Response);
             if (proof is not null)
             {
                 action = accepted.Action;
@@ -135,7 +135,7 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
             }
         }
 
-        if (action is null || action.ActionId <= 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<MouDongZhuoOlBlackUseEvent>().Any(e => e.ActionId == action.ActionId))
+        if (action is null || action.ActionId <= 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDongZhuoOlBlackUseEvent>().Any(e => e.ActionId == action.ActionId))
             return;
         var suit = action.EffectiveSuit ?? (action.PhysicalCards is [var card] ? _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(card.CardId)) : Suit.None);
         var black = suit != Suit.None && (action.EffectiveIsRed is { } red ? !red : suit is Suit.Spade or Suit.Club);

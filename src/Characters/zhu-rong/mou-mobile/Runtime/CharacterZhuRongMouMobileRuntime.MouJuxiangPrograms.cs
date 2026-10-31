@@ -15,7 +15,7 @@ internal sealed partial class CharacterZhuRongMouMobileRuntime
     internal SkillProgramStepOutcome GiftMouZhuRongOutsideAssault(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != MouZhuRongComposition.Juxiang || f.TriggerId != "outside-assault-gift" || f.InstructionIndex != 2 || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } || f.SelectedTargetSeats is not [var recipient] || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhuRongAssaultGeneratedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.SkillId != MouZhuRongComposition.Juxiang || f.TriggerId != "outside-assault-gift" || f.InstructionIndex != 2 || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } || f.SelectedTargetSeats is not [var recipient] || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhuRongAssaultGeneratedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Juxiang requires its current Ending and one living recipient.");
         // The fixed mode recipe, not the depleted stock, supplies printed faces.
         // A mode without this kind uses the ordinary game's three printed faces.

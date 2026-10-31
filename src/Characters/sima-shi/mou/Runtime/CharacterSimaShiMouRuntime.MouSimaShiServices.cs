@@ -47,8 +47,8 @@ internal sealed partial class CharacterSimaShiMouRuntime
         var p = _cardZonesOperations._cardZones.GetLocation(id);
         return new MouSimaShiCard(id, _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind, p);
     }).ToArray());
-    bool IMouSimaShiFacts.Quarantined(MouSimaShiRemovedEvent removed) => _cardZonesOperations._cardZones.GetLocation(removed.CardId) == CardLocation.OutsideGame && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == removed.CardId)is { } actual && actual.Sequence == removed.Sequence && actual.To == CardLocation.OutsideGame && _coreProgramEventHistoryOperations.ProgramEventHistory<MouSimaShiMovedEvent>().Count(m => m.DebtId == removed.DebtId && m.CardId == removed.CardId && m.Sequence == actual.Sequence && m.Operation == SkillProgramEffectOp.RemoveMouSimaShiChenlve && m.To == actual.To) == 1;
-    IEnumerable<T> IMouSimaShiFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    bool IMouSimaShiFacts.Quarantined(MouSimaShiRemovedEvent removed) => _cardZonesOperations._cardZones.GetLocation(removed.CardId) == CardLocation.OutsideGame && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == removed.CardId)is { } actual && actual.Sequence == removed.Sequence && actual.To == CardLocation.OutsideGame && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouSimaShiMovedEvent>().Count(m => m.DebtId == removed.DebtId && m.CardId == removed.CardId && m.Sequence == actual.Sequence && m.Operation == SkillProgramEffectOp.RemoveMouSimaShiChenlve && m.To == actual.To) == 1;
+    IEnumerable<T> IMouSimaShiFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     MouSimaShiUse? IMouSimaShiFacts.Use(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
     {
         if (w.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || w.CardUse is not { } info || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame p || p.Action.Type != CardActionType.Use || p.Action.ActionId != info.CardActionId || p.CandidateIndex < 0 || p.CandidateIndex >= p.Candidates.Count || _coreCardUseLifecycleOperations.LifecycleCardUse(info.ParentCardUseFrameId)is not { Action: { } a } use || a.ActionId != p.Action.ActionId)
@@ -86,7 +86,7 @@ internal sealed partial class CharacterSimaShiMouRuntime
 
     void IMouSimaShiNative.Shuffle(ProgramSkillFrame f)
     {
-        if (!MouSimaShiRules.Valid(f) || f.MouSimaShi is not { Stage: MouSimaShiStage.Shuffle, Operation: SkillProgramEffectOp.ReturnMouSimaShiChenlve } || _coreProgramEventHistoryOperations.ProgramEventHistory<MouSimaShiShuffledEvent>().Any(s => s.FrameId == f.Id))
+        if (!MouSimaShiRules.Valid(f) || f.MouSimaShi is not { Stage: MouSimaShiStage.Shuffle, Operation: SkillProgramEffectOp.ReturnMouSimaShiChenlve } || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouSimaShiShuffledEvent>().Any(s => s.FrameId == f.Id))
             throw new InvalidOperationException("Chenlve shuffles only after its actual death return movements.");
         var before = _randomOperations._random.State;
         _cardZonesOperations._cardZones.Shuffle(CardLocation.DrawPile, _randomOperations._random);

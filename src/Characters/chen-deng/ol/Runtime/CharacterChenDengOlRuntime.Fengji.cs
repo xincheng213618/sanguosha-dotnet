@@ -9,7 +9,7 @@ internal sealed partial class CharacterChenDengOlRuntime
     {
         if (_coreActualRoundProgressRoundNumberAccess._roundNumber == 0)
             return[];
-        return[.._coreProgramEventHistoryOperations.ProgramEventHistory<ProgramFengjiOptionChosenEvent>().Where(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.OwnerSeat == ownerSeat)];
+        return[.._coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramFengjiOptionChosenEvent>().Where(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.OwnerSeat == ownerSeat)];
     }
 
     internal FengjiOptionKind? PendingFengjiOption(int ownerSeat)

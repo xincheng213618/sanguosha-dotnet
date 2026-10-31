@@ -30,7 +30,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
-            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.Window == state.Window);
+            return state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id && e.Change.Window == state.Window);
         return false;
     }
 
@@ -93,5 +93,5 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28960)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28960)]
-    internal bool ContinuePaidMouHuangYueying(ProgramSkillFrame f) => f.MouBingcai is { Paid: true } && IsPaidMouBingcai(f) || f.MouLixian is { Paid: true } r && ValidMouLixianStarted(f) && (r.Stage == MouLixianStage.NativeUse && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is { } use && IsIssuedMouLixianUse(use) || r.Stage == MouLixianStage.NativeChildren && r.NativeReturned && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLixianUseReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.ActionId == r.ActionId) == 1);
+    internal bool ContinuePaidMouHuangYueying(ProgramSkillFrame f) => f.MouBingcai is { Paid: true } && IsPaidMouBingcai(f) || f.MouLixian is { Paid: true } r && ValidMouLixianStarted(f) && (r.Stage == MouLixianStage.NativeUse && _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is { } use && IsIssuedMouLixianUse(use) || r.Stage == MouLixianStage.NativeChildren && r.NativeReturned && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLixianUseReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.ActionId == r.ActionId) == 1);
 }

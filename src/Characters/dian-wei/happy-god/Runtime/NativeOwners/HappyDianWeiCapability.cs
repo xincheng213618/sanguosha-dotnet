@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class HappyDianWeiCapability(Func<RuntimeEntries.CharacterDianWeiHappyGodEntries> getCharacterDianWeiHappyGodRuntime) : IHappyDianWeiHost
+internal sealed class HappyDianWeiCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDianWeiHappyGodRuntime>> getCharacterDianWeiHappyGodRuntime) : IHappyDianWeiHost
 {
-    public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterDianWeiHappyGodRuntime().ResolveHappyDianWei(f, op);
+    public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterDianWeiHappyGodRuntime().Value.ResolveHappyDianWei(f, op);
 }

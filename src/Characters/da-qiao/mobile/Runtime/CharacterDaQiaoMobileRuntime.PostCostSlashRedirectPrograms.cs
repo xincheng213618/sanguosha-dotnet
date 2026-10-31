@@ -7,7 +7,7 @@ internal sealed partial class CharacterDaQiaoMobileRuntime
     internal ProgramSkillFrame? PostCostSlashRedirectFrame(NativeOwners.CardAttackHandle attack, int owner) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(frame => frame.OwnerSeat == owner && frame.WindowContext is { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } use } && use.ParentCardUseFrameId == attack.ResolutionId && UsesPostCostSlashRedirectRange(frame));
     internal bool IsPostCostSlashRedirectTarget(NativeOwners.CardAttackHandle attack, int owner, int target, int? excludedEquipment)
     {
-        if (owner == attack.SourceSeat || !_coreProgramAttackEffectsOperations.IsProgramSlashRedirectBaseTarget(attack, owner, target))
+        if (owner == attack.SourceSeat || !_coreProgramAttackEffectsOperations.Value.IsProgramSlashRedirectBaseTarget(attack, owner, target))
             return false;
         return _characterTaishiCiMobileGodOperations.HasShenTaishiCiPoweiRange(owner, target) || _characterSunYuanOlOperations.HasSayingRoundRange(owner, target) || _coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(owner, target) || CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target], excludedEquipment)) <= CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(_coreMatchParticipantsPlayersAccess._players[owner], excludedEquipment));
     }

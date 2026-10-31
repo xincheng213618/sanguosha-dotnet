@@ -21,7 +21,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
         if (context.Window == SkillProgramTriggerWindow.AfterDamageApplied)
         {
             var parent = _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Single(w => w.Id == context.ParentFrameId);
-            excluded = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(parent).IsSourceLess ? null : context.SourceSeat;
+            excluded = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(parent).IsSourceLess ? null : context.SourceSeat;
         }
 
         var r = new DuFuRenReceipt(DuFuRenSource(f), f.GameplayHash, f.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, op == SkillProgramEffectOp.ResolveYiseOwnedGain ? DuFuRenStage.RedChoice : DuFuRenStage.GiftChoice, excluded, context.DamageFrameId, context.MovementBatch?.Id, op == SkillProgramEffectOp.ResolveYiseOwnedGain ? context.TargetSeat : null);
@@ -174,7 +174,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
     }
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26520)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26520)]
-    internal bool ContinuePaidDuFuRen(ProgramSkillFrame f) => f.DuFuRen is { } r && (r.Stage == DuFuRenStage.RecoveryChildren || r.Stage == DuFuRenStage.GiftChildren && r.GiftSequence > 0) && _coreProgramEventHistoryOperations.ProgramEventHistory<DuFuRenStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
+    internal bool ContinuePaidDuFuRen(ProgramSkillFrame f) => f.DuFuRen is { } r && (r.Stage == DuFuRenStage.RecoveryChildren || r.Stage == DuFuRenStage.GiftChildren && r.GiftSequence > 0) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuFuRenStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveYiseOwnedGain, SkillProgramEffectOp.GiveForNextActualPhases)]
     internal PromptChoice AiDuFuRen(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters["option"] == "recover") ?? p.Choices.OrderBy(c => c.Cards.Count == 0 ? 0 : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards.Single()), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
 }

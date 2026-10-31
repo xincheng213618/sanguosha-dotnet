@@ -87,7 +87,7 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
 
     internal SkillProgramStepOutcome BeginTurnDefaultStatAllocation(ProgramSkillFrame f, string stateId)
     {
-        if (!_coreTurnDefaultStatsValidationOperations.ExactTurnDefaultStatPhaseParent(f))
+        if (!_coreTurnDefaultStatsValidationOperations.Value.ExactTurnDefaultStatPhaseParent(f))
             throw new InvalidOperationException("Default-stat allocation lost its actual owner phase parent.");
         var key = new GameEngine.TurnDefaultStatKey(f.OwnerSeat, f.SkillId, stateId);
         var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
@@ -110,7 +110,7 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
 
     internal SkillProgramStepOutcome IncreaseNextTurnDefaultStatMinimum(ProgramSkillFrame f, string stateId)
     {
-        if (!_coreTurnDefaultStatsValidationOperations.ExactTurnDefaultStatDamageParent(f, out var damage, out var window, out var attack))
+        if (!_coreTurnDefaultStatsValidationOperations.Value.ExactTurnDefaultStatDamageParent(f, out var damage, out var window, out var attack))
             throw new InvalidOperationException("A next-turn minimum increment requires one real positive applied-damage event outside the owner's turn.");
         var source = new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
         var key = new GameEngine.TurnDefaultStatKey(f.OwnerSeat, f.SkillId, stateId);
@@ -156,7 +156,7 @@ internal sealed partial class CoreGameEngineTurnDefaultStatsRuntime
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("Default-stat choice lost its owner.");
         var plan = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!);
-        if (f.TurnDefaultStatAllocation is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } decision || !_coreTurnDefaultStatsValidationOperations.IsTurnDefaultStatChoice(f, decision) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], TurnDefaultStatChoices(f).Where(c => c.Id == choice.Id).ToArray()))
+        if (f.TurnDefaultStatAllocation is not { } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } decision || !_coreTurnDefaultStatsValidationOperations.Value.IsTurnDefaultStatChoice(f, decision) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], TurnDefaultStatChoices(f).Where(c => c.Id == choice.Id).ToArray()))
             throw new InvalidOperationException("A default-stat choice changed its frozen slot or phase.");
         var slot = int.Parse(choice.Parameters["slot-index"], CultureInfo.InvariantCulture);
         var key = new GameEngine.TurnDefaultStatKey(f.OwnerSeat, f.SkillId, r.Origin.StateId);

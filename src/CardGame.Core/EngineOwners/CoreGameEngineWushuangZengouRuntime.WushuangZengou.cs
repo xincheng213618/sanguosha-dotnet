@@ -156,13 +156,13 @@ internal sealed partial class CoreGameEngineWushuangZengouRuntime
     {
         if (continuation is not (ProgramCardContinuation.Dodge or ProgramCardContinuation.GroupResponse) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.WushuangZengouInvalidation is not { } proof || proof.Payment.ActionId != action.ActionId)
             return false;
-        if (proof.Payment.AttackFrameId != attack.ResolutionId || proof.Payment.DodgerSeat != attack.TargetSeat || action.ActorSeat != attack.TargetSeat || action.EffectiveKind != CardKind.Dodge || action.ParentActionId != _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId || proof.Payment.DodgeCursor != attack.SuccessfulDodgeResponses || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangZengouPaidEvent>().Count(e => e == proof.Payment) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangZengouInvalidatedEvent>().Count(e => e == proof) != 1)
+        if (proof.Payment.AttackFrameId != attack.ResolutionId || proof.Payment.DodgerSeat != attack.TargetSeat || action.ActorSeat != attack.TargetSeat || action.EffectiveKind != CardKind.Dodge || action.ParentActionId != _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId || proof.Payment.DodgeCursor != attack.SuccessfulDodgeResponses || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangZengouPaidEvent>().Count(e => e == proof.Payment) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangZengouInvalidatedEvent>().Count(e => e == proof) != 1)
             throw new InvalidOperationException("An invalidated Dodge changed its exact native response cursor.");
         _characterHuanShuJunOlOperations.ClearHuanpeiDodgeResponse(attack);
         _coreRoundOnceCardlessNativeResponsesOperations.ClearRoundOnceCardlessDodgeResponse(attack);
         _coreTieredRoundZeroResponsesOperations.ClearTieredRoundDodgeResponse(attack);
         _coreChainedStateBasicReturnsOperations.ClearChainedStateBasicDodgeResponse(attack);
-        _coreDrawFundedDistinctBasicResponsesOperations.ClearDrawFundedDistinctBasicDodgeResponse(attack);
+        _coreDrawFundedDistinctBasicResponsesOperations.Value.ClearDrawFundedDistinctBasicDodgeResponse(attack);
         _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);
         if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);

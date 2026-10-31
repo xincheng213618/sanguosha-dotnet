@@ -8,7 +8,7 @@ internal sealed partial class CharacterSharedGameEngineOlMoRumoProofsRuntime
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat))
             return null;
-        var entries = _coreProgramEventHistoryOperations.ProgramEventHistory<OlMoRumoEnteredEvent>().Where(item => item.OwnerSeat == ownerSeat).ToArray();
+        var entries = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<OlMoRumoEnteredEvent>().Where(item => item.OwnerSeat == ownerSeat).ToArray();
         if (entries.Length > 1 || entries.Any(item => item.EntryId <= 0 || item.Origin.OwnerSeat != ownerSeat || item.ActualTurn < 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(item.TurnOwner) || !(item.Origin.SkillId == "ol:mo-qiangang" && item.EntryRound >= 1 && _characterSunQuanOlMagicOperations.IsPaidQiangangRumoOrigin(item.EntryId, item.Origin, item.OriginGameplayHash) || _characterLuBuOlMagicOperations.IsMoLuBuRumoOrigin(item) || _characterDiaoChanOlMagicOperations.IsMoDcQingshiRumoOrigin(item) || _programPipelineHooksOperations._programPipelineHooks.RumoOrigin(item.EntryId, item.Origin, item.OriginGameplayHash))))
             throw new InvalidOperationException("OL Rumo must retain one exact permanent paid entry per owner.");
         return entries.SingleOrDefault();

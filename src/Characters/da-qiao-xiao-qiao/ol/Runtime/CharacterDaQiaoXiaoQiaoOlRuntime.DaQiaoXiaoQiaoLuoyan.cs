@@ -6,7 +6,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
     internal bool HasDaQiaoXiaoQiaoCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveXingwuDepositAndBurst) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.MaintainLuoyanPileSkills);
 
     internal bool DaQiaoXiaoQiaoHasPile(int seat) => _corePublicPileSourcesOperations.PublicPileSources(seat).Any(p => p.SkillId == "ol:xingwu" && _corePublicPileSourcesOperations.PublicPileCards(p).Count > 0);
-    internal bool DaQiaoXiaoQiaoLuoyanSourceLive(CharacterState owner, SkillGrant source) => owner.IsAlive && source.IsEnabled && source.SkillId == "ol:luoyan" && source.DaQiaoXiaoQiaoLuoyanSource is null && _coreHpConditionalSkillGrantsOperations.HpConditionalSourceQualified(owner, source) && _coreHpConditionalSkillGrantsOperations.IsHpConditionalGrantQualified(owner, source) && _characterHeQiOlOperations.IsEquipmentSuitGrantQualified(owner, source);
+    internal bool DaQiaoXiaoQiaoLuoyanSourceLive(CharacterState owner, SkillGrant source) => owner.IsAlive && source.IsEnabled && source.SkillId == "ol:luoyan" && source.DaQiaoXiaoQiaoLuoyanSource is null && _coreHpConditionalSkillGrantsOperations.Value.HpConditionalSourceQualified(owner, source) && _coreHpConditionalSkillGrantsOperations.Value.IsHpConditionalGrantQualified(owner, source) && _characterHeQiOlOperations.IsEquipmentSuitGrantQualified(owner, source);
     internal bool IsDaQiaoXiaoQiaoLuoyanGrantQualified(CharacterState owner, SkillGrant grant)
     {
         if (grant.DaQiaoXiaoQiaoLuoyanSource is not { } relation)
@@ -57,8 +57,8 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
                             _ = _contentRegistryOperations._contentRegistry.GetSkill(skill);
                             var relation = new DaQiaoXiaoQiaoLuoyanSource(source.GrantId, source.SkillInstanceId, skill);
                             var id = DaQiaoXiaoQiaoDerivedId(owner.Seat, relation);
-                            var previous = _coreProgramEventHistoryOperations.ProgramEventHistory<DaQiaoXiaoQiaoLuoyanChangedEvent>().LastOrDefault(e => e.OwnerSeat == owner.Seat && e.GrantId == id && e.Added);
-                            var independent = owner.SkillGrants.Grants.FirstOrDefault(g => g.SkillId == skill && g.DaQiaoXiaoQiaoLuoyanSource is null && g.IsEnabled && _coreHpConditionalSkillGrantsOperations.HpConditionalSourceQualified(owner, g) && _coreHpConditionalSkillGrantsOperations.IsHpConditionalGrantQualified(owner, g));
+                            var previous = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DaQiaoXiaoQiaoLuoyanChangedEvent>().LastOrDefault(e => e.OwnerSeat == owner.Seat && e.GrantId == id && e.Added);
+                            var independent = owner.SkillGrants.Grants.FirstOrDefault(g => g.SkillId == skill && g.DaQiaoXiaoQiaoLuoyanSource is null && g.IsEnabled && _coreHpConditionalSkillGrantsOperations.Value.HpConditionalSourceQualified(owner, g) && _coreHpConditionalSkillGrantsOperations.Value.IsHpConditionalGrantQualified(owner, g));
                             desired[id] = new(id, skill, previous?.InstanceId ?? independent?.SkillInstanceId ?? id, "luoyan:" + source.SourceId)
                             {
                                 DaQiaoXiaoQiaoLuoyanSource = relation

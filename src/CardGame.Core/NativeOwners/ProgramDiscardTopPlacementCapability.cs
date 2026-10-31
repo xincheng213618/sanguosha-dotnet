@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramDiscardTopPlacementCapability(Func<RuntimeEntries.CoreGameEngineProgramDiscardTopPlacementEntries> getCoreGameEngineProgramDiscardTopPlacementRuntime) : IProgramDiscardTopPlacementHost
+internal sealed class ProgramDiscardTopPlacementCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramDiscardTopPlacementRuntime>> getCoreGameEngineProgramDiscardTopPlacementRuntime) : IProgramDiscardTopPlacementHost
 {
-    public SkillProgramStepOutcome PutDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame) => getCoreGameEngineProgramDiscardTopPlacementRuntime().PutProgramDiscardedCardsOnDrawPileTop(frame);
+    public SkillProgramStepOutcome PutDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame) => getCoreGameEngineProgramDiscardTopPlacementRuntime().Value.PutProgramDiscardedCardsOnDrawPileTop(frame);
 }

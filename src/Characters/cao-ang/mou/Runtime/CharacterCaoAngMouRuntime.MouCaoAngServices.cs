@@ -17,7 +17,7 @@ internal sealed partial class CharacterCaoAngMouRuntime
     bool IMouCaoAngFacts.Human(int s) => _coreMatchParticipantsPlayersAccess._players[s].IsHuman;
     string IMouCaoAngFacts.Name(int s) => _coreMatchParticipantsPlayersAccess._players[s].Name;
     SkillProgram? IMouCaoAngFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
-    IEnumerable<T> IMouCaoAngFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouCaoAngFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouCaoAngFacts.Parent(ProgramSkillFrame f) => MouCaParent(f);
     int IMouCaoAngFacts.LostEquipmentOwner(ProgramSkillFrame f) => f.WindowContext?.MovementBatch is { } batch && f.WindowContext.MovementIndex is { } index && index >= 0 && index < batch.Movements.Count && batch.Movements[index] is { From.Zone: CardZoneKind.Equipment } m && m.To != m.From && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) ? m.From.OwnerSeat ?? -1 : -1;
     int IMouCaoAngFacts.EmptySlots(int seat) => Enum.GetValues<EquipmentSlot>().Sum(slot => Math.Max(0, _coreMatchParticipantsPlayersAccess._players[seat].EquipmentSlotCapacity(slot) - _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat).Count(c => _coreEquipmentContentOperations.EquipmentRules.Get(c.Kind).Slot == slot)));

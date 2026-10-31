@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class AnniversaryZhangJiaoCapability(Func<RuntimeEntries.CharacterZhangJiaoAnniversaryGodEntries> getCharacterZhangJiaoAnniversaryGodRuntime) : IAnniversaryZhangJiaoHost
+internal sealed class AnniversaryZhangJiaoCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhangJiaoAnniversaryGodRuntime>> getCharacterZhangJiaoAnniversaryGodRuntime) : IAnniversaryZhangJiaoHost
 {
-    public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffect e) => getCharacterZhangJiaoAnniversaryGodRuntime().BeginAnniversaryZj(f, e);
+    public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffect e) => getCharacterZhangJiaoAnniversaryGodRuntime().Value.BeginAnniversaryZj(f, e);
 }

@@ -51,7 +51,7 @@ internal sealed partial class CharacterWangCanOlRuntime
                 {
                     if (kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor))
                         result.Add(new(LegalActionKind.Peach, id, actor.Seat, $"登楼：使用【桃】", kind, TargetSeats: [actor.Seat]) { ConversionSource = conversion });
-                    if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && (_characterLuKangWumiaoOperations.HasWuLuKangDixianMaterialPrivilege(actor, kind, [id], conversion) || _characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || _coreAdvancedPoliciesOperations.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.HasFriendQihuiAllowance(actor) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, CardKind.Alcohol) || _coreRoundGainedSourceUsesOperations.HasRoundGainedBasicBonus(actor, CardKind.Alcohol, [id])))
+                    if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && (_characterLuKangWumiaoOperations.HasWuLuKangDixianMaterialPrivilege(actor, kind, [id], conversion) || _characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || _coreAdvancedPoliciesOperations.Value.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.Value.HasFriendQihuiAllowance(actor) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, CardKind.Alcohol) || _coreRoundGainedSourceUsesOperations.HasRoundGainedBasicBonus(actor, CardKind.Alcohol, [id])))
                         result.Add(new(LegalActionKind.Alcohol, id, actor.Seat, "登楼：使用【酒】", kind, TargetSeats: [actor.Seat]) { ConversionSource = conversion });
                 }
             }
@@ -135,7 +135,7 @@ internal sealed partial class CharacterWangCanOlRuntime
         var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
         var nuzhan = _coreCardConversionsOperations.GetNuzhanModifiers(id, actor);
         var amount = 1 + actor.AlcoholDamageBonus + nuzhan.DamageBonus;
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         if (targets.Count > 1)
         {

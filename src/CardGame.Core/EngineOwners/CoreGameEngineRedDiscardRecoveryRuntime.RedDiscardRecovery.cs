@@ -112,7 +112,7 @@ internal sealed partial class CoreGameEngineRedDiscardRecoveryRuntime
                 var recovered = Math.Min(1, owner.MaxHp - owner.Hp);
                 if (recovered > 0)
                 {
-                    if (_coreRecoveryAmountBonusesOperations.TracksRecoveryAmountBonuses && _coreRecoveryReplacementOperations.TryQueueRecoveryReplacement(active.Id, active.OwnerSeat, active.OwnerSeat, recovered, new(RecoveryAttemptProducer.Program, active.InstructionIndex)))
+                    if (_coreRecoveryAmountBonusesOperations.Value.TracksRecoveryAmountBonuses && _coreRecoveryReplacementOperations.TryQueueRecoveryReplacement(active.Id, active.OwnerSeat, active.OwnerSeat, recovered, new(RecoveryAttemptProducer.Program, active.InstructionIndex)))
                     {
                         if (!_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(active.Id, PostEventContinuation.Program))
                             throw new InvalidOperationException("The paid red-discard recovery lost its exact queued recovery child.");

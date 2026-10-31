@@ -24,7 +24,7 @@ internal sealed partial class CoreNativeTrickUseRuntime
             throw new InvalidOperationException("Alcohol became illegal before resolution.");
         }
 
-        _coreProgramAlcoholConversionsOperations.ValidateAlcoholConversion(source, alcohol, conversionSource, forResponse: false);
+        _coreProgramAlcoholConversionsOperations.Value.ValidateAlcoholConversion(source, alcohol, conversionSource, forResponse: false);
         var resolutionId = _coreNativeCardUseOperations.BeginCardUse(alcohol, source.Seat, [], playedCardKind: CardKind.Alcohol, conversionSource: conversionSource);
         _corePhysicalMovementFacadesOperations.MoveCard(alcohol, _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(source, alcohol), CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
         // Spend the allowance at commitment, before an optional trigger can pause.
@@ -125,7 +125,7 @@ internal sealed partial class CoreNativeTrickUseRuntime
 
         var resolutionId = _coreNativeCardUseOperations.BeginCardUse(delayedCard, source.Seat, [target.Seat], effectiveCardKind);
         _corePhysicalMovementFacadesOperations.MoveCard(delayedCard, _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(source, delayedCard), CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
-        if (effectiveCardKind == CardKind.Lightning && !_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && _coreCardActionsOperations.TryBeginDelayedCardUsePrograms(resolutionId))
+        if (effectiveCardKind == CardKind.Lightning && !_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability && _coreCardActionsOperations.TryBeginDelayedCardUsePrograms(resolutionId))
         {
             return;
         }
@@ -157,7 +157,7 @@ internal sealed partial class CoreNativeTrickUseRuntime
             _ => throw new InvalidOperationException($"Card {(_coreNativeNullificationFramesOperations.GetNullificationEffectCard(pending).Kind)} is not a delayed card.")};
         if (_characterLiuYanOlOperations.TrySkipUnavailableLiuYanLimuEffect(pending))
             return;
-        if (_characterQuHuangOlOperations.TrySkipUnavailableQuHuangLightning(pending))
+        if (_characterQuHuangOlOperations.Value.TrySkipUnavailableQuHuangLightning(pending))
             return;
         var canTargetSelf = pending.EffectCardKind == CardKind.Lightning || _characterLiuYanOlOperations.IsLiuYanLimuSelfDelayedUse(pending);
         if (pending.EffectCardKind == CardKind.SupplyShortage && false && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count == 0)

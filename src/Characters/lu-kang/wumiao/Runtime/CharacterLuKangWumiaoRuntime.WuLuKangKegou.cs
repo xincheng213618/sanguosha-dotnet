@@ -191,7 +191,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
 
         if (r.Stage == WuLuKangKegouStage.Pindian)
         {
-            if (r.PindianId is not { } pairId || _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().SingleOrDefault(e => e.FrameId == pairId)is not { } determined || !f.PindianResultBindings.Any(b => b.Name == $"wu-lu-kang-kegou-{(r.Iteration)}" && b.SourceSeat == f.OwnerSeat && b.OpponentSeat == r.OpponentSeat && b.SourceRank == determined.Result.SourceRank && b.OpponentRank == determined.Result.OpponentRank))
+            if (r.PindianId is not { } pairId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().SingleOrDefault(e => e.FrameId == pairId)is not { } determined || !f.PindianResultBindings.Any(b => b.Name == $"wu-lu-kang-kegou-{(r.Iteration)}" && b.SourceSeat == f.OwnerSeat && b.OpponentSeat == r.OpponentSeat && b.SourceRank == determined.Result.SourceRank && b.OpponentRank == determined.Result.OpponentRank))
                 throw new InvalidOperationException("Kegou must receive its genuine whole pair result after all global effects and claims.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuLuKangKegou = r = r with { Result = determined.Result, Stage = WuLuKangKegouStage.PindianChildren } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuLuKangKegouPindianReturnedEvent(id, r.Iteration, pairId, determined.Result));

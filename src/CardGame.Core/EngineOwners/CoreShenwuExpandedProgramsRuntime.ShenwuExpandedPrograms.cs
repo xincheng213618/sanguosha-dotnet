@@ -8,7 +8,7 @@ internal sealed partial class CoreShenwuExpandedProgramsRuntime
     internal bool AllowsShenwuExpandedTrigger(ProgramTriggerLegalityContext gate)
     {
         if (gate.SkillId is "shenwu:enemy-tier" or "shenwu:player-tier-2020")
-            return _coreShenwuActivitiesOperations.ShenwuBattleRules?.AllowsTierTrigger(gate.OwnerSeat, gate.SkillId) ?? false;
+            return _coreShenwuActivitiesOperations.Value.ShenwuBattleRules?.AllowsTierTrigger(gate.OwnerSeat, gate.SkillId) ?? false;
         if (gate.SkillId is "shenwu:xunyou" or "shenwu:yanyu")
             return gate.WindowContext is null || gate.Context.TargetSeat is { } other && other != gate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[other].IsAlive;
         if (gate.SkillId == "shenwu:poison")

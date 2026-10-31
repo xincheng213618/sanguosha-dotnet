@@ -14,11 +14,11 @@ internal sealed partial class CharacterZouShiLeRuntime
         projection.Append(HasYunzhengEntityMark(cardId) ? "筝" : null);
     }
 
-    internal bool HasYunzhengEntityMark(int cardId) => HasLeZouShiCapability && (_coreProgramEventHistoryOperations.ProgramEventHistory<YunzhengInitialEntityMarkedEvent>().Any(e => e.CardId == cardId) || _coreProgramEventHistoryOperations.ProgramEventHistory<HuoxinEntityMarkedEvent>().Any(e => e.CardId == cardId));
+    internal bool HasYunzhengEntityMark(int cardId) => HasLeZouShiCapability && (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YunzhengInitialEntityMarkedEvent>().Any(e => e.CardId == cardId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuoxinEntityMarkedEvent>().Any(e => e.CardId == cardId));
     internal bool HasYunzhengHandEntityMark(int ownerSeat, int cardId) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Any(c => c.Id == cardId) && HasYunzhengEntityMark(cardId);
     internal bool IsYunzhengHandLimitExempt(CharacterState owner, int cardId) => HasLeZouShiCapability && HasLiveYunzhengSource(owner) && HasYunzhengHandEntityMark(owner.Seat, cardId);
     internal bool YunzhengNonLockedGrantQualified(CharacterState holder, SkillGrant grant) => !HasLeZouShiCapability || _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !_corePhysicalOwnedCardQueriesOperations.GetHand(holder).Any(c => HasYunzhengEntityMark(c.Id)) || !_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != holder.Seat && HasLiveYunzhengSource(p));
-    internal bool YunzhengBaseGrantQualified(CharacterState owner, SkillGrant grant) => _corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, grant) && (grant.IsModeRule || !owner.IdentityConcealed && _coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(owner, grant) && _coreGuanduGeneralsOperations.GuanduGeneralGrantQualified(owner, grant) && _coreLordSkillProjectionsOperations.IsProjectedGrantQualified(owner, grant) && _corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, grant) && _coreHpConditionalSkillGrantsOperations.IsHpConditionalGrantQualified(owner, grant) && _characterHeQiOlOperations.IsEquipmentSuitGrantQualified(owner, grant) && _characterDaQiaoXiaoQiaoOlOperations.IsDaQiaoXiaoQiaoLuoyanGrantQualified(owner, grant));
+    internal bool YunzhengBaseGrantQualified(CharacterState owner, SkillGrant grant) => _corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, grant) && (grant.IsModeRule || !owner.IdentityConcealed && _coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(owner, grant) && _coreGuanduGeneralsOperations.GuanduGeneralGrantQualified(owner, grant) && _coreLordSkillProjectionsOperations.IsProjectedGrantQualified(owner, grant) && _corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, grant) && _coreHpConditionalSkillGrantsOperations.Value.IsHpConditionalGrantQualified(owner, grant) && _characterHeQiOlOperations.IsEquipmentSuitGrantQualified(owner, grant) && _characterDaQiaoXiaoQiaoOlOperations.IsDaQiaoXiaoQiaoLuoyanGrantQualified(owner, grant));
     internal bool HasLiveYunzhengSource(CharacterState owner)
     {
         if (!owner.IsAlive)
@@ -34,8 +34,8 @@ internal sealed partial class CharacterZouShiLeRuntime
     {
         if (!HasLeZouShiCapability)
             return inner;
-        var initial = _coreProgramEventHistoryOperations.ProgramEventHistory<YunzhengInitialEntityMarkedEvent>().Count();
-        var shown = _coreProgramEventHistoryOperations.ProgramEventHistory<HuoxinEntityMarkedEvent>().Count();
+        var initial = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YunzhengInitialEntityMarkedEvent>().Count();
+        var shown = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuoxinEntityMarkedEvent>().Count();
         if (initial == 0 && shown == 0)
             return inner;
         // Pure cache evidence; a runtime skill lookup here would recurse into shards.
@@ -82,7 +82,7 @@ internal sealed partial class CharacterZouShiLeRuntime
         };
     }
 
-    internal bool IsIssuedYunzhengCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => HasLeZouShiCapability && candidate.SkillId == "le:yunzheng" && candidate.BindingId == "mark-initial-entities" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program?.GameplayHash == candidate.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.InitializeYunzhengInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == candidate.OwnerSeat && _coreActualTurnProgressPhaseAccess._phase == TurnPhase.NotStarted && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, YunzhengInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == candidate && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<YunzhengInitializedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat);
+    internal bool IsIssuedYunzhengCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => HasLeZouShiCapability && candidate.SkillId == "le:yunzheng" && candidate.BindingId == "mark-initial-entities" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program?.GameplayHash == candidate.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.InitializeYunzhengInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == candidate.OwnerSeat && _coreActualTurnProgressPhaseAccess._phase == TurnPhase.NotStarted && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, YunzhengInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == candidate && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YunzhengInitializedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28950, SkillProgramEffectOp.InitializeYunzhengInitialEntities)]
     internal bool CanOfferYunzheng(ProgramTriggerLegalityContext gate) => IsIssuedYunzhengCandidate(gate.Candidate, gate.Context);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28950)]
@@ -95,7 +95,7 @@ internal sealed partial class CharacterZouShiLeRuntime
         if (IsIssuedYunzhengCandidate(candidate, context))
             return true;
         // After the only instruction, preserve its completed right while the executor closes it.
-        return frame.InstructionIndex == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<YunzhengInitializedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var initialized] && initialized.Source == YunzhengSource(frame) && initialized.GameplayHash == frame.GameplayHash;
+        return frame.InstructionIndex == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YunzhengInitializedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var initialized] && initialized.Source == YunzhengSource(frame) && initialized.GameplayHash == frame.GameplayHash;
     }
 
     SkillProgramStepOutcome ILeZouShiHost.InitializeYunzheng(ProgramSkillFrame frame) => InitializeYunzheng(frame);
@@ -103,7 +103,7 @@ internal sealed partial class CharacterZouShiLeRuntime
     internal SkillProgramStepOutcome InitializeYunzheng(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.InstructionIndex != 1 || !PermitIssuedYunzheng(frame) || _coreProgramEventHistoryOperations.ProgramEventHistory<YunzhengInitializedEvent>().Any(e => e.Source.OwnerSeat == frame.OwnerSeat))
+        if (frame.InstructionIndex != 1 || !PermitIssuedYunzheng(frame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YunzhengInitializedEvent>().Any(e => e.Source.OwnerSeat == frame.OwnerSeat))
             throw new InvalidOperationException("Yunzheng requires its exact frozen opening mother and initializes once.");
         var parent = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == frame.WindowContext!.ParentFrameId);
         var entities = parent.YunzhengInitialEntities!.Where(e => e.OwnerSeat == frame.OwnerSeat).ToArray();

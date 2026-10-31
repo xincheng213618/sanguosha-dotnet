@@ -16,8 +16,8 @@ internal sealed partial class CoreMatchOutcomesRuntime
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
         {
             player.RoleRevealed = true;
-            player.TeamRevealed = _coreNativeDamageHandlesOperations.IsTeamMode;
-            if (_coreNativeDamageHandlesOperations.IsNationalWarMode)
+            player.TeamRevealed = _coreNativeDamageHandlesOperations.Value.IsTeamMode;
+            if (_coreNativeDamageHandlesOperations.Value.IsNationalWarMode)
             {
                 _coreNationalGeneralRevealOperations.RevealNationalInformation(player);
             }
@@ -27,8 +27,8 @@ internal sealed partial class CoreMatchOutcomesRuntime
         _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._status = EngineStatus.Completed;
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = null;
         _coreMatchLogOperations.AddLog("GameEnded", $"{(reason)}，本局记为平局。");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WinnerDeterminedEvent(_coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winner, _coreNativeDamageHandlesOperations.IsTeamMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winnerTeamId : null, _coreNativeDamageHandlesOperations.IsNationalWarMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winnerFactionId : null));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GameEndedEvent(_coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winner, _coreNativeDamageHandlesOperations.IsTeamMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winnerTeamId : null, _coreNativeDamageHandlesOperations.IsNationalWarMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winnerFactionId : null));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WinnerDeterminedEvent(_coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winner, _coreNativeDamageHandlesOperations.Value.IsTeamMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winnerTeamId : null, _coreNativeDamageHandlesOperations.Value.IsNationalWarMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winnerFactionId : null));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GameEndedEvent(_coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winner, _coreNativeDamageHandlesOperations.Value.IsTeamMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winnerTeamId : null, _coreNativeDamageHandlesOperations.Value.IsNationalWarMode ? _coreMatchOutcomeStatusWinnerWinnerFactionIdWinnerTeamIdAccess._winnerFactionId : null));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     }
 

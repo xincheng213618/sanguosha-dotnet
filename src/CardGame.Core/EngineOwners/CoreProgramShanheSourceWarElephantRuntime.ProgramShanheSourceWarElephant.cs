@@ -19,7 +19,7 @@ internal sealed partial class CoreProgramShanheSourceWarElephantRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (!IsShanheWarElephantMode || frame.SkillId != ShanheSourceXiongshou1136 || frame.ShanheWarElephantCounterSlash is not null || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 1 } context || context.TargetSeat != frame.OwnerSeat || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not DamageTriggerWindowFrame window || window.Id != context.ParentFrameId || window.TriggerWindow != context.Window || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(frame, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("Source Xiongshou lost its actual first large-damage owner and original after-damage window.");
-        GameEngine.IDamageAttempt original = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+        GameEngine.IDamageAttempt original = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window);
         if (original.TargetSeat != frame.OwnerSeat || original.DamageAmount != context.Amount || context.SourceSeat != (original.IsSourceLess ? null : original.SourceSeat))
             throw new InvalidOperationException("Source Xiongshou cannot borrow another damage's source or amount.");
         // The first qualifying damage consumes this actual turn's trigger even if
@@ -33,7 +33,7 @@ internal sealed partial class CoreProgramShanheSourceWarElephantRuntime
             _coreCardAttackStateOperations.UpdateCardAttackState(attackId, state => state!with { Active = false });
         if (duel is { } duelId)
             _coreCardAttackStateOperations.UpdateCardContinuations(duelId, state => state with { Duel = state.Duel!with { Active = false } });
-        return _coreTriggeredCardProgramsOperations.UseTriggeredProgramVirtualSlash(frame, source);
+        return _coreTriggeredCardProgramsOperations.Value.UseTriggeredProgramVirtualSlash(frame, source);
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.BeforeParentResume, 24530)]

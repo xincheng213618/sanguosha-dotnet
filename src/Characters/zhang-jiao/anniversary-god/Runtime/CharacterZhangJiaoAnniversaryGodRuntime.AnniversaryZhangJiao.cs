@@ -110,7 +110,7 @@ internal sealed partial class CharacterZhangJiaoAnniversaryGodRuntime
         {
             if (f.InstructionIndex != 1 || f.AnniversaryZhangJiao is not null)
                 throw new InvalidOperationException("Sanshou already froze its actual-use categories.");
-            var mask = _coreProgramEventHistoryOperations.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Where(x => x.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && x.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat).Aggregate(0, (m, x) => m | x.CardCategoryMask);
+            var mask = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Where(x => x.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && x.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat).Aggregate(0, (m, x) => m | x.CardCategoryMask);
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { AnniversaryZhangJiao = new(AnniversaryZjSource(f), f.GameplayHash, e.Op, 1, AnniversaryZhangJiaoStage.SanshouSnapshot, UsedCategories: mask) });
             return SkillProgramStepOutcome.Continue;
         }

@@ -134,7 +134,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime
     {
         if (f.ConditionalDiscardDuel is not { Stage: ConditionalDiscardDuelStage.OwnerChildren or ConditionalDiscardDuelStage.TargetChildren })
             return false;
-        if (f.PendingMovementContinuation is null || !_coreConditionalDiscardDuelReturnsOperations.ValidConditionalDuelPayments(f))
+        if (f.PendingMovementContinuation is null || !_coreConditionalDiscardDuelReturnsOperations.Value.ValidConditionalDuelPayments(f))
             throw new InvalidOperationException("Conditional Duel movement lost its real cost.");
         ContinueConditionalDuelPaymentChildren(f);
         return true;
@@ -145,7 +145,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.ConditionalDiscardDuel is not { } d)
             return false;
-        if (!ConditionalDuelParentMatches(f) || !_coreConditionalDiscardDuelReturnsOperations.ValidConditionalDuelPayments(f))
+        if (!ConditionalDuelParentMatches(f) || !_coreConditionalDiscardDuelReturnsOperations.Value.ValidConditionalDuelPayments(f))
             throw new InvalidOperationException("Conditional Duel lost its frozen owner, costs or instruction.");
         if (d.Stage is ConditionalDiscardDuelStage.OwnerChoice or ConditionalDiscardDuelStage.TargetChoice)
         {

@@ -9,7 +9,7 @@ internal sealed partial class CharacterXuJingAnniversaryRuntime
             return false;
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).ToArray();
         if (r.Stage == AnniversaryXuJingStage.MovementChildren)
-            return r.MovementSource is { } source && r.MovementDestination is { } destination && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXuJingMovedEvent>().Count(e => e == new AnniversaryXuJingMovedEvent(f.Id, r.CardId, source, destination, r.Before, r.After)) == 1 && (source == destination ? r.Before == r.After && moves.Length == 0 : moves is [var movement] && movement.CardId == r.CardId && movement.From == source && movement.To == destination && movement.Reason == AnniversaryXuJingMoveReason);
+            return r.MovementSource is { } source && r.MovementDestination is { } destination && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXuJingMovedEvent>().Count(e => e == new AnniversaryXuJingMovedEvent(f.Id, r.CardId, source, destination, r.Before, r.After)) == 1 && (source == destination ? r.Before == r.After && moves.Length == 0 : moves is [var movement] && movement.CardId == r.CardId && movement.From == source && movement.To == destination && movement.Reason == AnniversaryXuJingMoveReason);
         return r.Draws.LastOrDefault()is { } draw && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && draw.RecipientSeat == r.TargetSeat && draw.ActualDrawIds.All(id => moves.Count(m => m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason == AnniversaryXuJingDrawReason) == 1);
     }
 
@@ -32,7 +32,7 @@ internal sealed partial class CharacterXuJingAnniversaryRuntime
 
     internal ProgramSkillFrame? AnniversaryXuJingObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((frame, child) => this.AnniversaryXuJingFirstChild(frame, child), (index) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 43100)]
-    internal bool AnniversaryXuJingDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnniversaryXuJingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool AnniversaryXuJingDyingObserver() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && AnniversaryXuJingObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 43100)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 43100)]
     internal bool AnniversaryXuJingRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

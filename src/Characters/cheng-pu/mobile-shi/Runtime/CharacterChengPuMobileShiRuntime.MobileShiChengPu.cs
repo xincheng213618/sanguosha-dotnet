@@ -277,7 +277,7 @@ internal sealed partial class CharacterChengPuMobileShiRuntime
         var reduced = false;
         if (f.WindowContext is { } context && _resolutionStackOperations._resolutionStack.OfType<BeforeDamageProgramWindowFrame>().SingleOrDefault(window => window.Id == context.ParentFrameId)is { Prevented: false } window && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } attack && attack.SourceSeat == window.SourceSeat && attack.TargetSeat == window.TargetSeat)
         {
-            _coreProgramDamageReductionOperations.ReduceProgramCurrentDamage(f, 1);
+            _coreProgramDamageReductionOperations.Value.ReduceProgramCurrentDamage(f, 1);
             reduced = true;
         }
 

@@ -74,7 +74,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 61010)]
     internal bool AllowsWushuangOriginalActivation(ProgramActivationLegalityContext gate) => gate.SkillId is not ("wushuang:skill-3282" or "wushuang:skill-3283") || _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != gate.OwnerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0);
-    internal bool WushuangYashiGrantQualified(CharacterState owner, SkillGrant grant) => _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangYashiSuppressedEvent>().Any(e => e.Target == owner.Seat && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangYashiExpiredEvent>().Any(expired => expired.ProducerId == e.FrameId));
+    internal bool WushuangYashiGrantQualified(CharacterState owner, SkillGrant grant) => _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Locked) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYashiSuppressedEvent>().Any(e => e.Target == owner.Seat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYashiExpiredEvent>().Any(expired => expired.ProducerId == e.FrameId));
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 61009)]
     internal void RecordWushuangTairanRecovery(IGameEvent payload)
     {
@@ -84,7 +84,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
         var producer = parent as ProgramSkillFrame;
         if (parent is RecoveryReplacementFrame replacement && replacement.Attempt.Completion.Producer == RecoveryAttemptProducer.Program)
             producer = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == replacement.ParentFrameId && f.InstructionIndex == replacement.Attempt.Completion.InstructionIndex);
-        if (producer is not { WushuangOriginalSkill: { Operation: SkillProgramEffectOp.ResolveWushuangTairan, Stage: "tairan-recovered" } } tairan || applied.SourceSeat != tairan.OwnerSeat || applied.TargetSeat != tairan.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangTairanHealedEvent>().Any(e => e.FrameId == tairan.Id))
+        if (producer is not { WushuangOriginalSkill: { Operation: SkillProgramEffectOp.ResolveWushuangTairan, Stage: "tairan-recovered" } } tairan || applied.SourceSeat != tairan.OwnerSeat || applied.TargetSeat != tairan.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangTairanHealedEvent>().Any(e => e.FrameId == tairan.Id))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangTairanHealedEvent(tairan.Id, tairan.OwnerSeat, tairan.SkillInstanceId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, applied.Amount));
     }
@@ -94,7 +94,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
     {
         if (payload is TurnStartedEvent start)
         {
-            foreach (var issued in _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangYashiSuppressedEvent>().Where(e => e.Target == start.ActorSeat && e.ActualTurn < start.TurnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangYashiExpiredEvent>().Any(x => x.ProducerId == e.FrameId)).ToArray())
+            foreach (var issued in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYashiSuppressedEvent>().Where(e => e.Target == start.ActorSeat && e.ActualTurn < start.TurnNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYashiExpiredEvent>().Any(x => x.ProducerId == e.FrameId)).ToArray())
             {
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangYashiExpiredEvent(issued.FrameId, issued.Target));
                 _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
@@ -110,7 +110,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
         }
 
         if (payload is TurnEndedEvent end)
-            foreach (var issued in _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangChoufaRewrittenEvent>().Where(e => e.Target == end.ActorSeat && e.ActualTurn <= end.TurnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangChoufaExpiredEvent>().Any(x => x.ProducerId == e.FrameId)).ToArray())
+            foreach (var issued in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangChoufaRewrittenEvent>().Where(e => e.Target == end.ActorSeat && e.ActualTurn <= end.TurnNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangChoufaExpiredEvent>().Any(x => x.ProducerId == e.FrameId)).ToArray())
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangChoufaExpiredEvent(issued.FrameId, issued.Target));
     }
 
@@ -127,14 +127,14 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
         }
 
         if (!attack.IsSourceLess && !attack.IsChainPropagation)
-            bonus += _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangLingrenGuessedEvent>().Count(e => e.Owner == attack.SourceSeat && e.Target == attack.TargetSeat && e.UseId == attack.ResolutionId && e.Correct >= 1 && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && _coreCardUseLifecycleOperations.LifecycleCardUse(e.UseId)?.Action?.ActionId == e.ActionId);
+            bonus += _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangLingrenGuessedEvent>().Count(e => e.Owner == attack.SourceSeat && e.Target == attack.TargetSeat && e.UseId == attack.ResolutionId && e.Correct >= 1 && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && _coreCardUseLifecycleOperations.LifecycleCardUse(e.UseId)?.Action?.ActionId == e.ActionId);
         return bonus;
     }
 
     internal GameEngine.ProgramCardIdentityMatch? WushuangChoufaIdentity(CharacterState owner, Card card)
     {
-        var expired = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangChoufaExpiredEvent>().Select(e => e.ProducerId).ToHashSet();
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangChoufaRewrittenEvent>().LastOrDefault(e => e.Target == owner.Seat && e.CardIds.Contains(card.Id) && !expired.Contains(e.FrameId) && !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == card.Id && m.From == CardLocation.Hand(owner.Seat) && m.Sequence > e.MovementSequence));
+        var expired = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangChoufaExpiredEvent>().Select(e => e.ProducerId).ToHashSet();
+        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangChoufaRewrittenEvent>().LastOrDefault(e => e.Target == owner.Seat && e.CardIds.Contains(card.Id) && !expired.Contains(e.FrameId) && !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == card.Id && m.From == CardLocation.Hand(owner.Seat) && m.Sequence > e.MovementSequence));
         // Current hand identity applies only to the exact frozen card entities.
         if (issued is null)
             return null;
@@ -166,7 +166,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
     {
         if (use.WushuangCiweiNullification is not { } proof)
             return false;
-        if (proof.UseId != use.Id || use.Action is not { } action || action.ActionId != proof.ActionId || action.ActorSeat != proof.Actor || action.EffectiveKind != proof.Kind || proof.SkillId != "wushuang:skill-3284" || _contentRegistryOperations._contentRegistry.GetSkill(proof.SkillId).Program?.GameplayHash != proof.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCiweiNullifiedEvent>().Count(e => e == proof) != 1 || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == proof.PaidMovement && m.CardId == proof.PaidCard && m.From.OwnerSeat == proof.Owner && m.To == CardLocation.DiscardPile))
+        if (proof.UseId != use.Id || use.Action is not { } action || action.ActionId != proof.ActionId || action.ActorSeat != proof.Actor || action.EffectiveKind != proof.Kind || proof.SkillId != "wushuang:skill-3284" || _contentRegistryOperations._contentRegistry.GetSkill(proof.SkillId).Program?.GameplayHash != proof.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCiweiNullifiedEvent>().Count(e => e == proof) != 1 || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == proof.PaidMovement && m.CardId == proof.PaidCard && m.From.OwnerSeat == proof.Owner && m.To == CardLocation.DiscardPile))
             throw new InvalidOperationException("Ciwei's ineffective use lost its exact issued action and paid entity.");
         return true;
     }

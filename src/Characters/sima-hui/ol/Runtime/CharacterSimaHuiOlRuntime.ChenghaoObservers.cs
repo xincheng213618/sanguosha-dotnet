@@ -71,7 +71,7 @@ internal sealed partial class CharacterSimaHuiOlRuntime
         proof = null !;
         if (context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, DamageFrameId: { } damageId, TargetSeat: { } target } || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.ParentFrameId != damageId || window.TargetSeat != target || _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damageId)is not { } damage)
             return false;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window);
         if (!TrySimaHuiOriginalChainMembers(attack, out var originalMembers) || damage.ParentFrameId != attack.ResolutionId || damage.TargetSeat != target || damage.Amount != context.Amount || damage.Nature != _coreNativeCardClassificationsOperations.GetDamageNature(attack))
             return false;
         proof = new(window.Id, attack.ResolutionId, _coreActualTurnProgressTurnNumberAccess._turnNumber, attack.SourceSeat, target, damage.Nature, attack.IsSourceLess, originalMembers.Length);

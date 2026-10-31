@@ -11,7 +11,7 @@ internal sealed partial class CharacterHuangQuanMobileShiRuntime
     internal bool HasShiQuan => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveShiHqCuixian);
 
     internal bool IsShiQuanDuelUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ShiQuanDuelOrigin: not null, CardId: 0, CardKind: CardKind.Duel, PhysicalCardIds.Count: 0 };
-    internal IReadOnlyList<int> ShiQuanOrderedPileIds(int holderSeat) => !HasShiQuan || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(holderSeat) ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<ShiQuanCuixianPlacedEvent>().SelectMany(entry => entry.CardIds).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == ShiHuangQuanComposition.Pile(holderSeat)).Distinct().ToArray();
+    internal IReadOnlyList<int> ShiQuanOrderedPileIds(int holderSeat) => !HasShiQuan || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(holderSeat) ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiQuanCuixianPlacedEvent>().SelectMany(entry => entry.CardIds).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == ShiHuangQuanComposition.Pile(holderSeat)).Distinct().ToArray();
     internal bool ShiQuanGainsAvailable(int ownerSeat, ProgramSkillWindowContext? context) => context is { } window && window.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && window.CardUse is { EffectiveKind: { } kind, DesignatedTargetSeats: [var holder] } use && holder != ownerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(holder) && _coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[holder].IsAlive && ShiHuangQuanComposition.IsDamageKind(kind) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Count > 0 && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]).Count > 0;
     internal bool ShiQuanClaimAvailable(int ownerSeat, ProgramSkillWindowContext? context)
     {
@@ -21,8 +21,8 @@ internal sealed partial class CharacterHuangQuanMobileShiRuntime
         return placement is { } pending && ShiQuanUseDamaged(useId) && ShiQuanOrderedPileIds(pending.HolderSeat).Count > 0 && _coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive;
     }
 
-    internal ShiQuanCuixianPlacedEvent? ShiQuanPendingPlacement(long useId) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiQuanCuixianPlacedEvent>().LastOrDefault(entry => entry.UseId == useId && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiQuanCuixianClaimedEvent>().Any(claimed => claimed.FrameId == entry.FrameId && claimed.UseId == useId));
-    internal bool ShiQuanUseDamaged(long useId) => _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Any(entry => entry.SourceCardUseResolutionId == useId && entry.Amount > 0);
+    internal ShiQuanCuixianPlacedEvent? ShiQuanPendingPlacement(long useId) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiQuanCuixianPlacedEvent>().LastOrDefault(entry => entry.UseId == useId && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiQuanCuixianClaimedEvent>().Any(claimed => claimed.FrameId == entry.FrameId && claimed.UseId == useId));
+    internal bool ShiQuanUseDamaged(long useId) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Any(entry => entry.SourceCardUseResolutionId == useId && entry.Amount > 0);
     internal bool ShiQuanTurnAvailable(int ownerSeat, ProgramSkillWindowContext? context)
     {
         if (context is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, SourceSeat: { } holder } || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(holder) || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[holder].IsAlive || holder == ownerSeat || ShiQuanOrderedPileIds(holder).Count == 0)
@@ -352,7 +352,7 @@ internal sealed partial class CharacterHuangQuanMobileShiRuntime
         if (context is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count)
             return null;
         var from = batch.Movements[index].From;
-        if (from.OwnerSeat != ownerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment) || _cardZonesOperations._cardZones.CardsAt(new CardLocation(from.Zone, ownerSeat)).Count != 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiQuanGushiZoneUsedEvent>().Any(entry => entry.OwnerSeat == ownerSeat && entry.Zone == from.Zone))
+        if (from.OwnerSeat != ownerSeat || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment) || _cardZonesOperations._cardZones.CardsAt(new CardLocation(from.Zone, ownerSeat)).Count != 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiQuanGushiZoneUsedEvent>().Any(entry => entry.OwnerSeat == ownerSeat && entry.Zone == from.Zone))
             return null;
         return from.Zone;
     }
@@ -502,7 +502,7 @@ internal sealed partial class CharacterHuangQuanMobileShiRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 68770)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 68770)]
     internal bool ContinueShiQuanAfterLoss(ProgramSkillFrame f) => f.ShiQuan is { Stage: ShiQuanStage.DuelIssued };
-    internal bool ShiQuanGushiUnlimitedCard(CharacterState actor, CardKind kind, IReadOnlyList<int> ids) => HasShiQuan && actor.IsAlive && ShiHuangQuanComposition.IsDamageKind(kind) && ids is [var id] && id > 0 && _cardZonesOperations._cardZones.GetLocation(id)is { Zone: CardZoneKind.Hand, OwnerSeat: { } holder } && holder == actor.Seat && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiQuanGushiCardClaimedEvent>().Any(entry => entry.OwnerSeat == actor.Seat && entry.CardId == id);
+    internal bool ShiQuanGushiUnlimitedCard(CharacterState actor, CardKind kind, IReadOnlyList<int> ids) => HasShiQuan && actor.IsAlive && ShiHuangQuanComposition.IsDamageKind(kind) && ids is [var id] && id > 0 && _cardZonesOperations._cardZones.GetLocation(id)is { Zone: CardZoneKind.Hand, OwnerSeat: { } holder } && holder == actor.Seat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiQuanGushiCardClaimedEvent>().Any(entry => entry.OwnerSeat == actor.Seat && entry.CardId == id);
     [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaBeforeLimit, 51940)]
     internal bool ShiQuanGushiSlashQuotaBeforeLimit(ProgramSlashQuotaQuery query) => ShiQuanGushiUnlimitedCard(query.Actor, query.Kind, query.PhysicalCardIds ?? (query.PhysicalCard is { Id: > 0 } ? [query.PhysicalCard.Id] : []));
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 51941)]

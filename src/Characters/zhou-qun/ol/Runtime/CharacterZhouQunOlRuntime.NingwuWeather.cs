@@ -11,7 +11,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
             return false;
         if (!IsNingwuJudgment(j, f))
             throw new InvalidOperationException("Ningwu received a different native judgment return.");
-        var result = _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Single(e => e.ResolutionId == j.Id && e.ParentResolutionId == f.Id && e.TargetSeat == r.Peer && e.Reason == "ningwu");
+        var result = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentResolvedEvent>().Single(e => e.ResolutionId == j.Id && e.ParentResolutionId == f.Id && e.TargetSeat == r.Peer && e.Reason == "ningwu");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZhouQun = r with { Stage = ZhouQunStage.JudgmentChildren, JudgmentCardId = result.CardId, JudgmentRank = result.Rank } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NingwuJudgmentReturnedEvent(f.Id, j.Id, result.CardId, result.Rank));
         BeginZhouQunMovement(ref f, ZhouQunStage.JudgmentChildren);
@@ -33,7 +33,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
         var r = f.ZhouQun!;
         if (r.SlashRank is not { } slashRank || r.JudgmentRank is not { } rank || rank <= slashRank || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { Action: { } action } use || action.ActionId != r.ActionId)
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<NingwuUseNullifiedEvent>().Any(e => e.FrameId == f.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<NingwuUseNullifiedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Ningwu may finish its own native judgment once.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NingwuUseNullifiedEvent(f.Id, use.Id, action.ActionId, r.JudgmentId, r.Peer, r.Targets.Single(), slashRank, rank));
         foreach (var target in action.EffectiveDesignatedTargetSeats)
@@ -47,9 +47,9 @@ internal sealed partial class CharacterZhouQunOlRuntime
     {
         if (!HasZhouQunCapability)
             return false;
-        foreach (var e in _coreProgramEventHistoryOperations.ProgramEventHistory<NingwuUseNullifiedEvent>().Where(e => e.UseId == use.Id))
+        foreach (var e in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NingwuUseNullifiedEvent>().Where(e => e.UseId == use.Id))
         {
-            if (use.Action?.ActionId != e.ActionId || e.JudgmentRank <= e.SlashRank || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || _coreProgramEventHistoryOperations.ProgramEventHistory<NingwuJudgmentIssuedEvent>().Count(i => i.FrameId == e.FrameId && i.JudgmentId == e.JudgmentId && i.UseId == use.Id && i.ActionId == e.ActionId && i.ActorSeat == e.ActorSeat && i.TargetSeat == e.TargetSeat && i.SlashRank == e.SlashRank) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<NingwuJudgmentReturnedEvent>().Count(i => i.FrameId == e.FrameId && i.JudgmentId == e.JudgmentId && i.Rank == e.JudgmentRank) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhouQunStartedEvent>().Count(i => i.FrameId == e.FrameId && i.Op == SkillProgramEffectOp.ResolveNingwuSingletonSlashJudgment && i.Source.SkillId == "ol:ningwu") != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Count(i => i.ResolutionId == e.JudgmentId && i.ParentResolutionId == e.FrameId && i.TargetSeat == e.ActorSeat && i.Rank == e.JudgmentRank && i.Reason == "ningwu") != 1)
+            if (use.Action?.ActionId != e.ActionId || e.JudgmentRank <= e.SlashRank || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NingwuJudgmentIssuedEvent>().Count(i => i.FrameId == e.FrameId && i.JudgmentId == e.JudgmentId && i.UseId == use.Id && i.ActionId == e.ActionId && i.ActorSeat == e.ActorSeat && i.TargetSeat == e.TargetSeat && i.SlashRank == e.SlashRank) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NingwuJudgmentReturnedEvent>().Count(i => i.FrameId == e.FrameId && i.JudgmentId == e.JudgmentId && i.Rank == e.JudgmentRank) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhouQunStartedEvent>().Count(i => i.FrameId == e.FrameId && i.Op == SkillProgramEffectOp.ResolveNingwuSingletonSlashJudgment && i.Source.SkillId == "ol:ningwu") != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentResolvedEvent>().Count(i => i.ResolutionId == e.JudgmentId && i.ParentResolutionId == e.FrameId && i.TargetSeat == e.ActorSeat && i.Rank == e.JudgmentRank && i.Reason == "ningwu") != 1)
                 throw new InvalidOperationException("Ningwu whole-use nullification lost its exact issued native judgment proof.");
             return true;
         }

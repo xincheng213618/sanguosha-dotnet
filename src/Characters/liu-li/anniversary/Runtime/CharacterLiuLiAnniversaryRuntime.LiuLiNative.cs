@@ -5,7 +5,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
 {
     internal void EnsureLiuLiDamagePool(int owner)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Any(e => e.OwnerSeat == owner))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Any(e => e.OwnerSeat == owner))
             return;
         var pool = new[]
         {
@@ -19,13 +19,13 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiPoolNameEvent(owner, name));
     }
 
-    internal bool LiuLiNameChosen(int owner, CardKind kind) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiNameChosenEvent>().Any(e => e.Source.OwnerSeat == owner && e.Name == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind) && LiuLiChosenProof(e));
+    internal bool LiuLiNameChosen(int owner, CardKind kind) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiNameChosenEvent>().Any(e => e.Source.OwnerSeat == owner && e.Name == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind) && LiuLiChosenProof(e));
     internal IReadOnlyList<AnniversaryLiuLiPlan> LiuLiPlans(int owner)
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[owner];
         if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
             return[];
-        var pool = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.Name).ToHashSet();
+        var pool = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.Name).ToHashSet();
         var result = new List<AnniversaryLiuLiPlan>();
         if (pool.Contains(CardKind.Slash) && !LiuLiNameChosen(owner, CardKind.Slash))
             foreach (var kind in new[]
@@ -87,7 +87,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
         _coreAlternativeViewAsCostsOperations.RecordProgramUsedBasicCard(actor.Seat, p.Kind);
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, target.Seat, null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: p.Kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, p.Kind));
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, p.Kind);
@@ -100,7 +100,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     {
         if (use.VirtualOrdinaryTrickOrigin is not { SkillId: AnniversaryLiuLiComposition.Dehua } o || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ParentProgramFrameId)is not ProgramSkillFrame { AnniversaryLiuLi: { Plan: { } p } r } f || !ValidLiuLi(f) || r.Stage is not (AnniversaryLiuLiStage.IssuingUse or AnniversaryLiuLiStage.NativeUse) || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(p.Kind) || use.CardKind != p.Kind || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0, RequesterSeat: null, ResponderSeat: null, OpponentSeat: null } a || a.ActionId != o.CardActionId || a.ProviderSeat != f.OwnerSeat || a.EffectiveKind != p.Kind || a.EffectiveSuit is not (null or Suit.None) || a.EffectiveRank is not (null or 0) || a.EffectiveIsRed == true || !a.TargetSeats.SequenceEqual(use.TargetSeats) || o.OwnerSeat != f.OwnerSeat || o.InitialActorSeat != f.OwnerSeat || o.InitialTargetSeat != f.OwnerSeat || o.BindingId != f.ActivationId || o.SkillInstanceId != f.SkillInstanceId || o.GameplayHash != f.GameplayHash || o.InstructionIndex != f.InstructionIndex || o.LifecycleFrameId != 0 || o.TurnNumber != r.Turn || r.UseId != 0 && (r.UseId != use.Id || r.ActionId != a.ActionId))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, f.OwnerSeat, f.OwnerSeat) : a.ActorSeat == f.OwnerSeat;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, f.OwnerSeat, f.OwnerSeat) : a.ActorSeat == f.OwnerSeat;
     }
 
     internal bool TryReturnAnniversaryLiuLiVirtualUse(CardUseFrame use)
@@ -118,7 +118,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     internal void CompleteLiuLiNative(ProgramSkillFrame f, bool? hadAttack = null)
     {
         var r = f.AnniversaryLiuLi!;
-        if (!ValidLiuLi(f) || r.Stage != AnniversaryLiuLiStage.NativeUse || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == r.Plan!.Kind) != 1)
+        if (!ValidLiuLi(f) || r.Stage != AnniversaryLiuLiStage.NativeUse || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == r.Plan!.Kind) != 1)
             throw new InvalidOperationException("Dehua must finish its same whole zero-entity native Use exactly once.");
         var attack = hadAttack ?? _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } a && a.ResolutionId == r.UseId;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryLiuLi = r with { Stage = AnniversaryLiuLiStage.ReturnedUse, HadAttack = attack } });
@@ -139,13 +139,13 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     {
         var r = f.AnniversaryLiuLi!;
         var name = CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.Plan!.Kind);
-        if (!ValidLiuLi(f) || r.Stage != AnniversaryLiuLiStage.ReturnedUse || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiNameChosenEvent>().Any(e => e.FrameId == f.Id) || LiuLiNameChosen(f.OwnerSeat, name))
+        if (!ValidLiuLi(f) || r.Stage != AnniversaryLiuLiStage.ReturnedUse || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiNameChosenEvent>().Any(e => e.FrameId == f.Id) || LiuLiNameChosen(f.OwnerSeat, name))
             throw new InvalidOperationException("Dehua cannot settle a name twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiNameChosenEvent(f.Id, r.Source, r.Hash, name, r.UseId, r.ActionId));
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Where(e => e.OwnerSeat == f.OwnerSeat).All(e => LiuLiNameChosen(f.OwnerSeat, e.Name)))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Where(e => e.OwnerSeat == f.OwnerSeat).All(e => LiuLiNameChosen(f.OwnerSeat, e.Name)))
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryLiuLi = r with { Stage = AnniversaryLiuLiStage.SkillChildren } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiDehuaCompletedEvent(f.Id, f.OwnerSeat, _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Count(e => e.OwnerSeat == f.OwnerSeat)));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiDehuaCompletedEvent(f.Id, f.OwnerSeat, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Count(e => e.OwnerSeat == f.OwnerSeat)));
             foreach (var p in _coreMatchParticipantsPlayersAccess._players)
                 _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
             foreach (var grant in _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].SkillGrants.Grants.Where(g => g.SkillId == AnniversaryLiuLiComposition.Dehua).ToArray())

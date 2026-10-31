@@ -21,7 +21,7 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
         var source = f.OwnerSeat;
         if (yachai)
         {
-            if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } actor, DamageFrameId: { } damage, Amount: > 0 } context || context.TargetSeat != f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) || !_coreMatchParticipantsPlayersAccess._players[actor].IsAlive || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId && w.ParentFrameId == damage)is not { } window || !_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window).DamageWasApplied)
+            if (f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } actor, DamageFrameId: { } damage, Amount: > 0 } context || context.TargetSeat != f.OwnerSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) || !_coreMatchParticipantsPlayersAccess._players[actor].IsAlive || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId && w.ParentFrameId == damage)is not { } window || !_coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window).DamageWasApplied)
                 throw new InvalidOperationException("Yachai requires the actual sourced damage and its living source, including self damage.");
             source = actor;
         }

@@ -12,7 +12,7 @@ internal sealed partial class CharacterGuoJiaMouRuntime
             return IsMouGjJudgment(j, f);
         if (child is CardsMovedTriggerWindowFrame moved && f.PendingMovementContinuation is { } p && MouGjMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p))
             return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && (moved.Batch.ParentFrameId == f.Id && m.Sequence > r.Before && m.Sequence <= r.After || r.Stage == MouGuoJiaStage.JudgmentChildren && moved.Batch.ParentFrameId == r.JudgmentId && m.Sequence == r.JudgmentHandoff && m.CardId == r.JudgmentCard && m.From == CardLocation.Judgment(f.OwnerSeat) && m.To == CardLocation.Processing && m.Reason.Value == "skill-program.judgment.result"));
-        if (r.Stage == MouGuoJiaStage.DamageChildren && f.AttackAttempt is { TargetSeat: var target, SourceSeat: var source, SourceLess: true } a && target == f.OwnerSeat && source == f.OwnerSeat && a.Nature == DamageNature.Thunder && f.AttackReturn is not null && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGjLightningIssuedEvent>().Count(e => e.FrameId == f.Id && e.JudgmentId == r.JudgmentId && e.Target == target && e.Amount == 3) == 1)
+        if (r.Stage == MouGuoJiaStage.DamageChildren && f.AttackAttempt is { TargetSeat: var target, SourceSeat: var source, SourceLess: true } a && target == f.OwnerSeat && source == f.OwnerSeat && a.Nature == DamageNature.Thunder && f.AttackReturn is not null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGjLightningIssuedEvent>().Count(e => e.FrameId == f.Id && e.JudgmentId == r.JudgmentId && e.Target == target && e.Amount == 3) == 1)
         {
             if (child is BeforeDamageProgramWindowFrame before)
                 return before.ParentFrameId == f.Id && before.SourceSeat == f.OwnerSeat && before.TargetSeat == f.OwnerSeat && before.Nature == DamageNature.Thunder;
@@ -20,7 +20,7 @@ internal sealed partial class CharacterGuoJiaMouRuntime
                 return true;
         }
 
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
+        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
     internal bool MouGjJudgmentEdge(int i) => i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is JudgmentFrame j && IsMouGjLightningJudgment(j) && _resolutionStackOperations._resolutionStack[i] is ProgramJudgmentTriggerWindowFrame p && p.ParentFrameId == j.Id && p.Judgment.JudgmentFrameId == j.Id;
@@ -28,7 +28,7 @@ internal sealed partial class CharacterGuoJiaMouRuntime
     internal bool MouGjSuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _characterGuoJiaMouOperations.MouGjEdge(i), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? MouGjRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => _characterGuoJiaMouOperations.MouGjFirstChild(f, c), (n) => _characterGuoJiaMouOperations.MouGjSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 37100)]
-    internal bool MouGjDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && MouGjRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
+    internal bool MouGjDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && MouGjRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 37100)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 37100)]
     internal bool MouGjRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

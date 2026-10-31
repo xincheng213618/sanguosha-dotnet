@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramHealthChildQueriesRuntime
 {
-    DyingFrame? IProgramHealthChildQueries.ActiveDying => _coreDyingCursorRuntimeOperations.ActiveDying;
+    DyingFrame? IProgramHealthChildQueries.ActiveDying => _coreDyingCursorRuntimeOperations.Value.ActiveDying;
 
     HpChangeContext? IProgramHealthChildQueries.LastPendingLoss(long parentFrameId, int targetSeat) => _coreGameEngineHpChangeProgramsPendingHpChangesAccess._pendingHpChanges.LastOrDefault(c => c.ParentFrameId == parentFrameId && c.TargetSeat == targetSeat && c.Kind == HpChangeKind.Loss);
     bool IProgramHealthChildQueries.ProgramRecoveryChild(ProgramSkillFrame parent, ResolutionFrame child) => child switch

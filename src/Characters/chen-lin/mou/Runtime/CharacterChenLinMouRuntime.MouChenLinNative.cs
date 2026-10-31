@@ -59,7 +59,7 @@ internal sealed partial class CharacterChenLinMouRuntime
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, plan.Kind);
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
             actor.HasAlcoholEffect = false;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(card.Id, plan.Kind, actor.Seat, target.Seat, IgnoresArmor: attack.IgnoresArmor));
             _coreNativeAiDecisionsOperations.NotifyAiOfSlash(actor, target);
@@ -84,7 +84,7 @@ internal sealed partial class CharacterChenLinMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenLinUseIssuedEvent(origin));
     }
 
-    internal bool MouChenLinUseRidesOn(ProgramSkillFrame f, CardUseFrame u) => ValidMouChenLin(f) && f.MouChenLin is { Stage: MouChenLinStage.NativeUse, Native: { } o, Plan: { } p } r && u.MouChenLinWrittenUse == o && o.FrameId == f.Id && o.Source == r.Source && o.GameplayHash == f.GameplayHash && o.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && o.Index == r.Index && o.Target == r.Target && p.CardId == o.CardId && p.Kind == o.Kind && p.EligibleTargets.Contains(o.Target) && u.Id == o.UseId && u.CardId == o.CardId && u.CardKind == o.Kind && u.SourceSeat == f.OwnerSeat && u.TargetSeats.SequenceEqual([o.Target]) && u.PhysicalCardIds is [var id] && id == o.CardId && u.Action is { Type: CardActionType.Use } a && a.ActionId == o.ActionId && a.ProviderSeat == f.OwnerSeat && a.RequesterSeat is null && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, f.OwnerSeat, f.OwnerSeat) && a.PhysicalCards is [{ CardId: var material, From: var from }] && material == id && from == CardLocation.Processing && a.ConversionChain.SequenceEqual([r.Source]) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinUseIssuedEvent>().Count(e => e.Origin == o) == 1;
+    internal bool MouChenLinUseRidesOn(ProgramSkillFrame f, CardUseFrame u) => ValidMouChenLin(f) && f.MouChenLin is { Stage: MouChenLinStage.NativeUse, Native: { } o, Plan: { } p } r && u.MouChenLinWrittenUse == o && o.FrameId == f.Id && o.Source == r.Source && o.GameplayHash == f.GameplayHash && o.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && o.Index == r.Index && o.Target == r.Target && p.CardId == o.CardId && p.Kind == o.Kind && p.EligibleTargets.Contains(o.Target) && u.Id == o.UseId && u.CardId == o.CardId && u.CardKind == o.Kind && u.SourceSeat == f.OwnerSeat && u.TargetSeats.SequenceEqual([o.Target]) && u.PhysicalCardIds is [var id] && id == o.CardId && u.Action is { Type: CardActionType.Use } a && a.ActionId == o.ActionId && a.ProviderSeat == f.OwnerSeat && a.RequesterSeat is null && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(u, f.OwnerSeat, f.OwnerSeat) && a.PhysicalCards is [{ CardId: var material, From: var from }] && material == id && from == CardLocation.Processing && a.ConversionChain.SequenceEqual([r.Source]) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenLinUseIssuedEvent>().Count(e => e.Origin == o) == 1;
     [NativeUseValidation(37000)]
     internal void ValidateMouChenLinUse(CardUseFrame use)
     {
@@ -98,7 +98,7 @@ internal sealed partial class CharacterChenLinMouRuntime
         if (use.MouChenLinWrittenUse is not { } o)
             return false;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
-        if (!MouChenLinUseRidesOn(f, use) || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MouChenLinUseReturnedEvent>().Any(e => e.UseId == use.Id))
+        if (!MouChenLinUseRidesOn(f, use) || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenLinUseReturnedEvent>().Any(e => e.UseId == use.Id))
             throw new InvalidOperationException("Zhuanwen requires its exact once-completed whole native card return.");
         MouChenLinRules.UseReturned(o, use.CardAttack is { Active: true });
         return true;

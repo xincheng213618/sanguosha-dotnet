@@ -65,7 +65,7 @@ internal sealed partial class CharacterLuYuShengOlRuntime
             return;
         if (attack.IsChainPropagation && r.ChainCursor == LuYuShengChainCursor(attack) && (r.TransferredTargetSeat ?? r.TargetSeat) == attack.TargetSeat)
         {
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<LuYuShengDamageAdjustedEvent>().Any(e => e.Applied && e.Receipt.WindowId == r.WindowId && e.Receipt.AttackId == r.AttackId && e.Receipt.ChainCursor == r.ChainCursor && e.Receipt.Before == r.Before && e.Receipt.After == r.After))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LuYuShengDamageAdjustedEvent>().Any(e => e.Applied && e.Receipt.WindowId == r.WindowId && e.Receipt.AttackId == r.AttackId && e.Receipt.ChainCursor == r.ChainCursor && e.Receipt.Before == r.Before && e.Receipt.After == r.After))
                 throw new InvalidOperationException("Cangxin chain restoration lost its exact paid native reduction.");
             SetLuYuShengDamageAmount(attack, r.Before);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LuYuShengDamageRebasedEvent(r.WindowId, r.AttackId, attack.TargetSeat, r.ChainCursor, r.Before));

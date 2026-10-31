@@ -94,7 +94,7 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
             r = f.ShiXinXianYing!;
             if (r.Stage == ShiXinXianYingStage.JiejieChildren)
             {
-                if (_coreMatchParticipantsPlayersAccess._players[r.Actor].IsAlive && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiXinXianYingSuitChosenEvent>().Single(e => e.FrameId == id).Included)
+                if (_coreMatchParticipantsPlayersAccess._players[r.Actor].IsAlive && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiXinXianYingSuitChosenEvent>().Single(e => e.FrameId == id).Included)
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiXinXianYingSuitAllowanceEvent(id, r.Source, r.GameplayHash, r.Actor, r.ActualTurn, r.ChosenSuit));
                 CompleteShiXxyJiejie(f);
                 return;
@@ -132,8 +132,8 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
     internal void ReturnShiXxyDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
         var r = f.ShiXinXianYing ?? throw new InvalidOperationException("Qingshi draw lost its owning frame.");
-        var request = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiXinXianYingDrawIssuedEvent>().SingleOrDefault(e => e.FrameId == f.Id && e.Cursor == r.DrawCursor);
-        if (r.Stage != ShiXinXianYingStage.Drawing || request is null || request.Recipient != outcome.RecipientSeat || request.Requested != outcome.RequestedCount || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiXinXianYingDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Cursor == r.DrawCursor))
+        var request = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiXinXianYingDrawIssuedEvent>().SingleOrDefault(e => e.FrameId == f.Id && e.Cursor == r.DrawCursor);
+        if (r.Stage != ShiXinXianYingStage.Drawing || request is null || request.Recipient != outcome.RecipientSeat || request.Requested != outcome.RequestedCount || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiXinXianYingDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Cursor == r.DrawCursor))
             throw new InvalidOperationException("Qingshi rejects a repeated or foreign draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiXinXianYing = r with { Stage = ShiXinXianYingStage.DrawChildren, DrawCursor = r.DrawCursor + 1, Before = outcome.SequenceBefore, After = outcome.SequenceAfter }, PendingMovementContinuation = new(outcome.RecipientSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiXinXianYingDrawReturnedEvent(f.Id, r.DrawCursor, outcome.RecipientSeat, outcome.ActualDrawIds.Count));
@@ -185,7 +185,7 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
         return p.Choices.First();
     }
 
-    internal bool HasShiXxySuitAllowance(int actor, Suit? suit) => suit is { } s && s != Suit.None && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiXinXianYingSuitAllowanceEvent>().Any(e => e.Actor == actor && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Suit == s);
+    internal bool HasShiXxySuitAllowance(int actor, Suit? suit) => suit is { } s && s != Suit.None && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiXinXianYingSuitAllowanceEvent>().Any(e => e.Actor == actor && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Suit == s);
     [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaAfterLimit, 48200)]
     internal bool ShiXxySlashQuota(ProgramSlashQuotaQuery q)
     {
@@ -199,6 +199,6 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
     {
         if (skillId != ShiXxyJiejie)
             return[];
-        return _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(i => i.SkillId == skillId).SelectMany(i => new[] { new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "qingshi-round", ProgramPublicRuleStateKind.GameActivationProgress, ShiXxyRoundUsed(owner.Seat)), new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "jiejie-active-suits", ProgramPublicRuleStateKind.GameActivationProgress, ShiXxyMask(_coreProgramEventHistoryOperations.ProgramEventHistory<ShiXinXianYingSuitAllowanceEvent>().Where(e => e.Actor == owner.Seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber).Select(e => e.Suit))) }).ToArray();
+        return _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(i => i.SkillId == skillId).SelectMany(i => new[] { new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "qingshi-round", ProgramPublicRuleStateKind.GameActivationProgress, ShiXxyRoundUsed(owner.Seat)), new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "jiejie-active-suits", ProgramPublicRuleStateKind.GameActivationProgress, ShiXxyMask(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiXinXianYingSuitAllowanceEvent>().Where(e => e.Actor == owner.Seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber).Select(e => e.Suit))) }).ToArray();
     }
 }

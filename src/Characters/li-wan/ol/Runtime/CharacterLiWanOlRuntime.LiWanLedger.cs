@@ -13,7 +13,7 @@ internal sealed partial class CharacterLiWanOlRuntime
             return;
         if (fact is ActualDiscardRecoveryPhaseStartedEvent { Phase.Kind: ActualDiscardRecoveryPhaseKind.Ending } ending)
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<LianjuEndingReachedEvent>().Any(e => e.NativePhaseToken == ending.Phase.Token))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LianjuEndingReachedEvent>().Any(e => e.NativePhaseToken == ending.Phase.Token))
                 throw new InvalidOperationException("Lianju cannot enter the same actual Ending phase twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LianjuEndingReachedEvent(LianjuEndingSerial + 1, ending.Phase.TurnNumber, ending.Phase.ActorSeat, ending.Phase.Token));
             return;
@@ -51,14 +51,14 @@ internal sealed partial class CharacterLiWanOlRuntime
             if (context.Window != SkillProgramTriggerWindow.TurnEnding || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } parent || parent.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || parent.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || parent.ItemIndex < 0 || parent.ItemIndex >= parent.Items.Count || parent.Items[parent.ItemIndex].Candidate != c)
                 return false;
             var due = LianjuDuePromises();
-            return c.OccurrenceIndex >= 0 && c.OccurrenceIndex < due.Length && due[c.OccurrenceIndex] is { } p && p.Source.OwnerSeat == c.OwnerSeat && p.Source.SkillId == c.SkillId && p.Source.SkillInstanceId == c.SkillInstanceId && p.GameplayHash == c.GameplayHash && p.RecipientSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && context.SourceSeat == p.RecipientSeat && context.TargetSeat == p.RecipientSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<LianjuPromiseConsumedEvent>().Any(e => e.PromiseFrameId == p.FrameId);
+            return c.OccurrenceIndex >= 0 && c.OccurrenceIndex < due.Length && due[c.OccurrenceIndex] is { } p && p.Source.OwnerSeat == c.OwnerSeat && p.Source.SkillId == c.SkillId && p.Source.SkillInstanceId == c.SkillInstanceId && p.GameplayHash == c.GameplayHash && p.RecipientSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && context.SourceSeat == p.RecipientSeat && context.TargetSeat == p.RecipientSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LianjuPromiseConsumedEvent>().Any(e => e.PromiseFrameId == p.FrameId);
         }
 
         if (op != SkillProgramEffectOp.ReturnDiscardedSilvEntity || context.Window != SkillProgramTriggerWindow.DiscardPileReceived || context.MovementBatch is not { } batch || context.MovementIndex != c.OccurrenceIndex || context.ParentFrameId != batch.Id || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == batch.Id)is not { } movement || movement.CandidateIndex < 0 || movement.CandidateIndex >= movement.Candidates.Count || movement.Candidates[movement.CandidateIndex] != c || !movement.Batch.Movements.SequenceEqual(batch.Movements) || c.OccurrenceIndex < 0 || c.OccurrenceIndex >= batch.Movements.Count)
             return false;
         var move = batch.Movements[c.OccurrenceIndex];
         var mark = SilvMark(move.CardId);
-        return mark is not null && mark.Source.OwnerSeat == c.OwnerSeat && mark.Source.SkillId == c.SkillId && mark.Source.SkillInstanceId == c.SkillInstanceId && mark.GameplayHash == c.GameplayHash && IsRefundableSilvMovement(move) && context.SourceSeat == _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move)?.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<LiWanStartedEvent>().Any(e => e.RefundSequence == move.Sequence);
+        return mark is not null && mark.Source.OwnerSeat == c.OwnerSeat && mark.Source.SkillId == c.SkillId && mark.Source.SkillInstanceId == c.SkillInstanceId && mark.GameplayHash == c.GameplayHash && IsRefundableSilvMovement(move) && context.SourceSeat == _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move)?.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiWanStartedEvent>().Any(e => e.RefundSequence == move.Sequence);
     }
 
     [ProgramIssuedTrigger(550, ProgramIssuedTriggerMatch.Decision)]

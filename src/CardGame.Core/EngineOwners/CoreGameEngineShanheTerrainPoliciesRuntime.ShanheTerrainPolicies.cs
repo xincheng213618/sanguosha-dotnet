@@ -29,7 +29,7 @@ internal sealed partial class CoreGameEngineShanheTerrainPoliciesRuntime
             return false;
         // A paid tenth use keeps its existing target/material continuation. The
         // cap stops a new use and does not retroactively cancel the accepted one.
-        if (query.ExistingUseFrameId is { } id && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(frame => frame.Id == id && frame.Action is { } action && action.ActorSeat == query.ActorSeat && (_coreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess._actualPlayPhaseUseActions.Contains(action.ActionId) || _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Any(accepted => accepted.Action.ActionId == action.ActionId && accepted.Action.ActorSeat == query.ActorSeat))))
+        if (query.ExistingUseFrameId is { } id && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(frame => frame.Id == id && frame.Action is { } action && action.ActorSeat == query.ActorSeat && (_coreGameEngineActualPlayPhaseCardUsesActualPlayPhaseUseActionsAccess._actualPlayPhaseUseActions.Contains(action.ActionId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Any(accepted => accepted.Action.ActionId == action.ActionId && accepted.Action.ActorSeat == query.ActorSeat))))
             return false;
         return true;
     }

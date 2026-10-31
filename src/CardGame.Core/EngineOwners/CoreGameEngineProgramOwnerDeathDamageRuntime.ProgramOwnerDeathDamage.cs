@@ -29,8 +29,8 @@ internal sealed partial class CoreGameEngineProgramOwnerDeathDamageRuntime
             return false;
         var window = _resolutionStackOperations._resolutionStack.OfType<ProgramDeathTriggerWindowFrame>().LastOrDefault();
         var death = _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().LastOrDefault();
-        return window is not null && death is not null && context.ParentFrameId == window.Id && window.DeathFrameId == death.Id && window.OwnerSeat == frame.OwnerSeat && death.VictimSeat == frame.OwnerSeat && !death.OwnerDiedProgramsResolved && (_coreDyingCursorRuntimeOperations.ActiveDying is null || death.ParentFrameId == _coreDyingCursorRuntimeOperations.ActiveDying.FrameId);
+        return window is not null && death is not null && context.ParentFrameId == window.Id && window.DeathFrameId == death.Id && window.OwnerSeat == frame.OwnerSeat && death.VictimSeat == frame.OwnerSeat && !death.OwnerDiedProgramsResolved && (_coreDyingCursorRuntimeOperations.Value.ActiveDying is null || death.ParentFrameId == _coreDyingCursorRuntimeOperations.Value.ActiveDying.FrameId);
     }
 
-    internal bool IsOwnerDeathSuspendedDying(long programFrameId) => _coreDyingCursorRuntimeOperations.ActiveDying is not null && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(frame => frame.Id == programFrameId)is { } program && IsOwnerDeathProgramDamage(program) && _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().LastOrDefault()?.ParentFrameId == _coreDyingCursorRuntimeOperations.ActiveDying.FrameId;
+    internal bool IsOwnerDeathSuspendedDying(long programFrameId) => _coreDyingCursorRuntimeOperations.Value.ActiveDying is not null && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(frame => frame.Id == programFrameId)is { } program && IsOwnerDeathProgramDamage(program) && _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().LastOrDefault()?.ParentFrameId == _coreDyingCursorRuntimeOperations.Value.ActiveDying.FrameId;
 }

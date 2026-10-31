@@ -5,7 +5,7 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
 {
     internal const string BoundaryZongshiReason = "skill-program.boundary:zongshih-mobile.obtain";
     internal bool TryBeginBoundaryJianYongZongshi(PindianFrame p) => p.Result is { } r && TryBeginBoundaryZongshiContest(p, r, -1);
-    internal bool TryBeginBoundaryJianYongSimultaneousZongshi(ProgramSkillFrame f) => f.SimultaneousPindian is { ComparisonIssued: true } r && TryBeginBoundaryZongshiContest(f, _coreSimultaneousPindianOperations.SimultaneousResult(f), r.ComparisonIndex);
+    internal bool TryBeginBoundaryJianYongSimultaneousZongshi(ProgramSkillFrame f) => f.SimultaneousPindian is { ComparisonIssued: true } r && TryBeginBoundaryZongshiContest(f, _coreSimultaneousPindianOperations.Value.SimultaneousResult(f), r.ComparisonIndex);
     internal bool BoundaryZongshiNativeResult(ResolutionFrame p, out PindianResult result, out int comparison)
     {
         comparison = -1;
@@ -19,7 +19,7 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
         if (p is ProgramSkillFrame { SimultaneousPindian: { ComparisonIssued: true } r } f && r.ComparisonIndex < r.Opponents.Count)
         {
             comparison = r.ComparisonIndex;
-            result = _coreSimultaneousPindianOperations.SimultaneousResult(f);
+            result = _coreSimultaneousPindianOperations.Value.SimultaneousResult(f);
             return true;
         }
 
@@ -224,7 +224,7 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
             throw new InvalidOperationException("Zongshi lost its original privately viewed deck top before choosing.");
         var parent = _resolutionStackOperations._resolutionStack[n - 1];
         var pair = parent.BoundaryJianYongZongshiContest!.Result;
-        var comparisons = _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Where(e => e.FrameId == parent.Id).ToArray();
+        var comparisons = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().Where(e => e.FrameId == parent.Id).ToArray();
         var comparison = r.ComparisonIndex < 0 ? 0 : r.ComparisonIndex;
         var lower = pair.SourceRank == pair.OpponentRank ? new[]
         {
@@ -238,7 +238,7 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
         };
         if (r.Choice == 1 && (r.From == CardLocation.DrawPile ? r.PaidCardId != r.TopCardId : r.From != CardLocation.Processing || r.PaidCardId is not { } claimed || !lower.Contains(claimed)))
             throw new InvalidOperationException("Zongshi payment must be its viewed top or exact lower/equal final-rank contest entity.");
-        if (r.Choice == 1 && (r.PaidCardId is not { } id || r.From is not { } from || r.After <= r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == from && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == BoundaryZongshiReason) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryJianYongZongshiPaidEvent>().Count(e => e == new BoundaryJianYongZongshiPaidEvent(f.Id, r.PindianId, f.OwnerSeat, from.Zone, r.Before, r.After, r.ComparisonIndex)) != 1))
+        if (r.Choice == 1 && (r.PaidCardId is not { } id || r.From is not { } from || r.After <= r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == from && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == BoundaryZongshiReason) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryJianYongZongshiPaidEvent>().Count(e => e == new BoundaryJianYongZongshiPaidEvent(f.Id, r.PindianId, f.OwnerSeat, from.Zone, r.Before, r.After, r.ComparisonIndex)) != 1))
             throw new InvalidOperationException("Zongshi lost its exact once-paid native Obtain.");
     }
 
@@ -273,7 +273,7 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
     internal bool BoundaryZongshiSuffix(int n) => _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations2._resolutionStack()[i - 1], _resolutionStackOperations2._resolutionStack()[i]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, d) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, d));
     internal ProgramSkillFrame? BoundaryZongshiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.BoundaryZongshiFirstChild(f, c), (n) => this.BoundaryZongshiSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 56500)]
-    internal bool BoundaryZongshiDyingChild() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && BoundaryZongshiObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
+    internal bool BoundaryZongshiDyingChild() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && BoundaryZongshiObserverRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 56500)]
     internal bool AdvanceBoundaryZongshiChild() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && BoundaryZongshiObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBoundaryJianYongZongshi)]

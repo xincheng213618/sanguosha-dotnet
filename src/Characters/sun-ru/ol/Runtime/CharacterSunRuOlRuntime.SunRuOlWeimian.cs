@@ -234,7 +234,7 @@ internal sealed partial class CharacterSunRuOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26110)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26110)]
-    internal bool CanContinuePaidSunRuOl(ProgramSkillFrame f) => f.SunRuOlChishi is { } c && _coreProgramEventHistoryOperations.ProgramEventHistory<SunRuOlChishiAppliedEvent>().Any(e => e.FrameId == f.Id && e.Source == c.Source) || f.SunRuOlWeimian is { Paid: true } r && _coreProgramEventHistoryOperations.ProgramEventHistory<SunRuOlWeimianPaidEvent>().Any(e => e.FrameId == f.Id && e.Source == r.Source);
+    internal bool CanContinuePaidSunRuOl(ProgramSkillFrame f) => f.SunRuOlChishi is { } c && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunRuOlChishiAppliedEvent>().Any(e => e.FrameId == f.Id && e.Source == c.Source) || f.SunRuOlWeimian is { Paid: true } r && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunRuOlWeimianPaidEvent>().Any(e => e.FrameId == f.Id && e.Source == r.Source);
     [ProgramAiChoice(SkillProgramEffectOp.AbolishEquipmentSlotsForDistinctBenefits)]
     internal PromptChoice ChooseAiSunRuOl(PendingDecision p, ProgramSkillFrame f) => p.Choices.OrderByDescending(c => c.Parameters["branch"] == "slots" ? SunRuOlBitCount(int.Parse(c.Parameters["value"], CultureInfo.InvariantCulture)) : c.Parameters["branch"] == "restore" ? 10 : SunRuOlBenefitAiValue(f, int.Parse(c.Parameters["value"], CultureInfo.InvariantCulture))).ThenBy(c => c.Id.Value, StringComparer.Ordinal).First();
     internal int SunRuOlBenefitAiValue(ProgramSkillFrame f, int mask)

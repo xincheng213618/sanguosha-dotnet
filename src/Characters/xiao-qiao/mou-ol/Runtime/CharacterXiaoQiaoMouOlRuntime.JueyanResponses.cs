@@ -9,12 +9,12 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             return[];
         if (dying)
         {
-            if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } d || d.ResponderSeat != actor.Seat || !_coreMatchParticipantsPlayersAccess._players[d.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[d.VictimSeat].Hp > 0 || kind == CardKind.Peach && !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(actor.Seat, d.VictimSeat) || kind == CardKind.Alcohol && (d.VictimSeat != actor.Seat || _coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, d.VictimSeat, Suit.None))
+            if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } d || d.ResponderSeat != actor.Seat || !_coreMatchParticipantsPlayersAccess._players[d.VictimSeat].IsAlive || _coreMatchParticipantsPlayersAccess._players[d.VictimSeat].Hp > 0 || kind == CardKind.Peach && !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(actor.Seat, d.VictimSeat) || kind == CardKind.Alcohol && (d.VictimSeat != actor.Seat || _coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat)) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, d.VictimSeat, Suit.None))
                 return[];
         }
         else if (kind == CardKind.Dodge)
         {
-            if (!_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is not null || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } slash && (_characterLiuQiOlOperations.IsWenjiResponseForbidden2(slash.ResolutionId, actor.Seat) || _coreConvertedSlashResponseOperations.ConvertedSlashSameColorResponseColor(slash)is not null))
+            if (!_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is not null || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } slash && (_characterLiuQiOlOperations.IsWenjiResponseForbidden2(slash.ResolutionId, actor.Seat) || _coreConvertedSlashResponseOperations.Value.ConvertedSlashSameColorResponseColor(slash)is not null))
                 return[];
         }
         else if (kind == CardKind.Nullification)
@@ -51,8 +51,8 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             throw new InvalidOperationException("Jueyan cannot replace pure Played or another native responder.");
         var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
         var program = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!;
-        var parent = dying ? _coreDyingCursorRuntimeOperations.ActiveDying!.Id : kind == CardKind.Nullification ? _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow!.Id : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack!.ResolutionId;
-        var target = dying ? _coreDyingCursorRuntimeOperations.ActiveDying!.VictimSeat : kind == CardKind.Nullification ? _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow!.SourceSeat : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack!.SourceSeat;
+        var parent = dying ? _coreDyingCursorRuntimeOperations.Value.ActiveDying!.Id : kind == CardKind.Nullification ? _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow!.Id : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack!.ResolutionId;
+        var target = dying ? _coreDyingCursorRuntimeOperations.Value.ActiveDying!.VictimSeat : kind == CardKind.Nullification ? _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow!.SourceSeat : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack!.SourceSeat;
         var request = new MouXiaoQiaoJueyanResponseRequest(parent, prompt.Kind, kind, actor.Seat, target, _resolutionStackOperations._resolutionStack[^1].Id);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var f = new ProgramSkillFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, actor.Seat, source.SkillId, source.BindingId, program.GameplayHash, 0, [id], [])
@@ -81,7 +81,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
 
     internal void ReturnMouXqJueyanResponse(ProgramSkillFrame f)
     {
-        if (!IsMouXqJueyanResponseRequest(f) || f.MouXiaoQiaoOl is not { Paid: true } r || f.MouXiaoQiaoJueyanResponse is not { } request || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouXiaoQiaoJueyanUsedEvent>().Any(e => e.FrameId == f.Id && e.CardId == r.SelectedCard && e.OutputKind == request.OutputKind))
+        if (!IsMouXqJueyanResponseRequest(f) || f.MouXiaoQiaoOl is not { Paid: true } r || f.MouXiaoQiaoJueyanResponse is not { } request || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiaoQiaoJueyanUsedEvent>().Any(e => e.FrameId == f.Id && e.CardId == r.SelectedCard && e.OutputKind == request.OutputKind))
             throw new InvalidOperationException("Jueyan lost its actual public retained-Hand response invoice.");
         var grant = new MouXiaoQiaoJueyanResponseGrant(f.Id, r.Source, f.GameplayHash, r.Round, r.SelectedCard, request);
         var parent = _resolutionStackOperations._resolutionStack.Single(x => x.Id == request.ParentFrameId);
@@ -106,7 +106,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
 
         if (request.DecisionKind == DecisionKind.RescueDying)
         {
-            var d = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("Jueyan rescue lost its original unresolved Dying.");
+            var d = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("Jueyan rescue lost its original unresolved Dying.");
             _coreNativeDyingFramesOperations.SetDyingFrameStep(d.Id, ResolutionFrameStep.ResolvingEffect);
             var victim = _coreMatchParticipantsPlayersAccess._players[d.VictimSeat];
             var policies = kind == CardKind.Peach && actor.Seat != victim.Seat ? _coreProgramCardPoliciesOperations.CardPolicies(victim, SkillProgramCardPolicyKind.RescueRecoveryBonus, CardKind.Peach).Where(p => string.Equals(_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(actor), p.Policy.FactionId, StringComparison.Ordinal)).ToArray() : [];
@@ -121,7 +121,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     internal void CancelMouXqResponseAfterReveal(MouXiaoQiaoJueyanResponseRequest request, CharacterState actor)
     {
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (request.DecisionKind == DecisionKind.RescueDying && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.Id == request.ParentFrameId && dying.ResponderSeat == actor.Seat)
+        if (request.DecisionKind == DecisionKind.RescueDying && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.Id == request.ParentFrameId && dying.ResponderSeat == actor.Seat)
         {
             _coreNativeDyingOperations.ApplyDyingResponse(actor, false, null, false, null);
             return;
@@ -185,7 +185,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(0, actor.Seat, attack.SourceSeat, CardKind.Dodge));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(action));
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.Dodge))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(attack, action, ProgramCardContinuation.Dodge))
             return;
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardResponseAccepted, [attack.SourceSeat], ProgramCardContinuation.Dodge))
             return;
@@ -202,7 +202,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == pending.Id);
         pending = _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { EffectNullified = !pending.EffectNullified, ChainDepth = pending.ChainDepth + 1, CandidateSeats = _coreNativeNullificationOperations.BuildNullificationCandidateSeats(actor.Seat), CandidateIndex = 0, Step = ResolutionFrameStep.AwaitingResponse });
-        var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _coreDelayedNullificationOperations.NullificationParentActionId(pending), CardActionType.Response, actor.Seat, actor.Seat, null, actor.Seat, pending.SourceSeat, CardKind.Nullification, [], [], [grant.Source], effectiveSuit: Suit.None, effectiveRank: 0));
+        var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _coreDelayedNullificationOperations.Value.NullificationParentActionId(pending), CardActionType.Response, actor.Seat, actor.Seat, null, actor.Seat, pending.SourceSeat, CardKind.Nullification, [], [], [grant.Source], effectiveSuit: Suit.None, effectiveRank: 0));
         SignMouXqResponse(pending, grant, action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(0, actor.Seat, pending.SourceSeat, CardKind.Nullification));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, actor.Seat, 0, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
@@ -212,7 +212,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == pending.Id);
         if (_coreUnrespondableCounterspellsOperations.TryBeginPolicyCounterspellPayment(pending, action, policy, []))
             return;
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(null, action, ProgramCardContinuation.NullificationResponse))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(null, action, ProgramCardContinuation.NullificationResponse))
             return;
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(null, action, SkillProgramTriggerWindow.CardResponseAccepted, [], ProgramCardContinuation.NullificationResponse))
             return;
@@ -223,9 +223,9 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     {
         if (owner.MouXiaoQiaoJueyanResponseGrant is not { } g || g.Request.ParentFrameId != owner.Id || g.ActionId != action.ActionId || action.Type != CardActionType.Response || action.ActorSeat != g.Source.OwnerSeat || action.ProviderSeat != action.ActorSeat || action.RequesterSeat is not null || action.ResponderSeat != action.ActorSeat || action.PhysicalCards.Count != 0 || action.EffectiveKind != g.Request.OutputKind || action.EffectiveSuit != Suit.None || action.EffectiveRank != 0 || action.EffectiveIsRed is not null || !action.ConversionChain.SequenceEqual([g.Source]))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiaoQiaoJueyanResponseGrantedEvent>().Count(e => e.Grant == (g with { ActionId = 0 })) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiaoQiaoJueyanResponseIssuedEvent>().Count(e => e == new MouXiaoQiaoJueyanResponseIssuedEvent(owner.Id, g.ProgramFrameId, action.ActionId, action.ActorSeat, action.EffectiveKind)) == 1 && (owner switch
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiaoQiaoJueyanResponseGrantedEvent>().Count(e => e.Grant == (g with { ActionId = 0 })) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiaoQiaoJueyanResponseIssuedEvent>().Count(e => e == new MouXiaoQiaoJueyanResponseIssuedEvent(owner.Id, g.ProgramFrameId, action.ActionId, action.ActorSeat, action.EffectiveKind)) == 1 && (owner switch
         {
-            NullificationWindowFrame n => action.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(n) && action.OpponentSeat == n.SourceSeat,
+            NullificationWindowFrame n => action.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(n) && action.OpponentSeat == n.SourceSeat,
             CardUseFrame { CardAttack: { } attack } use => action.ParentActionId == use.Action?.ActionId && action.ActorSeat == attack.TargetSeat && action.OpponentSeat == attack.SourceSeat,
             _ => false
         });
@@ -233,9 +233,9 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     internal bool HasMouXqJueyanDyingResponse(CharacterState actor) => MouXqJueyanResponseChoices(actor, CardKind.Peach, true).Count > 0 || MouXqJueyanResponseChoices(actor, CardKind.Alcohol, true).Count > 0;
     internal bool TryMouXqJueyanAiResponse(CardKind kind, bool dying = false)
     {
-        if (dying ? _coreDyingCursorRuntimeOperations.ActiveDying is null : _corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
+        if (dying ? _coreDyingCursorRuntimeOperations.Value.ActiveDying is null : _corePendingDecisionPolicyPipelineOperations._pendingDecision is null)
             return false;
-        var actor = _coreMatchParticipantsPlayersAccess._players[dying ? _coreDyingCursorRuntimeOperations.ActiveDying!.ResponderSeat : _corePendingDecisionPolicyPipelineOperations._pendingDecision!.PlayerSeat];
+        var actor = _coreMatchParticipantsPlayersAccess._players[dying ? _coreDyingCursorRuntimeOperations.Value.ActiveDying!.ResponderSeat : _corePendingDecisionPolicyPipelineOperations._pendingDecision!.PlayerSeat];
         if (actor.IsHuman)
             return false;
         var choices = MouXqJueyanResponseChoices(actor, kind, dying);
@@ -246,7 +246,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         AiThoughtRecord thought;
         if (dying)
         {
-            (use, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseProgramDyingRescue(view, _coreDyingCursorRuntimeOperations.ActiveDying!.VictimSeat, "绝颜", ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
+            (use, thought) = _coreAiBrainsAiBrainsAccess._aiBrains[actor.Seat].ChooseProgramDyingRescue(view, _coreDyingCursorRuntimeOperations.Value.ActiveDying!.VictimSeat, "绝颜", ++_coreAiDiagnosticsThoughtSequenceAccess._thoughtSequence);
         }
         else if (kind == CardKind.Nullification)
         {
@@ -263,10 +263,10 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         if (!use)
             return false;
         if (dying)
-            _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.RescueDying, actor.Seat, "绝颜：选择真实已发布的手牌展示救援。", choices.SelectMany(c => c.Cards).ToArray(), [], _coreDyingCursorRuntimeOperations.ActiveDying!.VictimSeat)
+            _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.RescueDying, actor.Seat, "绝颜：选择真实已发布的手牌展示救援。", choices.SelectMany(c => c.Cards).ToArray(), [], _coreDyingCursorRuntimeOperations.Value.ActiveDying!.VictimSeat)
             {
                 PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
-                TargetSeat = _coreDyingCursorRuntimeOperations.ActiveDying!.VictimSeat,
+                TargetSeat = _coreDyingCursorRuntimeOperations.Value.ActiveDying!.VictimSeat,
                 Choices = choices
             };
         BeginMouXqJueyanResponse(choices[0]);

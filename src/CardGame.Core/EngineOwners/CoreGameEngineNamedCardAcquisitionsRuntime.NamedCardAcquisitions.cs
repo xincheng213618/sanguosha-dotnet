@@ -117,7 +117,7 @@ internal sealed partial class CoreGameEngineNamedCardAcquisitionsRuntime
 
     internal bool ValidNamedCardAcquisition(ProgramSkillFrame f)
     {
-        if (f.NamedCardAcquisition is not { } d || !_coreNamedAcquisitionObserversOperations.NamedAcquisitionParentMatches(f) || f.InstructionIndex != d.InstructionIndex || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect is not { Op: SkillProgramEffectOp.LoseSkillsAndObtainNamedCard } effect || effect.OutputKind != d.PrintedKind || !d.SkillsRemoved || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSelectedSkillsLostEvent>().Count(e => e.ProgramFrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.InitiatingSkillId == f.SkillId) != 1)
+        if (f.NamedCardAcquisition is not { } d || !_coreNamedAcquisitionObserversOperations.Value.NamedAcquisitionParentMatches(f) || f.InstructionIndex != d.InstructionIndex || ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect is not { Op: SkillProgramEffectOp.LoseSkillsAndObtainNamedCard } effect || effect.OutputKind != d.PrintedKind || !d.SkillsRemoved || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramSelectedSkillsLostEvent>().Count(e => e.ProgramFrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.InitiatingSkillId == f.SkillId) != 1)
             return false;
         if (d.Stage == NamedCardAcquisitionStage.Selecting)
             return d.CardId is null && d.From is null;

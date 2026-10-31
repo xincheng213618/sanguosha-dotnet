@@ -19,7 +19,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
 
     internal bool ValidShiDa(ProgramSkillFrame f)
     {
-        if (f.ShiDengAi is not { } r || r.Source != ShiDaSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.Hash || f.InstructionIndex != 1 || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.WindowId != (f.WindowContext?.ParentFrameId ?? 0) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !Enum.IsDefined(r.Stage) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaStartedEvent>().Count(e => e == new ShiDaStartedEvent(f.Id, r.Source, r.Hash, r.Op, r.Turn, r.TurnOwner, r.WindowId)) != 1)
+        if (f.ShiDengAi is not { } r || r.Source != ShiDaSource(f) || r.Hash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != r.Hash || f.InstructionIndex != 1 || r.Turn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.WindowId != (f.WindowContext?.ParentFrameId ?? 0) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || !Enum.IsDefined(r.Stage) || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Op || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiDaStartedEvent>().Count(e => e == new ShiDaStartedEvent(f.Id, r.Source, r.Hash, r.Op, r.Turn, r.TurnOwner, r.WindowId)) != 1)
             return false;
         return r.Op switch
         {
@@ -43,7 +43,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
             if (f.PendingMovementContinuation is not { } pending || !ShiDaMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending) || !CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved))
                 return false;
             if (r.Stage == ShiDaStage.NativeChildren)
-                return r.NativeBatches.Contains(moved.Batch.Id) && moved.Batch.ParentFrameId == r.NativeUseId && moved.Batch.AwaitingProgramFrameId is null && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && _coreProgramEventHistoryOperations.ProgramEventHistory<ShiDaNativeBatchEvent>().Count(e => e == new ShiDaNativeBatchEvent(f.Id, r.NativeUseId, moved.Batch.Id, moved.Batch.ParentBatchId, moved.Batch.Movements.Count)) == 1;
+                return r.NativeBatches.Contains(moved.Batch.Id) && moved.Batch.ParentFrameId == r.NativeUseId && moved.Batch.AwaitingProgramFrameId is null && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiDaNativeBatchEvent>().Count(e => e == new ShiDaNativeBatchEvent(f.Id, r.NativeUseId, moved.Batch.Id, moved.Batch.ParentBatchId, moved.Batch.Movements.Count)) == 1;
             return moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         }
 
@@ -67,7 +67,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
     internal bool ShiDaChildSuffix(int i) => _coreObserverSubtreesOperations.HasObserverSuffix(i, (n) => this.ShiDaChildEdge(n), (n, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n, dying));
     internal ProgramSkillFrame? ShiDaObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, child) => this.ShiDaFirstChild(f, child), (i) => this.ShiDaChildSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 50300)]
-    internal bool ShiDaDyingObserver() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && ShiDaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
+    internal bool ShiDaDyingObserver() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && ShiDaObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == root.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 50300)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 50300)]
     internal bool ShiDaRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

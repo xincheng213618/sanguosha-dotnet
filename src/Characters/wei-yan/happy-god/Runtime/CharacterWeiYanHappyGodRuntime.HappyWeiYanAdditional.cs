@@ -263,7 +263,7 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         FinishHappyWeiYan(frame);
     }
 
-    internal bool HappyEzhiDistance(int actor, int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<HappyWeiYanEzhiPaidEvent>().Any(e => !e.Canceled && e.Source.OwnerSeat == actor && e.Actor == target && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program!.GameplayHash);
+    internal bool HappyEzhiDistance(int actor, int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyWeiYanEzhiPaidEvent>().Any(e => !e.Canceled && e.Source.OwnerSeat == actor && e.Actor == target && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && e.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program!.GameplayHash);
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 42300)]
     internal bool HappyEzhiCardDistance(ProgramCardDistanceQuery query) => HappyEzhiDistance(query.Actor.Seat, query.Target.Seat);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 42300)]

@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class HealthContinuationFacts(Func<FrameStore> getFrameStore, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreCardMovementJournalState cardMovementJournalState, EngineStates.CoreGameEngineHpChangeProgramsState gameEngineHpChangeProgramsState, Func<RuntimeEntries.CoreDyingCursorRuntimeEntries> getCoreDyingCursorRuntimeRuntime, Func<RuntimeEntries.CoreDamageCursorRuntimeEntries> getCoreDamageCursorRuntimeRuntime, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries> getCoreGameEngineAlternatingBenefitsRuntime, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CoreGameEngineProgramCardPaymentsEntries> getCoreGameEngineProgramCardPaymentsRuntime) : IHealthContinuationFacts
+internal sealed class HealthContinuationFacts(Func<FrameStore> getFrameStore, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreCardMovementJournalState cardMovementJournalState, EngineStates.CoreGameEngineHpChangeProgramsState gameEngineHpChangeProgramsState, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreDyingCursorRuntimeRuntime>> getCoreDyingCursorRuntimeRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreDamageCursorRuntimeRuntime>> getCoreDamageCursorRuntimeRuntime, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries> getCoreGameEngineAlternatingBenefitsRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CoreGameEngineProgramCardPaymentsEntries> getCoreGameEngineProgramCardPaymentsRuntime) : IHealthContinuationFacts
 {
     public int FrameCount => getFrameStore().Count;
 
@@ -15,13 +15,13 @@ internal sealed class HealthContinuationFacts(Func<FrameStore> getFrameStore, En
     public int PendingHpChangeCount => gameEngineHpChangeProgramsState.ReferenceToPendingHpChanges.Count;
 
     public HpChangeContext PendingHpChangeAt(int index) => gameEngineHpChangeProgramsState.ReferenceToPendingHpChanges[index];
-    public DyingFrame? ActiveDying => getCoreDyingCursorRuntimeRuntime().ActiveDying;
-    public DamageTriggerWindowFrame? ActiveDamageTrigger => getCoreDamageCursorRuntimeRuntime().ActiveDamageTrigger;
+    public DyingFrame? ActiveDying => getCoreDyingCursorRuntimeRuntime().Value.ActiveDying;
+    public DamageTriggerWindowFrame? ActiveDamageTrigger => getCoreDamageCursorRuntimeRuntime().Value.ActiveDamageTrigger;
 
     public SkillProgram? Program(string skillId) => getContentRegistry().Skills.TryGetValue(skillId, out var skill) ? skill.Program : null;
     public SkillProgram RequireProgram(string skillId) => getContentRegistry().GetSkill(skillId).Program!;
     public IEnumerable<IGameEvent> CompleteProgramEventHistory() => getCoreGameEngineAlternatingBenefitsRuntime().CompleteProgramEventHistory();
     public IReadOnlyList<T> ProgramEventHistory<T>()
-        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>();
+        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>();
     public int ResolveProgramParticipant(ProgramSkillFrame frame, ProgramParticipantReference reference) => getCoreGameEngineProgramCardPaymentsRuntime().ResolveProgramParticipant(frame, reference);
 }

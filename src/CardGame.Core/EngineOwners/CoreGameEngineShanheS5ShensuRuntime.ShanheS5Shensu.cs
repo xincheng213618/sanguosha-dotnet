@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineShanheS5ShensuRuntime
             return;
         if (_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber <= 0 || owner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || phase is not (SkillProgramTurnPhase.Judgment or SkillProgramTurnPhase.Draw or SkillProgramTurnPhase.Play or SkillProgramTurnPhase.Discard) || extraDrawFrameId < 0 || extraDrawFrameId != 0 && phase != SkillProgramTurnPhase.Draw)
             throw new InvalidOperationException("S5 Shensu phase counting requires an exact actual-turn phase occurrence.");
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5SkippedPhaseRecordedEvent>().Any(e => e.OwnerSeat == owner && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Phase == phase && e.ExtraDrawFrameId == extraDrawFrameId))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5SkippedPhaseRecordedEvent>().Any(e => e.OwnerSeat == owner && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Phase == phase && e.ExtraDrawFrameId == extraDrawFrameId))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5SkippedPhaseRecordedEvent(owner, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, phase, extraDrawFrameId, costProgramFrameId));
     }
@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEngineShanheS5ShensuRuntime
         foreach (var phase in phases)
         {
             var occurrence = phase == SkillProgramTurnPhase.Draw ? extra : 0;
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5PhaseSkipCostEvent>().Any(e => e.FrameId == f.Id && e.InstructionIndex == f.InstructionIndex && e.Phase == phase))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5PhaseSkipCostEvent>().Any(e => e.FrameId == f.Id && e.InstructionIndex == f.InstructionIndex && e.Phase == phase))
                 throw new InvalidOperationException("A phase cost cannot pay or count twice on the same native instruction.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5PhaseSkipCostEvent(f.Id, f.InstructionIndex, f.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, phase, occurrence));
             RecordShanheS5ActualPhaseSkip(f.OwnerSeat, phase, occurrence, f.Id);
@@ -63,10 +63,10 @@ internal sealed partial class CoreGameEngineShanheS5ShensuRuntime
         if (f.ShanheS5Shensu is not null || f.SkillId != ShanheS5ShensuId || f.WindowContext is not { } context || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || f.SelectedTargetSeats is not [var target] || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || target == f.OwnerSeat || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramLifecycleTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.Window != context.Window || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
             throw new InvalidOperationException("S5 Shensu requires its original current phase candidate and selected native Slash target.");
         var phases = ShanheS5ShensuContract.Phases(context.Window);
-        var costs = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5PhaseSkipCostEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var costs = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5PhaseSkipCostEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (phases.Length == 0 || costs.Length != phases.Length || !costs.Select(e => e.Phase).SequenceEqual(phases) || costs.Any(e => e.OwnerSeat != f.OwnerSeat || e.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || e.InstructionIndex != 2 || e.ExtraDrawFrameId != 0) || f.InstructionIndex != (context.Window == SkillProgramTriggerWindow.DiscardPhaseStarting ? 4 : 3))
             throw new InvalidOperationException("S5 Shensu must freeze X after this exact actual phase cost was committed.");
-        var count = _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5SkippedPhaseRecordedEvent>().Count(e => e.OwnerSeat == f.OwnerSeat && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
+        var count = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5SkippedPhaseRecordedEvent>().Count(e => e.OwnerSeat == f.OwnerSeat && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
         var receipt = new ShanheS5ShensuReceipt(new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, parent.Id, context.Window, target, count);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheS5Shensu = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheS5ShensuPreparedEvent(f.Id, receipt));
@@ -98,12 +98,12 @@ internal sealed partial class CoreGameEngineShanheS5ShensuRuntime
 
     internal bool IsPaidShanheS5TurnoverReturn(ProgramSkillFrame f)
     {
-        if (f.SkillId != ShanheS5ShensuId || f.InstructionIndex != 3 || f.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPhaseStarting } context || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Window: SkillProgramTriggerWindow.DiscardPhaseStarting } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheS5PhaseSkipCostEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [{ InstructionIndex: 2, Phase: SkillProgramTurnPhase.Discard, ExtraDrawFrameId: 0 } cost] || cost.OwnerSeat != f.OwnerSeat || cost.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
+        if (f.SkillId != ShanheS5ShensuId || f.InstructionIndex != 3 || f.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPhaseStarting } context || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { Window: SkillProgramTriggerWindow.DiscardPhaseStarting } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheS5PhaseSkipCostEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [{ InstructionIndex: 2, Phase: SkillProgramTurnPhase.Discard, ExtraDrawFrameId: 0 } cost] || cost.OwnerSeat != f.OwnerSeat || cost.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
             return false;
         // Only the actual already-issued turnover on this original frame can
         // bridge source loss before Prepare freezes X. A mere queued phase
         // flag, a different character's turnover or a fresh trigger cannot.
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Count(e => e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == f.OwnerSeat && e.Change.Window == SkillProgramTriggerWindow.CharacterTurnedOver && e.Change.TurnedOver is { } paid && paid.WasFaceDown != paid.IsFaceDown) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Count(e => e.Change.ParentFrameId == f.Id && e.Change.TargetSeat == f.OwnerSeat && e.Change.Window == SkillProgramTriggerWindow.CharacterTurnedOver && e.Change.TurnedOver is { } paid && paid.WasFaceDown != paid.IsFaceDown) == 1;
     }
 
     void IShanheS5ShensuHost.PrepareShanheS5Shensu(ProgramSkillFrame f) => PrepareShanheS5Shensu(f);

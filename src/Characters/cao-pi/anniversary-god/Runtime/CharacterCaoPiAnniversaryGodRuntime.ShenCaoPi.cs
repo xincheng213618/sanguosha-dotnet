@@ -6,10 +6,10 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     internal bool HasShenCaoPiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ApplyShenCaoPiYinzhi);
 
     internal static CardConversionSource ShenCaoPiSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal int YinzhiOwnTurns(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == seat);
+    internal int YinzhiOwnTurns(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == seat);
     internal bool YinzhiAwaitingOwnTurn(YinzhiIssuedEvent e) => YinzhiOwnTurns(e.TargetSeat) == e.TargetOwnTurns && !(_resolutionStackOperations._resolutionStack.FirstOrDefault()is BeiMiHuTurnPreludeFrame prelude && prelude.Proof.UpcomingOwnerSeat == e.TargetSeat && prelude.Proof.UpcomingTurnNumber > e.ActualTurn);
-    internal bool IsYinzhiSkillSuppressed(int seat) => HasShenCaoPiCapability && _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.TargetSeat == seat && YinzhiAwaitingOwnTurn(e));
-    internal bool IsYinzhiTurnRestricted(int actor) => HasShenCaoPiCapability && actor == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.TargetSeat == actor && YinzhiOwnTurns(actor) == e.TargetOwnTurns + 1 && !_coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiTurnRestrictionReleasedEvent>().Any(r => r.IssueFrameId == e.FrameId));
+    internal bool IsYinzhiSkillSuppressed(int seat) => HasShenCaoPiCapability && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.TargetSeat == seat && YinzhiAwaitingOwnTurn(e));
+    internal bool IsYinzhiTurnRestricted(int actor) => HasShenCaoPiCapability && actor == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.TargetSeat == actor && YinzhiOwnTurns(actor) == e.TargetOwnTurns + 1 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiTurnRestrictionReleasedEvent>().Any(r => r.IssueFrameId == e.FrameId));
     internal bool YinzhiNewCardsForbidden(int actor, IEnumerable<int> ids)
     {
         if (!IsYinzhiTurnRestricted(actor))
@@ -26,7 +26,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         if (payload is TurnStartedEvent)
             _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
         if (payload is DamageAppliedEvent { SourceLess: false, Amount: > 0 } damage)
-            foreach (var issue in _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiIssuedEvent>().Where(e => e.TargetSeat == damage.SourceSeat && e.Source.OwnerSeat == damage.TargetSeat && damage.SourceSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && YinzhiOwnTurns(e.TargetSeat) == e.TargetOwnTurns + 1 && !_coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiTurnRestrictionReleasedEvent>().Any(r => r.IssueFrameId == e.FrameId)).ToArray())
+            foreach (var issue in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiIssuedEvent>().Where(e => e.TargetSeat == damage.SourceSeat && e.Source.OwnerSeat == damage.TargetSeat && damage.SourceSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && YinzhiOwnTurns(e.TargetSeat) == e.TargetOwnTurns + 1 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiTurnRestrictionReleasedEvent>().Any(r => r.IssueFrameId == e.FrameId)).ToArray())
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YinzhiTurnRestrictionReleasedEvent(issue.FrameId, _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().Last(d => d.SourceSeat == damage.SourceSeat && d.TargetSeat == damage.TargetSeat).Id));
         ObserveKemingProducedFacts(payload);
     }
@@ -46,12 +46,12 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     internal bool YinzhiActionBan(ProgramLegalActionQuery q) => q.EffectiveKind is not null && YinzhiNewCardsForbidden(q.Actor.Seat, q.Action.CardId is> 0 and var id ? [id] : []);
     SkillProgramStepOutcome IShenCaoPiHost.Resolve(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginShenCaoPi(frame, op);
     internal CardActionContext? YinzhiAction(ProgramSkillWindowContext? c) => c is null ? null : _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)?.Action;
-    internal YinzhiIssuedEvent? YinzhiRewardIssue(int owner, CardActionContext? a) => a is null || !a.PhysicalCards.Any(c => c.From == CardLocation.Hand(a.ActorSeat)) ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiIssuedEvent>().Where(e => e.Source.OwnerSeat == owner && e.TargetSeat == a.ActorSeat && YinzhiAwaitingOwnTurn(e) && !_coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiHandRewardRequestedEvent>().Any(r => r.IssueFrameId == e.FrameId && r.ActionId == a.ActionId)).OrderBy(e => e.FrameId).FirstOrDefault();
+    internal YinzhiIssuedEvent? YinzhiRewardIssue(int owner, CardActionContext? a) => a is null || !a.PhysicalCards.Any(c => c.From == CardLocation.Hand(a.ActorSeat)) ? null : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiIssuedEvent>().Where(e => e.Source.OwnerSeat == owner && e.TargetSeat == a.ActorSeat && YinzhiAwaitingOwnTurn(e) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiHandRewardRequestedEvent>().Any(r => r.IssueFrameId == e.FrameId && r.ActionId == a.ActionId)).OrderBy(e => e.FrameId).FirstOrDefault();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 39700, SkillProgramEffectOp.DrawYinzhiHandAction, SkillProgramEffectOp.ResolveKemingDamagedSkill, SkillProgramEffectOp.ArmKemingSkillEcho)]
     internal bool CanTriggerShenCaoPi(ProgramTriggerLegalityContext g) => _coreProgramLifecycleOperations.GetProgramTrigger2(g.Candidate).Effects[0].Op switch
     {
         SkillProgramEffectOp.DrawYinzhiHandAction => YinzhiRewardIssue(g.OwnerSeat, YinzhiAction(g.WindowContext))is not null,
-        SkillProgramEffectOp.ResolveKemingDamagedSkill => g.WindowContext is { SourceSeat: { } source, TargetSeat: { } target, Amount: > 0 } c && source != target && target == g.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } window && !_coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window).IsSourceLess && KemingBorrowOptions(g.OwnerSeat, source).Count > 0,
+        SkillProgramEffectOp.ResolveKemingDamagedSkill => g.WindowContext is { SourceSeat: { } source, TargetSeat: { } target, Amount: > 0 } c && source != target && target == g.OwnerSeat && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { } window && !_coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window).IsSourceLess && KemingBorrowOptions(g.OwnerSeat, source).Count > 0,
         SkillProgramEffectOp.ArmKemingSkillEcho => g.WindowContext is { SourceSeat: { } s, TargetSeat: { } t, Amount: > 0 } && s == g.OwnerSeat && s != t,
         _ => false
     };
@@ -88,7 +88,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         var r = new ShenCaoPiReceipt(ShenCaoPiSource(f), f.GameplayHash, op, f.InstructionIndex, f.WindowContext?.ParentFrameId ?? 0, target, ShenCaoPiStage.Complete);
         if (op == SkillProgramEffectOp.ApplyShenCaoPiYinzhi)
         {
-            var count = Math.Min(3, _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiActivatedEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.TargetSeat == target) + 1);
+            var count = Math.Min(3, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiActivatedEvent>().Count(e => e.Source.OwnerSeat == f.OwnerSeat && e.TargetSeat == target) + 1);
             r = r with
             {
                 Count = count,
@@ -130,7 +130,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShenCaoPi = r });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KemingEchoArmedEvent(f.Id, r.Source, r.GameplayHash, target, _coreProgramEventHistoryOperations.ProgramEventHistory<SkillInvocationStartedEvent>().Select(e => e.FrameId).DefaultIfEmpty().Max()));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KemingEchoArmedEvent(f.Id, r.Source, r.GameplayHash, target, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SkillInvocationStartedEvent>().Select(e => e.FrameId).DefaultIfEmpty().Max()));
         FinishShenCaoPi(f);
         return SkillProgramStepOutcome.AwaitChild;
     }
@@ -147,8 +147,8 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
             return true;
         if (r.Operation == SkillProgramEffectOp.ApplyShenCaoPiYinzhi && r.Stage == ShenCaoPiStage.Children)
         {
-            var activation = _coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiActivatedEvent>().Single(e => e.FrameId == id);
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.FrameId == id))
+            var activation = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiActivatedEvent>().Single(e => e.FrameId == id);
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YinzhiIssuedEvent>().Any(e => e.FrameId == id))
                 throw new InvalidOperationException("Yinzhi cannot issue its post-draw suppression twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YinzhiIssuedEvent(id, activation.Source, activation.GameplayHash, activation.TargetSeat, activation.Count, activation.ActualTurn, activation.TargetOwnTurns));
             _coreGameEngineCurrentTurnSkillSuppressionsCurrentTurnSkillSuppressionRevisionAccess._currentTurnSkillSuppressionRevision++;
@@ -168,7 +168,7 @@ internal sealed partial class CharacterCaoPiAnniversaryGodRuntime
     internal void ReturnShenCaoPiDraw(ProgramSkillFrame f, NativeDrawOutcome o)
     {
         var r = f.ShenCaoPi ?? throw new InvalidOperationException("Shen Cao Pi's draw lost its original paid receipt.");
-        if (r.Stage != ShenCaoPiStage.Drawing || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.Count || o.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenCaoPiDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (r.Stage != ShenCaoPiStage.Drawing || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != r.Count || o.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenCaoPiDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Shen Cao Pi cannot repeat or alter his native draw.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenCaoPi = r with { Stage = ShenCaoPiStage.Children, DrawOutcome = o } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenCaoPiDrawReturnedEvent(f.Id, f.OwnerSeat, r.Count, o.ActualDrawIds.Count, o.SequenceBefore, o.SequenceAfter));

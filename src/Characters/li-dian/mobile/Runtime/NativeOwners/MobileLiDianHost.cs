@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MobileLiDianHost(Func<RuntimeEntries.CharacterLiDianMobileEntries> getCharacterLiDianMobileRuntime) : IMobileLiDianWangxiHost
+internal sealed class MobileLiDianHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiDianMobileRuntime>> getCharacterLiDianMobileRuntime) : IMobileLiDianWangxiHost
 {
-    public SkillProgramStepOutcome Draw(ProgramSkillFrame f) => getCharacterLiDianMobileRuntime().BeginMobileLiDianWangxi(f);
+    public SkillProgramStepOutcome Draw(ProgramSkillFrame f) => getCharacterLiDianMobileRuntime().Value.BeginMobileLiDianWangxi(f);
 }

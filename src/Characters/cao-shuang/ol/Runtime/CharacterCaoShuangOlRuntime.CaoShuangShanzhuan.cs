@@ -123,5 +123,5 @@ internal sealed partial class CharacterCaoShuangOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 26060)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 26060)]
-    internal bool CanContinuePaidCaoShuang(ProgramSkillFrame f) => f.CaoShuangTuogu is { Granted: true } && _coreProgramEventHistoryOperations.ProgramEventHistory<CaoShuangTuoguInheritedEvent>().Any(e => e.FrameId == f.Id && e.Source == f.CaoShuangTuogu.Source) || f.CaoShuangShanzhuan is { Placed: true } && _coreProgramEventHistoryOperations.ProgramEventHistory<CaoShuangShanzhuanPlacedEvent>().Any(e => e.FrameId == f.Id && e.Source == f.CaoShuangShanzhuan.Source);
+    internal bool CanContinuePaidCaoShuang(ProgramSkillFrame f) => f.CaoShuangTuogu is { Granted: true } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoShuangTuoguInheritedEvent>().Any(e => e.FrameId == f.Id && e.Source == f.CaoShuangTuogu.Source) || f.CaoShuangShanzhuan is { Placed: true } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoShuangShanzhuanPlacedEvent>().Any(e => e.FrameId == f.Id && e.Source == f.CaoShuangShanzhuan.Source);
 }

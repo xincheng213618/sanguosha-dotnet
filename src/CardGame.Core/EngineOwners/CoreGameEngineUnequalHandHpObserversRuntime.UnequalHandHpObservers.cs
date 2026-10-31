@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineUnequalHandHpObserversRuntime
     {
         if (root.UnequalHandHp is not { Payments.Count: > 0 } r || root.PendingMovementContinuation is null)
             return false;
-        _coreUnequalHandHpEndingOperations.RequireUnequalHandHpReceipt(root);
+        _coreUnequalHandHpEndingOperations.Value.RequireUnequalHandHpReceipt(root);
         var p = r.Payments[^1];
         if (child is CardsMovedTriggerWindowFrame moved)
             return moved.Batch.ParentFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.AwaitingProgramFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.Sequence > p.Before && m.Sequence <= p.After && m.Reason.Value == CoreGameEngineUnequalHandHpEndingRuntime.UnequalHandHpReason(root, p.Step));
@@ -25,7 +25,7 @@ internal sealed partial class CoreGameEngineUnequalHandHpObserversRuntime
 
     internal ProgramSkillFrame? UnequalHandHpObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.UnequalHandHpFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasHandGainDebtObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 210)]
-    internal bool IsUnequalHandHpDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && UnequalHandHpObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsUnequalHandHpDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && UnequalHandHpObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40)]
     internal bool TryAdvanceUnequalHandHpSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && UnequalHandHpObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(advanceRecoveryReplacement: true);
 }

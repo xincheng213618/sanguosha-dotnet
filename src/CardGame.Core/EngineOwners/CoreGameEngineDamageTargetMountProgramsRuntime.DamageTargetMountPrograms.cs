@@ -8,9 +8,9 @@ internal sealed partial class CoreGameEngineDamageTargetMountProgramsRuntime
     internal static bool IsPrintedMount(CardKind kind) => RuntimeSkills.RuntimeRules_Core_DamageTargetMountPrograms.IsPrintedMount(kind);
     internal CardUseFrame? ActualDamageTargetMountUse(int ownerSeat, ProgramSkillWindowContext context)
     {
-        if (context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target } || source != ownerSeat || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } damage || damage.Id != context.ParentFrameId || damage.ParentFrameId != context.DamageFrameId)
+        if (context is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target } || source != ownerSeat || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } damage || damage.Id != context.ParentFrameId || damage.ParentFrameId != context.DamageFrameId)
             return null;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage);
         if (attack.IsSourceLess || !attack.DamageWasApplied || attack.SourceSeat != ownerSeat || attack.TargetSeat != target || attack.EffectiveCardKind is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash))
             return null;
         // The real action is stored on the owning use (also for prepared multi-target/chain attacks).

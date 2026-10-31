@@ -17,10 +17,10 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureRuntime
     internal bool CanActivatePhaseHandSeizure(CharacterState owner, SkillProgram program) => !program.Activations.Any(a => a.Effects.Any(e => e.Op == SkillProgramEffectOp.DiscardTurnOverAndTakeHand)) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<PhaseHandSeizurePaidEvent>().Any(e => e.Source.OwnerSeat == owner.Seat && e.Source.SkillId == program.Id && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
     internal IEnumerable<PhaseHandSeizureIssuedEvent> UnsettledPhaseHandSeizures()
     {
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<PhaseHandSeizureIssuedEvent>();
+        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PhaseHandSeizureIssuedEvent>();
         if (issued.Count == 0)
             return Array.Empty<PhaseHandSeizureIssuedEvent>();
-        var settlements = _coreProgramEventHistoryOperations.ProgramEventHistory<PhaseHandDebtSettledEvent>();
+        var settlements = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PhaseHandDebtSettledEvent>();
         if (settlements.Count == 0)
             return issued;
         var settled = settlements.Select(e => e.SeizureFrameId).ToHashSet();

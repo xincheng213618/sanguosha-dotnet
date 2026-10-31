@@ -188,7 +188,7 @@ internal sealed partial class CoreGameEngineDyingSuitsAndHistoricalUseObserversR
             if (child is HpChangedTriggerWindowFrame hp)
                 return hp.Change.ParentFrameId == use.Id && hp.ResumeFrameId == use.Id && (hp.Continuation == PostEventContinuation.CardUse && hp.CardId == use.CardId || hp.Continuation == PostEventContinuation.HistoricalEndingCardUse && use.EndingHistoricalUseReturn is not null && !use.EndingHistoricalCostDrained);
             if (child is ProgramCardTriggerWindowFrame cards)
-                return cards.ParentFrameId == use.Id && cards.Action.ActionId == use.Action!.ActionId && (cards.Continuation == ProgramCardContinuation.FinalizedDelayedPlacement ? _coreDelayedPlacementTargetProgramsOperations.IsExactFinalizedDelayedPlacementWindow(cards) : cards.Continuation is ProgramCardContinuation.CommittedSimpleCard or ProgramCardContinuation.FinalizedSimpleCard or ProgramCardContinuation.BeforeSimpleTargetEffects or ProgramCardContinuation.CompletedCard or ProgramCardContinuation.CommittedTrick or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.CommittedSlash or ProgramCardContinuation.Slash or ProgramCardContinuation.CompletedSlash);
+                return cards.ParentFrameId == use.Id && cards.Action.ActionId == use.Action!.ActionId && (cards.Continuation == ProgramCardContinuation.FinalizedDelayedPlacement ? _coreDelayedPlacementTargetProgramsOperations.Value.IsExactFinalizedDelayedPlacementWindow(cards) : cards.Continuation is ProgramCardContinuation.CommittedSimpleCard or ProgramCardContinuation.FinalizedSimpleCard or ProgramCardContinuation.BeforeSimpleTargetEffects or ProgramCardContinuation.CompletedCard or ProgramCardContinuation.CommittedTrick or ProgramCardContinuation.FinalizedTrick or ProgramCardContinuation.CommittedSlash or ProgramCardContinuation.Slash or ProgramCardContinuation.CompletedSlash);
             if (child is RecoveryReplacementFrame recovery)
                 return _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, use);
         }
@@ -218,7 +218,7 @@ internal sealed partial class CoreGameEngineDyingSuitsAndHistoricalUseObserversR
 
     internal ProgramSkillFrame? DyingSuitsObserverRoot() => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.DyingSuits is not null && DyingSuitsPaidPrefix(f));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 710)]
-    internal bool IsDyingSuitsProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && DyingSuitsObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsDyingSuitsProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && DyingSuitsObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 530)]
     internal bool TryAdvanceDyingSuitsSubtree()
     {

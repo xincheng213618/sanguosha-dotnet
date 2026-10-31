@@ -5,10 +5,10 @@ internal sealed partial class CharacterWuTuGuOlRuntime
 {
     internal bool ValidWuTuGuRanshang(ProgramSkillFrame f)
     {
-        if (f.WuTuGuRanshang is not { } r || !HasWuTuGuCapability || f.SkillId != "ol:ranshang" || f.TriggerId != "ending-total-hp-loss" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveRanshangEndingHpLoss || r.Source != WuTuGuSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ParentId != f.WindowContext?.ParentFrameId || r.Amount < 1 || !Enum.IsDefined(r.Stage) || f.PendingMovementContinuation is not null || !WuTuGuEndingParentMatches(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<WuTuGuRanshangIssuedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray()is not [var issued] || issued != new WuTuGuRanshangIssuedEvent(f.Id, r.Source, r.GameplayHash, r.ParentId, r.ActualTurn, r.Amount))
+        if (f.WuTuGuRanshang is not { } r || !HasWuTuGuCapability || f.SkillId != "ol:ranshang" || f.TriggerId != "ending-total-hp-loss" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveRanshangEndingHpLoss || r.Source != WuTuGuSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.ParentId != f.WindowContext?.ParentFrameId || r.Amount < 1 || !Enum.IsDefined(r.Stage) || f.PendingMovementContinuation is not null || !WuTuGuEndingParentMatches(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuTuGuRanshangIssuedEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray()is not [var issued] || issued != new WuTuGuRanshangIssuedEvent(f.Id, r.Source, r.GameplayHash, r.ParentId, r.ActualTurn, r.Amount))
             return false;
-        var native = _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Where(e => e.FrameId == f.Id).ToArray();
-        var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<WuTuGuRanshangPaidEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
+        var native = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuTuGuRanshangPaidEvent>().Where(e => e.ProgramFrameId == f.Id).ToArray();
         return r.Stage == WuTuGuRanshangStage.Issuing ? native.Length == 0 && paid.Length == 0 : native is [var hp] && hp.SkillId == f.SkillId && hp.TargetSeat == f.OwnerSeat && hp.Amount == r.Amount && paid is [var receipt] && receipt.Amount == r.Amount && receipt.RemainingHp == hp.RemainingHp;
     }
 
@@ -19,7 +19,7 @@ internal sealed partial class CharacterWuTuGuOlRuntime
         if (child is HpChangedTriggerWindowFrame hp)
             return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.SourceSeat is null && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Kind == HpChangeKind.Loss && hp.Change.Amount == r.Amount;
         if (child is DyingFrame dying)
-            return dying.ParentFrameId == f.Id && dying.VictimSeat == f.OwnerSeat && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.Amount == r.Amount && e.RemainingHp <= 0) == 1;
+            return dying.ParentFrameId == f.Id && dying.VictimSeat == f.OwnerSeat && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramSkillHpLostEvent>().Count(e => e.FrameId == f.Id && e.Amount == r.Amount && e.RemainingHp <= 0) == 1;
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 

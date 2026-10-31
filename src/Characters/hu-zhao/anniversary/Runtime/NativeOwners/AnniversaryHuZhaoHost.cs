@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class AnniversaryHuZhaoHost(Func<RuntimeEntries.CharacterHuZhaoAnniversaryEntries> getCharacterHuZhaoAnniversaryRuntime) : IAnniversaryHuZhaoHost
+internal sealed class AnniversaryHuZhaoHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHuZhaoAnniversaryRuntime>> getCharacterHuZhaoAnniversaryRuntime) : IAnniversaryHuZhaoHost
 {
-    public SkillProgramStepOutcome Resolve(ProgramSkillFrame frame) => getCharacterHuZhaoAnniversaryRuntime().BeginHuZhaoMidu(frame);
+    public SkillProgramStepOutcome Resolve(ProgramSkillFrame frame) => getCharacterHuZhaoAnniversaryRuntime().Value.BeginHuZhaoMidu(frame);
 }

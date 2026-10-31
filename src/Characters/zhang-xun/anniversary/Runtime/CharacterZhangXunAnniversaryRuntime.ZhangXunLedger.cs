@@ -64,7 +64,7 @@ internal sealed partial class CharacterZhangXunAnniversaryRuntime
         return Array.AsReadOnly(history.Take(cutoff).Select((fact, index) => (fact, index)).Where(x => x.index > due.StartIndex && x.fact is DamageAppliedEvent { Amount: > 0, SourceLess: false } damage && damage.SourceSeat == due.Lease.RecipientSeat && LegalZhangXunFollowupTarget(due.Lease.Source.OwnerSeat, damage.TargetSeat)).Select(x => new ZhangXunSuizhengDamageWitness(x.index, ((DamageAppliedEvent)x.fact).TargetSeat)).DistinctBy(x => x.TargetSeat).ToArray());
     }
 
-    internal bool ZhangXunPhaseUsed(long leaseId, int turn, int phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangXunSuizhengFollowupStartedEvent>().Any(e => e.LeaseId == leaseId && e.ActualTurn == turn && e.PhaseInstance == phase) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangXunSuizhengPhaseClosedEvent>().Any(e => e.LeaseId == leaseId && e.ActualTurn == turn && e.PhaseInstance == phase);
+    internal bool ZhangXunPhaseUsed(long leaseId, int turn, int phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangXunSuizhengFollowupStartedEvent>().Any(e => e.LeaseId == leaseId && e.ActualTurn == turn && e.PhaseInstance == phase) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangXunSuizhengPhaseClosedEvent>().Any(e => e.LeaseId == leaseId && e.ActualTurn == turn && e.PhaseInstance == phase);
     internal IEnumerable<ProgramTriggerCandidate> IssuedAnniversaryZhangXunPlayEndingCandidates(CharacterState phaseActor)
     {
         if (!HasAnniversaryZhangXunCapability || !_characterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess._hasIssuedAnniversaryZhangXun || !phaseActor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || phaseActor.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || phaseActor.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat)
@@ -107,13 +107,13 @@ internal sealed partial class CharacterZhangXunAnniversaryRuntime
         if (c.OwnerSeat != fact.OwnerSeat || c.SkillId != fact.SkillId || c.BindingId != fact.BindingId || c.SkillInstanceId != fact.SkillInstanceId)
             return;
         var due = ActiveZhangXunLeases().SingleOrDefault(d => d.Ordinal == c.OccurrenceIndex && d.Lease.Source.OwnerSeat == c.OwnerSeat && d.Lease.Source.SkillInstanceId == c.SkillInstanceId && d.Lease.Hash == c.GameplayHash && d.Lease.RecipientSeat == parent.OwnerSeat);
-        if (due is null || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangXunSuizhengPhaseClosedEvent>().Any(e => e.LeaseId == due.Lease.FrameId && e.WindowId == parent.Id))
+        if (due is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangXunSuizhengPhaseClosedEvent>().Any(e => e.LeaseId == due.Lease.FrameId && e.WindowId == parent.Id))
             return;
         if (fact.Activated)
         {
             // Completion pops the original Program child before publishing its
             // own ID; refusal instead publishes the still-active parent ID.
-            if (fact.FrameId == parent.Id || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangXunSuizhengFollowupStartedEvent>().Where(e => e.FrameId == fact.FrameId).ToArray()is not [var started] || started.ParentWindowId != parent.Id || started.LeaseId != due.Lease.FrameId || started.ActualTurn != due.DueTurn || started.RecipientSeat != parent.OwnerSeat || started.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == fact.FrameId && e.OwnerSeat == c.OwnerSeat && e.SkillId == c.SkillId && e.BindingId == c.BindingId && e.SkillInstanceId == c.SkillInstanceId && e.Window == SkillProgramTriggerWindow.PlayEnding) != 1)
+            if (fact.FrameId == parent.Id || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangXunSuizhengFollowupStartedEvent>().Where(e => e.FrameId == fact.FrameId).ToArray()is not [var started] || started.ParentWindowId != parent.Id || started.LeaseId != due.Lease.FrameId || started.ActualTurn != due.DueTurn || started.RecipientSeat != parent.OwnerSeat || started.PhaseInstance != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == fact.FrameId && e.OwnerSeat == c.OwnerSeat && e.SkillId == c.SkillId && e.BindingId == c.BindingId && e.SkillInstanceId == c.SkillInstanceId && e.Window == SkillProgramTriggerWindow.PlayEnding) != 1)
                 return;
         }
         else if (fact.FrameId != parent.Id)

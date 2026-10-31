@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class ShanheSourcePojunCapability(Func<RuntimeEntries.CoreGameEngineShanheSourcePojunEntries> getCoreGameEngineShanheSourcePojunRuntime) : IShanheSourcePojunHost
+internal sealed class ShanheSourcePojunCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineShanheSourcePojunRuntime>> getCoreGameEngineShanheSourcePojunRuntime) : IShanheSourcePojunHost
 {
-    public SkillProgramStepOutcome HoldAllTargetHand(ProgramSkillFrame frame) => getCoreGameEngineShanheSourcePojunRuntime().HoldShanheSourcePojunTargetHand(frame);
+    public SkillProgramStepOutcome HoldAllTargetHand(ProgramSkillFrame frame) => getCoreGameEngineShanheSourcePojunRuntime().Value.HoldShanheSourcePojunTargetHand(frame);
 }

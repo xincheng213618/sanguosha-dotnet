@@ -18,7 +18,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
         if (op == SkillProgramEffectOp.ResolveXiangxuMinimumTransition)
         {
             var edge = CaoYuTransition(c, context.CaoYuOpportunityId)!;
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuMinimumArmedEvent>().Any(e => e.OpportunityId == edge.OpportunityId))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuMinimumArmedEvent>().Any(e => e.OpportunityId == edge.OpportunityId))
                 throw new InvalidOperationException("Xiangxu cannot arm a transition twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoYuMinimumArmedEvent(f.Id, edge.OpportunityId, edge.Source, edge.GameplayHash));
             return SkillProgramStepOutcome.Continue;
@@ -171,7 +171,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
         if (branch is "target" or "unselect-target")
         {
             var seat = choice.Targets.Single();
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoYuTargetChoiceEvent(f.Id, _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuTargetChoiceEvent>().Count(e => e.FrameId == f.Id), seat, branch == "target"));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoYuTargetChoiceEvent(f.Id, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuTargetChoiceEvent>().Count(e => e.FrameId == f.Id), seat, branch == "target"));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CaoYu = r with { Targets = branch == "target" ? r.Targets.Append(seat).ToArray() : r.Targets.Where(s => s != seat).ToArray() } });
             PublishCaoYu(f);
             return;
@@ -300,7 +300,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var r = f.CaoYu!;
-        var count = r.Stage is CaoYuStage.GongjieDrawChildren or CaoYuStage.XiangxuDrawChildren ? _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == (r.Stage == CaoYuStage.GongjieDrawChildren ? GongjieDrawReason : XiangxuDrawReason)) : _coreProgramEventHistoryOperations.ProgramEventHistory<CaoYuCardPaidEvent>().Count(e => e.FrameId == f.Id && e.Stage == r.Stage && e.Index == r.Index && e.Sequence > r.Before && e.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
+        var count = r.Stage is CaoYuStage.GongjieDrawChildren or CaoYuStage.XiangxuDrawChildren ? _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == (r.Stage == CaoYuStage.GongjieDrawChildren ? GongjieDrawReason : XiangxuDrawReason)) : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoYuCardPaidEvent>().Count(e => e.FrameId == f.Id && e.Stage == r.Stage && e.Index == r.Index && e.Sequence > r.Before && e.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CaoYu = r with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Count = count } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoYuMovementPaidEvent(id, r.Stage, r.Index, f.OwnerSeat, r.Before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, count));
     }

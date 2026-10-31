@@ -57,7 +57,7 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossObserversRunt
         var completed = history.OfType<OrderedPrintedSkillLossCompletedEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (r.Stage == OrderedPrintedSkillLossStage.LossChildren)
             return !r.DrawIssued && r.DrawActual == 0 && r.DrawBefore == 0 && r.DrawAfter == 0 && draws.Length == 0 && completed.Length == 0 && f.PendingMovementContinuation is { BeforeCount: 0, CoverageResultBind: null } lossPending && lossPending.SubjectSeat == f.OwnerSeat;
-        if (!r.DrawIssued || r.DrawActual < 0 || r.DrawActual > r.Lease.LostSkillIds.Count || r.DrawBefore < 0 || r.DrawAfter < r.DrawBefore || r.DrawAfter > _coreOrderedPrintedSkillLossOperations.OrderedPrintedLossMovementSequence || draws is not [var draw] || draw != new OrderedPrintedSkillLossDrawIssuedEvent(f.Id, r.Lease.LostSkillIds.Count, r.DrawActual, r.DrawBefore, r.DrawAfter))
+        if (!r.DrawIssued || r.DrawActual < 0 || r.DrawActual > r.Lease.LostSkillIds.Count || r.DrawBefore < 0 || r.DrawAfter < r.DrawBefore || r.DrawAfter > _coreOrderedPrintedSkillLossOperations.Value.OrderedPrintedLossMovementSequence || draws is not [var draw] || draw != new OrderedPrintedSkillLossDrawIssuedEvent(f.Id, r.Lease.LostSkillIds.Count, r.DrawActual, r.DrawBefore, r.DrawAfter))
             return false;
         var drawn = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > r.DrawBefore && m.Sequence <= r.DrawAfter && m.Reason.Value == CoreGameEngineOrderedPrintedSkillLossRuntime.OrderedPrintedLossDrawReason(f)).ToArray();
         if (drawn.Length != r.DrawActual || drawn.Any(m => m.From != CardLocation.DrawPile || m.To != CardLocation.Hand(f.OwnerSeat)))
@@ -99,10 +99,10 @@ internal sealed partial class CoreGameEngineOrderedPrintedSkillLossObserversRunt
     {
         var parent = _resolutionStackOperations._resolutionStack[child - 1];
         var current = _resolutionStackOperations._resolutionStack[child];
-        return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(current, parent) || OrderedPrintedSkillLossSkillsChangedEdge(parent, current) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(parent, current) || _coreMatchingRecastObserversOperations.MatchingRecastStructuralEdge(parent, current) || _coreOverflowTargetCancellationObserversOperations.OverflowTargetCancellationStructuralEdge(parent, current) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(child) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child);
+        return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(current, parent) || OrderedPrintedSkillLossSkillsChangedEdge(parent, current) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(parent, current) || _coreMatchingRecastObserversOperations.Value.MatchingRecastStructuralEdge(parent, current) || _coreOverflowTargetCancellationObserversOperations.OverflowTargetCancellationStructuralEdge(parent, current) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(child) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(child);
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 590)]
-    internal bool IsOrderedPrintedSkillLossProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OrderedPrintedSkillLossObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsOrderedPrintedSkillLossProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && OrderedPrintedSkillLossObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 20)]
     internal bool TryAdvanceOrderedPrintedSkillLossSubtree()

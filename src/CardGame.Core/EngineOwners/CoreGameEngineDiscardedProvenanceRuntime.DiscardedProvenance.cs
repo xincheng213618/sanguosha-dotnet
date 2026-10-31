@@ -52,7 +52,7 @@ internal sealed partial class CoreGameEngineDiscardedProvenanceRuntime
 
     SkillProgramStepOutcome IDiscardedProvenanceProgramHost.ClaimDiscardedEntityWithProvenance(ProgramSkillFrame frame, string provenanceId) => BeginDiscardedProvenanceClaim(frame, provenanceId);
     SkillProgramStepOutcome IDiscardedProvenanceProgramHost.OfferFaceUpForOutsideClaims(ProgramSkillFrame frame, string provenanceId) => OfferProvenanceFaceUp(frame, provenanceId);
-    SkillProgramStepOutcome IDiscardedProvenanceProgramHost.UseVirtualAlcohol(ProgramSkillFrame frame) => _coreProvenanceVirtualAlcoholOperations.BeginProvenanceVirtualAlcohol(frame);
+    SkillProgramStepOutcome IDiscardedProvenanceProgramHost.UseVirtualAlcohol(ProgramSkillFrame frame) => _coreProvenanceVirtualAlcoholOperations.Value.BeginProvenanceVirtualAlcohol(frame);
     internal SkillProgramStepOutcome BeginDiscardedProvenanceClaim(ProgramSkillFrame input, string tag)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);

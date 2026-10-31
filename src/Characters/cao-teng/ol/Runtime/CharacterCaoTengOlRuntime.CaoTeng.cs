@@ -228,7 +228,7 @@ internal sealed partial class CharacterCaoTengOlRuntime
                     if (cards.Length > 0)
                     {
                         var damage = _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Single(w => w.Id == r.ParentId);
-                        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(damage);
+                        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage);
                         _corePhysicalMovementFacadesOperations.MoveCards(cards, CardLocation.Processing, CardLocation.Hand(f.OwnerSeat), new(CaoTengJianxiongClaimReason));
                         if (_coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { } group)
                         {
@@ -279,7 +279,7 @@ internal sealed partial class CharacterCaoTengOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27300)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27300)]
-    internal bool ContinuePaidCaoTeng(ProgramSkillFrame f) => f.CaoTeng is { } r && (r.Op == SkillProgramEffectOp.ResolveCaoTengJianxiongDrawAndClaim || _coreProgramEventHistoryOperations.ProgramEventHistory<CaoTengBenefitIssuedEvent>().Any(e => e.FrameId == f.Id && e.Index == 0)) && ValidCaoTeng(f);
+    internal bool ContinuePaidCaoTeng(ProgramSkillFrame f) => f.CaoTeng is { } r && (r.Op == SkillProgramEffectOp.ResolveCaoTengJianxiongDrawAndClaim || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoTengBenefitIssuedEvent>().Any(e => e.FrameId == f.Id && e.Index == 0)) && ValidCaoTeng(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveQingliuFactionChoice, SkillProgramEffectOp.ResolveYongzuDistinctBenefits, SkillProgramEffectOp.ResolveCaoTengJianxiongDrawAndClaim)]
     internal PromptChoice ChooseCaoTengAi(PendingDecision p, ProgramSkillFrame f)
     {

@@ -38,7 +38,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
 
     internal bool IsWuFuUse(CardUseFrame use)
     {
-        if (use.AnniversaryWuFuSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { AnniversaryWuFu: { Stage: AnniversaryWuFuStage.NativeUse } r } f || !ValidWuFu(f) || o.Source != r.Source || o.Hash != f.GameplayHash || o.Cursor != r.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || o.Actor != WuFuTask(f).Actor || o.Target != WuFuTask(f).Target || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (use.AnniversaryWuFuSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { AnniversaryWuFu: { Stage: AnniversaryWuFuStage.NativeUse } r } f || !ValidWuFu(f) || o.Source != r.Source || o.Hash != f.GameplayHash || o.Cursor != r.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || o.Actor != WuFuTask(f).Actor || o.Target != WuFuTask(f).Target || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor);
     }
@@ -76,7 +76,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.AnniversaryWuFu!;
-        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Zhonge cannot return another native use or return its own twice.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { AnniversaryWuFu = r with { Returned = true } });
         if (use.CardAttack is not { Active: true })
@@ -98,7 +98,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var r = f.AnniversaryWuFu!;
-        if (!r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuSlashReturnedEvent>().Any(e => e.FrameId == id && e.Cursor == r.Cursor))
+        if (!r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuSlashReturnedEvent>().Any(e => e.FrameId == id && e.Cursor == r.Cursor))
             throw new InvalidOperationException("Zhonge must release each complete original native Slash exactly once.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryWuFuSlashReturnedEvent(id, r.Cursor, r.UseId, r.ActionId));
         var batches = _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Where(b => b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.OriginOwnerSeat == f.OwnerSeat && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId).ToArray();
@@ -108,7 +108,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
         ContinueWuFu(id);
     }
 
-    internal bool IsAnniversaryWuFuSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => f.AnniversaryWuFu is { Stage: AnniversaryWuFuStage.NativeChildren, Returned: true } r && ValidWuFu(f) && r.NativeBatches.Contains(b.Id) && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.OriginOwnerSeat == f.OwnerSeat && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.Movements.Count > 0 && b.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After) && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuNativeBatchEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.BatchId == b.Id && e.Before == b.Movements.Min(m => m.Sequence) - 1 && e.After == b.Movements.Max(m => m.Sequence)) == 1;
+    internal bool IsAnniversaryWuFuSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => f.AnniversaryWuFu is { Stage: AnniversaryWuFuStage.NativeChildren, Returned: true } r && ValidWuFu(f) && r.NativeBatches.Contains(b.Id) && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.OriginOwnerSeat == f.OwnerSeat && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.Movements.Count > 0 && b.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuNativeBatchEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.BatchId == b.Id && e.Before == b.Movements.Min(m => m.Sequence) - 1 && e.After == b.Movements.Max(m => m.Sequence)) == 1;
     [ProgramPipelineHook(ProgramPipelinePhase.IsProgramMovementSettlement, 1400)]
     internal bool WindowSettlement_IsAnniversaryWuFuSettlementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => IsAnniversaryWuFuSettlementBatch(frame, batch);
 }

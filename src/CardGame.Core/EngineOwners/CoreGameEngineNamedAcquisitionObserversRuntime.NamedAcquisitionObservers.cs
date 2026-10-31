@@ -8,7 +8,7 @@ internal sealed partial class CoreGameEngineNamedAcquisitionObserversRuntime
     {
         for (var index = 1; index + 1 < _resolutionStackOperations._resolutionStack.Count; index++)
         {
-            if (_resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame { NamedCardAcquisition: { Stage: NamedCardAcquisitionStage.MovementChildren } d } root || !_coreNamedCardAcquisitionsOperations.ValidNamedCardAcquisition(root) || !NamedAcquisitionParentMatches(root) || root.PendingMovementContinuation is not { CoverageResultBind: null } pending || pending.SubjectSeat != root.OwnerSeat || damageWindowId is { } requested && !_resolutionStackOperations._resolutionStack.Skip(index + 1).Any(f => f.Id == requested))
+            if (_resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame { NamedCardAcquisition: { Stage: NamedCardAcquisitionStage.MovementChildren } d } root || !_coreNamedCardAcquisitionsOperations.Value.ValidNamedCardAcquisition(root) || !NamedAcquisitionParentMatches(root) || root.PendingMovementContinuation is not { CoverageResultBind: null } pending || pending.SubjectSeat != root.OwnerSeat || damageWindowId is { } requested && !_resolutionStackOperations._resolutionStack.Skip(index + 1).Any(f => f.Id == requested))
                 continue;
             var paid = _coreCardMovementJournalCardMovementsAccess._cardMovements.Single(m => m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter && m.CardId == d.CardId && m.From == d.From && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == CoreGameEngineNamedCardAcquisitionsRuntime.NamedAcquisitionReason(root));
             var first = _resolutionStackOperations._resolutionStack[index + 1];
@@ -49,7 +49,7 @@ internal sealed partial class CoreGameEngineNamedAcquisitionObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 330)]
-    internal bool IsNamedAcquisitionProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is not null && NamedAcquisitionObserverRoot()is not null;
+    internal bool IsNamedAcquisitionProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is not null && NamedAcquisitionObserverRoot()is not null;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 40)]
     internal bool CanStartLostHpTargetSelection(CharacterState owner, SkillProgramActivation activation)
     {

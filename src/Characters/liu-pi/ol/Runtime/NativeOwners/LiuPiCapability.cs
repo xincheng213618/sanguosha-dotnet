@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class LiuPiCapability(Func<RuntimeEntries.CharacterLiuPiOlEntries> getCharacterLiuPiOlRuntime) : ILiuPiProgramHost
+internal sealed class LiuPiCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterLiuPiOlRuntime>> getCharacterLiuPiOlRuntime) : ILiuPiProgramHost
 {
-    public SkillProgramStepOutcome Exchange(ProgramSkillFrame f) => getCharacterLiuPiOlRuntime().BeginLiuPiExchange(f);
+    public SkillProgramStepOutcome Exchange(ProgramSkillFrame f) => getCharacterLiuPiOlRuntime().Value.BeginLiuPiExchange(f);
 }

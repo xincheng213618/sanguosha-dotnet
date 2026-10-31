@@ -16,7 +16,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, use.TargetSeats[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[use.TargetSeats[0]], CardKind.Slash), programSkillCardUseFrameId: f.Id);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         if (r.Need?.Intent == BoundaryLiuFengIntent.BorrowedSword)
             _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword!.ActiveAttack = attack;
@@ -77,8 +77,8 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
             a = fire.OriginalAction;
         }
 
-        var actorMatches = _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor) || !_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) && use.SourceSeat == o.Actor && a.ActorSeat == o.Actor;
-        return actorMatches && a.EffectiveKind == CardKind.Slash && (a.ConversionChain.Count == 0 || a.ConversionChain is [var s] && s == o.Source) && _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash == o.Hash && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiuFengUseIssuedEvent>().Count(e => e.Origin == o) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiuFengCostPaidEvent>().Count(e => e.FrameId == o.FrameId && e.Source == o.Source && e.Hash == o.Hash && e.Turn == o.Turn && e.TurnOwner == o.TurnOwner) == 1;
+        var actorMatches = _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) && use.SourceSeat == o.Actor && a.ActorSeat == o.Actor;
+        return actorMatches && a.EffectiveKind == CardKind.Slash && (a.ConversionChain.Count == 0 || a.ConversionChain is [var s] && s == o.Source) && _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash == o.Hash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryLiuFengUseIssuedEvent>().Count(e => e.Origin == o) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryLiuFengCostPaidEvent>().Count(e => e.FrameId == o.FrameId && e.Source == o.Source && e.Hash == o.Hash && e.Turn == o.Turn && e.TurnOwner == o.TurnOwner) == 1;
     }
 
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 50201)]
@@ -182,7 +182,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
     internal void ReturnBoundaryLiuFengRewardDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!ValidBoundaryLiuFeng(f) || f.BoundaryLiuFeng is not { Stage: BoundaryLiuFengStage.RewardDraw, ConsequencePaid: true, Returned: true, Damaged: true, RewardDraw: null } r || f.NativeDraw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1 || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiuFengRewardDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (!ValidBoundaryLiuFeng(f) || f.BoundaryLiuFeng is not { Stage: BoundaryLiuFengStage.RewardDraw, ConsequencePaid: true, Returned: true, Damaged: true, RewardDraw: null } r || f.NativeDraw is not null || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1 || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryLiuFengRewardDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Qinling reward lost its original once-issued native draw and typed return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryLiuFeng = r with { Stage = BoundaryLiuFengStage.NativeTail, RewardDraw = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryLiuFengRewardDrawReturnedEvent(f.Id, r.UseId, outcome.AttemptFrameId, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));

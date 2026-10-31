@@ -21,7 +21,7 @@ internal sealed partial class CharacterZhouYuMobileShiRuntime
 
     bool IShiZhouYuFacts.HasTriggerOperation(SkillProgramEffectOp operation) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(operation);
     ContentSkillDefinition IShiZhouYuFacts.Skill(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId);
-    IEnumerable<T> IShiZhouYuFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IShiZhouYuFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     CardConversionSource IShiZhouYuFacts.Source(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     CardLocation IShiZhouYuFacts.Location(int cardId) => _cardZonesOperations._cardZones.GetLocation(cardId);
     IReadOnlyList<Card> IShiZhouYuFacts.CardsAt(CardLocation location) => _cardZonesOperations._cardZones.CardsAt(location);

@@ -7,7 +7,7 @@ internal sealed partial class CharacterTangTangOlRuntime
     internal IReadOnlyList<TangTangOwnedOrigin>? CaptureTangTangOwnedOrigins(IEnumerable<CardLocation> sources) => !HasTangTangZhiyi ? null : Array.AsReadOnly(sources.Where(IsTangTangOwnedZone).Distinct().SelectMany(from => _cardZonesOperations._cardZones.CardsAt(from).Select(c => new TangTangOwnedOrigin(c.Id, from.OwnerSeat!.Value, from, _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[from.OwnerSeat.Value], c)))).ToArray());
     internal void RecordTangTangOwnedTransferProducer(CardMovementRecord m, int recipientSeat, long producerId)
     {
-        if (!HasTangTangZhiyi || !IsTangTangOwnedZone(m.From) || m.To != CardLocation.Processing || m.From.OwnerSeat == recipientSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipientSeat) || producerId <= 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhiyiTransferProducerEvent>().Any(e => e.EntrySequence == m.Sequence))
+        if (!HasTangTangZhiyi || !IsTangTangOwnedZone(m.From) || m.To != CardLocation.Processing || m.From.OwnerSeat == recipientSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipientSeat) || producerId <= 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhiyiTransferProducerEvent>().Any(e => e.EntrySequence == m.Sequence))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhiyiTransferProducerEvent(m.Sequence, recipientSeat, producerId));
     }
@@ -44,11 +44,11 @@ internal sealed partial class CharacterTangTangOlRuntime
             if (entry is null && m.From == CardLocation.Processing)
             {
                 var previous = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(p => p.CardId == m.CardId && p.Sequence < m.Sequence);
-                if (previous is { To.Zone: CardZoneKind.Processing } && IsTangTangOwnedZone(previous.From) && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhiyiTransferProducerEvent>().Any(e => e.EntrySequence == previous.Sequence && e.RecipientSeat == recipient))
+                if (previous is { To.Zone: CardZoneKind.Processing } && IsTangTangOwnedZone(previous.From) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhiyiTransferProducerEvent>().Any(e => e.EntrySequence == previous.Sequence && e.RecipientSeat == recipient))
                     entry = previous;
             }
 
-            if (entry is not null && entry.From.OwnerSeat is { } issuer && issuer != recipient && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhiyiOwnedOriginEvent>().SingleOrDefault(e => e.Sequence == entry.Sequence && e.CardId == entry.CardId && e.From == entry.From)is { } original)
+            if (entry is not null && entry.From.OwnerSeat is { } issuer && issuer != recipient && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhiyiOwnedOriginEvent>().SingleOrDefault(e => e.Sequence == entry.Sequence && e.CardId == entry.CardId && e.From == entry.From)is { } original)
                 Add(issuer, true, original.Suit, entry.Sequence, entry.From, new HashSet<int>());
             void Add(int ownerSeat, bool foreign, Suit effective, long entrySequence, CardLocation from, IReadOnlySet<int> excluded)
             {

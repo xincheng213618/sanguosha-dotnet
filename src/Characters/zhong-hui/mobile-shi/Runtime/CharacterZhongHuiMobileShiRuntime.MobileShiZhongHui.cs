@@ -10,14 +10,14 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     internal bool HasShiZhHuiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveShiZhHuiSizi);
 
     internal bool HasShiZhHuiKechang(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].SkillGrants.Grants.Any(grant => grant.IsEnabled && grant.SkillId == ShiZhHuiComposition.KeChangSkill) || _coreNationalSkillsOperations.EnabledContentSkillIds(_coreMatchParticipantsPlayersAccess._players[seat]).Contains(ShiZhHuiComposition.KeChangSkill, StringComparer.Ordinal);
-    internal int ShiZhHuiKechangLevel(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhHuiYunanAwakenedEvent>().Where(entry => entry.Source.OwnerSeat == seat).Select(entry => entry.Level).LastOrDefault();
-    internal bool ShiZhHuiRoundHasDeath => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhHuiDeathRecordedEvent>().Any(death => death.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
-    internal ShiZhHuiSiziActivatedEvent? ShiZhHuiActiveSizi => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhHuiSiziActivatedEvent>().LastOrDefault(activation => !_coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhHuiSiziExpiredEvent>().Any(expired => expired.ActivationOrdinal == activation.Ordinal));
+    internal int ShiZhHuiKechangLevel(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiYunanAwakenedEvent>().Where(entry => entry.Source.OwnerSeat == seat).Select(entry => entry.Level).LastOrDefault();
+    internal bool ShiZhHuiRoundHasDeath => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiDeathRecordedEvent>().Any(death => death.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
+    internal ShiZhHuiSiziActivatedEvent? ShiZhHuiActiveSizi => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiSiziActivatedEvent>().LastOrDefault(activation => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiSiziExpiredEvent>().Any(expired => expired.ActivationOrdinal == activation.Ordinal));
     internal bool ShiZhHuiSiziActive => ShiZhHuiActiveSizi is not null;
 
     internal IReadOnlyList<int> ShiZhHuiEndingVictims(int turnNumber, int ownerHp, int consumed)
     {
-        var users = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhHuiSlashUsedEvent>().Where(use => use.TurnNumber == turnNumber).Select(use => use.ActorSeat).Distinct().Where(seat => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive).ToArray();
+        var users = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiSlashUsedEvent>().Where(use => use.TurnNumber == turnNumber).Select(use => use.ActorSeat).Distinct().Where(seat => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive).ToArray();
         if (users.Length > 0 || consumed <= ownerHp || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat) || !_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat].IsAlive)
             return Array.AsReadOnly(users);
         // Effect 3: with no slash used and a consumed X above the activation HP, the turn player loses 1 HP.
@@ -36,7 +36,7 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
         if (candidate.SkillId == ShiZhHuiSizi && trigger.Id == ShiZhHuiComposition.SiziEndingTrigger)
             return ShiZhHuiSiziActive;
         if (candidate.SkillId == ShiZhHuiYunan && trigger.Id == ShiZhHuiComposition.YunanTrigger)
-            return _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.KillerSeat == candidate.OwnerSeat && ShiZhHuiRoundHasDeath;
+            return _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.KillerSeat == candidate.OwnerSeat && ShiZhHuiRoundHasDeath;
         return true;
     }
 
@@ -86,7 +86,7 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
 
     internal ShiZhHuiReceipt StartShiZhHuiYunan(ProgramSkillFrame f)
     {
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("Yunan lost its dying entry.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("Yunan lost its dying entry.");
         if (dying.KillerSeat != f.OwnerSeat)
             throw new InvalidOperationException("Yunan requires a dying state caused by its owner.");
         return new("yunan", _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, TargetSeat: dying.VictimSeat)
@@ -142,7 +142,7 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
         if (consumed is < 1 or > ShiZhHuiComposition.ChargeCapacity || consumed > ShiZhHuiCharge(f.OwnerSeat))
             throw new InvalidOperationException("Sizi consumed an unavailable charge amount.");
         ChangeShiZhHuiCharge(f.Id, f.OwnerSeat, -consumed, ShiZhHuiComposition.SiziChargeReason, out _);
-        var ordinal = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhHuiSiziActivatedEvent>().Count + 1;
+        var ordinal = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiSiziActivatedEvent>().Count + 1;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZhHuiSiziActivatedEvent(f.Id, r.Source!, f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, ordinal, consumed, _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiZhHui = r with { Consumed = consumed, Ordinal = ordinal } });
         FinishShiZhHuiOperation(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
@@ -226,7 +226,7 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
             r = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id).ShiZhHui!;
         }
 
-        var elapsed = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZhHuiSiziElapsedEvent>().Count(entry => entry.ActivationOrdinal == activation.Ordinal) + 1;
+        var elapsed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiSiziElapsedEvent>().Count(entry => entry.ActivationOrdinal == activation.Ordinal) + 1;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZhHuiSiziElapsedEvent(activation.Ordinal, elapsed));
         if (elapsed >= activation.Consumed)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZhHuiSiziExpiredEvent(activation.Ordinal, "turn-count"));
@@ -251,7 +251,7 @@ internal sealed partial class CharacterZhongHuiMobileShiRuntime
     internal void ContinueShiZhHuiYunan(ProgramSkillFrame f)
     {
         var r = f.ShiZhHui!;
-        var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("Yunan lost its dying entry.");
+        var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("Yunan lost its dying entry.");
         ApplyShiZhHuiFactionChange(f, "qun");
         var level = Math.Min(2, ShiZhHuiKechangLevel(f.OwnerSeat) + 1);
         if (!HasShiZhHuiKechang(f.OwnerSeat))

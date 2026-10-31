@@ -13,7 +13,7 @@ internal sealed partial class CharacterLiYiOlRuntime
         var actor = ChanshuangItem(f).Seat;
         if (r.Stage == ChanshuangStage.DrawChildren)
             return m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(actor) && m.Reason == CardMoveReasons.RecastDraw || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ChanshuangMaterialPaidEvent>().Any(e => e.FrameId == f.Id && e.Cursor == r.Cursor && e.Sequence == m.Sequence && e.CardId == m.CardId && e.From == m.From && e.To == m.To))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangMaterialPaidEvent>().Any(e => e.FrameId == f.Id && e.Cursor == r.Cursor && e.Sequence == m.Sequence && e.CardId == m.CardId && e.From == m.From && e.To == m.To))
             return true;
         return r.Materials.Any(c => c.Kind == CardKind.WoodenOx && c.From == CardLocation.Equipment(actor)) && r.Grain.Contains(m.CardId) && m.From == CardLocation.WoodenOxGrain(actor) && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.WoodenOxGrainDiscard;
     }
@@ -45,7 +45,7 @@ internal sealed partial class CharacterLiYiOlRuntime
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange)
-            return state.ResumeProgramFrameId == f.Id && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
+            return state.ResumeProgramFrameId == f.Id && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id);
         if (child is not CardsMovedTriggerWindowFrame moved)
             return false;
         return r.Stage == ChanshuangStage.NativeChildren ? moved.ResumeProgramFrameId == f.Id && IsChanshuangNativeSettlementBatch(f, moved.Batch) : CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => IsLiYiPaidMovement(f, m));

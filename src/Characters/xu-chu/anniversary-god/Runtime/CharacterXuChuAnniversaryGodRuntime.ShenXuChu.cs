@@ -11,7 +11,7 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
     SkillProgramStepOutcome IShenXuChuHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginShenXuChu(f, op);
     internal ProgramCardTriggerWindowFrame? ZhuangpoParent(ProgramSkillWindowContext? w) => w?.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized ? null : _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(p => p.Id == w.ParentFrameId);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 38800, SkillProgramEffectOp.ResolveZhuangpoTarget)]
-    internal bool CanResolveZhuangpo(ProgramTriggerLegalityContext g) => ZhuangpoParent(g.WindowContext)is { Action: { EffectiveKind: CardKind.Duel } a } && a.ActorSeat == g.OwnerSeat && a.ConversionChain.Contains(new(g.SkillId, ShenXuChuComposition.ViewAs, g.OwnerSeat, g.Candidate.SkillInstanceId)) && a.TargetSeats.Count > 0 && !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhuangpoTargetIssuedEvent>().Any(e => e.ActionId == a.ActionId && e.Source.OwnerSeat == g.OwnerSeat && e.Source.SkillInstanceId == g.Candidate.SkillInstanceId);
+    internal bool CanResolveZhuangpo(ProgramTriggerLegalityContext g) => ZhuangpoParent(g.WindowContext)is { Action: { EffectiveKind: CardKind.Duel } a } && a.ActorSeat == g.OwnerSeat && a.ConversionChain.Contains(new(g.SkillId, ShenXuChuComposition.ViewAs, g.OwnerSeat, g.Candidate.SkillInstanceId)) && a.TargetSeats.Count > 0 && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhuangpoTargetIssuedEvent>().Any(e => e.ActionId == a.ActionId && e.Source.OwnerSeat == g.OwnerSeat && e.Source.SkillInstanceId == g.Candidate.SkillInstanceId);
     internal (int Damage, int[] Seats) ZhengqingMaximum()
     {
         var totals = new Dictionary<(int Turn, int Source), int>();
@@ -46,12 +46,12 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
         var r = new ShenXuChuReceipt(ShenXuChuSource(f), f.GameplayHash, w.ParentFrameId, f.InstructionIndex, op, ShenXuChuStage.MarkChildren);
         if (op == SkillProgramEffectOp.SettleZhengqingRound)
         {
-            if (!ShenXuChuComposition.IsZhengqing(f.SkillId) || w.Window != SkillProgramTriggerWindow.RoundEnding || _resolutionStackOperations._resolutionStack.FirstOrDefault()is not RoundEndingBoundaryFrame boundary || boundary.RoundNumber != _coreActualRoundProgressRoundNumberAccess._roundNumber || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhengqingSettledEvent>().Any(e => e.Source == r.Source && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber))
+            if (!ShenXuChuComposition.IsZhengqing(f.SkillId) || w.Window != SkillProgramTriggerWindow.RoundEnding || _resolutionStackOperations._resolutionStack.FirstOrDefault()is not RoundEndingBoundaryFrame boundary || boundary.RoundNumber != _coreActualRoundProgressRoundNumberAccess._roundNumber || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhengqingSettledEvent>().Any(e => e.Source == r.Source && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber))
                 throw new InvalidOperationException("Zhengqing requires its once-only actual round ending.");
             var(maximum, seats) = ZhengqingMaximum();
             var before = _randomOperations._random.State;
             var winner = ZhengqingWinner(seats, f.OwnerSeat, _randomOperations._random);
-            var draws = _characterXuChuHappyGodOperations.ShenXuChuRoundDraws(f, winner, maximum);
+            var draws = _characterXuChuHappyGodOperations.Value.ShenXuChuRoundDraws(f, winner, maximum);
             r = r with
             {
                 TargetSeat = winner,
@@ -206,7 +206,7 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.ShenXuChu ?? throw new InvalidOperationException("Shen Xu Chu draw lost its frame.");
-        if (r.Stage != ShenXuChuStage.DrawAttempt || r.DrawIndex >= r.Draws.Count || r.Draws[r.DrawIndex] != new ShenXuChuDraw(outcome.RecipientSeat, outcome.RequestedCount) || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<ShenXuChuDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Index == r.DrawIndex))
+        if (r.Stage != ShenXuChuStage.DrawAttempt || r.DrawIndex >= r.Draws.Count || r.Draws[r.DrawIndex] != new ShenXuChuDraw(outcome.RecipientSeat, outcome.RequestedCount) || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenXuChuDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Index == r.DrawIndex))
             throw new InvalidOperationException("Shen Xu Chu requires the once-only exact native draw return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenXuChu = r with { Stage = ShenXuChuStage.DrawChildren, Before = outcome.SequenceBefore, After = outcome.SequenceAfter } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenXuChuDrawReturnedEvent(f.Id, r.DrawIndex, outcome.RecipientSeat, outcome.RequestedCount, outcome.ActualDrawIds.Count, outcome.SequenceBefore, outcome.SequenceAfter));
@@ -288,6 +288,6 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
     {
         if (attack.EffectiveCardKind != CardKind.Duel || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action } use)
             return 0;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ZhuangpoTargetIssuedEvent>().Any(e => e.UseId == use.Id && e.ActionId == action.ActionId && e.TargetMarked && ShenXuChuComposition.IsZhuangpo(e.Source.SkillId) && e.Source.OwnerSeat == action.ActorSeat && action.ConversionChain.Contains(new(e.Source.SkillId, ShenXuChuComposition.ViewAs, e.Source.OwnerSeat, e.Source.SkillInstanceId))) ? 1 : 0;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhuangpoTargetIssuedEvent>().Any(e => e.UseId == use.Id && e.ActionId == action.ActionId && e.TargetMarked && ShenXuChuComposition.IsZhuangpo(e.Source.SkillId) && e.Source.OwnerSeat == action.ActorSeat && action.ConversionChain.Contains(new(e.Source.SkillId, ShenXuChuComposition.ViewAs, e.Source.OwnerSeat, e.Source.SkillInstanceId))) ? 1 : 0;
     }
 }

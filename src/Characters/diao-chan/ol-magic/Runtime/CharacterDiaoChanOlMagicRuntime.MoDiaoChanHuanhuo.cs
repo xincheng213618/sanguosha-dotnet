@@ -7,8 +7,8 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
 
     internal static CardConversionSource MoDcSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_diao_chan_ol_magic_MoDiaoChanHuanhuo.MoDcSource(f);
     internal int? MoDcDueTurn(MoDiaoChanPromiseEvent p) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Skip(p.AfterTurnStartOrdinal).FirstOrDefault(t => t.ActorSeat == p.TargetSeat)?.TurnNumber;
-    internal MoDiaoChanPromiseEvent[] ActiveMoDcPromises(int actor) => !HasMoDiaoChan || !_coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn || actor != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != actor ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanPromiseEvent>().Where(p => p.TargetSeat == actor && MoDcDueTurn(p) == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim.PromiseId == p.PromiseId) < 2).ToArray();
-    internal int MoDcRemaining(int actor) => ActiveMoDcPromises(actor).Select(p => 2 - _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim.PromiseId == p.PromiseId)).DefaultIfEmpty(0).Max();
+    internal MoDiaoChanPromiseEvent[] ActiveMoDcPromises(int actor) => !HasMoDiaoChan || !_coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn || actor != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != actor ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanPromiseEvent>().Where(p => p.TargetSeat == actor && MoDcDueTurn(p) == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim.PromiseId == p.PromiseId) < 2).ToArray();
+    internal int MoDcRemaining(int actor) => ActiveMoDcPromises(actor).Select(p => 2 - _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim.PromiseId == p.PromiseId)).DefaultIfEmpty(0).Max();
     // Only command progression calls this; view/query code merely reads the signed lock.
     [ProgramPipelineHook(ProgramPipelinePhase.PreparePlayPhaseDecision, 1)]
     internal void PrepareMoDiaoChanHandSelection(CharacterState actor)
@@ -18,19 +18,19 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Select(c => c.Id).ToHashSet();
         var actions = _coreNativeLegalActionsOperations.BuildLegalActionsCore(actor, includeProgramActions: true, selectedPhysicalCardId: null, nativeOriginalCard: null, ignoreForcedHandSelection: true);
         var pool = actions.Where(a => a.Kind is not (LegalActionKind.EndPlay or LegalActionKind.UseProgramSkill or LegalActionKind.UseEquipmentEffect or LegalActionKind.Recast)).SelectMany(a => a.CardId is { } id ? new[] { id } : a.SelectableCardIds ?? []).Where(hand.Contains).Distinct().Order().ToArray();
-        var old = _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanLockEvent>().LastOrDefault(e => e.ActorSeat == actor.Seat && e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber);
+        var old = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanLockEvent>().LastOrDefault(e => e.ActorSeat == actor.Seat && e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber);
         if (old is not null && old.PhaseToken == phase.Token && (old.CardId == 0 && pool.Length == 0 || pool.Contains(old.CardId)))
             return;
         var before = _randomOperations._random.State;
         var index = pool.Length == 0 ? -1 : _randomOperations._random.Next(pool.Length);
-        var lockId = _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanLockEvent>().Select(e => e.LockId).DefaultIfEmpty().Max() + 1;
+        var lockId = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanLockEvent>().Select(e => e.LockId).DefaultIfEmpty().Max() + 1;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoDiaoChanLockEvent(lockId, actor.Seat, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, phase.Token, index < 0 ? 0 : pool[index], pool.Length, index, before, _randomOperations._random.State));
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.ForcedPlayHandSelection, 1)]
     internal ForcedHandSelectionSnapshot? MoDiaoChanHandSelection(int actor)
     {
-        if (ActiveMoDcPromises(actor).Length == 0 || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { } phase || _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanLockEvent>().LastOrDefault(e => e.ActorSeat == actor && e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.PhaseToken == phase.Token)is not { CardId: > 0 } pick || _cardZonesOperations._cardZones.GetLocation(pick.CardId) != CardLocation.Hand(actor))
+        if (ActiveMoDcPromises(actor).Length == 0 || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { } phase || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanLockEvent>().LastOrDefault(e => e.ActorSeat == actor && e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.PhaseToken == phase.Token)is not { CardId: > 0 } pick || _cardZonesOperations._cardZones.GetLocation(pick.CardId) != CardLocation.Hand(actor))
             return null;
         return new(MoDiaoChanComposition.Huanhuo, pick.LockId, phase.Token, pick.CardId, MoDcRemaining(actor));
     }
@@ -52,7 +52,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
     internal bool MoDcHuanhuoPaymentAllowed(int actor, IReadOnlyList<int> ids, long? existingUseId = null)
     {
         // A compulsory Play selection is not a response or a skill-payment ban.
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not null || _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not null || _resolutionStackOperations._resolutionStack.LastOrDefault() is ProgramSkillFrame)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not null || _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is not null || _resolutionStackOperations._resolutionStack.LastOrDefault() is ProgramSkillFrame)
             return true;
         if (existingUseId is { } use && _coreCardUseLifecycleOperations.LifecycleCardUse(use)?.MoDiaoChanClaims?.Any(q => q.ActorSeat == actor) == true)
             return true;
@@ -85,9 +85,9 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
             return;
         foreach (var p in ActiveMoDcPromises(action.ActorSeat))
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Any(e => e.Claim.PromiseId == p.PromiseId && e.Claim.ActionId == action.ActionId))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Any(e => e.Claim.PromiseId == p.PromiseId && e.Claim.ActionId == action.ActionId))
                 continue;
-            var ordinal = _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim.PromiseId == p.PromiseId) + 1;
+            var ordinal = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim.PromiseId == p.PromiseId) + 1;
             var source = p.Source with
             {
                 BindingId = "affected-use-completed"
@@ -105,11 +105,11 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
             return direct;
         if (candidate.SkillId != MoDiaoChanComposition.Huanhuo || candidate.BindingId != "affected-use-completed" || context.Window != SkillProgramTriggerWindow.CardUseCompleted || context.CardUse is not { } identity || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.Action.ActionId != identity.CardActionId || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == w.ParentFrameId)?.MoDiaoChanClaims is not { } claims)
             return null;
-        return claims.SingleOrDefault(q => q.Source.OwnerSeat == candidate.OwnerSeat && q.Source.SkillInstanceId == candidate.SkillInstanceId && q.GameplayHash == candidate.GameplayHash && q.ActionId == w.Action.ActionId && q.ProviderSeat == w.Action.ProviderSeat && _characterZhouYuOlMouOperations.MouGuquActorLineageMatches(q.ParentFrameId, q.ActionId, q.ActorSeat, w.Action.ActorSeat, q.ProviderSeat, w.Action.Type) && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim == q) == 1);
+        return claims.SingleOrDefault(q => q.Source.OwnerSeat == candidate.OwnerSeat && q.Source.SkillInstanceId == candidate.SkillInstanceId && q.GameplayHash == candidate.GameplayHash && q.ActionId == w.Action.ActionId && q.ProviderSeat == w.Action.ProviderSeat && _characterZhouYuOlMouOperations.MouGuquActorLineageMatches(q.ParentFrameId, q.ActionId, q.ActorSeat, w.Action.ActorSeat, q.ProviderSeat, w.Action.Type) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim == q) == 1);
     }
 
     [ProgramIssuedTrigger(40)]
-    internal bool IsIssuedMoDiaoChanCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => MoDcCompletedClaim(c, context)is { } q && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanStartedEvent>().Any(e => e.Source == q.Source && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == e.FrameId && f.MoDiaoChan?.ActionId == q.ActionId)) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseSettledEvent>().Any(e => e.PromiseId == q.PromiseId && e.ActionId == q.ActionId);
+    internal bool IsIssuedMoDiaoChanCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => MoDcCompletedClaim(c, context)is { } q && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanStartedEvent>().Any(e => e.Source == q.Source && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == e.FrameId && f.MoDiaoChan?.ActionId == q.ActionId)) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanUseSettledEvent>().Any(e => e.PromiseId == q.PromiseId && e.ActionId == q.ActionId);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 23)]
     internal void CollectIssuedMoDiaoChanCandidates(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result)
     {
@@ -123,7 +123,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.ObservesResponseUseCompletion, 3)]
-    internal bool HasIssuedMoDiaoChanResponse(CardActionContext action) => HasMoDiaoChan && _resolutionStackOperations._resolutionStack.Any(f => f.MoDiaoChanClaims?.Any(q => q.ActionId == action.ActionId && q.ParentFrameId == f.Id && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim == q) == 1) == true);
+    internal bool HasIssuedMoDiaoChanResponse(CardActionContext action) => HasMoDiaoChan && _resolutionStackOperations._resolutionStack.Any(f => f.MoDiaoChanClaims?.Any(q => q.ActionId == action.ActionId && q.ParentFrameId == f.Id && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanUseClaimedEvent>().Count(e => e.Claim == q) == 1) == true);
     internal Card[] MoDcDiscardable(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[owner])).Where(c => !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard)).ToArray();
     internal void PayMoDcRandomDiscard(ProgramSkillFrame f)
     {

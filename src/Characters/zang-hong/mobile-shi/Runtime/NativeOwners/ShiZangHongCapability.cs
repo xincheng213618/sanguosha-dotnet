@@ -1,8 +1,8 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class ShiZangHongCapability(Func<RuntimeEntries.CharacterZangHongMobileShiEntries> getCharacterZangHongMobileShiRuntime) : IShiZangHongHost
+internal sealed class ShiZangHongCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZangHongMobileShiRuntime>> getCharacterZangHongMobileShiRuntime) : IShiZangHongHost
 {
-    public SkillProgramStepOutcome ResolveLiezhi(ProgramSkillFrame frame) => getCharacterZangHongMobileShiRuntime().BeginShiZhLiezhi(frame);
-    public SkillProgramStepOutcome ResolveJuegu(ProgramSkillFrame frame) => getCharacterZangHongMobileShiRuntime().BeginShiZhJuegu(frame);
+    public SkillProgramStepOutcome ResolveLiezhi(ProgramSkillFrame frame) => getCharacterZangHongMobileShiRuntime().Value.BeginShiZhLiezhi(frame);
+    public SkillProgramStepOutcome ResolveJuegu(ProgramSkillFrame frame) => getCharacterZangHongMobileShiRuntime().Value.BeginShiZhJuegu(frame);
 }

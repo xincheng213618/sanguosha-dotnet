@@ -11,7 +11,7 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
     {
         if (!HasMouHuangYueyingMobile)
             return;
-        foreach (var grant in _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGrantedEvent>().GroupBy(e => e.RecipientSeat).Select(g => g.Last()).ToArray())
+        foreach (var grant in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingQiGrantedEvent>().GroupBy(e => e.RecipientSeat).Select(g => g.Last()).ToArray())
         {
             if (!_coreMatchParticipantsPlayersAccess._players[grant.Source.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[grant.RecipientSeat].IsAlive)
                 continue;
@@ -23,7 +23,7 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
                 var m = pair.Movement;
                 if (remaining == 0)
                     break;
-                if (m.Sequence <= grant.MovementSequence || m.To != CardLocation.Hand(grant.RecipientSeat) || _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(m, batch) == CardLocation.Hand(grant.RecipientSeat) || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(m.CardKind) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().Any(e => e.GrantId == grant.GrantId && e.GainSequence == m.Sequence))
+                if (m.Sequence <= grant.MovementSequence || m.To != CardLocation.Hand(grant.RecipientSeat) || _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(m, batch) == CardLocation.Hand(grant.RecipientSeat) || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(m.CardKind) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().Any(e => e.GrantId == grant.GrantId && e.GainSequence == m.Sequence))
                     continue;
                 var source = grant.Source with
                 {
@@ -36,15 +36,15 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
         }
     }
 
-    internal IEnumerable<ProgramTriggerCandidate> CollectMouHyQiGainCandidates(CardMovementBatchContext batch) => !HasMouHuangYueyingMobile ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().Where(e => e.BatchId == batch.Id && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiClaimSettledEvent>().Any(t => t.GrantId == e.GrantId && t.GainSequence == e.GainSequence)).Select(e => new ProgramTriggerCandidate(e.Source.OwnerSeat, e.Source.SkillId, e.Source.BindingId, e.Source.SkillInstanceId, e.GameplayHash, 0, e.MovementIndex)).ToArray();
+    internal IEnumerable<ProgramTriggerCandidate> CollectMouHyQiGainCandidates(CardMovementBatchContext batch) => !HasMouHuangYueyingMobile ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().Where(e => e.BatchId == batch.Id && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingQiClaimSettledEvent>().Any(t => t.GrantId == e.GrantId && t.GainSequence == e.GainSequence)).Select(e => new ProgramTriggerCandidate(e.Source.OwnerSeat, e.Source.SkillId, e.Source.BindingId, e.Source.SkillInstanceId, e.GameplayHash, 0, e.MovementIndex)).ToArray();
     internal MouHuangYueyingQiGainClaimedEvent? MouHyQiBatchClaim(ProgramTriggerCandidate candidate, CardMovementBatchContext batch)
     {
         if (candidate.SkillId != MouHuangYueyingMobileComposition.Qicai || candidate.BindingId != "receive-three" || candidate.OccurrenceIndex < 0 || candidate.OccurrenceIndex >= batch.Movements.Count)
             return null;
-        var claim = _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().SingleOrDefault(e => e.BatchId == batch.Id && e.MovementIndex == candidate.OccurrenceIndex && e.Source == new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId) && e.GameplayHash == candidate.GameplayHash);
+        var claim = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingQiGainClaimedEvent>().SingleOrDefault(e => e.BatchId == batch.Id && e.MovementIndex == candidate.OccurrenceIndex && e.Source == new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId) && e.GameplayHash == candidate.GameplayHash);
         if (claim is null || batch.Movements[claim.MovementIndex] is not { } m || m.CardId != claim.CardId || m.Sequence != claim.GainSequence || m.To != CardLocation.Hand(claim.GainingSeat) || _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(m, batch) != claim.OriginalFrom || !CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(m.CardKind))
             return null;
-        var grant = _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiGrantedEvent>().SingleOrDefault(g => g.GrantId == claim.GrantId);
+        var grant = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingQiGrantedEvent>().SingleOrDefault(g => g.GrantId == claim.GrantId);
         return grant is not null && grant.RecipientSeat == claim.GainingSeat && (grant.Source with
         {
             BindingId = "receive-three"
@@ -72,7 +72,7 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
     }
 
     [ProgramIssuedTrigger(110)]
-    internal bool IsIssuedMouHyQiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && MouHyQiClaim(c, context)is { } claim && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouHuangYueyingQiClaimSettledEvent>().Any(e => e.GrantId == claim.GrantId && e.GainSequence == claim.GainSequence);
+    internal bool IsIssuedMouHyQiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && MouHyQiClaim(c, context)is { } claim && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingQiClaimSettledEvent>().Any(e => e.GrantId == claim.GrantId && e.GainSequence == claim.GainSequence);
     internal SkillProgramStepOutcome BeginMouHyQiTransfer(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

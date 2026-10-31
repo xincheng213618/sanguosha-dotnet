@@ -10,13 +10,13 @@ internal sealed partial class CoreGameEngineRoundPricedPileAlcoholRuntime
         var effect = trigger.Effects.SingleOrDefault(e => e.Op == SkillProgramEffectOp.UseRoundPricedPileDyingAlcohol);
         if (effect is null)
             return true;
-        return context.Window == SkillProgramTriggerWindow.DyingResponse && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && context.ParentFrameId == dying.FrameId && context.TargetSeat == dying.VictimSeat && dying.ResponderSeat == candidate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp <= 0 && _cardZonesOperations._cardZones.Count(new(effect.Zones[0], candidate.OwnerSeat)) >= NextRoundPileAlcoholPrice(candidate.OwnerSeat, candidate.SkillId, effect.StateId!);
+        return context.Window == SkillProgramTriggerWindow.DyingResponse && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && context.ParentFrameId == dying.FrameId && context.TargetSeat == dying.VictimSeat && dying.ResponderSeat == candidate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp <= 0 && _cardZonesOperations._cardZones.Count(new(effect.Zones[0], candidate.OwnerSeat)) >= NextRoundPileAlcoholPrice(candidate.OwnerSeat, candidate.SkillId, effect.StateId!);
     }
 
     internal SkillProgramStepOutcome BeginRoundPileAlcohol(ProgramSkillFrame input, string stateId, CardZoneKind zone)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        if (f.RoundPileAlcohol is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.DyingResponse } context || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || context.ParentFrameId != dying.FrameId || context.TargetSeat != dying.VictimSeat || dying.ResponderSeat != f.OwnerSeat)
+        if (f.RoundPileAlcohol is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.DyingResponse } context || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || context.ParentFrameId != dying.FrameId || context.TargetSeat != dying.VictimSeat || dying.ResponderSeat != f.OwnerSeat)
             throw new InvalidOperationException("Round-priced Alcohol lost its exact dying responder.");
         var price = NextRoundPileAlcoholPrice(f.OwnerSeat, f.SkillId, stateId);
         if (!RoundPileAlcoholUnpaidValid(f, dying.FrameId, dying.VictimSeat, stateId, _coreActualRoundProgressRoundNumberAccess._roundNumber, price, zone))
@@ -30,7 +30,7 @@ internal sealed partial class CoreGameEngineRoundPricedPileAlcoholRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal bool RoundPileAlcoholUnpaidValid(ProgramSkillFrame f, long dyingId, int victimSeat, string stateId, int round, int price, CardZoneKind zone) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[victimSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[victimSeat].Hp <= 0 && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreActualRoundProgressRoundNumberAccess._roundNumber == round && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.FrameId == dyingId && dying.VictimSeat == victimSeat && dying.ResponderSeat == f.OwnerSeat && NextRoundPileAlcoholPrice(f.OwnerSeat, f.SkillId, stateId) == price && _cardZonesOperations._cardZones.Count(new(zone, f.OwnerSeat)) >= price && _coreAlcoholIdentityPoliciesOperations.CanUseProgramDyingAlcohol(f, SkillProgramEffectOp.UseRoundPricedPileDyingAlcohol);
+    internal bool RoundPileAlcoholUnpaidValid(ProgramSkillFrame f, long dyingId, int victimSeat, string stateId, int round, int price, CardZoneKind zone) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[victimSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[victimSeat].Hp <= 0 && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) && _coreActualRoundProgressRoundNumberAccess._roundNumber == round && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.FrameId == dyingId && dying.VictimSeat == victimSeat && dying.ResponderSeat == f.OwnerSeat && NextRoundPileAlcoholPrice(f.OwnerSeat, f.SkillId, stateId) == price && _cardZonesOperations._cardZones.Count(new(zone, f.OwnerSeat)) >= price && _coreAlcoholIdentityPoliciesOperations.CanUseProgramDyingAlcohol(f, SkillProgramEffectOp.UseRoundPricedPileDyingAlcohol);
     internal void PublishRoundPileAlcohol(ProgramSkillFrame f)
     {
         var r = f.RoundPileAlcohol!;
@@ -128,7 +128,7 @@ internal sealed partial class CoreGameEngineRoundPricedPileAlcoholRuntime
             return;
         _coreRuntimeOperations.ReplaceRuntimeTop(use with { RoundPileAlcoholCostDrained = true });
         var card = _coreCardAttackStateOperations.GetAttackCard(use.CardId);
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive || _coreDyingCursorRuntimeOperations.ActiveDying?.FrameId != use.RoundPileAlcoholReturn.DyingFrameId)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive || _coreDyingCursorRuntimeOperations.Value.ActiveDying?.FrameId != use.RoundPileAlcoholReturn.DyingFrameId)
         {
             _coreNativeCardUseCompletionOperations.FinishCardUse(id, card, CardKind.Alcohol);
             return;

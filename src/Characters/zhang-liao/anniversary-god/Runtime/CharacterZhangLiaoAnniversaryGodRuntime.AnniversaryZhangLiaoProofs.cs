@@ -25,7 +25,7 @@ internal sealed partial class CharacterZhangLiaoAnniversaryGodRuntime
 
     internal ProgramSkillFrame? AnnZlObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.AnnZlFirstChild(f, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 40750)]
-    internal bool AnnZlDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && AnnZlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool AnnZlDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && AnnZlObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 40750)]
     internal bool AdvanceAnnZlChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && AnnZlObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 40750)]

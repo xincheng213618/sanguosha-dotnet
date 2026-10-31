@@ -64,7 +64,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, p.Kind);
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(useId, actor);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(useId, actor);
             actor.HasAlcoholEffect = false;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, p.Kind, actor.Seat, targets[0], IgnoresArmor: attack.IgnoresArmor));
             _coreCardUseLifecycleOperations.TryMarkProgramUseCommitted(useId);
@@ -107,7 +107,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     {
         if (use.MouLiuChengOrigin is not { } o || use.Action is not { Type: CardActionType.Use } a || o.UseId != use.Id || o.ActionId != a.ActionId || o.Kind != use.CardKind || a.EffectiveKind != use.CardKind || use.SourceSeat != a.ActorSeat || use.CardId != 0 || a.ProviderSeat != o.ActorSeat || a.RequesterSeat is not null || a.PhysicalCards.Count != 0 || use.PhysicalCardIds is not { Count: 0 } || a.EffectiveSuit != Suit.None || a.EffectiveRank != 0 || a.EffectiveIsRed is not null || !a.ConversionChain.SequenceEqual([o.Source]) || !_characterZhouYuOlMouOperations.MouGuquActorLineageMatches(use.Id, a.ActionId, o.ActorSeat, a.ActorSeat, a.ProviderSeat, a.Type) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ProgramFrameId)is not ProgramSkillFrame { MouLiuChengCompletion: { } r } f || !MouLiuChengRootMatches(f) || r.UseId != use.Id || r.ActionId != a.ActionId || o.Source != MouLiuChengSource(f) || o.GameplayHash != f.GameplayHash)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengNativeIssuedEvent>().Count(e => e == new MouLiuChengNativeIssuedEvent(f.Id, use.Id, a.ActionId, o.ActorSeat, o.Kind)) == 1 && use.CardId == 0;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengNativeIssuedEvent>().Count(e => e == new MouLiuChengNativeIssuedEvent(f.Id, use.Id, a.ActionId, o.ActorSeat, o.Kind)) == 1 && use.CardId == 0;
     }
 
     internal bool MatchesMouLiuChengNativeAction(long id, CardActionContext action, int cardId) => cardId == 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } current } use && IsIssuedMouLiuChengUse(use) && action.ActionId == current.ActionId && action.Type == current.Type && action.ActorSeat == current.ActorSeat && action.ProviderSeat == current.ProviderSeat && action.EffectiveKind == current.EffectiveKind && action.PhysicalCards.Count == 0 && action.ConversionChain.SequenceEqual(current.ConversionChain);
@@ -156,7 +156,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     {
         if (use.MouLiuChengOrigin is not { } o)
             return;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || use.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLiuChengCompletion: { } r } f || f.Id != o.ProgramFrameId || r.UseId != use.Id || r.ActionId != o.ActionId || r.Returned || _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengNativeReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || use.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLiuChengCompletion: { } r } f || f.Id != o.ProgramFrameId || r.UseId != use.Id || r.ActionId != o.ActionId || r.Returned || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengNativeReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("MouLiuCheng can return only once to its original paid native parent.");
         var batches = SignMouLiuChengNativeBatches(f, use);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouLiuChengCompletion = r with { Stage = MouLiuChengStage.NativeChildren, Returned = true, NativeBatchIds = batches }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -178,7 +178,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         return Array.AsReadOnly(batches.Select(b => b.Id).ToArray());
     }
 
-    internal bool IsMouLiuChengNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => f.MouLiuChengCompletion is { Stage: MouLiuChengStage.NativeChildren, Returned: true } r && MouLiuChengRootMatches(f) && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.Movements.Count > 0 && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.OriginOwnerSeat == f.OwnerSeat && r.NativeBatchIds.Contains(b.Id) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengNativeBatchSignedEvent>().Count(e => e == new MouLiuChengNativeBatchSignedEvent(f.Id, r.UseId, b.Id, b.ParentBatchId, b.Movements.Count)) == 1 && b.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLiuChengNativeMovementSignedEvent>().Count(e => e == new MouLiuChengNativeMovementSignedEvent(f.Id, r.UseId, b.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1);
+    internal bool IsMouLiuChengNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => f.MouLiuChengCompletion is { Stage: MouLiuChengStage.NativeChildren, Returned: true } r && MouLiuChengRootMatches(f) && b.ParentFrameId == r.UseId && b.AwaitingProgramFrameId is null && b.Movements.Count > 0 && b.OriginSkillId == f.SkillId && b.OriginSkillInstanceId == f.SkillInstanceId && b.OriginOwnerSeat == f.OwnerSeat && r.NativeBatchIds.Contains(b.Id) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengNativeBatchSignedEvent>().Count(e => e == new MouLiuChengNativeBatchSignedEvent(f.Id, r.UseId, b.Id, b.ParentBatchId, b.Movements.Count)) == 1 && b.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengNativeMovementSignedEvent>().Count(e => e == new MouLiuChengNativeMovementSignedEvent(f.Id, r.UseId, b.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)) == 1);
     [ProgramPipelineHook(ProgramPipelinePhase.IsProgramMovementSettlement, 900)]
     internal bool WindowSettlement_IsMouLiuChengNativeSettlementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => IsMouLiuChengNativeSettlementBatch(frame, batch);
 }

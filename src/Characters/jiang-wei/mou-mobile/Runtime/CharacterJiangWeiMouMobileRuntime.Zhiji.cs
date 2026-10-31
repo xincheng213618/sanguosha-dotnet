@@ -4,11 +4,11 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiMouMobileRuntime
 {
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 33200, SkillProgramEffectOp.ResolveMouJiangWeiZhiji)]
-    internal bool CanAwakenMouJw(ProgramTriggerLegalityContext g) => g.SkillId == MouJiangWeiComposition.Zhiji && g.Context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && g.Context.SourceSeat == g.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Preparation } p && p.ActorSeat == g.OwnerSeat && g.Owner.IsAlive && (MouJwSelectedCount(g.OwnerSeat) >= 4 || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(g.OwnerSeat, g.SkillId, g.Candidate.BindingId)) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiAwakenedEvent>().Any(e => e.OwnerSeat == g.OwnerSeat);
+    internal bool CanAwakenMouJw(ProgramTriggerLegalityContext g) => g.SkillId == MouJiangWeiComposition.Zhiji && g.Context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && g.Context.SourceSeat == g.OwnerSeat && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Preparation } p && p.ActorSeat == g.OwnerSeat && g.Owner.IsAlive && (MouJwSelectedCount(g.OwnerSeat) >= 4 || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(g.OwnerSeat, g.SkillId, g.Candidate.BindingId)) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiAwakenedEvent>().Any(e => e.OwnerSeat == g.OwnerSeat);
     internal void GrantMouJwBeifa(ProgramSkillFrame f)
     {
         var r = f.MouJiangWei!;
-        if (r.Op != SkillProgramEffectOp.ResolveMouJiangWeiZhiji || r.Stage != MouJiangWeiStage.MarkTargets || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiAwakenedEvent>().Any(e => e.FrameId == f.Id))
+        if (r.Op != SkillProgramEffectOp.ResolveMouJiangWeiZhiji || r.Stage != MouJiangWeiStage.MarkTargets || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiAwakenedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Beifa needs its actual paid awakening.");
         foreach (var seat in r.Targets.Where(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive))
         {
@@ -22,12 +22,12 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         }
     }
 
-    internal IEnumerable<MouJiangWeiBeifaGrantedEvent> ActiveMouJwBeifa(int holder) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiBeifaGrantedEvent>().Where(e => e.HolderSeat == holder && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiBeifaExpiredEvent>().Any(x => x.FrameId == e.FrameId && x.HolderSeat == holder));
+    internal IEnumerable<MouJiangWeiBeifaGrantedEvent> ActiveMouJwBeifa(int holder) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiBeifaGrantedEvent>().Where(e => e.HolderSeat == holder && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiBeifaExpiredEvent>().Any(x => x.FrameId == e.FrameId && x.HolderSeat == holder));
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 33200)]
     internal void ExpireMouJwBeifa(TurnStartedEvent turn)
     {
         var ordinal = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Count();
-        foreach (var grant in _coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiBeifaGrantedEvent>().Where(e => e.Source.OwnerSeat == turn.ActorSeat && e.TurnOrdinal < ordinal && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiBeifaExpiredEvent>().Any(x => x.FrameId == e.FrameId && x.HolderSeat == e.HolderSeat)).ToArray())
+        foreach (var grant in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiBeifaGrantedEvent>().Where(e => e.Source.OwnerSeat == turn.ActorSeat && e.TurnOrdinal < ordinal && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiBeifaExpiredEvent>().Any(x => x.FrameId == e.FrameId && x.HolderSeat == e.HolderSeat)).ToArray())
         {
             var p = _coreMatchParticipantsPlayersAccess._players[grant.HolderSeat];
             var count = p.Markers.GetValueOrDefault(PlayerMarkerKind.MouJiangWeiBeifa);
@@ -62,7 +62,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 33201)]
     internal void GainMouJwDiscardCharge(NativeLogicalDiscardInvocationRecordedEvent e)
     {
-        if (e.Phase is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase || phase.ActorSeat != e.ExecutorSeat || e.ActualCount < 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(e.ExecutorSeat) || !_coreMatchParticipantsPlayersAccess._players[e.ExecutorSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[e.ExecutorSeat], MouJiangWeiComposition.Tiaoxin) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouJiangWeiChargeChangedEvent>().Any(x => x.DiscardInvocationId == e.InvocationId))
+        if (e.Phase is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase || phase.ActorSeat != e.ExecutorSeat || e.ActualCount < 1 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(e.ExecutorSeat) || !_coreMatchParticipantsPlayersAccess._players[e.ExecutorSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[e.ExecutorSeat], MouJiangWeiComposition.Tiaoxin) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiChargeChangedEvent>().Any(x => x.DiscardInvocationId == e.InvocationId))
             return;
         ChangeMouJwCharge(e.ParentFrameId ?? 0, e.ExecutorSeat, e.ActualCount, e.InvocationId);
     }

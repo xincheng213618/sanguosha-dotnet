@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyObserversRuntime
             var valid = true;
             for (var j = i + 1; j < _resolutionStackOperations._resolutionStack.Count; j++)
             {
-                if (!_corePaidColorDamageClaimObserversOperations.PaidColorDamageClaimObserverEdge(j))
+                if (!_corePaidColorDamageClaimObserversOperations.Value.PaidColorDamageClaimObserverEdge(j))
                 {
                     valid = false;
                     break;
@@ -68,5 +68,5 @@ internal sealed partial class CoreGameEngineSlashTargetPenaltyObserversRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 670)]
-    internal bool IsTargetPenaltyProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && TargetPenaltyPaidObserverRoot(_coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsTargetPenaltyProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && TargetPenaltyPaidObserverRoot(_coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id)is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

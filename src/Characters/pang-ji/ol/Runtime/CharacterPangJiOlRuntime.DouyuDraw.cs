@@ -17,13 +17,13 @@ internal sealed partial class CharacterPangJiOlRuntime
         }
         else if (parent is ProgramSkillFrame { SimultaneousPindian: { ComparisonIssued: true } simultaneous } f)
         {
-            if (result.SkillId != f.SkillId || _coreSimultaneousPindianOperations.SimultaneousResult(f) != result.Result)
+            if (result.SkillId != f.SkillId || _coreSimultaneousPindianOperations.Value.SimultaneousResult(f) != result.Result)
                 throw new InvalidOperationException("Douyu cannot qualify a different native common-group comparison.");
             comparison = simultaneous.ComparisonIndex;
         }
         else
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<DouyuResultRecordedEvent>().Any(e => e.ContestId == parent.Id && e.ComparisonIndex == comparison))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuResultRecordedEvent>().Any(e => e.ContestId == parent.Id && e.ComparisonIndex == comparison))
             throw new InvalidOperationException("Douyu cannot repeat a settled native comparison.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DouyuResultRecordedEvent(parent.Id, comparison, result.Result));
     }
@@ -34,12 +34,12 @@ internal sealed partial class CharacterPangJiOlRuntime
     internal bool TryBeginDouyuWinWindow(ResolutionFrame parent, PindianResult result, int comparison)
     {
         var r = parent.DouyuContest!;
-        if (!r.Paid || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != parent.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuResultRecordedEvent>().Count(e => e.ContestId == parent.Id && e.ComparisonIndex == comparison && e.Result == result) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == parent.Id && e.Result == result) != 1)
+        if (!r.Paid || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != parent.Id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuResultRecordedEvent>().Count(e => e.ContestId == parent.Id && e.ComparisonIndex == comparison && e.Result == result) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == parent.Id && e.Result == result) != 1)
             throw new InvalidOperationException("Douyu win draws require the exact settled native result before its claims.");
         var entries = new List<DouyuWindowEntry>();
         foreach (var swap in r.Swaps.Where(s => DouyuSwappedPair(r, s, result)))
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<DouyuRewardClosedEvent>().Any(e => e.ContestId == parent.Id && e.SwapFrameId == swap.FrameId))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuRewardClosedEvent>().Any(e => e.ContestId == parent.Id && e.SwapFrameId == swap.FrameId))
                 continue;
             if (!result.WonBy(swap.Source.OwnerSeat) || !_coreMatchParticipantsPlayersAccess._players[swap.Source.OwnerSeat].IsAlive)
             {
@@ -63,7 +63,7 @@ internal sealed partial class CharacterPangJiOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.Douyu!;
-        if (r.Stage != DouyuStage.DrawWaiting || r.DrawStarted || r.SwapFrameId is not { } swap || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuWinDrawStartedEvent>().Any(e => e.SwapFrameId == swap))
+        if (r.Stage != DouyuStage.DrawWaiting || r.DrawStarted || r.SwapFrameId is not { } swap || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuWinDrawStartedEvent>().Any(e => e.SwapFrameId == swap))
             throw new InvalidOperationException("Douyu cannot repeat or invent a swapped-pair win draw.");
         r = r with
         {
@@ -79,9 +79,9 @@ internal sealed partial class CharacterPangJiOlRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveDouyuPreRevealSwapAndWinDraw)]
     internal void ReturnDouyuWinDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.Douyu is not { DrawStarted: true, Stage: DouyuStage.DrawWaiting, SwapFrameId: { } swap } r || f.NativeDraw is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 2 || outcome.SequenceBefore < r.Before || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.ActualDrawIds.Count > 2 || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.ReplacementGainedIds.Distinct().Count() != outcome.ReplacementGainedIds.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuWinDrawStartedEvent>().Count(e => e.FrameId == f.Id && e.ContestId == r.ContestId && e.ComparisonIndex == r.ComparisonIndex && e.SwapFrameId == swap && e.Source == r.IssuedSource && e.RecipientSeat == f.OwnerSeat && e.Before == r.Before) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuWinDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.Douyu is not { DrawStarted: true, Stage: DouyuStage.DrawWaiting, SwapFrameId: { } swap } r || f.NativeDraw is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != f.Id || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 2 || outcome.SequenceBefore < r.Before || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || outcome.ActualDrawIds.Count > 2 || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.ReplacementGainedIds.Distinct().Count() != outcome.ReplacementGainedIds.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuWinDrawStartedEvent>().Count(e => e.FrameId == f.Id && e.ContestId == r.ContestId && e.ComparisonIndex == r.ComparisonIndex && e.SwapFrameId == swap && e.Source == r.IssuedSource && e.RecipientSeat == f.OwnerSeat && e.Before == r.Before) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuWinDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Douyu lost its one actual native draw or replacement return.");
-        if (outcome.AttemptFrameId is { } attempt && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == attempt && e.ParentFrameId == f.Id && e.RecipientSeat == f.OwnerSeat && e.RequestedCount == 2 && e.Replaced == (outcome.Replacement is not null)) != 1)
+        if (outcome.AttemptFrameId is { } attempt && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == attempt && e.ParentFrameId == f.Id && e.RecipientSeat == f.OwnerSeat && e.RequestedCount == 2 && e.Replaced == (outcome.Replacement is not null)) != 1)
             throw new InvalidOperationException("Douyu cannot accept another native draw attempt.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Douyu = r with { Stage = DouyuStage.DrawChildren, Before = outcome.SequenceBefore, After = outcome.SequenceAfter, AttemptFrameId = outcome.AttemptFrameId, ActualDrawIds = outcome.ActualDrawIds, ReplacementGainedIds = outcome.ReplacementGainedIds }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         for (var i = 0; i < outcome.ActualDrawIds.Count; i++)

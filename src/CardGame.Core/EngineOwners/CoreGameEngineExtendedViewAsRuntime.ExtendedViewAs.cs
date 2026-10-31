@@ -17,9 +17,9 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
 
     internal IReadOnlyList<PromptChoice> ExtendedViewAsResponseChoices(CharacterState owner, CardKind kind)
     {
-        if (kind == CardKind.Peach && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(owner.Seat, dying.VictimSeat))
+        if (kind == CardKind.Peach && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(owner.Seat, dying.VictimSeat))
             return[];
-        return _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(owner, kind, true).Where(selection => (kind != CardKind.Peach || !_coreDeckEquipmentProgramsOperations.IsShieldedRescueSelection(owner, selection)) && (kind != CardKind.Alcohol || _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(selection) || _characterZhaoTongZhaoGuangAnniversaryOperations.IsAnniversaryYizanSelection(selection) || _characterXunXuAnniversaryOperations.IsAnniversaryXunXuBoqiaSource(selection.Source) || _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.RoundDistinctBasicUse is not null || _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.LeiluanBasicUse is not null)).Select(selection =>
+        return _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(owner, kind, true).Where(selection => (kind != CardKind.Peach || !_coreDeckEquipmentProgramsOperations.IsShieldedRescueSelection(owner, selection)) && (kind != CardKind.Alcohol || _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(selection) || _characterZhaoTongZhaoGuangAnniversaryOperations.Value.IsAnniversaryYizanSelection(selection) || _characterXunXuAnniversaryOperations.IsAnniversaryXunXuBoqiaSource(selection.Source) || _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.RoundDistinctBasicUse is not null || _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.LeiluanBasicUse is not null)).Select(selection =>
         {
             var parameters = new Dictionary<string, string>
             {
@@ -52,7 +52,7 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
             return;
         if (_coreWushuangJinzhiOperations.TryResolveWushuangJinzhiDyingAlcohol(owner, selection))
             return;
-        if (_characterZhaoTongZhaoGuangAnniversaryOperations.TryResolveAnniversaryYizanDyingAlcohol(owner, selection))
+        if (_characterZhaoTongZhaoGuangAnniversaryOperations.Value.TryResolveAnniversaryYizanDyingAlcohol(owner, selection))
             return;
         if (_characterXunXuAnniversaryOperations.TryResolveAnniversaryXunXuDyingAlcohol(owner, selection))
             return;
@@ -60,7 +60,7 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
             return;
         if (kind == CardKind.Peach)
         {
-            var dying = _coreDyingCursorRuntimeOperations.ActiveDying ?? throw new InvalidOperationException("Missing dying response.");
+            var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying ?? throw new InvalidOperationException("Missing dying response.");
             if (dying.ResponderSeat != owner.Seat || !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(owner.Seat, dying.VictimSeat) || _coreDeckEquipmentProgramsOperations.IsShieldedRescueSelection(owner, selection))
                 throw new InvalidOperationException("The rescue responder is no longer legal.");
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -88,7 +88,7 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
                 _characterCaoXiOlOperations.CaptureCaoXiNativeCounterspellOffset(pending, action, invalidated: false);
             if (_coreUnrespondableCounterspellsOperations.TryBeginPolicyCounterspellPayment(pending, action, unrespondableSource, selection.Cards.Select(card => card.Id).ToArray()))
                 return;
-            if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(null, action, ProgramCardContinuation.NullificationResponse))
+            if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(null, action, ProgramCardContinuation.NullificationResponse))
                 return;
             if (!_coreCardActionsOperations.TryBeginProgramCardWindow(null, action, SkillProgramTriggerWindow.CardResponseAccepted, [], ProgramCardContinuation.NullificationResponse))
                 _coreResponseUseCompletionOperations.ContinueNullificationAfterResponseUse(action);
@@ -102,7 +102,7 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
         _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);
         var responseAction = _coreCardConversionsOperations.MoveProgramMultiCardResponse(owner, selection, attack.ResolutionId, attack.SourceSeat);
         var continuation = _corePlayCardHistoryOperations.ViewAsRule(selection.Source)is { RoundDistinctBasicUse: not null } or { LeiluanBasicUse: not null } ? ProgramCardContinuation.Dodge : _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is { } ? ProgramCardContinuation.GroupResponse : ProgramCardContinuation.Dodge;
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(attack, responseAction, continuation))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(attack, responseAction, continuation))
             return;
         if (!_coreCardActionsOperations.TryBeginProgramCardWindow(attack, responseAction, SkillProgramTriggerWindow.CardResponseAccepted, [], continuation))
             _coreNativeDodgeOperations.ContinueAcceptedCardResponse(attack, responseAction, continuation);

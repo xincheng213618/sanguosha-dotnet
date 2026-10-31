@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineShanheS5ZhangxiuRuntime
     internal const string ShanheS5XiongluanId = "shanhe:s5-xiongluan-14116";
     internal const string ShanheXiongluanJudgmentReason = "shanhe.s5.xiongluan.abolish-judgment";
     SkillProgramStepOutcome IShanheS5ZhangxiuHost.PayShanheS5Xiongluan(ProgramSkillFrame f) => PayShanheS5Xiongluan(f);
-    void IShanheS5ZhangxiuHost.ResolveShanheLeizhenUse(ProgramSkillFrame f) => _coreShanheLeizhenOperations.ResolveShanheLeizhenUse(f);
+    void IShanheS5ZhangxiuHost.ResolveShanheLeizhenUse(ProgramSkillFrame f) => _coreShanheLeizhenOperations.Value.ResolveShanheLeizhenUse(f);
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 59401)]
     internal bool CanPayShanheS5Xiongluan(CharacterState owner, SkillProgramActivation activation) => !activation.Effects.Any(e => e.Op == SkillProgramEffectOp.PayShanheS5Xiongluan) || owner.IsAlive && Enum.GetValues<EquipmentSlot>().Any(slot => owner.EquipmentSlotCapacity(slot) > 0);
     internal SkillProgramStepOutcome PayShanheS5Xiongluan(ProgramSkillFrame input)

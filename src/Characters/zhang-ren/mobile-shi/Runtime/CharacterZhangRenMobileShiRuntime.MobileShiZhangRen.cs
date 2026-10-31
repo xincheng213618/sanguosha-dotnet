@@ -35,7 +35,7 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
 
     internal IReadOnlyList<Suit> ShiZrFuanRecordableSuits(int seat)
     {
-        var used = _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZrFuanRecordedEvent>().Where(entry => entry.OwnerSeat == seat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber).Select(entry => entry.Suit).ToHashSet();
+        var used = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanRecordedEvent>().Where(entry => entry.OwnerSeat == seat && entry.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber).Select(entry => entry.Suit).ToHashSet();
         return _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Select(card => card.Suit).Distinct().Where(suit => !used.Contains(suit)).Order().ToArray();
     }
 
@@ -62,7 +62,7 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
     {
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat == seat || ShiZrFuanRecord(seat)is not { } record)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ShiZrFuanSuitDiscardedEvent>().Any(entry => entry.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && entry.OwnerSeat == seat && entry.Suit == record.Suit);
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZrFuanSuitDiscardedEvent>().Any(entry => entry.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber && entry.OwnerSeat == seat && entry.Suit == record.Suit);
     }
 
     internal SkillProgramStepOutcome BeginShiZrFuanStrike(ProgramSkillFrame input)
@@ -86,7 +86,7 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
         var record = ShiZrFuanRecord(f.OwnerSeat) ?? throw new InvalidOperationException("FuAn lost its recorded suit before the strike.");
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZrFuanClearedEvent(f.Id, f.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualRoundProgressRoundNumberAccess._roundNumber, targetSeat));
-        var damageBefore = _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Count(entry => entry.SourceSeat == f.OwnerSeat && entry.TargetSeat == targetSeat);
+        var damageBefore = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Count(entry => entry.SourceSeat == f.OwnerSeat && entry.TargetSeat == targetSeat);
         var useId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actor.Seat, actor.Seat, null, null, null, CardKind.Slash, [targetSeat], [], Array.AsReadOnly(new[] { ShiZrSource(f) }), effectiveSuit: Suit.None, effectiveRank: 0));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiZhangRen = r with { Stage = ShiZrStage.StrikeIssued, TargetSeat = targetSeat, UseId = useId, DamageCountBefore = damageBefore } });
@@ -100,7 +100,7 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, actor.Seat, targetSeat, card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targetSeat], CardKind.Slash), programSkillCardUseFrameId: f.Id);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(useId, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(useId, actor);
         actor.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, targetSeat));
@@ -114,7 +114,7 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
     internal void SettleShiZrFuanStrike(ProgramSkillFrame f)
     {
         var r = f.ShiZhangRen!;
-        var damaged = r.UseId != 0 && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && r.TargetSeat >= 0 && _coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive && _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Count(entry => entry.SourceSeat == f.OwnerSeat && entry.TargetSeat == r.TargetSeat) > r.DamageCountBefore;
+        var damaged = r.UseId != 0 && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && r.TargetSeat >= 0 && _coreMatchParticipantsPlayersAccess._players[r.TargetSeat].IsAlive && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Count(entry => entry.SourceSeat == f.OwnerSeat && entry.TargetSeat == r.TargetSeat) > r.DamageCountBefore;
         if (!damaged)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiZrFuanStrikeSettledEvent(f.Id, r.UseId, r.TargetSeat, false, "none"));

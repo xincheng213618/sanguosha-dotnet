@@ -12,7 +12,7 @@ internal sealed partial class CharacterYangFengOlRuntime
     {
         if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveQujiaLimitedTurnEnd))
             return true;
-        return context.Window == SkillProgramTriggerWindow.AfterTurnEnded && candidate.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && context.TargetSeat == candidate.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Finished && !_coreProgramEventHistoryOperations.ProgramEventHistory<YangFengStartedEvent>().Any(e => e.Op == SkillProgramEffectOp.ResolveQujiaLimitedTurnEnd && e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillId == candidate.SkillId);
+        return context.Window == SkillProgramTriggerWindow.AfterTurnEnded && candidate.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && context.TargetSeat == candidate.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Finished && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YangFengStartedEvent>().Any(e => e.Op == SkillProgramEffectOp.ResolveQujiaLimitedTurnEnd && e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillId == candidate.SkillId);
     }
 
     internal SkillProgramStepOutcome BeginYangFeng(ProgramSkillFrame supplied, SkillProgramEffectOp op)
@@ -38,7 +38,7 @@ internal sealed partial class CharacterYangFengOlRuntime
         }
         else
         {
-            if (f.TriggerId is null || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded } context || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Finished || context.TargetSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().LastOrDefault()is not { } ended || !_coreAfterTurnEndedProgramsOperations.MatchesAfterTurnEndedChild(ended, f, context) || context.Facts is not { OwnerKilledThisTurn: false } || _coreProgramEventHistoryOperations.ProgramEventHistory<YangFengStartedEvent>().Any(e => e.Op == op && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == f.SkillId))
+            if (f.TriggerId is null || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded } context || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Finished || context.TargetSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().LastOrDefault()is not { } ended || !_coreAfterTurnEndedProgramsOperations.MatchesAfterTurnEndedChild(ended, f, context) || context.Facts is not { OwnerKilledThisTurn: false } || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<YangFengStartedEvent>().Any(e => e.Op == op && e.Source.OwnerSeat == f.OwnerSeat && e.Source.SkillId == f.SkillId))
                 throw new InvalidOperationException("Qujia requires its genuine no-kill completed own actual turn.");
             YangFengComposition.Trigger(f.SkillId, _coreProgramLifecycleOperations.GetProgramTrigger(f));
             target = f.OwnerSeat;

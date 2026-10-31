@@ -97,7 +97,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicReturnsRuntim
 
     internal bool DrawFundedDistinctBasicDyingRescueRide(int dyingIndex, DyingFrame dying)
     {
-        if (dyingIndex < 0 || dyingIndex + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[dyingIndex] is not DyingFrame exact || exact != dying || _coreDyingCursorRuntimeOperations.ActiveDying?.FrameId != dying.Id)
+        if (dyingIndex < 0 || dyingIndex + 1 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[dyingIndex] is not DyingFrame exact || exact != dying || _coreDyingCursorRuntimeOperations.Value.ActiveDying?.FrameId != dying.Id)
             return false;
         if (_resolutionStackOperations._resolutionStack[dyingIndex + 1] is DrawFundedDistinctBasicFrame paid)
             return paid.Payment.Intent == DrawFundedDistinctBasicIntent.Dying && paid.Payment.ParentFrameId == dying.Id && paid.Payment.RequestFrameId == dying.Id && paid.Payment.Source.OwnerSeat == dying.ResponderSeat && paid.Payment.Cursor == dying.ResponderIndex && paid.Payment.TargetSeat == dying.VictimSeat && _coreDrawFundedDistinctBasicPaymentOperations.ValidDrawFundedDistinctBasicPayment(paid.Payment) && _coreDrawFundedDistinctBasicObserversOperations.DrawFundedDistinctBasicPaidSuffix(dyingIndex + 1);

@@ -5,7 +5,7 @@ internal sealed partial class CharacterPangJiOlRuntime
 {
     internal bool ValidDouyuContest(ResolutionFrame parent)
     {
-        if (parent.DouyuContest is not { } r || r.ParentFrameId != parent.Id || r.ActualTurn != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.SequenceBefore < 0 || r.SequenceBefore > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.SequenceAfter < 0 || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Paid && (!r.Ready || r.SequenceAfter < r.SequenceBefore) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.SourceSeat) || r.OriginalCards.Count is < 2 or > 4 || r.OriginalCards[0].Seat != r.SourceSeat || r.OriginalCards.Select(c => c.Seat).Distinct().Count() != r.OriginalCards.Count || r.OriginalCards.Select(c => c.CardId).Distinct().Count() != r.OriginalCards.Count || r.OriginalCards.Any(c => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(c.Seat) || c.OriginalRank is < 1 or > 13 || _coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId).Kind != c.PrintedKind) || r.OriginalCards is not System.Collections.IList { IsReadOnly: true } || r.Assignments is not System.Collections.IList { IsReadOnly: true } || r.Opportunities is not System.Collections.IList { IsReadOnly: true } || r.Swaps is not System.Collections.IList { IsReadOnly: true } || !r.Assignments.Select(a => a.Seat).SequenceEqual(r.OriginalCards.Select(c => c.Seat)) || r.Opportunities.Select(o => o.Candidate.OwnerSeat).Distinct().Count() != r.Opportunities.Count || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuContestStartedEvent>().Count(e => e == new DouyuContestStartedEvent(parent.Id, r.Simultaneous, r.SourceSeat, r.OriginalCards.Count, r.ActualTurn, r.TurnOwner, r.SequenceBefore)) != 1)
+        if (parent.DouyuContest is not { } r || r.ParentFrameId != parent.Id || r.ActualTurn != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat || r.SequenceBefore < 0 || r.SequenceBefore > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.SequenceAfter < 0 || r.SequenceAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Paid && (!r.Ready || r.SequenceAfter < r.SequenceBefore) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.SourceSeat) || r.OriginalCards.Count is < 2 or > 4 || r.OriginalCards[0].Seat != r.SourceSeat || r.OriginalCards.Select(c => c.Seat).Distinct().Count() != r.OriginalCards.Count || r.OriginalCards.Select(c => c.CardId).Distinct().Count() != r.OriginalCards.Count || r.OriginalCards.Any(c => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(c.Seat) || c.OriginalRank is < 1 or > 13 || _coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId).Kind != c.PrintedKind) || r.OriginalCards is not System.Collections.IList { IsReadOnly: true } || r.Assignments is not System.Collections.IList { IsReadOnly: true } || r.Opportunities is not System.Collections.IList { IsReadOnly: true } || r.Swaps is not System.Collections.IList { IsReadOnly: true } || !r.Assignments.Select(a => a.Seat).SequenceEqual(r.OriginalCards.Select(c => c.Seat)) || r.Opportunities.Select(o => o.Candidate.OwnerSeat).Distinct().Count() != r.Opportunities.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuContestStartedEvent>().Count(e => e == new DouyuContestStartedEvent(parent.Id, r.Simultaneous, r.SourceSeat, r.OriginalCards.Count, r.ActualTurn, r.TurnOwner, r.SequenceBefore)) != 1)
             return false;
         if (parent is PindianFrame p)
         {
@@ -32,7 +32,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         for (var i = 0; i < r.OriginalCards.Count; i++)
         {
             var original = r.OriginalCards[i];
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<DouyuOriginalCardCommittedEvent>().Count(e => e.ContestId == parent.Id && e.Index == i && e.Card == original) != 1 || !r.Paid && _cardZonesOperations._cardZones.GetLocation(original.CardId) != original.PaymentFrom)
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuOriginalCardCommittedEvent>().Count(e => e.ContestId == parent.Id && e.Index == i && e.Card == original) != 1 || !r.Paid && _cardZonesOperations._cardZones.GetLocation(original.CardId) != original.PaymentFrom)
                 return false;
         }
 
@@ -40,7 +40,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         {
             var opportunity = r.Opportunities[i];
             var c = opportunity.Candidate;
-            if (opportunity.Opponents is not System.Collections.IList { IsReadOnly: true } || c.OccurrenceIndex != 0 || c.BindingId != "pre-reveal" || !r.OriginalCards.Any(original => original.Seat == c.OwnerSeat) || !opportunity.Opponents.SequenceEqual(c.OwnerSeat == r.SourceSeat ? r.OriginalCards.Skip(1).Select(original => original.Seat) : [r.SourceSeat]) || _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program is not { } program || program.GameplayHash != c.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == c.BindingId)is not { Window: SkillProgramTriggerWindow.PindianBeforeReveal } || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuCandidateCommittedEvent>().Count(e => e.ContestId == parent.Id && e.Ordinal == i && e.Source == DouyuSource(c) && e.GameplayHash == c.GameplayHash) != 1)
+            if (opportunity.Opponents is not System.Collections.IList { IsReadOnly: true } || c.OccurrenceIndex != 0 || c.BindingId != "pre-reveal" || !r.OriginalCards.Any(original => original.Seat == c.OwnerSeat) || !opportunity.Opponents.SequenceEqual(c.OwnerSeat == r.SourceSeat ? r.OriginalCards.Skip(1).Select(original => original.Seat) : [r.SourceSeat]) || _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program is not { } program || program.GameplayHash != c.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == c.BindingId)is not { Window: SkillProgramTriggerWindow.PindianBeforeReveal } || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuCandidateCommittedEvent>().Count(e => e.ContestId == parent.Id && e.Ordinal == i && e.Source == DouyuSource(c) && e.GameplayHash == c.GameplayHash) != 1)
                 return false;
         }
 
@@ -50,7 +50,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         for (var i = 0; i < r.Swaps.Count; i++)
         {
             var swap = r.Swaps[i];
-            if (swap.Ordinal != i || !r.Opportunities.Any(o => DouyuSource(o.Candidate) == swap.Source && o.Candidate.GameplayHash == swap.GameplayHash && o.Opponents.Contains(swap.OpponentSeat)) || assignments[swap.Source.OwnerSeat] != swap.OwnerCardBefore || assignments[swap.OpponentSeat] != swap.OpponentCardBefore || swap.OwnerCardAfter != swap.OpponentCardBefore || swap.OpponentCardAfter != swap.OwnerCardBefore || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuSwapCommittedEvent>().Count(e => e == new DouyuSwapCommittedEvent(parent.Id, swap.WindowId, swap.FrameId, i, swap.Source, swap.GameplayHash, swap.OpponentSeat, swap.OwnerCardBefore, swap.OpponentCardBefore, swap.OwnerCardAfter, swap.OpponentCardAfter)) != 1)
+            if (swap.Ordinal != i || !r.Opportunities.Any(o => DouyuSource(o.Candidate) == swap.Source && o.Candidate.GameplayHash == swap.GameplayHash && o.Opponents.Contains(swap.OpponentSeat)) || assignments[swap.Source.OwnerSeat] != swap.OwnerCardBefore || assignments[swap.OpponentSeat] != swap.OpponentCardBefore || swap.OwnerCardAfter != swap.OpponentCardBefore || swap.OpponentCardAfter != swap.OwnerCardBefore || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuSwapCommittedEvent>().Count(e => e == new DouyuSwapCommittedEvent(parent.Id, swap.WindowId, swap.FrameId, i, swap.Source, swap.GameplayHash, swap.OpponentSeat, swap.OwnerCardBefore, swap.OpponentCardBefore, swap.OwnerCardAfter, swap.OpponentCardAfter)) != 1)
                 return false;
             assignments[swap.Source.OwnerSeat] = swap.OwnerCardAfter;
             assignments[swap.OpponentSeat] = swap.OpponentCardAfter;
@@ -59,7 +59,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         for (var i = 0; i < r.Assignments.Count; i++)
         {
             var a = r.Assignments[i];
-            if (assignments[a.Seat] != a.CardId || a.Rank is < 1 or > 13 || r.Ready && _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuAssignmentFinalizedEvent>().Count(e => e == new DouyuAssignmentFinalizedEvent(parent.Id, i, a.Seat, a.CardId, a.Rank)) != 1)
+            if (assignments[a.Seat] != a.CardId || a.Rank is < 1 or > 13 || r.Ready && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuAssignmentFinalizedEvent>().Count(e => e == new DouyuAssignmentFinalizedEvent(parent.Id, i, a.Seat, a.CardId, a.Rank)) != 1)
                 return false;
         }
 
@@ -68,7 +68,7 @@ internal sealed partial class CharacterPangJiOlRuntime
 
     internal bool ValidDouyuMaterialPayment(long contestId, DouyuOriginalCard card)
     {
-        var facts = _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuNativePaymentEvent>().Where(e => e.ContestId == contestId && e.OriginalSeat == card.Seat).ToArray();
+        var facts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuNativePaymentEvent>().Where(e => e.ContestId == contestId && e.OriginalSeat == card.Seat).ToArray();
         if (facts is not [var paid] || paid.CardId != card.CardId || paid.PrintedKind != card.PrintedKind || paid.From != card.PaymentFrom || paid.AlreadyReserved != (card.PaymentFrom == CardLocation.Processing))
             return false;
         return _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == paid.MovementSequence && m.CardId == card.CardId && m.CardKind == card.PrintedKind && m.To == CardLocation.Processing && (paid.AlreadyReserved ? card.ReservationSequence == m.Sequence && m.From == CardLocation.DrawPile && (card.Top && m.Reason.Value is "pindian.reserve-top" or "skill.pindian.reserve-top" || m.Reason.Value == "skill-program.wu-lu-kang.shenduan.reserve" && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == contestId)is { } parent && _characterLuKangWumiaoOperations.IsWuLuKangOriginalInput(parent, card.Seat, card.CardId, card.PaymentFrom, card.Top, card.ReservationSequence)) : m.From == card.PaymentFrom && m.Reason == CardMoveReasons.PindianReveal)) == 1;
@@ -78,23 +78,23 @@ internal sealed partial class CharacterPangJiOlRuntime
     internal IReadOnlyList<PindianRevealedCard> GetDouyuOriginalSimultaneousCards(ProgramSkillFrame f) => f.DouyuContest is { Simultaneous: true } r ? Array.AsReadOnly(r.OriginalCards.Select(c => new PindianRevealedCard(c.Seat, c.CardId, c.OriginalRank, c.OriginalRank)).ToArray()) : f.SimultaneousPindian!.Cards;
     internal bool IsDouyuHistoricalPairAssignment(long contestId, PindianResult result, int originalSourceCardId)
     {
-        var originals = _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuOriginalCardCommittedEvent>().Where(e => e.ContestId == contestId).OrderBy(e => e.Index).ToArray();
-        if (originals is not [var first, var second] || first.Index != 0 || second.Index != 1 || first.Card.CardId != originalSourceCardId || first.Card.Seat != result.SourceSeat || second.Card.Seat != result.OpponentSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuContestStartedEvent>().Count(e => e.ContestId == contestId && !e.Simultaneous && e.SourceSeat == result.SourceSeat && e.ParticipantCount == 2) != 1 || originals.Any(e => !ValidDouyuMaterialPayment(contestId, e.Card)) || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuResultRecordedEvent>().Count(e => e.ContestId == contestId && e.ComparisonIndex == 0 && e.Result == result) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == contestId && e.Result == result) != 1)
+        var originals = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuOriginalCardCommittedEvent>().Where(e => e.ContestId == contestId).OrderBy(e => e.Index).ToArray();
+        if (originals is not [var first, var second] || first.Index != 0 || second.Index != 1 || first.Card.CardId != originalSourceCardId || first.Card.Seat != result.SourceSeat || second.Card.Seat != result.OpponentSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuContestStartedEvent>().Count(e => e.ContestId == contestId && !e.Simultaneous && e.SourceSeat == result.SourceSeat && e.ParticipantCount == 2) != 1 || originals.Any(e => !ValidDouyuMaterialPayment(contestId, e.Card)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuResultRecordedEvent>().Count(e => e.ContestId == contestId && e.ComparisonIndex == 0 && e.Result == result) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == contestId && e.Result == result) != 1)
             return false;
         var ids = originals.ToDictionary(e => e.Card.Seat, e => e.Card.CardId);
-        var swaps = _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuSwapCommittedEvent>().Where(e => e.ContestId == contestId).OrderBy(e => e.Ordinal).ToArray();
+        var swaps = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuSwapCommittedEvent>().Where(e => e.ContestId == contestId).OrderBy(e => e.Ordinal).ToArray();
         if (swaps.Select(s => s.Source.OwnerSeat).Distinct().Count() != swaps.Length)
             return false;
         for (var i = 0; i < swaps.Length; i++)
         {
             var swap = swaps[i];
-            if (swap.Ordinal != i || !ids.ContainsKey(swap.Source.OwnerSeat) || !ids.ContainsKey(swap.OpponentSeat) || swap.Source.OwnerSeat == swap.OpponentSeat || ids[swap.Source.OwnerSeat] != swap.OwnerCardBefore || ids[swap.OpponentSeat] != swap.OpponentCardBefore || swap.OwnerCardAfter != swap.OpponentCardBefore || swap.OpponentCardAfter != swap.OwnerCardBefore || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuCandidateCommittedEvent>().Count(e => e.ContestId == contestId && e.Source == swap.Source && e.GameplayHash == swap.GameplayHash) != 1)
+            if (swap.Ordinal != i || !ids.ContainsKey(swap.Source.OwnerSeat) || !ids.ContainsKey(swap.OpponentSeat) || swap.Source.OwnerSeat == swap.OpponentSeat || ids[swap.Source.OwnerSeat] != swap.OwnerCardBefore || ids[swap.OpponentSeat] != swap.OpponentCardBefore || swap.OwnerCardAfter != swap.OpponentCardBefore || swap.OpponentCardAfter != swap.OwnerCardBefore || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuCandidateCommittedEvent>().Count(e => e.ContestId == contestId && e.Source == swap.Source && e.GameplayHash == swap.GameplayHash) != 1)
                 return false;
             ids[swap.Source.OwnerSeat] = swap.OwnerCardAfter;
             ids[swap.OpponentSeat] = swap.OpponentCardAfter;
         }
 
-        return ids[result.SourceSeat] == result.SourceCardId && ids[result.OpponentSeat] == result.OpponentCardId && _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuAssignmentFinalizedEvent>().Count(e => e.ContestId == contestId && e.Seat == result.SourceSeat && e.CardId == result.SourceCardId) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuAssignmentFinalizedEvent>().Count(e => e.ContestId == contestId && e.Seat == result.OpponentSeat && e.CardId == result.OpponentCardId) == 1;
+        return ids[result.SourceSeat] == result.SourceCardId && ids[result.OpponentSeat] == result.OpponentCardId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuAssignmentFinalizedEvent>().Count(e => e.ContestId == contestId && e.Seat == result.SourceSeat && e.CardId == result.SourceCardId) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuAssignmentFinalizedEvent>().Count(e => e.ContestId == contestId && e.Seat == result.OpponentSeat && e.CardId == result.OpponentCardId) == 1;
     }
 
     [ProgramIssuedTrigger(270)]
@@ -104,9 +104,9 @@ internal sealed partial class CharacterPangJiOlRuntime
             return false;
         if (w.Stage == DouyuWindowStage.BeforeReveal)
             return context.Window == SkillProgramTriggerWindow.PindianBeforeReveal && candidate.BindingId == "pre-reveal" && dc.SwapFrameId is null && !r.Ready && !r.Paid && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], candidate.SkillId, candidate.SkillInstanceId) && !r.Swaps.Any(s => s.Source.OwnerSeat == candidate.OwnerSeat) && r.Opportunities.Any(o => o.Candidate == candidate);
-        if (context.Window != SkillProgramTriggerWindow.PindianResultDetermined || candidate.BindingId != "swapped-win" || !r.Paid || dc.SwapFrameId is not { } id || r.Swaps.SingleOrDefault(s => s.FrameId == id)is not { } swap || swap.Source.OwnerSeat != candidate.OwnerSeat || swap.Source.SkillId != candidate.SkillId || swap.Source.SkillInstanceId != candidate.SkillInstanceId || swap.GameplayHash != candidate.GameplayHash || candidate.OccurrenceIndex != swap.Ordinal || _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuRewardClosedEvent>().Any(e => e.ContestId == parent.Id && e.SwapFrameId == id))
+        if (context.Window != SkillProgramTriggerWindow.PindianResultDetermined || candidate.BindingId != "swapped-win" || !r.Paid || dc.SwapFrameId is not { } id || r.Swaps.SingleOrDefault(s => s.FrameId == id)is not { } swap || swap.Source.OwnerSeat != candidate.OwnerSeat || swap.Source.SkillId != candidate.SkillId || swap.Source.SkillInstanceId != candidate.SkillInstanceId || swap.GameplayHash != candidate.GameplayHash || candidate.OccurrenceIndex != swap.Ordinal || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuRewardClosedEvent>().Any(e => e.ContestId == parent.Id && e.SwapFrameId == id))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<DouyuResultRecordedEvent>().Count(e => e.ContestId == parent.Id && e.ComparisonIndex == dc.ComparisonIndex && DouyuSwappedPair(r, swap, e.Result) && e.Result.WonBy(candidate.OwnerSeat)) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuResultRecordedEvent>().Count(e => e.ContestId == parent.Id && e.ComparisonIndex == dc.ComparisonIndex && DouyuSwappedPair(r, swap, e.Result) && e.Result.WonBy(candidate.OwnerSeat)) == 1;
     }
 
     internal bool DouyuPindianChildRidesOn(ResolutionFrame child, ResolutionFrame beneath)
@@ -142,7 +142,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         {
             if (_resolutionStackOperations._resolutionStack[at] is CardUseFrame { Action: { Type: CardActionType.Use } action } use)
             {
-                if (action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.SourceSeat == use.SourceSeat && e.CardId == use.CardId) != 1)
+                if (action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.SourceSeat == use.SourceSeat && e.CardId == use.CardId) != 1)
                     throw new InvalidOperationException("A nested Douyu observer must retain its exact declared native Use.");
                 foreach (var cost in action.PhysicalCards.Where(c => _cardZonesOperations._cardZones.GetLocation(c.CardId) == CardLocation.Processing))
                 {
@@ -172,7 +172,7 @@ internal sealed partial class CharacterPangJiOlRuntime
                         if (_cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Processing || expected.Contains(id))
                             continue;
                         var moved = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == id);
-                        if (bound.SourceLocations.Count != bound.CardIds.Count || bound.SourceLocations[cardIndex] != CardLocation.Processing || moved is null || moved.Sequence <= r.SequenceBefore || moved.From.Zone != CardZoneKind.Judgment || moved.To != CardLocation.Processing || moved.Reason.Value != "skill-program.judgment.result" || _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Count(e => e.ParentResolutionId == program.Id && e.TargetSeat == moved.From.OwnerSeat && e.CardId == id && e.CardKind == moved.CardKind && _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentRequestedEvent>().Any(start => start.ResolutionId == e.ResolutionId && start.ParentResolutionId == program.Id && start.TargetSeat == e.TargetSeat && start.Reason == e.Reason)) != 1)
+                        if (bound.SourceLocations.Count != bound.CardIds.Count || bound.SourceLocations[cardIndex] != CardLocation.Processing || moved is null || moved.Sequence <= r.SequenceBefore || moved.From.Zone != CardZoneKind.Judgment || moved.To != CardLocation.Processing || moved.Reason.Value != "skill-program.judgment.result" || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentResolvedEvent>().Count(e => e.ParentResolutionId == program.Id && e.TargetSeat == moved.From.OwnerSeat && e.CardId == id && e.CardKind == moved.CardKind && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentRequestedEvent>().Any(start => start.ResolutionId == e.ResolutionId && start.ParentResolutionId == program.Id && start.TargetSeat == e.TargetSeat && start.Reason == e.Reason)) != 1)
                             throw new InvalidOperationException("A nested Douyu judgment result lacks its exact final-card handoff and native parent.");
                         expected.Add(id);
                     }

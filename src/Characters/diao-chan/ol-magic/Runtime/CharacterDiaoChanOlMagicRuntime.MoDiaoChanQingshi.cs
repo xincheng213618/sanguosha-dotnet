@@ -5,12 +5,12 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
 {
     [ProgramTargetWindow(ProgramTargetWindowStage.SoleTargetRedirectSource, 10)]
     internal bool MoDiaoChanSoleTargetRedirectSource(CardConversionSource source) => HasMoDiaoChan && source.SkillId == MoDiaoChanComposition.Qingshi;
-    internal bool HasMoDcQingshiCard(int owner, int card) => card > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanCardGrantedEvent>().Any(e => e.Source.OwnerSeat == owner && e.CardId == card);
-    internal bool HasMoDcQingshiCard(int card) => HasMoDiaoChan && card > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanCardGrantedEvent>().Any(e => e.CardId == card);
+    internal bool HasMoDcQingshiCard(int owner, int card) => card > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanCardGrantedEvent>().Any(e => e.Source.OwnerSeat == owner && e.CardId == card);
+    internal bool HasMoDcQingshiCard(int card) => HasMoDiaoChan && card > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanCardGrantedEvent>().Any(e => e.CardId == card);
     internal bool MoDcRefreshReady(int owner)
     {
-        var cohort = _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanCohortStartedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner);
-        return cohort is null || _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanCardGrantedEvent>().Where(e => e.CohortId == cohort.CohortId).All(e => _cardZonesOperations._cardZones.GetLocation(e.CardId) != CardLocation.Hand(e.RecipientSeat));
+        var cohort = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanCohortStartedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner);
+        return cohort is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanCardGrantedEvent>().Where(e => e.CohortId == cohort.CohortId).All(e => _cardZonesOperations._cardZones.GetLocation(e.CardId) != CardLocation.Hand(e.RecipientSeat));
     }
 
     internal static bool IsMoDcSingleDamageKind(CardKind kind) => RuntimeSkills.RuntimeRules_diao_chan_ol_magic_MoDiaoChanQingshi.IsMoDcSingleDamageKind(kind);
@@ -19,7 +19,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
     {
         var r = f.MoDiaoChan!;
         var recipients = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(f.OwnerSeat, p.Seat)).Select(p => p.Seat).ToArray();
-        var cohort = _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanCohortStartedEvent>().Select(e => e.CohortId).DefaultIfEmpty().Max() + 1;
+        var cohort = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanCohortStartedEvent>().Select(e => e.CohortId).DefaultIfEmpty().Max() + 1;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MoDiaoChan = r with { Paid = true, Stage = MoDiaoChanStage.Obtaining, CohortId = cohort, Targets = recipients, Cursor = 0 } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoDiaoChanCohortStartedEvent(cohort, f.Id, r.Source, r.GameplayHash, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, recipients.Length));
         ContinueMoDc(f.Id);
@@ -91,11 +91,11 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
     }
 
     [ProgramTargetWindow(ProgramTargetWindowStage.SoleTargetReplacementFact, 10)]
-    internal bool IsMoDcSoleTargetFact(CardUseFrame use, SoleTargetReplacedEvent fact, IReadOnlyList<int> before) => HasMoDiaoChan && fact.Source.SkillId == MoDiaoChanComposition.Qingshi && fact.Source.BindingId == "cohort-unique-target" && before is [var old] && fact.BeforeTargets.SequenceEqual(before) && fact.AfterTargets is [var target] && old == fact.PreviousTargetSeat && target == fact.NewTargetSeat && target != old && fact.CardUseFrameId == use.Id && fact.ActionId == use.Action?.ActionId && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanRetargetedEvent>().Count(e => e.Source == fact.Source && e.UseId == use.Id && e.ActionId == fact.ActionId && e.PreviousTarget == old && e.NewTarget == target && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanCostEvent>().Any(p => p.FrameId == e.FrameId && p.From.OwnerSeat == e.Source.OwnerSeat && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == p.Sequence && m.CardId == p.CardId && m.From == p.From && m.To == p.To))) == 1;
-    internal bool MoDcDamageEligible(int owner, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.Amount > 0 && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } attack && attack.PhysicalCards.Any(card => HasMoDcQingshiCard(owner, card.Id)) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanStartedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Op == SkillProgramEffectOp.ResolveMoDiaoChanQingshiDamage && e.WindowId == c.ParentFrameId);
+    internal bool IsMoDcSoleTargetFact(CardUseFrame use, SoleTargetReplacedEvent fact, IReadOnlyList<int> before) => HasMoDiaoChan && fact.Source.SkillId == MoDiaoChanComposition.Qingshi && fact.Source.BindingId == "cohort-unique-target" && before is [var old] && fact.BeforeTargets.SequenceEqual(before) && fact.AfterTargets is [var target] && old == fact.PreviousTargetSeat && target == fact.NewTargetSeat && target != old && fact.CardUseFrameId == use.Id && fact.ActionId == use.Action?.ActionId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanRetargetedEvent>().Count(e => e.Source == fact.Source && e.UseId == use.Id && e.ActionId == fact.ActionId && e.PreviousTarget == old && e.NewTarget == target && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanCostEvent>().Any(p => p.FrameId == e.FrameId && p.From.OwnerSeat == e.Source.OwnerSeat && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == p.Sequence && m.CardId == p.CardId && m.From == p.From && m.To == p.To))) == 1;
+    internal bool MoDcDamageEligible(int owner, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.Amount > 0 && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } attack && attack.PhysicalCards.Any(card => HasMoDcQingshiCard(owner, card.Id)) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanStartedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Op == SkillProgramEffectOp.ResolveMoDiaoChanQingshiDamage && e.WindowId == c.ParentFrameId);
     internal bool MoDcUsePaymentMovement(CardMovementRecord movement)
     {
-        foreach (var p in _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseMaterialEvent>().Where(p => p.CardId == movement.CardId))
+        foreach (var p in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanUseMaterialEvent>().Where(p => p.CardId == movement.CardId))
         {
             var paid = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.FirstOrDefault(m => m.CardId == p.CardId && m.Sequence > p.Before && m.From == p.From);
             if (paid is null)
@@ -120,7 +120,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
             return;
         foreach (var cost in action.PhysicalCards)
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanUseMaterialEvent>().Any(e => e.ActionId == action.ActionId && e.CardId == cost.CardId))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanUseMaterialEvent>().Any(e => e.ActionId == action.ActionId && e.CardId == cost.CardId))
                 continue;
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             if (action.Type == CardActionType.Response || use?.AcceptedDeclarationPayment?.Cost.CardId == cost.CardId)
@@ -134,7 +134,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         }
     }
 
-    internal int[] MoDcRecaptureIndexes(CardMovementBatchContext batch, int owner) => batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && HasMoDcQingshiCard(owner, x.m.CardId) && _cardZonesOperations._cardZones.GetLocation(x.m.CardId) == CardLocation.DiscardPile && !MoDcUsePaymentMovement(x.m) && !_coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanDiscardClaimedEvent>().Any(e => e.Source.OwnerSeat == owner && e.CardId == x.m.CardId && e.Sequence == x.m.Sequence)).Select(x => x.i).ToArray();
+    internal int[] MoDcRecaptureIndexes(CardMovementBatchContext batch, int owner) => batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && HasMoDcQingshiCard(owner, x.m.CardId) && _cardZonesOperations._cardZones.GetLocation(x.m.CardId) == CardLocation.DiscardPile && !MoDcUsePaymentMovement(x.m) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanDiscardClaimedEvent>().Any(e => e.Source.OwnerSeat == owner && e.CardId == x.m.CardId && e.Sequence == x.m.Sequence)).Select(x => x.i).ToArray();
     internal CardMovementRecord[] MoDcRecaptureCards(int owner, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.DiscardPileReceived && c.MovementBatch is { } batch && c.MovementIndex is { } index && MoDcRecaptureIndexes(batch, owner).Contains(index) ? [batch.Movements[index]] : [];
     internal void RecaptureMoDcCards(ProgramSkillFrame f)
     {
@@ -151,7 +151,7 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         SealMoDcMovement(f.Id, before);
     }
 
-    internal bool IsMoDcQingshiRumoOrigin(OlMoRumoEnteredEvent e) => e.Origin.SkillId == MoDiaoChanComposition.Qingshi && e.Origin.BindingId == "prepare-enter-or-refresh" && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanQingshiEnteredEvent>().Count(p => p.FrameId == e.EntryId && p.Source == e.Origin && p.GameplayHash == e.OriginGameplayHash && p.ActualTurn == e.ActualTurn && p.Round == e.EntryRound) == 1;
-    internal bool IsPaidMoDcQingshiOrigin(long id, CardConversionSource source, string hash) => source.SkillId == MoDiaoChanComposition.Qingshi && source.BindingId == "prepare-enter-or-refresh" && _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash == hash && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanQingshiEnteredEvent>().Count(e => e.FrameId == id && e.Source == source && e.GameplayHash == hash) == 1;
-    internal bool IsPaidMoDcQingshiEntry(ProgramSkillFrame f) => f.MoDiaoChan is { Op: SkillProgramEffectOp.ResolveMoDiaoChanQingshiPrep, Paid: true } r && ValidMoDc(f) && _coreProgramEventHistoryOperations.ProgramEventHistory<MoDiaoChanQingshiEnteredEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == f.GameplayHash) == 1;
+    internal bool IsMoDcQingshiRumoOrigin(OlMoRumoEnteredEvent e) => e.Origin.SkillId == MoDiaoChanComposition.Qingshi && e.Origin.BindingId == "prepare-enter-or-refresh" && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanQingshiEnteredEvent>().Count(p => p.FrameId == e.EntryId && p.Source == e.Origin && p.GameplayHash == e.OriginGameplayHash && p.ActualTurn == e.ActualTurn && p.Round == e.EntryRound) == 1;
+    internal bool IsPaidMoDcQingshiOrigin(long id, CardConversionSource source, string hash) => source.SkillId == MoDiaoChanComposition.Qingshi && source.BindingId == "prepare-enter-or-refresh" && _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.GameplayHash == hash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanQingshiEnteredEvent>().Count(e => e.FrameId == id && e.Source == source && e.GameplayHash == hash) == 1;
+    internal bool IsPaidMoDcQingshiEntry(ProgramSkillFrame f) => f.MoDiaoChan is { Op: SkillProgramEffectOp.ResolveMoDiaoChanQingshiPrep, Paid: true } r && ValidMoDc(f) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanQingshiEnteredEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == f.GameplayHash) == 1;
 }

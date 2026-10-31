@@ -22,7 +22,7 @@ internal sealed partial class CoreGameEngineRequiredGroupDodgesRuntime
         else
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(group.ResolutionId, ResolutionFrameStep.AwaitingResponse);
-            _coreNativeGroupAttackOperations.ContinueGroupAttackResponseAfterEffect(group);
+            _coreNativeGroupAttackOperations.Value.ContinueGroupAttackResponseAfterEffect(group);
         }
 
         return true;

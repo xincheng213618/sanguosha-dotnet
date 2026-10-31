@@ -15,7 +15,7 @@ internal sealed partial class CharacterZhuRanMouMobileRuntime
 
     IReadOnlyList<int> IMouZhuRanFacts.ActionOrder(int from, IEnumerable<int> seats) => Array.AsReadOnly(seats.Distinct().OrderBy(s => _coreTableOrderOperations.RelativeTableOrder(from, s)).ToArray());
     MouZhuRanPlayer IMouZhuRanFacts.Player(int seat) => new(seat, _coreMatchParticipantsPlayersAccess._players[seat].IsAlive, _coreMatchParticipantsPlayersAccess._players[seat].IsHuman, _coreTreatedWoundedOperations.IsRuleWounded(_coreMatchParticipantsPlayersAccess._players[seat]));
-    IEnumerable<T> IMouZhuRanFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouZhuRanFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     SkillProgram? IMouZhuRanFacts.Program(string skill) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(skill)?.Program;
     bool IMouZhuRanFacts.ExactStart(ProgramSkillFrame f, SkillProgramEffectOp operation)
     {

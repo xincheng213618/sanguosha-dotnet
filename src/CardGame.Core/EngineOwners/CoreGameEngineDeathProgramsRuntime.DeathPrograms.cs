@@ -180,7 +180,7 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
             {
                 if (frame.BeforeDeathCleanup)
                 {
-                    _characterYuanYinAnniversaryOperations.CompleteAnniversaryYuanYinDeathBeforeCleanupWindow(frame, death);
+                    _characterYuanYinAnniversaryOperations.Value.CompleteAnniversaryYuanYinDeathBeforeCleanupWindow(frame, death);
                     _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.ProgramDeathTriggerWindow);
                     ContinuePlayerDeathCleanup(death.Id);
                     return;
@@ -249,10 +249,10 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
         }
 
         var previousWinner = _coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winner;
-        _coreModeRulesOperations.ApplyModeDeathOutcome(deathFrameId, victim, killer);
+        _coreModeRulesOperations.Value.ApplyModeDeathOutcome(deathFrameId, victim, killer);
         if (_coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winner != previousWinner && _coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winner != Winner.None)
         {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WinnerDeterminedEvent(_coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winner, _coreNativeDamageHandlesOperations.IsTeamMode ? _coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winnerTeamId : null, _coreNativeDamageHandlesOperations.IsNationalWarMode ? _coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winnerFactionId : null));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WinnerDeterminedEvent(_coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winner, _coreNativeDamageHandlesOperations.Value.IsTeamMode ? _coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winnerTeamId : null, _coreNativeDamageHandlesOperations.Value.IsNationalWarMode ? _coreMatchOutcomeWinnerWinnerFactionIdWinnerTeamIdAccess._winnerFactionId : null));
         }
 
         ContinueDeathResolution(deathFrameId);
@@ -298,14 +298,14 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
             death = GetCurrentDeathFrame(death.Id);
         }
 
-        if (_characterDianWeiHappyGodOperations.TryBeginHappyDianWeiDeathRemovals(death))
+        if (_characterDianWeiHappyGodOperations.Value.TryBeginHappyDianWeiDeathRemovals(death))
             return;
         _coreRuntimeOperations.PopResolutionFrame(death.Id, ResolutionFrameKind.Death);
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != death.ParentFrameId)
             throw new InvalidOperationException("A death resolution lost its return parent.");
         if (death.ReturnKind == DeathReturnKind.Dying)
         {
-            if (_resolutionStackOperations._resolutionStack[^1] is not DyingFrame || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.FrameId != death.ParentFrameId)
+            if (_resolutionStackOperations._resolutionStack[^1] is not DyingFrame || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.FrameId != death.ParentFrameId)
                 throw new InvalidOperationException("A death resolution lost its dying parent.");
             _coreNativeDyingOperations.CompleteDyingAfterDeath(dying, survived: _coreMatchParticipantsPlayersAccess._players[death.VictimSeat].IsAlive);
             return;
@@ -450,7 +450,7 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
             deathCleanupCardIds.AddRange(_characterZhouFeiBoundaryMobileOperations.DiscardBoundaryZhouFeiHolderDeathPiles(_resolutionStackOperations._resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
             deathCleanupCardIds.AddRange(_characterSunQuanAnniversaryGodOperations.DiscardAnniversarySunQuanMingOnDeath(_resolutionStackOperations._resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
             UpdateDeathFrame(deathFrameId, frame => frame with { CleanedUpCardIds = deathCleanupCardIds });
-            _coreMatchLogOperations.AddLog("PlayerDied", _coreNativeDamageHandlesOperations.IsNationalWarMode ? $"{(victim.Name)} 阵亡，属于{(CoreMatchPresentationRuntime.GetFactionName(victim.NationalFactionId!))}势力。" : $"{(victim.Name)} 阵亡，身份是【{(_coreMatchPresentationOperations.GetRoleName(victim.Role))}】。", killer?.Seat, victim.Seat);
+            _coreMatchLogOperations.AddLog("PlayerDied", _coreNativeDamageHandlesOperations.Value.IsNationalWarMode ? $"{(victim.Name)} 阵亡，属于{(CoreMatchPresentationRuntime.GetFactionName(victim.NationalFactionId!))}势力。" : $"{(victim.Name)} 阵亡，身份是【{(_coreMatchPresentationOperations.GetRoleName(victim.Role))}】。", killer?.Seat, victim.Seat);
             _coreConvertingGiftsOperations.MarkConvertingGiftExactDeath(deathFrameId, victim.Seat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerDiedEvent(victim.Seat, killer?.Seat));
             if (_characterPangTongAnniversaryGodOperations.TryBeginShenPangTongKunyuDeath(GetCurrentDeathFrame(deathFrameId)))

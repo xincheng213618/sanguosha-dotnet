@@ -24,7 +24,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         if (owner is null)
             return;
         var p = WeijieResponseOrigin(owner)!;
-        if (!ValidWeijiePayment(p) || p.OutputKind != a.EffectiveKind || p.Need.ActorSeat != a.ActorSeat || p.Need.ProviderSeat != a.ProviderSeat || p.Need.RequesterSeat != a.RequesterSeat || a.ResponderSeat != a.ActorSeat || a.TargetSeats.Count != 0 || a.OpponentSeat != p.Need.OpponentSeat || a.EffectiveIsRed is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieResponseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId) || _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieUseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId))
+        if (!ValidWeijiePayment(p) || p.OutputKind != a.EffectiveKind || p.Need.ActorSeat != a.ActorSeat || p.Need.ProviderSeat != a.ProviderSeat || p.Need.RequesterSeat != a.RequesterSeat || a.ResponderSeat != a.ActorSeat || a.TargetSeats.Count != 0 || a.OpponentSeat != p.Need.OpponentSeat || a.EffectiveIsRed is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieResponseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieUseIssuedEvent>().Any(e => e.AttemptId == p.AttemptId))
             throw new InvalidOperationException("Weijie zero response changed its original native participants or already-issued cost.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WeijieResponseIssuedEvent(p.AttemptId, owner.Id, a.ActionId, a.ActorSeat, a.ProviderSeat, a.RequesterSeat, p.OutputKind, WeijieResponseContinuation(p)));
     }
@@ -88,7 +88,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         if (a.Type != CardActionType.Response || a.PhysicalCards.Count != 0 || a.ConversionChain is not [var source] || source.SkillId != "ol:weijie")
             return false;
-        return _resolutionStackOperations._resolutionStack.Any(f => WeijieResponseOrigin(f)is { } p && ValidWeijiePayment(p) && p.Source == source && p.Need.ActorSeat == a.ActorSeat && p.Need.ProviderSeat == a.ProviderSeat && p.Need.RequesterSeat == a.RequesterSeat && p.Need.ParentActionId == a.ParentActionId && p.OutputKind == a.EffectiveKind && _coreProgramEventHistoryOperations.ProgramEventHistory<WeijieResponseIssuedEvent>().Count(e => e.AttemptId == p.AttemptId && e.OwnerFrameId == f.Id && e.ActionId == a.ActionId && e.Continuation == c) == 1);
+        return _resolutionStackOperations._resolutionStack.Any(f => WeijieResponseOrigin(f)is { } p && ValidWeijiePayment(p) && p.Source == source && p.Need.ActorSeat == a.ActorSeat && p.Need.ProviderSeat == a.ProviderSeat && p.Need.RequesterSeat == a.RequesterSeat && p.Need.ParentActionId == a.ParentActionId && p.OutputKind == a.EffectiveKind && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeijieResponseIssuedEvent>().Count(e => e.AttemptId == p.AttemptId && e.OwnerFrameId == f.Id && e.ActionId == a.ActionId && e.Continuation == c) == 1);
     }
 
     internal void DispatchWeijieFactionUse(WeijiePaidOrigin p)
@@ -160,7 +160,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
 
         if (n.Intent == WeijieIntent.Dying)
         {
-            if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.Id != n.OwnerFrameId || dying.ResponderSeat != n.ProviderSeat || dying.ResponderIndex != n.Cursor)
+            if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.Id != n.OwnerFrameId || dying.ResponderSeat != n.ProviderSeat || dying.ResponderIndex != n.Cursor)
                 throw new InvalidOperationException("Weijie lost its original dying responder return.");
             if (actor.IsHuman)
                 _coreNativeDyingOperations.RequestHumanDyingResponse(actor, _coreNativeDyingOperations.GetDyingPeaches(actor), _coreNativeDyingOperations.GetDyingAlcohols(actor, dying.VictimSeat));

@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineCommittedResponseUsesRuntime
             return true;
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreResponseUseCompletionOperations.IsCompletedResponseUse(action, continuation) || continuation == ProgramCardContinuation.Dodge && (attack is null || attack.EffectiveCardKind is not { } incoming || !CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) || attack.TargetSeat != action.ActorSeat))
             return false;
-        if (!_coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && (_coreNationalSkillsOperations.GetSkillBindingShard(owner)?.GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCommitted) ?? []).Any(binding => binding.Trigger.IncludeResponseUses)) && !_characterSunHaoOlOperations.HasSunHaoCanshiResponseObligation(action, continuation))
+        if (!_coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && (_coreNationalSkillsOperations.GetSkillBindingShard(owner)?.GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCommitted) ?? []).Any(binding => binding.Trigger.IncludeResponseUses)) && !_characterSunHaoOlOperations.Value.HasSunHaoCanshiResponseObligation(action, continuation))
             return false;
         return _coreCardActionsOperations.TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardUseCommitted, [], continuation: null, completedResponseReturn: new(continuation == ProgramCardContinuation.Dodge ? ProgramCompletedResponseKind.Dodge : ProgramCompletedResponseKind.Nullification, IsCommitted: true));
     }

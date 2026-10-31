@@ -77,7 +77,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
     {
         if (payload is not JudgmentResolvedEvent { CardId: { } card, CardKind: { } kind } e || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.ParentResolutionId)is not { Weifu: { } r } f)
             return;
-        if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment is not { } judgment || !IsWeifuJudgment(judgment, f) || judgment.Id != e.ResolutionId || r.ResultKind is not null)
+        if (_coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is not { } judgment || !IsWeifuJudgment(judgment, f) || judgment.Id != e.ResolutionId || r.ResultKind is not null)
             throw new InvalidOperationException("Weifu cannot freeze a different or duplicate judgment result.");
         var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(kind);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { Weifu = r with { ResultCardId = card, ResultKind = kind, ResultCategory = category } });
@@ -88,7 +88,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Weifu: { } r } f || f.Id != j.ParentFrameId)
             return false;
-        if (!IsWeifuJudgment(j, f) || r.ResultCardId is not { } id || r.ResultKind is null || !_coreProgramEventHistoryOperations.ProgramEventHistory<WeifuJudgedEvent>().Any(e => e.FrameId == f.Id && e.JudgmentId == j.Id && e.CardId == id && e.Kind == r.ResultKind))
+        if (!IsWeifuJudgment(j, f) || r.ResultCardId is not { } id || r.ResultKind is null || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeifuJudgedEvent>().Any(e => e.FrameId == f.Id && e.JudgmentId == j.Id && e.CardId == id && e.Kind == r.ResultKind))
             throw new InvalidOperationException("Weifu lost its exact paid native judgment return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Weifu = r with { Stage = WeifuStage.JudgmentChildren, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         if (_cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing)

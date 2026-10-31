@@ -7,15 +7,15 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
 
     internal static CardConversionSource AnniversaryXiahouJieSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static ProgramTriggerCandidate AnniversaryXiahouJieCandidate(ProgramSkillFrame f) => new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0, f.WindowContext?.OccurrenceIndex ?? 0);
-    internal bool IsAnniversaryXiahouJieGrantQualified(CharacterState owner, SkillGrant grant) => grant.SkillId != AnniversaryXiahouJieComposition.Liedan || !HasAnniversaryXiahouJie || !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Any(e => e.Source.OwnerSeat == owner.Seat && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieSuppressionExpiredEvent>().Any(x => x.FrameId == e.FrameId));
+    internal bool IsAnniversaryXiahouJieGrantQualified(CharacterState owner, SkillGrant grant) => grant.SkillId != AnniversaryXiahouJieComposition.Liedan || !HasAnniversaryXiahouJie || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Any(e => e.Source.OwnerSeat == owner.Seat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressionExpiredEvent>().Any(x => x.FrameId == e.FrameId));
     internal long CaptureAnniversaryXiahouJieQualificationStamp(long underlying)
     {
         if (!HasAnniversaryXiahouJie)
             return underlying;
-        var issued = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Count;
+        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Count;
         if (issued == 0)
             return underlying;
-        var input = (underlying, issued, _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieSuppressionExpiredEvent>().Count);
+        var input = (underlying, issued, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressionExpiredEvent>().Count);
         if (_characterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess._anniversaryXiahouJieQualificationStamp == 0 || input != _characterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess._anniversaryXiahouJieQualificationInputs)
         {
             _characterXiahouJieAnniversaryAnniversaryXiahouJieQualificationInputsAnniversaryXiahouJieQualificationStampAccess._anniversaryXiahouJieQualificationInputs = input;
@@ -28,9 +28,9 @@ internal sealed partial class CharacterXiahouJieAnniversaryRuntime
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 45500)]
     internal void ExpireAnniversaryXiahouJie(TurnEndedEvent ended)
     {
-        if (!HasAnniversaryXiahouJie || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Count == 0)
+        if (!HasAnniversaryXiahouJie || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Count == 0)
             return;
-        foreach (var issued in _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Where(e => e.Source.OwnerSeat == ended.ActorSeat && e.ActualTurn <= ended.TurnNumber && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXiahouJieSuppressionExpiredEvent>().Any(x => x.FrameId == e.FrameId)).ToArray())
+        foreach (var issued in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressedEvent>().Where(e => e.Source.OwnerSeat == ended.ActorSeat && e.ActualTurn <= ended.TurnNumber && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXiahouJieSuppressionExpiredEvent>().Any(x => x.FrameId == e.FrameId)).ToArray())
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryXiahouJieSuppressionExpiredEvent(issued.FrameId, ended.ActorSeat, ended.TurnNumber));
     }
 

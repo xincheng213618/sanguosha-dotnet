@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineShanheS5QuyiRuntime
             return false;
         // A counterspell responds to the last actual counterspell, rather than
         // retaining the initial trick user's privilege throughout the chain.
-        var sourceSeat = window.ChainDepth == 0 ? window.SourceSeat : _coreProgramEventHistoryOperations.ProgramEventHistory<NullificationRespondedEvent>().LastOrDefault(e => e.WindowFrameId == window.Id && e.ResolutionId == window.ParentFrameId && e.ChainDepth == window.ChainDepth)?.ResponderSeat ?? -1;
+        var sourceSeat = window.ChainDepth == 0 ? window.SourceSeat : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NullificationRespondedEvent>().LastOrDefault(e => e.WindowFrameId == window.Id && e.ResolutionId == window.ParentFrameId && e.ChainDepth == window.ChainDepth)?.ResponderSeat ?? -1;
         return IsShanheS5FuqiResponseProhibited(sourceSeat, responderSeat);
     }
 

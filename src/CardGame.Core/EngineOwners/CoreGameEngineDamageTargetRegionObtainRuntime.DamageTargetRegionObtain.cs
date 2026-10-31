@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineDamageTargetRegionObtainRuntime
 
     internal int PrepareDamageTargetDuelDamage(long useId, int targetSeat)
     {
-        if (_coreShanheS5ShuangxiongOperations.TryGetShanheS5ShuangxiongDuelBaseDamage(useId, out var scaled))
+        if (_coreShanheS5ShuangxiongOperations.Value.TryGetShanheS5ShuangxiongDuelBaseDamage(useId, out var scaled))
             return scaled;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.DamageTargetDuelOrigin is not { BaseDamage: { } amount } origin)
             return _characterFanJiangZhangDaOlOperations.PrepareJueshengDuelDamage(useId, targetSeat);

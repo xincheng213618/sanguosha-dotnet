@@ -24,8 +24,8 @@ internal sealed partial class CharacterCaoTengOlRuntime
     {
         if (!HasCaoTengCapability)
             return;
-        var expired = _coreProgramEventHistoryOperations.ProgramEventHistory<CaoTengSkillExpiredEvent>().Select(e => e.GrantId).ToHashSet(StringComparer.Ordinal);
-        foreach (var grant in _coreProgramEventHistoryOperations.ProgramEventHistory<CaoTengSkillGrantedEvent>().Where(e => e.RecipientSeat == started.ActorSeat && e.ActualTurn < started.TurnNumber && !expired.Contains(e.GrantId)).ToArray())
+        var expired = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoTengSkillExpiredEvent>().Select(e => e.GrantId).ToHashSet(StringComparer.Ordinal);
+        foreach (var grant in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoTengSkillGrantedEvent>().Where(e => e.RecipientSeat == started.ActorSeat && e.ActualTurn < started.TurnNumber && !expired.Contains(e.GrantId)).ToArray())
         {
             var actual = _coreMatchParticipantsPlayersAccess._players[grant.RecipientSeat].SkillGrants.Grants.SingleOrDefault(g => g.GrantId == grant.GrantId);
             if (actual is not null)
@@ -39,5 +39,5 @@ internal sealed partial class CharacterCaoTengOlRuntime
         }
     }
 
-    internal int CaoTengYongzuHandLimitBonus(int seat) => HasCaoTengCapability ? _coreProgramEventHistoryOperations.ProgramEventHistory<CaoTengHandLimitGrantedEvent>().Count(e => e.RecipientSeat == seat) : 0;
+    internal int CaoTengYongzuHandLimitBonus(int seat) => HasCaoTengCapability ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CaoTengHandLimitGrantedEvent>().Count(e => e.RecipientSeat == seat) : 0;
 }

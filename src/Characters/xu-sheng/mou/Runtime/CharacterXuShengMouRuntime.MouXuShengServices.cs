@@ -19,7 +19,7 @@ internal sealed partial class CharacterXuShengMouRuntime
     bool IMouXuShengFacts.Friendly(int owner, int other) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), other, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
     int IMouXuShengFacts.KeepValue(int owner, int id) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[owner]);
     SkillProgram? IMouXuShengFacts.Program(string id) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(id)?.Program;
-    IEnumerable<T> IMouXuShengFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouXuShengFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     MouXuShengUse? IMouXuShengFacts.Use(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
         if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.OwnerSeat != candidate.OwnerSeat || context.CardUse is not { } info || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame window || window.Action.ActionId != info.CardActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || window.Candidates[window.CandidateIndex] is not { } current || current.OwnerSeat != candidate.OwnerSeat || current.SkillId != candidate.SkillId || current.TriggerId != candidate.BindingId || current.SkillInstanceId != candidate.SkillInstanceId || current.GameplayHash != candidate.GameplayHash)
@@ -94,7 +94,7 @@ internal sealed partial class CharacterXuShengMouRuntime
     {
         if (attack.IsChainPropagation || attack is not NativeOwners.CardAttackHandle || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action, MouXuShengBoosts: { } boosts } use)
             return 0;
-        return boosts.Where(b => b.UseId == use.Id && b.ActionId == action.ActionId && b.Source.OwnerSeat == action.ActorSeat && _contentRegistryOperations._contentRegistry.GetSkill(b.Source.SkillId).Program?.GameplayHash == b.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuShengBoostIssuedEvent>().Count(e => e.Boost == b) == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouXuShengBenefitUsedEvent>().Count(e => e.FrameId == b.FrameId && e.ActionId == b.ActionId && e.Damage && e.X == b.X) == 1).Sum(b => b.X);
+        return boosts.Where(b => b.UseId == use.Id && b.ActionId == action.ActionId && b.Source.OwnerSeat == action.ActorSeat && _contentRegistryOperations._contentRegistry.GetSkill(b.Source.SkillId).Program?.GameplayHash == b.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuShengBoostIssuedEvent>().Count(e => e.Boost == b) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuShengBenefitUsedEvent>().Count(e => e.FrameId == b.FrameId && e.ActionId == b.ActionId && e.Damage && e.X == b.X) == 1).Sum(b => b.X);
     }
 
     [ProgramViewContributor(ProgramViewContribution.PrivateCards, 34900)]

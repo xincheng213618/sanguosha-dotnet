@@ -10,17 +10,17 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
     internal GameEngine.MobileShiLuYuShengTrack MobileShiLuYuShengTrackAt(int seat)
     {
         var phase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
-        var all = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiGrantIssuedEvent>().Where(e => e.Source.OwnerSeat == seat && e.ActualTurn == _coreActualTurnProgressPhaseTurnNumberAccess._turnNumber).ToArray();
+        var all = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiRunweiGrantIssuedEvent>().Where(e => e.Source.OwnerSeat == seat && e.ActualTurn == _coreActualTurnProgressPhaseTurnNumberAccess._turnNumber).ToArray();
         var grant = all.FirstOrDefault(e => e.Phase == phase && e.GainedCount > 0);
-        var marked = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiCardGrantedEvent>().Where(e => e.OwnerSeat == seat && e.TargetSeat == seat && e.Phase == phase).Select(e => e.CardId).Distinct().ToArray();
-        var refunded = phase is not null && _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiDebtRefundedEvent>().Any(e => e.Source.OwnerSeat == seat && e.Phase == phase);
+        var marked = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiRunweiCardGrantedEvent>().Where(e => e.OwnerSeat == seat && e.TargetSeat == seat && e.Phase == phase).Select(e => e.CardId).Distinct().ToArray();
+        var refunded = phase is not null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiRunweiDebtRefundedEvent>().Any(e => e.Source.OwnerSeat == seat && e.Phase == phase);
         var progress = grant is null ? 0 : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > grant.SequenceAfter && m.TurnNumber == _coreActualTurnProgressPhaseTurnNumberAccess._turnNumber && m.From.OwnerSeat == seat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment);
         return new(phase, all.Where(e => e.GainedCount > 0).Select(e => e.TargetSeat).Distinct().ToArray(), marked, grant?.GainedCount ?? 0, progress, refunded);
     }
 
     internal GameEngine.MobileShiLuYuShengTrack? PeekMobileShiLuYuSheng(int seat) => MobileShiLuYuShengTrackAt(seat);
-    internal MobileShiRunweiGrantIssuedEvent? ShiLysRunweiGrant(long id) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiGrantIssuedEvent>().SingleOrDefault(e => e.FrameId == id);
-    internal IReadOnlyList<ActualPhaseEndItem> CollectShiLysPhaseEndCandidates(ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiGrantIssuedEvent>().Where(e => e.Phase == phase && e.TargetSeat == e.Source.OwnerSeat && e.GainedCount > 0 && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive).GroupBy(e => (e.Source.OwnerSeat, e.Source.SkillInstanceId)).Select(g => g.First()).Where(e => !_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiPhaseEndConsumedEvent>().Any(c => c.GrantId == e.FrameId && c.Phase == phase)).Select(e => new ActualPhaseEndItem(new(e.Source.OwnerSeat, ShiLysRunweiSkill, MobileShiLuYuShengComposition.RunweiPhaseEndTrigger, e.Source.SkillInstanceId, e.GameplayHash, 0), e.FrameId)).ToArray();
+    internal MobileShiRunweiGrantIssuedEvent? ShiLysRunweiGrant(long id) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiRunweiGrantIssuedEvent>().SingleOrDefault(e => e.FrameId == id);
+    internal IReadOnlyList<ActualPhaseEndItem> CollectShiLysPhaseEndCandidates(ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiRunweiGrantIssuedEvent>().Where(e => e.Phase == phase && e.TargetSeat == e.Source.OwnerSeat && e.GainedCount > 0 && _coreMatchParticipantsPlayersAccess._players[e.Source.OwnerSeat].IsAlive).GroupBy(e => (e.Source.OwnerSeat, e.Source.SkillInstanceId)).Select(g => g.First()).Where(e => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiRunweiPhaseEndConsumedEvent>().Any(c => c.GrantId == e.FrameId && c.Phase == phase)).Select(e => new ActualPhaseEndItem(new(e.Source.OwnerSeat, ShiLysRunweiSkill, MobileShiLuYuShengComposition.RunweiPhaseEndTrigger, e.Source.SkillInstanceId, e.GameplayHash, 0), e.FrameId)).ToArray();
     [ProgramPipelineHook(ProgramPipelinePhase.IssuedTriggerCandidate, 67400)]
     internal bool IsIssuedShiLysPhaseEnd(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => c.SkillId == ShiLysRunweiSkill && c.BindingId == MobileShiLuYuShengComposition.RunweiPhaseEndTrigger && _coreActualPhaseEndsOperations.IsExactActualPhaseEndCandidate(c, context) && context.ActualPhaseEnd is { } due && ShiLysRunweiGrant(due.EntitlementId)is { } grant && grant.Source.OwnerSeat == c.OwnerSeat && grant.Source.SkillInstanceId == c.SkillInstanceId && grant.GameplayHash == c.GameplayHash && grant.Phase == due.Phase && grant.TargetSeat == c.OwnerSeat && grant.GainedCount > 0;
     SkillProgramStepOutcome IMobileShiLuYuShengProgramHost.ResolveRunweiGrant(ProgramSkillFrame frame) => BeginMobileShiRunweiGrant(frame);
@@ -324,7 +324,7 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0);
         if (f.WindowContext is not { } context || !IsIssuedShiLysPhaseEnd(candidate, context) || context.ActualPhaseEnd is not { } due || ShiLysRunweiGrant(due.EntitlementId)is not { Phase: { } phase } grant)
             throw new InvalidOperationException("Runwei cleanup requires its original issued actual-phase grant.");
-        var marked = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiRunweiCardGrantedEvent>().Where(e => e.OwnerSeat == f.OwnerSeat && e.TargetSeat == f.OwnerSeat && e.Phase == phase && ShiLysRunweiGrant(e.FrameId)?.Source.SkillInstanceId == f.SkillInstanceId).Select(e => e.CardId).Distinct().ToArray();
+        var marked = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiRunweiCardGrantedEvent>().Where(e => e.OwnerSeat == f.OwnerSeat && e.TargetSeat == f.OwnerSeat && e.Phase == phase && ShiLysRunweiGrant(e.FrameId)?.Source.SkillInstanceId == f.SkillInstanceId).Select(e => e.CardId).Distinct().ToArray();
         var allowed = _coreTurnHandCategoryRestrictionsOperations.GetSelfDiscardableOwnedHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Select(c => c.Id).ToHashSet();
         var hands = marked.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(f.OwnerSeat) && allowed.Contains(id)).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiLuYuSheng = new("runwei-end", _coreActualTurnProgressPhaseTurnNumberAccess._turnNumber, Stage: 9, Discarded: hands.Length) { Source = grant.Source, GameplayHash = grant.GameplayHash, Phase = phase, GrantId = grant.FrameId, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -419,7 +419,7 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiShuanghuaiGuardIssuedEvent(f.Id, ShiLysSource(f), f.GameplayHash, _coreActualTurnProgressPhaseTurnNumberAccess._turnNumber, r.TargetSeat, option, SameShiLysShuanghuaiTarget(f)));
     }
 
-    internal bool SameShiLysShuanghuaiTarget(ProgramSkillFrame f) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiShuanghuaiGuardIssuedEvent>().LastOrDefault(e => e.Source.OwnerSeat == f.OwnerSeat && e.FrameId != f.Id)?.VictimSeat == f.MobileShiLuYuSheng!.TargetSeat;
+    internal bool SameShiLysShuanghuaiTarget(ProgramSkillFrame f) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiShuanghuaiGuardIssuedEvent>().LastOrDefault(e => e.Source.OwnerSeat == f.OwnerSeat && e.FrameId != f.Id)?.VictimSeat == f.MobileShiLuYuSheng!.TargetSeat;
     internal void ContinueMobileShiShuanghuai(long id)
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MobileShiLuYuSheng: { Operation: "shuanghuai" } r } f || f.Id != id)
@@ -530,7 +530,7 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMobileShiShuanghuaiGuard)]
     internal void ReturnShiLysShuanghuaiDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.MobileShiLuYuSheng is not { Operation: "shuanghuai", Stage: 12, SameAsLast: true } r || outcome.RequestedCount != 1 || outcome.RecipientSeat != (r.DrawCursor == 0 ? f.OwnerSeat : r.TargetSeat) || r.DrawCursor is < 0 or > 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiShuanghuaiDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Cursor == r.DrawCursor))
+        if (f.MobileShiLuYuSheng is not { Operation: "shuanghuai", Stage: 12, SameAsLast: true } r || outcome.RequestedCount != 1 || outcome.RecipientSeat != (r.DrawCursor == 0 ? f.OwnerSeat : r.TargetSeat) || r.DrawCursor is < 0 or > 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiShuanghuaiDrawReturnedEvent>().Any(e => e.FrameId == f.Id && e.Cursor == r.DrawCursor))
             throw new InvalidOperationException("Shuanghuai draw lost its exact once-issued real recipient or native return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiLuYuSheng = r with { Stage = 13, DrawCursor = r.DrawCursor + 1, Before = outcome.SequenceBefore, After = outcome.SequenceAfter }, PendingMovementContinuation = new(outcome.RecipientSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiShuanghuaiDrawReturnedEvent(f.Id, r.DrawCursor, outcome.RecipientSeat, outcome.ActualDrawIds.Count));
@@ -606,7 +606,7 @@ internal sealed partial class CharacterLuYuShengMobileShiRuntime
             }
             else
             {
-                var last = _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiShuanghuaiGuardIssuedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner.Seat);
+                var last = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiShuanghuaiGuardIssuedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner.Seat);
                 result.Add(new(instance.SkillInstanceId, "shuanghuai-last-target", ProgramPublicRuleStateKind.GameActivationProgress, (last?.VictimSeat ?? -1) + 1));
                 result.Add(new(instance.SkillInstanceId, "shuanghuai-turn-used", ProgramPublicRuleStateKind.GameActivationProgress, _skillRuntimeStateOperations._skillRuntimeState.GetUsage(owner.Seat, skillId, MobileShiLuYuShengComposition.ShuanghuaiGuardTrigger + "@" + instance.SkillInstanceId, SkillUsageScope.Turn)));
             }

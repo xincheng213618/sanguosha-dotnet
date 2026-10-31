@@ -64,7 +64,7 @@ internal sealed partial class CharacterGuanYuRuntimeRuntime
                 {
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanFocusedSlashEvent(slash.ActionId, frame.OwnerSeat, focus.TargetSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId));
                     _coreCardUseDebitsOperations.RefundProgramCardUseDebit(frame);
-                    _coreProgramLifecycleOperations.DrawProgramCards(frame.Id, frame.OwnerSeat, _coreNativeDamageHandlesOperations.IsClassicIdentityMode ? 2 : 1, null, null, SkillProgramCardSetVisibility.Private, new("skill-program.focused-slash.draw"));
+                    _coreProgramLifecycleOperations.DrawProgramCards(frame.Id, frame.OwnerSeat, _coreNativeDamageHandlesOperations.Value.IsClassicIdentityMode ? 2 : 1, null, null, SkillProgramCardSetVisibility.Private, new("skill-program.focused-slash.draw"));
                 }
 
                 break;

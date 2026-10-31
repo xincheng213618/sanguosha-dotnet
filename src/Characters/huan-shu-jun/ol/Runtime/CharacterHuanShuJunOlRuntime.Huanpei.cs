@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuanShuJunOlRuntime
 {
-    internal bool HuanpeiRoundSpent(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiAdjustmentAcceptedEvent>().Any(e => e.OwnerSeat == owner && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber);
+    internal bool HuanpeiRoundSpent(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiAdjustmentAcceptedEvent>().Any(e => e.OwnerSeat == owner && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber);
     internal IEnumerable<CardConversionSource> HuanpeiSources(CharacterState owner)
     {
         if (!owner.IsAlive || !owner.HasHpValue || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualRoundProgressRoundNumberAccess._roundNumber < 1 || HuanpeiRoundSpent(owner.Seat))

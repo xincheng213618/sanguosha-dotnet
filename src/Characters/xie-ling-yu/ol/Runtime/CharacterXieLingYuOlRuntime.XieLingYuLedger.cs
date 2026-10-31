@@ -14,9 +14,9 @@ internal sealed partial class CharacterXieLingYuOlRuntime
             return;
         foreach (var m in batch.Movements.Where(m => m.To == CardLocation.DiscardPile && m.From != m.To && XieLingYuNameBit(m.CardKind)is> 0 and < 8))
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<YuandiDiscardEnteredEvent>().Any(e => e.MovementSequence == m.Sequence))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<YuandiDiscardEnteredEvent>().Any(e => e.MovementSequence == m.Sequence))
                 continue;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YuandiDiscardEnteredEvent(batch.Id, batch.TurnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, m.Sequence, m.CardId, m.CardKind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(m.CardKind), _coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(batch, m)));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YuandiDiscardEnteredEvent(batch.Id, batch.TurnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, m.Sequence, m.CardId, m.CardKind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(m.CardKind), _coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, m)));
         }
     }
 

@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class GhostActivityProgramHost(Func<RuntimeEntries.CoreGhostActivityProgramsEntries> getCoreGhostActivityProgramsRuntime) : IGhostActivityProgramHost
+internal sealed class GhostActivityProgramHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGhostActivityProgramsRuntime>> getCoreGhostActivityProgramsRuntime) : IGhostActivityProgramHost
 {
-    public SkillProgramStepOutcome ExecuteGhostActivity(ProgramSkillFrame frame, SkillProgramEffect effect) => getCoreGhostActivityProgramsRuntime().ExecuteGhostActivity(frame, effect);
+    public SkillProgramStepOutcome ExecuteGhostActivity(ProgramSkillFrame frame, SkillProgramEffect effect) => getCoreGhostActivityProgramsRuntime().Value.ExecuteGhostActivity(frame, effect);
 }

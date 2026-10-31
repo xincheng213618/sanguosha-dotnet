@@ -8,9 +8,9 @@ internal sealed partial class CharacterBianFuRenOlRuntime
     internal static bool IsBianFuRenOwnedZone(CardLocation from) => RuntimeSkills.RuntimeRules_bian_fu_ren_ol_BianFuRenMovements.IsBianFuRenOwnedZone(from);
     internal void RecordBianFuRenOwnedTransferProducer(CardMovementRecord movement, int recipientSeat, long producerId)
     {
-        _characterLuSuMouOperations.RecordMouLuSuOwnedTransferProducer(movement, recipientSeat, producerId);
+        _characterLuSuMouOperations.Value.RecordMouLuSuOwnedTransferProducer(movement, recipientSeat, producerId);
         _characterDuFuRenOlOperations.RecordDuFuRenOwnedTransferProducer(movement, recipientSeat, producerId);
-        _characterTangTangOlOperations.RecordTangTangOwnedTransferProducer(movement, recipientSeat, producerId);
+        _characterTangTangOlOperations.Value.RecordTangTangOwnedTransferProducer(movement, recipientSeat, producerId);
         if (!HasBianFuRenCapability || !IsBianFuRenOwnedZone(movement.From) || !HasBianFuRenWanwei(movement.From.OwnerSeat!.Value) || movement.To != CardLocation.Processing || movement.From.OwnerSeat == recipientSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(recipientSeat) || producerId <= 0 || !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(movement))
             return;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BianFuRenOwnedTransferProducerEvent(movement.Sequence, producerId, movement.From.OwnerSeat.Value, recipientSeat));
@@ -27,7 +27,7 @@ internal sealed partial class CharacterBianFuRenOlRuntime
 
     internal void CaptureBianFuRenForeignDiscardProducer(CardMovementRecord movement)
     {
-        _characterLuSuMouOperations.CaptureMouLuSuNativeTransferProducer(movement);
+        _characterLuSuMouOperations.Value.CaptureMouLuSuNativeTransferProducer(movement);
         CaptureBianFuRenNativeUsePayment(movement);
         CaptureBianFuRenDelayedPlacement(movement);
         if (!HasBianFuRenCapability || !IsBianFuRenOwnedZone(movement.From) || !HasBianFuRenWanwei(movement.From.OwnerSeat!.Value) || movement.To != CardLocation.DiscardPile && movement.To != CardLocation.Processing)

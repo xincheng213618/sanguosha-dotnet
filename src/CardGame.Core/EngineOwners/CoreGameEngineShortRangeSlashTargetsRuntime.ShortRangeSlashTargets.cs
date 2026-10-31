@@ -268,6 +268,6 @@ internal sealed partial class CoreGameEngineShortRangeSlashTargetsRuntime
     }
 
     SkillProgramStepOutcome IDirectedDistanceDebtHost.OfferShortRangeSlashTarget(ProgramSkillFrame frame) => OfferShortRangeSlashTarget(frame);
-    void IDirectedDistanceDebtHost.GrantFixedDistanceOneTurnPolicy(ProgramSkillFrame frame, int target) => _coreFixedDistanceOneDebtOperations.GrantFixedDistanceOneTurnPolicy(frame, target);
-    SkillProgramStepOutcome IDirectedDistanceDebtHost.SettleFixedDistanceOneEndingDebt(ProgramSkillFrame frame) => _coreFixedDistanceOneDebtOperations.SettleFixedDistanceOneEndingDebt(frame);
+    void IDirectedDistanceDebtHost.GrantFixedDistanceOneTurnPolicy(ProgramSkillFrame frame, int target) => _coreFixedDistanceOneDebtOperations.Value.GrantFixedDistanceOneTurnPolicy(frame, target);
+    SkillProgramStepOutcome IDirectedDistanceDebtHost.SettleFixedDistanceOneEndingDebt(ProgramSkillFrame frame) => _coreFixedDistanceOneDebtOperations.Value.SettleFixedDistanceOneEndingDebt(frame);
 }

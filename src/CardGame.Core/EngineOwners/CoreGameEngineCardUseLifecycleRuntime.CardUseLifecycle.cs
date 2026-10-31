@@ -24,7 +24,7 @@ internal sealed partial class CoreGameEngineCardUseLifecycleRuntime
         var frame = LifecycleCardUse(frameId) ?? throw new InvalidOperationException("The card-use lifecycle owner is missing.");
         if (frame.ProgramUseCommitted)
             return false;
-        _characterLiuYouAnniversaryOperations.CaptureAnniversaryLiuYouNextSlash(frameId);
+        _characterLiuYouAnniversaryOperations.Value.CaptureAnniversaryLiuYouNextSlash(frameId);
         frame = LifecycleCardUse(frameId)!;
         _coreRuntimeOperations.ReplaceRuntimeFrame(frameId, frame with { ProgramUseCommitted = true });
         return true;
@@ -119,20 +119,20 @@ internal sealed partial class CoreGameEngineCardUseLifecycleRuntime
             return;
         if (_characterChengYuMouOperations.ContinueMouCyIneffectiveSimple(frameId, continuation))
             return;
-        if (_characterCaoZhenBoundaryMobileOperations.ContinueBoundarySidiIneffectiveSimple(frameId, continuation))
+        if (_characterCaoZhenBoundaryMobileOperations.Value.ContinueBoundarySidiIneffectiveSimple(frameId, continuation))
             return;
         if (_coreFinalizedCardTargetsOperations.TryBeginFinalizedSimpleCardPrograms(frameId, continuation))
             return;
         if (_characterCaoChunOlOperations.TryBeginCaoChunSimpleDebt(frameId, continuation))
             return;
-        if (_coreProgramCardUseNullificationOperations.TryBeginSimpleBeforeTargetPrograms(frameId, continuation))
+        if (_coreProgramCardUseNullificationOperations.Value.TryBeginSimpleBeforeTargetPrograms(frameId, continuation))
             return;
         if (_characterHuangZhongAnniversaryGodOperations.ContinueAnniversaryHzIneffectiveSimple(frameId, continuation))
             return;
         var frame = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(item => item.Id == frameId);
         if (_coreGuanduCardsOperations.ContinueGuanduIntoxicationUse(frameId, continuation))
             return;
-        if (_coreDyingSuitsPeachProgramsOperations.ContinueDyingSuitsPeach(frameId, continuation))
+        if (_coreDyingSuitsPeachProgramsOperations.Value.ContinueDyingSuitsPeach(frameId, continuation))
             return;
         if (_characterDongZhuoMouOlOperations.ContinueMouDongZhuoOlWine(frameId, continuation) || _characterHuanShuJunOlOperations.ContinueHuanpeiSimpleUse(frameId, continuation) || _characterDiaoChanLeOperations.ContinueDiouSimpleUse(frameId, continuation) || _characterXiaoQiaoMouOlOperations.ContinueMouXqJueyanSimpleUse(frameId, continuation))
             return;
@@ -146,7 +146,7 @@ internal sealed partial class CoreGameEngineCardUseLifecycleRuntime
             return;
         if (_characterZhugeLiangMouOperations.ContinueMouZhijueSimpleUse(frameId, continuation))
             return;
-        if (_characterAHuiNanOlOperations.ContinueAHuiNanJuemanSimpleUse(frameId, continuation))
+        if (_characterAHuiNanOlOperations.Value.ContinueAHuiNanJuemanSimpleUse(frameId, continuation))
             return;
         if (_characterQinLangOlOperations.ContinueQinLangXianyingSimpleUse(frameId, continuation))
             return;
@@ -159,7 +159,7 @@ internal sealed partial class CoreGameEngineCardUseLifecycleRuntime
         var card = _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(continuation.CardId)).Single(item => item.Id == continuation.CardId);
         var source = _coreMatchParticipantsPlayersAccess._players[frame.SourceSeat];
         _coreNativeCardUseFramesOperations.SetCardUseStep(frameId, ResolutionFrameStep.ResolvingEffect);
-        if (!source.IsAlive && frame.ExtraCardEffect is null && !_characterDaQiaoLeOperations.IsZixiExtraEffectRound(frameId) && !_coreSoleIncomingEffectRepeatOperations.IsSoleIncomingExtraRound(frameId))
+        if (!source.IsAlive && frame.ExtraCardEffect is null && !_characterDaQiaoLeOperations.IsZixiExtraEffectRound(frameId) && !_coreSoleIncomingEffectRepeatOperations.Value.IsSoleIncomingExtraRound(frameId))
         {
             _coreNativeCardUseCompletionOperations.FinishCardUse(frameId, card, frame.CardKind);
             return;

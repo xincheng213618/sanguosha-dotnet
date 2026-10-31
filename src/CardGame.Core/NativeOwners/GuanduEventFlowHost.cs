@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class GuanduEventFlowHost(Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, Func<RuntimeEntries.CoreGuanduEventProgramsEntries> getCoreGuanduEventProgramsRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineRuntimeEntries> getCoreGameEngineRuntimeRuntime, KernelAdvanceEventRulesAndQueueFactCall advanceEventRulesAndQueueFact, EngineStates.CoreActualTurnProgressState actualTurnProgressState, Func<RuntimeEntries.CoreGameEngineProgramNativeDrawEntries> getCoreGameEngineProgramNativeDrawRuntime, ProgramSkillHostFactory createProgramSkillHost, Func<RuntimeEntries.CoreGameEngineActivityBattleRulesEntries> getCoreGameEngineActivityBattleRulesRuntime) : IGuanduEventFlowHost
+internal sealed class GuanduEventFlowHost(Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, Func<RuntimeEntries.CoreGuanduEventProgramsEntries> getCoreGuanduEventProgramsRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineRuntimeEntries> getCoreGameEngineRuntimeRuntime, KernelAdvanceEventRulesAndQueueFactCall advanceEventRulesAndQueueFact, EngineStates.CoreActualTurnProgressState actualTurnProgressState, Func<RuntimeEntries.CoreGameEngineProgramNativeDrawEntries> getCoreGameEngineProgramNativeDrawRuntime, ProgramSkillHostFactory createProgramSkillHost, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineActivityBattleRulesRuntime>> getCoreGameEngineActivityBattleRulesRuntime) : IGuanduEventFlowHost
 {
     public long? DamageRewardUse(long frameId)
     {
@@ -44,7 +44,7 @@ internal sealed class GuanduEventFlowHost(Func<RuntimeEntries.CoreGameEngineProg
     }
 
     public ModeGuanduFlowCursor? Current(long frameId) => getFrameStore().LastOrDefault()is ProgramSkillFrame { GuanduEventFlow: { } receipt } frame && frame.Id == frameId ? new(frameId, frame.OwnerSeat, receipt, frame.NativeDraw is not null) : null;
-    public bool DrainChildren(long frameId) => getCoreGameEngineActivityBattleRulesRuntime().DrainActivityRuleChildren(frameId);
+    public bool DrainChildren(long frameId) => getCoreGameEngineActivityBattleRulesRuntime().Value.DrainActivityRuleChildren(frameId);
     public void ClearFlow(long frameId)
     {
         var frame = getCoreGameEngineProgramLifecycleRuntime().GetActiveProgramFrame(frameId);

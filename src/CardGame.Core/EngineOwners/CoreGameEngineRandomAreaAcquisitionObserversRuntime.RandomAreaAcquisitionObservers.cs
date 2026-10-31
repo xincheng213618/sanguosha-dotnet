@@ -5,12 +5,12 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionObserversRuntim
 {
     internal bool RandomAreaFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
-        if (root.RandomAreaAcquisition is not { } r || !_coreRandomAreaAcquisitionProofsOperations.ValidRandomAreaAcquisition(root))
+        if (root.RandomAreaAcquisition is not { } r || !_coreRandomAreaAcquisitionProofsOperations.Value.ValidRandomAreaAcquisition(root))
             return false;
         if (_coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(root, child))
             return true;
         if (child is ProgramLifecycleTriggerWindowFrame state && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange)
-            return state.ResumeProgramFrameId == root.Id && state.CharacterStateContinuation == CharacterStateContinuation.Program && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Count(e => e.Change.Id == state.Id && e.Change.ParentFrameId == root.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window) == 1;
+            return state.ResumeProgramFrameId == root.Id && state.CharacterStateContinuation == CharacterStateContinuation.Program && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Count(e => e.Change.Id == state.Id && e.Change.ParentFrameId == root.Id && e.Change.TargetSeat == state.OwnerSeat && e.Change.Window == state.Window) == 1;
         if (r.Stage != RandomAreaAcquisitionStage.MovementChildren || r.Steps.Count == 0)
             return false;
         var step = r.Steps[^1];

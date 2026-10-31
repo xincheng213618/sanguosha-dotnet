@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineLiushiEffectsRuntime
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not DamageTriggerWindowFrame window || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target } context || context.ParentFrameId != window.Id || context.DamageFrameId != window.ParentFrameId || source != f.OwnerSeat || target != window.TargetSeat || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, window.Candidates[window.CandidateIndex].ToProgramCandidate()))
             throw new InvalidOperationException("Liushi lost its exact applied-damage candidate.");
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window);
         if (attack.IsChainPropagation)
             return;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == attack.ResolutionId);
@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineLiushiEffectsRuntime
             throw new InvalidOperationException("Liushi requires its own exact native converted Slash damage.");
         if (!_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
             return;
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramLiushiEffectAppliedEvent>().Any(e => e.FrameId == f.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramLiushiEffectAppliedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Liushi damage was already paid.");
         _coreAttributedMarkerEventsOperations.MutateParticipantMarker(f, target, PlayerMarkerKind.LiuShi, 1);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramLiushiEffectAppliedEvent(f.Id, window.Id, window.ParentFrameId, use.Id, action.ActionId, source, target, f.SkillId, f.SkillInstanceId, _coreMatchParticipantsPlayersAccess._players[target].Markers.GetValueOrDefault(PlayerMarkerKind.LiuShi)));
@@ -42,7 +42,7 @@ internal sealed partial class CoreGameEngineLiushiEffectsRuntime
     {
         if (f.LiushiDrawPayment is not { } p)
             return false;
-        if (!IsLiushiClearDraw(f) || p.FrameId != f.Id || p.SkillId != f.SkillId || p.SkillInstanceId != f.SkillInstanceId || p.GameplayHash != f.GameplayHash || p.OwnerSeat != f.OwnerSeat || f.WindowContext is not { } c || p.WindowId != c.ParentFrameId || p.TargetSeat != c.TargetSeat || p.RequestedCount < 1 || p.RequestedCount != c.Facts?.TurnOwnerDiscardPhaseHandDiscardCount || p.InstructionIndex != 1 || f.InstructionIndex is < 1 or > 2 || p.ActualCount < 0 || p.ActualCount > p.RequestedCount || p.SequenceBefore > p.SequenceAfter || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramLiushiDrawPaidEvent>().Count(e => e.Payment == p) != 1)
+        if (!IsLiushiClearDraw(f) || p.FrameId != f.Id || p.SkillId != f.SkillId || p.SkillInstanceId != f.SkillInstanceId || p.GameplayHash != f.GameplayHash || p.OwnerSeat != f.OwnerSeat || f.WindowContext is not { } c || p.WindowId != c.ParentFrameId || p.TargetSeat != c.TargetSeat || p.RequestedCount < 1 || p.RequestedCount != c.Facts?.TurnOwnerDiscardPhaseHandDiscardCount || p.InstructionIndex != 1 || f.InstructionIndex is < 1 or > 2 || p.ActualCount < 0 || p.ActualCount > p.RequestedCount || p.SequenceBefore > p.SequenceAfter || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramLiushiDrawPaidEvent>().Count(e => e.Payment == p) != 1)
             throw new InvalidOperationException("Liushi clearing lost its issued owning draw receipt.");
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == p.WindowId);
         if (parent is null || parent.Window != SkillProgramTriggerWindow.DiscardPhaseEnded || parent.OwnerSeat != p.TargetSeat || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, parent.Candidates[parent.CandidateIndex]))
@@ -50,7 +50,7 @@ internal sealed partial class CoreGameEngineLiushiEffectsRuntime
         var moves = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > p.SequenceBefore && m.Sequence <= p.SequenceAfter && m.Reason == new CardMoveReason($"skill-program.{(f.SkillId)}.{(SkillProgramEffectOp.Draw)}")).ToArray();
         if (moves.Length != p.ActualCount || moves.Select(m => m.CardId).Distinct().Count() != moves.Length || moves.Any(m => m.From != CardLocation.DrawPile || m.To != CardLocation.Hand(f.OwnerSeat)))
             throw new InvalidOperationException("Liushi clearing draw materials changed after payment.");
-        if (p.AttemptId is { } attempt && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == attempt && e.ParentFrameId == f.Id && e.RecipientSeat == f.OwnerSeat && e.RequestedCount == p.RequestedCount && e.Replaced == p.Replaced) != 1)
+        if (p.AttemptId is { } attempt && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == attempt && e.ParentFrameId == f.Id && e.RecipientSeat == f.OwnerSeat && e.RequestedCount == p.RequestedCount && e.Replaced == p.Replaced) != 1)
             throw new InvalidOperationException("Liushi clearing lost its exact native draw decision.");
         return true;
     }
@@ -62,7 +62,7 @@ internal sealed partial class CoreGameEngineLiushiEffectsRuntime
     internal void ClearProgramLiushiEffect(ProgramSkillFrame frame)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (!HasPaidLiushiClear(f) || f.InstructionIndex != 2 || f.NativeDraw is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramLiushiEffectClearedEvent>().Any(e => e.FrameId == f.Id))
+        if (!HasPaidLiushiClear(f) || f.InstructionIndex != 2 || f.NativeDraw is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramLiushiEffectClearedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Liushi cannot clear before its paid draw children return or clear twice.");
         var p = f.LiushiDrawPayment!;
         var target = _coreMatchParticipantsPlayersAccess._players[p.TargetSeat];

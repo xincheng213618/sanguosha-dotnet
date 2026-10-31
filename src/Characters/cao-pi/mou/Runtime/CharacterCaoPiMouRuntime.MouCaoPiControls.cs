@@ -27,7 +27,7 @@ internal sealed partial class CharacterCaoPiMouRuntime
     }
 
     internal bool MouCaoPiCannotRespondTo(int responder, int source) => responder != source && ActiveMouCaoPiControls(responder).Any(c => c.Kind == MouCaoPiControlKind.CannotRespond);
-    internal int? MouCaoPiResponseSource() => _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault()is { } counter ? counter.ChainDepth == 0 ? counter.SourceSeat : _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().LastOrDefault(e => e.Action.EffectiveKind == CardKind.Nullification)?.Action.ActorSeat ?? counter.SourceSeat : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.CardUserSeat ?? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.SourceSeat;
+    internal int? MouCaoPiResponseSource() => _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault()is { } counter ? counter.ChainDepth == 0 ? counter.SourceSeat : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().LastOrDefault(e => e.Action.EffectiveKind == CardKind.Nullification)?.Action.ActorSeat ?? counter.SourceSeat : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.CardUserSeat ?? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.SourceSeat;
     internal bool MouCaoPiResponseForbidden(int actor, CardKind kind, CardActionType type) => (type == CardActionType.Response || kind == CardKind.Nullification) && MouCaoPiResponseSource()is { } source && MouCaoPiCannotRespondTo(actor, source);
     internal bool MouCaoPiHandUseForbidden(int actor, CardKind effectiveKind, IEnumerable<int> ids, bool response = false)
     {

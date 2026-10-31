@@ -21,7 +21,7 @@ internal sealed partial class CharacterGuoJiaMouRuntime
             return false;
         if (!IsMouGjJudgment(j, f) || _resolutionStackOperations._resolutionStack.Any(x => x.Id == j.Id))
             throw new InvalidOperationException("Xianmou received a different or still-active native judgment return.");
-        var result = _coreProgramEventHistoryOperations.ProgramEventHistory<JudgmentResolvedEvent>().Single(e => e.ResolutionId == j.Id && e.ParentResolutionId == f.Id && e.TargetSeat == f.OwnerSeat && e.Reason == JudgmentReasons.Lightning);
+        var result = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JudgmentResolvedEvent>().Single(e => e.ResolutionId == j.Id && e.ParentResolutionId == f.Id && e.TargetSeat == f.OwnerSeat && e.Reason == JudgmentReasons.Lightning);
         CardMovementRecord? handoff = null;
         if (result.CardId is { } id && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing)
         {

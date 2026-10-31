@@ -20,7 +20,7 @@ internal sealed partial class CharacterYangFuOlRuntime
     bool IYangFuAdjacencyFacts.HasDesignatedExtraTargetTail(CardUseFrame use) => _coreDesignatedExtraTargetsOperations.HasDesignatedExtraTargetTail(use);
     bool IYangFuAdjacencyFacts.HasRecipientCategorySlashTargetTail(CardUseFrame use) => _coreRecipientCategorySlashTargetsOperations.HasRecipientCategorySlashTargetTail(use);
     bool IYangFuAdjacencyFacts.HasZhangYanLangdaoTargetTail(CardUseFrame use) => _characterZhangYanOlOperations.HasZhangYanLangdaoTargetTail(use);
-    DyingFrame? IYangFuAdjacencyFacts.ActiveDying => _coreDyingCursorRuntimeOperations.ActiveDying;
+    DyingFrame? IYangFuAdjacencyFacts.ActiveDying => _coreDyingCursorRuntimeOperations.Value.ActiveDying;
 
     bool IYangFuAdjacencyFacts.MovementObserverEdge(long childId) => _coreObserverSubtreesOperations.IsMovementObserverEdge(_resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == childId));
     bool IYangFuAdjacencyFacts.DyingExitEdge(long childId) => _characterYanPuOlOperations.IsYanPuDyingExitEdge(_resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == childId));

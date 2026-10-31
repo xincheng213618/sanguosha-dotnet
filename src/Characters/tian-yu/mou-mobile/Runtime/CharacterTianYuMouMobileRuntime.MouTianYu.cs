@@ -6,7 +6,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTianYuMouMobileRuntime
 {
     internal bool HasMouTianYu => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouTianYuYangshi) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouTianYuZhenxi);
-    internal int MouTianYuActualTurn => _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count();
+    internal int MouTianYuActualTurn => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count();
 
     internal static CardConversionSource MouTianYuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal static bool IsMouTianYuTargetTrigger(SkillProgramTrigger t) => t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouTianYuZhenxi);
@@ -17,7 +17,7 @@ internal sealed partial class CharacterTianYuMouMobileRuntime
             return false;
         if (t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouTianYuYangshi))
             return c.Window == SkillProgramTriggerWindow.AfterDamageApplied && c.TargetSeat == candidate.OwnerSeat;
-        return c.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && c.CardUse is { } a && a.ActorSeat == candidate.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && c.TargetSeat is { } target && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouTianYuStartedEvent>().Any(e => e.Source.SkillId == MouTianYuComposition.Zhenxi && e.Source.OwnerSeat == candidate.OwnerSeat && e.TurnOrdinal == MouTianYuActualTurn);
+        return c.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && c.CardUse is { } a && a.ActorSeat == candidate.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && c.TargetSeat is { } target && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouTianYuStartedEvent>().Any(e => e.Source.SkillId == MouTianYuComposition.Zhenxi && e.Source.OwnerSeat == candidate.OwnerSeat && e.TurnOrdinal == MouTianYuActualTurn);
     }
 
     internal SkillProgramStepOutcome BeginMouTianYu(ProgramSkillFrame input, SkillProgramEffectOp op)
@@ -218,7 +218,7 @@ internal sealed partial class CharacterTianYuMouMobileRuntime
     internal bool ReturnMouTianYuMovement(ProgramSkillFrame f) => f.MouTianYu is not null && ResumeMouTianYu(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 30600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 30600)]
-    internal bool ContinuePaidMouTianYu(ProgramSkillFrame f) => f.MouTianYu is { } r && (r.Before < r.After || _coreProgramEventHistoryOperations.ProgramEventHistory<MouTianYuDiscardPaidEvent>().Any(e => e.FrameId == f.Id));
+    internal bool ContinuePaidMouTianYu(ProgramSkillFrame f) => f.MouTianYu is { } r && (r.Before < r.After || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouTianYuDiscardPaidEvent>().Any(e => e.FrameId == f.Id));
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouTianYuZhenxi)]
     internal PromptChoice SelectAiMouTianYu(PendingDecision p, ProgramSkillFrame f)
     {

@@ -22,7 +22,7 @@ internal sealed partial class CharacterCaoShuangMouRuntime
     bool IMouCaoShuangAnniversaryFacts.Friendly(int owner, int other) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), other, new(0, 0, 0, 1, 0, 0, false, false)) > 0;
     IReadOnlyList<int> IMouCaoShuangAnniversaryFacts.Living() => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
     SkillProgram IMouCaoShuangAnniversaryFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    IEnumerable<T> IMouCaoShuangAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouCaoShuangAnniversaryFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouCaoShuangAnniversaryFacts.Parent(ProgramSkillFrame f)
     {
         if (f.TriggerId != f.ActivationId || f.WindowContext is not { } w || w.OwnerSeat != f.OwnerSeat)
@@ -65,7 +65,7 @@ internal sealed partial class CharacterCaoShuangMouRuntime
     }
 
     IReadOnlyList<MouCaoShuangAnniversaryCard> IMouCaoShuangAnniversaryFacts.Payable(int payer, bool recast) => !((IMouCaoShuangAnniversaryFacts)this).Alive(payer) ? [] : Array.AsReadOnly((recast ? new[] { CardZoneKind.Hand } : new[] { CardZoneKind.Hand, CardZoneKind.Equipment }).SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, payer)).Where(c => recast || !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(payer, c, new(z, payer), OwnedCardMoveIntent.Discard)).Select(c => new MouCaoShuangAnniversaryCard(c.Id, c.Kind, new(z, payer), c.DisplayName))).ToArray());
-    bool IMouCaoShuangAnniversaryFacts.Hurt(int source, int victim) => _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Any(d => !d.SourceLess && d.Amount > 0 && d.SourceSeat == source && d.TargetSeat == victim);
+    bool IMouCaoShuangAnniversaryFacts.Hurt(int source, int victim) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Any(d => !d.SourceLess && d.Amount > 0 && d.SourceSeat == source && d.TargetSeat == victim);
     void IMouCaoShuangAnniversaryNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     void IMouCaoShuangAnniversaryNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     bool IMouCaoShuangAnniversaryNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);

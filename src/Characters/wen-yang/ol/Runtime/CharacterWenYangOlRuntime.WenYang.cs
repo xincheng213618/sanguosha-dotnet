@@ -9,14 +9,14 @@ internal sealed partial class CharacterWenYangOlRuntime
     internal bool HasWenYangCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveQingjiaoWholeHandExchange);
 
     internal static CardConversionSource WenYangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_wen_yang_ol_WenYang.WenYangSource(f);
-    internal int WenYangAwakeningLevel(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<WenYangAwakenedEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.Level).DefaultIfEmpty(0).Max();
-    internal bool WenYangHasAwakened(int owner, int level) => _coreProgramEventHistoryOperations.ProgramEventHistory<WenYangAwakenedEvent>().Any(e => e.OwnerSeat == owner && e.Level == level);
+    internal int WenYangAwakeningLevel(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenYangAwakenedEvent>().Where(e => e.OwnerSeat == owner).Select(e => e.Level).DefaultIfEmpty(0).Max();
+    internal bool WenYangHasAwakened(int owner, int level) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenYangAwakenedEvent>().Any(e => e.OwnerSeat == owner && e.Level == level);
     SkillProgramStepOutcome IWenYangHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWenYang(f, op);
     internal bool WenYangDamageParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c)
     {
         if (c.Window != SkillProgramTriggerWindow.AfterDamageApplied || c.OwnerSeat != candidate.OwnerSeat || c.Amount <= 0 || c.OccurrenceIndex != 0 || c.DamageFrameId is not { } id || _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } w || w.ParentFrameId != id || w.TriggerWindow != c.Window || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex].ToProgramCandidate() != candidate)
             return false;
-        var a = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(w);
+        var a = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(w);
         return a.DamageWasApplied && a.TargetSeat == c.TargetSeat && (a.IsSourceLess ? c.SourceSeat is null : a.SourceSeat == c.SourceSeat) && (candidate.BindingId == "after-causing-damage" ? !a.IsSourceLess && a.SourceSeat == candidate.OwnerSeat : a.TargetSeat == candidate.OwnerSeat && (a.IsSourceLess || a.SourceSeat != candidate.OwnerSeat));
     }
 
@@ -44,7 +44,7 @@ internal sealed partial class CharacterWenYangOlRuntime
         if (!owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return false;
         if (e.Op == SkillProgramEffectOp.ResolveLvliActualDamageChoice)
-            return WenYangDamageParent(candidate, c) && (candidate.BindingId != "after-receiving-damage" || WenYangHasAwakened(owner.Seat, 2)) && WenYangLvliUses(owner.Seat) < WenYangLvliLimit(owner.Seat) && !_coreProgramEventHistoryOperations.ProgramEventHistory<WenYangLvliIssuedEvent>().Any(x => x.OwnerSeat == owner.Seat && x.DamageWindowId == c.ParentFrameId);
+            return WenYangDamageParent(candidate, c) && (candidate.BindingId != "after-receiving-damage" || WenYangHasAwakened(owner.Seat, 2)) && WenYangLvliUses(owner.Seat) < WenYangLvliLimit(owner.Seat) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WenYangLvliIssuedEvent>().Any(x => x.OwnerSeat == owner.Seat && x.DamageWindowId == c.ParentFrameId);
         if (e.Op == SkillProgramEffectOp.ResolveWenYangAwakening)
             return WenYangAwakeningParent(candidate, c) && owner.MaxHp > 0 && (candidate.SkillId == "ol:choujue" ? !WenYangHasAwakened(owner.Seat, 1) && (Math.Abs(_corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count - owner.Hp) >= 3 || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(owner.Seat, candidate.SkillId, candidate.BindingId)) : !WenYangHasAwakened(owner.Seat, 2) && (_corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count < 2 || owner.Hp < 2 || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(owner.Seat, candidate.SkillId, candidate.BindingId)));
         return WenYangPlayParent(candidate, c) && WenYangDiscardable(owner.Seat, candidate.SkillInstanceId, true).Count == _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count;

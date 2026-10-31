@@ -42,7 +42,7 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
 
     internal bool IsMouHxBojueUse(CardUseFrame use)
     {
-        if (use.MouHxBojueSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { MouHxBojue: { Stage: MouHxBojueStage.NativeUse } r } f || !ValidMouHxBojue(f) || o.Source != r.Source || o.GameplayHash != f.GameplayHash || o.Cursor != r.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || o.Actor != MouHxBojueActor(f) || o.Target != MouHxBojueOther(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHxBojueSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
+        if (use.MouHxBojueSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { MouHxBojue: { Stage: MouHxBojueStage.NativeUse } r } f || !ValidMouHxBojue(f) || o.Source != r.Source || o.GameplayHash != f.GameplayHash || o.Cursor != r.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || o.Actor != MouHxBojueActor(f) || o.Target != MouHxBojueOther(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHxBojueSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor);
     }
@@ -80,7 +80,7 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MouHxBojue!;
-        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Bojue cannot return a repeated or unrelated native Slash.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouHxBojue = r with { Returned = true } });
         if (use.CardAttack is not { Active: true })
@@ -102,7 +102,7 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var r = f.MouHxBojue!;
-        if (!r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHxBojueSlashReturnedEvent>().Any(e => e.FrameId == id && e.Cursor == r.Cursor))
+        if (!r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHxBojueSlashReturnedEvent>().Any(e => e.FrameId == id && e.Cursor == r.Cursor))
             throw new InvalidOperationException("Bojue must release each original participant's paid native child exactly once.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHxBojueSlashReturnedEvent(id, r.Cursor, r.UseId, r.ActionId));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouHxBojue = r with { Stage = MouHxBojueStage.NativeChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });

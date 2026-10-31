@@ -62,7 +62,7 @@ internal sealed partial class CoreGameEngineNamedAmbushInvalidationRuntime
         _coreRoundOnceCardlessNativeResponsesOperations.ClearRoundOnceCardlessDodgeResponse(attack);
         _coreTieredRoundZeroResponsesOperations.ClearTieredRoundDodgeResponse(attack);
         _coreChainedStateBasicReturnsOperations.ClearChainedStateBasicDodgeResponse(attack);
-        _coreDrawFundedDistinctBasicResponsesOperations.ClearDrawFundedDistinctBasicDodgeResponse(attack);
+        _coreDrawFundedDistinctBasicResponsesOperations.Value.ClearDrawFundedDistinctBasicDodgeResponse(attack);
         _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);
         if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
             _coreNativeAttackCompletionOperations.CompleteAttack(attack);
@@ -90,7 +90,7 @@ internal sealed partial class CoreGameEngineNamedAmbushInvalidationRuntime
         _characterLiJueOlOperations.CaptureLiJueCompletedNullificationUse(pending.Id, action);
     }
 
-    internal bool IsDeferredZeroCounterspell(NullificationWindowFrame pending, CardActionContext action, NamedAmbushCounterspellResponse response) => response.CardId == 0 && action.PhysicalCards.Count == 0 && pending.TieredRoundResponseUse is { } receipt && receipt.OwnerFrameId == pending.Id && receipt.CardActionId == action.ActionId && receipt.ActorSeat == action.ActorSeat && receipt.EffectiveKind == CardKind.Nullification && _coreProgramEventHistoryOperations.ProgramEventHistory<TieredRoundConversionUseIssuedEvent>().Count(e => e.Receipt == receipt) == 1;
+    internal bool IsDeferredZeroCounterspell(NullificationWindowFrame pending, CardActionContext action, NamedAmbushCounterspellResponse response) => response.CardId == 0 && action.PhysicalCards.Count == 0 && pending.TieredRoundResponseUse is { } receipt && receipt.OwnerFrameId == pending.Id && receipt.CardActionId == action.ActionId && receipt.ActorSeat == action.ActorSeat && receipt.EffectiveKind == CardKind.Nullification && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TieredRoundConversionUseIssuedEvent>().Count(e => e.Receipt == receipt) == 1;
     internal NullificationWindowFrame CompleteNamedAmbushCounterspell(NullificationWindowFrame pending)
     {
         if (pending.NamedAmbushResponse is not { } r)

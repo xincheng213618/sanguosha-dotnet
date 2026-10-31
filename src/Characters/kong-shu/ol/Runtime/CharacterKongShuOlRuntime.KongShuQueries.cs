@@ -48,7 +48,7 @@ internal sealed partial class CharacterKongShuOlRuntime
         if (!response)
             return kind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.Peach or CardKind.Alcohol;
         if (kind is CardKind.Peach or CardKind.Alcohol)
-            return _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == owner.Seat && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp <= 0 && (kind == CardKind.Peach ? _coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(owner.Seat, dying.VictimSeat) : dying.VictimSeat == owner.Seat && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat));
+            return _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.ResponderSeat == owner.Seat && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp <= 0 && (kind == CardKind.Peach ? _coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(owner.Seat, dying.VictimSeat) : dying.VictimSeat == owner.Seat && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat));
         return kind == CardKind.Dodge && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, kind);
     }
 
@@ -57,7 +57,7 @@ internal sealed partial class CharacterKongShuOlRuntime
         if (!HasLeiluanCapability || !owner.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreActualRoundProgressRoundNumberAccess._roundNumber < 1 || !LeiluanNativeDirection(owner, kind, forResponse))
             return[];
         var x = LeiluanCurrentX;
-        var candidates = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Concat(_coreNativeDamageHandlesOperations.UsesFormalWoodenOx && _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Any(c => c.Kind == CardKind.WoodenOx) ? _cardZonesOperations._cardZones.CardsAt(CardLocation.WoodenOxGrain(owner.Seat)) : []).Where(c => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, c) && !_coreCardConversionsOperations.HasProgramCardIdentity(owner, c)).OrderBy(c => c.Id).ToArray();
+        var candidates = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner)).Concat(_coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Any(c => c.Kind == CardKind.WoodenOx) ? _cardZonesOperations._cardZones.CardsAt(CardLocation.WoodenOxGrain(owner.Seat)) : []).Where(c => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(owner, c) && !_coreCardConversionsOperations.HasProgramCardIdentity(owner, c)).OrderBy(c => c.Id).ToArray();
         if (candidates.Length < x)
             return[];
         var result = new List<ProgramMultiCardViewAsSelection>();

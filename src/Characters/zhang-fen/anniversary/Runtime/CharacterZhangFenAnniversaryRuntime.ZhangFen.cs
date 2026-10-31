@@ -6,7 +6,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
     internal static CardConversionSource ZhangFenSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     SkillProgramStepOutcome IAnniversaryZhangFenHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginZhangFen(f, op);
     internal bool ZhangFenSlashDamage(int owner, ProgramSkillWindowContext w) => w.SourceSeat == owner && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is NativeOwners.CardAttackHandle a && !a.IsSourceLess && a.SourceSeat == owner && w.TargetSeat == a.TargetSeat && a.DamageWasApplied && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveCardKind ?? CardKind.Slash);
-    internal int ZhangFenDestroyedCount(int owner, ProgramSkillWindowContext w) => w.MovementBatch is { } batch ? batch.Movements.Where((m, index) => (w.MovementIndex is null || w.MovementIndex == index) && m.From == CardLocation.Equipment(owner) && IsDagongCheDestroyedMaterial(m)).Sum(m => _coreProgramEventHistoryOperations.ProgramEventHistory<DagongCheDestroyedEvent>().Single(e => e.CardId == m.CardId).Upgrades) : 0;
+    internal int ZhangFenDestroyedCount(int owner, ProgramSkillWindowContext w) => w.MovementBatch is { } batch ? batch.Movements.Where((m, index) => (w.MovementIndex is null || w.MovementIndex == index) && m.From == CardLocation.Equipment(owner) && IsDagongCheDestroyedMaterial(m)).Sum(m => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DagongCheDestroyedEvent>().Single(e => e.CardId == m.CardId).Upgrades) : 0;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 43500, SkillProgramEffectOp.ResolveAnniversaryZhangFenWanglu, SkillProgramEffectOp.ResolveAnniversaryZhangFenXianzhu, SkillProgramEffectOp.ResolveAnniversaryDagongCheAttack, SkillProgramEffectOp.ResolveAnniversaryZhangFenChaixie)]
     internal bool CanOfferZhangFen(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => t.Id switch
     {
@@ -110,7 +110,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
                 return true;
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null)
                 throw new InvalidOperationException("Dagong Che cannot return an unfinished native Use.");
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == CardKind.Slash) != 1)
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId && e.CardId == 0 && e.CardKind == CardKind.Slash) != 1)
                 throw new InvalidOperationException("Dagong Che must retain its once-completed native Use before attack cleanup.");
             // PopFinishedCardUse retires the frame that owns ActiveCardAttack.
             // Its typed attack completion is still on the native call stack;

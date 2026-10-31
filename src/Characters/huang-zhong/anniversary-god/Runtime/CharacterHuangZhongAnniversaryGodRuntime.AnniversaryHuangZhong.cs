@@ -9,9 +9,9 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
     internal bool HasAnniversaryHuangZhongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveAnniversaryHuangZhongLieqiong);
 
     internal static CardConversionSource AnniversaryHzSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal IEnumerable<AnniversaryHzBodyIssuedEvent> ActiveAnniversaryHzBody(int target, AnniversaryHzBody body) => !HasAnniversaryHuangZhongCapability ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzBodyIssuedEvent>().Where(e => e.Target == target && e.Body == body && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzStatusConsumedEvent>().Any(c => c.Id == e.Id) && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzStatusExpiredEvent>().Any(c => c.Id == e.Id));
+    internal IEnumerable<AnniversaryHzBodyIssuedEvent> ActiveAnniversaryHzBody(int target, AnniversaryHzBody body) => !HasAnniversaryHuangZhongCapability ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzBodyIssuedEvent>().Where(e => e.Target == target && e.Body == body && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzStatusConsumedEvent>().Any(c => c.Id == e.Id) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzStatusExpiredEvent>().Any(c => c.Id == e.Id));
     internal bool HasAnniversaryHzPendingInvalidation(int actor) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && ActiveAnniversaryHzBody(actor, AnniversaryHzBody.Zhongshu).Any();
-    internal AnniversaryHzZhanjueIssuedEvent? ActiveAnniversaryHzZhanjue(int actor, int mode) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == actor && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualPhaseEndedEvent>().Any(e => e.Phase == phase) ? _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzZhanjueIssuedEvent>().LastOrDefault(e => e.Source.OwnerSeat == actor && e.Phase == phase && e.Mode == mode && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzZhanjueSpentEvent>().Any(c => c.Id == e.Id)) : null;
+    internal AnniversaryHzZhanjueIssuedEvent? ActiveAnniversaryHzZhanjue(int actor, int mode) => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == actor && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualPhaseEndedEvent>().Any(e => e.Phase == phase) ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzZhanjueIssuedEvent>().LastOrDefault(e => e.Source.OwnerSeat == actor && e.Phase == phase && e.Mode == mode && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzZhanjueSpentEvent>().Any(c => c.Id == e.Id)) : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 39600)]
     internal bool CanTriggerAnniversaryHz(ProgramTriggerLegalityContext g)
     {
@@ -24,7 +24,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
         return AnniversaryHzRecoveryReservation(g.OwnerSeat, g.WindowContext?.DamageFrameId)is not null;
     }
 
-    internal AnniversaryHzZhanjueSpentEvent? AnniversaryHzRecoveryReservation(int actor, long? damageId) => damageId is null ? null : _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzZhanjueSpentEvent>().LastOrDefault(c => c.Origin == damageId && c.Amount > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzZhanjueIssuedEvent>().Any(e => e.Id == c.Id && e.Mode == 2 && e.Source.OwnerSeat == actor) && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzZhanjueRecoveredEvent>().Any(e => e.IssueId == c.Id));
+    internal AnniversaryHzZhanjueSpentEvent? AnniversaryHzRecoveryReservation(int actor, long? damageId) => damageId is null ? null : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzZhanjueSpentEvent>().LastOrDefault(c => c.Origin == damageId && c.Amount > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzZhanjueIssuedEvent>().Any(e => e.Id == c.Id && e.Mode == 2 && e.Source.OwnerSeat == actor) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzZhanjueRecoveredEvent>().Any(e => e.IssueId == c.Id));
     SkillProgramStepOutcome IAnniversaryHzHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginAnniversaryHz(f, op);
     internal SkillProgramStepOutcome BeginAnniversaryHz(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
@@ -74,7 +74,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal bool AnniversaryHzAlreadyHit(int owner, int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryHzBodyIssuedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Target == target && e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
+    internal bool AnniversaryHzAlreadyHit(int owner, int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzBodyIssuedEvent>().Any(e => e.Source.OwnerSeat == owner && e.Target == target && e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat);
     internal PromptChoice AnniversaryHzChoice(ProgramSkillFrame f, string option, string label) => new(new($"anniversary-hz.{(f.Id)}.{(option)}"), label, [], [], new Dictionary<string, string> { ["program-action"] = "anniversary-huang-zhong", ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture), ["option"] = option });
     internal IReadOnlyList<PromptChoice> AnniversaryHzChoices(ProgramSkillFrame f)
     {
@@ -207,7 +207,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
                 return;
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
             r = f.AnniversaryHuangZhong!;
-            if (r.Stage == AnniversaryHzStage.TianchongChildren && r.HpPaid && r.DyingId > 0 && !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive && _coreProgramEventHistoryOperations.ProgramEventHistory<DyingResolvedEvent>().Any(e => e.ResolutionId == r.DyingId && e.VictimSeat == r.Target && !e.Survived))
+            if (r.Stage == AnniversaryHzStage.TianchongChildren && r.HpPaid && r.DyingId > 0 && !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DyingResolvedEvent>().Any(e => e.ResolutionId == r.DyingId && e.VictimSeat == r.Target && !e.Survived))
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryHuangZhong = r with { Stage = AnniversaryHzStage.Children } });
                 _coreProgramLifecycleOperations.ChangeProgramMaximumHp(f, 1);

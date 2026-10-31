@@ -119,11 +119,11 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
             return true;
         if (_coreShortRangeSlashTargetsOperations.TryGetShortRangeVirtualPrimaryReturn(use, parent, out primaryTarget))
             return true;
-        if (_coreForeignContestAidObserversOperations.TryGetSameTypeAidVirtualPrimaryReturn(use, parent, out primaryTarget))
+        if (_coreForeignContestAidObserversOperations.Value.TryGetSameTypeAidVirtualPrimaryReturn(use, parent, out primaryTarget))
             return true;
         if (_coreCurrentSlashFireOffersOperations.TryGetCurrentSlashFirePrimaryReturn(use, parent, out primaryTarget))
             return true;
-        if (_coreCurrentEnhancementVirtualReturnOperations.TryGetCurrentEnhancementVirtualPrimaryReturn(use, parent, out primaryTarget))
+        if (_coreCurrentEnhancementVirtualReturnOperations.Value.TryGetCurrentEnhancementVirtualPrimaryReturn(use, parent, out primaryTarget))
             return true;
         if (!HasIssuedOriginalTargetAdditionTail(use) || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.CardAttack is not { CardId: null, EffectiveCardKind: CardKind.Slash, PhysicalCardIds.Count: 0 } attack || attack.SourceSeat != use.SourceSeat || attack.ProgramSkillCardUseFrameId != parent.Id || use.TargetSeats.Count < 2 || use.TargetSeats.Distinct().Count() != use.TargetSeats.Count || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash } action || action.ActorSeat != use.SourceSeat || action.ProviderSeat != action.ActorSeat || action.PhysicalCards.Count != 0 || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || !action.TargetSeats.SequenceEqual(use.TargetSeats) || action.EffectiveSuit != Suit.None || action.EffectiveRank != 0 || string.IsNullOrWhiteSpace(parent.SkillId) || string.IsNullOrWhiteSpace(parent.SkillInstanceId) || string.IsNullOrWhiteSpace(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent)) || parent.InstructionIndex <= 0)
             return false;

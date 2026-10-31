@@ -10,7 +10,7 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             throw new InvalidOperationException("The group attack is not the current card resolution.");
         }
 
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null)
         {
             throw new InvalidOperationException("A group card cannot finish while a target continuation is pending.");
         }
@@ -68,7 +68,7 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
             throw new InvalidOperationException("The group recovery is not the current card resolution.");
         }
 
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null)
         {
             throw new InvalidOperationException("A group recovery cannot finish while another continuation is pending.");
         }

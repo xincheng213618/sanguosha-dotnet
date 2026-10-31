@@ -17,7 +17,7 @@ internal sealed partial class CharacterLuMengMouRuntime
 
     internal void RecordYingboCardUse(long resolutionId, int sourceSeat, CardKind cardKind)
     {
-        if (!_coreMouLuMengOperations.UsesFormalMouLuMeng || !CoreGameEngineMouLuMengRuntime.IsDamageCardKind(cardKind))
+        if (!_coreMouLuMengOperations.Value.UsesFormalMouLuMeng || !CoreGameEngineMouLuMengRuntime.IsDamageCardKind(cardKind))
             return;
         var usageId = CoreGameEngineMouLuMengRuntime.GetRoundDamageCardUsageId(cardKind);
         var wasUsedEarlier = _coreMatchParticipantsPlayersAccess._players.Any(player => _skillRuntimeStateOperations._skillRuntimeState.GetUsage(player.Seat, "system:round-damage-card-history", usageId, SkillUsageScope.Round) > 0);
@@ -38,8 +38,8 @@ internal sealed partial class CharacterLuMengMouRuntime
         }
     }
 
-    internal bool IsYingboUnrespondable(long resolutionId) => _coreMouLuMengOperations.UsesFormalMouLuMeng && (_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.YingboUnrespondable == true);
-    internal bool IsYingboRepeated(long resolutionId) => _coreMouLuMengOperations.UsesFormalMouLuMeng && (_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.YingboRepeated == true);
+    internal bool IsYingboUnrespondable(long resolutionId) => _coreMouLuMengOperations.Value.UsesFormalMouLuMeng && (_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.YingboUnrespondable == true);
+    internal bool IsYingboRepeated(long resolutionId) => _coreMouLuMengOperations.Value.UsesFormalMouLuMeng && (_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.YingboRepeated == true);
     internal bool TryBeginYingboGift(long resolutionId, int sourceSeat, Card card, CardKind cardKind, IReadOnlyList<Card> physicalCards, YingboGiftContinuation continuation, NativeOwners.CardAttackHandle? attack = null, NativeOwners.GroupCardHandle? group = null)
     {
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !IsYingboUnrespondable(resolutionId) || ActiveYingboGift is not null || physicalCards is not [var physicalCard] || physicalCard.Id != card.Id || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Processing)
@@ -105,7 +105,7 @@ internal sealed partial class CharacterLuMengMouRuntime
         {
             var attack = pending.Attack ?? throw new InvalidOperationException("The Yingbo attack gift lost its card continuation.");
             var completion = _coreCardAttackStateOperations.CaptureAttackCompletion(attack);
-            if (!_coreNativeSlashCompletionOperations.FinishAttack(attack, allowYingboGift: false))
+            if (!_coreNativeSlashCompletionOperations.Value.FinishAttack(attack, allowYingboGift: false))
             {
                 _coreNativeAttackCompletionOperations.CompleteAttackAfterCardResolution(completion);
             }

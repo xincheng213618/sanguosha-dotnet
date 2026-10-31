@@ -13,10 +13,10 @@ internal sealed partial class CharacterXiahouDunMouMobileRuntime
         // Capture while the native Use/response producer is still alive.
         // Discard-trigger candidates may be consumed after that producer retires.
         foreach (var move in batch.Movements.Where(m => m.To == CardLocation.DiscardPile && m.From != m.To))
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouXiahouDunMobileDiscardOriginEvent(batch.Id, move.Sequence, move.CardId, _coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(batch, move)));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouXiahouDunMobileDiscardOriginEvent(batch.Id, move.Sequence, move.CardId, _coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, move)));
     }
 
-    internal int[] MatchingMouXiahouDunDiscardIndexes(CardMovementBatchContext batch) => batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From != x.m.To && _coreProgramEventHistoryOperations.ProgramEventHistory<MouXiahouDunMobileDiscardOriginEvent>().Count(e => e == new MouXiahouDunMobileDiscardOriginEvent(batch.Id, x.m.Sequence, x.m.CardId, false)) == 1).Select(x => x.i).ToArray();
+    internal int[] MatchingMouXiahouDunDiscardIndexes(CardMovementBatchContext batch) => batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From != x.m.To && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouDunMobileDiscardOriginEvent>().Count(e => e == new MouXiahouDunMobileDiscardOriginEvent(batch.Id, x.m.Sequence, x.m.CardId, false)) == 1).Select(x => x.i).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 31200, SkillProgramEffectOp.CollectMouXiahouDunQingjian, SkillProgramEffectOp.DistributeMouXiahouDunQingjian)]
     internal bool CanOfferMouXiahouDunQingjian(ProgramTriggerLegalityContext gate)
     {

@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineSourceBeigongChildrenRuntime
         if (child is CardUseFrame use)
             return _coreSourceDingxiNativeOperations.SourceDingxiUseRidesOn(f, use);
         if (child is JudgmentFrame judge)
-            return _coreSourceHuojieOperations.IsSourceHuojieJudgment(judge, f);
+            return _coreSourceHuojieOperations.Value.IsSourceHuojieJudgment(judge, f);
         if (child is CardsMovedTriggerWindowFrame moved && f.PendingMovementContinuation is { } pending && _coreSourceBeigongOperations.SourceBeigongMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending))
         {
             var before = f.SourceDingxi?.Before ?? f.SourceHuojie?.Before ?? f.SourceXingxia?.Before ?? -1;
@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEngineSourceBeigongChildrenRuntime
                 return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.TargetSeat == payer;
         }
 
-        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
+        return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
     }
 
     internal bool SourceBeigongOwnAttack(ProgramSkillFrame f, AttackAttemptState attack)
@@ -43,18 +43,18 @@ internal sealed partial class CoreGameEngineSourceBeigongChildrenRuntime
         if (attack.SourceSeat != f.OwnerSeat)
             return false;
         if (f.SourceHuojie is { Stage: SourceHuojieStage.DamageChildren } h)
-            return attack.SourceLess && attack.TargetSeat == f.OwnerSeat && attack.Nature == DamageNature.Thunder && _coreProgramEventHistoryOperations.ProgramEventHistory<SourceHuojieJudgmentIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.JudgmentId == h.JudgmentId && e.Ordinal == h.Done) == 1;
-        if (f.SourceXingxia is not { } x || attack.SourceLess || attack.Nature != DamageNature.Fire || _coreProgramEventHistoryOperations.ProgramEventHistory<SourceXingxiaIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Round == x.Round && e.FriendSeat == x.FriendSeat) != 1)
+            return attack.SourceLess && attack.TargetSeat == f.OwnerSeat && attack.Nature == DamageNature.Thunder && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SourceHuojieJudgmentIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.JudgmentId == h.JudgmentId && e.Ordinal == h.Done) == 1;
+        if (f.SourceXingxia is not { } x || attack.SourceLess || attack.Nature != DamageNature.Fire || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SourceXingxiaIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.Round == x.Round && e.FriendSeat == x.FriendSeat) != 1)
             return false;
         return x.Stage == SourceXingxiaStage.FriendlyDamage && attack.TargetSeat == x.FriendSeat || x.Stage == SourceXingxiaStage.EnemyDamage && x.Index >= 0 && x.Index < x.Enemies.Count && attack.TargetSeat == x.Enemies[x.Index];
     }
 
-    internal bool SourceBeigongJudgmentEdge(int i) => i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is JudgmentFrame j && _coreSourceHuojieOperations.IsSourceHuojieLightningJudgment(j) && _resolutionStackOperations._resolutionStack[i] is ProgramJudgmentTriggerWindowFrame window && window.ParentFrameId == j.Id && window.Judgment.JudgmentFrameId == j.Id;
+    internal bool SourceBeigongJudgmentEdge(int i) => i > 0 && _resolutionStackOperations._resolutionStack[i - 1] is JudgmentFrame j && _coreSourceHuojieOperations.Value.IsSourceHuojieLightningJudgment(j) && _resolutionStackOperations._resolutionStack[i] is ProgramJudgmentTriggerWindowFrame window && window.ParentFrameId == j.Id && window.Judgment.JudgmentFrameId == j.Id;
     internal bool SourceBeigongEdge(int i) => SourceBeigongJudgmentEdge(i) || _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreSameNameHandDiscardOrDamageObserversOperations.IsSameNameHandObserverEdge(i) || _characterYanPuOlOperations.IsYanPuDyingExitEdge(i) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]) || _resolutionStackOperations._resolutionStack[i - 1] is ProgramSkillFrame f && SourceBeigongFirstChild(f, _resolutionStackOperations._resolutionStack[i]) || CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations._resolutionStack[i], _resolutionStackOperations._resolutionStack[i - 1]) || _coreDyingSuitsAndHistoricalUseObserversOperations.DyingSuitsStructuralEdge(_resolutionStackOperations._resolutionStack[i - 1], _resolutionStackOperations._resolutionStack[i]);
     internal bool SourceBeigongSuffix(int n) => _resolutionStackOperations._resolutionStack[n + 1] is DyingFrame d && n + 2 < _resolutionStackOperations._resolutionStack.Count && _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(n + 1, d) || _coreObserverSubtreesOperations.HasObserverSuffix(n, (i) => this.SourceBeigongEdge(i), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));
     internal ProgramSkillFrame? SourceBeigongRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((f, c) => this.SourceBeigongFirstChild(f, c), (n) => this.SourceBeigongSuffix(n));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 24510)]
-    internal bool SourceBeigongDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && SourceBeigongRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
+    internal bool SourceBeigongDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && SourceBeigongRoot()is { } f && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == d.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, 24510)]
     [ProgramRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, 24510)]
     internal bool SourceBeigongRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery)

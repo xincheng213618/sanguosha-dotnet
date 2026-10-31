@@ -114,7 +114,7 @@ internal sealed partial class CharacterYangHongMobileShiRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
         if (f.YangHong is not null)
             throw new InvalidOperationException("Shi Yang Hong restarted a running operation.");
-        if (f.SkillId != ShiYhYuanmo || f.TriggerId is not (ShiYangHongComposition.YuanmoPrepTrigger or ShiYangHongComposition.YuanmoDamageTrigger) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiYhYuanmoUsedEvent>().Count(entry => entry.OwnerSeat == f.OwnerSeat && entry.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber) >= 2 || !ShiYhFieldMovesExist())
+        if (f.SkillId != ShiYhYuanmo || f.TriggerId is not (ShiYangHongComposition.YuanmoPrepTrigger or ShiYangHongComposition.YuanmoDamageTrigger) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiYhYuanmoUsedEvent>().Count(entry => entry.OwnerSeat == f.OwnerSeat && entry.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber) >= 2 || !ShiYhFieldMovesExist())
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { YangHong = new("yuanmo", ShiYhStage.MoveChoice) });
         PublishShiYh(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));

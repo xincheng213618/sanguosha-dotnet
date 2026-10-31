@@ -7,14 +7,14 @@ internal sealed partial class CharacterJuShouMouRuntime
     {
         if (!MouJuShou.Valid(f) || f.MouJuShou is not { Stage: MouJuShouStage.Declaration, Native: { UseId: 0, ActionId: 0, Plan: { Form: "native", Cards: [var cardId], Action: { ConversionSource: { } source } } plan } n } r || d.Return is not { Purpose: CardDeclarationPurpose.MouJuShouUse, UseAction: { } action } ret || ret.ParentFrameId != f.Id || ret.ParentKind != f.Kind || ret.ParentStep != f.Step || ret.ActorSeat != r.Actor || ret.FinalEffectiveKind != plan.Kind || !MouJuShouRuntime.SamePlan(plan, plan with { Action = action }) || d.OwnerSeat != r.Actor || d.TurnNumber != r.Turn || d.Payment is not { Claimed: false } p || p.DeclarationId != d.Id || p.OwnerFrameId != d.Id || p.ActorSeat != r.Actor || p.ProviderSeat != r.Actor || p.Cost.CardId != cardId || p.Cost.From != CardLocation.Hand(r.Actor) || p.Source != source || _corePlayCardHistoryOperations.ViewAsRule(source)is not { DeclarationValidation: not null } rule || rule.OutputKind != p.DeclaredKind || !d.TargetSeats.SequenceEqual(plan.Targets))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardDeclarationCommittedEvent>().Count(e => e.DeclarationId == d.Id && e.OwnerSeat == r.Actor && e.ActorSeat == r.Actor && e.DeclaredKind == p.DeclaredKind && e.TargetSeats.SequenceEqual(plan.Targets)) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.CardId == cardId && m.From == p.Cost.From && m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay") == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardDeclarationCommittedEvent>().Count(e => e.DeclarationId == d.Id && e.OwnerSeat == r.Actor && e.ActorSeat == r.Actor && e.DeclaredKind == p.DeclaredKind && e.TargetSeats.SequenceEqual(plan.Targets)) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.CardId == cardId && m.From == p.Cost.From && m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay") == 1;
     }
 
     internal bool ReturnMouJsDeclaration(CardDeclarationFrame d, bool succeeded)
     {
         if (d.Return.Purpose != CardDeclarationPurpose.MouJuShouUse)
             return false;
-        if (_resolutionStackOperations._resolutionStack.Any(x => x.Id == d.Id) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != d.Return.ParentFrameId || d.Stage != CardDeclarationStage.Returning || !MatchesMouJsDeclaration(f, d) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouJsDeclarationReturnedEvent>().Any(e => e.DeclarationId == d.Id))
+        if (_resolutionStackOperations._resolutionStack.Any(x => x.Id == d.Id) || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != d.Return.ParentFrameId || d.Stage != CardDeclarationStage.Returning || !MatchesMouJsDeclaration(f, d) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJsDeclarationReturnedEvent>().Any(e => e.DeclarationId == d.Id))
             throw new InvalidOperationException("Zuo Jun declaration returned to another or already completed native request.");
         var r = f.MouJuShou!;
         if (succeeded)

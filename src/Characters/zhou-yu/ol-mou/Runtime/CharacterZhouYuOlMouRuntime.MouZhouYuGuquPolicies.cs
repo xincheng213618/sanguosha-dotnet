@@ -7,9 +7,9 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     {
         if (useId is not { } id || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { Type: CardActionType.Use } a } use || use.SourceSeat != actor || a.ActorSeat != actor || use.CardKind != kind || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(ids))
             return false;
-        if (use.GuquAdmission is not { } admitted || admitted.UseId != use.Id || admitted.ActionId != a.ActionId || admitted.ProviderSeat != a.ProviderSeat || admitted.MaterialCount != ids.Count || admitted.EffectiveKind != kind || _coreProgramEventHistoryOperations.ProgramEventHistory<GuquUseAcceptedEvent>().Count(e => e.Admission == admitted) != 1 || !MouGuquActorLineageMatches(use.Id, a.ActionId, admitted.ActorSeat, actor, a.ProviderSeat, a.Type))
+        if (use.GuquAdmission is not { } admitted || admitted.UseId != use.Id || admitted.ActionId != a.ActionId || admitted.ProviderSeat != a.ProviderSeat || admitted.MaterialCount != ids.Count || admitted.EffectiveKind != kind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquUseAcceptedEvent>().Count(e => e.Admission == admitted) != 1 || !MouGuquActorLineageMatches(use.Id, a.ActionId, admitted.ActorSeat, actor, a.ProviderSeat, a.Type))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == id && e.SourceSeat == admitted.ActorSeat && e.CardId == use.CardId && (e.CardKind == kind || CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(kind))) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == id && e.SourceSeat == admitted.ActorSeat && e.CardId == use.CardId && (e.CardKind == kind || CoreNativeCardClassificationsRuntime.IsSlashCard(e.CardKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(kind))) == 1;
     }
 
     internal bool MouGuquActorLineageMatches(long useId, long actionId, int originalActor, int currentActor, int provider, CardActionType type)
@@ -19,7 +19,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         if (type != CardActionType.Use || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { Action: { } action } use || action.ActionId != actionId || action.ActorSeat != currentActor || action.ProviderSeat != provider || use.SourceSeat != currentActor)
             return false;
         var cursor = originalActor;
-        foreach (var changed in _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == useId))
+        foreach (var changed in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == useId))
         {
             if (changed.PreviousActorSeat != cursor || changed.ProviderSeat != provider)
                 return false;
@@ -117,7 +117,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
         };
     }
 
-    internal bool ValidMouGuquDeclaration(DeclaredCardPayment paid) => paid.GuquPermit is { } p && p.DeclarationId == paid.DeclarationId && p.ActorSeat == paid.ActorSeat && p.ProviderSeat == paid.ProviderSeat && p.CardId == paid.Cost.CardId && p.PrintedKind == paid.Cost.CardKind && p.From == paid.Cost.From && p.Conversion == paid.Source && p.OutputKind == paid.DeclaredKind && p.From == CardLocation.Hand(p.ProviderSeat) && p.MovementSequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreProgramEventHistoryOperations.ProgramEventHistory<GuquDeclarationCapturedEvent>().Count(e => e.Permit == p) == 1;
+    internal bool ValidMouGuquDeclaration(DeclaredCardPayment paid) => paid.GuquPermit is { } p && p.DeclarationId == paid.DeclarationId && p.ActorSeat == paid.ActorSeat && p.ProviderSeat == paid.ProviderSeat && p.CardId == paid.Cost.CardId && p.PrintedKind == paid.Cost.CardKind && p.From == paid.Cost.From && p.Conversion == paid.Source && p.OutputKind == paid.DeclaredKind && p.From == CardLocation.Hand(p.ProviderSeat) && p.MovementSequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquDeclarationCapturedEvent>().Count(e => e.Permit == p) == 1;
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeLegalActionKind, 10)]
     internal bool MouGuquEquipmentActionForbidden(ProgramLegalActionQuery query) => query.Action.Kind == LegalActionKind.UseEquipmentEffect && query.Action.EquipmentKind == CardKind.ZhangbaSerpentSpear && MouGuquRestrictingSources(query.Actor.Seat).Count != 0;
     [ProgramCardLegality(ProgramCardLegalityStage.AfterLegalActionKind, 10)]

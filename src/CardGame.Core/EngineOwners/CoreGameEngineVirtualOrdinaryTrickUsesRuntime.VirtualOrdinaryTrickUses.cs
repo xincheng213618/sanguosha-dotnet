@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
     internal bool IsExactOwnVirtualOrdinaryTrickProgram(ProgramSkillFrame frame)
     {
         if (frame.WindowContext?.Window == SkillProgramTriggerWindow.TurnEnding)
-            return _characterZhaoYunMobileShiOperations.IsExactMobileShiCuifengProgram(frame);
+            return _characterZhaoYunMobileShiOperations.Value.IsExactMobileShiCuifengProgram(frame);
         if (frame.WindowContext?.Window == SkillProgramTriggerWindow.GameStarting)
             return _coreHellActivitiesOperations.IsExactHellArrivalProgram(frame);
         if (frame.WindowContext?.Window == SkillProgramTriggerWindow.PlayEnding)
@@ -27,15 +27,15 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
 
     internal SkillProgramEffect ValidateVirtualOrdinaryTrickInstruction(ProgramSkillFrame frame)
     {
-        if (_characterLuXunMouMobileOperations.IsMouLuXunVirtualParent(frame))
-            return _characterLuXunMouMobileOperations.MouLuXunVirtualInstruction(frame);
+        if (_characterLuXunMouMobileOperations.Value.IsMouLuXunVirtualParent(frame))
+            return _characterLuXunMouMobileOperations.Value.MouLuXunVirtualInstruction(frame);
         if (!IsExactOwnVirtualOrdinaryTrickProgram(frame) || frame.InstructionIndex <= 0)
             throw new InvalidOperationException("A virtual ordinary trick lost its exact owning phase program.");
         var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
         var choulue = _coreGuanduGeneralNativeCardsOperations.IsGuanduChoulueVirtualOrdinaryProgram(frame, effect);
-        if (effect.Op != SkillProgramEffectOp.UseVirtualOrdinaryTrick || effect.Target != SkillProgramEffectTarget.Owner || !choulue && (!UseVirtualOrdinaryTrickProgramOperationDescriptor.HasValidReferences(effect.OutputKind, effect.ActorReference?.Kind, effect.TargetReference?.Kind) || !UseVirtualOrdinaryTrickProgramOperationDescriptor.AllowsWindow(effect.OutputKind, frame.WindowContext!.Window) || UseVirtualOrdinaryTrickProgramOperationDescriptor.IsGroupOutput(effect.OutputKind) && effect.Condition.Kind != SkillProgramConditionKind.Always && !_coreHellKingProgramsOperations.IsHellRandomAssaultBranch(frame, effect) || effect.Condition.Kind is not (SkillProgramConditionKind.Always or SkillProgramConditionKind.PindianWon or SkillProgramConditionKind.PindianNotWon) && !(effect.OutputKind == CardKind.Duel && effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs) && !_coreHellKingProgramsOperations.IsHellRandomAssaultBranch(frame, effect) || (effect.ActorReference?.Kind == ProgramParticipantRef.SelectedTarget || effect.TargetReference?.Kind == ProgramParticipantRef.SelectedTarget) && frame.SelectedTargetSeats.Count != 1))
+        if (effect.Op != SkillProgramEffectOp.UseVirtualOrdinaryTrick || effect.Target != SkillProgramEffectTarget.Owner || !choulue && (!UseVirtualOrdinaryTrickProgramOperationDescriptor.HasValidReferences(effect.OutputKind, effect.ActorReference?.Kind, effect.TargetReference?.Kind) || !UseVirtualOrdinaryTrickProgramOperationDescriptor.AllowsWindow(effect.OutputKind, frame.WindowContext!.Window) || UseVirtualOrdinaryTrickProgramOperationDescriptor.IsGroupOutput(effect.OutputKind) && effect.Condition.Kind != SkillProgramConditionKind.Always && !_coreHellKingProgramsOperations.Value.IsHellRandomAssaultBranch(frame, effect) || effect.Condition.Kind is not (SkillProgramConditionKind.Always or SkillProgramConditionKind.PindianWon or SkillProgramConditionKind.PindianNotWon) && !(effect.OutputKind == CardKind.Duel && effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs) && !_coreHellKingProgramsOperations.Value.IsHellRandomAssaultBranch(frame, effect) || (effect.ActorReference?.Kind == ProgramParticipantRef.SelectedTarget || effect.TargetReference?.Kind == ProgramParticipantRef.SelectedTarget) && frame.SelectedTargetSeats.Count != 1))
             throw new InvalidOperationException("A virtual ordinary trick lost its exact references or output instruction.");
-        if (effect.Condition.Kind is not (SkillProgramConditionKind.Always or SkillProgramConditionKind.ChoiceIs) && !_coreHellKingProgramsOperations.IsHellRandomAssaultBranch(frame, effect))
+        if (effect.Condition.Kind is not (SkillProgramConditionKind.Always or SkillProgramConditionKind.ChoiceIs) && !_coreHellKingProgramsOperations.Value.IsHellRandomAssaultBranch(frame, effect))
         {
             var result = frame.PindianResultBindings.SingleOrDefault(item => item.Name == effect.Condition.SourceBind);
             if (result is null || result.SourceSeat != frame.OwnerSeat || frame.SelectedTargetSeats is not [var opponent] || result.OpponentSeat != opponent || result.SourceWon != (effect.Condition.Kind == SkillProgramConditionKind.PindianWon))
@@ -141,19 +141,19 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
     internal bool ValidProgramVirtualOrdinaryTrickUse(CardUseFrame use)
     {
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "shanhe:zhaogu-mirror-6018")
-            return _coreZhaoguMirrorOperations.IsZhaoguVirtualOrdinaryTrickUse(use);
+            return _coreZhaoguMirrorOperations.Value.IsZhaoguVirtualOrdinaryTrickUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "mobile:shi-xiaoge")
-            return _characterZhangYanMobileShiOperations.ValidShiZyVirtualDuelUse(use);
+            return _characterZhangYanMobileShiOperations.Value.ValidShiZyVirtualDuelUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "mobile:shi-jixi")
             return _characterDengAiMobileShiOperations.ValidShiDaVirtualSnatchUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "anniversary:zhuning")
-            return _characterLiuYongAnniversaryOperations.IsAnniversaryLiuYongVirtualUse(use);
+            return _characterLiuYongAnniversaryOperations.Value.IsAnniversaryLiuYongVirtualUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "anniversary:dehua")
             return _characterLiuLiAnniversaryOperations.IsAnniversaryLiuLiVirtualUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "anniversary:juee")
             return _characterYangBiaoAnniversaryOperations.IsAnniversaryYangBiaoVirtualUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "happy:zuoxing")
-            return _characterGuoJiaHappyGodOperations.IsHappyGuoJiaVirtualUse(use);
+            return _characterGuoJiaHappyGodOperations.Value.IsHappyGuoJiaVirtualUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "mobile:zuoxing")
             return _characterGuoJiaMobileGodOperations.IsShenGuoJiaVirtualUse(use);
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == MouXunYuAnniversaryRuntime.Shimou)
@@ -209,21 +209,21 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
     {
         if (use.VirtualOrdinaryTrickOrigin?.SkillId == "shanhe:zhaogu-mirror-6018")
         {
-            _coreZhaoguMirrorOperations.ReturnZhaoguVirtualOrdinaryTrickUse(use);
+            _coreZhaoguMirrorOperations.Value.ReturnZhaoguVirtualOrdinaryTrickUse(use);
             return;
         }
 
         if (use.VirtualOrdinaryTrickOrigin is not { } origin)
             return;
-        if (_characterZhangYanMobileShiOperations.TryReturnShiZyVirtualDuel(use))
+        if (_characterZhangYanMobileShiOperations.Value.TryReturnShiZyVirtualDuel(use))
             return;
         if (_characterDengAiMobileShiOperations.TryReturnShiDaVirtualSnatch(use))
             return;
-        if (_characterGuoJiaHappyGodOperations.TryReturnHappyGuoJiaVirtualUse(use))
+        if (_characterGuoJiaHappyGodOperations.Value.TryReturnHappyGuoJiaVirtualUse(use))
             return;
         if (_characterGuoJiaMobileGodOperations.TryReturnShenGuoJiaVirtualUse(use))
             return;
-        if (_characterLiuYongAnniversaryOperations.TryReturnAnniversaryLiuYongVirtualUse(use))
+        if (_characterLiuYongAnniversaryOperations.Value.TryReturnAnniversaryLiuYongVirtualUse(use))
             return;
         if (_characterLiuLiAnniversaryOperations.TryReturnAnniversaryLiuLiVirtualUse(use))
             return;
@@ -231,13 +231,13 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
             return;
         if (_characterXunYuMouOperations.ReturnMouXyVirtualUse(use))
             return;
-        if (_characterLuXunMouMobileOperations.ReturnMouLuXunNativeUse(use))
+        if (_characterLuXunMouMobileOperations.Value.ReturnMouLuXunNativeUse(use))
             return;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.Id != origin.ParentProgramFrameId || frame.InstructionIndex != origin.InstructionIndex || frame.OwnerSeat != origin.OwnerSeat || frame.SkillId != origin.SkillId || frame.TriggerId != origin.BindingId || frame.SkillInstanceId != origin.SkillInstanceId || frame.GameplayHash != origin.GameplayHash || use.Step != ResolutionFrameStep.Completed || frame.WindowContext?.ParentFrameId != origin.LifecycleFrameId || ValidateVirtualOrdinaryTrickInstruction(frame).OutputKind != origin.OutputKind)
             throw new InvalidOperationException("A completed virtual ordinary trick lost its typed program return.");
         if (use.CardKind is CardKind.Duel or CardKind.FireAttack or CardKind.UnexpectedAssault or CardKind.QizhengXiangsheng && use.CardAttack is { Active: true })
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Any(e => e.UseId == use.Id))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().Any(e => e.UseId == use.Id))
                 throw new InvalidOperationException("A virtual ordinary attack cannot return twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramVirtualOrdinaryAttackReturnedEvent(use.Id, origin));
             return;
@@ -249,7 +249,7 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
     [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 44001)]
     internal bool ResumeProgramVirtualOrdinaryAttack()
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.Op != SkillProgramEffectOp.UseVirtualOrdinaryTrick || _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().LastOrDefault()is not { Origin: { } origin } returned || origin.ParentProgramFrameId != frame.Id || origin.InstructionIndex != frame.InstructionIndex || _resolutionStackOperations._resolutionStack.Any(f => f.Id == returned.UseId) || frame.SkillId != origin.SkillId || frame.SkillInstanceId != origin.SkillInstanceId || ValidateVirtualOrdinaryTrickInstruction(frame).OutputKind != origin.OutputKind)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)?.Op != SkillProgramEffectOp.UseVirtualOrdinaryTrick || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramVirtualOrdinaryAttackReturnedEvent>().LastOrDefault()is not { Origin: { } origin } returned || origin.ParentProgramFrameId != frame.Id || origin.InstructionIndex != frame.InstructionIndex || _resolutionStackOperations._resolutionStack.Any(f => f.Id == returned.UseId) || frame.SkillId != origin.SkillId || frame.SkillInstanceId != origin.SkillInstanceId || ValidateVirtualOrdinaryTrickInstruction(frame).OutputKind != origin.OutputKind)
             return false;
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return true;

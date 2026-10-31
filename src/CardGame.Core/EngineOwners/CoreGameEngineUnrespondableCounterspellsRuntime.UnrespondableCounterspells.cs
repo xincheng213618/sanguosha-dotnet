@@ -11,7 +11,7 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
             return new(binding.Source.SkillId, binding.Policy.Id, owner.Seat, binding.Source.SkillInstanceId);
         CardConversionSource? source = null;
         _coreProvenanceCardPoliciesOperations.TryFreezeProvenanceCounterspellSource(owner, physicalCardIds, ref source);
-        return source ?? _characterChenDaoMobileShiOperations.MobileShiWanglieCounterspellSource(owner, physicalCardIds) ?? zhaJiangSource ?? _characterWeiYanMobileShiOperations.MobileShiZhuangshiCounterspellSource(owner, physicalCardIds) ?? _characterSimaShiMouOperations.MouSimaShiNoResponseSource(owner, physicalCardIds);
+        return source ?? _characterChenDaoMobileShiOperations.Value.MobileShiWanglieCounterspellSource(owner, physicalCardIds) ?? zhaJiangSource ?? _characterWeiYanMobileShiOperations.MobileShiZhuangshiCounterspellSource(owner, physicalCardIds) ?? _characterSimaShiMouOperations.MouSimaShiNoResponseSource(owner, physicalCardIds);
     }
 
     internal void IssueUnrespondableCounterspell(NullificationWindowFrame window, CardActionContext action, CardConversionSource? frozenSource)
@@ -19,7 +19,7 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
         if (frozenSource is null)
             return;
         var current = _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().Single(frame => frame.Id == window.Id);
-        if (action.Type != CardActionType.Response || action.EffectiveKind != CardKind.Nullification || action.ActorSeat != action.ProviderSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || !_coreDelayedNullificationOperations.HasNullificationEffectOwner(current) || action.ParentActionId != _coreDelayedNullificationOperations.NullificationParentActionId(current) || frozenSource.OwnerSeat != action.ActorSeat || string.IsNullOrWhiteSpace(frozenSource.SkillId) || string.IsNullOrWhiteSpace(frozenSource.BindingId) || string.IsNullOrWhiteSpace(frozenSource.SkillInstanceId) || action.PhysicalCards.Count == 0 && !_coreTieredRoundZeroResponsesOperations.IsIssuedTieredRoundZeroResponse(current, action) && !_characterXiaoQiaoMouOlOperations.IsIssuedMouXqResponse(current, action) || current.ChainDepth <= 0 || current.UnrespondableCounterspell is not null)
+        if (action.Type != CardActionType.Response || action.EffectiveKind != CardKind.Nullification || action.ActorSeat != action.ProviderSeat || action.ResponderSeat != action.ActorSeat || action.RequesterSeat is not null || !_coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(current) || action.ParentActionId != _coreDelayedNullificationOperations.Value.NullificationParentActionId(current) || frozenSource.OwnerSeat != action.ActorSeat || string.IsNullOrWhiteSpace(frozenSource.SkillId) || string.IsNullOrWhiteSpace(frozenSource.BindingId) || string.IsNullOrWhiteSpace(frozenSource.SkillInstanceId) || action.PhysicalCards.Count == 0 && !_coreTieredRoundZeroResponsesOperations.IsIssuedTieredRoundZeroResponse(current, action) && !_characterXiaoQiaoMouOlOperations.IsIssuedMouXqResponse(current, action) || current.ChainDepth <= 0 || current.UnrespondableCounterspell is not null)
             throw new InvalidOperationException("Unrespondable counterspell lost its exact paid response action.");
         var receipt = new UnrespondableCounterspellReceipt(frozenSource, current.Id, current.ParentFrameId, action.ActionId, action.ActorSeat, current.ChainDepth);
         _coreRuntimeOperations.ReplaceRuntimeFrame(current.Id, current with { UnrespondableCounterspell = receipt });
@@ -32,7 +32,7 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
             return false;
         if (window.CounterspellPayment is not null)
             throw new InvalidOperationException("Counterspell cannot finish before its exact payment children.");
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != window.Id || receipt.WindowFrameId != window.Id || receipt.ParentCardUseFrameId != window.ParentFrameId || receipt.ChainDepth != window.ChainDepth || receipt.ResponderSeat != receipt.Source.OwnerSeat || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(fact => fact.Action.ActionId == receipt.ActionId && fact.Action.EffectiveKind == CardKind.Nullification && fact.Action.ActorSeat == receipt.ResponderSeat && fact.Action.ProviderSeat == receipt.ResponderSeat && fact.Action.ResponderSeat == receipt.ResponderSeat && fact.Action.RequesterSeat is null && fact.Action.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(window)))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != window.Id || receipt.WindowFrameId != window.Id || receipt.ParentCardUseFrameId != window.ParentFrameId || receipt.ChainDepth != window.ChainDepth || receipt.ResponderSeat != receipt.Source.OwnerSeat || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(fact => fact.Action.ActionId == receipt.ActionId && fact.Action.EffectiveKind == CardKind.Nullification && fact.Action.ActorSeat == receipt.ResponderSeat && fact.Action.ProviderSeat == receipt.ResponderSeat && fact.Action.ResponderSeat == receipt.ResponderSeat && fact.Action.RequesterSeat is null && fact.Action.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(window)))
             throw new InvalidOperationException("Unrespondable counterspell changed its issued chain node.");
         // Every accepted/committed/completed response child has already returned
         // here. This ends this counterspell node, not the original trick's policy.
@@ -45,7 +45,7 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
             if (window.GroupTargetReturn is not null)
             {
                 _coreNativeCardUseFramesOperations.SetCardUseStep(window.ParentFrameId, ResolutionFrameStep.ResolvingEffect);
-                _coreGroupTargetNullificationOperations.CompleteGroupTargetNullification(window);
+                _coreGroupTargetNullificationOperations.Value.CompleteGroupTargetNullification(window);
                 return true;
             }
 
@@ -80,7 +80,7 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
         if (_coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(windowId, PostEventContinuation.CounterspellPayment) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(windowId))
             return;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { CounterspellPayment = null });
-        if (_coreCommittedResponseUsesOperations.TryBeginCommittedResponseUsePrograms(null, action, ProgramCardContinuation.NullificationResponse))
+        if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(null, action, ProgramCardContinuation.NullificationResponse))
             return;
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(null, action, SkillProgramTriggerWindow.CardResponseAccepted, [], ProgramCardContinuation.NullificationResponse))
             return;
@@ -140,7 +140,7 @@ internal sealed partial class CoreGameEngineUnrespondableCounterspellsRuntime
     }
 
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 420)]
-    internal bool IsPaidCounterspellProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { CounterspellPayment: not null } window && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(frame => frame.Id == dying.FrameId && frame.ParentFrameId == dying.ParentFrameId) && TryGetPolicyCounterspellPaymentRide(window, out _);
+    internal bool IsPaidCounterspellProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { ResumesProgramSkill: true } dying && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { CounterspellPayment: not null } window && _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().Any(frame => frame.Id == dying.FrameId && frame.ParentFrameId == dying.ParentFrameId) && TryGetPolicyCounterspellPaymentRide(window, out _);
     internal bool TryGetPolicyCounterspellPaymentRide(NullificationWindowFrame window, out int[] rescueCosts)
     {
         rescueCosts = [];

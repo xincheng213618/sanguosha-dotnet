@@ -6,7 +6,7 @@ internal sealed partial class CharacterXuanGongZhuOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 370)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 370)]
-    internal bool CanContinueIssuedXuanGongZhu(ProgramSkillFrame f) => _coreQimeiProgramsOperations.ValidQimeiDraw(f) || _coreZhuijiProgramsOperations.ValidZhuijiIssued(f) || _coreIdentityConcealmentOperations.ValidGaolingRecovery(f);
+    internal bool CanContinueIssuedXuanGongZhu(ProgramSkillFrame f) => _coreQimeiProgramsOperations.ValidQimeiDraw(f) || _coreZhuijiProgramsOperations.Value.ValidZhuijiIssued(f) || _coreIdentityConcealmentOperations.ValidGaolingRecovery(f);
     internal bool XuanGongZhuFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (_coreIdentityConcealmentOperations.ValidGaolingRecovery(root) && root.GaolingRecovery is { } g)
@@ -19,7 +19,7 @@ internal sealed partial class CharacterXuanGongZhuOlRuntime
 
         if (_coreQimeiProgramsOperations.ValidQimeiDraw(root) && root.QimeiDraw is { } q && child is CardsMovedTriggerWindowFrame moved)
             return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.Sequence > q.Before && m.Sequence <= q.After && m.To == CardLocation.Hand(q.Receipt.BeneficiarySeat) && m.Reason.Value == "program.qimei.equal-draw");
-        if (!_coreZhuijiProgramsOperations.ValidZhuijiIssued(root))
+        if (!_coreZhuijiProgramsOperations.Value.ValidZhuijiIssued(root))
             return false;
         if (root.ZhuijiDebt is { Stage: ZhuijiDebtStage.DiscardChildren } d && child is CardsMovedTriggerWindowFrame discard)
             return discard.Batch.ParentFrameId == root.Id && discard.Batch.AwaitingProgramFrameId == root.Id && discard.Batch.OriginSkillId == root.SkillId && discard.Batch.OriginSkillInstanceId == root.SkillInstanceId && discard.Batch.Movements.Count > 0 && discard.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m) && m.Sequence > d.Before && m.Sequence <= d.After && m.From.OwnerSeat == root.OwnerSeat && m.To == CardLocation.DiscardPile && m.Reason.Value == "program.zhuiji.ending-discard");
@@ -39,7 +39,7 @@ internal sealed partial class CharacterXuanGongZhuOlRuntime
     internal bool TryAdvanceXuanGongZhuSubtree() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && XuanGongZhuObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     SkillProgramStepOutcome IXuanGongZhuProgramHost.ArmQimeiPair(ProgramSkillFrame f) => _coreQimeiProgramsOperations.ArmQimeiPair(f);
     SkillProgramStepOutcome IXuanGongZhuProgramHost.SettleQimeiPairEquality(ProgramSkillFrame f) => _coreQimeiProgramsOperations.SettleQimeiPairEquality(f);
-    SkillProgramStepOutcome IXuanGongZhuProgramHost.OfferZhuijiActualPlayChoice(ProgramSkillFrame f) => _coreZhuijiProgramsOperations.ArmZhuijiActualPlay(f);
-    SkillProgramStepOutcome IXuanGongZhuProgramHost.SettleZhuijiActualPlayDebt(ProgramSkillFrame f) => _coreZhuijiProgramsOperations.SettleZhuijiActualPlayDebt(f);
+    SkillProgramStepOutcome IXuanGongZhuProgramHost.OfferZhuijiActualPlayChoice(ProgramSkillFrame f) => _coreZhuijiProgramsOperations.Value.ArmZhuijiActualPlay(f);
+    SkillProgramStepOutcome IXuanGongZhuProgramHost.SettleZhuijiActualPlayDebt(ProgramSkillFrame f) => _coreZhuijiProgramsOperations.Value.SettleZhuijiActualPlayDebt(f);
     SkillProgramStepOutcome IXuanGongZhuProgramHost.AfterActualIdentityAppearanceRecover(ProgramSkillFrame f) => _coreIdentityConcealmentOperations.ArmGaolingRecovery(f);
 }

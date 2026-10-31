@@ -64,7 +64,7 @@ internal sealed partial class CharacterQinLangOlRuntime
         {
             var currentTargets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, currentTargets[0], null, 1 + actor.AlcoholDamageBonus, kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[currentTargets[0]], kind));
-            _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+            _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
             actor.HasAlcoholEffect = false;
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
@@ -172,7 +172,7 @@ internal sealed partial class CharacterQinLangOlRuntime
     {
         if (!HasQinLangCapability)
             return;
-        var ids = _coreProgramEventHistoryOperations.ProgramEventHistory<QinLangXianyingUseIssuedEvent>().Where(e => e.Origin.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.Origin.CardKind == CardKind.Alcohol).Select(e => e.Origin.CardUseFrameId).ToHashSet();
+        var ids = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QinLangXianyingUseIssuedEvent>().Where(e => e.Origin.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.Origin.CardKind == CardKind.Alcohol).Select(e => e.Origin.CardUseFrameId).ToHashSet();
         var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         foreach (var entry in facts.OfType<AlcoholAppliedEvent>().Where(e => ids.Contains(e.ResolutionId)).GroupBy(e => e.SourceSeat))
         {

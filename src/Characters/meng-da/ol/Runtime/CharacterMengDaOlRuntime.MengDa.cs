@@ -137,7 +137,7 @@ internal sealed partial class CharacterMengDaOlRuntime
             if (r.Stage == GoudeStage.SlashTarget)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Goude = r with { TargetSeat = target, Stage = GoudeStage.NativeSlash } });
-                if (_coreTriggeredCardProgramsOperations.UseTriggeredProgramVirtualSlash(f, target) != SkillProgramStepOutcome.AwaitChild)
+                if (_coreTriggeredCardProgramsOperations.Value.UseTriggeredProgramVirtualSlash(f, target) != SkillProgramStepOutcome.AwaitChild)
                     FinishGoude(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
                 return;
             }

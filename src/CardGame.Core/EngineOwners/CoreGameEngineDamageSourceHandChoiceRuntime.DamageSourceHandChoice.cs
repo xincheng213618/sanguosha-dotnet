@@ -18,7 +18,7 @@ internal sealed partial class CoreGameEngineDamageSourceHandChoiceRuntime
     internal SkillProgramStepOutcome BeginDamageSourceHandChoice(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.DamageSourceHandChoice is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } source, DamageFrameId: { } damageId, Amount: > 0 } context || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } window || window.Id != context.ParentFrameId || window.ParentFrameId != damageId || context.TargetSeat != f.OwnerSeat)
+        if (f.DamageSourceHandChoice is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } source, DamageFrameId: { } damageId, Amount: > 0 } context || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } window || window.Id != context.ParentFrameId || window.ParentFrameId != damageId || context.TargetSeat != f.OwnerSeat)
             throw new InvalidOperationException("The hand choice requires its actual sourced damage occurrence.");
         var r = new DamageSourceHandChoiceReceipt
         {

@@ -108,7 +108,7 @@ internal sealed partial class CoreGameEngineEquipmentPairDyingCardObserversRunti
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 470)]
     internal bool IsEquipmentPairOrDyingCardProgramDying()
     {
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { ResumesProgramSkill: true } dying)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { ResumesProgramSkill: true } dying)
             return false;
         var root = EquipmentPairPaymentObserverRoot() ?? DyingOwnedCardObserverRoot();
         return root is not null && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);

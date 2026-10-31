@@ -73,7 +73,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuSuAnniversaryUseIssuedEvent(origin));
     }
 
-    internal bool MouLuSuNativeMatches(CardUseFrame use) => use.MouLuSuAnniversary is { } o && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { MouLuSuAnniversary: { Stage: MouLuSuAnniversaryStage.NativeUse } r } f && MouLuSuAnniversary.Valid(f) && o.Source == r.Source && o.GameplayHash == r.GameplayHash && o.Index == r.Index && o.Actor == r.Other && o.UseId == use.Id && o.UseId == r.UseId && o.ActionId == r.ActionId && use.Action?.ActionId == o.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuSuAnniversaryUseIssuedEvent>().Count(e => e.Origin == o) == 1;
+    internal bool MouLuSuNativeMatches(CardUseFrame use) => use.MouLuSuAnniversary is { } o && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { MouLuSuAnniversary: { Stage: MouLuSuAnniversaryStage.NativeUse } r } f && MouLuSuAnniversary.Valid(f) && o.Source == r.Source && o.GameplayHash == r.GameplayHash && o.Index == r.Index && o.Actor == r.Other && o.UseId == use.Id && o.UseId == r.UseId && o.ActionId == r.ActionId && use.Action?.ActionId == o.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuSuAnniversaryUseIssuedEvent>().Count(e => e.Origin == o) == 1;
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 36100)]
     internal bool MouLuSuNoSlashDebit(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouLuSuAnniversary: { } o } use && actor == o.Actor && MouLuSuNativeMatches(use);
     [NativeUseValidation(36100)]
@@ -90,7 +90,7 @@ internal sealed partial class CharacterLuSuMouRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MouLuSuAnniversary!;
-        if (!MouLuSuNativeMatches(use) || r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (!MouLuSuNativeMatches(use) || r.Returned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Mengmou cannot replace or repeat its native Slash return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouLuSuAnniversary = r with { Returned = true } });
         if (use.CardAttack is not { Active: true })
@@ -126,5 +126,5 @@ internal sealed partial class CharacterLuSuMouRuntime
     }
 
     [ProgramIssuedTrigger(430)]
-    internal bool IsIssuedMouLuSuDamageCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => candidate.BindingId == "requested-slash-damage" && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.RecoverMouLuSuMengmouDamage }] && _characterLuSuMouOperations.CreateMouLuSuAnniversaryFacts().Damage(candidate, context)is { } damage && context.DamageFrameId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(damage.UseId)is { Action: { } action } && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuSuAnniversaryDamageRewardIssuedEvent>().Any(e => e.DamageFrameId == id && e.UseId == damage.UseId && e.ActionId == action.ActionId);
+    internal bool IsIssuedMouLuSuDamageCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => candidate.BindingId == "requested-slash-damage" && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.RecoverMouLuSuMengmouDamage }] && _characterLuSuMouOperations.CreateMouLuSuAnniversaryFacts().Damage(candidate, context)is { } damage && context.DamageFrameId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(damage.UseId)is { Action: { } action } && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuSuAnniversaryDamageRewardIssuedEvent>().Any(e => e.DamageFrameId == id && e.UseId == damage.UseId && e.ActionId == action.ActionId);
 }

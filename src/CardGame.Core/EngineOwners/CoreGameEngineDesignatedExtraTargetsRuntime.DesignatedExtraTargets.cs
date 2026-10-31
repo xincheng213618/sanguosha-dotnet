@@ -233,9 +233,9 @@ internal sealed partial class CoreGameEngineDesignatedExtraTargetsRuntime
 
     internal bool IsDesignatedExtraTargetFact(CardUseFrame use, DesignatedExtraTargetResolvedEvent fact, IReadOnlyList<int> originalTargets)
     {
-        if (_coreShanheXiashengOperations.IsShanheXiashengTargetFact(use, fact, originalTargets))
+        if (_coreShanheXiashengOperations.Value.IsShanheXiashengTargetFact(use, fact, originalTargets))
             return true;
-        if (_characterWuYiBoundaryMobileOperations.IsBoundaryWuYiTargetFact(use, fact, originalTargets))
+        if (_characterWuYiBoundaryMobileOperations.Value.IsBoundaryWuYiTargetFact(use, fact, originalTargets))
             return true;
         if (use.Action is not { Type: CardActionType.Use } action || fact.CardUseFrameId != use.Id || fact.ActionId != action.ActionId || fact.Source.OwnerSeat != action.ActorSeat || fact.InstructionIndex != 1 || !fact.OriginalTargetSeats.SequenceEqual(originalTargets) || fact.OriginalTargetSeats.Count == 0 || fact.AddedTargetSeats.Count != (use.CardKind == CardKind.BorrowedSword ? 2 : 1) || fact.AddedTargetSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat)) || (use.CardKind == CardKind.BorrowedSword ? originalTargets.Where((_, i) => i % 2 == 0) : originalTargets).Contains(fact.AddedTargetSeats[0]) || !fact.ResultTargetSeats.SequenceEqual(originalTargets.Concat(fact.AddedTargetSeats)) || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program is not { } program || program.GameplayHash != fact.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == fact.Source.BindingId)is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized } trigger || trigger.Effects is not [{ Op: SkillProgramEffectOp.AddOneDistanceFreeCurrentUseTarget }])
             return false;

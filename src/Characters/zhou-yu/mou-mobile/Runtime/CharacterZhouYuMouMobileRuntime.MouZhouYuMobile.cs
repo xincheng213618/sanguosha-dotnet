@@ -14,8 +14,8 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
         return h.LastOrDefault(e => e is TurnStartedEvent or ActualTurnCursorReturnedEvent)is TurnStartedEvent t && t.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && t.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat ? new(t.TurnNumber, t.ActorSeat, h.OfType<TurnStartedEvent>().Count()) : null;
     }
 
-    internal bool MouZyMobileDisabled(int owner, MouZhouYuMobileTurn turn) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhouYuMobileDisabledEvent>().Any(e => e.OwnerSeat == owner && e.Turn == turn);
-    internal bool MouZyMobileSuitSpent(int owner, MouZhouYuMobileTurn turn, Suit suit) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhouYuMobileCoveredEvent>().Any(e => e.ActualSuit == suit && _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhouYuMobileStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == owner && s.Turn == turn));
+    internal bool MouZyMobileDisabled(int owner, MouZhouYuMobileTurn turn) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhouYuMobileDisabledEvent>().Any(e => e.OwnerSeat == owner && e.Turn == turn);
+    internal bool MouZyMobileSuitSpent(int owner, MouZhouYuMobileTurn turn, Suit suit) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhouYuMobileCoveredEvent>().Any(e => e.ActualSuit == suit && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhouYuMobileStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source.OwnerSeat == owner && s.Turn == turn));
     internal Card[] MouZyMobileCards(int owner) => MouZyMobileTurn()is { } turn ? _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Where(c => !MouZyMobileSuitSpent(owner, turn, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], c))).ToArray() : [];
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 31100, SkillProgramEffectOp.ResolveMouZhouYuFanjian)]
     internal bool CanStartMouZyMobile(CharacterState owner) => MouZyMobileTurn()is { } turn && !MouZyMobileDisabled(owner.Seat, turn) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == owner.Seat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == owner.Seat && MouZyMobileCards(owner.Seat).Length > 0;
@@ -27,7 +27,7 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
             throw new InvalidOperationException("Mobile Zhou Yu requires one exact actual-turn instruction.");
         if (yingzi)
         {
-            if (f.SkillId != MouZhouYuMobileComposition.Yingzi || f.TriggerId != "three-condition-draw" || f.WindowContext is not { Window: SkillProgramTriggerWindow.DrawPhaseStarting, SourceSeat: { } source } || source != f.OwnerSeat || _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhouYuMobileYingziIssuedEvent>().Any(e => e.FrameId == f.Id))
+            if (f.SkillId != MouZhouYuMobileComposition.Yingzi || f.TriggerId != "three-condition-draw" || f.WindowContext is not { Window: SkillProgramTriggerWindow.DrawPhaseStarting, SourceSeat: { } source } || source != f.OwnerSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhouYuMobileYingziIssuedEvent>().Any(e => e.FrameId == f.Id))
                 throw new InvalidOperationException("Yingzi requires its native normal-draw window.");
             var owner = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
             var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count >= 2;
@@ -186,7 +186,7 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouZhouYuMobile = r with { Revealed = true, Stage = MouZhouYuMobileStage.GiftChildren, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, f.ActivationId, f.OwnerSeat, "covered", Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
             _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.Hand(r.TargetSeat), new("skill-program.mou-mobile:fanjian.gift"), m => _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhouYuMobileGiftedEvent(f.Id, card.Id, r.TargetSeat, m.From, m.To, m.Sequence)));
-            var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<MouZhouYuMobileGiftedEvent>().Single(e => e.FrameId == f.Id);
+            var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhouYuMobileGiftedEvent>().Single(e => e.FrameId == f.Id);
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouZhouYuMobile = f.MouZhouYuMobile!with { GiftSequence = paid.Sequence } });
             SealMouZyMobile(f.Id, before);

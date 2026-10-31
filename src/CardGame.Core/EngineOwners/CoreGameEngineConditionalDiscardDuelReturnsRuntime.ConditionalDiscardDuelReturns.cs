@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelReturnsRuntime
 {
     internal bool ValidConditionalDuelPayments(ProgramSkillFrame f)
     {
-        if (!_coreConditionalDiscardDuelsOperations.ConditionalDuelParentMatches(f) || f.ConditionalDiscardDuel is not { } d || !Enum.IsDefined(d.Stage))
+        if (!_coreConditionalDiscardDuelsOperations.Value.ConditionalDuelParentMatches(f) || f.ConditionalDiscardDuel is not { } d || !Enum.IsDefined(d.Stage))
             return false;
         bool Paid(ConditionalDiscardDuelPayment? p, bool owner)
         {
@@ -35,7 +35,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelReturnsRuntime
             return;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || use.Id != origin.CardUseFrameId || !MatchesConditionalDuelOrigin(f, origin))
             throw new InvalidOperationException("Conditional Duel lost its exact no-attack typed return.");
-        _coreConditionalDiscardDuelsOperations.FinishConditionalDiscardDuel(f, true);
+        _coreConditionalDiscardDuelsOperations.Value.FinishConditionalDiscardDuel(f, true);
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterBorrowedSword, 50)]
@@ -51,6 +51,6 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelReturnsRuntime
     {
         if (completion.ConditionalDiscardDuelReturn is not { AttackStarted: true } origin || completion.ResolutionId != origin.CardUseFrameId || completion.ProgramFrameId != origin.ParentProgramFrameId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != origin.ParentProgramFrameId || !MatchesConditionalDuelOrigin(f, origin))
             throw new InvalidOperationException("Conditional Duel lost its exact completed attack return.");
-        _coreConditionalDiscardDuelsOperations.FinishConditionalDiscardDuel(f, true);
+        _coreConditionalDiscardDuelsOperations.Value.FinishConditionalDiscardDuel(f, true);
     }
 }

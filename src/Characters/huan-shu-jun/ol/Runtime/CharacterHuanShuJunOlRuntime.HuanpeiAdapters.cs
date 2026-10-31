@@ -83,6 +83,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         if (f.HuanpeiReturn is not { Payment: { } p } || !ValidHuanpeiPayment(p) || p.Request.Intent != HuanpeiIntent.KeBiNengBasic || p.Request.ParentFrameId != f.Id || p.Request.Cursor != f.InstructionIndex || f.KeBiNengPingduan is not { } k || p.Source.OwnerSeat != k.ActorSeat || action.CardId != 0 || action.SelectableCardIds.Count != 0 || action.ConversionSource != p.Source || action.PlayedCardKind != p.Kind || !action.TargetSeats.SequenceEqual(p.Targets) || action.Kind != (CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) ? LegalActionKind.Slash : p.Kind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol))
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<HuanpeiKeActionAcceptedEvent>().Count(e => e == new HuanpeiKeActionAcceptedEvent(f.Id, f.InstructionIndex, k.Source, f.GameplayHash, p.ProgramFrameId, p.Kind)) == 1;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiKeActionAcceptedEvent>().Count(e => e == new HuanpeiKeActionAcceptedEvent(f.Id, f.InstructionIndex, k.Source, f.GameplayHash, p.ProgramFrameId, p.Kind)) == 1;
     }
 }

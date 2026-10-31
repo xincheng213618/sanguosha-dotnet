@@ -19,7 +19,7 @@ internal sealed partial class CharacterKongRongMouOlRuntime
     int IMouKongRongFacts.Xian(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Markers.GetValueOrDefault(PlayerMarkerKind.MouKongRongXian);
     IReadOnlyList<int> IMouKongRongFacts.Living => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Select(p => p.Seat).ToArray());
 
-    IReadOnlyList<T> IMouKongRongFacts.History<T>() => Array.AsReadOnly(_coreProgramEventHistoryOperations.ProgramEventHistory<T>().ToArray());
+    IReadOnlyList<T> IMouKongRongFacts.History<T>() => Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>().ToArray());
     bool IMouKongRongFacts.ParentMatches(ProgramSkillFrame f) => MouKrParentMatches(f);
     CardActionContext? IMouKongRongFacts.Action(ProgramSkillFrame f) => _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == f.WindowContext?.ParentFrameId)is ProgramCardTriggerWindowFrame w ? w.Action : null;
     MouKrZhengyiStartedEvent? IMouKongRongFacts.Damage(ProgramSkillFrame f) => _resolutionStackOperations._resolutionStack.SingleOrDefault(p => p.Id == f.WindowContext?.ParentFrameId)is BeforeDamageProgramWindowFrame { Nature: DamageNature.Normal, Amount: > 0 } w && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } a && a.TargetSeat == w.TargetSeat ? new(f.Id, MouKongRongRuntime.Source(f), f.GameplayHash, w.Id, a.ResolutionId, w.TargetSeat, w.Amount) : null;
@@ -69,10 +69,10 @@ internal sealed partial class CharacterKongRongMouOlRuntime
             CardActionAcceptedEvent { Action.Type: CardActionType.Response } e => e.Action,
             _ => null
         };
-        if (action is null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouKrActionObservedEvent>().Any(e => e.ActionId == action.ActionId))
+        if (action is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouKrActionObservedEvent>().Any(e => e.ActionId == action.ActionId))
             return;
         var actor = action.ActorSeat;
-        var previous = _coreProgramEventHistoryOperations.ProgramEventHistory<MouKrActionObservedEvent>().LastOrDefault(e => e.ActorSeat == actor);
+        var previous = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouKrActionObservedEvent>().LastOrDefault(e => e.ActorSeat == actor);
         var category = CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind);
         var instance = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[actor]).ProgramInstances.FirstOrDefault(i => i.SkillId == MouKongRongRuntime.Liwen);
         var source = instance is null ? null : new CardConversionSource(instance.SkillId, "after-use", actor, instance.SkillInstanceId);

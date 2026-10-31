@@ -26,7 +26,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
             var actual = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
             var a = actual.Action!;
             var p = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(x => x.Id == f.Id);
-            throw new InvalidOperationException($"Limu issue proof failed: receipt={(ValidLiuYan(p))},origin={(actual.LiuYanLimu == o)},kind={(actual.CardKind)}/{(a.EffectiveKind)},suit={(a.EffectiveSuit)},rank={(a.EffectiveRank)}/{(o.Rank)},red={(a.EffectiveIsRed)},provider={(a.ProviderSeat)}/{(o.ActorSeat)},declared={(_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == id))},actor={(_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(actual, o.ActorSeat, o.ActorSeat))},cost={(a.PhysicalCards.Count)},conversion={(a.ConversionChain.SequenceEqual([o.Source]))},from={((a.PhysicalCards.Count == 1 ? a.PhysicalCards[0].From.ToString() : "none"))},expected={(o.From)}");
+            throw new InvalidOperationException($"Limu issue proof failed: receipt={(ValidLiuYan(p))},origin={(actual.LiuYanLimu == o)},kind={(actual.CardKind)}/{(a.EffectiveKind)},suit={(a.EffectiveSuit)},rank={(a.EffectiveRank)}/{(o.Rank)},red={(a.EffectiveIsRed)},provider={(a.ProviderSeat)}/{(o.ActorSeat)},declared={(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Count(e => e.ResolutionId == id))},actor={(_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(actual, o.ActorSeat, o.ActorSeat))},cost={(a.PhysicalCards.Count)},conversion={(a.ConversionChain.SequenceEqual([o.Source]))},from={((a.PhysicalCards.Count == 1 ? a.PhysicalCards[0].From.ToString() : "none"))},expected={(o.From)}");
         }
 
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(id, card, o.ActorSeat, [o.ActorSeat], LegalActionKind.Indulgence, playedCardKind: CardKind.Indulgence);
@@ -66,7 +66,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
     {
         if (use.LiuYanLimu is not { } o)
             return;
-        if (use.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !MatchesLiuYanLimu(f, o) || f.LiuYan!.PaymentSequence is null || _coreProgramEventHistoryOperations.ProgramEventHistory<LiuYanLimuReturnedEvent>().Any(e => e.Origin == o))
+        if (use.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || !MatchesLiuYanLimu(f, o) || f.LiuYan!.PaymentSequence is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiuYanLimuReturnedEvent>().Any(e => e.Origin == o))
             throw new InvalidOperationException("Limu must return exactly once after its physical card use finishes.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LiuYanLimuReturnedEvent(o));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LiuYan = f.LiuYan!with { Stage = LiuYanStage.LimuReturnedChildren, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

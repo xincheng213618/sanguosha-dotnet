@@ -26,7 +26,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
         }
 
         if (child is HpChangedTriggerWindowFrame hp)
-            return r.Stage == LiuYanStage.LimuRecoveryChildren && r.RecoveryIssued && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.ParentFrameId == f.Id && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == f.OwnerSeat && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Amount > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<LiuYanLimuRecoveryIssuedEvent>().Count(e => e.FrameId == f.Id) == 1;
+            return r.Stage == LiuYanStage.LimuRecoveryChildren && r.RecoveryIssued && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.ParentFrameId == f.Id && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == f.OwnerSeat && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Amount > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiuYanLimuRecoveryIssuedEvent>().Count(e => e.FrameId == f.Id) == 1;
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 

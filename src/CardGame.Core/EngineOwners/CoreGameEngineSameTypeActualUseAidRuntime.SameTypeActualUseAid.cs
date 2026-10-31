@@ -79,7 +79,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
         if (_characterDianWeiMouOperations.IsMouDianWeiSlashUse(use.Id))
             return true;
         if (use.PindianWinnerSlashReturn is { } winner)
-            return _coreRecipientContestReceiptsOperations.MatchesPindianWinnerUse(use, winner);
+            return _coreRecipientContestReceiptsOperations.Value.MatchesPindianWinnerUse(use, winner);
         if (use.ForeignTurnContestSlashReturn is not null)
             return true;
         if (use.CardAttack?.ProgramSkillCardUseFrameId is not { } id || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == id)is not { } parent || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash || parent.InstructionIndex < 1)
@@ -158,7 +158,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
     internal void ResolveSameTypeAidChoice(PromptChoice selected)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(_resolutionStackOperations._resolutionStack.Last().Id);
-        _coreForeignContestAidObserversOperations.AssertSameTypeAid(f);
+        _coreForeignContestAidObserversOperations.Value.AssertSameTypeAid(f);
         var r = f.SameTypeAid ?? throw new InvalidOperationException("Aid answer lost its owning receipt.");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == SameTypeAidStage.ChoosingRecipient ? f.OwnerSeat : r.RecipientSeat) || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual(_corePendingDecisionPolicyPipelineOperations._pendingDecision.Choices, SameTypeAidChoices(f)) || !SameTypeAidChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets)))
             throw new InvalidOperationException("Aid changed its frozen chooser, payment slot or current target.");
@@ -255,7 +255,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != frameId || f.SameTypeAid is not { } r)
             return false;
-        _coreForeignContestAidObserversOperations.AssertSameTypeAid(f);
+        _coreForeignContestAidObserversOperations.Value.AssertSameTypeAid(f);
         if (r.Stage is SameTypeAidStage.ChoosingRecipient or SameTypeAidStage.ChoosingAnswer)
         {
             if (!SameTypeAidUnpaidSourceValid(f))

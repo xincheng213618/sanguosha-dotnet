@@ -3,14 +3,14 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHanDangMouMobileRuntime
 {
-    internal IEnumerable<MouHanDangGongqiGrantedEvent> MouHanDangActionRestrictions(long action) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouHanDangUseRestrictedEvent>().Where(e => e.ActionId == action).SelectMany(e => _coreProgramEventHistoryOperations.ProgramEventHistory<MouHanDangGongqiGrantedEvent>().Where(g => g.FrameId == e.GrantFrameId));
+    internal IEnumerable<MouHanDangGongqiGrantedEvent> MouHanDangActionRestrictions(long action) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHanDangUseRestrictedEvent>().Where(e => e.ActionId == action).SelectMany(e => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHanDangGongqiGrantedEvent>().Where(g => g.FrameId == e.GrantFrameId));
     internal CardActionContext? CurrentMouHanDangRespondedAction()
     {
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault();
         if (_coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { ChainDepth: > 0 } n)
         {
             var original = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == n.ParentFrameId)?.Action;
-            return _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Nullification && a.ParentActionId == original?.ActionId) ?? original;
+            return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Nullification && a.ParentActionId == original?.ActionId) ?? original;
         }
 
         return use?.Action;
@@ -31,8 +31,8 @@ internal sealed partial class CharacterHanDangMouMobileRuntime
         var isUse = a.Type == CardActionType.Use || a.Type == CardActionType.Response && a.ActorSeat == a.ProviderSeat && a.RequesterSeat is null && (a.EffectiveKind == CardKind.Nullification || _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat], a.EffectiveKind));
         if (!isUse || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || phase.ActorSeat != a.ActorSeat)
             return;
-        foreach (var grant in _coreProgramEventHistoryOperations.ProgramEventHistory<MouHanDangGongqiGrantedEvent>().Where(g => g.Source.OwnerSeat == a.ActorSeat && g.Phase == phase).ToArray())
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouHanDangUseRestrictedEvent>().Any(e => e.ActionId == a.ActionId && e.GrantFrameId == grant.FrameId))
+        foreach (var grant in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHanDangGongqiGrantedEvent>().Where(g => g.Source.OwnerSeat == a.ActorSeat && g.Phase == phase).ToArray())
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHanDangUseRestrictedEvent>().Any(e => e.ActionId == a.ActionId && e.GrantFrameId == grant.FrameId))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHanDangUseRestrictedEvent(a.ActionId, a.ActorSeat, grant.FrameId));
     }
 }

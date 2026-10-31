@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineProgramDamageTransferRuntime
         if (cost.CardIds.Count != 1)
             throw new InvalidOperationException("Damage redirection requires exactly one bound cost card.");
         attack.RedirectFinalizedDamageTarget(recipientSeat, new GameEngine.ProgramDamageTransferFollowup(active.SkillId, active.OwnerSeat, recipientSeat, drawLostHpAfterDamage));
-        _coreRecipientScopedDamageOperations.UpdateRecipientScopedDamageRedirect(attack);
+        _coreRecipientScopedDamageOperations.Value.UpdateRecipientScopedDamageRedirect(attack);
         _coreRuntimeOperations.ReplaceRuntimeFrame(_resolutionStackOperations._resolutionStack[^2].Id, window with { RedirectedTargetSeat = recipientSeat });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDamageTransferredEvent(attack.ResolutionId, active.SkillId, active.OwnerSeat, attack.SourceSeat, recipientSeat, cost.CardIds[0], window.Amount, window.Nature));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 转移 {(window.Amount)} 点伤害给 {(_coreMatchParticipantsPlayersAccess._players[recipientSeat].Name)}。", active.OwnerSeat, recipientSeat);

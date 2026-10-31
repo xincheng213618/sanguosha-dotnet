@@ -3,11 +3,11 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuFuAnniversaryRuntime
 {
-    internal bool WuFuPhaseOpen(ActualDiscardRecoveryPhaseKey phase) => phase.Kind == ActualDiscardRecoveryPhaseKind.Play && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase() == phase && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) && !_coreProgramEventHistoryOperations.ProgramEventHistory<ActualPhaseEndedEvent>().Any(e => e.Phase == phase);
+    internal bool WuFuPhaseOpen(ActualDiscardRecoveryPhaseKey phase) => phase.Kind == ActualDiscardRecoveryPhaseKind.Play && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase() == phase && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualPhaseEndedEvent>().Any(e => e.Phase == phase);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 46601)]
     internal void CaptureWuFuPhaseGain(IGameEvent fact)
     {
-        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveAnniversaryWuFuJuekai) || fact is not CardMovedEvent { To.Zone: CardZoneKind.Hand, To.OwnerSeat: { } seat } moved || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || !WuFuPhaseOpen(phase) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuPhaseGainEvent>().Any(e => e.Phase == phase && e.Recipient == seat))
+        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveAnniversaryWuFuJuekai) || fact is not CardMovedEvent { To.Zone: CardZoneKind.Hand, To.OwnerSeat: { } seat } moved || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Play } phase || !WuFuPhaseOpen(phase) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuPhaseGainEvent>().Any(e => e.Phase == phase && e.Recipient == seat))
             return;
         var movement = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == moved.CardId && m.From == moved.From && m.To == moved.To && m.Reason == moved.Reason);
         if (movement is null || _coreActualHandGainProgramsOperations.ActualHandGainOriginalSource(movement) == CardLocation.Hand(seat))
@@ -15,7 +15,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryWuFuPhaseGainEvent(phase, seat, movement.Sequence));
     }
 
-    internal bool IsAnniversaryWuFuHandUseForbidden(int seat, IReadOnlyList<int> ids) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveAnniversaryWuFuJuekai) && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuJuekaiEvent>().Any(e => WuFuPhaseOpen(e.Phase) && _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWuFuPhaseGainEvent>().Any(g => g.Phase == e.Phase && g.Recipient == seat)) && ids.Any(id => id > 0 && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(seat));
+    internal bool IsAnniversaryWuFuHandUseForbidden(int seat, IReadOnlyList<int> ids) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveAnniversaryWuFuJuekai) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuJuekaiEvent>().Any(e => WuFuPhaseOpen(e.Phase) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuPhaseGainEvent>().Any(g => g.Phase == e.Phase && g.Recipient == seat)) && ids.Any(id => id > 0 && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(seat));
     internal bool WuFuResponseIsUse(int actor, CardKind kind, bool dying = false) => dying || kind == CardKind.Nullification || _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[actor], kind);
     [ProgramCardLegality(ProgramCardLegalityStage.MaterialUseBan, 46601)]
     internal bool WuFuMaterialBan(ProgramCardMaterialQuery q) => (!q.IsResponse || WuFuResponseIsUse(q.ActorSeat, q.Kind)) && IsAnniversaryWuFuHandUseForbidden(q.ActorSeat, q.CardIds.ToArray());

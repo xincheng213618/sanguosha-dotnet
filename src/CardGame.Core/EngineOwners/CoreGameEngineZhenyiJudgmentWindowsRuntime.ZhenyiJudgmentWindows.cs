@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineZhenyiJudgmentWindowsRuntime
             return true;
         if (_coreHellDizangProgramsOperations.IsExactHellDayuanBeforeResultProgramChild(window, child))
             return true;
-        if (window.ZhenyiBeforeResult != true || !window.Activated || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || child.WindowContext is not { Window: SkillProgramTriggerWindow.JudgmentBeforeResult, Judgment: { } result } context || context.ParentFrameId != window.Id || result != window.Judgment || _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(f => f.Id == window.ParentFrameId)is not { } pending || pending.ZhenyiBeforeResultCompleted == true || pending.Id != result.JudgmentFrameId || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id != result.CardId)
+        if (window.ZhenyiBeforeResult != true || !window.Activated || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || child.WindowContext is not { Window: SkillProgramTriggerWindow.JudgmentBeforeResult, Judgment: { } result } context || context.ParentFrameId != window.Id || result != window.Judgment || _resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().SingleOrDefault(f => f.Id == window.ParentFrameId)is not { } pending || pending.ZhenyiBeforeResultCompleted == true || pending.Id != result.JudgmentFrameId || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)?.Id != result.CardId)
             return false;
         var candidate = window.Candidates[window.CandidateIndex];
         return candidate.OwnerSeat == child.OwnerSeat && candidate.SkillId == child.SkillId && candidate.TriggerId == child.TriggerId && candidate.SkillInstanceId == child.SkillInstanceId && candidate.GameplayHash == child.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger(child).Effects is [{ Op: SkillProgramEffectOp.ChooseFinalJudgmentFiveByZiwei }];
@@ -38,7 +38,7 @@ internal sealed partial class CoreGameEngineZhenyiJudgmentWindowsRuntime
 
     internal ProgramJudgmentTriggerWindowFrame RefreshZhenyiBeforeResultWindow(ProgramJudgmentTriggerWindowFrame frame, JudgmentFrame pending)
     {
-        if (frame.ZhenyiBeforeResult != true || frame.ParentFrameId != pending.Id || frame.Judgment.JudgmentFrameId != pending.Id || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)is not { } card || card.Id != frame.Judgment.CardId || card.Kind != frame.Judgment.CardKind)
+        if (frame.ZhenyiBeforeResult != true || frame.ParentFrameId != pending.Id || frame.Judgment.JudgmentFrameId != pending.Id || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)is not { } card || card.Id != frame.Judgment.CardId || card.Kind != frame.Judgment.CardKind)
             throw new InvalidOperationException("The before-result judgment lost its exact native physical card and parent.");
         var suit = _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentSuit(pending, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[pending.TargetSeat], card));
         var rank = _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentRank(pending, card.Rank);

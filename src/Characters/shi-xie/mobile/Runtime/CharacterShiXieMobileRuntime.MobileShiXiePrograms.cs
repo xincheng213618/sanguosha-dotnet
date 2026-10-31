@@ -20,10 +20,10 @@ internal sealed partial class CharacterShiXieMobileRuntime
     internal SkillProgramStepOutcome ChangeMobileShiXieDistance(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != op || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiXieIncomingDistanceChangedEvent>().Any(e => e.ProgramFrameId == f.Id && e.InstructionIndex == f.InstructionIndex))
+        if (_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != op || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiXieIncomingDistanceChangedEvent>().Any(e => e.ProgramFrameId == f.Id && e.InstructionIndex == f.InstructionIndex))
             throw new InvalidOperationException("Mobile Shi Xie cannot reissue another instruction's permanent distance change.");
         var increase = op == SkillProgramEffectOp.IncreaseMobileShiXieIncomingDistanceByLivingFactions;
-        if (increase ? f.SkillId != MobileShiXieComposition.Biluan || f.TriggerId != "skip-normal-draw-for-distance" || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.DrawPhaseStarting } c || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != f.OwnerSeat || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is not { Window: SkillProgramTriggerWindow.DrawPhaseStarting, Continuation: ProgramLifecycleContinuation.CompleteDrawPhase } || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != f.OwnerSeat && _coreNativeRuleQueriesOperations.GetCombatDistance(p.Seat, f.OwnerSeat) == 1) : !MobileShiXieCourtesySelected(f) || f.NativeDraw is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiXieCourtesyDrawIssuedEvent>().Any(e => e.ProgramFrameId == f.Id))
+        if (increase ? f.SkillId != MobileShiXieComposition.Biluan || f.TriggerId != "skip-normal-draw-for-distance" || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.DrawPhaseStarting } c || c.OwnerSeat != f.OwnerSeat || c.SourceSeat != f.OwnerSeat || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(p => p.Id == c.ParentFrameId)is not { Window: SkillProgramTriggerWindow.DrawPhaseStarting, Continuation: ProgramLifecycleContinuation.CompleteDrawPhase } || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != f.OwnerSeat && _coreNativeRuleQueriesOperations.GetCombatDistance(p.Seat, f.OwnerSeat) == 1) : !MobileShiXieCourtesySelected(f) || f.NativeDraw is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiXieCourtesyDrawIssuedEvent>().Any(e => e.ProgramFrameId == f.Id))
             throw new InvalidOperationException("Mobile Shi Xie lost its native Draw replacement or already-issued exact Ending benefit.");
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None)
             return SkillProgramStepOutcome.Continue;
@@ -35,13 +35,13 @@ internal sealed partial class CharacterShiXieMobileRuntime
 
     internal void IssueMobileShiXieDistance(ProgramSkillFrame f, int amount)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiXieIncomingDistanceChangedEvent>().Any(e => e.ProgramFrameId == f.Id))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiXieIncomingDistanceChangedEvent>().Any(e => e.ProgramFrameId == f.Id))
             throw new InvalidOperationException("Mobile Shi Xie cannot settle the original distance instruction twice.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiXieIncomingDistanceChangedEvent(f.Id, f.InstructionIndex, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, amount));
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.IncomingContributions, 78900)]
-    internal IEnumerable<RuleQueryContribution> MobileShiXieIncomingDistance(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiXieIncomingDistanceChangedEvent>().Where(e => e.Source.OwnerSeat == target).Select(e => (RuleQueryContribution)new FiniteRuleQueryContribution($"mobile-shi-xie:{(e.ProgramFrameId)}:{(e.InstructionIndex)}", SkillRuleOperation.Add, e.Amount));
+    internal IEnumerable<RuleQueryContribution> MobileShiXieIncomingDistance(int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiXieIncomingDistanceChangedEvent>().Where(e => e.Source.OwnerSeat == target).Select(e => (RuleQueryContribution)new FiniteRuleQueryContribution($"mobile-shi-xie:{(e.ProgramFrameId)}:{(e.InstructionIndex)}", SkillRuleOperation.Add, e.Amount));
     internal bool MobileShiXieCourtesySelected(ProgramSkillFrame f)
     {
         if (!MobileShiXieEndingParent(f) || f.ChoiceBindings.SingleOrDefault(b => b.Name == MobileShiXieComposition.Benefit)is not { ChooserSeat: var chooser, OptionId: "self" or "current" } choice || chooser != f.OwnerSeat)
@@ -54,7 +54,7 @@ internal sealed partial class CharacterShiXieMobileRuntime
     internal void ReturnMobileShiXieCourtesyDraw(ProgramSkillFrame supplied, NativeDrawOutcome drawn)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!MobileShiXieCourtesySelected(f) || f.NativeDraw is not null || drawn.RecipientSeat != MobileShiXieCourtesyRecipient(f) || drawn.RequestedCount != 1 || drawn.ActualDrawIds.Count > 1 || drawn.SequenceBefore > drawn.SequenceAfter || drawn.SequenceAfter > _coreCardMovementJournalMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiXieCourtesyDrawIssuedEvent>().Any(e => e.ProgramFrameId == f.Id))
+        if (!MobileShiXieCourtesySelected(f) || f.NativeDraw is not null || drawn.RecipientSeat != MobileShiXieCourtesyRecipient(f) || drawn.RequestedCount != 1 || drawn.ActualDrawIds.Count > 1 || drawn.SequenceBefore > drawn.SequenceAfter || drawn.SequenceAfter > _coreCardMovementJournalMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiXieCourtesyDrawIssuedEvent>().Any(e => e.ProgramFrameId == f.Id))
             throw new InvalidOperationException("Lixia lost the original chosen one-card native draw return.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiXieCourtesyDrawIssuedEvent(f.Id, f.InstructionIndex, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), f.GameplayHash, drawn.RecipientSeat, drawn.ActualDrawIds.Count, drawn.SequenceAfter));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
@@ -63,7 +63,7 @@ internal sealed partial class CharacterShiXieMobileRuntime
     [ProgramContinuation(ProgramContinuationKind.Resume, 78900)]
     internal bool SettleMobileShiXieCourtesy(long id)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.NativeDraw is not null || !MobileShiXieCourtesySelected(f) || !MobileShiXieCourtesyIssued(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiXieIncomingDistanceChangedEvent>().Any(e => e.ProgramFrameId == f.Id))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || f.Id != id || f.NativeDraw is not null || !MobileShiXieCourtesySelected(f) || !MobileShiXieCourtesyIssued(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiXieIncomingDistanceChangedEvent>().Any(e => e.ProgramFrameId == f.Id))
             return false;
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.Program) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.Program) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id))
             return true;
@@ -79,7 +79,7 @@ internal sealed partial class CharacterShiXieMobileRuntime
         if (!MobileShiXieCourtesySelected(f))
             return false;
         var recipient = MobileShiXieCourtesyRecipient(f);
-        return f.NativeDraw is { ReturnKind: NativeDrawAttemptReturnKind.ProgramOperation, RequestedCount: 1, Operation: SkillProgramEffectOp.DecreaseMobileShiXieIncomingDistance, InstructionIndex: 2 } native && native.Recipients.SequenceEqual([recipient]) || _coreProgramEventHistoryOperations.ProgramEventHistory<MobileShiXieCourtesyDrawIssuedEvent>().Any(e => e.ProgramFrameId == f.Id && e.InstructionIndex == 2 && e.Source == CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f) && e.GameplayHash == f.GameplayHash && e.RecipientSeat == recipient && e.ActualCount is >= 0 and <= 1 && e.MovementSequence <= _coreCardMovementJournalMovementSequenceAccess._movementSequence);
+        return f.NativeDraw is { ReturnKind: NativeDrawAttemptReturnKind.ProgramOperation, RequestedCount: 1, Operation: SkillProgramEffectOp.DecreaseMobileShiXieIncomingDistance, InstructionIndex: 2 } native && native.Recipients.SequenceEqual([recipient]) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiXieCourtesyDrawIssuedEvent>().Any(e => e.ProgramFrameId == f.Id && e.InstructionIndex == 2 && e.Source == CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f) && e.GameplayHash == f.GameplayHash && e.RecipientSeat == recipient && e.ActualCount is >= 0 and <= 1 && e.MovementSequence <= _coreCardMovementJournalMovementSequenceAccess._movementSequence);
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 78900)]

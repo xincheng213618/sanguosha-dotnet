@@ -168,7 +168,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
                 if (stage == SunYuanStage.ReclaimChildren)
                 {
                     var original = r.Materials.Single(c => c.CardId == m.CardId);
-                    var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<SunYuanEntityMovedEvent>().Single(e => e.FrameId == f.Id && e.Stage == SunYuanStage.DiscardChildren && e.CardId == m.CardId);
+                    var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunYuanEntityMovedEvent>().Single(e => e.FrameId == f.Id && e.Stage == SunYuanStage.DiscardChildren && e.CardId == m.CardId);
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DongxinEntityAcquiredEvent(f.Id, r.Source, f.OwnerSeat, m.CardId, original.EffectiveKind, paid.Sequence, m.Sequence));
                 }
             }

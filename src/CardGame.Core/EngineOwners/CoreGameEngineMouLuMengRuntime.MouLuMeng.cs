@@ -9,17 +9,17 @@ internal sealed partial class CoreGameEngineMouLuMengRuntime
 
     internal void BeginRoundForTurn(CharacterState current)
     {
-        if ((!_modeRulesOperations._modeRules.RequiresRoundTracking && !UsesFormalMouLuMeng && !_contentRegistryOperations._contentRegistry.ProgramDependencies.UsesRoundTracking && !_coreShanheSourceDifficultyOperations.RequiresShanheSourceArmorTracking) || _coreActualTurnProgressTurnProgressionAccess._turnProgression.Kind == ActualTurnKind.Extra)
+        if ((!_modeRulesOperations._modeRules.RequiresRoundTracking && !UsesFormalMouLuMeng && !_contentRegistryOperations._contentRegistry.ProgramDependencies.UsesRoundTracking && !_coreShanheSourceDifficultyOperations.Value.RequiresShanheSourceArmorTracking) || _coreActualTurnProgressTurnProgressionAccess._turnProgression.Kind == ActualTurnKind.Extra)
             return;
         if (_coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber == 0 || _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Contains(current.Seat))
         {
-            if (!_coreRoundEndingOperations.TracksRoundEnding || !_coreProgramEventHistoryOperations.ProgramEventHistory<RoundEndedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber))
+            if (!_coreRoundEndingOperations.Value.TracksRoundEnding || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<RoundEndedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber))
                 _characterGuanYuRuntimeOperations.ReturnDemonRoundHolds();
             _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber++;
             _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Clear();
             _skillRuntimeStateOperations._skillRuntimeState.ResetRound();
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoundStartedEvent(_coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber, current.Seat));
-            _coreShanheSourceDifficultyOperations.RestoreShanheSourceRoundArmor();
+            _coreShanheSourceDifficultyOperations.Value.RestoreShanheSourceRoundArmor();
             _coreMatchLogOperations.AddLog("RoundStarted", $"第 {(_coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber)} 轮开始。", current.Seat);
         }
 

@@ -9,7 +9,7 @@ internal sealed partial class CoreOwnedDrawPhaseRuntimePortsRuntime
 
     bool IOwnedDrawPhaseFacts.HasAttemptCapability => _coreNativeDrawAttemptsOperations.HasNativeDrawAttemptCapability;
 
-    bool IOwnedDrawPhaseFacts.TracksNativeDrawThresholds => _coreNativeDrawThresholdOperations.TracksNativeDrawThresholds;
+    bool IOwnedDrawPhaseFacts.TracksNativeDrawThresholds => _coreNativeDrawThresholdOperations.Value.TracksNativeDrawThresholds;
 
     bool IOwnedDrawPhaseFacts.TracksShanheS5PhaseSkips => _coreShanheS5ShensuOperations.TracksShanheS5PhaseSkips;
 
@@ -25,6 +25,6 @@ internal sealed partial class CoreOwnedDrawPhaseRuntimePortsRuntime
     ProgramMarkerExtraDrawPolicy? IOwnedDrawPhaseNativeOperations.ConsumeIssuedExtraDrawMarker(DrawPhaseObligationFrame frame) => _coreLeastHandMarkerDrawProgramsOperations.ConsumeIssuedExtraDrawMarker(frame);
     void IOwnedDrawPhaseNativeOperations.AdvanceRulesAndPublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     void IOwnedDrawPhaseNativeOperations.EndTurn() => _coreActualTurnsOperations.EndTurn();
-    bool IOwnedDrawPhaseNativeOperations.CompleteShanheSourceChunlaoJudgmentDraw(DrawPhaseObligationFrame frame) => _coreShanheSourceChunlaoJudgment3161Operations.TryCompleteShanheSourceChunlaoJudgmentDraw(frame);
+    bool IOwnedDrawPhaseNativeOperations.CompleteShanheSourceChunlaoJudgmentDraw(DrawPhaseObligationFrame frame) => _coreShanheSourceChunlaoJudgment3161Operations.Value.TryCompleteShanheSourceChunlaoJudgmentDraw(frame);
     void IOwnedDrawPhaseNativeOperations.CompleteTurnStartAfterDraw(CharacterState owner, int delayedEffects) => _coreActualTurnsOperations.CompleteTurnStartAfterDraw(owner, (GameEngine.DelayedTurnEffects)delayedEffects, drawPhaseEndedProgramsCompleted: true, actualDrawCompletionCompleted: true);
 }

@@ -25,7 +25,7 @@ internal sealed partial class CoreProgramBoundCardRuntimePortsRuntime
     int? IProgramBoundInstructionFacts.SelectionActor(ProgramSkillFrame frame, string bind, IReadOnlyList<int> ids, IReadOnlyList<CardLocation> locations) => _characterWuGuoTaiBoundaryMobileOperations.BoundaryWuGuoTaiBuyiDiscardActor(frame, bind, ids, locations);
     int IProgramBoundInstructionFacts.Participant(ProgramSkillFrame frame, ProgramParticipantReference reference) => _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, reference);
     IReadOnlyList<int> IProgramBoundInstructionFacts.TargetSeats(int owner, SkillProgramTargetKind kind, ProgramSkillWindowContext? context) => _coreProgramLifecycleOperations.GetProgramTargetSeats(owner, kind, context);
-    bool IProgramBoundInstructionFacts.IsAtomicDiscard(ProgramSkillFrame frame, string sourceBind) => _coreLiejieSourceDiscardsOperations.IsAtomicLiejieCostMove(frame, sourceBind);
+    bool IProgramBoundInstructionFacts.IsAtomicDiscard(ProgramSkillFrame frame, string sourceBind) => _coreLiejieSourceDiscardsOperations.Value.IsAtomicLiejieCostMove(frame, sourceBind);
     IReadOnlyList<PromptChoice> IProgramBoundInstructionFacts.PresentDistribution(ProgramSkillFrame frame, IReadOnlyList<PromptChoice> choices, string sourceBind, SkillProgramTargetKind targetKind) => _coreCardDistributionPresentationOperations.PresentBoundCardDistribution(frame, choices, sourceBind, targetKind);
     long IProgramBoundCardMovementOperations.Sequence => _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
 
@@ -36,15 +36,15 @@ internal sealed partial class CoreProgramBoundCardRuntimePortsRuntime
     void IProgramBoundCardMovementOperations.PlaceAtBottom(IReadOnlyList<int> ids) => _cardZonesOperations._cardZones.PlaceDrawPileCardsAtBottom(ids);
     void IProgramBoundCardMovementOperations.PlaceAtTop(IReadOnlyList<int> ids) => _cardZonesOperations._cardZones.PlaceDrawPileCardsAtTop(ids);
     void IProgramBoundCardPaymentOperations.Cancel(ProgramSkillFrame frame, string reason) => _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, reason);
-    void IProgramBoundCardPaymentOperations.CleanupRepeatedJudgment(ProgramSkillFrame frame) => _coreExactRepeatedJudgmentOperations.CleanupExactRepeatedJudgment(frame);
+    void IProgramBoundCardPaymentOperations.CleanupRepeatedJudgment(ProgramSkillFrame frame) => _coreExactRepeatedJudgmentOperations.Value.CleanupExactRepeatedJudgment(frame);
     void IProgramBoundCardPaymentOperations.CleanupDeckSlash(ProgramSkillFrame frame) => _coreDeckProgramsOperations.CleanupDeckSlashSequence(frame);
     ProgramSkillFrame IProgramBoundCardPaymentOperations.FreezeSequentialDiscardTop(ProgramSkillFrame frame, string bind, string? exceptBind, SkillProgramCardDestination destination) => _coreSequentialDiscardReceiptsOperations.FreezeSequentialDiscardTopPayment(frame, bind, exceptBind, destination);
-    ProgramSkillFrame IProgramBoundCardPaymentOperations.FreezeLostHpChained(ProgramSkillFrame frame, string bind, string? exceptBind, SkillProgramCardDestination destination) => _coreProgramLostHpChainedPaymentsOperations.FreezeLostHpChainedPayment(frame, bind, exceptBind, destination);
+    ProgramSkillFrame IProgramBoundCardPaymentOperations.FreezeLostHpChained(ProgramSkillFrame frame, string bind, string? exceptBind, SkillProgramCardDestination destination) => _coreProgramLostHpChainedPaymentsOperations.Value.FreezeLostHpChainedPayment(frame, bind, exceptBind, destination);
     long? IProgramBoundCardPaymentOperations.BeginWholeHandAcquisition(ProgramSkillFrame frame, string bind, SkillProgramCardDestination destination) => _corePindianHandReturnsOperations.BeginPindianWholeHandAcquisition(frame, bind, destination);
     void IProgramBoundCardPaymentOperations.CommitWholeHandAcquisition(long frameId, string bind, long sequenceBefore) => _corePindianHandReturnsOperations.CommitPindianWholeHandAcquisition(frameId, bind, sequenceBefore);
     bool IProgramBoundCardPaymentOperations.PreparePhaseAlcohol(ProgramSkillFrame frame, string bind, CardMoveReason reason) => _coreForcedPhaseAlcoholOperations.PreparePhaseAlcoholPayment(frame, bind, reason);
-    void IProgramBoundCardPaymentOperations.FreezeDiscardColors(ProgramSkillFrame frame, string bind, IReadOnlyList<int> ids, IReadOnlyList<CardLocation> locations) => _coreLiejieSourceDiscardsOperations.FreezeLiejieDiscardColors(frame, bind, ids, locations);
+    void IProgramBoundCardPaymentOperations.FreezeDiscardColors(ProgramSkillFrame frame, string bind, IReadOnlyList<int> ids, IReadOnlyList<CardLocation> locations) => _coreLiejieSourceDiscardsOperations.Value.FreezeLiejieDiscardColors(frame, bind, ids, locations);
     SkillProgramStepOutcome IProgramBoundCardPaymentOperations.BeginParticipantGift(ProgramSkillFrame frame, string bind, IReadOnlyList<int> ids, CardLocation target, CardMoveReason reason) => _coreParticipantHandProgramsOperations.BeginBoundParticipantGift(frame, bind, ids, target, reason);
-    void IProgramBoundCardPaymentOperations.CommitLostHpChained(long frameId) => _coreProgramLostHpChainedPaymentsOperations.CommitLostHpChainedPayment(frameId);
+    void IProgramBoundCardPaymentOperations.CommitLostHpChained(long frameId) => _coreProgramLostHpChainedPaymentsOperations.Value.CommitLostHpChainedPayment(frameId);
     void IProgramBoundCardPaymentOperations.CommitPhaseAlcohol(long frameId) => _coreForcedPhaseAlcoholOperations.CommitPhaseAlcoholPayment(frameId);
 }

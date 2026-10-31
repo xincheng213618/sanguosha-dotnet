@@ -24,7 +24,7 @@ internal sealed partial class CoreGameEngineHpConditionalSkillGrantsRuntime
         var source = owner.SkillGrants.Grants.FirstOrDefault(candidate => candidate.GrantId == relation.CapabilityGrantId && candidate.SkillId == relation.CapabilitySkillId && candidate.SkillInstanceId == relation.CapabilitySkillInstanceId && candidate.HpConditionalSource is null);
         if (source is null || !HpConditionalSourceQualified(owner, source))
             return false;
-        return _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.HpSkillGrants.Any(rule => rule.Id == relation.RuleId && rule.SkillId == grant.SkillId && rule.Matches(owner.Hp) && _characterTangZiOlOperations.MatchesTangZiWoundedGrant(owner, rule)) == true;
+        return _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program?.HpSkillGrants.Any(rule => rule.Id == relation.RuleId && rule.SkillId == grant.SkillId && rule.Matches(owner.Hp) && _characterTangZiOlOperations.Value.MatchesTangZiWoundedGrant(owner, rule)) == true;
     }
 
     internal bool HpConditionalSourceQualified(CharacterState owner, SkillGrant source)
@@ -54,7 +54,7 @@ internal sealed partial class CoreGameEngineHpConditionalSkillGrantsRuntime
                     _coreGameEngineHpConditionalSkillGrantsHpConditionalSkillInstancesSynchronizingHpConditionalSkillGrantsAccess._hpConditionalSkillInstances.Remove(key);
                 var desired = new Dictionary<string, SkillGrant>(StringComparer.Ordinal);
                 foreach (var source in owner.SkillGrants.Grants.Where(grant => grant.HpConditionalSource is null && _contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Program?.HpSkillGrants.Count > 0 && HpConditionalSourceQualified(owner, grant)))
-                    foreach (var rule in _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.HpSkillGrants.Where(rule => rule.Matches(owner.Hp) && _characterTangZiOlOperations.MatchesTangZiWoundedGrant(owner, rule)))
+                    foreach (var rule in _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.HpSkillGrants.Where(rule => rule.Matches(owner.Hp) && _characterTangZiOlOperations.Value.MatchesTangZiWoundedGrant(owner, rule)))
                     {
                         var relation = new HpConditionalSkillGrantSource(source.GrantId, source.SkillId, source.SkillInstanceId, rule.Id);
                         var id = HpConditionalGrantId(owner.Seat, relation);

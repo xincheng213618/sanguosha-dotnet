@@ -86,7 +86,7 @@ internal sealed partial class CoreGameEngineLastDamageSourceReciprocityRuntime
         var e = LastDamageSourceEligibility(f.OwnerSeat, f.SkillId, trigger, damageId);
         if (e is null || e.SkillInstanceId != f.SkillInstanceId || !CanOfferLastDamageSourceReciprocity(f.OwnerSeat, f.SkillId, trigger, context))
             return SkillProgramStepOutcome.Continue;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(window);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window);
         if (attack.ResolutionId != e.AttackFrameId || attack.IsSourceLess || !attack.DamageWasApplied || attack.SourceSeat != e.SourceSeat || attack.TargetSeat != e.TargetSeat || attack.DamageAmount != e.Amount || _coreNativeCardClassificationsOperations.GetDamageNature(attack) != e.Nature)
             throw new InvalidOperationException("Last-source reciprocity lost its real positive damage producer.");
         var participant = e.Direction == LastDamageSourceReciprocityDirection.DrawOwner ? f.OwnerSeat : e.SourceSeat;

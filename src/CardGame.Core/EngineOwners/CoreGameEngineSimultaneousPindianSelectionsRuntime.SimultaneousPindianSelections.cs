@@ -19,7 +19,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
             if (selection.Receipts.All(p => p.TargetSeat != c.TargetSeat) && _corePindianRandomSelectionsOperations.PindianPolicySourceLive(c.OwnerSeat, c.Source, SkillProgramCardPolicyKind.PindianOpponentRandomHand) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.TargetSeat]).Count > 0)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimultaneousPindian = r with { RandomSelection = selection } });
-                _coreSimultaneousPindianOperations.PublishSimultaneousChoice(f);
+                _coreSimultaneousPindianOperations.Value.PublishSimultaneousChoice(f);
                 return;
             }
 
@@ -85,7 +85,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
             _corePhysicalDrawFacadesOperations.EnsureDrawPile();
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimultaneousPindian = f.SimultaneousPindian!with { MovementAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-            if (!_coreSimultaneousPindianOperations.DrainSimultaneousChildren(f))
+            if (!_coreSimultaneousPindianOperations.Value.DrainSimultaneousChildren(f))
                 _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
             return;
         }
@@ -96,7 +96,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
             var forced = r.RandomSelection!.Receipts.SingleOrDefault(p => p.TargetSeat == seat);
             if (forced is null)
             {
-                _coreSimultaneousPindianOperations.PublishSimultaneousChoice(f);
+                _coreSimultaneousPindianOperations.Value.PublishSimultaneousChoice(f);
                 return;
             }
 
@@ -145,7 +145,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimultaneousPindian = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Processing, CoreGameEngineSimultaneousPindianSelectionsDefinitions.SimultaneousTopReservationReason, _ => _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SimultaneousPindianTopCommittedEvent(f.Id, seat, source)), emitCardMovedEvents: false);
-            if (!_coreSimultaneousPindianOperations.DrainSimultaneousChildren(f))
+            if (!_coreSimultaneousPindianOperations.Value.DrainSimultaneousChildren(f))
                 _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
             return;
         }
@@ -181,7 +181,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
         foreach (var t in r.TopReceipts)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PindianTopSourceChosenEvent(t.Seat, t.Source, t.CardId));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PindianCardsRevealedEvent(f.Id, r.Cards, true));
-        if (!_coreSimultaneousPindianOperations.DrainSimultaneousChildren(f))
+        if (!_coreSimultaneousPindianOperations.Value.DrainSimultaneousChildren(f))
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 }

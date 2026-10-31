@@ -6,7 +6,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineShanheSourceLihuo3160Runtime
 {
     SkillProgramStepOutcome IShanheSourceJiangdongTrioHost.LihuoFirstDamage(ProgramSkillFrame f) => BeginShanheSourceLihuoCost(f);
-    SkillProgramStepOutcome IShanheSourceJiangdongTrioHost.ChunlaoStorage(ProgramSkillFrame f) => _coreShanheSourceChunlao3161Operations.BeginShanheSourceChunlaoStorage(f);
+    SkillProgramStepOutcome IShanheSourceJiangdongTrioHost.ChunlaoStorage(ProgramSkillFrame f) => _coreShanheSourceChunlao3161Operations.Value.BeginShanheSourceChunlaoStorage(f);
     internal static bool IsShanheSourceLihuoConversion(CardConversionSource source) => source.SkillId == ShanheSourceJiangdongTrioIds.Lihuo && source.BindingId is "ordinary-slash-to-fire" or "committed-fire-target";
     internal int ShanheSourceLihuoProspectiveTargetBonus(CardUseFrame use) => use.CardKind == CardKind.Slash && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame f && f.SkillId == ShanheSourceJiangdongTrioIds.Lihuo && f.WindowContext?.CardUse?.ParentCardUseFrameId == use.Id && !_coreProgramPersistentStateOperations.GetProgramBooleanState2(f.OwnerSeat, f.SkillId, f.SkillInstanceId, ShanheSourceJiangdongTrioIds.FireTargetState) ? 1 : 0;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 24920)]
@@ -24,21 +24,21 @@ internal sealed partial class CoreGameEngineShanheSourceLihuo3160Runtime
 
     internal CardUseFrame? ShanheSourceLihuoDamageUse(ProgramTriggerCandidate c, ProgramSkillWindowContext w)
     {
-        if (c.SkillId != ShanheSourceJiangdongTrioIds.Lihuo || w.Window != SkillProgramTriggerWindow.AfterDamageApplied || w.Amount <= 0 || w.SourceSeat != c.OwnerSeat || w.DamageFrameId is not { } damageId || _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is not { } parent || parent.Id != w.ParentFrameId || parent.ParentFrameId != damageId)
+        if (c.SkillId != ShanheSourceJiangdongTrioIds.Lihuo || w.Window != SkillProgramTriggerWindow.AfterDamageApplied || w.Amount <= 0 || w.SourceSeat != c.OwnerSeat || w.DamageFrameId is not { } damageId || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } parent || parent.Id != w.ParentFrameId || parent.ParentFrameId != damageId)
             return null;
-        var attack = _coreNativeDamageHandlesOperations.GetDamageTriggerAttack(parent);
+        var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(parent);
         if (!attack.DamageWasApplied || attack.IsSourceLess || attack.SourceSeat != c.OwnerSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { CardKind: CardKind.FireSlash, Action: { Type: CardActionType.Use } a } use || a.ActorSeat != c.OwnerSeat || !a.ConversionChain.Any(s => IsShanheSourceLihuoConversion(s) && s.OwnerSeat == c.OwnerSeat && s.SkillInstanceId == c.SkillInstanceId))
             return null;
         return use;
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 24920)]
-    internal bool CanOfferShanheSourceLihuoCost(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => !t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveShanheSourceLihuoFirstDamage) || ShanheSourceLihuoDamageUse(c, w)is { } use && !_coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceLihuoCostStartedEvent>().Any(e => e.UseId == use.Id && e.OwnerSeat == c.OwnerSeat);
+    internal bool CanOfferShanheSourceLihuoCost(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => !t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveShanheSourceLihuoFirstDamage) || ShanheSourceLihuoDamageUse(c, w)is { } use && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceLihuoCostStartedEvent>().Any(e => e.UseId == use.Id && e.OwnerSeat == c.OwnerSeat);
     internal SkillProgramStepOutcome BeginShanheSourceLihuoCost(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0);
-        if (f.ShanheSourceLihuoCost is not null || f.WindowContext is not { } w || ShanheSourceLihuoDamageUse(c, w)is not { } use || _coreProgramEventHistoryOperations.ProgramEventHistory<ShanheSourceLihuoCostStartedEvent>().Any(e => e.UseId == use.Id && e.OwnerSeat == f.OwnerSeat))
+        if (f.ShanheSourceLihuoCost is not null || f.WindowContext is not { } w || ShanheSourceLihuoDamageUse(c, w)is not { } use || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheSourceLihuoCostStartedEvent>().Any(e => e.UseId == use.Id && e.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Source3160 cost requires its original first converted-Use damage.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheSourceLihuoCost = new(use.Id, w.ParentFrameId, w.DamageFrameId!.Value) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceLihuoCostStartedEvent(f.Id, use.Id, w.DamageFrameId.Value, f.OwnerSeat, f.SkillInstanceId));

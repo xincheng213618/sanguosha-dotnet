@@ -91,14 +91,14 @@ internal sealed partial class CoreNativeCardUseRuntime
         if (colorFireAttack is not null)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ColorFireAttackPolicyIssuedEvent(resolutionId, colorFireAttack.ActionId, colorFireAttack.Source));
         _coreTieredRoundZeroUsesOperations.IssueTieredRoundConversionUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
-        _coreNoDamageSkillDisableOperations.IssueNoDamageSkillDisablePolicy(resolutionId);
+        _coreNoDamageSkillDisableOperations.Value.IssueNoDamageSkillDisablePolicy(resolutionId);
         _coreDrawFundedDistinctBasicUsesOperations.IssueDrawFundedDistinctBasicUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!, drawFundedPayment);
         _coreChainedStateBasicReturnsOperations.IssueChainedStateBasicUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!, chainedStatePayment);
         _coreProvenanceCardPoliciesOperations.IssueProvenanceUsePolicy(resolutionId, actionContext);
         _coreNonBasicSlashProfileOperations.IssueNonBasicSlashPolicy(resolutionId, actionContext);
         _coreRoundGainedSourceUsesOperations.IssueRoundGainedUseQualifications(resolutionId, actionContext);
         _coreShownEntityTurnPoliciesOperations.IssueShownEntityUseBenefits(resolutionId, actionContext);
-        _coreGiftedSlashUseRewardsOperations.IssueGiftedSlashUseBenefit(resolutionId, actionContext);
+        _coreGiftedSlashUseRewardsOperations.Value.IssueGiftedSlashUseBenefit(resolutionId, actionContext);
         _coreGrantedEntityPhasesOperations.IssueGrantedPhaseEntityUseDistance(resolutionId, actionContext);
         _characterWangGuanOlOperations.IssueMiuyanUse(resolutionId, actionContext);
         _characterMaXiuMaTieOlOperations.IssueKenshangUse(resolutionId, actionContext!);
@@ -117,7 +117,7 @@ internal sealed partial class CoreNativeCardUseRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TargetsConfirmedEvent(resolutionId, targets));
         _characterLuMengMouOperations.RecordYingboCardUse(resolutionId, sourceSeat, effectiveCardKind);
         _characterWangYunOlOperations.BindWangYunNativeUse(resolutionId);
-        _characterZhangJiOlOperations.BindZhangJiNativeUse(resolutionId);
+        _characterZhangJiOlOperations.Value.BindZhangJiNativeUse(resolutionId);
         _characterGuoSiOlOperations.BindGuoSiAcceptedUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterHuangQuanOlOperations.BindJianjiNativeUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterZhouYuMouOperations.BindMouZyNativeUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);

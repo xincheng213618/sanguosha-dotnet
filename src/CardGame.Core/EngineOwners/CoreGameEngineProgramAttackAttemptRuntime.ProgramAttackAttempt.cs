@@ -14,7 +14,7 @@ internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
             return false;
         }
 
-        if (!attack.TryAdvanceChainedTarget(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive, _coreNativeDamageHandlesOperations.UsesFormalTengjia || _coreNativeDamageHandlesOperations.UsesFormalSilverLion || _coreRecipientScopedDamageOperations.HasShenwuRecipientDamageModifiers || _modeRulesOperations._modeRules.RequiresRecipientDamageReevaluation || _characterCheZhouAnniversaryOperations.HasAnniversaryCheZhouRules || _coreRecipientScopedDamageOperations.HasPublicEnemyRecipientDamageScope(attack) || _coreRecipientScopedDamageOperations.HasFixedTargetRecipientDamageScope(attack) || _corePassiveRulePoliciesOperations.HasPerOccurrenceSourceDamageModifiers(attack.SourceSeat) || _corePassiveDamageCapsOperations.HasNextRecipientPassiveDamageCap(attack), out fromSeat))
+        if (!attack.TryAdvanceChainedTarget(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive, _coreNativeDamageHandlesOperations.Value.UsesFormalTengjia || _coreNativeDamageHandlesOperations.Value.UsesFormalSilverLion || _coreRecipientScopedDamageOperations.Value.HasShenwuRecipientDamageModifiers || _modeRulesOperations._modeRules.RequiresRecipientDamageReevaluation || _characterCheZhouAnniversaryOperations.Value.HasAnniversaryCheZhouRules || _coreRecipientScopedDamageOperations.Value.HasPublicEnemyRecipientDamageScope(attack) || _coreRecipientScopedDamageOperations.Value.HasFixedTargetRecipientDamageScope(attack) || _corePassiveRulePoliciesOperations.HasPerOccurrenceSourceDamageModifiers(attack.SourceSeat) || _corePassiveDamageCapsOperations.HasNextRecipientPassiveDamageCap(attack), out fromSeat))
             return false;
         _coreProgramDamageHooksOperations.DamageHooks.AdvanceChain(ProgramDamagePhase.AfterChainAdvance, attack);
         return true;
@@ -43,9 +43,9 @@ internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
 
     internal void CompleteProgramAttack(GameEngine.IDamageAttempt attack)
     {
-        if (_coreShanheS5YimieOperations.TryBeginShanheS5YimieRecovery(attack))
+        if (_coreShanheS5YimieOperations.Value.TryBeginShanheS5YimieRecovery(attack))
             return;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not null && !_characterJiangWeiMobileGodOperations.IsMobileJwSuspendedDying(attack.ResolutionId) && !_coreProgramOwnerDeathDamageOperations.IsOwnerDeathSuspendedDying(attack.ResolutionId))
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not null && !_characterJiangWeiMobileGodOperations.IsMobileJwSuspendedDying(attack.ResolutionId) && !_coreProgramOwnerDeathDamageOperations.IsOwnerDeathSuspendedDying(attack.ResolutionId))
             throw new InvalidOperationException("Program damage retained a dying child.");
         if (attack.TryConsumeProgramDamageTransferFollowup(out var transfer))
         {
@@ -70,7 +70,7 @@ internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
         if (index != _resolutionStackOperations._resolutionStack.Count - 1 || _resolutionStackOperations._resolutionStack[index] is not ProgramSkillFrame program)
             throw new InvalidOperationException("Program damage lost its owner continuation.");
         var receipt = program.AttackReturn;
-        _coreRecoveryDamageEdgesOperations.AssertRecoveryDamageOrigin(program);
+        _coreRecoveryDamageEdgesOperations.Value.AssertRecoveryDamageOrigin(program);
         _coreSuitDamagePreventionBenefitsOperations.CaptureSuitPreventionDamageCompleted(program, attack.DamageWasApplied);
         program = _coreDynamicDiscardDamagePaymentsOperations.CaptureDynamicDiscardDamageCompleted(program);
         program = _characterZhaoZhongOlOperations.CaptureYintianProgramDamageCompleted(program, attack);
@@ -78,7 +78,7 @@ internal sealed partial class CoreGameEngineProgramAttackAttemptRuntime
         _coreRuntimeOperations.ReplaceRuntimeFrame(_resolutionStackOperations._resolutionStack[index].Id, program with { AttackAttempt = null, AttackReturn = null });
         if (receipt?.ParentAttackOwnerFrameId is { } parentId && CurrentDamageAttempt?.ResolutionId != parentId)
             throw new InvalidOperationException("Program damage changed its suspended parent owner.");
-        if (receipt?.ParentDamageWindowFrameId is { } windowId && _coreDamageCursorRuntimeOperations.ActiveDamageTrigger?.Id != windowId)
+        if (receipt?.ParentDamageWindowFrameId is { } windowId && _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger?.Id != windowId)
             throw new InvalidOperationException("Program damage lost its parent damage occurrence.");
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = null;
         _coreRuntimeOperations.AdvanceRuntimeProgram(id);

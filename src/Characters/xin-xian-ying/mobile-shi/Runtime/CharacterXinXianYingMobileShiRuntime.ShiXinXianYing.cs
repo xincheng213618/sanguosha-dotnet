@@ -16,8 +16,8 @@ internal sealed partial class CharacterXinXianYingMobileShiRuntime
     }));
     internal static int ShiXxySuitCount(int mask) => System.Numerics.BitOperations.PopCount((uint)mask);
     internal static CardConversionSource ShiXxySource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
-    internal int ShiXxyRoundMask(int owner, int actor) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiXinXianYingViewedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Actor == actor && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber).Aggregate(0, (n, e) => n | e.SuitMask);
-    internal int ShiXxyRoundUsed(int owner) => _coreProgramEventHistoryOperations.ProgramEventHistory<ShiXinXianYingQingshiIssuedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.FromJiejie);
+    internal int ShiXxyRoundMask(int owner, int actor) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiXinXianYingViewedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Actor == actor && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber).Aggregate(0, (n, e) => n | e.SuitMask);
+    internal int ShiXxyRoundUsed(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiXinXianYingQingshiIssuedEvent>().Count(e => e.Source.OwnerSeat == owner && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.FromJiejie);
     internal bool ShiXxySameCamp(int owner, int target)
     {
         if (owner == target)

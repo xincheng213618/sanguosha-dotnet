@@ -17,7 +17,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
 
     internal IReadOnlyList<LegalAction> ChainedStateBasicNativePlayActions(CharacterState actor, CardConversionSource source, CardKind kind)
     {
-        if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.IsMouLuSuUseQuery(actor) || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
+        if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor) || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
             return[];
         var card = new Card(0, kind, Suit.None, 0);
         var targets = _coreNativeMultiTargetActionsOperations.GetFangtianOrderedSlashTargets(actor, card, source, effectiveKind: kind);
@@ -30,7 +30,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
 
     internal IReadOnlyList<LegalAction> ChainedStateBasicPlayActions(CharacterState actor)
     {
-        if ((_resolutionStackOperations._resolutionStack.Count != 0 || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.IsMouLuSuUseQuery(actor))
+        if ((_resolutionStackOperations._resolutionStack.Count != 0 || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor))
             return[];
         return Array.AsReadOnly(ChainedStateBasicRules(actor).SelectMany(r => ChainedStateBasicNativePlayActions(actor, r.Source, r.Rule.OutputKind)).ToArray());
     }
@@ -306,7 +306,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || p.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber || p.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat)
             return false;
         if (p.Intent == ChainedStateBasicIntent.Play)
-            return (_resolutionStackOperations._resolutionStack.Count == 1 || _characterKeBiNengOlOperations.IsKeBiNengPingduanPaymentFrame(frame) || (_characterKongRongMouOlOperations.IsMouKrLiwenPaymentFrame(frame) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTiePaymentFrame(frame)) || _characterLuSuMouOperations.IsMouLuSuPaymentFrame(frame)) && ChainedStateBasicNativePlayActions(actor, p.Source, p.EffectiveKind).Any(a => a.TargetSeats.SequenceEqual(frame.TargetSeats));
+            return (_resolutionStackOperations._resolutionStack.Count == 1 || _characterKeBiNengOlOperations.IsKeBiNengPingduanPaymentFrame(frame) || (_characterKongRongMouOlOperations.Value.IsMouKrLiwenPaymentFrame(frame) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTiePaymentFrame(frame)) || _characterLuSuMouOperations.Value.IsMouLuSuPaymentFrame(frame)) && ChainedStateBasicNativePlayActions(actor, p.Source, p.EffectiveKind).Any(a => a.TargetSeats.SequenceEqual(frame.TargetSeats));
         var request = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == p.RequestFrameId);
         if (request is null || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2].Id != request.Id || ChainedStateBasicContext(frame.OriginalDecision, request)is not { } current || current.Intent != p.Intent || current.ParentFrameId != p.ParentFrameId || current.RequestFrameId != p.RequestFrameId || current.ParentActionId != p.ParentActionId || current.Cursor != p.Cursor)
             return false;
@@ -328,9 +328,9 @@ internal sealed partial class CoreGameEngineChainedStateBasicConversionsRuntime
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         if (p.ParentFrameId is { } pingduanParent && _characterKeBiNengOlOperations.TryCancelKeBiNengPingduanBasicPayment(pingduanParent))
             return;
-        if (p.ParentFrameId is { } luSuParent && _characterLuSuMouOperations.TryCancelMouLuSuPayment(luSuParent))
+        if (p.ParentFrameId is { } luSuParent && _characterLuSuMouOperations.Value.TryCancelMouLuSuPayment(luSuParent))
             return;
-        if (p.ParentFrameId is { } liwenParent && (_characterKongRongMouOlOperations.TryCancelMouKrLiwenPayment(liwenParent) || _characterMaTieAnniversaryOperations.TryCancelAnniversaryMaTiePayment(liwenParent)))
+        if (p.ParentFrameId is { } liwenParent && (_characterKongRongMouOlOperations.Value.TryCancelMouKrLiwenPayment(liwenParent) || _characterMaTieAnniversaryOperations.TryCancelAnniversaryMaTiePayment(liwenParent)))
             return;
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return;

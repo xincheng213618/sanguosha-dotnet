@@ -59,5 +59,5 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardObserversRuntime
         return root;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 580)]
-    internal bool IsOffTurnUsedCardGiftProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.OffTurnUsedCardGift is not null && OffTurnUsedCardGiftObserverRoot(f.Id)is not null && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id));
+    internal bool IsOffTurnUsedCardGiftProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.OffTurnUsedCardGift is not null && OffTurnUsedCardGiftObserverRoot(f.Id)is not null && _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id));
 }

@@ -7,13 +7,13 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     internal bool IsAnniversaryXunXuBoqiaSource(CardConversionSource? s) => s is { SkillId: AnniversaryXunXuComposition.Boqia } && AnniversaryXunXuComposition.IsBoqiaRuleId(s.BindingId) && _corePlayCardHistoryOperations.ViewAsRule(s)is { InputCount: 3, ExtendedUse: true };
     internal bool XunXuAllowance(int owner, CardKind kind)
     {
-        var uses = _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuUseEvent>().Where(e => e.Source.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber).ToArray();
+        var uses = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuUseEvent>().Where(e => e.Source.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber).ToArray();
         if (uses.Any(e => e.Name == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind)))
             return false;
-        return uses.Length == 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuRearmedEvent>().Any(e => e.ActionId == uses[^1].ActionId && e.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
+        return uses.Length == 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuRearmedEvent>().Any(e => e.ActionId == uses[^1].ActionId && e.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber);
     }
 
-    internal bool XunXuUseDirection(CharacterState owner, CardKind kind, bool response, bool dying) => !response || kind == CardKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not null || kind == CardKind.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, kind) || kind is CardKind.Peach or CardKind.Alcohol && dying && _coreDyingCursorRuntimeOperations.ActiveDying?.ResponderSeat == owner.Seat;
+    internal bool XunXuUseDirection(CharacterState owner, CardKind kind, bool response, bool dying) => !response || kind == CardKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not null || kind == CardKind.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, kind) || kind is CardKind.Peach or CardKind.Alcohol && dying && _coreDyingCursorRuntimeOperations.Value.ActiveDying?.ResponderSeat == owner.Seat;
     [ProgramCardLegality(ProgramCardLegalityStage.ViewAsBan, 46100)]
     internal bool BanUnavailableXunXuConversion(ProgramViewAsLegalityQuery q) => q.Source.SkillId == AnniversaryXunXuComposition.Boqia && (!IsAnniversaryXunXuBoqiaSource(q.Source) || q.Source.OwnerSeat != q.Owner.Seat || q.CardIds.Count != 3 || q.CardIds.Distinct().Count() != 3 || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(q.Owner, q.Source.SkillId, q.Source.SkillInstanceId) || !XunXuAllowance(q.Owner.Seat, q.Kind) || !XunXuUseDirection(q.Owner, q.Kind, q.ForResponse, q.DyingUse) || q.CardIds.Any(id => id <= 0 || _cardZonesOperations._cardZones.GetLocation(id).OwnerSeat != q.Owner.Seat || _cardZonesOperations._cardZones.GetLocation(id).Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)));
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 46100)]
@@ -27,9 +27,9 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
         else
             return;
         var sources = action.ConversionChain.Where(s => s.SkillId == AnniversaryXunXuComposition.Boqia).ToArray();
-        if (sources.Length == 0 || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuUseEvent>().Any(e => e.ActionId == action.ActionId))
+        if (sources.Length == 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuUseEvent>().Any(e => e.ActionId == action.ActionId))
             return;
-        if (sources is not [var source] || source.OwnerSeat != action.ActorSeat || source.OwnerSeat != action.ProviderSeat || action.RequesterSeat is not null || !IsAnniversaryXunXuBoqiaSource(source) || action.PhysicalCards.Count != 3 || action.PhysicalCards.Select(c => c.CardId).Distinct().Count() != 3 || action.PhysicalCards.Any(c => c.From.OwnerSeat != source.OwnerSeat || c.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || action.EffectiveKind != _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind || action.Type == CardActionType.Response && !XunXuUseDirection(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action.EffectiveKind, true, _coreDyingCursorRuntimeOperations.ActiveDying?.ResponderSeat == source.OwnerSeat))
+        if (sources is not [var source] || source.OwnerSeat != action.ActorSeat || source.OwnerSeat != action.ProviderSeat || action.RequesterSeat is not null || !IsAnniversaryXunXuBoqiaSource(source) || action.PhysicalCards.Count != 3 || action.PhysicalCards.Select(c => c.CardId).Distinct().Count() != 3 || action.PhysicalCards.Any(c => c.From.OwnerSeat != source.OwnerSeat || c.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) || action.EffectiveKind != _corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind || action.Type == CardActionType.Response && !XunXuUseDirection(_coreMatchParticipantsPlayersAccess._players[source.OwnerSeat], action.EffectiveKind, true, _coreDyingCursorRuntimeOperations.Value.ActiveDying?.ResponderSeat == source.OwnerSeat))
             throw new InvalidOperationException("Boqia requires a true native Use, its accepted three HE entities, owner and exact conversion source.");
         if (!XunXuAllowance(source.OwnerSeat, action.EffectiveKind))
             throw new InvalidOperationException("Boqia cannot reuse this actual-turn allowance or card name.");
@@ -163,7 +163,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     {
         if (s.OutputKind != CardKind.Alcohol || !IsAnniversaryXunXuBoqiaSource(s.Source))
             return false;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { } d || d.VictimSeat != owner.Seat || d.ResponderSeat != owner.Seat || _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(owner, s.Cards.Select(c => c.Id).ToArray(), CardKind.Alcohol, true, s.Source)is null || _coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat))
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } d || d.VictimSeat != owner.Seat || d.ResponderSeat != owner.Seat || _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(owner, s.Cards.Select(c => c.Id).ToArray(), CardKind.Alcohol, true, s.Source)is null || _coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat))
             throw new InvalidOperationException("Boqia Alcohol requires its native current self-rescue and three real HE materials.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(owner, owner, s.Cards[0], "酒", CardKind.Alcohol, conversionSource: s.Source, dyingResponse: new(d.FrameId, owner.Seat, false, null, true, s.Cards[0].Id), physicalCards: s.Cards);
@@ -181,7 +181,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     {
         if (use.Action is not { Type: CardActionType.Use } action || action.ConversionChain.SingleOrDefault(s => s.SkillId == AnniversaryXunXuComposition.Boqia)is not { } source || !IsAnniversaryXunXuBoqiaSource(source))
             return false;
-        if (use.PhysicalCardIds is not { Count: 3 } ids || !ids.SequenceEqual(action.PhysicalCards.Select(c => c.CardId)) || ids.Any(id => id <= 0) || action.ActorSeat != source.OwnerSeat || action.ProviderSeat != source.OwnerSeat || action.EffectiveKind != use.CardKind || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuUseEvent>().Count(e => e.ActionId == action.ActionId && e.Source == source) != 1)
+        if (use.PhysicalCardIds is not { Count: 3 } ids || !ids.SequenceEqual(action.PhysicalCards.Select(c => c.CardId)) || ids.Any(id => id <= 0) || action.ActorSeat != source.OwnerSeat || action.ProviderSeat != source.OwnerSeat || action.EffectiveKind != use.CardKind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuUseEvent>().Count(e => e.ActionId == action.ActionId && e.Source == source) != 1)
             throw new InvalidOperationException("Boqia lost its exact accepted three-material native Use before final payment cleanup.");
         var remaining = ids.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_characterXinPiOlOperations.IsXinPiPhysicalClaim(use.Id, id) && !_characterHuaManOlOperations.IsHuaManClaimedEntity(use.Id, id) && !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(use.Id, id) && !_characterXuRongOlOperations.IsXuRongCausalEntityClaim(use.Id, id)).ToArray();
         if (remaining.Length > 0)
@@ -204,8 +204,8 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
         if (!IsAnniversaryXunXuBoqiaSource(selection.Source))
             return false;
         var ids = selection.Cards.Select(c => c.Id).ToArray();
-        var action = _coreProgramEventHistoryOperations.ProgramEventHistory<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.Type == CardActionType.Response && a.ActorSeat == selection.Source.OwnerSeat && a.ProviderSeat == selection.Source.OwnerSeat && a.EffectiveKind == selection.OutputKind && a.ConversionChain.Contains(selection.Source) && a.PhysicalCards.Select(c => c.CardId).SequenceEqual(ids));
-        if (ids.Length != 3 || ids.Any(id => id <= 0) || ids.Distinct().Count() != 3 || action is null || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryXunXuUseEvent>().Count(e => e.ActionId == action.ActionId && e.Source == selection.Source) != 1)
+        var action = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.Type == CardActionType.Response && a.ActorSeat == selection.Source.OwnerSeat && a.ProviderSeat == selection.Source.OwnerSeat && a.EffectiveKind == selection.OutputKind && a.ConversionChain.Contains(selection.Source) && a.PhysicalCards.Select(c => c.CardId).SequenceEqual(ids));
+        if (ids.Length != 3 || ids.Any(id => id <= 0) || ids.Distinct().Count() != 3 || action is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuUseEvent>().Count(e => e.ActionId == action.ActionId && e.Source == selection.Source) != 1)
             throw new InvalidOperationException("Boqia response cleanup requires its once-accepted genuine three-material response Use.");
         var parent = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.Action?.ActionId == action.ParentActionId);
         var remaining = ids.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_coreResponseEntityExchangeOperations.IsExchangedCardClaim(action.ActionId, id) && (parent is null || !_characterXinPiOlOperations.IsXinPiPhysicalClaim(parent.Id, id) && !_characterHuaManOlOperations.IsHuaManClaimedEntity(parent.Id, id) && !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(parent.Id, id) && !_characterXuRongOlOperations.IsXuRongCausalEntityClaim(parent.Id, id))).ToArray();

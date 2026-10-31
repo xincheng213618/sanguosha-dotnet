@@ -28,8 +28,8 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
 
         if (conversion.OwnerSeat != provider.Seat || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(provider, conversion.SkillId, conversion.SkillInstanceId))
             throw new InvalidOperationException("Hu keeps the native conversion's actual live provider.");
-        var response = forResponse || kind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.ActiveDying?.ResponderSeat == provider.Seat;
-        var dying = response && kind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.ActiveDying?.ResponderSeat == provider.Seat;
+        var response = forResponse || kind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.Value.ActiveDying?.ResponderSeat == provider.Seat;
+        var dying = response && kind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.Value.ActiveDying?.ResponderSeat == provider.Seat;
         if (materials is [var single] && (_coreActionQueriesOperations.GetProgramViewAsConversions(provider, single, kind, response, dying).Contains(conversion) || _coreCardConversionsOperations.GetProgramCardIdentitySources(provider, single, kind, response).Contains(conversion)))
             return true;
         if (_coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(provider, materials.Select(c => c.Id).ToArray(), kind, response, conversion)is not null)
@@ -135,7 +135,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
                 continue;
             _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { MouGongsunZanHuPayment = r with { ActionId = a.ActionId } });
             foreach (var m in r.Materials)
-                if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanHuActionBoundEvent>().Any(e => e.ParentFrameId == parent.Id && e.CardId == m.CardId && e.Sequence == m.Sequence && e.ActionId == a.ActionId))
+                if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanHuActionBoundEvent>().Any(e => e.ParentFrameId == parent.Id && e.CardId == m.CardId && e.Sequence == m.Sequence && e.ActionId == a.ActionId))
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGongsunZanHuActionBoundEvent(parent.Id, m.CardId, m.Sequence, a.ActionId));
         }
     }
@@ -144,7 +144,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
     {
         if (cost.From.Zone != CardZoneKind.PublicPersistentPile || cost.From.OwnerSeat != action.ProviderSeat)
             return false;
-        return _resolutionStackOperations._resolutionStack.Any(f => f.MouGongsunZanHuPayment is { } r && r.ActionId == action.ActionId && r.ActorSeat == action.ActorSeat && r.ProviderSeat == action.ProviderSeat && r.RequesterSeat == action.RequesterSeat && r.Materials.Any(m => m.CardId == cost.CardId && m.Kind == cost.CardKind && m.From == cost.From)) || _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanHuActionBoundEvent>().Any(b => b.ActionId == action.ActionId && b.CardId == cost.CardId && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanHuMaterialIssuedEvent>().Any(e => e.ParentFrameId == b.ParentFrameId && e.CardId == cost.CardId && e.Kind == cost.CardKind && e.From == cost.From && e.ActorSeat == action.ActorSeat && e.ProviderSeat == action.ProviderSeat && e.RequesterSeat == action.RequesterSeat) && _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanHuMaterialPaidEvent>().Any(p => p.ParentFrameId == b.ParentFrameId && p.CardId == b.CardId && p.Sequence == b.Sequence));
+        return _resolutionStackOperations._resolutionStack.Any(f => f.MouGongsunZanHuPayment is { } r && r.ActionId == action.ActionId && r.ActorSeat == action.ActorSeat && r.ProviderSeat == action.ProviderSeat && r.RequesterSeat == action.RequesterSeat && r.Materials.Any(m => m.CardId == cost.CardId && m.Kind == cost.CardKind && m.From == cost.From)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanHuActionBoundEvent>().Any(b => b.ActionId == action.ActionId && b.CardId == cost.CardId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanHuMaterialIssuedEvent>().Any(e => e.ParentFrameId == b.ParentFrameId && e.CardId == cost.CardId && e.Kind == cost.CardKind && e.From == cost.From && e.ActorSeat == action.ActorSeat && e.ProviderSeat == action.ProviderSeat && e.RequesterSeat == action.RequesterSeat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanHuMaterialPaidEvent>().Any(p => p.ParentFrameId == b.ParentFrameId && p.CardId == b.CardId && p.Sequence == b.Sequence));
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 33601)]
@@ -159,7 +159,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
             for (var i = 0; i < r.Materials.Count; i++)
             {
                 var m = r.Materials[i];
-                if (m.Source.OwnerSeat != r.ProviderSeat || m.From.OwnerSeat != r.ProviderSeat || m.Source.SkillId != MouGongsunZanMobileComposition.Yicong || _coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanHuMaterialIssuedEvent>().Count(e => e == new MouGongsunZanHuMaterialIssuedEvent(f.Id, i, m.CardId, m.Kind, m.From, m.Source, m.GameplayHash, r.ActorSeat, r.ProviderSeat, r.RequesterSeat, r.Turn, r.Before)) != 1 || m.Sequence > 0 && (_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.Sequence == m.Sequence && move.CardId == m.CardId && move.CardKind == m.Kind && move.From == m.From && move.To == CardLocation.Processing) != 1 || !_coreProgramEventHistoryOperations.ProgramEventHistory<MouGongsunZanHuMaterialPaidEvent>().Contains(new(f.Id, i, m.CardId, m.Sequence))))
+                if (m.Source.OwnerSeat != r.ProviderSeat || m.From.OwnerSeat != r.ProviderSeat || m.Source.SkillId != MouGongsunZanMobileComposition.Yicong || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanHuMaterialIssuedEvent>().Count(e => e == new MouGongsunZanHuMaterialIssuedEvent(f.Id, i, m.CardId, m.Kind, m.From, m.Source, m.GameplayHash, r.ActorSeat, r.ProviderSeat, r.RequesterSeat, r.Turn, r.Before)) != 1 || m.Sequence > 0 && (_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.Sequence == m.Sequence && move.CardId == m.CardId && move.CardKind == m.Kind && move.From == m.From && move.To == CardLocation.Processing) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGongsunZanHuMaterialPaidEvent>().Contains(new(f.Id, i, m.CardId, m.Sequence))))
                     throw new InvalidOperationException("Hu lost its exact source/material/native payment.");
             }
         }

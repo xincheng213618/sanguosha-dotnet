@@ -247,7 +247,7 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, owner.Seat, r.TargetSeat, card, damageAmount: 1 + owner.AlcoholDamageBonus, playedCardKind: card.Kind, physicalCards: [card], ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(owner, target, card.Kind), programSkillCardUseFrameId: f.Id);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(useId, owner);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(useId, owner);
         owner.HasAlcoholEffect = false;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(card.Id, card.Kind, owner.Seat, r.TargetSeat, IgnoresArmor: attack.IgnoresArmor));
         _coreNativeAiDecisionsOperations.NotifyAiOfSlash(owner, target);
@@ -277,7 +277,7 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
         if (use.ShiXiahouBaPoxi is not { } n)
             return false;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(n.FrameId);
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || f.ShiXiahouBa is not { UseId: var useId } || useId != use.Id || _coreProgramEventHistoryOperations.ProgramEventHistory<ShiXbPoxiNativeReturnedEvent>().Any(e => e.UseId == use.Id))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || f.ShiXiahouBa is not { UseId: var useId } || useId != use.Id || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiXbPoxiNativeReturnedEvent>().Any(e => e.UseId == use.Id))
             throw new InvalidOperationException("Poxi requires one exact whole native use return.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiXbPoxiNativeReturnedEvent(n.FrameId, use.Id));
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { ShiXiahouBa = f.ShiXiahouBa!with { Stage = ShiXiahouBaComposition.PoxiStageReturnedUse } });

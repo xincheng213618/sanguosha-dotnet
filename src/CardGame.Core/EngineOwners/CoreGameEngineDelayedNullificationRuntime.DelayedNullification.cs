@@ -26,12 +26,12 @@ internal sealed partial class CoreGameEngineDelayedNullificationRuntime
     internal bool HasNullificationEffectOwner(NullificationWindowFrame window)
     {
         if (window.GroupTargetReturn is not null)
-            return _coreGroupTargetNullificationOperations.IsGroupTargetNullification(window);
+            return _coreGroupTargetNullificationOperations.Value.IsGroupTargetNullification(window);
         if (window.DelayedReturn is not { } delayed)
             return _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not null;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == window.Id);
         var parent = index > 0 ? _resolutionStackOperations._resolutionStack[index - 1] : null;
-        return index >= 0 && (parent?.Id ?? 0) == delayed.ParentFrameId && parent?.Kind == delayed.ParentKind && parent?.Step == delayed.ParentStep && window.ParentFrameId == delayed.ParentFrameId && window.EffectCardId == delayed.CardId && window.EffectCardKind == delayed.EffectiveKind && CoreNativeCardClassificationsRuntime.IsDelayedCard(delayed.EffectiveKind) && window.SourceSeat == delayed.OwnerSeat && window.TargetSeats.SequenceEqual([delayed.OwnerSeat]) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber == delayed.TurnNumber && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == delayed.Phase && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == delayed.OwnerSeat && (delayed.OriginalUseLightning is not null ? _coreOriginalUseLightningOperations.ValidOriginalUseLightningDelayed(delayed) : _coreShanheDelayedNullifiedTrickClaimsOperations.HasShanheClaimedDelayedOwner(window, delayed) || _cardZonesOperations._cardZones.GetLocation(delayed.CardId) == CardLocation.Judgment(delayed.OwnerSeat) && _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(_coreNativeNullificationFramesOperations.GetNullificationEffectCard(window)) == delayed.EffectiveKind);
+        return index >= 0 && (parent?.Id ?? 0) == delayed.ParentFrameId && parent?.Kind == delayed.ParentKind && parent?.Step == delayed.ParentStep && window.ParentFrameId == delayed.ParentFrameId && window.EffectCardId == delayed.CardId && window.EffectCardKind == delayed.EffectiveKind && CoreNativeCardClassificationsRuntime.IsDelayedCard(delayed.EffectiveKind) && window.SourceSeat == delayed.OwnerSeat && window.TargetSeats.SequenceEqual([delayed.OwnerSeat]) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber == delayed.TurnNumber && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == delayed.Phase && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == delayed.OwnerSeat && (delayed.OriginalUseLightning is not null ? _coreOriginalUseLightningOperations.ValidOriginalUseLightningDelayed(delayed) : _coreShanheDelayedNullifiedTrickClaimsOperations.Value.HasShanheClaimedDelayedOwner(window, delayed) || _cardZonesOperations._cardZones.GetLocation(delayed.CardId) == CardLocation.Judgment(delayed.OwnerSeat) && _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(_coreNativeNullificationFramesOperations.GetNullificationEffectCard(window)) == delayed.EffectiveKind);
     }
 
     internal long? NullificationParentActionId(NullificationWindowFrame window) => window.DelayedReturn is null ? _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)?.Action?.ActionId : null;
@@ -44,7 +44,7 @@ internal sealed partial class CoreGameEngineDelayedNullificationRuntime
             return;
         }
 
-        if (_coreShanheDelayedNullifiedTrickClaimsOperations.TryCompleteShanheClaimedDelayedNullification(window, delayed))
+        if (_coreShanheDelayedNullifiedTrickClaimsOperations.Value.TryCompleteShanheClaimedDelayedNullification(window, delayed))
             return;
         var owner = _coreMatchParticipantsPlayersAccess._players[delayed.OwnerSeat];
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive)

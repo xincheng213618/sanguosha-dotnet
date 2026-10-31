@@ -27,7 +27,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, r.Target, card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), programSkillCardUseFrameId: f.Id);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, r.Target, IgnoresArmor: attack.IgnoresArmor));
@@ -52,7 +52,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
 
     internal bool IsIssuedMouHuCheErUse(CardUseFrame use)
     {
-        if (use.MouHuCheErSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.UnlimitedUse != true || o.UseId != use.Id || o.ActionId != current.ActionId || current.ProviderSeat != o.Source.OwnerSeat || current.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuCheErSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouHuCheEr: { Stage: MouHuCheErStage.NativeSlash, Returned: false } r } parent || !ValidMouHuCheEr(parent) || r.UseId != use.Id || r.ActionId != current.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.Index != o.Index || r.Target != o.Target)
+        if (use.MouHuCheErSlash is not { } o || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } current || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.UnlimitedUse != true || o.UseId != use.Id || o.ActionId != current.ActionId || current.ProviderSeat != o.Source.OwnerSeat || current.RequesterSeat is not null || _contentRegistryOperations._contentRegistry.GetSkill(o.Source.SkillId).Program?.GameplayHash != o.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuCheErSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouHuCheEr: { Stage: MouHuCheErStage.NativeSlash, Returned: false } r } parent || !ValidMouHuCheEr(parent) || r.UseId != use.Id || r.ActionId != current.ActionId || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.Index != o.Index || r.Target != o.Target)
             return false;
         var original = current;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -64,7 +64,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
             return false;
         if (original.EffectiveKind != CardKind.Slash || original.EffectiveSuit != Suit.None || original.EffectiveRank != 0 || original.EffectiveIsRed is not null || original.ConversionChain is not [var source] || source != o.Source)
             return false;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == o.Source.OwnerSeat && current.ActorSeat == o.Source.OwnerSeat;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == o.Source.OwnerSeat && current.ActorSeat == o.Source.OwnerSeat;
     }
 
     internal bool IsMouHuCheErUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouHuCheErUse(use);
@@ -103,7 +103,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MouHuCheEr!;
-        if (r.Stage != MouHuCheErStage.NativeSlash || r.Returned || r.UseId != use.Id || r.ActionId != o.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.Stage != MouHuCheErStage.NativeSlash || r.Returned || r.UseId != use.Id || r.ActionId != o.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Kongwu lost its unique typed whole-use return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouHuCheEr = r with { Returned = true } });
         if (use.CardAttack is not { Active: true })
@@ -117,7 +117,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
             return false;
         if (c.ProgramFrameId != f.Id)
             throw new InvalidOperationException("Kongwu attack returned to another owner.");
-        SettleMouHuCheErNative(_coreProgramEventHistoryOperations.ProgramEventHistory<MouHuCheErSlashIssuedEvent>().Single(e => e.Origin.FrameId == f.Id && e.Origin.Index == r.Index).Origin);
+        SettleMouHuCheErNative(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuCheErSlashIssuedEvent>().Single(e => e.Origin.FrameId == f.Id && e.Origin.Index == r.Index).Origin);
         return true;
     }
 
@@ -125,7 +125,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.MouHuCheEr!;
-        if (!r.Returned || r.UseId != o.UseId || r.ActionId != o.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuCheErSlashReturnedEvent>().Any(e => e.FrameId == f.Id && e.Index == r.Index))
+        if (!r.Returned || r.UseId != o.UseId || r.ActionId != o.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuCheErSlashReturnedEvent>().Any(e => e.FrameId == f.Id && e.Index == r.Index))
             throw new InvalidOperationException("Kongwu cannot settle a native Slash twice.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouHuCheEr = r with { Index = r.Index + 1, Stage = MouHuCheErStage.SlashChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouHuCheErSlashReturnedEvent(f.Id, r.Index, o.UseId, o.ActionId));

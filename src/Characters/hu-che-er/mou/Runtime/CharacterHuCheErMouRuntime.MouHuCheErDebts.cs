@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuCheErMouRuntime
 {
-    internal IEnumerable<MouHuCheErDebtEvent> ActiveMouHuCheErDebts(int target) => !HasMouHuCheEr ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuCheErDebtEvent>().Where(d => d.Target == target && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouHuCheErDebtExpiredEvent>().Any(e => e.FrameId == d.FrameId));
+    internal IEnumerable<MouHuCheErDebtEvent> ActiveMouHuCheErDebts(int target) => !HasMouHuCheEr ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuCheErDebtEvent>().Where(d => d.Target == target && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuCheErDebtExpiredEvent>().Any(e => e.FrameId == d.FrameId));
     internal bool MouHuCheErEquipmentDisabled(int target) => ActiveMouHuCheErDebts(target).Any();
     internal IReadOnlyList<Card> KongwuEffectiveEquipment(CharacterState player) => MouHuCheErEquipmentDisabled(player.Seat) ? [] : _corePhysicalOwnedCardQueriesOperations.GetEquipment(player).Where(card => !_characterWeiYanHappyGodOperations.IsHappyWeiYanBone(card.Id)).ToArray();
     internal IReadOnlyList<Card> KongwuEffectiveEquipment(int seat) => KongwuEffectiveEquipment(_coreMatchParticipantsPlayersAccess._players[seat]);
@@ -13,7 +13,7 @@ internal sealed partial class CharacterHuCheErMouRuntime
     {
         if (!HasMouHuCheEr)
             return original;
-        var events = _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuCheErDebtEvent>().Count() + _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuCheErDebtExpiredEvent>().Count();
+        var events = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuCheErDebtEvent>().Count() + _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuCheErDebtExpiredEvent>().Count();
         if (events == 0)
             return original;
         if (_characterHuCheErMouMouHuCheErQualificationDependenciesMouHuCheErQualificationStampAccess._mouHuCheErQualificationDependencies.TryGetValue(original, out var cached) && cached.Events == events)
@@ -23,5 +23,5 @@ internal sealed partial class CharacterHuCheErMouRuntime
         return stamp;
     }
 
-    internal int MouHuCheErDrawPenalty(CharacterState player) => _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat == player.Seat && _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat == player.Seat ? ActiveMouHuCheErDebts(player.Seat).Count(d => _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuCheErDebtTurnEvent>().Any(t => t.FrameId == d.FrameId && t.Target == player.Seat && t.Turn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber)) : 0;
+    internal int MouHuCheErDrawPenalty(CharacterState player) => _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat == player.Seat && _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat == player.Seat ? ActiveMouHuCheErDebts(player.Seat).Count(d => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuCheErDebtTurnEvent>().Any(t => t.FrameId == d.FrameId && t.Target == player.Seat && t.Turn == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber)) : 0;
 }

@@ -75,7 +75,7 @@ internal sealed partial class CharacterXunYuMouRuntime
             return false;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ParentProgramFrameId);
         var r = f.MouXunYuAnniversary!;
-        if (!MouXyAnniversary.Valid(f) || r.Stage != MouXyStage.NativeUse || r.UseId != use.Id || r.ActionId != use.Action?.ActionId || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == r.Kind) != 1)
+        if (!MouXyAnniversary.Valid(f) || r.Stage != MouXyStage.NativeUse || r.UseId != use.Id || r.ActionId != use.Action?.ActionId || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == r.Kind) != 1)
             throw new InvalidOperationException("Shimou must return the same full native zero-material Use once.");
         MouXyAnniversary.Returned(f.Id, use.Id, r.ActionId, use.CardAttack is { Active: true });
         return true;

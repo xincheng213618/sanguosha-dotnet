@@ -314,7 +314,7 @@ internal sealed partial class CharacterRuanYuOlRuntime
     {
         if (f.RuanYu is { Paid: true })
             return ValidRuanYu(f);
-        if (f.RuanYu is not null || f.TriggerId is null || f.WindowContext is not { } context || f.InstructionIndex is not (0 or 1) || !_coreProgramEventHistoryOperations.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId))
+        if (f.RuanYu is not null || f.TriggerId is null || f.WindowContext is not { } context || f.InstructionIndex is not (0 or 1) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Any(e => e.FrameId == f.Id && e.SkillId == f.SkillId && e.BindingId == f.TriggerId && e.SkillInstanceId == f.SkillInstanceId))
             return false;
         var c = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex);
         return IsIssuedRuanYuXingzuoEndingCandidate(c, context) || IsIssuedRuanYuMiaoxianRedCandidate(c, context);

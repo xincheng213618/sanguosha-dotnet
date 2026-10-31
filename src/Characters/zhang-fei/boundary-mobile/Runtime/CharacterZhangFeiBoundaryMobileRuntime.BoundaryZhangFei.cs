@@ -18,8 +18,8 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
     {
         if (!BoundaryZhangFeiOwnPlay(owner))
             return null;
-        var reserve = _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiyongReservedEvent>().Select(fact => fact.Reserve).LastOrDefault(item => item.Source.OwnerSeat == owner && item.Source.SkillInstanceId == instance && item.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && item.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
-        return reserve is not null && !_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiyongUseIssuedEvent>().Any(fact => fact.Use.Reserve == reserve) ? reserve : null;
+        var reserve = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryLiyongReservedEvent>().Select(fact => fact.Reserve).LastOrDefault(item => item.Source.OwnerSeat == owner && item.Source.SkillInstanceId == instance && item.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && item.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
+        return reserve is not null && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryLiyongUseIssuedEvent>().Any(fact => fact.Use.Reserve == reserve) ? reserve : null;
     }
 
     internal CardUseFrame? BoundaryZhangFeiWindowUse(ProgramSkillWindowContext? context) => context?.CardUse is { } card && _coreCardUseLifecycleOperations.LifecycleCardUse(card.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } action } use && action.ActionId == card.CardActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) ? use : null;
@@ -30,7 +30,7 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
         if (candidate.SkillId != BoundaryZhangFeiLiyong)
             return true;
         if (candidate.BindingId == BoundaryZhangFeiReserve)
-            return BoundaryZhangFeiOwnPlay(candidate.OwnerSeat) && BoundaryZhangFeiWindowUse(context)is { CardAttack: { } state } use && use.Action!.ActorSeat == candidate.OwnerSeat && state.SuccessfulDodgeResponses >= state.RequiredDodgeResponses && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.ResolutionId == use.Id && !_coreSlashSuitDiscardOperations.IsSlashDodgeCancellationPrevented(attack);
+            return BoundaryZhangFeiOwnPlay(candidate.OwnerSeat) && BoundaryZhangFeiWindowUse(context)is { CardAttack: { } state } use && use.Action!.ActorSeat == candidate.OwnerSeat && state.SuccessfulDodgeResponses >= state.RequiredDodgeResponses && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.ResolutionId == use.Id && !_coreSlashSuitDiscardOperations.Value.IsSlashDodgeCancellationPrevented(attack);
         if (candidate.BindingId == BoundaryZhangFeiIssue)
             return BoundaryZhangFeiOwnPlay(candidate.OwnerSeat) && BoundaryZhangFeiReady(candidate.OwnerSeat, candidate.SkillInstanceId)is not null && BoundaryZhangFeiWindowUse(context)is { BoundaryLiyong: null, Action: { } action } && action.ActorSeat == candidate.OwnerSeat;
         if (candidate.BindingId == BoundaryZhangFeiTargets)
@@ -82,7 +82,7 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
         if (!CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.Type != CardActionType.Use || window is not (SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardUseTargetsFinalized))
             return;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(item => item.Action?.ActionId == action.ActionId);
-        var reserve = window == SkillProgramTriggerWindow.CardUseCommitted ? _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiyongReservedEvent>().Select(item => item.Reserve).LastOrDefault(item => item.Source.OwnerSeat == action.ActorSeat && BoundaryZhangFeiReady(action.ActorSeat, item.Source.SkillInstanceId) == item) : use?.BoundaryLiyong?.Reserve;
+        var reserve = window == SkillProgramTriggerWindow.CardUseCommitted ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryLiyongReservedEvent>().Select(item => item.Reserve).LastOrDefault(item => item.Source.OwnerSeat == action.ActorSeat && BoundaryZhangFeiReady(action.ActorSeat, item.Source.SkillInstanceId) == item) : use?.BoundaryLiyong?.Reserve;
         if (reserve is null)
             return;
         var binding = window == SkillProgramTriggerWindow.CardUseCommitted ? BoundaryZhangFeiIssue : BoundaryZhangFeiTargets;
@@ -113,7 +113,7 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
         {
             var right = use.BoundaryLiyong!;
             var reserve = right.Reserve;
-            if (use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || right.CardUseFrameId != use.Id || right.CardActionId != action.ActionId || reserve.Source.SkillId != BoundaryZhangFeiLiyong || reserve.Source.OwnerSeat != action.ActorSeat || reserve.Source.BindingId != BoundaryZhangFeiReserve || reserve.ProducerFrameId <= 0 || reserve.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || reserve.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || reserve.CancelledUseId == use.Id || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiyongReservedEvent>().Count(fact => fact.Reserve == reserve) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryLiyongUseIssuedEvent>().Count(fact => fact.Use == right) != 1)
+            if (use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || right.CardUseFrameId != use.Id || right.CardActionId != action.ActionId || reserve.Source.SkillId != BoundaryZhangFeiLiyong || reserve.Source.OwnerSeat != action.ActorSeat || reserve.Source.BindingId != BoundaryZhangFeiReserve || reserve.ProducerFrameId <= 0 || reserve.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || reserve.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId || reserve.CancelledUseId == use.Id || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryLiyongReservedEvent>().Count(fact => fact.Reserve == reserve) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryLiyongUseIssuedEvent>().Count(fact => fact.Use == right) != 1)
                 throw new InvalidOperationException("Liyong lost the original phase cancellation or exact next actual Use receipt.");
         }
     }

@@ -11,14 +11,14 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicUseRuntime
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !owner.IsAlive || _coreActualRoundProgressRoundNumberAccess._roundNumber < 1 || RoundDistinctBasicNameUsed(owner.Seat, instance.SkillId, policy, rule.OutputKind) || _coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, rule.OutputKind, CardActionType.Use))
             return false;
         if (dyingUse)
-            return rule.OutputKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == owner.Seat && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp <= 0 && (rule.OutputKind == CardKind.Peach ? _coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(owner.Seat, dying.VictimSeat) : dying.VictimSeat == owner.Seat && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat));
+            return rule.OutputKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.ResponderSeat == owner.Seat && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat].Hp <= 0 && (rule.OutputKind == CardKind.Peach ? _coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(owner.Seat, dying.VictimSeat) : dying.VictimSeat == owner.Seat && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat));
         return forResponse ? rule.OutputKind == CardKind.Dodge && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, CardKind.Dodge) : rule.ForPlay;
     }
 
     internal bool IsRoundDistinctBasicMaterial(CharacterState owner, Card card)
     {
         var location = _cardZonesOperations._cardZones.GetLocation(card.Id);
-        return location == CardLocation.Hand(owner.Seat) || location == CardLocation.WoodenOxGrain(owner.Seat) && _coreNativeDamageHandlesOperations.UsesFormalWoodenOx && _characterHuCheErMouOperations.KongwuEffectiveEquipment(owner).Any(e => e.Kind == CardKind.WoodenOx);
+        return location == CardLocation.Hand(owner.Seat) || location == CardLocation.WoodenOxGrain(owner.Seat) && _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && _characterHuCheErMouOperations.KongwuEffectiveEquipment(owner).Any(e => e.Kind == CardKind.WoodenOx);
     }
 
     internal bool MatchesRoundDistinctBasicMaterials(CharacterState owner, SkillProgramViewAs rule, IReadOnlyList<Card> cards)
@@ -69,7 +69,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicUseRuntime
 
         if (RoundDistinctBasicNameUsed(action.ActorSeat, source.SkillId, policy, action.EffectiveKind))
             throw new InvalidOperationException("This method already used the canonical basic name in this actual round.");
-        var receipt = new RoundDistinctBasicUseReceipt(source, program.GameplayHash, policy.StateId, policy.LedgerId, _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, action.ActionId, use.Id, action.ActorSeat, action.EffectiveKind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind), color, response, action.ParentActionId, action.OpponentSeat, !response && action.EffectiveKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == action.ActorSeat && use.TargetSeats.SequenceEqual([dying.VictimSeat]) ? dying.FrameId : null);
+        var receipt = new RoundDistinctBasicUseReceipt(source, program.GameplayHash, policy.StateId, policy.LedgerId, _coreActualRoundProgressRoundNumberAccess._roundNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, action.ActionId, use.Id, action.ActorSeat, action.EffectiveKind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(action.EffectiveKind), color, response, action.ParentActionId, action.OpponentSeat, !response && action.EffectiveKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.ResponderSeat == action.ActorSeat && use.TargetSeats.SequenceEqual([dying.VictimSeat]) ? dying.FrameId : null);
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { RoundDistinctBasicUsesIssued = true, RoundDistinctBasicUses = (use.RoundDistinctBasicUses ?? []).Append(receipt).ToArray() });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoundDistinctBasicUseAcceptedEvent(receipt));
     }

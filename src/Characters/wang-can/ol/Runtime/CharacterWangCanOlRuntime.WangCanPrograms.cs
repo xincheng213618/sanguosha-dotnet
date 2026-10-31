@@ -21,7 +21,7 @@ internal sealed partial class CharacterWangCanOlRuntime
         var r = new WangCanReceipt(source, f.GameplayHash, 1, w.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, initial, Sanwen: w.Sanwen);
         if (op == SkillProgramEffectOp.ResolveSanwenActualGainDuplicates && (w.Window != SkillProgramTriggerWindow.CardsGained || w.Sanwen is not { } q || q.OwnerSeat != f.OwnerSeat || w.MovementBatch is not { } batch || !ValidSanwenProof(q, batch) || SanwenPayable(q).Count == 0))
             throw new InvalidOperationException("Sanwen lost the frozen real gain batch or its original hand witnesses.");
-        if (op == SkillProgramEffectOp.CollectQiaiLivingContributions && (w.Window != SkillProgramTriggerWindow.DyingEntering || _coreDyingCursorRuntimeOperations.ActiveDying is not { } dying || dying.VictimSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(entry => entry.Id == w.ParentFrameId)?.ResumeDyingFrameId != dying.Id))
+        if (op == SkillProgramEffectOp.CollectQiaiLivingContributions && (w.Window != SkillProgramTriggerWindow.DyingEntering || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.VictimSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(entry => entry.Id == w.ParentFrameId)?.ResumeDyingFrameId != dying.Id))
             throw new InvalidOperationException("Qiai requires its actual own entering-dying frame.");
         if (op == SkillProgramEffectOp.ViewDenglouTopAndUseBasics && (w.Window != SkillProgramTriggerWindow.TurnEnding || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count != 0))
             throw new InvalidOperationException("Denglou requires an actual own Ending with no hand.");
@@ -44,7 +44,7 @@ internal sealed partial class CharacterWangCanOlRuntime
         if (op == SkillProgramEffectOp.CollectQiaiLivingContributions)
         {
             var seats = Enumerable.Range(1, _coreMatchParticipantsPlayersAccess._players.Count - 1).Select(i => _coreTableOrderOperations.TableStepSeat(f.OwnerSeat, i)).Where(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive).ToArray();
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangCan = r with { Seats = seats, DyingFrameId = _coreDyingCursorRuntimeOperations.ActiveDying!.Id } });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangCan = r with { Seats = seats, DyingFrameId = _coreDyingCursorRuntimeOperations.Value.ActiveDying!.Id } });
             ContinueQiai(f);
             return SkillProgramStepOutcome.AwaitChoice;
         }

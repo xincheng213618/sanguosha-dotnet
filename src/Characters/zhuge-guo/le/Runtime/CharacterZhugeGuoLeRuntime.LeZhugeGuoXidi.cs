@@ -16,7 +16,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
         projection.Append(HasLeXidiEntityMark(cardId) ? "笛" : null);
     }
 
-    internal bool HasLeXidiEntityMark(int cardId) => HasLeZhugeGuoCapability && cardId > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<LeXidiEntityMarkedEvent>().Any(e => e.CardId == cardId);
+    internal bool HasLeXidiEntityMark(int cardId) => HasLeZhugeGuoCapability && cardId > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LeXidiEntityMarkedEvent>().Any(e => e.CardId == cardId);
     internal bool IsLeXidiHandLimitExempt(CharacterState owner, int cardId) => _coreNationalSkillsOperations.HasRuntimeSkill(owner, LeXidi) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(owner.Seat) && HasLeXidiEntityMark(cardId);
     internal ProgramLifecycleTriggerWindowFrame CaptureLeXidiOpening(ProgramLifecycleTriggerWindowFrame w)
     {
@@ -31,7 +31,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
     internal SkillProgramStepOutcome InitializeLeXidi(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != LeXidi || f.TriggerId != "mark-initial-flutes" || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { LeXidiOpening: not null } w || _coreProgramEventHistoryOperations.ProgramEventHistory<LeXidiInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
+        if (f.SkillId != LeXidi || f.TriggerId != "mark-initial-flutes" || f.ActivationId != f.TriggerId || f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { LeXidiOpening: not null } w || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LeXidiInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Xidi requires its original frozen opening-Hand window.");
         var cards = w.LeXidiOpening.Where(e => e.OwnerSeat == f.OwnerSeat).ToArray();
         foreach (var e in cards)

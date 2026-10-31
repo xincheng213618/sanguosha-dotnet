@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class HappyZhenJiHost(Func<RuntimeEntries.CharacterZhenJiHappyGodEntries> getCharacterZhenJiHappyGodRuntime) : IHappyZhenJiHost
+internal sealed class HappyZhenJiHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhenJiHappyGodRuntime>> getCharacterZhenJiHappyGodRuntime) : IHappyZhenJiHost
 {
-    public SkillProgramStepOutcome Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterZhenJiHappyGodRuntime().BeginHappyZj(f, op);
+    public SkillProgramStepOutcome Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterZhenJiHappyGodRuntime().Value.BeginHappyZj(f, op);
 }

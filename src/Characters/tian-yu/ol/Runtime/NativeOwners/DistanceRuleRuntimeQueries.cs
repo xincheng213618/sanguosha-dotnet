@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class DistanceRuleRuntimeQueries(EngineStates.CoreActualRoundProgressState actualRoundProgressState, EngineStates.CoreMatchDefinitionState matchDefinitionState, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineNationalSkillsEntries> getCoreGameEngineNationalSkillsRuntime, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<CardZoneStore> getCardZoneStore, Func<RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries> getCoreGameEngineAlternatingBenefitsRuntime) : IDistanceRuleRuntimeQueries
+internal sealed class DistanceRuleRuntimeQueries(EngineStates.CoreActualRoundProgressState actualRoundProgressState, EngineStates.CoreMatchDefinitionState matchDefinitionState, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<ContentRegistry> getContentRegistry, Func<RuntimeEntries.CoreGameEngineNationalSkillsEntries> getCoreGameEngineNationalSkillsRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<CardZoneStore> getCardZoneStore, Func<RuntimeEntries.CoreGameEngineAlternatingBenefitsEntries> getCoreGameEngineAlternatingBenefitsRuntime) : IDistanceRuleRuntimeQueries
 {
     public int RoundNumber => actualRoundProgressState.ReferenceToRoundNumber;
     public int PlayerCount => matchDefinitionState.ReferenceToPlayerCount;
@@ -9,7 +9,7 @@ internal sealed class DistanceRuleRuntimeQueries(EngineStates.CoreActualRoundPro
     public bool HasTriggerOperation(SkillProgramEffectOp op) => getContentRegistry().ProgramDependencies.HasTriggerOperation(op);
     public bool HasSkill(int seat, string skillId) => getCoreGameEngineNationalSkillsRuntime().HasRuntimeSkill(matchParticipantsState.ReferenceToPlayers[seat], skillId);
     public IReadOnlyList<T> History<T>()
-        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>();
+        where T : IGameEvent => getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>();
     public IEnumerable<int> OwnedCardIds(int seat) => getCorePhysicalOwnedCardQueriesRuntime().GetHand(matchParticipantsState.ReferenceToPlayers[seat]).Concat(getCorePhysicalOwnedCardQueriesRuntime().GetEquipment(matchParticipantsState.ReferenceToPlayers[seat])).Select(card => card.Id);
     public CardLocation Location(int cardId) => getCardZoneStore().GetLocation(cardId);
     public IEnumerable<ProgramDirectedDistanceLedgerEntry> DirectedDistanceLedger()

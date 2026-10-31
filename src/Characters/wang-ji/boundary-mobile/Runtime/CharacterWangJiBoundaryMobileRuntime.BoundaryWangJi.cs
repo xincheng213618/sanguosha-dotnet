@@ -10,7 +10,7 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
     internal static CardConversionSource BoundaryWjSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     internal int BoundaryWjCharge(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(PlayerMarkerKind.BoundaryWangJiCharge);
     internal bool BoundaryWjCard(CardActionContext action) => _coreFriendTrioOperations.IsFriendActualCardUse(action) && (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(action.EffectiveKind) == SkillProgramCardCategory.Basic || CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(action.EffectiveKind));
-    internal BoundaryWangJiTurnEvent? BoundaryWjTurn() => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangJiTurnEvent>().LastOrDefault(entry => entry.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && entry.OwnerSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
+    internal BoundaryWangJiTurnEvent? BoundaryWjTurn() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryWangJiTurnEvent>().LastOrDefault(entry => entry.TurnNumber == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && entry.OwnerSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
     internal int BoundaryWjPeak(int owner)
     {
         var turn = BoundaryWjTurn();
@@ -21,11 +21,11 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
     internal void ObserveBoundaryWjTurn(TurnStartedEvent entry)
     {
         if (_contentRegistryOperations._contentRegistry.Skills.ContainsKey(BoundaryWjJinqu) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[entry.ActorSeat], BoundaryWjJinqu))
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryWangJiTurnEvent(entry.TurnNumber, entry.ActorSeat, _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count() + 1, BoundaryWjCharge(entry.ActorSeat)));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryWangJiTurnEvent(entry.TurnNumber, entry.ActorSeat, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count() + 1, BoundaryWjCharge(entry.ActorSeat)));
     }
 
-    internal IReadOnlyList<int> BoundaryWjRecipients(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangJiRecipientEvent>().Where(entry => entry.Source.OwnerSeat == owner && entry.Source.SkillId == BoundaryWjQizhi && entry.Phase == phase).Select(entry => entry.TargetSeat).Distinct().OrderBy(seat => _coreTableOrderOperations.RelativeTableOrder(owner, seat)).ToArray();
-    internal bool CanSpendBoundaryWj(int owner, int target) => BoundaryWjCharge(owner) > 0 && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == owner && !_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangJiSpentEvent>().Any(entry => entry.Source.OwnerSeat == owner && entry.Phase == phase && entry.TargetSeat == target);
+    internal IReadOnlyList<int> BoundaryWjRecipients(int owner, ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryWangJiRecipientEvent>().Where(entry => entry.Source.OwnerSeat == owner && entry.Source.SkillId == BoundaryWjQizhi && entry.Phase == phase).Select(entry => entry.TargetSeat).Distinct().OrderBy(seat => _coreTableOrderOperations.RelativeTableOrder(owner, seat)).ToArray();
+    internal bool CanSpendBoundaryWj(int owner, int target) => BoundaryWjCharge(owner) > 0 && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == owner && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryWangJiSpentEvent>().Any(entry => entry.Source.OwnerSeat == owner && entry.Phase == phase && entry.TargetSeat == target);
     SkillProgramStepOutcome IBoundaryWangJiHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation) => BeginBoundaryWj(frame, operation);
     bool IBoundaryWangJiSelection.CanSpend(int owner, int target) => CanSpendBoundaryWj(owner, target);
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedInstantTrickRequirement, 54400)]
@@ -57,7 +57,7 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
             return _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } phase && phase.ActorSeat == gate.OwnerSeat && gate.Context.CardUse is { ActorSeat: var actor } && actor == gate.OwnerSeat && BoundaryWjRecipients(gate.OwnerSeat, phase).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count > 0);
         if (gate.SkillId != BoundaryWjJinqu)
             return true;
-        return gate.Trigger.Id == "ending-peak" ? BoundaryWjPeak(gate.OwnerSeat) > 0 : BoundaryWjTurn()is { } turn && turn.OwnerSeat == gate.OwnerSeat && BoundaryWjCompletedWindow(gate.Context, out var window) && window.Action.ActorSeat == gate.OwnerSeat && (!_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangJiUseEvent>().Any(entry => entry.OwnerSeat == gate.OwnerSeat && entry.ActionId == window.Action.ActionId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.BoundaryWangJi?.WindowId == window.Id && frame.OwnerSeat == gate.OwnerSeat));
+        return gate.Trigger.Id == "ending-peak" ? BoundaryWjPeak(gate.OwnerSeat) > 0 : BoundaryWjTurn()is { } turn && turn.OwnerSeat == gate.OwnerSeat && BoundaryWjCompletedWindow(gate.Context, out var window) && window.Action.ActorSeat == gate.OwnerSeat && (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryWangJiUseEvent>().Any(entry => entry.OwnerSeat == gate.OwnerSeat && entry.ActionId == window.Action.ActionId) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(frame => frame.BoundaryWangJi?.WindowId == window.Id && frame.OwnerSeat == gate.OwnerSeat));
     }
 
     internal SkillProgramStepOutcome BeginBoundaryWj(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
@@ -67,7 +67,7 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
         {
             if (frame.SkillId != BoundaryWjQizhi || frame.TriggerId != "initial-charge" || frame.WindowContext?.Window != SkillProgramTriggerWindow.GameStarting)
                 throw new InvalidOperationException("Mobile Qizhi initial charge requires its original game-start binding.");
-            if (!_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangJiInitializedEvent>().Any(entry => entry.OwnerSeat == frame.OwnerSeat))
+            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryWangJiInitializedEvent>().Any(entry => entry.OwnerSeat == frame.OwnerSeat))
             {
                 BoundaryWjChangeMarkerCharge(frame.Id, frame.OwnerSeat, PlayerMarkerKind.BoundaryWangJiCharge, 1, 2, BoundaryWjQizhi);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryWangJiInitializedEvent(frame.Id, frame.OwnerSeat));
@@ -119,7 +119,7 @@ internal sealed partial class CharacterWangJiBoundaryMobileRuntime
             if (frame.SkillId != BoundaryWjJinqu || BoundaryWjTurn()is not { } turn || turn.OwnerSeat != frame.OwnerSeat || !BoundaryWjCompletedWindow(context, out var window) || window.Action.ActorSeat != frame.OwnerSeat)
                 throw new InvalidOperationException("Jinqu counts only its owner's completed true uses in the owner's actual turn.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryWangJiUseEvent(frame.Id, frame.OwnerSeat, turn.Ordinal, window.Action.ActionId));
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryWangJiUseEvent>().Count(entry => entry.OwnerSeat == frame.OwnerSeat && entry.TurnOrdinal == turn.Ordinal) % 2 != 0)
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryWangJiUseEvent>().Count(entry => entry.OwnerSeat == frame.OwnerSeat && entry.TurnOrdinal == turn.Ordinal) % 2 != 0)
                 return SkillProgramStepOutcome.Continue;
             receipt = receipt with
             {

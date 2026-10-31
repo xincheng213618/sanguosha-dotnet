@@ -15,10 +15,10 @@ internal sealed partial class CoreGameEngineShanheXingtianRuntime
     {
         if (f.SkillId != ShanheXingtianSkill || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects, TargetSeat: { } target } || target == f.OwnerSeat || f.CardSetBindings.SingleOrDefault(b => b.Name == "axe-cost")is not { CardIds.Count: 2, SourceLocations.Count: 2 } cost)
             return false;
-        var invoices = _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ParentFrameId == f.Id && e.InitiatorSeat == f.OwnerSeat && e.ExecutorSeat == f.OwnerSeat && e.SubjectSeat == f.OwnerSeat && e.ActualCount == 2 && e.Reason.Value == $"skill-program.{(f.SkillId)}.MoveBoundCards").ToArray();
+        var invoices = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.ParentFrameId == f.Id && e.InitiatorSeat == f.OwnerSeat && e.ExecutorSeat == f.OwnerSeat && e.SubjectSeat == f.OwnerSeat && e.ActualCount == 2 && e.Reason.Value == $"skill-program.{(f.SkillId)}.MoveBoundCards").ToArray();
         if (invoices is not [var invoice])
             return false;
-        return cost.CardIds.Select((id, i) => (id, from: cost.SourceLocations[i])).All(c => c.from.OwnerSeat == f.OwnerSeat && c.from.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _coreProgramEventHistoryOperations.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(e => e.InvocationId == invoice.InvocationId && e.CardId == c.id && e.From == c.from && e.CompletionSequence > invoice.SequenceBefore && e.CompletionSequence <= invoice.SequenceAfter) == 1);
+        return cost.CardIds.Select((id, i) => (id, from: cost.SourceLocations[i])).All(c => c.from.OwnerSeat == f.OwnerSeat && c.from.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Count(e => e.InvocationId == invoice.InvocationId && e.CardId == c.id && e.From == c.from && e.CompletionSequence > invoice.SequenceBefore && e.CompletionSequence <= invoice.SequenceAfter) == 1);
     }
 
     internal void ApplyShanheXingtianSeal(ProgramSkillFrame input)

@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineSoleTargetRedirectRuntime
     {
         var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w => w.Id == receipt.WindowFrameId);
         var targetIndex = Array.IndexOf(use.TargetSeats.ToArray(), receipt.Source.OwnerSeat);
-        if (window.Continuation != ProgramCardContinuation.Slash || window.SoleTargetRedirectPending is not null || window.SoleTargetRedirectReturn is not null || _coreSoleTargetProtectionOperations.SoleProtectionMainTargets(use)is not [var target] || target != receipt.Source.OwnerSeat || use.CardAttack is null || targetIndex < 0)
+        if (window.Continuation != ProgramCardContinuation.Slash || window.SoleTargetRedirectPending is not null || window.SoleTargetRedirectReturn is not null || _coreSoleTargetProtectionOperations.Value.SoleProtectionMainTargets(use)is not [var target] || target != receipt.Source.OwnerSeat || use.CardAttack is null || targetIndex < 0)
             throw new InvalidOperationException("A protected Slash lost its exact new-target redirection boundary.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(window.Id, window with { SoleTargetRedirectPending = new(use.Id, use.Action!.ActionId, receipt.Source, target, targetIndex) });
     }
@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineSoleTargetRedirectRuntime
     {
         if (frame.SoleTargetRedirectPending is not { } request)
             return false;
-        if ((!_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && !_coreProgramTargetWindowProtocolsOperations.TargetWindowProtocols.AllowsRedirectSource(request.ProtectionSource)) || frame.Continuation != ProgramCardContinuation.Slash || frame.SoleTargetRedirectReturn is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(request.CardUseFrameId)is not { Action: { } action } use || frame.ParentFrameId != use.Id || frame.Action.ActionId != request.ActionId || action.ActionId != request.ActionId || use.CardAttack is not { } resumeAttack || request.TargetIndex < 0 || request.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[request.TargetIndex] != request.TargetSeat || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SoleTargetReplacedEvent>().Any(e => e.Source == request.ProtectionSource && e.NewTargetSeat == request.TargetSeat && _coreSoleTargetQuarantineOperations.IsSoleTargetReplacementFact(use, e, e.BeforeTargets)))
+        if ((!_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability && !_coreProgramTargetWindowProtocolsOperations.TargetWindowProtocols.AllowsRedirectSource(request.ProtectionSource)) || frame.Continuation != ProgramCardContinuation.Slash || frame.SoleTargetRedirectReturn is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(request.CardUseFrameId)is not { Action: { } action } use || frame.ParentFrameId != use.Id || frame.Action.ActionId != request.ActionId || action.ActionId != request.ActionId || use.CardAttack is not { } resumeAttack || request.TargetIndex < 0 || request.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[request.TargetIndex] != request.TargetSeat || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<SoleTargetReplacedEvent>().Any(e => e.Source == request.ProtectionSource && e.NewTargetSeat == request.TargetSeat && _coreSoleTargetQuarantineOperations.IsSoleTargetReplacementFact(use, e, e.BeforeTargets)))
             throw new InvalidOperationException("A protected Slash cannot reopen redirection without its exact issued replacement.");
         var saved = frame with
         {
@@ -54,7 +54,7 @@ internal sealed partial class CoreGameEngineSoleTargetRedirectRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(returned.FinalizedCursor with { Action = action });
-        _coreCurrentUseTargetCandidateRefreshOperations.RefreshCurrentUseAddedTargetCandidates(use, _coreSoleTargetProtectionOperations.SoleProtectionMainTargets(use));
+        _coreCurrentUseTargetCandidateRefreshOperations.RefreshCurrentUseAddedTargetCandidates(use, _coreSoleTargetProtectionOperations.Value.SoleProtectionMainTargets(use));
         _coreSoleTargetQuarantineOperations.RefreshSoleProtectionObservers(use);
         return true;
     }

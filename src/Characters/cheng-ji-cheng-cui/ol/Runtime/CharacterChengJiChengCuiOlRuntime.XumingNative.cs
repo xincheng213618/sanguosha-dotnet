@@ -42,11 +42,11 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
     {
         if (use.XumingOrigin is not { } o || use.Action is not { Type: CardActionType.Use } action || o.UseId != use.Id || o.ActionId != action.ActionId || action.ActorSeat != o.ActorSeat || action.ProviderSeat != o.ActorSeat || use.SourceSeat != o.ActorSeat || action.EffectiveKind != o.Kind || use.CardKind != o.Kind || o.Kind is not (CardKind.BorrowedSword or CardKind.Dismantlement) || use.TargetSeats.Count == 0 || use.TargetSeats[0] != o.TargetSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.ProgramFrameId)is not ProgramSkillFrame { XumingEnding: { Stage: XumingStage.NativeUse } r } f || r.UseId != use.Id || r.ActionId != action.ActionId || r.Plan is not { } plan || r.PromiseIndex >= r.Promises.Count || r.Promises[r.PromiseIndex] is not { } p || p.PromiseId != o.PromiseId || p.Source != o.Source || p.ActorSeat != o.ActorSeat || p.TargetSeat != o.TargetSeat || r.GameplayHash != o.GameplayHash || !action.ConversionChain.Contains(r.Source) || !use.TargetSeats.SequenceEqual(plan.Targets))
             return false;
-        var materials = _coreProgramEventHistoryOperations.ProgramEventHistory<XumingMaterialFrozenEvent>().Where(e => e.PromiseId == p.PromiseId && e.Source == p.Source).OrderBy(e => e.Index).ToArray();
-        return materials.Length == p.MaterialCount && action.PhysicalCards.Select(c => (c.CardId, c.CardKind)).SequenceEqual(materials.Select(m => (m.CardId, m.PrintedKind))) && _coreProgramEventHistoryOperations.ProgramEventHistory<XumingNativeUseIssuedEvent>().Count(e => e == new XumingNativeUseIssuedEvent(f.Id, p.PromiseId, p.Source, use.Id, action.ActionId, p.ActorSeat, p.TargetSeat, plan.Kind, p.MaterialCount)) == 1;
+        var materials = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingMaterialFrozenEvent>().Where(e => e.PromiseId == p.PromiseId && e.Source == p.Source).OrderBy(e => e.Index).ToArray();
+        return materials.Length == p.MaterialCount && action.PhysicalCards.Select(c => (c.CardId, c.CardKind)).SequenceEqual(materials.Select(m => (m.CardId, m.PrintedKind))) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingNativeUseIssuedEvent>().Count(e => e == new XumingNativeUseIssuedEvent(f.Id, p.PromiseId, p.Source, use.Id, action.ActionId, p.ActorSeat, p.TargetSeat, plan.Kind, p.MaterialCount)) == 1;
     }
 
-    internal bool IsXumingClaimedProcessingMaterial(long originalUseId, int cardId) => HasChengJiChengCui && cardId > 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<XumingProcessingMaterialClaimedEvent>().Any(e => e.OriginalUseId == originalUseId && e.CardId == cardId && _coreProgramEventHistoryOperations.ProgramEventHistory<XumingNativeUseIssuedEvent>().Any(issued => issued.FrameId == e.ProgramFrameId && issued.UseId == e.UseId && issued.PromiseId == e.PromiseId && issued.Source == e.Source) && _coreProgramEventHistoryOperations.ProgramEventHistory<XumingMaterialFrozenEvent>().Any(m => m.PromiseId == e.PromiseId && m.Source == e.Source && m.CardId == cardId));
+    internal bool IsXumingClaimedProcessingMaterial(long originalUseId, int cardId) => HasChengJiChengCui && cardId > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingProcessingMaterialClaimedEvent>().Any(e => e.OriginalUseId == originalUseId && e.CardId == cardId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingNativeUseIssuedEvent>().Any(issued => issued.FrameId == e.ProgramFrameId && issued.UseId == e.UseId && issued.PromiseId == e.PromiseId && issued.Source == e.Source) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingMaterialFrozenEvent>().Any(m => m.PromiseId == e.PromiseId && m.Source == e.Source && m.CardId == cardId));
     [NativeUseValidation(32202)]
     internal void ValidateXumingNativeUse(CardUseFrame use)
     {
@@ -59,7 +59,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { XumingEnding: { Stage: XumingStage.NativeUse } r } f || r.UseId != useId)
             return;
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Any(e => e.ResolutionId == useId && e.CardKind == r.Plan!.Kind) || _coreProgramEventHistoryOperations.ProgramEventHistory<XumingNativeUseReturnedEvent>().Any(e => e.UseId == useId))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Any(e => e.ResolutionId == useId && e.CardKind == r.Plan!.Kind) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingNativeUseReturnedEvent>().Any(e => e.UseId == useId))
             throw new InvalidOperationException("Xuming's native Use must finish and return once, without re-paying its original materials.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XumingNativeUseReturnedEvent(f.Id, useId));
         SettleXumingPromise(f, true, useId);
@@ -73,7 +73,7 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
         if (f.SkillId != ChengJiChengCuiComposition.Xuming)
             return false;
         if (f.XumingEnding is { } r)
-            return r.Source == ChengJiSource(f) && r.GameplayHash == f.GameplayHash && r.Promises.Count > 0 && r.Promises.All(p => _coreProgramEventHistoryOperations.ProgramEventHistory<XumingPromiseIssuedEvent>().Contains(p));
+            return r.Source == ChengJiSource(f) && r.GameplayHash == f.GameplayHash && r.Promises.Count > 0 && r.Promises.All(p => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingPromiseIssuedEvent>().Contains(p));
         // Source loss may precede the actual turn end. The native candidate is
         // already issued before its first instruction creates the local receipt.
         // Admit that exact owning child, not an arbitrary newly acquired source.

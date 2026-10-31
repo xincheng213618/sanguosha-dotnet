@@ -18,7 +18,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
                 request = new(HuanpeiIntent.WenyiPeach, f.Id, f.Id, null, p.PlayerSeat, f.InstructionIndex, CardKind.Peach, f.HuanShuJun!.TargetSeat, p.PromptId, p.Revision);
             else if (f.KeBiNengPingduan is { Stage: KeBiNengPingduanStage.BasicChoice } ke && ke.ActorSeat == p.PlayerSeat)
                 request = new(HuanpeiIntent.KeBiNengBasic, f.Id, f.Id, null, p.PlayerSeat, f.InstructionIndex, null, null, p.PromptId, p.Revision);
-            else if (f.FixedTargetSlash is { Issued: false } fixedSlash && f.OwnerSeat == p.PlayerSeat && (_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner || _characterLeiBoAnniversaryOperations.IsAnniversaryLeiBoFixedSlash(f)))
+            else if (f.FixedTargetSlash is { Issued: false } fixedSlash && f.OwnerSeat == p.PlayerSeat && (_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner || _characterLeiBoAnniversaryOperations.Value.IsAnniversaryLeiBoFixedSlash(f)))
                 request = new(HuanpeiIntent.FixedSlash, f.Id, f.Id, null, p.PlayerSeat, f.InstructionIndex, CardKind.Slash, fixedSlash.TargetSeat, p.PromptId, p.Revision);
         }
 
@@ -105,7 +105,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             }
             else if (kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None))
                 result.Add(new(LegalActionKind.Peach, 0, null, "视为使用【桃】", kind) { ConversionSource = source });
-            else if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None) && (_characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || _coreAdvancedPoliciesOperations.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.HasFriendQihuiAllowance(actor) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, kind)))
+            else if (kind == CardKind.Alcohol && !actor.HasAlcoholEffect && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, Suit.None) && (_characterHuangQuanOlOperations.CanUseJianjiOrdinaryAlcohol(actor, null) || _coreTurnTargetCardQuotaAllowancesOperations.HasTargetCardQuotaAllowance(actor.Seat, actor.Seat) || _coreAdvancedPoliciesOperations.Value.HasNextUnlimitedCard(actor) || _characterZhugeLiangMouOperations.HasMouWujingAllowance(actor) || _coreAdvancedPoliciesOperations.Value.HasFriendQihuiAllowance(actor) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.UnlimitedAlcoholUse, kind)))
                 result.Add(new(LegalActionKind.Alcohol, 0, null, "视为使用【酒】", kind) { ConversionSource = source });
         }
 
@@ -316,7 +316,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     }
 
     internal bool HasHuanpeiRequiredBasic(CharacterState actor, CardKind kind) => HuanpeiSources(actor).Any() && CanAdjustHuanpeiHand(actor) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) && !_characterCuiYanOlOperations.IsCuiYanNextUseForbidden(actor.Seat, [], null) && (kind != CardKind.Dodge || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind));
-    internal bool HasHuanpeiDyingResponse(CharacterState actor) => _coreDyingCursorRuntimeOperations.ActiveDying is { } d && HuanpeiSources(actor).Any() && CanAdjustHuanpeiHand(actor) && new[]
+    internal bool HasHuanpeiDyingResponse(CharacterState actor) => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && HuanpeiSources(actor).Any() && CanAdjustHuanpeiHand(actor) && new[]
     {
         CardKind.Peach,
         CardKind.Alcohol

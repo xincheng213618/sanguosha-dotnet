@@ -10,8 +10,8 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal static CardConversionSource FuleSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cao_zhi_le_LeCaoZhiFule.FuleSource(f);
     internal FuEntityNameSnapshot? CaptureLeCaoZhiFuEntity(int cardId)
     {
-        var completed = _coreProgramEventHistoryOperations.ProgramEventHistory<FuMarkingCompletedEvent>().Select(e => (e.FrameId, e.Origin)).ToHashSet();
-        var mark = _coreProgramEventHistoryOperations.ProgramEventHistory<FuEntityAssignedEvent>().LastOrDefault(e => e.CardId == cardId && completed.Contains((e.FrameId, e.Origin)));
+        var completed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuMarkingCompletedEvent>().Select(e => (e.FrameId, e.Origin)).ToHashSet();
+        var mark = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuEntityAssignedEvent>().LastOrDefault(e => e.CardId == cardId && completed.Contains((e.FrameId, e.Origin)));
         return mark is null ? null : new(mark.CardId, mark.PrintedKind, mark.AliasKind, mark.Revision);
     }
 
@@ -56,7 +56,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         };
     }
 
-    internal bool IsIssuedFuleInitialCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => candidate.SkillId == LeCaoZhiFuleSkill && candidate.BindingId == FuleInitialBinding && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program is { } program && program.GameplayHash == candidate.GameplayHash && LeCaoZhiComposition.IsFuleProgram(program) && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == candidate.OwnerSeat && _coreActualTurnProgressPhaseAccess._phase == TurnPhase.NotStarted && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, FuleInitialEntities: not null } window && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && window.Candidates[window.CandidateIndex] == candidate && context.SourceSeat == window.OwnerSeat && context.TargetSeat == window.OwnerSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<FuleInitializedEvent>().Any(done => done.Source.OwnerSeat == candidate.OwnerSeat);
+    internal bool IsIssuedFuleInitialCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => candidate.SkillId == LeCaoZhiFuleSkill && candidate.BindingId == FuleInitialBinding && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program is { } program && program.GameplayHash == candidate.GameplayHash && LeCaoZhiComposition.IsFuleProgram(program) && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == candidate.OwnerSeat && _coreActualTurnProgressPhaseAccess._phase == TurnPhase.NotStarted && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, FuleInitialEntities: not null } window && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && window.Candidates[window.CandidateIndex] == candidate && context.SourceSeat == window.OwnerSeat && context.TargetSeat == window.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuleInitializedEvent>().Any(done => done.Source.OwnerSeat == candidate.OwnerSeat);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29080, SkillProgramEffectOp.InitializeLeCaoZhiFule)]
     internal bool CanOfferFuleInitial(ProgramTriggerLegalityContext gate) => IsIssuedFuleInitialCandidate(gate.Candidate, gate.Context);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 29080)]
@@ -65,13 +65,13 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     {
         if (f.SkillId != LeCaoZhiFuleSkill || f.TriggerId != FuleInitialBinding || f.ActivationId != f.TriggerId || f.InstructionIndex is < 0 or > 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || !_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.GameStarting) || !_coreOriginalHandEntityObserversOperations.OriginalHandBindingStarted(f, SkillProgramTriggerWindow.GameStarting))
             return false;
-        return IsIssuedFuleInitialCandidate(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context) || f.InstructionIndex == 1 && _coreProgramEventHistoryOperations.ProgramEventHistory<FuleInitializedEvent>().Count(done => done.FrameId == f.Id && done.Source == FuleSource(f) && done.GameplayHash == f.GameplayHash) == 1;
+        return IsIssuedFuleInitialCandidate(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), context) || f.InstructionIndex == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuleInitializedEvent>().Count(done => done.FrameId == f.Id && done.Source == FuleSource(f) && done.GameplayHash == f.GameplayHash) == 1;
     }
 
     internal SkillProgramStepOutcome InitializeLeCaoZhiFule(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.InstructionIndex != 1 || !PermitIssuedFuleInitial(f) || _coreProgramEventHistoryOperations.ProgramEventHistory<FuleInitializedEvent>().Any(done => done.Source.OwnerSeat == f.OwnerSeat))
+        if (f.InstructionIndex != 1 || !PermitIssuedFuleInitial(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuleInitializedEvent>().Any(done => done.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Fule requires its once-issued original opening-Hand mother.");
         var window = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(frame => frame.Id == f.WindowContext!.ParentFrameId);
         var entities = window.FuleInitialEntities!.Where(entity => entity.OwnerSeat == f.OwnerSeat).ToArray();
@@ -92,7 +92,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
 
     internal void AssignFuleEntities(ProgramSkillFrame f, IReadOnlyList<int> ids, FuMarkOrigin origin)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<FuMarkingCompletedEvent>().Any(done => done.FrameId == f.Id && done.Origin == origin) || _coreProgramEventHistoryOperations.ProgramEventHistory<FuEntityAssignedEvent>().Any(mark => mark.FrameId == f.Id && mark.Origin == origin))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuMarkingCompletedEvent>().Any(done => done.FrameId == f.Id && done.Origin == origin) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuEntityAssignedEvent>().Any(mark => mark.FrameId == f.Id && mark.Origin == origin))
             throw new InvalidOperationException("A Fu batch may assign its actual entities only once.");
         var pool = FuleModeNames();
         for (var index = 0; index < ids.Count; index++)
@@ -124,7 +124,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
         if (requestedUseTarget is { } requested)
             return rule.OutputKind == CardKind.Peach && !forResponse && !dyingUse && _coreWenyiPeachSuppliesOperations.IsWenyiPeachSupplyQuery(owner, requested);
         if (dyingUse || forResponse && rule.OutputKind is CardKind.Peach or CardKind.Alcohol)
-            return _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && dying.ResponderSeat == owner.Seat && (rule.OutputKind == CardKind.Peach || rule.OutputKind == CardKind.Alcohol && dying.VictimSeat == owner.Seat);
+            return _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && dying.ResponderSeat == owner.Seat && (rule.OutputKind == CardKind.Peach || rule.OutputKind == CardKind.Alcohol && dying.VictimSeat == owner.Seat);
         if (!forResponse)
             return true;
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind))

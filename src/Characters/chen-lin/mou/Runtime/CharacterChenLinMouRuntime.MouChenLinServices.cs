@@ -33,7 +33,7 @@ internal sealed partial class CharacterChenLinMouRuntime
         return n >= 1 && _resolutionStackOperations._resolutionStack[n - 1] is TurnEndingBoundaryFrame p && p.Id == w.ParentFrameId && p.OwnerSeat == f.OwnerSeat && p.ItemIndex >= 0 && p.ItemIndex < p.Items.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Items[p.ItemIndex].Candidate);
     }
 
-    IEnumerable<T> IMouChenLinFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouChenLinFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     ActualDiscardRecoveryPhaseKey? IMouChenLinFacts.Phase() => _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase();
     bool IMouChenLinFacts.Recorded(ActualDiscardRecoveryPhaseKey phase) => _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase);
     string IMouChenLinFacts.SkillName(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Name;

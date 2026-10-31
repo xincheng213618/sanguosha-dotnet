@@ -36,5 +36,5 @@ internal sealed partial class CoreGameEngineExtraDrawDebtObserversRuntime
     }
 
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 440)]
-    internal bool IsExtraDrawDebtProgramDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { ResumesProgramSkill: true } dying && ExtraDrawDebtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
+    internal bool IsExtraDrawDebtProgramDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { ResumesProgramSkill: true } dying && ExtraDrawDebtObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == root.Id);
 }

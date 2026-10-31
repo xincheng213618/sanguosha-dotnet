@@ -17,13 +17,13 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesRuntime
 
         if (p.Intent == DrawFundedDistinctBasicIntent.OwnSlashDodge)
         {
-            _coreDrawFundedDistinctBasicResponsesOperations.ResolveDrawFundedDistinctBasicDodge(p);
+            _coreDrawFundedDistinctBasicResponsesOperations.Value.ResolveDrawFundedDistinctBasicDodge(p);
             return;
         }
 
         if (p.Intent == DrawFundedDistinctBasicIntent.Dying)
         {
-            var dying = _coreDyingCursorRuntimeOperations.ActiveDying!;
+            var dying = _coreDyingCursorRuntimeOperations.Value.ActiveDying!;
             var victim = _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat];
             _coreNativeDyingFramesOperations.SetDyingFrameStep(dying.FrameId, ResolutionFrameStep.ResolvingEffect);
             var policies = kind == CardKind.Peach && actor.Seat != victim.Seat ? _coreProgramCardPoliciesOperations.CardPolicies(victim, SkillProgramCardPolicyKind.RescueRecoveryBonus, CardKind.Peach).Where(policy => string.Equals(_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(actor), policy.Policy.FactionId, StringComparison.Ordinal)).ToArray() : [];
@@ -147,7 +147,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesRuntime
         if (countsTowardLimit && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && actor.Seat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, p.Source))
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, kind);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, actor);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, kind, actor.Seat, actualTargets[0], IgnoresArmor: attack.IgnoresArmor));
         _coreNativeAiDecisionsOperations.NotifyAiOfSlash(actor, _coreMatchParticipantsPlayersAccess._players[actualTargets[0]]);

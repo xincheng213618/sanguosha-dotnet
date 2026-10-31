@@ -80,7 +80,7 @@ internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ActualEndedEquipment = new(0, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, context.ParentFrameId, context.OccurrenceIndex, context.ActualEndedEquipment!, ActualEndedTurnEquipmentStage.Offering) });
         }
 
-        if (!_coreEquipmentDonationObserversOperations.IsValidActualEndedEquipment(f))
+        if (!_coreEquipmentDonationObserversOperations.Value.IsValidActualEndedEquipment(f))
             throw new InvalidOperationException("Equipment options lost their issued actual-turn draw/placement ledger.");
         var r = f.ActualEndedEquipment!;
         if (r.Stage == ActualEndedTurnEquipmentStage.Complete)
@@ -117,7 +117,7 @@ internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
 
     internal void ResolveActualEndedEquipmentChoice(ProgramSkillFrame f, PromptChoice choice)
     {
-        if (!_coreEquipmentDonationObserversOperations.IsValidActualEndedEquipment(f) || f.ActualEndedEquipment is not { } r || r.Stage != ActualEndedTurnEquipmentStage.Offering || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat)
+        if (!_coreEquipmentDonationObserversOperations.Value.IsValidActualEndedEquipment(f) || f.ActualEndedEquipment is not { } r || r.Stage != ActualEndedTurnEquipmentStage.Offering || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat)
             throw new InvalidOperationException("An ended-turn equipment choice lost its exact original turn.");
         choice = ActualEndedEquipmentChoices(f).Single(c => c.Id == choice.Id);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();

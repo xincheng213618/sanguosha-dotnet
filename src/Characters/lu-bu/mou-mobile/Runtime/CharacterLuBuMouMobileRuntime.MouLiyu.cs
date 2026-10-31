@@ -236,9 +236,9 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 31600)]
     internal void ExpireMouLbGrant(ActualTurnCursorReturnedEvent returned)
     {
-        foreach (var issued in _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuBuLiyuGrantEvent>().Where(e => e.RecipientSeat == returned.OwnerSeat).ToArray())
+        foreach (var issued in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuBuLiyuGrantEvent>().Where(e => e.RecipientSeat == returned.OwnerSeat).ToArray())
         {
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<MouLuBuLiyuGrantExpiredEvent>().Any(e => e.GrantId == issued.GrantId))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuBuLiyuGrantExpiredEvent>().Any(e => e.GrantId == issued.GrantId))
                 continue;
             var due = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnStartedEvent>().Skip(issued.AfterTurnStartOrdinal).FirstOrDefault(e => e.ActorSeat == issued.RecipientSeat);
             if (due?.TurnNumber != returned.ActualTurn)

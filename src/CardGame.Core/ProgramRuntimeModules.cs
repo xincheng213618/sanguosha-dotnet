@@ -76,7 +76,8 @@ internal sealed class ProgramRuntimeModuleCatalog
 
         bool IsDedicatedDependency(Type dependency)
         {
-            if (dependency.IsDefined(typeof(ProgramRuntimeEntryAttribute), false))
+            if (dependency.IsDefined(typeof(ProgramRuntimeEntryAttribute), false) ||
+                dependency.IsConstructedGenericType && dependency.GetGenericTypeDefinition() == typeof(RuntimeEntries.DeferredRuntime<>))
             {
                 if (!entries.ContainsKey(dependency)) entries.Add(dependency, ProgramRuntimeEntryRegistration.For(dependency));
                 return true;

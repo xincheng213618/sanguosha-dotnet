@@ -21,7 +21,7 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
 
     internal bool IsWangChangSlash(CardUseFrame use)
     {
-        if (use.AnniversaryWangChangSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Source.OwnerSeat || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { AnniversaryWangChang: { Stage: AnniversaryWangChangStage.NativeSlash } r } f || !ValidWangChang(f) || r.Source != o.Source || r.Hash != o.Hash || r.SlashCursor != o.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || r.Targets[r.SlashCursor] != o.TargetSeat || !a.ConversionChain.Contains(o.Source) || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWangChangSlashIssuedEvent>().Count(e => e == new AnniversaryWangChangSlashIssuedEvent(f.Id, o.Cursor, o.UseId, o.ActionId, o.TargetSeat)) != 1)
+        if (use.AnniversaryWangChangSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Source.OwnerSeat || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { AnniversaryWangChang: { Stage: AnniversaryWangChangStage.NativeSlash } r } f || !ValidWangChang(f) || r.Source != o.Source || r.Hash != o.Hash || r.SlashCursor != o.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || r.Targets[r.SlashCursor] != o.TargetSeat || !a.ConversionChain.Contains(o.Source) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWangChangSlashIssuedEvent>().Count(e => e == new AnniversaryWangChangSlashIssuedEvent(f.Id, o.Cursor, o.UseId, o.ActionId, o.TargetSeat)) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat);
     }
@@ -40,7 +40,7 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(origin.FrameId);
         var r = f.AnniversaryWangChang!;
-        if (!IsWangChangSlash(use) || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (!IsWangChangSlash(use) || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Pingxi cannot return an unfinished, repeated or unrelated native Use.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { AnniversaryWangChang = r with { NativeReturned = true } });
         if (use.CardAttack is not { Active: true })
@@ -62,7 +62,7 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var r = f.AnniversaryWangChang!;
-        if (!ValidWangChang(f) || !r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryWangChangSlashReturnedEvent>().Any(e => e.FrameId == f.Id && e.Cursor == r.SlashCursor))
+        if (!ValidWangChang(f) || !r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWangChangSlashReturnedEvent>().Any(e => e.FrameId == f.Id && e.Cursor == r.SlashCursor))
             throw new InvalidOperationException("Pingxi's original group must receive each whole native Slash exactly once.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryWangChangSlashReturnedEvent(f.Id, r.SlashCursor, r.UseId, r.ActionId));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SelectedTargetSeats = [], AnniversaryWangChang = r with { Stage = AnniversaryWangChangStage.ReturnedSlash, SlashCursor = r.SlashCursor + 1 } });

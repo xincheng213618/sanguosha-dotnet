@@ -3,14 +3,14 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
 {
-    internal bool TracksRedOwnedLoss => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RevealRedLossAndDraw) || _characterZhugeJinMobileOperations.HasMobileMingzheRegistration;
+    internal bool TracksRedOwnedLoss => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.RevealRedLossAndDraw) || _characterZhugeJinMobileOperations.Value.HasMobileMingzheRegistration;
 
     internal static bool OwnedLossZone(CardZoneKind zone) => RuntimeSkills.RuntimeRules_Core_GainGiftPrograms.OwnedLossZone(zone);
     internal RedOwnedLossMaterial? CaptureRedOwnedLoss(Card card, CardLocation from, CardLocation to, long sequence)
     {
         // Freeze the original owner's effective suit at issuance, before equipment
         // grants/removal observers change that owner. The snapshot keeps printed suit.
-        if (!TracksRedOwnedLoss || from.OwnerSeat is not { } owner || !OwnedLossZone(from.Zone) || to.OwnerSeat == owner && OwnedLossZone(to.Zone) || _coreCardMovementProgramsOperations.CaptureMovementTiming()is not { } timing || timing.Phase == TurnPhase.Play && timing.PhaseActorSeat == owner && !(_characterZhugeJinMobileOperations.HasMobileMingzheRegistration && timing.ActualTurnOwnerSeat != owner))
+        if (!TracksRedOwnedLoss || from.OwnerSeat is not { } owner || !OwnedLossZone(from.Zone) || to.OwnerSeat == owner && OwnedLossZone(to.Zone) || _coreCardMovementProgramsOperations.CaptureMovementTiming()is not { } timing || timing.Phase == TurnPhase.Play && timing.PhaseActorSeat == owner && !(_characterZhugeJinMobileOperations.Value.HasMobileMingzheRegistration && timing.ActualTurnOwnerSeat != owner))
             return null;
         var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card);
         return suit is Suit.Heart or Suit.Diamond ? new(owner, _coreSnapshotValueProjectionOperations.ToSnapshot(card), suit, timing, sequence) : null;
@@ -79,10 +79,10 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
 
     internal SkillProgramStepOutcome PayDelegatedJudgment(ProgramSkillFrame f, SkillProgramEffect effect)
     {
-        var j = _coreJudgmentCursorRuntimeOperations.ActiveJudgment ?? throw new InvalidOperationException("Delegated payment has no actual judgment.");
+        var j = _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment ?? throw new InvalidOperationException("Delegated payment has no actual judgment.");
         var d = j.DelegatedReplacement ?? throw new InvalidOperationException("Delegated payment lost its owning draft.");
         var c = f.WindowContext?.JudgmentReplacement;
-        if (!_coreDelegatedJudgmentChoicesOperations.ValidDelegatedJudgmentDraft(j, d) || d.Stage != DelegatedJudgmentStage.Chosen || d.Source != GainGiftSource(f) || d.GameplayHash != f.GameplayHash || c is null || d.SelectedCardId != c.ReplacementCardId || d.OldCardId != c.OldCardId)
+        if (!_coreDelegatedJudgmentChoicesOperations.Value.ValidDelegatedJudgmentDraft(j, d) || d.Stage != DelegatedJudgmentStage.Chosen || d.Source != GainGiftSource(f) || d.GameplayHash != f.GameplayHash || c is null || d.SelectedCardId != c.ReplacementCardId || d.OldCardId != c.OldCardId)
             throw new InvalidOperationException("The delegated choice is not the original owner's unpaid actual card.");
         var from = _cardZonesOperations._cardZones.GetLocation(c.ReplacementCardId);
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;

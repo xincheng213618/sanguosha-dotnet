@@ -15,7 +15,7 @@ internal sealed partial class CharacterLiFengOlRuntime
         if (!_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive)
             return false;
         if (effect.Op == SkillProgramEffectOp.InitializeJiyunCategoryGrain)
-            return !_coreProgramEventHistoryOperations.ProgramEventHistory<LiFengStartedEvent>().Any(e => e.Op == effect.Op && e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillInstanceId == candidate.SkillInstanceId);
+            return !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiFengStartedEvent>().Any(e => e.Op == effect.Op && e.Source.OwnerSeat == candidate.OwnerSeat && e.Source.SkillInstanceId == candidate.SkillInstanceId);
         if (effect.Op == SkillProgramEffectOp.DistributeShuliangEndingGrain)
             return _corePublicPileSourcesOperations.ReferencedPublicPileSources(candidate.OwnerSeat, "ol:jiyun", candidate.SkillInstanceId).Any(p => IsLiveJiyunPile(p) && _corePublicPileSourcesOperations.PublicPileCards(p).Count > 0);
         return effect.Op != SkillProgramEffectOp.ResolveJiyunPreparationDrawLeases || context.SourceSeat == candidate.OwnerSeat;

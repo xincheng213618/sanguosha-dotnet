@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class MouChengYuFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineProgramEventHistoryEntries> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CharacterChengYuMouOlEntries> getCharacterChengYuMouOlRuntime, Func<RuntimeEntries.CoreGameEngineCardUseLifecycleEntries> getCoreGameEngineCardUseLifecycleRuntime, Func<RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries> getCoreGameEngineDesignatedExtraTargetsRuntime) : IMouChengYuFacts
+internal sealed class MouChengYuFacts(EngineStates.CoreActualTurnProgressState actualTurnProgressState, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime, Func<RuntimeEntries.CharacterChengYuMouOlEntries> getCharacterChengYuMouOlRuntime, Func<RuntimeEntries.CoreGameEngineCardUseLifecycleEntries> getCoreGameEngineCardUseLifecycleRuntime, Func<RuntimeEntries.CoreGameEngineDesignatedExtraTargetsEntries> getCoreGameEngineDesignatedExtraTargetsRuntime) : IMouChengYuFacts
 {
     public int Turn => actualTurnProgressState.ReferenceToTurnNumber;
     public bool GameOver => matchOutcomeState.ReferenceToWinner != Winner.None;
@@ -8,7 +8,7 @@ internal sealed class MouChengYuFacts(EngineStates.CoreActualTurnProgressState a
     public bool Alive(int seat) => getCoreTableSeatQueriesRuntime().IsValidPlayerSeat(seat) && matchParticipantsState.ReferenceToPlayers[seat].IsAlive;
     public bool Human(int seat) => matchParticipantsState.ReferenceToPlayers[seat].IsHuman;
     public IReadOnlyList<T> History<T>()
-        where T : IGameEvent => Array.AsReadOnly(getCoreGameEngineProgramEventHistoryRuntime().ProgramEventHistory<T>().ToArray());
+        where T : IGameEvent => Array.AsReadOnly(getCoreGameEngineProgramEventHistoryRuntime().Value.ProgramEventHistory<T>().ToArray());
     public CardActionContext Action(ProgramSkillFrame f) => getCharacterChengYuMouOlRuntime().MouChengYuAction(f);
     public CardUseFrame? Use(long id) => getCoreGameEngineCardUseLifecycleRuntime().LifecycleCardUse(id);
     public CardUseFrame? TargetUse(ProgramSkillFrame f) => f.SkillId == MouChengYuComposition.Lidan && f.TriggerId == "next-matching-targets" && NativeParentMatches(f) && f.WindowContext?.CardUse is { } c ? getCoreGameEngineCardUseLifecycleRuntime().LifecycleCardUse(c.ParentCardUseFrameId) : null;

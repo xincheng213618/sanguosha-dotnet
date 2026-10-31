@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class DrawDiscardCategoryProgramCapability(Func<RuntimeEntries.CoreGameEngineDrawDiscardCategoryRefundEntries> getCoreGameEngineDrawDiscardCategoryRefundRuntime) : IDrawDiscardCategoryProgramHost
+internal sealed class DrawDiscardCategoryProgramCapability(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineDrawDiscardCategoryRefundRuntime>> getCoreGameEngineDrawDiscardCategoryRefundRuntime) : IDrawDiscardCategoryProgramHost
 {
-    public SkillProgramStepOutcome DrawThenDiscardDistinctCategories(ProgramSkillFrame f, int targetSeat, int amount, string stateId) => getCoreGameEngineDrawDiscardCategoryRefundRuntime().BeginDrawDiscardCategoryRefund(f, targetSeat, amount, stateId);
+    public SkillProgramStepOutcome DrawThenDiscardDistinctCategories(ProgramSkillFrame f, int targetSeat, int amount, string stateId) => getCoreGameEngineDrawDiscardCategoryRefundRuntime().Value.BeginDrawDiscardCategoryRefund(f, targetSeat, amount, stateId);
 }

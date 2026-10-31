@@ -97,7 +97,7 @@ internal sealed partial class CoreGameEngineSoleIncomingRangeDrawRuntime
             var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id);
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             var completion = _coreCardAttackStateOperations.CaptureAttackCompletion(attack);
-            if (!_coreNativeSlashCompletionOperations.FinishAttack(attack))
+            if (!_coreNativeSlashCompletionOperations.Value.FinishAttack(attack))
                 _coreNativeAttackCompletionOperations.CompleteAttackAfterCardResolution(completion);
         }
         else

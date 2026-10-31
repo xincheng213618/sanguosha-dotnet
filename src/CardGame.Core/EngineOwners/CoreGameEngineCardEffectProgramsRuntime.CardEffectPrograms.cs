@@ -36,7 +36,7 @@ internal sealed partial class CoreGameEngineCardEffectProgramsRuntime
 
     internal bool BeginCardEffectPrograms(CardActionContext action, IReadOnlyList<int> designated, NullificationWindowFrame? ordinary, DelayedEffectContinuation? delayed, NativeTrickTargetEffectReturn? nativeTargetReturn = null, bool perTargetOnly = false)
     {
-        var candidates = _coreCardActionsOperations.CollectSharedCardActionCandidates(action, SkillProgramTriggerWindow.CardEffectBeforeApply, designated, null).Where(candidate => !perTargetOnly || _characterLuXunMouMobileOperations.HasPerTargetTrickEffectBinding(candidate)).OrderByDescending(c => c.Priority).ThenBy(c => _coreTableOrderOperations.RelativeTableOrder(0, c.OwnerSeat)).ThenBy(c => c.SkillId, StringComparer.Ordinal).ThenBy(c => c.SkillInstanceId, StringComparer.Ordinal).ThenBy(c => c.TriggerId, StringComparer.Ordinal).ToArray();
+        var candidates = _coreCardActionsOperations.CollectSharedCardActionCandidates(action, SkillProgramTriggerWindow.CardEffectBeforeApply, designated, null).Where(candidate => !perTargetOnly || _characterLuXunMouMobileOperations.Value.HasPerTargetTrickEffectBinding(candidate)).OrderByDescending(c => c.Priority).ThenBy(c => _coreTableOrderOperations.RelativeTableOrder(0, c.OwnerSeat)).ThenBy(c => c.SkillId, StringComparer.Ordinal).ThenBy(c => c.SkillInstanceId, StringComparer.Ordinal).ThenBy(c => c.TriggerId, StringComparer.Ordinal).ToArray();
         if (candidates.Length == 0)
             return false;
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
@@ -63,7 +63,7 @@ internal sealed partial class CoreGameEngineCardEffectProgramsRuntime
             {
                 _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.CardEffectBeforeApply);
                 if (frame.NativeTargetReturn is not null)
-                    _characterLuXunMouMobileOperations.ReturnNativeTrickTargetEffect(frame);
+                    _characterLuXunMouMobileOperations.Value.ReturnNativeTrickTargetEffect(frame);
                 else if (frame.OrdinaryReturn is { } ordinary)
                 {
                     var parent = _resolutionStackOperations._resolutionStack.LastOrDefault();

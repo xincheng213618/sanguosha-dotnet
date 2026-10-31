@@ -278,7 +278,7 @@ internal sealed partial class CharacterMaChengOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var r = f.Chenglie!;
-        var count = _coreProgramEventHistoryOperations.ProgramEventHistory<ChenglieCardMovedEvent>().Count(e => e.FrameId == id && e.Stage == r.Stage && e.Index == r.Index && e.Sequence > r.Before && e.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
+        var count = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChenglieCardMovedEvent>().Count(e => e.FrameId == id && e.Stage == r.Stage && e.Index == r.Index && e.Sequence > r.Before && e.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Chenglie = r with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Count = count } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChenglieMovementPaidEvent(id, r.Stage, r.Index, r.Before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, count));
         ContinueChenglie(id);

@@ -19,7 +19,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCardCount, 43300, SkillProgramEffectOp.ResolveAnniversaryLiuLiFuli)]
     internal bool CanStartLiuLiFuli(CharacterState owner) => LiuLiCategories(owner.Seat).Any(cards => LiuLiCanDiscard(owner.Seat, cards));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 43300, SkillProgramEffectOp.ResolveAnniversaryLiuLiDehua)]
-    internal bool CanStartLiuLiDehua(ProgramTriggerLegalityContext g) => g.SkillId == AnniversaryLiuLiComposition.Dehua && !_coreProgramEventHistoryOperations.ProgramEventHistory<AnniversaryLiuLiStartedEvent>().Any(e => e.Source.OwnerSeat == g.OwnerSeat && e.Source.SkillId == g.SkillId && e.Source.BindingId == g.Candidate.BindingId && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber);
+    internal bool CanStartLiuLiDehua(ProgramTriggerLegalityContext g) => g.SkillId == AnniversaryLiuLiComposition.Dehua && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiStartedEvent>().Any(e => e.Source.OwnerSeat == g.OwnerSeat && e.Source.SkillId == g.SkillId && e.Source.BindingId == g.Candidate.BindingId && e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber);
     internal SkillProgramStepOutcome BeginLiuLi(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -124,7 +124,7 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
         if (r.Stage == AnniversaryLiuLiStage.RangeTarget)
         {
             var target = c.Targets.Single();
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiRangeIssuedEvent(f.Id, r.Source, r.Hash, target, _coreProgramEventHistoryOperations.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == f.OwnerSeat), r.DamageDiscarded));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiRangeIssuedEvent(f.Id, r.Source, r.Hash, target, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnStartedEvent>().Count(e => e.ActorSeat == f.OwnerSeat), r.DamageDiscarded));
             FinishLiuLi(f);
             return;
         }

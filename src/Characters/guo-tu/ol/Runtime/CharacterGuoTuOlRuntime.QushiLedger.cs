@@ -7,8 +7,8 @@ internal sealed partial class CharacterGuoTuOlRuntime
 
     internal const string QushiDrawReason = "skill-program.guo-tu.qushi.draw", QushiSealReason = "skill-program.guo-tu.qushi.seal", QushiRemoveReason = "skill-program.guo-tu.qushi.remove", QushiDeathReason = "skill-program.guo-tu.qushi.holder-death";
     internal static CardConversionSource QushiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_guo_tu_ol_QushiLedger.QushiSource(f);
-    internal bool ValidQushiSeal(QushiSeal s) => s.Source.SkillId == "ol:qushi" && s.Source.BindingId == "draw-seal" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(s.HolderSeat) && s.HolderSeat != s.Source.OwnerSeat && s.Location == new CardLocation(CardZoneKind.PrivatePersistentPile, s.HolderSeat, $"qushi:{(s.SealId)}") && _contentRegistryOperations._contentRegistry.GetSkill(s.Source.SkillId).Program?.GameplayHash == s.GameplayHash && _coreProgramEventHistoryOperations.ProgramEventHistory<QushiStartedEvent>().Count(e => e.FrameId == s.SealId && e.Source == s.Source && e.GameplayHash == s.GameplayHash && e.Op == SkillProgramEffectOp.ResolveQushiDrawAndPrivateSeal) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == s.MovementSequence && m.CardId == s.CardId && m.CardKind == s.PrintedKind && m.From == CardLocation.Hand(s.Source.OwnerSeat) && m.To == s.Location && m.Reason.Value == QushiSealReason) == 1;
-    internal QushiSeal[] LiveQushiSeals() => !HasQushiCapability ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<QushiSealPlacedEvent>().Select(e => e.Seal).Where(s => ValidQushiSeal(s) && !_coreProgramEventHistoryOperations.ProgramEventHistory<QushiSealRemovedEvent>().Any(e => e.SealId == s.SealId) && _cardZonesOperations._cardZones.GetLocation(s.CardId) == s.Location).ToArray();
+    internal bool ValidQushiSeal(QushiSeal s) => s.Source.SkillId == "ol:qushi" && s.Source.BindingId == "draw-seal" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(s.HolderSeat) && s.HolderSeat != s.Source.OwnerSeat && s.Location == new CardLocation(CardZoneKind.PrivatePersistentPile, s.HolderSeat, $"qushi:{(s.SealId)}") && _contentRegistryOperations._contentRegistry.GetSkill(s.Source.SkillId).Program?.GameplayHash == s.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiStartedEvent>().Count(e => e.FrameId == s.SealId && e.Source == s.Source && e.GameplayHash == s.GameplayHash && e.Op == SkillProgramEffectOp.ResolveQushiDrawAndPrivateSeal) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == s.MovementSequence && m.CardId == s.CardId && m.CardKind == s.PrintedKind && m.From == CardLocation.Hand(s.Source.OwnerSeat) && m.To == s.Location && m.Reason.Value == QushiSealReason) == 1;
+    internal QushiSeal[] LiveQushiSeals() => !HasQushiCapability ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiSealPlacedEvent>().Select(e => e.Seal).Where(s => ValidQushiSeal(s) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiSealRemovedEvent>().Any(e => e.SealId == s.SealId) && _cardZonesOperations._cardZones.GetLocation(s.CardId) == s.Location).ToArray();
     internal IReadOnlyList<NamedAmbushPileSnapshot>? ProjectQushiSeals(int holderSeat, int viewerSeat, bool revealAll)
     {
         var seals = LiveQushiSeals().Where(s => s.HolderSeat == holderSeat).ToArray();
@@ -55,7 +55,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         if (c.SkillId != "ol:qushi" || c.BindingId != "issued-holder-ending")
             return context;
         var item = parent.Items[parent.ItemIndex];
-        var s = _coreProgramEventHistoryOperations.ProgramEventHistory<QushiSealPlacedEvent>().Select(e => e.Seal).SingleOrDefault(s => item.StableIdentity == $"qushi:{(s.SealId)}");
+        var s = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiSealPlacedEvent>().Select(e => e.Seal).SingleOrDefault(s => item.StableIdentity == $"qushi:{(s.SealId)}");
         return context with
         {
             QushiSealId = s?.SealId
@@ -66,7 +66,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
     {
         if (!HasQushiCapability || c.SkillId != "ol:qushi" || c.BindingId != "issued-holder-ending" || context.Window != SkillProgramTriggerWindow.TurnEnding || context.OwnerSeat != c.OwnerSeat || context.SourceSeat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat || context.TargetSeat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat || context.OccurrenceIndex != c.OccurrenceIndex || context.QushiSealId is not { } id || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } p || p.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat || p.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber || p.ItemIndex < 0 || p.ItemIndex >= p.Items.Count || p.Items[p.ItemIndex].Candidate != c || p.Items[p.ItemIndex].StableIdentity != $"qushi:{(id)}")
             return null;
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<QushiSealPlacedEvent>().Select(e => e.Seal).SingleOrDefault(s => s.SealId == id && s.Source.OwnerSeat == c.OwnerSeat && s.Source.SkillInstanceId == c.SkillInstanceId && s.GameplayHash == c.GameplayHash && s.HolderSeat == p.OwnerSeat && ValidQushiSeal(s));
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiSealPlacedEvent>().Select(e => e.Seal).SingleOrDefault(s => s.SealId == id && s.Source.OwnerSeat == c.OwnerSeat && s.Source.SkillInstanceId == c.SkillInstanceId && s.GameplayHash == c.GameplayHash && s.HolderSeat == p.OwnerSeat && ValidQushiSeal(s));
     }
 
     [ProgramIssuedTrigger(290)]
@@ -80,7 +80,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         {
             var trueUse = false;
             long origin = 0;
-            if (a.EffectiveKind == CardKind.Nullification && _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault()is { } n && a.ParentActionId == _coreDelayedNullificationOperations.NullificationParentActionId(n) && a.OpponentSeat == n.SourceSeat)
+            if (a.EffectiveKind == CardKind.Nullification && _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault()is { } n && a.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(n) && a.OpponentSeat == n.SourceSeat)
             {
                 trueUse = true;
                 origin = n.Id;
@@ -92,19 +92,19 @@ internal sealed partial class CharacterGuoTuOlRuntime
                 origin = u.Id;
             }
 
-            if (trueUse && a.ActorSeat == a.ProviderSeat && a.RequesterSeat is null && a.ResponderSeat == a.ActorSeat && !_coreProgramEventHistoryOperations.ProgramEventHistory<QushiActualUseEvent>().Any(x => x.ResponseUse && x.ActionId == a.ActionId))
+            if (trueUse && a.ActorSeat == a.ProviderSeat && a.RequesterSeat is null && a.ResponderSeat == a.ActorSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiActualUseEvent>().Any(x => x.ResponseUse && x.ActionId == a.ActionId))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QushiActualUseEvent(_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat, origin, a.ActionId, true, a.ActorSeat, a.EffectiveKind, 0));
         }
 
         foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().ToArray())
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(d => d.ResolutionId == use.Id))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(d => d.ResolutionId == use.Id))
                 RecordQushiUse(use);
     }
 
     [NativeUsePreparation(27460)]
     internal bool CaptureQushiFinalUse(CardUseFrame use)
     {
-        if (HasQushiCapability && _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().Any(d => d.ResolutionId == use.Id))
+        if (HasQushiCapability && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(d => d.ResolutionId == use.Id))
             RecordQushiUse(use);
         return false;
     }
@@ -117,11 +117,11 @@ internal sealed partial class CharacterGuoTuOlRuntime
         var count = targets.Distinct().Count();
         if (count == 0 && !use.TargetsAdjusted && (CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(use.CardKind) == SkillProgramCardCategory.Equipment || use.CardKind is CardKind.DrawTwo or CardKind.Peach or CardKind.Alcohol))
             count = 1;
-        var old = _coreProgramEventHistoryOperations.ProgramEventHistory<QushiActualUseEvent>().LastOrDefault(e => !e.ResponseUse && e.OriginId == use.Id);
+        var old = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiActualUseEvent>().LastOrDefault(e => !e.ResponseUse && e.OriginId == use.Id);
         var next = new QushiActualUseEvent(old?.ActualTurn ?? _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, old?.TurnOwner ?? _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat, use.Id, use.Action?.ActionId ?? 0, false, use.SourceSeat, use.CardKind, count);
         if (next != old)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(next);
     }
 
-    internal QushiActualUseEvent[] QushiActualUses(int holder) => _coreProgramEventHistoryOperations.ProgramEventHistory<QushiActualUseEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat).GroupBy(e => (e.ResponseUse, e.ResponseUse ? e.ActionId : e.OriginId)).Select(g => g.Last()).Where(e => e.ActorSeat == holder).ToArray();
+    internal QushiActualUseEvent[] QushiActualUses(int holder) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QushiActualUseEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat).GroupBy(e => (e.ResponseUse, e.ResponseUse ? e.ActionId : e.OriginId)).Select(g => g.Last()).Where(e => e.ActorSeat == holder).ToArray();
 }

@@ -11,7 +11,7 @@ internal sealed partial class CharacterBeiMiHuOlRuntime
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.Count != 0 || owner.Seat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat)
             throw new InvalidOperationException("Before-turn work requires a clean actual turn boundary.");
         var oldRound = _coreActualRoundProgressRoundNumberAccess._roundNumber;
-        _coreMouLuMengOperations.BeginRoundForTurn(owner);
+        _coreMouLuMengOperations.Value.BeginRoundForTurn(owner);
         var events = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         var roundIndex = Array.FindLastIndex(events, item => item is RoundStartedEvent round && round.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
         if (roundIndex < 0 || _coreActualRoundProgressRoundNumberAccess._roundNumber < 1)

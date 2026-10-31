@@ -60,7 +60,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         var opportunities = CollectDouyuOpportunities(frame.SourceSeat, [frame.SourceSeat, opponent]);
         if (opportunities.Count == 0)
             return false;
-        _corePindianOwnedPileSourcesOperations.AssertOwnedPilePindianSource(frame);
+        _corePindianOwnedPileSourcesOperations.Value.AssertOwnedPilePindianSource(frame);
         if (frame.Result is not null || frame.PindianStep != PindianStep.ChooseOpponentCard || frame.SourceCardId is not { } sourceId || !_corePindianPoliciesOperations.HasCurrentPindianSourceCard(frame))
             throw new InvalidOperationException("Douyu requires the native unconsumed pair's two real selections.");
         var from = frame.OwnedPileSource?.Pile.Location ?? (frame.SourceUsesDrawPileTop ? CardLocation.Processing : CardLocation.Hand(frame.SourceSeat));
@@ -189,7 +189,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         if (window.Stage == DouyuWindowStage.WinDraw)
         {
             var swap = window.Entries[window.CandidateIndex].SwapFrameId ?? throw new InvalidOperationException("A Douyu win candidate lost its original swap.");
-            if (_coreProgramEventHistoryOperations.ProgramEventHistory<DouyuRewardClosedEvent>().Any(e => e.ContestId == window.ParentFrameId && e.SwapFrameId == swap))
+            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DouyuRewardClosedEvent>().Any(e => e.ContestId == window.ParentFrameId && e.SwapFrameId == swap))
                 throw new InvalidOperationException("Douyu cannot close the same issued win twice.");
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DouyuRewardClosedEvent(window.ParentFrameId, window.ComparisonIndex, swap, false));
         }

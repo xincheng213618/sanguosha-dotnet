@@ -9,7 +9,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
         if (!_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m))
             return false;
         if (r.Stage == ZhouQunStage.JudgmentChildren && m.CardId == r.JudgmentCardId && m.From == CardLocation.Judgment(r.Peer) && m.To == CardLocation.Processing && m.Reason.Value == "skill-program.judgment.result")
-            return m.Sequence <= r.Before && _coreProgramEventHistoryOperations.ProgramEventHistory<NingwuJudgmentReturnedEvent>().Count(e => e.FrameId == f.Id && e.CardId == m.CardId && e.JudgmentId == r.JudgmentId) == 1;
+            return m.Sequence <= r.Before && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NingwuJudgmentReturnedEvent>().Count(e => e.FrameId == f.Id && e.CardId == m.CardId && e.JudgmentId == r.JudgmentId) == 1;
         if (m.Sequence <= r.Before || m.Sequence > r.After)
             return false;
         if (m.Reason == CardMoveReasons.Reshuffle && m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile)
@@ -38,7 +38,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
         if (child is HpChangedTriggerWindowFrame hp)
             return r.Stage == ZhouQunStage.HpChildren && r.Cursor < r.Targets.Count && hp.ResumeFrameId == f.Id && hp.Change.ParentFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Loss && hp.Change.TargetSeat == r.Targets[r.Cursor] && hp.Change.SourceSeat is null && hp.Change.Amount == 1;
         if (child is DyingFrame dying)
-            return r.Stage == ZhouQunStage.HpChildren && r.Cursor < r.Targets.Count && dying.ParentFrameId == f.Id && dying.VictimSeat == r.Targets[r.Cursor] && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.ProgramEventHistory<ZhouQunHpPaidEvent>().Any(e => e.FrameId == f.Id && e.Index == r.Cursor && e.TargetSeat == dying.VictimSeat && e.RemainingHp == 0);
+            return r.Stage == ZhouQunStage.HpChildren && r.Cursor < r.Targets.Count && dying.ParentFrameId == f.Id && dying.VictimSeat == r.Targets[r.Cursor] && dying.Continuation == DyingContinuationKind.ProgramSkill && dying.KillerSeat is null && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhouQunHpPaidEvent>().Any(e => e.FrameId == f.Id && e.Index == r.Cursor && e.TargetSeat == dying.VictimSeat && e.RemainingHp == 0);
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 

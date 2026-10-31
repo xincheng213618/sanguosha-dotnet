@@ -44,7 +44,7 @@ internal sealed partial class CoreGameEngineRecoveryReplacementDamageRidesRuntim
         var paymentCursor = _coreTypedRecoveryDamageCursorOperations.ProjectTypedCommittedSlashPaymentCursor();
         if (paymentCursor.IsMalformed || paymentCursor.Owner is { } typedOwner && (requiredPaidUseId is null || requiredPaidUseId == typedOwner.Id))
             return false;
-        if (_coreDyingCursorRuntimeOperations.ActiveDying is not { ResumesProgramSkill: true } dying || _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(f => f.Id == dying.FrameId)is not { } child || child.ParentFrameId != dying.ParentFrameId)
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { ResumesProgramSkill: true } dying || _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(f => f.Id == dying.FrameId)is not { } child || child.ParentFrameId != dying.ParentFrameId)
             return false;
         var effectiveTop = _coreDamageObserverCursorQueriesOperations.DamageCursorEffectiveTop(includeNestedObservers: true);
         var topMatches = effectiveTop is DyingFrame topDying && topDying.Id == child.Id || effectiveTop is ProgramSkillFrame { WindowContext: { } response } && response.ParentFrameId == child.Id && response.Window is SkillProgramTriggerWindow.DyingResponse or SkillProgramTriggerWindow.SelfDyingResponse;
@@ -57,7 +57,7 @@ internal sealed partial class CoreGameEngineRecoveryReplacementDamageRidesRuntim
         for (var index = parentIndex; index >= 0; index--)
         {
             var frame = _resolutionStackOperations._resolutionStack[index];
-            if (hasRecovery && (requiredPaidUseId is { } paidUseId ? frame is CardUseFrame { RecoveryPaidContinuation: not null } paid && paid.Id == paidUseId : _coreDamageCursorRuntimeOperations.ActiveDamageTrigger is { } damage && frame is ProgramSkillFrame { WindowContext: { } context } && context.ParentFrameId == damage.Id && context.Window is SkillProgramTriggerWindow.DamageAppliedBeforeDying or SkillProgramTriggerWindow.AfterDamageApplied))
+            if (hasRecovery && (requiredPaidUseId is { } paidUseId ? frame is CardUseFrame { RecoveryPaidContinuation: not null } paid && paid.Id == paidUseId : _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is { } damage && frame is ProgramSkillFrame { WindowContext: { } context } && context.ParentFrameId == damage.Id && context.Window is SkillProgramTriggerWindow.DamageAppliedBeforeDying or SkillProgramTriggerWindow.AfterDamageApplied))
                 return true;
             if (index == 0)
                 return false;

@@ -36,7 +36,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
 
     internal bool IsZhangYanSujiUse(CardUseFrame use)
     {
-        if (use.ZhangYanSuji is not { } r || use.Action is not { Type: CardActionType.Use } a || r.UseId != use.Id || r.ActionId != a.ActionId || r.CardId != use.CardId || use.PhysicalCardIds is not [var material] || material != r.CardId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.PhysicalCards is not [var cost] || cost.CardId != r.CardId || cost.CardKind != r.PrintedKind || cost.From != r.From || !a.ConversionChain.Contains(r.Source) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.Source.OwnerSeat, r.Source.OwnerSeat) || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanSujiIssuedEvent>().Count(e => e.Return == r) != 1)
+        if (use.ZhangYanSuji is not { } r || use.Action is not { Type: CardActionType.Use } a || r.UseId != use.Id || r.ActionId != a.ActionId || r.CardId != use.CardId || use.PhysicalCardIds is not [var material] || material != r.CardId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || a.PhysicalCards is not [var cost] || cost.CardId != r.CardId || cost.CardKind != r.PrintedKind || cost.From != r.From || !a.ConversionChain.Contains(r.Source) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.Source.OwnerSeat, r.Source.OwnerSeat) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYanSujiIssuedEvent>().Count(e => e.Return == r) != 1)
             return false;
         var at = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
         return at > 0 && _resolutionStackOperations._resolutionStack[at - 1] is ProgramSkillFrame { ZhangYan: { Stage: ZhangYanStage.NativeUse, NativeCompleted: false } p } parent && parent.Id == r.ProgramFrameId && p.NativeReturn == r && p.Source == r.Source && p.GameplayHash == r.GameplayHash;
@@ -66,7 +66,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { ZhangYan: { Stage: ZhangYanStage.NativeUse, NativeCompleted: true, NativeReturn: { } ret } r } f || ret.UseId != completion.ResolutionId)
             return false;
-        if (completion.ProgramFrameId != f.Id || _coreCardUseLifecycleOperations.LifecycleCardUse(ret.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == ret.UseId) != 1 || _coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanSujiReturnedEvent>().Any(e => e.Return == ret))
+        if (completion.ProgramFrameId != f.Id || _coreCardUseLifecycleOperations.LifecycleCardUse(ret.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == ret.UseId) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYanSujiReturnedEvent>().Any(e => e.Return == ret))
             throw new InvalidOperationException("Suji cannot resume before or twice after its genuine complete native attack.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangYanSujiReturnedEvent(ret));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ZhangYan = r with { Stage = ZhangYanStage.NativeChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
@@ -95,6 +95,6 @@ internal sealed partial class CharacterZhangYanOlRuntime
     {
         if (ZhangYanRewardUse(context)is not { ZhangYanSuji: { } r } || r.Source.OwnerSeat != c.OwnerSeat || r.Source.SkillId != c.SkillId || r.Source.SkillInstanceId != c.SkillInstanceId || r.GameplayHash != c.GameplayHash || _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is not [{ Op: SkillProgramEffectOp.ObtainSujiDamagedPhaseOwnerCard }] || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not DamageTriggerWindowFrame w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex].ToProgramCandidate() != c)
             return false;
-        return !_coreProgramEventHistoryOperations.ProgramEventHistory<ZhangYanStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.ObtainSujiDamagedPhaseOwnerCard && e.Source.OwnerSeat == c.OwnerSeat && e.DamageId == w.ParentFrameId);
+        return !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYanStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.ObtainSujiDamagedPhaseOwnerCard && e.Source.OwnerSeat == c.OwnerSeat && e.DamageId == w.ParentFrameId);
     }
 }

@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class ShenXuChuHost(Func<RuntimeEntries.CharacterXuChuAnniversaryGodEntries> getCharacterXuChuAnniversaryGodRuntime) : IShenXuChuHost
+internal sealed class ShenXuChuHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterXuChuAnniversaryGodRuntime>> getCharacterXuChuAnniversaryGodRuntime) : IShenXuChuHost
 {
-    public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterXuChuAnniversaryGodRuntime().BeginShenXuChu(f, op);
+    public SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterXuChuAnniversaryGodRuntime().Value.BeginShenXuChu(f, op);
 }

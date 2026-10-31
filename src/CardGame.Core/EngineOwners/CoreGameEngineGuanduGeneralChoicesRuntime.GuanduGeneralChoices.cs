@@ -152,7 +152,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralChoicesRuntime
             var target = r.Seats![r.Index];
             f = _coreGuanduGeneralsOperations.GuanduUpdate(f, r with { Stage = "xiying-target", Index = r.Index + 1 });
             if (option == "ban")
-                _coreGuanduGeneralQualificationOperations.IssueGuanduAllCardBan(f, target);
+                _coreGuanduGeneralQualificationOperations.Value.IssueGuanduAllCardBan(f, target);
             else
                 GuanduDiscardOne(f, choice.Cards.Single(), target);
             _coreGuanduGeneralsOperations.RunGuanduGeneral(f.Id);

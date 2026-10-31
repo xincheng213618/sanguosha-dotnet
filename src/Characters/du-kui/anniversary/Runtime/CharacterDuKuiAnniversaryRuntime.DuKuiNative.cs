@@ -51,7 +51,7 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
             return;
         }
 
-        if (card.Kind == CardKind.Lightning && !_coreSoleTargetProtectionOperations.HasSoleTargetProtectionCapability && _coreCardActionsOperations.TryBeginDelayedCardUsePrograms(useId))
+        if (card.Kind == CardKind.Lightning && !_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability && _coreCardActionsOperations.TryBeginDelayedCardUsePrograms(useId))
             return;
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(useId, card, actor.Seat, _coreCardUseLifecycleOperations.LifecycleCardUse(useId)!.TargetSeats, action.Kind, action.TargetCardId, trick?.RequiredCardKind, card.Kind);
     }
@@ -74,7 +74,7 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MaterialPayment, 43200)]
     internal bool PayDuKuiProcessingMaterial(IReadOnlyList<Card> cards, int provider, CardLocation? from, CardMoveReason reason) => from == CardLocation.Processing && reason == CardMoveReasons.Use && cards is [var card] && _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { DuKuiOrigin: { } origin } use && IsDuKuiNativeUse(use) && origin.Source.OwnerSeat == provider && origin.CardId == card.Id && _cardZonesOperations._cardZones.Contains(CardLocation.Processing, card.Id);
-    internal bool IsDuKuiNativeUse(CardUseFrame use) => use.DuKuiOrigin is { } o && use.Id == o.UseId && use.CardId == o.CardId && use.Action is { Type: CardActionType.Use } a && a.ActionId == o.ActionId && a.ActorSeat == o.Source.OwnerSeat && a.ProviderSeat == a.ActorSeat && a.EffectiveKind == use.CardKind && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == o.CardId && from == CardLocation.Processing && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == o.FrameId)is { DuKui: { } r } f && ValidDuKuiFrame(f) && r.UseId == use.Id && r.ActionId == a.ActionId && r.Source == o.Source && r.GameplayHash == o.GameplayHash && r.Iteration == o.Iteration && _coreProgramEventHistoryOperations.ProgramEventHistory<DuKuiNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
+    internal bool IsDuKuiNativeUse(CardUseFrame use) => use.DuKuiOrigin is { } o && use.Id == o.UseId && use.CardId == o.CardId && use.Action is { Type: CardActionType.Use } a && a.ActionId == o.ActionId && a.ActorSeat == o.Source.OwnerSeat && a.ProviderSeat == a.ActorSeat && a.EffectiveKind == use.CardKind && a.PhysicalCards is [{ CardId: var id, From: var from }] && id == o.CardId && from == CardLocation.Processing && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == o.FrameId)is { DuKui: { } r } f && ValidDuKuiFrame(f) && r.UseId == use.Id && r.ActionId == a.ActionId && r.Source == o.Source && r.GameplayHash == o.GameplayHash && r.Iteration == o.Iteration && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuKuiNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
     [NativeUseValidation(43200)]
     internal void ValidateDuKuiNativeReturn(CardUseFrame use)
     {
@@ -89,7 +89,7 @@ internal sealed partial class CharacterDuKuiAnniversaryRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.DuKui!;
-        if (!IsDuKuiNativeUse(use) || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == o.CardId) != 1)
+        if (!IsDuKuiNativeUse(use) || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == o.CardId) != 1)
             throw new InvalidOperationException("Fanyin cannot retire another use or return its accepted use twice.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { DuKui = r with { NativeReturned = true } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuKuiNativeReturnedEvent(f.Id, use.Id, o.ActionId));

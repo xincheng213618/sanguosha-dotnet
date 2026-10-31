@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEnginePrepDiscardPaymentsRuntime
 
     internal CardConversionSource PrepDiscardSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool IsImmediatePrepDiscard(ProgramSkillFrame f) => _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects is [{ Op: SkillProgramEffectOp.ResolvePrepDiscardOrImmediateDraw }];
-    internal bool PrepDiscardCanContinue(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || IsImmediatePrepDiscard(f) && f.PrepDiscard?.TargetPayment is { } paid && _corePrepDiscardReceiptsOperations.ValidPrepDiscardPayment(f, paid, false));
+    internal bool PrepDiscardCanContinue(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && (_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId) || IsImmediatePrepDiscard(f) && f.PrepDiscard?.TargetPayment is { } paid && _corePrepDiscardReceiptsOperations.Value.ValidPrepDiscardPayment(f, paid, false));
     internal IReadOnlyList<PromptChoice> PrepDiscardCards(ProgramSkillFrame f, int payer, IReadOnlyList<int>? selected = null) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, payer, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard, canSelect: (_, c) => !c.IsGeneralWeapon && !(selected ?? []).Contains(c.Id));
     internal bool MatchesActualPrepDiscard(ProgramSkillFrame f)
     {
@@ -32,11 +32,11 @@ internal sealed partial class CoreGameEnginePrepDiscardPaymentsRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PrepDiscard = new(0, PrepDiscardSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, f.WindowContext!.ParentFrameId, PrepDiscardStage.ChoosingTarget, null, 0, 0, 0, 0, [], []), ReexecuteParticipantInstruction = true });
         else
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ReexecuteParticipantInstruction = true });
-        if (!_corePrepDiscardReceiptsOperations.ValidPrepDiscard(f))
+        if (!_corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(f))
             throw new InvalidOperationException("Preparation discard lost its original turn, target or paid ledger.");
         var d = f.PrepDiscard!;
         if (d.Stage is PrepDiscardStage.ImmediateDrawAttempt or PrepDiscardStage.ImmediateDrawChildren)
-            return _corePrepDiscardImmediateDrawOperations.ContinuePrepDiscardImmediateDraw(f);
+            return _corePrepDiscardImmediateDrawOperations.Value.ContinuePrepDiscardImmediateDraw(f);
         if (d.Stage is PrepDiscardStage.TargetChildren or PrepDiscardStage.OwnerChildren)
         {
             if (f.PendingMovementContinuation is not null)
@@ -118,7 +118,7 @@ internal sealed partial class CoreGameEnginePrepDiscardPaymentsRuntime
 
     internal void ResolvePrepDiscardChoice(ProgramSkillFrame f, PromptChoice choice)
     {
-        if (!_corePrepDiscardReceiptsOperations.ValidPrepDiscard(f) || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture))
+        if (!_corePrepDiscardReceiptsOperations.Value.ValidPrepDiscard(f) || choice.Parameters.GetValueOrDefault("frame-id") != f.Id.ToString(CultureInfo.InvariantCulture))
             throw new InvalidOperationException("The preparation discard choice lost its owning frame.");
         var d = f.PrepDiscard!;
         var step = choice.Parameters.GetValueOrDefault("prep-discard-step");
@@ -165,7 +165,7 @@ internal sealed partial class CoreGameEnginePrepDiscardPaymentsRuntime
                     return;
                 }
 
-                _corePrepDiscardImmediateDrawOperations.IssuePrepDiscardImmediateDraw(f);
+                _corePrepDiscardImmediateDrawOperations.Value.IssuePrepDiscardImmediateDraw(f);
                 return;
             }
 

@@ -6,16 +6,16 @@ internal sealed partial class CharacterHuLieMouRuntime
     internal MouHuLieRuntime MouHuLieRules => _mouHuLieOperations.Get();
     internal bool HasMouHuLie => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.StartMouHuLieChuanyu);
 
-    internal MouHuLieYu? CurrentMouHuLieYu(int owner, string instance) => _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuLieMarkedEvent>().Select(e => e.Yu).LastOrDefault(y => y.Source.OwnerSeat == owner && y.Source.SkillInstanceId == instance && y.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && _contentRegistryOperations._contentRegistry.GetSkill(y.Source.SkillId).Program?.GameplayHash == y.GameplayHash && !_coreProgramEventHistoryOperations.ProgramEventHistory<MouHuLieClearedEvent>().Any(e => e.MarkId == y.MarkId));
+    internal MouHuLieYu? CurrentMouHuLieYu(int owner, string instance) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuLieMarkedEvent>().Select(e => e.Yu).LastOrDefault(y => y.Source.OwnerSeat == owner && y.Source.SkillInstanceId == instance && y.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && _contentRegistryOperations._contentRegistry.GetSkill(y.Source.SkillId).Program?.GameplayHash == y.GameplayHash && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuLieClearedEvent>().Any(e => e.MarkId == y.MarkId));
     [ProgramPipelineHook(ProgramPipelinePhase.CardEntitySkillLabel, 37500)]
-    internal string? MouHuLieCardLabel(int cardId) => HasMouHuLie && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuLieMarkedEvent>().Any(e => e.Yu.CardId == cardId && CurrentMouHuLieYu(e.Yu.Source.OwnerSeat, e.Yu.Source.SkillInstanceId)?.MarkId == e.Yu.MarkId) ? "舆" : null;
+    internal string? MouHuLieCardLabel(int cardId) => HasMouHuLie && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuLieMarkedEvent>().Any(e => e.Yu.CardId == cardId && CurrentMouHuLieYu(e.Yu.Source.OwnerSeat, e.Yu.Source.SkillInstanceId)?.MarkId == e.Yu.MarkId) ? "舆" : null;
     [ProgramPipelineHook(ProgramPipelinePhase.IncludeTriggerCandidate, 37500)]
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeMouHuLieRoundDebt(CharacterState owner, SkillProgramTriggerWindow window, IReadOnlyList<ProgramTriggerCandidate> ordinary)
     {
         if (!HasMouHuLie || window != SkillProgramTriggerWindow.RoundEnding || !owner.IsAlive)
             return ordinary;
         var result = ordinary.ToList();
-        foreach (var mark in _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuLieMarkedEvent>().Select(e => e.Yu).Where(y => y.Source.OwnerSeat == owner.Seat && CurrentMouHuLieYu(owner.Seat, y.Source.SkillInstanceId)?.MarkId == y.MarkId))
+        foreach (var mark in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuLieMarkedEvent>().Select(e => e.Yu).Where(y => y.Source.OwnerSeat == owner.Seat && CurrentMouHuLieYu(owner.Seat, y.Source.SkillInstanceId)?.MarkId == y.MarkId))
         {
             var candidate = new ProgramTriggerCandidate(owner.Seat, MouHuLieRuntime.Chuanyu, "round-clear-and-slashes", mark.Source.SkillInstanceId, mark.GameplayHash, 0);
             if (!result.Contains(candidate))
@@ -29,16 +29,16 @@ internal sealed partial class CharacterHuLieMouRuntime
     {
         if (!HasMouHuLie || batch.ParentFrameId is not { } parent)
             return;
-        foreach (var yu in _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuLieMarkedEvent>().Select(e => e.Yu).Where(y => CurrentMouHuLieYu(y.Source.OwnerSeat, y.Source.SkillInstanceId)?.MarkId == y.MarkId))
-            foreach (var move in batch.Movements.Where(m => m.CardId == yu.CardId && _coreNativeUsedDiscardOriginsOperations.IsNativeTrueUseDiscardMovement(batch, m)))
+        foreach (var yu in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuLieMarkedEvent>().Select(e => e.Yu).Where(y => CurrentMouHuLieYu(y.Source.OwnerSeat, y.Source.SkillInstanceId)?.MarkId == y.MarkId))
+            foreach (var move in batch.Movements.Where(m => m.CardId == yu.CardId && _coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, m)))
             {
                 var fact = new MouHuLieUsedDiscardEvent(yu, batch.Id, parent, batch.TurnNumber, move.CardId, move.Sequence);
-                if (!_coreProgramEventHistoryOperations.ProgramEventHistory<MouHuLieUsedDiscardEvent>().Contains(fact))
+                if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuLieUsedDiscardEvent>().Contains(fact))
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(fact);
             }
     }
 
-    internal bool IsMouHuLieUsedDiscard(CardMovementBatchContext batch, CardMovementRecord move, MouHuLieYu yu) => batch.ParentFrameId is { } parent && move.CardId == yu.CardId && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && batch.Movements.Contains(move) && _cardZonesOperations._cardZones.GetLocation(move.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == move.CardId) == move && _coreProgramEventHistoryOperations.ProgramEventHistory<MouHuLieUsedDiscardEvent>().Count(e => e == new MouHuLieUsedDiscardEvent(yu, batch.Id, parent, batch.TurnNumber, move.CardId, move.Sequence)) == 1;
+    internal bool IsMouHuLieUsedDiscard(CardMovementBatchContext batch, CardMovementRecord move, MouHuLieYu yu) => batch.ParentFrameId is { } parent && move.CardId == yu.CardId && move.From == CardLocation.Processing && move.To == CardLocation.DiscardPile && batch.Movements.Contains(move) && _cardZonesOperations._cardZones.GetLocation(move.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == move.CardId) == move && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuLieUsedDiscardEvent>().Count(e => e == new MouHuLieUsedDiscardEvent(yu, batch.Id, parent, batch.TurnNumber, move.CardId, move.Sequence)) == 1;
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 37500)]
     internal int[]? MouHuLieUsedIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, ProgramInstructionFeatures features) => !features.HasOperation(SkillProgramEffectOp.RegiveMouHuLieChuanyu) ? null : CurrentMouHuLieYu(candidate.OwnerSeat, candidate.SkillInstanceId)is { } yu ? batch.Movements.Select((m, i) => (m, i)).Where(x => IsMouHuLieUsedDiscard(batch, x.m, yu)).Select(x => x.i).ToArray() : [];
     int IMouHuLieFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
@@ -56,7 +56,7 @@ internal sealed partial class CharacterHuLieMouRuntime
     int IMouHuLieFacts.Keep(int actor, int id) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[actor]);
     bool IMouHuLieFacts.Friendly(int actor, int target) => actor == target || (_coreAiBrainsAiBrainsAccess._aiBrains.TryGetValue(actor, out var brain) ? brain.ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(actor), target, new(0, 0, 0, 1, 0, 0, false, false)) > 0 : _coreMatchParticipantsPlayersAccess._players[actor].TeamRevealed && _coreMatchParticipantsPlayersAccess._players[target].TeamRevealed && _coreMatchParticipantsPlayersAccess._players[actor].TeamId is { } t && _coreMatchParticipantsPlayersAccess._players[target].TeamId == t);
     SkillProgram IMouHuLieFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    IEnumerable<T> IMouHuLieFacts.History<T>() => _coreProgramEventHistoryOperations.ProgramEventHistory<T>();
+    IEnumerable<T> IMouHuLieFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouHuLieFacts.Parent(ProgramSkillFrame f)
     {
         if (f.TriggerId != f.ActivationId || f.WindowContext is not { } w || w.OwnerSeat != f.OwnerSeat)

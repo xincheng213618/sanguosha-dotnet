@@ -11,7 +11,7 @@ internal sealed partial class CharacterQuanCongBoundaryMobileRuntime
     internal static CardConversionSource BoundaryYaomingSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     internal (int Remaining, string? Pending) BoundaryYaomingState(int owner, string instance)
     {
-        var last = _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryQuanCongYaomingStateEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillInstanceId == instance);
+        var last = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryQuanCongYaomingStateEvent>().LastOrDefault(e => e.OwnerSeat == owner && e.SkillInstanceId == instance);
         return last is null ? (2, null) : (last.Remaining, last.PendingOption);
     }
 
@@ -153,7 +153,7 @@ internal sealed partial class CharacterQuanCongBoundaryMobileRuntime
         ContinueBoundaryYaoming(frame.Id);
     }
 
-    internal bool ValidBoundaryYaoming(ProgramSkillFrame frame) => frame.BoundaryQuanCongYaoming is { } receipt && OriginalBoundaryYaoming(frame) && receipt.Source == BoundaryYaomingSource(frame) && receipt.GameplayHash == frame.GameplayHash && receipt.ParentWindowId == (frame.WindowContext?.ParentFrameId ?? 0) && receipt.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _coreProgramEventHistoryOperations.ProgramEventHistory<BoundaryQuanCongYaomingStartedEvent>().Count(e => e.FrameId == frame.Id && e.Source == receipt.Source && e.GameplayHash == receipt.GameplayHash && e.ParentWindowId == receipt.ParentWindowId && e.Turn == receipt.Turn) == 1;
+    internal bool ValidBoundaryYaoming(ProgramSkillFrame frame) => frame.BoundaryQuanCongYaoming is { } receipt && OriginalBoundaryYaoming(frame) && receipt.Source == BoundaryYaomingSource(frame) && receipt.GameplayHash == frame.GameplayHash && receipt.ParentWindowId == (frame.WindowContext?.ParentFrameId ?? 0) && receipt.Turn == _coreActualTurnProgressTurnNumberAccess._turnNumber && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryQuanCongYaomingStartedEvent>().Count(e => e.FrameId == frame.Id && e.Source == receipt.Source && e.GameplayHash == receipt.GameplayHash && e.ParentWindowId == receipt.ParentWindowId && e.Turn == receipt.Turn) == 1;
     [ProgramContinuation(ProgramContinuationKind.Resume, 51200)]
     internal bool ContinueBoundaryYaoming(long id)
     {

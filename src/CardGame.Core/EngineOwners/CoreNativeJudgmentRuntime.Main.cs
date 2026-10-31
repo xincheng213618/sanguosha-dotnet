@@ -46,7 +46,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
 
     internal bool? BeginJudgment(NativeOwners.CardAttackHandle? attack, int targetSeat, string reason, long parentFrameId, CardKind? sourceCard, JudgmentContinuationKind continuation, Card? delayedCard = null, int? sourceSeat = null, string? programResultBind = null, SkillProgramCardSetVisibility? programResultVisibility = null, OriginalUseLightningAttachment? originalUseLightning = null, int? originalUseLightningExcludedCardId = null)
     {
-        if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment is { } originalJudgment && !_coreFinalizedJudgmentDamageChildrenOperations.CanBeginFinalizedDamageChildJudgment(originalJudgment, parentFrameId, targetSeat, reason, continuation, programResultBind, programResultVisibility))
+        if (_coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is { } originalJudgment && !_coreFinalizedJudgmentDamageChildrenOperations.Value.CanBeginFinalizedDamageChildJudgment(originalJudgment, parentFrameId, targetSeat, reason, continuation, programResultBind, programResultVisibility))
         {
             throw new InvalidOperationException("The engine cannot resolve two judgments at once.");
         }
@@ -131,7 +131,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
             {
                 var program = binding.Program;
                 var trigger = binding.Trigger;
-                if (!_coreJudgmentReplacementProgramsOperations.MatchesProgramJudgmentReplacement(owner, trigger, targetSeat, reason) || (CharacterWangYiMobileRuntime.IsDeckTopJudgmentReplacement(trigger) ? !_characterWangYiMobileOperations.HasDeckTopJudgmentReplacementMaterial() : _coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacementCards(owner, trigger, targetSeat, reason, ignoreCurrentColor: true).Count == 0))
+                if (!_coreJudgmentReplacementProgramsOperations.MatchesProgramJudgmentReplacement(owner, trigger, targetSeat, reason) || (CharacterWangYiMobileRuntime.IsDeckTopJudgmentReplacement(trigger) ? !_characterWangYiMobileOperations.Value.HasDeckTopJudgmentReplacementMaterial() : _coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacementCards(owner, trigger, targetSeat, reason, ignoreCurrentColor: true).Count == 0))
                 {
                     continue;
                 }
@@ -147,7 +147,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
     internal void BeginJudgmentReplacementChoice(JudgmentFrame pending)
     {
         pending = GetJudgmentFrame(pending.Id);
-        if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment?.Id != pending.Id || _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)is not { } judgmentCard)
+        if (_coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment?.Id != pending.Id || _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)is not { } judgmentCard)
         {
             throw new InvalidOperationException("The replacement judgment is not the current resolution.");
         }
@@ -171,7 +171,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
     internal bool IsProtectedJudgmentSourceEquipment(CharacterState owner, Card card, int judgmentSubjectSeat, string judgmentReason) => owner.Seat == judgmentSubjectSeat && string.Equals(judgmentReason, JudgmentReasons.BaguaDefense, StringComparison.Ordinal) && card.Kind == CardKind.BaguaFormation && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Equipment(owner.Seat);
     internal void AdvanceJudgmentCandidate(JudgmentFrame pending)
     {
-        if (_coreJudgmentCursorRuntimeOperations.ActiveJudgment?.Id != pending.Id)
+        if (_coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment?.Id != pending.Id)
         {
             throw new InvalidOperationException("The replacement judgment is not the current resolution.");
         }
@@ -199,7 +199,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
     internal bool? FinalizeJudgment(JudgmentFrame pending)
     {
         pending = GetJudgmentFrame(pending.Id);
-        if (_coreNativeDamageHandlesOperations.GetJudgmentCard(pending)is not { } judgmentCard)
+        if (_coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)is not { } judgmentCard)
         {
             throw new InvalidOperationException("A judgment cannot resolve without a card.");
         }
@@ -209,11 +209,11 @@ internal sealed partial class CoreNativeJudgmentRuntime
         if (_coreZhenyiJudgmentWindowsOperations.TryBeginZhenyiBeforeResultWindow(pending, judgmentCard, judgmentSuit))
             return null;
         var judgmentRank = _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentRank(pending, judgmentCard.Rank);
-        _coreDiscardedProvenanceOperations.CaptureProvenanceJudgmentOrigin(pending, judgmentCard, judgmentSuit);
-        _coreSlashSuitDiscardOperations.CaptureProgramSlashSuitJudgment(pending, judgmentSuit);
+        _coreDiscardedProvenanceOperations.Value.CaptureProvenanceJudgmentOrigin(pending, judgmentCard, judgmentSuit);
+        _coreSlashSuitDiscardOperations.Value.CaptureProgramSlashSuitJudgment(pending, judgmentSuit);
         _coreDamageJudgmentSuitPaymentsOperations.CaptureDamageJudgmentSuitResult(pending, judgmentCard, judgmentSuit);
-        _coreExactRepeatedJudgmentOperations.CaptureProgramRepeatedJudgmentClaimOutcome(pending, judgmentCard, judgmentSuit);
-        var succeeded = _characterGuoJiaMouOperations.IsMouGjLightningJudgment(pending) || _coreSourceHuojieOperations.IsSourceHuojieLightningJudgment(pending) ? judgmentSuit == Suit.Spade && judgmentRank is >= 2 and <= 9 : pending.Continuation switch
+        _coreExactRepeatedJudgmentOperations.Value.CaptureProgramRepeatedJudgmentClaimOutcome(pending, judgmentCard, judgmentSuit);
+        var succeeded = _characterGuoJiaMouOperations.IsMouGjLightningJudgment(pending) || _coreSourceHuojieOperations.Value.IsSourceHuojieLightningJudgment(pending) ? judgmentSuit == Suit.Spade && judgmentRank is >= 2 and <= 9 : pending.Continuation switch
         {
             JudgmentContinuationKind.Lightning => judgmentSuit == Suit.Spade && judgmentRank is >= 2 and <= 9,
             JudgmentContinuationKind.Indulgence => judgmentSuit == Suit.Heart,
@@ -234,7 +234,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
         var judgmentResult = pending.Continuation == JudgmentContinuationKind.Lightning ? succeeded ? "命中" : "未命中" : succeeded ? "成功" : "失败";
         _coreMatchLogOperations.AddLog("Judgment", pending.ZhenyiOverride is null ? $"{(_coreMatchParticipantsPlayersAccess._players[pending.TargetSeat].Name)} 发动【{(abilityName)}】判定：最终为【{(judgmentCard.DisplayName)}】（{(judgmentCard.Suit)} {(judgmentCard.RankText)}），判定{(judgmentResult)}。" : $"{(_coreMatchParticipantsPlayersAccess._players[pending.TargetSeat].Name)} 发动【{(abilityName)}】判定：最终为【{(judgmentCard.DisplayName)}】（{(judgmentSuit)} {(judgmentRank)}），判定{(judgmentResult)}。", pending.TargetSeat, pending.SourceSeat);
         pending = GetJudgmentFrame(pending.Id);
-        if (_coreJudgmentProgramsOperations.TryBeginProgramJudgmentWindow(pending, judgmentCard, judgmentSuit, succeeded))
+        if (_coreJudgmentProgramsOperations.Value.TryBeginProgramJudgmentWindow(pending, judgmentCard, judgmentSuit, succeeded))
         {
             return null;
         }
@@ -256,7 +256,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
 
     internal void FinishResolvedJudgment(JudgmentFrame pending)
     {
-        var judgmentCard = _coreNativeDamageHandlesOperations.GetJudgmentCard(pending) ?? throw new InvalidOperationException("A resolved judgment must retain its card until disposition.");
+        var judgmentCard = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending) ?? throw new InvalidOperationException("A resolved judgment must retain its card until disposition.");
         if (_cardZonesOperations._cardZones.GetLocation(judgmentCard.Id) == CardLocation.Judgment(pending.TargetSeat))
         {
             _corePhysicalMovementFacadesOperations.MoveCard(judgmentCard, CardLocation.Judgment(pending.TargetSeat), CardLocation.DiscardPile, CardMoveReasons.JudgmentFinish);
@@ -280,7 +280,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
 
     internal void CompleteDelayedJudgment(JudgmentFrame pending, bool succeeded)
     {
-        var delayedCard = _coreNativeDamageHandlesOperations.GetDelayedJudgmentCard(pending) ?? throw new InvalidOperationException("A delayed judgment has no delayed card.");
+        var delayedCard = _coreNativeDamageHandlesOperations.Value.GetDelayedJudgmentCard(pending) ?? throw new InvalidOperationException("A delayed judgment has no delayed card.");
         var target = _coreMatchParticipantsPlayersAccess._players[pending.TargetSeat];
         var delayedLocation = _cardZonesOperations._cardZones.GetLocation(delayedCard.Id);
         if (delayedLocation != CardLocation.Judgment(target.Seat))
@@ -293,9 +293,9 @@ internal sealed partial class CoreNativeJudgmentRuntime
         var delayedEffects = delayedEffectSucceeded ? CoreActualTurnsRuntime.GetDelayedTurnEffects(effectiveCardKind) : GameEngine.DelayedTurnEffects.None;
         _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects |= delayedEffects;
         _corePhysicalMovementFacadesOperations.MoveCard(delayedCard, CardLocation.Judgment(target.Seat), CardLocation.DiscardPile, CardMoveReasons.DelayedCardFinish);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DelayedCardResolvedEvent(pending.Id, delayedCard.Id, effectiveCardKind, target.Seat, _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id, succeeded, SkippedPlayPhase: delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase)) { SkippedDrawPhase = delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DelayedCardResolvedEvent(pending.Id, delayedCard.Id, effectiveCardKind, target.Seat, _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)?.Id, succeeded, SkippedPlayPhase: delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase)) { SkippedDrawPhase = delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) });
         var phaseDescription = delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) && delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase) ? "跳过摸牌和出牌阶段" : delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) ? "跳过摸牌阶段" : delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase) ? "跳过出牌阶段" : "正常进入后续阶段";
-        _coreMatchLogOperations.AddLog("DelayedCardResolved", $"{(target.Name)} 的【{(CardCatalog.Get(effectiveCardKind).DisplayName)}】判定为{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(_coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Suit))}，{(phaseDescription)}。", target.Seat);
+        _coreMatchLogOperations.AddLog("DelayedCardResolved", $"{(target.Name)} 的【{(CardCatalog.Get(effectiveCardKind).DisplayName)}】判定为{(CoreNativeCardClassificationsRuntime.GetSuitDisplayName(_coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)?.Suit))}，{(phaseDescription)}。", target.Seat);
         _coreActualTurnsOperations.BeginDelayedJudgmentOrTurnStart(target);
     }
 
@@ -322,7 +322,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
             return;
         }
 
-        var lightning = _coreNativeDamageHandlesOperations.GetDelayedJudgmentCard(pending) ?? throw new InvalidOperationException("A Lightning judgment has no delayed card.");
+        var lightning = _coreNativeDamageHandlesOperations.Value.GetDelayedJudgmentCard(pending) ?? throw new InvalidOperationException("A Lightning judgment has no delayed card.");
         var target = _coreMatchParticipantsPlayersAccess._players[pending.TargetSeat];
         var lightningLocation = _cardZonesOperations._cardZones.GetLocation(lightning.Id);
         if (lightningLocation != CardLocation.Judgment(target.Seat))
@@ -332,12 +332,12 @@ internal sealed partial class CoreNativeJudgmentRuntime
 
         if (!hit)
         {
-            CompleteLightningWithoutHit(pending.Id, lightning, target, _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id);
+            CompleteLightningWithoutHit(pending.Id, lightning, target, _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)?.Id);
             return;
         }
 
         const int lightningDamage = 3;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LightningResolvedEvent(pending.Id, lightning.Id, target.Seat, _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)?.Id, Hit: true, NextTargetSeat: null, DamageAmount: lightningDamage));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LightningResolvedEvent(pending.Id, lightning.Id, target.Seat, _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)?.Id, Hit: true, NextTargetSeat: null, DamageAmount: lightningDamage));
         _coreMatchLogOperations.AddLog("LightningResolved", $"{(target.Name)} 的【闪电】命中，受到 {(lightningDamage)} 点雷电伤害。", target.Seat);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(pending.Id, target.Seat, target.Seat, lightning, damageAmount: lightningDamage, playedCardKind: CardKind.Lightning, isDelayedJudgmentDamage: true, delayedJudgmentSeat: target.Seat);
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
@@ -371,23 +371,23 @@ internal sealed partial class CoreNativeJudgmentRuntime
                 return;
             if (_characterZhangFeiAnniversaryGodOperations.TryReturnShenZfJudgment(pending))
                 return;
-            if (_coreWushuangCombatProgramsOperations.TryReturnWushuangLightningJudgment(pending))
+            if (_coreWushuangCombatProgramsOperations.Value.TryReturnWushuangLightningJudgment(pending))
                 return;
-            if (_characterMaYuanYiOlOperations.TryReturnBinghuoJudgment(pending))
+            if (_characterMaYuanYiOlOperations.Value.TryReturnBinghuoJudgment(pending))
                 return;
             if (_characterGuoJiaMouOperations.ReturnMouGjJudgment(pending))
                 return;
-            if (_coreSourceHuojieOperations.ReturnSourceHuojieJudgment(pending))
+            if (_coreSourceHuojieOperations.Value.ReturnSourceHuojieJudgment(pending))
                 return;
-            if (_characterZhouQunOlOperations.TryReturnNingwuJudgment(pending))
+            if (_characterZhouQunOlOperations.Value.TryReturnNingwuJudgment(pending))
                 return;
             if (_characterQianZhaoOlOperations.TryReturnWeifuJudgment(pending))
                 return;
-            if (_characterZhangJiOlOperations.TryReturnZhangJiJudgment(pending))
+            if (_characterZhangJiOlOperations.Value.TryReturnZhangJiJudgment(pending))
                 return;
             if (_coreDamageJudgmentSuitPaymentsOperations.TryReturnDamageJudgmentSuitPayment(pending))
                 return;
-            if (_coreSlashSuitDiscardOperations.TryReturnProgramSlashSuitJudgment(pending))
+            if (_coreSlashSuitDiscardOperations.Value.TryReturnProgramSlashSuitJudgment(pending))
                 return;
             if (_coreProgramLifecycleOperations.GetActiveProgramFrame(pending.ParentFrameId).RepeatedJudgment is not null)
             {
@@ -399,34 +399,34 @@ internal sealed partial class CoreNativeJudgmentRuntime
                 return;
             var bind = pending.ProgramResultBind ?? throw new InvalidOperationException("A program judgment lost its result binding.");
             var visibility = pending.ProgramResultVisibility ?? throw new InvalidOperationException("A program judgment lost its result visibility.");
-            var ownedResultClaimed = _coreOwnedDamagePointJudgmentsOperations.IsOwnedDamagePointJudgmentResultClaimed(pending);
-            var cardIds = !ownedResultClaimed && _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)is { } resultCard ? new[]
+            var ownedResultClaimed = _coreOwnedDamagePointJudgmentsOperations.Value.IsOwnedDamagePointJudgmentResultClaimed(pending);
+            var cardIds = !ownedResultClaimed && _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)is { } resultCard ? new[]
             {
                 resultCard.Id
             }
 
             : Array.Empty<int>();
-            var locations = !ownedResultClaimed && _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)is { } boundCard ? new[]
+            var locations = !ownedResultClaimed && _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)is { } boundCard ? new[]
             {
                 _cardZonesOperations._cardZones.GetLocation(boundCard.Id)
             }
 
             : Array.Empty<CardLocation>();
-            _coreProgramLifecycleOperations.SetProgramCardSet(pending.ParentFrameId, bind, cardIds, visibility, locations, _coreNativeDamageHandlesOperations.GetJudgmentCard(pending)is { } finalCard ? _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentSuit(pending, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[pending.TargetSeat], finalCard)) : null);
+            _coreProgramLifecycleOperations.SetProgramCardSet(pending.ParentFrameId, bind, cardIds, visibility, locations, _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending)is { } finalCard ? _characterZhangQiYingOlOperations.EffectiveZhenyiJudgmentSuit(pending, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[pending.TargetSeat], finalCard)) : null);
             _coreRuntimeOperations.AdvanceRuntimeProgram(pending.ParentFrameId);
             return;
         }
 
         if (pending.Continuation == JudgmentContinuationKind.Bagua)
         {
-            var attack = _coreNativeDamageHandlesOperations.GetJudgmentAttack(pending) ?? throw new InvalidOperationException("A Bagua judgment has no attack continuation.");
+            var attack = _coreNativeDamageHandlesOperations.Value.GetJudgmentAttack(pending) ?? throw new InvalidOperationException("A Bagua judgment has no attack continuation.");
             CompleteBaguaResponse(attack, succeeded);
             return;
         }
 
         if (pending.Continuation == JudgmentContinuationKind.FactionDefenseBagua)
         {
-            var attack = _coreNativeDamageHandlesOperations.GetJudgmentAttack(pending) ?? throw new InvalidOperationException("A FactionDefense Bagua judgment has no attack continuation.");
+            var attack = _coreNativeDamageHandlesOperations.Value.GetJudgmentAttack(pending) ?? throw new InvalidOperationException("A FactionDefense Bagua judgment has no attack continuation.");
             _coreNativeDodgeOperations.CompleteFactionDefenseBaguaResponse(attack, succeeded);
             return;
         }

@@ -9,7 +9,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 29021, SkillProgramEffectOp.ResolveMouZhouYuGuqu)]
     internal bool CanOfferMouGuqu(ProgramTriggerLegalityContext gate) => IsIssuedMouGuquCandidate(gate.Candidate, gate.Context);
     [ProgramIssuedTrigger(70)]
-    internal bool IsIssuedMouGuquCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && MouGuquCompletedClaim(c, context)is { } q && !_coreProgramEventHistoryOperations.ProgramEventHistory<GuquStartedEvent>().Any(e => e.Claim.Source == q.Source && e.Claim.ActionId == q.ActionId);
+    internal bool IsIssuedMouGuquCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && MouGuquCompletedClaim(c, context)is { } q && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquStartedEvent>().Any(e => e.Claim.Source == q.Source && e.Claim.ActionId == q.ActionId);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 22)]
     internal void CollectIssuedMouGuquCandidates(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result)
     {
@@ -45,7 +45,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMouZhouYuGuqu)]
     internal void ReturnMouGuquDraw(ProgramSkillFrame f, NativeDrawOutcome o)
     {
-        if (f.Guqu is not { Stage: GuquStage.Drawing } r || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != 2 || _coreProgramEventHistoryOperations.ProgramEventHistory<GuquDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
+        if (f.Guqu is not { Stage: GuquStage.Drawing } r || o.RecipientSeat != f.OwnerSeat || o.RequestedCount != 2 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuquDrawReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Guqu cannot repeat a completed native draw or replace its actual-material invoice.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Guqu = r with { Stage = GuquStage.DrawChildren, DrawOutcome = o }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuquDrawReturnedEvent(f.Id, 2, o.ActualDrawIds.Count, o.ReplacementGainedIds.Count, o.SequenceBefore, o.SequenceAfter, o.AttemptFrameId));

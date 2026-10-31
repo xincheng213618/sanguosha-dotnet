@@ -83,7 +83,7 @@ internal sealed partial class CoreGameEngineOutsidePhaseDrawDiscardObserversRunt
 
     internal ProgramSkillFrame? OutsidePhaseDrawDiscardObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((root, child) => this.OutsidePhaseDrawDiscardFirstChild(root, child), (index) => _coreObserverSubtreesOperations.HasMovementObserverSuffix(index));
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 80)]
-    internal bool IsOutsidePhaseDrawDiscardDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && OutsidePhaseDrawDiscardObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
+    internal bool IsOutsidePhaseDrawDiscardDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && OutsidePhaseDrawDiscardObserverRoot()is { } root && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == root.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 90)]
     internal bool TryAdvanceOutsidePhaseDrawDiscardSubtree()
     {

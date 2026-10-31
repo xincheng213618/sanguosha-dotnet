@@ -28,7 +28,7 @@ internal sealed partial class CharacterLuShiOlRuntime
         _coreAlternativeViewAsCostsOperations.RecordProgramUsedBasicCard(f.OwnerSeat, CardKind.ThunderSlash);
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, f.OwnerSeat, targetSeat, card: null, damageAmount: 1 + source.AlcoholDamageBonus, playedCardKind: CardKind.ThunderSlash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(source, target, CardKind.ThunderSlash), programSkillCardUseFrameId: f.Id);
-        _coreAlcoholSlashSuppressionsOperations.CaptureProgramAlcoholConsumption(id, source);
+        _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, source);
         source.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(source.Seat, CardKind.ThunderSlash);
@@ -40,7 +40,7 @@ internal sealed partial class CharacterLuShiOlRuntime
 
     internal bool IsOlLuShiLeijieNativeSlash(CardUseFrame use)
     {
-        if (use.OlLuShiLeijie is not { } o || use.CardId != 0 || use.CardKind != CardKind.ThunderSlash || use.UnlimitedUse != true || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.ThunderSlash, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0 } a || use.Id != o.UseId || a.ActionId != o.ActionId || a.ActorSeat != o.Source.OwnerSeat || a.ProviderSeat != o.Source.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { OlLuShi: { Operation: SkillProgramEffectOp.ResolveOlLuShiLeijie, Stage: OlLuShiStage.NativeUse } r } f || r.Source != o.Source || r.Hash != o.Hash || r.SlashCount != o.Ordinal || r.TargetSeat != o.TargetSeat || r.UseId != use.Id || r.ActionId != a.ActionId || _coreProgramEventHistoryOperations.ProgramEventHistory<OlLuShiSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || !HasOlLuShiJudgmentProof(f))
+        if (use.OlLuShiLeijie is not { } o || use.CardId != 0 || use.CardKind != CardKind.ThunderSlash || use.UnlimitedUse != true || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.ThunderSlash, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0 } a || use.Id != o.UseId || a.ActionId != o.ActionId || a.ActorSeat != o.Source.OwnerSeat || a.ProviderSeat != o.Source.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { OlLuShi: { Operation: SkillProgramEffectOp.ResolveOlLuShiLeijie, Stage: OlLuShiStage.NativeUse } r } f || r.Source != o.Source || r.Hash != o.Hash || r.SlashCount != o.Ordinal || r.TargetSeat != o.TargetSeat || r.UseId != use.Id || r.ActionId != a.ActionId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<OlLuShiSlashIssuedEvent>().Count(e => e.Origin == o) != 1 || !HasOlLuShiJudgmentProof(f))
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat);
     }
@@ -78,7 +78,7 @@ internal sealed partial class CharacterLuShiOlRuntime
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.FrameId);
         var r = f.OlLuShi!;
-        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
+        if (r.UseId != use.Id || r.ActionId != o.ActionId || r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Leijie cannot repeat or skip a native use return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { OlLuShi = r with { NativeReturned = true } });
         if (use.CardAttack is not { Active: true })
@@ -100,7 +100,7 @@ internal sealed partial class CharacterLuShiOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var r = f.OlLuShi!;
-        if (!r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<OlLuShiSlashReturnedEvent>().Any(e => e.FrameId == id && e.Ordinal == r.SlashCount))
+        if (!r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<OlLuShiSlashReturnedEvent>().Any(e => e.FrameId == id && e.Ordinal == r.SlashCount))
             throw new InvalidOperationException("Leijie cannot continue before its once-only native return.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OlLuShiSlashReturnedEvent(id, r.SlashCount, r.UseId, r.ActionId));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { OlLuShi = r with { Stage = OlLuShiStage.Children } });

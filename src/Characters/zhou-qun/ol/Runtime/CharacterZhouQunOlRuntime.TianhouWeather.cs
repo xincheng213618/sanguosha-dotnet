@@ -7,8 +7,8 @@ internal sealed partial class CharacterZhouQunOlRuntime
     {
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
             _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);
-        var expired = _coreProgramEventHistoryOperations.ProgramEventHistory<TianhouWeatherExpiredEvent>().Select(e => e.GrantId).ToHashSet(StringComparer.Ordinal);
-        foreach (var old in _coreProgramEventHistoryOperations.ProgramEventHistory<TianhouWeatherGrantedEvent>().Where(e => e.Source.OwnerSeat == f.OwnerSeat && !expired.Contains(e.GrantId)).ToArray())
+        var expired = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TianhouWeatherExpiredEvent>().Select(e => e.GrantId).ToHashSet(StringComparer.Ordinal);
+        foreach (var old in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TianhouWeatherGrantedEvent>().Where(e => e.Source.OwnerSeat == f.OwnerSeat && !expired.Contains(e.GrantId)).ToArray())
         {
             var grant = _coreMatchParticipantsPlayersAccess._players[old.RecipientSeat].SkillGrants.Grants.SingleOrDefault(g => g.GrantId == old.GrantId);
             if (grant is not null && (grant.SkillId != old.SkillId || grant.SkillInstanceId != old.SkillInstanceId || grant.SourceId != old.GrantSourceId))
@@ -22,7 +22,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
     internal void GrantTianhouWeather(ProgramSkillFrame f, int recipient)
     {
         var r = f.ZhouQun!;
-        if (r.Stage != ZhouQunStage.ChooseWeatherRecipient || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !r.Viewed.Contains(r.ChosenCard) || _cardZonesOperations._cardZones.GetLocation(r.ChosenCard) != CardLocation.DrawPile || _coreProgramEventHistoryOperations.ProgramEventHistory<TianhouCardShownEvent>().Count(e => e.FrameId == f.Id && e.CardId == r.ChosenCard) != 1)
+        if (r.Stage != ZhouQunStage.ChooseWeatherRecipient || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !r.Viewed.Contains(r.ChosenCard) || _cardZonesOperations._cardZones.GetLocation(r.ChosenCard) != CardLocation.DrawPile || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TianhouCardShownEvent>().Count(e => e.FrameId == f.Id && e.CardId == r.ChosenCard) != 1)
             throw new InvalidOperationException("Tianhou lost its publicly chosen exact top card or real living recipient.");
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
             _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.Revision);

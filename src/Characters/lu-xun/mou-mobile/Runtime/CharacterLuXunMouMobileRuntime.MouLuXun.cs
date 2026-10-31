@@ -39,10 +39,10 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
     {
         if (window.DelayedReturn is not { } delayed)
             return window.Action.ActorSeat;
-        var declared = _coreProgramEventHistoryOperations.ProgramEventHistory<CardUseDeclaredEvent>().LastOrDefault(e => e.CardId == delayed.CardId);
+        var declared = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().LastOrDefault(e => e.CardId == delayed.CardId);
         if (declared is null)
             return null; // Native placement without a Use has no invented actor.
-        return _coreProgramEventHistoryOperations.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().LastOrDefault(e => e.CardUseFrameId == declared.ResolutionId)?.ActorSeat ?? declared.SourceSeat;
+        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().LastOrDefault(e => e.CardUseFrameId == declared.ResolutionId)?.ActorSeat ?? declared.SourceSeat;
     }
 
     internal bool MouLuXunParentMatches(ProgramSkillFrame f)
@@ -60,7 +60,7 @@ internal sealed partial class CharacterLuXunMouMobileRuntime
         return parent is DeferredTurnEndFrame ending && _coreAfterTurnEndedProgramsOperations.MatchesAfterTurnEndedChild(ending, f, context);
     }
 
-    internal bool ValidMouLuXun(ProgramSkillFrame f) => f.MouLuXun is { } r && !string.IsNullOrWhiteSpace(r.GrantSourceId) && r.Source == MouLuXunSource(f) && r.GameplayHash == f.GameplayHash && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && f.WindowContext?.ParentFrameId == r.WindowId && r.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && r.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && MouLuXunParentMatches(f) && f.TriggerId == f.ActivationId && f.InstructionIndex == 1 && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats.Count == 0 && _coreProgramEventHistoryOperations.ProgramEventHistory<MouLuXunStartedEvent>().Count(e => e == new MouLuXunStartedEvent(f.Id, r.Source, r.GameplayHash, r.Operation, r.WindowId, r.ActualTurn, r.TurnOwner, r.Limit, r.GrantSourceId)) == 1;
+    internal bool ValidMouLuXun(ProgramSkillFrame f) => f.MouLuXun is { } r && !string.IsNullOrWhiteSpace(r.GrantSourceId) && r.Source == MouLuXunSource(f) && r.GameplayHash == f.GameplayHash && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash && f.WindowContext?.ParentFrameId == r.WindowId && r.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && r.TurnOwner == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && MouLuXunParentMatches(f) && f.TriggerId == f.ActivationId && f.InstructionIndex == 1 && f.SelectedCardIds.Count == 0 && f.SelectedTargetSeats.Count == 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuXunStartedEvent>().Count(e => e == new MouLuXunStartedEvent(f.Id, r.Source, r.GameplayHash, r.Operation, r.WindowId, r.ActualTurn, r.TurnOwner, r.Limit, r.GrantSourceId)) == 1;
     internal SkillProgramStepOutcome BeginMouLuXun(ProgramSkillFrame input, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);

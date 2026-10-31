@@ -6,11 +6,11 @@ internal sealed partial class CoreGameEngineDamageArmorPaymentsRuntime
     internal DamageArmorPaymentReceipt? PrepareDamageArmorPayment(long frameId, GameEngine.IDamageAttempt attack)
     {
         var target = _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat];
-        if (target.Armor == 0 || _coreNativeDamageArmorPoliciesOperations.BypassesNativeDamageArmor(attack))
+        if (target.Armor == 0 || _coreNativeDamageArmorPoliciesOperations.Value.BypassesNativeDamageArmor(attack))
             return null;
         if (target.Armor < 0 || _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.Id != frameId || damage.ParentFrameId != attack.ResolutionId || damage.SourceSeat != attack.SourceSeat || damage.TargetSeat != attack.TargetSeat || damage.Amount != attack.DamageAmount || damage.Amount < 0 || !attack.DamageAmountFinalized || damage.ArmorPayment is not null || !IsExactArmorDamageRequest(damage, attack, requireUnpaid: true))
             throw new InvalidOperationException("Armor payment requires the exact unpaid native damage segment.");
-        var multiplier = _coreNativeDamageArmorPoliciesOperations.NativeDamageArmorMultiplier(attack);
+        var multiplier = _coreNativeDamageArmorPoliciesOperations.Value.NativeDamageArmorMultiplier(attack);
         var absorbed = Math.Min(target.Armor, checked(damage.Amount * multiplier));
         var hpLoss = damage.Amount - (absorbed + multiplier - 1) / multiplier;
         var unclamped = checked(target.Hp - hpLoss);
@@ -32,7 +32,7 @@ internal sealed partial class CoreGameEngineDamageArmorPaymentsRuntime
     };
     internal bool IsExactArmorDamageRequest(DamageFrame damage, GameEngine.IDamageAttempt attack, bool requireUnpaid = false)
     {
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<DamageRequestedEvent>().Where(request => request.ResolutionId == damage.Id).ToArray()is not [var request] || request.SourceSeat != damage.SourceSeat || request.TargetSeat != damage.TargetSeat || request.Amount != damage.Amount || request.SourceCard != attack.EffectiveCardKind || request.Nature != damage.Nature || request.SourceLess != attack.IsSourceLess)
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageRequestedEvent>().Where(request => request.ResolutionId == damage.Id).ToArray()is not [var request] || request.SourceSeat != damage.SourceSeat || request.TargetSeat != damage.TargetSeat || request.Amount != damage.Amount || request.SourceCard != attack.EffectiveCardKind || request.Nature != damage.Nature || request.SourceLess != attack.IsSourceLess)
             return false;
         // DamageWasApplied belongs to the whole attack/use and remains true
         // after the first chained recipient. The new segment's own request,
@@ -48,7 +48,7 @@ internal sealed partial class CoreGameEngineDamageArmorPaymentsRuntime
     }
 
     internal static bool DamageAppliedMatchesArmorPayment(DamageAppliedEvent applied, DamageArmorPaymentReceipt payment) => RuntimeSkills.RuntimeRules_Core_DamageArmorPayments.DamageAppliedMatchesArmorPayment(applied, payment);
-    internal bool IsIssuedDamageArmorPayment(DamageFrame damage) => IsValidDamageArmorPayment(damage, requireApplied: true) && _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Where(applied => applied.ArmorPayment == damage.ArmorPayment).ToArray()is [var applied] && DamageAppliedMatchesArmorPayment(applied, damage.ArmorPayment!);
+    internal bool IsIssuedDamageArmorPayment(DamageFrame damage) => IsValidDamageArmorPayment(damage, requireApplied: true) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Where(applied => applied.ArmorPayment == damage.ArmorPayment).ToArray()is [var applied] && DamageAppliedMatchesArmorPayment(applied, damage.ArmorPayment!);
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 101)]
     internal void RequireExactDamageArmorPayment(IGameEvent payload)
     {
@@ -56,7 +56,7 @@ internal sealed partial class CoreGameEngineDamageArmorPaymentsRuntime
             return;
         if (applied.ArmorPayment is null && _resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame { ArmorPayment: not null })
             return;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.ArmorPayment is not { } payment || !IsValidDamageArmorPayment(damage, requireApplied: true) || !DamageAppliedMatchesArmorPayment(applied, payment) || _coreProgramEventHistoryOperations.ProgramEventHistory<DamageAppliedEvent>().Any(previous => previous.ArmorPayment == payment))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not DamageFrame damage || damage.ArmorPayment is not { } payment || !IsValidDamageArmorPayment(damage, requireApplied: true) || !DamageAppliedMatchesArmorPayment(applied, payment) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DamageAppliedEvent>().Any(previous => previous.ArmorPayment == payment))
             throw new InvalidOperationException("Damage lost its exact once-only Armor and HP payment.");
     }
 }

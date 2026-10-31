@@ -9,8 +9,8 @@ internal sealed partial class CharacterDuXiOlRuntime
     internal bool HasDuXiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveQuxiAtPlayEnding);
 
     internal CardConversionSource DuXiIssuer(ProgramSkillFrame f) => new("ol:quxi", "markers", f.OwnerSeat, f.SkillInstanceId);
-    internal DuXiQuxiMarkerMovedEvent[] DuXiCurrentMarkers() => !HasDuXiCapability ? [] : _coreProgramEventHistoryOperations.ProgramEventHistory<DuXiQuxiMarkerMovedEvent>().GroupBy(e => (e.Source, e.Marker)).Select(g => g.Last()).ToArray();
-    internal int? DuXiHolder(CardConversionSource source, PlayerMarkerKind marker) => _coreProgramEventHistoryOperations.ProgramEventHistory<DuXiQuxiMarkerMovedEvent>().LastOrDefault(e => e.Source == source && e.Marker == marker)?.Holder;
+    internal DuXiQuxiMarkerMovedEvent[] DuXiCurrentMarkers() => !HasDuXiCapability ? [] : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuXiQuxiMarkerMovedEvent>().GroupBy(e => (e.Source, e.Marker)).Select(g => g.Last()).ToArray();
+    internal int? DuXiHolder(CardConversionSource source, PlayerMarkerKind marker) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuXiQuxiMarkerMovedEvent>().LastOrDefault(e => e.Source == source && e.Marker == marker)?.Holder;
     internal bool DuXiHasPair(int owner) => _coreMatchParticipantsPlayersAccess._players.Any(a => a.IsAlive && a.Seat != owner && _coreMatchParticipantsPlayersAccess._players.Any(b => b.IsAlive && b.Seat != owner && _corePhysicalOwnedCardQueriesOperations.GetHand(a).Count < _corePhysicalOwnedCardQueriesOperations.GetHand(b).Count));
     SkillProgramStepOutcome IDuXiProgramHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginDuXi(f, op);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 26300)]
@@ -18,7 +18,7 @@ internal sealed partial class CharacterDuXiOlRuntime
     {
         var op = trigger.Effects.FirstOrDefault()?.Op;
         if (op == SkillProgramEffectOp.ResolveQuxiAtPlayEnding)
-            return context.Window == SkillProgramTriggerWindow.PlayEnding && candidate.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && DuXiHasPair(candidate.OwnerSeat) && !_coreProgramEventHistoryOperations.ProgramEventHistory<DuXiQuxiAcceptedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat);
+            return context.Window == SkillProgramTriggerWindow.PlayEnding && candidate.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && DuXiHasPair(candidate.OwnerSeat) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuXiQuxiAcceptedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat);
         if (op == SkillProgramEffectOp.TransferQuxiAtRoundOrDeath)
         {
             var source = new CardConversionSource("ol:quxi", "markers", candidate.OwnerSeat, candidate.SkillInstanceId);
@@ -245,10 +245,10 @@ internal sealed partial class CharacterDuXiOlRuntime
     internal int DuXiDrawAdjustment(CharacterState player) => !player.IsAlive ? 0 : DuXiCurrentMarkers().Where(e => e.Holder == player.Seat).Sum(e => e.Marker == PlayerMarkerKind.QuxiFeng ? 1 : -1);
     internal bool TrySkipDuXiDiscardPhase(CharacterState player)
     {
-        var receipt = _coreProgramEventHistoryOperations.ProgramEventHistory<DuXiQuxiAcceptedEvent>().SingleOrDefault(e => e.Source.OwnerSeat == player.Seat && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber);
+        var receipt = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuXiQuxiAcceptedEvent>().SingleOrDefault(e => e.Source.OwnerSeat == player.Seat && e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber);
         if (receipt is null)
             return false;
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<DuXiQuxiDiscardSkippedEvent>().Any(e => e.AcceptedFrameId == receipt.FrameId))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DuXiQuxiDiscardSkippedEvent>().Any(e => e.AcceptedFrameId == receipt.FrameId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DuXiQuxiDiscardSkippedEvent(receipt.FrameId, player.Seat, _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber));
         return true;
     }

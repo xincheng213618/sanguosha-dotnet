@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
     internal static bool BOrdinaryTrick(CardKind kind) => CoreGameEngineProgramCardPaymentsRuntime.MatchesSkillProgramCardCategory(kind, SkillProgramCardCategory.Trick) && !CoreNativeCardClassificationsRuntime.IsDelayedCard(kind);
     internal CardConversionSource BSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool BSourceCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId);
-    internal bool BZhendanDisabled(int seat) => _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangZhendanDisabledEvent>().Any(e => e.OwnerSeat == seat && e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
+    internal bool BZhendanDisabled(int seat) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangZhendanDisabledEvent>().Any(e => e.OwnerSeat == seat && e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber);
     internal IEnumerable<ProgramTriggerCandidate> CollectWushuangBChunlaoLossCandidates(HpChangeContext change)
     {
         if (!HasWushuangBSkills || change.Kind != HpChangeKind.Loss)
@@ -29,14 +29,14 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
     {
         if (!HasWushuangBSkills)
             return;
-        if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { } native && (native.Action is null || native.Action.Type == CardActionType.Use) && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.OriginUseId == declared.ResolutionId && e.CardActionId == (native.Action?.ActionId ?? 0)))
+        if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { } native && (native.Action is null || native.Action.Type == CardActionType.Use) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.OriginUseId == declared.ResolutionId && e.CardActionId == (native.Action?.ActionId ?? 0)))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangCardUseNameRecordedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualRoundProgressRoundNumberAccess._roundNumber, declared.SourceSeat, BCanonicalName(declared.CardKind), native.Action?.ActionId ?? 0, declared.ResolutionId));
-        if (payload is CardActionAcceptedEvent { Action: { Type: CardActionType.Response } a } && a.ActorSeat == a.ProviderSeat && a.ResponderSeat == a.ActorSeat && a.RequesterSeat is null && (a.EffectiveKind == CardKind.Nullification || a.EffectiveKind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } defending && defending.TargetSeat == a.ActorSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(defending.EffectiveCardKind ?? CardKind.Slash) && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is null) && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.CardActionId == a.ActionId))
+        if (payload is CardActionAcceptedEvent { Action: { Type: CardActionType.Response } a } && a.ActorSeat == a.ProviderSeat && a.ResponderSeat == a.ActorSeat && a.RequesterSeat is null && (a.EffectiveKind == CardKind.Nullification || a.EffectiveKind == CardKind.Dodge && _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } defending && defending.TargetSeat == a.ActorSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(defending.EffectiveCardKind ?? CardKind.Slash) && _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is null) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.CardActionId == a.ActionId))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangCardUseNameRecordedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualRoundProgressRoundNumberAccess._roundNumber, a.ActorSeat, BCanonicalName(a.EffectiveKind), a.ActionId, 0));
         if (payload is ActualDiscardRecoveryPhaseStartedEvent { Phase: { Kind: ActualDiscardRecoveryPhaseKind.Draw or ActualDiscardRecoveryPhaseKind.Discard } } phase)
         {
             var kind = phase.Phase.Kind == ActualDiscardRecoveryPhaseKind.Draw ? TurnPhase.Draw : TurnPhase.Discard;
-            var pending = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangYinglueArmedEvent>().Where(e => e.TargetSeat == phase.Phase.ActorSeat && e.Phase == kind && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangYinglueAppliedEvent>().Any(applied => applied.ProgramFrameId == e.ProgramFrameId)).ToArray();
+            var pending = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYinglueArmedEvent>().Where(e => e.TargetSeat == phase.Phase.ActorSeat && e.Phase == kind && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYinglueAppliedEvent>().Any(applied => applied.ProgramFrameId == e.ProgramFrameId)).ToArray();
             foreach (var grant in pending)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangYinglueAppliedEvent(grant.ProgramFrameId, grant.TargetSeat, grant.Phase, grant.Amount, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber));
         }
@@ -63,23 +63,23 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
     {
         if (!HasWushuangBSkills || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != player.Seat || !((_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Draw && query == SkillRuleQuery.DrawCount) || (_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Discard && query == SkillRuleQuery.HandLimit)))
             yield break;
-        foreach (var item in _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangYinglueAppliedEvent>().Where(e => e.TargetSeat == player.Seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Phase == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase))
+        foreach (var item in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangYinglueAppliedEvent>().Where(e => e.TargetSeat == player.Seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Phase == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase))
             yield return new FiniteRuleQueryContribution($"wushuang:yinglue:{(item.ProgramFrameId)}", SkillRuleOperation.Add, item.Amount);
     }
 
     [ProgramCardLegality(ProgramCardLegalityStage.ConfiguredConversionBan, 61200)]
-    internal bool IsWushuangZhendanConversionForbidden(ProgramConfiguredViewAsQuery q) => q.Instance.SkillId == BZhendan && (BZhendanDisabled(q.Owner.Seat) || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.ActorSeat == q.Owner.Seat && e.Name == BCanonicalName(q.Rule.OutputKind)));
+    internal bool IsWushuangZhendanConversionForbidden(ProgramConfiguredViewAsQuery q) => q.Instance.SkillId == BZhendan && (BZhendanDisabled(q.Owner.Seat) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.ActorSeat == q.Owner.Seat && e.Name == BCanonicalName(q.Rule.OutputKind)));
     [ProgramCardLegality(ProgramCardLegalityStage.ViewAsBan, 61200)]
-    internal bool IsWushuangZhendanSubmittedConversionForbidden(ProgramViewAsLegalityQuery q) => q.Source.SkillId == BZhendan && (BZhendanDisabled(q.Owner.Seat) || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.ActorSeat == q.Owner.Seat && e.Name == BCanonicalName(q.Kind)));
+    internal bool IsWushuangZhendanSubmittedConversionForbidden(ProgramViewAsLegalityQuery q) => q.Source.SkillId == BZhendan && (BZhendanDisabled(q.Owner.Seat) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(e => e.RoundNumber == _coreActualRoundProgressRoundNumberAccess._roundNumber && e.ActorSeat == q.Owner.Seat && e.Name == BCanonicalName(q.Kind)));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 61200)]
     internal bool CanTriggerWushuangBSkill(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (c.SkillId == BWeiyi)
-            return context.TargetSeat is { } target && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangWeiyiUsedEvent>().Any(e => e.OwnerSeat == c.OwnerSeat && e.SkillId == c.SkillId && e.TargetSeat == target);
+            return context.TargetSeat is { } target && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangWeiyiUsedEvent>().Any(e => e.OwnerSeat == c.OwnerSeat && e.SkillId == c.SkillId && e.TargetSeat == target);
         if (c.SkillId == BZhendan)
             return !BZhendanDisabled(c.OwnerSeat);
         if (c.SkillId == BXiaojie && trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveWushuangXiaojie))
-            return context.CardUse is { } card && _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangXiaojieAcceptedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.IncomingUseId == card.ParentCardUseFrameId);
+            return context.CardUse is { } card && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangXiaojieAcceptedEvent>().Any(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.IncomingUseId == card.ParentCardUseFrameId);
         if (c.SkillId == BDingan)
             return context.CardUse is { } use && BSecondTurnUse(use.CardActionId, use.EffectiveKind) && !BDyingThisTurn() && BDinganDrawTargets(c.OwnerSeat, BTargets(use)).Any();
         return true;
@@ -90,11 +90,11 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
     internal bool BDyingThisTurn() => BTurnHistory().OfType<PlayerDyingEvent>().Any();
     internal bool BSecondTurnUse(long actionId, CardKind kind)
     {
-        var declared = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Where(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Name == BCanonicalName(kind)).ToArray();
+        var declared = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Where(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Name == BCanonicalName(kind)).ToArray();
         return declared.Length == 2 && declared[^1].CardActionId == actionId;
     }
 
-    internal IEnumerable<int> BDinganDrawTargets(int owner, IReadOnlyList<int> targets) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !targets.Contains(p.Seat) && !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangDinganDrawnEvent>().Any(e => e.OwnerSeat == owner && e.TargetSeat == p.Seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber)).Select(p => p.Seat);
+    internal IEnumerable<int> BDinganDrawTargets(int owner, IReadOnlyList<int> targets) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && !targets.Contains(p.Seat) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangDinganDrawnEvent>().Any(e => e.OwnerSeat == owner && e.TargetSeat == p.Seat && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber)).Select(p => p.Seat);
     SkillProgramStepOutcome IWushuangSkillsBHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginWushuangB(f, op);
     internal SkillProgramStepOutcome BeginWushuangB(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
@@ -541,7 +541,7 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
     [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 61200)]
     internal bool ReturnWushuangBNativeAttack(GameEngine.AttackCompletionReceipt completion)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WushuangB: { } r } f || !_coreProgramEventHistoryOperations.ProgramEventHistory<WushuangBNativeReturnedEvent>().Any(e => e.Return.ProgramFrameId == f.Id && e.Return.CardUseFrameId == completion.ResolutionId))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WushuangB: { } r } f || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangBNativeReturnedEvent>().Any(e => e.Return.ProgramFrameId == f.Id && e.Return.CardUseFrameId == completion.ResolutionId))
             return false;
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return true;
@@ -560,8 +560,8 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
     {
         if (id <= 0 || !HasWushuangBSkills || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(seat))
             return null;
-        var mark = _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangBianyuMarkedEvent>().LastOrDefault(e => e.TargetSeat == seat && e.CardId == id);
-        if (mark is null || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > mark.MovementSequence && m.CardId == id && m.From == CardLocation.Hand(seat)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId > mark.ActionSequence && e.Action.ActorSeat == seat && (e.Action.Type == CardActionType.Use || _coreProgramEventHistoryOperations.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(use => use.CardActionId == e.Action.ActionId)) && !BBasic(e.Action.EffectiveKind)))
+        var mark = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangBianyuMarkedEvent>().LastOrDefault(e => e.TargetSeat == seat && e.CardId == id);
+        if (mark is null || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence > mark.MovementSequence && m.CardId == id && m.From == CardLocation.Hand(seat)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId > mark.ActionSequence && e.Action.ActorSeat == seat && (e.Action.Type == CardActionType.Use || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCardUseNameRecordedEvent>().Any(use => use.CardActionId == e.Action.ActionId)) && !BBasic(e.Action.EffectiveKind)))
             return null;
         return mark;
     }

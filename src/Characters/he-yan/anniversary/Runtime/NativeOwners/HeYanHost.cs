@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class HeYanHost(Func<RuntimeEntries.CharacterHeYanAnniversaryEntries> getCharacterHeYanAnniversaryRuntime) : IAnniversaryHeYanHost
+internal sealed class HeYanHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterHeYanAnniversaryRuntime>> getCharacterHeYanAnniversaryRuntime) : IAnniversaryHeYanHost
 {
-    public SkillProgramStepOutcome Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterHeYanAnniversaryRuntime().BeginHeYan(f, op);
+    public SkillProgramStepOutcome Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => getCharacterHeYanAnniversaryRuntime().Value.BeginHeYan(f, op);
 }

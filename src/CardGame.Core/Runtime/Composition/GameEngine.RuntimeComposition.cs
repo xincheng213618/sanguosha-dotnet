@@ -273,6 +273,6 @@ internal sealed class MatchRuntimeAdapterFactory(GameEngine engine) : IMatchRunt
     private ProgramViewContributors ViewContributors => _viewContributors ??= new(EngineOwners.CoreProgramViewContributorsDefinitions.ViewContributionMetadata.Value,
         row => BindRuntimeHandler(row.Method, row.DelegateType));
     private IPendingGameEventOutput? _pendingGameEventOutput;
-    private IPendingGameEventOutput PendingEventOutput => _pendingGameEventOutput ??= new PendingGameEventOutput(() => _started, payload => this.PublicPlayedCardsEntries.CapturePublicPlayedCard(payload), payload => this.ProgramEventHistoryEntries.AppendPendingProgramEvent(payload), () => _pendingEvents[^1], () => checked(_eventSequence + _pendingEvents.Count), (payload, sequence) => this.SimaYiMouEntries.CaptureMouSmSecretFact(payload, sequence));
+    private IPendingGameEventOutput PendingEventOutput => _pendingGameEventOutput ??= new PendingGameEventOutput(() => _started, payload => this.PublicPlayedCardsEntries.Value.CapturePublicPlayedCard(payload), payload => this.ProgramEventHistoryEntries.Value.AppendPendingProgramEvent(payload), () => _pendingEvents[^1], () => checked(_eventSequence + _pendingEvents.Count), (payload, sequence) => this.SimaYiMouEntries.CaptureMouSmSecretFact(payload, sequence));
     public bool IsMoLuBuOpeningPhase =>GetRuntimeModule<EngineOwners.CharacterLuBuOlMagicRuntime>().IsMoLuBuOpeningPhase;
 }

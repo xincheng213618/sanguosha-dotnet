@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEngineJudgmentProgramsRuntime
     {
         while (_resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramJudgmentTriggerWindowFrame frame)
         {
-            var pending = _coreJudgmentCursorRuntimeOperations.ActiveJudgment ?? throw new InvalidOperationException("Missing judgment trigger continuation.");
+            var pending = _coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment ?? throw new InvalidOperationException("Missing judgment trigger continuation.");
             if (frame.ZhenyiBeforeResult == true)
             {
                 frame = _coreZhenyiJudgmentWindowsOperations.RefreshZhenyiBeforeResultWindow(frame, pending);
@@ -57,7 +57,7 @@ internal sealed partial class CoreGameEngineJudgmentProgramsRuntime
             if (frame.CandidateIndex == frame.Candidates.Count)
             {
                 var succeeded = pending.Succeeded ?? throw new InvalidOperationException("A final judgment trigger lost its result.");
-                var judgmentCard = _coreNativeDamageHandlesOperations.GetJudgmentCard(pending) ?? throw new InvalidOperationException("A final judgment trigger lost its card.");
+                var judgmentCard = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending) ?? throw new InvalidOperationException("A final judgment trigger lost its card.");
                 _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.ProgramJudgmentTriggerWindow);
                 var completed = _coreNativeJudgmentOperations.CompleteFinalizedJudgment(pending, judgmentCard, succeeded);
                 if (completed is { } result)
@@ -107,7 +107,7 @@ internal sealed partial class CoreGameEngineJudgmentProgramsRuntime
         }
 
         var succeeded = pending.Succeeded ?? throw new InvalidOperationException("A terminal judgment trigger lost its result.");
-        var judgmentCard = _coreNativeDamageHandlesOperations.GetJudgmentCard(pending) ?? throw new InvalidOperationException("A terminal judgment trigger lost its card.");
+        var judgmentCard = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(pending) ?? throw new InvalidOperationException("A terminal judgment trigger lost its card.");
         _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.ProgramJudgmentTriggerWindow);
         var completed = _coreNativeJudgmentOperations.CompleteFinalizedJudgment(pending, judgmentCard, succeeded);
         if (completed is { } result)

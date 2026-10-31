@@ -106,13 +106,13 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
                 return;
             }
 
-            var before = _coreUniqueHpPeerProgramsOperations.RecipientContestSequence;
+            var before = _coreUniqueHpPeerProgramsOperations.Value.RecipientContestSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DyingSuits = r with { Stage = DyingSuitsStage.Drawing, RecipientSeat = seat, DrawBefore = before, DrawAfter = before }, PendingMovementContinuation = new(seat, 0, null) });
             var cards = _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[seat], 4, log: true, reason: new(DyingSuitsDrawReason(f)));
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             r = f.DyingSuits!with
             {
-                DrawAfter = _coreUniqueHpPeerProgramsOperations.RecipientContestSequence,
+                DrawAfter = _coreUniqueHpPeerProgramsOperations.Value.RecipientContestSequence,
                 ActualDrawCount = cards.Count
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { DyingSuits = r });
@@ -141,7 +141,7 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
         }
 
         var suits = ids.Select(card => _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[payer], _coreCardAttackStateOperations.GetAttackCard(card))).ToArray();
-        var costBefore = _coreUniqueHpPeerProgramsOperations.RecipientContestSequence;
+        var costBefore = _coreUniqueHpPeerProgramsOperations.Value.RecipientContestSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DyingSuits = r with { Stage = DyingSuitsStage.Discarding, DiscardSuits = suits, DiscardBefore = costBefore, DiscardAfter = costBefore }, PendingMovementContinuation = new(payer, 0, null) });
         _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, payer, ids, new(DyingSuitsDiscardReason(f)), (_, records) =>
         {

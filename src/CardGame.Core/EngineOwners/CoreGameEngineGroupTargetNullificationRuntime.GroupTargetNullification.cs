@@ -58,10 +58,10 @@ internal sealed partial class CoreGameEngineGroupTargetNullificationRuntime
         switch (group.Effect)
         {
             case GroupCardEffect.ResponseAttack:
-                _coreNativeGroupAttackOperations.BeginGroupAttackResponse(group);
+                _coreNativeGroupAttackOperations.Value.BeginGroupAttackResponse(group);
                 break;
             case GroupCardEffect.PublicDraft:
-                _coreNativeHarvestOperations.BeginHarvestSelection(group);
+                _coreNativeHarvestOperations.Value.BeginHarvestSelection(group);
                 break;
             case GroupCardEffect.Recovery:
                 if (group.TargetIndex >= group.TargetSeats.Count)

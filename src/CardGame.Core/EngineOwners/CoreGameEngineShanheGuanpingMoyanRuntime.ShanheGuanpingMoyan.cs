@@ -32,7 +32,7 @@ internal sealed partial class CoreGameEngineShanheGuanpingMoyanRuntime
         return null;
     }
     [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 535)]
-    internal bool IsGuanpingMoyanPaidLongyinDying() => _coreDyingCursorRuntimeOperations.ActiveDying is { } dying && GuanpingMoyanPaidLongyinRoot()is { AttackAttempt: not null } moyan && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == moyan.Id);
+    internal bool IsGuanpingMoyanPaidLongyinDying() => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && GuanpingMoyanPaidLongyinRoot()is { AttackAttempt: not null } moyan && _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.FrameId) > _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == moyan.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterResponseHealth, 575)]
     internal bool TryAdvanceGuanpingMoyanPaidLongyinSubtree()
     {

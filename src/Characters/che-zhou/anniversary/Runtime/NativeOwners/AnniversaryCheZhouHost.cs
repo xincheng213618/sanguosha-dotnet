@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.NativeOwners;
-internal sealed class AnniversaryCheZhouHost(Func<RuntimeEntries.CharacterCheZhouAnniversaryEntries> getCharacterCheZhouAnniversaryRuntime) : IAnniversaryCheZhouHost
+internal sealed class AnniversaryCheZhouHost(Func<RuntimeEntries.DeferredRuntime<EngineOwners.CharacterCheZhouAnniversaryRuntime>> getCharacterCheZhouAnniversaryRuntime) : IAnniversaryCheZhouHost
 {
-    public SkillProgramStepOutcome Resolve(ProgramSkillFrame f) => getCharacterCheZhouAnniversaryRuntime().BeginAnniversaryCheZhouPigua(f);
+    public SkillProgramStepOutcome Resolve(ProgramSkillFrame f) => getCharacterCheZhouAnniversaryRuntime().Value.BeginAnniversaryCheZhouPigua(f);
 }

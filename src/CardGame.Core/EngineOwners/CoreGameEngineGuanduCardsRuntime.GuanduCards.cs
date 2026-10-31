@@ -6,9 +6,9 @@ internal sealed partial class CoreGameEngineGuanduCardsRuntime
     internal static bool IsGuanduCard(CardKind kind) => kind == CardKind.Intoxication || IsGuanduTrick(kind);
     internal static bool IsGuanduTrick(CardKind kind) => CoreGameEngineGuanduCardsDefinitions.GuanduOrdinaryTrickKinds.Contains(kind);
     internal static LegalActionKind GuanduCardAction(CardKind kind) => RuntimeSkills.RuntimeRules_Core_GuanduCards.GuanduCardAction(kind);
-    internal bool GuanduIntoxicationTargetSpent(int target) => _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduIntoxicationCommittedEvent>().Any(e => e.ActualTurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.TargetSeat == target);
+    internal bool GuanduIntoxicationTargetSpent(int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduIntoxicationCommittedEvent>().Any(e => e.ActualTurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.TargetSeat == target);
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 220)]
-    internal int GuanduIntoxicationDamageBonus(GameEngine.IDamageAttempt attack) => _coreActivityBattleRulesOperations.GuanduRules?.IntoxicationDamageBonus(attack.TargetSeat) ?? 0;
+    internal int GuanduIntoxicationDamageBonus(GameEngine.IDamageAttempt attack) => _coreActivityBattleRulesOperations.Value.GuanduRules?.IntoxicationDamageBonus(attack.TargetSeat) ?? 0;
     internal bool CanBeGuanduAdditionalTarget(CardUseFrame use, CharacterState target) => target.IsAlive && (use.CardKind switch
     {
         CardKind.StoreGrain => true,
@@ -101,11 +101,11 @@ internal sealed partial class CoreGameEngineGuanduCardsRuntime
         if (use.CardKind != CardKind.Intoxication || use.Action is not { Type: CardActionType.Use } action || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.DyingResponse is not null)
             throw new InvalidOperationException("Intoxication cannot become a rescue, ordinary Wine, or unrelated basic effect.");
         var target = use.TargetSeats[use.TargetIndex];
-        if (!_coreProgramEventHistoryOperations.ProgramEventHistory<GuanduIntoxicationCommittedEvent>().Any(e => e.UseFrameId == id && e.TargetSeat == target))
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduIntoxicationCommittedEvent>().Any(e => e.UseFrameId == id && e.TargetSeat == target))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduIntoxicationCommittedEvent(id, action.ActionId, _coreActualTurnProgressTurnNumberAccess._turnNumber, use.SourceSeat, target));
         if (!_coreGuanduActivitiesOperations.GuanduAllies(use.SourceSeat, target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramCardTargetEffectsOperations.IsCardEffectIneffective(id, target))
         {
-            var occurrence = _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduIntoxicationAppliedEvent>().Count(e => e.UseFrameId == id && e.TargetSeat == target) + 1;
+            var occurrence = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduIntoxicationAppliedEvent>().Count(e => e.UseFrameId == id && e.TargetSeat == target) + 1;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduIntoxicationAppliedEvent(id, action.ActionId, _coreActualTurnProgressTurnNumberAccess._turnNumber, use.SourceSeat, target, occurrence));
         }
 
@@ -126,7 +126,7 @@ internal sealed partial class CoreGameEngineGuanduCardsRuntime
 
         var allied = _coreGuanduActivitiesOperations.GuanduAllies(use.SourceSeat, target);
         var amount = CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.StoreGrain || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.UnitedEffort && allied && _coreMatchParticipantsPlayersAccess._players[target].IsChained ? 1 : 0;
-        var occurrence = _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduCardEffectStartedEvent>().Count(e => e.UseFrameId == use.Id && e.TargetIndex == use.TargetIndex) + 1;
+        var occurrence = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduCardEffectStartedEvent>().Count(e => e.UseFrameId == use.Id && e.TargetIndex == use.TargetIndex) + 1;
         var receipt = new GuanduCardEffectReceipt(action.ActionId, pending.Id, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), target, use.TargetIndex, occurrence, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.Reinforcements ? GuanduCardEffectStage.RecoveryChildren : CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) == CardKind.UnitedEffort && !allied ? GuanduCardEffectStage.ChainChildren : GuanduCardEffectStage.Drawing)
         {
             AlliedBranch = allied,
@@ -206,6 +206,6 @@ internal sealed partial class CoreGameEngineGuanduCardsRuntime
     internal bool IsGuanduCardEffectMovement(CardUseFrame use, CardMovementBatchContext batch) => use.GuanduCardEffect is { Stage: GuanduCardEffectStage.DrawingChildren, DrawOutcome: { } result } r && batch.ParentFrameId == use.Id && batch.AwaitingProgramFrameId == r.AwaitingProgramFrameId && batch.Movements.Count > 0 && batch.Movements.All(m => m.Sequence > result.SequenceBefore && m.Sequence <= result.SequenceAfter && (result.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(result.RecipientSeat) && m.Reason == CardMoveReasons.Draw || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle));
     internal bool IsGuanduCardEffectMovementReturn(CardUseFrame use, CardsMovedTriggerWindowFrame frame) => frame.ResumeGuanduCardEffectFrameId == use.Id && frame.Id == frame.Batch.Id && frame.ResumeProgramFrameId is null && !CoreDamageObserverCursorQueriesRuntime.HasAlternateProgramMovementReturn(frame with { ResumeGuanduCardEffectFrameId = null }) && IsGuanduCardEffectMovement(use, frame.Batch);
     internal bool IsGuanduCardEffectHpReturn(CardUseFrame use, HpChangedTriggerWindowFrame frame) => use.GuanduCardEffect is { Stage: GuanduCardEffectStage.RecoveryChildren } r && frame.ResumeFrameId == use.Id && frame.Continuation == PostEventContinuation.GuanduCardEffect && frame.Change.ParentFrameId == use.Id && frame.Change.SourceSeat == use.SourceSeat && frame.Change.TargetSeat == r.TargetSeat && frame.CardId is null && frame.CardKind is null;
-    internal bool IsGuanduCardRecoveryAttempt(CardUseFrame use, RecoveryAttempt attempt) => use.GuanduCardEffect is { Stage: GuanduCardEffectStage.RecoveryChildren, RecoveryAmount: > 0 } r && attempt.SourceSeat == use.SourceSeat && attempt.TargetSeat == r.TargetSeat && attempt.Amount == r.RecoveryAmount && attempt.Completion.Producer == RecoveryAttemptProducer.CardUse && attempt.Completion.CardId == use.CardId && attempt.Completion.CardKind == CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) && attempt.Completion.Policies is { Count: 0 } && _coreProgramEventHistoryOperations.ProgramEventHistory<GuanduCardRecoveryIssuedEvent>().Count(e => e.UseFrameId == use.Id && e.NullificationFrameId == r.NullificationFrameId && e.Occurrence == r.Occurrence && e.SourceSeat == use.SourceSeat && e.TargetSeat == r.TargetSeat && e.Amount == attempt.Amount) == 1;
+    internal bool IsGuanduCardRecoveryAttempt(CardUseFrame use, RecoveryAttempt attempt) => use.GuanduCardEffect is { Stage: GuanduCardEffectStage.RecoveryChildren, RecoveryAmount: > 0 } r && attempt.SourceSeat == use.SourceSeat && attempt.TargetSeat == r.TargetSeat && attempt.Amount == r.RecoveryAmount && attempt.Completion.Producer == RecoveryAttemptProducer.CardUse && attempt.Completion.CardId == use.CardId && attempt.Completion.CardKind == CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) && attempt.Completion.Policies is { Count: 0 } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduCardRecoveryIssuedEvent>().Count(e => e.UseFrameId == use.Id && e.NullificationFrameId == r.NullificationFrameId && e.Occurrence == r.Occurrence && e.SourceSeat == use.SourceSeat && e.TargetSeat == r.TargetSeat && e.Amount == attempt.Amount) == 1;
     internal bool IsGuanduCardEffectRecoveryReturn(CardUseFrame use, RecoveryReplacementFrame frame) => frame.ParentFrameId == use.Id && frame.Return == new RecoveryReplacementReturn(PostEventContinuation.GuanduCardEffect, use.Id) && IsGuanduCardRecoveryAttempt(use, frame.Attempt);
 }

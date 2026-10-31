@@ -21,7 +21,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     internal SkillProgramStepOutcome BeginWuHaoxian(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!HasWuHaoxianOriginalPayment(f) || f.WuHaoxian is not null || _coreProgramEventHistoryOperations.ProgramEventHistory<WuHaoxianStartedEvent>().Any(e => e.FrameId == f.Id))
+        if (!HasWuHaoxianOriginalPayment(f) || f.WuHaoxian is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHaoxianStartedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Haoxian requires its exact once-paid native limited activation.");
         var materials = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => c.Rank == 3).Select(c => new WuHaoxianMaterial(c.Id, c.Kind, CardLocation.DiscardPile, c.Rank)).ToArray();
         var r = new WuHaoxianReceipt(WuHaoxianSource(f), f.GameplayHash, WuHaoxianStage.Recycle, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
@@ -107,9 +107,9 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
         var destination = recycle ? CardLocation.DrawPile : CardLocation.Hand(f.OwnerSeat);
         if (moves.Count != expected.Count || !moves.Select(m => m.CardId).SequenceEqual(expected.Select(m => m.CardId)) || moves.Where((m, i) => m.From != expected[i].From || m.CardKind != expected[i].PrintedKind || m.To != destination || m.Reason.Value != (recycle ? WuHaoxianRecycleReason : WuHaoxianObtainReason)).Any())
             throw new InvalidOperationException("Haoxian must move the exact real rank-three entities once.");
-        if (_coreProgramEventHistoryOperations.ProgramEventHistory<WuHaoxianMovementPaidEvent>().Any(e => e.FrameId == id && e.Recycle == recycle))
+        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHaoxianMovementPaidEvent>().Any(e => e.FrameId == id && e.Recycle == recycle))
             throw new InvalidOperationException("Haoxian cannot pay one movement twice.");
-        var before = recycle ? _coreProgramEventHistoryOperations.ProgramEventHistory<WuHaoxianStartedEvent>().Single(e => e.FrameId == id).Before : r.Before;
+        var before = recycle ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHaoxianStartedEvent>().Single(e => e.FrameId == id).Before : r.Before;
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { WuHaoxian = recycle ? r with { RecycleBatchId = batchId, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } : r with { ObtainBatchId = batchId, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuHaoxianMovementPaidEvent(id, recycle, batchId, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, moves.Count));
     }
@@ -127,9 +127,9 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
 
     internal void RequireWuHaoxian(ProgramSkillFrame f)
     {
-        if (f.WuHaoxian is not { } r || !HasWuHaoxianOriginalPayment(f) || r.Source != WuHaoxianSource(f) || r.GameplayHash != f.GameplayHash || _coreProgramEventHistoryOperations.ProgramEventHistory<WuHaoxianStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) != 1 || r.RecycleMaterials.Select(m => m.CardId).Distinct().Count() != r.RecycleMaterials.Count || r.ObtainMaterials.Select(m => m.CardId).Distinct().Count() != r.ObtainMaterials.Count || r.RecycleMaterials.Any(m => m.From != CardLocation.DiscardPile || m.EffectiveRank != 3 || _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).Rank != 3) || r.ObtainMaterials.Any(m => m.From.Zone != CardZoneKind.Hand || m.From.OwnerSeat is null || m.From.OwnerSeat == f.OwnerSeat || m.EffectiveRank != 3))
+        if (f.WuHaoxian is not { } r || !HasWuHaoxianOriginalPayment(f) || r.Source != WuHaoxianSource(f) || r.GameplayHash != f.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHaoxianStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) != 1 || r.RecycleMaterials.Select(m => m.CardId).Distinct().Count() != r.RecycleMaterials.Count || r.ObtainMaterials.Select(m => m.CardId).Distinct().Count() != r.ObtainMaterials.Count || r.RecycleMaterials.Any(m => m.From != CardLocation.DiscardPile || m.EffectiveRank != 3 || _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).Rank != 3) || r.ObtainMaterials.Any(m => m.From.Zone != CardZoneKind.Hand || m.From.OwnerSeat is null || m.From.OwnerSeat == f.OwnerSeat || m.EffectiveRank != 3))
             throw new InvalidOperationException("Haoxian lost its native limited payment, exact source or frozen real rank-three roster.");
-        foreach (var paid in _coreProgramEventHistoryOperations.ProgramEventHistory<WuHaoxianMovementPaidEvent>().Where(e => e.FrameId == f.Id))
+        foreach (var paid in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHaoxianMovementPaidEvent>().Where(e => e.FrameId == f.Id))
         {
             var materials = paid.Recycle ? r.RecycleMaterials : r.ObtainMaterials;
             var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > paid.Before && m.Sequence <= paid.After && m.Reason.Value == (paid.Recycle ? WuHaoxianRecycleReason : WuHaoxianObtainReason)).ToArray();
@@ -137,7 +137,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
                 throw new InvalidOperationException("Haoxian's committed movement no longer matches its frozen primary materials.");
         }
 
-        var shuffle = _coreProgramEventHistoryOperations.ProgramEventHistory<WuHaoxianShuffledEvent>().Where(e => e.FrameId == f.Id).ToArray();
+        var shuffle = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHaoxianShuffledEvent>().Where(e => e.FrameId == f.Id).ToArray();
         if (r.Shuffled != (shuffle.Length == 1) || shuffle.Length > 1)
             throw new InvalidOperationException("Haoxian's shuffle must happen once.");
         if (shuffle is [var s])
@@ -154,7 +154,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
     {
         RequireWuHaoxian(f);
         var r = f.WuHaoxian!;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuHaoxianCompletedEvent(f.Id, r.RecycleMaterials.Count, _coreProgramEventHistoryOperations.ProgramEventHistory<WuHaoxianMovementPaidEvent>().SingleOrDefault(e => e.FrameId == f.Id && !e.Recycle)?.Count ?? 0, r.Shuffled));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuHaoxianCompletedEvent(f.Id, r.RecycleMaterials.Count, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHaoxianMovementPaidEvent>().SingleOrDefault(e => e.FrameId == f.Id && !e.Recycle)?.Count ?? 0, r.Shuffled));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuHaoxian = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }
@@ -190,7 +190,7 @@ internal sealed partial class CharacterZhangFeiWumiaoRuntime
         if (child is not CardsMovedTriggerWindowFrame moved || !CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) || moved.Batch.OriginOwnerSeat != f.OwnerSeat || moved.Batch.OriginSkillId != f.SkillId || moved.Batch.OriginSkillInstanceId != f.SkillInstanceId)
             return false;
         var recycle = r.Stage == WuHaoxianStage.RecycleChildren;
-        var paid = _coreProgramEventHistoryOperations.ProgramEventHistory<WuHaoxianMovementPaidEvent>().SingleOrDefault(e => e.FrameId == f.Id && e.Recycle == recycle);
+        var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHaoxianMovementPaidEvent>().SingleOrDefault(e => e.FrameId == f.Id && e.Recycle == recycle);
         return paid is not null && paid.BatchId == moved.Batch.Id && moved.Batch.Movements.Count == paid.Count && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > paid.Before && m.Sequence <= paid.After && m.Reason.Value == (recycle ? WuHaoxianRecycleReason : WuHaoxianObtainReason));
     }
 }
