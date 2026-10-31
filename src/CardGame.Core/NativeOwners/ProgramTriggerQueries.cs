@@ -82,7 +82,24 @@ internal readonly struct ProgramTriggerQueries(Func<RuntimeEntries.DeferredRunti
     public int? ActiveSlashTargetSeat => getCoreActiveNativeAttackQueriesRuntime().ActiveCardAttack?.TargetSeat;
     public int AlivePlayerCount => matchParticipantsState.ReferenceToPlayers.Count(player => player.IsAlive);
 
-    public int GetUsage(int ownerSeat, string skillId, string bindingId, SkillUsageScope scope) => getSkillRuntimeStateStore().GetUsage(ownerSeat, skillId, bindingId, scope);
-    public bool TryConsumeUsage(int ownerSeat, string skillId, string bindingId, SkillUsageScope scope, int limit) => getSkillRuntimeStateStore().TryConsumeUsage(ownerSeat, skillId, bindingId, scope, limit);
+    public int GetUsage(int ownerSeat, string skillId, string bindingId, SkillUsageScope scope, ProgramSkillWindowContext? context = null) =>
+        scope != SkillUsageScope.Event ? getSkillRuntimeStateStore().GetUsage(ownerSeat, skillId, bindingId, scope) :
+        EventUsageFrame(context) is { } frame ? frame.EventUsages.SingleOrDefault(usage =>
+            usage.OwnerSeat == ownerSeat && usage.SkillId == skillId && usage.BindingId == bindingId)?.Count ?? 0 : int.MaxValue;
+    public bool TryConsumeUsage(int ownerSeat, string skillId, string bindingId, SkillUsageScope scope, int limit, ProgramSkillWindowContext? context = null)
+    {
+        if (scope != SkillUsageScope.Event) return getSkillRuntimeStateStore().TryConsumeUsage(ownerSeat, skillId, bindingId, scope, limit);
+        if (EventUsageFrame(context) is not { } frame) return false;
+        var count = GetUsage(ownerSeat, skillId, bindingId, scope, context);
+        if (count >= limit) return false;
+        getFrameStore().Replace(frame with { EventUsages = frame.EventUsages.Where(usage =>
+            usage.OwnerSeat != ownerSeat || usage.SkillId != skillId || usage.BindingId != bindingId)
+            .Append(new(ownerSeat, skillId, bindingId, count + 1)).ToArray() });
+        return true;
+    }
+    private ProgramCardTriggerWindowFrame? EventUsageFrame(ProgramSkillWindowContext? context) =>
+        context?.CardUse is not { } action ? null : getFrameStore().OfType<ProgramCardTriggerWindowFrame>()
+            .SingleOrDefault(frame => frame.Id == context.ParentFrameId && frame.Action.ActionId == action.CardActionId &&
+                EngineOwners.CoreGameEngineCardActionsRuntime.GetCardActionWindow(frame) == context.Window);
     public void RecordUsageConsumed(SkillUsageConsumedEvent fact) => advanceEventRulesAndQueueFact(fact);
 }

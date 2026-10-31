@@ -39,6 +39,7 @@ internal interface IProgramExpressionWorld
     bool? Flag(string flag, int seat);
     int? BindingStat(string stat, string name) => null;
     int? Number(string name) => null;
+    int? CardMarkCount(int seat, string mark, CardZoneKind zone) => null;
 }
 
 internal static class ProgramExpressions
@@ -108,6 +109,15 @@ internal static class ProgramExpressions
         if (op == "same") { Arity(2, 2); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Flags.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Stats.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Participant)); }
+        if (op == "cardMarkCount")
+        {
+            Arity(3, 3);
+            if (args[1].ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(args[1].GetString()) || args[1].GetString()!.Length > 128 ||
+                args[2].ValueKind != JsonValueKind.String || args[2].GetString() is not ("hand" or "equipment"))
+                Fail(path, "cardMarkCount requires a mark identifier and hand or equipment");
+            return new(op, ProgramExpressionType.Int, [Arg(0, ProgramExpressionType.Participant)],
+                literal: (int)(args[2].GetString() == "hand" ? CardZoneKind.Hand : CardZoneKind.Equipment), name: args[1].GetString());
+        }
         if (op is "+" or "min" or "max") { Arity(2, 8); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op == "-") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op == "floorDiv") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
@@ -199,6 +209,8 @@ internal static class ProgramExpressions
             case "int": return e.Literal;
             case "when": return EvaluateBool(e.Args[0], world, it) == true ? EvaluateInt(e.Args[1], world, it) : null;
             case "number": return world.Number(e.Name!);
+            case "cardMarkCount": return EvaluateParticipant(e.Args[0], world, it) is { } markedSeat
+                ? world.CardMarkCount(markedSeat, e.Name!, (CardZoneKind)e.Literal) : null;
             case "choiceNumber" or "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank": return world.BindingStat(e.Op, e.Name!);
             case "-":
                 return EvaluateInt(e.Args[0], world, it) is { } left && EvaluateInt(e.Args[1], world, it) is { } right ? left - right : null;

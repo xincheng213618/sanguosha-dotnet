@@ -14,7 +14,7 @@ internal sealed class ProgramBindingRuntime(IProgramRuntimeFrames frames, IProgr
         native.ConsumePrepDiscardEnding(candidate, context);
         native.ConsumeFixedDistanceDebt(candidate, context);
         if (!facts.Trigger(candidate).Effects.Any(e => e.Op is SkillProgramEffectOp.DiscardSameCategoryForExtraEffect or SkillProgramEffectOp.PayTwoForChosenAssaultAndApplyTargetOutcomes or SkillProgramEffectOp.DyingRecipientChooseReplaceOrGrantThenRecover or SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage))
-            native.ConsumeUsage(candidate);
+            native.ConsumeUsage(candidate, context);
         native.PayMarkerCost(candidate.OwnerSeat, facts.Trigger(candidate).MarkerCost,
             candidate.SkillId, candidate.BindingId);
         prompts.Clear();

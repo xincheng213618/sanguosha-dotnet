@@ -12,7 +12,7 @@
           "optional": false,
           "effects": [
             {
-              "op": "initializeLingkongInitialEntities",
+              "op": "markInitialHand", "mark": "lingkong",
               "target": "owner"
             }
           ]

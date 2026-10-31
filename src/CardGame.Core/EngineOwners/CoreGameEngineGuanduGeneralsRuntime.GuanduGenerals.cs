@@ -9,7 +9,7 @@ internal sealed partial class CoreGameEngineGuanduGeneralsRuntime
     {
         if (grant.SkillId is not ("guandu:zezhu" or "guandu:chenggong"))
             return true;
-        if (!_coreGuanduActivitiesOperations.IsGuanduActivity || !owner.IsAlive || !owner.SkillGrants.Grants.Any(g => g.SkillId == "guandu:fushi" && g.IsEnabled && _corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, g) && _coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(owner, g)))
+        if (!_coreGuanduActivitiesOperations.IsGuanduActivity || !owner.IsAlive || !owner.SkillGrants.Grants.Any(g => g.SkillId == "guandu:fushi" && g.IsEnabled && _corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, g) && _coreNationalSkillsOperations.IsSkillGrantStateEffective(owner, g)))
             return false;
         var qun = _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(p) == "qun");
         var wei = _coreMatchParticipantsPlayersAccess._players.Count(p => p.IsAlive && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(p) == "wei");

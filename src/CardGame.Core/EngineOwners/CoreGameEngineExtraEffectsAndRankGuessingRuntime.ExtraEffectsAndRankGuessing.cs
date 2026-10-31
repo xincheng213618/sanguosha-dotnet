@@ -172,7 +172,7 @@ internal sealed partial class CoreGameEngineExtraEffectsAndRankGuessingRuntime
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ExtraEffectsAndRankGuess = r with { Stage = ExtraEffectsAndRankGuessStage.MovementChildren, PaidCardId = card.Id, MovementBefore = before, MovementAfter = before, Choices = [] }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _coreNativeLogicalDiscardsOperations.MoveLogicalDiscard(f.OwnerSeat, f.OwnerSeat, card, CardLocation.Hand(f.OwnerSeat), new(ExtraEffectCostReason));
-        _coreProgramLifecycleOperations.ConsumeProgramTriggerUsage(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0));
+        _coreProgramLifecycleOperations.ConsumeProgramTriggerUsage(new(f.OwnerSeat, f.SkillId, f.TriggerId!, f.SkillInstanceId, f.GameplayHash, 0), f.WindowContext);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { ExtraEffectsAndRankGuess = f.ExtraEffectsAndRankGuess!with { MovementAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ExtraEffectsAndRankGuessPaidEvent(f.Id, f.ExtraEffectsAndRankGuess!));
         if (!DrainExtraEffectsAndRankGuessChildren(f))

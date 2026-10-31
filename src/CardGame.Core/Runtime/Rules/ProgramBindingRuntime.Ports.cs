@@ -17,7 +17,7 @@ internal interface IProgramBindingProtocols : IProgramRuntimeOperations
     void ConsumeEarnedActualEnding(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
     void ConsumePrepDiscardEnding(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
     void ConsumeFixedDistanceDebt(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
-    void ConsumeUsage(ProgramTriggerCandidate candidate);
+    void ConsumeUsage(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
     void PayMarkerCost(int seat, SkillProgramMarkerCost? cost, string skillId, string bindingId);
     ProgramDyingAlcoholPermission? CaptureDyingAlcoholPermission(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
     ProgramSkillFrame CaptureHpConditionalSource(ProgramSkillFrame frame);

@@ -1,18 +1,10 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
-public sealed partial record ProgramLifecycleTriggerWindowFrame
-{
-    private readonly IReadOnlyList<LeXidiOpeningEntity>? _leXidiOpening;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IReadOnlyList<LeXidiOpeningEntity>? LeXidiOpening
-    { get => _leXidiOpening; init => _leXidiOpening = value is null ? null : Array.AsReadOnly(value.ToArray()); }
-}
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public LeChengyanReceipt? LeChengyan { get; init; } }
 
 internal interface ILeZhugeGuoHost
 {
-    SkillProgramStepOutcome Initialize(ProgramSkillFrame f);
     SkillProgramStepOutcome Reorder(ProgramSkillFrame f);
     SkillProgramStepOutcome Chengyan(ProgramSkillFrame f);
 }
@@ -29,7 +21,6 @@ internal sealed class LeZhugeGuoHandler(SkillProgramEffectOp op) : ISkillProgram
     public SkillProgramEffectOp Op => op;
     public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int target, ISkillProgramEffectHost h) => op switch
     {
-        SkillProgramEffectOp.InitializeLeZhugeGuoXidi => h.GetCapability<ILeZhugeGuoHost>().Initialize(f),
         SkillProgramEffectOp.ReorderLeZhugeGuoXidi => h.GetCapability<ILeZhugeGuoHost>().Reorder(f),
         _ => h.GetCapability<ILeZhugeGuoHost>().Chengyan(f)
     };

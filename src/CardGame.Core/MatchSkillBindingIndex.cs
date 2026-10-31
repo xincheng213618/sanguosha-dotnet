@@ -12,7 +12,7 @@ internal readonly record struct SkillBindingIndexStamp(
     bool HasSecondary,
     bool SecondarySelected,
     bool SecondaryRevealed, long ProjectionRevision = 0, Role? OwnerRole = null,
-    long DerivedProjectionRevision = 0, bool OwnerAlive = true, string? PrimaryGeneralId = null);
+    long DerivedProjectionRevision = 0, bool OwnerAlive = true);
 
 internal sealed record IndexedSkillProgramInstance(
     string SkillId,
@@ -213,7 +213,6 @@ internal sealed class MatchSkillBindingIndex
     private readonly SkillAvailability _availability;
     private readonly Func<CharacterState, bool>? _hasHpSensitiveSources;
     private readonly RuntimeEntries.CoreGameEngineHealthQueriesEntries? _health;
-    private readonly bool _tracksPrintedLordQualification;
     private readonly Func<long>? _projectionStamp;
     private readonly Func<CharacterState, long>? _derivedProjectionStamp;
     private readonly Dictionary<int, (SkillBindingShard Shard, int RebuildCount)> _shards = [];
@@ -224,21 +223,19 @@ internal sealed class MatchSkillBindingIndex
         Func<CharacterState, bool>? hasHpSensitiveSources = null,
         Func<CharacterState, SkillGrant, bool>? grantQualification = null, Func<long>? projectionStamp = null,
         Func<CharacterState, long>? derivedProjectionStamp = null, bool dualGenerals = false,
-        Func<CharacterState, SkillGrant, bool>? additionalPrintedLordQualification = null,
         EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess? participants = null, CardZoneStore? cards = null,
         IActualDiscardRecoveryPhaseQueries? phases = null, IProgramRuntimeFrames? frames = null,
         RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null,
         EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState = null,
-        IProgramHealthChildQueries? healthChildren = null)
+        IProgramHealthChildQueries? healthChildren = null, ICardEntityMarkQueries? cardMarks = null)
     {
         ArgumentNullException.ThrowIfNull(resolveDefinition);
         _availability = new(resolveDefinition, isNationalWarMode, dualGenerals,
-            grantQualification, additionalPrintedLordQualification, participants, cards, phases, frames, health, turnState, healthChildren);
+            grantQualification, participants, cards, phases, frames, health, turnState, healthChildren, cardMarks);
         _hasHpSensitiveSources = hasHpSensitiveSources;
         _health = health;
         _projectionStamp = projectionStamp;
         _derivedProjectionStamp = derivedProjectionStamp;
-        _tracksPrintedLordQualification = additionalPrintedLordQualification is not null;
     }
 
     internal int CachedSeatCount => _shards.Count;
@@ -256,8 +253,7 @@ internal sealed class MatchSkillBindingIndex
             ProjectionRevision = _projectionStamp?.Invoke() ?? 0,
             DerivedProjectionRevision = _derivedProjectionStamp?.Invoke(player) ?? 0,
             OwnerRole = player.Role,
-            OwnerAlive = player.IsAlive,
-            PrimaryGeneralId = _tracksPrintedLordQualification ? player.General.Id : null
+            OwnerAlive = player.IsAlive
         };
         if (!player.SkillGrants.Restrictions.Any(restriction => restriction.While is not null) &&
             _shards.TryGetValue(player.Seat, out var existing) && existing.Shard.Stamp == stamp)

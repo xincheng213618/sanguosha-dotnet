@@ -28,7 +28,7 @@ internal sealed partial class CoreGameEnginePrivateGeneralLibrariesRuntime
         return _coreNationalSkillsOperations.IsSkillGrantStateEffective(owner, cap);
     }
 
-    internal bool LibraryBaseGrantLive(CharacterState owner, SkillGrant grant) => owner.IsAlive && _coreNationalSkillsOperations.IsRawSkillSourceAdmitted(owner, grant) && (grant.SourceId is not (CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource) || !_contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Lord) || owner.Role == Role.Lord || _corePrintedLordSkillQualificationsOperations.IsPrintedLordGrantQualified(owner, grant));
+    internal bool LibraryBaseGrantLive(CharacterState owner, SkillGrant grant) => owner.IsAlive && _coreNationalSkillsOperations.IsRawSkillSourceAdmitted(owner, grant) && (grant.SourceId is not (CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource) || !_contentRegistryOperations._contentRegistry.GetSkill(grant.SkillId).Tags.HasFlag(SkillTag.Lord) || owner.Role == Role.Lord || PrintedLordSkillQualifications.Matches(owner, grant));
     internal bool LibraryBaseLordProjectionLive(CharacterState owner, SkillGrant grant)
     {
         if (grant.LordProjection is not { } p)
@@ -42,7 +42,7 @@ internal sealed partial class CoreGameEnginePrivateGeneralLibrariesRuntime
     }
 
     internal bool LibraryProjectionRelationLive(SkillGrant grant, GeneralLibraryProjectionSource relation) => _coreGameEnginePrivateGeneralLibrariesFieldsAccess._privateGeneralLibraries.GetValueOrDefault(relation.LibrarySource)is { } library && library.Initialized && library.RevealedGeneralId == relation.GeneralId && library.DeclaredSkillId == relation.SkillId && grant.SkillId == relation.SkillId;
-    internal bool IsGeneralLibraryGrantQualified(CharacterState owner, SkillGrant grant) => _coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(owner, grant) && (grant.GeneralLibraryProjection is not { } source || source.LibrarySource.OwnerSeat == owner.Seat && LibraryProjectionRelationLive(grant, source) && LibrarySourceQualified(source.LibrarySource));
+    internal bool IsGeneralLibraryGrantQualified(CharacterState owner, SkillGrant grant) => _coreNationalSkillsOperations.IsSkillGrantStateEffective(owner, grant) && (grant.GeneralLibraryProjection is not { } source || source.LibrarySource.OwnerSeat == owner.Seat && LibraryProjectionRelationLive(grant, source) && LibrarySourceQualified(source.LibrarySource));
     internal PrivateGeneralLibrary? EffectiveGeneralLibrary(CharacterState owner) => _coreGameEnginePrivateGeneralLibrariesFieldsAccess._privateGeneralLibraries.Count == 0 ? null : FindEffectiveGeneralLibrary(owner);
     internal PrivateGeneralLibrary? FindEffectiveGeneralLibrary(CharacterState owner) => _coreGameEnginePrivateGeneralLibrariesFieldsAccess._privateGeneralLibraries.Values.Where(l => l.Source.OwnerSeat == owner.Seat && l.RevealedGeneralId is not null && LibrarySourceQualified(l.Source)).OrderBy(l => l.Source.CapabilitySkillInstanceId, StringComparer.Ordinal).ThenBy(l => l.Source.CapabilityGrantId, StringComparer.Ordinal).FirstOrDefault();
     internal GeneralGender? GetPrivateGeneralLibraryGender(CharacterState owner) => EffectiveGeneralLibrary(owner)is { } l ? _contentRegistryOperations._contentRegistry.Generals[l.RevealedGeneralId!].Gender : null;

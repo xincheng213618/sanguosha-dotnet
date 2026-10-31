@@ -2,6 +2,7 @@
   "schemaVersion": 3,
   "skills": {
     "le:lingkong": {
+      "cardMarks": { "lingkong": "箜篌" },
       "name": "灵箜",
       "description": "锁定技，游戏开始时，你的初始手牌增加“箜篌”标记且不计入手牌上限。你每回合首次摸牌阶段外获得的牌标记为“箜篌”。"
     },

@@ -4,52 +4,23 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMiHengLeRuntime
 {
     internal const string JiguDrawReason = "skill-program.mi-heng.jigu.draw";
-    internal bool HasLeMiHengJiguCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeJiguInitialEntities) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw);
+    internal bool HasLeMiHengJiguCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw);
 
     internal static CardConversionSource JiguSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.JiguSource(f);
     internal static bool IsJiguDamageTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.IsJiguDamageTrigger(t);
-    // Registration only; the query still belongs to legacy GameEngine.LeMiHengJigu.
-    [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 100)]
-    internal void ProjectJiguCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
-    {
-        projection.Append(HasJiguEntityMark(cardId) ? "激鼓" : null);
-    }
-
-    internal bool HasJiguEntityMark(int cardId) => HasLeMiHengJiguCapability && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiguInitialEntityEvent>().Any(e => e.CardId == cardId);
+    internal bool HasJiguEntityMark(int cardId) => _cardEntityMarks.Has(cardId, "jigu");
     internal bool HasJiguEntityMark(int ownerSeat, int cardId) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(ownerSeat) && HasJiguEntityMark(cardId);
     internal bool IsJiguHandLimitExempt(CharacterState owner, int cardId) => _coreNationalSkillsOperations.HasRuntimeSkill(owner, "le:jigu") && HasJiguEntityMark(owner.Seat, cardId);
-    internal int JiguMarkedHandCount(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Count(c => HasJiguEntityMark(owner, c.Id));
+    internal int JiguMarkedHandCount(int owner) => _cardEntityMarks.CountMarked(owner, "jigu", CardZoneKind.Hand);
     internal int JiguStartedSeatCount => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Where(e => e.Phase.Kind == ActualDiscardRecoveryPhaseKind.Preparation && e.Phase.ActorSeat == e.Phase.ActualTurnOwnerSeat).Select(e => e.Phase.ActorSeat).Distinct().Count();
 
     internal int JiguEmptySlotCount(CharacterState owner) => Enum.GetValues<EquipmentSlot>().Sum(slot => Math.Max(0, owner.EquipmentSlotCapacity(slot) - _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Count(c => _coreEquipmentContentOperations.EquipmentRules.Get(c.Kind).Slot == slot)));
     internal int JiguUseCount(int owner, int round) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiguActivationPaidEvent>().Count(e => e.Source.OwnerSeat == owner && e.Source.SkillId == "le:jigu" && e.RoundNumber == round);
     internal bool JiguRoundDisabled(int owner, int round) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiguActivationPaidEvent>().Any(e => e.Source.OwnerSeat == owner && e.Source.SkillId == "le:jigu" && e.RoundNumber == round && e.DisabledForRound);
-    internal ProgramLifecycleTriggerWindowFrame CaptureJiguInitialEntities(ProgramLifecycleTriggerWindowFrame window)
-    {
-        if (!HasLeMiHengJiguCapability || window.Window != SkillProgramTriggerWindow.GameStarting || window.Continuation != ProgramLifecycleContinuation.CompleteGameStarting)
-            return window;
-        if (window.JiguInitialEntities is not null)
-            throw new InvalidOperationException("Jigu's actual opening Hand can only be frozen once.");
-        var owners = window.Candidates.Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.InitializeJiguInitialEntities }]).Select(c => c.OwnerSeat).Distinct().Order();
-        var entities = owners.SelectMany(owner => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Select(c =>
-        {
-            var paid = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == c.Id && m.To == CardLocation.Hand(owner));
-            if (paid is null || paid.CardKind != c.Kind)
-                throw new InvalidOperationException("A Jigu initial entity requires its actual opening Hand entry.");
-            return new JiguInitialEntity(owner, c.Id, c.Kind, paid.Sequence);
-        })).ToArray();
-        return window with
-        {
-            JiguInitialEntities = entities
-        };
-    }
-
-    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28210, SkillProgramEffectOp.InitializeJiguInitialEntities, SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw)]
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28210, SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw)]
     internal bool CanOfferJiguGate(ProgramTriggerLegalityContext gate) => CanOfferJigu(gate.Candidate, gate.Trigger, gate.Context);
     internal bool CanOfferJigu(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
-        if (trigger.Effects is [{ Op: SkillProgramEffectOp.InitializeJiguInitialEntities }])
-            return context.Window == SkillProgramTriggerWindow.GameStarting && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiguInitializedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat);
         if (!IsJiguDamageTrigger(trigger))
             return true;
         if (context.Window != SkillProgramTriggerWindow.AfterDamageApplied || context.OwnerSeat != candidate.OwnerSeat || context.OccurrenceIndex != 0 || candidate.OccurrenceIndex != 0 || context.Amount <= 0 || context.DamageFrameId is not { } damageId || context.TargetSeat != candidate.OwnerSeat && context.SourceSeat != candidate.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || JiguRoundDisabled(candidate.OwnerSeat, _coreActualRoundProgressRoundNumberAccess._roundNumber) || JiguMarkedHandCount(candidate.OwnerSeat) != _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat]).Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiguActivationPaidEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat && e.DamageFrameId == damageId) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is not DamageTriggerWindowFrame w || w.TriggerWindow != context.Window || w.ParentFrameId != damageId || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex].ToProgramCandidate() != candidate || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == damageId)is not DamageFrame d || d.TargetSeat != context.TargetSeat || d.Amount != context.Amount)
@@ -57,25 +28,7 @@ internal sealed partial class CharacterMiHengLeRuntime
         return _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(w)is { } attack && d.ParentFrameId == attack.ResolutionId && (attack.IsSourceLess ? context.SourceSeat is null : context.SourceSeat == attack.SourceSeat);
     }
 
-    SkillProgramStepOutcome ILeMiHengJiguHost.Initialize(ProgramSkillFrame frame) => InitializeJigu(frame);
     SkillProgramStepOutcome ILeMiHengJiguHost.Draw(ProgramSkillFrame frame) => BeginJiguDraw(frame);
-    internal SkillProgramStepOutcome InitializeJigu(ProgramSkillFrame supplied)
-    {
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SkillId != "le:jigu" || f.TriggerId != "mark-initial-entities" || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.GameStarting) || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JiguInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
-            throw new InvalidOperationException("Jigu initialization requires its original game-start binding exactly once.");
-        // The native game-start mother freezes the final opening Hand before
-        // any game-start skill can move it, including real opening replacements.
-        var parent = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == f.WindowContext!.ParentFrameId);
-        var entities = parent.JiguInitialEntities?.Where(e => e.OwnerSeat == f.OwnerSeat).ToArray() ?? throw new InvalidOperationException("Jigu requires the native mother's frozen initial entities.");
-        if (entities.Select(e => e.CardId).Distinct().Count() != entities.Length || entities.Any(e => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.DealSequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.To == CardLocation.Hand(e.OwnerSeat))))
-            throw new InvalidOperationException("Jigu cannot mark an entity without its exact opening-Hand provenance.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiguInitializedEvent(f.Id, JiguSource(f), f.GameplayHash, entities.Length));
-        foreach (var e in entities)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiguInitialEntityEvent(f.Id, f.OwnerSeat, e.CardId, e.PrintedKind, e.DealSequence));
-        return SkillProgramStepOutcome.Continue;
-    }
-
     internal SkillProgramStepOutcome BeginJiguDraw(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

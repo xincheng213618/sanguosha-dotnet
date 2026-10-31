@@ -108,7 +108,8 @@ internal sealed partial class StandardModeSetupFeature
             var selected = SelectInitial(player, general);
             var bonus = (activity.PlayerTier >= 2 ? 1 : 0) + (activity.PlayerTier >= 5 ? 1 : 0) + (Commander(seat) ? 1 : 0);
             players[seat] = selected with { GeneralDraftCandidateIds = null,
-                MaxHp = general.BaseHp + bonus, Hp = (general.InitialHp ?? general.BaseHp) + bonus };
+                MaxHp = general.BaseHp + bonus, Hp = (general.InitialHp ?? general.BaseHp) + bonus,
+                PrintedLordQualifications = Commander(seat) ? DeclarePrintedLordSkills(general) : [] };
         }
         return new(players, [], [], guanduConfiguration: configured, initialActorSeat: configured.CaoCommanderSeat);
     }

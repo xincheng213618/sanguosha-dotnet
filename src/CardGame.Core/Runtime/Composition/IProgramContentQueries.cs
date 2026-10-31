@@ -20,6 +20,7 @@ internal interface IProgramContentQueries : IProgramSelectionQuery
     bool HasCardPolicy(SkillProgramCardPolicyKind policy);
     string SkillName(string skillId);
     string? AuthorityName(string skillId);
+    string? CardMarkLabel(string mark) => null;
 }
 
 public sealed partial class ContentRegistry : IProgramContentQueries
@@ -48,4 +49,5 @@ public sealed partial class ContentRegistry : IProgramContentQueries
     string IProgramContentQueries.SkillName(string skillId) => GetSkill(skillId).Name;
     string? IProgramContentQueries.AuthorityName(string skillId) =>
         Skills.GetValueOrDefault(skillId)?.ProgramPresentation?.AuthorityName;
+    string? IProgramContentQueries.CardMarkLabel(string mark) => _cardMarkLabels.GetValueOrDefault(mark);
 }

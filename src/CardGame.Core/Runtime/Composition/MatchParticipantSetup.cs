@@ -66,6 +66,7 @@ internal sealed class MatchParticipantSetup(IProgramContentQueries content, IRea
                 player.SkillGrants.Grant(new SkillGrant(grant.GrantId, grant.SkillId,
                     grant.SkillInstanceId, grant.SourceId) { IsModeRule = grant.IsModeRule });
             }
+            ApplyPrintedLordQualifications(player, seat.PrintedLordQualifications);
             players.Add(player);
         }
         availableGenerals.AddRange(plan.AvailableGeneralIds.Select(ResolveGeneral));
@@ -109,8 +110,22 @@ internal sealed class MatchParticipantSetup(IProgramContentQueries content, IRea
     {
         var plan = mode.PrepareSelectedGeneral(CaptureSeat(player, context), selected.Id);
         player.General = AddModeSetupSkills(selected, plan.ExtraSkillIds);
+        ApplyPrintedLordQualifications(player, plan.PrintedLordQualifications);
         if (plan.MaximumHp is { } maximum) player.MaxHp = maximum;
         if (plan.Hp is { } hp) player.Hp = hp;
+    }
+
+    private static void ApplyPrintedLordQualifications(CharacterState player, IReadOnlyList<ModePrintedLordQualification> declarations)
+    {
+        foreach (var declaration in declarations)
+        {
+            var grant = player.SkillGrants.Grants.Single(value => value.SourceId == CharacterState.PrimarySkillSource && value.SkillId == declaration.SkillId);
+            var qualification = new PrintedLordSkillQualification(player.Seat, player.General.Id, grant.SourceId,
+                grant.GrantId, grant.SkillId, grant.SkillInstanceId, new PrintedLordQualificationSource.SetupDeclared(declaration.DeclarationId));
+            if (!PrintedLordSkillQualifications.Matches(player, grant with { PrintedLordQualification = qualification }))
+                throw new InvalidOperationException("The mode declaration requires an existing printed Lord skill on the selected primary general.");
+            player.SkillGrants.SetPrintedLordQualification(grant.GrantId, qualification);
+        }
     }
 
     private static bool IsValidSeat(int seat, int count) => seat >= 0 && seat < count;

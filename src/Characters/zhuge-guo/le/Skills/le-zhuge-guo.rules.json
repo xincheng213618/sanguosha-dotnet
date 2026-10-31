@@ -5,7 +5,7 @@
       "id": "le:xidi", "revision": 1,
       "triggers": [
         { "id": "mark-initial-flutes", "window": "gameStarting", "subject": "owner", "optional": false,
-          "effects": [{ "op": "initializeLeZhugeGuoXidi", "target": "owner" }] },
+          "effects": [{ "op": "markInitialHand", "mark": "xidi", "target": "owner" }] },
         { "id": "preparation-reorder", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false,
           "effects": [{ "op": "reorderLeZhugeGuoXidi", "target": "owner" }] },
         { "id": "ending-reorder", "window": "turnEnding", "subject": "owner", "optional": false,

@@ -1,5 +1,7 @@
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Modes.Standard;
+using System.Text.Json.Nodes;
 
 internal static class SkillProgramCardTriggerChecks
 {
@@ -7,6 +9,61 @@ internal static class SkillProgramCardTriggerChecks
     {
         ExactUseConversionSourceAndOptionalDrawReplay();
         ResponseTriggerPausesAtOpaqueTakeAndReplays();
+        EventQuotaBelongsToItsOriginalCardWindowAcrossGrantsAndCold();
+    }
+
+    private static void EventQuotaBelongsToItsOriginalCardWindowAcrossGrantsAndCold()
+    {
+        var unsupported = JsonNode.Parse(Rules)!;
+        var lifecycle = unsupported["skills"]![2]!["triggers"]![0]!.AsObject();
+        lifecycle["window"] = "gameStarting"; lifecycle["subject"] = "owner";
+        lifecycle["usageScope"] = "event"; lifecycle["usageLimit"] = 1;
+        foreach (var field in new[] { "sourceSkillId", "sourceViewAsId", "ownerRelation" }) lifecycle.Remove(field);
+        try { SkillProgramCatalog.Load(unsupported.ToJsonString(), Presentation); throw new InvalidOperationException("An event quota on an unsupported lifecycle frame was accepted."); }
+        catch (InvalidOperationException error) when (error.Message.Contains("event usage requires a native card-action window", StringComparison.Ordinal)) { }
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new TriggerFixturePackage(onlySourceA: true, eventQuota: true));
+        var game = Create(registry);
+        for (var actionNumber = 1; actionNumber <= 2; actionNumber++)
+        {
+            var action = game.GetHumanLegalActions().First(a => a.ConversionSource?.SkillId == "trigger-test:source-a" && a.TargetSeats.Count == 2);
+            Require(game.Submit(Command(game, action)).Accepted, "The native two-target event-quota use was rejected.");
+            var window = game.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single();
+            Require(window.Candidates.Where(c => c.SkillId == "trigger-test:draw").Select(c => c.SkillInstanceId).Distinct().Count() == 2 &&
+                window.Candidates.Select(c => c.OpponentSeat).Distinct().Count() == 2 && window.EventUsages.Count == 0,
+                "Two actual source instances and two event targets remain distinct candidates; a new native action starts without consumed event quota.");
+            if (actionNumber == 1)
+            {
+                EventAnswer(game, c => c.Parameters.GetValueOrDefault("program-action") == "skip");
+                Require(game.PendingDecision?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate") == true &&
+                    game.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single().EventUsages.Count == 0,
+                    "Declining one candidate leaves this event's allowance available to the next candidate.");
+            }
+            EventAnswer(game, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
+            var accepted = game.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single();
+            Require(accepted.Id == window.Id && accepted.EventUsages is [{ OwnerSeat: 0, SkillId: "trigger-test:draw", BindingId: "after-use", Count: 1 }] &&
+                game.PendingDecision?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "choose-option" &&
+                    c.Parameters.GetValueOrDefault("option-id") == "continue") == true,
+                "Accepted progress is recorded on the original native window before the ordinary choice and draw children run.");
+            game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+            Require(game.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single().EventUsages.SequenceEqual(accepted.EventUsages),
+                "Cold recovery retains the original event quota across its unfinished child.");
+            var beforeDraw = game.CreateSnapshot(0).Players[0].HandCount;
+            EventAnswer(game, c => c.Parameters.GetValueOrDefault("program-action") == "choose-option" &&
+                c.Parameters.GetValueOrDefault("option-id") == "continue");
+            for (var step = 0; step < 160 && game.PendingDecision?.Kind != DecisionKind.PlayCard; step++)
+                Require(game.Submit(new AdvanceOneStepCommand(game.Revision)).Accepted, "The event-quota native use failed to resume.");
+            Require(game.PendingDecision is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } &&
+                game.CreateSnapshot(0).Players[0].HandCount == beforeDraw + 1 &&
+                game.Events.Select(e => e.Payload).OfType<SkillUsageConsumedEvent>().Count(e => e.SkillId == "trigger-test:draw" && e.Scope == SkillUsageScope.Event) == actionNumber &&
+                game.Events.Select(e => e.Payload).OfType<ProgramCardTriggerResolvedEvent>().Count(e => e.SkillId == "trigger-test:draw" && e.Activated) == actionNumber,
+                "Each native action executes one accepted reward across all source instances and target candidates, and the next action receives its own allowance.");
+        }
+        static void EventAnswer(GameEngine game, Func<PromptChoice, bool> predicate)
+        {
+            var p = game.PendingDecision!;
+            Require(game.Submit(new AnswerPromptCommand(0, p.PromptId, p.Choices.First(predicate).Id, game.Revision)).Accepted,
+                "The published event-quota choice was rejected.");
+        }
     }
 
     private static void ResponseTriggerPausesAtOpaqueTakeAndReplays()
@@ -199,14 +256,26 @@ internal static class SkillProgramCardTriggerChecks
         return game;
     }
 
-    private sealed class TriggerFixturePackage(bool onlySourceA = false) : IGameContentPackage
+    private sealed class TriggerFixturePackage(bool onlySourceA = false, bool eventQuota = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("program-trigger-fixture", new Version(1, 0, 0),
             [new PackageDependency("standard", new Version(1, 11, 0))]);
 
         public void Register(IContentRegistryBuilder builder)
         {
-            var catalog = SkillProgramCatalog.Load(Rules, Presentation);
+            var rules = JsonNode.Parse(Rules)!;
+            var presentation = JsonNode.Parse(Presentation)!;
+            if (eventQuota)
+            {
+                var conversion = rules["skills"]![0]!["viewAs"]![0]!;
+                conversion["outputKind"] = "ironChain"; conversion["singleCardTrickUse"] = true;
+                var trigger = rules["skills"]![2]!["triggers"]![0]!;
+                trigger["usageScope"] = "event"; trigger["usageLimit"] = 1;
+                trigger["effects"] = JsonNode.Parse("""[{"op":"chooseOption","target":"owner","resultBind":"accepted","options":[{"id":"continue"}]},{"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true}]""");
+                presentation["skills"]!["trigger-test:draw"]!["optionLabels"] = new JsonObject { ["continue"] = "Continue" };
+                builder.AddModeFeatureFactory(new EventQuotaSetupFactory());
+            }
+            var catalog = SkillProgramCatalog.Load(rules.ToJsonString(), presentation.ToJsonString());
             foreach (var program in catalog.Programs.Values)
             {
                 var text = catalog.Presentations[program.Id];
@@ -236,6 +305,31 @@ internal static class SkillProgramCardTriggerChecks
                     [nameof(Role.Rebel)] = 2, [nameof(Role.Renegade)] = 1
                 }, DeckId: "trigger-test:slash-deck", GeneralCandidateCount: 1, GeneralPoolIds: generalIds));
         }
+    }
+
+    private sealed class EventQuotaSetupFactory : IGameModeSetupFeatureFactory
+    {
+        public string Id => "fixture:event-quota-setup";
+        public string ModeId => "identity:program-trigger-5";
+        public IGameModeFeature Create(ModeFeatureCreationContext context) =>
+            new EventQuotaSetup((IMatchModeSetupFeature)new StandardModeSetupFactory().Create(context));
+    }
+    private sealed class EventQuotaSetup(IMatchModeSetupFeature inner) : IMatchModeSetupFeature
+    {
+        public ModeSetupPlan BuildPlayers()
+        {
+            var plan = inner.BuildPlayers();
+            return new(plan.Seats.Select(seat => seat.Seat != 0 ? seat : seat with { SkillGrants = seat.SkillGrants.Concat([
+                new ModeSetupSkillGrant("fixture:event-source", "trigger-test:draw", "fixture:event-instance", "acquired:event-fixture")]).ToArray() }),
+                plan.AvailableGeneralIds, plan.SelectionOrder, plan.ShenwuSharedGodIds, plan.ShenwuLeaderGeneralId, plan.GuanduConfiguration, plan.InitialActorSeat);
+        }
+        public ModeGeneralOfferPlan GetGeneralOffers(ModeGeneralOfferRequest request) => inner.GetGeneralOffers(request);
+        public IReadOnlyList<string> RemoveGeneralIdsAfterSelection(string generalId) => inner.RemoveGeneralIdsAfterSelection(generalId);
+        public IReadOnlyList<Card> PrepareDeck(IReadOnlyList<Card> original) => inner.PrepareDeck(original);
+        public IReadOnlyList<Card> ProjectDeckCardNames(IReadOnlyList<Card> original) => inner.ProjectDeckCardNames(original);
+        public IReadOnlyList<Type> InitialEquipmentCompletionFacts => inner.InitialEquipmentCompletionFacts;
+        public ModeSelectedEquipmentPlan? PrepareSelectedEquipment(IReadOnlyList<Card> drawPile, IReadOnlyList<ModeSeatSetupFacts> seats) => inner.PrepareSelectedEquipment(drawPile, seats);
+        public ModeSelectedGeneralPlan PrepareSelectedGeneral(ModeSeatSetupFacts seat, string generalId) => inner.PrepareSelectedGeneral(seat, generalId);
     }
 
     private const string Rules = """

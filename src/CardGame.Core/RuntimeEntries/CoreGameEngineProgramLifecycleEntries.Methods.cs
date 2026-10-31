@@ -29,7 +29,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleEntries
     internal void CompletePlayPhaseAfterProgramWindow() => _resolve().CompletePlayPhaseAfterProgramWindow();
     internal void CompleteProgramDrawCards(long frameId, int targetSeat, string? resultBind, SkillProgramCardSetVisibility visibility, CardMoveReason reason, long fixedRecipientSequenceBefore, IReadOnlyList<int> drawn) => _resolve().CompleteProgramDrawCards(frameId, targetSeat, resultBind, visibility, reason, fixedRecipientSequenceBefore, drawn);
     internal void CompleteSkippedProgramCandidate(ProgramTriggerCandidate candidate) => _resolve().CompleteSkippedProgramCandidate(candidate);
-    internal void ConsumeProgramTriggerUsage(ProgramTriggerCandidate candidate) => _resolve().ConsumeProgramTriggerUsage(candidate);
+    internal void ConsumeProgramTriggerUsage(ProgramTriggerCandidate candidate, ProgramSkillWindowContext? context = null) => _resolve().ConsumeProgramTriggerUsage(candidate, context);
     internal ProgramSkillWindowContext CreateAfterDamageProgramContext(DamageTriggerWindowFrame damage, ProgramTriggerCandidate candidate) => _resolve().CreateAfterDamageProgramContext(damage, candidate);
     internal ProgramSkillWindowContext CreateDyingProgramContext(DyingFrame dying, ProgramTriggerCandidate candidate) => _resolve().CreateDyingProgramContext(dying, candidate);
     internal ProgramAiPublicContext CreateProgramAiPublicContext(CharacterState owner) => _resolve().CreateProgramAiPublicContext(owner);

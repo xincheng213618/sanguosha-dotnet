@@ -33,6 +33,8 @@ public interface IMatchModeSetupFeature : IGameModeFeature
 public sealed record ModeSetupSkillGrant(string GrantId, string SkillId, string SkillInstanceId,
     string SourceId, bool IsModeRule = false);
 
+public sealed record ModePrintedLordQualification(string SkillId, string DeclarationId);
+
 /// <summary>No live character or mutable skill set is exposed by a seat recipe.</summary>
 public sealed record ModeSeatSetup(int Seat, string Name, bool IsHuman, Role Role,
     string? GeneralId, int MaxHp, int Hp)
@@ -56,6 +58,9 @@ public sealed record ModeSeatSetup(int Seat, string Name, bool IsHuman, Role Rol
     private readonly IReadOnlyList<ModeSetupSkillGrant> _skillGrants = Array.Empty<ModeSetupSkillGrant>();
     public IReadOnlyList<ModeSetupSkillGrant> SkillGrants
     { get => _skillGrants; init => _skillGrants = Array.AsReadOnly(value.ToArray()); }
+    private readonly IReadOnlyList<ModePrintedLordQualification> _printedLordQualifications = [];
+    public IReadOnlyList<ModePrintedLordQualification> PrintedLordQualifications
+    { get => _printedLordQualifications; init => _printedLordQualifications = Array.AsReadOnly(value.ToArray()); }
     private readonly IReadOnlyList<string>? _draftCandidates;
     public IReadOnlyList<string>? GeneralDraftCandidateIds
     { get => _draftCandidates; init => _draftCandidates = value is null ? null : Array.AsReadOnly(value.ToArray()); }
@@ -135,15 +140,18 @@ public sealed class ModeGeneralOfferPlan
 
 public sealed class ModeSelectedGeneralPlan
 {
-    public ModeSelectedGeneralPlan(IEnumerable<string> extraSkillIds, int? maximumHp = null, int? hp = null)
+    public ModeSelectedGeneralPlan(IEnumerable<string> extraSkillIds, int? maximumHp = null, int? hp = null,
+        IEnumerable<ModePrintedLordQualification>? printedLordQualifications = null)
     {
         ExtraSkillIds = Array.AsReadOnly(extraSkillIds.ToArray());
         MaximumHp = maximumHp;
         Hp = hp;
+        PrintedLordQualifications = Array.AsReadOnly((printedLordQualifications ?? []).ToArray());
     }
     public IReadOnlyList<string> ExtraSkillIds { get; }
     public int? MaximumHp { get; }
     public int? Hp { get; }
+    public IReadOnlyList<ModePrintedLordQualification> PrintedLordQualifications { get; }
 }
 
 public sealed record ModeInitialEquipmentPlacement(int Seat, int CardId);

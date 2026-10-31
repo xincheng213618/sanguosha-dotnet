@@ -17,14 +17,14 @@ internal sealed partial class CoreGameEngineNationalSkillsRuntime
         }
     }
 
-    internal bool CanOwnPrintedSkill(CharacterState player, GeneralDefinition general, GeneralSkillDefinition skill) => !skill.Tags.HasFlag(SkillTag.Lord) || player.Role == Role.Lord || player.SkillGrants.Grants.Any(g => g.SkillId == skill.ContentId && g.SourceId == (general.Id == player.General.Id ? CharacterState.PrimarySkillSource : CharacterState.SecondarySkillSource) && _corePrintedLordSkillQualificationsOperations.IsPrintedLordGrantQualified(player, g));
+    internal bool CanOwnPrintedSkill(CharacterState player, GeneralDefinition general, GeneralSkillDefinition skill) => !skill.Tags.HasFlag(SkillTag.Lord) || player.Role == Role.Lord || player.SkillGrants.Grants.Any(g => g.SkillId == skill.ContentId && g.SourceId == (general.Id == player.General.Id ? CharacterState.PrimarySkillSource : CharacterState.SecondarySkillSource) && PrintedLordSkillQualifications.Matches(player, g));
     internal IEnumerable<GeneralSkillDefinition> OwnedPrintedSkills(CharacterState player, GeneralDefinition general) => general.Skills.Where(skill => CanOwnPrintedSkill(player, general, skill) && IsEnabledTemplateSkill(player, general, skill.ContentId));
     internal bool IsEnabledTemplateSkill(CharacterState player, GeneralDefinition general, string? skillId)
     {
         if (skillId is null)
             return false;
         var source = general.Id == player.General.Id ? CharacterState.PrimarySkillSource : CharacterState.SecondarySkillSource;
-        return player.SkillGrants.Grants.Any(grant => grant.SourceId == source && grant.SkillId == skillId && _coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(player, grant));
+        return player.SkillGrants.Grants.Any(grant => grant.SourceId == source && grant.SkillId == skillId && IsSkillGrantStateEffective(player, grant));
     }
 
     internal GeneralSkillDefinition ToRuntimeSkillDefinition(string skillId)

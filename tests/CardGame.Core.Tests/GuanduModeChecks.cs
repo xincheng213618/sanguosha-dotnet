@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Reflection;
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
@@ -35,6 +36,7 @@ internal static class GuanduModeChecks
                 (player.Seat == config.CaoCommanderSeat || player.Seat == config.YuanCommanderSeat ? 1 : 0)) &&
             Enumerable.Range(0, 8).All(seat => g.CardMovements.Count(m => m.To == CardLocation.Hand(seat) && m.Reason == CardMoveReasons.InitialDeal) == 5),
             "The real default tier-five setup grants two maximum HP and one opening card, with a separate commander HP bonus and original fixed commander versions.");
+        CommanderPrintedLordQualificationsUseTheActualGrant(g, config);
         var generated = E<GuanduChariotCreatedEvent>(g).Select(e => e.CardId).ToHashSet();
         var deck = g.CreateCardZoneDiagnostics().Where(c => !generated.Contains(c.CardId)).ToArray();
         var sourceDeck = r.Decks[mode.DeckId].PhysicalCards!;
@@ -97,6 +99,26 @@ internal static class GuanduModeChecks
     }
 
     private static PendingDecision? Prompt(GameEngine g) => Enumerable.Range(0, 8).Select(seat => g.CreateSnapshot(seat).PendingDecision).FirstOrDefault(p => p is not null);
+    private static void CommanderPrintedLordQualificationsUseTheActualGrant(GameEngine g, GuanduBattleConfiguredEvent config)
+    {
+        var players = (IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine
+            .GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(g)!;
+        foreach (var seat in new[] { config.CaoCommanderSeat, config.YuanCommanderSeat })
+        {
+            var player = players[seat];
+            var skill = player.General.Skills.Single(value => value.Tags.HasFlag(SkillTag.Lord));
+            var grant = player.SkillGrants.Grants.Single(value => value.SourceId == CharacterState.PrimarySkillSource && value.SkillId == skill.ContentId);
+            Need(player.Role is Role.TeamA or Role.TeamB && grant.IsEnabled &&
+                grant.PrintedLordQualification?.Source is PrintedLordQualificationSource.SetupDeclared &&
+                PrintedLordSkillQualifications.Matches(player, grant) &&
+                g.NationalSkillsEntries.CanOwnPrintedSkill(player, player.General, skill) &&
+                g.CreateSnapshot(seat).Players[seat].Skills!.Any(value => value.ContentId == grant.SkillId) &&
+                g.NationalSkillsEntries.HasOwnedRuntimeSkill(player, grant.SkillId) &&
+                g.NationalSkillsEntries.HasRuntimeSkill(player, grant.SkillId) &&
+                g.NationalSkillsEntries.HasRuntimeSkillInstance(player, grant.SkillId, grant.SkillInstanceId),
+                "Both real commanders retain their team identities while the setup-issued exact grant has one printed-lord answer for UI, possession and effectiveness.");
+        }
+    }
     private static void Drive(GameEngine g, Func<bool> done)
     {
         for (var i = 0; i < 240; i++)

@@ -2,6 +2,7 @@
   "schemaVersion": 3,
   "skills": {
     "le:shuangjia": {
+      "cardMarks": { "shuangjia": "胡笳" },
       "name": "霜笳",
       "description": "锁定技，游戏开始时，你的初始手牌增加“胡笳”标记且不计入手牌上限。你每拥有一张“胡笳”，其他角色与你计算距离+1（最多+5）。"
     },

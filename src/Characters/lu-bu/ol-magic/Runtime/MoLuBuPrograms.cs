@@ -2,13 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
-public sealed record MoLuBuInitialQi(int OriginalOwnerSeat, int CardId, CardKind PrintedKind, long EntrySequence);
-public sealed partial record ProgramLifecycleTriggerWindowFrame
-{
-    private readonly IReadOnlyList<MoLuBuInitialQi>? _moInitial;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IReadOnlyList<MoLuBuInitialQi>? MoLuBuInitialQi { get => _moInitial; init => _moInitial = value is null ? null : Array.AsReadOnly(value.ToArray()); }
-}
 public sealed record MoLuBuOpeningReceipt(long IssuerFrameId, CardConversionSource Source, string GameplayHash,
     int NormalSeat, int ActualTurn, bool PlayStarted = false);
 public sealed partial record ActualTurnProgression
@@ -28,7 +21,6 @@ public sealed partial record ProgramSkillFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public MoLuBuReceipt? MoLuBu { get; init; }
 }
-public sealed record MoLuBuQiMarkedEvent(long FrameId, int OriginalOwnerSeat, int CardId, CardKind PrintedKind, long EntrySequence) : IGameEvent;
 public sealed record MoLuBuInitializedEvent(long FrameId, CardConversionSource Source, string GameplayHash, long WindowId) : IGameEvent;
 public sealed record MoLuBuOpeningStartedEvent(long IssuerFrameId, CardConversionSource Source, int ActualTurn, int NormalSeat) : IGameEvent;
 public sealed record MoLuBuOpeningCompletedEvent(long IssuerFrameId, int OwnerSeat, int ActualTurn, int NormalSeat) : IGameEvent;

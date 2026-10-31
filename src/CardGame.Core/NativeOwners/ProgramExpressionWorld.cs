@@ -1,8 +1,10 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineProgramExpressionsEntries> getCoreGameEngineProgramExpressionsRuntime, Func<CardZoneStore> getCardZoneStore, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineHealthQueriesEntries> getCoreGameEngineHealthQueriesRuntime, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<RuntimeEntries.CoreNativeRuleQueriesEntries> getCoreNativeRuleQueriesRuntime, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, ProgramSkillFrame frame) : IProgramExpressionWorld
+internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineProgramExpressionsEntries> getCoreGameEngineProgramExpressionsRuntime, Func<CardZoneStore> getCardZoneStore, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineHealthQueriesEntries> getCoreGameEngineHealthQueriesRuntime, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<RuntimeEntries.CoreNativeRuleQueriesEntries> getCoreNativeRuleQueriesRuntime, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, ProgramSkillFrame frame, ICardEntityMarkQueries? cardMarks = null) : IProgramExpressionWorld
 {
     public int? Number(string name) => getCoreGameEngineProgramExpressionsRuntime().ReadProgramExpressionNumber(frame, name);
+    public int? CardMarkCount(int seat, string mark, CardZoneKind zone) =>
+        getCoreTableSeatQueriesRuntime().IsValidPlayerSeat(seat) ? cardMarks?.CountMarked(seat, mark, zone) : null;
     public int? BindingStat(string stat, string name)
     {
         if (stat == "choiceNumber") return frame.ChoiceBindings.SingleOrDefault(binding => binding.Name == name)?.Number;

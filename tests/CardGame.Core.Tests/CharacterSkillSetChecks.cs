@@ -124,6 +124,7 @@ internal static class CharacterSkillSetChecks
         Require(index.GetShard(owner).HasInstance("fixture:plain", "printed-instance"), "An explicitly empty skill selection must not become an all-skills restriction.");
         owner.SkillGrants.RemoveRestriction("empty");
         RawSourceAdmissionPreservesSelectionVisibilityAndQualificationStages();
+        PrintedLordQualificationsUseExactGrantsForSetupAndPrograms();
     }
 
     private static void RawSourceAdmissionPreservesSelectionVisibilityAndQualificationStages()
@@ -134,7 +135,7 @@ internal static class CharacterSkillSetChecks
         var owner = Character(new GeneralDefinition("fixture:raw-owner", "Owner", "", []));
         var primary = new SkillGrant("primary", plain, "primary-instance", CharacterState.PrimarySkillSource);
         owner.SkillGrants.Grant(primary);
-        var hidden = new SkillAvailability(id => definitions[id], true, false, null, null);
+        var hidden = new SkillAvailability(id => definitions[id], true, false, null);
         foreach (var selected in new[] { false, true })
         foreach (var revealed in new[] { false, true })
         {
@@ -149,7 +150,7 @@ internal static class CharacterSkillSetChecks
         var secondary = primary with { GrantId = "secondary", SkillInstanceId = "secondary-instance", SourceId = CharacterState.SecondarySkillSource };
         foreach (var (nationalWar, dualGenerals) in new[] { (false, false), (true, false), (false, true) })
         {
-            var availability = new SkillAvailability(id => definitions[id], nationalWar, dualGenerals, null, null);
+            var availability = new SkillAvailability(id => definitions[id], nationalWar, dualGenerals, null);
             foreach (var selected in new[] { false, true })
             foreach (var revealed in new[] { false, true })
             {
@@ -158,22 +159,56 @@ internal static class CharacterSkillSetChecks
                     "Secondary origins use the same selection/reveal rule and require a mode with a second general.");
             }
         }
-        var ordinary = new SkillAvailability(id => definitions[id], false, false, null, null);
+        var ordinary = new SkillAvailability(id => definitions[id], false, false, null);
         owner.GeneralSelected = false; owner.GeneralRevealed = false;
         Require(ordinary.IsRawSourceAdmitted(owner, primary) && !ordinary.IsRawSourceAdmitted(owner, primary with { IsEnabled = false }),
             "Ordinary primary origins retain their established pre-reveal admission, while disabled grants never qualify.");
         owner.IsAlive = false;
         var independent = primary with { SourceId = "equipment:raw-source" };
         var raw = new SkillAvailability(_ => throw new InvalidOperationException("Raw admission resolved a definition."), true, false,
-            (_, _) => throw new InvalidOperationException("Raw admission entered derived qualification."),
-            (_, _) => throw new InvalidOperationException("Raw admission entered printed-lord qualification."));
+            (_, _) => throw new InvalidOperationException("Raw admission entered derived qualification."));
         Require(raw.IsRawSourceAdmitted(owner, independent) && raw.IsRawSourceAdmitted(owner, independent with { SourceId = "acquired:raw-source" }),
-            "Raw origin admission reads no final availability, derived relation or printed-lord callback; source-owner survival remains a caller rule.");
+            "Raw origin admission reads no final availability or derived relation; source-owner survival remains a caller rule.");
         owner.IsAlive = true;
         var printedLord = primary with { GrantId = "lord", SkillId = lord, SkillInstanceId = "lord-instance" };
         owner.SkillGrants.Grant(printedLord);
         Require(ordinary.IsRawSourceAdmitted(owner, printedLord) && !ordinary.Query(owner).HasOwnedInstance(lord, printedLord.SkillInstanceId),
             "Raw admission does not replace the existing printed-lord ownership decision or grant its rights to a non-lord.");
+    }
+
+    private static void PrintedLordQualificationsUseExactGrantsForSetupAndPrograms()
+    {
+        const string lord = "fixture:qualified-lord";
+        var template = new GeneralDefinition("fixture:qualified-owner", "Owner", "",
+            [new("Printed Lord", "") { ContentId = lord, Tags = SkillTag.Lord }]);
+        var owner = Character(template);
+        var grant = owner.SkillGrants.Grants.Single();
+        var index = new MatchSkillBindingIndex(_ => new(lord, "Printed Lord", "") { Tags = SkillTag.Lord }, false);
+        var before = index.GetShard(owner);
+        Require(!before.HasOwnedSkill(lord), "An ordinary non-Lord printed grant starts unqualified.");
+        var qualified = new PrintedLordSkillQualification(owner.Seat, template.Id, grant.SourceId, grant.GrantId,
+            grant.SkillId, grant.SkillInstanceId, new PrintedLordQualificationSource.SetupDeclared("fixture:setup"));
+        owner.SkillGrants.SetPrintedLordQualification(grant.GrantId, qualified);
+        Require(index.GetShard(owner).HasOwnedInstance(lord, grant.SkillInstanceId) &&
+            index.GetShard(owner).HasInstance(lord, grant.SkillInstanceId) && owner.Role == Role.Rebel && !before.HasOwnedSkill(lord),
+            "A setup declaration qualifies its actual printed grant, refreshes cached possession/effectiveness and preserves the real identity role.");
+        var program = qualified with { Source = new PrintedLordQualificationSource.ProgramIssued(17,
+            new("fixture:issuer", "paid", 1, "issuer-instance"), "gameplay-hash") };
+        owner.SkillGrants.SetPrintedLordQualification(grant.GrantId,
+            JsonSerializer.Deserialize<PrintedLordSkillQualification>(JsonSerializer.Serialize(program))!);
+        var issued = owner.SkillGrants.Grants.Single();
+        Require(PrintedLordSkillQualifications.Matches(owner, issued) && index.GetShard(owner).HasInstance(lord, grant.SkillInstanceId),
+            "An original-frame program qualification uses the same grant identity and retains its typed source through serialization.");
+        foreach (var wrong in new[] { issued with { GrantId = "another-grant" }, issued with { SkillInstanceId = "another-instance" },
+            issued with { SourceId = "acquired:another-source" }, issued with { PrintedLordQualification = qualified with { BeneficiarySeat = 1 } },
+            issued with { PrintedLordQualification = qualified with { GeneralId = "fixture:another-general" } } })
+            Require(!PrintedLordSkillQualifications.Matches(owner, wrong), "Setup and program provenance cannot authorize another beneficiary, template, grant or instance.");
+        Require(!PrintedLordSkillQualifications.Matches(owner, issued with { PrintedLordQualification = program with
+            { Source = new PrintedLordQualificationSource.ProgramIssued(0, new("fixture:issuer", "paid", 1, "issuer-instance"), "gameplay-hash") } }),
+            "Program-issued qualification still requires its real positive originating frame id.");
+        owner.General = template with { Id = "fixture:replacement-owner" };
+        Require(owner.SkillGrants.Grants.Single().PrintedLordQualification is null && !index.GetShard(owner).HasOwnedSkill(lord),
+            "Replacing the primary general clears stale qualification even when the replacement prints the same skill and keeps its grant id.");
     }
 
     private static SkillStateRestriction Restriction(string id, SkillStateAction action, SkillStateMatch match, int seat) =>

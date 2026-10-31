@@ -29,7 +29,7 @@ internal sealed partial class CoreGameEngineHpConditionalSkillGrantsRuntime
 
     internal bool HpConditionalSourceQualified(CharacterState owner, SkillGrant source)
     {
-        if (!_corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, source) || !_coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(owner, source) || !_coreLordSkillProjectionsOperations.IsProjectedGrantQualified(owner, source) || !_corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, source))
+        if (!_corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, source) || !_coreNationalSkillsOperations.IsSkillGrantStateEffective(owner, source) || !_coreLordSkillProjectionsOperations.IsProjectedGrantQualified(owner, source) || !_corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, source))
             return false;
         return true;
     }

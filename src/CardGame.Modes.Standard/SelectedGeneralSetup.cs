@@ -8,6 +8,7 @@ internal sealed partial class StandardModeSetupFeature
     {
         var general = _registry.Generals[generalId];
         var extras = new List<string>();
+        IReadOnlyList<ModePrintedLordQualification> printedLordQualifications = [];
         int? maximum = null, hp = null;
         if (_mode.TeamActivity is { } teamActivity)
         {
@@ -55,6 +56,7 @@ internal sealed partial class StandardModeSetupFeature
             var bonus = (guandu.PlayerTier >= 2 ? 1 : 0) + (guandu.PlayerTier >= 5 ? 1 : 0) + (seat.IsGuanduCommander ? 1 : 0);
             maximum = general.BaseHp + bonus;
             hp = (general.InitialHp ?? general.BaseHp) + bonus;
+            if (seat.IsGuanduCommander) printedLordQualifications = DeclarePrintedLordSkills(general);
         }
         if (_mode.DragonBoatActivity is { } dragon)
         {
@@ -62,6 +64,10 @@ internal sealed partial class StandardModeSetupFeature
             maximum = general.BaseHp + bonus;
             hp = (general.InitialHp ?? general.BaseHp) + bonus;
         }
-        return new(extras, maximum, hp);
+        return new(extras, maximum, hp, printedLordQualifications);
     }
+
+    private IReadOnlyList<ModePrintedLordQualification> DeclarePrintedLordSkills(ContentGeneralDefinition general) =>
+        general.SkillIds.Where(id => _registry.Skills[id].Tags.HasFlag(SkillTag.Lord))
+            .Select(id => new ModePrintedLordQualification(id, _mode.Id)).ToArray();
 }

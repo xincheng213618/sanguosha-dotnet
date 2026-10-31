@@ -188,7 +188,4 @@ public sealed partial class GameEngine
     private ref bool _hasIssuedZhugeGuoState => ref _characterZhugeGuoOl.ReferenceToHasIssuedZhugeGuoState;
     private ref readonly Dictionary<int, int> _mouZhitianCounts => ref _characterZhugeLiangMou.ReferenceToMouZhitianCounts;
     private ref readonly HashSet<int> _mouWujingAllowances => ref _characterZhugeLiangMou.ReferenceToMouWujingAllowances;
-    private ref YunzhengQualificationSeat[] _yunzhengQualificationSeats => ref _characterZouShiLe.ReferenceToYunzhengQualificationSeats;
-    private ref (long Inner, long Movement, int Initial, int Shown) _yunzhengQualificationInputs => ref _characterZouShiLe.ReferenceToYunzhengQualificationInputs;
-    private ref long _yunzhengQualificationStamp => ref _characterZouShiLe.ReferenceToYunzhengQualificationStamp;
 }

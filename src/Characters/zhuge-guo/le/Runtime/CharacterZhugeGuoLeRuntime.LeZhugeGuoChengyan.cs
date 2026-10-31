@@ -25,11 +25,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LeChengyan = r with { Stage = second ? LeChengyanStage.SecondDrawChildren : LeChengyanStage.RevealChildren, Draw = d, Before = d.SequenceBefore, After = d.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LeChengyanDrawReturnedEvent(f.Id, second, d.ActualDrawIds.Count, d.ReplacementGainedIds.Count, d.AttemptFrameId));
         if (second)
-            foreach (var id in d.ActualDrawIds)
-            {
-                var m = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter && m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat));
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LeXidiEntityMarkedEvent(f.Id, LeZhugeGuoSource(f), id, m.Sequence, false));
-            }
+            _cardEntityMarkOperations.Mark(f.Id, "xidi", d.ActualDrawIds);
 
         ContinueLeChengyan(f.Id);
     }

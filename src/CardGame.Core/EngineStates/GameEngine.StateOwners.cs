@@ -37,7 +37,6 @@ public sealed partial class GameEngine
     private readonly EngineStates.CharacterZhangXunAnniversaryState _characterZhangXunAnniversary = new();
     private readonly EngineStates.CharacterZhugeGuoOlState _characterZhugeGuoOl = new();
     private readonly EngineStates.CharacterZhugeLiangMouState _characterZhugeLiangMou = new();
-    private readonly EngineStates.CharacterZouShiLeState _characterZouShiLe = new();
     private readonly EngineStates.CoreDirectedTurnCardPoliciesState _directedTurnCardPolicies2 = new();
     private readonly EngineStates.CoreEndingHandCountProgramsState _endingHandCountPrograms = new();
     private readonly EngineStates.CoreGameEngineActionQueriesState _actionQueries = new();
@@ -192,7 +191,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICharacterZhangXunAnniversaryHasIssuedAnniversaryZhangXunAccess), _characterZhangXunAnniversary),
         new(typeof(EngineStates.Contracts.ICharacterZhugeGuoOlHasIssuedZhugeGuoStateAccess), _characterZhugeGuoOl),
         new(typeof(EngineStates.Contracts.ICharacterZhugeLiangMouMouWujingAllowancesMouZhitianCountsAccess), _characterZhugeLiangMou),
-        new(typeof(EngineStates.Contracts.ICharacterZouShiLeYunzhengQualificationInputsYunzhengQualificationSeatsYunzhengQualificationStampAccess), _characterZouShiLe),
         new(typeof(EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess), _directedTurnCardPolicies2),
         new(typeof(EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesDirectedTurnCardPolicySequenceAccess), _directedTurnCardPolicies2),
         new(typeof(EngineStates.Contracts.ICoreEndingHandCountProgramsEndingHandCountHistoriesAccess), _endingHandCountPrograms),

@@ -87,6 +87,7 @@ internal static class SkillStateMatcher
         public int? Stat(string stat, int seat) => bindings?.Stat(stat, seat);
         public bool? Flag(string flag, int seat) => bindings?.Flag(flag, seat);
         public int? BindingStat(string stat, string name) => bindings?.BindingStat(stat, name);
+        public int? CardMarkCount(int seat, string mark, CardZoneKind zone) => bindings?.CardMarkCount(seat, mark, zone);
         public int? Number(string name) => name switch
         {
             "skill.locked" => skill.Tags.HasFlag(SkillTag.Locked) ? 1 : 0,

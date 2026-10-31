@@ -124,5 +124,4 @@ internal sealed record YanjiaoCandidate(int Id, int Rank, CardLocation Location,
 internal sealed record ShiZrFuanRecordInfo(Suit Suit, bool ViaRelaunch);
 
     internal sealed record ZhangXunDueLease(ZhangXunSuizhengLeaseEvent Lease, int Ordinal, int StartIndex, int DueTurn);
-    internal readonly record struct YunzhengQualificationSeat(long Revision, int Hp, bool Alive, bool Concealed, bool PrimarySelected, bool PrimaryRevealed, bool SecondarySelected, bool SecondaryRevealed, Role Role);
 }

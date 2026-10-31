@@ -12,7 +12,7 @@
           "optional": false,
           "effects": [
             {
-              "op": "initializeShuangjiaInitialEntities",
+              "op": "markInitialHand", "mark": "shuangjia",
               "target": "owner"
             }
           ]

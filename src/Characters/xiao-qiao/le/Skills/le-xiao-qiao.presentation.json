@@ -2,6 +2,7 @@
   "schemaVersion": 3,
   "skills": {
     "le:qiqin": {
+      "cardMarks": { "qiqin": "琴" },
       "name": "绮琴",
       "description": "锁定技，游戏开始时，你的初始手牌增加“琴”标记且不计入手牌上限。准备阶段，你获得弃牌堆中所有“琴”。"
     },

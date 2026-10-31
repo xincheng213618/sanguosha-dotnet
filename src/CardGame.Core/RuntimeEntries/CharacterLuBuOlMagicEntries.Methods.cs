@@ -12,7 +12,6 @@ internal sealed partial class CharacterLuBuOlMagicEntries
     internal bool CanEnterMoKuangmo(ProgramActivationLegalityContext g) => _resolve().CanEnterMoKuangmo(g);
     internal bool CanOfferMoDuoqi(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext c) => _resolve().CanOfferMoDuoqi(candidate, trigger, c);
     internal bool CanUseMoGangquan(CharacterState owner, IndexedSkillProgramInstance instance, SkillProgramViewAs rule, bool forResponse, bool dyingUse) => _resolve().CanUseMoGangquan(owner, instance, rule, forResponse, dyingUse);
-    internal ProgramLifecycleTriggerWindowFrame CaptureMoLuBuInitialQi(ProgramLifecycleTriggerWindowFrame f) => _resolve().CaptureMoLuBuInitialQi(f);
     internal void CaptureMoLuBuLegacyDuel(ProgramSkillFrame frame, int actor) => _resolve().CaptureMoLuBuLegacyDuel(frame, actor);
     internal void CaptureMoLuBuLegacyDuelPipeline(ProgramSkillFrame frame, int sourceSeat, int targetSeat) => _resolve().CaptureMoLuBuLegacyDuelPipeline(frame, sourceSeat, targetSeat);
     internal PromptChoice ChooseMoLuBuAi(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseMoLuBuAi(p, f);
@@ -59,7 +58,6 @@ internal sealed partial class CharacterLuBuOlMagicEntries
     internal bool MoLuBuRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().MoLuBuRecoveryParent(f, recovery);
     internal void MoveMoLuBuQi(ProgramSkillFrame f, MoLuBuQiCandidate item) => _resolve().MoveMoLuBuQi(f, item);
     internal void ObserveMoLuBuUse(IGameEvent fact) => _resolve().ObserveMoLuBuUse(fact);
-    internal void ProjectMoLuBuQiCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectMoLuBuQiCardSkillMark(cardId, ref projection);
     internal void PublishMoLuBu(ProgramSkillFrame f) => _resolve().PublishMoLuBu(f);
     internal bool ResumeMoLuBu(long id) => _resolve().ResumeMoLuBu(id);
     internal bool ReturnMoLuBuMovement(ProgramSkillFrame f) => _resolve().ReturnMoLuBuMovement(f);

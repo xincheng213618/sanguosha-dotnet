@@ -187,7 +187,7 @@ internal static class LeDaQiaoZixiChecks
         public PlayerSnapshot V(int seat = 0) => G.CreateSnapshot(seat).Players[seat];
         public IReadOnlyList<CardSnapshot> Hand() => V().Hand;
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
-        public int[] Marks() => E<QiqinInitialEntityMarkedEvent>().Where(e => e.OriginalOwnerSeat == 0).Select(e => e.CardId).ToArray();
+        public int[] Marks() => E<CardEntityMarkedEvent>().Where(e => e.Mark == "qiqin" && e.InitialOwnerSeat == 0).Select(e => e.CardId).ToArray();
         public ProgramSkillFrame Frame(long id) => G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == id);
         public LegalAction[] Actions() => G.GetHumanLegalActions().Where(a => a.CardId is not null && a.ConversionSource is null && a.ProgramSkillId is null).ToArray();
         public bool Optional(string binding) => P?.SkillPrompt?.SkillId == ZdSkill && P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate" && c.Parameters.GetValueOrDefault("binding-id") == binding);

@@ -11,10 +11,32 @@ internal sealed partial class CoreGameEngineParticipantAndReserveProgramsRuntime
         var candidates = _coreMatchParticipantsPlayersAccess._players.SelectMany(player => _coreProgramLifecycleOperations.CollectEligibleProgramTriggerCandidates(player, SkillProgramTriggerWindow.GameStarting, facts[player.Seat])).OrderBy(candidate => candidate.OwnerSeat).ThenByDescending(candidate => candidate.Priority).ToArray();
         if (candidates.Length == 0)
             return false;
-        _coreRuntimeOperations.PushRuntimeFrame(_characterLuBuOlMagicOperations.CaptureMoLuBuInitialQi(_characterZhugeGuoLeOperations.CaptureLeXidiOpening(_characterCaoZhiLeOperations.FreezeFuleInitialEntities(_characterCaiYongLeOperations.CaptureJiaoweiInitialEntities(_characterDiaoChanLeOperations.CaptureTanbanInitialEntities(_characterZouShiLeOperations.CaptureYunzhengInitialEntities(_characterZhouYuLeOperations.CaptureGuYinInitialEntities(_characterXiaoQiaoLeOperations.CaptureQiqinInitialEntities(_characterCaiWenJiLeOperations.CaptureShuangjiaInitialEntities(_characterZhouFeiLeOperations.CaptureLingkongInitialEntities(_characterMiHengLeOperations.CaptureJiguInitialEntities(new ProgramLifecycleTriggerWindowFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, _coreActualTurnProgressCurrentSeatStartedAccess._currentSeat, SkillProgramTriggerWindow.GameStarting, candidates, ProgramLifecycleContinuation.CompleteGameStarting, facts[_coreActualTurnProgressCurrentSeatStartedAccess._currentSeat]) { ParticipantFacts = facts, FrozenFactionPopulation = _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GrantFactionPopulationMarker) ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, int>(_coreMatchParticipantsPlayersAccess._players.GroupBy(player => _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(player) ?? "").ToDictionary(group => group.Key, group => group.Count(), StringComparer.Ordinal)) : null }))))))))))));
+        var window = new ProgramLifecycleTriggerWindowFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence,
+            _coreActualTurnProgressCurrentSeatStartedAccess._currentSeat, SkillProgramTriggerWindow.GameStarting, candidates,
+            ProgramLifecycleContinuation.CompleteGameStarting, facts[_coreActualTurnProgressCurrentSeatStartedAccess._currentSeat])
+        {
+            ParticipantFacts = facts,
+            OpeningHandEntities = CaptureOpeningHandEntities(),
+            FrozenFactionPopulation = _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.GrantFactionPopulationMarker)
+                ? new System.Collections.ObjectModel.ReadOnlyDictionary<string, int>(_coreMatchParticipantsPlayersAccess._players
+                    .GroupBy(player => _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(player) ?? "")
+                    .ToDictionary(group => group.Key, group => group.Count(), StringComparer.Ordinal)) : null
+        };
+        _coreRuntimeOperations.PushRuntimeFrame(_characterCaoZhiLeOperations.FreezeFuleInitialEntities(
+            _characterCaiYongLeOperations.CaptureJiaoweiInitialEntities(_characterDiaoChanLeOperations.CaptureTanbanInitialEntities(
+                _characterZhouYuLeOperations.CaptureGuYinInitialEntities(window)))));
         _coreRuntimeOperations.AdvanceRuntimeTop<ProgramLifecycleTriggerWindowFrame>();
         return true;
     }
+
+    private IReadOnlyList<OpeningHandEntity> CaptureOpeningHandEntities() =>
+        _coreMatchParticipantsPlayersAccess._players.SelectMany(player => _corePhysicalOwnedCardQueriesOperations.GetHand(player).Select(card =>
+        {
+            var entry = _openingMovements.Last(move => move.CardId == card.Id && move.To == CardLocation.Hand(player.Seat));
+            if (entry is null || entry.CardKind != card.Kind)
+                throw new InvalidOperationException("An opening Hand entity requires its genuine original entry.");
+            return new OpeningHandEntity(player.Seat, card.Id, card.Kind, entry.Sequence);
+        })).ToArray();
 
     // Dying entry and exit are mandatory immediate boundaries. Definitions are
     // restricted to automatic draws so the rescue cursor never exposes stale hands.

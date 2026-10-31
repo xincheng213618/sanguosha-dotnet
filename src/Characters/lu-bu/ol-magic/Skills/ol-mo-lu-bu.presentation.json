@@ -2,6 +2,7 @@
   "schemaVersion": 3,
   "skills": {
     "ol:mo-duoqi": {
+      "cardMarks": { "qi": "炁" },
       "name": "夺炁",
       "description": "锁定技，一号位首个回合开始前，你执行一个不能使用延时锦囊牌的额外出牌阶段。所有角色的初始手牌称为“炁”。你每回合对一名角色首次造成伤害后，你获得其一张“炁”。",
       "activationLabels": {},

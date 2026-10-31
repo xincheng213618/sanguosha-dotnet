@@ -102,6 +102,10 @@ internal sealed class ProgramTriggerRuntime
         where TQuery : IProgramTriggerDamageQuery, IProgramTriggerCardsQuery, IProgramTriggerContentQuery, IProgramTriggerEligibilityQuery, IProgramTriggerSelectionQuery, IProgramTriggerUsageQuery, IProgramTriggerWindowQuery
     {
         if (!query.IsValidPlayerSeat(candidate.OwnerSeat) || candidate.OwnerSeat != context.OwnerSeat) return false;
+        if (query.FindProgram(candidate.SkillId) is { } eventProgram &&
+            ProgramInstructionResolver.Default.FindTrigger(eventProgram, candidate.BindingId) is { UsageScope: SkillUsageScope.Event, UsageLimit: { } eventLimit } &&
+            query.GetUsage(candidate.OwnerSeat, candidate.SkillId, candidate.BindingId, SkillUsageScope.Event, context) >= eventLimit)
+            return false;
         if (query.DecideIssued(candidate, context) is { } issuedDecision) return issuedDecision;
         var owner = query.Players[candidate.OwnerSeat];
         if (context.Window != SkillProgramTriggerWindow.OwnerDied && !owner.IsAlive && query.DecideTriggerProof(ProgramTriggerProofPhase.OwnerException, new CandidateTriggerProofRequest(candidate, context)) != true ||
@@ -135,7 +139,7 @@ internal sealed class ProgramTriggerRuntime
         if (!HasInitialOwnedCardSelectionCandidates(query, owner, trigger)) return false;
         if (!query.CanTrigger(ProgramTriggerLegalityPhase.AfterCondition, legality)) return false;
         if (query.IsConfirmedActualStartingSubstitution(context)) return false;
-        if (trigger.UsageScope is { } scope && ProgramTriggerUsageLimit(query, trigger) is { } limit &&
+        if (trigger.UsageScope is { } scope and not SkillUsageScope.Event && ProgramTriggerUsageLimit(query, trigger) is { } limit &&
             query.GetUsage(
                 owner.Seat, candidate.SkillId, ProgramTriggerUsageId(query, candidate), scope) >= limit)
             return false;
@@ -542,14 +546,14 @@ internal sealed class ProgramTriggerRuntime
         return true;
     }
 
-    internal void ConsumeProgramTriggerUsage<TQuery>(TQuery query, ProgramTriggerCandidate candidate)
+    internal void ConsumeProgramTriggerUsage<TQuery>(TQuery query, ProgramTriggerCandidate candidate, ProgramSkillWindowContext? context = null)
         where TQuery : IProgramTriggerContentQuery, IProgramTriggerUsageQuery
     {
         var trigger = query.Program(candidate.SkillId).Triggers
             .Single(item => item.Id == candidate.BindingId);
         if (trigger.UsageScope is not { } scope || ProgramTriggerUsageLimit(query, trigger) is not { } limit) return;
         if (!query.TryConsumeUsage(
-                candidate.OwnerSeat, candidate.SkillId, ProgramTriggerUsageId(query, candidate), scope, limit))
+                candidate.OwnerSeat, candidate.SkillId, ProgramTriggerUsageId(query, candidate), scope, limit, context))
             throw new InvalidOperationException("The configured trigger usage was already consumed.");
         query.RecordUsageConsumed(new SkillUsageConsumedEvent(
             candidate.OwnerSeat, candidate.SkillId, candidate.BindingId, scope, 1));
@@ -559,6 +563,7 @@ internal sealed class ProgramTriggerRuntime
         where TQuery : IProgramTriggerContentQuery
     {
         var trigger = GetProgramTrigger(query, candidate);
+        if (trigger.UsageScope == SkillUsageScope.Event) return candidate.BindingId;
         if (trigger.NamedUsageGroup is { } named) return $"named-group:{named}";
         if (trigger.DynamicUsageLimit is not null) return $"named-binding:{candidate.BindingId}";
         var usageBinding = trigger.ChoiceGroup is { } choiceGroup

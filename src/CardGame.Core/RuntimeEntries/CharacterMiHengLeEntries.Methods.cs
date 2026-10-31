@@ -10,7 +10,6 @@ internal sealed partial class CharacterMiHengLeEntries
     internal bool CanOfferJiguGate(ProgramTriggerLegalityContext gate) => _resolve().CanOfferJiguGate(gate);
     internal bool CanUseSiruiConversion(CharacterState owner, Card card, IndexedSkillProgramInstance instance, SkillProgramViewAs rule, bool forResponse, bool dyingUse = false, int? requestedUseTarget = default) => _resolve().CanUseSiruiConversion(owner, card, instance, rule, forResponse, dyingUse, requestedUseTarget);
     internal bool CanUseSiruiPhase(CharacterState owner, CardConversionSource source) => _resolve().CanUseSiruiPhase(owner, source);
-    internal ProgramLifecycleTriggerWindowFrame CaptureJiguInitialEntities(ProgramLifecycleTriggerWindowFrame window) => _resolve().CaptureJiguInitialEntities(window);
     internal void CaptureSiruiMaterialPayment(IGameEvent payload) => _resolve().CaptureSiruiMaterialPayment(payload);
     internal void ContinueJigu(long id) => _resolve().ContinueJigu(id);
     internal bool DistanceBorrowedPaidWeaponSlash20SiruiPhysicalSlashVariants(ProgramSlashDistanceQuery q) => _resolve().DistanceBorrowedPaidWeaponSlash20SiruiPhysicalSlashVariants(q);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterMiHengLeEntries
     internal bool HasJiguEntityMark2(int ownerSeat, int cardId) => _resolve().HasJiguEntityMark(ownerSeat, cardId);
     internal bool HasSiruiForcedSlash(CharacterState actor, CharacterState target, NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().HasSiruiForcedSlash(actor, target, pending);
     internal bool HasSiruiSlashDistance(CharacterState actor, CardKind kind, IReadOnlyList<int>? materialIds = default, CardConversionSource? conversionSource = default, long? existingUseFrameId = default) => _resolve().HasSiruiSlashDistance(actor, kind, materialIds, conversionSource, existingUseFrameId);
-    internal SkillProgramStepOutcome InitializeJigu(ProgramSkillFrame supplied) => _resolve().InitializeJigu(supplied);
     internal bool IsJiguHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsJiguHandLimitExempt(owner, cardId);
     internal bool IsLeMiHengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsLeMiHengRecoveryParent(f, recovery);
     internal bool IsSiruiOutsideGeneralWeaponMaterial(long useId, int cardId) => _resolve().IsSiruiOutsideGeneralWeaponMaterial(useId, cardId);
@@ -43,7 +41,6 @@ internal sealed partial class CharacterMiHengLeEntries
     internal int JiguUseCount(int owner, int round) => _resolve().JiguUseCount(owner, round);
     internal bool PermitPaidJigu(ProgramSkillFrame f) => _resolve().PermitPaidJigu(f);
     internal void PrepareSiruiResponsePayment(CharacterState provider, Card card, CardKind kind, CardConversionSource? source) => _resolve().PrepareSiruiResponsePayment(provider, card, kind, source);
-    internal void ProjectJiguCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectJiguCardSkillMark(cardId, ref projection);
     internal bool ResumeJigu(long id) => _resolve().ResumeJigu(id);
     internal void ReturnJiguDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) => _resolve().ReturnJiguDraw(f, outcome);
     internal bool ReturnJiguMovement(ProgramSkillFrame f) => _resolve().ReturnJiguMovement(f);

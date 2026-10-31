@@ -195,6 +195,7 @@ public sealed partial class ContentRegistry
     private readonly IReadOnlyDictionary<string, ContentGeneralDefinition> _generals;
     private readonly IReadOnlyDictionary<string, ContentDeckRecipe> _decks;
     private readonly IReadOnlyDictionary<string, ContentModeDefinition> _modes;
+    private readonly IReadOnlyDictionary<string, string> _cardMarkLabels;
 
     private ContentRegistry(
         IReadOnlyList<PackageManifest> packages,
@@ -215,6 +216,15 @@ public sealed partial class ContentRegistry
         EquipmentPackages = Array.AsReadOnly(equipmentPackages.Select(registration => registration.Package).ToArray());
         ModeFeatureFactories = modeFeatureFactories;
         ProgramDependencies = new SkillProgramDependencies(_skills.Values);
+        var cardMarkLabels = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var skill in _skills.Values)
+        {
+            if (skill.ProgramPresentation?.CardMarks is not { } labels) continue;
+            foreach (var (mark, label) in labels)
+                if (!cardMarkLabels.TryAdd(mark, label) && cardMarkLabels[mark] != label)
+                    throw new InvalidOperationException($"Conflicting presentation labels for card mark '{mark}'.");
+        }
+        _cardMarkLabels = new ReadOnlyDictionary<string, string>(cardMarkLabels);
         var legacyContentHash = ComputeContentHash(
             Packages,
             _cards,

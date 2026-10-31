@@ -7,8 +7,10 @@ internal sealed class SkillStateConditionWorld(SkillStateConditionContext contex
     IActualDiscardRecoveryPhaseQueries? phases = null, IProgramRuntimeFrames? frames = null,
     RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null,
     EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState = null,
-    IProgramHealthChildQueries? healthChildren = null) : IProgramExpressionWorld
+    IProgramHealthChildQueries? healthChildren = null, ICardEntityMarkQueries? cardMarks = null) : IProgramExpressionWorld
 {
+    public int? CardMarkCount(int seat, string mark, CardZoneKind zone) =>
+        Player(seat) is null ? null : cardMarks?.CountMarked(seat, mark, zone);
     public int? Participant(string name)
     {
         int? seat = name switch

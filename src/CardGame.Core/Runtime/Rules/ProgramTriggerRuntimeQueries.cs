@@ -103,8 +103,8 @@ internal interface IProgramTriggerWindowQuery : IProgramSelectionQuery, IProgram
 internal interface IProgramTriggerUsageQuery : IProgramRuntimeOperations
 {
     int AlivePlayerCount { get; }
-    int GetUsage(int ownerSeat, string skillId, string bindingId, SkillUsageScope scope);
-    bool TryConsumeUsage(int ownerSeat, string skillId, string bindingId, SkillUsageScope scope, int limit);
+    int GetUsage(int ownerSeat, string skillId, string bindingId, SkillUsageScope scope, ProgramSkillWindowContext? context = null);
+    bool TryConsumeUsage(int ownerSeat, string skillId, string bindingId, SkillUsageScope scope, int limit, ProgramSkillWindowContext? context = null);
     void RecordUsageConsumed(SkillUsageConsumedEvent fact);
 }
 

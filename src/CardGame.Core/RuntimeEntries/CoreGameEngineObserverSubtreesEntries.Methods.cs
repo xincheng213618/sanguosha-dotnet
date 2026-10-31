@@ -2,6 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineObserverSubtreesEntries
 {
+    internal bool HasOwnedObserverSuffix(int rootIndex) => _resolve().HasOwnedObserverSuffix(rootIndex);
     internal ProgramSkillFrame? FindProgramObserverRoot(Func<ProgramSkillFrame, ResolutionFrame, bool> firstChild, Func<int, bool> suffix, long? requiredRootId = default) => _resolve().FindProgramObserverRoot(firstChild, suffix, requiredRootId);
     internal bool HasHandGainDebtObserverSuffix(int rootIndex) => _resolve().HasHandGainDebtObserverSuffix(rootIndex);
     internal bool HasMovementObserverSuffix(int rootIndex) => _resolve().HasMovementObserverSuffix(rootIndex);

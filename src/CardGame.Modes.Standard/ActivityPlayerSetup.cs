@@ -27,7 +27,8 @@ internal sealed partial class StandardModeSetupFeature
     {
         var plan = PrepareSelectedGeneral(Facts(seat), general.Id);
         return seat with { GeneralId = general.Id, GeneralSelected = true, GeneralRevealed = true,
-            ExtraGeneralSkillIds = plan.ExtraSkillIds, MaxHp = plan.MaximumHp ?? seat.MaxHp, Hp = plan.Hp ?? seat.Hp };
+            ExtraGeneralSkillIds = plan.ExtraSkillIds, MaxHp = plan.MaximumHp ?? seat.MaxHp, Hp = plan.Hp ?? seat.Hp,
+            PrintedLordQualifications = plan.PrintedLordQualifications };
     }
     private ModeSetupPlan BuildSurvivalPlayers()
     {
@@ -179,7 +180,9 @@ internal sealed partial class StandardModeSetupFeature
                 seat == _options.HumanSeat, TeamRole(team), general.Id, general.BaseHp + member.MaxHpBonus + sharedHp,
                 (member.Hp ?? general.InitialHp ?? general.BaseHp + member.MaxHpBonus) + sharedHp)
             { TeamId = team, TeamRevealed = true, RoleRevealed = true, GeneralSelected = true, GeneralRevealed = true,
-                SkillGrants = grants, InitialArmor = member.InitialArmor });
+                SkillGrants = grants, InitialArmor = member.InitialArmor,
+                PrintedLordQualifications = (member.QualifiedPrintedLordSkillIds ?? [])
+                    .Select(id => new ModePrintedLordQualification(id, _mode.Id)).ToArray() });
         }
         return new(players, [], []);
     }

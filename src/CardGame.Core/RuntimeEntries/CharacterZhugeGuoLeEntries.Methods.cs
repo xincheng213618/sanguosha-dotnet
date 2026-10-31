@@ -8,7 +8,6 @@ internal sealed partial class CharacterZhugeGuoLeEntries
     internal void BeginLeChengyanBorrowedWithAuxiliary(CardUseFrame supplied) => _resolve().BeginLeChengyanBorrowedWithAuxiliary(supplied);
     internal void BeginLeChengyanSlash(CardUseFrame u) => _resolve().BeginLeChengyanSlash(u);
     internal bool CanOfferLeChengyan(ProgramTriggerLegalityContext gate) => _resolve().CanOfferLeChengyan(gate);
-    internal ProgramLifecycleTriggerWindowFrame CaptureLeXidiOpening(ProgramLifecycleTriggerWindowFrame w) => _resolve().CaptureLeXidiOpening(w);
     internal bool ContinueAcceptedLeChengyan(ProgramSkillFrame f) => _resolve().ContinueAcceptedLeChengyan(f);
     internal void ContinueChengyanAfterPublicReveal(ProgramSkillFrame f) => _resolve().ContinueChengyanAfterPublicReveal(f);
     internal void ContinueLeChengyan(long id) => _resolve().ContinueLeChengyan(id);
@@ -17,7 +16,6 @@ internal sealed partial class CharacterZhugeGuoLeEntries
     internal bool FinishLeChengyanBorrowedNative(NativeOwners.BorrowedSwordHandle borrowed) => _resolve().FinishLeChengyanBorrowedNative(borrowed);
     internal bool HasLeChengyanBorrowedPrompt() => _resolve().HasLeChengyanBorrowedPrompt();
     internal bool HasLeXidiEntityMark(int cardId) => _resolve().HasLeXidiEntityMark(cardId);
-    internal SkillProgramStepOutcome InitializeLeXidi(ProgramSkillFrame supplied) => _resolve().InitializeLeXidi(supplied);
     internal bool IsLeChengyanDying() => _resolve().IsLeChengyanDying();
     internal bool IsLeChengyanEffectUse(long id) => _resolve().IsLeChengyanEffectUse(id);
     internal bool IsLeChengyanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => _resolve().IsLeChengyanMovement(f, e, p);
@@ -31,7 +29,6 @@ internal sealed partial class CharacterZhugeGuoLeEntries
     internal bool LeChengyanObserverSuffix(int index) => _resolve().LeChengyanObserverSuffix(index);
     internal Card LeChengyanOriginalCard(CardUseFrame u) => _resolve().LeChengyanOriginalCard(u);
     internal bool LeZhugeGuoFinalizedBeforeActivityTargetWindow(ProgramTargetCardWindowQuery query) => _resolve().LeZhugeGuoFinalizedBeforeActivityTargetWindow(query);
-    internal void ProjectLeXidiCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectLeXidiCardSkillMark(cardId, ref projection);
     internal SkillProgramStepOutcome ReorderLeXidi(ProgramSkillFrame supplied) => _resolve().ReorderLeXidi(supplied);
     internal bool ResumeLeChengyan(long id) => _resolve().ResumeLeChengyan(id);
     internal void ReturnLeChengyanDraw(ProgramSkillFrame f, NativeDrawOutcome d) => _resolve().ReturnLeChengyanDraw(f, d);

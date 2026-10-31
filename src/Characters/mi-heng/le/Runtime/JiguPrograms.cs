@@ -3,19 +3,6 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
 public enum JiguStage { Drawing, DrawChildren }
-public sealed record JiguInitialEntity(int OwnerSeat, int CardId, CardKind PrintedKind, long DealSequence);
-
-public sealed partial record ProgramLifecycleTriggerWindowFrame
-{
-    private readonly IReadOnlyList<JiguInitialEntity>? _jiguInitialEntities;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IReadOnlyList<JiguInitialEntity>? JiguInitialEntities
-    {
-        get => _jiguInitialEntities;
-        init => _jiguInitialEntities = value is null ? null : Array.AsReadOnly(value.ToArray());
-    }
-}
-
 public sealed record JiguReceipt(CardConversionSource Source, string GameplayHash,
     long DamageFrameId, long DamageWindowId, int RoundNumber, int ActualTurn, int TurnOwner,
     int MarkedHandCount, int EquipmentCount, int EmptySlotCount, int StartedSeatCount,
@@ -31,10 +18,6 @@ public sealed partial record ProgramSkillFrame
     public JiguReceipt? Jigu { get; init; }
 }
 
-public sealed record JiguInitializedEvent(long FrameId, CardConversionSource Source,
-    string GameplayHash, int EntityCount) : IGameEvent;
-public sealed record JiguInitialEntityEvent(long FrameId, int OwnerSeat, int CardId,
-    CardKind PrintedKind, long DealSequence) : IGameEvent;
 public sealed record JiguActivationPaidEvent(long FrameId, CardConversionSource Source,
     string GameplayHash, long DamageFrameId, long DamageWindowId, int RoundNumber,
     int ActualTurn, int TurnOwner, int MarkedHandCount, int EquipmentCount, int EmptySlotCount,
@@ -45,7 +28,6 @@ public sealed record JiguCompletedEvent(long FrameId, long DamageFrameId) : IGam
 
 internal interface ILeMiHengJiguHost
 {
-    SkillProgramStepOutcome Initialize(ProgramSkillFrame frame);
     SkillProgramStepOutcome Draw(ProgramSkillFrame frame);
 }
 
@@ -57,14 +39,8 @@ internal abstract class JiguDescriptor(SkillProgramEffectOp op) : ProgramOperati
     public override ProgramOperationAiPolicy AiPolicy { get; } =
         new(ProgramOperationAiSemantic.GainCards, static (_, c) => c.PublicControlValue(1));
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
-        [new RequireTriggerWindow(op == SkillProgramEffectOp.InitializeJiguInitialEntities
-            ? SkillProgramTriggerWindow.GameStarting : SkillProgramTriggerWindow.AfterDamageApplied)];
+        [new RequireTriggerWindow(SkillProgramTriggerWindow.AfterDamageApplied)];
     public override ISkillProgramEffectHandler Handler { get; } = new JiguHandler(op);
-}
-internal sealed class InitializeJiguInitialEntitiesDescriptor()
-    : JiguDescriptor(SkillProgramEffectOp.InitializeJiguInitialEntities)
-{
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
 }
 internal sealed class ResolveJiguDamageEquipmentDrawDescriptor()
     : JiguDescriptor(SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw)
@@ -75,9 +51,7 @@ internal sealed class JiguHandler(SkillProgramEffectOp op) : ISkillProgramEffect
 {
     public SkillProgramEffectOp Op => op;
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame,
-        int target, ISkillProgramEffectHost host) => op == SkillProgramEffectOp.InitializeJiguInitialEntities
-            ? host.GetCapability<ILeMiHengJiguHost>().Initialize(frame)
-            : host.GetCapability<ILeMiHengJiguHost>().Draw(frame);
+        int target, ISkillProgramEffectHost host) => host.GetCapability<ILeMiHengJiguHost>().Draw(frame);
 }
 
 internal static class JiguComposition
@@ -86,23 +60,17 @@ internal static class JiguComposition
     internal static void ValidateProgram(string path, SkillProgram p)
     {
         var operations = p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects));
-        if (!operations.Any(e => e.Op is SkillProgramEffectOp.InitializeJiguInitialEntities or
-            SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw)) return;
+        if (!operations.Any(e => e.Op is SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw)) return;
         if (p.Id != "le:jigu" || p.Activations.Count != 0 || p.ViewAs.Count != 0 ||
             p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 ||
             p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 ||
             p.Contributions.Count != 0 || p.Triggers.Count != 2 ||
-            p.Triggers.SingleOrDefault(t => t.Id == "mark-initial-entities") is not { } initial ||
-            initial.Window != SkillProgramTriggerWindow.GameStarting || initial.Subject != SkillProgramTriggerSubject.Owner ||
-            initial.DamageOccurrence is not null ||
-            initial.Effects is not [{ Op: SkillProgramEffectOp.InitializeJiguInitialEntities,
-                Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }] ||
             p.Triggers.SingleOrDefault(t => t.Id == "damage-equipment-draw") is not { } damage ||
             damage.Window != SkillProgramTriggerWindow.AfterDamageApplied || damage.Subject != SkillProgramTriggerSubject.Any ||
             damage.DamageOccurrence != SkillProgramDamageOccurrence.PerDamage ||
             damage.Effects is not [{ Op: SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw,
                 Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }] ||
-            !Plain(initial) || !Plain(damage))
+            !Plain(damage))
             throw new InvalidOperationException(path + ": Jigu requires its permanent initial entities and one whole source-or-target damage occurrence.");
     }
 

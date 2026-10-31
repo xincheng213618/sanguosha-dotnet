@@ -29,6 +29,7 @@
 | 角色状态 | 布尔：`alive`、`hasHp`、`faceDown`、`chained`；整数：`hp`、`maxHp`、`lostHp`、`handCount`、`handLimit`、`equipmentCount` |
 | 运算 | `["+", i, ...]`、`["min", i, ...]`、`["max", i, ...]`（2–8 项）、`["-", i, i]`、`["floorDiv", i, i]`；`["when", b, i]` 在 b 为真时取 i，否则未知 |
 | 绑定读取 | 整数：`["number", "name"]`、`["boundCount", "cards"]`、`["boundSuitCount", "cards"]`、`["boundDistinctSuitCount", "cards"]`、`["boundRank", "singleCard"]`；布尔：`["boundIsEquipment", "singleCard"]` |
+| 物理牌标记 | `["cardMarkCount", p, "mark-id", "hand"]`，牌区也可为 `"equipment"`；按当前牌区读取永久实体标记 |
 | 量词 | `["all", set, b]`、`["any", set, b]` 返回布尔；`["count", set, b]` 返回整数；`b` 内用 `"it"` 表示当前成员 |
 
 加载时检查运算符、参数个数、类型、字面量范围、嵌套深度（8 层）以及 `"it"` 只能出现在量词谓词中。表达式随规则 JSON 规范化后进入技能玩法指纹，空白不影响指纹；新增该可选节点不改变规则格式版本。
@@ -44,7 +45,20 @@
 
 ## 适用范围
 
-布尔表达式只允许出现在效果步骤的 `condition` 中（包括 `all`/`any`/`not` 组合内）。主动入口、选项、触发器和持续规则的条件在加载时拒绝表达式；这些位置没有运行中的程序帧。整数表达式还可以用于下述数量字段。
+布尔表达式可用于效果步骤的 `condition`（包括 `all`/`any`/`not` 组合内）。`skillStates` 的 `when` / `while` 与 `skillState.match.filter` 使用同一求值器，加载器分别限制为该上下文能够提供的只读事实；它们不借用运行中的程序帧。其他入口是否接受表达式仍由各自加载边界决定。整数表达式还可以用于下述数量字段。
+
+## 永久物理牌标记
+
+```json
+{ "op": "markInitialHand", "target": "owner", "mark": "zheng" }
+{ "op": "markCards", "bind": "shown-cards", "mark": "zheng" }
+```
+
+`markInitialHand` 只用于开局触发，读取真实开局母帧在任何开局子结算之前冻结的原始手牌；原候选已获签发后，来源消失或拥有者死亡不会把这批牌改成稍后的手牌。`markCards` 读取已有牌集合绑定，不重新选择、移动或支付。两者写同一种共享实体事实，重复标记不重复产生同一标记；初始牌的原主人是独立的来源信息，后续移动不覆盖它。
+
+`["cardMarkCount","target","zheng","hand"]` 按当时受体的手牌计算；在持续状态里 `target` 是受体，效果表达式使用其支持的参与者名称。该读取也接受 `equipment`，离开牌区会改变计数，但不删除永久实体标记。标记本身不授予手牌上限、距离或其他收益，这些规则仍声明自己的有效技能及对象条件。
+
+展示文件用 `cardMarks: {"zheng":"筝"}` 指定标签，同一标记的不同声明必须使用同一文字；加载器拒绝冲突。UI 只为原本允许该观察者看到的实体附加文字，标记 ID 与标签不混用。翻转标记、离区到期租约及尚未提交的批次不是永久标记，不能直接套用本节点。
 
 ## 数量表达式
 

@@ -4,13 +4,18 @@
     {
       "id": "le:yunzheng",
       "revision": 1,
+      "skillStates": [{
+        "action": "suppress", "target": "all",
+        "match": { "filter": ["==", ["number", "skill.locked"], 0] },
+        "while": ["and", ["not", ["same", "owner", "target"]], [">", ["cardMarkCount", "target", "zheng", "hand"], 0]]
+      }],
       "triggers": [
         {
           "id": "mark-initial-entities",
           "window": "gameStarting",
           "subject": "owner",
           "optional": false,
-          "effects": [{ "op": "initializeYunzhengInitialEntities", "target": "owner" }]
+          "effects": [{ "op": "markInitialHand", "target": "owner", "mark": "zheng" }]
         }
       ]
     },
@@ -26,6 +31,7 @@
           "includeResponseUses": true,
           "allowNoEventTarget": true,
           "singleActionInstance": true,
+          "usageScope": "event", "usageLimit": 1,
           "effects": [{ "op": "resolveHuoxinNonEquipmentUse", "target": "owner" }]
         }
       ]

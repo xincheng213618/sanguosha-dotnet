@@ -11,6 +11,10 @@ internal struct CardSkillMarkProjection
 {
     private string? _label;
     private string? _last;
+    private Dictionary<string, string>? _marks;
+
+    internal void AppendMark(string mark, string label) => (_marks ??= new(StringComparer.Ordinal)).TryAdd(mark, label);
+    internal void OverrideMarkLabel(string mark, string label) => (_marks ??= new(StringComparer.Ordinal))[mark] = label;
 
     internal void Append(string? label)
     {
@@ -24,15 +28,21 @@ internal struct CardSkillMarkProjection
         if (label is not null) _last = _last is null ? label : _last + " / " + label;
     }
 
-    internal string? Complete() => _last is null ? _label : _label is null ? _last : _label + " / " + _last;
+    internal string? Complete()
+    {
+        if (_marks is not null)
+            foreach (var (_, label) in _marks.OrderBy(pair => pair.Key, StringComparer.Ordinal)) Append(label);
+        return _last is null ? _label : _label is null ? _last : _label + " / " + _last;
+    }
 }
 
 [ProgramRuntimeModule]
-internal sealed class CardSkillMarkProjector(ICardSkillMarkSources sources)
+internal sealed class CardSkillMarkProjector(ICardSkillMarkSources sources, ICardEntityMarkQueries marks)
 {
     internal string? Label(int cardId)
     {
         var projection = new CardSkillMarkProjection();
+        foreach (var (mark, label) in marks.MarkedNames(cardId)) projection.AppendMark(mark, label);
         sources.Project(cardId, ref projection);
         return projection.Complete();
     }

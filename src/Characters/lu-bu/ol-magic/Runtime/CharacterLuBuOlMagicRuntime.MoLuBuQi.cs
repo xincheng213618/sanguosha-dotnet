@@ -8,26 +8,9 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     internal bool HasMoLuBu => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeMoLuBuQiAndOpeningPlay);
 
     internal static CardConversionSource MoLuBuSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lu_bu_ol_magic_MoLuBuQi.MoLuBuSource(f);
-    // Registration only; the query still belongs to legacy GameEngine.MoLuBuQi.
-    [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 60)]
-    internal void ProjectMoLuBuQiCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
-    {
-        projection.Append(HasMoLuBuQi(cardId) ? "炁" : null);
-    }
-
-    internal bool HasMoLuBuQi(int id) => HasMoLuBu && id > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuQiMarkedEvent>().Any(e => e.CardId == id);
-    internal ProgramLifecycleTriggerWindowFrame CaptureMoLuBuInitialQi(ProgramLifecycleTriggerWindowFrame f)
-    {
-        if (!HasMoLuBu || f.Window != SkillProgramTriggerWindow.GameStarting || f.Continuation != ProgramLifecycleContinuation.CompleteGameStarting)
-            return f;
-        return f with
-        {
-            MoLuBuInitialQi = _coreMatchParticipantsPlayersAccess._players.SelectMany(p => _corePhysicalOwnedCardQueriesOperations.GetHand(p).Select(card => new MoLuBuInitialQi(p.Seat, card.Id, card.Kind, _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == card.Id && m.To == CardLocation.Hand(p.Seat)).Sequence))).ToArray()
-        };
-    }
-
+    internal bool HasMoLuBuQi(int id) => _cardEntityMarks.Has(id, "qi");
     internal bool MoLuBuQiZone(CardLocation location) => location.Zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment or CardZoneKind.DrawPile or CardZoneKind.DiscardPile;
-    internal IReadOnlyList<MoLuBuQiCandidate> MoLuBuQiCandidates(int original) => Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuQiMarkedEvent>().Where(e => e.OriginalOwnerSeat == original).DistinctBy(e => e.CardId).Select(e => new MoLuBuQiCandidate(e.CardId, _cardZonesOperations._cardZones.GetLocation(e.CardId))).Where(e => MoLuBuQiZone(e.From)).ToArray());
+    internal IReadOnlyList<MoLuBuQiCandidate> MoLuBuQiCandidates(int original) => Array.AsReadOnly(_cardEntityMarks.MarkedCardIds("qi").Where(id => _cardEntityMarks.InitialOwnerSeat(id, "qi") == original).Select(id => new MoLuBuQiCandidate(id, _cardZonesOperations._cardZones.GetLocation(id))).Where(e => MoLuBuQiZone(e.From)).ToArray());
     internal bool MoLuBuLastUseWasQi(int actor) => _coreCommandJournalStorageEventsPendingEventsAccess._events.Select(e => e.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents).LastOrDefault(e => e is MoLuBuActualUseQiEvent used && used.ActorSeat == actor || e is MoLuBuLegacyDuelUseEvent duel && duel.ActorSeat == actor)is MoLuBuActualUseQiEvent { IsQi: true };
     internal void CaptureMoLuBuLegacyDuel(ProgramSkillFrame frame, int actor)
     {
@@ -52,11 +35,10 @@ internal sealed partial class CharacterLuBuOlMagicRuntime
     internal bool IsMoLuBuTrueUse(CardActionContext action) => action.Type == CardActionType.Use || action.EffectiveKind == CardKind.Nullification && _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.NullificationResponse) || _coreResponseUseCompletionOperations.IsCompletedResponseUse(action, ProgramCardContinuation.Dodge) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ParentActionId)is { CardAttack: { EffectiveCardKind: { } incoming } attack } && CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && attack.TargetSeat == action.ActorSeat;
     internal SkillProgramStepOutcome InitializeMoLuBu(ProgramSkillFrame f)
     {
-        if (f.SkillId != MoLuBuComposition.Duoqi || f.TriggerId != "initial-qi-opening-play" || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { MoLuBuInitialQi: { } initial } || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
+        if (f.SkillId != MoLuBuComposition.Duoqi || f.TriggerId != "initial-qi-opening-play" || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.GameStarting } c || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == c.ParentFrameId)is not ProgramLifecycleTriggerWindowFrame { OpeningHandEntities: { } initial } || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
             throw new InvalidOperationException("Duoqi needs its one actual opening-Hand snapshot.");
-        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoLuBuQiMarkedEvent>().Any())
-            foreach (var card in initial)
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoLuBuQiMarkedEvent(f.Id, card.OriginalOwnerSeat, card.CardId, card.PrintedKind, card.EntrySequence));
+        foreach (var owner in initial.GroupBy(card => card.OwnerSeat))
+            _cardEntityMarkOperations.Mark(f.Id, "qi", owner.Select(card => card.CardId).ToArray(), owner.Key);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoLuBuInitializedEvent(f.Id, MoLuBuSource(f), f.GameplayHash, c.ParentFrameId));
         return SkillProgramStepOutcome.Continue;
     }

@@ -1663,17 +1663,13 @@ public enum SkillProgramEffectOp
     ResolveBiguoDrawAndArmTargetPindian = 28130,
     ResolveBiguoTargetedPindianAndCategoryBan = 28131,
     ResolveDouyuPreRevealSwapAndWinDraw = 28132,
-    InitializeJiguInitialEntities = 28210,
     ResolveJiguDamageEquipmentDraw = 28211,
-    InitializeLingkongInitialEntities = 28310,
     MarkLingkongFirstOutsideDrawGain = 28311,
     ResolveXianshuGiftDrawAndHealth = 28320,
-    InitializeShuangjiaInitialEntities = 28410,
     ResolveBeifenLostMarkedSuitGains = 28420,
     ResolveYixianAllEquipmentObtainAndCompensate = 28530,
     ResolveWuyouContributionAndNamedReturn = 28520,
     ResolveQiqinDiscardPileQin = 28610,
-    InitializeQiqinInitialEntities = 28611,
     ResolveWeiwanQinDiscardAndSuitObtain = 28620,
     ResolveZixiQinJudgmentPlacement = 28710,
     ResolveZixiUniqueTargetJudgmentEffects = 28720,
@@ -1686,7 +1682,6 @@ public enum SkillProgramEffectOp
     ResolveMoSunQuanTianenUniqueUse = 28920,
     ResolveMoSunQuanQiangangEntry = 28930,
     ResolveOlMoRumoRoundPenalty = 28940,
-    InitializeYunzhengInitialEntities = 28950,
     ResolveHuoxinNonEquipmentUse = 28951,
     ResolveMouHuangYueyingLixian = 28960,
     ResolveMouHuangYueyingBingcai = 28961,
@@ -1738,7 +1733,6 @@ public enum SkillProgramEffectOp
     ResolveWuZhugeLiangJincui = 30301,
     ResolveWuZhugeLiangQingshi = 30302,
     ResolveWuZhugeLiangZhizhe = 30303,
-    InitializeLeZhugeGuoXidi = 30200,
     ReorderLeZhugeGuoXidi = 30201,
     ResolveLeZhugeGuoChengyan = 30202,
     RecordMouZhuRongLieren = 30400,
@@ -1899,7 +1893,9 @@ public enum SkillProgramEffectOp
     SelectPublicPile = 900001,
     DistributeBoundCards = 900002,
     CaptureNumber = 900003,
-    SkillState = 900004
+    SkillState = 900004,
+    MarkInitialHand = 900005,
+    MarkCards = 900006
 }
 public enum SkillProgramEffectTarget { Owner, Actor, SelectedTarget, SelectedTargets, HpPairHigher = 2000, HpPairLower = 2001, Activator = 2002 }
 public enum SkillProgramTurnPhase { Judgment, Draw, Play, Discard }
@@ -3442,6 +3438,13 @@ public sealed class SkillPresentation
         new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(StringComparer.Ordinal));
     public IReadOnlyDictionary<string, string> ActivationLabels { get; internal init; } =
         new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(StringComparer.Ordinal));
+    private readonly IReadOnlyDictionary<string, string>? _cardMarks;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyDictionary<string, string>? CardMarks
+    {
+        get => _cardMarks;
+        internal init => _cardMarks = value is null ? null : new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(value, StringComparer.Ordinal));
+    }
 }
 
 public sealed record ProgramBooleanStatePresentation(string TrueText, string FalseText);
@@ -3739,7 +3742,7 @@ public sealed class SkillProgramCatalog
             if (string.IsNullOrWhiteSpace(id) || id.Length > 128) Fail(path, "skill id must contain 1 to 128 characters");
             if (!programs.ContainsKey(id)) Fail(path, $"presentation references unknown skill '{id}'");
             RequireObject(property.Value, path);
-            CheckProperties(property.Value, path, "name", "description", "triggerChoices", "booleanStates", "optionLabels", "activationLabels", "authorityName", "triggerLabels");
+            CheckProperties(property.Value, path, "name", "description", "triggerChoices", "booleanStates", "optionLabels", "activationLabels", "authorityName", "triggerLabels", "cardMarks");
             var triggerChoices = new Dictionary<string, string>(StringComparer.Ordinal);
             var booleanStates = new Dictionary<string, ProgramBooleanStatePresentation>(StringComparer.Ordinal);
             if (property.Value.TryGetProperty("triggerChoices", out var choices))
@@ -3830,6 +3833,20 @@ public sealed class SkillProgramCatalog
                         Fail(path + ".triggerLabels", $"duplicate trigger label '{label.Name}'");
                 }
             }
+            Dictionary<string, string>? cardMarks = null;
+            if (property.Value.TryGetProperty("cardMarks", out var markLabels))
+            {
+                RequireObject(markLabels, path + ".cardMarks");
+                CheckCount(markLabels.EnumerateObject().Count(), path + ".cardMarks");
+                cardMarks = new(StringComparer.Ordinal);
+                foreach (var label in markLabels.EnumerateObject())
+                {
+                    if (string.IsNullOrWhiteSpace(label.Name) || label.Name.Length > 128)
+                        Fail(path + ".cardMarks", "mark id must contain 1 to 128 characters");
+                    if (!cardMarks.TryAdd(label.Name, NonEmptyStringValue(label.Value, path + ".cardMarks." + label.Name)))
+                        Fail(path + ".cardMarks", $"duplicate card mark '{label.Name}'");
+                }
+            }
             result.Add(id, new SkillPresentation(NonEmptyString(property.Value, "name", path),
                 NonEmptyString(property.Value, "description", path),
                 new ReadOnlyDictionary<string, string>(triggerChoices),
@@ -3837,6 +3854,7 @@ public sealed class SkillProgramCatalog
                 {
                     ActivationLabels = new ReadOnlyDictionary<string, string>(activationLabels),
                     TriggerLabels = new ReadOnlyDictionary<string, string>(triggerLabels),
+                    CardMarks = cardMarks,
                     AuthorityName = property.Value.TryGetProperty("authorityName", out var authorityName)
                         ? NonEmptyStringValue(authorityName, path + ".authorityName") : null
                 });
@@ -5836,7 +5854,10 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             if (hasUsageScope)
             {
                 usageScope = EnumValue<SkillUsageScope>(node, "usageScope", path);
-                if (usageScope == SkillUsageScope.Event) Fail(path + ".usageScope", "event usage is unsupported");
+                if (usageScope == SkillUsageScope.Event &&
+                    (!isCardActionWindow || window == SkillProgramTriggerWindow.CardEffectBeforeApply || hasDynamic ||
+                     node.TryGetProperty("namedUsageGroup", out _) || node.TryGetProperty("choiceGroup", out _)))
+                    Fail(path + ".usageScope", "event usage requires a native card-action window with a static binding limit and no usage group");
                 if (hasUsageLimit)
                 {
                     usageLimit = PositiveInt(node, "usageLimit", path);

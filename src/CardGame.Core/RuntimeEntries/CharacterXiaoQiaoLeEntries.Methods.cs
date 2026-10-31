@@ -10,7 +10,6 @@ internal sealed partial class CharacterXiaoQiaoLeEntries
     internal bool CanActivateWeiwan(ProgramActivationLegalityContext gate) => _resolve().CanActivateWeiwan(gate);
     internal bool CanOfferQiqin(ProgramTriggerLegalityContext gate) => _resolve().CanOfferQiqin(gate);
     internal bool CanPayWeiwanQin(int owner, Card card) => _resolve().CanPayWeiwanQin(owner, card);
-    internal ProgramLifecycleTriggerWindowFrame CaptureQiqinInitialEntities(ProgramLifecycleTriggerWindowFrame window) => _resolve().CaptureQiqinInitialEntities(window);
     internal DeclaredCardPayment CaptureWeiwanDeclarationPayment(DeclaredCardPayment paid, CardDeclarationParentReturn parent) => _resolve().CaptureWeiwanDeclarationPayment(paid, parent);
     internal WeiwanUseSnapshot CaptureWeiwanUseSnapshot(int actor) => _resolve().CaptureWeiwanUseSnapshot(actor);
     internal void CaptureWeiwanZeroMaterialUse(IGameEvent payload) => _resolve().CaptureWeiwanZeroMaterialUse(payload);
@@ -27,8 +26,6 @@ internal sealed partial class CharacterXiaoQiaoLeEntries
     internal bool HasQiqinHandEntityMark(int owner, int id) => _resolve().HasQiqinHandEntityMark(owner, id);
     internal bool HasWeiwanQuota(CharacterState actor, CharacterState target) => _resolve().HasWeiwanQuota(actor, target);
     internal bool HasWeiwanUseDistance(CharacterState actor, CharacterState target, CardKind kind, long? useId = default) => _resolve().HasWeiwanUseDistance(actor, target, kind, useId);
-    internal SkillProgramStepOutcome InitializeQiqin(ProgramSkillFrame supplied) => _resolve().InitializeQiqin(supplied);
-    internal bool IsIssuedQiqinCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedQiqinCandidate(c, context);
     internal bool IsQiqinHandLimitExempt(CharacterState owner, int id) => _resolve().IsQiqinHandLimitExempt(owner, id);
     internal bool IsQiqinRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsQiqinRecoveryParent(f, recovery);
     internal bool IsWeiwanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsWeiwanRecoveryParent(f, recovery);
@@ -36,7 +33,6 @@ internal sealed partial class CharacterXiaoQiaoLeEntries
     internal void IssueWeiwanUse(CardUseFrame use) => _resolve().IssueWeiwanUse(use);
     internal void ObserveWeiwanHpLoss(IGameEvent payload) => _resolve().ObserveWeiwanHpLoss(payload);
     internal bool PermitIssuedQiqin(ProgramSkillFrame f) => _resolve().PermitIssuedQiqin(f);
-    internal void ProjectQiqinCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectQiqinCardSkillMark(cardId, ref projection);
     internal bool QiqinBatchMatches(ProgramSkillFrame f, CardMovementBatchContext batch) => _resolve().QiqinBatchMatches(f, batch);
     internal bool QiqinFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().QiqinFirstChild(f, child);
     internal ProgramSkillFrame? QiqinObserverRoot() => _resolve().QiqinObserverRoot();
@@ -62,6 +58,5 @@ internal sealed partial class CharacterXiaoQiaoLeEntries
     internal bool WeiwanPrimaryMovement(ProgramSkillFrame f, CardMovementRecord m) => _resolve().WeiwanPrimaryMovement(f, m);
     internal IReadOnlyList<WeiwanTurnLease> WeiwanQueryLeases(int actor, long? useId) => _resolve().WeiwanQueryLeases(actor, useId);
     internal bool WeiwanTargetQuotaAllowed(ProgramTargetQuotaQuery query) => _resolve().WeiwanTargetQuotaAllowed(query);
-    internal bool HasLeXiaoQiaoQiqinCapability { get => _resolve().HasLeXiaoQiaoQiqinCapability; }
     internal bool HasLeXiaoQiaoWeiwanCapability { get => _resolve().HasLeXiaoQiaoWeiwanCapability; }
 }

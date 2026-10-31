@@ -4,55 +4,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterCaiWenJiLeRuntime
 {
     internal ShuangjiaMarkRuntime ShuangjiaMarks => (ShuangjiaMarkRuntime)_closedShuangjiaMarkRuntimeSource.Get();
-    internal bool HasLeCaiWenJiShuangjiaCapability => ShuangjiaMarks.HasCapability;
-
-    internal static CardConversionSource ShuangjiaSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     internal bool HasShuangjiaEntityMark(int cardId) => ShuangjiaMarks.HasEntityMark(cardId);
     internal bool IsShuangjiaHandLimitExempt(CharacterState owner, int cardId) => ShuangjiaMarks.IsHandLimitExempt(owner.Seat, cardId);
-    internal ProgramLifecycleTriggerWindowFrame CaptureShuangjiaInitialEntities(ProgramLifecycleTriggerWindowFrame window)
-    {
-        if (!HasLeCaiWenJiShuangjiaCapability || window.Window != SkillProgramTriggerWindow.GameStarting || window.Continuation != ProgramLifecycleContinuation.CompleteGameStarting)
-            return window;
-        var owners = window.Candidates.Where(candidate => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.InitializeShuangjiaInitialEntities }]).Select(candidate => candidate.OwnerSeat).Distinct().Order();
-        var entities = owners.SelectMany(owner => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Select(card =>
-        {
-            var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == card.Id && m.To == CardLocation.Hand(owner));
-            return new ShuangjiaInitialEntity(owner, card.Id, card.Kind, entry.Sequence);
-        })).ToArray();
-        return window with
-        {
-            ShuangjiaInitialEntities = entities
-        };
-    }
-
-    [ProgramIssuedTrigger(190)]
-    internal bool IsIssuedShuangjiaCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => HasLeCaiWenJiShuangjiaCapability && candidate.SkillId == "le:shuangjia" && candidate.BindingId == "mark-initial-entities" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(candidate.OwnerSeat) && _contentRegistryOperations._contentRegistry.GetSkill(candidate.SkillId).Program?.GameplayHash == candidate.GameplayHash && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.InitializeShuangjiaInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == candidate.OwnerSeat && _coreActualTurnProgressPhaseAccess._phase == TurnPhase.NotStarted && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, ShuangjiaInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == candidate && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShuangjiaInitializedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat);
-    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28410, SkillProgramEffectOp.InitializeShuangjiaInitialEntities)]
-    internal bool CanOfferShuangjia(ProgramTriggerLegalityContext gate) => IsIssuedShuangjiaCandidate(gate.Candidate, gate.Context);
-    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28410)]
-    [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28410)]
-    internal bool PermitIssuedShuangjia(ProgramSkillFrame frame)
-    {
-        if (frame.SkillId != "le:shuangjia" || frame.TriggerId != "mark-initial-entities" || frame.WindowContext is not { } context || frame.InstructionIndex is < 0 or > 1 || frame.SelectedCardIds.Count != 0 || frame.SelectedTargetSeats.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program?.GameplayHash != frame.GameplayHash || !_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(frame, SkillProgramTriggerWindow.GameStarting))
-            return false;
-        var candidate = new ProgramTriggerCandidate(frame.OwnerSeat, frame.SkillId, frame.TriggerId, frame.SkillInstanceId, frame.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(frame).Priority, context.OccurrenceIndex);
-        if (IsIssuedShuangjiaCandidate(candidate, context))
-            return true;
-        // After the only instruction, preserve its completed right while the executor closes it.
-        return frame.InstructionIndex == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShuangjiaInitializedEvent>().Where(e => e.FrameId == frame.Id).ToArray()is [var initialized] && initialized.Source == ShuangjiaSource(frame) && initialized.GameplayHash == frame.GameplayHash;
-    }
-
-    SkillProgramStepOutcome ILeCaiWenJiShuangjiaHost.InitializeShuangjia(ProgramSkillFrame frame) => InitializeShuangjia(frame);
-    internal SkillProgramStepOutcome InitializeShuangjia(ProgramSkillFrame supplied)
-    {
-        var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.InstructionIndex != 1 || !PermitIssuedShuangjia(frame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShuangjiaInitializedEvent>().Any(e => e.Source.OwnerSeat == frame.OwnerSeat))
-            throw new InvalidOperationException("Shuangjia requires its exact frozen opening mother and initializes once.");
-        var parent = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == frame.WindowContext!.ParentFrameId);
-        var entities = parent.ShuangjiaInitialEntities!.Where(e => e.OwnerSeat == frame.OwnerSeat).ToArray();
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShuangjiaInitializedEvent(frame.Id, ShuangjiaSource(frame), frame.GameplayHash, entities.Length));
-        foreach (var entity in entities)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShuangjiaInitialEntityMarkedEvent(frame.Id, entity.OwnerSeat, entity.CardId, entity.PrintedKind, entity.DealSequence));
-        return SkillProgramStepOutcome.Continue;
-    }
 }

@@ -7,13 +7,13 @@ internal sealed partial class CoreGameEngineLordSkillProjectionsRuntime
 
     internal IEnumerable<SkillGrant> EffectiveUnprojectedGrants(CharacterState owner)
     {
-        var active = owner.SkillGrants.Grants.Where(g => g.LordProjection is null && (g.GeneralLibraryProjection is null ? _coreNationalSkillsOperations.IsSkillGrantStateEffective(owner, g) : _corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, g)) && _coreNationalSkillsOperations.IsRawSkillSourceAdmitted(owner, g) && (g.SourceId is not (CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource) || !_contentRegistryOperations._contentRegistry.GetSkill(g.SkillId).Tags.HasFlag(SkillTag.Lord) || owner.Role == Role.Lord || _corePrintedLordSkillQualificationsOperations.IsPrintedLordGrantQualified(owner, g))).ToArray();
+        var active = owner.SkillGrants.Grants.Where(g => g.LordProjection is null && (g.GeneralLibraryProjection is null ? _coreNationalSkillsOperations.IsSkillGrantStateEffective(owner, g) : _corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, g)) && _coreNationalSkillsOperations.IsRawSkillSourceAdmitted(owner, g) && (g.SourceId is not (CharacterState.PrimarySkillSource or CharacterState.SecondarySkillSource) || !_contentRegistryOperations._contentRegistry.GetSkill(g.SkillId).Tags.HasFlag(SkillTag.Lord) || owner.Role == Role.Lord || PrintedLordSkillQualifications.Matches(owner, g))).ToArray();
         return active;
     }
 
     internal bool IsProjectedGrantQualified(CharacterState owner, SkillGrant grant)
     {
-        if (!_coreCurrentTurnSkillSuppressionsOperations.IsCurrentTurnSkillGrantQualified(owner, grant))
+        if (!_coreNationalSkillsOperations.IsSkillGrantStateEffective(owner, grant))
             return false;
         if (grant.LordProjection is not { } source)
             return true;
@@ -54,7 +54,7 @@ internal sealed partial class CoreGameEngineLordSkillProjectionsRuntime
             return false;
         // The menu uses the same stable instance that execution resolves. Do not let another grant authorize it.
         instance ??= _corePrintedLordSkillQualificationsOperations.PreferredQualifiedPrintedLordInstance(owner, skillId) ?? _coreNationalSkillsOperations.GetSkillBindingShard(owner).ActiveGrants.Where(g => g.SkillId == skillId).OrderBy(g => g.SkillInstanceId, StringComparer.Ordinal).Select(g => g.SkillInstanceId).FirstOrDefault();
-        return owner.SkillGrants.Grants.Any(g => g.SkillId == skillId && g.SkillInstanceId == instance && g.IsEnabled && (_corePrintedLordSkillQualificationsOperations.IsPrintedLordGrantQualified(owner, g) || g.LordProjection is not null && IsProjectedGrantQualified(owner, g))) || _boundaryYuanShuOperations.Get().IsLordGrantQualified(owner.Seat, skillId, instance);
+        return owner.SkillGrants.Grants.Any(g => g.SkillId == skillId && g.SkillInstanceId == instance && g.IsEnabled && (PrintedLordSkillQualifications.Matches(owner, g) || g.LordProjection is not null && IsProjectedGrantQualified(owner, g))) || _boundaryYuanShuOperations.Get().IsLordGrantQualified(owner.Seat, skillId, instance);
     }
 
     internal IReadOnlyList<string> AdvancedOwnedSkillIds(CharacterState owner) => owner.SkillGrants.Grants.Where(g => g.IsEnabled && !g.IsModeRule && (g.LordProjection is null || IsProjectedGrantQualified(owner, g)) && _corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, g)).Select(g => g.SkillId).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();

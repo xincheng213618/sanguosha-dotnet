@@ -8,14 +8,12 @@ internal sealed partial class CharacterCaiWenJiLeEntries
     internal DeclaredCardPayment? BeifenOriginalDeclaration(CardUseFrame use) => _resolve().BeifenOriginalDeclaration(use);
     internal bool BeifenSlashQuotaBeforeLimit(ProgramSlashQuotaQuery query) => _resolve().BeifenSlashQuotaBeforeLimit(query);
     internal bool CanOfferBeifen(ProgramTriggerLegalityContext gate) => _resolve().CanOfferBeifen(gate);
-    internal bool CanOfferShuangjia(ProgramTriggerLegalityContext gate) => _resolve().CanOfferShuangjia(gate);
     internal DeclaredCardPayment CaptureBeifenDeclarationPayment(DeclaredCardPayment payment, CardDeclarationParentReturn parent) => _resolve().CaptureBeifenDeclarationPayment(payment, parent);
     internal void CaptureBeifenLossQualifications(CardMovementBatchContext batch, IReadOnlyList<BeifenLossSource> sources) => _resolve().CaptureBeifenLossQualifications(batch, sources);
     internal IReadOnlyList<BeifenLossSource> CaptureBeifenLossSources(IEnumerable<CardLocation> locations) => _resolve().CaptureBeifenLossSources(locations);
     internal BeifenUseQualification? CaptureBeifenUseQualification(CharacterState actor) => _resolve().CaptureBeifenUseQualification(actor);
     internal void CaptureBeifenZeroMaterialNativeUse(IGameEvent payload) => _resolve().CaptureBeifenZeroMaterialNativeUse(payload);
     internal void CaptureMovementBatchStartBeifenLossSources(CardMovementBatchBuilder batch) => _resolve().CaptureMovementBatchStartBeifenLossSources(batch);
-    internal ProgramLifecycleTriggerWindowFrame CaptureShuangjiaInitialEntities(ProgramLifecycleTriggerWindowFrame window) => _resolve().CaptureShuangjiaInitialEntities(window);
     internal IReadOnlyList<ProgramTriggerCandidate> CollectBeifenLossCandidates(CardMovementBatchContext batch) => _resolve().CollectBeifenLossCandidates(batch);
     internal void CollectWindow_CollectBeifenLossCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result) => _resolve().CollectWindow_CollectBeifenLossCandidates(batch, result);
     internal CardMovementBatchContext CompleteMovementBatchCaptureBeifenLossQualifications(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureBeifenLossQualifications(batch, completed);
@@ -31,13 +29,10 @@ internal sealed partial class CharacterCaiWenJiLeEntries
     internal bool HasBeifenUseDistance(CharacterState actor, long? existingUseFrameId = default) => _resolve().HasBeifenUseDistance(actor, existingUseFrameId);
     internal bool HasIssuedBeifenUse(long useId, int actorSeat) => _resolve().HasIssuedBeifenUse(useId, actorSeat);
     internal bool HasShuangjiaEntityMark(int cardId) => _resolve().HasShuangjiaEntityMark(cardId);
-    internal SkillProgramStepOutcome InitializeShuangjia(ProgramSkillFrame supplied) => _resolve().InitializeShuangjia(supplied);
     internal bool IsBeifenOwnedLoss(CardMovementRecord m, int owner) => _resolve().IsBeifenOwnedLoss(m, owner);
     internal bool IsIssuedBeifenCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedBeifenCandidate(c, context);
-    internal bool IsIssuedShuangjiaCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().IsIssuedShuangjiaCandidate(candidate, context);
     internal bool IsShuangjiaHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsShuangjiaHandLimitExempt(owner, cardId);
     internal void IssueBeifenUse(CardUseFrame use) => _resolve().IssueBeifenUse(use);
-    internal bool PermitIssuedShuangjia(ProgramSkillFrame frame) => _resolve().PermitIssuedShuangjia(frame);
     internal bool ResumeBeifen(long id) => _resolve().ResumeBeifen(id);
     internal bool ReturnBeifenMovement(ProgramSkillFrame f) => _resolve().ReturnBeifenMovement(f);
     internal ProgramSkillWindowContext? TryCreateBeifenMovementContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate) => _resolve().TryCreateBeifenMovementContext(frame, candidate);
@@ -45,6 +40,5 @@ internal sealed partial class CharacterCaiWenJiLeEntries
     internal bool ValidBeifenQualification(BeifenUseQualification q) => _resolve().ValidBeifenQualification(q);
     internal bool ValidBeifenReceipt(ProgramSkillFrame f) => _resolve().ValidBeifenReceipt(f);
     internal bool HasLeCaiWenJiBeifenCapability { get => _resolve().HasLeCaiWenJiBeifenCapability; }
-    internal bool HasLeCaiWenJiShuangjiaCapability { get => _resolve().HasLeCaiWenJiShuangjiaCapability; }
     internal ShuangjiaMarkRuntime ShuangjiaMarks { get => _resolve().ShuangjiaMarks; }
 }

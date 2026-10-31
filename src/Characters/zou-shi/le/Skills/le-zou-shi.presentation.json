@@ -2,6 +2,7 @@
   "schemaVersion": 3,
   "skills": {
     "le:yunzheng": {
+      "cardMarks": { "zheng": "筝" },
       "name": "韵筝",
       "description": "锁定技，游戏开始时，你的初始手牌增加“筝”标记且不计入手牌上限，手牌有“筝”的其他角色非锁定技失效。"
     },

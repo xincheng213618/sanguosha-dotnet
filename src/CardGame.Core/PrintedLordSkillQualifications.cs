@@ -1,10 +1,22 @@
+using System.Text.Json.Serialization;
+
 namespace CardGame.Core;
 
 // A qualification belongs to one existing printed grant, never to a role or
 // an acquired skill id. The issuing skill need not remain live afterwards.
 public sealed record PrintedLordSkillQualification(int BeneficiarySeat, string GeneralId,
     string TemplateSourceId, string GrantId, string SkillId, string SkillInstanceId,
-    long ProgramFrameId, CardConversionSource Issuer, string GameplayHash);
+    PrintedLordQualificationSource Source);
+
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+[JsonDerivedType(typeof(PrintedLordQualificationSource.SetupDeclared), "setupDeclared")]
+[JsonDerivedType(typeof(PrintedLordQualificationSource.ProgramIssued), "programIssued")]
+public abstract record PrintedLordQualificationSource
+{
+    public sealed record SetupDeclared(string DeclarationId) : PrintedLordQualificationSource;
+    public sealed record ProgramIssued(long ProgramFrameId, CardConversionSource Issuer,
+        string GameplayHash) : PrintedLordQualificationSource;
+}
 
 internal static class PrintedLordSkillQualifications
 {
@@ -12,10 +24,16 @@ internal static class PrintedLordSkillQualifications
     {
         if (grant.PrintedLordQualification is not { } q || q.BeneficiarySeat != owner.Seat ||
             q.GrantId != grant.GrantId || q.SkillId != grant.SkillId || q.SkillInstanceId != grant.SkillInstanceId ||
-            q.TemplateSourceId != grant.SourceId || grant.LordProjection is not null || grant.GeneralLibraryProjection is not null ||
-            q.ProgramFrameId <= 0 || q.Issuer.OwnerSeat == owner.Seat ||
-            string.IsNullOrWhiteSpace(q.Issuer.SkillId) || string.IsNullOrWhiteSpace(q.Issuer.BindingId) ||
-            string.IsNullOrWhiteSpace(q.Issuer.SkillInstanceId) || string.IsNullOrWhiteSpace(q.GameplayHash)) return false;
+            q.TemplateSourceId != grant.SourceId || grant.LordProjection is not null || grant.GeneralLibraryProjection is not null)
+            return false;
+        if (!(q.Source switch
+        {
+            PrintedLordQualificationSource.SetupDeclared declared => !string.IsNullOrWhiteSpace(declared.DeclarationId),
+            PrintedLordQualificationSource.ProgramIssued issued => issued.ProgramFrameId > 0 && issued.Issuer.OwnerSeat != owner.Seat &&
+                !string.IsNullOrWhiteSpace(issued.Issuer.SkillId) && !string.IsNullOrWhiteSpace(issued.Issuer.BindingId) &&
+                !string.IsNullOrWhiteSpace(issued.Issuer.SkillInstanceId) && !string.IsNullOrWhiteSpace(issued.GameplayHash),
+            _ => false
+        })) return false;
         var general = grant.SourceId switch
         {
             CharacterState.PrimarySkillSource => owner.General,

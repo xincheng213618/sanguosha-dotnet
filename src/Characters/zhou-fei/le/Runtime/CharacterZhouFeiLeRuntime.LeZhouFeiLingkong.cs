@@ -3,40 +3,14 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhouFeiLeRuntime
 {
-    internal bool HasLeZhouFeiLingkongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeLingkongInitialEntities) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.MarkLingkongFirstOutsideDrawGain);
+    internal bool HasLeZhouFeiLingkongCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.MarkLingkongFirstOutsideDrawGain);
 
     internal static CardConversionSource LingkongSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhou_fei_le_LeZhouFeiLingkong.LingkongSource(f);
     internal static bool IsLingkongGainTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_zhou_fei_le_LeZhouFeiLingkong.IsLingkongGainTrigger(t);
     // Registration only; the query still belongs to legacy GameEngine.LeZhouFeiLingkong.
-    [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 110)]
-    internal void ProjectLingkongCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
-    {
-        projection.Append(HasLingkongEntityMark(cardId) ? "箜篌" : null);
-    }
-
-    internal bool HasLingkongEntityMark(int cardId) => HasLeZhouFeiLingkongCapability && (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LingkongInitialEntityMarkedEvent>().Any(e => e.CardId == cardId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LingkongGainEntityMarkedEvent>().Any(e => e.CardId == cardId));
+    internal bool HasLingkongEntityMark(int cardId) => _cardEntityMarks.Has(cardId, "lingkong");
     internal bool HasLingkongHandEntityMark(int ownerSeat, int cardId) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(ownerSeat) && HasLingkongEntityMark(cardId);
     internal bool IsLingkongHandLimitExempt(CharacterState owner, int cardId) => _coreNationalSkillsOperations.HasRuntimeSkill(owner, "le:lingkong") && HasLingkongHandEntityMark(owner.Seat, cardId);
-    internal ProgramLifecycleTriggerWindowFrame CaptureLingkongInitialEntities(ProgramLifecycleTriggerWindowFrame window)
-    {
-        if (!HasLeZhouFeiLingkongCapability || window.Window != SkillProgramTriggerWindow.GameStarting || window.Continuation != ProgramLifecycleContinuation.CompleteGameStarting)
-            return window;
-        if (window.LingkongInitialEntities is not null)
-            throw new InvalidOperationException("Lingkong's actual opening Hand can only be frozen once.");
-        var owners = window.Candidates.Where(c => _coreProgramLifecycleOperations.GetProgramTrigger2(c).Effects is [{ Op: SkillProgramEffectOp.InitializeLingkongInitialEntities }]).Select(c => c.OwnerSeat).Distinct().Order();
-        var entities = owners.SelectMany(owner => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Select(c =>
-        {
-            var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == c.Id && m.To == CardLocation.Hand(owner));
-            if (entry is null || entry.CardKind != c.Kind)
-                throw new InvalidOperationException("A Lingkong initial entity requires its actual opening-Hand entry.");
-            return new LingkongInitialEntity(owner, c.Id, c.Kind, entry.Sequence);
-        })).ToArray();
-        return window with
-        {
-            LingkongInitialEntities = entities
-        };
-    }
-
     internal CardMovementBatchContext CaptureLingkongGainBatch(CardMovementBatchContext batch)
     {
         if (!HasLeZhouFeiLingkongCapability || batch.TurnNumber <= 0 || batch.MovementTiming is not { } timing || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(timing.ActualTurnOwnerSeat))
@@ -168,16 +142,10 @@ internal sealed partial class CharacterZhouFeiLeRuntime
         return true;
     }
 
-    internal bool IsIssuedLingkongInitialCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => HasLeZhouFeiLingkongCapability && candidate.SkillId == "le:lingkong" && candidate.BindingId == "mark-initial-entities" && _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is [{ Op: SkillProgramEffectOp.InitializeLingkongInitialEntities }] && context.Window == SkillProgramTriggerWindow.GameStarting && context.OwnerSeat == candidate.OwnerSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == context.ParentFrameId)is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.GameStarting, Continuation: ProgramLifecycleContinuation.CompleteGameStarting, LingkongInitialEntities: not null } parent && parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count && parent.Candidates[parent.CandidateIndex] == candidate && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LingkongInitializedEvent>().Any(e => e.Source.OwnerSeat == candidate.OwnerSeat);
     [ProgramIssuedTrigger(180)]
-    internal bool IsIssuedLingkongCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => IsIssuedLingkongGainCandidate(candidate, context) || IsIssuedLingkongInitialCandidate(candidate, context);
-    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28310, SkillProgramEffectOp.InitializeLingkongInitialEntities, SkillProgramEffectOp.MarkLingkongFirstOutsideDrawGain)]
-    internal bool CanOfferLingkong(ProgramTriggerLegalityContext gate)
-    {
-        if (IsLingkongGainTrigger(gate.Trigger))
-            return IsIssuedLingkongGainCandidate(gate.Candidate, gate.Context);
-        return gate.Context.Window == SkillProgramTriggerWindow.GameStarting && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LingkongInitializedEvent>().Any(e => e.Source.OwnerSeat == gate.Candidate.OwnerSeat);
-    }
+    internal bool IsIssuedLingkongCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => IsIssuedLingkongGainCandidate(candidate, context);
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28310, SkillProgramEffectOp.MarkLingkongFirstOutsideDrawGain)]
+    internal bool CanOfferLingkong(ProgramTriggerLegalityContext gate) => IsIssuedLingkongGainCandidate(gate.Candidate, gate.Context);
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28310)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28310)]
@@ -195,28 +163,10 @@ internal sealed partial class CharacterZhouFeiLeRuntime
         // instruction. Its already-issued marker is not a second entitlement.
         if (f.InstructionIndex != 1)
             return false;
-        if (f.TriggerId == "mark-initial-entities")
-            return _coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.GameStarting) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LingkongInitializedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var initial] && initial.Source == LingkongSource(f) && initial.GameplayHash == f.GameplayHash;
         return context.MovementBatch is { } batch && _resolutionStackOperations._resolutionStack[index - 1] is CardsMovedTriggerWindowFrame window && window.Batch == batch && window.CandidateIndex >= 0 && window.CandidateIndex < window.Candidates.Count && window.Candidates[window.CandidateIndex] == candidate && ExactLingkongGainQualification(batch, LingkongSource(f), f.GameplayHash, out _) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LingkongGainMarkedEvent>().Where(e => e.FrameId == f.Id).ToArray()is [var marked] && marked.BatchId == batch.Id && marked.Source == LingkongSource(f) && marked.GameplayHash == f.GameplayHash;
     }
 
-    SkillProgramStepOutcome ILeZhouFeiLingkongHost.InitializeLingkong(ProgramSkillFrame frame) => InitializeLingkong(frame);
     SkillProgramStepOutcome ILeZhouFeiLingkongHost.MarkLingkongGain(ProgramSkillFrame frame) => MarkLingkongGain(frame);
-    internal SkillProgramStepOutcome InitializeLingkong(ProgramSkillFrame supplied)
-    {
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.InstructionIndex != 1 || f.TriggerId != "mark-initial-entities" || !_coreOriginalHandEntityObserversOperations.ExactOriginalHandLifecycleParent(f, SkillProgramTriggerWindow.GameStarting) || !PermitIssuedLingkong(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LingkongInitializedEvent>().Any(e => e.Source.OwnerSeat == f.OwnerSeat))
-            throw new InvalidOperationException("Lingkong initialization requires its exact frozen game-start mother once.");
-        var parent = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == f.WindowContext!.ParentFrameId);
-        var entries = parent.LingkongInitialEntities!.Where(e => e.OwnerSeat == f.OwnerSeat).ToArray();
-        if (entries.Select(e => e.CardId).Distinct().Count() != entries.Length || entries.Any(e => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.DealSequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.To == CardLocation.Hand(e.OwnerSeat))))
-            throw new InvalidOperationException("Lingkong cannot mark an entity without its original opening-Hand entry.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LingkongInitializedEvent(f.Id, LingkongSource(f), f.GameplayHash, entries.Length));
-        foreach (var entity in entries)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LingkongInitialEntityMarkedEvent(f.Id, entity.OwnerSeat, entity.CardId, entity.PrintedKind, entity.DealSequence));
-        return SkillProgramStepOutcome.Continue;
-    }
-
     internal SkillProgramStepOutcome MarkLingkongGain(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -224,8 +174,7 @@ internal sealed partial class CharacterZhouFeiLeRuntime
             throw new InvalidOperationException("Lingkong requires its issued first outside-own-Draw acquisition and exact original batch.");
         var entries = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LingkongGainEntityIssuedEvent>().Where(e => e.BatchId == batch.Id && e.RecipientSeat == f.OwnerSeat).OrderBy(e => e.GainSequence).ToArray();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LingkongGainMarkedEvent(f.Id, batch.Id, qualified.Source, qualified.GameplayHash, qualified.ActualTurn, qualified.TurnOwner, entries.Length));
-        foreach (var entity in entries)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LingkongGainEntityMarkedEvent(f.Id, batch.Id, entity.RecipientSeat, entity.CardId, entity.PrintedKind, entity.GainSequence));
+        _cardEntityMarkOperations.Mark(f.Id, "lingkong", entries.Select(entity => entity.CardId).ToArray());
         return SkillProgramStepOutcome.Continue;
     }
 

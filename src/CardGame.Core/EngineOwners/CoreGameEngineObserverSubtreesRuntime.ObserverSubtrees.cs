@@ -57,6 +57,15 @@ internal sealed partial class CoreGameEngineObserverSubtreesRuntime
         return true;
     }
 
+    internal bool HasOwnedObserverSuffix(int rootIndex)
+    {
+        var frames = _resolutionStackOperations._resolutionStack;
+        if (rootIndex < 0 || rootIndex + 1 >= frames.Count) return false;
+        for (var child = rootIndex + 1; child < frames.Count; child++)
+            if (frames[child].RuntimeOrigin?.ParentId != frames[child - 1].Id) return false;
+        return true;
+    }
+
     internal static bool IsObserverSkillsChangedEdge(ResolutionFrame parent, ResolutionFrame child) => RuntimeSkills.RuntimeRules_Core_ObserverSubtrees.IsObserverSkillsChangedEdge(parent, child);
     internal bool IsPaidRescueObserverSuffix(int child, DyingFrame dying) => _coreParticipantHandProgramRescueRidesOperations.IsPaidHandRepaymentProgramAlcoholRide(child, dying) || _coreParticipantHandDamageRidesOperations.IsPaidHandRepaymentRescueRide(child, dying) || _coreUnrespondableCounterspellsOperations.PolicyCounterspellVirtualAlcoholRide(child, dying) || _coreHalfHandPhaseDebtDamageObserversOperations.PaidObserverDamageVirtualAlcoholRide(child, dying);
     internal bool IsSuspendedOrPaidRescueObserverSuffix(int child, DyingFrame dying) => _coreDyingSuitsAndHistoricalUseObserversOperations.IsOriginalDyingSuspendedByDyingSuits(dying) || _coreRecipientCategoryMarkContinuationsOperations.Value.IsOriginalDyingSuspendedByRecipientCategoryMark(dying) || _coreOwnedDeathBenefitReturnsOperations.Value.IsOriginalDyingSuspendedByOwnedDeathBenefit(dying) || _characterHeJinOlOperations.IsOriginalDyingSuspendedByHeJinYanhuo(dying) || _characterDiaoChanLeOperations.IsOriginalDyingSuspendedByDiou(dying) || _characterZhangFeiWumiaoOperations.IsOriginalDyingSuspendedByWuZishengMovement(dying) || IsPaidRescueObserverSuffix(child, dying);

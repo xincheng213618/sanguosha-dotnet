@@ -6,40 +6,30 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZouShiLeRuntime
 {
     internal const string HuoxinObtainReason = "skill-program.le-zou-shi.huoxin.obtain";
-    internal static CardConversionSource HuoxinSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zou_shi_le_LeZouShiHuoxin.HuoxinSource(f);
     internal bool TryGetHuoxinUse(int owner, ProgramSkillWindowContext context, out ProgramCardTriggerWindowFrame window)
     {
-        window = null !;
-        if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || context.CardUse is not { } use || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || CoreGameEngineCardActionsRuntime.GetCardActionWindow(w) != SkillProgramTriggerWindow.CardUseCommitted || w.Action.ActionId != use.CardActionId || w.Action.ActorSeat != owner || use.ActorSeat != owner || w.Action.EffectiveKind != use.EffectiveKind || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(w.Action.EffectiveKind) == SkillProgramCardCategory.Equipment || w.Action.Type == CardActionType.Response && w.CompletedResponseReturn is not { IsCommitted: true })
-            return false;
-        if (w.Action.Type == CardActionType.Use && w.CompletedResponseReturn is not null)
-            return false;
-        window = w;
-        return true;
+        window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>()
+            .SingleOrDefault(frame => frame.Id == context.ParentFrameId)!;
+        return window is not null && window.Action.ActorSeat == owner &&
+            CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(window.Action.EffectiveKind) != SkillProgramCardCategory.Equipment &&
+            (window.Action.Type != CardActionType.Response || window.CompletedResponseReturn is { IsCommitted: true }) &&
+            (window.Action.Type != CardActionType.Use || window.CompletedResponseReturn is null);
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28951)]
-    internal bool CanOfferHuoxin(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
-    {
-        if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveHuoxinNonEquipmentUse))
-            return true;
-        return candidate.SkillId == "le:huoxin" && candidate.BindingId == "non-equipment-use" && _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive && TryGetHuoxinUse(candidate.OwnerSeat, context, out var window) && _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window) && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != candidate.OwnerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(p).Count > 0) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuoxinStartedEvent>().Any(e => e.ActionId == window.Action.ActionId && e.Source.OwnerSeat == candidate.OwnerSeat);
-    }
+    internal bool CanOfferHuoxin(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) =>
+        !trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ResolveHuoxinNonEquipmentUse) ||
+        TryGetHuoxinUse(candidate.OwnerSeat, context, out _) && _coreMatchParticipantsPlayersAccess._players.Any(player =>
+            player.IsAlive && player.Seat != candidate.OwnerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(player).Count > 0);
 
     internal SkillProgramStepOutcome BeginHuoxin(ProgramSkillFrame supplied)
     {
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.Huoxin is not null || f.InstructionIndex != 1 || f.TriggerId != "non-equipment-use" || f.SkillId != "le:huoxin" || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context || !CanOfferHuoxin(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context) || !TryGetHuoxinUse(f.OwnerSeat, context, out var window))
-            throw new InvalidOperationException("Huoxin requires its unique accepted native non-equipment true Use and original actor.");
-        var r = new HuoxinReceipt(HuoxinSource(f), f.GameplayHash, window.Id, window.ParentFrameId, window.Action.ActionId, window.Action.EffectiveKind, window.Action.EffectiveSuit ?? context.CardUse!.PublicSuit ?? Suit.None)
-        {
-            Stage = HuoxinStage.TargetChoice,
-            Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
-            After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
-        };
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Huoxin = r });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuoxinStartedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, r.UseId, r.ActionId, r.EffectiveKind, r.EffectiveSuit));
-        PublishHuoxin(f);
+        var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        var window = (ProgramCardTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(value => value.Id == frame.WindowContext!.ParentFrameId);
+        var receipt = new HuoxinReceipt(window.Action.EffectiveSuit ?? frame.WindowContext!.CardUse!.PublicSuit ?? Suit.None)
+        { Stage = HuoxinStage.TargetChoice };
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Huoxin = receipt });
+        PublishHuoxin(frame);
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
@@ -98,13 +88,12 @@ internal sealed partial class CharacterZouShiLeRuntime
                 var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat], card);
                 var marked = HasYunzhengEntityMark(id);
                 var may = marked || r.EffectiveSuit != Suit.None && r.EffectiveSuit == suit;
-                _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Huoxin = r with { Stage = HuoxinStage.ObtainChoice, Paid = true, CardId = id, PrintedKind = card.Kind, ShownEffectiveSuit = suit, WasMarked = marked, MayObtain = may } });
+                _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Huoxin = r with { Stage = HuoxinStage.ObtainChoice, Paid = true, CardId = id, MayObtain = may } });
                 _coreProgramLifecycleOperations.SetProgramCardSet(f.Id, "huoxin-shown", [id], SkillProgramCardSetVisibility.Private, [CardLocation.Hand(r.TargetSeat)]);
                 f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
                 _coreProgramCategoryChallengesOperations.RevealProgramBoundCards(f, "huoxin-shown");
                 f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuoxinEntityShownEvent(f.Id, r.TargetSeat, id, card.Kind, suit, marked, may));
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuoxinEntityMarkedEvent(f.Id, r.Source, r.GameplayHash, r.TargetSeat, id, card.Kind));
+                _cardEntityMarkOperations.Mark(f.Id, "zheng", [id]);
                 if (may)
                     PublishHuoxin(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
                 else
@@ -112,17 +101,9 @@ internal sealed partial class CharacterZouShiLeRuntime
                 return;
             case "obtain":
                 var selected = r.CardId!.Value;
-                var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-                _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Huoxin = r with { Stage = HuoxinStage.ObtainChildren, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([selected], CardLocation.Hand(f.OwnerSeat), new(HuoxinObtainReason), (batch, moves) =>
-                {
-                    var m = moves.Single();
-                    var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-                    if (m.CardId != selected || m.CardKind != r.PrintedKind || m.From != CardLocation.Hand(r.TargetSeat) || m.To != CardLocation.Hand(f.OwnerSeat))
-                        throw new InvalidOperationException("Huoxin must obtain the same publicly shown Hand entity exactly once.");
-                    _coreRuntimeOperations.ReplaceRuntimeTop(current with { Huoxin = current.Huoxin!with { BatchId = batch, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, PaidSequence = m.Sequence } });
-                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuoxinObtainPaidEvent(f.Id, batch, selected, m.CardKind, m.From, m.To, m.Sequence, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
-                });
+                _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+                { Huoxin = r with { Stage = HuoxinStage.ObtainChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([selected], CardLocation.Hand(f.OwnerSeat), new(HuoxinObtainReason));
                 ContinueHuoxin(f.Id);
                 return;
             case "decline":
@@ -152,7 +133,6 @@ internal sealed partial class CharacterZouShiLeRuntime
     internal void FinishHuoxin(ProgramSkillFrame f)
     {
         var r = f.Huoxin!;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuoxinCompletedEvent(f.Id, r.Paid, r.PaidSequence > 0));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Huoxin = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, r.Paid);
     }
@@ -177,7 +157,7 @@ internal sealed partial class CharacterZouShiLeRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28951)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 28951)]
-    internal bool PermitPaidHuoxin(ProgramSkillFrame f) => f.Huoxin is { Paid: true } && ValidHuoxin(f);
+    internal bool PermitPaidHuoxin(ProgramSkillFrame f) => f.Huoxin is { Paid: true };
     [ProgramAiChoice(SkillProgramEffectOp.ResolveHuoxinNonEquipmentUse)]
     internal PromptChoice HuoxinAi(PendingDecision p, ProgramSkillFrame f)
     {

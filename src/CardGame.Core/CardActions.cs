@@ -125,6 +125,8 @@ public sealed record ProgramCardTriggerCandidate(
     string SkillInstanceId = "", int Priority = 0,
     ProgramSkillWindowContext? FrozenContext = null);
 
+public sealed record ProgramCardTriggerUsage(int OwnerSeat, string SkillId, string BindingId, int Count);
+
 public sealed partial record ProgramCardTriggerWindowFrame(
     long Id, long ParentFrameId, CardActionContext Action,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] ProgramCardContinuation? Continuation,
@@ -133,7 +135,12 @@ public sealed partial record ProgramCardTriggerWindowFrame(
     ProgramTrickContinuation? TrickContinuation = null,
     ProgramSimpleCardContinuation? SimpleContinuation = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] ProgramCompletedResponseReturn? CompletedResponseReturn = null, long? AttackOwnerFrameId = null)
-    : ResolutionFrame(Id, ResolutionFrameKind.ProgramCardTriggerWindow, ResolutionFrameStep.ResolvingEffect);
+    : ResolutionFrame(Id, ResolutionFrameKind.ProgramCardTriggerWindow, ResolutionFrameStep.ResolvingEffect)
+{
+    private readonly IReadOnlyList<ProgramCardTriggerUsage> _eventUsages = [];
+    public IReadOnlyList<ProgramCardTriggerUsage> EventUsages
+    { get => _eventUsages; init => _eventUsages = Array.AsReadOnly(value.ToArray()); }
+}
 
 public sealed record ProgramCardTriggerResolvedEvent(
     long FrameId, string SkillId, string TriggerId, int OwnerSeat, int OpponentSeat, bool Activated) : IGameEvent;

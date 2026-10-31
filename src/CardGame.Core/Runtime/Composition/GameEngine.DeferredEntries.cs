@@ -1565,7 +1565,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineScenarioGodFactionsRuntime> ScenarioGodFactionsEntries => GetDeferredModule<EngineOwners.CoreGameEngineScenarioGodFactionsRuntime>();
 
-    internal Core.RuntimeEntries.CoreGameEngineScenarioPrintedLordQualificationsEntries ScenarioPrintedLordQualificationsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineScenarioPrintedLordQualificationsEntries, EngineOwners.CoreGameEngineScenarioPrintedLordQualificationsRuntime>(Core.RuntimeEntries.CoreGameEngineScenarioPrintedLordQualificationsEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineSequentialDeckKindGrowthEntries SequentialDeckKindGrowthEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSequentialDeckKindGrowthEntries, EngineOwners.CoreGameEngineSequentialDeckKindGrowthRuntime>(Core.RuntimeEntries.CoreGameEngineSequentialDeckKindGrowthEntries.Create);
 
