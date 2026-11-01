@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:shenxing-mobile", "revision": 1, "activations": [
       { "id": "discard-pair", "minCards": 2, "maxCards": 2, "sourceZones": ["hand", "equipment"],

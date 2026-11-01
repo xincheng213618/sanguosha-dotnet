@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:xianzhou-current", "revision": 1, "minimumRulesVersion": 195,
       "activations": [{ "id": "all-equipment-donation", "minCards": 0, "maxCards": 0,

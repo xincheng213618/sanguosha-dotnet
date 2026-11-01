@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 64, "skills": [
+   "skills": [
     { "id": "boundary:zongxuan-mobile", "revision": 1,
       "activations": [{ "id": "draw-then-top", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,
         "targetKind": "anyLiving", "usesPerTurn": null, "usesPerPhase": 1,

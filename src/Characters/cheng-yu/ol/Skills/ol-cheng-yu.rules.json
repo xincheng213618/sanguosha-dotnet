@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:shefu", "revision": 1, "triggers": [
       { "id": "record-ending-ambush", "window": "turnEnding", "subject": "owner", "optional": true,

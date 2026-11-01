@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "wumiao:jincui", "revision": 1, "triggers": [
       { "id": "opening-seven", "window": "gameStarting", "subject": "owner", "optional": false, "effects": [{ "op": "initializeWuZhugeLiangJincui", "target": "owner" }] },

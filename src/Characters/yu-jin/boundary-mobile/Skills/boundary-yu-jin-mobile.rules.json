@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{ "id": "boundary:jieyue-mobile", "revision": 1,
     "triggers": [{ "id": "ending-gift-and-recipient-choice", "window": "turnEnding", "subject": "owner", "turnOwnerScope": "own", "optional": true,
       "effects": [

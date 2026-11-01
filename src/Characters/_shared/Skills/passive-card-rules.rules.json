@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     {"id":"classic:wushuang","revision":1,"minimumRulesVersion": 172,"cardPolicies":[
       {"id":"slash-two-dodges","kind":"minimumResponseCount","cardKinds":["slash","fireSlash","thunderSlash"],"requiredCardKinds":["dodge"],"value":2},

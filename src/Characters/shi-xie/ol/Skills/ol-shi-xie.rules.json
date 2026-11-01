@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:biluan", "revision": 1, "triggers": [
       { "id": "ending-faction-distance", "window": "turnEnding", "subject": "owner", "turnOwnerScope": "own", "optional": true,

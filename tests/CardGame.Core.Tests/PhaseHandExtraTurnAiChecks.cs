@@ -119,7 +119,7 @@ internal static class PhaseHandExtraTurnAiChecks
                 const string suffix = "classic-shen-sima-yi.rules.json";
                 using var stream = assembly.GetManifestResourceStream(assembly.GetManifestResourceNames().Single(n => n.EndsWith(suffix, StringComparison.Ordinal)))!;
                 using var reader = new StreamReader(stream);
-                var rules = JsonNode.Parse(reader.ReadToEnd())!.AsObject();
+                var rules = JsonNode.Parse(SkillProgramTestJson.VersionedEmbeddedRules(reader.ReadToEnd()))!.AsObject();
                 var legacy = rules["skills"]!.AsArray().Single(node => node!["id"]!.GetValue<string>() == "classic:lianpo")!.DeepClone();
                 var originalEffects = legacy["triggers"]!.AsArray().Single()!["effects"]!.DeepClone();
                 legacy["id"] = OwnerOnlySkill;

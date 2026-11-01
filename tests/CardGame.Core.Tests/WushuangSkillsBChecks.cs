@@ -52,17 +52,9 @@ internal static partial class WushuangSkillsBChecks
         public PackageManifest Manifest { get; } = new("fixture-wushuang-b", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            var asm = typeof(StandardContentPackage).Assembly;
-            string Read(string suffix) { using var stream = asm.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.wushuang-skills-b." + suffix + ".json")!; using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-            var prod = SkillProgramCatalog.Load(Read("rules"), Read("presentation"));
-            using (var auditStream = asm.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.wushuang-skills-b-audit.rules.json")!)
-            using (var auditPresentation = asm.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.wushuang-skills-b-audit.presentation.json")!)
-            using (var auditRulesReader = new StreamReader(auditStream))
-            using (var auditPresentationReader = new StreamReader(auditPresentation))
-            {
-                var audit = SkillProgramCatalog.Load(auditRulesReader.ReadToEnd(), auditPresentationReader.ReadToEnd());
-                foreach (var (id, program) in audit.Programs) b.AddSkill(new(id, audit.Presentations[id].Name, audit.Presentations[id].Description) { Program = program, ProgramPresentation = audit.Presentations[id] });
-            }
+            var prod = CharacterFixtureContent.EmbeddedProgramBundle("wushuang-skills-b");
+            var audit = CharacterFixtureContent.EmbeddedProgramBundle("wushuang-skills-b-audit");
+            foreach (var (id, program) in audit.Programs) b.AddSkill(new(id, audit.Presentations[id].Name, audit.Presentations[id].Description) { Program = program, ProgramPresentation = audit.Presentations[id] });
             foreach (var (id, program) in prod.Programs) b.AddSkill(new(id, prod.Presentations[id].Name, prod.Presentations[id].Description) { Program = program, ProgramPresentation = prod.Presentations[id] });
             if (skills.Contains(3218)) b.AddSkill(StandardWushuangContentRegistry.Create().Skills["ol:weijing"]);
             var fixtures = SkillProgramCatalog.Load(Rules.Replace("$SCHEMA$", SkillProgramCatalog.RulesSchemaVersion.ToString()),

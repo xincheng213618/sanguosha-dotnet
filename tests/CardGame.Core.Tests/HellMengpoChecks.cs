@@ -103,10 +103,7 @@ internal static class HellMengpoChecks
         public PackageManifest Manifest { get; } = new("fixture-hell-mengpo", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var rules = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.hell-mengpo.rules.json")!);
-            using var presentation = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.hell-mengpo.presentation.json")!);
-            var actual = SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
+            var actual = CharacterFixtureContent.EmbeddedProgramBundle("hell-mengpo");
             foreach (var (id, program) in actual.Programs) b.AddSkill(new(id, actual.Presentations[id].Name, actual.Presentations[id].Description)
             { Program = program, ProgramPresentation = actual.Presentations[id], Tags = id is "hell:wanghun" or "hell:wangshi" ? SkillTag.Locked : SkillTag.None });
             b.AddCard(new("fixture:return-soul", "回魂", "锦囊牌", "Real fixture soul entity.", CardKind.ReturnSoul));

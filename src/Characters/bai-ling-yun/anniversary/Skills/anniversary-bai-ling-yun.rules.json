@@ -1,4 +1,4 @@
-{"schemaVersion":64,"skills":[
+{"skills":[
   {"id":"anniversary:linghui","revision":1,"triggers":[
     {"id":"own-ending","window":"turnEnding","subject":"owner","turnOwnerScope":"own","optional":true,"effects":[{"op":"resolveAnniversaryBaiLingYunLinghui","target":"owner"}]},
     {"id":"foreign-ending","window":"turnEnding","subject":"owner","turnOwnerScope":"otherLiving","optional":true,"effects":[{"op":"resolveAnniversaryBaiLingYunLinghui","target":"owner"}]}

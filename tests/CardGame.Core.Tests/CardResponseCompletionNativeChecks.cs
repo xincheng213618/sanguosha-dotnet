@@ -185,10 +185,7 @@ internal static class CardResponseCompletionNativeChecks
         public PackageManifest Manifest { get; } = new("fixture:card-response-completion-native", "1.0.0", "原生丈八两实体响应完成");
         public void Register(IContentRegistryBuilder b)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var rules = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ordinary-guo-huai.rules.json")!);
-            using var labels = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ordinary-guo-huai.presentation.json")!);
-            var formal = SkillProgramCatalog.Load(rules.ReadToEnd(), labels.ReadToEnd());
+            var formal = CharacterFixtureContent.EmbeddedProgramBundle("ordinary-guo-huai");
             b.AddSkill(new(Zhefu, formal.Presentations[Zhefu].Name, formal.Presentations[Zhefu].Description)
                 { Program = formal.Programs[Zhefu], ProgramPresentation = formal.Presentations[Zhefu] });
             var catalog = SkillProgramCatalog.Load($$$"""

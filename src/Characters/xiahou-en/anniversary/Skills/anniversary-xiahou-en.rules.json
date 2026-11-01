@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "anniversary:chijian", "revision": 1, "modifiers": [
       { "id": "one-more-slash", "query": "slashLimit", "operation": "add", "value": 1, "priority": 0 }

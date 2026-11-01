@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:luanzhan", "revision": 1, "triggers": [
       { "id": "applied-damage-budget", "window": "afterDamageApplied", "subject": "any", "damageOccurrence": "perDamage", "optional": false,

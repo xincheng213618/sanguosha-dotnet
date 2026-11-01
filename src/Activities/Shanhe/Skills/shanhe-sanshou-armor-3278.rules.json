@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "shanhe:sanshou-armor-3278", "revision": 1, "triggers": [
       { "id": "three-types", "window": "beforeDamageApplied", "subject": "damageTarget", "optional": true, "priority": 0,

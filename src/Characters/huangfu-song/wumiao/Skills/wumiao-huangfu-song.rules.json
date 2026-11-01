@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "wumiao:chaozhen", "revision": 1, "triggers": [
       { "id": "preparation-minimum", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": true, "effects": [{ "op": "resolveWuHuangFuSongChaozhen", "target": "owner" }] },

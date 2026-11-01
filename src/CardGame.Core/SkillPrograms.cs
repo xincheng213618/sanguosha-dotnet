@@ -3473,7 +3473,14 @@ public sealed class SkillProgramCatalog
     public IReadOnlyDictionary<string, SkillProgram> Programs { get; }
     public IReadOnlyDictionary<string, SkillPresentation> Presentations { get; }
 
-    public static SkillProgramCatalog Load(string rulesJson, string presentationJson)
+    public static SkillProgramCatalog Load(string rulesJson, string presentationJson) =>
+        Load(rulesJson, presentationJson, requireRulesVersion: true);
+
+    /// <summary>Loads rules shipped with the current implementation; an explicit rules version is rejected.</summary>
+    public static SkillProgramCatalog LoadCurrent(string rulesJson, string presentationJson) =>
+        Load(rulesJson, presentationJson, requireRulesVersion: false);
+
+    private static SkillProgramCatalog Load(string rulesJson, string presentationJson, bool requireRulesVersion)
     {
         ArgumentNullException.ThrowIfNull(rulesJson);
         ArgumentNullException.ThrowIfNull(presentationJson);
@@ -3481,7 +3488,7 @@ public sealed class SkillProgramCatalog
         {
             using var rules = Parse(rulesJson, "rules");
             using var presentation = Parse(presentationJson, "presentation");
-            var programs = LoadPrograms(rules.RootElement);
+            var programs = LoadPrograms(rules.RootElement, requireRulesVersion);
             var presentations = LoadPresentations(presentation.RootElement, programs);
             return new SkillProgramCatalog(ReadOnly(programs), ReadOnly(presentations));
         }
@@ -3511,11 +3518,16 @@ public sealed class SkillProgramCatalog
         }
     }
 
-    private static Dictionary<string, SkillProgram> LoadPrograms(JsonElement root)
+    private static Dictionary<string, SkillProgram> LoadPrograms(JsonElement root, bool requireVersion)
     {
         RequireObject(root, "rules");
-        CheckProperties(root, "rules", "schemaVersion", "skills");
-        RequireVersion(root, "rules", RulesSchemaVersion);
+        if (requireVersion)
+        {
+            CheckProperties(root, "rules", "schemaVersion", "skills");
+            RequireVersion(root, "rules", RulesSchemaVersion);
+        }
+        else
+            CheckProperties(root, "rules", "skills");
         var runtimeVersion = RuntimeVersion;
         const int minimumRulesVersion = 171;
         var skills = Required(root, "skills", JsonValueKind.Array, "rules");

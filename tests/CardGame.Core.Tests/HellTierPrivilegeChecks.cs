@@ -84,10 +84,7 @@ internal static class HellTierPrivilegeChecks
         public PackageManifest Manifest { get; } = new("fixture-hell-tier-privileges", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var rules = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.hell-activity.rules.json")!);
-            using var presentation = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.hell-activity.presentation.json")!);
-            var actual = SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
+            var actual = CharacterFixtureContent.EmbeddedProgramBundle("hell-activity");
             foreach (var (id, program) in actual.Programs) b.AddSkill(new(id, actual.Presentations[id].Name, actual.Presentations[id].Description)
             { Program = program, ProgramPresentation = actual.Presentations[id], Tags = id == "hell:chongsheng" ? SkillTag.Limited : SkillTag.Locked });
             var definitions = new List<object>

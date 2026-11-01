@@ -120,10 +120,7 @@ internal static class GuanduCardChecks
         public PackageManifest Manifest { get; } = new("fixture-guandu-cards", new Version(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var rules = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.guandu-events.rules.json")!);
-            using var presentation = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.guandu-events.presentation.json")!);
-            var events = SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
+            var events = CharacterFixtureContent.EmbeddedProgramBundle("guandu-events");
             foreach (var (id, program) in events.Programs) b.AddSkill(new(id, id, "Native Guandu event fixture.")
                 { Program = program, ProgramPresentation = events.Presentations[id] });
             var json = $$$"""

@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "shanhe:rank-five-rebirth", "revision": 1,
       "triggers": [{ "id": "campaign-rebirth", "window": "selfDyingResponse", "subject": "owner", "optional": true,

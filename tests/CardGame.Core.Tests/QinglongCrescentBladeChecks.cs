@@ -208,10 +208,7 @@ internal static partial class QinglongCrescentBladeChecks
         public PackageManifest Manifest { get; } = new("fixture-qinglong-completed-gift", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder builder)
         {
-            var assembly = typeof(StandardClassicGeneralPackage).Assembly;
-            string Resource(string name) { using var stream = assembly.GetManifestResourceStream(assembly.GetManifestResourceNames().Single(n => n.EndsWith(name, StringComparison.Ordinal)))!;
-                using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-            var actual = SkillProgramCatalog.Load(Resource("classic-zhou-cang.rules.json"), Resource("classic-zhou-cang.presentation.json"));
+            var actual = CharacterFixtureContent.EmbeddedProgramBundle("classic-zhou-cang");
             builder.AddSkill(new("classic:zhongyong", "忠勇", "已有经典忠勇真实程序") { Program = actual.Programs["classic:zhongyong"], ProgramPresentation = actual.Presentations["classic:zhongyong"] });
             var responseTriggers = distant
                 ? """[{"id":"far-after-dodge","window":"slashFullyDodged","ownerRelation":"actor","cardKinds":["slash"],"usageScope":"game","usageLimit":1,"optional":false,"effects":[{"op":"grantTurnRuleModifier","target":"owner","ruleQuery":"outgoingDistance","ruleOperation":"add","amount":4}]}]"""

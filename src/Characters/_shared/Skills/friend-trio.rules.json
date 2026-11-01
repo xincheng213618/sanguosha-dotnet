@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "friend:yance", "revision": 1, "triggers": [
       { "id": "first-round", "window": "roundStarting", "subject": "owner", "optional": true,

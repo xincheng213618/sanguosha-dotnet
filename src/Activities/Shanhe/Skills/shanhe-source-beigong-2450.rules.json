@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "shanhe:source-dingxi-3601", "revision": 1, "triggers": [
       { "id": "actual-used-damage-enters-discard", "window": "discardPileReceived", "subject": "owner", "sourceZones": ["processing"], "movementOccurrence": "perBatch", "optional": true,

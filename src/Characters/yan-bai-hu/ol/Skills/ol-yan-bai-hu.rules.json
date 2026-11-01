@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:zhidao", "revision": 1, "triggers": [
       { "id": "damage-zone-acquisition", "window": "afterDamageApplied", "subject": "any", "optional": false,

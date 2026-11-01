@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:zhendu", "revision": 1, "triggers": [
       { "id": "self-play-start-wine", "window": "playPhaseStarting", "subject": "owner", "turnOwnerScope": "own", "optional": true,

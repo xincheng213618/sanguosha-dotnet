@@ -1,5 +1,5 @@
 {
-  "schemaVersion":64,"skills":[
+  "skills":[
     {"id":"boundary:fenli-mobile","revision":1,"triggers":[
       {"id":"skip-draw-most-hand","window":"drawPhaseStarting","subject":"owner","optional":true,"effects":[{"op":"skipBoundaryZhuHuanDraw","target":"owner"}]},
       {"id":"skip-play-most-hp","window":"afterNormalDraw","subject":"owner","optional":true,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]},

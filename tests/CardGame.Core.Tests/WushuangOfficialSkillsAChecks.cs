@@ -101,17 +101,10 @@ internal static class WushuangOfficialSkillsAChecks
         public PackageManifest Manifest { get; } = new("fixture-wushuang-a", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            SkillProgramCatalog Bundle(string name)
-            {
-                using var rules = new StreamReader(assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.{name}.rules.json")!);
-                using var presentation = new StreamReader(assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.{name}.presentation.json")!);
-                return SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
-            }
-            var official = Bundle("wushuang-skills-a"); var audit = Bundle("wushuang-audit-a");
+            var official = CharacterFixtureContent.EmbeddedProgramBundle("wushuang-skills-a"); var audit = CharacterFixtureContent.EmbeddedProgramBundle("wushuang-audit-a");
             if (enemyFunan)
             {
-                var exchanged = Bundle("classic-xue-zong");
+                var exchanged = CharacterFixtureContent.EmbeddedProgramBundle("classic-xue-zong");
                 const string id = "classic:funan";
                 b.AddSkill(new(id, exchanged.Presentations[id].Name, exchanged.Presentations[id].Description)
                     { Program = exchanged.Programs[id], ProgramPresentation = exchanged.Presentations[id] });
@@ -127,7 +120,7 @@ internal static class WushuangOfficialSkillsAChecks
                 { Program = official.Programs[invoiceConsumer], ProgramPresentation = official.Presentations[invoiceConsumer] });
             }
             foreach (var (bundle, id) in new[] { ("boundary-cao-cao", "boundary:jianxiong"), ("classic-cao-pi", "classic:xingshang"), ("classic-lifecycle-skills", "classic:dangxian") })
-            { var cat = Bundle(bundle); b.AddSkill(new(id, cat.Presentations[id].Name, cat.Presentations[id].Description) { Program = cat.Programs[id], ProgramPresentation = cat.Presentations[id] }); }
+            { var cat = CharacterFixtureContent.EmbeddedProgramBundle(bundle); b.AddSkill(new(id, cat.Presentations[id].Name, cat.Presentations[id].Description) { Program = cat.Programs[id], ProgramPresentation = cat.Presentations[id] }); }
             var json = $$$"""
             {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
              {"id":"{{{Driver}}}","revision":1,"modifiers":[{"id":"fixture-range","query":"slashDistanceLimit","operation":"unlimited","value":0,"priority":0}],"activations":[{"id":"damage","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"selectedTarget","amount":1}]}]},

@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{ "id": "shanhe:source-xiechan-4055", "revision": 1,
     "activations": [{ "id": "limited-contest-duel", "minCards": 0, "maxCards": 0,
       "minTargets": 1, "maxTargets": 1, "targetKind": "otherLivingWithHand", "usesPerTurn": null, "usesPerGame": 1,

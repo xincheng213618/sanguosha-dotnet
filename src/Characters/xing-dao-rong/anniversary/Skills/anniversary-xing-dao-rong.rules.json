@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 64, "skills": [{ "id": "anniversary:xuhe", "revision": 1, "triggers": [
+   "skills": [{ "id": "anniversary:xuhe", "revision": 1, "triggers": [
     { "id": "pay-maximum-neighbors", "window": "playPhaseStarting", "subject": "owner", "turnOwnerScope": "own", "optional": true,
       "effects": [{ "op": "changeMaximumHp", "target": "owner", "amount": -1 }, { "op": "resolveAnniversaryXingDaoRongXuHe", "target": "owner" }] },
     { "id": "not-highest-maximum", "window": "playEnding", "subject": "owner", "turnOwnerScope": "own", "optional": false,

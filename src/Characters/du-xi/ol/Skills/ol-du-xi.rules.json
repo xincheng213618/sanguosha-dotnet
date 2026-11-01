@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:quxi", "revision": 1, "triggers": [
       { "id": "limited-play-ending", "window": "playEnding", "subject": "owner", "turnOwnerScope": "own", "optional": true,

@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{ "id": "boundary:qiangxi-mobile", "revision": 1, "activations": [
     { "id": "lose-hp-and-damage", "usesPerTurn": null, "minCards": 0, "maxCards": 0, "minTargets": 1, "maxTargets": 1, "targetKind": "otherLivingInAttackRange",
       "condition": { "kind": "hpAtLeast", "value": 1 },

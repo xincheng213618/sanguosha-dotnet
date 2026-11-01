@@ -148,10 +148,7 @@ internal static class SkillStateEventChecks
         public void Register(IContentRegistryBuilder builder)
         {
             CharacterFixtureContent.Register(builder, "boundary:jia-xu");
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var rules = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.shenwu-expanded.rules.json")!);
-            using var presentation = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.shenwu-expanded.presentation.json")!);
-            var production = SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
+            var production = CharacterFixtureContent.EmbeddedProgramBundle("shenwu-expanded");
             builder.AddSkill(new(Fengdong, Fengdong, "Production turn-start declaration")
                 { Program = production.Programs[Fengdong], Tags = SkillTag.Locked });
             var catalog = SkillProgramCatalog.Load($$$"""

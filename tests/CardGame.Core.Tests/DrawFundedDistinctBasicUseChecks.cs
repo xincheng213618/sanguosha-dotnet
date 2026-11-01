@@ -281,11 +281,7 @@ internal static class DrawFundedBasicFixture
         public PackageManifest Manifest { get; } = new("fixture:draw-funded-basic", "1.0.0", "实际摸牌基本牌的真实原生路径");
         public void Register(IContentRegistryBuilder b)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var rs = assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ordinary-wang-xiang.rules.json")!;
-            using var ps = assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ordinary-wang-xiang.presentation.json")!;
-            using var rr = new StreamReader(rs); using var pr = new StreamReader(ps);
-            var production = SkillProgramCatalog.Load(rr.ReadToEnd(), pr.ReadToEnd());
+            var production = CharacterFixtureContent.EmbeddedProgramBundle("ordinary-wang-xiang");
             b.AddSkill(new(Bingxin, "冰心", "完整实际摸牌共享能力") { Program = production.Programs[Bingxin] });
             var root = JsonNode.Parse("""
             {"skills":[

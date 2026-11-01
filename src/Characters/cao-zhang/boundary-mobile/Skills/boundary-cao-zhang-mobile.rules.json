@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{ "id": "boundary:jiangchi-mobile", "revision": 1,
     "triggers": [
       { "id": "draw-restraint", "window": "playPhaseStarting", "subject": "owner", "turnOwnerScope": "own", "optional": true, "choiceGroup": "play-mode",

@@ -1,4 +1,4 @@
-{"schemaVersion":64,"skills":[
+{"skills":[
  {"id":"ol:sun-hao-canshi","revision":1,"triggers":[
   {"id":"normal-draw-add-wounded","window":"drawPhaseStarting","subject":"owner","optional":true,"effects":[{"op":"grantSunHaoCanshiDrawObligation","target":"owner"}]},
   {"id":"issued-turn-use-discard","window":"cardUseCommitted","ownerRelation":"actor","optional":false,"includeResponseUses":true,"effects":[{"op":"resolveSunHaoCanshiUseDiscard","target":"owner"}]}

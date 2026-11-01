@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "mou:mingshi", "revision": 1, "triggers": [
       { "id": "extra-normal-draw", "window": "drawPhaseStarting", "subject": "owner", "optional": true, "effects": [{ "op": "adjustNormalDraw", "target": "owner", "amount": 2 }, { "op": "scheduleMouLuSuMingshi", "target": "owner" }] },

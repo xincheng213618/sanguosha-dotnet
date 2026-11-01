@@ -120,6 +120,6 @@ internal static class ProgramTriggerResourceChecks
             using var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
-        return (Text(".rules.json"), Text(".presentation.json"));
+        return (SkillProgramTestJson.VersionedEmbeddedRules(Text(".rules.json")), Text(".presentation.json"));
     }
 }

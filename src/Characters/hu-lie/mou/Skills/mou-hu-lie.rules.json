@@ -1,4 +1,4 @@
-{"schemaVersion":64,"skills":[
+{"skills":[
  {"id":"mou:chuanyu","revision":1,"triggers":[
    {"id":"round-gift","window":"roundStarting","subject":"owner","optional":true,"effects":[{"op":"startMouHuLieChuanyu","target":"owner"}]},
    {"id":"true-used-yu-discard","window":"discardPileReceived","subject":"owner","optional":true,"effects":[{"op":"regiveMouHuLieChuanyu","target":"owner"}]},

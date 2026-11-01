@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "mou:sanshi", "revision": 1, "triggers": [
       { "id": "mark-ranks", "window": "gameStarting", "subject": "owner", "optional": false, "effects": [{ "op": "initializeMouSimaShiSanshi", "target": "owner" }] },

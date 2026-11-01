@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:huantu", "revision": 1, "triggers": [
       { "id": "give-before-other-draw", "window": "drawPhaseStarting", "subject": "owner", "optional": true, "effects": [{ "op": "giveCardSkipDrawForEnding", "target": "owner" }] },

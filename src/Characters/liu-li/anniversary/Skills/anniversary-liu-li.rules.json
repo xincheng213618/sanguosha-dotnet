@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "anniversary:fuli", "revision": 1, "activations": [{ "id": "reveal-discard-draw", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": 1,
       "effects": [{ "op": "resolveAnniversaryLiuLiFuli", "target": "owner" }] }] },

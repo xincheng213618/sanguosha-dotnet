@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:zhiming", "revision": 1, "triggers": [
       { "id": "preparation", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false,

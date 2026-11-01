@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "mobile:xinghun", "revision": 1, "activations": [{ "id": "five-stars", "minCards": 0, "maxCards": 0, "sourceZones": ["hand"], "minTargets": 0, "maxTargets": 0, "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": 1, "usesPerGame": null, "effects": [{ "op": "resolveMobileJiangWeiXinghun", "target": "owner" }] }] },
     { "id": "mobile:tiantao", "revision": 1, "triggers": [{ "id": "ending-region", "window": "turnEnding", "subject": "owner", "optional": false, "effects": [{ "op": "resolveMobileJiangWeiTiantao", "target": "owner" }] }] },

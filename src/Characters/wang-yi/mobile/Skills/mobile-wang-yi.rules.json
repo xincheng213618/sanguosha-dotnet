@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "mobile:zhenlie", "revision": 1, "triggers": [
       { "id": "replace-own-judgment-with-top", "window": "judgmentReplacing", "subject": "owner", "excludedReasons": [], "optional": true,

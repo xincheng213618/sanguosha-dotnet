@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     {"id":"shanhe:source-xiongni-14206","revision":1,"triggers":[
       {"id":"five-suit-or-maximum","window":"playPhaseStarting","subject":"owner","optional":true,

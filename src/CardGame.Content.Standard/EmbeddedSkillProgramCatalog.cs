@@ -87,6 +87,6 @@ internal static class EmbeddedSkillProgramCatalog
                 $"Missing embedded skill-program resource pair '{rulesName}' and '{presentationName}'.");
         using var rulesReader = new StreamReader(rulesStream);
         using var presentationReader = new StreamReader(presentationStream);
-        return SkillProgramCatalog.Load(rulesReader.ReadToEnd(), presentationReader.ReadToEnd());
+        return SkillProgramCatalog.LoadCurrent(rulesReader.ReadToEnd(), presentationReader.ReadToEnd());
     }
 }

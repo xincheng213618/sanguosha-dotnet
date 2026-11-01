@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "mobile:shi-ganggeng", "revision": 1,
       "activations": [{ "id": "gift-at-least-two", "minCards": 2, "maxCards": null, "sourceZones": ["hand"],

@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "anniversary:yiju", "revision": 1, "triggers": [ {
       "id": "other-sole-target", "window": "cardUseTargetsFinalized", "ownerRelation": "target", "onlyDesignatedCardTargets": true, "optional": false,

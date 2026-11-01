@@ -244,11 +244,7 @@ internal static class NativeCollectedDiscardProjectionChecks
         {
             foreach (var name in new[] { "classic-wang-ji", "ol-cheng-yu" })
             {
-                using var rules = typeof(StandardContentPackage).Assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.{name}.rules.json")!;
-                using var labels = typeof(StandardContentPackage).Assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.{name}.presentation.json")!;
-                using var ruleReader = new StreamReader(rules);
-                using var labelReader = new StreamReader(labels);
-                Register(SkillProgramCatalog.Load(ruleReader.ReadToEnd(), labelReader.ReadToEnd()));
+                Register(CharacterFixtureContent.EmbeddedProgramBundle(name));
             }
             var driverPresentation = JsonSerializer.Serialize(new
             {

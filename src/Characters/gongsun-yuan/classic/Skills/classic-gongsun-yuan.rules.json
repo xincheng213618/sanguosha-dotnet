@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{
     "id": "classic:huaiyi", "revision": 1, "minimumRulesVersion": 190,
     "activations": [{ "id": "reveal-color-take", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,

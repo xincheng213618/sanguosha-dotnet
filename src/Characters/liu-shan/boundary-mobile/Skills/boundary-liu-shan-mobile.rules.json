@@ -1,4 +1,4 @@
-{"schemaVersion":64,"skills":[
+{"skills":[
  {"id":"boundary:xiangle-mobile","revision":1,"triggers":[{"id":"nullify-unless-actor-discards-basic","window":"cardUseBeforeTargetEffects","ownerRelation":"target","cardKinds":["slash","fireSlash","thunderSlash"],"optional":false,"effects":[
   {"op":"chooseOption","target":"actor","resultBind":"xiangle-answer","options":[{"id":"pay","condition":{"kind":"hasOwnedCardCategory","zones":["hand"],"cardCategories":["basic"]}},{"id":"decline"}]},
   {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"actor"},"cardOwnerRef":{"kind":"actor"},"zones":["hand"],"cardCategories":["basic"],"count":1,"destination":"discardPile","awaitMovementTriggers":true,"condition":{"kind":"choiceIs","sourceBind":"xiangle-answer","optionId":"pay"}},

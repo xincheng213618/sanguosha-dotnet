@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:beige-mobile", "revision": 1,
       "triggers": [{ "id": "pay-then-judge-slash-damage", "window": "afterDamageApplied", "subject": "any", "optional": true, "damageOccurrence": "perDamage",

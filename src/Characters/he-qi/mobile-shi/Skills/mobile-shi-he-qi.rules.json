@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "mobile:shi-shanxi", "revision": 1, "viewAs": [
       { "id": "yingji-duel", "inputKinds": [], "inputSuits": [], "inputCount": 1, "sourceZones": ["hand"],

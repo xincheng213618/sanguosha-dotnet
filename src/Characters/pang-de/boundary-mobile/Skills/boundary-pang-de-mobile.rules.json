@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{ "id": "boundary:jianchu-mobile", "revision": 1,
     "triggers": [{ "id": "discard-final-target-card", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "cardKinds": ["slash", "fireSlash", "thunderSlash"], "optional": true,
       "effects": [

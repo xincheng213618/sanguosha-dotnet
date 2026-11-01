@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{ "id": "ol:zhenwei", "revision": 1, "triggers": [
     { "id": "protect-other-sole-target", "window": "cardUseTargetsFinalized", "ownerRelation": "observer", "optional": true,
       "effects": [{ "op": "protectOtherSoleCardTarget", "target": "owner" }] }

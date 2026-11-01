@@ -128,14 +128,7 @@ internal static class ShanheObservedTacticChecks
         public PackageManifest Manifest { get; } = new("fixture-shanhe-observed-tactics", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            static string Resource(string suffix)
-            {
-                var assembly = typeof(StandardContentPackage).Assembly;
-                using var stream = assembly.GetManifestResourceStream(assembly.GetManifestResourceNames()
-                    .Single(name => name.EndsWith("." + suffix, StringComparison.Ordinal)))!;
-                using var reader = new StreamReader(stream); return reader.ReadToEnd();
-            }
-            var production = SkillProgramCatalog.Load(Resource("shanhe-passives.rules.json"), Resource("shanhe-passives.presentation.json"));
+            var production = CharacterFixtureContent.EmbeddedProgramBundle("shanhe-passives");
             foreach (var (id, program) in production.Programs)
                 b.AddSkill(new(id, production.Presentations[id].Name, production.Presentations[id].Description)
                 { Program = program, ProgramPresentation = production.Presentations[id] });

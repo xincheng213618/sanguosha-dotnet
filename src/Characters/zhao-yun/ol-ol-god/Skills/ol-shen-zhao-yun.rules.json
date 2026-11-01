@@ -1,4 +1,4 @@
-{"schemaVersion":64,"skills":[
+{"skills":[
 {"id":"ol:juejing","revision":1,"minimumRulesVersion":187,"modifiers":[{"id":"hand-limit","query":"handLimit","operation":"add","value":2,"priority":0}],"triggers":[{"id":"enter-dying","window":"dyingEntered","subject":"owner","optional":false,"priority":0,"effects":[{"op":"draw","target":"owner","amount":1}]},{"id":"leave-dying","window":"dyingExited","subject":"owner","optional":false,"priority":0,"effects":[{"op":"draw","target":"owner","amount":1}]}]},
 {"id":"ol:longhun","revision":1,"minimumRulesVersion":187,"viewAs":[
 {"id":"1-heart","inputKinds":[],"inputSuits":["heart"],"outputKind":"peach","forPlay":true,"forResponse":true,"sourceZones":["hand","equipment"],"extendedUse":true},

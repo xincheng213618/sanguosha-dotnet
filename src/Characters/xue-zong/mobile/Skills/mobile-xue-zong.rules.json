@@ -1,4 +1,4 @@
-{"schemaVersion":64,"skills":[
+{"skills":[
  {"id":"mobile:funan","revision":1,"triggers":[
   {"id":"claim-response","window":"cardResponseAccepted","ownerRelation":"observer","optional":true,"effects":[{"op":"exchangeRespondedCardEntities","target":"owner","stateId":"mobile-response-exchange","responseExchangeMode":"claimResponseOnly"}]},
   {"id":"obtained-use-unanswered","window":"cardUseCompleted","ownerRelation":"actor","includeResponseUses":true,"singleActionInstance":true,"isSkillInvocation":false,"optional":false,"effects":[{"op":"draw","target":"owner","amount":1},{"op":"awaitBoundCardMovements","target":"owner"}]}

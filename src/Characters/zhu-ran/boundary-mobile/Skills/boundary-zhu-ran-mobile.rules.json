@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{ "id": "boundary:danshou-mobile", "revision": 1,
     "triggers": [
       { "id": "untargeted-ending-draw", "window": "turnEnding", "subject": "owner", "turnOwnerScope": "otherLiving", "optional": false,

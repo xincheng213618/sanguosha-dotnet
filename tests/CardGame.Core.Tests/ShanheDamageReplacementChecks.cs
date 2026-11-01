@@ -159,19 +159,13 @@ internal static class ShanheDamageReplacementChecks
         public PackageManifest Manifest { get; } = new("fixture-shanhe-replacements", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            string Read(string file)
-            {
-                using var stream = assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms." + file)!;
-                using var reader = new StreamReader(stream); return reader.ReadToEnd();
-            }
-            var production = SkillProgramCatalog.Load(Read("shanhe-replacements.rules.json"), Read("shanhe-replacements.presentation.json"));
+            var production = CharacterFixtureContent.EmbeddedProgramBundle("shanhe-replacements");
             foreach (var (id, program) in production.Programs)
                 builder.AddSkill(new(id, id, id) { Program = program, Tags = SkillTag.Locked });
-            var reactions = SkillProgramCatalog.Load(Read("shanhe-reactions.rules.json"), Read("shanhe-reactions.presentation.json"));
+            var reactions = CharacterFixtureContent.EmbeddedProgramBundle("shanhe-reactions");
             foreach (var id in new[] { "shanhe:xueren", "shanhe:shixue-1" })
                 builder.AddSkill(new(id, id, id) { Program = reactions.Programs[id], Tags = SkillTag.Locked });
-            var boss = SkillProgramCatalog.Load(Read("shanhe-boss.rules.json"), Read("shanhe-boss.presentation.json"));
+            var boss = CharacterFixtureContent.EmbeddedProgramBundle("shanhe-boss");
             builder.AddSkill(new("shanhe:shengui-shenqu", "神躯", boss.Presentations["shanhe:shengui-shenqu"].Description)
                 { Program = boss.Programs["shanhe:shengui-shenqu"], ProgramPresentation = boss.Presentations["shanhe:shengui-shenqu"] });
             var rules = $$$"""

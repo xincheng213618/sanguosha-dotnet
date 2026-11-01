@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 64, "skills": [
+   "skills": [
     { "id": "boundary:huashen-mobile", "revision": 1, "triggers": [
       { "id": "initial", "window": "gameStarting", "subject": "owner", "optional": false,
         "effects": [{ "op": "initializePrivateGeneralLibrary", "target": "owner", "amount": 3, "excludedSkillTags": ["limited", "awakening", "lord"] }] },

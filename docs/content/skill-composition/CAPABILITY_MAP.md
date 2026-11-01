@@ -730,6 +730,47 @@ OL 芮姬巧力原本先打开无懈窗口、再附不能响应权利；改为�
 
 已核实：`SkillPrograms.cs` 规则根版本只用于加载入口等值校验；技能 GameplayHash 来自 RuntimeVersion 与单个 skill 的 canonical JSON，不包含根版本。`ContentRegistry` 指纹由已解析内容构成；`Replay` 保存命令、配置、包签名和 ContentHash，没有持久化规则根或 RulesSchemaVersion。展示、checkpoint 与外层 save 的格式各有独立来源，不随本方案变更。
 
-**建议，尚未实施格式切换**：1066 份随代码编译的内置规则删除根 schemaVersion，由 `EmbeddedSkillProgramCatalog` 的唯一资源加载点显式选择当前源格式；只区分根门禁，后续技能解析、未知字段/指令拒绝和指纹函数共用同一路径。对外 `SkillProgramCatalog.Load` 及 Inspect 工具仍要求显式版本，避免把“字段仍合法但含义已变”的旧外部文档默认为当前格式。62 个已经引用常量的生产 C# 文件不需机械改写。
+**格式方案（已由下一独立批次实施）**：1066 份随代码编译的内置规则删除根 schemaVersion，由 `EmbeddedSkillProgramCatalog` 的唯一资源加载点显式选择当前源格式；只区分根门禁，后续技能解析、未知字段/指令拒绝和指纹函数共用同一路径。对外 `SkillProgramCatalog.Load` 及 Inspect 工具仍要求显式版本，避免把“字段仍合法但含义已变”的旧外部文档默认为当前格式。62 个已经引用常量的生产 C# 文件不需机械改写。
 
 这是内置内容源格式变化，无须增加存档字段、RulesVersion、包版本或玩法 epoch。纯删除根字段可保持所有 GameplayHash 与 registry ContentHash；真正修改技能步骤导致的指纹变化仍照常生效。实施时应以同一整合源码对比去字段前后的全部指纹并复用冷恢复检查，不能把本批实际无前规则变化一起算成“格式迁移保持兼容”。未知字段校验能拒绝旧拼写，不能独自识别合法字段的语义变化，因此外部文档的格式标识仍有意义。
+
+## 独立格式批：内置规则显式选择当前格式
+
+本节记录已批准按独立提交实施的内置规则格式迁移。嵌入程序集的 `*.rules.json` 删除根 `schemaVersion`；`EmbeddedSkillProgramCatalog` 在唯一资源加载点改用 `SkillProgramCatalog.LoadCurrent`，明确选择当前实现的源格式。这一批不修改技能步骤、玩法规则或 RuntimeVersion，也不计入外观事实需求的依赖清理；之前批次的规则修改与指纹变化不归入这次格式对比。
+
+`LoadCurrent` 要求无版本根，出现 `schemaVersion` 会按未知字段拒绝；它不是猜测版本或兼容旧外部文件的入口。对外 `SkillProgramCatalog.Load` 保持严格版本要求，缺失、错误的规则版本仍拒绝。Inspector 内置示例与直接读取这些资源的夹具显式选用当前格式入口；用户提供的外部规则仍走严格入口。生产 C# 中已引用版本常量的规则生成代码保持原加载方式。两个入口只在规则根门禁处区别，后续技能解析、字段与操作校验、重复键拒绝、展示配对和集合冻结共用原路径。展示、checkpoint、外层存档和包版本均保持各自的既有边界，不增加玩法 epoch 或存档 RulesVersion。
+
+内容基线为 `89743fa30`，本批对其 1066 份规则 Git blob 与新文件逐一比较，2424 个 skill 对象及根的其他字段均无变化。哈希比较使用本批同一份整合源码、同一组规则内容，分别由无根版本的 LoadCurrent 与补入当前显式版本的 Load 独立解析；没有拿旧二进制或未整合的规则版本混比，也没有覆盖静态 catalog 缓存来制造两份输入。
+
+按 bundle + skill id 核对 **1066 个包、2424 个技能程序**：缺失 **0**、新增 **0**、GameplayHash 差异 **0**。对 **22 个实际内容目录**，保留相同元数据和装备包归属，替换为各自独立解析的程序后调用生产指纹函数重新计算；两侧 ContentHash 差异 **0**，原程序字典重算也等于目录真实 ContentHash。移除一个 Program 的负控制会改变指纹，排除了直接复用缓存 hash 的空比较。未迁移的内联生成程序仍参与目录指纹，保留其原对象；它们没有内置文件的根字段。
+
+| 内容目录 | 前后相同的 ContentHash |
+| --- | --- |
+| Create | `82260660293C9A83C25994AF5A276280EF8CD15C73FC97E6E4C0002077B76B15` |
+| CreateWithActiveSkills | `7EB22985A9CD70B19DC149CB0CC99D9413C174D69534C4C3B4D7C74FC1E33AEC` |
+| CreateWithActiveSkillsAndNationalWarAmbitious | `2E2F2C1B5FC3F66DABAC49C883DA918BADEDEB9203611D806675D2A7370C6BC5` |
+| CreateWithActiveSkillsAndNationalWarLite | `F01CED641BF25793BFC74C1DE8191BA175A5AF4CBB88E99C79251A64FA7D07D5` |
+| CreateWithActiveSkillsAndTeamModes | `344318809534435FF33A40D27FFD400F735898F12E73FA9D56183109BEDACE8A` |
+| CreateWithActiveSkillsAndTeamModesAndNationalWarAmbitious | `215205C79586369944F2BE3E2AACD9DAB640157089F5898C2CC87C44EFA0B633` |
+| CreateWithClassicGenerals | `67EC1984AF7239985747438ABA2228C3B5FE0990C56ABB62C3875C7E73AE6ABA` |
+| CreateWithClassicGeneralsAndTeamModesAndNationalWarAmbitious | `7C287DD94F27551B24EB5D14F134AF62E05F26CA23E6D6E38C64BBCCE6CE76A7` |
+| CreateWithNationalWarAmbitious | `FCBF67FD13C0B00F32C7710EC86A6AA00C3EA66A6AC01F1E13125271D9C10AAE` |
+| CreateWithNationalWarLite | `83B0CFC747835026D845F30EB5E2C8B42C969BF93AFEC30E7B8F8C9619853656` |
+| CreateWithRescueSkills | `18DF5267E836F4FD4629584FC3DA5B90851AF0B5BED97B9DB780341B088FFD7D` |
+| CreateWithRescueSkillsAndNationalWarAmbitious | `13633869BE27DFE62755FFE19D9CDA02EDBC3F5DE8109FD47C8929BFB1373440` |
+| CreateWithRescueSkillsAndTeamModes | `1A4EE9DF1C98F45D4328FCCB45BE05F908B2E71CA7D5C1E0DAD972543D47A86A` |
+| CreateWithRescueSkillsAndTeamModesAndNationalWarAmbitious | `273D80B151A1C487CE5293AEDE153E0B9CFAD901D6890229CF843837E7BA1ADB` |
+| CreateWithRescueSkillsAndTeamModesAndNationalWarLite | `2EF9A5C90F79DBEF44FB45F2FDC189ACE2EA9F6C67FE34121E6C451A0EE7158D` |
+| CreateWithTeamModes | `D25CD58B8FDE550CB2314B1558DC42963837B6E532E3CF1613251F3A265E9281` |
+| CreateWithTeamModesAndNationalWarAmbitious | `52A2E08CE456FA97723E613771ED01AB1D7EF59DA36168BF59A8AE5D33FFF100` |
+| Showcase | `9F87413E8074879EE2FC2A1FFCC357D9CE1587D22D0BA5DA1C54970188C76415` |
+| ShowcaseAllActivities | `3531887F396403C7895B406C665C60D7590D413A4F3339185E16D11F0E260353` |
+| Wushuang | `EAB33A8279056C30D77A560D6BA6254427AF03AB4B80E0F865C13EE3B62FE3D4` |
+| ShanhePlayerRoster | `9F87413E8074879EE2FC2A1FFCC357D9CE1587D22D0BA5DA1C54970188C76415` |
+| ShanheEncounter | `43017FA3F5DC4DA1E3FB52B23F7F061504D067C572BB90FE39354846283D0D2D` |
+
+目录覆盖 17 个公开无参数标准工厂、Showcase 默认及全活动、Wushuang、山河玩家目录和一份固定战斗配置。外部 Load 的缺版本、旧版本负例及 LoadCurrent 的显式版本负例通过；Inspector 实际 CLI 对当前外部版本通过、无版本及旧版本拒绝，内置 draw 示例返回 3 项。必要的资源读取夹具同步走统一 catalog；需要改写 JSON 的夹具补全局版本后继续检验严格外部入口，不删原断言或负例。
+
+**11 项相关 Core、1 项相关 WPF、5 项例行检查通过**，包含 gameplay hash 与 checkpoint 兼容性、暂停私密提示冷恢复及既有原生返回。定向构建 42.097 秒，Core 进程 17.485 秒、WPF 进程 30.248 秒（并行，不能相加为墙钟）；最终例行构建 2.750 秒、依赖验证 0.170 秒、检查进程 2.920 秒。未运行全量、发布或混入外观事实需求修改。
+
+相对基线，src C# **+18/-6，净 +12 行、+646 字节**，仅两个加载文件；规则 JSON **−929 行、−23,959 字节**，仅为根元数据删除，不计作人物业务代码缩减。人物 Runtime C#、throw/history/event 数和依赖基线均未改。bao-xin **650 行/54,861 字节**、liao-hua **159/13,546**、xun-yu **1130/127,104**，均未变化。RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均未升级；没有新增 RulesVersion 或玩法 epoch。

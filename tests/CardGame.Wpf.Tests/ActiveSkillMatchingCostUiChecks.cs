@@ -259,10 +259,7 @@ internal static class ActiveSkillMatchingCostUiChecks
         public PackageManifest Manifest { get; } = new("fixture-ui-matching-cost", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder builder)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var rules = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ordinary-zhang-hua.rules.json")!);
-            using var presentation = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ordinary-zhang-hua.presentation.json")!);
-            var formal = SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
+            var formal = CharacterFixtureContent.EmbeddedProgramBundle("ordinary-zhang-hua");
             foreach (var (id, program) in formal.Programs)
                 builder.AddSkill(new(id, formal.Presentations[id].Name, formal.Presentations[id].Description)
                     { Program = program, ProgramPresentation = formal.Presentations[id] });

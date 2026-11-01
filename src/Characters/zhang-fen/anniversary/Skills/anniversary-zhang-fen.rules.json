@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "anniversary:wanglu", "revision": 1, "triggers": [{ "id": "preparation-cart-or-play", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false,
       "effects": [{ "op": "resolveAnniversaryZhangFenWanglu", "target": "owner" }] }] },

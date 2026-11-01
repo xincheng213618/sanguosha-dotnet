@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "anniversary:shencai", "revision": 1,
       "activations": [{ "id": "sentence", "minCards": 0, "maxCards": 0, "minTargets": 1, "maxTargets": 1, "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": 5, "effects": [{ "op": "resolveShenZhangFeiShencai", "target": "owner" }] }],

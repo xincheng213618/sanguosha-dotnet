@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "happy:duorui", "revision": 1, "triggers": [
       { "id": "take-hand", "window": "playPhaseStarting", "subject": "owner", "optional": true, "effects": [{ "op": "resolveHappyZhangLiaoDuorui", "target": "owner" }] },

@@ -239,9 +239,7 @@ internal static class WenheRoundRuleChecks
         public void Register(IContentRegistryBuilder b)
         {
             var a = typeof(StandardContentPackage).Assembly;
-            using var rules = new StreamReader(a.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.wenhe-activity.rules.json")!);
-            using var presentation = new StreamReader(a.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.wenhe-activity.presentation.json")!);
-            var activity = SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
+            var activity = CharacterFixtureContent.EmbeddedProgramBundle("wenhe-activity");
             foreach (var (id, program) in activity.Programs) b.AddSkill(new(id, activity.Presentations[id].Name, activity.Presentations[id].Description)
             { Program = program, ProgramPresentation = activity.Presentations[id], Tags = id == "wenhe:niepan" ? SkillTag.Limited : id == "wenhe:rules" ? SkillTag.Locked : SkillTag.None });
             var lethalActivations = string.Join(",", new[] { "self-lethal", "defeat" }.SelectMany(id =>

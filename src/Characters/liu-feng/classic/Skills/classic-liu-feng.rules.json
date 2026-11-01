@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{
     "id": "classic:xiansi", "revision": 1, "minimumRulesVersion": 190,
     "modifiers": [], "viewAs": [], "activations": [],

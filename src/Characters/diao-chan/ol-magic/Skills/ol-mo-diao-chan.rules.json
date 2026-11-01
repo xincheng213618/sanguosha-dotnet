@@ -1,5 +1,5 @@
 {
- "schemaVersion":64,"skills":[
+ "skills":[
   {"id":"ol:mo-huanhuo","revision":1,"triggers":[
    {"id":"round-draw-and-select","window":"roundStarting","subject":"owner","optional":false,"effects":[{"op":"resolveMoDiaoChanHuanhuoRound","target":"owner"}]},
    {"id":"affected-use-completed","window":"cardUseCompleted","ownerRelation":"observer","includeResponseUses":true,"singleActionInstance":true,"optional":false,"effects":[{"op":"resolveMoDiaoChanHuanhuoUse","target":"owner"}]}

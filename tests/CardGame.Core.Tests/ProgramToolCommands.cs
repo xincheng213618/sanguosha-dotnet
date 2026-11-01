@@ -94,16 +94,8 @@ internal static class ProgramToolCommands
             var rulesText = reader.ReadToEnd();
             using var document = JsonDocument.Parse(rulesText);
             var root = document.RootElement;
-            if (!root.TryGetProperty("schemaVersion", out var schemaNode) ||
-                schemaNode.ValueKind != JsonValueKind.Number || schemaNode.GetInt32() != SkillProgramCatalog.RulesSchemaVersion)
-                continue;
-            var presentationName = resourceName[..^rulesSuffix.Length] + ".presentation.json";
-            using var presentationStream = assembly.GetManifestResourceStream(presentationName);
-            if (presentationStream is null)
-                throw new InvalidOperationException($"Missing embedded resource pair '{resourceName}' and '{presentationName}'.");
-            using var presentationReader = new StreamReader(presentationStream);
-            var catalog = SkillProgramCatalog.Load(rulesText, presentationReader.ReadToEnd());
             var bundle = resourceName[prefix.Length..^rulesSuffix.Length];
+            var catalog = CharacterFixtureContent.EmbeddedProgramBundle(bundle);
             foreach (var skillNode in root.GetProperty("skills").EnumerateArray())
             {
                 var skillId = skillNode.GetProperty("id").GetString()!;

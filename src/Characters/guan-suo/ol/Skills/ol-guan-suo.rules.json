@@ -1,4 +1,4 @@
-{"schemaVersion":64,"skills":[
+{"skills":[
  {"id":"ol:zhengnan","revision":1,"triggers":[{"id":"other-death-draw-and-skill","window":"characterDied","subject":"owner","optional":true,
   "effects":[{"op":"drawAfterOtherDeathThenChooseMissingSkill","target":"owner","amount":3,"skillIds":["boundary:wusheng","classic:dangxian","classic:zhiman"]}]}]},
  {"id":"ol:xiefang","revision":1,"modifiers":[{"id":"living-female-outgoing-distance","query":"outgoingDistance","operation":"add","valueExpression":"negatedLivingFemaleCount","priority":0}]}

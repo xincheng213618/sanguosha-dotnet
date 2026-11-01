@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "mobile:shi-gongmou", "revision": 1, "triggers": [
       { "id": "preparation-exchange", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": true,

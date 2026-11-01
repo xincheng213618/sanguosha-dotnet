@@ -200,13 +200,7 @@ internal static class ShanheTeamTacticChecks
         public void Register(IContentRegistryBuilder b)
         {
             var aura = scene.StartsWith("aura-", StringComparison.Ordinal);
-            static string Resource(string suffix)
-            {
-                var assembly = typeof(StandardContentPackage).Assembly;
-                using var stream = assembly.GetManifestResourceStream(assembly.GetManifestResourceNames().Single(n => n.EndsWith("." + suffix, StringComparison.Ordinal)))!;
-                using var reader = new StreamReader(stream); return reader.ReadToEnd();
-            }
-            var production = SkillProgramCatalog.Load(Resource("shanhe-team-2026.rules.json"), Resource("shanhe-team-2026.presentation.json"));
+            var production = CharacterFixtureContent.EmbeddedProgramBundle("shanhe-team-2026");
             foreach (var (id, program) in production.Programs)
                 b.AddSkill(new(id, production.Presentations[id].Name, production.Presentations[id].Description)
                 { Program = program, ProgramPresentation = production.Presentations[id] });

@@ -164,13 +164,7 @@ internal static class NianRevivalChecks
         public PackageManifest Manifest { get; } = new("nian-revival-fixture", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            const string prefix = "CardGame.Content.Standard.SkillPrograms.nian-activity";
-            using var rulesStream = assembly.GetManifestResourceStream(prefix + ".rules.json")!;
-            using var presentationStream = assembly.GetManifestResourceStream(prefix + ".presentation.json")!;
-            using var rulesReader = new StreamReader(rulesStream);
-            using var presentationReader = new StreamReader(presentationStream);
-            var actual = SkillProgramCatalog.Load(rulesReader.ReadToEnd(), presentationReader.ReadToEnd());
+            var actual = CharacterFixtureContent.EmbeddedProgramBundle("nian-activity");
             foreach (var (id, program) in actual.Programs) b.AddSkill(new(id, actual.Presentations[id].Name,
                 actual.Presentations[id].Description) { Program = program, ProgramPresentation = actual.Presentations[id],
                 Tags = id == "nian:niepan" ? SkillTag.Limited : SkillTag.None });

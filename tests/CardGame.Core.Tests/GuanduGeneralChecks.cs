@@ -84,12 +84,9 @@ internal static class GuanduGeneralChecks
         public PackageManifest Manifest { get; } = new("fixture-guandu-generals", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
             foreach (var bundle in new[] { "guandu-activity", "guandu-events" })
             {
-                using var rules = new StreamReader(assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.{bundle}.rules.json")!);
-                using var presentation = new StreamReader(assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.{bundle}.presentation.json")!);
-                var actual = SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
+                var actual = CharacterFixtureContent.EmbeddedProgramBundle(bundle);
                 foreach (var (id, program) in actual.Programs) b.AddSkill(new(id, actual.Presentations[id].Name, actual.Presentations[id].Description)
                     { Program = program, ProgramPresentation = actual.Presentations[id], Tags = id is "guandu:yongdi" or "guandu:niepan" ? SkillTag.Limited : SkillTag.None });
             }

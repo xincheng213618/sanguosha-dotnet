@@ -148,10 +148,7 @@ internal static class SkillChangeOpeningChecks
                 "fuzhan" => ("mou-jiang-wei", new[] { "mou:juemou", "mou:fuzhan" }),
                 _ => ("boundary-xu-shu", new[] { "boundary:zhuhai-current", "boundary:qianxin-current" })
             };
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var rules = new StreamReader(assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.{bundle}.rules.json")!);
-            using var presentation = new StreamReader(assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.{bundle}.presentation.json")!);
-            var production = SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
+            var production = CharacterFixtureContent.EmbeddedProgramBundle(bundle);
             foreach (var (id, program) in production.Programs)
                 builder.AddSkill(new(id, production.Presentations[id].Name, "Production skill change") { Program = program, ProgramPresentation = production.Presentations[id] });
 

@@ -190,7 +190,7 @@ internal static class PublicPileProjectionChecks
         {
             // Reuse the retained Cai Yong program rather than reconstructing its
             // exchange contract, plus one small real cash-out program.
-            var catalog = SkillProgramCatalog.Load(Read("classic-cai-yong.rules.json"), Read("classic-cai-yong.presentation.json"));
+            var catalog = CharacterFixtureContent.EmbeddedProgramBundle("classic-cai-yong");
             foreach (var (id, program) in catalog.Programs)
                 builder.AddSkill(new(id, id, "Shared pile projection") { Program = program, ProgramPresentation = catalog.Presentations[id] });
             var rules = $$$"""
@@ -210,12 +210,6 @@ internal static class PublicPileProjectionChecks
             builder.AddSkill(new(Cash, Cash, "Exact cash-out source") { Program = additions.Programs[Cash], ProgramPresentation = additions.Presentations[Cash] });
             builder.AddSkill(new(Extra, Extra, "No presentation name") { Program = additions.Programs[Extra] });
             builder.AddSkill(new(Plain, Plain, "No program"));
-        }
-        private static string Read(string suffix)
-        {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var stream = assembly.GetManifestResourceStream(assembly.GetManifestResourceNames().Single(name => name.EndsWith(suffix, StringComparison.Ordinal)))!;
-            using var reader = new StreamReader(stream); return reader.ReadToEnd();
         }
     }
 }

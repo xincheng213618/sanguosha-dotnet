@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "mobile:shi-feijing", "revision": 1,
       "viewAs": [{ "id": "damage-trick-slash", "sourceZones": ["hand", "equipment"], "inputKinds": ["duel", "fireAttack", "barbarianAssault", "arrowBarrage", "lightning", "qizhengXiangsheng", "wumiaoFlood", "unexpectedAssault"], "inputSuits": [], "outputKind": "slash", "forPlay": true, "forResponse": true }],

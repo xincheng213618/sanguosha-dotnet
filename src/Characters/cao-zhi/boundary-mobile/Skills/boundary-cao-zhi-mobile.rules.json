@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:luoying-mobile", "revision": 1,
       "triggers": [{ "id": "other-club-discard-or-judgment", "window": "discardPileReceived", "subject": "owner", "movementOccurrence": "perCard", "suits": ["club"], "optional": true,

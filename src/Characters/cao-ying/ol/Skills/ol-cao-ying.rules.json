@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:lingren", "revision": 1, "triggers": [
       { "id": "guess-real-target", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "optional": true,

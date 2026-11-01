@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:lianju", "revision": 1, "triggers": [
       { "id": "same-color-gift", "window": "turnEnding", "subject": "owner", "turnOwnerScope": "own", "optional": true,

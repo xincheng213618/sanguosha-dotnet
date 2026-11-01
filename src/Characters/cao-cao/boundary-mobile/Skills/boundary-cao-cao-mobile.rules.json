@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{ "id": "boundary:jianxiong-mobile", "revision": 1, "triggers": [
     { "id": "claim-then-draw", "window": "afterDamageApplied", "subject": "owner", "damageOccurrence": "perDamage", "optional": true,
       "effects": [

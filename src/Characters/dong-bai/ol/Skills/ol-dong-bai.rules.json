@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "ol:lianzhu", "revision": 1, "activations": [
       { "id": "reveal-hand-gift", "minCards": 1, "maxCards": 1, "sourceZones": ["hand"], "minTargets": 1, "maxTargets": 1,

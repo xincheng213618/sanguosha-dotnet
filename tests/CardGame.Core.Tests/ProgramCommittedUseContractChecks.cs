@@ -89,7 +89,8 @@ internal static class ProgramCommittedUseContractChecks
         var name = assembly.GetManifestResourceNames().Single(name => name.EndsWith(suffix, StringComparison.Ordinal));
         using var stream = assembly.GetManifestResourceStream(name)!;
         using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
+        var json = reader.ReadToEnd();
+        return suffix.EndsWith(".rules.json", StringComparison.Ordinal) ? SkillProgramTestJson.VersionedEmbeddedRules(json) : json;
     }
 
     private static void Reject(IProgramCommittedUseContract[] contracts)

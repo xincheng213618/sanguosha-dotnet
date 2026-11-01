@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [{ "id": "mobile:wangxi", "revision": 1,
     "triggers": [
       { "id": "taking-each-point", "window": "afterDamageApplied", "subject": "owner", "optional": true, "damageOccurrence": "perDamagePoint",

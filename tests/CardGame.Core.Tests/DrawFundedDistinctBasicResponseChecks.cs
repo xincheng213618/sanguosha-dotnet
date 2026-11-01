@@ -348,10 +348,7 @@ internal static class DrawFundedDistinctBasicResponseChecks
         public PackageManifest Manifest { get; } = new("fixture:draw-funded-response", "1.0.0", "真实响应与原生武器回返");
         public void Register(IContentRegistryBuilder b)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var rules = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ordinary-wang-xiang.rules.json")!);
-            using var labels = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ordinary-wang-xiang.presentation.json")!);
-            var production = SkillProgramCatalog.Load(rules.ReadToEnd(), labels.ReadToEnd());
+            var production = CharacterFixtureContent.EmbeddedProgramBundle("ordinary-wang-xiang");
             b.AddSkill(new(Bingxin, "冰心", "完整实际摸牌共享能力") { Program = production.Programs[Bingxin] });
             var catalog = SkillProgramCatalog.Load($$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[

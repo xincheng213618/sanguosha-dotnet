@@ -1,4 +1,4 @@
-{"schemaVersion":64,"skills":[{"id":"anniversary:xiongmang","revision":1,
+{"skills":[{"id":"anniversary:xiongmang","revision":1,
 "viewAs":[
  {"id":"distinct-hand-1","inputKinds":[],"inputSuits":[],"inputCount":1,"sourceZones":["hand"],"outputKind":"slash","forPlay":true,"forResponse":false,"allowSameKind":true},
  {"id":"distinct-hand-2","inputKinds":[],"inputSuits":[],"inputCount":2,"sourceZones":["hand"],"outputKind":"slash","forPlay":true,"forResponse":false,"allowSameKind":true},

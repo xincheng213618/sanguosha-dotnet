@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "mou-mobile:lianhuan", "revision": 1,
       "viewAs": [{ "id": "club-hand-chain", "sourceZones": ["hand"], "inputSuits": ["club"], "inputKinds": [], "outputKind": "ironChain", "forPlay": true, "forResponse": false }],

@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "mou:zhitian", "revision": 1, "activations": [
       { "id": "view-top", "usesPerTurn": null, "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving",

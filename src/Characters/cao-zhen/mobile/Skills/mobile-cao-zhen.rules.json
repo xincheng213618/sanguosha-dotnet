@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 64, "skills": [{ "id": "mobile:sidi", "revision": 1,
+   "skills": [{ "id": "mobile:sidi", "revision": 1,
     "triggers": [
       { "id": "store-after-actual-dodge", "window": "cardResponseAccepted", "ownerRelation": "observer", "cardKinds": ["dodge"], "optional": true,
         "effects": [

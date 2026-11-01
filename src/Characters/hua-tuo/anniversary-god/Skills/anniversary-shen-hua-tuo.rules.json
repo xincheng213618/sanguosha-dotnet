@@ -1,5 +1,4 @@
 {
-  "schemaVersion": 64,
   "skills": [
     { "id": "anniversary-god:luxin", "revision": 1, "activations": [
       { "id": "give-and-filter", "usesPerTurn": null, "usesPerPhase": 1, "minCards": 1, "maxCards": 1, "sourceZones": ["hand"], "minTargets": 1, "maxTargets": 1, "targetKind": "otherLiving", "effects": [

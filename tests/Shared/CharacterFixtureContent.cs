@@ -14,7 +14,12 @@ internal static partial class CharacterFixtureContent
     private static readonly Type CatalogType = ContentAssembly.GetType("CardGame.Content.Standard.CharacterContentCatalog", true)!;
     private static readonly MethodInfo LoadCatalog = CatalogType.GetMethod("Load", BindingFlags.Static | BindingFlags.NonPublic)!;
     private static readonly MethodInfo RegisterCatalog = CatalogType.GetMethod("Register", BindingFlags.Instance | BindingFlags.NonPublic)!;
+    private static readonly MethodInfo ProgramBundleCatalog = ContentAssembly.GetType("CardGame.Content.Standard.EmbeddedSkillProgramCatalog", true)!
+        .GetMethod("Catalog", BindingFlags.Static | BindingFlags.NonPublic)!;
     private static readonly ConcurrentDictionary<string, Lazy<Selection>> Selections = new(StringComparer.Ordinal);
+
+    internal static SkillProgramCatalog EmbeddedProgramBundle(string bundle) =>
+        (SkillProgramCatalog)Invoke(ProgramBundleCatalog, null, [bundle])!;
 
     internal static void Register(IContentRegistryBuilder builder, params string[] generalIds)
     {

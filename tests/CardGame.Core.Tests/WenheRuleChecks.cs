@@ -166,10 +166,7 @@ internal static class WenheRuleChecks
         public PackageManifest Manifest { get; } = new("wenhe-rules-fixture", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
-            var assembly = typeof(StandardContentPackage).Assembly;
-            using var rules = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.wenhe-activity.rules.json")!);
-            using var presentation = new StreamReader(assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.wenhe-activity.presentation.json")!);
-            var activity = SkillProgramCatalog.Load(rules.ReadToEnd(), presentation.ReadToEnd());
+            var activity = CharacterFixtureContent.EmbeddedProgramBundle("wenhe-activity");
             foreach (var (id, program) in activity.Programs)
                 builder.AddSkill(new(id, activity.Presentations[id].Name, activity.Presentations[id].Description)
                 { Program = program, ProgramPresentation = activity.Presentations[id], Tags = id == "wenhe:niepan" ? SkillTag.Limited : id == "wenhe:rules" ? SkillTag.Locked : SkillTag.None });

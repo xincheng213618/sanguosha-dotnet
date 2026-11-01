@@ -628,6 +628,7 @@ var tests = new (string Name, Action Body)[]
     ("public pile bindings: selected source frozen suits and paid children cold", BoundPublicPileDistributionChecks.SelectedSourceFrozenSuitsAndPaidChildrenReplayExactly),
     ("configured active sequences reject forged input and replay exact moves", SkillProgramChecks.ConfiguredActiveSequenceIsAtomicAndReplayable),
     ("program gameplay hashes control checkpoint compatibility independently of presentation", SkillProgramChecks.ProgramHashControlsCheckpointCompatibility),
+    ("Built-in rules: versionless and external forms preserve all content hashes", BuiltinSkillProgramFormatChecks.EmbeddedAndExternalFormsPreserveAllContentHashes),
     ("program dying checkpoints cancel a selected card spent on rescue", SkillProgramChecks.ProgramPausedDyingAndConsumedSelection),
     ("physical deck recipes preserve exact suit, rank and content hashing", PhysicalDeckRecipeChecks.ExactSuitRankValidationAndHashing),
     ("classic identity applies base HP, multiple skills and legacy replay boundaries", ClassicGeneralChecks.SetupHealthAndReplay),
