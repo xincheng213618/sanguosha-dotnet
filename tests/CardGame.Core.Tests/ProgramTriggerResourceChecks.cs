@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Reflection;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static class ProgramTriggerResourceChecks
 {
@@ -67,6 +68,7 @@ internal static class ProgramTriggerResourceChecks
         var game = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 5, ModeId = "identity:standard-5", HumanSeat = 0,
             HumanRole = Role.Lord, UseInteractiveSetup = false, AdvanceAfterHumanCommands = false }, registry);
         if (!game.Submit(new StartGameCommand()).Accepted) throw new InvalidOperationException("Facts fixture failed to start.");
+        NativeAppearanceFactDemand(program, game);
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
         var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", flags)!.GetValue(game)!;
         var action = new CardActionContext(1, null, CardActionType.Use, 0, 0, null, null, 1,
@@ -88,6 +90,51 @@ internal static class ProgramTriggerResourceChecks
         invalid["skills"]![0]!["triggers"]![0]!["subject"] = "owner";
         invalid["skills"]![0]!["triggers"]![0]!["condition"] = JsonNode.Parse("""{"kind":"damageSourceGenderIs","gender":"male"}""");
         Reject(invalid, presentation, "requires a beforeDamageApplied trigger");
+    }
+
+    private static void NativeAppearanceFactDemand(SkillProgram template, GameEngine withoutDemand)
+    {
+        var triggered = ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.DrawHengwuFieldSuitEquipment).FactRequirements;
+        var activated = ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.ResolveWuyouContributionAndNamedReturn).FactRequirements;
+        if ((triggered.Triggered & ProgramTrackedFact.NativeActionAppearance) == 0 ||
+            (triggered.Activated & ProgramTrackedFact.NativeActionAppearance) != 0 ||
+            (activated.Activated & ProgramTrackedFact.NativeActionAppearance) == 0 ||
+            (activated.Triggered & ProgramTrackedFact.NativeActionAppearance) != 0)
+            throw new InvalidOperationException("Native appearance demand must preserve the operation's trigger or activation scope.");
+
+        var rank = WithViewAs(CharacterFixtureContent.EmbeddedProgramBundle("wumiao-guan-yu")
+            .Programs["wumiao:juewu"].ViewAs.Where(rule => rule.RankTwoDamageUse).ToArray());
+        var name = WithViewAs(CharacterFixtureContent.EmbeddedProgramBundle("le-mi-heng")
+            .Programs["le:sirui"].ViewAs.Where(rule => rule.EqualNameLengthUse).ToArray());
+        foreach (var program in new[] { rank, name })
+            if (!new SkillProgramDependencies([Definition(program)]).RequiresFact(ProgramTrackedFact.NativeActionAppearance))
+                throw new InvalidOperationException("A view-as declaration must request native appearance without a character capability callback.");
+        if (new SkillProgramDependencies([Definition(WithViewAs([]))]).RequiresFact(ProgramTrackedFact.NativeActionAppearance))
+            throw new InvalidOperationException("Programs without an appearance consumer must retain omitted legacy appearance facts.");
+
+        var omitted = Capture(withoutDemand);
+        if (omitted.Action.EffectiveSuit is not null || omitted.Action.EffectiveRank is not null)
+            throw new InvalidOperationException("Native use appearance must remain omitted without catalog demand.");
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new FactsPackage(rank));
+        var game = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 5, ModeId = "identity:standard-5", HumanSeat = 0,
+            HumanRole = Role.Lord, UseInteractiveSetup = false, AdvanceAfterHumanCommands = false }, registry);
+        if (!game.Submit(new StartGameCommand()).Accepted) throw new InvalidOperationException("Appearance fixture failed to start.");
+        var captured = Capture(game);
+        if (captured.Action.EffectiveSuit != captured.Card.Suit || captured.Action.EffectiveRank != captured.Card.Rank ||
+            captured.Action.EffectiveIsRed != (captured.Card.Suit is Suit.Heart or Suit.Diamond))
+            throw new InvalidOperationException("An unowned catalog declaration must freeze the actual physical use's suit, rank and color.");
+
+        SkillProgram WithViewAs(IReadOnlyList<SkillProgramViewAs> viewAs) => new(template.Id, template.Revision,
+            template.GameplayHash, template.RuntimeVersion, template.MinimumRulesVersion, [], viewAs, [], [], [], []);
+        static ContentSkillDefinition Definition(SkillProgram program) => new(program.Id, "Facts", "Facts") { Program = program };
+        static (CardActionContext Action, Card Card) Capture(GameEngine game)
+        {
+            var zones = (CardZoneStore)typeof(GameEngine).GetField("_cardZones", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+            var card = zones.CardsAt(CardLocation.Hand(0)).First();
+            var action = game.GetRuntimeModule<CoreGameEngineCardActionsRuntime>()
+                .CaptureCardUseAction(card, 0, [], card.Kind, [card.Id])!;
+            return (action, card);
+        }
     }
 
     private static void AssertOmitted(SkillProgramTriggerFacts facts, string property)

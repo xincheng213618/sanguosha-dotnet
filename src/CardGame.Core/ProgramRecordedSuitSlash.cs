@@ -30,6 +30,7 @@ internal interface IRecordedSuitSlashProgramHost
 internal sealed class RevealRecordedSuitSlashDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.RevealRecordedSuitSlash;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
     public override ProgramContextCapability RequiredCapabilities => ProgramContextCapability.CardAction;
     public override ISkillProgramEffectHandler Handler { get; } = new RevealRecordedSuitSlashHandler();
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.ProhibitCurrentResponse,

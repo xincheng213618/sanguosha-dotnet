@@ -42,6 +42,7 @@ internal abstract class WuLuXunZhangcaiDescriptor(SkillProgramEffectOp op) : Pro
     public override ISkillProgramEffectHandler Handler { get; } = new WuLuXunZhangcaiHandler(op);
 }
 internal sealed class ResolveWuLuXunZhangcaiDescriptor() : WuLuXunZhangcaiDescriptor(SkillProgramEffectOp.ResolveWuLuXunZhangcai){
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);
 }
 internal sealed class WuLuXunZhangcaiHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler

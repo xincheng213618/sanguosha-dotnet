@@ -49,6 +49,7 @@ public sealed record WuZhangFeiUseCompletedEvent(long FrameId, long ActionId, in
 internal interface IWuZhangFeiUseHost { SkillProgramStepOutcome Sample(ProgramSkillFrame frame); }
 internal sealed class ResolveWuZhangFeiUseSampleDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveWuZhangFeiUseSample;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>

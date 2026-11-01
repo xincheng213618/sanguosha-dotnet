@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 internal sealed class ClaimLiubingUndamagingSlashDescriptor() : WuJingDescriptor(SkillProgramEffectOp.ClaimLiubingUndamagingSlash)
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeActionAppearance);
 }
 public sealed record WuJingLiubingAppearance(long UseId, long ActionId, CardConversionSource Source, int ActualTurn, int TurnOwner, int ActorSeat, int CardId, CardKind Kind, Suit Suit);
 public sealed record WuJingLiubingAppearanceIssuedEvent(WuJingLiubingAppearance Receipt) : IGameEvent;

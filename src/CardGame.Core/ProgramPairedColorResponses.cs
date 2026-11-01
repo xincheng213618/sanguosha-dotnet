@@ -57,6 +57,7 @@ internal interface IPairedColorResponseHost
 internal sealed class OfferPairedColorCardDispositionDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.OfferPairedColorCardDisposition;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
     public override ISkillProgramEffectHandler Handler { get; } = new PairedColorDispositionHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramContextCapability RequiredCapabilities => ProgramContextCapability.CardAction;

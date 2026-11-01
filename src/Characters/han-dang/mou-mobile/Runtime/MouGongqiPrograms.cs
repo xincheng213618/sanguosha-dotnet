@@ -4,7 +4,7 @@ public sealed record MouHanDangGongqiGrantedEvent(long FrameId, CardConversionSo
 public sealed record MouHanDangUseRestrictedEvent(long ActionId, int ActorSeat, long GrantFrameId) : IGameEvent;
 internal sealed class ResolveMouHanDangGongqiDescriptor : MouHanDangDescriptor
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.NativeActionAppearance);
 
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouHanDangGongqi;
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(SkillProgramTriggerWindow.PlayPhaseStarting)];

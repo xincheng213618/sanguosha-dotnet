@@ -9,6 +9,8 @@ public sealed record MiaoxianPaymentQualifiedEvent(long BatchId,long? ParentFram
 public sealed record MiaoxianNativeCounterspellFinishedEvent(long ActionId,long ParentFrameId,int CardId,long EntrySequence,long FinishSequence):IGameEvent;
 public sealed record MiaoxianBlackConsumedEvent(long ActionId,CardConversionSource Source,int ActualTurn,int CardId):IGameEvent;
 public sealed record MiaoxianRedDrawIssuedEvent(long FrameId,long ActionId,CardConversionSource Source,int ActualTurn):IGameEvent;
-internal sealed class ResolveMiaoxianUniqueRedUseDrawDescriptor:RuanYuDescriptor {public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveMiaoxianUniqueRedUseDraw;}
+internal sealed class ResolveMiaoxianUniqueRedUseDrawDescriptor:RuanYuDescriptor {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
+    public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveMiaoxianUniqueRedUseDraw;}
 internal sealed class RuanYuMiaoxianCommittedUseContract:IProgramCommittedUseContract
 {public string SkillId=>"ol:miaoxian";public void ValidateTrigger(SkillProgramTrigger trigger)=>RuanYuComposition.ValidateRedTrigger("ol:miaoxian",trigger);}

@@ -1,3 +1,7 @@
 namespace CardGame.Core;
 public sealed record GuanOpeningUseEvent(long ActionId, int OwnerSeat, int TurnNumber, bool IsRed, bool IsBasic, bool IsWeilin) : IGameEvent;
-internal sealed class RecordOpeningTurnUseDescriptor : GuanYuVariantDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.RecordOpeningTurnUse; }
+internal sealed class RecordOpeningTurnUseDescriptor : GuanYuVariantDescriptor
+{
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.RecordOpeningTurnUse;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
+}

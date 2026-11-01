@@ -1,6 +1,9 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
-internal sealed class UseHejiAtCompletedSingleTargetDescriptor() : WuJingDescriptor(SkillProgramEffectOp.UseHejiAtCompletedSingleTarget);
+internal sealed class UseHejiAtCompletedSingleTargetDescriptor() : WuJingDescriptor(SkillProgramEffectOp.UseHejiAtCompletedSingleTarget)
+{
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
+}
 internal sealed class RewardHejiUnconvertedUseDescriptor() : WuJingDescriptor(SkillProgramEffectOp.RewardHejiUnconvertedUse);
 public sealed record WuJingHejiOrigin(long ProgramFrameId, long UseId, long ActionId, long IncomingUseId, long IncomingActionId, CardConversionSource Source, string GameplayHash, int ActualTurn, int ActorSeat, int TargetSeat, CardKind Kind, bool RewardEligible)
 {

@@ -13,6 +13,7 @@ public sealed record HuoxinReceipt(Suit EffectiveSuit)
     public bool Paid { get; init; }
 }
 internal sealed class ResolveHuoxinNonEquipmentUseDescriptor() : LeZouShiDescriptor(SkillProgramEffectOp.ResolveHuoxinNonEquipmentUse){
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);
 }
 internal sealed class HuoxinCommittedUseContract : IProgramCommittedUseContract

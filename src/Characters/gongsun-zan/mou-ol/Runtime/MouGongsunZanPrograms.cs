@@ -34,7 +34,7 @@ internal abstract class MouGongsunZanDescriptor : ProgramOperationDescriptorBase
 internal sealed class ResolveMouGongsunZanJiaodiDescriptor : MouGongsunZanDescriptor
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouGongsunZanJiaodi;
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.NativeActionAppearance);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseTargetsFinalized), new RequireCardActionActor()];
 }
 internal sealed class ResolveMouGongsunZanBaojingDescriptor : MouGongsunZanDescriptor

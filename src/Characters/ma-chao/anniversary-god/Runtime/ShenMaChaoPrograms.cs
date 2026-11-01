@@ -30,7 +30,10 @@ internal abstract class ShenMaChaoDescriptor(SkillProgramEffectOp op) : ProgramO
         [SkillProgramTriggerWindow.CardUseCommitted, SkillProgramTriggerWindow.CardResponseAccepted])];
 }
 internal sealed class DealShouliStartingMountsDescriptor() : ShenMaChaoDescriptor(SkillProgramEffectOp.DealShouliStartingMounts);
-internal sealed class DrawHengwuFieldSuitEquipmentDescriptor() : ShenMaChaoDescriptor(SkillProgramEffectOp.DrawHengwuFieldSuitEquipment);
+internal sealed class DrawHengwuFieldSuitEquipmentDescriptor() : ShenMaChaoDescriptor(SkillProgramEffectOp.DrawHengwuFieldSuitEquipment)
+{
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
+}
 internal sealed class ShenMaChaoHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {
     public SkillProgramEffectOp Op => op;

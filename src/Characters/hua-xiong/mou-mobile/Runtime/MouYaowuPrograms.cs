@@ -9,6 +9,7 @@ public sealed record MouHuaXiongYaowuBenefitChosenEvent(long FrameId, int? Recip
 internal sealed class ResolveMouHuaXiongYaowuDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouHuaXiongYaowu;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) =>
         [new CreateChoiceResult("yaowu-benefit", ["source-recover", "source-draw", "owner-draw", "none"])];

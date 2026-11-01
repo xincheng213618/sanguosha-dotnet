@@ -15,17 +15,17 @@ public sealed record JiyunCompletedUseLeaseIssuedEvent(CardConversionSource Sour
 public sealed record JiyunClaimedEntityEvent(long FrameId, long NativeUseId, long ActionId, ProgramCompletedResponseKind? ResponseKind, long LeaseId, int CardId, CardKind PrintedKind, CardLocation From, CardLocation To, long MovementSequence) : IGameEvent;
 public sealed record JiyunLeaseResolvedEvent(long FrameId, long ActionId, long LeaseId, bool Claimed) : IGameEvent;
 internal sealed class InitializeJiyunCategoryGrainDescriptor() : LiFengDescriptor(SkillProgramEffectOp.InitializeJiyunCategoryGrain){
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeTrueUseProcessingEntry);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeTrueUseProcessingEntry | ProgramTrackedFact.NativeActionAppearance);
 
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.Frame.LiFeng is { Paid: true };
 }
 internal sealed class ResolveJiyunPreparationDrawLeasesDescriptor() : LiFengDescriptor(SkillProgramEffectOp.ResolveJiyunPreparationDrawLeases){
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeTrueUseProcessingEntry);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeTrueUseProcessingEntry | ProgramTrackedFact.NativeActionAppearance);
 
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.Frame.LiFeng is { Paid: true };
 }
 internal sealed class CollectJiyunCompletedUseEntitiesDescriptor() : LiFengDescriptor(SkillProgramEffectOp.CollectJiyunCompletedUseEntities){
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeTrueUseProcessingEntry);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeTrueUseProcessingEntry | ProgramTrackedFact.NativeActionAppearance);
 
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.Frame.LiFeng is { Paid: true };
 }

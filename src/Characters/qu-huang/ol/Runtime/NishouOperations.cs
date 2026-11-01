@@ -7,7 +7,9 @@ public sealed record NishouSwapDebtConsumedEvent(long DebtId,long FrameId,long B
 public sealed record NishouOriginalHandFrozenEvent(long FrameId,int HolderSeat,int CardId,CardKind Kind):IGameEvent;
 public sealed record NishouLightningPaidEvent(QuHuangNishouUseOrigin Origin,long Sequence):IGameEvent;
 public sealed record NishouLightningReturnedEvent(QuHuangNishouUseOrigin Origin):IGameEvent;
-internal sealed class ResolveNishouEquipmentLossChoiceDescriptor:QuHuangDescriptor {public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveNishouEquipmentLossChoice;}
+internal sealed class ResolveNishouEquipmentLossChoiceDescriptor:QuHuangDescriptor {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
+public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveNishouEquipmentLossChoice;}
 internal sealed class ResolveNishouIssuedCurrentPhaseSwapDescriptor:QuHuangDescriptor {
     public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
 public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveNishouIssuedCurrentPhaseSwap;}

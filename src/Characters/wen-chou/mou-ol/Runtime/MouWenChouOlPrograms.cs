@@ -65,9 +65,13 @@ internal abstract class MouWenChouOlDescriptor : ProgramOperationDescriptorBase
         _ => [new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseTargetsFinalized)]
     };
 }
-internal sealed class UseMouWenChouLunzhanDescriptor : MouWenChouOlDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.UseMouWenChouLunzhan; }
+internal sealed class UseMouWenChouLunzhanDescriptor : MouWenChouOlDescriptor {
+    public override ProgramFactRequirements FactRequirements => base.FactRequirements.Union(new(Activated: ProgramTrackedFact.NativeActionAppearance));
+public override SkillProgramEffectOp Op => SkillProgramEffectOp.UseMouWenChouLunzhan; }
 internal sealed class RewardMouWenChouLunzhanDescriptor : MouWenChouOlDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.RewardMouWenChouLunzhan; }
-internal sealed class ResolveMouWenChouJuejueDescriptor : MouWenChouOlDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouWenChouJuejue; }
+internal sealed class ResolveMouWenChouJuejueDescriptor : MouWenChouOlDescriptor {
+    public override ProgramFactRequirements FactRequirements => base.FactRequirements.Union(new(Triggered: ProgramTrackedFact.NativeActionAppearance));
+public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouWenChouJuejue; }
 internal sealed class MouWenChouOlHandler(SkillProgramEffectOp operation) : ISkillProgramEffectHandler
 {
     public SkillProgramEffectOp Op => operation;

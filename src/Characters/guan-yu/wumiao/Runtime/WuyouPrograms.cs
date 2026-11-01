@@ -62,7 +62,7 @@ public sealed record WuyouDeclarationBoundEvent(long DeclarationId, long OwnerFr
 internal interface IWuGuanYuWuyouHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame); }
 internal sealed class ResolveWuyouContributionAndNamedReturnDescriptor : ProgramOperationDescriptorBase
 {
-    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeActionAppearance);
 
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveWuyouContributionAndNamedReturn;
     public override ProgramOperationAiPolicy AiPolicy { get; } =

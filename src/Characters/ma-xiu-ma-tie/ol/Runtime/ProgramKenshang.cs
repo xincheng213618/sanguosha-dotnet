@@ -37,7 +37,11 @@ internal abstract class KenshangDescriptor:ProgramOperationDescriptorBase
     public override ProgramOperationAiPolicy AiPolicy{get;}=new(ProgramOperationAiSemantic.GainCards,static(_,c)=>c.PublicControlValue(3));
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(Op==SkillProgramEffectOp.ResolveKenshangTargetRewrite?SkillProgramTriggerWindow.CardUseCommitted:SkillProgramTriggerWindow.CardUseCompleted)];
 }
-internal sealed class ResolveKenshangTargetRewriteDescriptor:KenshangDescriptor{public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveKenshangTargetRewrite;}
+internal sealed class ResolveKenshangTargetRewriteDescriptor:KenshangDescriptor
+{
+    public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveKenshangTargetRewrite;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
+}
 internal sealed class DrawForKenshangShortDamageDescriptor:KenshangDescriptor{public override SkillProgramEffectOp Op=>SkillProgramEffectOp.DrawForKenshangShortDamage;}
 internal sealed class KenshangHandler(SkillProgramEffectOp op):ISkillProgramEffectHandler
 {public SkillProgramEffectOp Op=>op;public SkillProgramStepOutcome Execute(SkillProgramEffect e,ProgramSkillFrame f,int seat,ISkillProgramEffectHost h)=>h.GetCapability<IKenshangHost>().Resolve(f,op);}

@@ -1,6 +1,7 @@
 #nullable enable
 
 namespace CardGame.Core.EngineOwners;
+[ProgramPassiveFactRequirements(HappyGuanYuComposition.Wushen, ProgramTrackedFact.NativeActionAppearance)]
 internal sealed partial class CharacterGuanYuHappyGodRuntime
 {
     internal bool HasHappyGuanYuHeartSlashCapability => _contentRegistryOperations._contentRegistry.Skills.ContainsKey(HappyGuanYuComposition.Wushen);

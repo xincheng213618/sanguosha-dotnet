@@ -5,7 +5,7 @@ public sealed record ShuliangGrainDistributedEvent(long FrameId, int CardId, int
 public sealed record ShuliangDistributionEntityFrozenEvent(long FrameId, int Index, int CardId, CardKind PrintedKind, CardLocation From) : IGameEvent;
 public sealed record ShuliangGrainPaidEvent(long ParentFrameId, long ActionId, CardConversionSource Source, int ProviderSeat, int ActualTurn, int TurnOwner, int CardId, CardLocation From, long MovementSequence, bool Played) : IGameEvent;
 internal sealed class DistributeShuliangEndingGrainDescriptor() : LiFengDescriptor(SkillProgramEffectOp.DistributeShuliangEndingGrain){
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeTrueUseProcessingEntry);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeTrueUseProcessingEntry | ProgramTrackedFact.NativeActionAppearance);
 
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.Frame.LiFeng is { Paid: true };
 }

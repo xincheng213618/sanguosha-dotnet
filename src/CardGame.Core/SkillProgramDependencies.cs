@@ -56,7 +56,8 @@ internal sealed class SkillProgramDependencies
             (UsesSkillStatePhaseEnds || skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseStarted)
                 ? ProgramTrackedFact.ActualDiscardRecoveryPhase : ProgramTrackedFact.None) |
             (programs.Any(program => program.DamageModifiers.Any(modifier =>
-                modifier.Condition == SkillProgramDamageModifierCondition.OwnerUsedHeartSlash))
+                modifier.Condition == SkillProgramDamageModifierCondition.OwnerUsedHeartSlash) ||
+                program.ViewAs.Any(rule => rule.RankTwoDamageUse || rule.EqualNameLengthUse))
                 ? ProgramTrackedFact.NativeActionAppearance : ProgramTrackedFact.None);
         _conditions = triggers.SelectMany(trigger => resolver.Features(trigger).ConditionKinds).ToFrozenSet();
         TracksActualTurnUseOrdinal = triggers.Any(trigger => trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.NullifyWushuangSecondUse)) || UsesTriggerCondition(SkillProgramTriggerConditionKind.CardActionActualTurnUseOrdinalIs) ||

@@ -4,7 +4,7 @@ public sealed record WuHuangFuSongLianjieEntityEvent(long FrameId, int OwnerSeat
 internal sealed class ResolveWuHuangFuSongLianjieDescriptor : WuHuangFuSongDescriptor
 {
     public override ProgramDependencyKinds TracksActualTurnCursorReturn => ProgramDependencyKinds.Trigger;
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeActionAppearance);
  public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveWuHuangFuSongLianjie; public override ISkillProgramEffectHandler Handler { get; } = new WuHuangFuSongLianjieHandler();
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);
 }

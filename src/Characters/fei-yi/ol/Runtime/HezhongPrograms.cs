@@ -11,4 +11,7 @@ public sealed record FeiYiHezhongPaidEvent(long FrameId,CardConversionSource Sou
 public sealed record FeiYiRankEffectBoundEvent(long GrantId,long UseFrameId,long ActionId,int EffectiveRank,int AcceptedActorSeat) : IGameEvent;
 public sealed record FeiYiEffectRoundStartedEvent(long UseFrameId,long ActionId,int Round) : IGameEvent;
 internal sealed class RevealSingletonAndArmRankEffectsDescriptor():FeiYiDescriptor(SkillProgramEffectOp.RevealSingletonAndArmRankEffects)
-{ public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(SkillProgramTriggerWindow.CardsMoved)]; }
+{
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(SkillProgramTriggerWindow.CardsMoved)];
+}

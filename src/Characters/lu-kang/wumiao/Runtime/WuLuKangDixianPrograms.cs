@@ -58,7 +58,7 @@ internal interface IWuLuKangDixianHost
 { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame); }
 internal sealed class ResolveWuLuKangDixianDescriptor : ProgramOperationDescriptorBase
 {
-    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard);
+    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.NativeActionAppearance);
 
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveWuLuKangDixian;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);

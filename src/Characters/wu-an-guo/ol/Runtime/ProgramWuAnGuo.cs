@@ -30,6 +30,7 @@ public sealed class ResolveLiyongUsedSuitDeckAndDuelHandler : ISkillProgramEffec
 }
 internal sealed class ResolveLiyongUsedSuitDeckAndDuelDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.NativeActionAppearance);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveLiyongUsedSuitDeckAndDuel;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
     public override ISkillProgramEffectHandler Handler { get; } = new ResolveLiyongUsedSuitDeckAndDuelHandler();

@@ -6,7 +6,9 @@ public sealed record LiuYanLimuPaidEvent(LiuYanLimuUseOrigin Origin,long Sequenc
 public sealed record LiuYanLimuReturnedEvent(LiuYanLimuUseOrigin Origin):IGameEvent;
 public sealed record LiuYanLimuRecoveryIssuedEvent(long FrameId,int OwnerSeat,int Amount):IGameEvent;
 internal sealed class UseLimuSelfIndulgenceAndRecoverDescriptor:LiuYanDescriptor
-{public override SkillProgramEffectOp Op=>SkillProgramEffectOp.UseLimuSelfIndulgenceAndRecover;public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new ConsumeSelectedCards(1)];}
+{
+    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.NativeActionAppearance);
+    public override SkillProgramEffectOp Op=>SkillProgramEffectOp.UseLimuSelfIndulgenceAndRecover;public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new ConsumeSelectedCards(1)];}
 
 [ProgramSelectionModule(ProgramSelectionStage.CardAfterDiscard,27231,SkillProgramEffectOp.UseLimuSelfIndulgenceAndRecover)]
 internal sealed class LiuYanLimuCardFilter:IProgramSelectionCardFilter

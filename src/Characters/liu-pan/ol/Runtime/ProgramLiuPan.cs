@@ -64,7 +64,9 @@ internal abstract class LiuPanDescriptor:ProgramOperationDescriptorBase
     public override ProgramOperationAiPolicy AiPolicy{get;}=new(ProgramOperationAiSemantic.GainCards,static(_,c)=>c.PublicControlValue(3));
     public override ProgramOperationInteraction Interaction=>ProgramOperationInteraction.Choice;
 }
-internal sealed class ResolvePijingTargetTogglesAndRandomGiftsDescriptor:LiuPanDescriptor {public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolvePijingTargetTogglesAndRandomGifts;}
+internal sealed class ResolvePijingTargetTogglesAndRandomGiftsDescriptor:LiuPanDescriptor {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
+    public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolvePijingTargetTogglesAndRandomGifts;}
 internal sealed class ResolvePijingNextSoleTargetChoiceDescriptor:LiuPanDescriptor {public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolvePijingNextSoleTargetChoice;
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => true;
 }

@@ -51,7 +51,7 @@ internal abstract class MoLuBuDescriptor : ProgramOperationDescriptorBase
 }
 internal sealed class InitializeMoLuBuQiDescriptor : MoLuBuDescriptor {
     public override ProgramDependencyKinds TracksActualTurnCursorReturn => ProgramDependencyKinds.Trigger;
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeActionAppearance);
  public override SkillProgramEffectOp Op => SkillProgramEffectOp.InitializeMoLuBuQiAndOpeningPlay; }
 internal sealed class ResolveMoLuBuDuoqiDescriptor : MoLuBuDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMoLuBuDuoqi; }
 internal sealed class EnterMoLuBuKuangmoDescriptor : MoLuBuDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.EnterMoLuBuKuangmo; }

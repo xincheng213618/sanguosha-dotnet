@@ -22,6 +22,7 @@ internal interface IAlternateActualUseColorProgramHost
 
 internal sealed class GrantAlternateActualUseColorDrawDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.GrantAlternateActualUseColorDraw;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
     public override ISkillProgramEffectHandler Handler { get; } = new GrantAlternateActualUseColorDrawHandler();

@@ -7,6 +7,7 @@ internal interface IBianFuRenProgramHost
 
 internal abstract class BianFuRenMovementDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
     // The character validates its frozen multi-zone batch invoice at runtime;
     // the generic single-source static context does not model that receipt.

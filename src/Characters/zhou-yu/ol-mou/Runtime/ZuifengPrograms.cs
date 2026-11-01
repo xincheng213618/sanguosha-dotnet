@@ -67,7 +67,7 @@ public sealed record MouZuifengCompletedEvent(long FrameId, bool Paid, int? Show
 internal interface IMouZhouYuZuifengHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame f); }
 internal sealed class ResolveMouZhouYuZuifengDescriptor : ProgramOperationDescriptorBase
 {
-    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeActionAppearance);
 
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouZhouYuZuifeng;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
