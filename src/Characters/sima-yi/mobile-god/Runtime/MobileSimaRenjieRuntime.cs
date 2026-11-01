@@ -64,7 +64,7 @@ internal sealed class MobileSimaRenjieRuntime(IProgramRuntimeFrames frames, IPro
     {
         var owner = facts.Player(pending.WeaponOwnerSeat);
         if (!HasMobileSimaRenjie || !owner.IsAlive || pending.SourceSeat == owner.Seat || !CanBeginMobileSimaRenjie(owner.Seat) ||
-            facts.UseUnrespondable(pending.ResolutionId) || facts.YingboUnrespondable(pending.ResolutionId) ||
+            facts.UseUnrespondable(pending.ResolutionId) ||
             facts.WenjiResponseForbidden(pending.ResolutionId, owner.Seat) ||
             !facts.LegalBorrowedSwordTarget(owner.Seat, pending.SlashTargetSeat) ||
             !facts.Equipment(owner.Seat).Any(c => EquipmentCatalog.Get(c.Kind).Slot == EquipmentSlot.Weapon) ||
@@ -82,7 +82,7 @@ internal sealed class MobileSimaRenjieRuntime(IProgramRuntimeFrames frames, IPro
     {
         if (!HasMobileSimaRenjie || use.Qizheng is not { Stage: QizhengStage.Response, ResponseKind: null } q ||
             use.SourceSeat == q.Target || !CanBeginMobileSimaRenjie(q.Target) || facts.WenjiResponseForbidden(use.Id, q.Target) ||
-            facts.UseUnrespondable(use.Id) || facts.YingboUnrespondable(use.Id)) return false;
+            facts.UseUnrespondable(use.Id)) return false;
         var key = $"qizheng:{use.Id}:{q.NullificationId}:{q.TargetIndex}:{q.EffectOrdinal}";
         if (facts.History<MobileSimaRenjieStartedEvent>().Any(e => e.OccurrenceKey == key)) return false;
         prompts.Clear();

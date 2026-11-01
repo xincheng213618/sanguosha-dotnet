@@ -2,12 +2,12 @@ using CardGame.Core;
 
 internal static class SkillProgramViewAsZoneChecks
 {
-    private const string Rules = """
-        {"schemaVersion":64,"skills":[{"id":"test:owned-red-slash","revision":1,
+    private static string Rules => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"test:owned-red-slash","revision":1,
         "minimumRulesVersion": 171,"viewAs":[{"id":"red-owned","sourceZones":["hand","equipment"],
         "inputKinds":[],"inputSuits":["heart","diamond"],"outputKind":"slash",
         "forPlay":true,"forResponse":true}]}]}
-        """;
+        """);
     private const string Presentation = """
         {"schemaVersion":3,"skills":{"test:owned-red-slash":{"name":"红牌当杀","description":"测试来源牌区"}}}
         """;

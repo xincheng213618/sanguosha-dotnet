@@ -70,9 +70,9 @@ internal static class DrawPolicyProgramChecks
         if (!condition) throw new InvalidOperationException(message);
     }
 
-    private const string ActiveRules = """
+    private static string ActiveRules => SkillProgramTestJson.CurrentSchema("""
         {
-          "schemaVersion": 64,
+          "schemaVersion": __RULES_SCHEMA__,
           "skills": [{
             "id": "fixture:active-op",
             "revision": 1,
@@ -94,7 +94,7 @@ internal static class DrawPolicyProgramChecks
             "cardIdentities": []
           }]
         }
-        """;
+        """);
 
     private const string Presentation = """
         {

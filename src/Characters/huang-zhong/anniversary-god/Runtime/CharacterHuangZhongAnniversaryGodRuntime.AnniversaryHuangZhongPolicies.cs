@@ -62,10 +62,10 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
         if (a.Type == CardActionType.Use && CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) && ActiveAnniversaryHzZhanjue(a.ActorSeat, 1)is { } issue && _coreCardUseLifecycleOperations.LifecycleCardUse(parent)is { Action: { } current } use && current.ActionId == a.ActionId)
         {
             var noResponse = new IssuedCardNoResponse(a.ActionId, parent, issue.Source, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(parent, f => f with { AnniversaryHzSlashIssueId = issue.Id, IssuedNoResponse = f.IssuedNoResponse ?? noResponse });
+            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(parent, f => f with { AnniversaryHzSlashIssueId = issue.Id });
+
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryHzZhanjueSpentEvent(issue.Id, parent, 0));
-            if (use.IssuedNoResponse is null)
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IssuedCardNoResponseEvent(noResponse));
+            _coreCardUseLifecycleOperations.IssueNoResponsePolicy(noResponse);
         }
 
         var statuses = ActiveAnniversaryHzBody(a.ActorSeat, AnniversaryHzBody.Zhongshu).ToArray();

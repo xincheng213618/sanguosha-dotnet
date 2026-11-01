@@ -11,11 +11,11 @@ internal sealed partial class CharacterSimaShiMouRuntime
     {
         if (!HasMouSimaShi)
             return;
-        if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { Action: { Type: CardActionType.Use } a } use && MouSimaShiNoResponseSource(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat], a.PhysicalCards.Select(c => c.CardId).ToArray())is { } source && use.IssuedNoResponse is null)
+        if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { Action: { Type: CardActionType.Use } a } use && MouSimaShiNoResponseSource(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat], a.PhysicalCards.Select(c => c.CardId).ToArray())is { } source)
         {
             var issued = new IssuedCardNoResponse(a.ActionId, use.Id, source, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { IssuedNoResponse = issued });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IssuedCardNoResponseEvent(issued));
+
+            _coreCardUseLifecycleOperations.IssueNoResponsePolicy(issued);
         }
 
         if (payload is NativeTrueUseProcessingEntryEvent { Kind: NativeTrueUseDiscardKind.Use } native && _coreCardUseLifecycleOperations.LifecycleCardUse(native.ParentFrameId)is { Action: { Type: CardActionType.Use } nativeAction } && nativeAction.ActionId == native.ParentActionId && nativeAction.ProviderSeat == native.ProviderSeat && nativeAction.PhysicalCards.Any(c => c.CardId == native.CardId && c.CardKind == native.CardKind && c.From == native.From) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouSimaShiMaterialEvent>().Any(e => e.ActionId == nativeAction.ActionId && e.CardId == native.CardId))

@@ -14,13 +14,17 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
         if (domains.Length == 0)
             return;
         var mask = domains.Aggregate(0, (n, d) => n | (1 << (int)d));
-        var noResponse = use.IssuedNoResponse;
-        if (domains.Contains(ShenDengAiDomain.Junshan) && noResponse is null)
-            noResponse = new(a.ActionId, use.Id, new(skillId, "junshan-entity", a.ActorSeat, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat], skillId)), _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { ShenDengAiDomain = new(a.ActionId, a.ActorSeat, mask), IssuedNoResponse = noResponse });
+        IssuedCardNoResponse? noResponse = null;
+        if (domains.Contains(ShenDengAiDomain.Junshan))
+        {
+            var source = new CardConversionSource(skillId, "junshan-entity", a.ActorSeat, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(_coreMatchParticipantsPlayersAccess._players[a.ActorSeat], skillId));
+            noResponse = new(a.ActionId, use.Id, source, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
+
+        }
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { ShenDengAiDomain = new(a.ActionId, a.ActorSeat, mask) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenDengAiDomainIssuedEvent(use.Id, a.ActionId, a.ActorSeat, mask));
-        if (noResponse is not null && use.IssuedNoResponse is null)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IssuedCardNoResponseEvent(noResponse));
+        if (noResponse is not null)
+            _coreCardUseLifecycleOperations.IssueNoResponsePolicy(noResponse);
     }
 
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 38500)]

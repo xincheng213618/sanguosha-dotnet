@@ -173,8 +173,8 @@ internal static class SkillProgramContributionChecks
         if (!condition) throw new InvalidOperationException(message);
     }
 
-    private const string Rules = """
-        {"schemaVersion":64,"skills":[
+    private static string Rules => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[
           {"id":"scenario:classic-huangtian","revision":1,"modifiers":[],"viewAs":[],"activations":[],"triggers":[],
            "contributions":[{"id":"contribute","providerFactions":["qun"],"ownerRole":"lord",
              "cardKinds":["dodge","lightning"],"cardSuits":[],"usesPerPlayPhase":1}]},
@@ -182,7 +182,7 @@ internal static class SkillProgramContributionChecks
            "contributions":[{"id":"contribute","providerFactions":["qun"],"ownerRole":"lord",
              "cardKinds":["dodge"],"cardSuits":["spade"],"usesPerPlayPhase":1}]}
         ]}
-        """;
+        """);
 
     private const string Presentation = """
         {"schemaVersion":3,"skills":{

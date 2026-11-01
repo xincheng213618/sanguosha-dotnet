@@ -112,15 +112,15 @@ internal static class ProgramCompositionEntryChecks
     """;
     private static readonly string RevealRules = Rules(RevealSkillId, RevealEffects);
     private static readonly string GiftRules = Rules(GiftSkillId, GiftEffects);
-    private static string Rules(string skillId, string effects) => $$"""
-    {"schemaVersion":64,"skills":[{"id":"{{skillId}}","revision":1,"minimumRulesVersion": 171,
+    private static string Rules(string skillId, string effects) => SkillProgramTestJson.CurrentSchema($$"""
+    {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"{{skillId}}","revision":1,"minimumRulesVersion": 171,
     "modifiers":[],"viewAs":[],
     "activations":[{"id":"active","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,"effects":{{effects}}}],
     "triggers":[
       {"id":"play","window":"playEnding","subject":"owner","optional":true,"priority":0,"effects":{{effects}}},
       {"id":"turn","window":"turnEnding","subject":"owner","optional":true,"priority":0,"effects":{{effects}}}],
     "contributions":[],"cardIdentities":[]}]}
-    """;
+    """);
     private const string RevealPresentation = """{"schemaVersion":3,"skills":{"fixture:cross-entry-reveal":{"name":"组合亮牌","description":"测试"}}}""";
     private const string GiftPresentation = """{"schemaVersion":3,"skills":{"fixture:cross-entry-gift":{"name":"组合赠牌","description":"测试"}}}""";
 }

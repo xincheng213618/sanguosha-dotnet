@@ -100,13 +100,13 @@ internal static class ProgramChoiceChecks
         if (!condition) throw new InvalidOperationException(message);
     }
 
-    private static string BuildRules(string effects) => $$"""
-        {"schemaVersion":64,"skills":[{"id":"{{SkillId}}","revision":1,
+    private static string BuildRules(string effects) => SkillProgramTestJson.CurrentSchema($$"""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"{{SkillId}}","revision":1,
         "minimumRulesVersion": 171,"modifiers":[],"viewAs":[],"activations":[],
         "triggers":[{"id":"support","window":"turnEnding","subject":"owner","optional":false,
         "priority":0,"usageScope":"turn","usageLimit":1,"effects":{{effects}}}],
         "contributions":[],"cardIdentities":[]}]}
-        """;
+        """);
 
     private static string Presentation(string draw, string recover, string? restore) =>
         "{\"schemaVersion\":3,\"skills\":{\"" + SkillId +

@@ -9,7 +9,7 @@ internal sealed partial class CoreNativeCardEffectDrawsRuntime
             return false;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || use.Id != pending.ParentFrameId || pending.ActionKind != LegalActionKind.DrawTwo || pending.EffectCardKind != CardKind.DrawTwo || use.NativeDraw is not null || use.NativeCardEffectDraw is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             throw new InvalidOperationException("DrawTwo requires its actual resolved effect and owning CardUse.");
-        if (pending.Id < 0 || pending.Id == 0 && (use.Action is null || !_coreUnnullifiableOrdinaryTricksOperations.IsOriginalOrdinaryTrickCannotNullify(use.Id) && !_characterLuMengMouOperations.IsYingboUnrespondable(use.Id) && !_coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(use.Id)))
+        if (pending.Id < 0 || pending.Id == 0 && (use.Action is null || !_coreUnnullifiableOrdinaryTricksOperations.IsOriginalOrdinaryTrickCannotNullify(use.Id) && !_coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(use.Id)))
             throw new InvalidOperationException("A windowless DrawTwo requires its exact already-issued native no-response policy.");
         var recipient = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) ?? pending.SourceSeat;
         var receipt = new NativeCardEffectDrawReceipt(pending.Id, pending.EffectCardId, pending.EffectCardKind, recipient, use.TargetIndex, NativeCardEffectDrawStage.Requesting)

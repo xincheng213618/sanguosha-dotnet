@@ -20,7 +20,7 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 41200)]
     internal bool RetainHappyLuBuPaid(ProgramSkillFrame f)
     {
-        if (f.HappyLuBu is { Paid.Count: > 0 })
+        if (f.HappyLuBu is { Paid.Count: > 0 } or { Operation: SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse, Stage: HappyLuBuStage.Finished })
         {
             return true;
         }

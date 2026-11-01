@@ -12,6 +12,7 @@
     <Compile Include="..\Shared\BoundaryLiaoHuaScenario.cs" Link="BoundaryLiaoHuaScenario.cs" />
     <Compile Include="..\Shared\BaguaResponseScenario.cs" Link="BaguaResponseScenario.cs" />
     <Compile Include="..\Shared\CharacterFixtureContent.cs" Link="CharacterFixtureContent.cs" />
+    <Compile Include="..\Shared\SkillProgramTestJson.cs" Link="SkillProgramTestJson.cs" />
     <Compile Include="..\Shared\ActiveEffectScenario.cs" Link="ActiveEffectScenario.cs" />
     <Compile Include="..\Shared\PrivateReserveScenario.cs" Link="PrivateReserveScenario.cs" />
     <Compile Include="..\Shared\LastZoneConversionScenario.cs" Link="LastZoneConversionScenario.cs" />
@@ -24,6 +25,7 @@
     <Compile Include="..\Shared\ZhuqueFanScenario.cs" Link="ZhuqueFanScenario.cs" />
     <Compile Include="..\Shared\SilverLionScenario.cs" Link="SilverLionScenario.cs" />
     <EmbeddedResource Include="Fixtures\group-claim-before-death.json" />
+    <EmbeddedResource Include="Fixtures\runtime-module-dependency-directions.txt" />
     <ProjectReference Include="..\..\src\CardGame.Core\CardGame.Core.csproj" />
     <ProjectReference Include="..\..\src\CardGame.Server\CardGame.Server.csproj" />
     <ProjectReference Include="..\..\src\CardGame.Content.Standard\CardGame.Content.Standard.csproj" />

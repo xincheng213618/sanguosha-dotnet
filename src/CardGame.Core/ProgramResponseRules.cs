@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
+public enum ResponseRuleAudience { Targets, All }
+
 public sealed record ResponseRule
 {
     public int Minimum { get; }
@@ -14,10 +16,13 @@ public sealed record ResponseRule
     public ProgramExpression? While { get; }
     public bool MatchUseKind { get; }
     public string? SkillName { get; }
+    public ResponseRuleAudience Audience { get; }
+    public CardConversionSource? Source { get; }
     public int? InstructionIndex { get; internal init; }
     public ResponseRule(int minimum = 1, bool forbid = false, int? targetSeat = null, int? actorSeat = null,
         int? opponentSeat = null, IReadOnlyList<CardKind>? incomingKinds = null, IReadOnlyList<CardKind>? requiredKinds = null,
-        ProgramExpression? condition = null, bool matchUseKind = false, string? skillName = null)
+        ProgramExpression? condition = null, bool matchUseKind = false, string? skillName = null,
+        ResponseRuleAudience audience = ResponseRuleAudience.Targets, CardConversionSource? source = null)
     {
         if (minimum < 1 || condition is not null && (condition.Type != ProgramExpressionType.Bool ||
             condition.Nodes().Any(node => node.Op is not ("bool" or "int" or "eventSource" or "eventTarget" or
@@ -25,9 +30,9 @@ public sealed record ResponseRule
                 "alive" or "hasHp" or "faceDown" or "chained" or "not" or "and" or "or" or "<" or "<=" or ">" or ">=" or "==" or "!=" or
                 "+" or "-" or "min" or "max" or "floorDiv" or "when"))))
             throw new InvalidOperationException("A response rule requires a positive minimum and public incoming-actor/responder conditions.");
-        (Minimum, Forbid, TargetSeat, ActorSeat, OpponentSeat, IncomingKinds, RequiredKinds, While, MatchUseKind, SkillName) =
+        (Minimum, Forbid, TargetSeat, ActorSeat, OpponentSeat, IncomingKinds, RequiredKinds, While, MatchUseKind, SkillName, Audience, Source) =
             (minimum, forbid, targetSeat, actorSeat, opponentSeat, Array.AsReadOnly((incomingKinds ?? []).ToArray()),
-             Array.AsReadOnly((requiredKinds ?? []).ToArray()), condition, matchUseKind, skillName);
+             Array.AsReadOnly((requiredKinds ?? []).ToArray()), condition, matchUseKind, skillName, audience, source);
     }
 }
 

@@ -13,8 +13,9 @@ internal sealed partial class CoreGameEngineNonBasicSlashProfileRuntime
         var issued = new IssuedCardNoResponse(action.ActionId, useId, source, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
         var policy = new ConvertedNonBasicSlashPolicy(useId, action.ActionId, source, _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.GameplayHash, cost);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, u => u with { NonBasicSlashPolicy = policy });
+        _coreCardUseLifecycleOperations.IssueResponseRule(useId, new(forbid: true, audience: ResponseRuleAudience.All));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ConvertedNonBasicSlashIssuedEvent(useId, action.ActionId, source, _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!.GameplayHash, cost.CardId, cost.CardKind, cost.From));
-        if (use.IssuedNoResponse is null)
+        if (use.ProvenanceUseSource is null)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IssuedCardNoResponseEvent(issued));
     }
 

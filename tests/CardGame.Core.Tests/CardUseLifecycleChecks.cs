@@ -108,8 +108,8 @@ internal static class CardUseLifecycleChecks
                 {"id":"nested-rescue","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":["slash"],
                  "priority":100,"optional":false,"effects":[{"op":"loseHp","target":"owner","amount":1}]},
                 """ : "";
-            var rules = $$$$"""
-                {"schemaVersion":64,"skills":[{"id":"{{{{SkillId}}}}","revision":1,"minimumRulesVersion":175,
+            var rules = SkillProgramTestJson.CurrentSchema($$$$"""
+                {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"{{{{SkillId}}}}","revision":1,"minimumRulesVersion":175,
                  "modifiers":[{"id":"extra-target","query":"cardTargetCount","operation":"add","value":1,"priority":0,"cardKinds":["slash"]}],
                  "triggers":[
                   {{{{nestedTrigger}}}}
@@ -119,7 +119,7 @@ internal static class CardUseLifecycleChecks
                    "effects":[{"op":"draw","target":"owner","amount":1}]},
                   {"id":"completed","window":"cardUseCompleted","ownerRelation":"actor","cardKinds":[{{{{cardKinds}}}}],"optional":true,
                    "effects":[{"op":"draw","target":"owner","amount":1}]}]}]}
-                """;
+                """);
             var presentation = $$$$"""
                 {"schemaVersion":3,"skills":{"{{{{SkillId}}}}":{"name":"Card use lifecycle","description":"Card use lifecycle test"}}}
                 """;

@@ -9,7 +9,13 @@ internal sealed partial class CoreGameEngineIssuedPlayUsePoliciesRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 50)]
     internal void CleanupIssuedPlayPhaseUseBans() => _coreGameEngineIssuedPlayUsePoliciesIssuedPlayPhaseUseProhibitionsAccess._issuedPlayPhaseUseProhibitions.RemoveAll(policy => _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || policy.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || policy.TurnNumber != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || policy.PhaseInstanceId != _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
     internal bool HasIssuedPolicyForAction(long actionId) => _coreGameEngineIssuedPlayUsePoliciesIssuedPlayPhaseUseProhibitionsAccess._issuedPlayPhaseUseProhibitions.Any(policy => policy.CardActionId == actionId);
-    internal bool IsIssuedCardUnrespondable(long frameId) => _characterZhangFeiBoundaryMobileOperations.Value.IsBoundaryZhangFeiLiyongUnrespondable(frameId) || _characterHuangZhongBoundaryMobileOperations.Value.IsBoundaryHuangZhongUnrespondable(frameId) || _characterMaChaoBoundaryMobileOperations.Value.IsBoundaryMaChaoUnrespondable(frameId) || _characterPangDeBoundaryMobileOperations.Value.IsBoundaryPangDeUnrespondable(frameId) || _characterPanZhangMaZhongBoundaryMobileOperations.Value.IsBoundaryAnjianUnrespondable(frameId) || _characterChenDaoMobileShiOperations.Value.IsMobileShiWanglieUnrespondable(frameId) || _characterWeiYanMobileShiOperations.IsMobileShiZhuangshiUnrespondable(frameId) || _characterHuangChongMobileShiOperations.IsShiHcSiliSlashUnrespondable(frameId) || _characterHuangGaiMouMobileOperations.IsMouZhaJiangUnrespondable(frameId) || _characterLvKuangLvXiangOlOperations.IsQigongUnrespondable(frameId) || _coreNonBasicSlashProfileOperations.HasIssuedNonBasicSlashDistance(frameId) || _characterZhangYanOlOperations.IsZhangYanLangdaoUnrespondable(frameId) || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { Action: { } action, IssuedNoResponse: { } issued } && issued.CardActionId == action.ActionId && issued.ParentFrameId == frameId;
+    internal bool IsIssuedCardUnrespondable(long frameId) =>
+        _coreCardUseLifecycleOperations.HasUnconditionalResponseProhibition(frameId) ||
+        _characterHuangZhongBoundaryMobileOperations.Value.IsBoundaryHuangZhongUnrespondable(frameId) ||
+        _characterMaChaoBoundaryMobileOperations.Value.IsBoundaryMaChaoUnrespondable(frameId) ||
+        _characterPangDeBoundaryMobileOperations.Value.IsBoundaryPangDeUnrespondable(frameId) ||
+        _characterPanZhangMaZhongBoundaryMobileOperations.Value.IsBoundaryAnjianUnrespondable(frameId) ||
+        _characterHuangChongMobileShiOperations.IsShiHcSiliSlashUnrespondable(frameId);
     void IIssuedPlayUseProgramHost.IssueCardNoResponseAndPlayUseBan(ProgramSkillFrame frame) => IssueCardNoResponseAndPlayUseBan(frame);
     internal void IssueCardNoResponseAndPlayUseBan(ProgramSkillFrame frame)
     {
@@ -25,9 +31,9 @@ internal sealed partial class CoreGameEngineIssuedPlayUsePoliciesRuntime
         if (!isResponse)
         {
             var index = _resolutionStackOperations._resolutionStack.FindIndex(item => item.Id == parent.ParentFrameId);
-            if (index < 0 || _resolutionStackOperations._resolutionStack[index] is not CardUseFrame use || use.Action?.ActionId != action.ActionId || parent.Continuation is not (ProgramCardContinuation.CommittedSlash or ProgramCardContinuation.CommittedTrick or ProgramCardContinuation.CommittedSimpleCard) || use.IssuedNoResponse is not null)
+            if (index < 0 || _resolutionStackOperations._resolutionStack[index] is not CardUseFrame use || use.Action?.ActionId != action.ActionId || parent.Continuation is not (ProgramCardContinuation.CommittedSlash or ProgramCardContinuation.CommittedTrick or ProgramCardContinuation.CommittedSimpleCard))
                 throw new InvalidOperationException("Issued card policy lost its actual owning card-use frame.");
-            _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { IssuedNoResponse = issued });
+            _coreCardUseLifecycleOperations.IssueResponseRule(use.Id, new(forbid: true, audience: ResponseRuleAudience.All, source: source));
         }
         else if (parent.CompletedResponseReturn?.Kind == ProgramCompletedResponseKind.Nullification)
         {

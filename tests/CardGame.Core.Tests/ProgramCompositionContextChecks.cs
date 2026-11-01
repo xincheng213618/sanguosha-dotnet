@@ -67,11 +67,11 @@ internal static class ProgramCompositionContextChecks
         throw new InvalidOperationException($"Expected rejection containing '{expected}'.");
     }
 
-    private static string Rules(string id, IReadOnlyList<string> activations, IReadOnlyList<string> triggers) => $$"""
-    {"schemaVersion":64,"skills":[{"id":"{{id}}","revision":1,"minimumRulesVersion": 171,
+    private static string Rules(string id, IReadOnlyList<string> activations, IReadOnlyList<string> triggers) => SkillProgramTestJson.CurrentSchema($$"""
+    {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"{{id}}","revision":1,"minimumRulesVersion": 171,
     "modifiers":[],"viewAs":[],"activations":[{{string.Join(',', activations)}}],
     "triggers":[{{string.Join(',', triggers)}}],"contributions":[],"cardIdentities":[]}]}
-    """;
+    """);
 
     private static string Activation(string id, string effects) => $$"""
     {"id":"{{id}}","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,

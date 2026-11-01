@@ -22,7 +22,6 @@ internal sealed partial class CharacterHuangGaiMouMobileEntries
     internal bool HasMouZhaJiangUseDistance(CharacterState actor, long? useId = default) => _resolve().HasMouZhaJiangUseDistance(actor, useId);
     internal bool IsMouKurouDying() => _resolve().IsMouKurouDying();
     internal bool IsMouKurouRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery) => _resolve().IsMouKurouRecoveryParent(frame, recovery);
-    internal bool IsMouZhaJiangUnrespondable(long useId) => _resolve().IsMouZhaJiangUnrespondable(useId);
     internal void IssueMouZhaJiangLegacyDuel(ProgramSkillFrame owner, int actorSeat) => _resolve().IssueMouZhaJiangLegacyDuel(owner, actorSeat);
     internal void IssueMouZhaJiangLegacyDuelPipeline(ProgramSkillFrame frame, int sourceSeat, int targetSeat) => _resolve().IssueMouZhaJiangLegacyDuelPipeline(frame, sourceSeat, targetSeat);
     internal void IssueMouZhaJiangUse(CardUseFrame use) => _resolve().IssueMouZhaJiangUse(use);

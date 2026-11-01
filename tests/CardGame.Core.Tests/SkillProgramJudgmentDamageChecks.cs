@@ -291,8 +291,8 @@ internal static class SkillProgramJudgmentDamageChecks
     private const string RecoveryTriggerId = "a-club-recover";
     private const string StrikeTriggerId = "b-club-strike";
 
-    private const string ValidV5 = """
-        {"schemaVersion":64,"skills":[
+    private static string ValidV5 => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[
           {"id":"judgment-damage-test:effects","revision":1,"triggers":[
             {"id":"opening-judgment","window":"turnStartBeforeNormalFlow","subject":"owner",
              "optional":false,"effects":[
@@ -313,7 +313,7 @@ internal static class SkillProgramJudgmentDamageChecks
              ]}
           ]}
         ]}
-        """;
+        """);
 
     private const string Presentation = """
         {"schemaVersion":3,"skills":{

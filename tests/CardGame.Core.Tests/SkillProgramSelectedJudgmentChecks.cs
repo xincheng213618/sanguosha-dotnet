@@ -227,8 +227,8 @@ internal static class SkillProgramSelectedJudgmentChecks
         if (!condition) throw new InvalidOperationException(message);
     }
 
-    private const string Rules = """
-        {"schemaVersion":64,"skills":[
+    private static string Rules => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[
           {"id":"selected-judgment-test:leiji","revision":1,"minimumRulesVersion": 171,"modifiers":[],"viewAs":[],"activations":[],"contributions":[],"triggers":[
             {"id":"after-dodge","window":"cardResponseAccepted","ownerRelation":"actor","cardKinds":["dodge"],
              "optional":true,"effects":[
@@ -255,7 +255,7 @@ internal static class SkillProgramSelectedJudgmentChecks
              ]}
           ]}
         ]}
-        """;
+        """);
 
     private const string Presentation = """
         {"schemaVersion":3,"skills":{

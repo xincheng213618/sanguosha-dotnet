@@ -3,7 +3,11 @@
   "skills": [
     { "id": "happy:wuqian", "revision": 1, "triggers": [
       { "id": "actual-turn-basic", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false, "effects": [{ "op": "obtainHappyShenLuBuTurnBasic", "target": "owner" }] },
-      { "id": "first-kind-use", "window": "cardUseCommitted", "ownerRelation": "actor", "optional": false, "cardKinds": ["slash", "fireSlash", "thunderSlash", "duel"], "effects": [{ "op": "enhanceHappyShenLuBuFirstUse", "target": "owner" }] }
+      { "id": "first-kind-use", "window": "cardUseCommitted", "ownerRelation": "actor", "optional": false, "cardKinds": ["slash", "fireSlash", "thunderSlash", "duel"], "effects": [
+        { "op": "enhanceHappyShenLuBuFirstUse", "target": "owner", "resultBind": "response-kind" },
+        { "op": "issueCurrentResponseRule", "target": "owner", "minimum": 2, "actorRef": {"kind":"eventSource"}, "opponentRef": {"kind":"eventSource"}, "incomingKinds": ["slash","fireSlash","thunderSlash","coldSlash"], "requiredKinds": ["dodge"], "condition": {"kind":"choiceIs","sourceBind":"response-kind","optionId":"slash"} },
+        { "op": "issueCurrentResponseRule", "target": "owner", "minimum": 2, "actorRef": {"kind":"eventSource"}, "opponentRef": {"kind":"eventSource"}, "incomingKinds": ["duel"], "requiredKinds": ["slash"], "condition": {"kind":"choiceIs","sourceBind":"response-kind","optionId":"duel"} }
+      ] }
     ] },
     { "id": "happy:shenfen", "revision": 1, "activations": [
       { "id": "limited-destruction", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": null, "usesPerGame": 1, "effects": [

@@ -271,15 +271,15 @@ internal static class CardMovementProgramChecks
 
     private static void VerifySlashPaymentReturnsBeforeItsEffect()
     {
-        var program = SkillProgramCatalog.Load("""
-            {"schemaVersion":64,"skills":[{"id":"fixture:card-movement","revision":1,
+        var program = SkillProgramCatalog.Load(SkillProgramTestJson.CurrentSchema("""
+            {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:card-movement","revision":1,
              "modifiers":[{"id":"payment-quota","query":"slashLimit","operation":"add","value":2,"priority":0}],
              "viewAs":[{"id":"top-cost","inputKinds":[],"inputSuits":[],"sourceZones":["hand"],
                "outputKind":"fireSlash","forPlay":true,"forResponse":false,"useOnly":true,"costDestination":"drawPileTop"}],
              "triggers":[{"id":"paid-owner-batch","window":"cardsMoved","subject":"owner",
               "sourceZones":["hand","equipment"],"movementOccurrence":"perOwnerBatch","optional":true,
               "effects":[{"op":"draw","target":"owner","amount":1}]}]}]}
-            """, Presentation).Programs[ScenarioPackage.SkillId];
+            """), Presentation).Programs[ScenarioPackage.SkillId];
         var registry = ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true),
             new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(),
             new ScenarioPackage(program, slashPayment: true));
@@ -687,8 +687,8 @@ internal static class CardMovementProgramChecks
         if (!condition) throw new InvalidOperationException(message);
     }
 
-    private const string Rules = """
-        {"schemaVersion":64,"skills":[{"id":"fixture:card-movement","revision":1,
+    private static string Rules => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:card-movement","revision":1,
         "minimumRulesVersion": 171,"modifiers":[],"viewAs":[],
         "activations":[{"id":"discard-two","minCards":2,"maxCards":2,"minTargets":0,
         "maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,
@@ -706,7 +706,7 @@ internal static class CardMovementProgramChecks
         "right":{"kind":"integerConstant","value":0}}]},
         "effects":[{"op":"draw","target":"owner","amount":1}]}],
         "contributions":[],"cardIdentities":[]}]}
-        """;
+        """);
 
     private const string Presentation =
         "{\"schemaVersion\":3,\"skills\":{\"fixture:card-movement\":{\"name\":\"Movement\",\"description\":\"Fixture\"}}}";

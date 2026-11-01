@@ -381,7 +381,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
             return;
         }
 
-        if (_characterLuMengMouOperations.IsYingboUnrespondable(resolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(resolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(resolutionId, target.Seat))
+        if (_coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(resolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(resolutionId, target.Seat))
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(resolutionId, ResolutionFrameStep.ResolvingEffect);
             if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))

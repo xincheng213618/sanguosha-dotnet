@@ -39,7 +39,7 @@ internal static class SharedPostEventChecks
         }
     }
 
-    private static (GameEngine, ContentRegistry) Create(string rules = Rules, string cardId = "standard:peach")
+    private static (GameEngine, ContentRegistry) Create(string rules, string cardId = "standard:peach")
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(rules, cardId));
         var game = GameEngine.CreateStandard(new GameOptions
@@ -75,8 +75,8 @@ internal static class SharedPostEventChecks
     private static string State(GameEngine game) => SnapshotJson.Serialize(game.CreateSnapshot(0, true));
     private static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
 
-    private const string Rules = """
-        {"schemaVersion":64,"skills":[
+    private static string Rules => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[
          {"id":"fixture:driver","revision":1,"minimumRulesVersion":176,"activations":[
           {"id":"draw","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,
            "effects":[{"op":"draw","target":"owner","amount":2},{"op":"loseHp","target":"owner","amount":1}]},
@@ -101,7 +101,7 @@ internal static class SharedPostEventChecks
           {"id":"recovery","window":"afterHpRecovered","subject":"owner","optional":true,
            "condition":{"kind":"compare","left":{"kind":"hpChangeAmount"},"operator":"greaterThan","right":{"kind":"integerConstant","value":0}},
            "effects":[{"op":"draw","target":"owner","amount":1}]}]}]}
-        """;
+        """);
     private const string Presentation = """
         {"schemaVersion":3,"skills":{"fixture:driver":{"name":"Driver","description":"Test"},
          "fixture:observer":{"name":"Observer","description":"Test"}}}

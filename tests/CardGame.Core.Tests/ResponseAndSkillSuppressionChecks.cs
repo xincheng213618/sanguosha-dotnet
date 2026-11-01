@@ -85,12 +85,12 @@ internal static class ResponseAndSkillSuppressionChecks
 
         public void Register(IContentRegistryBuilder builder)
         {
-            var driver = SkillProgramCatalog.Load("""
-                {"schemaVersion":64,"skills":[{"id":"fixture:skill-loss-damage","revision":1,
+            var driver = SkillProgramCatalog.Load(SkillProgramTestJson.CurrentSchema("""
+                {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:skill-loss-damage","revision":1,
                   "minimumRulesVersion":180,"activations":[{"id":"hit","usesPerTurn":1,
                     "minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,
                     "targetKind":"otherLiving","effects":[{"op":"damage","target":"selectedTarget","amount":5}]}]}]}
-                """, """
+                """), """
                 {"schemaVersion":3,"skills":{"fixture:skill-loss-damage":{"name":"伤害","description":"测试"}}}
                 """);
             builder.AddSkill(new ContentSkillDefinition("fixture:skill-loss-damage", "伤害", "测试")

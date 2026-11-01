@@ -25,7 +25,7 @@ internal sealed partial class CoreNativeDuelRuntime
 
         var responder = _coreMatchParticipantsPlayersAccess._players[duel.ResponderSeat];
         var opponent = _coreMatchParticipantsPlayersAccess._players[duel.OpponentSeat];
-        if (_characterLuMengMouOperations.IsYingboUnrespondable(duel.ResolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(duel.ResolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(duel.ResolutionId, responder.Seat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(duel.Attack.CardUserSeat, responder.Seat, CardKind.Duel, [duel.TargetSeat], duel.ResolutionId, CardKind.Slash))
+        if (_coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(duel.ResolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(duel.ResolutionId, responder.Seat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(duel.Attack.CardUserSeat, responder.Seat, CardKind.Duel, [duel.TargetSeat], duel.ResolutionId, CardKind.Slash))
         {
             _coreNativeResponseWindowsOperations.SetResponseParentStep(duel.ResolutionId, ResolutionFrameStep.ResolvingEffect);
             _corePendingDecisionPolicyPipelineOperations._pendingDecision = null;

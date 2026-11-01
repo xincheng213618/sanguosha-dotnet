@@ -345,8 +345,8 @@ internal static class SkillProgramChecks
                 }, DeckId: deckId, GeneralCandidateCount: 1, GeneralPoolIds: ids));
     }
 
-    private const string DyingRules = """
-        {"schemaVersion":64,"skills":[{"id":"scenario:dying","revision":1,"modifiers":[],"viewAs":[],
+    private static string DyingRules => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"scenario:dying","revision":1,"modifiers":[],"viewAs":[],
         "activations":[{"id":"invoke","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,
         "targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"loseHp","target":"owner","amount":5},
         {"op":"draw","target":"owner","amount":1}]},
@@ -355,7 +355,7 @@ internal static class SkillProgramChecks
         {"op":"discardSelected","target":"owner","amount":1},{"op":"draw","target":"owner","amount":1}]},
         {"id":"gift-any-living","minCards":1,"maxCards":1,"minTargets":1,"maxTargets":1,
         "targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"giveSelected","target":"selectedTarget","amount":1}]}]}]}
-        """;
+        """);
     private const string DyingPresentation = """
         {"schemaVersion":3,"skills":{"scenario:dying":{"name":"Dying","description":"Lose HP then draw"}}}
         """;
@@ -406,9 +406,9 @@ internal static class SkillProgramChecks
         }
         """;
 
-    private const string RulesA = """
+    private static string RulesA => SkillProgramTestJson.CurrentSchema("""
         {
-          "schemaVersion":64,
+          "schemaVersion":__RULES_SCHEMA__,
           "skills":[{
             "id":"scenario:composed",
             "revision":1,
@@ -428,9 +428,9 @@ internal static class SkillProgramChecks
             }]
           }]
         }
-        """;
+        """);
 
-    private const string RulesB = """
+    private static string RulesB => SkillProgramTestJson.CurrentSchema("""
         {
           "skills": [
             {
@@ -457,7 +457,7 @@ internal static class SkillProgramChecks
               "id": "scenario:composed"
             }
           ],
-          "schemaVersion": 64
+          "schemaVersion": __RULES_SCHEMA__
         }
-        """;
+        """);
 }

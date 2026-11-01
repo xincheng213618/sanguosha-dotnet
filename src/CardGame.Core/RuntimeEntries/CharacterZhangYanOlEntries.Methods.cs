@@ -19,7 +19,6 @@ internal sealed partial class CharacterZhangYanOlEntries
     internal bool HasIssuedZhangYanSujiRewardCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().HasIssuedZhangYanSujiRewardCandidate(c, context);
     internal bool HasZhangYanLangdaoTargetTail(CardUseFrame use) => _resolve().HasZhangYanLangdaoTargetTail(use);
     internal bool IsZhangYanLangdaoIssued(CardUseFrame use) => _resolve().IsZhangYanLangdaoIssued(use);
-    internal bool IsZhangYanLangdaoUnrespondable(long id) => _resolve().IsZhangYanLangdaoUnrespondable(id);
     internal bool IsZhangYanNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _resolve().IsZhangYanNativeSettlementBatch(f, batch);
     internal bool IsZhangYanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsZhangYanRecoveryParent(f, recovery);
     internal bool IsZhangYanRewardMovement(ProgramSkillFrame f, CardMovementRecord m) => _resolve().IsZhangYanRewardMovement(f, m);

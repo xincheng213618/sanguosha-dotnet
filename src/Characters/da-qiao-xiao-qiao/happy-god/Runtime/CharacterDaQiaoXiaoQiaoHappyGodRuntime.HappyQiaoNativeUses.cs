@@ -210,11 +210,11 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
             ActionId = action.ActionId,
             Targets = expectedTargets
         };
-        var policy = use.IssuedNoResponse ?? new IssuedCardNoResponse(action.ActionId, use.Id, native.Source, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
+        var policy = new IssuedCardNoResponse(action.ActionId, use.Id, native.Source, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
         _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { HappyQiao = receipt with { Stage = HappyQiaoStage.NativeUse, Native = bound } });
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, owner => owner with { HappyQiaoShutuUse = bound, UnlimitedUse = true, IssuedNoResponse = policy });
-        if (use.IssuedNoResponse is null)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IssuedCardNoResponseEvent(policy));
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, owner => owner with { HappyQiaoShutuUse = bound, UnlimitedUse = true });
+
+        _coreCardUseLifecycleOperations.IssueNoResponsePolicy(policy);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyQiaoUseIssuedEvent(frame.Id, use.Id, action.ActionId, frame.OwnerSeat));
     }
 

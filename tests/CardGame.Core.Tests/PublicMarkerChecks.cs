@@ -10,8 +10,8 @@ internal static class PublicMarkerChecks
     private const string BystanderOneId = "wuhun-marker:bystander-1";
     private const string BystanderTwoId = "wuhun-marker:bystander-2";
     private const string WuhunSkillId = "wuhun-marker:wuhun";
-    private const string WuhunRules = """
-    {"schemaVersion":64,"skills":[{"id":"wuhun-marker:wuhun","revision":2,"minimumRulesVersion": 171,
+    private static string WuhunRules => SkillProgramTestJson.CurrentSchema("""
+    {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"wuhun-marker:wuhun","revision":2,"minimumRulesVersion": 171,
     "modifiers":[],"viewAs":[],"activations":[],"triggers":[
       {"id":"damage-nightmare","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamagePoint","optional":false,"priority":0,
        "effects":[{"op":"changeAttributedMarker","target":"owner","targetRef":{"kind":"eventSource"},"marker":"nightmare","amount":1}]},
@@ -20,7 +20,7 @@ internal static class PublicMarkerChecks
                   {"op":"startJudgment","target":"selectedTarget","judgmentReason":"skill.wuhun.death","resultBind":"judgment","visibility":"public"},
                   {"op":"causeDeathUnlessBoundCardKind","target":"selectedTarget","sourceBind":"judgment","excludedCardKinds":["peach","peachGarden"]}]}
     ],"contributions":[],"cardIdentities":[],"states":[]}]}
-    """;
+    """);
     private const string WuhunPresentation = """
     {"schemaVersion":3,"skills":{"wuhun-marker:wuhun":{"name":"武魂","description":"归属梦魇与死亡判定测试。"}}}
     """;

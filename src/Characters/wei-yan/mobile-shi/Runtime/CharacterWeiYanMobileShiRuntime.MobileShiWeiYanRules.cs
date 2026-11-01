@@ -12,7 +12,6 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
 
     internal bool HasMobileShiZhuangshiQuota(int seat) => ShiWyPhaseGrant(seat)is { } grant && ShiWyPhaseUses(seat, grant.TurnNumber, grant.PhaseInstanceId) < grant.LostHp;
     internal CardConversionSource? MobileShiZhuangshiCounterspellSource(CharacterState owner, IReadOnlyList<int> physicalCardIds) => HasMobileShiZhuangshiDistance(owner.Seat) ? ShiWyPhaseGrant(owner.Seat)?.Source : null;
-    internal bool IsMobileShiZhuangshiUnrespondable(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } action } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.DistanceAndNoResponse);
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeAlcoholDebit, 47100)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 47100)]
     internal bool IsIssuedMobileShiZhuangshiNoCount(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } action } && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWeiYanUseEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.OwnerSeat == actor && e.NoCount);
@@ -47,6 +46,8 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
                 _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, f => f with { QuotaOnlyUseLimitExemption = true });
             }
 
+            if (ordinal <= grant.DiscardedCards)
+                _coreCardUseLifecycleOperations.IssueResponseRule(use.Id, new(forbid: true, audience: ResponseRuleAudience.All));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiWeiYanUseEvent(use.Id, action.ActionId, use.SourceSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, ordinal, ordinal <= grant.DiscardedCards, noCount));
         }
         else if (payload is CardActionAcceptedEvent { Action.Type: CardActionType.Response } response)

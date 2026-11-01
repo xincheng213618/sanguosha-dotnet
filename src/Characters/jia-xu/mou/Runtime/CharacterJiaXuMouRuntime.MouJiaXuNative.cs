@@ -67,10 +67,10 @@ internal sealed partial class CharacterJiaXuMouRuntime
             Targets = targets
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MouJiaXu = r with { Stage = MouJiaXuStage.NativeUse, Native = bound } });
-        var policy = use.IssuedNoResponse ?? new IssuedCardNoResponse(a.ActionId, use.Id, n.Source, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouJiaXuFumou = bound, UnlimitedUse = true, IssuedNoResponse = policy });
-        if (use.IssuedNoResponse is null)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IssuedCardNoResponseEvent(policy));
+        var policy = new IssuedCardNoResponse(a.ActionId, use.Id, n.Source, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouJiaXuFumou = bound, UnlimitedUse = true });
+
+        _coreCardUseLifecycleOperations.IssueNoResponsePolicy(policy);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiaXuUseIssuedEvent(f.Id, use.Id, a.ActionId, n.Actor, n.CardId));
     }
 

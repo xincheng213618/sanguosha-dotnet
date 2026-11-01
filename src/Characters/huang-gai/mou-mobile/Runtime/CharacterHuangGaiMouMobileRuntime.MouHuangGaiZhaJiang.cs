@@ -129,6 +129,8 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
             q = CaptureMouZhaJiangAdmission(_coreMatchParticipantsPlayersAccess._players[use.SourceSeat]);
         var r = new MouZhaJiangUseReceipt(use.Id, a?.ActionId ?? 0, use.CardKind, q, paid?.DeclarationId);
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { MouZhaJiangUse = r });
+        if (q.Applies)
+            _coreCardUseLifecycleOperations.IssueResponseRule(use.Id, new(forbid: true, actorSeat: q.ActorSeat, audience: ResponseRuleAudience.All));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhaJiangUseAdmittedEvent(use.Id, r.ActionId, r.OriginalKind, q, r.DeclarationId));
     }
 
@@ -143,7 +145,6 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
         return owner is CardUseFrame use && r.ProgramInstructionIndex is null && use.SourceSeat == actorSeat && (use.Action is { Type: CardActionType.Use } a ? a.ActionId == r.ActionId && a.ActorSeat == actorSeat : use.Action is null && r.ActionId == 0 && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 }) && (use.CardKind == r.OriginalKind || CoreNativeCardClassificationsRuntime.IsSlashCard(r.OriginalKind) && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && _coreCurrentSlashFireOffersOperations.IsCurrentSlashFireChangedUse(use));
     }
 
-    internal bool IsMouZhaJiangUnrespondable(long useId) => _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == useId)?.MouZhaJiangUse?.Admission is { } q && HasIssuedMouZhaJiangUse(useId, q.ActorSeat);
     internal void IssueMouZhaJiangLegacyDuel(ProgramSkillFrame owner, int actorSeat)
     {
         if (!HasMouZhaJiangCapability)
@@ -152,6 +153,8 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
         var r = new MouZhaJiangUseReceipt(owner.Id, 0, CardKind.Duel, q, null, owner.InstructionIndex);
         var current = _resolutionStackOperations._resolutionStack.Single(f => f.Id == owner.Id);
         _coreRuntimeOperations.ReplaceRuntimeFrame(owner.Id, current with { MouZhaJiangUse = r });
+        if (q.Applies)
+            _coreCardUseLifecycleOperations.IssueResponseRule(owner.Id, new(forbid: true, actorSeat: q.ActorSeat, audience: ResponseRuleAudience.All));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhaJiangUseAdmittedEvent(owner.Id, 0, CardKind.Duel, q, null, owner.InstructionIndex));
     }
 

@@ -58,7 +58,7 @@ internal sealed partial class CoreNativeNullificationRuntime
 
         if (_characterZhugeGuoLeOperations.TryBypassLeChengyanNullification(resolutionId, effectCard, targetSeats, actionKind, targetCardId, requiredCardKind))
             return;
-        if (_coreUnnullifiableOrdinaryTricksOperations.IsOriginalOrdinaryTrickCannotNullify(resolutionId) || _coreOrderedSelectedActorDuelsOperations.IsOrderedSelectedActorDuelCannotNullify(resolutionId) || _characterLuMengMouOperations.IsYingboUnrespondable(resolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(resolutionId))
+        if (_coreUnnullifiableOrdinaryTricksOperations.IsOriginalOrdinaryTrickCannotNullify(resolutionId) || _coreOrderedSelectedActorDuelsOperations.IsOrderedSelectedActorDuelCannotNullify(resolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(resolutionId))
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(resolutionId, ResolutionFrameStep.ResolvingEffect);
             ResolveNullifiableEffect(new NullificationWindowFrame(0, resolutionId, sourceSeat, Array.AsReadOnly(targetSeats.ToArray()), effectCard.Id, playedCardKind ?? effectCard.Kind, actionKind, targetCardId, requiredCardKind, []));

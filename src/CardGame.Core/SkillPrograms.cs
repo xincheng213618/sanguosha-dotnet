@@ -283,6 +283,7 @@ public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
 
 public enum SkillProgramEffectOp
 {
+    IssueCurrentResponseRule = 2103,
     AddCurrentCardDamage = 2102,
     OfferGeneratedEquipment = 910000,
     SelectRandomPileEquipment = 910001,
@@ -3105,6 +3106,8 @@ public sealed partial class SkillProgramEffect
     public SkillProgramNumberExpression? NumberExpression { get; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramExpression? AmountExpression { get; internal init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramCurrentResponseRule? CurrentResponseRule { get; internal init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public ProgramCardDamageTargetScope CardDamageTargetScope { get; internal init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]

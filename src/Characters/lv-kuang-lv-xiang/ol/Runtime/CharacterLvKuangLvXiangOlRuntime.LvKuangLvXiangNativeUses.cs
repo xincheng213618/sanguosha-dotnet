@@ -154,6 +154,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
             throw new InvalidOperationException("Qigong must pay exactly its chosen original native entities or independent state cost.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { LvKuangLvXiang = parent.LvKuangLvXiang!with { Native = paid } });
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { Qigong = paid });
+        _coreCardUseLifecycleOperations.IssueResponseRule(id, new(forbid: true, audience: ResponseRuleAudience.All));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QigongNativePaidEvent(paid));
     }
 
@@ -175,7 +176,6 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
     }
 
     internal bool IsQigongIssuedDistance(long? id, int actor) => id is { } useId && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Qigong: { Paid: true }, Action: { } action } use && action.ActorSeat == actor && ValidQigongNativeUse(use);
-    internal bool IsQigongUnrespondable(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Qigong: { Paid: true } } use && ValidQigongNativeUse(use);
     internal bool QigongCardUseRidesOn(CardUseFrame use, ProgramSkillFrame parent) => use.Qigong?.ProgramId == parent.Id && ValidQigongNativeUse(use);
     [NativeUseValidation(80)]
     internal void ValidateQigongNativeUseReturn(ref CardUseFrame use)

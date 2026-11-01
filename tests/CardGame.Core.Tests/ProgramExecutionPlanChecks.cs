@@ -46,8 +46,8 @@ internal static class ProgramExecutionPlanChecks
     }
 
     private static SkillProgram Load() => SkillProgramCatalog.Load(
-        """
-        {"schemaVersion":64,"skills":[{"id":"fixture:plan","revision":1,"minimumRulesVersion": 171,
+        SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:plan","revision":1,"minimumRulesVersion": 171,
           "activations":[{"id":"draw","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,
             "targetKind":"otherLiving","usesPerTurn":1,"effects":[
               {"op":"draw","target":"owner","amount":1},
@@ -59,7 +59,7 @@ internal static class ProgramExecutionPlanChecks
              "suits":["club"],"minimumRank":1,"maximumRank":13,"excludedReasons":[],
              "optional":false,"effects":[{"op":"draw","target":"owner","amount":1}]}
           ]}]}
-        """,
+        """),
         """{"schemaVersion":3,"skills":{"fixture:plan":{"name":"Plan","description":"Plan fixture"}}}""")
         .Programs["fixture:plan"];
 

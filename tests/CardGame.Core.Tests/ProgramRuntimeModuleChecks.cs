@@ -60,6 +60,7 @@ internal static class ProgramRuntimeModuleChecks
 
         CheckNativeOwnerComposition();
         CheckNativeFrameOwnerComposition();
+        ProgramRuntimeDependencyDirectionChecks.Run();
     }
 
     private static void CheckNativeOwnerComposition()

@@ -4,12 +4,21 @@ internal interface IHappyLuBuHost { SkillProgramStepOutcome Execute(ProgramSkill
 internal abstract class HappyLuBuDescriptor(SkillProgramEffectOp op):ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op=>op;
-    public override SkillProgramEffect Parse(ProgramOperationNodeReader r)=>ParseOwnerAlways(r);
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
+    {
+        if(op!=SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse)return ParseOwnerAlways(r);
+        r.AllowOnly("op","target","resultBind","condition");
+        var effect=new SkillProgramEffect(op,FilterBoundCardsProgramOperationDescriptor.Owner(r),0,r.Condition(),resultBind:r.RequiredIdentifier("resultBind"));
+        RequireAlways(effect,r.Path);
+        return effect;
+    }
     public override ISkillProgramEffectHandler Handler=>new HappyLuBuHandler(op);
     public override ProgramOperationInteraction Interaction=>op==SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse?ProgramOperationInteraction.Choice:ProgramOperationInteraction.Automatic;
     public override ProgramOperationAiPolicy AiPolicy {get;}=new(ProgramOperationAiSemantic.GainCards,static(_,c)=>c.PublicControlValue(2));
     public override ProgramFactRequirements FactRequirements=>op==SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse?new(Triggered:ProgramTrackedFact.WholeActualUseDeclaration|ProgramTrackedFact.NativeActionAppearance):default;
-    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(op switch{SkillProgramEffectOp.ObtainHappyShenLuBuTurnBasic=>SkillProgramTriggerWindow.TurnStartBeforeNormalFlow,SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse=>SkillProgramTriggerWindow.CardUseCommitted,_=>SkillProgramTriggerWindow.AfterTurnEnded})];
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>
+        new ProgramResourceOperation[]{new RequireTriggerWindow(op switch{SkillProgramEffectOp.ObtainHappyShenLuBuTurnBasic=>SkillProgramTriggerWindow.TurnStartBeforeNormalFlow,SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse=>SkillProgramTriggerWindow.CardUseCommitted,_=>SkillProgramTriggerWindow.AfterTurnEnded})}
+        .Concat(op==SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse?[new CreateChoiceResult(e.ResultBind!,["slash","duel"])]:Array.Empty<ProgramResourceOperation>()).ToArray();
 }
 internal sealed class ObtainHappyLuBuBasicDescriptor():HappyLuBuDescriptor(SkillProgramEffectOp.ObtainHappyShenLuBuTurnBasic);
 internal sealed class EnhanceHappyLuBuUseDescriptor():HappyLuBuDescriptor(SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse);
@@ -26,7 +35,10 @@ internal static class HappyLuBuComposition
         bool Single(SkillProgramTrigger t,SkillProgramEffectOp op)=>!t.Optional&&t.UsageScope is null&&t.MarkerCost is null&&t.Condition.Kind==SkillProgramTriggerConditionKind.Always&&t.Effects is [{Target:SkillProgramEffectTarget.Owner,TargetReference:null,Condition.Kind:SkillProgramConditionKind.Always} e]&&e.Op==op;
         var valid=p.Modifiers.Count==0&&p.ViewAs.Count==0&&p.CardPolicies.Count==0&&p.CardIdentities.Count==0&&p.BooleanStates.Count==0;
         if(p.Id==Wuqian)valid&=p.Activations.Count==0&&p.Triggers is [var basic,var use]&&basic.Id=="actual-turn-basic"&&basic.Window==SkillProgramTriggerWindow.TurnStartBeforeNormalFlow&&basic.TurnOwnerScope==SkillProgramTurnOwnerScope.Own&&Single(basic,SkillProgramEffectOp.ObtainHappyShenLuBuTurnBasic)&&
-            use.Id=="first-kind-use"&&use.Window==SkillProgramTriggerWindow.CardUseCommitted&&use.OwnerRelation==SkillProgramCardActionOwnerRelation.Actor&&use.CardKinds.Count==4&&use.CardKinds.All(k=>k is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.Duel)&&Single(use,SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse);
+            use.Id=="first-kind-use"&&use.Window==SkillProgramTriggerWindow.CardUseCommitted&&use.OwnerRelation==SkillProgramCardActionOwnerRelation.Actor&&use.CardKinds.Count==4&&use.CardKinds.All(k=>k is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.Duel)&&
+            !use.Optional&&use.UsageScope is null&&use.MarkerCost is null&&use.Condition.Kind==SkillProgramTriggerConditionKind.Always&&
+            use.Effects is [{Op:SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse,Target:SkillProgramEffectTarget.Owner,ResultBind:not null,Condition.Kind:SkillProgramConditionKind.Always},..]&&
+            use.Effects.Skip(1).All(e=>e.Op==SkillProgramEffectOp.IssueCurrentResponseRule);
         else valid&=p.Id==Shenfen&&p.Triggers is [var reset]&&reset.Id=="full-hp-reset"&&reset.Window==SkillProgramTriggerWindow.AfterTurnEnded&&reset.TurnOwnerScope==SkillProgramTurnOwnerScope.AnyLiving&&Single(reset,SkillProgramEffectOp.ResetHappyShenLuBuShenfen)&&
             p.Activations is [{Id:"limited-destruction",MinCards:0,MaxCards:0,MinTargets:0,MaxTargets:0,UsesPerGame:1,UsesPerTurn:null,UsesPerPhase:null,MarkerCost:null,Effects:[
                 {Op:SkillProgramEffectOp.LoseHp,Target:SkillProgramEffectTarget.Owner,Amount:3},

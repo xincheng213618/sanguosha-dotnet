@@ -8,12 +8,12 @@ internal static class ProgramActivationLimitChecks
     private const string ActivationId = "exchange-owned-cards";
     private const string GeneralId = "fixture:phase-exchange-owner";
     private const string ModeId = "identity:classic-phase-exchange";
-    private const string Rules = """
-        {"schemaVersion":64,"skills":[{"id":"fixture:turn-draw","revision":1,
+    private static string Rules => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:turn-draw","revision":1,
         "activations":[{"id":"draw","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,
         "targetKind":"anyLiving","usesPerTurn":1,"usesPerPhase":1,
         "effects":[{"op":"draw","target":"owner","amount":1}]}]}]}
-        """;
+        """);
     private const string Presentation = """
         {"schemaVersion":3,"skills":{"fixture:turn-draw":{"name":"限次摸牌","description":"回合和阶段分别限次。"}}}
         """;

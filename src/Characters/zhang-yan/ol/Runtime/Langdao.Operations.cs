@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 public enum LangdaoOption { Damage, ExtraTarget, NoResponse }
-public sealed record ZhangYanLangdaoUse(long ProgramFrameId,long WindowId,long ActionId,CardConversionSource Source,string GameplayHash,int OriginalActor,int OriginalTarget,int ExtraCount,bool NoResponse,bool Killed=false,bool Settled=false)
+public sealed record ZhangYanLangdaoUse(long ProgramFrameId,long WindowId,long ActionId,CardConversionSource Source,string GameplayHash,int OriginalActor,int OriginalTarget,int ExtraCount,bool Killed=false,bool Settled=false)
 {
  private IReadOnlyList<int> _original=[],_added=[];private IReadOnlyList<LangdaoOption> _selected=[];
  public IReadOnlyList<int> OriginalTargets {get=>_original;init=>_original=Array.AsReadOnly(value.ToArray());}

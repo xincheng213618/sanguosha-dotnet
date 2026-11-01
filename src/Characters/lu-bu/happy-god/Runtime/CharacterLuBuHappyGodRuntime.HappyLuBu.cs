@@ -123,7 +123,7 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
     [ProgramContinuation(ProgramContinuationKind.Resume, 41200)]
     internal bool ContinueHappyLuBu(long id)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyLuBu: { } r } f || f.Id != id)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyLuBu: { Stage: not HappyLuBuStage.Finished } r } f || f.Id != id)
             return false;
         if (r.Stage == HappyLuBuStage.BasicChildren)
         {
@@ -176,9 +176,12 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
         var targets = added is { } seat ? use.TargetSeats.Append(seat).ToArray() : use.TargetSeats.ToArray();
         var action = _coreDesignatedExtraTargetsOperations.CloneDesignatedExtraTargetAction(use.Action!, targets);
         _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(use with { TargetSeats = targets, Action = action, HappyLuBuWuqian = policy with { Applied = true, AddedTarget = added }, IgnoresArmor = true, EnhancementOwnerSeat = use.EnhancementOwnerSeat ?? f.OwnerSeat, Enhancements = use.Enhancements | CurrentCardEnhancement.IgnoreArmor | (added is null ? CurrentCardEnhancement.None : CurrentCardEnhancement.ExtraTarget), TargetsAdjusted = use.TargetsAdjusted || added is not null }, action);
-        _coreCardUseLifecycleOperations.IssueResponseRule(use.Id, new(minimum: 2, actorSeat: use.SourceSeat, opponentSeat: use.SourceSeat,
-            incomingKinds: use.CardKind == CardKind.Duel ? [CardKind.Duel] : [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash],
-            requiredKinds: use.CardKind == CardKind.Duel ? [CardKind.Slash] : [CardKind.Dodge]));
+        var bind = _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects[0].ResultBind!;
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+        {
+            HappyLuBu = r with { Stage = HappyLuBuStage.Finished }, Step = ResolutionFrameStep.ResolvingEffect,
+            ChoiceBindings = Array.AsReadOnly(f.ChoiceBindings.Append(new ProgramChoiceResultBinding(bind, policy.Kind == CardKind.Duel ? "duel" : "slash", f.OwnerSeat)).ToArray())
+        });
         if ((use.Enhancements & CurrentCardEnhancement.IgnoreArmor) == 0)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CurrentCardEnhancedEvent(use.Id, r.ActionId, f.OwnerSeat, CurrentCardEnhancement.IgnoreArmor, null));
         if (added is { } extra)
@@ -186,8 +189,7 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
         if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.ResolutionId == use.Id)
             attack.SetIgnoresArmor(true);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyLuBuUseAppliedEvent(f.Id, use.Id, r.ActionId, added));
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyLuBu = r with { Stage = HappyLuBuStage.Finished }, Step = ResolutionFrameStep.ResolvingEffect });
-        _coreSkillProgramsOperations.FinishProgramSkill(f, true);
+        _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
     [ProgramContinuation(ProgramContinuationKind.Movement, 41200)]

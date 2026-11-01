@@ -17,11 +17,10 @@ internal sealed partial class CharacterRuiJiOlRuntime
         if (unrespondable)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQiaoliArmorCommittedEvent(active.Id, active.SkillId, active.ActivationId, active.OwnerSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber));
+            AttachQiaoliNoResponse(resolutionId, source);
         }
 
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(resolutionId, card, active.OwnerSeat, [target], LegalActionKind.Duel, playedCardKind: CardKind.Duel);
-        if (unrespondable)
-            AttachQiaoliNoResponse(resolutionId, source);
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】，将【{(card.DisplayName)}】当【决斗】对 {(_coreMatchParticipantsPlayersAccess._players[target].Name)} 使用{((unrespondable ? "（不能被响应）" : string.Empty))}。", active.OwnerSeat, target);
         return SkillProgramStepOutcome.AwaitChild;
     }
@@ -31,8 +30,8 @@ internal sealed partial class CharacterRuiJiOlRuntime
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(item => item.Id == resolutionId) ?? throw new InvalidOperationException("The Qiaoli duel lost its committed use frame.");
         var action = use.Action ?? throw new InvalidOperationException("The Qiaoli duel lost its committed action.");
         var issued = new IssuedCardNoResponse(action.ActionId, resolutionId, source, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
-        _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { IssuedNoResponse = issued });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IssuedCardNoResponseEvent(issued));
+
+        _coreCardUseLifecycleOperations.IssueNoResponsePolicy(issued);
     }
 
     internal static int QiaoliWeaponRange(IReadOnlyList<Card> physicalCards) => RuntimeSkills.RuntimeRules_rui_ji_ol_Qiaoli_Programs.QiaoliWeaponRange(physicalCards);

@@ -278,10 +278,10 @@ internal static class SkillProgramExecutorChecks
 
     private static SkillProgram ProgramWithActivations(string activations)
     {
-        var rules = $$"""
-            {"schemaVersion":64,"skills":[{"id":"fixture:executor","revision":1,"minimumRulesVersion": 171,
+        var rules = SkillProgramTestJson.CurrentSchema($$"""
+            {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:executor","revision":1,"minimumRulesVersion": 171,
             "modifiers":[],"viewAs":[],"activations":[{{activations}}]}]}
-            """;
+            """);
         const string presentation =
             """{"schemaVersion":3,"skills":{"fixture:executor":{"name":"Executor","description":"Fixture"}}}""";
         return SkillProgramCatalog.Load(rules, presentation).Programs["fixture:executor"];
@@ -294,12 +294,12 @@ internal static class SkillProgramExecutorChecks
         int minTargets = 0,
         int maxTargets = 0)
     {
-        var rules = $$"""
-            {"schemaVersion":64,"skills":[{"id":"fixture:executor","revision":1,"minimumRulesVersion": 171,"modifiers":[],"viewAs":[],
+        var rules = SkillProgramTestJson.CurrentSchema($$"""
+            {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:executor","revision":1,"minimumRulesVersion": 171,"modifiers":[],"viewAs":[],
             "activations":[{"id":"run","minCards":{{minCards}},"maxCards":{{maxCards}},
             "minTargets":{{minTargets}},"maxTargets":{{maxTargets}},"targetKind":"anyLiving","usesPerTurn":1,
             "effects":[{{effects}}]}]}]}
-            """;
+            """);
         const string presentation =
             """{"schemaVersion":3,"skills":{"fixture:executor":{"name":"Executor","description":"Fixture"}}}""";
         return SkillProgramCatalog.Load(rules, presentation).Programs["fixture:executor"];

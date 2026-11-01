@@ -17,7 +17,7 @@ internal sealed partial class CoreGameEngineGroupTargetNullificationRuntime
     {
         if (group.NullificationCompletedTargetIndex == group.TargetIndex)
             return false;
-        if (CoreNativeCardClassificationsRuntime.IsSlashCard(GroupNullificationCardKind(group)) || _coreUnnullifiableOrdinaryTricksOperations.IsOriginalOrdinaryTrickCannotNullify(group.ResolutionId) || _coreOrderedSelectedActorDuelsOperations.IsOrderedSelectedActorDuelCannotNullify(group.ResolutionId) || _characterLuMengMouOperations.IsYingboUnrespondable(group.ResolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(group.ResolutionId))
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(GroupNullificationCardKind(group)) || _coreUnnullifiableOrdinaryTricksOperations.IsOriginalOrdinaryTrickCannotNullify(group.ResolutionId) || _coreOrderedSelectedActorDuelsOperations.IsOrderedSelectedActorDuelCannotNullify(group.ResolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(group.ResolutionId))
         {
             group.NullificationCompletedTargetIndex = group.TargetIndex;
             return false;

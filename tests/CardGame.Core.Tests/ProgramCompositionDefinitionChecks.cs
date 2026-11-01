@@ -262,8 +262,8 @@ internal static class ProgramCompositionDefinitionChecks
                     SkillProgramEffectOp.Draw]),
             "Schema 34 category challenges must retain variable activation cards, exact choice binding and bound-card draws.");
 
-        static string MultiCardRules() => $$$"""
-        {"schemaVersion":64,"skills":[{"id":"fixture:multi-card","revision":1,
+        static string MultiCardRules() => SkillProgramTestJson.CurrentSchema($$$"""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:multi-card","revision":1,
          "minimumRulesVersion": 171,"modifiers":[],
          "viewAs":[{"id":"two-as-slash","inputKinds":[],"inputSuits":[],"inputCount":2,
           "outputKind":"slash","forPlay":true,"forResponse":true,"condition":{"kind":"always"}}],
@@ -276,7 +276,7 @@ internal static class ProgramCompositionDefinitionChecks
           "optional":false,"priority":0,"usageScope":"turn","usageLimit":1,"condition":{"kind":"always"},
           "effects":[{"op":"grantTurnSkills","target":"owner","skillIds":["classic:wusheng","classic:paoxiao"]}]}],
          "contributions":[],"cardIdentities":[]}]}
-        """;
+        """);
         var multiCardProgram = Load("fixture:multi-card", MultiCardRules());
         Require(multiCardProgram.RuntimeVersion == "skill-program-v62" &&
                 multiCardProgram.MinimumRulesVersion == 171 &&
@@ -630,10 +630,10 @@ internal static class ProgramCompositionDefinitionChecks
             skills = new Dictionary<string, object> { [id] = new { name = "Fixture", description = "Fixture" } }
         })).Programs[id];
 
-    private static string Rules(string id, string effects, string entries) => $$"""
-    {"schemaVersion":64,"skills":[{"id":"{{id}}","revision":1,"minimumRulesVersion": 171,
+    private static string Rules(string id, string effects, string entries) => SkillProgramTestJson.CurrentSchema($$"""
+    {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"{{id}}","revision":1,"minimumRulesVersion": 171,
     "modifiers":[],"viewAs":[],{{entries}},"contributions":[],"cardIdentities":[]}]}
-    """;
+    """);
 
     private static string Activation(string id, string effects) => $$"""
     {"id":"{{id}}","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,

@@ -44,6 +44,20 @@ internal static class MouHuaXiongOlChecks
             ruled.ResponseRules.All(rule => rule.InstructionIndex == 1) && minimum.InstructionIndex is null &&
             lifecycle.CreateResponseQuery(s.G.ResolutionStack.OfType<ResponseWindowFrame>().Single().Id, 1, 0, CardKind.Duel, CardKind.Slash, [0]) is null,
             "Forbid combines by OR on the real original instruction, matches the incoming use kind, and cannot flow into counter-Nullification or a response window's own identity.");
+        var sourceA = new CardConversionSource(Driver, "source-a", 0, original.SkillInstanceId);
+        var sourceB = sourceA with { BindingId = "source-b" };
+        lifecycle.IssueResponseRule(original.Id, new(forbid: true, audience: ResponseRuleAudience.All, actorSeat: 1, source: sourceA));
+        lifecycle.IssueResponseRule(original.Id, new(forbid: true, audience: ResponseRuleAudience.All, actorSeat: 1, source: sourceB));
+        lifecycle.IssueResponseRule(original.Id, new(minimum: 3));
+        lifecycle.RemoveResponseRulesIssuedBy(original.Id, sourceA);
+        var retained = s.G.ResolutionStack.Single(frame => frame.Id == original.Id).ResponseRules!;
+        s.Need(!retained.Any(rule => rule.Source == sourceA) && retained.Count(rule => rule.Source == sourceB) == 1 &&
+            retained.Any(rule => rule.Source is null && rule.Minimum == 3) && lifecycle.HasUnconditionalResponseProhibition(original.Id) &&
+            lifecycle.GetResponseDecision(query with { ResponderSeat = 2, TargetSeats = [0] }).Forbidden,
+            "Explicit source revocation removes only its own row; another source and unscoped minima remain, and All also prohibits an untargeted responder.");
+        lifecycle.RemoveResponseRulesIssuedBy(original.Id, sourceB);
+        s.Need(!lifecycle.HasUnconditionalResponseProhibition(original.Id) && lifecycle.GetResponseDecision(query).Minimum == 3,
+            "The whole-window optimization reads actual unconditional rows without inventing a responder or removing unrelated response requirements.");
         s.Answer(c => c.Parameters.GetValueOrDefault("response") is "pass" or "take-damage");
         s.Reach(() => s.P is { Kind: DecisionKind.RespondSlash, PlayerSeat: 0 } &&
             s.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == original.Id && f.CardAttack?.ProgramUseInstructionIndex == 2));
@@ -53,6 +67,55 @@ internal static class MouHuaXiongOlChecks
         s.Answer(c => c.Parameters.GetValueOrDefault("response") is "pass" or "take-damage"); s.Play();
         s.Need(s.E<DamageAppliedEvent>().Count(e => e.SourceSeat == 1 && e.TargetSeat == 0 && e.Amount == 1) == 2 &&
             !s.G.ResolutionStack.Any(f => f.Id == original.Id), "Both real direct Duels return through their original parent once.");
+    }
+
+    public static void WuqianResponseRulesRunAsOrdinaryJsonSuffixCold()
+    {
+        const string skill = "happy:wuqian";
+        foreach (var scenario in new[] { (Kind: CardKind.Slash, LoseSource: true), (Kind: CardKind.Duel, LoseSource: false) })
+        {
+            var s = Scene.Start(wuqian: true); s.Play();
+            s.Need(s.V().GeneralId == "happy:shen-lu-bu" && s.V().Skills!.Any(value => value.Id == skill),
+                "The real Wuqian general exposes its printed source before the first native use.");
+            var card = s.V().Hand.First(card => card.Kind == scenario.Kind);
+            var action = s.G.GetHumanLegalActions().First(a => a.CardId == card.Id && a.ConversionSource is null && a.TargetSeats.SequenceEqual([1]));
+            s.Accept(new PlayCardCommand(0, card.Id, action.TargetSeats, s.G.Revision, s.P!.PromptId, action.PlayedCardKind, action.TargetCardId));
+            s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "happy-lu-bu-target") == true);
+            var binding = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == skill);
+            var useId = binding.HappyLuBu!.UseId;
+            s.Need(binding.InstructionIndex == 1 && s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Id == useId).ResponseRules is null,
+                "The native target compound owns its already-paid use while the ordinary JSON suffix remains unexecuted.");
+            s.Cold();
+            var owner = Owner();
+            if (scenario.LoseSource)
+            {
+                foreach (var grant in owner.SkillGrants.Grants.Where(g => g.SkillId == skill).ToArray()) owner.SkillGrants.SetEnabled(grant.GrantId, false);
+                s.Need(!s.G.NationalSkillsEntries.HasRuntimeSkill(owner, skill), "The accepted choice must complete after its actual source is disabled.");
+            }
+            s.Answer(c => c.Targets.Count == 0);
+            s.Reach(() => s.G.ResolutionStack.OfType<ResponseWindowFrame>().Any(f => f.ParentFrameId == useId));
+            Verify();
+            if (!scenario.LoseSource) { s.Cold(); Verify(); }
+            s.Play();
+            s.Need(s.E<CardUseDeclaredEvent>().Count(e => e.ResolutionId == useId && e.CardId == card.Id) == 1 &&
+                s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == useId) == 1 &&
+                s.E<HappyLuBuUseAppliedEvent>().Count(e => e.UseId == useId) == 1,
+                "The real material and native whole-use completion occur once after the compound returns to ordinary JSON.");
+
+            void Verify()
+            {
+                var use = s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Id == useId);
+                var rule = use.ResponseRules!.Single();
+                var required = scenario.Kind == CardKind.Duel ? CardKind.Slash : CardKind.Dodge;
+                s.Need(rule.Minimum == 2 && rule.RequiredKinds.SequenceEqual([required]) &&
+                    rule.IncomingKinds.Contains(scenario.Kind) && (scenario.Kind == CardKind.Duel || !rule.IncomingKinds.Contains(CardKind.Duel)) &&
+                    rule.ActorSeat == 0 && rule.OpponentSeat == 0 && !s.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == binding.Id) &&
+                    s.G.GetRuntimeModule<CoreNativeEquipmentAndFactionQueriesRuntime>().GetRequiredResponseCount(Owner(), 0, 1, scenario.Kind, required, useId) == 2,
+                    "Exactly the chosen incoming/required pair is issued by JSON on the original use and consumed by the actual native response count.");
+            }
+            CharacterState Owner() => ((IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine.GetField("_players",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(s.G)!)[0];
+        }
     }
 
     public static void StandardIssuedAttackCompletionIsFrameOwnedCold()
@@ -212,14 +275,16 @@ internal static class MouHuaXiongOlChecks
         private string Diagnostic() => JsonSerializer.Serialize(new { G.State.TurnNumber, G.State.CurrentSeat, G.State.Phase, Owner = V(), Prompt = P,
             Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())),
             Facts = G.Events.Where(e => e.Payload.GetType().Name.StartsWith("MouHx", StringComparison.Ordinal) || e.Payload is DamageAppliedEvent or NativeLogicalDiscardInvocationRecordedEvent or NativeDrawInvocationRecordedEvent).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())) });
-        public static Scene Start(bool pauseCompletion = false)
+        public static Scene Start(bool pauseCompletion = false, bool wuqian = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(pauseCompletion));
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(pauseCompletion, wuqian));
             ShanheStartingCard C(CardKind kind, int rank) => new(kind, Suit.Spade, rank);
-            var setup = new ShanheBattleSetup(7, 1, "mou-hua-xiong-ol-real", Hero, 6, 0, 0, 0, 0, pauseCompletion ? [MouHuaXiongOlChecks.Driver, CompletionPause] : [MouHuaXiongOlChecks.Driver],
-                [C(CardKind.Slash, 2), C(CardKind.Slash, 3), C(CardKind.Dodge, 4), C(CardKind.Dodge, 5), C(CardKind.Dodge, 6), C(CardKind.Dodge, 7)], [],
+            var skills = pauseCompletion ? new[] { MouHuaXiongOlChecks.Driver, CompletionPause } : [MouHuaXiongOlChecks.Driver];
+            ShanheStartingCard[] opening = [C(CardKind.Slash, 2), C(CardKind.Slash, 3), C(CardKind.Dodge, 4), C(CardKind.Dodge, 5), C(CardKind.Dodge, 6), C(CardKind.Dodge, 7)];
+            if (wuqian) opening = [.. opening, C(CardKind.Duel, 8)];
+            var setup = new ShanheBattleSetup(7, 1, "mou-hua-xiong-ol-real", wuqian ? "happy:shen-lu-bu" : Hero, 6, 0, 0, 0, 0, skills, opening, [],
                 [new("fixture:mhxo-enemy-a", Hp: 12) { StartingHand = [] }, new("fixture:mhxo-enemy-b", Hp: 12) { StartingHand = [] }],
-                [new("fixture:mhxo-ally", Hp: 12) { StartingHand = [C(CardKind.Peach, 8), C(CardKind.Peach, 9)] }], new string('c', 64));
+                [new("fixture:mhxo-ally", Hp: 12) { StartingHand = wuqian ? [C(CardKind.Dodge, 9), C(CardKind.Slash, 10)] : [C(CardKind.Peach, 8), C(CardKind.Peach, 9)] }], new string('c', 64));
             var g = GameEngine.CreateStandard(new() { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
                 HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup, UseInteractiveSetup = false,
                 UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 14 }, registry);
@@ -227,12 +292,13 @@ internal static class MouHuaXiongOlChecks
         }
     }
 
-    private sealed class Fixture(bool pauseCompletion = false) : IGameContentPackage
+    private sealed class Fixture(bool pauseCompletion = false, bool wuqian = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-mou-hua-xiong-ol", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, Hero);
+            if (wuqian) CharacterFixtureContent.Register(b, "happy:shen-lu-bu");
             var defs = new object[] {
                 new { id = Driver, revision = 1, activations = new object[] {
                     new { id = "draw-two", minCards = 0, maxCards = 0, minTargets = 0, maxTargets = 0, targetKind = "anyLiving", usesPerTurn = (int?)null, effects = new[] { new { op = "draw", target = "owner", amount = 2 } } },
@@ -255,13 +321,13 @@ internal static class MouHuaXiongOlChecks
             var catalog = SkillProgramCatalog.Load(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = defs }),
                 JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, p) in catalog.Programs) b.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description) { Program = p, ProgramPresentation = catalog.Presentations[id] });
-            foreach (var kind in new[] { CardKind.Slash, CardKind.Dodge, CardKind.Peach })
+            foreach (var kind in (wuqian ? new[] { CardKind.Slash, CardKind.Dodge, CardKind.Peach, CardKind.Duel } : [CardKind.Slash, CardKind.Dodge, CardKind.Peach]))
             { var c = CardCatalog.Get(kind); b.AddCard(new("fixture:mhxo-card-" + kind, c.DisplayName, c.CategoryName, c.Description, kind)); }
             foreach (var peer in new[] { "fixture:mhxo-ally", "fixture:mhxo-enemy-a", "fixture:mhxo-enemy-b" })
                 b.AddGeneral(new(peer, "真实同行", "supporter", Quiet, peer.EndsWith("ally", StringComparison.Ordinal) ? "qun" : "wei", 12));
             b.AddDeck(new("fixture:mhxo-deck", "固定四十八张真实杀", 0, 0, []) { PhysicalCards = Enumerable.Range(0, 48).Select(i => new ContentDeckPhysicalCard("fixture:mhxo-card-Slash", Suit.Club, i % 13 + 1)).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "谋华雄OL真实小局", 4, 4, new Dictionary<string, int>(), "fixture:mhxo-deck",
-                GeneralPoolIds: [Hero, "fixture:mhxo-ally", "fixture:mhxo-enemy-a", "fixture:mhxo-enemy-b"], ModeKind: ContentModeKind.Team,
+                GeneralPoolIds: wuqian ? [Hero, "happy:shen-lu-bu", "fixture:mhxo-ally", "fixture:mhxo-enemy-a", "fixture:mhxo-enemy-b"] : [Hero, "fixture:mhxo-ally", "fixture:mhxo-enemy-a", "fixture:mhxo-enemy-b"], ModeKind: ContentModeKind.Team,
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));
         }
     }

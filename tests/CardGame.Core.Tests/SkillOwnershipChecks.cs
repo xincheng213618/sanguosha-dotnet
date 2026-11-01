@@ -150,15 +150,15 @@ internal static class SkillOwnershipChecks
                 }));
         }
 
-        private const string ProgramRules = """
-            {"schemaVersion":64,"skills":[{"id":"fixture:lord-program","revision":1,
+        private static string ProgramRules => SkillProgramTestJson.CurrentSchema("""
+            {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:lord-program","revision":1,
             "modifiers":[],"viewAs":[],"activations":[{"id":"prepare","minCards":0,"maxCards":0,
             "minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,
             "effects":[{"op":"draw","target":"owner","amount":1}]}]},
             {"id":"fixture:lord-longdan","revision":1,"viewAs":[
             {"id":"dodge-as-slash","inputKinds":["dodge"],"inputSuits":[],"outputKind":"slash",
             "forPlay":true,"forResponse":true}]}]}
-            """;
+            """);
 
         private const string ProgramPresentation = """
             {"schemaVersion":3,"skills":{"fixture:lord-program":{"name":"主公整备",

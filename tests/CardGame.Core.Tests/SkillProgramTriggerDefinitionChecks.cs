@@ -32,7 +32,7 @@ internal static class SkillProgramTriggerDefinitionChecks
     private static void RejectsRetiredSchemas()
     {
         foreach (var version in Enumerable.Range(1, SkillProgramCatalog.RulesSchemaVersion - 1))
-            AssertReject(CurrentRules.Replace("\"schemaVersion\":64", $"\"schemaVersion\":{version}", StringComparison.Ordinal),
+            AssertReject(CurrentRules.Replace(SkillProgramTestJson.CurrentSchema("\"schemaVersion\":__RULES_SCHEMA__"), $"\"schemaVersion\":{version}", StringComparison.Ordinal),
                 Presentation, "schemaVersion");
     }
 
@@ -105,13 +105,13 @@ internal static class SkillProgramTriggerDefinitionChecks
         {"schemaVersion":3,"skills":{"test:source":{"name":"Source","description":"test"},"test:trigger":{"name":"Trigger","description":"test"}}}
         """;
 
-    private const string CurrentRules = """
-        {"schemaVersion":64,"skills":[
+    private static string CurrentRules => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[
           {"id":"test:source","revision":1,"minimumRulesVersion": 172,"viewAs":[{"id":"respond","inputKinds":[],"inputSuits":[],"sourceZones":["hand"],"outputKind":"dodge","forPlay":false,"forResponse":true}]},
           {"id":"test:trigger","revision":1,"minimumRulesVersion": 172,"triggers":[{"id":"after-response","window":"cardResponseAccepted","ownerRelation":"conversionSource","sourceSkillId":"test:source","sourceViewAsId":"respond","optional":true,"effects":[
             {"op":"draw","target":"owner","amount":2,"condition":{"kind":"wounded"}},
             {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"eventTarget"},"zones":["hand"],"count":1,"destination":"ownerHand"}
           ]}]}
         ]}
-        """;
+        """);
 }

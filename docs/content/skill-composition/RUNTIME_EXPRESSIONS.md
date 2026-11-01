@@ -158,3 +158,18 @@
 4. **跨版本参数化**：同名技能的不同版本（如归心、神赋、清俭）共用一个操作并以参数区分。
 
 每个阶段先迁移少量代表人物并量化删除的专用代码，再推广。
+
+## 本次用牌的响应规则
+
+`issueCurrentResponseRule` 在原 `CardUseCommitted`、`CardUseTargetsFinalized` 或 `SlashBeforeResponse` 窗口给真实用牌签发一行规则；不重新发动源技能、不模拟一个用牌帧。最低响应数按 max 合并，`forbid` 按 OR 合并。
+
+```json
+{ "op": "issueCurrentResponseRule", "target": "owner", "minimum": 2,
+  "actorRef": {"kind":"eventSource"}, "opponentRef": {"kind":"eventSource"},
+  "incomingKinds": ["duel"], "requiredKinds": ["slash"],
+  "condition": {"kind":"choiceIs","choiceBind":"response-kind","optionId":"duel"} }
+```
+
+`audience` 默认 `targets`，`all` 包含原使用者和非目标无懈候选。`actorRef`、`opponentRef`、`responderRef` 可冻结 owner/eventSource/eventTarget，后者只限制该角色；没有声明则不增加这项过滤。`incomingKinds`、`requiredKinds` 限制响应牌种对，`matchUseKind` 另要求本次原牌种类与 incoming 一致。`while` 复用响应规则公开事实的表达式子集，在实际查询时读逻辑响应者和原使用者，不把材料提供者当成响应者。
+
+无前的原生额外目标步骤通过现有 ChoiceBindings 输出 slash/duel，完成该指令后由普通 JSON 条件签发实际一对；支付、原返回及已接受步骤的失源履约仍在原帧。当前 JSON host 需要真实 CardUse 上下文，未覆盖没有该上下文的直接决斗或反无懈链节点。`all` 也不会把原牌禁令传播到后继无懈的独立节点，濒死救援保持自己的边界。

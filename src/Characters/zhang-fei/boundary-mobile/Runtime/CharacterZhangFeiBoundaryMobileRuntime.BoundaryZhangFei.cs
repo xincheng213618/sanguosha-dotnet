@@ -62,6 +62,7 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
             var reserve = BoundaryZhangFeiReady(frame.OwnerSeat, frame.SkillInstanceId)!;
             var right = new BoundaryLiyongUse(reserve, use.Id, use.Action!.ActionId);
             _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { BoundaryLiyong = right });
+            _coreCardUseLifecycleOperations.IssueResponseRule(use.Id, new(forbid: true, audience: ResponseRuleAudience.All));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryLiyongUseIssuedEvent(right));
         }
         else
@@ -75,7 +76,6 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    internal bool IsBoundaryZhangFeiLiyongUnrespondable(long frameId) => _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)is { Action: { } action, BoundaryLiyong: { } right } && right.CardUseFrameId == frameId && right.CardActionId == action.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind);
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 58600)]
     internal void IncludeBoundaryZhangFeiTargets(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result)
     {

@@ -10,6 +10,7 @@
     <Compile Include="..\CardGame.Core.Tests\WushuangOfficialSkillsAChecks.cs" Link="WushuangOfficialSkillsAScenario.cs" />
     <Compile Include="..\Shared\BaguaResponseScenario.cs" Link="BaguaResponseScenario.cs" />
     <Compile Include="..\Shared\CharacterFixtureContent.cs" Link="CharacterFixtureContent.cs" />
+    <Compile Include="..\Shared\SkillProgramTestJson.cs" Link="SkillProgramTestJson.cs" />
     <Compile Include="..\CardGame.Core.Tests\ShenDengAiChecks.cs" Link="ShenDengAiScenario.cs" />
     <Compile Include="..\CardGame.Core.Tests\Fame2017PublicPileChecks.cs" Link="Fame2017PublicPileScenario.cs" />
     <Compile Include="..\CardGame.Core.Tests\NativeCollectedDiscardProjectionChecks.cs" Link="NativeCollectedDiscardScenario.cs" />

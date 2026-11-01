@@ -8,7 +8,6 @@ internal sealed partial class CharacterLuMengMouEntries
     internal void HumanYingboCore(PromptChoice selected, bool advanceToHumanBoundary) => _resolve().HumanYingboCore(selected, advanceToHumanBoundary);
     internal bool IsAiYingboPending() => _resolve().IsAiYingboPending();
     internal bool IsYingboRepeated(long resolutionId) => _resolve().IsYingboRepeated(resolutionId);
-    internal bool IsYingboUnrespondable(long resolutionId) => _resolve().IsYingboUnrespondable(resolutionId);
     internal void RecordYingboCardUse(long resolutionId, int sourceSeat, CardKind cardKind) => _resolve().RecordYingboCardUse(resolutionId, sourceSeat, cardKind);
     internal void ResetHengyeAfterKill(CharacterState? killer) => _resolve().ResetHengyeAfterKill(killer);
     internal void ResolveHengyeTurnStart(CharacterState player) => _resolve().ResolveHengyeTurnStart(player);

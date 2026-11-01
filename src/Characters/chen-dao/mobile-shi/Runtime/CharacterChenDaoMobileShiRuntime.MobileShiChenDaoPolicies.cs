@@ -6,12 +6,12 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
     internal MobileShiWanglieSelectedEvent? ShiCdWanglieGrant(int seat) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWanglieSelectedEvent>().LastOrDefault(e => e.Source.OwnerSeat == seat && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId) : null;
     internal bool ShiCdWanglieMaterials(int seat, IEnumerable<int>? ids) => ShiCdWanglieGrant(seat)is { } grant && ids?.Contains(grant.CardId) == true;
     internal bool ShiCdWanglieBan(int seat, long? existingUse = null) => ShiCdWanglieGrant(seat)is { } grant && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWanglieCompletedEvent>().Any(e => e.SelectionId == grant.FrameId && (existingUse is null || existingUse.Value > e.UseId));
-    internal bool IsMobileShiWanglieUnrespondable(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.Action is { } action && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWanglieUsedEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.OwnerSeat == action.ActorSeat);
     internal CardConversionSource? MobileShiWanglieCounterspellSource(CharacterState owner, IReadOnlyList<int> ids) => ShiCdWanglieMaterials(owner.Seat, ids) ? ShiCdWanglieGrant(owner.Seat)?.Source : null;
+    internal bool HasIssuedShiCdWanglieDistance(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.Action is { } action && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWanglieUsedEvent>().Any(e => e.UseId == id && e.ActionId == action.ActionId && e.OwnerSeat == action.ActorSeat);
     [ProgramPipelineHook(ProgramPipelinePhase.CardEntitySkillLabel, 47800)]
     internal string? ShiCdWanglieCardLabel(int cardId) => ShiCdWanglieGrant(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)is { } grant && grant.CardId == cardId && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(grant.Source.OwnerSeat) ? "往烈" : null;
     [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 47800)]
-    internal bool ShiCdWanglieCardDistance(ProgramCardDistanceQuery q) => q.CardUseFrameId is { } id && IsMobileShiWanglieUnrespondable(id) || ShiCdWanglieMaterials(q.Actor.Seat, q.PhysicalCardIds);
+    internal bool ShiCdWanglieCardDistance(ProgramCardDistanceQuery q) => q.CardUseFrameId is { } id && HasIssuedShiCdWanglieDistance(id) || ShiCdWanglieMaterials(q.Actor.Seat, q.PhysicalCardIds);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 47800)]
     [ProgramDistanceRule(ProgramDistanceStage.VirtualSlash, 47800)]
     [ProgramDistanceRule(ProgramDistanceStage.ProvidedSlash, 47800)]
@@ -19,7 +19,7 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPhysicalSlash, 47800)]
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPaidWeaponSlash, 47800)]
     [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 47800)]
-    internal bool ShiCdWanglieSlashDistance(ProgramSlashDistanceQuery q) => q.ExistingUseFrameId is { } id && IsMobileShiWanglieUnrespondable(id) || ShiCdWanglieMaterials(q.Actor.Seat, q.PhysicalCardIds ?? (q.PhysicalCard is { } c ? [c.Id] : null));
+    internal bool ShiCdWanglieSlashDistance(ProgramSlashDistanceQuery q) => q.ExistingUseFrameId is { } id && HasIssuedShiCdWanglieDistance(id) || ShiCdWanglieMaterials(q.Actor.Seat, q.PhysicalCardIds ?? (q.PhysicalCard is { } c ? [c.Id] : null));
     [ProgramTargetRule(ProgramTargetRulePoint.DirectedProhibition, 47800)]
     [ProgramTargetRule(ProgramTargetRulePoint.DeclaredGlobalProhibition, 47800)]
     internal bool ShiCdWanglieOtherTargets(ProgramDirectedTargetQuery q) => q.TargetSeat != q.ActorSeat && ShiCdWanglieBan(q.ActorSeat, q.ExistingUseFrameId);
@@ -37,7 +37,10 @@ internal sealed partial class CharacterChenDaoMobileShiRuntime
     internal void CaptureShiCdUse(IGameEvent payload)
     {
         if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { Action: { Type: CardActionType.Use } a } use && ShiCdWanglieMaterials(a.ActorSeat, a.PhysicalCards.Select(c => c.CardId)) && ShiCdWanglieGrant(a.ActorSeat)is { } grant && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWanglieUsedEvent>().Any(e => e.ActionId == a.ActionId))
+        {
+            _coreCardUseLifecycleOperations.IssueResponseRule(use.Id, new(forbid: true, actorSeat: a.ActorSeat, audience: ResponseRuleAudience.All));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiWanglieUsedEvent(grant.FrameId, use.Id, a.ActionId, a.ActorSeat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId));
+        }
         else if (payload is CardActionAcceptedEvent { Action.Type: CardActionType.Response } accepted)
         {
             var response = accepted.Action;

@@ -686,8 +686,6 @@ public sealed partial record CardUseFrame(
     public bool ConsumedAlcoholBoost { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ConsumedAlcoholBonus { get; init; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IssuedCardNoResponse? IssuedNoResponse { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool NextSlashDamageFrozen { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

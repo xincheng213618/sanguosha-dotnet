@@ -181,12 +181,12 @@ internal static class CardConversionUiChecks
                 }, DeckId: "ui-trigger:dodge-deck", GeneralCandidateCount: 1, GeneralPoolIds: generals));
         }
 
-        private const string Rules = """
-            {"schemaVersion":64,"skills":[
+        private static string Rules => SkillProgramTestJson.CurrentSchema("""
+            {"schemaVersion":__RULES_SCHEMA__,"skills":[
               {"id":"ui-trigger:source","revision":1,"viewAs":[{"id":"slash","inputKinds":["dodge"],"inputSuits":[],"outputKind":"slash","forPlay":true,"forResponse":false}]},
               {"id":"ui-trigger:obtain","revision":1,"minimumRulesVersion": 171,"triggers":[{"id":"after-use","window":"cardUseTargetsFinalized","sourceSkillId":"ui-trigger:source","sourceViewAsId":"slash","ownerRelation":"conversionSource","optional":true,"effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"eventTarget"},"zones":["hand"],"count":1,"destination":"ownerHand","skipIfNoCards":true}]}]}
             ]}
-            """;
+            """);
         private const string Presentation = """
             {"schemaVersion":3,"skills":{
               "ui-trigger:source":{"name":"转化","description":"转化"},

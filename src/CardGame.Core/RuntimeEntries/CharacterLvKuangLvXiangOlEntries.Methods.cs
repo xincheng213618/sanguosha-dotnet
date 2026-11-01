@@ -22,7 +22,6 @@ internal sealed partial class CharacterLvKuangLvXiangOlEntries
     internal bool IsQigongDeclarationQuery(CharacterState actor, int? selectedId) => _resolve().IsQigongDeclarationQuery(actor, selectedId);
     internal bool IsQigongIssuedDistance(long? id, int actor) => _resolve().IsQigongIssuedDistance(id, actor);
     internal bool IsQigongRequest(ProgramSkillFrame f) => _resolve().IsQigongRequest(f);
-    internal bool IsQigongUnrespondable(long id) => _resolve().IsQigongUnrespondable(id);
     internal void IssueQigongCardless(ProgramSkillFrame f, CardConversionSource source, CardKind kind) => _resolve().IssueQigongCardless(f, source, kind);
     internal void IssueQigongSlash(ProgramSkillFrame f, PromptChoice choice) => _resolve().IssueQigongSlash(f, choice);
     internal PromptChoice LvChoice(ProgramSkillFrame f, string branch, string key, string label, IReadOnlyList<int>? cards = default, IReadOnlyList<int>? targets = default, IReadOnlyDictionary<string, string>? extra = default) => _resolve().LvChoice(f, branch, key, label, cards, targets, extra);

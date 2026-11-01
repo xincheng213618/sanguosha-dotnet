@@ -45,7 +45,8 @@ internal sealed partial class CoreGameEngineProvenanceCardPoliciesRuntime
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(useId);
         if (use?.ProvenanceUseSource is not { } source || source.OwnerSeat == actor)
             return;
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, f => f with { ProvenanceUseSource = null, IssuedNoResponse = f.IssuedNoResponse?.Source == source ? null : f.IssuedNoResponse });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, f => f with { ProvenanceUseSource = null });
+        _coreCardUseLifecycleOperations.RemoveResponseRulesIssuedBy(useId, source);
     }
 
     internal void IssueProvenanceUsePolicy(long useId, CardActionContext? action)
@@ -56,7 +57,8 @@ internal sealed partial class CoreGameEngineProvenanceCardPoliciesRuntime
         if (source is null)
             return;
         var issued = new IssuedCardNoResponse(action.ActionId, useId, source, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, f => f with { IssuedNoResponse = issued, ProvenanceUseSource = source });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, f => f with { ProvenanceUseSource = source });
+        _coreCardUseLifecycleOperations.IssueResponseRule(useId, new(forbid: true, audience: ResponseRuleAudience.All, source: source));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new IssuedCardNoResponseEvent(issued));
     }
 

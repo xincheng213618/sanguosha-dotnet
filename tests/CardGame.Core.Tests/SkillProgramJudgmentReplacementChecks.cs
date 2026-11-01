@@ -345,8 +345,8 @@ internal static class SkillProgramJudgmentReplacementChecks
     private const string ExchangeTriggerId = "a-exchange";
     private const string DiscardTriggerId = "b-discard";
 
-    private const string ValidV4 = """
-        {"schemaVersion":64,"skills":[
+    private static string ValidV4 => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[
           {"id":"judgment-replace-test:both","revision":1,"triggers":[
             {"id":"a-exchange","window":"judgmentReplacing","subject":"any",
              "excludedReasons":["skill.leiji"],"optional":true,"effects":[
@@ -362,7 +362,7 @@ internal static class SkillProgramJudgmentReplacementChecks
              ]}
           ]}
         ]}
-        """;
+        """);
 
     private const string Presentation = """
         {"schemaVersion":3,"skills":{

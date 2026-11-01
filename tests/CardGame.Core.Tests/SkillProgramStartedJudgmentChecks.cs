@@ -318,8 +318,8 @@ internal static class SkillProgramStartedJudgmentChecks
     private const string ResultTriggerId = "after-result";
     private const string JudgmentReason = "skill.started-judgment-test";
 
-    private const string Rules = """
-        {"schemaVersion":64,"skills":[
+    private static string Rules => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[
           {"id":"started-judgment-test:skill","revision":1,"minimumRulesVersion": 171,"triggers":[
             {"id":"after-dodge","window":"cardResponseAccepted","ownerRelation":"actor","cardKinds":["dodge"],
              "optional":true,"effects":[
@@ -336,7 +336,7 @@ internal static class SkillProgramStartedJudgmentChecks
              ]}
           ]}
         ]}
-        """;
+        """);
 
     private const string Presentation = """
         {"schemaVersion":3,"skills":{

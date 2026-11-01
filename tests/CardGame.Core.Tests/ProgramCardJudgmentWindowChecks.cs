@@ -16,8 +16,8 @@ internal static class ProgramCardJudgmentWindowChecks
 
     private static void VerifyWindow(string window, SkillProgramTriggerWindow expected)
     {
-        var rules = $$"""
-            {"schemaVersion":64,"skills":[{"id":"fixture:card-judgment","revision":1,
+        var rules = SkillProgramTestJson.CurrentSchema($$"""
+            {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:card-judgment","revision":1,
               "minimumRulesVersion": 171,"triggers":[{"id":"judge-slash","window":"{{window}}",
               "ownerRelation":"actor","cardKinds":["slash"],"optional":true,
               "effects":[{"op":"startJudgment","target":"owner",
@@ -25,7 +25,7 @@ internal static class ProgramCardJudgmentWindowChecks
                 "visibility":"public"},
                 {"op":"moveBoundCards","target":"owner","sourceBind":"judgment-card",
                 "destination":"discardPile"}]}]}]}
-            """;
+            """);
         const string presentation = """
             {"schemaVersion":3,"skills":{"fixture:card-judgment":{
               "name":"卡动作判定","description":"使用杀时可以进行一次判定。"}}}

@@ -249,8 +249,8 @@ internal static class SkillProgramCardIdentityChecks
         }
     }
 
-    private const string Rules = """
-        {"schemaVersion":64,"skills":[
+    private static string Rules => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[
           {"id":"card-identity-test:wushen","revision":1,
            "modifiers":[
              {"id":"slash-distance","priority":0,"query":"slashDistanceLimit","operation":"unlimited","value":0,
@@ -261,7 +261,7 @@ internal static class SkillProgramCardIdentityChecks
               "outputKind":"slash","condition":{"kind":"always"}}
            ]}
         ]}
-        """;
+        """);
 
     private const string Presentation = """
         {"schemaVersion":3,"skills":{

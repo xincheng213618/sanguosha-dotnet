@@ -99,15 +99,15 @@ internal static class ProgramOwnedCardsUiChecks
 
         public void Register(IContentRegistryBuilder builder)
         {
-            var catalog = SkillProgramCatalog.Load("""
-                {"schemaVersion":64,"skills":[{"id":"fixture:ui-owned-cards","revision":1,
+            var catalog = SkillProgramCatalog.Load(SkillProgramTestJson.CurrentSchema("""
+                {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:ui-owned-cards","revision":1,
                 "minimumRulesVersion": 171,"activations":[{"id":"select","minCards":0,"maxCards":0,
                 "minTargets":0,"maxTargets":0,"targetKind":"otherLiving","usesPerTurn":1,
                 "condition":{"kind":"always"},"effects":[
                 {"op":"selectOwnedCards","target":"owner","amount":2,"zones":["hand"],"resultBind":"chosen"},
                 {"op":"moveBoundCards","target":"owner","sourceBind":"chosen","destination":"discardPile"}
                 ]}]}]}
-                """, """
+                """), """
                 {"schemaVersion":3,"skills":{"fixture:ui-owned-cards":{"name":"区域牌集合",
                 "description":"私下选择两张自己的手牌，再统一移动。"}}}
                 """);

@@ -26,8 +26,8 @@ internal sealed partial class CharacterLuMengMouRuntime
         {
             if (wasUsedEarlier)
                 _coreCardUseLifecycleOperations.TryMarkYingboRepeated(resolutionId);
-            else
-                _coreCardUseLifecycleOperations.TryMarkYingboUnrespondable(resolutionId);
+            else if (_coreCardUseLifecycleOperations.TryMarkYingboUnrespondable(resolutionId))
+                _coreCardUseLifecycleOperations.IssueResponseRule(resolutionId, new(forbid: true, audience: ResponseRuleAudience.All));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YingboCardModeEvent(resolutionId, sourceSeat, cardKind, wasUsedEarlier, CannotBeRespondedTo: !wasUsedEarlier, ConvertsDamageToFire: wasUsedEarlier, DamageBonus: wasUsedEarlier ? 1 : 0));
             _coreMatchLogOperations.AddLog("SkillTriggered", wasUsedEarlier ? $"{(source.Name)} 的【英博】令本轮重复使用的【{(CardCatalog.Get(cardKind).DisplayName)}】伤害改为火焰且伤害 +1。" : $"{(source.Name)} 的【英博】令本轮首次使用的【{(CardCatalog.Get(cardKind).DisplayName)}】不能被响应。", sourceSeat);
         }
@@ -38,11 +38,11 @@ internal sealed partial class CharacterLuMengMouRuntime
         }
     }
 
-    internal bool IsYingboUnrespondable(long resolutionId) => _coreMouLuMengOperations.Value.UsesFormalMouLuMeng && (_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.YingboUnrespondable == true);
+    internal bool IsYingboGiftEligibleUse(long resolutionId) => _coreMouLuMengOperations.Value.UsesFormalMouLuMeng && (_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.YingboUnrespondable == true);
     internal bool IsYingboRepeated(long resolutionId) => _coreMouLuMengOperations.Value.UsesFormalMouLuMeng && (_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.YingboRepeated == true);
     internal bool TryBeginYingboGift(long resolutionId, int sourceSeat, Card card, CardKind cardKind, IReadOnlyList<Card> physicalCards, YingboGiftContinuation continuation, NativeOwners.CardAttackHandle? attack = null, NativeOwners.GroupCardHandle? group = null)
     {
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !IsYingboUnrespondable(resolutionId) || ActiveYingboGift is not null || physicalCards is not [var physicalCard] || physicalCard.Id != card.Id || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Processing)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !IsYingboGiftEligibleUse(resolutionId) || ActiveYingboGift is not null || physicalCards is not [var physicalCard] || physicalCard.Id != card.Id || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Processing)
             return false;
         var source = _coreMatchParticipantsPlayersAccess._players[sourceSeat];
         var targets = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != sourceSeat).OrderBy(player => player.Seat).ToArray();

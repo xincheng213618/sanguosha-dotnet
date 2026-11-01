@@ -215,8 +215,8 @@ internal static class SkillProgramJudgmentTriggerChecks
         if (!condition) throw new InvalidOperationException(message);
     }
 
-    private const string ValidV3 = """
-        {"schemaVersion":64,"skills":[
+    private static string ValidV3 => SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[
           {"id":"judgment-test:reward","revision":1,"triggers":[{
             "id":"after-club-judgment","window":"judgmentFinalized","subject":"owner",
             "suits":["club"],"minimumRank":1,"maximumRank":13,"excludedReasons":["skill.leiji"],
@@ -231,7 +231,7 @@ internal static class SkillProgramJudgmentTriggerChecks
             "optional":false,"effects":[{"op":"draw","target":"owner","amount":20}]
           }]}
         ]}
-        """;
+        """);
 
     private const string Presentation = """
         {"schemaVersion":3,"skills":{

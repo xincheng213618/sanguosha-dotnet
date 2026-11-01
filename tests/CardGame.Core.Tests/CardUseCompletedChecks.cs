@@ -5,12 +5,12 @@ internal static class CardUseCompletedChecks
 {
     public static void FinishedSlashOpensReplayableProgramWindow()
     {
-        const string rules = """
-            {"schemaVersion":64,"skills":[{"id":"fixture:after-slash","revision":1,
+         string rules = SkillProgramTestJson.CurrentSchema("""
+            {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:after-slash","revision":1,
               "minimumRulesVersion": 171,"triggers":[{"id":"draw-after-finish",
               "window":"cardUseCompleted","ownerRelation":"actor","cardKinds":["slash"],
               "optional":true,"effects":[{"op":"draw","target":"owner","amount":1}]}]}]}
-            """;
+            """);
         const string presentation = """
             {"schemaVersion":3,"skills":{"fixture:after-slash":{"name":"结算后摸牌","description":"杀结算完毕后可以摸一张牌。"}}}
             """;
