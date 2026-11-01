@@ -55,11 +55,6 @@ internal static class TargetedTrickHandHpChecks
         _ = Cold(self, selfRegistry);
     }
 
-    private static string Embedded(string suffix)
-    {
-        using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.ol-dong-yun.{suffix}")!;
-        using var reader = new StreamReader(stream); return reader.ReadToEnd();
-    }
     private static string Reason(string step) => $"skill-program.{Bing}.unequal-hand-hp.{step}";
     private static PlayerSnapshot V(GameEngine g, int seat) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
@@ -128,7 +123,7 @@ internal static class TargetedTrickHandHpChecks
         public PackageManifest Manifest { get; } = new("targeted-trick-hand-hp-fixture", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
-            var production = SkillProgramCatalog.Load(Embedded("rules.json"), Embedded("presentation.json"));
+            var production = CharacterFixtureContent.EmbeddedProgramBundle("ol-dong-yun");
             foreach (var (id, program) in production.Programs) b.AddSkill(new(id, production.Presentations[id].Name, production.Presentations[id].Description)
                 { Program = program, ProgramPresentation = production.Presentations[id] });
             var watchEffects = new JsonArray(JsonNode.Parse("""{"op":"chooseOption","target":"owner","resultBind":"child","options":[{"id":"continue"}]}"""));

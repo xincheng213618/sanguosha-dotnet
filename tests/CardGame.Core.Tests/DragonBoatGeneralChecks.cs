@@ -150,11 +150,6 @@ internal static class DragonBoatGeneralChecks
         Accept(g, new SelectGeneralCommand(0, id, g.Revision, P(g)!.PromptId));
         return (g, registry);
     }
-    private static string Embedded(string suffix)
-    {
-        using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.dragonboat-activity." + suffix)!;
-        using var reader = new StreamReader(stream); return reader.ReadToEnd();
-    }
     private sealed class Fixture(string scenario) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("dragonboat-general-fixture", new(1, 0, 0));
@@ -165,7 +160,7 @@ internal static class DragonBoatGeneralChecks
                 foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description)
                 { Program = program, ProgramPresentation = catalog.Presentations[id], SelectionWeights = Enum.GetValues<Role>().ToDictionary(r => r, _ => id == Quiet ? 10000d : -10000d) });
             }
-            Add(SkillProgramCatalog.Load(Embedded("rules.json"), Embedded("presentation.json")));
+            Add(CharacterFixtureContent.EmbeddedProgramBundle("dragonboat-activity"));
             var rules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
               {"id":"{{Driver}}","revision":1,"modifiers":[{"id":"hand","query":"initialHandSize","operation":"add","value":8,"priority":0},{"id":"range","query":"slashDistanceLimit","operation":"unlimited","value":0,"priority":0}],"activations":[

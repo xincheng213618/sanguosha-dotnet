@@ -251,7 +251,7 @@ internal static class LeDaQiaoZixiChecks
             void Real(string bundle, params string[] ids)
             {
                 string Read(string suffix) { using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms." + bundle + "." + suffix + ".json") ?? throw new InvalidOperationException("Missing real bundle " + bundle); using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-                var rules = Read("rules");
+                var rules = SkillProgramTestJson.VersionedEmbeddedRules(Read("rules"));
                 if (scene == "late-redirect" && bundle == "ol-wen-pin")
                 {
                     var real = JsonNode.Parse(rules)!;

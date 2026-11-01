@@ -340,15 +340,7 @@ internal static class ActualTurnTemporarySkillChecks
         public PackageManifest Manifest { get; } = new("actual-turn-temporary-skill-fixture", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder builder)
         {
-            var assembly = typeof(StandardClassicGeneralPackage).Assembly;
-            string Read(string suffix)
-            {
-                using var stream = assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ordinary-xu-jing." + suffix)
-                    ?? throw new InvalidOperationException("The actual embedded ordinary Xu Jing program is missing.");
-                using var reader = new StreamReader(stream);
-                return reader.ReadToEnd();
-            }
-            var actual = SkillProgramCatalog.Load(Read("rules.json"), Read("presentation.json"));
+            var actual = CharacterFixtureContent.EmbeddedProgramBundle("ordinary-xu-jing");
             foreach (var id in new[] { Yuxu, Shijian })
                 builder.AddSkill(new(id, actual.Presentations[id].Name, actual.Presentations[id].Description)
                 {

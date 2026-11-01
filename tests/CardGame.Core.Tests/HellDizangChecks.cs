@@ -130,11 +130,6 @@ internal static class HellDizangChecks
         public PackageManifest Manifest { get; } = new("hell-dizang-fixture", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
-            string Read(string suffix, string bundle = "hell-dizang")
-            {
-                using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms." + bundle + "." + suffix)!;
-                using var reader = new StreamReader(stream); return reader.ReadToEnd();
-            }
             void Add(SkillProgramCatalog catalog)
             {
                 foreach (var (id, program) in catalog.Programs)
@@ -143,10 +138,10 @@ internal static class HellDizangChecks
                         Tags = zeroJudgmentDeck && id is Driver or Watch ? SkillTag.Awakening :
                             id.StartsWith("hell:") && id != "hell:dayuan" ? SkillTag.Locked : SkillTag.None });
             }
-            Add(SkillProgramCatalog.Load(Read("rules.json"), Read("presentation.json")));
+            Add(CharacterFixtureContent.EmbeddedProgramBundle("hell-dizang"));
             if (zeroJudgmentDeck)
             {
-                var mengpo = SkillProgramCatalog.Load(Read("rules.json", "hell-mengpo"), Read("presentation.json", "hell-mengpo"));
+                var mengpo = CharacterFixtureContent.EmbeddedProgramBundle("hell-mengpo");
                 const string wanghun = "hell:wanghun";
                 builder.AddSkill(new(wanghun, mengpo.Presentations[wanghun].Name, mengpo.Presentations[wanghun].Description)
                 { Program = mengpo.Programs[wanghun], ProgramPresentation = mengpo.Presentations[wanghun], Tags = SkillTag.Locked });

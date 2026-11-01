@@ -50,12 +50,7 @@ internal static class MouLuXunMobileChecks
             CharacterFixtureContent.Register(b, "mou:lu-xun-mobile");
             if (wenhe)
             {
-                static string Read(string suffix)
-                {
-                    using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.wenhe-activity." + suffix)!;
-                    using var reader = new StreamReader(stream); return reader.ReadToEnd();
-                }
-                var real = SkillProgramCatalog.Load(Read("rules.json"), Read("presentation.json"));
+                var real = CharacterFixtureContent.EmbeddedProgramBundle("wenhe-activity");
                 b.AddSkill(new("wenhe:chaos-resolution", "文和乱武原生处理", "真实官方活动卡程序")
                 { Program = real.Programs["wenhe:chaos-resolution"], ProgramPresentation = real.Presentations["wenhe:chaos-resolution"] });
                 b.AddCard(new("fixture:mlx-chaos", "文和乱武", "锦囊牌", "真实活动锦囊", LegacyKind: CardKind.WenheChaos));

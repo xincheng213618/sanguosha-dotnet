@@ -26,7 +26,6 @@ internal static class DamageTargetBudgetChecks
         g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue"); Play(g);
         Need(Count(g) == old && E<DamageTargetBudgetGainedEvent>(g).Count() == 4, "A real damage occurrence involving neither owner direction does not manufacture a mark.");
     }
-    private static string Embedded(string suffix,string package="ol-ta-dun") { using var s=typeof(StandardClassicGeneralPackage).Assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.{package}.{suffix}")!; using var r=new StreamReader(s); return r.ReadToEnd(); }
     private static PlayerSnapshot V(GameEngine g,int s)=>g.CreateSnapshot(s).Players[s];
     private static PendingDecision? P(GameEngine g)=>g.CreateSnapshot(0).PendingDecision;
     private static int Count(GameEngine g)=>(V(g,0).Markers??[]).SingleOrDefault(m=>m.Kind==PlayerMarkerKind.LuanZhan)?.Count??0;
@@ -66,10 +65,10 @@ internal static class DamageTargetBudgetChecks
         public PackageManifest Manifest {get;}=new("damage-target-budget-fixture",new(1,0,0),[]);
         public void Register(IContentRegistryBuilder b)
         {
-            var content=SkillProgramCatalog.Load(Embedded("rules.json"),Embedded("presentation.json"));foreach(var(id,p)in content.Programs)b.AddSkill(new(id,content.Presentations[id].Name,content.Presentations[id].Description){Program=p,ProgramPresentation=content.Presentations[id]});
+            var content=CharacterFixtureContent.EmbeddedProgramBundle("ol-ta-dun");foreach(var(id,p)in content.Programs)b.AddSkill(new(id,content.Presentations[id].Name,content.Presentations[id].Description){Program=p,ProgramPresentation=content.Presentations[id]});
             if(scenario=="late-gain")
             {
-                var benefit=SkillProgramCatalog.Load(Embedded("rules.json","ol-ma-yun-lu"),Embedded("presentation.json","ol-ma-yun-lu"));
+                var benefit=CharacterFixtureContent.EmbeddedProgramBundle("ol-ma-yun-lu");
                 foreach(var(id,p)in benefit.Programs)b.AddSkill(new(id,benefit.Presentations[id].Name,benefit.Presentations[id].Description){Program=p,ProgramPresentation=benefit.Presentations[id]});
             }
             var rules=JsonNode.Parse($$"""

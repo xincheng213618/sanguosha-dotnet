@@ -92,8 +92,7 @@ internal static partial class TaoQianChecks
         public PackageManifest Manifest { get; } = new("fixture-tao-qian-restriction", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
-            string Read(string part) { using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ol-tao-qian." + part + ".json") ?? throw new InvalidOperationException("Missing embedded current Tao Qian skill bundle."); using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-            var actual = SkillProgramCatalog.Load(Read("rules"), Read("presentation")); const string skill = "ol:zhaohuo";
+            var actual = CharacterFixtureContent.EmbeddedProgramBundle("ol-tao-qian"); const string skill = "ol:zhaohuo";
             b.AddSkill(new(skill, actual.Presentations[skill].Name, actual.Presentations[skill].Description) { Program = actual.Programs[skill], ProgramPresentation = actual.Presentations[skill] });
             if (scene == "timing") CharacterFixtureContent.Register(b, "ol:zhang-yi");
             static JsonNode N(string text) => JsonNode.Parse(text)!;

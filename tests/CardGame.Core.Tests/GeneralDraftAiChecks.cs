@@ -70,15 +70,7 @@ internal static class GeneralDraftAiChecks
             builder.AddGeneral(new("boundary:ma-chao", "界马超", "supporter", "boundary:tieqi", "shu"));
             void RegisterBundle(string bundle, params string[] ids)
             {
-                var assembly = typeof(StandardClassicGeneralPackage).Assembly;
-                string Read(string suffix)
-                {
-                    using var stream = assembly.GetManifestResourceStream(assembly.GetManifestResourceNames()
-                        .Single(name => name.EndsWith($".{bundle}.{suffix}.json", StringComparison.Ordinal)))!;
-                    using var reader = new StreamReader(stream);
-                    return reader.ReadToEnd();
-                }
-                var catalog = SkillProgramCatalog.Load(Read("rules"), Read("presentation"));
+                var catalog = CharacterFixtureContent.EmbeddedProgramBundle(bundle);
                 foreach (var id in ids)
                 {
                     var presentation = catalog.Presentations[id];

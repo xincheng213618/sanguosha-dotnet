@@ -34,7 +34,6 @@ internal static class DamageZoneAndAdjacentTargetChecks
             "The target restriction expires at the actual turn boundary."); _ = Cold(g, registry);
     }
     private static bool ZoneChoice(GameEngine g) => P(g)?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "damage-zone-acquisition") == true;
-    private static string Embedded(string suffix) { using var s = typeof(StandardClassicGeneralPackage).Assembly.GetManifestResourceStream($"CardGame.Content.Standard.SkillPrograms.ol-yan-bai-hu.{suffix}")!; using var r = new StreamReader(s); return r.ReadToEnd(); }
     private static PlayerSnapshot V(GameEngine g, int seat) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => g.CreateSnapshot(0).PendingDecision;
     private static IEnumerable<T> E<T>(GameEngine g) => g.Events.Select(e => e.Payload).OfType<T>();
@@ -86,7 +85,7 @@ internal static class DamageZoneAndAdjacentTargetChecks
         public PackageManifest Manifest { get; } = new("damage-zone-adjacent-fixture", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
-            var own = SkillProgramCatalog.Load(Embedded("rules.json"), Embedded("presentation.json"));
+            var own = CharacterFixtureContent.EmbeddedProgramBundle("ol-yan-bai-hu");
             foreach (var (id, p) in own.Programs) b.AddSkill(new(id, own.Presentations[id].Name, own.Presentations[id].Description) { Program = p, ProgramPresentation = own.Presentations[id], Tags = SkillTag.Locked });
             var rules = JsonNode.Parse($$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[

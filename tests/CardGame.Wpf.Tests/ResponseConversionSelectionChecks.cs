@@ -21,11 +21,7 @@ internal static class ResponseConversionSelectionChecks
         new StandardClassicGeneralPackage()).GetSkill(Longdan));
     private static readonly Lazy<ContentSkillDefinition> Definition = new(() =>
     {
-        var assembly = typeof(StandardContentPackage).Assembly;
-        string Read(string name) { using var stream = assembly.GetManifestResourceStream(
-            $"CardGame.Content.Standard.SkillPrograms.wushuang-skills-b-audit.{name}.json")!;
-            using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-        var catalog = SkillProgramCatalog.Load(Read("rules"), Read("presentation"));
+        var catalog = CharacterFixtureContent.EmbeddedProgramBundle("wushuang-skills-b-audit");
         return new(Longhun, catalog.Presentations[Longhun].Name, catalog.Presentations[Longhun].Description)
             { Program = catalog.Programs[Longhun], ProgramPresentation = catalog.Presentations[Longhun] };
     });

@@ -264,14 +264,7 @@ internal static class XieLingYuChecks
 
         private static void RegisterProductionSkill(IContentRegistryBuilder builder, string bundle, string skillId)
         {
-            string Read(string suffix)
-            {
-                using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream(
-                    "CardGame.Content.Standard.SkillPrograms." + bundle + "." + suffix + ".json")
-                    ?? throw new InvalidOperationException("Missing production resource " + bundle + "." + suffix);
-                using var reader = new StreamReader(stream); return reader.ReadToEnd();
-            }
-            var catalog = SkillProgramCatalog.Load(Read("rules"), Read("presentation"));
+            var catalog = CharacterFixtureContent.EmbeddedProgramBundle(bundle);
             var presentation = catalog.Presentations[skillId];
             builder.AddSkill(new(skillId, presentation.Name, presentation.Description)
             { Program = catalog.Programs[skillId], ProgramPresentation = presentation });

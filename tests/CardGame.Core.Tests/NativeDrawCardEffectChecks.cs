@@ -399,14 +399,7 @@ internal static class NativeDrawCardEffectChecks
         }
         private static void RegisterProduction(IContentRegistryBuilder b, string bundle, string skill)
         {
-            string Read(string suffix)
-            {
-                using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream(
-                    "CardGame.Content.Standard.SkillPrograms." + bundle + "." + suffix + ".json")
-                    ?? throw new InvalidOperationException("Missing production resource " + bundle + "." + suffix);
-                using var reader = new StreamReader(stream); return reader.ReadToEnd();
-            }
-            var catalog = SkillProgramCatalog.Load(Read("rules"), Read("presentation"));
+            var catalog = CharacterFixtureContent.EmbeddedProgramBundle(bundle);
             var p = catalog.Presentations[skill];
             b.AddSkill(new(skill, p.Name, p.Description) { Program = catalog.Programs[skill], ProgramPresentation = p });
         }

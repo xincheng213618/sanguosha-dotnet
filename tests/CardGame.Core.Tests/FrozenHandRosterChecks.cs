@@ -76,7 +76,6 @@ internal static class FrozenHandRosterChecks
     private static string Diagnostic(GameEngine g)=>JsonSerializer.Serialize(new{g.State.Winner,Prompt=P(g),Frames=g.ResolutionStack,Turns=E<TurnStartedEvent>(g),Players=Enumerable.Range(0,4).Select(s=>V(g,s)),Recent=g.Events.TakeLast(16).Select(e=>JsonSerializer.Serialize(e.Payload,e.Payload.GetType()))});
     private static string State(GameEngine g)=>JsonSerializer.Serialize(new{Views=Enumerable.Range(0,4).Select(s=>SnapshotJson.Serialize(g.CreateSnapshot(s))).ToArray(),Frames=g.ResolutionStack.Select(f=>JsonSerializer.Serialize(f,f.GetType())).ToArray(),g.CardMovements,Events=g.Events.Select(e=>JsonSerializer.Serialize(e.Payload,e.Payload.GetType())).ToArray(),Commands=CommandJson.Serialize(g.AcceptedCommands)});
     private static GameEngine Cold(GameEngine g,ContentRegistry r){var restored=GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(g.CreateCheckpoint())),r);Need(State(g)==State(restored),"Cold replay preserves every private actual-chooser prompt, frozen roster and once-paid native child cursor.");return restored;}
-    private static string Embedded(string suffix){using var s=typeof(StandardClassicGeneralPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ol-wu-yan."+suffix)!;using var r=new StreamReader(s);return r.ReadToEnd();}
     private static (GameEngine,ContentRegistry)Start(string scenario="normal")
     {
         var registry=ContentRegistry.Build(new StandardContentPackage(),new Fixture(scenario));var g=GameEngine.CreateStandard(new GameOptions{Seed=7,PlayerCount=4,HumanSeat=0,HumanRole=scenario.EndsWith("death",StringComparison.Ordinal)?Role.Rebel:Role.Lord,ModeId=Mode,UseInteractiveSetup=true,UseInteractiveDiscard=false,AdvanceAfterHumanCommands=false,MaxTurns=6},registry);
@@ -88,7 +87,7 @@ internal static class FrozenHandRosterChecks
         public void Register(IContentRegistryBuilder b)
         {
             void Add(SkillProgramCatalog cat){foreach(var(id,program)in cat.Programs)b.AddSkill(new(id,cat.Presentations[id].Name,cat.Presentations[id].Description){Program=program,ProgramPresentation=cat.Presentations[id],SelectionWeights=Enum.GetValues<Role>().ToDictionary(r=>r,_=>id==Quiet?10000d:-10000d)});}
-            Add(SkillProgramCatalog.Load(Embedded("rules.json"),Embedded("presentation.json")));
+            Add(CharacterFixtureContent.EmbeddedProgramBundle("ol-wu-yan"));
             var defs=new List<string>{$$"""{"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}""",
                 $$"""{"id":"{{Driver}}","revision":1,"modifiers":[{"id":"distance","query":"outgoingDistance","operation":"add","value":-1,"priority":0}]}"""};
             var skills=new List<string>{Skill};

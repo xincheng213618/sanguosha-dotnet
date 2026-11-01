@@ -245,12 +245,7 @@ internal static partial class TaoQianChecks
         }
         private static void WenProduction(IContentRegistryBuilder b, string bundle, params string[] ids)
         {
-            string Read(string suffix)
-            {
-                using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms." + bundle + "." + suffix + ".json") ?? throw new InvalidOperationException("Missing production resource " + bundle + "." + suffix);
-                using var reader = new StreamReader(stream); return reader.ReadToEnd();
-            }
-            var c = SkillProgramCatalog.Load(Read("rules"), Read("presentation"));
+            var c = CharacterFixtureContent.EmbeddedProgramBundle(bundle);
             foreach (var id in ids) b.AddSkill(new(id, c.Presentations[id].Name, c.Presentations[id].Description) { Program = c.Programs[id], ProgramPresentation = c.Presentations[id] });
         }
     }

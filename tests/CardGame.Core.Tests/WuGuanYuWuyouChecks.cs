@@ -182,8 +182,7 @@ internal static class WuGuanYuWuyouChecks
         public PackageManifest Manifest { get; } = new("fixture-wumiao-wuyou", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
-            string Read(string suffix) { using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.wumiao-guan-yu." + suffix + ".json") ?? throw new InvalidOperationException("Missing real Wuyou bundle"); using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-            var production = SkillProgramCatalog.Load(Read("rules"), Read("presentation")); b.AddSkill(new(WySkill, production.Presentations[WySkill].Name, production.Presentations[WySkill].Description) { Program = production.Programs[WySkill], ProgramPresentation = production.Presentations[WySkill] });
+            var production = CharacterFixtureContent.EmbeddedProgramBundle("wumiao-guan-yu"); b.AddSkill(new(WySkill, production.Presentations[WySkill].Name, production.Presentations[WySkill].Description) { Program = production.Programs[WySkill], ProgramPresentation = production.Presentations[WySkill] });
             if (scene == "later-combo") b.AddSkill(new("wumiao:juewu", production.Presentations["wumiao:juewu"].Name, production.Presentations["wumiao:juewu"].Description) { Program = production.Programs["wumiao:juewu"], ProgramPresentation = production.Presentations["wumiao:juewu"] });
             static JsonNode N(string text) => JsonNode.Parse(text)!;
             static JsonObject A(string id, string effects, int cards = 0, int targets = 0) => N("{\"id\":\"" + id + "\",\"minCards\":" + cards + ",\"maxCards\":" + cards + ",\"minTargets\":" + targets + ",\"maxTargets\":" + targets + ",\"targetKind\":\"anyLiving\",\"usesPerTurn\":null,\"effects\":[" + effects + "]}").AsObject();

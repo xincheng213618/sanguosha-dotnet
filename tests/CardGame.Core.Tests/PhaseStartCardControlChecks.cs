@@ -113,7 +113,7 @@ internal static class PhaseStartCardControlChecks
         public PackageManifest Manifest { get; } = new("phase-start-card-control-fixture", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
-            var productionRules = JsonNode.Parse(Embedded("rules.json"))!;
+            var productionRules = JsonNode.Parse(SkillProgramTestJson.VersionedEmbeddedRules(Embedded("rules.json")))!;
             if (malformedDerived == "unknown") productionRules["skills"]!.AsArray().Single(n => n!["id"]!.GetValue<string>() == Meibu)!["triggers"]![0]!["effects"]![0]!["skillId"] = "fixture:unknown-derived";
             var derived = productionRules["skills"]!.AsArray().Single(n => n!["id"]!.GetValue<string>() == Zhixi)!;
             if (malformedDerived is "empty" or "wrong-policy") derived["cardPolicies"] = JsonNode.Parse(malformedDerived == "empty" ? "[]" : """[{"id":"wrong","kind":"preventForeignEquipmentDiscard","cardKinds":[]}]""");

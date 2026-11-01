@@ -117,13 +117,11 @@ internal static class LeDiaoChanChecks
         public PackageManifest Manifest { get; } = new("fixture-le-diao-chan", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
-            string Read(string suffix) { using var s = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.le-diao-chan." + suffix + ".json") ?? throw new InvalidOperationException("Missing real le-diao-chan bundle"); using var r = new StreamReader(s); return r.ReadToEnd(); }
-            var real = SkillProgramCatalog.Load(Read("rules"), Read("presentation"));
+            var real = CharacterFixtureContent.EmbeddedProgramBundle("le-diao-chan");
             foreach (var id in new[] { Tb, Diou }) b.AddSkill(new(id, real.Presentations[id].Name, real.Presentations[id].Description) { Program = real.Programs[id], ProgramPresentation = real.Presentations[id] });
             if (scene == "liyu-judgment")
             {
-                string ReadLiyu(string suffix) { using var s = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.boundary-lu-bu." + suffix + ".json") ?? throw new InvalidOperationException("Missing real Liyu bundle"); using var r = new StreamReader(s); return r.ReadToEnd(); }
-                var actual = SkillProgramCatalog.Load(ReadLiyu("rules"), ReadLiyu("presentation"));
+                var actual = CharacterFixtureContent.EmbeddedProgramBundle("boundary-lu-bu");
                 b.AddSkill(new(Liyu, actual.Presentations[Liyu].Name, actual.Presentations[Liyu].Description) { Program = actual.Programs[Liyu], ProgramPresentation = actual.Presentations[Liyu] });
             }
             b.AddSkill(new(Neutral, "普通替代技能", "真实失去来源的中性定义"));

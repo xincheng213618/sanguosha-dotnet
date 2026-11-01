@@ -144,8 +144,7 @@ internal static partial class TaoQianChecks
         }
         private static void TqProduction(IContentRegistryBuilder b)
         {
-            string Read(string part) { using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ol-tao-qian." + part + ".json") ?? throw new InvalidOperationException("Missing actual Tao Qian embedded " + part); using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-            var c = SkillProgramCatalog.Load(Read("rules"), Read("presentation")); foreach (var id in new[] { TqZongluan, TqZhaohuo, TqWenren }) b.AddSkill(new(id, c.Presentations[id].Name, c.Presentations[id].Description) { Program = c.Programs[id], ProgramPresentation = c.Presentations[id] });
+            var c = CharacterFixtureContent.EmbeddedProgramBundle("ol-tao-qian"); foreach (var id in new[] { TqZongluan, TqZhaohuo, TqWenren }) b.AddSkill(new(id, c.Presentations[id].Name, c.Presentations[id].Description) { Program = c.Programs[id], ProgramPresentation = c.Presentations[id] });
         }
     }
 }

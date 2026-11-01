@@ -75,10 +75,9 @@ internal static class IdentityConcealmentViewChecks
         public PackageManifest Manifest{get;}=new("concealment-ui-fixture",new(1,0,0),[]);
         public void Register(IContentRegistryBuilder b)
         {
-            string Embedded(string suffix){using var s=typeof(StandardClassicGeneralPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ol-xuan-gong-zhu."+suffix)!;using var r=new StreamReader(s);return r.ReadToEnd();}
             void Add(SkillProgramCatalog cat){foreach(var(id,p)in cat.Programs)b.AddSkill(new(id,cat.Presentations[id].Name,cat.Presentations[id].Description){Program=p,ProgramPresentation=cat.Presentations[id],
                 SelectionWeights=Enum.GetValues<Role>().ToDictionary(r=>r,r=>id==Quiet?10000d:r==Role.Lord?-20000d:20000d)});}
-            Add(SkillProgramCatalog.Load(Embedded("rules.json"),Embedded("presentation.json")));
+            Add(CharacterFixtureContent.EmbeddedProgramBundle("ol-xuan-gong-zhu"));
             var rules=$$"""{"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}]}""";
             Add(SkillProgramCatalog.Load(rules,JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.PresentationSchemaVersion,skills=new Dictionary<string,object>{[Quiet]=new{name="安静身份同桌",description="固定跳过出牌"}}})));
             b.AddGeneral(new("ol:xuan-gong-zhu","宣公主·OL","ol-xuan-gong-zhu","ol:gaoling","jin",3,["ol:qimei","ol:zhuiji-tj"],GeneralGender.Female));

@@ -121,12 +121,7 @@ internal static class ProgramLiangzhuCompositionChecks
             CharacterFixtureContent.Register(builder, Hero);
             if (replaced)
             {
-                string Read(string suffix)
-                {
-                    using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ol-sun-hong." + suffix + ".json")!;
-                    using var reader = new StreamReader(stream); return reader.ReadToEnd();
-                }
-                var production = SkillProgramCatalog.Load(Read("rules"), Read("presentation"));
+                var production = CharacterFixtureContent.EmbeddedProgramBundle("ol-sun-hong");
                 builder.AddSkill(new(Zenrun, "禅润", "Native draw replacement") { Program = production.Programs[Zenrun], ProgramPresentation = production.Presentations[Zenrun] });
             }
             var rules = $$"""

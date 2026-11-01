@@ -162,8 +162,7 @@ internal static class OlMoZhangFeiChecks
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, Hero);
-            string Read(string suffix) { using var stream = typeof(StandardContentPackage).Assembly.GetManifestResourceStream("CardGame.Content.Standard.SkillPrograms.ol-mo-sun-quan." + suffix + ".json")!; using var reader = new StreamReader(stream); return reader.ReadToEnd(); }
-            var shared = SkillProgramCatalog.Load(Read("rules"), Read("presentation"));
+            var shared = CharacterFixtureContent.EmbeddedProgramBundle("ol-mo-sun-quan");
             b.AddSkill(new("ol:mo-rumo", "入魔", "共享入魔") { Program = shared.Programs["ol:mo-rumo"], ProgramPresentation = shared.Presentations["ol:mo-rumo"], Tags = SkillTag.Locked });
             var rules = $$"""
                 {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
