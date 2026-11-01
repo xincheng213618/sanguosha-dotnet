@@ -32,7 +32,7 @@ internal sealed partial class CharacterHaoMengAnniversaryRuntime
         var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards);
         var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards);
         var rank = cards.Length == 1 ? cards[0].Rank : 0;
-        return _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, t, CardKind.Slash, suit, color, rank, ids, conversionSource: source) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor, t.Seat, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, CardKind.Slash, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor, t.Seat, suit)).Select(t => t.Seat).ToArray();
+        return _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, t, CardKind.Slash, suit, color, rank, ids, conversionSource: source)).Select(t => t.Seat).ToArray();
     }
 
     internal int[] HaoMengAvailableCards(ProgramSkillFrame f)

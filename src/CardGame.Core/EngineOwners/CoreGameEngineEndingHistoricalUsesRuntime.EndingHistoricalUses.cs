@@ -45,7 +45,7 @@ internal sealed partial class CoreGameEngineEndingHistoricalUsesRuntime
             var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
             if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             {
-                var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, suit, color, card.Rank, [card.Id]) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, t.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, t.Seat, suit)).ToArray();
+                var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, suit, color, card.Rank, [card.Id])).ToArray();
                 foreach (var target in targets)
                     result.Add(new(LegalActionKind.Slash, card.Id, target.Seat, $"将【{(card.DisplayName)}】当【{(CardCatalog.Get(kind).DisplayName)}】对 {(target.Name)} 使用", kind, TargetSeats: [target.Seat]));
                 _coreNativeMultiTargetActionsOperations.AddFangtianHalberdSlashActions(result, actor, card, targets, CardCatalog.Get(kind).DisplayName, kind);

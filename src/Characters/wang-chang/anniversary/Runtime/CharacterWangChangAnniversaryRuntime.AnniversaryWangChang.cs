@@ -261,7 +261,7 @@ internal sealed partial class CharacterWangChangAnniversaryRuntime
             while (r.SlashCursor < r.Targets.Count)
             {
                 var target = r.Targets[r.SlashCursor];
-                if (_coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None, effectiveRank: 0, physicalCardIds: [], conversionSource: r.Source, countsTowardLimit: false) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(f.OwnerSeat, target, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None, null))
+                if (_coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None, effectiveRank: 0, physicalCardIds: [], conversionSource: r.Source, countsTowardLimit: false))
                 {
                     _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryWangChang = r with { Stage = AnniversaryWangChangStage.IssuingSlash, UseId = 0, ActionId = 0, NativeReturned = false } });
                     _coreTriggeredCardProgramsOperations.Value.UseTriggeredProgramVirtualSlash(f, target);

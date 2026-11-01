@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineVirtualBasicOffersRuntime
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat != owner || _characterZhouYuOlMouOperations.MouGuquPhysicalUseForbidden(owner, []))
             yield break;
         foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Where(kind => kind != CardKind.ColdSlash || anyRegisteredBasic && _contentRegistryOperations._contentRegistry.Cards.Values.Any(card => card.LegacyKind == CardKind.ColdSlash)))
-            foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, t.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, kind, Suit.None)))
+            foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, physicalSuit: Suit.None)))
                 yield return (kind, target.Seat);
         if (_coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Peach, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, owner, CardKind.Peach))
             yield return (CardKind.Peach, owner);

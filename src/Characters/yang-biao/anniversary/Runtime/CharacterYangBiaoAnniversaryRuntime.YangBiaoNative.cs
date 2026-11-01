@@ -11,7 +11,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
             return[];
         var target = _coreMatchParticipantsPlayersAccess._players[r.Target];
         var plans = new List<AnniversaryYangBiaoPlan>();
-        if (_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, target, CardKind.Slash, physicalSuit: Suit.None, effectiveRank: 0, ignoreDistance: true, countsTowardLimit: false) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, target.Seat, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.Slash, Suit.None, null))
+        if (_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, target, CardKind.Slash, physicalSuit: Suit.None, effectiveRank: 0, ignoreDistance: true, countsTowardLimit: false))
             plans.Add(new(CardKind.Slash, LegalActionKind.Slash) { Targets = [target.Seat] });
         plans.AddRange(_coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, CardKind.Dismantlement, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: []).Where(o => o.TargetSeats.SequenceEqual([target.Seat])).Select(o => new AnniversaryYangBiaoPlan(o.EffectiveCardKind, o.ActionKind, o.TargetCardId, o.RequiredCardKind) { Targets = o.TargetSeats }));
         // Juee expressly names one recipient, rather than all Five Grains recipients.

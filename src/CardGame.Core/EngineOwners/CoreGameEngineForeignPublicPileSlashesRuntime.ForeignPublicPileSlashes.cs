@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineForeignPublicPileSlashesRuntime
         foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != actor.Seat))
         {
             var pile = _cardZonesOperations._cardZones.CardsAt(CardLocation.Authority(owner.Seat));
-            if (pile.Count < 2 || !_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, owner) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, owner.Seat, CardKind.Slash))
+            if (pile.Count < 2 || !_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, owner))
                 continue;
             foreach (var binding in _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.ForeignPublicPileSlash))
             {

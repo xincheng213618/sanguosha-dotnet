@@ -5,7 +5,7 @@ using System.Globalization;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangFenAnniversaryRuntime
 {
-    internal int[] DagongLegalTargets(int owner, bool ignoreDistance) => _coreTableOrderOperations.CurrentTableOrder().Select(s => _coreMatchParticipantsPlayersAccess._players[s]).Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], t, CardKind.Slash, Suit.None, effectiveColor: false, effectiveRank: 0, ignoreDistance: ignoreDistance, countsTowardLimit: false) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, t.Seat, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, CardKind.Slash, Suit.None, false)).Select(t => t.Seat).ToArray();
+    internal int[] DagongLegalTargets(int owner, bool ignoreDistance) => _coreTableOrderOperations.CurrentTableOrder().Select(s => _coreMatchParticipantsPlayersAccess._players[s]).Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], t, CardKind.Slash, Suit.None, effectiveColor: false, effectiveRank: 0, ignoreDistance: ignoreDistance, countsTowardLimit: false)).Select(t => t.Seat).ToArray();
     internal static IEnumerable<int[]> DagongTargetSets(int[] legal, int max)
     {
         for (var bits = 1; bits < (1 << legal.Length); bits++)

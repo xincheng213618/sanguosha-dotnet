@@ -40,7 +40,7 @@ internal sealed partial class CharacterWangCanOlRuntime
                     continue;
                 if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
                 {
-                    var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, suit, color, card.Rank, [id], conversionSource: conversion, actualUnconvertedPhysical: conversion is null) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, t.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, t.Seat, suit)).ToArray();
+                    var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, suit, color, card.Rank, [id], conversionSource: conversion, actualUnconvertedPhysical: conversion is null)).ToArray();
                     foreach (var target in targets)
                         result.Add(new(LegalActionKind.Slash, id, target.Seat, $"登楼：将【{(card.DisplayName)}】对{(target.Name)}使用", kind, TargetSeats: [target.Seat]) { ConversionSource = conversion });
                     var multiple = new List<LegalAction>();

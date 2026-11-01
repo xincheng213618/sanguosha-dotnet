@@ -290,6 +290,7 @@ var tests = new (string Name, Action Body)[]
     ("Shanhe Dong Ji: frozen HP equipment children and paid source invalidation cold", ShanheDongJiChecks.FrozenRecipientHpSurvivesEquipmentChildrenAndPaidSourceInvalidationCold),
     ("Liushi effect contract: rejects unpaid foreign and wrong-window definitions", LiushiEffectValidationChecks.RejectsUnpaidForeignAndWrongWindowDefinitions),
     ("Mou Lu Xun Mobile: physical Wenhe Chaos participant effect and exact parent cold return", CardGame.Core.Tests.MouLuXunMobileChecks.RealWenheChaosParticipantRecordsAndReturnsItsPhysicalParent),
+    ("Virtual Slash targets: final appearance and common restrictions", VirtualSlashTargetChecks.FinalAppearanceAndCommonRestrictions),
     ("Native Cold: physical Slash existing family double Dodge bonus and elemental chain", NativeColdDamageChecks.PhysicalSlashUsesOldFamilyDoubleDodgeBonusAndElementalChain),
     ("Shanhe equipment forward: direct opening equipment empty deck and native theft", ShanheStartingResourceChecks.OpeningEquipmentDeckAndStolenWeaponStayNativeForward),
     ("Shanhe resources: flag flows across battles and legacy JSON stays unchanged", ShanheCampaignChecks.StartingResourceFlagFlowsAcrossBattlesAndKeepsLegacyJson),

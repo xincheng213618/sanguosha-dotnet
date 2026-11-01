@@ -155,16 +155,6 @@ internal sealed partial class CoreNativeDamagePoliciesRuntime
     }
 
     internal bool IsCardTargetProhibited(CharacterState target, CardKind cardKind, Suit? suit = null, bool? effectiveIsRed = null) => CoreNativeCardClassificationsRuntime.IsDelayedCard(cardKind) && _coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget) || _coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ProhibitTarget, cardKind) || suit is { } declaredSuit && _coreProgramCardPoliciesOperations.CardPolicies(target, SkillProgramCardPolicyKind.ProhibitTargetBySuit, cardKind).Any(item => item.Policy.InputSuit == declaredSuit) || _coreDyingWindowSkillPoliciesOperations.IsBlackTrickTargetProhibited(target, cardKind, effectiveIsRed);
-    internal bool IsSlashProhibited(CharacterState source, CharacterState target, Card slashCard)
-    {
-        if (IsSlashProhibited(target))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     internal static bool IsBlackCardUse(IReadOnlyList<Card> physicalCards) => RuntimeSkills.RuntimeRules_Core_CommonRules.IsBlackCardUse(physicalCards);
     internal static bool CanYizhongNullify(IReadOnlyList<Card> physicalCards, bool hasArmor) => RuntimeSkills.RuntimeRules_Core_CommonRules.CanYizhongNullify(physicalCards, hasArmor);
     internal static bool IsTrickCardDamage(CardKind kind) => RuntimeSkills.RuntimeRules_Core_CommonRules.IsTrickCardDamage(kind);

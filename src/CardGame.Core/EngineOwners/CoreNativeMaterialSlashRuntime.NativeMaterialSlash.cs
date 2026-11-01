@@ -56,7 +56,7 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
         var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards);
         var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards);
         var rank = _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(owner, cards);
-        var legal = Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, target, CardKind.Slash, suit, color, rank, ids) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner.Seat, target.Seat, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.Slash, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, target.Seat, suit)).Select(target => target.Seat).ToArray());
+        var legal = Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, target, CardKind.Slash, suit, color, rank, ids)).Select(target => target.Seat).ToArray());
         var ordinary = Math.Max(1, CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateCardTargetCount(owner, CardKind.Slash)));
         return (legal, ordinary, _coreProgramTargetRulesOperations.TargetRules.ExtraSlashTargetClaims(new(owner.Seat, CardKind.Slash, suit ?? Suit.None, legal, color)));
     }

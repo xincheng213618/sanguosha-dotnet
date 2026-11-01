@@ -130,7 +130,7 @@ internal sealed partial class CoreGameEngineShanheS5XuncanRuntime
     {
         owner,
         target
-    }.Where(actor => _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[actor == owner ? target : owner], CardKind.ColdSlash, physicalSuit: Suit.None, physicalCardIds: []) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[actor == owner ? target : owner], CardKind.ColdSlash, Suit.None)).ToArray();
+    }.Where(actor => _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[actor == owner ? target : owner], CardKind.ColdSlash, physicalSuit: Suit.None, physicalCardIds: [])).ToArray();
     internal void PublishShanheS5YunshenChoice(ProgramSkillFrame f, int[] actors)
     {
         var r = f.ShanheS5Yunshen!;

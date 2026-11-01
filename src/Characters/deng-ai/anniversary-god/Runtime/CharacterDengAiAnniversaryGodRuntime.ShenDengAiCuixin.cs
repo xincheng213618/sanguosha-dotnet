@@ -25,7 +25,7 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
         {
             if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             {
-                if (_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: [], countsTowardLimit: false) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, target, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None))
+                if (_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: [], countsTowardLimit: false))
                     result.Add(new("slash:" + target, kind, LegalActionKind.Slash, [target], "摧心：视为对“" + _coreMatchParticipantsPlayersAccess._players[target].Name + "”使用【" + CardCatalog.Get(kind).DisplayName + "】"));
             }
             else if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))

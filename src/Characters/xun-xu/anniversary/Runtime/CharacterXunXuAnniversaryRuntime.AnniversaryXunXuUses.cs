@@ -71,7 +71,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
         var suit = _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(owner, s);
         var color = _coreGuanHaiBridgesOperations.ProgramMultiCardColor(owner, s);
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
-            return _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, p, kind, physicalSuit: suit, effectiveColor: color, physicalCardIds: ids, conversionSource: s.Source) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner.Seat, p.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, p.Seat, suit)).Select(p => new GameEngine.XunXuUsePlan(LegalActionKind.Slash, [p.Seat])).ToArray();
+            return _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, p, kind, physicalSuit: suit, effectiveColor: color, physicalCardIds: ids, conversionSource: s.Source)).Select(p => new GameEngine.XunXuUsePlan(LegalActionKind.Slash, [p.Seat])).ToArray();
         if (kind == CardKind.Peach)
             return _coreTreatedWoundedOperations.IsRuleWounded(owner) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit) ? [new(LegalActionKind.Peach, [owner.Seat])] : [];
         if (kind == CardKind.Alcohol)

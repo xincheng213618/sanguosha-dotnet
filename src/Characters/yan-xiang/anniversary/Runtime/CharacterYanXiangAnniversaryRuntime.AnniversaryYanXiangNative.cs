@@ -24,7 +24,7 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
                 {
                     if (YanXiangColorBanned(actor.Seat, YanXiangUseColor(actor.Seat, kind, [card.Id], [r.Source])))
                         continue;
-                    var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, suit, color, card.Rank, [card.Id], conversionSource: r.Source) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor.Seat, t.Seat, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(t, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, t.Seat, suit)).ToArray();
+                    var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, suit, color, card.Rank, [card.Id], conversionSource: r.Source)).ToArray();
                     foreach (var target in targets)
                         actions.Add(new(LegalActionKind.Slash, card.Id, target.Seat, "邃识", kind, TargetSeats: [target.Seat]));
                     _coreNativeMultiTargetActionsOperations.AddFangtianHalberdSlashActions(actions, actor, card, targets, "邃识", kind, r.Source);

@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLuShiOlRuntime
 {
-    internal int[] OlLuShiLeijieSlashTargets(ProgramSkillFrame f) => _coreTableOrderOperations.CurrentTableOrder().Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], p, CardKind.ThunderSlash, physicalSuit: Suit.None, effectiveRank: 0, ignoreDistance: true, countsTowardLimit: false) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(f.OwnerSeat, p.Seat, CardKind.ThunderSlash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(p, CardKind.ThunderSlash, Suit.None, null)).Select(p => p.Seat).ToArray();
+    internal int[] OlLuShiLeijieSlashTargets(ProgramSkillFrame f) => _coreTableOrderOperations.CurrentTableOrder().Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], p, CardKind.ThunderSlash, physicalSuit: Suit.None, effectiveRank: 0, ignoreDistance: true, countsTowardLimit: false)).Select(p => p.Seat).ToArray();
     internal bool CanOlLuShiLeijieSlash(ProgramSkillFrame f, int targetSeat) => OlLuShiLeijieSlashTargets(f).Contains(targetSeat);
     internal void IssueOlLuShiLeijieSlash(ProgramSkillFrame f)
     {

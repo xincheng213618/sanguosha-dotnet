@@ -6,7 +6,7 @@ internal sealed partial class CharacterSunJianMouOlRuntime
     internal bool CanMouSunJianOlCounter(ProgramSkillFrame f)
     {
         var e = f.MouSunJianOlHulie!.Entry;
-        return _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[e.ActorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[e.TargetSeat].IsAlive && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[e.TargetSeat], _coreMatchParticipantsPlayersAccess._players[e.ActorSeat], CardKind.Slash, Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: []) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(e.TargetSeat, e.ActorSeat, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[e.ActorSeat], CardKind.Slash, Suit.None, null);
+        return _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[e.ActorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[e.TargetSeat].IsAlive && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[e.TargetSeat], _coreMatchParticipantsPlayersAccess._players[e.ActorSeat], CardKind.Slash, Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: []);
     }
 
     internal void IssueMouSunJianOlCounter(ProgramSkillFrame f)
