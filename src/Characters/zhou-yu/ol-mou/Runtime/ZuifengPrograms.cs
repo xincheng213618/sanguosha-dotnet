@@ -89,7 +89,7 @@ internal static class MouZuifengComposition
         if (p.Id != "mou-ol:zuifeng" && !p.Activations.Any(a => a.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouZhouYuZuifeng)) &&
             !p.Triggers.Any(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveMouZhouYuZuifeng))) return;
         if (p.Id != "mou-ol:zuifeng" || p.Triggers.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 ||
-            p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.HpSkillGrants.Count != 0 || p.Contributions.Count != 0 ||
+            p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.SkillGrants.Count != 0 || p.Contributions.Count != 0 ||
             p.Activations is not [var a] || a.Id != "unique-suit-view-and-wine" || a.MinCards != 0 || a.MaxCards != 0 || a.MinTargets != 0 || a.MaxTargets != 0 ||
             a.TargetKind != SkillProgramTargetKind.AnyLiving || !a.SourceZones.SequenceEqual([CardZoneKind.Hand]) || a.UsesPerTurn is not null || a.UsesPerPhase is not null ||
             a.UsesPerGame is not null || a.UsageGroup != a.Id || a.MarkerCost is not null || a.CategoryTargetLedgerId is not null || a.TargetPhaseLedgerId is not null ||

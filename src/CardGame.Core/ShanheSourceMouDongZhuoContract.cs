@@ -24,7 +24,7 @@ internal static class ShanheSourceMouContract
         if (!p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => Handles(e.Op))) return;
         bool One(IReadOnlyList<SkillProgramEffect> e, SkillProgramEffectOp op) => e is
             [{ Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always } first] && first.Op == op;
-        var valid = p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.DamageModifiers.Count == 0 && p.ViewAs.Count == 0 && p.BooleanStates.Count == 0 && p.HpSkillGrants.Count == 0;
+        var valid = p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.DamageModifiers.Count == 0 && p.ViewAs.Count == 0 && p.BooleanStates.Count == 0 && p.SkillGrants.Count == 0;
         valid &= p.Id switch
         {
             "shanhe:source-xiongni-14206" => p.Activations.Count == 0 && p.Triggers is

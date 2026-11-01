@@ -63,7 +63,7 @@ internal static class JuewuComposition
         if (program.Id != "wumiao:juewu" || program.ViewAs.Count != Outputs.Count ||
             !program.ViewAs.Select(rule => rule.OutputKind).ToHashSet().SetEquals(Outputs) ||
             program.Activations.Count != 0 || program.Triggers.Count != 0 || program.Modifiers.Count != 0 ||
-            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
             program.DamageModifiers.Count != 0 || program.BooleanStates.Count != 0 || program.Contributions.Count != 0 ||
             program.ViewAs.Any(rule => !Exact(rule)))
             throw new InvalidOperationException(path + ": Juewu requires its complete one-entity rank-two damage-card use family and independent actual-turn name allowances.");

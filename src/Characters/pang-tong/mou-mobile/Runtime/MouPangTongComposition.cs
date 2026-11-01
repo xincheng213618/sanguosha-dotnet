@@ -8,7 +8,7 @@ internal static class MouPangTongComposition
     internal static void ValidateProgram(string path, SkillProgram p)
     {
         if (p.Id is not (Lianhuan or Niepan) && !p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => Handles(e.Op))) return;
-        var common = p.Activations.Count == 0 && p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.CardIdentities.Count == 0 && p.HpSkillGrants.Count == 0 && p.DamageModifiers.Count == 0;
+        var common = p.Activations.Count == 0 && p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.CardIdentities.Count == 0 && p.SkillGrants.Count == 0 && p.DamageModifiers.Count == 0;
         var valid = p.Id switch
         {
             Lianhuan => p.ViewAs is [var v] && v.Id == "club-hand-chain" && v.SourceZones.SequenceEqual([CardZoneKind.Hand]) && v.InputSuits.SequenceEqual([Suit.Club]) && v.OutputKind == CardKind.IronChain && v.ForPlay && !v.ForResponse && v.UsesPerPhase is null &&

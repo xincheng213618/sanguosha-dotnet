@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62, "skills": [
+  "schemaVersion": 63, "skills": [
     { "id": "boundary:dangxian-mobile", "revision": 1, "triggers": [
       { "id": "discard-slash-extra-play", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false,
         "effects": [

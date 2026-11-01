@@ -708,22 +708,15 @@ public sealed partial class ContentRegistry
                             target.Op == SkillProgramEffectOp.ExchangeRespondedCardEntities && target.StateId == effect.StateId) != true)
                         throw new InvalidOperationException($"Skill '{skill.Id}' requires the upgraded skill's matching response-exchange state.");
                 }
-                foreach (var suitGrant in skill.Program!.EquipmentSuitSkillGrants)
+                foreach (var grant in skill.Program!.SkillGrants)
                 {
-                    if (!_skills.TryGetValue(suitGrant.SkillId, out var leaf) ||
-                        leaf.Program is not { } target || target.SkillStates.Count != 0 || target.EquipmentSuitSkillGrants.Count != 0 ||
-                        target.HpSkillGrants.Count != 0 || target.LordSkillProjection ||
-                        target.CardPolicies.Any(policy => policy.Kind == SkillProgramCardPolicyKind.RewriteSuit) ||
-                        target.Triggers.Any(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.InitializePrivateGeneralLibrary)))
-                        throw new InvalidOperationException($"Skill '{skill.Id}' must grant a known leaf without another projection or suppression capability.");
-                }
-                foreach (var hpGrant in skill.Program!.HpSkillGrants)
-                {
-                    if (!_skills.TryGetValue(hpGrant.SkillId, out var derived) ||
-                        derived.Program?.HpSkillGrants.Count > 0 || derived.Program?.EquipmentSuitSkillGrants.Count > 0 || derived.Program?.SkillStates.Count > 0 ||
+                    if (!_skills.TryGetValue(grant.SkillId, out var derived) ||
+                        derived.Program?.SkillGrants.Count > 0 || derived.Program?.SkillStates.Count > 0 ||
                         derived.Program?.LordSkillProjection == true ||
                         derived.Program?.Triggers.Any(trigger => trigger.Effects.Any(effect =>
-                            effect.Op == SkillProgramEffectOp.InitializePrivateGeneralLibrary)) == true)
+                            effect.Op == SkillProgramEffectOp.InitializePrivateGeneralLibrary)) == true ||
+                        grant.While.Reads("equipmentSuitCount") && (derived.Program is null ||
+                            derived.Program.CardPolicies.Any(policy => policy.Kind == SkillProgramCardPolicyKind.RewriteSuit)))
                         throw new InvalidOperationException($"Skill '{skill.Id}' must grant a known leaf skill without another projection or suppression capability.");
                 }
                 foreach (var phaseGrant in skill.Program!.Triggers.SelectMany(trigger => trigger.Effects)
@@ -733,7 +726,7 @@ public sealed partial class ContentRegistry
                         derived.Program is not { CardPolicies: [{ Kind: SkillProgramCardPolicyKind.StopUsingAfterTrickOrHpCount }] } leaf ||
                         leaf.Activations.Count != 0 || leaf.Triggers.Count != 0 || leaf.ViewAs.Count != 0 ||
                         leaf.Modifiers.Count != 0 || leaf.Contributions.Count != 0 || leaf.CardIdentities.Count != 0 ||
-                        leaf.BooleanStates.Count != 0 || leaf.DamageModifiers.Count != 0 || leaf.HpSkillGrants.Count != 0 || leaf.EquipmentSuitSkillGrants.Count != 0 ||
+                        leaf.BooleanStates.Count != 0 || leaf.DamageModifiers.Count != 0 || leaf.SkillGrants.Count != 0 ||
                         leaf.LordSkillProjection || leaf.CannotChallengeDeclarations)
                         throw new InvalidOperationException($"Skill '{skill.Id}' requires a known leaf with exactly its phase use restriction policy.");
                 }

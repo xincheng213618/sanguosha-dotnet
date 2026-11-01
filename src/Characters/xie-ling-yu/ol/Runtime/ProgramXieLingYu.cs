@@ -57,7 +57,7 @@ internal static class XieLingYuComposition
     internal static void ValidateProgram(string path, SkillProgram p)
     {
         if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => Handles(e.Op))) return;
-        if (p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.HpSkillGrants.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0)
+        if (p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.SkillGrants.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0)
             throw new InvalidOperationException(path + ": Xie Ling Yu requires the exact printed-entity ledger and native draw cycle.");
         if (p.Id == "ol:yuandi")
         {

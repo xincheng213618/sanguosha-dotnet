@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "mobile-god:qixing", "revision": 1, "triggers": [
       { "id": "initialize", "window": "gameStarting", "subject": "owner", "optional": false, "priority": 100,

@@ -48,7 +48,7 @@ internal static class RuanYuComposition
     internal static void ValidateProgram(string path,SkillProgram p)
     {
         if(!p.Triggers.Any(t=>t.Effects.Any(e=>Handles(e.Op)))&&!p.Activations.Any(a=>a.Effects.Any(e=>Handles(e.Op))))return;
-        if(p.Id is not("ol:xingzuo"or"ol:miaoxian")||p.Activations.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.HpSkillGrants.Count!=0||p.BooleanStates.Count!=0||p.Contributions.Count!=0||p.DamageModifiers.Count!=0||p.EquipmentSuitSkillGrants.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations)throw new InvalidOperationException(path+": Ruan Yu requires independent exact bottom-exchange and true-use contracts.");
+        if(p.Id is not("ol:xingzuo"or"ol:miaoxian")||p.Activations.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.SkillGrants.Count!=0||p.BooleanStates.Count!=0||p.Contributions.Count!=0||p.DamageModifiers.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations)throw new InvalidOperationException(path+": Ruan Yu requires independent exact bottom-exchange and true-use contracts.");
         var red=p.Id=="ol:miaoxian";
         if(p.Triggers.Count!=(red?1:2)||!red&&p.ViewAs.Count!=0)throw new InvalidOperationException(path+": Unexpected Ruan Yu bindings.");
         foreach(var t in p.Triggers)

@@ -9,7 +9,7 @@ internal static class BoundaryZhuRanComposition
     internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op == SkillProgramEffectOp.PrepareBoundaryZhuRanDanshou)) return;
-        if (p.Id != Skill || p.Activations.Count != 0 || p.Triggers.Count != 2 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
+        if (p.Id != Skill || p.Activations.Count != 0 || p.Triggers.Count != 2 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
             p.Triggers.SingleOrDefault(t => t.Id == Draw) is not { Window: SkillProgramTriggerWindow.TurnEnding, Subject: SkillProgramTriggerSubject.Owner, TurnOwnerScope: SkillProgramTurnOwnerScope.OtherLiving, Optional: false,
                 Effects: [{ Op: SkillProgramEffectOp.PrepareBoundaryZhuRanDanshou, Target: SkillProgramEffectTarget.Owner }, { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner, Amount: 1 }] } ||
             p.Triggers.SingleOrDefault(t => t.Id == Pay) is not { Window: SkillProgramTriggerWindow.TurnEnding, Subject: SkillProgramTriggerSubject.Owner, TurnOwnerScope: SkillProgramTurnOwnerScope.OtherLiving, Optional: true,

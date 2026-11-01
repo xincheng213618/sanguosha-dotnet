@@ -76,7 +76,7 @@ internal static class ShiZhouYuComposition
         if (program.Id == ChiyunSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers.Count != 1 ||
                 program.Triggers[0] is not { Id: ChiyunTrigger, Window: SkillProgramTriggerWindow.CardsGained,
@@ -92,7 +92,7 @@ internal static class ShiZhouYuComposition
         if (program.Id == YanhuiSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers.Count != 2 ||
                 program.Triggers[0] is not { Id: YanhuiTargetTrigger, Window: SkillProgramTriggerWindow.CardUseTargetsFinalized,
@@ -107,7 +107,7 @@ internal static class ShiZhouYuComposition
         if (program.Id == FentaoSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers.Count != 2 ||
                 program.Triggers[0] is not { Id: FentaoFireTrigger, Window: SkillProgramTriggerWindow.BeforeDamageApplied,
@@ -122,7 +122,7 @@ internal static class ShiZhouYuComposition
         }
         if (program.Id != XiongziSkill) return;
         if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
             program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
             program.Triggers.Count != 1 ||
             program.Triggers[0] is not { Id: XiongziTrigger, Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow,

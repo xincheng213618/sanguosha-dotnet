@@ -52,7 +52,7 @@ internal static class ShiZhHuiComposition
         if (program.Id == SiziSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 ||
                 program.Activations is not [{ Id: SiziActivation, MinCards: 0, MaxCards: 0, MinTargets: 0, MaxTargets: 0,
                     TargetKind: SkillProgramTargetKind.AnyLiving, UsesPerPhase: 1, UsesPerTurn: null, UsesPerGame: null }] ||
@@ -67,7 +67,7 @@ internal static class ShiZhHuiComposition
         if (program.Id == XiezhiSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers is not [{ Id: XiezhiTrigger, Window: SkillProgramTriggerWindow.AfterHealthChanged,
                     Subject: SkillProgramTriggerSubject.Owner, Optional: false, IsSkillInvocation: false }] ||
@@ -78,7 +78,7 @@ internal static class ShiZhHuiComposition
         if (program.Id == YunanSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers is not [{ Id: YunanTrigger, Window: SkillProgramTriggerWindow.DyingEntering,
                     Subject: SkillProgramTriggerSubject.Any, Optional: false, IsSkillInvocation: false }] ||
@@ -89,7 +89,7 @@ internal static class ShiZhHuiComposition
         if (program.Id != KeChangSkill) return;
         if (!program.LordSkillProjection || program.ViewAs.Count != 0 || program.Modifiers.Count != 0 ||
             program.DamageModifiers.Count != 0 || program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 ||
-            program.HpSkillGrants.Count != 0 || program.Contributions.Count != 0 || program.BooleanStates.Count != 0 ||
+            program.SkillGrants.Count != 0 || program.Contributions.Count != 0 || program.BooleanStates.Count != 0 ||
             program.Activations.Count != 0 || program.Triggers.Count != 0)
             throw new InvalidOperationException(path + ": Kechang is a locked lord passive evaluated by its runtime rules.");
     }

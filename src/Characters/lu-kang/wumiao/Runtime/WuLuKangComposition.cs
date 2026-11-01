@@ -9,7 +9,7 @@ internal static partial class WuLuKangComposition
         e.CardOwnerRef is null && e.ChooserRef is null && e.SourceBind is null && e.ResultBind is null && e.NumberExpression is null && e.Zones.Count == 0 &&
         !e.AllowDecline && !e.AwaitMovementTriggers;
     private static bool WuCommon(SkillProgram p) => p.ViewAs.Count == 0 && p.Modifiers.Count == 0 && p.CardIdentities.Count == 0 && p.Activations.Count == 0 &&
-        p.HpSkillGrants.Count == 0 && p.EquipmentSuitSkillGrants.Count == 0 && p.DamageModifiers.Count == 0 && p.BooleanStates.Count == 0 && p.Contributions.Count == 0 &&
+        p.SkillGrants.Count == 0 && p.DamageModifiers.Count == 0 && p.BooleanStates.Count == 0 && p.Contributions.Count == 0 &&
         !p.LordSkillProjection && !p.CannotChallengeDeclarations;
     private static bool WuUnfiltered(SkillProgramTrigger t) => t.Condition.Kind == SkillProgramTriggerConditionKind.Always && t.OwnerRelation is null &&
         t.UsageScope is null && t.UsageLimit is null && t.DynamicUsageLimit is null && t.NamedUsageGroup is null && t.GainPhaseQualification is null && t.MarkerCost is null &&

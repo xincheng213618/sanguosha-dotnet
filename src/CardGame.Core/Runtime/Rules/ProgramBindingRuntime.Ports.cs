@@ -20,8 +20,6 @@ internal interface IProgramBindingProtocols : IProgramRuntimeOperations
     void ConsumeUsage(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
     void PayMarkerCost(int seat, SkillProgramMarkerCost? cost, string skillId, string bindingId);
     ProgramDyingAlcoholPermission? CaptureDyingAlcoholPermission(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
-    ProgramSkillFrame CaptureHpConditionalSource(ProgramSkillFrame frame);
-    ProgramSkillFrame CaptureEquipmentSuitSource(ProgramSkillFrame frame);
     void AttachAfterTurnEndedChild(ProgramSkillFrame frame, ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
     void RecordPublicPileColorOffer(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
     void LogStarted(int seat, string skillName);

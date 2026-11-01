@@ -45,7 +45,7 @@ internal static class SiruiComposition
         if (p.Id != "le:sirui" || p.ViewAs.Count != Outputs.Count ||
             !p.ViewAs.Select(r => r.OutputKind).ToHashSet().SetEquals(Outputs) ||
             p.Activations.Count != 0 || p.Triggers.Count != 0 || p.Modifiers.Count != 0 ||
-            p.CardIdentities.Count != 0 || p.CardPolicies.Count != 0 || p.HpSkillGrants.Count != 0 ||
+            p.CardIdentities.Count != 0 || p.CardPolicies.Count != 0 || p.SkillGrants.Count != 0 ||
             p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
             p.ViewAs.Any(r => !Exact(r)))
             throw new InvalidOperationException(path + ": Sirui requires its complete equal-name, single HE true-use family and one shared actual Play allowance.");

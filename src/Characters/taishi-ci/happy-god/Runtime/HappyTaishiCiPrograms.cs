@@ -77,7 +77,7 @@ internal static class HappyTaishiCiComposition
             _ => ["start-slash", "physical-slash-choice"]
         };
         if (p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 ||
-            p.BooleanStates.Count != 0 || p.HpSkillGrants.Count != 0 || !p.Triggers.Select(t => t.Id).SequenceEqual(ids) ||
+            p.BooleanStates.Count != 0 || p.SkillGrants.Count != 0 || !p.Triggers.Select(t => t.Id).SequenceEqual(ids) ||
             p.Triggers.Any(t => t.Optional || t.UsageScope is not null || t.UsageLimit is not null || t.MarkerCost is not null || t.Condition.Kind != SkillProgramTriggerConditionKind.Always))
             throw new InvalidOperationException(path + ": Happy Taishi Ci requires every native trigger and its unmodified official edition.");
         foreach (var t in p.Triggers)

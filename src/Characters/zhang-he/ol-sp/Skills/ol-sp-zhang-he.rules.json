@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [{ "id": "ol:zhouxuan", "revision": 1, "triggers": [
     { "id": "discard-private-whirl", "window": "discardPhaseStarting", "subject": "owner", "optional": true,
       "effects": [{ "op": "depositPrivateWhirlUntilNextPlayEnding", "target": "owner" }] },

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [{ "id": "boundary:xuanfeng-mobile", "revision": 1, "triggers": [
     { "id": "equipment-left", "window": "cardsMoved", "subject": "owner", "sourceZones": ["equipment"], "movementOccurrence": "perOwnerBatch", "optional": true,
       "effects": [

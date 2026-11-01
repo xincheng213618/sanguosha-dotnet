@@ -9,7 +9,7 @@ internal static class BoundaryChenQunComposition
     internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op is SkillProgramEffectOp.PrepareBoundaryChenQunDingpin or SkillProgramEffectOp.ResolveBoundaryChenQunDingpin)) return;
-        if (p.Id != Skill || p.Triggers.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
+        if (p.Id != Skill || p.Triggers.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
             p.Activations is not [{ Id: Activation, MinCards: 1, MaxCards: 1, MinTargets: 1, MaxTargets: 1, TargetKind: SkillProgramTargetKind.AnyLiving, UsesPerTurn: null,
                 Effects: [{ Op: SkillProgramEffectOp.PrepareBoundaryChenQunDingpin }, { Op: SkillProgramEffectOp.CaptureSelectedCards, ResultBind: Cost },
                     { Op: SkillProgramEffectOp.MoveBoundCards, SourceBind: Cost, Destination: SkillProgramCardDestination.DiscardPile, AwaitMovementTriggers: true },

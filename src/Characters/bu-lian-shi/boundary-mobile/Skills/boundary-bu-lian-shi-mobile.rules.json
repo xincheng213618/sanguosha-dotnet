@@ -1,4 +1,4 @@
-{"schemaVersion":62,"skills":[
+{"schemaVersion":63,"skills":[
  {"id":"boundary:anxu-mobile","revision":1,"activations":[{"id":"recipient-obtains-donor","minCards":0,"maxCards":0,"minTargets":2,"maxTargets":2,"targetKind":"livingPairDistinct","usesPerTurn":null,"usesPerPhase":1,"effects":[
   {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"selectedFirst"},"cardOwnerRef":{"kind":"selectedSecond"},"zones":["hand","equipment"],"count":1,"destination":"selectedTargetHand","targetRef":{"kind":"selectedFirst"},"resultBind":"anxu-obtained","awaitMovementTriggers":true},
   {"op":"prepareBoundaryBuLianShiAnxu","target":"owner"},

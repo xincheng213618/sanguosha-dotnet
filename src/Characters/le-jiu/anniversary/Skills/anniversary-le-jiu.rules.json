@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [{ "id": "anniversary:cuijin", "revision": 1, "triggers": [
     { "id": "pay-original-use", "window": "cardUseCommitted", "ownerRelation": "observer", "cardKinds": ["slash", "fireSlash", "thunderSlash", "duel"], "optional": true, "effects": [
       { "op": "armAnniversaryLeJiuCuijin", "target": "owner" },

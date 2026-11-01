@@ -76,7 +76,7 @@ internal static class MaWanComposition
         if (uses.Length + offers.Length == 0) return;
         if (p.Id != "ol:hunjiang" || uses.Length != 1 || offers.Length != 1 || p.Activations.Count != 1 || p.Triggers.Count != 1 ||
             p.Modifiers.Count != 0 || p.ViewAs.Count != 0 || p.Contributions.Count != 0 || p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 ||
-            p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+            p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.SkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException($"{path}: Hunjiang requires its unique paired activation and issued Slash trigger without unrelated policy entries.");
         foreach (var a in uses)
             if (a.Effects is not [{ Op: SkillProgramEffectOp.ResolveHunjiangSimultaneousChoices, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }] ||

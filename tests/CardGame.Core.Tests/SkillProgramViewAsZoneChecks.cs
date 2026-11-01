@@ -3,7 +3,7 @@ using CardGame.Core;
 internal static class SkillProgramViewAsZoneChecks
 {
     private const string Rules = """
-        {"schemaVersion":62,"skills":[{"id":"test:owned-red-slash","revision":1,
+        {"schemaVersion":63,"skills":[{"id":"test:owned-red-slash","revision":1,
         "minimumRulesVersion": 171,"viewAs":[{"id":"red-owned","sourceZones":["hand","equipment"],
         "inputKinds":[],"inputSuits":["heart","diamond"],"outputKind":"slash",
         "forPlay":true,"forResponse":true}]}]}

@@ -40,6 +40,7 @@ internal interface IProgramExpressionWorld
     int? BindingStat(string stat, string name) => null;
     int? Number(string name) => null;
     int? CardMarkCount(int seat, string mark, CardZoneKind zone) => null;
+    int? PublicPileCount(int seat, string skillId) => null;
 }
 
 internal static class ProgramExpressions
@@ -48,8 +49,8 @@ internal static class ProgramExpressions
     public const string Iterator = "it";
     public static readonly string[] Participants = ["owner", "selectedTarget", "selectedFirst", "selectedSecond", "eventSource", "eventTarget"];
     public static readonly string[] Sets = ["living", "livingOthers"];
-    private static readonly string[] Stats = ["hp", "maxHp", "lostHp", "handCount", "handLimit", "equipmentCount"];
-    private static readonly string[] Flags = ["alive", "hasHp", "faceDown", "chained", "inIssuedPhase", "inUpcomingTurnPrelude", "isTurnOwner", "inIssuedTurn", "inIssuedDying"];
+    private static readonly string[] Stats = ["hp", "maxHp", "lostHp", "handCount", "handLimit", "equipmentCount", "equipmentSuitCount"];
+    private static readonly string[] Flags = ["alive", "hasHp", "faceDown", "chained", "ruleWounded", "inIssuedPhase", "inUpcomingTurnPrelude", "isTurnOwner", "inIssuedTurn", "inIssuedDying"];
     private static readonly string[] Comparisons = ["<", "<=", ">", ">=", "==", "!="];
 
     public static ProgramExpression Parse(JsonElement node, string path) =>
@@ -109,6 +110,15 @@ internal static class ProgramExpressions
         if (op == "same") { Arity(2, 2); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Flags.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Stats.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Participant)); }
+        if (op == "publicPileCount")
+        {
+            Arity(2, 2);
+            if (args[1].ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(args[1].GetString()) || args[1].GetString()!.Length > 128)
+                Fail(path, "publicPileCount requires a skill identifier");
+            try { _ = new ContentId(args[1].GetString()!); }
+            catch (ArgumentException) { throw Failure(path, "publicPileCount requires a skill identifier"); }
+            return new(op, ProgramExpressionType.Int, [Arg(0, ProgramExpressionType.Participant)], name: args[1].GetString());
+        }
         if (op == "cardMarkCount")
         {
             Arity(3, 3);
@@ -211,6 +221,8 @@ internal static class ProgramExpressions
             case "number": return world.Number(e.Name!);
             case "cardMarkCount": return EvaluateParticipant(e.Args[0], world, it) is { } markedSeat
                 ? world.CardMarkCount(markedSeat, e.Name!, (CardZoneKind)e.Literal) : null;
+            case "publicPileCount": return EvaluateParticipant(e.Args[0], world, it) is { } pileSeat
+                ? world.PublicPileCount(pileSeat, e.Name!) : null;
             case "choiceNumber" or "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank": return world.BindingStat(e.Op, e.Name!);
             case "-":
                 return EvaluateInt(e.Args[0], world, it) is { } left && EvaluateInt(e.Args[1], world, it) is { } right ? left - right : null;

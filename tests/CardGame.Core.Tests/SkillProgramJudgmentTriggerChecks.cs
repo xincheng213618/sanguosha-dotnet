@@ -216,7 +216,7 @@ internal static class SkillProgramJudgmentTriggerChecks
     }
 
     private const string ValidV3 = """
-        {"schemaVersion":62,"skills":[
+        {"schemaVersion":63,"skills":[
           {"id":"judgment-test:reward","revision":1,"triggers":[{
             "id":"after-club-judgment","window":"judgmentFinalized","subject":"owner",
             "suits":["club"],"minimumRank":1,"maximumRank":13,"excludedReasons":["skill.leiji"],

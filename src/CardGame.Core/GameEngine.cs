@@ -120,18 +120,16 @@ public sealed partial class GameEngine
             (owner, grant) => grant.IsModeRule ||
                 this.GuanduGeneralsEntries.GuanduGeneralGrantQualified(owner, grant) &&
                 this.LordSkillProjectionsEntries.IsProjectedGrantQualified(owner, grant) &&
-                this.PrivateGeneralLibrariesEntries.IsGeneralLibraryGrantQualified(owner, grant) &&
-                this.HpConditionalSkillGrantsEntries.Value.IsHpConditionalGrantQualified(owner, grant) &&
-                this.HeQiOlEntries.IsEquipmentSuitGrantQualified(owner, grant) &&
-                this.DaQiaoXiaoQiaoOlEntries.IsDaQiaoXiaoQiaoLuoyanGrantQualified(owner, grant),
+                this.PrivateGeneralLibrariesEntries.IsGeneralLibraryGrantQualified(owner, grant),
             this.CurrentTurnSkillSuppressionsEntries.CaptureCurrentTurnQualificationStamp,
-            derivedProjectionStamp: player => this.DaQiaoXiaoQiaoOlEntries.CaptureDaQiaoXiaoQiaoLuoyanQualificationStamp(player,
-                player.SkillGrants.HasProjectedGrants ? this.PrivateGeneralLibrariesEntries.CaptureCombinedProjectionDependencyStamp() : 0),
+            derivedProjectionStamp: player => player.SkillGrants.HasProjectedGrants ?
+                this.PrivateGeneralLibrariesEntries.CaptureCombinedProjectionDependencyStamp() : 0,
             dualGenerals: _modeDefinition.DualGenerals, participants: _matchParticipants, cards: _cardZones,
             phases: _programCapabilities.Get<IActualDiscardRecoveryPhaseQueries>(), frames: _programCapabilities.Get<IProgramRuntimeFrames>(),
             health: this.HealthQueriesEntries, turnState: _actualTurnProgress,
             healthChildren: _programCapabilities.Get<IProgramHealthChildQueries>(), cardMarks: _programCapabilities.Get<ICardEntityMarkQueries>(),
-            allowedEffectiveSkillIds: this.WushuangEntries.SkillAvailabilityAllowedIds);
+            allowedEffectiveSkillIds: this.WushuangEntries.SkillAvailabilityAllowedIds,
+            wounded: this.ProgramSelectionQueries.Get<ISelectionWoundedQueries>(), piles: this.PublicPileSourcesEntries);
         var deckDefinition = EngineOwners.CoreMatchParticipantSetupRuntime.ResolveDeckDefinition(contentRegistry, options.DeckId ?? _modeDefinition.DeckId);
         _initialHandSize = deckDefinition.InitialHandSize;
         _drawPerTurn = deckDefinition.DrawPerTurn;

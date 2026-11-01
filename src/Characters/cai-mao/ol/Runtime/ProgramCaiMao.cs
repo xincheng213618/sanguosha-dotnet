@@ -39,7 +39,7 @@ internal static class CaiMaoComposition
     {
         bool Handles(SkillProgramEffect e)=>e.Op is SkillProgramEffectOp.ResolveZuolianWholeRevealExchange or SkillProgramEffectOp.ResolveJingzhouBeforeDamageToggles;
         if(!p.Activations.Any(a=>a.Effects.Any(Handles))&&!p.Triggers.Any(t=>t.Effects.Any(Handles)))return;
-        if(p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.Contributions.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.BooleanStates.Count!=0||p.DamageModifiers.Count!=0||p.HpSkillGrants.Count!=0||p.EquipmentSuitSkillGrants.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations)
+        if(p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.Contributions.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.BooleanStates.Count!=0||p.DamageModifiers.Count!=0||p.SkillGrants.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path+": Cai Mao operations require their exact independent bindings.");
         if(p.Id=="ol:zuolian"&&p.Triggers.Count==0&&p.Activations is[var a]&&a.Id=="whole-exchange"&&a.MinCards==0&&a.MaxCards==0&&a.MinTargets==0&&a.MaxTargets==0&&a.UsesPerTurn is null&&a.UsesPerPhase==1&&a.TargetKind==SkillProgramTargetKind.AnyLiving&&
             a.Effects is[{Op:SkillProgramEffectOp.ResolveZuolianWholeRevealExchange,Target:SkillProgramEffectTarget.Owner,Condition.Kind:SkillProgramConditionKind.Always}])return;

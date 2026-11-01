@@ -1,4 +1,4 @@
-{ "schemaVersion": 62, "skills": [{ "id": "boundary:zaiqi-mobile", "revision": 1, "triggers": [
+{ "schemaVersion": 63, "skills": [{ "id": "boundary:zaiqi-mobile", "revision": 1, "triggers": [
   { "id": "red-discard-phase-end", "window": "discardPhaseEnded", "subject": "owner", "turnOwnerScope": "own", "allowOwnDiscardPhaseEnded": true,
     "optional": false, "effects": [{ "op": "offerRedDiscardRecoveryChoice", "target": "owner" }] }
 ] }] }

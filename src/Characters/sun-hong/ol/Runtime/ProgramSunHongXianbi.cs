@@ -92,8 +92,8 @@ internal static class SunHongComposition
                 Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }] ||
             program.Triggers.Count != 0 || program.Modifiers.Count != 0 || program.ViewAs.Count != 0 ||
             program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.BooleanStates.Count != 0 ||
-            program.HpSkillGrants.Count != 0 || program.DamageModifiers.Count != 0 || program.Contributions.Count != 0 ||
-            program.EquipmentSuitSkillGrants.Count != 0 || program.LordSkillProjection || program.CannotChallengeDeclarations)
+            program.SkillGrants.Count != 0 || program.DamageModifiers.Count != 0 || program.Contributions.Count != 0 ||
+            program.LordSkillProjection || program.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Xianbi requires its complete once-per-Play native adjustment and exact random Discard return.");
     }
 }

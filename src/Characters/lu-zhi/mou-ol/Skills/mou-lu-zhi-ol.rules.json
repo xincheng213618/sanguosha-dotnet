@@ -1,4 +1,4 @@
-{"schemaVersion":62,"skills":[
+{"schemaVersion":63,"skills":[
  {"id":"mou-ol:sibing","revision":1,"triggers":[
   {"id":"red-press","window":"cardUseTargetsFinalized","ownerRelation":"actor","optional":false,"effects":[{"op":"resolveMouLuZhiSibingPress","target":"owner"}]},
   {"id":"undamaged-retaliation","window":"cardUseCompleted","ownerRelation":"target","singleActionInstance":true,"optional":false,"effects":[{"op":"resolveMouLuZhiSibingRetaliation","target":"owner"}]}

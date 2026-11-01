@@ -346,7 +346,7 @@ internal static class SkillProgramJudgmentReplacementChecks
     private const string DiscardTriggerId = "b-discard";
 
     private const string ValidV4 = """
-        {"schemaVersion":62,"skills":[
+        {"schemaVersion":63,"skills":[
           {"id":"judgment-replace-test:both","revision":1,"triggers":[
             {"id":"a-exchange","window":"judgmentReplacing","subject":"any",
              "excludedReasons":["skill.leiji"],"optional":true,"effects":[

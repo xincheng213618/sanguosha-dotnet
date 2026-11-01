@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "boundary:zhenlie-current", "revision": 1, "minimumRulesVersion": 195,
       "triggers": [{ "id": "paid-own-target", "window": "otherActualUseTargeted", "subject": "owner", "optional": true,

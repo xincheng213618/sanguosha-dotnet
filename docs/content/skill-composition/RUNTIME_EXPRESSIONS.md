@@ -30,6 +30,7 @@
 | 运算 | `["+", i, ...]`、`["min", i, ...]`、`["max", i, ...]`（2–8 项）、`["-", i, i]`、`["floorDiv", i, i]`；`["when", b, i]` 在 b 为真时取 i，否则未知 |
 | 绑定读取 | 整数：`["number", "name"]`、`["boundCount", "cards"]`、`["boundSuitCount", "cards"]`、`["boundDistinctSuitCount", "cards"]`、`["boundRank", "singleCard"]`；布尔：`["boundIsEquipment", "singleCard"]` |
 | 物理牌标记 | `["cardMarkCount", p, "mark-id", "hand"]`，牌区也可为 `"equipment"`；按当前牌区读取永久实体标记 |
+| 条件授予事实 | `["ruleWounded", p]` 读规则受伤；`["equipmentSuitCount", p]` 读独立来源改写后的装备花色数；`["publicPileCount", p, "skill:id"]` 读本人该技能全部来源的公共堆实体数 |
 | 量词 | `["all", set, b]`、`["any", set, b]` 返回布尔；`["count", set, b]` 返回整数；`b` 内用 `"it"` 表示当前成员 |
 
 加载时检查运算符、参数个数、类型、字面量范围、嵌套深度（8 层）以及 `"it"` 只能出现在量词谓词中。表达式随规则 JSON 规范化后进入技能玩法指纹，空白不影响指纹；新增该可选节点不改变规则格式版本。
@@ -46,6 +47,10 @@
 ## 适用范围
 
 布尔表达式可用于效果步骤的 `condition`（包括 `all`/`any`/`not` 组合内）。`skillStates` 的 `when` / `while` 与 `skillState.match.filter` 使用同一求值器，加载器分别限制为该上下文能够提供的只读事实；它们不借用运行中的程序帧。其他入口是否接受表达式仍由各自加载边界决定。整数表达式还可以用于下述数量字段。
+
+`skillGrants[].while` 也使用同一表达式，参与者限 owner、量词 it 及 living/livingOthers，不允许帧绑定、选项、事件参与者或签发窗口事实。条件成立且精确父来源有效时，唯一物化器授予叶技能；条件退出只移除该派生来源，再次成立保留原实例。`ruleWounded` 复用现有规则受伤权威，不能用 Hp<MaxHp 替代；`equipmentSuitCount` 在当前求值已合格的独立改写来源上计算，不回最终技能绑定查询。两者可能依赖技能来源，受体持续限制的 raw while 不接受它们，避免自递归；效果及条件授予可用。公共堆数是 raw 事实，已知空堆返回 0，缺少参与者或读取能力则未知，不按同名技能猜同一实例。
+
+完整来源、调用续接策略和迁移范围见[条件授予的统一实现](CAPABILITY_MAP.md#条件授予的统一实现)。
 
 ## 永久物理牌标记
 

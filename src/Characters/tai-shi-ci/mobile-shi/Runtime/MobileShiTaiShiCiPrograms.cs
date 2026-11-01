@@ -60,7 +60,7 @@ internal static class ShiTaiShiCiComposition
         if (program.Id == HanzhanSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Triggers.Count != 0 ||
                 program.Activations is not [{ Id: HanzhanActivation, MinCards: 0, MaxCards: 0, MinTargets: 2, MaxTargets: 2,
                     TargetKind: SkillProgramTargetKind.AnyLiving, UsesPerPhase: 1, UsesPerTurn: null, UsesPerGame: null }] ||
@@ -75,7 +75,7 @@ internal static class ShiTaiShiCiComposition
         if (program.Id == ZhanlieSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers.Count != 3 ||
                 program.Triggers[0] is not { Id: ZhanlieRangeTrigger, Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow,
@@ -91,7 +91,7 @@ internal static class ShiTaiShiCiComposition
         }
         if (program.Id != ZhenfengSkill) return;
         if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
             program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Triggers.Count != 0 ||
             program.Activations is not [{ Id: ZhenfengActivation, MinCards: 0, MaxCards: 0, MinTargets: 0, MaxTargets: 0,
                 TargetKind: SkillProgramTargetKind.AnyLiving, UsesPerTurn: null, UsesPerGame: 1 }] ||

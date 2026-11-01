@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62, "skills": [{ "id": "mobile:zhuikong", "revision": 1,
+  "schemaVersion": 63, "skills": [{ "id": "mobile:zhuikong", "revision": 1,
     "triggers": [{ "id": "wounded-foreign-actual-turn", "window": "otherActualTurnStarted", "subject": "owner", "optional": true,
       "effects": [
         { "op": "selectTarget", "target": "owner", "targetKind": "eventSource" },

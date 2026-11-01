@@ -36,8 +36,8 @@ internal static class CaoXiComposition
     {
         if (!p.Activations.Any(a => a.Effects.Any(e => Own(e.Op))) && !p.Triggers.Any(t => t.Effects.Any(e => Own(e.Op)))) return;
         if (p.Activations.Count != 0 || p.Triggers.Count != 1 || p.Modifiers.Count != 0 || p.ViewAs.Count != 0 || p.Contributions.Count != 0 ||
-            p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.HpSkillGrants.Count != 0 ||
-            p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+            p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.SkillGrants.Count != 0 ||
+            p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Cao Xi requires one standalone original-source trigger without unrelated policy entries.");
         var t = p.Triggers[0]; var gangshu = p.Id == "ol:gangshu";
         if (!gangshu && p.Id != "ol:jianxuan" || t.Effects is not [{ Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }] ||

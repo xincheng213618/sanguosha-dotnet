@@ -72,7 +72,7 @@ internal static class DrawPolicyProgramChecks
 
     private const string ActiveRules = """
         {
-          "schemaVersion": 62,
+          "schemaVersion": 63,
           "skills": [{
             "id": "fixture:active-op",
             "revision": 1,

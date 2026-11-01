@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "ol:zhenlue", "revision": 1, "cardPolicies": [
       { "id": "own-ordinary-trick-cannot-nullify", "kind": "cannotNullifyOwnOrdinaryTrick", "cardKinds": ["drawTwo", "duel", "barbarianAssault", "arrowBarrage", "peachGarden", "fiveGrains", "dismantlement", "snatch", "fireAttack", "ironChain", "borrowedSword"] },

@@ -66,6 +66,6 @@ internal static class GuoTuWeijieComposition
     internal static void ValidateProgram(string path,SkillProgram p)
     {
         if(!p.Activations.Any(a=>a.Effects.Any(e=>e.Op==SkillProgramEffectOp.ResolveWeijieRequiredBasicRequest))&&!p.Triggers.Any(t=>t.Effects.Any(e=>e.Op==SkillProgramEffectOp.ResolveWeijieRequiredBasicRequest)))return;
-        if(p.Id!="ol:weijie"||p.Triggers.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.HpSkillGrants.Count!=0||p.Activations is not[var a]||a.Id!="native-basic-request"||a.MinCards!=0||a.MaxCards!=0||a.MinTargets!=0||a.MaxTargets!=0||a.UsesPerTurn is not null||a.Effects is not[{Op:SkillProgramEffectOp.ResolveWeijieRequiredBasicRequest,Target:SkillProgramEffectTarget.Owner}e]||e.Condition.Kind!=SkillProgramConditionKind.Always)throw new InvalidOperationException(path+": Weijie requires its complete native-only zero-selection request activation.");
+        if(p.Id!="ol:weijie"||p.Triggers.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.SkillGrants.Count!=0||p.Activations is not[var a]||a.Id!="native-basic-request"||a.MinCards!=0||a.MaxCards!=0||a.MinTargets!=0||a.MaxTargets!=0||a.UsesPerTurn is not null||a.Effects is not[{Op:SkillProgramEffectOp.ResolveWeijieRequiredBasicRequest,Target:SkillProgramEffectTarget.Owner}e]||e.Condition.Kind!=SkillProgramConditionKind.Always)throw new InvalidOperationException(path+": Weijie requires its complete native-only zero-selection request activation.");
     }
 }

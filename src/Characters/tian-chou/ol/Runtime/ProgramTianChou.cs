@@ -70,7 +70,7 @@ internal static class TianChouComposition
             a.MarkerCost is not null || a.CardCountExpression is not null || a.CardKinds.Count != 0 || a.CardSuits.Count != 0 || a.CardCategories.Count != 0 || a.EquipmentSlots.Count != 0 ||
             a.SelectedCardsSameSuit || a.SelectedCardsDistinctSuits || a.TargetRequiresEmptyEquipmentSlot || a.CategoryTargetLedgerId is not null || a.TargetPhaseLedgerId is not null || !a.SourceZones.SequenceEqual(new[] { CardZoneKind.Hand }) ||
             p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0 || p.CardPolicies.Count != 0 || p.DamageModifiers.Count != 0 ||
-            p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+            p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Shandao requires its complete once-per-real-Play owned top movement and two native global tricks.");
     }
 }

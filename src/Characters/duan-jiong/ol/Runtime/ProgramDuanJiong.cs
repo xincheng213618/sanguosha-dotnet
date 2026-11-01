@@ -78,7 +78,7 @@ internal static class DuanJiongComposition
             t.SingleActionInstance || t.DeferredTurnEndOnly || t.NoDyingAtActivation || t.OnlyDesignatedCardTargets || t.AllowOwnDiscardPhaseEnded || t.EvaluateConditionAtResolution ||
             p.BooleanStates is not [{ Id: "yin", InitialValue: false, Visibility: SkillProgramStateVisibility.Public, ResetScope: SkillProgramStateResetScope.Game, ReacquirePolicy: SkillProgramStateReacquirePolicy.PreserveUntilGameEnd }] ||
             p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.Contributions.Count != 0 || p.CardPolicies.Count != 0 || p.DamageModifiers.Count != 0 || p.CardIdentities.Count != 0 ||
-            p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+            p.SkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Saogu requires its complete alternating own-Play sweep and optional Ending delegation, with exact native discarded entities.");
     }
 }

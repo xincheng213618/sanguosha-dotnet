@@ -109,7 +109,7 @@ internal static class CardUseLifecycleChecks
                  "priority":100,"optional":false,"effects":[{"op":"loseHp","target":"owner","amount":1}]},
                 """ : "";
             var rules = $$$$"""
-                {"schemaVersion":62,"skills":[{"id":"{{{{SkillId}}}}","revision":1,"minimumRulesVersion":175,
+                {"schemaVersion":63,"skills":[{"id":"{{{{SkillId}}}}","revision":1,"minimumRulesVersion":175,
                  "modifiers":[{"id":"extra-target","query":"cardTargetCount","operation":"add","value":1,"priority":0,"cardKinds":["slash"]}],
                  "triggers":[
                   {{{{nestedTrigger}}}}

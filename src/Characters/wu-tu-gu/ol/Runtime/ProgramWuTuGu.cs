@@ -20,7 +20,7 @@ internal static class WuTuGuComposition
     {
         bool Own(SkillProgramEffect e)=>e.Op is SkillProgramEffectOp.ArmHanyongNativeGroupDamage or SkillProgramEffectOp.AccumulateRanshangFirePoint or SkillProgramEffectOp.ResolveRanshangEndingHpLoss;
         if(!p.Triggers.Any(t=>t.Effects.Any(Own))&&!p.Activations.Any(a=>a.Effects.Any(Own)))return;
-        if(p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.Contributions.Count!=0||p.BooleanStates.Count!=0||p.HpSkillGrants.Count!=0||p.EquipmentSuitSkillGrants.Count!=0||p.DamageModifiers.Count!=0||p.LordSkillProjection)
+        if(p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.Contributions.Count!=0||p.BooleanStates.Count!=0||p.SkillGrants.Count!=0||p.DamageModifiers.Count!=0||p.LordSkillProjection)
             throw new InvalidOperationException(path+": Wu Tu Gu requires independent native-use/fire/ending bindings.");
         if(p.Id=="ol:hanyong"&&p.Triggers is[var h]&&h.Id=="native-group-use"&&h.Window==SkillProgramTriggerWindow.CardUseCommitted&&h.OwnerRelation==SkillProgramCardActionOwnerRelation.Actor&&h.Optional&&h.DamageOccurrence is null&&
             h.CardKinds.ToHashSet().SetEquals([CardKind.BarbarianAssault,CardKind.ArrowBarrage])&&h.Condition.Kind==SkillProgramTriggerConditionKind.Always&&h.Effects is[{Op:SkillProgramEffectOp.ArmHanyongNativeGroupDamage,Target:SkillProgramEffectTarget.Owner,Condition.Kind:SkillProgramConditionKind.Always}])return;

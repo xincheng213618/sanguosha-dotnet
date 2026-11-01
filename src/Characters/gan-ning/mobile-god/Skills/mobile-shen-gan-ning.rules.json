@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "mobile-god:poxi", "revision": 1, "activations": [
       { "id": "four-suit-discard", "targetKind": "otherLiving", "usesPerPhase": 1, "usesPerTurn": null,

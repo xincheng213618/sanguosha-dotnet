@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "mobile:yingba", "revision": 1, "activations": [ {
       "id": "subdue", "minCards": 0, "maxCards": 0, "minTargets": 1, "maxTargets": 1, "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": 1,

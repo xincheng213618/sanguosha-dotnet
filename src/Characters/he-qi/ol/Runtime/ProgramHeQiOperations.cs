@@ -1,38 +1,4 @@
-using System.Text.Json;
 namespace CardGame.Core;
-public sealed record EquipmentSuitSkillGrantRule(string Id,string SkillId,int MinimumDistinctSuits);
-public sealed record EquipmentSuitSkillGrantSource(string CapabilityGrantId,string CapabilitySkillId,string CapabilitySkillInstanceId,string RuleId);
-public sealed record EquipmentSuitSkillGrantChangedEvent(int OwnerSeat,string GrantId,string SkillId,string SkillInstanceId,EquipmentSuitSkillGrantSource Source,bool Added,int DistinctSuits):IGameEvent;
-public sealed record EquipmentSuitProgramSourceReceipt(long FrameId,int OwnerSeat,string SkillId,string SkillInstanceId,string GameplayHash,string GrantId,EquipmentSuitSkillGrantSource Source);
-public sealed partial record ProgramSkillFrame
-{
-    [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    public EquipmentSuitProgramSourceReceipt? EquipmentSuitSourceReceipt { get; init; }
-}
-internal static class EquipmentSuitSkillGrantParser
-{
-    internal static IReadOnlyList<EquipmentSuitSkillGrantRule> Parse(JsonElement skill,string path)
-    {
-        if(!skill.TryGetProperty("equipmentSuitSkillGrants",out var array))return [];
-        if(array.ValueKind!=JsonValueKind.Array || array.GetArrayLength() is <1 or >16)throw new InvalidOperationException(path+": equipment suit grants require 1..16 rules.");
-        var rules=new List<EquipmentSuitSkillGrantRule>();
-        foreach(var node in array.EnumerateArray())
-        {
-            if(node.ValueKind!=JsonValueKind.Object || node.EnumerateObject().Any(p=>p.Name is not("id" or "skillId" or "minimumDistinctSuits")))throw new InvalidOperationException(path+": invalid equipment suit grant fields.");
-            string ReadId(string name)
-            {
-                if(!node.TryGetProperty(name,out var value)||value.ValueKind!=JsonValueKind.String||string.IsNullOrWhiteSpace(value.GetString())||value.GetString()!.Length>128)throw new InvalidOperationException(path+": equipment suit grant requires valid "+name+".");
-                return value.GetString()!;
-            }
-            if(node.EnumerateObject().Select(p=>p.Name).Distinct(StringComparer.Ordinal).Count()!=node.EnumerateObject().Count())throw new InvalidOperationException(path+": duplicate equipment suit grant property.");
-            var id=ReadId("id");var skillId=ReadId("skillId");
-            if(!node.TryGetProperty("minimumDistinctSuits",out var bound)||bound.ValueKind!=JsonValueKind.Number||!bound.TryGetInt32(out var minimum))throw new InvalidOperationException(path+": equipment suit grant requires integer minimumDistinctSuits.");
-            if(string.IsNullOrWhiteSpace(id)||string.IsNullOrWhiteSpace(skillId)||minimum is <1 or >4 || rules.Any(r=>r.Id==id||r.SkillId==skillId))throw new InvalidOperationException(path+": invalid or repeated equipment suit grant.");
-            try{_=new ContentId(skillId);}catch(ArgumentException e){throw new InvalidOperationException(path+": invalid equipment suit grant skillId.",e);} rules.Add(new(id,skillId,minimum));
-        }
-        return Array.AsReadOnly(rules.ToArray());
-    }
-}
 public enum HeQiStage { SelectingReveal,DiscardChildren,SelectingObtain,ObtainChildren }
 public sealed record HeQiMaterial(int CardId,CardKind PrintedKind,CardLocation From,int OriginalSlot);
 public sealed record HeQiReceipt(CardConversionSource Source,string GameplayHash,int InstructionIndex,int TurnNumber,int TurnOwnerSeat,int TargetSeat,int Maximum,

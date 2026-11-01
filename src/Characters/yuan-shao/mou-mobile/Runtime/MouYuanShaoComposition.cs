@@ -16,7 +16,7 @@ internal static class MouYuanShaoComposition
                 { Op: SkillProgramEffectOp.Draw, Target: SkillProgramEffectTarget.Owner, Amount: 1 }] ||
             t.Effects.Any(e => e.Condition.Kind != SkillProgramConditionKind.Always) || t.Condition.Kind != SkillProgramTriggerConditionKind.Always ||
             t.SourceZones.Count != 0 || t.DestinationZones.Count != 0 || t.SingleActionInstance || t.IncludeResponseUses ||
-            p.Modifiers.Count != 0 || p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 || p.BooleanStates.Count != 0)
+            p.Modifiers.Count != 0 || p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 || p.BooleanStates.Count != 0)
             throw new InvalidOperationException(path + ": mobile Yuan Shao requires its native one-card reward and actual-gain cap.");
         if (p.Id == Luanji)
         {

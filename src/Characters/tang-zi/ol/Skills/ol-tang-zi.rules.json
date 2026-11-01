@@ -1,15 +1,11 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     {
       "id": "ol:xingzhao",
       "revision": 1,
-      "hpSkillGrants": [
-        {
-          "id": "wounded-xunxun",
-          "skillId": "boundary:xunxun",
-          "minimumLivingWounded": 1
-        }
+      "skillGrants": [
+        {"id": "wounded-xunxun","skillId": "boundary:xunxun","while": [">=",["count","living",["ruleWounded","it"]],1],"onSourceLoss": "finishInvocation"}
       ],
       "triggers": [
         {

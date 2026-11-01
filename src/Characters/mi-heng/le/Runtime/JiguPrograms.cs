@@ -63,7 +63,7 @@ internal static class JiguComposition
         if (!operations.Any(e => e.Op is SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw)) return;
         if (p.Id != "le:jigu" || p.Activations.Count != 0 || p.ViewAs.Count != 0 ||
             p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 ||
-            p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 ||
+            p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 ||
             p.Contributions.Count != 0 || p.Triggers.Count != 2 ||
             p.Triggers.SingleOrDefault(t => t.Id == "damage-equipment-draw") is not { } damage ||
             damage.Window != SkillProgramTriggerWindow.AfterDamageApplied || damage.Subject != SkillProgramTriggerSubject.Any ||

@@ -1,4 +1,4 @@
-{"schemaVersion":62,"skills":[
+{"schemaVersion":63,"skills":[
   {"id":"happy:shenwei","revision":1,"triggers":[
     {"id":"grant-guards","window":"turnStartBeforeNormalFlow","subject":"owner","optional":true,"effects":[{"op":"grantHappyDianWeiShenwei","target":"owner"}]},
     {"id":"guard-damage","window":"beforeDamageApplied","subject":"any","optional":false,"effects":[{"op":"consumeHappyDianWeiShenwei","target":"owner"}]}

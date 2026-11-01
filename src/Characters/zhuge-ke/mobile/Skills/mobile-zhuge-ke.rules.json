@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "mobile:aocai", "revision": 1, "cardPolicies": [
       { "id": "outside-basic-need", "kind": "privateTopBasicRequest", "cardKinds": ["slash", "dodge", "peach", "alcohol"], "value": 2 }

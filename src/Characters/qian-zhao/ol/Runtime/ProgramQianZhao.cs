@@ -34,8 +34,8 @@ internal static class QianZhaoComposition
     {
         var ops = new[] { SkillProgramEffectOp.ResolveWeifuJudgment, SkillProgramEffectOp.OfferWeifuCategoryTargets, SkillProgramEffectOp.ResolveKuansaiTargetChoice };
         if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => ops.Contains(e.Op))) return;
-        if (p.Modifiers.Count != 0 || p.ViewAs.Count != 0 || p.CardPolicies.Count != 0 || p.HpSkillGrants.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 ||
-            p.Contributions.Count != 0 || p.CardIdentities.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+        if (p.Modifiers.Count != 0 || p.ViewAs.Count != 0 || p.CardPolicies.Count != 0 || p.SkillGrants.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 ||
+            p.Contributions.Count != 0 || p.CardIdentities.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Qian Zhao requires only its exact native paid judgment and finalized-target instructions.");
         if (p.Id == "ol:weifu")
         {

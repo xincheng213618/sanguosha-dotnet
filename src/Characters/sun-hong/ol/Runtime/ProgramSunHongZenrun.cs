@@ -68,8 +68,8 @@ internal static class SunHongZenrunComposition
             t.Effects is not [{ Op: SkillProgramEffectOp.ResolveZenrunNativeDrawReplacement, Target: SkillProgramEffectTarget.Owner,
                 Condition.Kind: SkillProgramConditionKind.Always }] || p.Modifiers.Count != 0 || p.ViewAs.Count != 0 ||
             p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 ||
-            p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.Contributions.Count != 0 ||
-            p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+            p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.Contributions.Count != 0 ||
+            p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Zenrun requires the real all-draw preattempt and its own exact phase budget and victim choice.");
     }
 }

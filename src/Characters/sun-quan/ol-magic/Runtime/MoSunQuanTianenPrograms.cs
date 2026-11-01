@@ -83,7 +83,7 @@ internal static class MoSunQuanTianenComposition
             .Any(e => e.Op == SkillProgramEffectOp.ResolveMoSunQuanTianenUniqueUse)) return;
         if (p.Id != "ol:mo-tianen" || p.Activations.Count != 0 || p.Triggers is not [var t] || p.ViewAs.Count != 0 ||
             p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 ||
-            p.HpSkillGrants.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
+            p.SkillGrants.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
             t.Id != "unique-target-branches" || t.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || t.Optional ||
             t.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor || !t.SingleActionInstance ||
             t.CardKinds.Count != 0 || t.CardCategories.Count != 0 ||

@@ -35,7 +35,7 @@ internal static class MobileShiChengPuComposition
         if (program.Id == DuzuoSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.Activations.Count != 0 || program.BooleanStates.Count != 0 ||
                 program.Triggers is not [{ Id: DuzuoGrantTrigger }] ||
                 program.Triggers[0] is not { Window: SkillProgramTriggerWindow.CardsGained, Subject: SkillProgramTriggerSubject.Owner,
@@ -48,7 +48,7 @@ internal static class MobileShiChengPuComposition
         }
         if (program.Id != BihanSkill) return;
         if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
             program.Contributions.Count != 0 || program.Activations.Count != 0 || program.BooleanStates.Count != 0 ||
             program.Triggers is not [{ Id: BihanGuardTrigger }] ||
             program.Triggers[0] is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, Subject: SkillProgramTriggerSubject.Any,

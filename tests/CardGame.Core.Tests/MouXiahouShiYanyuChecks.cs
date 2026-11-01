@@ -169,8 +169,8 @@ internal sealed class MouXiahouShiScene(MouXiahouShiSpec spec, GameEngine game, 
             if (spec.WatchDraw) watches.Add(N("{\"id\":\"draw-child\",\"window\":\"cardsGained\",\"subject\":\"owner\",\"destinationZones\":[\"hand\"],\"movementOccurrence\":\"perBatch\",\"movementReasons\":[\"skill-program.mou-mobile:qiaoshi.Draw\"],\"usageScope\":\"game\",\"usageLimit\":1,\"priority\":1000,\"optional\":false,\"effects\":[" + Pause() + tail + "]}"));
             if (watches.Count > 0) defs.Add(new JsonObject { ["id"] = Watch, ["revision"] = 1, ["triggers"] = watches });
             if (spec.ConditionalMinimum > 0) defs.Add(new JsonObject { ["id"] = Conditional, ["revision"] = 1,
-                ["hpSkillGrants"] = new JsonArray(new[] { Yanyu, Qiaoshi }.Where(id => id == Yanyu && spec.Yanyu || id == Qiaoshi && spec.Qiaoshi)
-                    .Select(id => (JsonNode)new JsonObject { ["id"] = "healthy-" + id, ["skillId"] = id, ["minimumHp"] = spec.ConditionalMinimum }).ToArray()) });
+                ["skillGrants"] = new JsonArray(new[] { Yanyu, Qiaoshi }.Where(id => id == Yanyu && spec.Yanyu || id == Qiaoshi && spec.Qiaoshi)
+                    .Select(id => (JsonNode)new JsonObject { ["id"] = "healthy-" + id, ["skillId"] = id, ["while"] = new JsonArray(">=", new JsonArray("hp", "owner"), spec.ConditionalMinimum), ["onSourceLoss"] = "finishInvocation" }).ToArray()) });
             if (spec.RecoveryReplacement)
             {
                 defs.Add(N("{\"id\":\"fixture:mxhs-redirect\",\"revision\":1,\"cardPolicies\":[{\"id\":\"native-lord-recovery\",\"kind\":\"redirectOwnTurnFactionRecovery\",\"factionId\":\"wu\",\"ownerRole\":\"lord\",\"value\":1,\"providerDrawCount\":1}]}"));

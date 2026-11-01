@@ -11,7 +11,7 @@ internal static class MouZhangHeComposition
                 throw new InvalidOperationException(path+": Qiaobian operations require their complete actual-phase native bindings.");
             return;
         }
-        if(p.Activations.Count!=0||p.Modifiers.Count!=0||p.DamageModifiers.Count!=0||p.CardPolicies.Count!=0||p.BooleanStates.Count!=0||p.HpSkillGrants.Count!=0||p.Contributions.Count!=0||p.CardIdentities.Count!=0)
+        if(p.Activations.Count!=0||p.Modifiers.Count!=0||p.DamageModifiers.Count!=0||p.CardPolicies.Count!=0||p.BooleanStates.Count!=0||p.SkillGrants.Count!=0||p.Contributions.Count!=0||p.CardIdentities.Count!=0)
             throw new InvalidOperationException(path+": Mou Zhang He must retain its complete phase-skip and obtained-entity conversion contract.");
         if(p.Id==MouQiaobianRuntime.Liaoshi)
         {

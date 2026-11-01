@@ -147,7 +147,7 @@ internal static class ProgramOwnedCardsChecks
 
     private const string Move = """{"op":"moveBoundCards","target":"owner","sourceBind":"chosen","destination":"discardPile"}""";
     private static string Rules(int count, bool other = false, bool equipmentOnly = false) =>
-        $$"""{"schemaVersion":62,"skills":[{"id":"{{SkillId}}","revision":1,"activations":[{"id":"select","minCards":0,"maxCards":0,"minTargets":{{(other ? 1 : 0)}},"maxTargets":{{(other ? 1 : 0)}},"targetKind":"otherLiving","usesPerTurn":1,"condition":{"kind":"always"},"effects":[{"op":"selectOwnedCards","target":"{{(other ? "selectedTarget" : "owner")}}","amount":{{count}},"zones":{{(equipmentOnly ? "[\"equipment\"]" : "[\"hand\",\"equipment\"]")}},"resultBind":"chosen"},{{Move}}]}]}]}""";
+        $$"""{"schemaVersion":63,"skills":[{"id":"{{SkillId}}","revision":1,"activations":[{"id":"select","minCards":0,"maxCards":0,"minTargets":{{(other ? 1 : 0)}},"maxTargets":{{(other ? 1 : 0)}},"targetKind":"otherLiving","usesPerTurn":1,"condition":{"kind":"always"},"effects":[{"op":"selectOwnedCards","target":"{{(other ? "selectedTarget" : "owner")}}","amount":{{count}},"zones":{{(equipmentOnly ? "[\"equipment\"]" : "[\"hand\",\"equipment\"]")}},"resultBind":"chosen"},{{Move}}]}]}]}""";
     private static string Presentation => JsonSerializer.Serialize(new
     {
         schemaVersion = 3,

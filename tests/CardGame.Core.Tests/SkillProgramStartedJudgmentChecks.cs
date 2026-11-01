@@ -319,7 +319,7 @@ internal static class SkillProgramStartedJudgmentChecks
     private const string JudgmentReason = "skill.started-judgment-test";
 
     private const string Rules = """
-        {"schemaVersion":62,"skills":[
+        {"schemaVersion":63,"skills":[
           {"id":"started-judgment-test:skill","revision":1,"minimumRulesVersion": 171,"triggers":[
             {"id":"after-dodge","window":"cardResponseAccepted","ownerRelation":"actor","cardKinds":["dodge"],
              "optional":true,"effects":[

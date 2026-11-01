@@ -96,7 +96,7 @@ internal static class ZixiEffectsComposition
         if (p.Id != "le:zixi" || p.Triggers.Count != 3 || effects is not [var t] ||
             !p.Triggers.Any(t => t.Id == "start-place-qin") || !p.Triggers.Any(t => t.Id == "end-place-qin") ||
             p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 ||
-            p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
+            p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
             p.BooleanStates.Count != 0 || p.Contributions.Count != 0 || t.Id != "unique-target-judgment-effects" ||
             t.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || t.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor ||
             !t.Optional || !t.SingleActionInstance || t.Priority != 0 ||

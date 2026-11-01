@@ -37,7 +37,7 @@ internal static class MobileXueZongComposition
     {
         if(p.Id is not(Funan or "mobile:jiexun")) return;
         if(p.Activations.Count!=0 || p.ViewAs.Count!=0 || p.CardPolicies.Count!=0 || p.BooleanStates.Count!=0 || p.Modifiers.Count!=0 ||
-            p.Contributions.Count!=0 || p.CardIdentities.Count!=0 || p.DamageModifiers.Count!=0 || p.HpSkillGrants.Count!=0 || p.EquipmentSuitSkillGrants.Count!=0 || p.LordSkillProjection)
+            p.Contributions.Count!=0 || p.CardIdentities.Count!=0 || p.DamageModifiers.Count!=0 || p.SkillGrants.Count!=0 || p.LordSkillProjection)
             throw new InvalidOperationException(path+": mobile Xue Zong uses only the response entity and escalating discard flows.");
         if(p.Id==Funan)
         {

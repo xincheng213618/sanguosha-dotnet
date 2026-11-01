@@ -228,12 +228,13 @@ internal sealed class MatchSkillBindingIndex
         RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null,
         EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState = null,
         IProgramHealthChildQueries? healthChildren = null, ICardEntityMarkQueries? cardMarks = null,
-        IReadOnlySet<string>? allowedEffectiveSkillIds = null)
+        IReadOnlySet<string>? allowedEffectiveSkillIds = null, ISelectionWoundedQueries? wounded = null,
+        RuntimeEntries.CoreGameEnginePublicPileSourcesEntries? piles = null)
     {
         ArgumentNullException.ThrowIfNull(resolveDefinition);
         _availability = new(resolveDefinition, isNationalWarMode, dualGenerals,
             grantQualification, participants, cards, phases, frames, health, turnState, healthChildren, cardMarks,
-            allowedEffectiveSkillIds);
+            allowedEffectiveSkillIds, wounded, piles);
         _hasHpSensitiveSources = hasHpSensitiveSources;
         _health = health;
         _projectionStamp = projectionStamp;
@@ -257,7 +258,8 @@ internal sealed class MatchSkillBindingIndex
             OwnerRole = player.Role,
             OwnerAlive = player.IsAlive
         };
-        if (!player.SkillGrants.Restrictions.Any(restriction => restriction.While is not null) &&
+        if (!_availability.HasConditionalSources(player) &&
+            !player.SkillGrants.Restrictions.Any(restriction => restriction.While is not null) &&
             _shards.TryGetValue(player.Seat, out var existing) && existing.Shard.Stamp == stamp)
             return existing.Shard;
 

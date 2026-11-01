@@ -35,7 +35,7 @@ internal static class ShiZangHongComposition
         if (program.Id == JueguSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers is not
                 [
@@ -54,7 +54,7 @@ internal static class ShiZangHongComposition
         }
         if (program.Id != LiezhiSkill) return;
         if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
             program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Triggers.Count != 0 ||
             program.Activations is not [{ Id: LiezhiActivation, MinCards: 0, MaxCards: 0, MinTargets: 0, MaxTargets: 0,
                 UsesPerTurn: 1, UsesPerPhase: null,

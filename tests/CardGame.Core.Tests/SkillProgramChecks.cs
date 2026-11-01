@@ -346,7 +346,7 @@ internal static class SkillProgramChecks
     }
 
     private const string DyingRules = """
-        {"schemaVersion":62,"skills":[{"id":"scenario:dying","revision":1,"modifiers":[],"viewAs":[],
+        {"schemaVersion":63,"skills":[{"id":"scenario:dying","revision":1,"modifiers":[],"viewAs":[],
         "activations":[{"id":"invoke","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,
         "targetKind":"anyLiving","usesPerTurn":1,"effects":[{"op":"loseHp","target":"owner","amount":5},
         {"op":"draw","target":"owner","amount":1}]},
@@ -408,7 +408,7 @@ internal static class SkillProgramChecks
 
     private const string RulesA = """
         {
-          "schemaVersion":62,
+          "schemaVersion":63,
           "skills":[{
             "id":"scenario:composed",
             "revision":1,
@@ -457,7 +457,7 @@ internal static class SkillProgramChecks
               "id": "scenario:composed"
             }
           ],
-          "schemaVersion": 62
+          "schemaVersion": 63
         }
         """;
 }

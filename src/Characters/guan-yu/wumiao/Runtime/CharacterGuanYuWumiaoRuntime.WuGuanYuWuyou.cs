@@ -100,8 +100,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             SkillInstanceId = source.Source.SkillInstanceId,
             Wuyou = receipt
         };
-        f = _coreHpConditionalSkillGrantsOperations.Value.CaptureHpConditionalProgramSource(f);
-        f = _characterHeQiOlOperations.CaptureEquipmentSuitProgramSource(f);
+        f = _conditionalSkillGrants.CaptureSource(f);
         _coreRuntimeOperations.PushRuntimeFrame(f);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillStartedEvent(f.Id, f.OwnerSeat, f.SkillId, f.ActivationId));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuyouStartedEvent(f.Id, receipt.Source, receipt.GameplayHash, phase, donor.Seat, card.Id, card.Kind, receipt.Before));

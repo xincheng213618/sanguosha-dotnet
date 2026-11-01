@@ -45,7 +45,7 @@ internal static class AHuiNanComposition
     {
         static bool Has(SkillProgramEffect e)=>e.Op==SkillProgramEffectOp.ResolveJuemanFirstBasicTurnEnd;
         if(!p.Activations.Any(a=>a.Effects.Any(Has))&&!p.Triggers.Any(t=>t.Effects.Any(Has)))return;
-        if(p.Id!="ol:jueman"||p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.Contributions.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.BooleanStates.Count!=0||p.DamageModifiers.Count!=0||p.HpSkillGrants.Count!=0||p.EquipmentSuitSkillGrants.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations||
+        if(p.Id!="ol:jueman"||p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.Contributions.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.BooleanStates.Count!=0||p.DamageModifiers.Count!=0||p.SkillGrants.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations||
             p.Triggers is not[var own,var foreign]||own.Id!="actual-end-own"||own.TurnOwnerScope!=SkillProgramTurnOwnerScope.Own||foreign.Id!="actual-end-foreign"||foreign.TurnOwnerScope!=SkillProgramTurnOwnerScope.OtherLiving||
             p.Triggers.Any(t=>t.Window!=SkillProgramTriggerWindow.AfterTurnEnded||t.Subject!=SkillProgramTriggerSubject.Owner||t.Optional||t.OwnerRelation is not null||t.Condition.Kind!=SkillProgramTriggerConditionKind.Always||t.MarkerCost is not null||t.UsageScope is not null||t.UsageLimit is not null||
                 t.CardKinds.Count!=0||t.CardCategories.Count!=0||t.SourceZones.Count!=0||t.DestinationZones.Count!=0||t.MovementReasons.Count!=0||t.ExcludedMovementReasons.Count!=0||t.SourceSkillId is not null||t.SourceViewAsId is not null||t.IncludeResponseUses||t.SingleActionInstance||t.IgnoreOwnSkillMovements||

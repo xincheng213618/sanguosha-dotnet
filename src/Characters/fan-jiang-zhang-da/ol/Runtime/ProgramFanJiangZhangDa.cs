@@ -60,7 +60,7 @@ internal static class FanJiangZhangDaComposition
         var policy = p.CardPolicies.Any(c => c.Kind == SkillProgramCardPolicyKind.BlackSlashIgnoresArmorBothDirections);
         if (!operation && !policy) return;
         if (p.Triggers.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
-            p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection)
+            p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.SkillGrants.Count != 0 || p.LordSkillProjection)
             throw new InvalidOperationException(path + ": Fan Jiang Zhang Da requires his exact native Duel or black-Slash armor metadata.");
         if (policy)
         {

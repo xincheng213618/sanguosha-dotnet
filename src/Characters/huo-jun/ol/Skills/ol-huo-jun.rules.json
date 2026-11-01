@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "ol:qiongshou", "revision": 1,
       "modifiers": [ { "id": "hand-limit-four", "query": "handLimit", "operation": "add", "value": 4, "priority": 0 } ],

@@ -695,7 +695,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineHpChangeProgramsEntries HpChangeProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHpChangeProgramsEntries, EngineOwners.CoreGameEngineHpChangeProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineHpChangeProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineHpConditionalSkillGrantsRuntime> HpConditionalSkillGrantsEntries => GetDeferredModule<EngineOwners.CoreGameEngineHpConditionalSkillGrantsRuntime>();
 
     internal Core.RuntimeEntries.CoreGameEngineHpDamageShieldsEntries HpDamageShieldsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineHpDamageShieldsEntries, EngineOwners.CoreGameEngineHpDamageShieldsRuntime>(Core.RuntimeEntries.CoreGameEngineHpDamageShieldsEntries.Create);
 

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "ol:huqi", "revision": 1,
       "modifiers": [{ "id": "outgoing-distance", "query": "outgoingDistance", "operation": "add", "value": -1, "priority": 0 }],

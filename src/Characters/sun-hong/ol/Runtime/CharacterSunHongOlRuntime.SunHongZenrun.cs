@@ -11,9 +11,9 @@ internal sealed partial class CharacterSunHongOlRuntime
     {
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !SunHongTargetBlocked(owner, target))
             return false;
-        // Inspect raw source identities, never the HP-conditional binding shard. All
+        // Inspect raw character origins, never the effective binding shard. All
         // native execution/disable eligibility remains with the admitting caller.
-        return _coreMatchParticipantsPlayersAccess._players[owner].SkillGrants.Grants.Any(g => g.SkillId == skillId && (skillInstanceId is null || g.SkillInstanceId == skillInstanceId) && g.EquipmentSuitSource is null && !g.SourceId.StartsWith("equipment:", StringComparison.Ordinal));
+        return _coreMatchParticipantsPlayersAccess._players[owner].SkillGrants.Grants.Any(g => g.SkillId == skillId && (skillInstanceId is null || g.SkillInstanceId == skillInstanceId) && SkillStateMatcher.IsCharacter(g));
     }
 
     internal bool ZenrunCanTake(int owner, int source, CardZoneKind zone, Card card) => !(zone == CardZoneKind.Equipment && card.IsGeneralWeapon) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, card, new(zone, source), OwnedCardMoveIntent.Obtain);

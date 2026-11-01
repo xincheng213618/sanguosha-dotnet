@@ -70,7 +70,7 @@ internal static class SkillProgramTargetOrderChecks
         public void Register(IContentRegistryBuilder builder)
         {
             var catalog = SkillProgramCatalog.Load("""
-                {"schemaVersion":62,"skills":[
+                {"schemaVersion":63,"skills":[
                   {"id":"target-order:swap","revision":1,"viewAs":[{"id":"slash","inputKinds":["dodge"],"inputSuits":[],"outputKind":"slash","forPlay":true,"forResponse":false}]},
                   {"id":"target-order:draw","revision":1,"minimumRulesVersion": 171,"triggers":[{"id":"after-use","window":"cardUseTargetsFinalized","ownerRelation":"conversionSource","sourceSkillId":"target-order:swap","sourceViewAsId":"slash","optional":true,"effects":[{"op":"draw","target":"owner","amount":1}]}]},
                   {"id":"target-order:liuli","revision":1,"minimumRulesVersion":172,"triggers":[{"id":"redirect-slash","window":"slashTargetRedirecting","ownerRelation":"target","cardKinds":["slash","fireSlash","thunderSlash"],"optional":false,"effects":[{"op":"selectTarget","target":"owner","targetKind":"slashRedirectable"},{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"zones":["hand","equipment"],"count":1,"destination":"discardPile","awaitMovementTriggers":true},{"op":"redirectCurrentAttack","target":"selectedTarget"}]}]}

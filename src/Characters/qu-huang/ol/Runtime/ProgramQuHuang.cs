@@ -41,7 +41,7 @@ internal static class QuHuangComposition
     internal static void ValidateProgram(string path,SkillProgram p)
     {
         if(!p.Triggers.Any(t=>t.Effects.Any(e=>Handles(e.Op)))&&!p.Activations.Any(a=>a.Effects.Any(e=>Handles(e.Op))))return;
-        if(p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.HpSkillGrants.Count!=0||p.BooleanStates.Count!=0||p.Contributions.Count!=0||p.DamageModifiers.Count!=0||p.EquipmentSuitSkillGrants.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations||p.Id is not("ol:qiejian"or"ol:nishou")||p.Triggers.Count!=(p.Id=="ol:qiejian"?1:2))throw new InvalidOperationException(path+": Qu Huang requires exact independent movement/issued-phase protocols.");
+        if(p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.SkillGrants.Count!=0||p.BooleanStates.Count!=0||p.Contributions.Count!=0||p.DamageModifiers.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations||p.Id is not("ol:qiejian"or"ol:nishou")||p.Triggers.Count!=(p.Id=="ol:qiejian"?1:2))throw new InvalidOperationException(path+": Qu Huang requires exact independent movement/issued-phase protocols.");
         foreach(var t in p.Triggers)
         {
             var q=p.Id=="ol:qiejian";var phase=t.Id=="issued-current-phase-swap";var op=q?SkillProgramEffectOp.ResolveQiejianLastHandLoss:phase?SkillProgramEffectOp.ResolveNishouIssuedCurrentPhaseSwap:SkillProgramEffectOp.ResolveNishouEquipmentLossChoice;

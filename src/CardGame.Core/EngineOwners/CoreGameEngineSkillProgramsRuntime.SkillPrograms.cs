@@ -313,8 +313,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
             HpLossSlashSelection = _coreHpLossSlashMaterialsOperations.FreezeHpLossSlashSelection(owner, plan, targets),
             SelectedAllOwnerHandCards = plan.Features.HasOperation(SkillProgramEffectOp.DrawAllHandSelectedBonus) ? _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > 0 && _corePhysicalOwnedCardQueriesOperations.GetHand(owner).All(card => cards.Contains(card.Id)) : null
         };
-        frame = _coreHpConditionalSkillGrantsOperations.Value.CaptureHpConditionalProgramSource(frame);
-        frame = _characterHeQiOlOperations.CaptureEquipmentSuitProgramSource(frame);
+        frame = _conditionalSkillGrants.CaptureSource(frame);
         frame = _characterLuKangWumiaoOperations.CaptureWuLuKangPindianSelection(frame, activation);
         _coreRuntimeOperations.PushRuntimeFrame(frame);
         _characterLuKangWumiaoOperations.IssueWuLuKangPindianSelection(frame);
@@ -529,8 +528,6 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame frame || frame.TriggerId is not null)
             return;
         var program = _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(frame.SkillId)?.Program;
-        if (frame.EquipmentSuitSourceReceipt is not null && !_characterHeQiOlOperations.ValidateEquipmentSuitProgramSource(frame))
-            throw new InvalidOperationException("An equipment-suit program lost its exact issued source receipt.");
         var activation = program is null ? null : ProgramInstructionResolver.Default.FindActivation(program, frame.ActivationId);
         if (activation is null || frame.InstructionIndex == 0 || activation.Effects[frame.InstructionIndex - 1].Op is not (SkillProgramEffectOp.UseSelectedCardsAs or SkillProgramEffectOp.UseAllHandCardsAsOrdinaryTrick))
             return;

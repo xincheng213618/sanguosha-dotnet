@@ -216,7 +216,7 @@ internal static partial class TaoQianChecks
                     A("give", "{\"op\":\"giveSelected\",\"target\":\"selectedTarget\"}", 1, 1)) },
                 N($$"""{"id":"{{WenQuiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}"""));
             if (scene == "ordered") definitions.Add(N($$"""{"id":"{{WenInsert}}","revision":1,"triggers":[{"id":"actual-inserted-play","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"insertPhase","target":"owner","phase":"play","phaseContinuation":"beforeNormalPreparation"}]}]}"""));
-            if (scene == "paid-loss") definitions.Add(N($$"""{"id":"{{WenConditional}}","revision":1,"hpSkillGrants":[{"id":"healthy-source","skillId":"{{WenSkill}}","minimumHp":13}]}"""));
+            if (scene == "paid-loss") definitions.Add(N($$"""{"id":"{{WenConditional}}","revision":1,"skillGrants":[{"id":"healthy-source","skillId":"{{WenSkill}}","while":[">=",["hp","owner"],13],"onSourceLoss":"finishInvocation"}]}"""));
             var watch = new JsonArray();
             void Watch(string option, string reason, string after = "") => watch.Add(N("{\"id\":\"real-" + option + "\",\"window\":\"cardsGained\",\"subject\":\"owner\",\"destinationZones\":[\"hand\"],\"movementOccurrence\":\"perBatch\",\"movementReasons\":[\"" + reason + "\"],\"optional\":false,\"effects\":[" + Choose(option) + (after.Length == 0 ? "" : "," + after) + "]}"));
             if (scene.StartsWith("paid-", StringComparison.Ordinal)) Watch("paid", WenReason, "{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":" + (scene == "paid-loss" ? 1 : 20) + "}");

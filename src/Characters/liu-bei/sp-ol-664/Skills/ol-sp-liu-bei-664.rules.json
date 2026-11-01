@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "ol:xudai-3576", "revision": 1, "triggers": [
       { "id": "grant-after-response", "window": "cardResponseCompleted", "ownerRelation": "actor", "optional": true,

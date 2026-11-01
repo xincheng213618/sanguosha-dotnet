@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [{ "id": "boundary:fenji-mobile", "revision": 1,
     "triggers": [
       { "id": "own-empty-hand-turn-ended", "window": "afterTurnEnded", "subject": "owner", "turnOwnerScope": "own", "optional": true,

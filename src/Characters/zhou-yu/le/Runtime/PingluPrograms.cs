@@ -63,7 +63,7 @@ internal static class PingluComposition
             .Any(e => e.Op == SkillProgramEffectOp.ResolvePingluInRangeRandomHands)) return;
         if (p.Id != "le:pinglu" || p.Activations is not [var a] || p.Triggers.Count != 0 || p.ViewAs.Count != 0 ||
             p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 ||
-            p.HpSkillGrants.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
+            p.SkillGrants.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
             a.Id != "all-in-range-random-hand" || a.MinCards != 0 || a.MaxCards != 0 || a.MinTargets != 0 || a.MaxTargets != 0 ||
             a.TargetKind != SkillProgramTargetKind.AnyLiving || !a.SourceZones.SequenceEqual([CardZoneKind.Hand]) ||
             a.UsesPerTurn is not null || a.UsesPerPhase is not null || a.UsesPerGame is not null || a.UsageGroup != a.Id ||

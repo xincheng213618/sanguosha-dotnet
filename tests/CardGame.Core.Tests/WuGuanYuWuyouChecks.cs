@@ -219,7 +219,7 @@ internal static class WuGuanYuWuyouChecks
                 defs.Add(N("{\"id\":\"" + WyWatch + "\",\"revision\":1,\"triggers\":[{\"id\":\"real-combined-use\",\"window\":\"cardUseCommitted\",\"ownerRelation\":\"actor\",\"cardKinds\":[\"fireSlash\"],\"optional\":false,\"effects\":[" + Choice("combo") + "]}]}"));
             }
             if (scene is "use-loss" or "foreign-loss")
-                defs.Add(N("{\"id\":\"" + WyConditional + "\",\"revision\":1,\"hpSkillGrants\":[{\"id\":\"healthy-issuer\",\"skillId\":\"wumiao:wuyou\",\"minimumHp\":12}]}"));
+                defs.Add(N("{\"id\":\"" + WyConditional + "\",\"revision\":1,\"skillGrants\":[{\"id\":\"healthy-issuer\",\"skillId\":\"wumiao:wuyou\",\"while\":[\">=\",[\"hp\",\"owner\"],12],\"onSourceLoss\":\"finishInvocation\"}]}"));
             if (scene == "use-loss") { defs.Add(N("{\"id\":\"" + WyWatch + "\",\"revision\":1,\"triggers\":[{\"id\":\"cost\",\"window\":\"cardsMoved\",\"subject\":\"owner\",\"sourceZones\":[\"hand\"],\"movementOccurrence\":\"perBatch\",\"movementReasons\":[\"" + CardMoveReasons.Use.Value + "\"],\"usageScope\":\"game\",\"usageLimit\":1,\"optional\":false,\"effects\":[" + Choice("cost") + ",{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":3}]}]}")); own.Add(WyWatch); }
             if (scene == "foreign-loss")
             {

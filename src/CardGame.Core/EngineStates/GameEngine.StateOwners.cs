@@ -21,10 +21,8 @@ public sealed partial class GameEngine
     private readonly EngineStates.CorePlayerDecisionState _playerDecision = new();
     private readonly EngineStates.CharacterCaoPiMouState _characterCaoPiMou = new();
     private readonly EngineStates.CharacterCaoXiOlState _characterCaoXiOl = new();
-    private readonly EngineStates.CharacterDaQiaoXiaoQiaoOlState _characterDaQiaoXiaoQiaoOl = new();
     private readonly EngineStates.CharacterDingYuanOlState _characterDingYuanOl = new();
     private readonly EngineStates.CharacterDuXiOlState _characterDuXiOl = new();
-    private readonly EngineStates.CharacterHeQiOlState _characterHeQiOl = new();
     private readonly EngineStates.CharacterHuaTuoMobileGodState _characterHuaTuoMobileGod = new();
     private readonly EngineStates.CharacterHuangChengYanOlState _characterHuangChengYanOl = new();
     private readonly EngineStates.CharacterHuangChongMobileShiState _characterHuangChongMobileShi = new();
@@ -63,7 +61,6 @@ public sealed partial class GameEngine
     private readonly EngineStates.CoreGameEngineFriendTrioState _friendTrio = new();
     private readonly EngineStates.CoreGameEngineGuanduActivitiesState _guanduActivities = new();
     private readonly EngineStates.CoreGameEngineHpChangeProgramsState _hpChangePrograms = new();
-    private readonly EngineStates.CoreGameEngineHpConditionalSkillGrantsState _hpConditionalSkillGrants = new();
     private readonly EngineStates.CoreGameEngineIssuedPlayUsePoliciesState _issuedPlayUsePolicies = new();
     private readonly EngineStates.CoreGameEngineLordSkillProjectionsState _lordSkillProjections = new();
     private readonly EngineStates.CoreGameEngineNativeFactionChangesState _nativeFactionChanges = new();
@@ -174,10 +171,8 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICorePlayerDecisionPendingDecisionBackingAccess), _playerDecision),
         new(typeof(EngineStates.Contracts.ICharacterCaoPiMouMouCaoPiControlsAccess), _characterCaoPiMou),
         new(typeof(EngineStates.Contracts.ICharacterCaoXiOlCaoXiActiveUnitsCaoXiHistoryCountCaoXiHistoryTailAccess), _characterCaoXiOl),
-        new(typeof(EngineStates.Contracts.ICharacterDaQiaoXiaoQiaoOlDaQiaoXiaoQiaoQualificationCacheDaQiaoXiaoQiaoQualificationRevisionSynchronizingDaQiaoXiaoQiaoLuoyanAccess), _characterDaQiaoXiaoQiaoOl),
         new(typeof(EngineStates.Contracts.ICharacterDingYuanOlSynchronizingAdoptedChildGrantsAccess), _characterDingYuanOl),
         new(typeof(EngineStates.Contracts.ICharacterDuXiOlDuXiSuitProjectionDuXiSuitProjectionEventCountDuXiSuitProjectionLastFactAccess), _characterDuXiOl),
-        new(typeof(EngineStates.Contracts.ICharacterHeQiOlEquipmentSuitSkillInstancesSynchronizingEquipmentSuitSkillGrantsAccess), _characterHeQiOl),
         new(typeof(EngineStates.Contracts.ICharacterHuaTuoMobileGodMobileWulingCoursesAccess), _characterHuaTuoMobileGod),
         new(typeof(EngineStates.Contracts.ICharacterHuangChengYanOlJiezhenConversionsAccess), _characterHuangChengYanOl),
         new(typeof(EngineStates.Contracts.ICharacterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess), _characterHuangChongMobileShi),
@@ -230,7 +225,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICoreGameEngineFriendTrioFriendQihuiUnlimitedAccess), _friendTrio),
         new(typeof(EngineStates.Contracts.ICoreGameEngineGuanduActivitiesGuanduInitialConfigurationGuanduQualificationDependenciesGuanduQualificationStampAccess), _guanduActivities),
         new(typeof(EngineStates.Contracts.ICoreGameEngineHpChangeProgramsPendingHpChangesAccess), _hpChangePrograms),
-        new(typeof(EngineStates.Contracts.ICoreGameEngineHpConditionalSkillGrantsHpConditionalSkillInstancesSynchronizingHpConditionalSkillGrantsAccess), _hpConditionalSkillGrants),
         new(typeof(EngineStates.Contracts.ICoreGameEngineIssuedPlayUsePoliciesIssuedPlayPhaseUseProhibitionsAccess), _issuedPlayUsePolicies),
         new(typeof(EngineStates.Contracts.ICoreGameEngineLordSkillProjectionsLordProjectionDependenciesLordProjectionDependencyRevisionSynchronizingLordProjectionsAccess), _lordSkillProjections),
         new(typeof(EngineStates.Contracts.ICoreGameEngineNativeFactionChangesNativeFactionObservationsNativeFactionRevisionAccess), _nativeFactionChanges),

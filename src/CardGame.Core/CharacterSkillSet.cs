@@ -17,9 +17,7 @@ public sealed partial record SkillGrant(
     [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     SkillGrantPhaseExpiry? PhaseExpiry = null,
     [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    HpConditionalSkillGrantSource? HpConditionalSource = null,
-    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-    EquipmentSuitSkillGrantSource? EquipmentSuitSource = null);
+    ConditionalSkillGrantSource? ConditionalSource = null);
 
 /// <summary>
 /// Source-aware skill ownership for one character. Definitions and execution
@@ -120,7 +118,7 @@ public sealed class CharacterSkillSet
         if (grant.IsModeRule && (!grant.SourceId.StartsWith("mode:", StringComparison.Ordinal) || !grant.IsEnabled ||
             grant.Lifetime is not null || grant.TurnExpiry is not null || grant.NextActualTurnStartExpiry is not null || grant.PhaseExpiry is not null || grant.LordProjection is not null ||
             grant.GeneralLibraryProjection is not null || grant.PrintedLordQualification is not null ||
-            grant.HpConditionalSource is not null || grant.EquipmentSuitSource is not null))
+            grant.ConditionalSource is not null))
             throw new InvalidOperationException("A mode-rule grant requires an enabled permanent mode source without character projections.");
         if (grant.TurnExpiry is { } expiry &&
             (expiry.TurnNumber <= 0 || expiry.TurnOwnerSeat < 0 || grant.NextActualTurnStartExpiry is not null ||

@@ -93,11 +93,13 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
         return new(kind, subject, timing, skip, phase);
     }
 
-    internal static bool IsPersistentCondition(ProgramExpression expression) => expression.Nodes().All(node => node.Op is
+    internal static bool IsPersistentCondition(ProgramExpression expression) => expression.Nodes().All(IsPersistentConditionNode);
+
+    internal static bool IsPersistentConditionNode(ProgramExpression node) => node.Op is
         "bool" or "int" or "and" or "or" or "not" or "<" or "<=" or ">" or ">=" or "==" or "!=" or "+" or "-" or
         "min" or "max" or "floorDiv" or "when" or "same" or "alive" or "hasHp" or "faceDown" or "chained" or "inIssuedPhase" or "inUpcomingTurnPrelude" or
         "isTurnOwner" or "inIssuedTurn" or "inIssuedDying" or "hp" or "maxHp" or
-        "lostHp" or "handCount" or "equipmentCount" or "cardMarkCount" or "all" or "any" or "count" or "owner" or "selectedTarget" or "eventTarget" or "it" or "living" or "livingOthers");
+        "lostHp" or "handCount" or "equipmentCount" or "publicPileCount" or "cardMarkCount" or "all" or "any" or "count" or "owner" or "selectedTarget" or "eventTarget" or "it" or "living" or "livingOthers";
 
     private static IReadOnlyList<string> Identifiers(JsonElement node, string path)
     {

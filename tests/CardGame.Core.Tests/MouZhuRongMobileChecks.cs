@@ -15,7 +15,7 @@ internal static class MouZhuRongMobileChecks
         Accept(g, new SelectGeneralCommand(0, Owner, g.Revision, P(g)!.PromptId)); Play(g);
         var initial = g.CreateSnapshot(0).Players[0];
         Need(initial.Hp == 9 && initial.SkillRuntimeStates?.Any(s => s.SkillId == "mou-mobile:lieren") == true &&
-            g.Events.Select(e => e.Payload).OfType<HpConditionalSkillGrantChangedEvent>().Any(e => e.OwnerSeat == 0 && e.SkillId == "mou-mobile:lieren" && e.Added && e.OwnerHp == 9),
+            g.Events.Select(e => e.Payload).OfType<ConditionalSkillGrantChangedEvent>().Any(e => e.OwnerSeat == 0 && e.SkillId == "mou-mobile:lieren" && e.Added && e.OwnerHp == 9),
             $"The native classic-identity fixture starts at 8+Lord HP with its actual conditional Lieren source enabled: hp={initial.Hp}/{initial.MaxHp}, role={initial.Role}, general={initial.GeneralId}, skills={string.Join(',', (initial.SkillRuntimeStates ?? []).Select(s => s.SkillId + ':' + s.IsAcquired))}.");
         var firstTurn = g.CreateSnapshot(0).TurnNumber; var targetHp = g.CreateSnapshot(0).Players[1].Hp;
         var otherHp = g.CreateSnapshot(0).Players[2].Hp;
@@ -30,7 +30,7 @@ internal static class MouZhuRongMobileChecks
         Need(P(g)!.Choices.All(c => c.Targets is [var t] && t != 0 && t != 1),
             "The deferred damage can select another other character, excluding both Zhu Rong and the original Slash target.");
         Need(g.CreateSnapshot(0).Players[0].Hp == 8 && !(g.CreateSnapshot(0).Players[0].SkillRuntimeStates?.Any(skill => skill.SkillId == "mou-mobile:lieren") ?? false) &&
-            g.Events.Select(e => e.Payload).OfType<HpConditionalSkillGrantChangedEvent>().Any(e => e.OwnerSeat == 0 && e.SkillId == "mou-mobile:lieren" && !e.Added && e.OwnerHp == 8),
+            g.Events.Select(e => e.Payload).OfType<ConditionalSkillGrantChangedEvent>().Any(e => e.OwnerSeat == 0 && e.SkillId == "mou-mobile:lieren" && !e.Added && e.OwnerHp == 8),
             "The paid winning contest still offers its original-source tail after real HP loss removes the conditional Lieren source.");
         var saved = GameCheckpointJson.Serialize(g.CreateCheckpoint()); var view = SnapshotJson.Serialize(g.CreateSnapshot(0));
         g = GameReplay.Restore(GameCheckpointJson.Deserialize(saved), r);
@@ -100,7 +100,7 @@ internal static class MouZhuRongMobileChecks
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, "mou:zhu-rong-mobile");
-            var rules = "{\"schemaVersion\":" + SkillProgramCatalog.RulesSchemaVersion + ",\"skills\":[{\"id\":\"" + Driver + "\",\"revision\":1,\"hpSkillGrants\":[{\"id\":\"healthy-lieren\",\"skillId\":\"mou-mobile:lieren\",\"minimumHp\":9}],\"triggers\":[{\"id\":\"lose-paid-source\",\"window\":\"afterDamageApplied\",\"subject\":\"damageSource\",\"damageOccurrence\":\"perDamage\",\"optional\":false,\"usageScope\":\"game\",\"usageLimit\":1,\"effects\":[{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":1}]}],\"cardPolicies\":[{\"id\":\"win-heart-contest\",\"kind\":\"pindianRankBySuit\",\"inputSuit\":\"heart\",\"value\":13}]},{\"id\":\"" + Quiet + "\",\"revision\":1,\"triggers\":[{\"id\":\"quiet\",\"window\":\"afterNormalDraw\",\"subject\":\"owner\",\"optional\":false,\"effects\":[{\"op\":\"skipTurnPhases\",\"target\":\"owner\",\"phases\":[\"play\"]}]}]}]}";
+            var rules = "{\"schemaVersion\":" + SkillProgramCatalog.RulesSchemaVersion + ",\"skills\":[{\"id\":\"" + Driver + "\",\"revision\":1,\"skillGrants\":[{\"id\":\"healthy-lieren\",\"skillId\":\"mou-mobile:lieren\",\"while\":[\">=\",[\"hp\",\"owner\"],9],\"onSourceLoss\":\"finishInvocation\"}],\"triggers\":[{\"id\":\"lose-paid-source\",\"window\":\"afterDamageApplied\",\"subject\":\"damageSource\",\"damageOccurrence\":\"perDamage\",\"optional\":false,\"usageScope\":\"game\",\"usageLimit\":1,\"effects\":[{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":1}]}],\"cardPolicies\":[{\"id\":\"win-heart-contest\",\"kind\":\"pindianRankBySuit\",\"inputSuit\":\"heart\",\"value\":13}]},{\"id\":\"" + Quiet + "\",\"revision\":1,\"triggers\":[{\"id\":\"quiet\",\"window\":\"afterNormalDraw\",\"subject\":\"owner\",\"optional\":false,\"effects\":[{\"op\":\"skipTurnPhases\",\"target\":\"owner\",\"phases\":[\"play\"]}]}]}]}";
             var presentation = "{\"schemaVersion\":" + SkillProgramCatalog.PresentationSchemaVersion + ",\"skills\":{\"" + Driver + "\":{\"name\":\"Native rank fixture\",\"description\":\"Native printed-rank Pindian policy\"},\"" + Quiet + "\":{\"name\":\"Quiet\",\"description\":\"Small native peer turns\"}}}";
             var programs = SkillProgramCatalog.Load(rules, presentation);
             foreach (var id in new[] { Driver, Quiet }) b.AddSkill(new(id, "Native fixture", "Native fixture") { Program = programs.Programs[id], ProgramPresentation = programs.Presentations[id] });

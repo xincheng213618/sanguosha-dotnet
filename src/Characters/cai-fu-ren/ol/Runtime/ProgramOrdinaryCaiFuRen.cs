@@ -21,7 +21,7 @@ internal static class OrdinaryCaiFuRenComposition
     internal static void ValidateProgram(string path, SkillProgram p)
     {
         if (!p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveOrdinaryCaiFuRenXianzhou or SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting)) return;
-        if (p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.HpSkillGrants.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0)
+        if (p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.SkillGrants.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0)
             throw new InvalidOperationException(path + ": ordinary Cai Fu Ren requires the complete donation and single ended-turn option contracts.");
         if (p.Id == "ol:xianzhou")
         {

@@ -10,7 +10,7 @@ internal static class MouMengHuoComposition
     internal static void ValidateProgram(string path, SkillProgram p)
     {
         if (p.Id is not (Huoshou or Zaiqi) && !p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => Handles(e.Op))) return;
-        var common = p.Activations.Count == 0 && p.ViewAs.Count == 0 && p.Modifiers.Count == 0 && p.CardIdentities.Count == 0 && p.HpSkillGrants.Count == 0 && p.DamageModifiers.Count == 0;
+        var common = p.Activations.Count == 0 && p.ViewAs.Count == 0 && p.Modifiers.Count == 0 && p.CardIdentities.Count == 0 && p.SkillGrants.Count == 0 && p.DamageModifiers.Count == 0;
         var valid = p.Id switch
         {
             Huoshou => p.CardPolicies is [var policy] && policy.Kind == SkillProgramCardPolicyKind.ExcludeGlobalTarget && policy.CardKinds.SequenceEqual([CardKind.BarbarianAssault]) &&

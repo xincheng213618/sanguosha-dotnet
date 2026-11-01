@@ -286,7 +286,7 @@ internal static class LeDaQiaoZixiChecks
             var defs = new JsonArray(new JsonObject { ["id"] = ZdDriver, ["revision"] = 1, ["modifiers"] = N("[{\"id\":\"keep-inventory\",\"query\":\"handLimit\",\"operation\":\"add\",\"value\":64,\"priority\":0}]"), ["activations"] = acts },
                 N("{\"id\":\"" + ZdQuiet + "\",\"revision\":1,\"triggers\":[{\"id\":\"quiet\",\"window\":\"afterNormalDraw\",\"subject\":\"owner\",\"optional\":false,\"effects\":[{\"op\":\"skipTurnPhases\",\"target\":\"owner\",\"phases\":[\"play\"]}]}]}"));
             var own = new List<string> { ZdDriver, ZdWatch, ZdQin, scene == "paid-loss" ? ZdGrant : ZdSkill };
-            if (scene == "paid-loss") defs.Add(N("{\"id\":\"" + ZdGrant + "\",\"revision\":1,\"hpSkillGrants\":[{\"id\":\"healthy-zixi\",\"skillId\":\"le:zixi\",\"minimumHp\":13}]}"));
+            if (scene == "paid-loss") defs.Add(N("{\"id\":\"" + ZdGrant + "\",\"revision\":1,\"skillGrants\":[{\"id\":\"healthy-zixi\",\"skillId\":\"le:zixi\",\"while\":[\">=\",[\"hp\",\"owner\"],13],\"onSourceLoss\":\"finishInvocation\"}]}"));
             if (scene is "redirect" or "late-redirect") own.Add("classic:liuli");
             if (scene == "late-redirect") own.Add("ol:zhenwei");
             if (scene == "delayed-subslots") own.AddRange(["boundary:guose", "friend:yangming"]);

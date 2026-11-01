@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class CommandSessionRuntime(EngineStates.CoreMatchDefinitionState matchDefinitionState, Func<ContentRegistry> getContentRegistry, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreNativeDamageHandlesRuntime>> getCoreNativeDamageHandlesRuntime, EngineStates.CoreCommandJournalStorageState commandJournalStorageState, Func<RuntimeEntries.CoreGameEnginePrivateGeneralLibrariesEntries> getCoreGameEnginePrivateGeneralLibrariesRuntime, Func<RuntimeEntries.CoreGameEngineLordSkillProjectionsEntries> getCoreGameEngineLordSkillProjectionsRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineHpConditionalSkillGrantsRuntime>> getCoreGameEngineHpConditionalSkillGrantsRuntime, Func<RuntimeEntries.CharacterHeQiOlEntries> getCharacterHeQiOlRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreCommandResultProjectionRuntime>> getCoreCommandResultProjectionRuntime, Func<RuntimeEntries.CharacterSimaYiMouEntries> getCharacterSimaYiMouRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime) : ICommandSessionRuntime
+internal sealed class CommandSessionRuntime(EngineStates.CoreMatchDefinitionState matchDefinitionState, Func<ContentRegistry> getContentRegistry, EngineStates.CoreMatchOutcomeState matchOutcomeState, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreNativeDamageHandlesRuntime>> getCoreNativeDamageHandlesRuntime, EngineStates.CoreCommandJournalStorageState commandJournalStorageState, Func<RuntimeEntries.CoreGameEnginePrivateGeneralLibrariesEntries> getCoreGameEnginePrivateGeneralLibrariesRuntime, Func<RuntimeEntries.CoreGameEngineLordSkillProjectionsEntries> getCoreGameEngineLordSkillProjectionsRuntime, Func<IConditionalSkillGrantOperations> getConditionalSkillGrants, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreCommandResultProjectionRuntime>> getCoreCommandResultProjectionRuntime, Func<RuntimeEntries.CharacterSimaYiMouEntries> getCharacterSimaYiMouRuntime, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime>> getCoreGameEngineProgramEventHistoryRuntime) : ICommandSessionRuntime
 {
     public GameOptions Options => matchDefinitionState.ReferenceToOptions;
     public string ModeId => matchDefinitionState.ReferenceToModeDefinition.Id;
@@ -13,8 +13,7 @@ internal sealed class CommandSessionRuntime(EngineStates.CoreMatchDefinitionStat
     {
         getCoreGameEnginePrivateGeneralLibrariesRuntime().SynchronizePrivateGeneralLibraries();
         getCoreGameEngineLordSkillProjectionsRuntime().SynchronizeLordSkillProjections();
-        getCoreGameEngineHpConditionalSkillGrantsRuntime().Value.SynchronizeHpConditionalSkillGrants();
-        getCharacterHeQiOlRuntime().SynchronizeEquipmentSuitSkillGrants();
+        getConditionalSkillGrants().Synchronize();
     }
     public void RefreshDecisionRevision() => getCoreCommandResultProjectionRuntime().Value.RefreshPendingDecisionRevision();
     public EventNotification? [] PreparePublicEvents(EventNotification[] events)

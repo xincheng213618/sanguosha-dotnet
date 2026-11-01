@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62, "skills": [
+  "schemaVersion": 63, "skills": [
     { "id": "mobile:shanxi", "revision": 1, "activations": [
       { "id": "red-basic-discard-and-view", "minCards": 1, "maxCards": 1, "sourceZones": ["hand"], "cardCategories": ["basic"],
         "minTargets": 1, "maxTargets": 1, "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": 1,
@@ -9,11 +9,11 @@
           { "op": "resolveMobileHeQiShanxiView", "target": "owner" }
         ] }
     ] },
-    { "id": "mobile:qizhou", "revision": 1, "equipmentSuitSkillGrants": [
-      { "id": "one-mounted", "skillId": "classic:mashu", "minimumDistinctSuits": 1 },
-      { "id": "two-valiant", "skillId": "boundary:yingzi", "minimumDistinctSuits": 2 },
-      { "id": "three-short-blade", "skillId": "ol:duanbing", "minimumDistinctSuits": 3 },
-      { "id": "four-awe", "skillId": "boundary:fenwei", "minimumDistinctSuits": 4 }
+    { "id": "mobile:qizhou", "revision": 1, "skillGrants": [
+      {"id": "one-mounted","skillId": "classic:mashu","while": [">=",["equipmentSuitCount","owner"],1],"onSourceLoss": "finishPaidInstruction"},
+      {"id": "two-valiant","skillId": "boundary:yingzi","while": [">=",["equipmentSuitCount","owner"],2],"onSourceLoss": "finishPaidInstruction"},
+      {"id": "three-short-blade","skillId": "ol:duanbing","while": [">=",["equipmentSuitCount","owner"],3],"onSourceLoss": "finishPaidInstruction"},
+      {"id": "four-awe","skillId": "boundary:fenwei","while": [">=",["equipmentSuitCount","owner"],4],"onSourceLoss": "finishPaidInstruction"}
     ] }
   ]
 }

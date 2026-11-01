@@ -1,4 +1,4 @@
-{"schemaVersion":62,"skills":[
+{"schemaVersion":63,"skills":[
  {"id":"happy:lunce","revision":1,"triggers":[
   {"id":"round-plan","window":"roundStarting","subject":"owner","optional":true,"effects":[{"op":"issueHappyPangTongPlan","target":"owner"}]},
   {"id":"turn-plan","window":"turnStartBeforeNormalFlow","subject":"owner","optional":true,"effects":[{"op":"issueHappyPangTongPlan","target":"owner"}]},

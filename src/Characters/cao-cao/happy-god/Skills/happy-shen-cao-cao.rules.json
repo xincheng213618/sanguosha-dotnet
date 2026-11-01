@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "happy:guixin", "revision": 1, "triggers": [
       { "id": "random-claim-conditional-turnover", "window": "afterDamageApplied", "subject": "owner", "damageOccurrence": "perDamagePoint", "optional": true,

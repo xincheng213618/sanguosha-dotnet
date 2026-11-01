@@ -1,4 +1,4 @@
-{"schemaVersion":62,"skills":[
+{"schemaVersion":63,"skills":[
  {"id":"ol:fudao","revision":1,"triggers":[
    {"id":"opening-draw-gift-discard-record","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"initializeFudaoHandRecord","target":"owner"}]},
    {"id":"own-actual-turn-matching-record","window":"afterTurnEnded","subject":"owner","turnOwnerScope":"own","optional":true,"effects":[{"op":"drawFudaoRecordedPair","target":"owner"}]},

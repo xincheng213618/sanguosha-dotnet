@@ -57,7 +57,7 @@ internal static class ChenJiaoComposition
         if (program.Id == QingYanSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Triggers.Count != 0 ||
                 program.Activations is not [{ Id: QingYanActivation, MinCards: 0, MaxCards: 0, MinTargets: 0, MaxTargets: 0,
                     TargetKind: SkillProgramTargetKind.AnyLiving, UsesPerTurn: null, UsesPerPhase: null, UsesPerGame: null }] ||
@@ -69,7 +69,7 @@ internal static class ChenJiaoComposition
         }
         if (program.Id != CeDuanSkill) return;
         if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
             program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Triggers.Count != 0 ||
             program.Activations is not [{ Id: CeDuanActivation, MinCards: 0, MaxCards: 0, MinTargets: 1, MaxTargets: 1,
                 TargetKind: SkillProgramTargetKind.OtherLivingWhoseAttackRangeIncludesOwner, UsesPerTurn: null,

@@ -44,7 +44,7 @@ internal static class WenYangComposition
     internal static void ValidateProgram(string path,SkillProgram p)
     {
         if(!p.Triggers.Any(t=>t.Effects.Any(e=>Handles(e.Op)))&&!p.Activations.Any(a=>a.Effects.Any(e=>Handles(e.Op))))return;
-        if(p.Activations.Count!=0||p.Modifiers.Count!=0||p.ViewAs.Count!=0||p.Contributions.Count!=0||p.CardIdentities.Count!=0||p.BooleanStates.Count!=0||p.CardPolicies.Count!=0||p.DamageModifiers.Count!=0||p.HpSkillGrants.Count!=0||p.EquipmentSuitSkillGrants.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations||
+        if(p.Activations.Count!=0||p.Modifiers.Count!=0||p.ViewAs.Count!=0||p.Contributions.Count!=0||p.CardIdentities.Count!=0||p.BooleanStates.Count!=0||p.CardPolicies.Count!=0||p.DamageModifiers.Count!=0||p.SkillGrants.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations||
             (p.Id=="ol:lvli"?p.Triggers.Count!=2:p.Id=="ol:choujue"?p.Triggers.Count!=2:p.Id=="ol:beishui"?p.Triggers.Count!=1:p.Id!="ol:qingjiao"||p.Triggers.Count!=2))
             throw new InvalidOperationException(path+": Wen Yang requires his exact native damage, two awakening and paid whole-hand/Ending entries.");
         foreach(var t in p.Triggers)

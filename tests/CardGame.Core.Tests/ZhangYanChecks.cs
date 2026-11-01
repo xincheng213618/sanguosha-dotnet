@@ -79,7 +79,7 @@ internal static class ZhangYanChecks
     {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]},
     {"id":"{{Prep}}","revision":1,"triggers":[{"id":"wound","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"loseHp","target":"owner","amount":1}]}]},
     {"id":"{{Health}}","revision":1,"triggers":[{"id":"native-recovery","window":"afterHpRecovered","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"chooseOption","target":"owner","resultBind":"pause","options":[{"id":"continue"}]}]}]},
-    {"id":"{{Conditional}}","revision":1,"hpSkillGrants":[{"id":"healthy-source","skillId":"{{Suji}}","minimumHp":8}]},
+    {"id":"{{Conditional}}","revision":1,"skillGrants":[{"id":"healthy-source","skillId":"{{Suji}}","while":[">=",["hp","owner"],8],"onSourceLoss":"finishInvocation"}]},
     {"id":"{{Watch}}","revision":1,"triggers":[{"id":"paid-child","window":"cardsMoved","subject":"owner","sourceZones":["equipment"],"movementOccurrence":"perBatch","movementReasons":["{{CardMoveReasons.Use.Value}}"],"optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"chooseOption","target":"owner","resultBind":"pause","options":[{"id":"continue"}]},{"op":"loseHp","target":"owner","amount":{{(scenario=="payment-death"?20:2)}}}]}]}
    ]}
    """;

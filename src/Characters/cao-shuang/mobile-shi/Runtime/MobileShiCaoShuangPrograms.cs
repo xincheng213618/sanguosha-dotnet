@@ -80,7 +80,7 @@ internal static class ShiCaoShuangComposition
         if (program.Id == SheQuanSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers.Any(trigger => trigger.Optional || trigger.IsSkillInvocation) ||
                 !triggerShape(SheQuanCausedTrigger, SheQuanTakenTrigger, SheQuanDyingTrigger, SkillProgramEffectOp.ResolveShiCaoShuangSheQuan))
@@ -91,7 +91,7 @@ internal static class ShiCaoShuangComposition
         if (program.Id == DianYiSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers.Any(trigger => trigger.Optional || trigger.IsSkillInvocation) ||
                 !triggerShape(DianYiCausedTrigger, DianYiTakenTrigger, DianYiDyingTrigger, SkillProgramEffectOp.ResolveShiCaoShuangDianYi))
@@ -102,7 +102,7 @@ internal static class ShiCaoShuangComposition
         if (program.Id == JianZhuanSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers.Any(trigger => trigger.Optional || trigger.IsSkillInvocation) ||
                 !triggerShape(JianZhuanCausedTrigger, JianZhuanTakenTrigger, JianZhuanDyingTrigger, SkillProgramEffectOp.ResolveShiCaoShuangJianZhuan))
@@ -112,7 +112,7 @@ internal static class ShiCaoShuangComposition
         }
         if (program.Id != NiZunSkill) return;
         if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
             program.Contributions.Count != 0 || program.BooleanStates.Count != 0 ||
             program.Activations is not [{ Id: NiZunUseActivation, MinCards: 0, MaxCards: 0, MinTargets: 0, MaxTargets: 0,
                 TargetKind: SkillProgramTargetKind.AnyLiving, UsesPerTurn: 1, UsesPerPhase: null, UsesPerGame: null }] ||

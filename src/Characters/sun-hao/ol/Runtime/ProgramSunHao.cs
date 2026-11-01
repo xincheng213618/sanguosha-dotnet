@@ -54,7 +54,7 @@ internal static class SunHaoComposition
     {
         var own = p.Triggers.Any(t => t.Effects.Any(e => Handles(e.Op))) || p.CardPolicies.Any(x => x.Kind is SkillProgramCardPolicyKind.OtherWuTreatedWoundedDuringOwnTurn or SkillProgramCardPolicyKind.OtherWuTreatedWoundedForCanshi or SkillProgramCardPolicyKind.EmptyHandDamageTakenBonus);
         if (!own) return;
-        if (p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection)
+        if (p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.SkillGrants.Count != 0 || p.LordSkillProjection)
             throw new InvalidOperationException(path+": Sun Hao's operations and native metadata cannot be combined with unrelated producers.");
         if (p.Id is "ol:sun-hao-canshi" or MobileCanshi)
         {

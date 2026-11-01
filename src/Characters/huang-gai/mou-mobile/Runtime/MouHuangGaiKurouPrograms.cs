@@ -95,8 +95,7 @@ internal static class MouHuangGaiKurouComposition
         if (program.Id != "mou-mobile:kurou" && !uses) return;
         if (program.Id != "mou-mobile:kurou" || program.Activations.Count != 0 || program.ViewAs.Count != 0 ||
             program.Modifiers.Count != 0 || program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 ||
-            program.HpSkillGrants.Count != 0 || program.EquipmentSuitSkillGrants.Count != 0 ||
-            program.DamageModifiers.Count != 0 || program.BooleanStates.Count != 0 || program.Contributions.Count != 0 ||
+            program.SkillGrants.Count != 0 || program.DamageModifiers.Count != 0 || program.BooleanStates.Count != 0 || program.Contributions.Count != 0 ||
             program.LordSkillProjection || program.CannotChallengeDeclarations || program.Triggers.Count != 2 ||
             program.Triggers.SingleOrDefault(t => t.Id == "give-before-loss") is not { } gift ||
             program.Triggers.SingleOrDefault(t => t.Id == "loss-armor") is not { } armor ||

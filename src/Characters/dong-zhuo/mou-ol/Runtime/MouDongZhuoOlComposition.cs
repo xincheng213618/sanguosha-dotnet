@@ -9,7 +9,7 @@ internal static class MouDongZhuoOlComposition
         var own=p.Id is MouDongZhuoOlRuntime.Guanbian or MouDongZhuoOlRuntime.Xiongni or MouDongZhuoOlRuntime.Fengshang or MouDongZhuoOlRuntime.Zhibing;
         if(!own&&!p.Activations.SelectMany(a=>a.Effects).Concat(p.Triggers.SelectMany(t=>t.Effects)).Any(e=>Handles(e.Op)))return;
         bool Effect(IReadOnlyList<SkillProgramEffect> e,SkillProgramEffectOp op)=>e is[{Target:SkillProgramEffectTarget.Owner,Condition.Kind:SkillProgramConditionKind.Always}x]&&x.Op==op;
-        var valid=own&&p.ViewAs.Count==0&&p.CardPolicies.Count==0&&p.BooleanStates.Count==0&&p.DamageModifiers.Count==0&&p.HpSkillGrants.Count==0;
+        var valid=own&&p.ViewAs.Count==0&&p.CardPolicies.Count==0&&p.BooleanStates.Count==0&&p.DamageModifiers.Count==0&&p.SkillGrants.Count==0;
         valid&=p.Id switch {
             MouDongZhuoOlRuntime.Guanbian=>p.Activations.Count==0&&p.Triggers.Count==2&&p.Modifiers.Count==3&&
                 p.Triggers[0].Id=="freeze-game-population"&&p.Triggers[0].Window==SkillProgramTriggerWindow.GameStarting&&!p.Triggers[0].Optional&&Effect(p.Triggers[0].Effects,SkillProgramEffectOp.InitializeMouDongZhuoGuanbian)&&

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "ol:weifu", "revision": 1,
       "activations": [{ "id": "discard-and-judge", "minCards": 1, "maxCards": 1, "sourceZones": ["hand", "equipment"], "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null,

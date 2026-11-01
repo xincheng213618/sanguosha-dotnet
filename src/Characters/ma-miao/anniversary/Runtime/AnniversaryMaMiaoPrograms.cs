@@ -60,7 +60,7 @@ internal static class AnniversaryMaMiaoComposition
         var owns = p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryMaMiaoZhangguan or SkillProgramEffectOp.ResolveAnniversaryMaMiaoCongfeng);
         if (p.Id is not (Zhangguan or Congfeng) && !owns) return;
         var first = p.Id == Zhangguan;
-        if (p.Id is not (Zhangguan or Congfeng) || p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.Modifiers.Count != 0 || p.BooleanStates.Count != 0 || p.HpSkillGrants.Count != 0 ||
+        if (p.Id is not (Zhangguan or Congfeng) || p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.Modifiers.Count != 0 || p.BooleanStates.Count != 0 || p.SkillGrants.Count != 0 ||
             p.Triggers is not [var t] || t.Subject != SkillProgramTriggerSubject.Owner || t.Effects is not [{ Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always } e] ||
             e.Op != (first ? SkillProgramEffectOp.ResolveAnniversaryMaMiaoZhangguan : SkillProgramEffectOp.ResolveAnniversaryMaMiaoCongfeng) ||
             (first ? t.Id != "each-actual-turn" || t.Window != SkillProgramTriggerWindow.TurnStartBeforeNormalFlow || t.TurnOwnerScope != SkillProgramTurnOwnerScope.AnyLiving || !t.Optional :

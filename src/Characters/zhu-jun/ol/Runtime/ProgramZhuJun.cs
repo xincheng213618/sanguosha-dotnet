@@ -66,7 +66,7 @@ internal static class ZhuJunComposition
     {
         if (!p.Activations.Any(a => a.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveCuipoActualTurnUse)) && !p.Triggers.Any(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveCuipoActualTurnUse))) return;
         if (p.Id != "ol:cuipo" || p.Activations.Count != 0 || p.Triggers is not [var trigger] || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.Contributions.Count != 0 ||
-            p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+            p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.SkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Cuipo requires its complete standalone ordinary OL skill.");
         ValidateTrigger(path, trigger);
     }

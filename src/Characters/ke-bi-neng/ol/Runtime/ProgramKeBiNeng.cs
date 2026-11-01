@@ -66,7 +66,7 @@ internal static class KeBiNengComposition
             a.MarkerCost is not null || a.CardCountExpression is not null || a.CategoryTargetLedgerId is not null || a.TargetPhaseLedgerId is not null ||
             a.SelectedCardsSameSuit || a.SelectedCardsDistinctSuits || a.TargetRequiresEmptyEquipmentSlot || a.EquipmentSlots.Count != 0 || a.CardKinds.Count != 0 || a.CardSuits.Count != 0 || a.CardCategories.Count != 0 ||
             !a.SourceZones.SequenceEqual(new[] { CardZoneKind.Hand }) || p.BooleanStates.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.Contributions.Count != 0 ||
-            p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+            p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.SkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Pingduan requires one complete native ordered three-item activation with the original private recipient.");
     }
 }

@@ -11,7 +11,7 @@ internal sealed partial class CharacterSunHaoMobileRuntime
         var grants = owner.SkillGrants.Grants.Where(g => _contentRegistryOperations._contentRegistry.GetSkill(g.SkillId).Program?.CardPolicies.Any(p => p.Kind == SkillProgramCardPolicyKind.OtherWuTreatedWoundedForCanshi) == true).ToArray();
         if (grants.Length == 0)
             return false;
-        return grants.Any(g => _corePrivateGeneralLibrariesOperations.LibraryBaseGrantLive(owner, g) && _coreNationalSkillsOperations.IsSkillGrantStateEffective(owner, g) && _coreLordSkillProjectionsOperations.IsProjectedGrantQualified(owner, g) && _corePrivateGeneralLibrariesOperations.IsGeneralLibraryGrantQualified(owner, g) && _coreHpConditionalSkillGrantsOperations.Value.IsHpConditionalGrantQualified(owner, g) && _characterHeQiOlOperations.IsEquipmentSuitGrantQualified(owner, g) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(owner, g.SkillId, g.SkillInstanceId, Role.Lord));
+        return grants.Any(g => _coreNationalSkillsOperations.IsEffectiveSkillSource(owner, g) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(owner, g.SkillId, g.SkillInstanceId, Role.Lord));
     }
 
     internal SkillProgramStepOutcome BeginMobileSunHaoDraw(ProgramSkillFrame frame)

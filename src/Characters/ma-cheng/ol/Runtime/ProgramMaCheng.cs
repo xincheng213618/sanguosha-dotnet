@@ -59,7 +59,7 @@ internal static class MaChengComposition
     internal static void ValidateProgram(string path,SkillProgram p)
     {
         if(!p.Triggers.SelectMany(t=>t.Effects).Concat(p.Activations.SelectMany(a=>a.Effects)).Any(e=>Handles(e.Op)))return;
-        if(p.Id!="ol:chenglie"||p.Activations.Count!=0||p.Triggers.Count!=2||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.HpSkillGrants.Count!=0||p.DamageModifiers.Count!=0)throw new InvalidOperationException(path+": Chenglie requires the complete extra-target, secret-entity and whole-Slash outcome protocol.");
+        if(p.Id!="ol:chenglie"||p.Activations.Count!=0||p.Triggers.Count!=2||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.SkillGrants.Count!=0||p.DamageModifiers.Count!=0)throw new InvalidOperationException(path+": Chenglie requires the complete extra-target, secret-entity and whole-Slash outcome protocol.");
         foreach(var t in p.Triggers)
         {
             var initial=t.Id=="extra-targets";

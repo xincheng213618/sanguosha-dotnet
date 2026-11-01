@@ -109,7 +109,7 @@ internal static class LeDiaoChanDiouComposition
         if (p.Id != "le:diou" && !p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects))
             .Any(e => e.Op == SkillProgramEffectOp.ResolveDiouTanbanUse)) return;
         if (p.Id != "le:diou" || p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 ||
-            p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 ||
+            p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 ||
             p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
             p.Triggers is not [var t] || t.Id != "completed-tanban-use" ||
             t.Window != SkillProgramTriggerWindow.CardUseCompleted || !t.IncludeResponseUses || !t.SingleActionInstance ||

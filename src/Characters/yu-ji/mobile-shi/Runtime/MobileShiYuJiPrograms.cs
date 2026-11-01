@@ -52,7 +52,7 @@ internal static class MobileShiYuJiComposition
         if (program.Id == FujiSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.Activations is not [{ Id: FujiGiftActivation }] ||
                 program.BooleanStates is not [{ Id: FujiEmpoweredState }] ||
                 program.Triggers is not [{ Id: "empowered-expire" }, { Id: FujiUseEffectsTrigger }, { Id: FujiDodgeDrawTrigger }] ||
@@ -69,7 +69,7 @@ internal static class MobileShiYuJiComposition
         }
         if (program.Id != DaozhuanSkill) return;
         if (program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 || program.CardPolicies.Count != 0 ||
-            program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 || program.Contributions.Count != 0 ||
+            program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 || program.Contributions.Count != 0 ||
             program.Activations.Count != 0 || program.BooleanStates.Count != 0 || program.Triggers.Count != 0 ||
             program.ViewAs.Count != 6 ||
             program.ViewAs.Select(rule => rule.OutputKind).Distinct().Count() != 6 ||

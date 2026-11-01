@@ -4,7 +4,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class ProgramBindingRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     IProgramRuntimePrompts prompts, IProgramBindingFacts facts, IProgramBindingProtocols native,
-    IProgramActivationWindows windows) : IProgramBindingActions
+    IProgramActivationWindows windows, IConditionalSkillGrantQueries conditionalGrants) : IProgramBindingActions
 {
     public void Begin(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
@@ -30,8 +30,7 @@ internal sealed class ProgramBindingRuntime(IProgramRuntimeFrames frames, IProgr
         };
         if (ProgramInvocations.Find(frames.Find(context.ParentFrameId), candidate, context) is { } authorization)
             frame = frame with { InvocationAuthorization = authorization with { ProgramFrameId = frame.Id } };
-        frame = native.CaptureHpConditionalSource(frame);
-        frame = native.CaptureEquipmentSuitSource(frame);
+        frame = conditionalGrants.CaptureSource(frame);
         native.AttachAfterTurnEndedChild(frame, candidate, context);
         frames.Push(frame);
         events.AdvanceFact(new ProgramBindingStartedEvent(frame.Id, frame.SkillId, candidate.BindingId,

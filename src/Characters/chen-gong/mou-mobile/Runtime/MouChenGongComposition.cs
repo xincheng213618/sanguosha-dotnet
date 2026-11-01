@@ -8,7 +8,7 @@ internal static class MouChenGongComposition
         e.Condition.Kind == SkillProgramConditionKind.Always && e.Amount == 0 && e.ActorReference is null && e.TargetReference is null &&
         e.CardOwnerRef is null && e.ChooserRef is null && e.SourceBind is null && e.ResultBind is null && e.NumberExpression is null && e.Zones.Count == 0 && !e.AllowDecline && !e.AwaitMovementTriggers;
     private static bool Empty(SkillProgram p) => p.ViewAs.Count == 0 && p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.CardIdentities.Count == 0 &&
-        p.HpSkillGrants.Count == 0 && p.EquipmentSuitSkillGrants.Count == 0 && p.DamageModifiers.Count == 0 && p.Contributions.Count == 0 && !p.LordSkillProjection && !p.CannotChallengeDeclarations;
+        p.SkillGrants.Count == 0 && p.DamageModifiers.Count == 0 && p.Contributions.Count == 0 && !p.LordSkillProjection && !p.CannotChallengeDeclarations;
     private static bool Unfiltered(SkillProgramTrigger t) => t.Condition.Kind == SkillProgramTriggerConditionKind.Always &&
         t.OwnerRelation is null && t.UsageScope is null && t.UsageLimit is null && t.DynamicUsageLimit is null && t.NamedUsageGroup is null && t.GainPhaseQualification is null &&
         t.MarkerCost is null && t.SourceZones.Count == 0 && t.DestinationZones.Count == 0 && t.CardKinds.Count == 0 && t.CardCategories.Count == 0 && t.DamageCardKinds.Count == 0 &&

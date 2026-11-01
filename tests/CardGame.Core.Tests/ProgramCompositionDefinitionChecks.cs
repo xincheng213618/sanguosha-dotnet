@@ -263,7 +263,7 @@ internal static class ProgramCompositionDefinitionChecks
             "Schema 34 category challenges must retain variable activation cards, exact choice binding and bound-card draws.");
 
         static string MultiCardRules() => $$$"""
-        {"schemaVersion":62,"skills":[{"id":"fixture:multi-card","revision":1,
+        {"schemaVersion":63,"skills":[{"id":"fixture:multi-card","revision":1,
          "minimumRulesVersion": 171,"modifiers":[],
          "viewAs":[{"id":"two-as-slash","inputKinds":[],"inputSuits":[],"inputCount":2,
           "outputKind":"slash","forPlay":true,"forResponse":true,"condition":{"kind":"always"}}],
@@ -631,7 +631,7 @@ internal static class ProgramCompositionDefinitionChecks
         })).Programs[id];
 
     private static string Rules(string id, string effects, string entries) => $$"""
-    {"schemaVersion":62,"skills":[{"id":"{{id}}","revision":1,"minimumRulesVersion": 171,
+    {"schemaVersion":63,"skills":[{"id":"{{id}}","revision":1,"minimumRulesVersion": 171,
     "modifiers":[],"viewAs":[],{{entries}},"contributions":[],"cardIdentities":[]}]}
     """;
 

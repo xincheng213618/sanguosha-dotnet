@@ -279,7 +279,7 @@ internal static class SkillProgramExecutorChecks
     private static SkillProgram ProgramWithActivations(string activations)
     {
         var rules = $$"""
-            {"schemaVersion":62,"skills":[{"id":"fixture:executor","revision":1,"minimumRulesVersion": 171,
+            {"schemaVersion":63,"skills":[{"id":"fixture:executor","revision":1,"minimumRulesVersion": 171,
             "modifiers":[],"viewAs":[],"activations":[{{activations}}]}]}
             """;
         const string presentation =
@@ -295,7 +295,7 @@ internal static class SkillProgramExecutorChecks
         int maxTargets = 0)
     {
         var rules = $$"""
-            {"schemaVersion":62,"skills":[{"id":"fixture:executor","revision":1,"minimumRulesVersion": 171,"modifiers":[],"viewAs":[],
+            {"schemaVersion":63,"skills":[{"id":"fixture:executor","revision":1,"minimumRulesVersion": 171,"modifiers":[],"viewAs":[],
             "activations":[{"id":"run","minCards":{{minCards}},"maxCards":{{maxCards}},
             "minTargets":{{minTargets}},"maxTargets":{{maxTargets}},"targetKind":"anyLiving","usesPerTurn":1,
             "effects":[{{effects}}]}]}]}

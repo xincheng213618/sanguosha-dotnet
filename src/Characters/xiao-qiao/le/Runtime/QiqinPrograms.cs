@@ -60,7 +60,7 @@ internal static class QiqinComposition
         if (p.Id != "le:qiqin" && !p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects))
                 .Any(e => e.Op is SkillProgramEffectOp.ResolveQiqinDiscardPileQin)) return;
         if (p.Id != "le:qiqin" || p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 ||
-            p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
+            p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
             p.BooleanStates.Count != 0 || p.Contributions.Count != 0 || p.Triggers.Count != 2 ||
             p.Triggers.SingleOrDefault(t => t.Id == "collect-discard-qin") is not { } prep ||
             !Exact(prep, SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, SkillProgramEffectOp.ResolveQiqinDiscardPileQin))

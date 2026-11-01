@@ -244,8 +244,8 @@ internal static class ShanheYaoliChecks
                 optional = false, effects = new[] { Pause("continue") } } } }, "continue");
             Add(Cost, new() { ["triggers"] = new[] { new { id = "real-support-cost-child", window = "afterHealthChanged", subject = "owner", optional = false,
                 effects = new[] { Pause("continue") } } } }, "continue");
-            if (scene is "source-boundary" or "paid-loss" or "paid-death") Add(Gate, new() { ["hpSkillGrants"] = new[]
-                { new { id = "real-hp-dependent-medicine", skillId = Skills[1], minimumHp = scene == "source-boundary" ? 5 : 3 } } });
+            if (scene is "source-boundary" or "paid-loss" or "paid-death") Add(Gate, new() { ["skillGrants"] = new[]
+                { new { id = "real-hp-dependent-medicine", skillId = Skills[1], @while = new object[] { ">=", new[] { "hp", "owner" }, scene == "source-boundary" ? 5 : 3 }, onSourceLoss = "finishInvocation" } } });
             if (scene is "paid-loss" or "paid-death")
             {
                 var effects = new List<object> { Pause("paid"), Effect("loseHp", scene == "paid-loss" ? 3 : 20) };

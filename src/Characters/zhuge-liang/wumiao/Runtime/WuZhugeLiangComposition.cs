@@ -15,7 +15,7 @@ internal static class WuZhugeLiangComposition
     internal static void ValidateProgram(string path, SkillProgram p)
     {
         if (!new[] { Jincui, Qingshi, Zhizhe }.Contains(p.Id) && !p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => Handles(e.Op))) return;
-        var empty = p.ViewAs.Count == 0 && p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.HpSkillGrants.Count == 0 && p.CardIdentities.Count == 0 && p.DamageModifiers.Count == 0 && !p.LordSkillProjection;
+        var empty = p.ViewAs.Count == 0 && p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.SkillGrants.Count == 0 && p.CardIdentities.Count == 0 && p.DamageModifiers.Count == 0 && !p.LordSkillProjection;
         var valid = p.Id switch
         {
             Jincui => p.Activations.Count == 0 && p.Triggers is [var g, var prep] && T(g, "opening-seven", SkillProgramTriggerWindow.GameStarting, false, SkillProgramEffectOp.InitializeWuZhugeLiangJincui) && g.Subject == SkillProgramTriggerSubject.Owner && T(prep, "preparation-seven", SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, false, SkillProgramEffectOp.ResolveWuZhugeLiangJincui) && prep.Subject == SkillProgramTriggerSubject.Owner,

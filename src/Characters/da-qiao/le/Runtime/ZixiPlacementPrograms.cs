@@ -66,7 +66,7 @@ internal static class ZixiPlacementComposition
         if (p.Id != "le:zixi" && !p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects))
                 .Any(e => e.Op == SkillProgramEffectOp.ResolveZixiQinJudgmentPlacement)) return;
         if (p.Id != "le:zixi" || p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 ||
-            p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 ||
+            p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 ||
             p.Contributions.Count != 0 || p.Triggers.Count != 3 ||
             p.Triggers.SingleOrDefault(t => t.Id == "start-place-qin") is not { } start ||
             p.Triggers.SingleOrDefault(t => t.Id == "end-place-qin") is not { } end ||

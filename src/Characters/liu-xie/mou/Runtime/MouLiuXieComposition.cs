@@ -9,7 +9,7 @@ internal static class MouLiuXieComposition
         static bool Reserved(SkillProgramEffect e) => e.Op is SkillProgramEffectOp.ResolveMouLiuXieZhanban or SkillProgramEffectOp.PrepareMouLiuXieChensheng;
         var ours = program.Id is Zhanban or Chensheng;
         if (!ours && !program.Activations.SelectMany(a => a.Effects).Concat(program.Triggers.SelectMany(t => t.Effects)).Any(Reserved)) return;
-        if (!ours || program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.CardPolicies.Count != 0 || program.DamageModifiers.Count != 0 || program.HpSkillGrants.Count != 0 || program.BooleanStates.Count != 0)
+        if (!ours || program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.CardPolicies.Count != 0 || program.DamageModifiers.Count != 0 || program.SkillGrants.Count != 0 || program.BooleanStates.Count != 0)
             throw new InvalidOperationException(path + ": Liu Xie requires his complete native adjustment or actual-turn-end binding.");
         var valid = program.Id == Zhanban
             ? program.Triggers.Count == 0 && program.Activations is [var a] && a.Id == "adjust-all-hands" &&

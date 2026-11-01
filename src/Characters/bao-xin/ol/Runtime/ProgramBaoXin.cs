@@ -49,7 +49,7 @@ internal static class BaoXinComposition
     internal static void ValidateProgram(string path,SkillProgram p)
     {
         if(!p.Activations.Any(a=>a.Effects.Any(e=>Handles(e.Op)))&&!p.Triggers.Any(t=>t.Effects.Any(e=>Handles(e.Op))))return;
-        if(p.Id is not("ol:mutao"or"ol:yimou")||p.Modifiers.Count!=0||p.ViewAs.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.BooleanStates.Count!=0||p.HpSkillGrants.Count!=0||p.DamageModifiers.Count!=0||p.Contributions.Count!=0||p.EquipmentSuitSkillGrants.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations)throw new InvalidOperationException(path+": Bao Xin requires independent exact material and native damage contracts.");
+        if(p.Id is not("ol:mutao"or"ol:yimou")||p.Modifiers.Count!=0||p.ViewAs.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.BooleanStates.Count!=0||p.SkillGrants.Count!=0||p.DamageModifiers.Count!=0||p.Contributions.Count!=0||p.LordSkillProjection||p.CannotChallengeDeclarations)throw new InvalidOperationException(path+": Bao Xin requires independent exact material and native damage contracts.");
         if(p.Id=="ol:mutao")
         {
             if(p.Triggers.Count!=0||p.Activations is not[var a]||a.Id!="public-slash-ring"||a.MinCards!=0||a.MaxCards!=0||a.MinTargets!=1||a.MaxTargets!=1||a.TargetKind!=SkillProgramTargetKind.AnyLiving||a.UsesPerTurn is not null||a.UsesPerPhase!=1||a.Effects is not[{Op:SkillProgramEffectOp.ResolveBaoXinMutao,Target:SkillProgramEffectTarget.Owner,Condition.Kind:SkillProgramConditionKind.Always}]||a.Condition.Kind!=SkillProgramConditionKind.Always)throw new InvalidOperationException(path+": Mutao requires the complete once-per-Play zero-card one-living-role activation.");return;

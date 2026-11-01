@@ -7,7 +7,7 @@ internal static class MouLuMengComposition
         e.TargetReference is null && e.ActorReference is null && e.NumberExpression is null && e.SourceBind is null && e.ResultBind is null &&
         e.Condition.Kind == SkillProgramConditionKind.Always;
     private static bool Empty(SkillProgram p) => p.ViewAs.Count == 0 && p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 &&
-        p.CardIdentities.Count == 0 && p.HpSkillGrants.Count == 0 && p.EquipmentSuitSkillGrants.Count == 0 && p.DamageModifiers.Count == 0 &&
+        p.CardIdentities.Count == 0 && p.SkillGrants.Count == 0 && p.DamageModifiers.Count == 0 &&
         p.BooleanStates.Count == 0 && p.Contributions.Count == 0 && !p.LordSkillProjection && !p.CannotChallengeDeclarations;
     internal static bool IsKeji(SkillProgram p) => p.Id == Keji && Empty(p) && p.Triggers.Count == 0 && p.Activations.Count == 2 &&
         p.Activations.All(a => a.Id is "discard-hand" or "lose-hp") && p.Activations.Select(a => a.Id).Distinct().Count() == 2 &&

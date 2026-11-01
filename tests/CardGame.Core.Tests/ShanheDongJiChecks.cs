@@ -277,7 +277,7 @@ internal static class ShanheDongJiChecks
             Add(RecipientGain, new() { ["triggers"] = new[] { new { id = "actual-gift-recipient-child", window = "cardsGained", subject = "owner", destinationZones = new[] { "hand" },
                 movementOccurrence = "perBatch", movementReasons = new[] { GiftReason }, optional = false, usageScope = "game", usageLimit = 1,
                 effects = new[] { new { op = scene == "recipient-death" ? "loseHp" : "recover", target = "owner", amount = scene == "recipient-death" ? 20 : 1 } } } } });
-            Add(Gate, new() { ["hpSkillGrants"] = new[] { new { id = "actual-full-health-source", skillId = Skill, minimumHp = 8 } } });
+            Add(Gate, new() { ["skillGrants"] = new[] { new { id = "actual-full-health-source", skillId = Skill, @while = new object[] { ">=", new[] { "hp", "owner" }, 8 }, onSourceLoss = "finishInvocation" } } });
             Add(Quiet, new() { ["triggers"] = new[] { new { id = "quiet-real-turn", window = "afterNormalDraw", subject = "owner", optional = false,
                 effects = new[] { new { op = "skipTurnPhases", target = "owner", phases = new[] { "play" } } } } } });
             var catalog = SkillProgramCatalog.Load(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = definitions }),

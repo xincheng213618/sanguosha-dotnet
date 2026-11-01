@@ -34,8 +34,7 @@ internal static class ZhangShiPingComposition
     {
         if (!p.Triggers.Any(t => t.Effects.Any(e => IsOwn(e.Op))) && !p.Activations.Any(a => a.Effects.Any(e => IsOwn(e.Op)))) return;
         if (p.Activations.Count != 0 || p.Modifiers.Count != 0 || p.ViewAs.Count != 0 || p.Contributions.Count != 0 || p.CardIdentities.Count != 0 ||
-            p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 ||
-            p.LordSkillProjection || p.CannotChallengeDeclarations || p.Id is not ("ol:hongji" or "ol:xinggu"))
+            p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.SkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations || p.Id is not ("ol:hongji" or "ol:xinggu"))
             throw new InvalidOperationException($"{path}: Zhang Shiping requires his exact lifecycle-only paired skill contracts.");
         if (p.Triggers.Count != (p.Id == "ol:hongji" ? 4 : 2)) throw new InvalidOperationException($"{path}: Zhang Shiping has an incomplete lifecycle contract.");
         foreach (var t in p.Triggers)

@@ -95,7 +95,7 @@ internal static class WuyouComposition
         if (p.Id != "wumiao:wuyou" && !p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects))
             .Any(e => e.Op == SkillProgramEffectOp.ResolveWuyouContributionAndNamedReturn)) return;
         if (p.Id != "wumiao:wuyou" || p.Triggers.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 ||
-            p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 ||
+            p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 ||
             p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
             p.Activations is not [var a] || a.Id != "hand-contribution" || a.MinCards != 0 || a.MaxCards != 0 ||
             a.MinTargets != 0 || a.MaxTargets != 0 || a.TargetKind != SkillProgramTargetKind.OtherLiving ||

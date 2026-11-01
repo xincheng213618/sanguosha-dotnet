@@ -57,11 +57,9 @@ public sealed partial class GameEngine
     private ref long _guanduQualificationStamp => ref _guanduActivities.ReferenceToGuanduQualificationStamp;
     private ref (long Underlying, int LivingMask, int FactionHash) _guanduQualificationDependencies => ref _guanduActivities.ReferenceToGuanduQualificationDependencies;
     private ref readonly List<HpChangeContext> _pendingHpChanges => ref _hpChangePrograms.ReferenceToPendingHpChanges;
-    private ref bool _synchronizingHpConditionalSkillGrants => ref _hpConditionalSkillGrants.ReferenceToSynchronizingHpConditionalSkillGrants;
     // A source relation remembers its first effective instance through HP exits.
     // This preserves scoped runtime state even when an independent shared grant
     // disappears while the conditional grant is absent. Replay reconstructs it.
-    private ref readonly Dictionary<(int OwnerSeat, HpConditionalSkillGrantSource Source), string> _hpConditionalSkillInstances => ref _hpConditionalSkillGrants.ReferenceToHpConditionalSkillInstances;
     // Issued phase facts survive source loss/suppression until this actual phase ends.
     private ref readonly List<IssuedPlayPhaseUseProhibition> _issuedPlayPhaseUseProhibitions => ref _issuedPlayUsePolicies.ReferenceToIssuedPlayPhaseUseProhibitions;
     private ref bool _synchronizingLordProjections => ref _lordSkillProjections.ReferenceToSynchronizingLordProjections;
@@ -144,19 +142,14 @@ public sealed partial class GameEngine
     private ref IGameEvent? _caoXiHistoryTail => ref _characterCaoXiOl.ReferenceToCaoXiHistoryTail;
     private ref int _caoXiHistoryCount => ref _characterCaoXiOl.ReferenceToCaoXiHistoryCount;
     private ref IReadOnlyList<CaoXiGangshuIncreasedEvent> _caoXiActiveUnits => ref _characterCaoXiOl.ReferenceToCaoXiActiveUnits;
-    private ref readonly Dictionary<int, ((long Base, long Grant, long Movement, int Hp, bool Alive, bool Concealed) Key, long Stamp)> _daQiaoXiaoQiaoQualificationCache => ref _characterDaQiaoXiaoQiaoOl.ReferenceToDaQiaoXiaoQiaoQualificationCache;
-    private ref long _daQiaoXiaoQiaoQualificationRevision => ref _characterDaQiaoXiaoQiaoOl.ReferenceToDaQiaoXiaoQiaoQualificationRevision;
-    private ref bool _synchronizingDaQiaoXiaoQiaoLuoyan => ref _characterDaQiaoXiaoQiaoOl.ReferenceToSynchronizingDaQiaoXiaoQiaoLuoyan;
     private ref bool _synchronizingAdoptedChildGrants => ref _characterDingYuanOl.ReferenceToSynchronizingAdoptedChildGrants;
     // Only a derived lookup cache. Its complete source is the immutable committed/pending rule facts.
     private ref int _duXiSuitProjectionEventCount => ref _characterDuXiOl.ReferenceToDuXiSuitProjectionEventCount;
     private ref IGameEvent? _duXiSuitProjectionLastFact => ref _characterDuXiOl.ReferenceToDuXiSuitProjectionLastFact;
     private ref IReadOnlyDictionary<int, int> _duXiSuitProjection => ref _characterDuXiOl.ReferenceToDuXiSuitProjection;
-    private ref bool _synchronizingEquipmentSuitSkillGrants => ref _characterHeQiOl.ReferenceToSynchronizingEquipmentSuitSkillGrants;
     // A source relation remembers its first effective instance through equipment suit exits.
     // This preserves scoped runtime state even when an independent shared grant
     // disappears while the conditional grant is absent. Replay reconstructs it.
-    private ref readonly Dictionary<(int OwnerSeat, EquipmentSuitSkillGrantSource Source), string> _equipmentSuitSkillInstances => ref _characterHeQiOl.ReferenceToEquipmentSuitSkillInstances;
     // Durable private courses, rather than pending choices. Commands rebuild
     // these immutable accepted orders on replay; public facts reveal no future animal.
     private ref readonly Dictionary<long, MobileWulingCourse> _mobileWulingCourses => ref _characterHuaTuoMobileGod.ReferenceToMobileWulingCourses;

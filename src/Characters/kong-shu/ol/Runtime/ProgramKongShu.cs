@@ -67,7 +67,7 @@ internal static class KongShuComposition
     internal static void ValidateProgram(string path, SkillProgram p)
     {
         if (!p.ViewAs.Any(v => v.LeiluanBasicUse is not null) && !p.Triggers.Any(t => t.Effects.Any(e => Handles(e.Op))) && !p.Activations.Any(a => a.Effects.Any(e => Handles(e.Op)))) return;
-        if (p.Id is not ("ol:leiluan" or "ol:fuchao") || p.Activations.Count != 0 || p.Modifiers.Count != 0 || p.CardIdentities.Count != 0 || p.CardPolicies.Count != 0 || p.DamageModifiers.Count != 0 || p.HpSkillGrants.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0)
+        if (p.Id is not ("ol:leiluan" or "ol:fuchao") || p.Activations.Count != 0 || p.Modifiers.Count != 0 || p.CardIdentities.Count != 0 || p.CardPolicies.Count != 0 || p.DamageModifiers.Count != 0 || p.SkillGrants.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0)
             throw new InvalidOperationException(path + ": Kong Shu requires her exact complete native basic and round-ending program.");
         if (p.Id == "ol:leiluan")
         {

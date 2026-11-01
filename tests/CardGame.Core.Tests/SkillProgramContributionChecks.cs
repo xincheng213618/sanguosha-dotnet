@@ -174,7 +174,7 @@ internal static class SkillProgramContributionChecks
     }
 
     private const string Rules = """
-        {"schemaVersion":62,"skills":[
+        {"schemaVersion":63,"skills":[
           {"id":"scenario:classic-huangtian","revision":1,"modifiers":[],"viewAs":[],"activations":[],"triggers":[],
            "contributions":[{"id":"contribute","providerFactions":["qun"],"ownerRole":"lord",
              "cardKinds":["dodge","lightning"],"cardSuits":[],"usesPerPlayPhase":1}]},

@@ -9,7 +9,7 @@ internal static class MouWangLingComposition
         static bool Reserved(SkillProgramEffect e) => e.Op is SkillProgramEffectOp.ResolveMouWangLingJichou or SkillProgramEffectOp.PrepareMouWangLingMouli or SkillProgramEffectOp.ResolveMouWangLingZifu;
         var ours=p.Id is Jichou or Mouli or Zifu;
         if(!ours&&!p.Activations.SelectMany(a=>a.Effects).Concat(p.Triggers.SelectMany(t=>t.Effects)).Any(Reserved))return;
-        if(!ours||p.Triggers is not[var t]||p.Activations.Count!=0||p.ViewAs.Count!=0||p.CardPolicies.Count!=0||p.Modifiers.Count!=0||p.DamageModifiers.Count!=0||p.HpSkillGrants.Count!=0||p.BooleanStates.Count!=0||
+        if(!ours||p.Triggers is not[var t]||p.Activations.Count!=0||p.ViewAs.Count!=0||p.CardPolicies.Count!=0||p.Modifiers.Count!=0||p.DamageModifiers.Count!=0||p.SkillGrants.Count!=0||p.BooleanStates.Count!=0||
             t.Subject!=SkillProgramTriggerSubject.Owner||t.Condition.Kind!=SkillProgramTriggerConditionKind.Always||t.Effects.Any(e=>e.Target!=SkillProgramEffectTarget.Owner||e.Condition.Kind!=SkillProgramConditionKind.Always))throw new InvalidOperationException(path+": Wang Ling requires its complete native lifecycle bindings.");
         var valid=p.Id switch {
             Jichou=>t.Id=="unique-turn-gifts"&&t.Window==SkillProgramTriggerWindow.TurnEnding&&t.Optional&&t.Effects is[{Op:SkillProgramEffectOp.ResolveMouWangLingJichou}],

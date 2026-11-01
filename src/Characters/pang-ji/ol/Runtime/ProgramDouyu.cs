@@ -114,7 +114,7 @@ internal static class DouyuComposition
                 .Any(e => e.Op == SkillProgramEffectOp.ResolveDouyuPreRevealSwapAndWinDraw)) return;
         if (p.Id != "ol:douyu" || p.Triggers.Count != 2 || p.Activations.Count != 0 || p.ViewAs.Count != 0 ||
             p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 ||
-            p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
+            p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
             !p.Triggers.Any(t => Exact(t, "pre-reveal", SkillProgramTriggerWindow.PindianBeforeReveal, true)) ||
             !p.Triggers.Any(t => Exact(t, "swapped-win", SkillProgramTriggerWindow.PindianResultDetermined, false)))
             throw new InvalidOperationException(path + ": Douyu requires its private native pre-reveal swap and exact issued swapped-pair win draw.");

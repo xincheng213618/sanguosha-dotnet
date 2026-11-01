@@ -70,7 +70,7 @@ internal static class HuBanComposition
         if(!p.Triggers.Any(t=>t.Effects.Any(e=>e.Op==SkillProgramEffectOp.ResolveHuiyunCompletedFireAttack)))return;
         if(p.Id!="ol:huiyun"||p.Triggers is not[var t]||t.Id!="completed-converted-fire-attack"||t.Window!=SkillProgramTriggerWindow.CardUseCompleted||t.OwnerRelation!=SkillProgramCardActionOwnerRelation.Actor||t.Optional||t.Priority!=0||t.Condition.Kind!=SkillProgramTriggerConditionKind.Always||t.UsageLimit is not null||t.MarkerCost is not null||
             t.Effects is not[{Op:SkillProgramEffectOp.ResolveHuiyunCompletedFireAttack,Target:SkillProgramEffectTarget.Owner,Condition.Kind:SkillProgramConditionKind.Always}]||p.ViewAs is not[var v]||v.Id!="huiyun-fire-attack"||v.OutputKind!=CardKind.FireAttack||!v.SingleCardTrickUse||!v.ForPlay||v.ForResponse||v.InputCount!=1||v.VariableInputCount||!v.AllowSameKind||!v.SourceZones.SequenceEqual([CardZoneKind.Hand,CardZoneKind.Equipment])||v.InputKinds.Count!=0||v.InputSuits.Count!=0||v.UsesPerPhase is not null||v.UsesPerActualTurn is not null||
-            p.Activations.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.HpSkillGrants.Count!=0||p.DamageModifiers.Count!=0)
+            p.Activations.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.SkillGrants.Count!=0||p.DamageModifiers.Count!=0)
             throw new InvalidOperationException(path+": Huiyun requires its unrestricted one-HE FireAttack conversion and exact whole-use continuation; round options are paid separately.");
     }
 }

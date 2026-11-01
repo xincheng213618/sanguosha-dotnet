@@ -35,7 +35,7 @@ internal static class CaoTengComposition
     {
         bool Handles(SkillProgramEffect e)=>e.Op is SkillProgramEffectOp.ResolveQingliuFactionChoice or SkillProgramEffectOp.ResolveYongzuDistinctBenefits or SkillProgramEffectOp.ResolveCaoTengJianxiongDrawAndClaim;
         if(!p.Triggers.Any(t=>t.Effects.Any(Handles))&&!p.Activations.Any(a=>a.Effects.Any(Handles)))return;
-        if(p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.BooleanStates.Count!=0||p.HpSkillGrants.Count!=0||p.EquipmentSuitSkillGrants.Count!=0||p.Contributions.Count!=0||p.DamageModifiers.Count!=0||p.LordSkillProjection)
+        if(p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.BooleanStates.Count!=0||p.SkillGrants.Count!=0||p.Contributions.Count!=0||p.DamageModifiers.Count!=0||p.LordSkillProjection)
             throw new InvalidOperationException(path+": Cao Teng operations require their exact independent native bindings.");
         var q=p.Id=="ol:qingliu";var y=p.Id=="ol:yongzu";var j=p.Id=="ol:caoteng-jianxiong";
         if(!q&&!y&&!j||p.Triggers.Count!=(q?2:1))throw new InvalidOperationException(path+": Unexpected Cao Teng skill or binding count.");

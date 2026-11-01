@@ -61,7 +61,7 @@ internal static class WuLuXunZhangcaiComposition
         if (p.Id is not ("wumiao:zhangcai" or "wumiao:ruxian") && !effects.Any(e => e.Op is
             SkillProgramEffectOp.ResolveWuLuXunZhangcai or SkillProgramEffectOp.ResolveWuLuXunRuxian)) return;
         if (p.Id is not ("wumiao:zhangcai" or "wumiao:ruxian") || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 ||
-            p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
+            p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
             p.BooleanStates.Count != 0 || p.Contributions.Count != 0)
             throw new InvalidOperationException(path + ": Wu Lu Xun requires his complete native accepted-action and limited actual-Play contracts.");
         if (p.Id == "wumiao:ruxian")

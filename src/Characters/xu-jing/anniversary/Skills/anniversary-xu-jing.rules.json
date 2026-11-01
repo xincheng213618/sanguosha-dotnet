@@ -1,4 +1,4 @@
-{"schemaVersion":62,"skills":[
+{"schemaVersion":63,"skills":[
   {"id":"anniversary:shangyu","revision":1,"triggers":[
     {"id":"opening-slash","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"resolveAnniversaryXuJingShangyu","target":"owner"}]},
     {"id":"marked-slash-damage","window":"afterDamageApplied","subject":"any","damageOccurrence":"perDamage","optional":false,"effects":[{"op":"resolveAnniversaryXuJingShangyu","target":"owner"}]},

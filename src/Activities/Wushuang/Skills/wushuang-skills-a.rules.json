@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     {
       "id": "wushuang:skill-3079",
@@ -158,27 +158,11 @@
     {
       "id": "wushuang:skill-3131",
       "revision": 1,
-      "equipmentSuitSkillGrants": [
-        {
-          "id": "one-mashu",
-          "skillId": "classic:mashu",
-          "minimumDistinctSuits": 1
-        },
-        {
-          "id": "two-yingzi",
-          "skillId": "boundary:yingzi",
-          "minimumDistinctSuits": 2
-        },
-        {
-          "id": "three-duanbing",
-          "skillId": "ol:duanbing",
-          "minimumDistinctSuits": 3
-        },
-        {
-          "id": "four-fenwei",
-          "skillId": "boundary:fenwei",
-          "minimumDistinctSuits": 4
-        }
+      "skillGrants": [
+        {"id": "one-mashu","skillId": "classic:mashu","while": [">=",["equipmentSuitCount","owner"],1],"onSourceLoss": "finishPaidInstruction"},
+        {"id": "two-yingzi","skillId": "boundary:yingzi","while": [">=",["equipmentSuitCount","owner"],2],"onSourceLoss": "finishPaidInstruction"},
+        {"id": "three-duanbing","skillId": "ol:duanbing","while": [">=",["equipmentSuitCount","owner"],3],"onSourceLoss": "finishPaidInstruction"},
+        {"id": "four-fenwei","skillId": "boundary:fenwei","while": [">=",["equipmentSuitCount","owner"],4],"onSourceLoss": "finishPaidInstruction"}
       ]
     },
     {
@@ -385,23 +369,10 @@
     {
       "id": "wushuang:skill-3004",
       "revision": 1,
-      "hpSkillGrants": [
-        {
-          "id": "taunt",
-          "skillId": "wushuang:skill-3001",
-          "maximumHp": 3
-        },
-        {
-          "id": "roar",
-          "skillId": "classic:paoxiao",
-          "maximumHp": 2
-        },
-        {
-          "id": "swift",
-          "skillId": "boundary:shensu",
-          "minimumHp": 1,
-          "maximumHp": 1
-        }
+      "skillGrants": [
+        {"id": "taunt","skillId": "wushuang:skill-3001","while": ["<=",["hp","owner"],3],"onSourceLoss": "finishInvocation"},
+        {"id": "roar","skillId": "classic:paoxiao","while": ["<=",["hp","owner"],2],"onSourceLoss": "finishInvocation"},
+        {"id": "swift","skillId": "boundary:shensu","while": ["==",["hp","owner"],1],"onSourceLoss": "finishInvocation"}
       ]
     },
     {

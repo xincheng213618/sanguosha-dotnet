@@ -23,6 +23,36 @@ internal static class FrozenHandRosterChecks
         g=Cold(g,registry);Answer(g,c=>c.Targets.SequenceEqual([1]));Reach(g,()=>!g.ResolutionStack.Any(f=>f.Id==id));
         Need(V(g,0).HandCount==5 && V(g,1).HandCount==5 && E<FrozenHandRosterDrawPaidEvent>(g).Count(e=>e.FrameId==id)==2 && E<FrozenHandRosterDamageIssuedEvent>(g).Count(e=>e.FrameId==id)==0 &&
             E<ProgramBindingResolvedEvent>(g).Count(e=>e.FrameId==id)==1,"Skipping optional damage still issues one selected mandatory reward and one final parent return.");_=Cold(g,registry);
+        ConditionalPaidSourceLossFinishesOnlyAcceptedDraw();
+    }
+    private static void ConditionalPaidSourceLossFinishesOnlyAcceptedDraw()
+    {
+        var(g,registry)=Start("conditional-paid");Begin(g);
+        var issued=Root(g);var id=issued.Id;
+        Need(issued.ConditionalSourceReceipt is{OnSourceLoss:ConditionalSkillGrantContinuation.FinishPaidInstruction,Source.CapabilitySkillId:Loss},
+            "The genuine ending invocation captures its conditional parent's paid-instruction permission.");
+        var source=issued.ConditionalSourceReceipt!.Source;
+        Answer(g,c=>Branch(c,"draw"));
+        Reach(g,()=>P(g)?.SkillPrompt?.SkillId==Watch && P(g)!.Choices.Any(c=>c.Parameters.GetValueOrDefault("option-id")=="continue"));
+        var owner=((IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine.GetField("_players",
+            System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!.GetValue(g)!)[0];
+        Need(owner.IsAlive && owner.SkillGrants.Grants.Any(grant=>grant.GrantId==source.CapabilityGrantId && !grant.IsEnabled) &&
+            !owner.SkillGrants.Grants.Any(grant=>grant.SkillId==Skill) && Root(g).Id==id && Root(g).FrozenHandRoster is{Stage:"movement"} &&
+            E<ConditionalSkillGrantChangedEvent>(g).Any(e=>!e.Added && e.Source==source && e.SkillId==Skill) &&
+            E<FrozenHandRosterDrawPaidEvent>(g).Count(e=>e.FrameId==id && e.ActualCount==1)==1,
+            "The actual first draw child disables the exact parent and removes its leaf while the living owner's original paid movement remains suspended.");
+        g=Cold(g,registry);
+        Need(g.GetRuntimeModule<ConditionalSkillGrantRuntime>().CanContinue(Root(g)),
+            "The same cold-restored paid frame retains its signed FinishPaidInstruction right after losing its real source.");
+        Answer(g,c=>c.Parameters.GetValueOrDefault("option-id")=="continue");
+        Reach(g,()=>!g.ResolutionStack.Any(f=>f.Id==id));
+        Need(V(g,0).IsAlive && V(g,0).HandCount==5 &&
+            E<FrozenHandRosterParticipantAnsweredEvent>(g).Count(e=>e.FrameId==id)==1 &&
+            E<FrozenHandRosterDrawPaidEvent>(g).Count(e=>e.FrameId==id)==1 &&
+            !E<FrozenHandRosterDamageIssuedEvent>(g).Any(e=>e.FrameId==id) &&
+            E<ProgramBindingResolvedEvent>(g).Count(e=>e.FrameId==id && e.Completed)==1,
+            "Only the already paid draw returns once; source loss prevents later participant choices, damage and the unissued reward tail.");
+        _=Cold(g,registry);
     }
     private static PlayerSnapshot V(GameEngine g,int s)=>g.CreateSnapshot(s).Players[s];
     private static PendingDecision? P(GameEngine g)=>Enumerable.Range(0,4).Select(s=>g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p=>p is not null);
@@ -62,6 +92,12 @@ internal static class FrozenHandRosterChecks
             var defs=new List<string>{$$"""{"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}""",
                 $$"""{"id":"{{Driver}}","revision":1,"modifiers":[{"id":"distance","query":"outgoingDistance","operation":"add","value":-1,"priority":0}]}"""};
             var skills=new List<string>{Skill};
+            if(scenario=="conditional-paid")
+            {
+                skills.Clear();skills.Add(Loss);skills.Add(Watch);
+                defs.Add($$$"""{"id":"{{{Loss}}}","revision":1,"skillGrants":[{"id":"paid-roster","skillId":"{{{Skill}}}","while":[">=",["hp","owner"],1],"onSourceLoss":"finishPaidInstruction"}]}""");
+                defs.Add($$$"""{"id":"{{{Watch}}}","revision":1,"triggers":[{"id":"paid-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["program.frozen-hand-roster.draw"],"optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"skillState","target":"owner","action":"lose","match":{"skillIds":["{{{Loss}}}"]}},{"op":"chooseOption","target":"owner","resultBind":"child","options":[{"id":"continue"}]}]}]}""");
+            }
             if(scenario.StartsWith("source-",StringComparison.Ordinal))
             {
                 defs.Add($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"paid-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["program.frozen-hand-roster.draw"],"optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"chooseOption","target":"owner","resultBind":"child","options":[{"id":"continue"}]},{"op":"loseHp","target":"owner","amount":20}]}]}""");skills.Add(Watch);

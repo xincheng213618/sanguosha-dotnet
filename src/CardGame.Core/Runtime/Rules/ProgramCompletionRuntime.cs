@@ -73,7 +73,7 @@ internal sealed class ProgramCompletionRuntime(IProgramRuntimeFrames frames, IPr
             var valid = (payment.Operation != SkillProgramEffectOp.SelectAndMoveOwnedCard || payment.Movement is { Delivered: true }) &&
                 facts.Alive(frame.OwnerSeat) &&
                 (facts.CanInvokeProgramSkill(frame) ||
-                 facts.CanContinueEquipmentSuit(frame) || facts.CanContinueHpConditional(frame) || facts.CanContinuePhaseAlcohol(frame) ||
+                 facts.CanContinueConditionalGrant(frame) || facts.CanContinuePhaseAlcohol(frame) ||
                  facts.CanContinueSelectedCardPayment(frame));
             frames.ReplaceTop(frame with
             {
@@ -109,7 +109,7 @@ internal sealed class ProgramCompletionRuntime(IProgramRuntimeFrames frames, IPr
         frames.ReplaceTop(frame with { PendingMovementContinuation = null });
         if (!facts.Alive(frame.OwnerSeat) || !facts.Alive(pending.SubjectSeat) ||
             !facts.CanInvokeProgramSkill(frame) &&
-            !facts.CanContinueEquipmentSuit(frame) && !facts.CanContinueHpConditional(frame) && !facts.CanContinuePhaseAlcohol(frame))
+            !facts.CanContinueConditionalGrant(frame) && !facts.CanContinuePhaseAlcohol(frame))
         {
             protocols.CancelBindingAndCleanup(frames.ActiveProgram(frameId),
                 "移动响应后技能持有人、装备持有人或技能实例已失效。");
@@ -131,8 +131,7 @@ internal interface IProgramCompletionFacts : IProgramSelectionQuery
     int TriggerPriority(ProgramSkillFrame frame);
     bool Alive(int seat);
     bool CanInvokeProgramSkill(ProgramSkillFrame frame);
-    bool CanContinueEquipmentSuit(ProgramSkillFrame frame);
-    bool CanContinueHpConditional(ProgramSkillFrame frame);
+    bool CanContinueConditionalGrant(ProgramSkillFrame frame);
     bool CanContinuePhaseAlcohol(ProgramSkillFrame frame);
     bool CanContinueSelectedCardPayment(ProgramSkillFrame frame);
     bool ValidDamageTargetObtain(ProgramSkillFrame frame);

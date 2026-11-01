@@ -91,7 +91,7 @@ internal static class XianshuComposition
         if (!handles && program.Id != "le:xianshu") return;
         if (program.Id != "le:xianshu" || program.Triggers.Count != 0 || program.ViewAs.Count != 0 ||
             program.Modifiers.Count != 0 || program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 ||
-            program.DamageModifiers.Count != 0 || program.HpSkillGrants.Count != 0 || program.BooleanStates.Count != 0 ||
+            program.DamageModifiers.Count != 0 || program.SkillGrants.Count != 0 || program.BooleanStates.Count != 0 ||
             program.Contributions.Count != 0 || program.Activations is not [{ } activation] ||
             activation.Id != "marked-hand-gift" || activation.MinCards != 1 || activation.MaxCards != 1 ||
             activation.MinTargets != 1 || activation.MaxTargets != 1 ||

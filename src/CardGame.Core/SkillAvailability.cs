@@ -12,34 +12,138 @@ internal sealed class SkillAvailability(
     RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null,
     EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState = null,
     IProgramHealthChildQueries? healthChildren = null, ICardEntityMarkQueries? cardMarks = null,
-    IReadOnlySet<string>? allowedEffectiveSkillIds = null)
+    IReadOnlySet<string>? allowedEffectiveSkillIds = null, ISelectionWoundedQueries? wounded = null,
+    RuntimeEntries.CoreGameEnginePublicPileSourcesEntries? piles = null)
 {
     private readonly IReadOnlySet<string>? _allowedEffectiveSkillIds =
         allowedEffectiveSkillIds?.ToFrozenSet(StringComparer.Ordinal);
+    private SourceEvaluation? _evaluation;
 
-    internal SkillAvailabilitySnapshot Query(CharacterState owner)
+    internal SkillAvailabilitySnapshot Query(CharacterState owner) => Evaluate(evaluation => Query(owner, evaluation));
+
+    private SkillAvailabilitySnapshot Query(CharacterState owner, SourceEvaluation evaluation)
     {
         var owned = new List<SkillGrant>();
         var effective = new List<SkillGrant>();
-        var definitions = new Dictionary<string, ContentSkillDefinition>(StringComparer.Ordinal);
-        var restrictions = ActiveRestrictions(owner).ToArray();
         foreach (var grant in owner.SkillGrants.Grants)
         {
-            var source = RawSourceAdmission(owner, grant);
-            if (!source.Owned) continue;
-            if (!definitions.TryGetValue(grant.SkillId, out var definition))
-                definitions[grant.SkillId] = definition = resolveDefinition(grant.SkillId);
-            if (!OwnsPrintedLord(owner, grant, definition)) continue;
-            var state = InterpretRestrictions(owner, grant, definition, restrictions);
-            if (!state.Owned) continue;
+            if (!ReadState(owner, grant, evaluation).Owned) continue;
             owned.Add(grant);
-            if (state.Effective && source.Effective &&
-                effectiveQualification?.Invoke(owner, grant) != false) effective.Add(grant);
+            if (IsEffective(owner, grant, evaluation)) effective.Add(grant);
         }
         var effectiveDefinitions = effective.Select(grant => grant.SkillId).Distinct(StringComparer.Ordinal)
-            .ToDictionary(id => id, id => definitions[id], StringComparer.Ordinal);
+            .ToDictionary(id => id, id => Definition(id, evaluation), StringComparer.Ordinal);
         return new(Array.AsReadOnly(owned.ToArray()), Array.AsReadOnly(effective.ToArray()),
             new ReadOnlyDictionary<string, ContentSkillDefinition>(effectiveDefinitions));
+    }
+
+    internal bool HasConditionalSources(CharacterState owner) => owner.SkillGrants.Grants.Any(grant =>
+        grant.ConditionalSource is not null || resolveDefinition(grant.SkillId).Program?.SkillGrants.Count > 0);
+
+    internal bool IsEffectiveSource(CharacterState owner, SkillGrant grant) =>
+        owner.IsAlive && Evaluate(evaluation => IsEffective(owner, grant, evaluation));
+
+    internal bool ConditionalRuleApplies(CharacterState owner, ConditionalSkillGrantRule rule) =>
+        Evaluate(_ => ProgramExpressions.EvaluateBool(rule.While,
+            CreateConditionWorld(new(owner.Seat, owner.Seat), owner)) == true);
+
+    internal int? EquipmentSuitCount(int seat) => Evaluate(evaluation =>
+    {
+        var owner = participants?._players.FirstOrDefault(player => player.Seat == seat);
+        if (owner is null || cards is null) return (int?)null;
+        if (owner.IdentityConcealed) return 0;
+        if (evaluation.EquipmentSuits.TryGetValue(seat, out var count)) return count;
+        // The suit read may use independently qualified roots and lower-tier
+        // grants, never a grant whose own condition needs this same suit read.
+        var policies = owner.SkillGrants.Grants.Where(grant =>
+                Definition(grant.SkillId, evaluation).Program?.CardPolicies.Any(policy =>
+                    policy.Kind == SkillProgramCardPolicyKind.RewriteSuit) == true &&
+                !DependsOnEquipmentSuits(owner, grant) && IsEffective(owner, grant, evaluation))
+            .GroupBy(grant => (grant.SkillId, grant.SkillInstanceId))
+            .OrderBy(group => group.Key.SkillId, StringComparer.Ordinal)
+            .ThenBy(group => group.Key.SkillInstanceId, StringComparer.Ordinal)
+            .SelectMany(group => Definition(group.Key.SkillId, evaluation).Program!.CardPolicies
+                .Where(policy => policy.Kind == SkillProgramCardPolicyKind.RewriteSuit)).ToArray();
+        count = CardSuitRewrites.CountEquipmentSuits(cards.CardsAt(CardLocation.Equipment(seat)), policies);
+        evaluation.EquipmentSuits.Add(seat, count);
+        return count;
+    });
+
+    private bool DependsOnEquipmentSuits(CharacterState owner, SkillGrant grant)
+    {
+        var visited = new HashSet<string>(StringComparer.Ordinal);
+        while (grant.ConditionalSource is { } source)
+        {
+            if (!visited.Add(grant.GrantId)) return true;
+            var parent = FindParent(owner, source);
+            if (parent is null) return false;
+            var rule = resolveDefinition(parent.SkillId).Program?.SkillGrants.FirstOrDefault(rule => rule.Id == source.RuleId);
+            if (rule?.While.Reads("equipmentSuitCount") == true) return true;
+            grant = parent;
+        }
+        return false;
+    }
+
+    private bool IsEffective(CharacterState owner, SkillGrant grant, SourceEvaluation evaluation)
+    {
+        var key = (owner.Seat, grant.GrantId);
+        if (evaluation.Effective.TryGetValue(key, out var effective)) return effective;
+        if (!evaluation.Visiting.Add(key)) return false;
+        try
+        {
+            effective = ReadState(owner, grant, evaluation).Effective &&
+                effectiveQualification?.Invoke(owner, grant) != false && ConditionalSourceQualifies(owner, grant, evaluation);
+            evaluation.Effective.Add(key, effective);
+            return effective;
+        }
+        finally { evaluation.Visiting.Remove(key); }
+    }
+
+    private bool ConditionalSourceQualifies(CharacterState owner, SkillGrant grant, SourceEvaluation evaluation)
+    {
+        if (grant.ConditionalSource is not { } source) return true;
+        if (!owner.IsAlive || FindParent(owner, source) is not { } parent || !IsEffective(owner, parent, evaluation)) return false;
+        return Definition(parent.SkillId, evaluation).Program?.SkillGrants.Any(rule =>
+            rule.Id == source.RuleId && rule.SkillId == grant.SkillId && ConditionalRuleApplies(owner, rule)) == true;
+    }
+
+    private static SkillGrant? FindParent(CharacterState owner, ConditionalSkillGrantSource source) =>
+        owner.SkillGrants.Grants.FirstOrDefault(grant => grant.GrantId == source.CapabilityGrantId &&
+            grant.SkillId == source.CapabilitySkillId && grant.SkillInstanceId == source.CapabilitySkillInstanceId);
+
+    private (bool Owned, bool Effective) ReadState(CharacterState owner, SkillGrant grant, SourceEvaluation evaluation)
+    {
+        var raw = RawSourceAdmission(owner, grant);
+        if (!raw.Owned) return (false, false);
+        var definition = Definition(grant.SkillId, evaluation);
+        if (!OwnsPrintedLord(owner, grant, definition)) return (false, false);
+        var state = InterpretRestrictions(owner, grant, definition, ActiveRestrictions(owner));
+        return (state.Owned, state.Effective && raw.Effective);
+    }
+
+    private ContentSkillDefinition Definition(string id, SourceEvaluation evaluation)
+    {
+        if (!evaluation.Definitions.TryGetValue(id, out var definition))
+            evaluation.Definitions.Add(id, definition = resolveDefinition(id));
+        return definition;
+    }
+
+    private T Evaluate<T>(Func<SourceEvaluation, T> read)
+    {
+        if (_evaluation is { } current) return read(current);
+        _evaluation = new SourceEvaluation();
+        try { return read(_evaluation); }
+        finally { _evaluation = null; }
+    }
+
+    // One synchronous read shares its exact-source traversal, including calls
+    // through rule-wounded facts. This is neither stored state nor a frame.
+    private sealed class SourceEvaluation
+    {
+        internal Dictionary<string, ContentSkillDefinition> Definitions { get; } = new(StringComparer.Ordinal);
+        internal Dictionary<(int Seat, string Grant), bool> Effective { get; } = [];
+        internal HashSet<(int Seat, string Grant)> Visiting { get; } = [];
+        internal Dictionary<int, int> EquipmentSuits { get; } = [];
     }
 
     /// <summary>Raw origin admission, including visibility and immutable mode content policy. Printed-lord rights and derived relationships have their own stages.</summary>
@@ -76,7 +180,8 @@ internal sealed class SkillAvailability(
             ActiveRestrictions(owner)).Effective;
 
     internal SkillStateConditionWorld CreateConditionWorld(SkillStateConditionContext context, CharacterState owner) =>
-        new(context, owner, participants, cards, phases, frames, health, turnState, healthChildren, cardMarks);
+        new(context, owner, participants, cards, phases, frames, health, turnState, healthChildren, cardMarks,
+            wounded, piles, EquipmentSuitCount);
 
     private IEnumerable<SkillStateRestriction> ActiveRestrictions(CharacterState owner) =>
         owner.SkillGrants.Restrictions.Where(restriction => restriction.While is null ||

@@ -213,7 +213,7 @@ internal static class XieLingYuChecks
             if (scene == "converted-null") driver["viewAs"] = N("""[{"id":"native-counterspell","inputKinds":["dodge"],"inputSuits":["club"],"sourceZones":["hand"],"outputKind":"nullification","forPlay":false,"forResponse":true}]""");
             definitions.Add(driver);
             definitions.Add(N("{\"id\":\"" + Quiet + "\",\"revision\":1,\"triggers\":[{\"id\":\"quiet\",\"window\":\"afterNormalDraw\",\"subject\":\"owner\",\"optional\":false,\"effects\":[{\"op\":\"skipTurnPhases\",\"target\":\"owner\",\"phases\":[\"play\"]}]}]}"));
-            if (scene == "paid-loss") definitions.Add(N("{\"id\":\"" + Conditional + "\",\"revision\":1,\"hpSkillGrants\":[{\"id\":\"healthy-source\",\"skillId\":\"ol:xinyou\",\"minimumHp\":9}]}"));
+            if (scene == "paid-loss") definitions.Add(N("{\"id\":\"" + Conditional + "\",\"revision\":1,\"skillGrants\":[{\"id\":\"healthy-source\",\"skillId\":\"ol:xinyou\",\"while\":[\">=\",[\"hp\",\"owner\"],9],\"onSourceLoss\":\"finishInvocation\"}]}"));
             if (scene.StartsWith("paid-", StringComparison.Ordinal))
             {
                 var effects = new JsonArray(N("""{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"paid"}]}"""));

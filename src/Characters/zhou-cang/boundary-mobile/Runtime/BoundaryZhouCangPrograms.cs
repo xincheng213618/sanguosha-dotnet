@@ -10,7 +10,7 @@ internal static class BoundaryZhouCangComposition
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op == SkillProgramEffectOp.ResolveBoundaryZhouCangZhongyong)) return;
         if (p.Id != Skill || p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 ||
-            p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.Triggers is not [{ Id: Binding, Window: SkillProgramTriggerWindow.CardUseCompleted,
+            p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.Triggers is not [{ Id: Binding, Window: SkillProgramTriggerWindow.CardUseCompleted,
                 Optional: true, SingleActionInstance: true, OwnerRelation: SkillProgramCardActionOwnerRelation.Actor,
                 Effects: [{ Op: SkillProgramEffectOp.ResolveBoundaryZhouCangZhongyong, Target: SkillProgramEffectTarget.Owner }] } t] ||
             t.CardKinds.Count != 0 || t.CardCategories.Count != 0 || t.IncludeResponseUses || t.Subject is not null || t.Priority != 0 ||

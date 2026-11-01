@@ -1,4 +1,4 @@
-{"schemaVersion":62,"skills":[
+{"schemaVersion":63,"skills":[
  {"id":"mou:baojia","revision":1,"triggers":[
   {"id":"opening-link","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"initializeMouDongChengBaojia","target":"owner"}]},
   {"id":"first-card-damage","window":"beforeDamageApplied","subject":"any","optional":true,"effects":[{"op":"resolveMouDongChengBaojia","target":"owner"}]},

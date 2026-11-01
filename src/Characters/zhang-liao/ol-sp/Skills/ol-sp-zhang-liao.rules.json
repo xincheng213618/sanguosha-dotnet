@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "ol:mubing", "revision": 1, "triggers": [
       { "id": "rank-exchange", "window": "playPhaseStarting", "subject": "owner", "optional": true, "effects": [{ "op": "resolveMubingRankExchange", "target": "owner" }] }

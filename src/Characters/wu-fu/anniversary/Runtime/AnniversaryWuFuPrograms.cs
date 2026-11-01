@@ -79,7 +79,7 @@ internal static class AnniversaryWuFuComposition
         var owns = p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op is SkillProgramEffectOp.ResolveAnniversaryWuFuZhonge or SkillProgramEffectOp.ResolveAnniversaryWuFuJuekai);
         if (p.Id is not (Zhonge or Juekai) && !owns) return;
         var zhonge = p.Id == Zhonge;
-        if (p.Id is not (Zhonge or Juekai) || p.Triggers.Count != 0 || p.ViewAs.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.Modifiers.Count != 0 || p.BooleanStates.Count != 0 || p.HpSkillGrants.Count != 0 ||
+        if (p.Id is not (Zhonge or Juekai) || p.Triggers.Count != 0 || p.ViewAs.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.Modifiers.Count != 0 || p.BooleanStates.Count != 0 || p.SkillGrants.Count != 0 ||
             p.Activations is not [var a] || a.Id != (zhonge ? "adjust-and-commit" : "reset-and-restrict") || a.MinCards != 0 || a.MaxCards != 0 || a.MinTargets != 0 || a.MaxTargets != 0 || a.UsesPerTurn is not null ||
             a.UsesPerPhase != (zhonge ? 1 : null) || a.UsesPerGame != (zhonge ? null : 1) || a.Effects is not [{ Target: SkillProgramEffectTarget.Owner } e] ||
             e.Op != (zhonge ? SkillProgramEffectOp.ResolveAnniversaryWuFuZhonge : SkillProgramEffectOp.ResolveAnniversaryWuFuJuekai) || e.Condition.Kind != SkillProgramConditionKind.Always)

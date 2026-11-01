@@ -165,8 +165,7 @@ internal sealed partial class CoreGameEngineRuntimeRuntime
     int IProgramCompletionFacts.TriggerPriority(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.GetProgramTrigger(frame).Priority;
     bool IProgramCompletionFacts.Alive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     bool IProgramCompletionFacts.CanInvokeProgramSkill(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.CanInvokeProgramSkill(frame);
-    bool IProgramCompletionFacts.CanContinueEquipmentSuit(ProgramSkillFrame frame) => _characterHeQiOlOperations.CanContinueEquipmentSuitProgram(frame);
-    bool IProgramCompletionFacts.CanContinueHpConditional(ProgramSkillFrame frame) => _coreHpConditionalSkillGrantsOperations.Value.CanContinueHpConditionalProgram(frame);
+    bool IProgramCompletionFacts.CanContinueConditionalGrant(ProgramSkillFrame frame) => _conditionalSkillGrants.CanContinue(frame);
     bool IProgramCompletionFacts.CanContinuePhaseAlcohol(ProgramSkillFrame frame) => _coreForcedPhaseAlcoholOperations.CanContinuePhaseAlcohol(frame);
     bool IProgramCompletionFacts.CanContinueSelectedCardPayment(ProgramSkillFrame frame) => frame.SelectedCardPayment?.Operation == SkillProgramEffectOp.SelectAndMoveOwnedCard && _coreProgramRuntimeHooksOperations.RuntimeHooks.CanContinue(ProgramRuntimePhase.AfterSkillLoss, frame);
     bool IProgramCompletionFacts.ValidDamageTargetObtain(ProgramSkillFrame frame) => _coreDamageTargetObtainProgramsOperations.IsValidDamageTargetObtain(frame);

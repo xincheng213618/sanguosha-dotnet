@@ -48,7 +48,7 @@ internal static class ShiGaoXiangComposition
         if (program.Id == ErdiSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers is not
                 [
@@ -62,7 +62,7 @@ internal static class ShiGaoXiangComposition
         }
         if (program.Id != ChiyuanSkill) return;
         if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
             program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Triggers.Count != 0 ||
             program.Activations is not [{ Id: ChiyuanActivation, MinCards: 1, MaxCards: 1, MinTargets: 0, MaxTargets: 0,
                 SourceZones: [CardZoneKind.Hand], UsesPerPhase: 1, UsesPerTurn: null,

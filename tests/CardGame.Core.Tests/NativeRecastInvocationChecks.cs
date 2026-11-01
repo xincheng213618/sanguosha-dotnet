@@ -126,7 +126,7 @@ internal static class NativeRecastInvocationChecks
             ]}
             """.Replace("@schema@", SkillProgramCatalog.RulesSchemaVersion.ToString(System.Globalization.CultureInfo.InvariantCulture));
             var rules = JsonNode.Parse(json)!; var defs = rules["skills"]!.AsArray();
-            if (scene == "loss") defs.Add(JsonNode.Parse("""{"id":"fixture:nri-conditional","revision":1,"hpSkillGrants":[{"id":"healthy","skillId":"fixture:nri-slash","minimumHp":9}]}"""));
+            if (scene == "loss") defs.Add(JsonNode.Parse("""{"id":"fixture:nri-conditional","revision":1,"skillGrants":[{"id":"healthy","skillId":"fixture:nri-slash","while":[">=",["hp","owner"],9],"onSourceLoss":"finishInvocation"}]}"""));
             if (scene != "whole")
             {
                 var trigger = JsonNode.Parse(scene.StartsWith("lion", StringComparison.Ordinal)

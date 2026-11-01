@@ -77,7 +77,7 @@ internal static class LiuPanComposition
     {
         static bool Own(SkillProgramEffectOp op)=>op is SkillProgramEffectOp.ResolvePijingTargetTogglesAndRandomGifts or SkillProgramEffectOp.ResolvePijingNextSoleTargetChoice;
         if(!p.Activations.Any(a=>a.Effects.Any(e=>Own(e.Op)))&&!p.Triggers.Any(t=>t.Effects.Any(e=>Own(e.Op))))return;
-        if(p.Id!="ol:pijing"||p.Activations.Count!=0||p.Triggers.Count!=2||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.HpSkillGrants.Count!=0)throw new InvalidOperationException(path+": Pijing requires both complete current ordinary-OL clauses.");
+        if(p.Id!="ol:pijing"||p.Activations.Count!=0||p.Triggers.Count!=2||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.SkillGrants.Count!=0)throw new InvalidOperationException(path+": Pijing requires both complete current ordinary-OL clauses.");
         foreach(var t in p.Triggers)
         {
             var initial=t.Id=="toggle-targets";

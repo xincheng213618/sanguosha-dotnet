@@ -20,8 +20,8 @@ internal static partial class CharacterFixtureContent
         return new(original.Id, original.Revision, hash, original.RuntimeVersion, original.MinimumRulesVersion,
             original.Modifiers, original.ViewAs, original.Activations, original.Triggers, original.Contributions,
             original.CardIdentities, original.BooleanStates, original.DamageModifiers, original.CardPolicies,
-            original.LordSkillProjection, original.CannotChallengeDeclarations, original.HpSkillGrants,
-            original.EquipmentSuitSkillGrants, original.SkillStates.Concat(declared.SkillStates).ToArray());
+            original.LordSkillProjection, original.CannotChallengeDeclarations, original.SkillGrants,
+            original.SkillStates.Concat(declared.SkillStates).ToArray());
     }
 
 }

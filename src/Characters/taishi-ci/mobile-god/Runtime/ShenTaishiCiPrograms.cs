@@ -76,7 +76,7 @@ internal static class ShenTaishiCiComposition
                 throw new InvalidOperationException(path + ": Shen Taishi Ci operations require their complete native skills.");
             return;
         }
-        if (p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.HpSkillGrants.Count != 0)
+        if (p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.SkillGrants.Count != 0)
             throw new InvalidOperationException(path + ": mobile Shen Taishi Ci requires its trigger-only official version.");
         var ids = p.Id switch
         {

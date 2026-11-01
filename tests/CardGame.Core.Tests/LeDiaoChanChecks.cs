@@ -157,7 +157,7 @@ internal static class LeDiaoChanChecks
             var own = new List<string> { Driver, Conv, Tb };
             if (scene == "liyu-judgment") own.Add(Liyu);
             if (scene is "draw-loss" or "equipment-ox" or "equipment-lion")
-            { defs.Add(N("{\"id\":\"" + Conditional + "\",\"revision\":1,\"hpSkillGrants\":[{\"id\":\"exact-health-diou\",\"skillId\":\"" + Diou + "\"," + (scene == "equipment-lion" ? "\"maximumHp\":12" : "\"minimumHp\":13") + "}]}")); own.Add(Conditional); }
+            { defs.Add(N("{\"id\":\"" + Conditional + "\",\"revision\":1,\"skillGrants\":[{\"id\":\"exact-health-diou\",\"skillId\":\"" + Diou + "\"," + (scene == "equipment-lion" ? "\"while\":[\"<=\",[\"hp\",\"owner\"],12],\"onSourceLoss\":\"finishInvocation\"" : "\"while\":[\">=\",[\"hp\",\"owner\"],13],\"onSourceLoss\":\"finishInvocation\"") + "}]}")); own.Add(Conditional); }
             else if (scene is not ("opening" or "swap")) own.Add(Diou);
             var watch = new JsonArray();
             if (scene.StartsWith("family-", StringComparison.Ordinal)) watch.Add(N("{\"id\":\"inspect-real-completed-use\",\"window\":\"cardUseCompleted\",\"ownerRelation\":\"actor\",\"includeResponseUses\":true,\"optional\":false,\"effects\":[" + Pause("inspect-use") + "]}"));

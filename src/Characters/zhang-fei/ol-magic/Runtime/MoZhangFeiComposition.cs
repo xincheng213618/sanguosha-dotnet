@@ -15,7 +15,7 @@ internal static class MoZhangFeiComposition
             return;
         }
         if (p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 ||
-            p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.HpSkillGrants.Count != 0 || p.Contributions.Count != 0 ||
+            p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.SkillGrants.Count != 0 || p.Contributions.Count != 0 ||
             p.Triggers.Any(t => t.Optional || t.Effects.Count != 1 || t.Effects[0].Target != SkillProgramEffectTarget.Owner ||
                 t.Effects[0].Condition.Kind != SkillProgramConditionKind.Always || !OwnedOp(t.Effects[0].Op)))
             throw new InvalidOperationException(path + ": Mo Zhang Fei requires native locked trigger operations with no alternate payment or view-as.");

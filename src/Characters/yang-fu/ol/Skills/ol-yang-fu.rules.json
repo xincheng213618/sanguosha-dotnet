@@ -1,4 +1,4 @@
-{"schemaVersion":62,"skills":[
+{"schemaVersion":63,"skills":[
  {"id":"ol:bingzhong","revision":1,"triggers":[
   {"id":"first-dynamic-x-targets","window":"cardUseTargetsFinalized","ownerRelation":"actor","optional":false,"effects":[{"op":"resolveBingzhongExtraTargets","target":"owner"}]},
   {"id":"actual-damage-dynamic-x","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":false,"effects":[{"op":"resolveBingzhongAfterDamageDraw","target":"owner"}]}

@@ -68,7 +68,7 @@ internal static class TangTangComposition
     internal static void ValidateProgram(string path, SkillProgram p)
     {
         if (!p.Activations.Any(a => a.Effects.Any(e => Handles(e.Op))) && !p.Triggers.Any(t => t.Effects.Any(e => Handles(e.Op)))) return;
-        if (p.Id is not ("ol:zexing" or "ol:zhiyi") || p.ViewAs.Count != 0 || p.CardIdentities.Count != 0 || p.CardPolicies.Count != 0 || p.Modifiers.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+        if (p.Id is not ("ol:zexing" or "ol:zhiyi") || p.ViewAs.Count != 0 || p.CardIdentities.Count != 0 || p.CardPolicies.Count != 0 || p.Modifiers.Count != 0 || p.Contributions.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.SkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Tang Tang requires her complete shown-card chain and one shared actual-turn gain opportunity.");
         if (p.Id == "ol:zexing")
         {

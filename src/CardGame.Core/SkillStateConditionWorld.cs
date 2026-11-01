@@ -7,10 +7,14 @@ internal sealed class SkillStateConditionWorld(SkillStateConditionContext contex
     IActualDiscardRecoveryPhaseQueries? phases = null, IProgramRuntimeFrames? frames = null,
     RuntimeEntries.CoreGameEngineHealthQueriesEntries? health = null,
     EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess? turnState = null,
-    IProgramHealthChildQueries? healthChildren = null, ICardEntityMarkQueries? cardMarks = null) : IProgramExpressionWorld
+    IProgramHealthChildQueries? healthChildren = null, ICardEntityMarkQueries? cardMarks = null,
+    ISelectionWoundedQueries? wounded = null, RuntimeEntries.CoreGameEnginePublicPileSourcesEntries? piles = null,
+    Func<int, int?>? equipmentSuitCount = null) : IProgramExpressionWorld
 {
     public int? CardMarkCount(int seat, string mark, CardZoneKind zone) =>
         Player(seat) is null ? null : cardMarks?.CountMarked(seat, mark, zone);
+    public int? PublicPileCount(int seat, string skillId) => Player(seat) is null || piles is null ? null :
+        piles.PublicPileSources(seat).Where(source => source.SkillId == skillId).Sum(source => piles.PublicPileCards(source).Count);
     public int? Participant(string name)
     {
         int? seat = name switch
@@ -38,6 +42,7 @@ internal sealed class SkillStateConditionWorld(SkillStateConditionContext contex
             "lostHp" => health?.UnambiguousHp(player) is { } hp ? player.MaxHp - hp : null,
             "handCount" => cards?.Count(CardLocation.Hand(seat)),
             "equipmentCount" => cards?.Count(CardLocation.Equipment(seat)),
+            "equipmentSuitCount" => equipmentSuitCount?.Invoke(seat),
             _ => null
         };
     }
@@ -51,6 +56,7 @@ internal sealed class SkillStateConditionWorld(SkillStateConditionContext contex
             "hasHp" => player.HasHpValue,
             "faceDown" => player.IsFaceDown,
             "chained" => player.IsChained,
+            "ruleWounded" => wounded?.IsRuleWounded(seat),
             "inIssuedPhase" => context.IssuedPhase is { } issued && issued.ActorSeat == seat && phases?.Current() == issued,
             "inUpcomingTurnPrelude" => frames is null ? null :
                 frames.OfType<ResolutionFrame>().FirstOrDefault()?.UpcomingTurnPrelude?.OwnerSeat == seat,

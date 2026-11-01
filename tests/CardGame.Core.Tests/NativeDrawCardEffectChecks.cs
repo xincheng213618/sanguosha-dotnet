@@ -125,6 +125,20 @@ internal static class NativeDrawCardEffectChecks
 
     public static void ZenrunReplacesNativeDrawTwoWithoutForgingDrawMaterialsCold()
     {
+        foreach (var capability in new[] { "ol:baobian", "ol:qizhou", "ol:luoyan" })
+        {
+            var derived = new SkillGrant("fixture:derived", "fixture:leaf", "fixture:leaf-instance", "conditional:general:primary")
+            { ConditionalSource = new("general:primary", capability, "fixture:capability-instance", "fixture:rule") };
+            RequireCharacterSource(derived, true);
+            RequireCharacterSource(derived with { IsEnabled = false }, true);
+            RequireCharacterSource(derived with { SourceId = "equipment:dynamic:17" }, false);
+            RequireCharacterSource(derived with { IsModeRule = true }, false);
+        }
+        static void RequireCharacterSource(SkillGrant grant, bool expected)
+        {
+            if (SkillStateMatcher.IsCharacter(grant) != expected)
+                throw new InvalidOperationException("Zenrun's raw character-source boundary must include all conditional character grants and leave effective/disabled admission to its caller.");
+        }
         var (g, registry) = Start("zenrun");
         var handBefore = Hand(g, 0).HandCount;
         var victimBefore = Hand(g, 1).HandCount;

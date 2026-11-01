@@ -98,7 +98,7 @@ internal static partial class YangFuChecks
             if(scene=="issued-distance")defs.Add("""{"id":"fixture:yfu-first-distance","revision":1,"cardPolicies":[{"id":"true-first-use-distance","kind":"firstActualPlayUseDistanceUnlimited"}]}""");
             if(scene=="suyi-fire")defs.Add("""{"id":"fixture:yfu-fire","revision":1,"triggers":[{"id":"real-fire","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":["slash"],"optional":false,"effects":[{"op":"offerCurrentSlashFireAndExtraTarget","target":"owner"}]}]}""");
             if(scene=="suyi-abolished")defs.Add("""{"id":"fixture:yfu-abolished","revision":1,"triggers":[{"id":"actual-area","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"abolishOwnerAreas","target":"owner","zones":["equipment"]}]}]}""");
-            if(scene is"draw-loss"or"suyi-loss")defs.Add($$"""{"id":"fixture:yfu-conditional","revision":1,"hpSkillGrants":[{"id":"actual-source","skillId":"{{(scene=="draw-loss"?Bing:Suyi)}}","minimumHp":{{(scene=="draw-loss"?11:13)}}}]}""");
+            if(scene is"draw-loss"or"suyi-loss")defs.Add($$"""{"id":"fixture:yfu-conditional","revision":1,"skillGrants":[{"id":"actual-source","skillId":"{{(scene=="draw-loss"?Bing:Suyi)}}","while":[">=",["hp","owner"],{{(scene=="draw-loss"?11:13)}}],"onSourceLoss":"finishInvocation"}]}""");
             if(scene.StartsWith("draw",StringComparison.Ordinal))
             {
                 var amount=scene=="draw-loss"?1:scene=="draw-death"?20:0;

@@ -1,13 +1,13 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     {
       "id": "ol:baobian",
       "revision": 1,
-      "hpSkillGrants": [
-        { "id": "taunt", "skillId": "classic:tiaoxin", "maximumHp": 3 },
-        { "id": "roar", "skillId": "classic:paoxiao", "maximumHp": 2 },
-        { "id": "swift", "skillId": "classic:shensu", "minimumHp": 1, "maximumHp": 1 }
+      "skillGrants": [
+        {"id": "taunt","skillId": "classic:tiaoxin","while": ["<=",["hp","owner"],3],"onSourceLoss": "finishInvocation"},
+        {"id": "roar","skillId": "classic:paoxiao","while": ["<=",["hp","owner"],2],"onSourceLoss": "finishInvocation"},
+        {"id": "swift","skillId": "classic:shensu","while": ["==",["hp","owner"],1],"onSourceLoss": "finishInvocation"}
       ]
     }
   ]

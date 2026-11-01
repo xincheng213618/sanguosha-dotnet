@@ -40,7 +40,7 @@ internal static class CaoYuComposition
  internal static void ValidateProgram(string path,SkillProgram p)
  {
   if(!p.Triggers.Any(t=>t.Effects.Any(e=>Handles(e.Op)))&&!p.Activations.Any(a=>a.Effects.Any(e=>Handles(e.Op))))return;
-  if(p.Id is not("ol:gongjie"or"ol:xiangxu"or"ol:xiangzu")||p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.HpSkillGrants.Count!=0||p.Triggers.Count!=(p.Id=="ol:xiangxu"?3:1))throw new InvalidOperationException(path+": CaoYu requires each complete ordinary-OL skill and exact trigger-only composition.");
+  if(p.Id is not("ol:gongjie"or"ol:xiangxu"or"ol:xiangzu")||p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.SkillGrants.Count!=0||p.Triggers.Count!=(p.Id=="ol:xiangxu"?3:1))throw new InvalidOperationException(path+": CaoYu requires each complete ordinary-OL skill and exact trigger-only composition.");
   foreach(var t in p.Triggers)
   {
    var (id,window,op,optional)=p.Id switch{"ol:gongjie"=>("round-first",SkillProgramTriggerWindow.RoundStarting,SkillProgramEffectOp.ResolveGongjieRoundFirstGifts,true),"ol:xiangzu"=>("dying-gift",SkillProgramTriggerWindow.DyingEntering,SkillProgramEffectOp.ResolveXiangzuDyingGiftAndRecovery,true),_=>t.Id=="minimum-edge"?("minimum-edge",SkillProgramTriggerWindow.CardsMoved,SkillProgramEffectOp.ResolveXiangxuMinimumTransition,false):(t.Id=="end-own"?"end-own":"end-foreign",SkillProgramTriggerWindow.AfterTurnEnded,SkillProgramEffectOp.ResolveXiangxuIssuedTurnEndAdjustment,false)};

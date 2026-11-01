@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     {"id":"standard:wusheng","revision":1,"minimumRulesVersion": 172,"viewAs":[{"id":"red-as-slash","sourceZones":["hand"],"inputKinds":[],"inputSuits":["heart","diamond"],"outputKind":"slash","forPlay":true,"forResponse":true}]},
     {"id":"standard:longdan","revision":1,"minimumRulesVersion": 172,"viewAs":[{"id":"dodge-as-slash","inputKinds":["dodge"],"inputSuits":[],"outputKind":"slash","forPlay":true,"forResponse":true},{"id":"slash-as-dodge","inputKinds":["slash","fireSlash","thunderSlash"],"inputSuits":[],"outputKind":"dodge","forPlay":false,"forResponse":true}]},

@@ -58,7 +58,7 @@ internal static class ShiLvYiComposition
         if (program.Id == ShishiSkill)
         {
             if (program.DamageModifiers.Count != 0 || program.Modifiers.Count != 0 ||
-                program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.Activations.Count != 0 || program.Triggers.Count != 0 ||
                 program.CardPolicies.Count != 0 || program.BooleanStates is not
                 [{ Id: "shishi-inert", InitialValue: false }] || program.ViewAs is not
@@ -70,7 +70,7 @@ internal static class ShiLvYiComposition
         if (program.Id == SongyanSkill)
         {
             if (program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 || program.CardPolicies.Count != 0 ||
-                program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 || program.Contributions.Count != 0 ||
+                program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 || program.Contributions.Count != 0 ||
                 program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.ViewAs is not [{ Id: SongyanViewAs, OutputKind: CardKind.Nullification, ForResponse: true, ForPlay: false }] ||
                 program.Triggers is not
@@ -89,7 +89,7 @@ internal static class ShiLvYiComposition
         }
         if (program.Id != HuilvSkill) return;
         if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
             program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
             program.Triggers is not
             [

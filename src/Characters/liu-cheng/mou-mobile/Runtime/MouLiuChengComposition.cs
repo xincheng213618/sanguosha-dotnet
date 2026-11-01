@@ -12,8 +12,8 @@ internal static class MouLiuChengComposition
         t.GainPhaseQualification is null && t.ChoiceGroup is null && t.OrderGroup is null && t.DamageOccurrence is null && t.MovementOccurrence is null &&
         !t.DeferredTurnEndOnly && !t.NoDyingAtActivation && !t.OnlyDesignatedCardTargets && !t.AllowNoEventTarget;
     internal static bool IsProgram(SkillProgram p) => IsSkill(p.Id) && p.Activations.Count == 0 && p.ViewAs.Count == 0 &&
-        p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.CardIdentities.Count == 0 && p.HpSkillGrants.Count == 0 &&
-        p.EquipmentSuitSkillGrants.Count == 0 && p.DamageModifiers.Count == 0 && p.BooleanStates.Count == 0 && p.Contributions.Count == 0 &&
+        p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.CardIdentities.Count == 0 && p.SkillGrants.Count == 0 &&
+        p.DamageModifiers.Count == 0 && p.BooleanStates.Count == 0 && p.Contributions.Count == 0 &&
         !p.LordSkillProjection && !p.CannotChallengeDeclarations && p.Triggers.Count == 2 &&
         p.Triggers.SingleOrDefault(t => t.Id == "after-designation") is { } gain && Trigger(gain) &&
         gain.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && !gain.SingleActionInstance && !gain.IncludeResponseUses && Exact(gain, SkillProgramEffectOp.AccrueMouLiuChengChui) &&

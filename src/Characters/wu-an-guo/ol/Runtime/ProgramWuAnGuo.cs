@@ -61,8 +61,7 @@ internal static class WuAnGuoComposition
             v.RoundOnceCardlessBasic is not null || v.ChainedStateCost is not null || v.RoundDistinctBasicUse is not null || v.DrawFundedDistinctBasic is not null ||
             v.DisableSkillUntilTurnEndIfNoDamage is not null || v.LastInSourceZone is not null || v.RoundGainedRedHandOnly is not null ||
             p.BooleanStates is not [{ Id: "yin", InitialValue: false, Visibility: SkillProgramStateVisibility.Public, ResetScope: SkillProgramStateResetScope.Game, ReacquirePolicy: SkillProgramStateReacquirePolicy.PreserveUntilGameEnd }] ||
-            p.Modifiers.Count != 0 || p.Contributions.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 ||
-            p.LordSkillProjection || p.CannotChallengeDeclarations)
+            p.Modifiers.Count != 0 || p.Contributions.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.SkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Liyong requires its exact unlimited alternating native HE Duel conversion and one complete zero-card incoming-Duel activation.");
     }
 }

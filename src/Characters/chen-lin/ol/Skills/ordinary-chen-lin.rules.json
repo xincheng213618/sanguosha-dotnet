@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "ol:bifa", "revision": 1, "triggers": [
       { "id": "deposit-at-ending", "window": "turnEnding", "subject": "owner", "turnOwnerScope": "own", "optional": true,

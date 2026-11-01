@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "anniversary:tianren", "revision": 1, "triggers": [
       { "id": "nonuse-discard", "window": "discardPileReceived", "subject": "owner", "optional": false, "effects": [{ "op": "resolveShenJiangWeiTianren", "target": "owner" }] },

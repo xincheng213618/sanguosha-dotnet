@@ -54,7 +54,7 @@ internal static class MaMiDiComposition
     {
         if (!p.Triggers.Any(t => t.Effects.Any(e => Handles(e.Op))) && !p.Activations.Any(a => a.Effects.Any(e => Handles(e.Op)))) return;
         if (p.Activations.Count != 0 || p.Modifiers.Count != 0 || p.ViewAs.Count != 0 || p.Contributions.Count != 0 || p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 ||
-            p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.HpSkillGrants.Count != 0 || p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+            p.DamageModifiers.Count != 0 || p.CardPolicies.Count != 0 || p.SkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Ma Mi Di requires its native maximum-HP, issued-target and actual-response instructions without unrelated policies.");
         if (p.Id == "ol:bingjie" ? p.Triggers.Count != 2 || p.Triggers.Count(t => t.Effects is [{ Op: SkillProgramEffectOp.PayBingjieTurnMaximumHp }]) != 1 || p.Triggers.Count(t => t.Effects is [{ Op: SkillProgramEffectOp.ResolveBingjieIssuedTargetDiscards }]) != 1 :
             p.Id != "ol:zhengding" || p.Triggers.Count != 1 || p.Triggers[0].Effects is not [{ Op: SkillProgramEffectOp.GrowZhengdingMatchingResponse }])

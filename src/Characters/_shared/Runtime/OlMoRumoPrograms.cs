@@ -64,7 +64,7 @@ internal static class OlMoRumoComposition
                 .Any(e => e.Op == SkillProgramEffectOp.ResolveOlMoRumoRoundPenalty)) return;
         if (program.Id != "ol:mo-rumo" || program.Activations.Count != 0 || program.ViewAs.Count != 0 ||
             program.Modifiers.Count != 0 || program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 ||
-            program.HpSkillGrants.Count != 0 || program.DamageModifiers.Count != 0 || program.BooleanStates.Count != 0 ||
+            program.SkillGrants.Count != 0 || program.DamageModifiers.Count != 0 || program.BooleanStates.Count != 0 ||
             program.Contributions.Count != 0 || program.Triggers is not [var trigger] || !Plain(trigger))
             throw new InvalidOperationException(path + ": OL Rumo requires its exact issued entered-state old-round penalty, without a printed or live-source substitute.");
     }

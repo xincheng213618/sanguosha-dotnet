@@ -7,7 +7,7 @@ internal static class BoundaryGuoHuaiComposition
     internal static void Validate(string path, SkillProgram p)
     {
         if (!p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects)).Any(e => e.Op == SkillProgramEffectOp.PrepareBoundaryGuoHuaiJingce)) return;
-        if (p.Id != Skill || p.Triggers.Count != 2 || p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.HpSkillGrants.Count != 0 ||
+        if (p.Id != Skill || p.Triggers.Count != 2 || p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.DamageModifiers.Count != 0 || p.SkillGrants.Count != 0 ||
             p.Triggers.SingleOrDefault(t => t.Id == Response) is not { Window: SkillProgramTriggerWindow.CardResponseCompleted, OwnerRelation: SkillProgramCardActionOwnerRelation.Observer, Optional: false,
                 IsSkillInvocation: false, Effects: [{ Op: SkillProgramEffectOp.PrepareBoundaryGuoHuaiJingce, Target: SkillProgramEffectTarget.Owner }] } ||
             p.Triggers.SingleOrDefault(t => t.Id == Ending) is not { Window: SkillProgramTriggerWindow.TurnEnding, Subject: SkillProgramTriggerSubject.Owner, TurnOwnerScope: SkillProgramTurnOwnerScope.Own, Optional: true,

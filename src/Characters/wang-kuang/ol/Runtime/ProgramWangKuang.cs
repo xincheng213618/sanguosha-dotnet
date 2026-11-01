@@ -60,8 +60,8 @@ internal static class WangKuangComposition
     {
         if (!p.Activations.Any(a => a.Effects.Any(e => Own(e.Op))) && !p.Triggers.Any(t => t.Effects.Any(e => Own(e.Op)))) return;
         if (p.Id != "ol:renxia" || p.Activations.Count != 1 || p.Triggers.Count != 1 || p.Modifiers.Count != 0 || p.ViewAs.Count != 0 || p.CardPolicies.Count != 0 ||
-            p.Contributions.Count != 0 || p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.HpSkillGrants.Count != 0 ||
-            p.EquipmentSuitSkillGrants.Count != 0 || p.LordSkillProjection || p.CannotChallengeDeclarations)
+            p.Contributions.Count != 0 || p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.DamageModifiers.Count != 0 || p.SkillGrants.Count != 0 ||
+            p.LordSkillProjection || p.CannotChallengeDeclarations)
             throw new InvalidOperationException(path + ": Renxia requires its unique paired original activation and issued phase-ending trigger.");
         var a = p.Activations[0]; var t = p.Triggers[0];
         if (a.Id != "choose-first-branch" || a.Effects is not [{ Op: SkillProgramEffectOp.ResolveRenxiaRepeatedBranch, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }] ||

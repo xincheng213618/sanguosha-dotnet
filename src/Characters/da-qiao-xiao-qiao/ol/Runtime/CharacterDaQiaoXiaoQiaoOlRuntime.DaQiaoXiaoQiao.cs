@@ -7,20 +7,12 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoOlRuntime
 {
     internal const string XingwuDepositReason = "skill-program.da-qiao-xiao-qiao.xingwu.deposit", XingwuPileReason = "skill-program.da-qiao-xiao-qiao.xingwu.pile-remove", XingwuHandReason = "skill-program.da-qiao-xiao-qiao.xingwu.hand-discard", XingwuEquipmentReason = "skill-program.da-qiao-xiao-qiao.xingwu.equipment-discard";
     internal static CardConversionSource DaQiaoXiaoQiaoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_da_qiao_xiao_qiao_ol_DaQiaoXiaoQiao.DaQiaoXiaoQiaoSource(f);
-    SkillProgramStepOutcome IDaQiaoXiaoQiaoHost.Resolve(ProgramSkillFrame f, bool maintain) => BeginDaQiaoXiaoQiao(f, maintain);
+    SkillProgramStepOutcome IDaQiaoXiaoQiaoHost.Resolve(ProgramSkillFrame f) => BeginDaQiaoXiaoQiao(f);
     internal bool DaQiaoXiaoQiaoParent(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.DiscardPhaseStarting } c && c.OwnerSeat == f.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == f.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Discard && _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is { Window: SkillProgramTriggerWindow.DiscardPhaseStarting, Continuation: ProgramLifecycleContinuation.CompleteDiscardPhase } p && p.OwnerSeat == f.OwnerSeat && p.CandidateIndex >= 0 && p.CandidateIndex < p.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, p.Candidates[p.CandidateIndex]);
     internal bool DaQiaoXiaoQiaoLive(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f);
-    internal SkillProgramStepOutcome BeginDaQiaoXiaoQiao(ProgramSkillFrame input, bool maintain)
+    internal SkillProgramStepOutcome BeginDaQiaoXiaoQiao(ProgramSkillFrame input)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
-        if (maintain)
-        {
-            if (f.SkillId != "ol:luoyan" || f.WindowContext?.Window != SkillProgramTriggerWindow.GameStarting)
-                throw new InvalidOperationException("Luoyan requires its native setup binding.");
-            SynchronizeDaQiaoXiaoQiaoLuoyan();
-            return SkillProgramStepOutcome.Continue;
-        }
-
         if (f.SkillId != "ol:xingwu" || f.TriggerId != "discard-start-dance" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.DaQiaoXiaoQiao is not null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !DaQiaoXiaoQiaoParent(f))
             throw new InvalidOperationException("Xingwu requires its exact unpaid actual Discard starting frame.");
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)

@@ -42,7 +42,7 @@ internal static class CuiYanComposition
     internal static void ValidateProgram(string path,SkillProgram p)
     {
         if(!p.Triggers.Any(t=>t.Effects.Any(e=>Handles(e.Op)))&&!p.Activations.Any(a=>a.Effects.Any(e=>Handles(e.Op))))return;
-        if(p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.HpSkillGrants.Count!=0||p.EquipmentSuitSkillGrants.Count!=0||p.BooleanStates.Count!=0||p.Contributions.Count!=0||p.DamageModifiers.Count!=0||p.LordSkillProjection)
+        if(p.Activations.Count!=0||p.ViewAs.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.SkillGrants.Count!=0||p.BooleanStates.Count!=0||p.Contributions.Count!=0||p.DamageModifiers.Count!=0||p.LordSkillProjection)
             throw new InvalidOperationException(path+": Cui Yan requires independent mandatory finalized-use and actual-turn-end triggers.");
         var shutong=p.Triggers.Any(t=>t.Effects.Any(e=>e.Op==SkillProgramEffectOp.ResolveShutongFinalizedUse));
         if(p.Triggers.Count!=(shutong?1:2))throw new InvalidOperationException(path+": Unexpected Cui Yan trigger collection.");

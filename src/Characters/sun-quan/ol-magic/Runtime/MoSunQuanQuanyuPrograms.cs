@@ -89,7 +89,7 @@ internal static class MoQuanyuComposition
             MoQuanyuSlashComposition.ValidateTrigger(path, nativeSlash);
         if (p.Id != "ol:mo-quanyu" || p.Triggers.Count != 2 || p.Activations is not [var a] ||
             p.ViewAs.Count != 0 || p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 ||
-            p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
+            p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
             p.Triggers.SingleOrDefault(t => t.Id == "round-choices") is not { } round ||
             p.Triggers.SingleOrDefault(t => t.Id == "singleton-slash-effects") is not { } slash ||
             !ExactTrigger(round, false) || !ExactTrigger(slash, true) || a.Id != "target-only-choices" ||

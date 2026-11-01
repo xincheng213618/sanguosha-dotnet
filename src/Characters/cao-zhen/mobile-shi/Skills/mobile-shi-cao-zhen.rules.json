@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [{ "id": "mobile:shi-sifeng", "revision": 1, "triggers": [
     { "id": "place-forecast", "window": "turnEnding", "subject": "owner", "optional": true,
       "effects": [{ "op": "resolveMobileShiCaoZhenSifengPlace", "target": "owner" }] },

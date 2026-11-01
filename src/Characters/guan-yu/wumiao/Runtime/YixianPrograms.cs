@@ -67,7 +67,7 @@ internal static class WuYixianComposition
         if (!owns && program.Id != "wumiao:yixian") return;
         if (program.Id != "wumiao:yixian" || program.Triggers.Count != 0 || program.ViewAs.Count != 0 ||
             program.Modifiers.Count != 0 || program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 ||
-            program.DamageModifiers.Count != 0 || program.HpSkillGrants.Count != 0 || program.Contributions.Count != 0 ||
+            program.DamageModifiers.Count != 0 || program.SkillGrants.Count != 0 || program.Contributions.Count != 0 ||
             program.BooleanStates.Count != 0 || program.Activations is not [{ } a] || a.Id != "all-equipment" ||
             a.MinCards != 0 || a.MaxCards != 0 || a.MinTargets != 0 || a.MaxTargets != 0 ||
             a.UsesPerTurn is not null || a.UsesPerPhase is not null || a.UsesPerGame is not null ||

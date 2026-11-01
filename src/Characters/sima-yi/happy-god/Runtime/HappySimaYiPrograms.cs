@@ -56,7 +56,7 @@ internal static class HappySimaYiComposition
                 throw new InvalidOperationException(path + ": Happy Sima Yi operations require the complete paid four-skill edition.");
             return;
         }
-        if (p.Modifiers.Count != 0 || p.ViewAs.Count != 0 || p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.HpSkillGrants.Count != 0)
+        if (p.Modifiers.Count != 0 || p.ViewAs.Count != 0 || p.CardIdentities.Count != 0 || p.BooleanStates.Count != 0 || p.SkillGrants.Count != 0)
             throw new InvalidOperationException(path + ": Happy Sima Yi cannot contain unrelated version abilities.");
         if (p.Id == "happy:renjie")
         {

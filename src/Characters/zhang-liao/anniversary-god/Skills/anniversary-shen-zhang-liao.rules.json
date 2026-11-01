@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "anniversary:cuixi", "revision": 1, "triggers": [{ "id": "actual-foreign-turn", "window": "otherActualTurnStarted", "subject": "owner", "optional": true, "effects": [{ "op": "resolveAnniversaryZhangLiaoCuixi", "target": "owner" }] }] },
     { "id": "anniversary:duorui", "revision": 1, "triggers": [{ "id": "damage-abolish", "window": "beforeDamageApplied", "subject": "damageSource", "optional": false, "effects": [{ "op": "resolveAnniversaryZhangLiaoDuorui", "target": "owner" }] }] },

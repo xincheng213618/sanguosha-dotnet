@@ -9,7 +9,7 @@ internal static class WuHuangFuSongComposition
     internal static void ValidateProgram(string path, SkillProgram p)
     {
         if (!new[] { Chaozhen, Lianjie, Jiangxian }.Contains(p.Id) && !p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => Handles(e.Op))) return;
-        var empty = p.ViewAs.Count == 0 && p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.HpSkillGrants.Count == 0 && p.CardIdentities.Count == 0 && p.DamageModifiers.Count == 0 && !p.LordSkillProjection;
+        var empty = p.ViewAs.Count == 0 && p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.SkillGrants.Count == 0 && p.CardIdentities.Count == 0 && p.DamageModifiers.Count == 0 && !p.LordSkillProjection;
         var valid = p.Id switch
         {
             Chaozhen => p.Activations.Count == 0 && p.Triggers is [var prep, var dying] && Trigger(prep, "preparation-minimum", SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, true, SkillProgramEffectOp.ResolveWuHuangFuSongChaozhen) && prep.Subject == SkillProgramTriggerSubject.Owner && Trigger(dying, "dying-minimum", SkillProgramTriggerWindow.DyingEntering, true, SkillProgramEffectOp.ResolveWuHuangFuSongChaozhen) && dying.Subject == SkillProgramTriggerSubject.Owner,

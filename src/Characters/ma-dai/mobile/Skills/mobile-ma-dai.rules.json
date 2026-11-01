@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [{ "id": "mobile:ma-dai-qianxi", "revision": 1,
     "triggers": [{ "id": "judge-nearby-slash-damage", "window": "beforeDamageApplied", "subject": "damageSource", "optional": true,
       "condition": { "kind": "all", "children": [{ "kind": "directCardUseDamage" }, { "kind": "damageCardIsSlash" }] },

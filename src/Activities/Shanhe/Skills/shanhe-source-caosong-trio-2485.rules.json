@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [
     { "id": "shanhe:source-chuanyun-665", "revision": 1, "triggers": [
       { "id": "ending-higher-hp-enemy", "window": "turnEnding", "subject": "owner", "optional": true,

@@ -38,7 +38,7 @@ internal static class MaYuanYiComposition
     internal static void ValidateProgram(string path,SkillProgram p)
     {
         if(!p.Triggers.Any(t=>t.Effects.Any(e=>Handles(e.Op))))return;
-        if(p.Activations.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.DamageModifiers.Count!=0||p.HpSkillGrants.Count!=0)
+        if(p.Activations.Count!=0||p.Modifiers.Count!=0||p.CardPolicies.Count!=0||p.CardIdentities.Count!=0||p.DamageModifiers.Count!=0||p.SkillGrants.Count!=0)
             throw new InvalidOperationException(path+": Ma Yuan Yi requires its exact native pile, opponent, awakening and judgment protocols.");
         var expected=p.Id switch {"ol:jibing"=>SkillProgramEffectOp.ReplaceJibingDrawWithTwoBing,"ol:wangjing"=>SkillProgramEffectOp.ResolveWangjingBingOpponentDraw,"ol:moucuan"=>SkillProgramEffectOp.ResolveMoucuanAwakening,"ol:binghuo"=>SkillProgramEffectOp.ResolveBinghuoEndingJudgment,_=>(SkillProgramEffectOp)(-1)};
         if(p.Triggers.Count!=(p.Id is"ol:wangjing"or"ol:binghuo"?2:1)||p.Triggers.Any(t=>t.Effects is not [{Target:SkillProgramEffectTarget.Owner,Condition.Kind:SkillProgramConditionKind.Always}e]||e.Op!=expected||t.Condition.Kind!=SkillProgramTriggerConditionKind.Always||t.MarkerCost is not null||t.Priority!=0))

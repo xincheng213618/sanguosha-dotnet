@@ -69,7 +69,7 @@ internal static class MouHuaXiongOlComposition
     {
         var owns = p.Activations.SelectMany(a => a.Effects).Concat(p.Triggers.SelectMany(t => t.Effects)).Any(e => e.Op == SkillProgramEffectOp.ResolveMouHuaXiongBojue);
         if (p.Id != Bojue && !owns) return;
-        var plain = p.Triggers.Count == 0 && p.ViewAs.Count == 0 && p.CardPolicies.Count == 0 && p.CardIdentities.Count == 0 && p.Modifiers.Count == 0 && p.BooleanStates.Count == 0 && p.HpSkillGrants.Count == 0;
+        var plain = p.Triggers.Count == 0 && p.ViewAs.Count == 0 && p.CardPolicies.Count == 0 && p.CardIdentities.Count == 0 && p.Modifiers.Count == 0 && p.BooleanStates.Count == 0 && p.SkillGrants.Count == 0;
         var valid = p.Id == Bojue && p.Activations is [var a] && a.Id == "simultaneous-choice" &&
             a.MinCards == 0 && a.MaxCards == 0 && a.MinTargets == 1 && a.MaxTargets == 1 && a.TargetKind == SkillProgramTargetKind.OtherLiving &&
             a.UsesPerTurn is null && a.UsesPerPhase == 2 && a.Effects is [{ Op: SkillProgramEffectOp.ResolveMouHuaXiongBojue, Target: SkillProgramEffectTarget.Owner } e] && e.Condition.Kind == SkillProgramConditionKind.Always;

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 62,
+  "schemaVersion": 63,
   "skills": [ { "id": "anniversary:midu", "revision": 1, "activations": [ {
     "id": "abolish-or-restore", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,
     "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": 1,

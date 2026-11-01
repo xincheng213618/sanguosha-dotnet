@@ -29,11 +29,10 @@ internal sealed class SkillProgramDependencies
             .SelectMany(effect => effect.SkillState?.Until ?? []).ToArray();
         UsesSkillStatePhaseEnds = skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseEnded);
         UsesConsumedAlcoholSlash = triggers.Any(trigger => trigger.RequiresConsumedAlcoholSlash);
-        HpSensitiveSkillIds = definitions.Where(skill => skill.Program?.HpSkillGrants.Count > 0)
+        HpSensitiveSkillIds = definitions.Where(skill => skill.Program?.SkillGrants.Any(rule =>
+                rule.While.Nodes().Any(node => node.Op is "hp" or "maxHp" or "lostHp" or "hasHp" or "ruleWounded")) == true)
             .Select(skill => skill.Id).ToFrozenSet(StringComparer.Ordinal);
-        HpConditionalCapabilitySkillIds = definitions.Where(skill => skill.Program?.HpSkillGrants.Count > 0)
-            .Select(skill => skill.Id).ToFrozenSet(StringComparer.Ordinal);
-        EquipmentSuitCapabilitySkillIds = definitions.Where(skill => skill.Program?.EquipmentSuitSkillGrants.Count > 0)
+        ConditionalSkillGrantCapabilitySkillIds = definitions.Where(skill => skill.Program?.SkillGrants.Count > 0)
             .Select(skill => skill.Id).ToFrozenSet(StringComparer.Ordinal);
         EquipmentPresenceSkillIds = definitions.Where(skill => skill.Program is { } p &&
             (p.Modifiers.Any(m => m.Condition.ContainsEquipmentPresence()) || p.CardPolicies.Any(c => c.Condition.ContainsEquipmentPresence()) ||
@@ -184,11 +183,10 @@ internal sealed class SkillProgramDependencies
     }
 
     internal IReadOnlySet<string> EquipmentPresenceSkillIds { get; }
-    internal IReadOnlySet<string> EquipmentSuitCapabilitySkillIds { get; }
+    internal IReadOnlySet<string> ConditionalSkillGrantCapabilitySkillIds { get; }
     internal bool UsesOwnerMarkerCount { get; }
     internal bool UsesDrawPhaseDrawCountHandLimit { get; }
     internal IReadOnlySet<string> HpSensitiveSkillIds { get; }
-    internal IReadOnlySet<string> HpConditionalCapabilitySkillIds { get; }
     internal bool UsesLordSkillProjection { get; }
     internal bool UsesGainPhaseQualification { get; }
     internal bool UsesConsumedAlcoholSlash { get; }

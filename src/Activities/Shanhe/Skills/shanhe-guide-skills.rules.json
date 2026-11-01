@@ -1,4 +1,4 @@
-{"schemaVersion":62,"skills":[
+{"schemaVersion":63,"skills":[
  {"id":"shanhe:buwu-3365","revision":1,"triggers":[
   {"id":"allied-damage","window":"beforeDamageApplied","subject":"any","optional":false,"effects":[{"op":"resolveShanheBuwu","target":"owner","stage":"before"}]},
   {"id":"actual-damage-draw","window":"afterDamageApplied","subject":"any","damageOccurrence":"perDamage","optional":false,"effects":[{"op":"resolveShanheBuwu","target":"owner","stage":"after"}]}]},

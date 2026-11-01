@@ -79,8 +79,8 @@ internal sealed class WuLuKangDixianHandler : ISkillProgramEffectHandler
 internal static partial class WuLuKangComposition
 {
     internal static bool IsDixian(SkillProgram p) => p.Id == Dixian && p.Triggers.Count == 0 && p.ViewAs.Count == 0 &&
-        p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.CardIdentities.Count == 0 && p.HpSkillGrants.Count == 0 &&
-        p.EquipmentSuitSkillGrants.Count == 0 && p.DamageModifiers.Count == 0 && p.BooleanStates.Count == 0 && p.Contributions.Count == 0 &&
+        p.Modifiers.Count == 0 && p.CardPolicies.Count == 0 && p.CardIdentities.Count == 0 && p.SkillGrants.Count == 0 &&
+        p.DamageModifiers.Count == 0 && p.BooleanStates.Count == 0 && p.Contributions.Count == 0 &&
         !p.LordSkillProjection && !p.CannotChallengeDeclarations && p.Activations is [var a] && a.Id == "declare-rank" &&
         a.MinCards == 0 && a.MaxCards == 0 && a.MinTargets == 0 && a.MaxTargets == 0 && a.TargetKind == SkillProgramTargetKind.AnyLiving &&
         a.UsesPerGame == 1 && a.UsesPerTurn is null && a.UsesPerPhase is null && a.UsageGroup == a.Id &&

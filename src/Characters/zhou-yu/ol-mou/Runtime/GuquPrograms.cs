@@ -77,7 +77,7 @@ internal static class MouZhouYuGuquComposition
         if (p.Id != "mou-ol:guqu" && !p.Triggers.SelectMany(t => t.Effects).Concat(p.Activations.SelectMany(a => a.Effects))
             .Any(e => e.Op == SkillProgramEffectOp.ResolveMouZhouYuGuqu)) return;
         if (p.Id != "mou-ol:guqu" || p.Activations.Count != 0 || p.ViewAs.Count != 0 || p.Modifiers.Count != 0 ||
-            p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.HpSkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
+            p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 || p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 ||
             p.BooleanStates.Count != 0 || p.Contributions.Count != 0 || p.Triggers is not [var t] ||
             t.Id != "completed-que-use" || t.Window != SkillProgramTriggerWindow.CardUseCompleted ||
             t.OwnerRelation != SkillProgramCardActionOwnerRelation.Observer || t.Optional || t.Subject is not null ||

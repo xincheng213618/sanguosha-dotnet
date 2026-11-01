@@ -1,4 +1,4 @@
-{"schemaVersion":62,"skills":[
+{"schemaVersion":63,"skills":[
  {"id":"mobile:sun-hao-canshi","revision":1,"triggers":[
   {"id":"normal-draw-replace-wounded","window":"drawPhaseStarting","drawPhaseMode":"replacement","subject":"owner","optional":true,"effects":[{"op":"grantSunHaoCanshiDrawObligation","target":"owner"}]},
   {"id":"issued-turn-use-discard","window":"cardUseCommitted","ownerRelation":"actor","optional":false,"includeResponseUses":true,"effects":[{"op":"resolveSunHaoCanshiUseDiscard","target":"owner"}]}

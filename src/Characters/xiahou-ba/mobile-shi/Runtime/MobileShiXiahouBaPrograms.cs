@@ -66,7 +66,7 @@ internal static class ShiXiahouBaComposition
         if (program.Id == LibbingSkill)
         {
             if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+                program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
                 program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
                 program.Triggers.Count != 1 ||
                 program.Triggers[0] is not { Id: LibbingTrigger, Window: SkillProgramTriggerWindow.CardUseCompleted,
@@ -76,7 +76,7 @@ internal static class ShiXiahouBaComposition
         }
         if (program.Id != PoxiSkill) return;
         if (program.ViewAs.Count != 0 || program.Modifiers.Count != 0 || program.DamageModifiers.Count != 0 ||
-            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.HpSkillGrants.Count != 0 ||
+            program.CardPolicies.Count != 0 || program.CardIdentities.Count != 0 || program.SkillGrants.Count != 0 ||
             program.Contributions.Count != 0 || program.BooleanStates.Count != 0 || program.Activations.Count != 0 ||
             program.Triggers.Count != 1 ||
             program.Triggers[0] is not { Id: PoxiTrigger, Window: SkillProgramTriggerWindow.DiscardPileReceived,
