@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "ol:wuniang", "revision": 1,
       "viewAs": [{ "id": "non-basic-as-slash", "inputKinds": [], "inputSuits": [], "inputCategories": ["trick", "equipment"],

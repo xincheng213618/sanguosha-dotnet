@@ -283,6 +283,7 @@ public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
 
 public enum SkillProgramEffectOp
 {
+    AddCurrentCardDamage = 2102,
     OfferGeneratedEquipment = 910000,
     SelectRandomPileEquipment = 910001,
     PlaceBoundEquipment = 910002,
@@ -1203,7 +1204,7 @@ public enum SkillProgramEffectOp
     GrantTurnRedSlashBenefits = 1680, UseDiamondDelayedOrDiscard = 1780, RevealOwnedBoundCardAppearance = 1860, GrantCurrentTurnDirectedHeartSlashBonus = 1862,
     GiveShownBoundCardsAndGrantTurnHandLimit = 1960,
     PlaceSelectedEquipment = 2000, FreezeSelectedHpPair = 2001,
-    PreventCurrentTargetSlashCancellation = 2100, AddCurrentTargetSlashDamage = 2101,
+    PreventCurrentTargetSlashCancellation = 2100,
     ChooseOwnerHpLoss = 2200, DrawPaidHpLoss = 2201, GrantPaidHpLossDistance = 2202, GrantPaidHpLossSlashLimit = 2203,
     DiscardDamageTargetAndClaimMount = 2300, OfferRedDiscardRecoveryChoice = 2340,
     DrawByDamageCardColor = 2400, UseSelectedActorDuel = 2401, ResolveDamageCardColorHealth = 2403,
@@ -3105,6 +3106,10 @@ public sealed partial class SkillProgramEffect
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramExpression? AmountExpression { get; internal init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public ProgramCardDamageTargetScope CardDamageTargetScope { get; internal init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public SkillProgramDamageLayer CardDamageLayer { get; internal init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public SkillProgramUnknownAmountBehavior OnUnknownAmount { get; internal init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramExpression? ValueExpression { get; internal init; }
@@ -3448,7 +3453,7 @@ public sealed record ProgramBooleanStatePresentation(string TrueText, string Fal
 
 public sealed class SkillProgramCatalog
 {
-    public const int RulesSchemaVersion = 63;
+    public const int RulesSchemaVersion = 64;
     public const int PresentationSchemaVersion = 3;
     public const string RuntimeVersion = "skill-program-v62";
     private const int MaximumDepth = 16;
@@ -6024,12 +6029,16 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                 SkillProgramTriggerValueKind.SourceZoneCountBefore or
                 SkillProgramTriggerValueKind.SourceZoneCountAfter))
             Fail(path + ".condition", "card-movement values are supported only by cardsMoved");
-        var finalTargetSlash = node.TryGetProperty("effects", out var finalEffects) && finalEffects.ValueKind == JsonValueKind.Array && finalEffects.EnumerateArray().Any(effect => effect.ValueKind == JsonValueKind.Object && effect.TryGetProperty("op", out var op) && op.ValueKind == JsonValueKind.String && (string.Equals(op.GetString(), "preventCurrentTargetSlashCancellation", StringComparison.OrdinalIgnoreCase) || string.Equals(op.GetString(), "addCurrentTargetSlashDamage", StringComparison.OrdinalIgnoreCase) || string.Equals(op.GetString(), "zhuiLieEscalateTargetDamage", StringComparison.OrdinalIgnoreCase)));
+        var finalTargetSlash = node.TryGetProperty("effects", out var finalEffects) && finalEffects.ValueKind == JsonValueKind.Array && finalEffects.EnumerateArray().Any(effect => effect.ValueKind == JsonValueKind.Object && effect.TryGetProperty("op", out var op) && op.ValueKind == JsonValueKind.String && (string.Equals(op.GetString(), "preventCurrentTargetSlashCancellation", StringComparison.OrdinalIgnoreCase) || string.Equals(op.GetString(), "zhuiLieEscalateTargetDamage", StringComparison.OrdinalIgnoreCase)));
+        var finalTargetCardDamage = window == SkillProgramTriggerWindow.CardUseTargetsFinalized && finalEffects.ValueKind == JsonValueKind.Array && finalEffects.EnumerateArray().Any(effect =>
+            effect.ValueKind == JsonValueKind.Object && effect.TryGetProperty("op", out var damageOp) && damageOp.ValueKind == JsonValueKind.String &&
+            string.Equals(damageOp.GetString(), "addCurrentCardDamage", StringComparison.OrdinalIgnoreCase) && effect.TryGetProperty("targetScope", out var damageScope) &&
+            damageScope.ValueKind == JsonValueKind.String && string.Equals(damageScope.GetString(), "currentTarget", StringComparison.OrdinalIgnoreCase));
         if (finalTargetSlash && (window != SkillProgramTriggerWindow.CardUseTargetsFinalized ||
             ownerRelation != SkillProgramCardActionOwnerRelation.Actor || cardKinds.Count == 0 ||
             cardKinds.Any(card => card is not (CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash))))
             Fail(path, "final target Slash facts require actual finalized actor Use and explicit Slash family kinds");
-        if (EnumerateTriggerValues(condition).Any(value => value.Kind == SkillProgramTriggerValueKind.EventTargetHp) && !finalTargetSlash &&
+        if (EnumerateTriggerValues(condition).Any(value => value.Kind == SkillProgramTriggerValueKind.EventTargetHp) && !finalTargetSlash && !finalTargetCardDamage &&
             window is not (SkillProgramTriggerWindow.BeforeDamageApplied or
                 SkillProgramTriggerWindow.AfterDamageApplied))
             Fail(path + ".condition", "eventTargetHp requires a damage trigger");
@@ -6063,7 +6072,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                 string.Equals(responseOp.GetString(), "prohibitCurrentResponse", StringComparison.OrdinalIgnoreCase));
         if (EnumerateTriggerValues(condition).Any(value => value.Kind == SkillProgramTriggerValueKind.EventTargetHandCount) &&
             window is not (SkillProgramTriggerWindow.SlashBeforeResponse or SkillProgramTriggerWindow.TurnEnding) &&
-            !finalTargetSlash && !finalTargetResponse)
+            !finalTargetSlash && !finalTargetCardDamage && !finalTargetResponse)
             Fail(path + ".condition", "target-hand comparison requires a Slash response, finalized Slash response policy or turn-ending boundary");
         if (EnumerateTriggerValues(condition).Any(value => value.Kind == SkillProgramTriggerValueKind.CurrentAttackRange) &&
             window is not (SkillProgramTriggerWindow.SlashBeforeResponse or

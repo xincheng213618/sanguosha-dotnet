@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:qizhi-mobile", "revision": 1,
       "activations": [{ "id": "charge-draw", "minCards": 0, "maxCards": 0, "minTargets": 1, "maxTargets": 1, "targetKind": "anyLiving", "usesPerTurn": null,

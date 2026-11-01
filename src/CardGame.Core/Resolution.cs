@@ -688,8 +688,8 @@ public sealed partial record CardUseFrame(
     public int? ConsumedAlcoholBonus { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IssuedCardNoResponse? IssuedNoResponse { get; init; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? NextSlashDamage { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool NextSlashDamageFrozen { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<NamedSlashCancellation>? NamedSlashCancellations { get; init; }
 

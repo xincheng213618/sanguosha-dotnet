@@ -274,7 +274,7 @@ public sealed partial class SimpleAiBrain
                         break;
                     case SkillProgramEffectOp.ProhibitCurrentResponse:
                     case SkillProgramEffectOp.PreventCurrentTargetSlashCancellation:
-                    case SkillProgramEffectOp.AddCurrentTargetSlashDamage:
+                    case SkillProgramEffectOp.AddCurrentCardDamage:
                     case SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner:
                     case SkillProgramEffectOp.InsertGrantedEntityPlayPhase:
                         offense += .6 * weight;

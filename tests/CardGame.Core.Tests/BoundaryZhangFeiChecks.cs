@@ -17,7 +17,7 @@ internal static class BoundaryZhangFeiChecks
             { RemainingUses: 1, Expiry: ActivePlayerEffectExpiry.ConsumedOrTurnEnd }, "A real next-Slash reserve must expose one outstanding use.");
         Slash(g, [1]);
         var use = g.ResolutionStack.OfType<CardUseFrame>().Single();
-        Require(use.NextSlashDamage == 1 && Consumed(g).Count() == 1, "Next accepted real Use freezes and consumes once before response.");
+        Require(use.NextSlashDamageFrozen && use.CardDamageAdjustments?.Sum(row => row.Amount) == 1 && Consumed(g).Count() == 1, "Next accepted real Use freezes and consumes once before response.");
         Require(g.CreateSnapshot(0).Players[0].ActiveEffects?.All(e => e.SkillId != "boundary:paoxiao") != false,
             "A consumed next-Slash reserve must disappear before its response window resolves.");
         Settle(g); Replay(g, r);

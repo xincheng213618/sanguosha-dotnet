@@ -603,7 +603,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         if (effects.Any(e => e.Op == SkillProgramEffectOp.DiscardDamageTargetAndClaimMount) && windowContext?.TargetSeat is { } mountTarget)
             publishedTargets = [mountTarget];
         GameSnapshot? targetSnapshot = null;
-        if (CoreGameEngineFinalTargetSlashRuntime.HasFinalTargetSlashEffects(effects) && windowContext is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, Facts: { } finalFacts, TargetSeat: { } finalSeat })
+        if ((CoreGameEngineFinalTargetSlashRuntime.HasFinalTargetSlashEffects(effects) || AddCurrentCardDamageDescriptor.HasTargetEffects(effects)) && windowContext is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, Facts: { } finalFacts, TargetSeat: { } finalSeat })
         {
             targetSnapshot = _corePlayerViewProjectionOperations.CreateSnapshot(owner.Seat);
             publicContext = publicContext with

@@ -127,7 +127,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
         }
 
         if (!finalized && issuedAttack is { } originalAttack)
-            cardLayer = checked(cardLayer + _characterPanZhangMaZhongBoundaryMobileOperations.Value.BoundaryAnjianDamage(originalAttack) + _characterChengPuBoundaryMobileOperations.Value.BoundaryChengPuLihuoDamage(originalAttack) + _characterHuangZhongBoundaryMobileOperations.Value.BoundaryHuangZhongCardDamage(originalAttack) + _characterZhangFeiBoundaryMobileOperations.Value.BoundaryZhangFeiLiyongCardDamage(originalAttack));
+            cardLayer = checked(cardLayer + _characterPanZhangMaZhongBoundaryMobileOperations.Value.BoundaryAnjianDamage(originalAttack) + _characterChengPuBoundaryMobileOperations.Value.BoundaryChengPuLihuoDamage(originalAttack) + _coreCardUseLifecycleOperations.CardDamageAdjustmentBonus(originalAttack, cardDamageOnly: true));
         if (!finalized)
             additional = checked(additional + _coreShanheS5QuyiOperations.ShanheS5JiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards) + _characterQuYiClassicOperations.Value.ClassicJiaoziPublicDamageBonus(view, sourceSeat, targetSeat, sourceLess, paidHandCards));
         if (!finalized && !sourceLess && !chain)

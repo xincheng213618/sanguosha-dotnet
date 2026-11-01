@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:xianzhen-mobile", "revision": 1,
       "activations": [{ "id": "contest", "minCards": 1, "maxCards": 1, "sourceZones": ["hand"], "minTargets": 1, "maxTargets": 1, "targetKind": "otherLivingWithHand", "usesPerTurn": null, "usesPerPhase": 1,

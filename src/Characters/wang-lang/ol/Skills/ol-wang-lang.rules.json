@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "ol:gushe", "revision": 1, "activations": [
       { "id": "simultaneous-pindian", "minCards": 1, "maxCards": 1, "minTargets": 1, "maxTargets": 3,

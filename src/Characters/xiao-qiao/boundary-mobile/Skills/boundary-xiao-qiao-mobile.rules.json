@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:hongyan-mobile", "revision": 1, "triggers": [
       { "id": "heart-before-result", "window": "judgmentBeforeResult", "subject": "any", "suits": ["heart"], "minimumRank": 1, "maximumRank": 13, "excludedReasons": [], "optional": false,

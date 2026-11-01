@@ -41,6 +41,7 @@ internal sealed partial class CharacterLeJiuAnniversaryRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { LeJiuCuijin = before with { Grant = grant } });
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { LeJiuCuijin = (u.LeJiuCuijin ?? []).Append(grant).ToArray() });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LeJiuCuijinArmedEvent(grant));
+        _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(use.Id, 1);
     }
 
     internal (NativeLogicalDiscardInvocationRecordedEvent Invocation, NativeLogicalDiscardMaterialCompletedEvent Material)? LeJiuPaidCost(ProgramSkillFrame f)
@@ -61,13 +62,4 @@ internal sealed partial class CharacterLeJiuAnniversaryRuntime
             throw new InvalidOperationException("Cuijin lost a real native use's immutable paid source grant.");
     }
 
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 44100)]
-    internal int LeJiuCuijinDamage(GameEngine.IDamageAttempt attack)
-    {
-        if (attack.IsChainPropagation || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { LeJiuCuijin: { } grants } use)
-            return 0;
-        if (grants.Any(g => !ValidLeJiuGrant(use, g)))
-            throw new InvalidOperationException("Cuijin damage must belong to its original paid whole native use.");
-        return grants.Count;
-    }
 }

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "ol:yicheng", "revision": 1, "activations": [
       { "id": "exchange", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0,

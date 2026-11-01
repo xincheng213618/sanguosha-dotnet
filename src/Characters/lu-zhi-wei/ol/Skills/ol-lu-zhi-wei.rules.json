@@ -1,5 +1,5 @@
 {
- "schemaVersion":63,
+ "schemaVersion":64,
  "skills":[
   {"id":"ol:weijing","revision":1,"viewAs":[
    {"id":"round-slash","inputKinds":[],"inputSuits":[],"inputCount":0,"sourceZones":[],"outputKind":"slash","forPlay":true,"forResponse":false,"roundOnceCardlessBasic":{"usageGroup":"weijing","usesPerRound":1}},

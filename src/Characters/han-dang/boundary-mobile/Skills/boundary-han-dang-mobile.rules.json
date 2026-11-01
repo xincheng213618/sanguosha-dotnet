@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63, "skills": [
+  "schemaVersion": 64, "skills": [
     { "id": "boundary:gongqi-mobile", "revision": 1,
       "modifiers": [{ "id": "mounted-unlimited-range", "query": "attackRange", "operation": "unlimited", "value": 0, "priority": 0, "condition": { "kind": "not", "children": [{ "kind": "noMounts" }] } }],
       "activations": [{ "id": "discard-nonbasic-and-target-card", "minCards": 1, "maxCards": 1, "sourceZones": ["hand", "equipment"], "cardCategories": ["trick", "equipment"],

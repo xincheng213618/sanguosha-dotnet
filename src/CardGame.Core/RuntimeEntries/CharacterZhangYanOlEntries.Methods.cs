@@ -41,7 +41,6 @@ internal sealed partial class CharacterZhangYanOlEntries
     internal int ZhangYanChooser(ProgramSkillFrame f) => _resolve().ZhangYanChooser(f);
     internal int[] ZhangYanExtraTargets(ProgramSkillFrame f, CardUseFrame use) => _resolve().ZhangYanExtraTargets(f, use);
     internal bool ZhangYanFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().ZhangYanFirstChild(f, child);
-    internal int ZhangYanLangdaoDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().ZhangYanLangdaoDamageBonus(attack);
     internal CardUseFrame? ZhangYanLangdaoParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c) => _resolve().ZhangYanLangdaoParent(candidate, c);
     internal ProgramSkillFrame? ZhangYanObserverRoot() => _resolve().ZhangYanObserverRoot();
     internal bool ZhangYanPlayParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c) => _resolve().ZhangYanPlayParent(candidate, c);

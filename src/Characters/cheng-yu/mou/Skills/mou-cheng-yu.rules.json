@@ -1,5 +1,5 @@
 {
- "schemaVersion":63,
+ "schemaVersion":64,
  "skills":[
   {"id":"mou:shizha","revision":1,"triggers":[
    {"id":"hp-change","window":"afterHealthChanged","subject":"owner","hpChangeOccurrence":"perEvent","optional":true,"usageScope":"turn","usageLimit":1,"effects":[{"op":"resolveMouChengYuAnniversaryShizha","target":"owner"}]},

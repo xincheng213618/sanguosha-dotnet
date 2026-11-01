@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "mobile:shi-heyun", "revision": 1, "activations": [
       { "id": "lose-for-draw", "minCards": 0, "maxCards": 0, "sourceZones": ["hand"], "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null, "usesPerPhase": 2,

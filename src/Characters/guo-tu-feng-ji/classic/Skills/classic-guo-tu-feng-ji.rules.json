@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "classic:jigong", "revision": 1, "minimumRulesVersion": 190,
       "triggers": [{ "id": "draw-for-damage-hand-limit", "window": "playPhaseStarting", "subject": "owner", "optional": true,

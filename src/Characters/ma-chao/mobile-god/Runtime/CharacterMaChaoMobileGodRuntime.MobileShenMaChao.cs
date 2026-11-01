@@ -11,8 +11,6 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
     internal DamageNature MobileMaChaoYuliNature(GameEngine.IDamageAttempt attack, DamageNature priorNature) => !attack.IsSourceLess && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], MobileMaChaoYuli) ? DamageNature.Thunder : priorNature;
     [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 40625)]
     internal int MobileMaChaoSourceDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsSourceLess && !attack.IsChainPropagation && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.SourceSeat) && _coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], MobileMaChaoYuli) && _coreNativeDamagePoliciesOperations.GetDamageNatureBeforeMobileMaChao(attack) == DamageNature.Thunder ? 1 : 0;
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 40626)]
-    internal int MobileTingweiCardDamageBonus(GameEngine.IDamageAttempt attack) => attack.IsChainPropagation ? 0 : (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MobileTingweiBoosts ?? []).Count(b => b.Target == attack.TargetSeat && b.UseId == attack.ResolutionId && _coreCardUseLifecycleOperations.LifecycleCardUse(b.UseId)?.Action?.ActionId == b.ActionId);
     internal long LastMobileJimieUse(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileMaChaoJimieUsedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner)?.FrameId ?? 0;
     internal bool CanMobileJimie(int owner) => LastMobileJimieUse(owner)is 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileMaChaoJimieRefreshedEvent>().Any(e => e.Owner == owner && e.UseFrameId == LastMobileJimieUse(owner));
     internal void RecordMobileYuli(ProgramSkillFrame f, int part)
@@ -240,9 +238,7 @@ internal sealed partial class CharacterMaChaoMobileGodRuntime
                     _coreRuntimeOperations.ReplaceRuntimeTop(f with { MobileShenMaChao = f.MobileShenMaChao!with { Stage = MobileMaChaoStage.Gift } });
                 else if (option == 3)
                 {
-                    var b = new MobileTingweiBoost(f.Id, r.Source, r.UseId, r.ActionId, r.Target);
-                    _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(r.UseId, u => u with { MobileTingweiBoosts = (u.MobileTingweiBoosts ?? []).Append(b).ToArray() });
-                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileTingweiBoostedEvent(b));
+                    _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(r.UseId, 1, r.Target);
                 }
                 else
                 {

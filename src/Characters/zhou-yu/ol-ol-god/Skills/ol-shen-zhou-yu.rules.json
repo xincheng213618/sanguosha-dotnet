@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
 {"id":"ol:qinyin","revision":1,"minimumRulesVersion":187,"triggers":[{"id":"discard-end","window":"discardPhaseEnded","turnOwnerScope":"own","allowOwnDiscardPhaseEnded":true,"subject":"owner","optional":true,"priority":0,"condition":{"kind":"compare","left":{"kind":"turnOwnerDiscardPhaseHandDiscardCount"},"operator":"greaterThanOrEqual","right":{"kind":"integerConstant","value":2}},"effects":[{"op":"chooseOption","target":"owner","resultBind":"melody","options":[{"id":"heal"},{"id":"lose"}]},{"op":"recoverAllLiving","target":"owner","amount":1,"condition":{"kind":"choiceIs","sourceBind":"melody","optionId":"heal"}},{"op":"loseHpParticipants","target":"owner","targetKind":"anyLiving","amount":1,"condition":{"kind":"choiceIs","sourceBind":"melody","optionId":"lose"}}]}]},
 {"id":"ol:yeyan","revision":1,"minimumRulesVersion":187,"activations":[
 {"id":"small","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":3,"targetKind":"anyLiving","usesPerTurn":null,"usesPerGame":1,"usageGroup":"limited","effects":[{"op":"damageParticipants","target":"selectedTargets","amount":1,"nature":"fire"}]},

@@ -76,7 +76,7 @@ internal static class SharedPostEventChecks
     private static void Require(bool value, string message) { if (!value) throw new InvalidOperationException(message); }
 
     private const string Rules = """
-        {"schemaVersion":63,"skills":[
+        {"schemaVersion":64,"skills":[
          {"id":"fixture:driver","revision":1,"minimumRulesVersion":176,"activations":[
           {"id":"draw","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,
            "effects":[{"op":"draw","target":"owner","amount":2},{"op":"loseHp","target":"owner","amount":1}]},

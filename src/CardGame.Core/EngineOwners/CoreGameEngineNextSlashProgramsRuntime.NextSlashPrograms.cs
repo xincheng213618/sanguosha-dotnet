@@ -65,14 +65,15 @@ internal sealed partial class CoreGameEngineNextSlashProgramsRuntime
     internal void FreezeNextSlashDamage(long frameId)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(frameId) ?? throw new InvalidOperationException("Next Slash damage lost its card owner.");
-        if (use.NextSlashDamage is not null || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
+        if (use.NextSlashDamageFrozen || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
             return;
         var matching = _coreGameEngineNextSlashProgramsNamedNextSlashReservesAccess._namedNextSlashReserves.Where(item => item.OwnerSeat == action.ActorSeat && item.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && item.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat).ToArray();
         var amount = matching.Sum(item => item.Amount);
-        // Preserve old nullable/canonical output when this registry has never issued this capability.
+        // Do not mark unrelated uses when this registry has never issued this capability.
         if (amount == 0 && !HasNextSlashDamageCapability)
             return;
-        _coreRuntimeOperations.ReplaceRuntimeFrame(frameId, use with { NextSlashDamage = amount });
+        _coreRuntimeOperations.ReplaceRuntimeFrame(frameId, use with { NextSlashDamageFrozen = true });
+        _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(frameId, amount, cardKinds: [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash]);
         if (amount == 0)
             return;
         foreach (var item in matching)
@@ -80,8 +81,7 @@ internal sealed partial class CoreGameEngineNextSlashProgramsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NextSlashDamageConsumedEvent(action.ActorSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frameId, amount));
     }
 
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 50)]
-    internal int FrozenNextSlashDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack.EffectiveCardKind is CardKind.Slash or CardKind.FireSlash or CardKind.ThunderSlash or CardKind.ColdSlash ? _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.NextSlashDamage ?? 0 : 0;
+
     internal void ExpireNextSlashDamage(int turnNumber, int turnSeat)
     {
         foreach (var item in _coreGameEngineNextSlashProgramsNamedNextSlashReservesAccess._namedNextSlashReserves.Where(item => item.TurnNumber == turnNumber && item.TurnSeat == turnSeat).ToArray())

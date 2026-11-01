@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
  {"id":"anniversary:liangjue","revision":1,"triggers":[
   {"id":"black-equipment-leaves","window":"cardsMoved","subject":"owner","sourceZones":["equipment"],"movementOccurrence":"perCard","optional":false,"effects":[{"op":"draw","target":"owner","amount":2},{"op":"awaitOwnedCardMovement","target":"owner"},{"op":"loseHp","target":"owner","amount":1,"condition":{"kind":"hpAtLeast","value":2}}]},
   {"id":"black-judgment-leaves","window":"cardsMoved","subject":"owner","sourceZones":["judgment"],"movementOccurrence":"perCard","optional":false,"effects":[{"op":"draw","target":"owner","amount":2},{"op":"awaitOwnedCardMovement","target":"owner"},{"op":"loseHp","target":"owner","amount":1,"condition":{"kind":"hpAtLeast","value":2}}]},

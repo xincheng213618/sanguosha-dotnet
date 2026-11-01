@@ -17,7 +17,7 @@ internal static class ProgramCardJudgmentWindowChecks
     private static void VerifyWindow(string window, SkillProgramTriggerWindow expected)
     {
         var rules = $$"""
-            {"schemaVersion":63,"skills":[{"id":"fixture:card-judgment","revision":1,
+            {"schemaVersion":64,"skills":[{"id":"fixture:card-judgment","revision":1,
               "minimumRulesVersion": 171,"triggers":[{"id":"judge-slash","window":"{{window}}",
               "ownerRelation":"actor","cardKinds":["slash"],"optional":true,
               "effects":[{"op":"startJudgment","target":"owner",

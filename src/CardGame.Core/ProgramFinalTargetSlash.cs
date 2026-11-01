@@ -3,7 +3,7 @@ namespace CardGame.Core;
 public enum ProgramFinalTargetComparison { TargetHandAtMostActor, TargetHpAtLeastActor, Always }
 public sealed record ProgramTargetSlashReceipt(long ActionId, int ActorSeat, int TargetSeat,
     long CardUseFrameId, long ProducerFrameId, string SkillId, string SkillInstanceId, string GameplayHash, string TriggerId,
-    int EffectIndex, bool PreventCancellation, int DamageBonus,
+    int EffectIndex, bool PreventCancellation,
     [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     bool EscalateToTargetHp = false);
 public sealed record ProgramTargetSlashReceiptIssuedEvent(long CardUseFrameId, ProgramTargetSlashReceipt Receipt) : IGameEvent;
@@ -29,10 +29,9 @@ internal abstract class FinalTargetSlashDescriptor : ProgramOperationDescriptorB
         r.AllowOnly("op", "target", "comparison", "amount", "condition");
         if (r.RequiredEnum<SkillProgramEffectTarget>("target") != SkillProgramEffectTarget.Owner)
             throw new InvalidOperationException("A final target Slash fact requires actor ownership.");
-        var amount = Op == SkillProgramEffectOp.AddCurrentTargetSlashDamage ? r.RequiredInt("amount") : 0;
-        if (amount is < 0 or > 20 || Op == SkillProgramEffectOp.AddCurrentTargetSlashDamage && amount < 1 ||
-            Op == SkillProgramEffectOp.PreventCurrentTargetSlashCancellation && r.Has("amount"))
-            throw new InvalidOperationException("A final target Slash damage amount must be 1..20; cancellation has no amount.");
+        var amount = 0;
+        if (r.Has("amount"))
+            throw new InvalidOperationException("Final target cancellation has no amount.");
         var effect = new SkillProgramEffect(Op, SkillProgramEffectTarget.Owner, amount, r.Condition())
         { FinalTargetComparison = r.RequiredEnum<ProgramFinalTargetComparison>("comparison") };
         RequireAlways(effect, r.Path);
@@ -46,11 +45,6 @@ internal sealed class PreventCurrentTargetSlashCancellationDescriptor : FinalTar
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.PreventCurrentTargetSlashCancellation;
     public override ISkillProgramEffectHandler Handler { get; } = new FinalTargetSlashHandler(SkillProgramEffectOp.PreventCurrentTargetSlashCancellation);
-}
-internal sealed class AddCurrentTargetSlashDamageDescriptor : FinalTargetSlashDescriptor
-{
-    public override SkillProgramEffectOp Op => SkillProgramEffectOp.AddCurrentTargetSlashDamage;
-    public override ISkillProgramEffectHandler Handler { get; } = new FinalTargetSlashHandler(SkillProgramEffectOp.AddCurrentTargetSlashDamage);
 }
 // 追猎: the weapon/mount judgment branch escalates this Slash's damage to the
 // target's current hp at damage application. The escalation rides the same

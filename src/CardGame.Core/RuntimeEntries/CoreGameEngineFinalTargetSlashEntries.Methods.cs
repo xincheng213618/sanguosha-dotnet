@@ -8,7 +8,6 @@ internal sealed partial class CoreGameEngineFinalTargetSlashEntries
     internal bool DistancePhysicalSlash260IsWithinSpecificSlashRange(ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash260IsWithinSpecificSlashRange(q);
     internal bool DistanceProvidedSlash110HasPotentialRankSlashRange(ProgramSlashDistanceQuery q) => _resolve().DistanceProvidedSlash110HasPotentialRankSlashRange(q);
     internal bool DistanceVirtualSlash120IsWithinSpecificSlashRange(ProgramSlashDistanceQuery q) => _resolve().DistanceVirtualSlash120IsWithinSpecificSlashRange(q);
-    internal int FinalTargetSlashDamage(GameEngine.IDamageAttempt attack) => _resolve().FinalTargetSlashDamage(attack);
     internal int FinalTargetSlashEscalationBonus(GameEngine.IDamageAttempt attack, int damageWithoutEscalation) => _resolve().FinalTargetSlashEscalationBonus(attack, damageWithoutEscalation);
     internal IEnumerable<ProgramTargetSlashReceipt> FinalTargetSlashReceipts(long frameId, int target) => _resolve().FinalTargetSlashReceipts(frameId, target);
     internal bool HasFinalTargetSlashHpDamage(GameEngine.IDamageAttempt attack) => _resolve().HasFinalTargetSlashHpDamage(attack);

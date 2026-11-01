@@ -128,6 +128,8 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
             Stage = MoQuanyuSlashStage.Applied
         };
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { MoQuanyuSlashPolicy = r });
+        if ((r.Mask & MoQuanyuBit(MoQuanyuEffect.Baihong)) != 0)
+            _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(use.Id, 1);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoQuanyuSlashAppliedEvent(f.Id, use.Id, r.Original.ActionId, r.Mask, r.AddedTargetSeat));
         if ((r.Mask & MoQuanyuBit(MoQuanyuEffect.Baili)) != 0)
         {
@@ -156,8 +158,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
             attack.ProhibitDodgeBy("权御·紫电");
     }
 
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 60)]
-    internal int MoQuanyuDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MoQuanyuSlashPolicy is { Stage: MoQuanyuSlashStage.Applied } r && (r.Mask & MoQuanyuBit(MoQuanyuEffect.Baihong)) != 0 ? 1 : 0;
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMoSunQuanQuanyuSlashEffects)]
     internal PromptChoice ChooseMoQuanyuExtraTargetAi(PendingDecision prompt, ProgramSkillFrame f) => prompt.Choices.FirstOrDefault(c => c.Targets is [var target] && !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[target])) ?? prompt.Choices.Single(c => c.Targets.Count == 0);
 }

@@ -15,13 +15,13 @@ internal sealed partial class CoreGameEngineRecordedSuitSlashRuntime
         var receipt = new ProgramRecordedSuitSlashReceipt(action.ActionId, use.Id, frame.Id, action.ActorSeat, target, frame.SkillId, frame.SkillInstanceId, frame.GameplayHash, frame.TriggerId!, frame.InstructionIndex - 1, effect.StateId!, mask, bonus);
         use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(f => f.Id == use.Id);
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { RecordedSuitSlashReceipts = Array.AsReadOnly((use.RecordedSuitSlashReceipts ?? []).Append(receipt).ToArray()) });
+        _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(use.Id, bonus, target, [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash]);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramRecordedSuitSlashIssuedEvent(receipt));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Name)}】，亮出 {(count)} 张牌，此【杀】伤害+{(bonus)}，目标不能使用已记录花色的牌响应。", frame.OwnerSeat);
     }
 
     internal IEnumerable<ProgramRecordedSuitSlashReceipt> RecordedSuitSlashReceipts(long frameId, int target) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == frameId)is { Action: { } action, RecordedSuitSlashReceipts: { } receipts } ? receipts.Where(r => r.CardUseFrameId == frameId && r.ActionId == action.ActionId && r.ActorSeat == action.ActorSeat && r.TargetSeat == target && action.EffectiveDesignatedTargetSeats.Contains(target)) : [];
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 40)]
-    internal int RecordedSuitSlashDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) ? RecordedSuitSlashReceipts(attack.ResolutionId, attack.TargetSeat).Sum(r => r.DamageBonus) : 0;
+
     internal bool IsRecordedSuitResponseAllowed(CharacterState responder, IReadOnlyList<Card> cards, CardKind kind)
     {
         if (kind != CardKind.Dodge || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) || responder.Seat != attack.TargetSeat && _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.CurrentCandidateSeat != responder.Seat)

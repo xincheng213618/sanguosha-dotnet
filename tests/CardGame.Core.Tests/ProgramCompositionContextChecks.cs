@@ -68,7 +68,7 @@ internal static class ProgramCompositionContextChecks
     }
 
     private static string Rules(string id, IReadOnlyList<string> activations, IReadOnlyList<string> triggers) => $$"""
-    {"schemaVersion":63,"skills":[{"id":"{{id}}","revision":1,"minimumRulesVersion": 171,
+    {"schemaVersion":64,"skills":[{"id":"{{id}}","revision":1,"minimumRulesVersion": 171,
     "modifiers":[],"viewAs":[],"activations":[{{string.Join(',', activations)}}],
     "triggers":[{{string.Join(',', triggers)}}],"contributions":[],"cardIdentities":[]}]}
     """;

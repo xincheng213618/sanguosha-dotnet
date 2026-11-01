@@ -23,13 +23,13 @@ internal sealed partial class CharacterZhangYanOlRuntime
         var damage = r.Votes.Count(v => v.Option == LangdaoOption.Damage);
         var extra = r.Votes.Count(v => v.Option == LangdaoOption.ExtraTarget);
         var noResponse = r.Votes.Any(v => v.Option == LangdaoOption.NoResponse);
-        var issued = new ZhangYanLangdaoUse(f.Id, r.WindowId, use.Action!.ActionId, r.Source, r.GameplayHash, use.SourceSeat, original, damage, extra, noResponse)
+        var issued = new ZhangYanLangdaoUse(f.Id, r.WindowId, use.Action!.ActionId, r.Source, r.GameplayHash, use.SourceSeat, original, extra, noResponse)
         {
             OriginalTargets = use.TargetSeats,
             SelectedOptions = r.Votes.Select(v => v.Option).Distinct().ToArray()
         };
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { ZhangYanLangdao = issued });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangYanLangdaoIssuedEvent(use.Id, issued.ActionId, f.Id, r.Source, r.GameplayHash, issued.OriginalActor, original, damage, extra, noResponse));
+        _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(use.Id, damage);
         if (extra == 0)
         {
             FinishZhangYan(f, true);
@@ -69,15 +69,13 @@ internal sealed partial class CharacterZhangYanOlRuntime
 
     internal bool IsZhangYanLangdaoIssued(CardUseFrame use)
     {
-        if (use.ZhangYanLangdao is not { } r || use.Action is not { Type: CardActionType.Use } a || a.ActionId != r.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || r.Source.OwnerSeat != r.OriginalActor || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.OriginalActor, a.ProviderSeat) || r.DamageBonus is < 0 or > 2 || r.ExtraCount is < 0 or > 2 || r.OriginalTargets is not [var original] || original != r.OriginalTarget || r.SelectedOptions.Count is < 1 or > 2 || r.SelectedOptions.Distinct().Count() != r.SelectedOptions.Count || r.AddedTargets.Count > r.ExtraCount || r.AddedTargets.Distinct().Count() != r.AddedTargets.Count || r.AddedTargets.Any(r.OriginalTargets.Contains))
+        if (use.ZhangYanLangdao is not { } r || use.Action is not { Type: CardActionType.Use } a || a.ActionId != r.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || r.Source.OwnerSeat != r.OriginalActor || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.OriginalActor, a.ProviderSeat) || r.ExtraCount is < 0 or > 2 || r.OriginalTargets is not [var original] || original != r.OriginalTarget || r.SelectedOptions.Count is < 1 or > 2 || r.SelectedOptions.Distinct().Count() != r.SelectedOptions.Count || r.AddedTargets.Count > r.ExtraCount || r.AddedTargets.Distinct().Count() != r.AddedTargets.Count || r.AddedTargets.Any(r.OriginalTargets.Contains))
             return false;
         var votes = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYanLangdaoVoteRevealedEvent>().Where(e => e.FrameId == r.ProgramFrameId).OrderBy(e => e.Index).ToArray();
-        return votes is [{ Index: 0 } first, { Index: 1 } second] && first.Seat == r.OriginalActor && second.Seat == r.OriginalTarget && votes.Count(v => v.Option == LangdaoOption.Damage) == r.DamageBonus && votes.Count(v => v.Option == LangdaoOption.ExtraTarget) == r.ExtraCount && votes.Any(v => v.Option == LangdaoOption.NoResponse) == r.NoResponse && votes.Select(v => v.Option).Distinct().SequenceEqual(r.SelectedOptions) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYanLangdaoIssuedEvent>().Count(e => e.UseId == use.Id && e.ActionId == a.ActionId && e.FrameId == r.ProgramFrameId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.OriginalActor == r.OriginalActor && e.OriginalTarget == r.OriginalTarget && e.DamageBonus == r.DamageBonus && e.ExtraCount == r.ExtraCount && e.NoResponse == r.NoResponse) == 1;
+        return votes is [{ Index: 0 } first, { Index: 1 } second] && first.Seat == r.OriginalActor && second.Seat == r.OriginalTarget && votes.Count(v => v.Option == LangdaoOption.ExtraTarget) == r.ExtraCount && votes.Any(v => v.Option == LangdaoOption.NoResponse) == r.NoResponse && votes.Select(v => v.Option).Distinct().SequenceEqual(r.SelectedOptions);
     }
 
     internal bool IsZhangYanLangdaoUnrespondable(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ZhangYanLangdao: { NoResponse: true } } use && IsZhangYanLangdaoIssued(use);
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 140)]
-    internal int ZhangYanLangdaoDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { ZhangYanLangdao: { } r } use && IsZhangYanLangdaoIssued(use) ? r.DamageBonus : 0;
     internal bool HasZhangYanLangdaoTargetTail(CardUseFrame use)
     {
         if (use.ZhangYanLangdao is not { AddedTargets.Count: > 0 } r || !IsZhangYanLangdaoIssued(use))

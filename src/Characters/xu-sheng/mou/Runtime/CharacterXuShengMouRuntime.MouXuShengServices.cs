@@ -45,17 +45,12 @@ internal sealed partial class CharacterXuShengMouRuntime
     bool IMouXuShengNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
     void IMouXuShengNative.Boost(ProgramSkillFrame f)
     {
-        if (!MouXuSheng.Valid(f) || f.MouXuSheng is not { Accepted: true, Operation: SkillProgramEffectOp.ResolveMouXuShengQinqiang } r)
-            throw new InvalidOperationException("Qinqiang requires its accepted original true Hand Use.");
+        var r = f.MouXuSheng!;
         // A true response Use owns its response window, never the incoming
         // card's damage. Such a non-damaging card may still spend this item.
         if (r.UseId == 0)
             return;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { Action: { } action } use || action.ActionId != r.ActionId || action.ActorSeat != f.OwnerSeat)
-            throw new InvalidOperationException("Qinqiang must attach only to its own accepted card.");
-        var boost = new MouXuShengBoost(f.Id, r.Source, f.GameplayHash, r.UseId, r.ActionId, r.X);
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouXuShengBoosts = (u.MouXuShengBoosts ?? []).Append(boost).ToArray() });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouXuShengBoostIssuedEvent(boost));
+        _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(r.UseId, r.X);
     }
 
     void IMouXuShengNative.Discard(ProgramSkillFrame f)
@@ -87,14 +82,6 @@ internal sealed partial class CharacterXuShengMouRuntime
             foreach (var moved in records.Where(m => m.To == CardLocation.Hand(f.OwnerSeat)))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouXuShengClaimedEvent(f.Id, moved.CardId, moved.Sequence));
         }, disclosure: CardMovementDisclosure.FaceUp);
-    }
-
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 34900)]
-    internal int MouXuShengDamageBonus(GameEngine.IDamageAttempt attack)
-    {
-        if (attack.IsChainPropagation || attack is not NativeOwners.CardAttackHandle || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action, MouXuShengBoosts: { } boosts } use)
-            return 0;
-        return boosts.Where(b => b.UseId == use.Id && b.ActionId == action.ActionId && b.Source.OwnerSeat == action.ActorSeat && _contentRegistryOperations._contentRegistry.GetSkill(b.Source.SkillId).Program?.GameplayHash == b.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuShengBoostIssuedEvent>().Count(e => e.Boost == b) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXuShengBenefitUsedEvent>().Count(e => e.FrameId == b.FrameId && e.ActionId == b.ActionId && e.Damage && e.X == b.X) == 1).Sum(b => b.X);
     }
 
     [ProgramViewContributor(ProgramViewContribution.PrivateCards, 34900)]

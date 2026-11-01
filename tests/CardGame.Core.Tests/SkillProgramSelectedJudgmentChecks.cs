@@ -228,7 +228,7 @@ internal static class SkillProgramSelectedJudgmentChecks
     }
 
     private const string Rules = """
-        {"schemaVersion":63,"skills":[
+        {"schemaVersion":64,"skills":[
           {"id":"selected-judgment-test:leiji","revision":1,"minimumRulesVersion": 171,"modifiers":[],"viewAs":[],"activations":[],"contributions":[],"triggers":[
             {"id":"after-dodge","window":"cardResponseAccepted","ownerRelation":"actor","cardKinds":["dodge"],
              "optional":true,"effects":[

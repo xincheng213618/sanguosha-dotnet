@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "ol:bingzheng", "revision": 1, "triggers": [{
       "id": "unequal-hand-hp-ending", "window": "playEnding", "subject": "owner", "turnOwnerScope": "own", "optional": true,

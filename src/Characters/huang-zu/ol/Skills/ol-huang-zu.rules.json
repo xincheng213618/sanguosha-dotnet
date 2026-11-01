@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     {
       "id": "ol:wangong",
@@ -32,12 +32,7 @@
             "kind": "previousPlayCardIsBasic"
           },
           "effects": [
-            {
-              "op": "addCurrentTargetSlashDamage",
-              "target": "owner",
-              "amount": 1,
-              "comparison": "always"
-            }
+            {"op":"addCurrentCardDamage","target":"owner","amount":1,"targetScope":"currentTarget","cardKinds":["slash","fireSlash","thunderSlash"]}
           ]
         }
       ],

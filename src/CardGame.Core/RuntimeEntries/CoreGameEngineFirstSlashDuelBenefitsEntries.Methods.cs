@@ -9,7 +9,6 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsEntries
     internal bool DrainFirstSlashDuelChildren(ProgramSkillFrame f) => _resolve().DrainFirstSlashDuelChildren(f);
     internal void FinishFirstSlashDuelBenefit(ProgramSkillFrame f) => _resolve().FinishFirstSlashDuelBenefit(f);
     internal IReadOnlyList<PromptChoice> FirstSlashDuelChoices(ProgramSkillFrame f) => _resolve().FirstSlashDuelChoices(f);
-    internal int FirstSlashDuelDamage(GameEngine.IDamageAttempt attack) => _resolve().FirstSlashDuelDamage(attack);
     internal bool FirstSlashDuelDeclaredKindMatches(CardUseFrame use, CardKind declaredKind) => _resolve().FirstSlashDuelDeclaredKindMatches(use, declaredKind);
     internal CardConversionSource FirstSlashDuelSource(ProgramSkillFrame f) => _resolve().FirstSlashDuelSource(f);
     internal bool IsFirstSlashDuelAction(int owner, CardActionContext action, CardUseFrame use) => _resolve().IsFirstSlashDuelAction(owner, action, use);

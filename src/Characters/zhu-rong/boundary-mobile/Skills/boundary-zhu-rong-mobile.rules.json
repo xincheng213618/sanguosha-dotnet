@@ -1,4 +1,4 @@
-{ "schemaVersion": 63, "skills": [{ "id": "boundary:lieren-mobile", "revision": 1, "triggers": [
+{ "schemaVersion": 64, "skills": [{ "id": "boundary:lieren-mobile", "revision": 1, "triggers": [
   { "id": "contest-on-slash-target", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "cardKinds": ["slash", "fireSlash", "thunderSlash", "coldSlash"], "optional": true,
     "effects": [
       { "op": "startCardActionPindian", "target": "owner", "opponentRef": { "kind": "eventTarget" }, "resultBind": "contest", "visibility": "public" },

@@ -31,7 +31,6 @@ internal sealed partial class CharacterSunJianMouOlEntries
     internal bool MouSunJianOlFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MouSunJianOlFirstChild(f, child);
     internal bool MouSunJianOlHulieAvailable(int owner, int turn, bool counter) => _resolve().MouSunJianOlHulieAvailable(owner, turn, counter);
     internal IReadOnlyList<PromptChoice> MouSunJianOlHulieChoices(ProgramSkillFrame f) => _resolve().MouSunJianOlHulieChoices(f);
-    internal int MouSunJianOlHulieDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().MouSunJianOlHulieDamageBonus(attack);
     internal Core.MouSunJianOlHulieEntry? MouSunJianOlHulieEntry(CardUseFrame use, ProgramTriggerCandidate c) => _resolve().MouSunJianOlHulieEntry(use, c);
     internal bool MouSunJianOlLionPayment(ProgramSkillFrame f, int seat, CardMoveReason? reason) => _resolve().MouSunJianOlLionPayment(f, seat, reason);
     internal bool MouSunJianOlNativeEdge(int n) => _resolve().MouSunJianOlNativeEdge(n);

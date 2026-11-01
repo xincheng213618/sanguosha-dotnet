@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:zhenlie-mobile", "revision": 1, "triggers": [
       { "id": "paid-own-target", "window": "otherActualUseTargeted", "subject": "owner", "optional": true, "effects": [

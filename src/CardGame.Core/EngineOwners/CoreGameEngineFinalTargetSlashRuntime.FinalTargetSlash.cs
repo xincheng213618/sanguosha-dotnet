@@ -15,14 +15,13 @@ internal sealed partial class CoreGameEngineFinalTargetSlashRuntime
         var index = frame.InstructionIndex - 1;
         if (entries.Any(item => item.ProducerFrameId == frame.Id && item.EffectIndex == index))
             return;
-        var receipt = new ProgramTargetSlashReceipt(action.ActionId, action.ActorSeat, target, owner.Id, frame.Id, frame.SkillId, frame.SkillInstanceId, frame.GameplayHash, frame.TriggerId!, index, effect.Op == SkillProgramEffectOp.PreventCurrentTargetSlashCancellation, effect.Op == SkillProgramEffectOp.AddCurrentTargetSlashDamage ? effect.Amount : 0, effect.Op == SkillProgramEffectOp.ZhuiLieEscalateTargetDamage);
+        var receipt = new ProgramTargetSlashReceipt(action.ActionId, action.ActorSeat, target, owner.Id, frame.Id, frame.SkillId, frame.SkillInstanceId, frame.GameplayHash, frame.TriggerId!, index, effect.Op == SkillProgramEffectOp.PreventCurrentTargetSlashCancellation, effect.Op == SkillProgramEffectOp.ZhuiLieEscalateTargetDamage);
         _coreRuntimeOperations.ReplaceRuntimeFrame(owner.Id, owner with { FinalTargetSlashReceipts = Array.AsReadOnly(entries.Append(receipt).ToArray()) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTargetSlashReceiptIssuedEvent(owner.Id, receipt));
     }
 
     internal IEnumerable<ProgramTargetSlashReceipt> FinalTargetSlashReceipts(long frameId, int target) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == frameId)is { Action: { } action, FinalTargetSlashReceipts: { } entries } ? entries.Where(item => item.ActionId == action.ActionId && item.CardUseFrameId == frameId && item.ActorSeat == action.ActorSeat && item.TargetSeat == target && action.EffectiveDesignatedTargetSeats.Contains(target)) : [];
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 30)]
-    internal int FinalTargetSlashDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) ? FinalTargetSlashReceipts(attack.ResolutionId, attack.TargetSeat).Sum(item => item.DamageBonus) : 0;
+
     internal bool HasFinalTargetSlashHpDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(attack.TargetSeat) && _coreMatchParticipantsPlayersAccess._players[attack.TargetSeat].IsAlive && FinalTargetSlashReceipts(attack.ResolutionId, attack.TargetSeat).Any(item => item.EscalateToTargetHp);
     internal int FinalTargetSlashEscalationBonus(GameEngine.IDamageAttempt attack, int damageWithoutEscalation)
     {

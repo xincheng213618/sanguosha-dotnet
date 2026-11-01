@@ -6,7 +6,7 @@ internal static class CardUseCompletedChecks
     public static void FinishedSlashOpensReplayableProgramWindow()
     {
         const string rules = """
-            {"schemaVersion":63,"skills":[{"id":"fixture:after-slash","revision":1,
+            {"schemaVersion":64,"skills":[{"id":"fixture:after-slash","revision":1,
               "minimumRulesVersion": 171,"triggers":[{"id":"draw-after-finish",
               "window":"cardUseCompleted","ownerRelation":"actor","cardKinds":["slash"],
               "optional":true,"effects":[{"op":"draw","target":"owner","amount":1}]}]}]}

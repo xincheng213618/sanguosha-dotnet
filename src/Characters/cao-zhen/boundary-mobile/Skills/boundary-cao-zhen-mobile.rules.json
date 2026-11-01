@@ -1,5 +1,5 @@
 {
-  "schemaVersion":63,"skills":[{"id":"boundary:sidi-mobile","revision":1,"triggers":[
+  "schemaVersion":64,"skills":[{"id":"boundary:sidi-mobile","revision":1,"triggers":[
     {"id":"prepare-forecast","window":"cardUseCompleted","ownerRelation":"observer","includeResponseUses":true,"singleActionInstance":true,"optional":true,"effects":[{"op":"prepareBoundaryCaoZhenSidi","target":"owner"}]},
     {"id":"consume-first-use","window":"cardUseCommitted","ownerRelation":"observer","includeResponseUses":true,"singleActionInstance":true,"optional":false,"effects":[
       {"op":"resolveBoundaryCaoZhenSidi","target":"owner","resultBind":"sidi-result"},

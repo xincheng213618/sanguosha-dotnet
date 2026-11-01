@@ -64,7 +64,6 @@ internal sealed partial class CharacterSunQuanOlMagicEntries
     internal bool MoQuanyuChildRidesOn(ResolutionFrame child, ProgramSkillFrame parent) => _resolve().MoQuanyuChildRidesOn(child, parent);
     internal IReadOnlyList<PromptChoice> MoQuanyuChoices(ProgramSkillFrame f) => _resolve().MoQuanyuChoices(f);
     internal MoQuanyuEffect MoQuanyuCurrentChoice(int issuer, int participant) => _resolve().MoQuanyuCurrentChoice(issuer, participant);
-    internal int MoQuanyuDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().MoQuanyuDamageBonus(attack);
     internal bool MoQuanyuDrawMovement(ProgramSkillFrame f, CardMovementRecord m) => _resolve().MoQuanyuDrawMovement(f, m);
     internal bool MoQuanyuFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MoQuanyuFirstChild(f, child);
     internal int MoQuanyuHistoryMask(int issuer, int participant) => _resolve().MoQuanyuHistoryMask(issuer, participant);

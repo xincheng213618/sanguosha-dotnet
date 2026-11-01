@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63, "skills": [
+  "schemaVersion": 64, "skills": [
     { "id": "boundary:liangyin-mobile", "revision": 1, "triggers": [
       { "id": "global-general-pile", "window": "cardsMoved", "subject": "owner", "sourceZones": ["hand"], "movementOccurrence": "perBatch", "optional": true,
         "effects": [{ "op": "resolveBoundaryZhouFeiLiangyin", "target": "owner" }] },

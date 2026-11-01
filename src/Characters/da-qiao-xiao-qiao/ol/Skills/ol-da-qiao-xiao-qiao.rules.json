@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
  {"id":"ol:xingwu","revision":1,"triggers":[{"id":"discard-start-dance","window":"discardPhaseStarting","subject":"owner","optional":true,"effects":[{"op":"resolveXingwuDepositAndBurst","target":"owner"}]}]},
  {"id":"ol:luoyan","revision":1,"skillGrants":[
   {"id":"tianxiang","skillId":"boundary:tianxiang","while":[">",["publicPileCount","owner","ol:xingwu"],0]},

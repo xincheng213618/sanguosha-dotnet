@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "ol:qingyuan", "revision": 1, "triggers": [
       { "id": "opening-partner", "window": "gameStarting", "subject": "owner", "optional": false,

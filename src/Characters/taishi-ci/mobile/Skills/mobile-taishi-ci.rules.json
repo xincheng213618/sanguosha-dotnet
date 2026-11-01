@@ -1,4 +1,4 @@
-{ "schemaVersion": 63, "skills": [{ "id": "mobile:taishi-ci-tianyi", "revision": 1,
+{ "schemaVersion": 64, "skills": [{ "id": "mobile:taishi-ci-tianyi", "revision": 1,
   "states": [
     { "id": "mobile-tianyi-won-phase", "initialValue": false, "visibility": "public", "resetScope": "playPhase", "reacquirePolicy": "preserveUntilGameEnd" },
     { "id": "mobile-tianyi-failed-phase", "initialValue": false, "visibility": "public", "resetScope": "playPhase", "reacquirePolicy": "preserveUntilGameEnd" }

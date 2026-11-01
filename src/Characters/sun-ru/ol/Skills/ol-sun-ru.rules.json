@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "ol:chishi", "revision": 1, "triggers": [ {
       "id": "actual-turn-last-zone-loss", "window": "cardsMoved", "subject": "owner", "sourceZones": ["hand", "equipment", "judgment"],

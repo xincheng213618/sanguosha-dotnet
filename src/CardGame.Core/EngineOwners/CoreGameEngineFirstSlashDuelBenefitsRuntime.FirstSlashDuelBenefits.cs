@@ -97,7 +97,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
         if (branch == "damage")
         {
             var use = _coreCardUseLifecycleOperations.LifecycleCardUse(r.CardUseFrameId)!;
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { FirstSlashDuelDamageBonus = checked((u.FirstSlashDuelDamageBonus ?? 0) + r.FrozenDiamondCount) });
+            _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(use.Id, r.FrozenDiamondCount, cardKinds: [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash, CardKind.Duel]);
             r = r with
             {
                 SelectedBranch = branch
@@ -150,16 +150,6 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
     internal bool CanContinueFirstSlashDuelBenefit(ProgramSkillFrame f) => f.FirstSlashDuelBenefit?.SelectedBranch == "draw" && _coreFirstSlashDuelBenefitObserversOperations.Value.ValidFirstSlashDuelBenefit(f);
     [ProgramAiChoice(SkillProgramEffectOp.ChooseFirstSlashDuelDiamondBenefit)]
     internal PromptChoice SelectAiFirstSlashDuelBenefit(PendingDecision decision, ProgramSkillFrame f) => decision.Choices.Single(c => c.Parameters["branch"] == (_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count < 3 ? "draw" : "damage"));
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 20)]
-    internal int FirstSlashDuelDamage(GameEngine.IDamageAttempt attack)
-    {
-        if (attack.IsChainPropagation || !IsFirstSlashDuelKind(attack.EffectiveCardKind ?? CardKind.Dodge) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { FirstSlashDuelDamageBonus: { } bonus } use)
-            return 0;
-        var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FirstSlashDuelBenefitIssuedEvent>().Where(e => e.Receipt.CardUseFrameId == use.Id && e.Receipt.ActionId == use.Action?.ActionId && e.Receipt.SelectedBranch == "damage").ToArray();
-        if (bonus < 0 || facts.Sum(e => e.Receipt.FrozenDiamondCount) != bonus)
-            throw new InvalidOperationException("A same-use first Slash/Duel damage benefit lost its actual issued facts.");
-        return bonus;
-    }
 
     SkillProgramStepOutcome IFirstSlashDuelBenefitHost.ChooseFirstSlashDuelDiamondBenefit(ProgramSkillFrame frame) => BeginFirstSlashDuelBenefit(frame);
 }

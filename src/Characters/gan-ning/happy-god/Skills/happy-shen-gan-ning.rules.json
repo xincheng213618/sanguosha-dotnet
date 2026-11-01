@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
   {"id":"happy:poxi","revision":1,"activations":[{"id":"three-suit-discard","targetKind":"otherLiving","usesPerPhase":1,"usesPerTurn":null,"minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"effects":[
     {"op":"selectDistinctSuitHandDiscards","target":"selectedTarget","amount":3,"resultBind":"three-suit-hands"},
     {"op":"resolveHappyGanNingPoxi","target":"owner","sourceBind":"three-suit-hands"}

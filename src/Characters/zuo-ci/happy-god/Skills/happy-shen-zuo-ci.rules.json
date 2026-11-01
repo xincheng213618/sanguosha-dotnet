@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
   {"id":"happy:huanshu","revision":1,"triggers":[
     {"id":"initial-phantoms","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"initializeHappyZuoCiPhantoms","target":"owner"}]},
     {"id":"round-phantoms","window":"roundStarting","subject":"owner","optional":false,"effects":[{"op":"gainHappyZuoCiPhantoms","target":"owner"}]},

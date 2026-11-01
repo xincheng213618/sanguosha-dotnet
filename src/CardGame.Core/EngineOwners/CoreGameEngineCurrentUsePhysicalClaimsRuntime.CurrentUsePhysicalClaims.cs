@@ -46,7 +46,7 @@ internal sealed partial class CoreGameEngineCurrentUsePhysicalClaimsRuntime
         var effectIndex = frame.InstructionIndex - 1;
         if (entries.Any(item => item.ProducerFrameId == frame.Id && item.EffectIndex == effectIndex))
             return;
-        var receipt = new ProgramTargetSlashReceipt(owner.Action!.ActionId, frame.OwnerSeat, target, owner.Id, frame.Id, frame.SkillId, frame.SkillInstanceId, frame.GameplayHash, frame.TriggerId!, effectIndex, true, 0);
+        var receipt = new ProgramTargetSlashReceipt(owner.Action!.ActionId, frame.OwnerSeat, target, owner.Id, frame.Id, frame.SkillId, frame.SkillInstanceId, frame.GameplayHash, frame.TriggerId!, effectIndex, true);
         _coreRuntimeOperations.ReplaceRuntimeFrame(owner.Id, owner with { FinalTargetSlashReceipts = Array.AsReadOnly(entries.Append(receipt).ToArray()) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTargetSlashReceiptIssuedEvent(owner.Id, receipt));
     }

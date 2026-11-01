@@ -86,7 +86,7 @@ internal static class ResponseAndSkillSuppressionChecks
         public void Register(IContentRegistryBuilder builder)
         {
             var driver = SkillProgramCatalog.Load("""
-                {"schemaVersion":63,"skills":[{"id":"fixture:skill-loss-damage","revision":1,
+                {"schemaVersion":64,"skills":[{"id":"fixture:skill-loss-damage","revision":1,
                   "minimumRulesVersion":180,"activations":[{"id":"hit","usesPerTurn":1,
                     "minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,
                     "targetKind":"otherLiving","effects":[{"op":"damage","target":"selectedTarget","amount":5}]}]}]}

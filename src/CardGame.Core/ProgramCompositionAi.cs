@@ -163,7 +163,7 @@ internal static class ProgramCompositionAi
             boundCardSuitMatchesChoice: (_, _) => false,
             boundCardCategoryMatchesCardAction: (_, _) => false,
             expression: expressionEvaluator ?? (expression => ProgramExpressions.EvaluateBool(expression,
-                new SkillContextExpressionWorld(player, context?.SelectedTarget, context?.EquipmentCardCount))));
+                new SkillContextExpressionWorld(player, context?.SelectedTarget, context?.EquipmentCardCount, windowFacts: context?.FinalTargetFacts))));
     }
 }
 
@@ -474,7 +474,7 @@ internal sealed partial class ProgramAiEstimateContext
             HandCount = Rounded(_estimatedHandCount), HpValueProvider = null
         }, _publicContext.SelectedTarget, _publicContext.EquipmentCardCount,
             (stat, name) => stat == "boundCount" && _bindings.TryGetValue(name, out var cards) ? Rounded(cards.Count) : null,
-            name => _expressionNumbers.TryGetValue(name, out var value) ? value : null);
+            name => _expressionNumbers.TryGetValue(name, out var value) ? value : null, _publicContext.FinalTargetFacts);
     private int? EvaluateAmount(ProgramExpression expression, SkillProgramUnknownAmountBehavior onUnknown)
     {
         if (ProgramExpressions.EvaluateInt(expression, CurrentExpressionWorld()) is { } amount)
@@ -841,6 +841,11 @@ internal sealed partial class ProgramAiEstimateContext
         var matches = comparison == ProgramFinalTargetComparison.TargetHandAtMostActor
             ? facts.EventTargetHandCount <= facts.CurrentHandCount : facts.EventTargetHp >= facts.CurrentHp;
         if (matches) _targetAdjustment -= effect.Op == SkillProgramEffectOp.PreventCurrentTargetSlashCancellation ? 20d : effect.Amount * 20d;
+    }
+    internal void CurrentCardDamageValue(SkillProgramEffect effect)
+    {
+        if (effect.CardDamageTargetScope == ProgramCardDamageTargetScope.CurrentTarget) _targetAdjustment -= effect.Amount * 20d;
+        else _otherAdjustment += effect.Amount * 6d;
     }
     internal void RecordedSuitSlashValue(SkillProgramEffect effect)
     {

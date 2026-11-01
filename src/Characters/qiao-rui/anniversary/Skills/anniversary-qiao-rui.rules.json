@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
  {"id":"anniversary:aishou","revision":1,"triggers":[
   {"id":"ending-marked-draw","window":"turnEnding","subject":"owner","optional":true,"effects":[{"op":"resolveAnniversaryQiaoRuiAishouDraw","target":"owner"}]},
   {"id":"prepare-marked-discard","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,"effects":[{"op":"resolveAnniversaryQiaoRuiAishouPrepare","target":"owner"}]},

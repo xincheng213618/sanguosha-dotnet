@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [{ "id": "boundary:qiaomeng-mobile", "revision": 1,
     "triggers": [{ "id": "black-slash-equipment-discard-and-mount", "window": "afterDamageApplied", "subject": "damageSource", "optional": true, "damageOccurrence": "perDamage",
       "effects": [{ "op": "discardDamageTargetAndClaimMount", "target": "owner" }] }]

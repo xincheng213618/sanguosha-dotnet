@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63, "skills": [
+  "schemaVersion": 64, "skills": [
     { "id": "boundary:zhuikong-mobile", "revision": 1, "triggers": [
       { "id": "foreign-actual-turn-contest", "window": "otherActualTurnStarted", "subject": "owner", "optional": true, "usageScope": "round", "usageLimit": 1,
         "effects": [

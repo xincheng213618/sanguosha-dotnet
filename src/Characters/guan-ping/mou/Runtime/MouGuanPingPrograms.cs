@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
 public sealed record MouGuanPingUseReceipt(long UseId, long ActionId, long ActivationId, CardConversionSource Source,
-    string GameplayHash, int ActualTurn, int TurnOwner, int PhaseId, int TypeCount, bool Extra, int OptionMask = 0);
+    string GameplayHash, int ActualTurn, int TurnOwner, int PhaseId, int TypeCount, bool Extra);
 public enum MouGuanPingStage { Choosing, Drawing, Children }
 public sealed record MouGuanPingReceipt(MouGuanPingUseReceipt Use, long WindowId, MouGuanPingStage Stage, int Cursor = 0, int Mask = 0)
 {
@@ -21,7 +21,6 @@ public sealed partial record ProgramSkillFrame
 public sealed record MouGuanPingUseIssuedEvent(MouGuanPingUseReceipt Receipt) : IGameEvent;
 public sealed record MouGuanPingOptionEvent(long FrameId, long UseId, long ActionId, int OwnerSeat, int ActualTurn, int TurnOwner, int Index, int Option) : IGameEvent;
 public sealed record MouGuanPingDrawReturnedEvent(long FrameId, int Index, int Actual, int Replacement, long? AttemptId) : IGameEvent;
-public sealed record MouGuanPingCompletedEvent(long FrameId, long UseId, int Count, int Mask) : IGameEvent;
 internal interface IMouGuanPingRuntime : IProgramRuntimeOperations { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame); }
 internal interface IMouGuanPingFacts : IProgramSelectionQuery
 {
@@ -38,7 +37,7 @@ internal interface IMouGuanPingFacts : IProgramSelectionQuery
 internal interface IMouGuanPingNative : IProgramRuntimeOperations
 {
     void PublishState(); void Finish(ProgramSkillFrame frame); bool Drain(ProgramSkillFrame frame);
-    void SetMask(ProgramSkillFrame frame, int mask); void Suppress(ProgramSkillFrame frame, int target);
+    void Suppress(ProgramSkillFrame frame, int target);
 }
 internal sealed class ResolveMouGuanPingWuweiDescriptor : ProgramOperationDescriptorBase
 {

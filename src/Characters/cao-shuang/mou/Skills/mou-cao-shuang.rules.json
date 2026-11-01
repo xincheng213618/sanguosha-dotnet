@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "mou:jianzhuan", "revision": 1, "triggers": [
       { "id": "use-item", "window": "cardUseCommitted", "ownerRelation": "actor", "includeResponseUses": true, "optional": false, "effects": [{ "op": "resolveMouCaoShuangJianzhuan", "target": "owner" }] },

@@ -19,7 +19,6 @@ internal sealed partial class CharacterMaChaoMobileGodEntries
     internal int MobileMaChaoSourceDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().MobileMaChaoSourceDamageBonus(attack);
     internal bool MobileMaChaoTriggerEligible(ProgramTriggerLegalityContext g) => _resolve().MobileMaChaoTriggerEligible(g);
     internal DamageNature MobileMaChaoYuliNature(GameEngine.IDamageAttempt attack, DamageNature priorNature) => _resolve().MobileMaChaoYuliNature(attack, priorNature);
-    internal int MobileTingweiCardDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().MobileTingweiCardDamageBonus(attack);
     internal void PublishMobileMaChao(ProgramSkillFrame f) => _resolve().PublishMobileMaChao(f);
     internal void RecordMobileYuli(ProgramSkillFrame f, int part) => _resolve().RecordMobileYuli(f, part);
     internal bool ResumeMobileMaChao(long id) => _resolve().ResumeMobileMaChao(id);

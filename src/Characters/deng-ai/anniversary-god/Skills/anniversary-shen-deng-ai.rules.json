@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "anniversary-god:tuoyu", "revision": 1, "triggers": [
       { "id": "initialize-domains", "isSkillInvocation": false, "window": "gameStarting", "subject": "owner", "optional": false,

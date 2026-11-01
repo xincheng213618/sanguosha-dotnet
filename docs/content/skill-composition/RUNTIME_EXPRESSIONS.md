@@ -27,6 +27,7 @@
 | 逻辑 | `["and", b, b, ...]`、`["or", b, b, ...]`（2–8 项）、`["not", b]` |
 | 比较 | `["<" / "<=" / ">" / ">=" / "==" / "!=", i, i]`、`["same", p, p]` |
 | 角色状态 | 布尔：`alive`、`hasHp`、`faceDown`、`chained`；整数：`hp`、`maxHp`、`lostHp`、`handCount`、`handLimit`、`equipmentCount` |
+| 窗口冻结事实 | `["windowHp", "owner" / "eventTarget"]`、`["windowHandCount", "owner" / "eventTarget"]` 读取原触发窗口的体力或手牌数；不读取后来子结算改变的现值 |
 | 运算 | `["+", i, ...]`、`["min", i, ...]`、`["max", i, ...]`（2–8 项）、`["-", i, i]`、`["floorDiv", i, i]`；`["when", b, i]` 在 b 为真时取 i，否则未知 |
 | 绑定读取 | 整数：`["number", "name"]`、`["boundCount", "cards"]`、`["boundSuitCount", "cards"]`、`["boundDistinctSuitCount", "cards"]`、`["boundRank", "singleCard"]`；布尔：`["boundIsEquipment", "singleCard"]` |
 | 物理牌标记 | `["cardMarkCount", p, "mark-id", "hand"]`，牌区也可为 `"equipment"`；按当前牌区读取永久实体标记 |
@@ -37,7 +38,7 @@
 
 ## 求值语义
 
-- 在步骤执行时读取当前公开状态，不冻结到发动时。先完成的摸牌、移动及其子结算会影响后续步骤的判断。
+- 普通角色状态在步骤执行时读取当前公开状态；先完成的摸牌、移动及其子结算会影响后续步骤的判断。显式 `windowHp` / `windowHandCount` 使用原 `WindowContext.Facts`；缺少窗口/目标或体力未定义、尚未选择体力池时返回未知。AI 也只使用提供给它的同一冻结事实，没有窗口时不猜测。
 - 三值逻辑：缺失的参与者（例如未选目标、事件没有来源）、未定义体力（`hp`、`lostHp`）以及未知集合都是“未知”。比较与运算遇到未知返回未知；`not` 保持未知；`and` 遇到确定的假即为假，`or` 遇到确定的真即为真；整个条件最终为未知时按假处理并跳过步骤。
 - 因此需要“没有体力值的角色不参与比较”时要明确写出，例如 `["or", ["not", ["hasHp", "it"]], ["<", ["hp", "it"], ["hp", "owner"]]]`。
 - 表达式只读，不支付、不移动、不发事件。拥有者死亡、失去技能实例和终局仍由执行器统一处理。
@@ -51,6 +52,20 @@
 `skillGrants[].while` 也使用同一表达式，参与者限 owner、量词 it 及 living/livingOthers，不允许帧绑定、选项、事件参与者或签发窗口事实。条件成立且精确父来源有效时，唯一物化器授予叶技能；条件退出只移除该派生来源，再次成立保留原实例。`ruleWounded` 复用现有规则受伤权威，不能用 Hp<MaxHp 替代；`equipmentSuitCount` 在当前求值已合格的独立改写来源上计算，不回最终技能绑定查询。两者可能依赖技能来源，受体持续限制的 raw while 不接受它们，避免自递归；效果及条件授予可用。公共堆数是 raw 事实，已知空堆返回 0，缺少参与者或读取能力则未知，不按同名技能猜同一实例。
 
 完整来源、调用续接策略和迁移范围见[条件授予的统一实现](CAPABILITY_MAP.md#条件授予的统一实现)。
+
+## 已签发的用牌加伤
+
+```json
+{"op":"addCurrentCardDamage","target":"owner","targetScope":"currentTarget",
+ "amount":1,"cardKinds":["slash","fireSlash","thunderSlash"],"damageLayer":"cardDamage",
+ "condition":{"kind":"expression","expr":[">=",["windowHp","eventTarget"],["windowHp","owner"]]}}
+```
+
+`targetScope` 默认为 `use`，也可指定 `currentTarget`；后者按原窗口目标签发，不限制为杀。`amountExpr` 与 `amount` 互斥，复用既有整数求值和未知值处理。`cardKinds` 可限制实际伤害牌种，完整旧杀族的寒冰杀匹配仍用共同匹配函数；未指定则不限制。`damageLayer` 默认为 `additionalDamage`，`cardDamage` 同时参与牌伤害层计算。
+
+该动作接在真实用牌的 committed、finalized 或 Slash-before-response 窗口；当前目标范围要求后两者。数值在步骤执行时确定，归原用牌帧；具体伤害结算读取共同调整，连环传播继承已确定的伤害，不再加一次。修改当前伤害仍使用原伤害操作。技能的资格、成本和后续惩罚分别保留在它们的原窗口。
+
+旧 `addCurrentTargetSlashDamage` 操作已退役，四份内容改用上例的作用域、条件与层，不保留解析别名。取消抵消和追猎的动态升伤仍属于各自规则。
 
 ## 永久物理牌标记
 

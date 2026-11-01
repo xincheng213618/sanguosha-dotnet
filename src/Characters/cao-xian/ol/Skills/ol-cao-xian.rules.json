@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
  {"id":"ol:lingxi","revision":1,"triggers":[
    {"id":"play-start-wings","window":"playPhaseStarting","subject":"owner","optional":true,"effects":[{"op":"storeCaoXianLingxi","target":"owner"}]},
    {"id":"play-end-wings","window":"playEnding","subject":"owner","optional":true,"effects":[{"op":"storeCaoXianLingxi","target":"owner"}]},

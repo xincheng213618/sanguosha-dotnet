@@ -66,7 +66,7 @@ internal static class BoundaryZhangFeiComposition
                 "issue-next-real-use" => trigger.Window == SkillProgramTriggerWindow.CardUseCommitted && trigger.OwnerRelation == SkillProgramCardActionOwnerRelation.Actor &&
                     trigger.Effects is [{ Op: SkillProgramEffectOp.IssueBoundaryZhangFeiLiyongTarget }],
                 "issued-target-rights" => trigger.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && trigger.OwnerRelation == SkillProgramCardActionOwnerRelation.Actor &&
-                    trigger.Effects is [{ Op: SkillProgramEffectOp.IssueBoundaryZhangFeiLiyongTarget }, { Op: SkillProgramEffectOp.AddCurrentTargetSlashDamage, Amount: 1, FinalTargetComparison: ProgramFinalTargetComparison.Always }],
+                    trigger.Effects is [{ Op: SkillProgramEffectOp.IssueBoundaryZhangFeiLiyongTarget }, { Op: SkillProgramEffectOp.AddCurrentCardDamage, Amount: 1, CardDamageTargetScope: ProgramCardDamageTargetScope.CurrentTarget, CardDamageLayer: SkillProgramDamageLayer.CardDamage }],
                 "issued-surviving-damage" => trigger.Window == SkillProgramTriggerWindow.AfterDamageApplied && trigger.Subject == SkillProgramTriggerSubject.Any && trigger.DamageOccurrence == SkillProgramDamageOccurrence.PerDamage &&
                     trigger.Effects is [{ Op: SkillProgramEffectOp.PayBoundaryZhangFeiLiyong }],
                 _ => false

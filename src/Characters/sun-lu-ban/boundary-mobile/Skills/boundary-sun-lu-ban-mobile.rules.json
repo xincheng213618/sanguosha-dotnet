@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:zenhui-mobile", "revision": 1, "triggers": [
       { "id": "own-choice-role", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "optional": true,

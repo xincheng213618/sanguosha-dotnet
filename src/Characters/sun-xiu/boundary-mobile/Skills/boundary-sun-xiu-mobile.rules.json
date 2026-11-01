@@ -1,5 +1,5 @@
 {
-  "schemaVersion":63,"skills":[
+  "schemaVersion":64,"skills":[
     {"id":"boundary:yanzhu-mobile","revision":1,"activations":[{"id":"equipment-or-obtain","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"usesPerPhase":1,"effects":[
       {"op":"chooseOption","target":"selectedTarget","resultBind":"yanzhu-choice","options":[{"id":"equipment","condition":{"kind":"hasOwnedCardCategory","zones":["equipment"],"cardCategories":["equipment"]}},{"id":"obtain"}]},
       {"op":"selectOwnedCards","target":"selectedTarget","zones":["equipment"],"numberExpression":"allOwnedZoneCards","resultBind":"all-equipment","condition":{"kind":"choiceIs","sourceBind":"yanzhu-choice","optionId":"equipment"}},

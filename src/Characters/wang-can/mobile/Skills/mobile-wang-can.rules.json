@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "mobile:qiai", "revision": 1, "activations": [
       { "id": "nonbasic-gift", "minCards": 1, "maxCards": 1, "sourceZones": ["hand", "equipment"], "cardCategories": ["trick", "equipment"],

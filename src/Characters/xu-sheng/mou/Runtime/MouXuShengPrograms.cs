@@ -29,21 +29,13 @@ public sealed record MouXuShengReceipt(CardConversionSource Source, string Gamep
     public IReadOnlyList<MouXuShengSelection> Selected { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }
     public IReadOnlyList<MouXuShengPaid> Paid { get => _paid; init => _paid = Array.AsReadOnly(value.ToArray()); }
 }
-public sealed record MouXuShengBoost(long FrameId, CardConversionSource Source, string GameplayHash, long UseId, long ActionId, int X);
 public sealed partial record ProgramSkillFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public MouXuShengReceipt? MouXuSheng { get; init; }
 }
-public sealed partial record CardUseFrame
-{
-    private IReadOnlyList<MouXuShengBoost>? _mouXuShengBoosts;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<MouXuShengBoost>? MouXuShengBoosts
-    { get => _mouXuShengBoosts; init => _mouXuShengBoosts = value is null ? null : Array.AsReadOnly(value.ToArray()); }
-}
 public sealed record MouXuShengStartedEvent(long FrameId, CardConversionSource Source, string GameplayHash, SkillProgramEffectOp Operation,
     int ActualTurn, int TurnOwner, long WindowId, long ActionId, long UseId, long DamageId, int OtherSeat, int X) : IGameEvent;
 public sealed record MouXuShengBenefitUsedEvent(long FrameId, int OwnerSeat, int ActualTurn, int TurnOwner, long ActionId, bool Damage, int X) : IGameEvent;
-public sealed record MouXuShengBoostIssuedEvent(MouXuShengBoost Boost) : IGameEvent;
 public sealed record MouXuShengDrawReturnedEvent(long FrameId, int Requested, int Actual, int Replacement, long? AttemptId) : IGameEvent;
 public sealed record MouXuShengDiscardPaidEvent(long FrameId, int Chooser, int Holder, int CardId, bool? IsRed, long Sequence) : IGameEvent;
 public sealed record MouXuShengClaimedEvent(long FrameId, int CardId, long Sequence) : IGameEvent;

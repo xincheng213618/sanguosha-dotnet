@@ -67,8 +67,6 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27120)]
     internal bool QualifyFulue(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => !t.Effects.Any(e => PeiYuanShaoComposition.Handles(e.Op)) || (t.Effects[0].Op == SkillProgramEffectOp.OfferFulueSingleTargetOption ? FulueOriginalCandidate(c, context) : CanRunIssuedFulueCandidate(c, context));
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 150)]
-    internal int FulueDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { FulueEntries: not null } use && FulueUseProof(use) ? use.FulueEntries!.Count(e => e.Option == FulueOption.Damage) : 0;
     SkillProgramStepOutcome IPeiYuanShaoHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginFulue(f, op);
     internal SkillProgramStepOutcome BeginFulue(ProgramSkillFrame supplied, SkillProgramEffectOp op)
     {
@@ -152,6 +150,7 @@ internal sealed partial class CharacterPeiYuanShaoOlRuntime
         var entry = new FulueUseEntry(f.Id, use.Id, r.ActionId, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, r.UserSeat, r.TargetSeat, option, r.Counter);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { FulueEntries = (u.FulueEntries ?? []).Append(entry).ToArray() });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FulueOptionExecutedEvent(entry));
+        if (option == FulueOption.Damage) _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(use.Id, 1);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Fulue = r with { Option = option, Stage = option == FulueOption.Obtain ? FulueStage.Obtain : FulueStage.Option } });
         if (option == FulueOption.Obtain && HasFulueObtainableCard(r.UserSeat, r.TargetSeat))
             PublishFulue(f);

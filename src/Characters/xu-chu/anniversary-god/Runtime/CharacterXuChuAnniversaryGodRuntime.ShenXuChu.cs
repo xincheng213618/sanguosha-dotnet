@@ -100,6 +100,8 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
                 Draws = CharacterXuChuHappyGodRuntime.ShenXuChuTargetDraws(f, r.TargetMarked)
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShenXuChu = r });
+            if (r.TargetMarked && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhuangpoTargetIssuedEvent>().Any(e => e.UseId == use.Id && e.TargetMarked))
+                _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(use.Id, 1, cardKinds: [CardKind.Duel]);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhuangpoTargetIssuedEvent(f.Id, r.Source, r.GameplayHash, use.Id, action.ActionId, r.TargetMarked ? action.TargetSeats.First(s => _coreMatchParticipantsPlayersAccess._players[s].Markers.GetValueOrDefault(PlayerMarkerKind.QingBanner) > 0) : r.TargetSeat, r.TargetMarked));
         }
 
@@ -283,11 +285,4 @@ internal sealed partial class CharacterXuChuAnniversaryGodRuntime
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveZhuangpoTarget)]
     internal PromptChoice ChooseShenXuChu(PendingDecision p, ProgramSkillFrame f) => f.ShenXuChu!.Stage == ShenXuChuStage.MarkChoice ? p.Choices.First(c => c.Parameters["option"] == "0") : p.Choices[0];
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 38800)]
-    internal int ZhuangpoDuelBonus(GameEngine.IDamageAttempt attack)
-    {
-        if (attack.EffectiveCardKind != CardKind.Duel || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action } use)
-            return 0;
-        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhuangpoTargetIssuedEvent>().Any(e => e.UseId == use.Id && e.ActionId == action.ActionId && e.TargetMarked && ShenXuChuComposition.IsZhuangpo(e.Source.SkillId) && e.Source.OwnerSeat == action.ActorSeat && action.ConversionChain.Contains(new(e.Source.SkillId, ShenXuChuComposition.ViewAs, e.Source.OwnerSeat, e.Source.SkillInstanceId))) ? 1 : 0;
-    }
 }

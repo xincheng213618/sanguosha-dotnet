@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 public enum LangdaoOption { Damage, ExtraTarget, NoResponse }
-public sealed record ZhangYanLangdaoUse(long ProgramFrameId,long WindowId,long ActionId,CardConversionSource Source,string GameplayHash,int OriginalActor,int OriginalTarget,int DamageBonus,int ExtraCount,bool NoResponse,bool Killed=false,bool Settled=false)
+public sealed record ZhangYanLangdaoUse(long ProgramFrameId,long WindowId,long ActionId,CardConversionSource Source,string GameplayHash,int OriginalActor,int OriginalTarget,int ExtraCount,bool NoResponse,bool Killed=false,bool Settled=false)
 {
  private IReadOnlyList<int> _original=[],_added=[];private IReadOnlyList<LangdaoOption> _selected=[];
  public IReadOnlyList<int> OriginalTargets {get=>_original;init=>_original=Array.AsReadOnly(value.ToArray());}
@@ -10,7 +10,6 @@ public sealed record ZhangYanLangdaoUse(long ProgramFrameId,long WindowId,long A
 }
 public sealed record ZhangYanLangdaoOptionFrozenEvent(long FrameId,int Index,LangdaoOption Option):IGameEvent;
 public sealed record ZhangYanLangdaoVoteRevealedEvent(long FrameId,int Index,int Seat,LangdaoOption Option):IGameEvent;
-public sealed record ZhangYanLangdaoIssuedEvent(long UseId,long ActionId,long FrameId,CardConversionSource Source,string GameplayHash,int OriginalActor,int OriginalTarget,int DamageBonus,int ExtraCount,bool NoResponse):IGameEvent;
 public sealed record ZhangYanLangdaoTargetAddedEvent(long FrameId,long UseId,long ActionId,int Target,int Index):IGameEvent;
 public sealed record ZhangYanLangdaoRedirectedEvent(long ProgramFrameId,long UseId,long ActionId,CardConversionSource Source,string GameplayHash,int InstructionIndex,int TargetIndex,int OriginalTarget,int NewTarget):IGameEvent;
 public sealed record ZhangYanLangdaoKilledEvent(long UseId,long ActionId,long DyingId,long DamageId,int Victim):IGameEvent;

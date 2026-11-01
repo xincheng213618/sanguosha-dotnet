@@ -22,11 +22,6 @@ public sealed partial record ProgramSkillFrame
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public FirstSlashDuelBenefitReceipt? FirstSlashDuelBenefit { get; init; }
 }
-public sealed partial record CardUseFrame
-{
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? FirstSlashDuelDamageBonus { get; init; }
-}
 internal interface IFirstSlashDuelBenefitHost
 { SkillProgramStepOutcome ChooseFirstSlashDuelDiamondBenefit(ProgramSkillFrame frame); }
 internal sealed class ChooseFirstSlashDuelDiamondBenefitDescriptor : ProgramOperationDescriptorBase

@@ -33,7 +33,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
         var index = Array.FindIndex(history, f => f is CurrentTurnCardUseKindsRecordedEvent c && c.CardActionId == e.ActionId && c.OriginFrameId == e.UseId && c.ActorSeat == e.Source.OwnerSeat);
         if (index < 0 || history.Take(index).OfType<CurrentTurnCardUseKindsRecordedEvent>().LastOrDefault(c => c.ActorSeat == e.Source.OwnerSeat) != e.Previous)
             return false;
-        return !e.Boosted || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlBoostedEvent>().Count(q => q.UseId == use.Id && q.Source == e.Source) == 1;
+        return true;
     }
 
     internal MouZhangXiuOlZhuijiaoEntry? MouZhangXiuOlEntry(CardUseFrame use, ProgramTriggerCandidate c) => use.MouZhangXiuOlZhuijiao?.SingleOrDefault(e => e.Source.OwnerSeat == c.OwnerSeat && e.Source.SkillId == c.SkillId && e.Source.SkillInstanceId == c.SkillInstanceId && e.GameplayHash == c.GameplayHash && ValidMouZhangXiuOlEntry(use, e));
@@ -56,7 +56,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
         if (operation == SkillProgramEffectOp.ResolveMouZhangXiuZhuijiao)
         {
             SetMouZhangXiuOlEntry(use.Id, entry.Source, e => e with { Boosted = true });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhangXiuOlBoostedEvent(f.Id, use.Id, entry.Source));
+            _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(use.Id, 1);
             _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, 1, new(MouZhangXiuOlDrawReason));
         }
         else
@@ -79,8 +79,6 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
         ContinueMouZhangXiuOl(f.Id);
     }
 
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 33003)]
-    internal int MouZhangXiuOlDamageBonus(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { MouZhangXiuOlZhuijiao: { } entries } use ? entries.Count(e => e.Boosted && ValidMouZhangXiuOlEntry(use, e)) : 0;
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 33003)]
     internal bool CaptureMouZhangXiuOlUseDamage(GameEngine.IDamageAttempt attack, long damageId)
     {

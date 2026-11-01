@@ -3,6 +3,8 @@ namespace CardGame.Core.NativeOwners;
 internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineProgramExpressionsEntries> getCoreGameEngineProgramExpressionsRuntime, Func<CardZoneStore> getCardZoneStore, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineHealthQueriesEntries> getCoreGameEngineHealthQueriesRuntime, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<RuntimeEntries.CoreNativeRuleQueriesEntries> getCoreNativeRuleQueriesRuntime, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, ProgramSkillFrame frame, ICardEntityMarkQueries? cardMarks = null, ISelectionWoundedQueries? wounded = null, RuntimeEntries.CoreGameEnginePublicPileSourcesEntries? piles = null, Func<int, int?>? equipmentSuitCount = null) : IProgramExpressionWorld
 {
     public int? Number(string name) => getCoreGameEngineProgramExpressionsRuntime().ReadProgramExpressionNumber(frame, name);
+    public int? WindowStat(string stat, string participant) =>
+        ProgramExpressions.ReadWindowStat(frame.WindowContext?.Facts, stat, participant, frame.WindowContext?.TargetSeat is not null);
     public int? CardMarkCount(int seat, string mark, CardZoneKind zone) =>
         getCoreTableSeatQueriesRuntime().IsValidPlayerSeat(seat) ? cardMarks?.CountMarked(seat, mark, zone) : null;
     public int? PublicPileCount(int seat, string skillId) => Valid(seat) is null || piles is null ? null :

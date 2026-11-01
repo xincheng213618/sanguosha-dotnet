@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
  {"id":"mobile:mingren","revision":1,"triggers":[
   {"id":"initial-reserve","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"draw","target":"owner","amount":1},{"op":"awaitOwnedCardMovement","target":"owner"},{"op":"selectOwnedCards","target":"owner","amount":1,"zones":["hand"],"resultBind":"initial-reserve"},{"op":"storeBoundHandInPublicPile","target":"owner","sourceBind":"initial-reserve"}]},
   {"id":"exchange-reserve","window":"turnEnding","subject":"owner","optional":true,"effects":[{"op":"exchangePublicPileHand","target":"owner","skillIds":["mobile:mingren"]}]}

@@ -82,7 +82,11 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
         var action = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(item => item.Id == f.WindowContext.ParentFrameId)?.Action;
         if (action is null)
             return SkillProgramStepOutcome.Continue;
+        var damageUse = _coreCardUseLifecycleOperations.LifecycleCardUse(f.WindowContext!.CardUse!.ParentCardUseFrameId);
+        if (damageUse is not { Action: { } useAction } || useAction.ActionId != action.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(damageUse.CardKind))
+            damageUse = null;
         var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
+        var slashEffectIssued = history.OfType<MobileShiFujiCardUsedEvent>().Any(item => item.ActionId == action.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(item.Kind));
         var issued = false;
         var gained = 0;
         foreach (var cost in action.PhysicalCards)
@@ -94,6 +98,11 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
             var card = _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(cost.CardId)).SingleOrDefault(item => item.Id == cost.CardId);
             if (card is null)
                 continue;
+            if (damageUse is not null && !slashEffectIssued && CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind))
+            {
+                _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(damageUse.Id, 1, cardKinds: [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash]);
+                slashEffectIssued = true;
+            }
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiFujiCardUsedEvent(action.ActionId, action.ActorSeat, cost.CardId, card.Kind, MobileShiYuJiComposition.Name(card.Kind), Empowered: false));
             if (GainMobileShiFujiSuitCard(action.ActorSeat, cost.CardId, card.Suit, action.ActionId))
                 gained++;
@@ -105,6 +114,11 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
         {
             var first = action.PhysicalCards.Count > 0 ? action.PhysicalCards[0] : null;
             var firstCard = first is { } leading ? _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(leading.CardId)).SingleOrDefault(item => item.Id == leading.CardId) : null;
+            if (damageUse is not null && !slashEffectIssued && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
+            {
+                _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(damageUse.Id, 1, cardKinds: [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash]);
+                slashEffectIssued = true;
+            }
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiFujiCardUsedEvent(action.ActionId, owner.Seat, firstCard?.Id ?? 0, action.EffectiveKind, normalized, Empowered: true));
             if (firstCard is not null && GainMobileShiFujiSuitCard(owner.Seat, firstCard.Id, firstCard.Suit, action.ActionId))
                 gained++;
@@ -143,12 +157,4 @@ internal sealed partial class CharacterYuJiMobileShiRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    // 符济【杀】基础伤害值+1：已结算的符济使用事实按 ActionId 归属本次攻击。
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 67210)]
-    internal int MobileShiFujiSlashDamageBonus(GameEngine.IDamageAttempt attack)
-    {
-        if (attack.IsChainPropagation || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { Action: { } action } || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<MobileShiFujiCardUsedEvent>().Any(item => item.ActionId == action.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(item.Kind)))
-            return 0;
-        return 1;
-    }
 }

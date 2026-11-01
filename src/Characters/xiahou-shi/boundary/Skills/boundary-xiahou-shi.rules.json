@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:qiaoshi-current", "revision": 1, "triggers": [
       { "id": "own-ending-pair", "window": "turnEnding", "subject": "owner", "turnOwnerScope": "own", "optional": true,

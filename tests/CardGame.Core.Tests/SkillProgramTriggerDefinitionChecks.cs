@@ -32,7 +32,7 @@ internal static class SkillProgramTriggerDefinitionChecks
     private static void RejectsRetiredSchemas()
     {
         foreach (var version in Enumerable.Range(1, SkillProgramCatalog.RulesSchemaVersion - 1))
-            AssertReject(CurrentRules.Replace("\"schemaVersion\":63", $"\"schemaVersion\":{version}", StringComparison.Ordinal),
+            AssertReject(CurrentRules.Replace("\"schemaVersion\":64", $"\"schemaVersion\":{version}", StringComparison.Ordinal),
                 Presentation, "schemaVersion");
     }
 
@@ -106,7 +106,7 @@ internal static class SkillProgramTriggerDefinitionChecks
         """;
 
     private const string CurrentRules = """
-        {"schemaVersion":63,"skills":[
+        {"schemaVersion":64,"skills":[
           {"id":"test:source","revision":1,"minimumRulesVersion": 172,"viewAs":[{"id":"respond","inputKinds":[],"inputSuits":[],"sourceZones":["hand"],"outputKind":"dodge","forPlay":false,"forResponse":true}]},
           {"id":"test:trigger","revision":1,"minimumRulesVersion": 172,"triggers":[{"id":"after-response","window":"cardResponseAccepted","ownerRelation":"conversionSource","sourceSkillId":"test:source","sourceViewAsId":"respond","optional":true,"effects":[
             {"op":"draw","target":"owner","amount":2,"condition":{"kind":"wounded"}},

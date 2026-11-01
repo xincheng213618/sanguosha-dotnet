@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
  {"id":"ol:juanjia","revision":1,"minimumRulesVersion":186,"triggers":[
   {"id":"extra-weapon-slot","window":"gameStarting","subject":"owner","optional":false,"priority":0,"effects":[{"op":"alterEquipmentSlots","target":"owner","equipmentSlots":["armor"],"amount":0},{"op":"alterEquipmentSlots","target":"owner","equipmentSlots":["weapon"],"amount":2}]}
  ]},

@@ -3,7 +3,8 @@ namespace CardGame.Core;
 
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouGuanPingRuntime(IMouGuanPingFacts facts, IMouGuanPingNative native, IProgramRuntimeFrames frames,
-    IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : IMouGuanPingRuntime
+    IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws,
+    RuntimeEntries.CoreGameEngineCardUseLifecycleEntries cardUses) : IMouGuanPingRuntime
 {
     internal const string Action = "mou-guan-ping",DrawReason = "skill-program.mou:wuwei.draw";
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 35000, SkillProgramEffectOp.ResolveMouGuanPingWuwei)]
@@ -25,7 +26,7 @@ internal sealed class MouGuanPingRuntime(IMouGuanPingFacts facts, IMouGuanPingNa
             r.Use.TypeCount is < 1 or > 3 || r.Cursor < 0 || r.Cursor > r.Use.TypeCount || r.Mask < 0 || r.Mask > 7 || !Enum.IsDefined(r.Stage) ||
             f.WindowContext is not { } w || w.ParentFrameId != r.WindowId || frames.ParentOf(f.Id)?.Id != r.WindowId ||
             facts.Use(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0), w) is not { MouGuanPing: { } live } ||
-            live != r.Use with { OptionMask = r.Mask }) return false;
+            live != r.Use) return false;
         var selected = facts.History<MouGuanPingOptionEvent>().Where(e => e.FrameId == f.Id).ToArray();
         return selected.Length == r.Cursor && selected.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, r.Cursor)) &&
             selected.All(e => e.UseId == r.Use.UseId && e.ActionId == r.Use.ActionId && e.OwnerSeat == f.OwnerSeat && e.ActualTurn == r.Use.ActualTurn && e.TurnOwner == r.Use.TurnOwner && e.Option is >= 1 and <= 3) &&
@@ -53,7 +54,6 @@ internal sealed class MouGuanPingRuntime(IMouGuanPingFacts facts, IMouGuanPingNa
         var mask = r.Mask | 1 << (option - 1);
         events.AdvanceFact(new MouGuanPingOptionEvent(f.Id, r.Use.UseId, r.Use.ActionId, f.OwnerSeat, r.Use.ActualTurn, r.Use.TurnOwner, r.Cursor, option));
         frames.ReplaceTop(f = f with { MouGuanPing = r with { Cursor = r.Cursor + 1, Mask = mask, Stage = option == 1 ? MouGuanPingStage.Drawing : MouGuanPingStage.Children, Draw = null } });
-        native.SetMask(f, mask);
         if (option == 1) { draws.BeginOperationProgramDraw(f, f.OwnerSeat, 1, new(DrawReason)); return; }
         if (option == 2) foreach (var target in r.Targets.Where(facts.Alive)) native.Suppress(f, target);
         Continue(f.Id);
@@ -84,7 +84,8 @@ internal sealed class MouGuanPingRuntime(IMouGuanPingFacts facts, IMouGuanPingNa
     }
     private void Complete(ProgramSkillFrame f)
     {
-        var r = f.MouGuanPing!; events.AdvanceFact(new MouGuanPingCompletedEvent(f.Id, r.Use.UseId, r.Cursor, r.Mask));
+        var r = f.MouGuanPing!;
+        if (r.Mask == 7 && r.Cursor == 3) cardUses.IssueCardDamageAdjustment(r.Use.UseId, 1);
         frames.ReplaceTop(f = f with { MouGuanPing = null, PendingMovementContinuation = null }); native.Finish(f);
     }
     [ProgramContinuation(ProgramContinuationKind.Resume, 35000)]

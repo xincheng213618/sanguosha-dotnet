@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "anniversary:dujun", "revision": 1, "triggers": [
       { "id": "choose-partner", "window": "gameStarting", "subject": "owner", "optional": false, "effects": [

@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineCardDamageMaximumHpReplacementRuntim
             throw new InvalidOperationException("Card damage must be selected before damage-only modifiers and prevention.");
         var turn = _turnCardUseEffectsOperations._turnCardUseEffects.GetDamageModifiers(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, attack.SourceSeat, attack.CardUserSeat, kind, false).Sum(m => m.Amount);
         var passive = _coreNativeDamagePoliciesOperations.GetPassiveProgramDamageModifiers(attack, cardDamageOnly: true).Sum(m => m.Amount);
-        var amount = checked(attack.DamageAmount + _coreExtendedViewAsOperations.ProgramConversionDamageBonus(card) + turn + passive + _characterPanZhangMaZhongBoundaryMobileOperations.Value.BoundaryAnjianDamage(attack) + _characterChengPuBoundaryMobileOperations.Value.BoundaryChengPuLihuoDamage(attack) + _characterHuangZhongBoundaryMobileOperations.Value.BoundaryHuangZhongCardDamage(attack) + _characterZhangFeiBoundaryMobileOperations.Value.BoundaryZhangFeiLiyongCardDamage(attack));
+        var amount = checked(attack.DamageAmount + _coreExtendedViewAsOperations.ProgramConversionDamageBonus(card) + turn + passive + _characterPanZhangMaZhongBoundaryMobileOperations.Value.BoundaryAnjianDamage(attack) + _characterChengPuBoundaryMobileOperations.Value.BoundaryChengPuLihuoDamage(attack) + _coreCardUseLifecycleOperations.CardDamageAdjustmentBonus(attack, cardDamageOnly: true));
         _coreCardAttackStateOperations.UpdateCardAttackState(attack.ResolutionId, state => state!with { CardDamageLayerAmount = amount });
         return amount;
     }

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [{ "id": "boundary:fuhun-mobile", "revision": 1,
     "viewAs": [{ "id": "two-hand-cards-as-slash", "inputKinds": [], "inputSuits": [], "inputCount": 2, "outputKind": "slash", "forPlay": true, "forResponse": true, "condition": { "kind": "always" } }],
     "activations": [{ "id": "two-hand-cards-as-slash", "minCards": 2, "maxCards": 2, "sourceZones": ["hand"], "minTargets": 1, "maxTargets": 1, "targetKind": "otherLiving", "usesPerTurn": null, "condition": { "kind": "always" },

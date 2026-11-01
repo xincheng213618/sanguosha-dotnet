@@ -19,11 +19,7 @@ internal sealed partial class CharacterWuTuGuOlRuntime
             if (f.SkillId != "ol:hanyong" || context.Window != SkillProgramTriggerWindow.CardUseCommitted || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramCardTriggerWindowFrame parent || parent.Id != context.ParentFrameId || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])) || WuTuGuHanyongQualification(CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex]), context)is not { } q)
                 throw new InvalidOperationException("Hanyong lost its frozen native-use HP/round qualification.");
             var use = _coreCardUseLifecycleOperations.LifecycleCardUse(q.UseId)!;
-            if (use.WuTuGuHanyong?.Grants.Any(g => g.Source == q.Source) == true)
-                throw new InvalidOperationException("Hanyong cannot arm one original source twice.");
-            var grant = new WuTuGuHanyongGrant(f.Id, q.UseId, q.ActionId, q.Source, q.GameplayHash, q.ActualTurn, q.Round, q.HpAtUse, q.ProviderSeat, q.Kind);
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { WuTuGuHanyong = new() { Grants = (u.WuTuGuHanyong?.Grants ?? []).Append(grant).ToArray() } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuTuGuHanyongArmedEvent(grant));
+            _coreCardUseLifecycleOperations.IssueCardDamageAdjustment(use.Id, 1, cardKinds: [q.Kind]);
             return SkillProgramStepOutcome.Continue;
         }
 

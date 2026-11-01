@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "happy:quanxue", "revision": 1, "triggers": [{ "id": "grant-study", "window": "playPhaseStarting", "subject": "owner", "optional": true, "effects": [{ "op": "grantHappySunQuanLearning", "target": "owner" }] }] },
     { "id": "happy:shehu", "revision": 1, "triggers": [{ "id": "slash-studying", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "cardKinds": ["slash", "fireSlash", "thunderSlash"], "optional": false, "effects": [{ "op": "resolveHappySunQuanShehu", "target": "owner" }] }] },

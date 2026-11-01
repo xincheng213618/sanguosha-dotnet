@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:paoxiao-mobile", "revision": 1,
       "modifiers": [{ "id": "unlimited-slash-uses", "query": "slashLimit", "operation": "unlimited", "value": 0, "priority": 0 }] },
@@ -10,7 +10,7 @@
         { "id": "issue-next-real-use", "window": "cardUseCommitted", "ownerRelation": "actor", "cardKinds": ["slash", "fireSlash", "thunderSlash"], "optional": false,
           "effects": [{ "op": "issueBoundaryZhangFeiLiyongTarget", "target": "owner" }] },
         { "id": "issued-target-rights", "window": "cardUseTargetsFinalized", "ownerRelation": "actor", "cardKinds": ["slash", "fireSlash", "thunderSlash"], "optional": false,
-          "effects": [{ "op": "issueBoundaryZhangFeiLiyongTarget", "target": "owner" }, { "op": "addCurrentTargetSlashDamage", "target": "owner", "comparison": "always", "amount": 1 }] },
+          "effects": [{ "op": "issueBoundaryZhangFeiLiyongTarget", "target": "owner" }, {"op":"addCurrentCardDamage","target":"owner","amount":1,"targetScope":"currentTarget","cardKinds":["slash","fireSlash","thunderSlash"],"damageLayer":"cardDamage"}] },
         { "id": "issued-surviving-damage", "window": "afterDamageApplied", "subject": "any", "damageOccurrence": "perDamage", "optional": false,
           "effects": [{ "op": "payBoundaryZhangFeiLiyong", "target": "owner" }] }
       ]

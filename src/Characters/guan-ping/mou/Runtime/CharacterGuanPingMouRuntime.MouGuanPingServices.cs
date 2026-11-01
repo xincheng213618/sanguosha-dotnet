@@ -56,18 +56,6 @@ internal sealed partial class CharacterGuanPingMouRuntime
     void IMouGuanPingNative.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     void IMouGuanPingNative.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     bool IMouGuanPingNative.Drain(ProgramSkillFrame f) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id);
-    void IMouGuanPingNative.SetMask(ProgramSkillFrame f, int mask)
-    {
-        if (f.MouGuanPing is not { } r || r.Mask != mask || _coreCardUseLifecycleOperations.LifecycleCardUse(r.Use.UseId)is not { MouGuanPing: { } receipt } use || receipt.ActionId != r.Use.ActionId || receipt != r.Use with
-        {
-            OptionMask = receipt.OptionMask
-        }
-
-        )
-            throw new InvalidOperationException("Wuwei may only modify its own original issued Slash.");
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouGuanPing = receipt with { OptionMask = mask } });
-    }
-
     void IMouGuanPingNative.Suppress(ProgramSkillFrame f, int target)
     {
         if (!MouGuanPing.Valid(f) || f.MouGuanPing is not { Stage: MouGuanPingStage.Children } r || !r.Targets.Contains(target))
@@ -100,6 +88,4 @@ internal sealed partial class CharacterGuanPingMouRuntime
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 35000)]
     [ProgramDistanceRule(ProgramDistanceStage.VirtualSlash, 35000)]
     internal bool MouGuanPingIssuedDistance(ProgramSlashDistanceQuery q) => q.Conversion is { SkillId: MouGuanPingComposition.Skill, BindingId: MouGuanPingComposition.Binding } s && s.OwnerSeat == q.Actor.Seat && (q.ExistingUseFrameId is { } id ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.MouGuanPing?.Source == s : q.PhysicalCardIds is { } ids && _characterGuanPingMouOperations.CreateMouGuanPingFacts().WholeColor(q.Actor.Seat, ids));
-    [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 35000)]
-    internal int MouGuanPingDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { Action: { } a, MouGuanPing: { OptionMask: 7 } r } u && r.UseId == u.Id && r.ActionId == a.ActionId && r.Source.OwnerSeat == a.ActorSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouGuanPingCompletedEvent>().Count(e => e.UseId == u.Id && e.Mask == 7 && e.Count == 3) == 1 ? 1 : 0;
 }

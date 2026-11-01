@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
  {"id":"boundary:xingshang-mobile","revision":1,"triggers":[{"id":"death-claim-or-recover","window":"characterDied","subject":"owner","optional":true,"effects":[
   {"op":"chooseBoundaryCaoPiXingshang","target":"owner","resultBind":"xingshang-result"},
   {"op":"claimDeathCleanupCards","target":"owner","zones":["hand","equipment"],"condition":{"kind":"choiceIs","sourceBind":"xingshang-result","optionId":"claim"}},

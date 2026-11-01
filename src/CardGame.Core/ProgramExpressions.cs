@@ -41,10 +41,24 @@ internal interface IProgramExpressionWorld
     int? Number(string name) => null;
     int? CardMarkCount(int seat, string mark, CardZoneKind zone) => null;
     int? PublicPileCount(int seat, string skillId) => null;
+    int? WindowStat(string stat, string participant) => null;
 }
 
 internal static class ProgramExpressions
 {
+    internal static int? ReadWindowStat(SkillProgramTriggerFacts? facts, string stat, string participant, bool hasTarget)
+    {
+        if (facts is null) return null;
+        return (stat, participant) switch
+        {
+            ("windowHp", "owner") when !facts.OwnerHpUndefined && facts.UnselectedOwnerHp is null => facts.CurrentHp,
+            ("windowHp", "eventTarget") when hasTarget && !facts.EventTargetHpUndefined && facts.UnselectedEventTargetHp is null => facts.EventTargetHp,
+            ("windowHandCount", "owner") => facts.CurrentHandCount,
+            ("windowHandCount", "eventTarget") when hasTarget => facts.EventTargetHandCount,
+            _ => null
+        };
+    }
+
     public const int MaximumDepth = 8;
     public const string Iterator = "it";
     public static readonly string[] Participants = ["owner", "selectedTarget", "selectedFirst", "selectedSecond", "eventSource", "eventTarget"];
@@ -110,6 +124,14 @@ internal static class ProgramExpressions
         if (op == "same") { Arity(2, 2); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Flags.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Stats.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Participant)); }
+        if (op is "windowHp" or "windowHandCount")
+        {
+            Arity(1, 1);
+            var subject = Arg(0, ProgramExpressionType.Participant);
+            if (subject.Name is not ("owner" or "eventTarget"))
+                Fail(path, "window stats require the frozen owner or eventTarget");
+            return new(op, ProgramExpressionType.Int, [subject]);
+        }
         if (op == "publicPileCount")
         {
             Arity(2, 2);
@@ -219,6 +241,7 @@ internal static class ProgramExpressions
             case "int": return e.Literal;
             case "when": return EvaluateBool(e.Args[0], world, it) == true ? EvaluateInt(e.Args[1], world, it) : null;
             case "number": return world.Number(e.Name!);
+            case "windowHp" or "windowHandCount": return world.WindowStat(e.Op, e.Args[0].Name!);
             case "cardMarkCount": return EvaluateParticipant(e.Args[0], world, it) is { } markedSeat
                 ? world.CardMarkCount(markedSeat, e.Name!, (CardZoneKind)e.Literal) : null;
             case "publicPileCount": return EvaluateParticipant(e.Args[0], world, it) is { } pileSeat
@@ -281,8 +304,9 @@ internal static class ProgramExpressions
 /// </summary>
 internal sealed class SkillContextExpressionWorld(PlayerSkillContext owner, PlayerSkillContext? selectedTarget,
     int? ownerEquipmentCount = null, Func<string, string, int?>? bindingStat = null,
-    Func<string, int?>? number = null) : IProgramExpressionWorld
+    Func<string, int?>? number = null, SkillProgramTriggerFacts? windowFacts = null) : IProgramExpressionWorld
 {
+    public int? WindowStat(string stat, string participant) => ProgramExpressions.ReadWindowStat(windowFacts, stat, participant, selectedTarget is not null);
     public int? BindingStat(string stat, string name) => bindingStat?.Invoke(stat, name);
     public int? Number(string name) => number?.Invoke(name);
     private PlayerSkillContext? Context(int seat) =>

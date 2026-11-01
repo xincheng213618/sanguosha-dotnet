@@ -17,8 +17,7 @@ public sealed record MouSunJianOlYipoReceipt(CardConversionSource Source, string
     public IReadOnlyList<int> Selected { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }
 }
 public sealed record MouSunJianOlHulieEntry(long FrameId, long UseId, long ActionId, CardConversionSource Source, string GameplayHash,
-    int Turn, int TurnOwner, int ActorSeat, int TargetSeat)
-{ public bool Boosted { get; init; } }
+    int Turn, int TurnOwner, int ActorSeat, int TargetSeat);
 public enum MouSunJianOlHulieStage { DamageChoice, CounterChoice, Issuing, NativeUse, Children }
 public sealed record MouSunJianOlHulieReceipt(MouSunJianOlHulieEntry Entry, MouSunJianOlHulieStage Stage)
 {

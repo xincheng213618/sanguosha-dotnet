@@ -272,7 +272,7 @@ internal static class CardMovementProgramChecks
     private static void VerifySlashPaymentReturnsBeforeItsEffect()
     {
         var program = SkillProgramCatalog.Load("""
-            {"schemaVersion":63,"skills":[{"id":"fixture:card-movement","revision":1,
+            {"schemaVersion":64,"skills":[{"id":"fixture:card-movement","revision":1,
              "modifiers":[{"id":"payment-quota","query":"slashLimit","operation":"add","value":2,"priority":0}],
              "viewAs":[{"id":"top-cost","inputKinds":[],"inputSuits":[],"sourceZones":["hand"],
                "outputKind":"fireSlash","forPlay":true,"forResponse":false,"useOnly":true,"costDestination":"drawPileTop"}],
@@ -688,7 +688,7 @@ internal static class CardMovementProgramChecks
     }
 
     private const string Rules = """
-        {"schemaVersion":63,"skills":[{"id":"fixture:card-movement","revision":1,
+        {"schemaVersion":64,"skills":[{"id":"fixture:card-movement","revision":1,
         "minimumRulesVersion": 171,"modifiers":[],"viewAs":[],
         "activations":[{"id":"discard-two","minCards":2,"maxCards":2,"minTargets":0,
         "maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "ol:zhuiji", "revision": 1,
       "cardPolicies": [{ "id": "hp-ordered-distance", "kind": "distanceOneToNotHigherHp" }],

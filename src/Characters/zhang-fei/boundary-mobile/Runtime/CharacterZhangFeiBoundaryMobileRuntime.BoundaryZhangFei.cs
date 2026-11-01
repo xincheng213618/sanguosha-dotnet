@@ -76,7 +76,6 @@ internal sealed partial class CharacterZhangFeiBoundaryMobileRuntime
     }
 
     internal bool IsBoundaryZhangFeiLiyongUnrespondable(long frameId) => _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)is { Action: { } action, BoundaryLiyong: { } right } && right.CardUseFrameId == frameId && right.CardActionId == action.ActionId && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind);
-    internal int BoundaryZhangFeiLiyongCardDamage(GameEngine.IDamageAttempt attack) => !attack.IsChainPropagation && attack is NativeOwners.CardAttackHandle && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Slash) ? _coreFinalTargetSlashOperations.FinalTargetSlashReceipts(attack.ResolutionId, attack.TargetSeat).Where(receipt => receipt.SkillId == BoundaryZhangFeiLiyong).Sum(receipt => receipt.DamageBonus) : 0;
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 58600)]
     internal void IncludeBoundaryZhangFeiTargets(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result)
     {

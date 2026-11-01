@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
   {"id":"happy:wushen","revision":1,
     "viewAs":[{"id":"heart-hand-as-slash","inputKinds":[],"inputSuits":["heart"],"sourceZones":["hand"],"inputCount":1,"outputKind":"slash","forPlay":true,"forResponse":true}],
     "cardPolicies":[{"id":"heart-slash-distance","kind":"ignoreSlashUseDistanceBySuit","cardKinds":["slash","fireSlash","thunderSlash"],"inputSuit":"heart"}]},

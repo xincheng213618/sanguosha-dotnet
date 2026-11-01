@@ -333,7 +333,7 @@ internal static class SkillProgramCardTriggerChecks
     }
 
     private const string Rules = """
-        {"schemaVersion":63,"skills":[
+        {"schemaVersion":64,"skills":[
           {"id":"trigger-test:source-a","revision":1,"viewAs":[{"id":"slash","inputKinds":["dodge"],"inputSuits":[],"outputKind":"slash","forPlay":true,"forResponse":false}]},
           {"id":"trigger-test:source-b","revision":1,"viewAs":[{"id":"slash","inputKinds":["dodge"],"inputSuits":[],"outputKind":"slash","forPlay":true,"forResponse":false}]},
           {"id":"trigger-test:draw","revision":1,"minimumRulesVersion": 171,"triggers":[{"id":"after-use","window":"cardUseTargetsFinalized","sourceSkillId":"trigger-test:source-a","sourceViewAsId":"slash","ownerRelation":"conversionSource","optional":true,"effects":[{"op":"draw","target":"owner","amount":1}]}]},

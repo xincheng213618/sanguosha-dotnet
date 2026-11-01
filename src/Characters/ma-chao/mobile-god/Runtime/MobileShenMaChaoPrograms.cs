@@ -31,16 +31,8 @@ public sealed record MobileMaChaoReceipt(CardConversionSource Source, string Gam
 }
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public MobileMaChaoReceipt? MobileShenMaChao { get; init; } }
-public sealed record MobileTingweiBoost(long ProgramFrameId, CardConversionSource Source, long UseId, long ActionId, int Target);
-public sealed partial record CardUseFrame
-{
-    private IReadOnlyList<MobileTingweiBoost>? _mobileTingweiBoosts;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<MobileTingweiBoost>? MobileTingweiBoosts
-    { get => _mobileTingweiBoosts; init => _mobileTingweiBoosts = value is null ? null : Array.AsReadOnly(value.ToArray()); }
-}
 public sealed record MobileTingweiStartedEvent(long FrameId, CardConversionSource Source, long UseId, long ActionId) : IGameEvent;
 public sealed record MobileTingweiSelectedEvent(long FrameId, int Target, int Mask, int Paid) : IGameEvent;
-public sealed record MobileTingweiBoostedEvent(MobileTingweiBoost Boost) : IGameEvent;
 public sealed record MobileMaChaoMovedEvent(long FrameId, string Mode, int Target, long Before, long After) : IGameEvent;
 public sealed record MobileMaChaoJimieUsedEvent(long FrameId, CardConversionSource Source, int Target, int Paid, int ActualTurn) : IGameEvent;
 public sealed record MobileMaChaoYuliExecutedEvent(long FrameId, int Owner, int Part, long JimieUseFrameId) : IGameEvent;

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "anniversary:songshu", "revision": 1, "activations": [ {
       "id": "hand-contest", "minCards": 1, "maxCards": 1, "sourceZones": [ "hand" ],

@@ -11,7 +11,7 @@ internal static class PublicMarkerChecks
     private const string BystanderTwoId = "wuhun-marker:bystander-2";
     private const string WuhunSkillId = "wuhun-marker:wuhun";
     private const string WuhunRules = """
-    {"schemaVersion":63,"skills":[{"id":"wuhun-marker:wuhun","revision":2,"minimumRulesVersion": 171,
+    {"schemaVersion":64,"skills":[{"id":"wuhun-marker:wuhun","revision":2,"minimumRulesVersion": 171,
     "modifiers":[],"viewAs":[],"activations":[],"triggers":[
       {"id":"damage-nightmare","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamagePoint","optional":false,"priority":0,
        "effects":[{"op":"changeAttributedMarker","target":"owner","targetRef":{"kind":"eventSource"},"marker":"nightmare","amount":1}]},

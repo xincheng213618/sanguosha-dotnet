@@ -250,7 +250,7 @@ internal static class SkillProgramCardIdentityChecks
     }
 
     private const string Rules = """
-        {"schemaVersion":63,"skills":[
+        {"schemaVersion":64,"skills":[
           {"id":"card-identity-test:wushen","revision":1,
            "modifiers":[
              {"id":"slash-distance","priority":0,"query":"slashDistanceLimit","operation":"unlimited","value":0,

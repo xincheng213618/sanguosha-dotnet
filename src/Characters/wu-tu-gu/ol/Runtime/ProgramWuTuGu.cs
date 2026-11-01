@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
-public sealed partial record CardUseFrame{[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public WuTuGuHanyongUse? WuTuGuHanyong{get;init;}}
 public sealed partial record ProgramSkillFrame{[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public WuTuGuRanshangReceipt? WuTuGuRanshang{get;init;}}
 public sealed record WuTuGuFirePointAddedEvent(long ProgramFrameId,long DamageFrameId,long ParentWindowId,CardConversionSource Source,string GameplayHash,int Point,int Amount,int Count):IGameEvent;
 internal interface IWuTuGuHost{SkillProgramStepOutcome Resolve(ProgramSkillFrame f,SkillProgramEffectOp op);}

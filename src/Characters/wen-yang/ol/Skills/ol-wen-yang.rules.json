@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
  {"id":"ol:lvli","revision":1,"triggers":[
   {"id":"after-causing-damage","window":"afterDamageApplied","subject":"damageSource","damageOccurrence":"perDamage","optional":true,"effects":[{"op":"resolveLvliActualDamageChoice","target":"owner"}]},
   {"id":"after-receiving-damage","window":"afterDamageApplied","subject":"owner","damageOccurrence":"perDamage","optional":true,"effects":[{"op":"resolveLvliActualDamageChoice","target":"owner"}]}

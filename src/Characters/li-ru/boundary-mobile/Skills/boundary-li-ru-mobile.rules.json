@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
  {"id":"boundary:juece-mobile","revision":1,"triggers":[{"id":"lost-card-ending","window":"turnEnding","subject":"owner","optional":true,"effects":[{"op":"selectTarget","target":"owner","targetKind":"boundaryLiRuLostCardsThisTurn"},{"op":"damage","target":"selectedTarget","amount":1}]}]},
  {"id":"boundary:mieji-mobile","revision":1,"activations":[{"id":"black-trick-top","minCards":1,"maxCards":1,"sourceZones":["hand"],"cardCategories":["trick"],"cardSuits":["spade","club"],"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"usesPerPhase":1,"effects":[
   {"op":"captureSelectedCards","target":"owner","resultBind":"mieji-cost"},{"op":"revealBoundCards","target":"owner","sourceBind":"mieji-cost"},

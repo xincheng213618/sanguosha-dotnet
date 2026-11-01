@@ -1,4 +1,4 @@
-{"schemaVersion":63,"skills":[
+{"schemaVersion":64,"skills":[
  {"id":"boundary:yongsi-mobile","revision":1,"triggers":[
   {"id":"faction-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"drawPhaseMode":"replacement","effects":[{"op":"draw","target":"owner","numberExpression":"livingFactionCount"}]},
   {"id":"discard-cost","window":"discardPhaseStarting","subject":"owner","optional":false,"effects":[

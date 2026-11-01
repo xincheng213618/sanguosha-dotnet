@@ -101,7 +101,7 @@ internal static class ProgramChoiceChecks
     }
 
     private static string BuildRules(string effects) => $$"""
-        {"schemaVersion":63,"skills":[{"id":"{{SkillId}}","revision":1,
+        {"schemaVersion":64,"skills":[{"id":"{{SkillId}}","revision":1,
         "minimumRulesVersion": 171,"modifiers":[],"viewAs":[],"activations":[],
         "triggers":[{"id":"support","window":"turnEnding","subject":"owner","optional":false,
         "priority":0,"usageScope":"turn","usageLimit":1,"effects":{{effects}}}],

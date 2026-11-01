@@ -15,7 +15,6 @@ internal sealed partial class CharacterPeiYuanShaoOlEntries
     internal void FinishFulue(ProgramSkillFrame f) => _resolve().FinishFulue(f);
     internal IReadOnlyList<PromptChoice> FulueChoices(ProgramSkillFrame f) => _resolve().FulueChoices(f);
     internal CardUseFrame? FulueContextUse(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().FulueContextUse(c, context);
-    internal int FulueDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().FulueDamageBonus(attack);
     internal bool FulueFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().FulueFirstChild(f, child);
     internal bool FulueLionProof(ProgramSkillFrame f, int seat, CardMoveReason? reason) => _resolve().FulueLionProof(f, seat, reason);
     internal ProgramSkillFrame? FulueObserverRoot() => _resolve().FulueObserverRoot();

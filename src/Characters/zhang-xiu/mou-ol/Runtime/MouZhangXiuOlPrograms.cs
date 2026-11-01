@@ -41,7 +41,6 @@ public sealed record MouZhangXiuOlQiulieIssuedEvent(MouZhangXiuOlQiulieOrigin Or
 public sealed record MouZhangXiuOlQiulieReturnedEvent(long FrameId, long UseId, long ActionId) : IGameEvent;
 public sealed record MouZhangXiuOlQiulieNullifiedEvent(long FrameId, long UseId, int TargetSeat, int PaidCardId) : IGameEvent;
 public sealed record MouZhangXiuOlQualifiedEvent(MouZhangXiuOlZhuijiaoEntry Entry) : IGameEvent;
-public sealed record MouZhangXiuOlBoostedEvent(long FrameId, long UseId, CardConversionSource Source) : IGameEvent;
 public sealed record MouZhangXiuOlDrawReturnedEvent(long FrameId, long UseId, int OwnerSeat, int Requested, int Actual, int Replacement) : IGameEvent;
 public sealed record MouZhangXiuOlUseDamageEvent(long OriginFrameId, int? InstructionIndex, long DamageId, int Amount) : IGameEvent;
 public sealed record MouZhangXiuOlPenaltyStartedEvent(long FrameId, long UseId, CardConversionSource Source) : IGameEvent;

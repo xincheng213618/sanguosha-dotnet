@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:mieji-current", "revision": 1,
       "activations": [{ "id": "topdeck-trick", "minCards": 1, "maxCards": 1, "sourceZones": ["hand"], "cardCategories": ["trick"],

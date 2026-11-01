@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "mobile:shi-chizhang", "revision": 1,
       "cardPolicies": [{ "id": "damage-distance", "kind": "ignoreUseDistance", "cardKinds": ["slash", "fireSlash", "thunderSlash", "duel", "fireAttack", "barbarianAssault", "arrowBarrage", "lightning", "qizhengXiangsheng", "wumiaoFlood"] }],

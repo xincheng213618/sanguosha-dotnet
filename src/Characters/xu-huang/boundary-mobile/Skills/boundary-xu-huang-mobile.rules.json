@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 63,
+  "schemaVersion": 64,
   "skills": [
     { "id": "boundary:duanliang-mobile", "revision": 1,
       "viewAs": [{ "id": "black-basic-or-equipment-as-supply-shortage", "sourceZones": ["hand", "equipment"],
