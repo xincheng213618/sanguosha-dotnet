@@ -53,7 +53,7 @@ internal sealed class MobileSimaRenjieRuntime(IProgramRuntimeFrames frames, IPro
             .LastOrDefault(e => e.ResolutionId == f.ParentFrameId && e.ChainDepth == f.ChainDepth)?.ResponderSeat ?? f.SourceSeat;
         if (f.DelayedReturn is null && source == actor || !CanBeginMobileSimaRenjie(actor) ||
             facts.WenjiNullificationForbidden(f, actor) || facts.FuqiNullificationBanned(actor) ||
-            f.ChainDepth == 0 && facts.NearbyResponseProhibited(f.SourceSeat, actor, f.EffectCardKind, f.TargetSeats)) return false;
+            f.ChainDepth == 0 && facts.NearbyResponseProhibited(f.SourceSeat, actor, f.EffectCardKind, f.TargetSeats, f.ParentFrameId)) return false;
         if (explicitPass && prompts.Current is { } p && (p.Kind != DecisionKind.Nullification || p.PlayerSeat != actor))
             throw new InvalidOperationException("Renjie cannot replace another accepted response decision.");
         prompts.Clear();

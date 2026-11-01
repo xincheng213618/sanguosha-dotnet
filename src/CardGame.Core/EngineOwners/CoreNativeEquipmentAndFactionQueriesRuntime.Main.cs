@@ -8,9 +8,13 @@ internal sealed partial class CoreNativeEquipmentAndFactionQueriesRuntime
     internal bool HasTengjia(CharacterState player) => !_coreExtendedViewAsOperations.IsArmorIneffectiveForTurn(player) && (_characterHuCheErMouOperations.KongwuEffectiveEquipment(player).Any(card => card.Kind == CardKind.Tengjia) || _coreProgramPipelineHooksOperations.ProgramVirtualEquipment(player.Seat, EquipmentSlot.Armor) == CardKind.Tengjia || _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.VirtualEquipment, CardKind.Tengjia) && !_corePhysicalOwnedCardQueriesOperations.GetEquipment(player).Any(card => _coreFieldEquipmentOperations.FieldEquipmentSlot(card) == EquipmentSlot.Armor));
     internal bool HasSilverLion(CharacterState player) => !_coreExtendedViewAsOperations.IsArmorIneffectiveForTurn(player) && (_characterHuCheErMouOperations.KongwuEffectiveEquipment(player).Any(card => card.Kind == CardKind.SilverLion) || _coreProgramPipelineHooksOperations.ProgramVirtualEquipment(player.Seat, EquipmentSlot.Armor) == CardKind.SilverLion);
     internal bool CanRequestFactionDefense(CharacterState owner, NativeOwners.CardAttackHandle attack) => !attack.FactionDefenseAttempted && owner.IsAlive && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(owner, CardKind.Dodge)is not null;
-    internal int GetRequiredResponseCount(CharacterState skillOwner, int sourceSeat, int responderSeat, CardKind incomingCard, CardKind requiredCardKind)
+    internal int GetRequiredResponseCount(CharacterState skillOwner, int sourceSeat, int responderSeat, CardKind incomingCard, CardKind requiredCardKind, long? incomingFrameId = null)
     {
-        return Math.Max(_coreProgramCardPoliciesOperations.GetProgramRequiredResponseCount(skillOwner, sourceSeat, responderSeat, incomingCard, requiredCardKind), _characterLuBuHappyGodOperations.HappyLuBuRequiredResponseCount(skillOwner.Seat, sourceSeat, responderSeat, incomingCard, requiredCardKind));
+        var minimum = _coreProgramCardPoliciesOperations.GetProgramRequiredResponseCount(skillOwner, sourceSeat, responderSeat, incomingCard, requiredCardKind);
+        if (incomingFrameId is { } id && _coreCardUseLifecycleOperations.CreateResponseQuery(id, sourceSeat, responderSeat, incomingCard, requiredCardKind,
+            _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.TargetSeats ?? [responderSeat]) is { } query)
+            minimum = Math.Max(minimum, _coreCardUseLifecycleOperations.GetResponseDecision(query).Minimum);
+        return minimum;
     }
 
     internal bool CanRequestFactionSlashResponse(CharacterState owner, NativeOwners.CardAttackHandle attack)

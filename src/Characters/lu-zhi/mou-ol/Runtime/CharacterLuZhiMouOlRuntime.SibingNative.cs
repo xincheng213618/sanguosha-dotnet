@@ -105,32 +105,6 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         ContinueMouLz(id);
     }
 
-    internal bool MouLzCannotRespond(int source, int responder, CardKind kind, IReadOnlyList<int> targets)
-    {
-        // Innermost incoming native effect only: an ancestor ban cannot affect a nested different Use.
-        var incoming = _resolutionStackOperations._resolutionStack.LastOrDefault(x => x is CardUseFrame || x is ProgramSkillFrame { MouLuZhiOlDirectDuel: not null, CardAttack.Active: true });
-        long id;
-        long action;
-        var instruction = 0;
-        if (incoming is CardUseFrame { Action: { } a } u)
-        {
-            if (a.ActorSeat != source || a.EffectiveKind != kind)
-                return false;
-            id = u.Id;
-            action = a.ActionId;
-        }
-        else if (incoming is ProgramSkillFrame { MouLuZhiOlDirectDuel: { } d })
-        {
-            if (d.Actor != source || kind != CardKind.Duel)
-                return false;
-            id = d.FrameId;
-            action = 0;
-            instruction = d.Instruction;
-        }
-        else
-            return false;
-        return targets.Contains(responder) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLuZhiOlResponseBannedEvent>().Any(e => e.Ban.UseId == id && e.Ban.ActionId == action && e.Ban.TargetSeat == responder && e.Ban.Instruction == instruction);
-    }
 
     [ProgramDamageHook(ProgramDamagePhase.AppliedBeforeDying, 32900)]
     internal bool RecordMouLzDamage(GameEngine.IDamageAttempt attack, long damageId)

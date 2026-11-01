@@ -22,7 +22,6 @@ internal sealed partial class CharacterXiahouBaMobileShiEntries
     internal int ShiXbLibbingRangeBonus(int seat) => _resolve().ShiXbLibbingRangeBonus(seat);
     internal (int Last, int Count1, int Count2, int Count3) ShiXbLibbingState(int ownerSeat) => _resolve().ShiXbLibbingState(ownerSeat);
     internal bool ShiXbNativeMaterialBatch(CardUseFrame use, CardMovementBatchContext batch) => _resolve().ShiXbNativeMaterialBatch(use, batch);
-    internal bool ShiXbPoxiCannotRespond(int sourceSeat, int responderSeat, CardKind incomingKind, IReadOnlyList<int> targetSeats) => _resolve().ShiXbPoxiCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats);
     internal Card ShiXbPoxiCard(ProgramSkillFrame f) => _resolve().ShiXbPoxiCard(f);
     internal IReadOnlyList<int> ShiXbPoxiTargets(ProgramSkillFrame f) => _resolve().ShiXbPoxiTargets(f);
     internal ShiXiahouBaReceipt StartShiXbLibbing(ProgramSkillFrame f) => _resolve().StartShiXbLibbing(f);

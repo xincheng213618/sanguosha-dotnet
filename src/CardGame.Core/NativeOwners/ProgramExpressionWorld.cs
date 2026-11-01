@@ -7,6 +7,8 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
         ProgramExpressions.ReadWindowStat(frame.WindowContext?.Facts, stat, participant, frame.WindowContext?.TargetSeat is not null);
     public int? CardMarkCount(int seat, string mark, CardZoneKind zone) =>
         getCoreTableSeatQueriesRuntime().IsValidPlayerSeat(seat) ? cardMarks?.CountMarked(seat, mark, zone) : null;
+    public int? HandPrintedSuitCount(int seat, Suit suit) => Valid(seat) is null ? null :
+        getCorePhysicalOwnedCardQueriesRuntime().GetHand(matchParticipantsState.ReferenceToPlayers[seat]).Count(card => card.Suit == suit);
     public int? PublicPileCount(int seat, string skillId) => Valid(seat) is null || piles is null ? null :
         piles.PublicPileSources(seat).Where(source => source.SkillId == skillId).Sum(source => piles.PublicPileCards(source).Count);
     public int? BindingStat(string stat, string name)

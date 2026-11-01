@@ -2,6 +2,9 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineCardUseLifecycleEntries
 {
+    internal void IssueResponseRule(long frameId, ResponseRule rule) => _resolve().IssueResponseRule(frameId, rule);
+    internal NativeResponseQuery? CreateResponseQuery(long incomingFrameId, int opponentSeat, int responderSeat, CardKind incoming, CardKind required, IReadOnlyList<int> targets, int? providerSeat = null, int counterspellDepth = 0) => _resolve().CreateResponseQuery(incomingFrameId, opponentSeat, responderSeat, incoming, required, targets, providerSeat, counterspellDepth);
+    internal ResponseDecision GetResponseDecision(NativeResponseQuery query) => _resolve().GetResponseDecision(query);
     internal void IssueCardDamageAdjustment(long useId, int amount, int? targetSeat = null, IReadOnlyList<CardKind>? cardKinds = null, SkillProgramDamageLayer damageLayer = SkillProgramDamageLayer.AdditionalDamage) => _resolve().IssueCardDamageAdjustment(useId, amount, targetSeat, cardKinds, damageLayer);
     internal int CardDamageAdjustmentBonus(GameEngine.IDamageAttempt attack, bool cardDamageOnly = false) => _resolve().CardDamageAdjustmentBonus(attack, cardDamageOnly);
     internal void BeginSimpleCardUse(long frameId, ProgramSimpleCardContinuation continuation) => _resolve().BeginSimpleCardUse(frameId, continuation);

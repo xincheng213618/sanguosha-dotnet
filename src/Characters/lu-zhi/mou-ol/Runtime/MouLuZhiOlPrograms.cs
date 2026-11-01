@@ -22,7 +22,6 @@ public sealed record MouLuZhiOlReceipt(CardConversionSource Source, string Gamep
     public IReadOnlyList<int> Selected { get => _selected; init => _selected = Array.AsReadOnly(value.ToArray()); }
 }
 public sealed record MouLuZhiOlCounterOrigin(long FrameId, CardConversionSource Source, string GameplayHash, long OriginalId, long OriginalActionId, long UseId, long ActionId, int ActorSeat, int TargetSeat);
-public sealed record MouLuZhiOlResponseBan(long FrameId, CardConversionSource Source, string GameplayHash, long UseId, long ActionId, int TargetSeat, int Instruction = 0);
 public sealed record MouLuZhiOlDirectDuel(long FrameId, int Instruction, CardConversionSource Producer, string Hash, int Actor, int Target)
 {
     public bool PressClosed { get; init; }
@@ -41,13 +40,10 @@ public sealed partial record ProgramSkillFrame
 public sealed partial record CardUseFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public MouLuZhiOlCounterOrigin? MouLuZhiOlCounter { get; init; }
-    private IReadOnlyList<MouLuZhiOlResponseBan>? _mouLuZhiOlBans;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<MouLuZhiOlResponseBan>? MouLuZhiOlBans { get => _mouLuZhiOlBans; init => _mouLuZhiOlBans = value is null ? null : Array.AsReadOnly(value.ToArray()); }
 }
 public sealed record MouLuZhiOlStartedEvent(long FrameId, CardConversionSource Source, string GameplayHash, SkillProgramEffectOp Op, long OriginalId, long ActionId, int Actor, int Target, int Turn, long BatchId) : IGameEvent;
 public sealed record MouLuZhiOlPressUsedEvent(long FrameId, int Owner, int Turn, int Required) : IGameEvent;
 public sealed record MouLuZhiOlDiscardedEvent(long FrameId, int Chooser, string Purpose, int Before, int After, int Actual) : IGameEvent;
-public sealed record MouLuZhiOlResponseBannedEvent(MouLuZhiOlResponseBan Ban) : IGameEvent;
 public sealed record MouLuZhiOlUseDamageEvent(long OriginalId, int Instruction, long DamageId, int Target, int Amount) : IGameEvent;
 public sealed record MouLuZhiOlCounterIssuedEvent(MouLuZhiOlCounterOrigin Origin) : IGameEvent;
 public sealed record MouLuZhiOlCounterReturnedEvent(long FrameId, long UseId, long ActionId) : IGameEvent;

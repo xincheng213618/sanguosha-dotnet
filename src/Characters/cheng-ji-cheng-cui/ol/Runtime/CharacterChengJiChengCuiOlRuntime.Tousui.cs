@@ -46,10 +46,11 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
         var before = batch.Movements[0].Sequence - 1;
         var after = batch.Movements[^1].Sequence;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { Tousui = r with { BottomPaid = true, Before = before, After = after } });
+        _coreCardUseLifecycleOperations.IssueResponseRule(use.Id, new(minimum: r.MaterialCount,
+            incomingKinds: [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash], requiredKinds: [CardKind.Dodge]));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TousuiBottomPaidEvent(use.Id, r.ActionId, r.MaterialCount, before, after));
     }
 
-    internal int TousuiRequiredDodge(long useId, int ordinary) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Tousui: { BottomPaid: true } r } use && TousuiUseProof(use) ? Math.Max(ordinary, r.MaterialCount) : ordinary;
     internal SkillProgramStepOutcome ResolveTousuiRequirement(ProgramSkillFrame f)
     {
         if (f.WindowContext?.CardUse is not { } c || _coreCardUseLifecycleOperations.LifecycleCardUse(c.ParentCardUseFrameId)is not { Tousui: { BottomPaid: true } r } use || !TousuiUseProof(use) || r.Source.SkillId != f.SkillId || r.Source.SkillInstanceId != f.SkillInstanceId || c.CardActionId != r.ActionId)

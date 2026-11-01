@@ -6,7 +6,6 @@ internal sealed partial class CharacterLuZhiMouOlEntries
     internal void AdvanceMouLzDirectWindow(MouLuZhiOlDirectWindowFrame w) => _resolve().AdvanceMouLzDirectWindow(w);
     internal void AfterMouLzChain(GameEngine.IDamageAttempt attack) => _resolve().AfterMouLzChain(attack);
     internal void AnswerMouLz(PromptChoice choice) => _resolve().AnswerMouLz(choice);
-    internal void BanMouLzResponse(ProgramSkillFrame f) => _resolve().BanMouLzResponse(f);
     internal void BeforeMouLzChain(GameEngine.IDamageAttempt attack) => _resolve().BeforeMouLzChain(attack);
     internal SkillProgramStepOutcome BeginMouLz(ProgramSkillFrame supplied, SkillProgramEffectOp op) => _resolve().BeginMouLz(supplied, op);
     internal void BindMouLzCounter(IGameEvent fact) => _resolve().BindMouLzCounter(fact);
@@ -24,7 +23,6 @@ internal sealed partial class CharacterLuZhiMouOlEntries
     internal bool IsMouLzDirectCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsMouLzDirectCandidate(c, context);
     internal void IssueMouLzCounter(ProgramSkillFrame f) => _resolve().IssueMouLzCounter(f);
     internal bool KeepMouLzPaid(ProgramSkillFrame f) => _resolve().KeepMouLzPaid(f);
-    internal bool MouLzCannotRespond(int source, int responder, CardKind kind, IReadOnlyList<int> targets) => _resolve().MouLzCannotRespond(source, responder, kind, targets);
     internal IReadOnlyList<Card> MouLzCards(int seat, bool red, bool handOnly) => _resolve().MouLzCards(seat, red, handOnly);
     internal int MouLzChainCursor(GameEngine.IDamageAttempt a) => _resolve().MouLzChainCursor(a);
     internal PromptChoice MouLzChoice(ProgramSkillFrame f, string branch, string label, int? card = default, int? target = default) => _resolve().MouLzChoice(f, branch, label, card, target);

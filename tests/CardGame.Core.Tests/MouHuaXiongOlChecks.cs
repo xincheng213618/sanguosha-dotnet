@@ -2,12 +2,58 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core.Campaigns;
+using CardGame.Core.EngineOwners;
 
 namespace CardGame.Core.Tests;
 
 internal static class MouHuaXiongOlChecks
 {
     private const string Hero = "mou:hua-xiong-ol", Bojue = "mou-ol:bojue", Driver = "fixture:mhxo-driver", Quiet = "fixture:mhxo-quiet", CompletionPause = "fixture:mhxo-completion-pause";
+
+    public static void SharedResponseQueriesBindTheActualDirectDuelInstruction()
+    {
+        var s = Scene.Start(); s.Play();
+        s.Driver("direct-duel-twice", [1, 0]);
+        s.Reach(() => s.P is { Kind: DecisionKind.RespondSlash, PlayerSeat: 0 });
+        var original = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Driver);
+        var lifecycle = s.G.GetRuntimeModule<CoreGameEngineCardUseLifecycleRuntime>();
+        var query = lifecycle.CreateResponseQuery(original.Id, 1, 0, CardKind.Duel, CardKind.Slash, [0], providerSeat: 3)
+            ?? throw new InvalidOperationException("The real direct Duel must expose its owning response scope.");
+        s.Need(query.ActorSeat == 1 && original.OwnerSeat == 0 && query.InstructionIndex == 1,
+            "The actual direct Duel actor is its selected source, and its frozen instruction is independent of the program owner.");
+        using var expression = JsonDocument.Parse("""[">",["handCount","eventTarget"],["handCount","eventSource"]]""");
+        var kinds = new List<CardKind> { CardKind.Duel };
+        var minimum = new ResponseRule(minimum: 2, actorSeat: 1, opponentSeat: 1, incomingKinds: kinds,
+            requiredKinds: [CardKind.Slash], condition: ProgramExpressions.Parse(expression.RootElement, "fixture.response.while"), skillName: "shared-response");
+        kinds.Clear();
+        lifecycle.IssueResponseRule(original.Id, minimum);
+        s.Need(lifecycle.GetResponseDecision(query).Minimum == 2 &&
+            lifecycle.GetResponseDecision(query with { ProviderSeat = 2 }).Minimum == 2 &&
+            lifecycle.GetResponseDecision(query with { OpponentSeat = 0 }).Minimum == 1,
+            "Live conditions read the logical responder and original actor, never the material provider; Duel's opposite direction has its own requirement.");
+        lifecycle.IssueResponseRule(original.Id, new(minimum: 2, incomingKinds: [CardKind.Duel], requiredKinds: [CardKind.Slash], skillName: "shared-response"));
+        s.Need(lifecycle.GetResponseDecision(query) is { Minimum: 2, Forbidden: false, SkillNames.Count: 1 },
+            "Two issued minimum-two rules combine by max, retain frozen kind lists, and do not multiply the response count.");
+        lifecycle.IssueResponseRule(original.Id, new(forbid: true, targetSeat: 0, matchUseKind: true, skillName: "target-ban"));
+        lifecycle.IssueResponseRule(original.Id, new());
+        var ruled = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == original.Id);
+        s.Need(lifecycle.GetResponseDecision(query) is { Minimum: 2, Forbidden: true } &&
+            lifecycle.GetResponseDecision(query with { IncomingKind = CardKind.Slash }) is { Minimum: 1, Forbidden: false } &&
+            lifecycle.GetResponseDecision(query with { CounterspellDepth = 1 }) is { Minimum: 1, Forbidden: false } &&
+            ruled.ResponseRules is IList<ResponseRule> { IsReadOnly: true, Count: 4 } &&
+            ruled.ResponseRules.All(rule => rule.InstructionIndex == 1) && minimum.InstructionIndex is null &&
+            lifecycle.CreateResponseQuery(s.G.ResolutionStack.OfType<ResponseWindowFrame>().Single().Id, 1, 0, CardKind.Duel, CardKind.Slash, [0]) is null,
+            "Forbid combines by OR on the real original instruction, matches the incoming use kind, and cannot flow into counter-Nullification or a response window's own identity.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("response") is "pass" or "take-damage");
+        s.Reach(() => s.P is { Kind: DecisionKind.RespondSlash, PlayerSeat: 0 } &&
+            s.G.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == original.Id && f.CardAttack?.ProgramUseInstructionIndex == 2));
+        var next = lifecycle.CreateResponseQuery(original.Id, 1, 0, CardKind.Duel, CardKind.Slash, [0])!.Value;
+        s.Need(next.InstructionIndex == 2 && lifecycle.GetResponseDecision(next) is { Minimum: 1, Forbidden: false },
+            "A genuinely completed first Duel advances the same program to its next instruction without inheriting the earlier rules.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("response") is "pass" or "take-damage"); s.Play();
+        s.Need(s.E<DamageAppliedEvent>().Count(e => e.SourceSeat == 1 && e.TargetSeat == 0 && e.Amount == 1) == 2 &&
+            !s.G.ResolutionStack.Any(f => f.Id == original.Id), "Both real direct Duels return through their original parent once.");
+    }
 
     public static void StandardIssuedAttackCompletionIsFrameOwnedCold()
     {
@@ -191,10 +237,11 @@ internal static class MouHuaXiongOlChecks
                 new { id = Driver, revision = 1, activations = new object[] {
                     new { id = "draw-two", minCards = 0, maxCards = 0, minTargets = 0, maxTargets = 0, targetKind = "anyLiving", usesPerTurn = (int?)null, effects = new[] { new { op = "draw", target = "owner", amount = 2 } } },
                     new { id = "direct-duel", minCards = 0, maxCards = 0, minTargets = 2, maxTargets = 2, targetKind = "anyLiving", usesPerTurn = (int?)null, effects = new[] { new { op = "startVirtualDuel", target = "owner" } } }
+                    ,new { id = "direct-duel-twice", minCards = 0, maxCards = 0, minTargets = 2, maxTargets = 2, targetKind = "anyLiving", usesPerTurn = (int?)null, effects = new[] { new { op = "startVirtualDuel", target = "owner" }, new { op = "startVirtualDuel", target = "owner" } } }
                 } },
                 new { id = Quiet, revision = 1, triggers = new[] { new { id = "quiet", window = "afterNormalDraw", subject = "owner", optional = false, effects = new[] { new { op = "skipTurnPhases", target = "owner", phases = new[] { "play" } } } } } }
             };
-            var labels = new Dictionary<string, object> { [Driver] = new { name = "原生摸牌与决斗", description = "既有真实操作", activationLabels = new Dictionary<string, string> { ["draw-two"] = "真实摸二", ["direct-duel"] = "真实双人决斗" } },
+            var labels = new Dictionary<string, object> { [Driver] = new { name = "原生摸牌与决斗", description = "既有真实操作", activationLabels = new Dictionary<string, string> { ["draw-two"] = "真实摸二", ["direct-duel"] = "真实双人决斗", ["direct-duel-twice"] = "两次真实决斗" } },
                 [Quiet] = new { name = "安静同行", description = "原生跳过同行出牌阶段" } };
             if (pauseCompletion)
             {

@@ -176,6 +176,9 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
         var targets = added is { } seat ? use.TargetSeats.Append(seat).ToArray() : use.TargetSeats.ToArray();
         var action = _coreDesignatedExtraTargetsOperations.CloneDesignatedExtraTargetAction(use.Action!, targets);
         _coreProgramCardUseRolesOperations.UpdateProgramRoleCardUse(use with { TargetSeats = targets, Action = action, HappyLuBuWuqian = policy with { Applied = true, AddedTarget = added }, IgnoresArmor = true, EnhancementOwnerSeat = use.EnhancementOwnerSeat ?? f.OwnerSeat, Enhancements = use.Enhancements | CurrentCardEnhancement.IgnoreArmor | (added is null ? CurrentCardEnhancement.None : CurrentCardEnhancement.ExtraTarget), TargetsAdjusted = use.TargetsAdjusted || added is not null }, action);
+        _coreCardUseLifecycleOperations.IssueResponseRule(use.Id, new(minimum: 2, actorSeat: use.SourceSeat, opponentSeat: use.SourceSeat,
+            incomingKinds: use.CardKind == CardKind.Duel ? [CardKind.Duel] : [CardKind.Slash, CardKind.FireSlash, CardKind.ThunderSlash, CardKind.ColdSlash],
+            requiredKinds: use.CardKind == CardKind.Duel ? [CardKind.Slash] : [CardKind.Dodge]));
         if ((use.Enhancements & CurrentCardEnhancement.IgnoreArmor) == 0)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CurrentCardEnhancedEvent(use.Id, r.ActionId, f.OwnerSeat, CurrentCardEnhancement.IgnoreArmor, null));
         if (added is { } extra)
@@ -191,11 +194,4 @@ internal sealed partial class CharacterLuBuHappyGodRuntime
     internal bool ReturnHappyLuBuMovement(ProgramSkillFrame f) => f.HappyLuBu is not null && ContinueHappyLuBu(f.Id);
     [ProgramAiChoice(SkillProgramEffectOp.EnhanceHappyShenLuBuFirstUse)]
     internal PromptChoice HappyLuBuAi(PendingDecision p) => p.Choices.First();
-    internal int HappyLuBuRequiredResponseCount(int skillOwner, int source, int responder, CardKind incoming, CardKind required)
-    {
-        if (skillOwner != source || incoming == CardKind.Duel && required != CardKind.Slash || CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && required != CardKind.Dodge)
-            return 1;
-        var id = incoming == CardKind.Duel ? _coreNativeCardContinuationCursorsOperations.ActiveDuel?.ResolutionId : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack?.ResolutionId;
-        return id is { } useId && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { HappyLuBuWuqian: { Applied: true } r } use && r.Source.OwnerSeat == source && use.SourceSeat == source && r.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && (incoming == CardKind.Duel ? use.CardKind == CardKind.Duel : CoreNativeCardClassificationsRuntime.IsSlashCard(incoming) && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind)) && use.TargetSeats.Contains(responder) ? 2 : 1;
-    }
 }

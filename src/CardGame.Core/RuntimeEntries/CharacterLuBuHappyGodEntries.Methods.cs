@@ -18,7 +18,6 @@ internal sealed partial class CharacterLuBuHappyGodEntries
     internal bool HappyLuBuFirstUse(CardUseFrame use) => _resolve().HappyLuBuFirstUse(use);
     internal bool HappyLuBuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => _resolve().HappyLuBuMovement(f, effect, pending);
     internal ProgramSkillFrame? HappyLuBuObserverRoot() => _resolve().HappyLuBuObserverRoot();
-    internal int HappyLuBuRequiredResponseCount(int skillOwner, int source, int responder, CardKind incoming, CardKind required) => _resolve().HappyLuBuRequiredResponseCount(skillOwner, source, responder, incoming, required);
     internal SkillProgramActivation HappyLuBuShenfenActivation() => _resolve().HappyLuBuShenfenActivation();
     internal bool HasHappyLuBuWuqianCapability(CharacterState source) => _resolve().HasHappyLuBuWuqianCapability(source);
     internal bool IsHappyLuBuActualStart(ProgramLifecycleTriggerWindowFrame p) => _resolve().IsHappyLuBuActualStart(p);

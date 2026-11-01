@@ -17,8 +17,12 @@ internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
 
     internal bool HasCardPolicy(CharacterState owner, SkillProgramCardPolicyKind kind, CardKind? effectiveKind = null) => kind == SkillProgramCardPolicyKind.UnlimitedAlcoholUse && _coreProgramAlcoholQuotaOperations.Value.HasAdditionalAlcoholUse(owner) || (kind is SkillProgramCardPolicyKind.IgnoreUseDistance or SkillProgramCardPolicyKind.UnlimitedAlcoholUse) && _characterHanSongAnniversaryOperations.Value.HasAnniversaryHanSongUniqueHand(owner) || (kind is SkillProgramCardPolicyKind.IgnoreUseDistance or SkillProgramCardPolicyKind.UnlimitedAlcoholUse) && _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(owner) || kind == SkillProgramCardPolicyKind.UnlimitedAlcoholUse && _characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(owner) || _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetCardPolicies(kind).Count != 0 && CardPolicies(owner, kind, effectiveKind).Any();
     internal bool HasOutsideAttackRangeSlashQuota(CharacterState owner, CharacterState target, CardKind kind, EquipmentSlot? excludedEquipmentSlot = null) => owner.IsAlive && target.IsAlive && owner.Seat != target.Seat && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && !_characterSunYuanOlOperations.HasSayingRoundRange(owner.Seat, target.Seat) && HasCardPolicy(owner, SkillProgramCardPolicyKind.BypassSlashLimitAgainstOutsideAttackRange, kind) && (excludedEquipmentSlot is null ? _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, target.Seat) > _coreNativeRuleQueriesOperations.GetAttackRange(owner.Seat) : CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(owner, target, excludedEquipmentSlot: excludedEquipmentSlot)) > CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(owner, excludedEquipmentSlot: excludedEquipmentSlot)));
-    internal bool IsNearbyTargetResponseProhibited(int sourceSeat, int responderSeat, CardKind incomingKind, IReadOnlyList<int> targetSeats)
+    internal bool IsNearbyTargetResponseProhibited(int sourceSeat, int responderSeat, CardKind incomingKind, IReadOnlyList<int> targetSeats, long? incomingFrameId = null, CardKind? requiredKind = null)
     {
+        if (incomingFrameId is { } id && _coreCardUseLifecycleOperations.CreateResponseQuery(id, sourceSeat, responderSeat,
+            incomingKind, requiredKind ?? CardKind.Nullification, targetSeats) is { } issued &&
+            _coreCardUseLifecycleOperations.GetResponseDecision(issued).Forbidden)
+            return true;
         if (_coreShanheTrickResponseOperations.IsShanheTrickResponseProhibited(sourceSeat, responderSeat, incomingKind, targetSeats))
             return true;
         if (_coreShanheS5QuyiOperations.IsShanheS5FuqiResponseProhibited(sourceSeat, responderSeat))
@@ -33,13 +37,7 @@ internal sealed partial class CoreGameEngineProgramCardPoliciesRuntime
             return true;
         if (_characterCaoPiMouOperations.MouCaoPiCannotRespondTo(responderSeat, sourceSeat))
             return true;
-        if (_characterLuZhiMouOlOperations.MouLzCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats))
-            return true;
         if (_characterZhongHuiMobileShiOperations.ShiZhHuiKeChangCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats))
-            return true;
-        if (_characterXiahouBaMobileShiOperations.ShiXbPoxiCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats))
-            return true;
-        if (_characterSunShaoMobileShiOperations.Value.ShiSsGanjueCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats))
             return true;
         if (_characterLvYiMobileShiOperations.Value.ShiLyShishiCannotRespond(sourceSeat, responderSeat))
             return true;

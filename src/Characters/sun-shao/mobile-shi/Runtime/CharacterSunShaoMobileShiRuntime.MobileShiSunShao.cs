@@ -43,6 +43,13 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
         actor.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, targetSeat));
+        _coreCardUseLifecycleOperations.IssueResponseRule(useId, new(forbid: true, targetSeat: targetSeat, actorSeat: actor.Seat,
+            incomingKinds: CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds,
+            condition: new("==", ProgramExpressionType.Bool,
+                [new("handPrintedSuitCount", ProgramExpressionType.Int,
+                    [new("eventTarget", ProgramExpressionType.Participant, [], name: "eventTarget")], literal: (int)equipment.Suit),
+                 new("int", ProgramExpressionType.Int, [], literal: 0)]),
+            skillName: _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Name));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiSsGanjueIssuedEvent(f.Id, f.OwnerSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, useId, action.ActionId, equipmentCardId, equipment.Suit, targetSeat));
         _coreMatchLogOperations.AddLog("CardUsed", $"{(actor.Name)} 的“敢决”将装备区里的【{(equipment.DisplayName)}】当作无距离和次数限制的【杀】对 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)} 使用。", actor.Seat, targetSeat);
         _coreCardUseLifecycleOperations.TryMarkProgramUseCommitted(useId);

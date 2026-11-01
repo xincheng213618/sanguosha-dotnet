@@ -41,7 +41,6 @@ internal sealed partial class CharacterChengJiChengCuiOlEntries
     internal IReadOnlyList<PromptChoice> TousuiQinglongSlashChoices(NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().TousuiQinglongSlashChoices(pending);
     internal IReadOnlyList<Card> TousuiRequestCards(CardConversionSource source) => _resolve().TousuiRequestCards(source);
     internal IReadOnlyList<PromptChoice> TousuiRequestPickChoices(TousuiRequestReceipt r) => _resolve().TousuiRequestPickChoices(r);
-    internal int TousuiRequiredDodge(long useId, int ordinary) => _resolve().TousuiRequiredDodge(useId, ordinary);
     internal bool TousuiSelectedRequestLegal(TousuiRequestReceipt r) => _resolve().TousuiSelectedRequestLegal(r);
     internal IEnumerable<CardConversionSource> TousuiSources(CharacterState actor) => _resolve().TousuiSources(actor);
     internal bool TousuiUseProof(CardUseFrame use) => _resolve().TousuiUseProof(use);

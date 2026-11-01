@@ -31,6 +31,7 @@
 | 运算 | `["+", i, ...]`、`["min", i, ...]`、`["max", i, ...]`（2–8 项）、`["-", i, i]`、`["floorDiv", i, i]`；`["when", b, i]` 在 b 为真时取 i，否则未知 |
 | 绑定读取 | 整数：`["number", "name"]`、`["boundCount", "cards"]`、`["boundSuitCount", "cards"]`、`["boundDistinctSuitCount", "cards"]`、`["boundRank", "singleCard"]`；布尔：`["boundIsEquipment", "singleCard"]` |
 | 物理牌标记 | `["cardMarkCount", p, "mark-id", "hand"]`，牌区也可为 `"equipment"`；按当前牌区读取永久实体标记 |
+| 手牌印刷花色 | `["handPrintedSuitCount", p, "spade"]`，花色也可为 heart/club/diamond/none；只数当前手牌的实体印刷花色，不应用花色改写 |
 | 条件授予事实 | `["ruleWounded", p]` 读规则受伤；`["equipmentSuitCount", p]` 读独立来源改写后的装备花色数；`["publicPileCount", p, "skill:id"]` 读本人该技能全部来源的公共堆实体数 |
 | 量词 | `["all", set, b]`、`["any", set, b]` 返回布尔；`["count", set, b]` 返回整数；`b` 内用 `"it"` 表示当前成员 |
 
@@ -66,6 +67,14 @@
 该动作接在真实用牌的 committed、finalized 或 Slash-before-response 窗口；当前目标范围要求后两者。数值在步骤执行时确定，归原用牌帧；具体伤害结算读取共同调整，连环传播继承已确定的伤害，不再加一次。修改当前伤害仍使用原伤害操作。技能的资格、成本和后续惩罚分别保留在它们的原窗口。
 
 旧 `addCurrentTargetSlashDamage` 操作已退役，四份内容改用上例的作用域、条件与层，不保留解析别名。取消抵消和追猎的动态升伤仍属于各自规则。
+
+## 本次目标响应规则的实时条件
+
+原帧 `ResponseRule.While` 复用同一表达式求值器，`eventSource` 是原用牌者，`eventTarget` 是被要求响应的角色。代供材料者与这两个身份分开，不用其手牌替代响应者手牌。该条件只读明确支持的公共角色事实；不能引用程序绑定、技能有效性或冻结窗口数据。
+
+迫袭使用 `["<=",["handCount","eventTarget"],["handCount","eventSource"]]` 实时比较；敢决在真实发行时把装备印刷花色冻结为常量，例如 `["==",["handPrintedSuitCount","eventTarget","spade"],0]`。牌的花色改写不会改变这个印刷花色判断。没有手牌数据的估值 world 返回 unknown，不根据隐藏手牌猜测；原生效果 world 与响应 world 读同一个实体牌区。
+
+目前这类已付签发仍由原生操作调用共用 issuer，尚未增加通用的已付响应效果 JSON 节点。持续技能状态/条件授予的 raw while 加载边界未开放这个新花色读取，不能把这些作用域混用。
 
 ## 永久物理牌标记
 

@@ -342,7 +342,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
 
         if (attack.SuccessfulDodgeResponses == 0)
         {
-            attack.SetRequiredDodgeResponses(_characterChengJiChengCuiOlOperations.TousuiRequiredDodge(resolutionId, _coreShortRangeSlashTargetsOperations.FreezeShortRangeSlashResponseRequirement(resolutionId, source.Seat, target.Seat, playedCardKind, _coreNativeEquipmentAndFactionQueriesOperations.GetRequiredResponseCount(source, source.Seat, target.Seat, playedCardKind, CardKind.Dodge))));
+            attack.SetRequiredDodgeResponses(_coreShortRangeSlashTargetsOperations.FreezeShortRangeSlashResponseRequirement(resolutionId, source.Seat, target.Seat, playedCardKind, _coreNativeEquipmentAndFactionQueriesOperations.GetRequiredResponseCount(source, source.Seat, target.Seat, playedCardKind, CardKind.Dodge, resolutionId)));
         }
 
         if (!ignoresArmor && !attack.IsTwoCardVirtualSlash && !_characterZhangFeiAnniversaryGodOperations.ShenZfAttackIsColorless(attack) && slash?.Suit is Suit.Spade or Suit.Club && _coreNativeEquipmentAndFactionQueriesOperations.HasBlackSlashBarrier(target))
@@ -392,7 +392,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
             return;
         }
 
-        var nearbyResponseProhibited = _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(attack.CardUserSeat, target.Seat, playedCardKind, [target.Seat]);
+        var nearbyResponseProhibited = _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(attack.CardUserSeat, target.Seat, playedCardKind, [target.Seat], attack.ResolutionId, CardKind.Dodge);
         var suitResponseProhibited = _coreProgramCardPoliciesOperations.IsSuitSlashResponseProhibited(attack);
         var convertedColorlessProhibited = _coreConvertedSlashResponseOperations.Value.HasConvertedSlashSameColorResponseRestriction(attack) && _coreConvertedSlashResponseOperations.Value.ConvertedSlashSameColorResponseColor(attack)is null;
         var ghostBladeProhibited = _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[attack.CardUserSeat], CardKind.GhostDragonCrescentBlade) && attack.PhysicalCards.Count > 0 && attack.PhysicalCards.All(card => CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[attack.CardUserSeat], card)));

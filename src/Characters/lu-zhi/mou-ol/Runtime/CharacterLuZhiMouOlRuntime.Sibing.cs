@@ -147,7 +147,7 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         if (branch == "decline")
         {
             if (r.Stage == MouLuZhiOlStage.TargetRed)
-                BanMouLzResponse(f);
+                _coreCardUseLifecycleOperations.IssueResponseRule(r.OriginalId, new(forbid: true, targetSeat: r.TargetSeat, matchUseKind: true));
             FinishMouLz(f);
             return;
         }
@@ -252,14 +252,6 @@ internal sealed partial class CharacterLuZhiMouOlRuntime
         PublishMouLz(f);
     }
 
-    internal void BanMouLzResponse(ProgramSkillFrame f)
-    {
-        var r = f.MouLuZhiOl!;
-        var ban = new MouLuZhiOlResponseBan(f.Id, r.Source, r.GameplayHash, r.OriginalId, r.OriginalActionId, r.TargetSeat, r.OriginalInstruction);
-        if (r.OriginalActionId > 0)
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(r.OriginalId, u => u with { MouLuZhiOlBans = (u.MouLuZhiOlBans ?? []).Append(ban).ToArray() });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuZhiOlResponseBannedEvent(ban));
-    }
 
     internal void FinishMouLz(ProgramSkillFrame f)
     {

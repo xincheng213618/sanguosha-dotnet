@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
         }
         else if (kind == CardKind.Dodge && !_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind))
             return[];
-        else if (kind == CardKind.Nullification && (_coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } n || n.CandidateIndex >= n.CandidateSeats.Count || n.CandidateSeats[n.CandidateIndex] != actor.Seat || n.ChainDepth == 0 && _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(n.SourceSeat, actor.Seat, n.EffectCardKind, n.TargetSeats)))
+        else if (kind == CardKind.Nullification && (_coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } n || n.CandidateIndex >= n.CandidateSeats.Count || n.CandidateSeats[n.CandidateIndex] != actor.Seat || n.ChainDepth == 0 && _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(n.SourceSeat, actor.Seat, n.EffectCardKind, n.TargetSeats, n.ParentFrameId, CardKind.Nullification)))
             return[];
         var choices = new List<PromptChoice>();
         foreach (var(source, _, _)in _coreTieredRoundZeroUsesOperations.TieredRoundZeroRules(actor, kind, responseUse: true, dyingUse: dyingUse))

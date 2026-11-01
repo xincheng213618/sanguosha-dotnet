@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineProgramCardPoliciesEntries
     internal int GetProgramRequiredResponseCount(CharacterState owner, int sourceSeat, int responderSeat, CardKind incomingKind, CardKind requiredKind) => _resolve().GetProgramRequiredResponseCount(owner, sourceSeat, responderSeat, incomingKind, requiredKind);
     internal bool HasCardPolicy(CharacterState owner, SkillProgramCardPolicyKind kind, CardKind? effectiveKind = default) => _resolve().HasCardPolicy(owner, kind, effectiveKind);
     internal bool HasOutsideAttackRangeSlashQuota(CharacterState owner, CharacterState target, CardKind kind, EquipmentSlot? excludedEquipmentSlot = default) => _resolve().HasOutsideAttackRangeSlashQuota(owner, target, kind, excludedEquipmentSlot);
-    internal bool IsNearbyTargetResponseProhibited(int sourceSeat, int responderSeat, CardKind incomingKind, IReadOnlyList<int> targetSeats) => _resolve().IsNearbyTargetResponseProhibited(sourceSeat, responderSeat, incomingKind, targetSeats);
+    internal bool IsNearbyTargetResponseProhibited(int sourceSeat, int responderSeat, CardKind incomingKind, IReadOnlyList<int> targetSeats, long? incomingFrameId = null, CardKind? requiredKind = null) => _resolve().IsNearbyTargetResponseProhibited(sourceSeat, responderSeat, incomingKind, targetSeats, incomingFrameId, requiredKind);
     internal bool IsSuitSlashResponseProhibited(NativeOwners.CardAttackHandle attack) => _resolve().IsSuitSlashResponseProhibited(attack);
     internal bool OutsideAttackRangeSlashQuotaAfterLimit(ProgramSlashQuotaQuery query) => _resolve().OutsideAttackRangeSlashQuotaAfterLimit(query);
 }

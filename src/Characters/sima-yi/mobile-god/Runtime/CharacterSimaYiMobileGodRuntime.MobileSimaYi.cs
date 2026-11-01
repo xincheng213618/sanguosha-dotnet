@@ -20,7 +20,7 @@ internal sealed partial class CharacterSimaYiMobileGodRuntime
     IReadOnlyList<Card> IMobileSimaRenjieFacts.Equipment(int seat) => _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat);
     bool IMobileSimaRenjieFacts.WenjiNullificationForbidden(NullificationWindowFrame frame, int actor) => _characterLiuQiOlOperations.IsWenjiNullificationResponseForbidden(frame, actor);
     bool IMobileSimaRenjieFacts.FuqiNullificationBanned(int actor) => _coreWushuangSkillsBAuditOperations.WushuangFuqiNullificationBanned(actor);
-    bool IMobileSimaRenjieFacts.NearbyResponseProhibited(int source, int actor, CardKind kind, IReadOnlyList<int> targets) => _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(source, actor, kind, targets);
+    bool IMobileSimaRenjieFacts.NearbyResponseProhibited(int source, int actor, CardKind kind, IReadOnlyList<int> targets, long incomingFrameId) => _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(source, actor, kind, targets, incomingFrameId, CardKind.Nullification);
     bool IMobileSimaRenjieFacts.UseUnrespondable(long useId) => _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(useId);
     bool IMobileSimaRenjieFacts.YingboUnrespondable(long useId) => _characterLuMengMouOperations.IsYingboUnrespondable(useId);
     bool IMobileSimaRenjieFacts.WenjiResponseForbidden(long useId, int actor) => _characterLiuQiOlOperations.IsWenjiResponseForbidden2(useId, actor);

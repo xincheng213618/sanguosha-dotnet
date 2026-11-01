@@ -49,14 +49,6 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
 
     internal int ShiXbLibbingRangeBonus(int seat) => !HasShiXbCapability ? 0 : ShiXbLibbingState(seat).Count1;
     internal bool ShiXbLibbingIsDamageUse(ProgramCardUseContext use) => ShiXiahouBaComposition.IsDamageCardKind(use.EffectiveKind);
-    internal bool ShiXbPoxiCannotRespond(int sourceSeat, int responderSeat, CardKind incomingKind, IReadOnlyList<int> targetSeats)
-    {
-        // The innermost incoming Use only: a nested unrelated Use cannot inherit the outer ban.
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault(x => x is CardUseFrame { ShiXiahouBaPoxi: not null })is not CardUseFrame { Action: { } action, ShiXiahouBaPoxi: { } poxi })
-            return false;
-        return CoreNativeCardClassificationsRuntime.IsSlashCard(incomingKind) && action.Type == CardActionType.Use && action.ActorSeat == sourceSeat && sourceSeat == poxi.Source.OwnerSeat && action.ActionId == poxi.ActionId && targetSeats.Contains(responderSeat) && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[responderSeat]).Count <= _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[sourceSeat]).Count;
-    }
-
     SkillProgramStepOutcome IShiXiahouBaProgramHost.ResolveLibbing(ProgramSkillFrame frame) => BeginShiXb(frame, SkillProgramEffectOp.ResolveShiXbLibbing);
     SkillProgramStepOutcome IShiXiahouBaProgramHost.ResolvePoxi(ProgramSkillFrame frame) => BeginShiXb(frame, SkillProgramEffectOp.ResolveShiXbPoxi);
     internal SkillProgramStepOutcome BeginShiXb(ProgramSkillFrame input, SkillProgramEffectOp op)
@@ -242,6 +234,12 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(p => p.Id == f.Id);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f = parent with { ShiXiahouBa = r with { Stage = ShiXiahouBaComposition.PoxiStageNativeUse, UseId = useId, ActionId = action.ActionId } });
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, u => u with { ShiXiahouBaPoxi = origin, UnlimitedUse = true });
+        _coreCardUseLifecycleOperations.IssueResponseRule(useId, new(forbid: true, actorSeat: owner.Seat,
+            incomingKinds: CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds,
+            condition: new("<=", ProgramExpressionType.Bool,
+                [new("handCount", ProgramExpressionType.Int, [new("eventTarget", ProgramExpressionType.Participant, [], name: "eventTarget")]),
+                 new("handCount", ProgramExpressionType.Int, [new("eventSource", ProgramExpressionType.Participant, [], name: "eventSource")])]),
+            skillName: _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Name));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiXbPoxiNativeIssuedEvent(f.Id, r.Source!, f.GameplayHash, _coreActualTurnProgressTurnNumberAccess._turnNumber, useId, action.ActionId, card.Id, r.TargetSeat));
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Processing, new(ShiXiahouBaComposition.PoxiUseMoveReason));
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(useId, owner.Seat, r.TargetSeat, card, damageAmount: 1 + owner.AlcoholDamageBonus, playedCardKind: card.Kind, physicalCards: [card], ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(owner, target, card.Kind), programSkillCardUseFrameId: f.Id);

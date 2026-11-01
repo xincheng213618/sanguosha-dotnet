@@ -19,7 +19,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         }
         else if (kind == CardKind.Nullification)
         {
-            if (_coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } n || n.CandidateIndex >= n.CandidateSeats.Count || n.CandidateSeats[n.CandidateIndex] != actor.Seat || n.ChainDepth == 0 && _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(n.SourceSeat, actor.Seat, n.EffectCardKind, n.TargetSeats))
+            if (_coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } n || n.CandidateIndex >= n.CandidateSeats.Count || n.CandidateSeats[n.CandidateIndex] != actor.Seat || n.ChainDepth == 0 && _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(n.SourceSeat, actor.Seat, n.EffectCardKind, n.TargetSeats, n.ParentFrameId, CardKind.Nullification))
                 return[];
         }
         else

@@ -25,7 +25,7 @@ internal sealed partial class CoreNativeDuelRuntime
 
         var responder = _coreMatchParticipantsPlayersAccess._players[duel.ResponderSeat];
         var opponent = _coreMatchParticipantsPlayersAccess._players[duel.OpponentSeat];
-        if (_characterLuMengMouOperations.IsYingboUnrespondable(duel.ResolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(duel.ResolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(duel.ResolutionId, responder.Seat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(duel.Attack.CardUserSeat, responder.Seat, CardKind.Duel, [duel.TargetSeat]))
+        if (_characterLuMengMouOperations.IsYingboUnrespondable(duel.ResolutionId) || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(duel.ResolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(duel.ResolutionId, responder.Seat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(duel.Attack.CardUserSeat, responder.Seat, CardKind.Duel, [duel.TargetSeat], duel.ResolutionId, CardKind.Slash))
         {
             _coreNativeResponseWindowsOperations.SetResponseParentStep(duel.ResolutionId, ResolutionFrameStep.ResolvingEffect);
             _corePendingDecisionPolicyPipelineOperations._pendingDecision = null;
@@ -34,7 +34,7 @@ internal sealed partial class CoreNativeDuelRuntime
         }
 
         _characterSimaYiMobileGodOperations.MarkMobileSimaRenjieResponse(duel.Attack, responder.Seat, CardKind.Slash);
-        var requiredSlashResponses = _coreNativeEquipmentAndFactionQueriesOperations.GetRequiredResponseCount(opponent, opponent.Seat, responder.Seat, CardKind.Duel, CardKind.Slash);
+        var requiredSlashResponses = _coreNativeEquipmentAndFactionQueriesOperations.GetRequiredResponseCount(opponent, opponent.Seat, responder.Seat, CardKind.Duel, CardKind.Slash, duel.ResolutionId);
         var responseOrdinal = duel.SuccessfulSlashResponses + 1;
         var slashes = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(responder, CardKind.Slash);
         var zhangbaPairs = _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(responder);
@@ -139,7 +139,7 @@ internal sealed partial class CoreNativeDuelRuntime
     {
         _characterSimaYiMobileGodOperations.ClearMobileSimaRenjieResponse(duel.Attack);
         var skillOwner = _coreMatchParticipantsPlayersAccess._players[duel.OpponentSeat];
-        var requiredSlashResponses = _coreNativeEquipmentAndFactionQueriesOperations.GetRequiredResponseCount(skillOwner, skillOwner.Seat, responderSeat, CardKind.Duel, CardKind.Slash);
+        var requiredSlashResponses = _coreNativeEquipmentAndFactionQueriesOperations.GetRequiredResponseCount(skillOwner, skillOwner.Seat, responderSeat, CardKind.Duel, CardKind.Slash, duel.ResolutionId);
         var completedResponseSet = duel.RegisterSlashResponse(requiredSlashResponses);
         if (requiredSlashResponses > 1)
         {

@@ -365,6 +365,8 @@ var tests = new (string Name, Action Body)[]
     ("Mou Hua Xiong OL: native committed pair and persistent directional tickets Cold", CardGame.Core.Tests.MouHuaXiongOlChecks.NativeCommittedPairMutualUseAndPersistentDirectionalTicketsCold),
     ("Issued attack completion: frame owned committed and completed windows cold", CardGame.Core.Tests.MouHuaXiongOlChecks.StandardIssuedAttackCompletionIsFrameOwnedCold),
     ("Card damage adjustments: paid use target current damage and cold", CardDamageAdjustmentChecks.PaidUseAndTargetBonusesRemainSeparateFromCurrentDamageCold),
+    ("Response rules: native dynamic predicates and nested use isolation cold", CardResponseRuleChecks.PoxiDoesNotLeakIntoCuixinNestedUseAndGanjueUsesPrintedSuitCold),
+    ("Response rules: direct Duel owner direction and instruction scope", CardGame.Core.Tests.MouHuaXiongOlChecks.SharedResponseQueriesBindTheActualDirectDuelInstruction),
     ("Mou Dong Zhao OL: real damage gift and native suit-loss obligation Cold", CardGame.Core.Tests.MouDongZhaoOlChecks.RealDamageGiftAndNativeSuitLossObligationCold),
     ("Mou Gongsun Zan Mobile: real Hu original Played and Hand conversions Round charge Cold", CardGame.Core.Tests.MouGongsunZanMobileChecks.RealHuOriginalPlayedAndHandConversionsWithRoundChargeCold),
     ("Mou Xiao Qiao OL: real public Hand reveal returns and retained native uses Cold", CardGame.Core.Tests.MouXiaoQiaoOlChecks.RealMiluoRetainedUsesAndExternalRevealReturnCold),

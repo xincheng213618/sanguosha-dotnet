@@ -16,13 +16,4 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPaidWeaponSlash, 68400)]
     [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 68400)]
     internal bool ShiSsGanjueSlashDistance(ProgramSlashDistanceQuery query) => query.ExistingUseFrameId is { } id && IsShiSsGanjueStrikeUse(id);
-    internal bool ShiSsGanjueCannotRespond(int sourceSeat, int responderSeat, CardKind? incomingKind, IReadOnlyList<int> targetSeats)
-    {
-        if (!HasShiSsCapability || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || incomingKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not { } attack || attack.ResolutionId == 0 || attack.SourceSeat != sourceSeat || attack.TargetSeat != responderSeat)
-            return false;
-        var issued = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiSsGanjueIssuedEvent>().LastOrDefault(entry => entry.UseId == attack.ResolutionId && entry.TargetSeat == responderSeat);
-        if (issued is null)
-            return false;
-        return !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[responderSeat]).Any(card => card.Suit == issued.StrikeSuit);
-    }
 }

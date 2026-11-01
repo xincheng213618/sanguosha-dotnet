@@ -42,7 +42,7 @@ internal interface IMobileSimaRenjieFacts : IMobileSimaCommonFacts
     IReadOnlyList<Card> Equipment(int seat);
     bool WenjiNullificationForbidden(NullificationWindowFrame frame, int actor);
     bool FuqiNullificationBanned(int actor);
-    bool NearbyResponseProhibited(int source, int actor, CardKind kind, IReadOnlyList<int> targets);
+    bool NearbyResponseProhibited(int source, int actor, CardKind kind, IReadOnlyList<int> targets, long incomingFrameId);
     bool UseUnrespondable(long useId);
     bool YingboUnrespondable(long useId);
     bool WenjiResponseForbidden(long useId, int actor);

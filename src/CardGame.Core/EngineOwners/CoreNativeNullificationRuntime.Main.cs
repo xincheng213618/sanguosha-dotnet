@@ -108,10 +108,10 @@ internal sealed partial class CoreNativeNullificationRuntime
                 continue;
             }
 
-            var cards = pending.ChainDepth == 0 && _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(pending.SourceSeat, responder.Seat, pending.EffectCardKind, pending.TargetSeats) ? [] : GetNullificationCards(responder);
+            var cards = pending.ChainDepth == 0 && _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(pending.SourceSeat, responder.Seat, pending.EffectCardKind, pending.TargetSeats, pending.ParentFrameId, CardKind.Nullification) ? [] : GetNullificationCards(responder);
             if (cards.Count == 0 && _coreTieredRoundZeroResponsesOperations.TieredRoundZeroResponseChoices(responder, CardKind.Nullification).Count == 0 && _characterXiaoQiaoMouOlOperations.MouXqJueyanResponseChoices(responder, CardKind.Nullification).Count == 0)
             {
-                if (!(pending.ChainDepth == 0 && _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(pending.SourceSeat, responder.Seat, pending.EffectCardKind, pending.TargetSeats)) && _characterSimaYiMobileGodOperations.TryBeginMobileSimaRenjieNullification(pending, explicitPass: false))
+                if (!(pending.ChainDepth == 0 && _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(pending.SourceSeat, responder.Seat, pending.EffectCardKind, pending.TargetSeats, pending.ParentFrameId, CardKind.Nullification)) && _characterSimaYiMobileGodOperations.TryBeginMobileSimaRenjieNullification(pending, explicitPass: false))
                     return;
                 pending = _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { CandidateIndex = pending.CandidateIndex + 1, Step = ResolutionFrameStep.AwaitingResponse });
                 continue;

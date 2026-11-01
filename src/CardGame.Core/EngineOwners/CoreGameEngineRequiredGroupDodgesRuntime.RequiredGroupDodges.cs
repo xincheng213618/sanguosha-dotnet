@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineRequiredGroupDodgesRuntime
     {
         if (group.RequiredCardKind != CardKind.Dodge)
             return;
-        attack.SetRequiredDodgeResponses(_coreNativeEquipmentAndFactionQueriesOperations.GetRequiredResponseCount(_coreMatchParticipantsPlayersAccess._players[group.SourceSeat], group.SourceSeat, attack.TargetSeat, group.Card.Kind, CardKind.Dodge));
+        attack.SetRequiredDodgeResponses(_coreNativeEquipmentAndFactionQueriesOperations.GetRequiredResponseCount(_coreMatchParticipantsPlayersAccess._players[group.SourceSeat], group.SourceSeat, attack.TargetSeat, group.Card.Kind, CardKind.Dodge, group.ResolutionId));
     }
 
     internal bool TryFinishRequiredGroupDodge(NativeOwners.CardAttackHandle attack)

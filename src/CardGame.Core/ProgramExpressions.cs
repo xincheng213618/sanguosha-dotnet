@@ -40,6 +40,7 @@ internal interface IProgramExpressionWorld
     int? BindingStat(string stat, string name) => null;
     int? Number(string name) => null;
     int? CardMarkCount(int seat, string mark, CardZoneKind zone) => null;
+    int? HandPrintedSuitCount(int seat, Suit suit) => null;
     int? PublicPileCount(int seat, string skillId) => null;
     int? WindowStat(string stat, string participant) => null;
 }
@@ -150,6 +151,14 @@ internal static class ProgramExpressions
             return new(op, ProgramExpressionType.Int, [Arg(0, ProgramExpressionType.Participant)],
                 literal: (int)(args[2].GetString() == "hand" ? CardZoneKind.Hand : CardZoneKind.Equipment), name: args[1].GetString());
         }
+        if (op == "handPrintedSuitCount")
+        {
+            Arity(2, 2);
+            if (args[1].ValueKind != JsonValueKind.String || args[1].GetString() is not ("none" or "spade" or "club" or "heart" or "diamond"))
+                Fail(path, "handPrintedSuitCount requires a printed suit");
+            return new(op, ProgramExpressionType.Int, [Arg(0, ProgramExpressionType.Participant)],
+                literal: (int)Enum.Parse<Suit>(args[1].GetString()!, ignoreCase: true));
+        }
         if (op is "+" or "min" or "max") { Arity(2, 8); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op == "-") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op == "floorDiv") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
@@ -244,6 +253,8 @@ internal static class ProgramExpressions
             case "windowHp" or "windowHandCount": return world.WindowStat(e.Op, e.Args[0].Name!);
             case "cardMarkCount": return EvaluateParticipant(e.Args[0], world, it) is { } markedSeat
                 ? world.CardMarkCount(markedSeat, e.Name!, (CardZoneKind)e.Literal) : null;
+            case "handPrintedSuitCount": return EvaluateParticipant(e.Args[0], world, it) is { } handSeat
+                ? world.HandPrintedSuitCount(handSeat, (Suit)e.Literal) : null;
             case "publicPileCount": return EvaluateParticipant(e.Args[0], world, it) is { } pileSeat
                 ? world.PublicPileCount(pileSeat, e.Name!) : null;
             case "choiceNumber" or "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank": return world.BindingStat(e.Op, e.Name!);
