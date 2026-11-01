@@ -26,6 +26,19 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
 
         if (_coreProgramDamageHooksOperations.DamageHooks.TryComplete(ProgramDamagePhase.IssuedAttackCompletion, attack, out var issuedPaused))
             return issuedPaused;
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId) is { UsesStandardZeroEntityAttackCompletion: true } issuedUse)
+        {
+            if (attack.Card is not null || issuedUse.CardId != 0 || issuedUse.PhysicalCardIds is not { Count: 0 } || issuedUse.Action is null)
+                throw new InvalidOperationException("Standard zero-entity attack completion requires its native card use and action.");
+            _coreNativeCardUseFramesOperations.SetCardUseStep(issuedUse.Id, ResolutionFrameStep.Completed);
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(issuedUse.Id, 0, issuedUse.CardKind));
+            if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, issuedUse.Action, SkillProgramTriggerWindow.CardUseCompleted, issuedUse.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
+                return true;
+            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(issuedUse.Id);
+            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
+            return false;
+        }
+
         if (attack.Card is null && attack.EffectiveCardKind == CardKind.Duel && _coreDamageTargetObtainProgramsOperations.IsIssuedZeroEntityDuel(attack.ResolutionId))
         {
             var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;

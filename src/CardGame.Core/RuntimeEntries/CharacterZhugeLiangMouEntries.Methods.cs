@@ -9,7 +9,6 @@ internal sealed partial class CharacterZhugeLiangMouEntries
     internal bool ContinueMouZhijueSimpleUse(long id, ProgramSimpleCardContinuation continuation) => _resolve().ContinueMouZhijueSimpleUse(id, continuation);
     internal void ContinueMouZhitianFirePayment(long id) => _resolve().ContinueMouZhitianFirePayment(id);
     internal SkillProgramStepOutcome ExecuteMouZhuge(ProgramSkillFrame frame, SkillProgramEffect effect) => _resolve().ExecuteMouZhuge(frame, effect);
-    internal bool FinishMouZhijueZeroAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouZhijueZeroAttack(attack, out paused);
     internal bool HasMouOperation(CharacterState owner, SkillProgramEffectOp op) => _resolve().HasMouOperation(owner, op);
     internal bool HasMouWujingAllowance(CharacterState owner) => _resolve().HasMouWujingAllowance(owner);
     internal bool IsMouZhijueUse(long id) => _resolve().IsMouZhijueUse(id);

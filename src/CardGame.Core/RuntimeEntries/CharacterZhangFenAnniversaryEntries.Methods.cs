@@ -6,7 +6,6 @@ internal sealed partial class CharacterZhangFenAnniversaryEntries
     internal void AppendDagongCheIssuedDamageCandidates(GameEngine.IDamageAttempt attack, SkillProgramTriggerWindow window, List<DamageTriggerCandidate> result) => _resolve().AppendDagongCheIssuedDamageCandidates(attack, window, result);
     internal SkillProgramStepOutcome BeginZhangFen(ProgramSkillFrame supplied, SkillProgramEffectOp op) => _resolve().BeginZhangFen(supplied, op);
     internal bool CanOfferZhangFen(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => _resolve().CanOfferZhangFen(c, t, w);
-    internal bool CompleteDagongCheAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().CompleteDagongCheAttack(attack, out paused);
     internal bool ContinueZhangFen(long id) => _resolve().ContinueZhangFen(id);
     internal string? DagongCheUpgradeLabel(int cardId) => _resolve().DagongCheUpgradeLabel(cardId);
     internal int[] DagongLegalTargets(int owner, bool ignoreDistance) => _resolve().DagongLegalTargets(owner, ignoreDistance);

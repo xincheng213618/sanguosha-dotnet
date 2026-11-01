@@ -107,7 +107,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         else
             PrepareMouXqProgramSlash(r);
         var card = new Card(0, r.OutputKind, Suit.None, 0);
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [target.Seat], r.OutputKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, r.OutputKind), physicalCardIds: [], conversionSource: grant.Source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [target.Seat], r.OutputKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, r.OutputKind), physicalCardIds: [], conversionSource: grant.Source, standardZeroEntityAttackCompletion: true);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, target.Seat, card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: r.OutputKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, r.OutputKind), programSkillCardUseFrameId: r.DecisionKind == DecisionKind.ProgramTrigger ? r.ParentFrameId : null);
         if (borrowed is not null)
             borrowed.ActiveAttack = attack;

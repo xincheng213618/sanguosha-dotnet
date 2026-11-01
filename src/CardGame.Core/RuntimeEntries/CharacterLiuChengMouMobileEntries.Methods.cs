@@ -21,7 +21,6 @@ internal sealed partial class CharacterLiuChengMouMobileEntries
     internal void DispatchMouLiuCheng(ProgramSkillFrame f, MouLiuChengUsePlan p) => _resolve().DispatchMouLiuCheng(f, p);
     internal bool DrainMouLiuChengChildren(ProgramSkillFrame f) => _resolve().DrainMouLiuChengChildren(f);
     internal void FinishMouLiuCheng(ProgramSkillFrame f) => _resolve().FinishMouLiuCheng(f);
-    internal bool FinishMouLiuChengAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouLiuChengAttack(attack, out paused);
     internal bool IsIssuedMouLiuChengUse(CardUseFrame use) => _resolve().IsIssuedMouLiuChengUse(use);
     internal bool IsMouLiuChengNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => _resolve().IsMouLiuChengNativeSettlementBatch(f, b);
     internal bool IsMouLiuChengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsMouLiuChengRecoveryParent(f, recovery);

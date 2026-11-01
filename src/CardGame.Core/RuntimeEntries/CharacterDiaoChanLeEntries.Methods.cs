@@ -34,7 +34,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal bool DrainDiouChildren(ProgramSkillFrame f) => _resolve().DrainDiouChildren(f);
     internal bool ExactTanbanDrawEndFrame(ProgramSkillFrame frame) => _resolve().ExactTanbanDrawEndFrame(frame);
     internal void FinishDiou(ProgramSkillFrame f) => _resolve().FinishDiou(f);
-    internal bool FinishDiouAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishDiouAttack(attack, out paused);
     internal bool HasIssuedDiouResponse(CardActionContext action) => _resolve().HasIssuedDiouResponse(action);
     internal bool HasTanbanEntityMark(int cardId) => _resolve().HasTanbanEntityMark(cardId);
     internal SkillProgramStepOutcome InitializeTanban(ProgramSkillFrame supplied) => _resolve().InitializeTanban(supplied);

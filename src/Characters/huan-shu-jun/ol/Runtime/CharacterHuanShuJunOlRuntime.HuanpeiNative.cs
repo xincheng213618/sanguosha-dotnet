@@ -66,26 +66,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         return true;
     }
 
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 40)]
-    internal bool FinishHuanpeiAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || !IsHuanpeiUse(attack.ResolutionId) || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
-
     [NativeUseValidation(28100)]
     internal void ValidateHuanpeiUse(CardUseFrame use)
     {
@@ -230,7 +210,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat];
         var card = new Card(0, p.Kind, Suit.None, 0);
         var program = p.Request.ParentSkillId is null ? (long? )null : p.Request.ParentFrameId;
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: p.Source, huanpeiOrigin: p);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: p.Source, huanpeiOrigin: p, standardZeroEntityAttackCompletion: true);
         var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, targets[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: p.Kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], p.Kind), programSkillCardUseFrameId: program);
         if (borrowed is not null)

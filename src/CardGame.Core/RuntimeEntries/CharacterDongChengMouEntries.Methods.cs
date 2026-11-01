@@ -7,7 +7,6 @@ internal sealed partial class CharacterDongChengMouEntries
     internal void BindMouDcUse(CardUseFrame use) => _resolve().BindMouDcUse(use);
     internal void ClaimMouDcDelayedCard(ProgramSkillFrame f) => _resolve().ClaimMouDcDelayedCard(f);
     internal bool ContinueMouDcSlash(NativeOwners.CardAttackHandle attack) => _resolve().ContinueMouDcSlash(attack);
-    internal bool FinishMouDcZeroAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouDcZeroAttack(attack, out paused);
     internal bool IsMouDcClaimedEntity(long useId, int card) => _resolve().IsMouDcClaimedEntity(useId, card);
     internal bool IsMouDcZeroUse(long id) => _resolve().IsMouDcZeroUse(id);
     internal void IssueMouDcUse(ProgramSkillFrame f) => _resolve().IssueMouDcUse(f);

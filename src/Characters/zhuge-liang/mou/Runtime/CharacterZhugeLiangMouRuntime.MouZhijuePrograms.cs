@@ -209,7 +209,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
         var kind = action.PlayedCardKind!.Value;
         if (trick?.NextActualUseAdjusted == true)
             _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats = action.TargetSeats;
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, action.TargetSeats, kind, physicalCardIds: physicalIds, conversionSource: frame.MouZhijue!.Yang ? new(frame.SkillId, frame.ActivationId, frame.OwnerSeat, frame.SkillInstanceId) : null, designatedTargetSeats: kind == CardKind.BorrowedSword ? action.TargetSeats.Take(1).ToArray() : null);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, action.TargetSeats, kind, physicalCardIds: physicalIds, conversionSource: frame.MouZhijue!.Yang ? new(frame.SkillId, frame.ActivationId, frame.OwnerSeat, frame.SkillInstanceId) : null, designatedTargetSeats: kind == CardKind.BorrowedSword ? action.TargetSeats.Take(1).ToArray() : null, standardZeroEntityAttackCompletion: physicalIds.Count == 0 && (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind is CardKind.Duel or CardKind.FireAttack));
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var ret = new MouZhijueUseReturn(frame.Id, frame.InstructionIndex, frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, frame.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, frame.MouZhijue!.Yang, kind, card.Id, use.Action!.ActionId);
         _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { MouZhijue = frame.MouZhijue with { Stage = "use", UseId = id } });

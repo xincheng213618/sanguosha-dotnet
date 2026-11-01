@@ -45,7 +45,7 @@ internal sealed partial class CharacterQinLangOlRuntime
         var kind = origin.CardKind;
         var actor = _coreMatchParticipantsPlayersAccess._players[origin.ActorSeat];
         var card = new Card(0, kind, Suit.None, 0);
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, targets, kind, physicalCardIds: [], qinLangXianying: origin);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, targets, kind, physicalCardIds: [], qinLangXianying: origin, standardZeroEntityAttackCompletion: CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || kind is CardKind.Duel or CardKind.FireAttack);
         if (id != origin.CardUseFrameId)
             throw new InvalidOperationException("Xianying lost its reserved native use identity.");
         if (kind == CardKind.Peach)
@@ -102,26 +102,6 @@ internal sealed partial class CharacterQinLangOlRuntime
 
     internal bool HasIssuedQinLangXianyingUse(long id) => IsQinLangXianyingUse(id);
     internal bool MatchesQinLangXianyingUseAction(long id, CardActionContext a, int cardId) => cardId == 0 && IsQinLangXianyingUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action is { } issued && a.ActionId == issued.ActionId && a.Type == CardActionType.Use && a.EffectiveKind == issued.EffectiveKind && a.ActorSeat == issued.ActorSeat && a.ProviderSeat == issued.ProviderSeat && a.PhysicalCards.Count == 0 && a.ConversionChain.SequenceEqual(issued.ConversionChain) && a.TargetSeats.SequenceEqual(issued.TargetSeats) && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed == false;
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 140)]
-    internal bool FinishQinLangXianyingAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (!IsQinLangXianyingUse(attack.ResolutionId) || attack.Card is not null || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && kind is not (CardKind.Duel or CardKind.FireAttack))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
-
     internal bool ContinueQinLangXianyingSimpleUse(long id, ProgramSimpleCardContinuation continuation)
     {
         if (!IsQinLangXianyingUse(id))

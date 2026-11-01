@@ -2,7 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineProgramVirtualSlashOffersEntries
 {
-    internal void BeginOfferedProgramVirtualSlash(ProgramSkillFrame frame, int actorSeat, int targetSeat) => _resolve().BeginOfferedProgramVirtualSlash(frame, actorSeat, targetSeat);
+    internal void BeginOfferedProgramVirtualSlash(ProgramSkillFrame frame, int actorSeat, int targetSeat, bool standardZeroEntityAttackCompletion = false) => _resolve().BeginOfferedProgramVirtualSlash(frame, actorSeat, targetSeat, standardZeroEntityAttackCompletion);
     internal int[] GetProgramVirtualSlashOfferTargets(int actorSeat) => _resolve().GetProgramVirtualSlashOfferTargets(actorSeat);
     internal void GrantProgramTurnCardEffectImmunity(ProgramSkillFrame frame, int targetSeat, IReadOnlyList<CardKind> cardKinds) => _resolve().GrantProgramTurnCardEffectImmunity(frame, targetSeat, cardKinds);
     internal SkillProgramStepOutcome OfferProgramVirtualSlashOrDraw(ProgramSkillFrame frame, int actorSeat) => _resolve().OfferProgramVirtualSlashOrDraw(frame, actorSeat);

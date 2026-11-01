@@ -20,7 +20,7 @@ internal sealed partial class CharacterZhangXiuMouRuntime
         var r = f.MouZhangXiuAnniversary!;
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[r.Target];
-        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, [r.Target], CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), physicalCardIds: [], conversionSource: r.Source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, [r.Target], CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), physicalCardIds: [], conversionSource: r.Source, standardZeroEntityAttackCompletion: true);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         if (use.MouZhangXiuAnniversarySlash is null)
             throw new InvalidOperationException("Fuxi native Slash must bind before its real declaration.");
@@ -69,26 +69,6 @@ internal sealed partial class CharacterZhangXiuMouRuntime
 
     internal bool IsMouZhangXiuAnniversaryUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouZhangXiuAnniversaryUse(use);
     internal Card MouZhangXiuAnniversaryRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouZhangXiuAnniversaryUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Fuxi requires its own native zero-material representation.");
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 36600)]
-    internal bool FinishMouZhangXiuAnniversaryAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || !IsMouZhangXiuAnniversaryUse(attack.ResolutionId))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
-
     [NativeUseValidation(36600)]
     internal void ValidateMouZhangXiuAnniversaryNative(CardUseFrame use)
     {

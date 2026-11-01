@@ -7,7 +7,6 @@ internal sealed partial class CharacterHuCheErMouEntries
     internal bool CanMouHuCheErSlash(ProgramSkillFrame f) => _resolve().CanMouHuCheErSlash(f);
     internal bool CanStartMouHuCheEr(CharacterState owner) => _resolve().CanStartMouHuCheEr(owner);
     internal void ContinueMouHuCheEr(long id) => _resolve().ContinueMouHuCheEr(id);
-    internal bool FinishMouHuCheErAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouHuCheErAttack(attack, out paused);
     internal bool IsIssuedMouHuCheErUse(CardUseFrame use) => _resolve().IsIssuedMouHuCheErUse(use);
     internal bool IsMouHuCheErUse(long id) => _resolve().IsMouHuCheErUse(id);
     internal void IssueMouHuCheErSlash(ProgramSkillFrame f) => _resolve().IssueMouHuCheErSlash(f);

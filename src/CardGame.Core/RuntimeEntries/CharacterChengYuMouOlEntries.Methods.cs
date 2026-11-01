@@ -7,7 +7,6 @@ internal sealed partial class CharacterChengYuMouOlEntries
     internal bool CanMouDanchiSlash(int actor, int target) => _resolve().CanMouDanchiSlash(actor, target);
     internal void CollectMouChengYuIssued(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result) => _resolve().CollectMouChengYuIssued(action, window, result);
     internal void ConsumeMouLidanCounterspell(CardActionContext action) => _resolve().ConsumeMouLidanCounterspell(action);
-    internal bool FinishMouDanchiSlash(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouDanchiSlash(attack, out paused);
     internal bool HasMouLidanTargetTail(CardUseFrame use) => _resolve().HasMouLidanTargetTail(use);
     internal bool IsIssuedMouChengYu(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedMouChengYu(c, context);
     internal bool IsMouChengYuTrueUse(CardActionContext action) => _resolve().IsMouChengYuTrueUse(action);

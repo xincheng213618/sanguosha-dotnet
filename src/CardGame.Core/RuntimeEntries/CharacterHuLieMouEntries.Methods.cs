@@ -8,7 +8,6 @@ internal sealed partial class CharacterHuLieMouEntries
     internal void CaptureMouHuLieUsedDiscard(CardMovementBatchContext batch) => _resolve().CaptureMouHuLieUsedDiscard(batch);
     internal CardMovementBatchContext CompleteMovementBatchCaptureMouHuLieUsedDiscard(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureMouHuLieUsedDiscard(batch, completed);
     internal MouHuLieYu? CurrentMouHuLieYu(int owner, string instance) => _resolve().CurrentMouHuLieYu(owner, instance);
-    internal bool FinishMouHuLieAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouHuLieAttack(attack, out paused);
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeMouHuLieRoundDebt(CharacterState owner, SkillProgramTriggerWindow window, IReadOnlyList<ProgramTriggerCandidate> ordinary) => _resolve().IncludeMouHuLieRoundDebt(owner, window, ordinary);
     internal bool IsIssuedMouHuLieUse(CardUseFrame use) => _resolve().IsIssuedMouHuLieUse(use);
     internal bool IsMouHuLieUse(long id) => _resolve().IsMouHuLieUse(id);

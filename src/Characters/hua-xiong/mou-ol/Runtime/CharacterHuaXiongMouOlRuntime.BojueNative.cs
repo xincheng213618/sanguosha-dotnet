@@ -16,7 +16,7 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, MouHxBojue = r with { Stage = MouHxBojueStage.Issuing } });
-        _coreProgramVirtualSlashOffersOperations.BeginOfferedProgramVirtualSlash(f, actor, target);
+        _coreProgramVirtualSlashOffersOperations.BeginOfferedProgramVirtualSlash(f, actor, target, standardZeroEntityAttackCompletion: true);
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 33300)]
@@ -45,25 +45,6 @@ internal sealed partial class CharacterHuaXiongMouOlRuntime
         if (use.MouHxBojueSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { MouHxBojue: { Stage: MouHxBojueStage.NativeUse } r } f || !ValidMouHxBojue(f) || o.Source != r.Source || o.GameplayHash != f.GameplayHash || o.Cursor != r.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || o.Actor != MouHxBojueActor(f) || o.Target != MouHxBojueOther(f) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHxBojueSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor);
-    }
-
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 33300)]
-    internal bool FinishMouHxBojueAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouHxBojueSlash: not null } use || !IsMouHxBojueUse(use))
-            return false;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
     }
 
     [NativeUseValidation(33300)]

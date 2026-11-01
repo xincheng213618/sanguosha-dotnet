@@ -172,7 +172,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[p.Need.ActorSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[p.TargetSeat];
         var kind = p.OutputKind;
-        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, kind, Suit.None, 0), actor.Seat, [target.Seat], kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, kind), physicalCardIds: [], conversionSource: p.Source, weijieOrigin: p);
+        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, kind, Suit.None, 0), actor.Seat, [target.Seat], kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, kind), physicalCardIds: [], conversionSource: p.Source, weijieOrigin: p, standardZeroEntityAttackCompletion: true);
         var actual = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, actual.TargetSeats[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[actual.TargetSeats[0]], kind), programSkillCardUseFrameId: parent);
         if (borrowed is not null)
@@ -228,26 +228,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
             _coreNativeTrickUseOperations.CompleteAlcoholUse(actor, card, id);
         else
             throw new InvalidOperationException("Weijie changed its native simple-card continuation.");
-        return true;
-    }
-
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 50)]
-    internal bool FinishWeijieAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || !IsWeijieUse(attack.ResolutionId) || !CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? CardKind.Dodge))
-            return false;
-        var u = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(u.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(u.Id, 0, u.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, u.Action!, SkillProgramTriggerWindow.CardUseCompleted, u.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(u.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
         return true;
     }
 

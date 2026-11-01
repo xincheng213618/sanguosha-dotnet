@@ -33,7 +33,6 @@ internal sealed partial class CharacterGuoTuOlEntries
     internal bool DrainWeijie(ProgramSkillFrame f) => _resolve().DrainWeijie(f);
     internal void ExpireWeijieAlcohol(ActualTurnCursorReturnedEvent returned) => _resolve().ExpireWeijieAlcohol(returned);
     internal void FinishQushi(ProgramSkillFrame f) => _resolve().FinishQushi(f);
-    internal bool FinishWeijieAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishWeijieAttack(attack, out paused);
     internal void FinishWeijieAttempt(ProgramSkillFrame f, bool success) => _resolve().FinishWeijieAttempt(f, success);
     internal bool HasAcceptedWeijieKeAction(ProgramSkillFrame f, LegalAction a) => _resolve().HasAcceptedWeijieKeAction(f, a);
     internal bool HasWeijieForcedSlash(CharacterState actor, CharacterState target, NativeOwners.BorrowedSwordHandle pending) => _resolve().HasWeijieForcedSlash(actor, target, pending);

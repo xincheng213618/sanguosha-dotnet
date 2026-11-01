@@ -14,7 +14,6 @@ internal sealed partial class CharacterQinLangOlEntries
     internal bool DrainQinLang(long id) => _resolve().DrainQinLang(id);
     internal void ExpireQinLangXianyingTurnEndWine() => _resolve().ExpireQinLangXianyingTurnEndWine();
     internal void FinishQinLang(ProgramSkillFrame f) => _resolve().FinishQinLang(f);
-    internal bool FinishQinLangXianyingAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishQinLangXianyingAttack(attack, out paused);
     internal bool HasIssuedQinLangXianyingUse(long id) => _resolve().HasIssuedQinLangXianyingUse(id);
     internal IReadOnlyList<TurnEndingBoundaryItem> IncludeQinLangXianyingAfterTurnEndedItems(DeferredTurnEndFrame parent, IReadOnlyList<TurnEndingBoundaryItem> ordinary) => _resolve().IncludeQinLangXianyingAfterTurnEndedItems(parent, ordinary);
     internal bool IsIssuedQinLangXianyingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedQinLangXianyingCandidate(c, context);

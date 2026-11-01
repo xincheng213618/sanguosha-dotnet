@@ -611,6 +611,10 @@ public sealed partial record CardUseFrame(
     IReadOnlyList<int>? PhysicalCardIds = null)
     : ResolutionFrame(Id, ResolutionFrameKind.CardUse, Step)
 {
+    // Issued on the native use; command replay reconstructs this completion role.
+    [JsonIgnore]
+    internal bool UsesStandardZeroEntityAttackCompletion { get; init; }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public TargetHandCardPreselection? TargetHandPreselection { get; init; }
 

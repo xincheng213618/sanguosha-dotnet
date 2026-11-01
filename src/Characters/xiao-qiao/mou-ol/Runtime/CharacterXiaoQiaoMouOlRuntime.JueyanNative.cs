@@ -85,7 +85,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             return;
         }
 
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: source, standardZeroEntityAttackCompletion: CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) || p.Kind is CardKind.Duel or CardKind.FireAttack);
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)?.MouXiaoQiaoOlOrigin is null)
             throw new InvalidOperationException("Jueyan must bind its own exact material-free issuance.");
         if (p.Kind == CardKind.Alcohol)
@@ -136,26 +136,6 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             _coreNativeTrickUseOperations.CompleteAlcoholUse(actor, card, id);
         else
             throw new InvalidOperationException("Jueyan changed its exact accepted native simple effect.");
-        return true;
-    }
-
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 34000)]
-    internal bool FinishMouXqJueyanAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || !IsMouXqJueyanUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && kind is not (CardKind.Duel or CardKind.FireAttack))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
         return true;
     }
 

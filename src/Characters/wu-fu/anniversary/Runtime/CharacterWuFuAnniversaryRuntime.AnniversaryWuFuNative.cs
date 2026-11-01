@@ -15,7 +15,7 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, AnniversaryWuFu = r with { Stage = AnniversaryWuFuStage.Issuing, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-        _coreProgramVirtualSlashOffersOperations.BeginOfferedProgramVirtualSlash(f, item.Actor, item.Target);
+        _coreProgramVirtualSlashOffersOperations.BeginOfferedProgramVirtualSlash(f, item.Actor, item.Target, standardZeroEntityAttackCompletion: true);
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 46600)]
@@ -41,25 +41,6 @@ internal sealed partial class CharacterWuFuAnniversaryRuntime
         if (use.AnniversaryWuFuSlash is not { } o || use.Id != o.UseId || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0 } a || a.ActionId != o.ActionId || a.ProviderSeat != o.Actor || a.RequesterSeat is not null || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is not ProgramSkillFrame { AnniversaryWuFu: { Stage: AnniversaryWuFuStage.NativeUse } r } f || !ValidWuFu(f) || o.Source != r.Source || o.Hash != f.GameplayHash || o.Cursor != r.Cursor || r.UseId != use.Id || r.ActionId != a.ActionId || o.Actor != WuFuTask(f).Actor || o.Target != WuFuTask(f).Target || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryWuFuSlashIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Actor, o.Actor);
-    }
-
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 46600)]
-    internal bool FinishWuFuAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { AnniversaryWuFuSlash: not null } use || !IsWuFuUse(use))
-            return false;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
     }
 
     [NativeUseValidation(46600)]

@@ -16,7 +16,7 @@ internal sealed partial class CharacterChengYuMouOlRuntime
         r = f.MouDanchi!;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouDanchi = r with { Stage = kind == CardKind.DrawTwo ? MouDanchiStage.DrawIssuing : MouDanchiStage.SlashIssuing, Kind = kind, TargetSeat = target, UseId = 0, ActionId = 0, Returned = false, Batches = [] }, PendingMovementContinuation = null });
         if (kind == CardKind.Slash)
-            _coreProgramVirtualSlashOffersOperations.BeginOfferedProgramVirtualSlash(f, f.OwnerSeat, target);
+            _coreProgramVirtualSlashOffersOperations.BeginOfferedProgramVirtualSlash(f, f.OwnerSeat, target, standardZeroEntityAttackCompletion: true);
         else
         {
             var card = new Card(0, kind, Suit.None, 0);
@@ -98,25 +98,6 @@ internal sealed partial class CharacterChengYuMouOlRuntime
     }
 
     internal bool IsMouDanchiSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => f.MouDanchi is { Stage: MouDanchiStage.Children, Returned: true } r && MouDanchi.Valid(f) && r.Batches.Contains(batch.Id) && batch.ParentFrameId == r.UseId && batch.AwaitingProgramFrameId is null && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.OriginOwnerSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDanchiNativeBatchEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.BatchId == batch.Id) == 1 && batch.Movements.Count > 0 && batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m));
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 34101)]
-    internal bool FinishMouDanchiSlash(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || !IsMouDanchiUse(attack.ResolutionId) || !CoreNativeCardClassificationsRuntime.IsSlashCard(_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!.CardKind))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
     [NativeUseValidation(34101)]
     internal void ValidateMouDanchiNativeUse(CardUseFrame use)
     {

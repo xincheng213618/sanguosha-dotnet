@@ -7,7 +7,50 @@ namespace CardGame.Core.Tests;
 
 internal static class MouHuaXiongOlChecks
 {
-    private const string Hero = "mou:hua-xiong-ol", Bojue = "mou-ol:bojue", Driver = "fixture:mhxo-driver", Quiet = "fixture:mhxo-quiet";
+    private const string Hero = "mou:hua-xiong-ol", Bojue = "mou-ol:bojue", Driver = "fixture:mhxo-driver", Quiet = "fixture:mhxo-quiet", CompletionPause = "fixture:mhxo-completion-pause";
+
+    public static void StandardIssuedAttackCompletionIsFrameOwnedCold()
+    {
+        var s = Scene.Start(pauseCompletion: true);
+        s.Play();
+        s.Bojue(); s.Reach(() => s.Branch("draw"));
+        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "draw");
+        s.Reach(() => Paused("issued"));
+        var use = Use();
+        var origin = use.MouHxBojueSlash!;
+        s.Need(use.UsesStandardZeroEntityAttackCompletion && use is { CardId: 0, PhysicalCardIds.Count: 0 } &&
+            use.RuntimeOrigin is { ParentKind: ResolutionFrameKind.ProgramSkill } parent && parent.ParentId == origin.FrameId &&
+            s.E<MouHxBojueSlashIssuedEvent>().Count(e => e.Origin.UseId == use.Id) == 1 &&
+            !s.E<CardUseFinishedEvent>().Any(e => e.ResolutionId == use.Id),
+            "The real issuer assigns the common completion role to its native child before effects, with its original scheduler parent.");
+        s.Cold();
+        s.Need(Use() is { UsesStandardZeroEntityAttackCompletion: true } restored && restored.Id == use.Id &&
+            restored.Action!.ActionId == origin.ActionId && restored.RuntimeOrigin?.ParentId == origin.FrameId,
+            "Command replay reconstructs the native completion role without serializing another pending return.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+        s.Reach(() => Paused("completed"));
+        s.Need(Use() is { UsesStandardZeroEntityAttackCompletion: true, Step: ResolutionFrameStep.Completed } &&
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id && e.CardId == 0 && e.CardKind == CardKind.Slash) == 1 &&
+            !s.E<MouHxBojueSlashReturnedEvent>().Any(e => e.UseId == use.Id),
+            "The common completion emits one real finish fact, then waits for CardUseCompleted children before the original typed return.");
+        s.Cold();
+        s.Need(Use().UsesStandardZeroEntityAttackCompletion &&
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) == 1,
+            "Cold recovery of the completed child preserves the role and cannot repeat its finish fact.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+        s.Play();
+        var issued = s.E<MouHxBojueSlashIssuedEvent>().Where(e => e.Origin.FrameId == origin.FrameId).ToArray();
+        s.Need(issued.Length == 2 && issued.All(e =>
+                s.E<CardUseFinishedEvent>().Count(f => f.ResolutionId == e.Origin.UseId) == 1 &&
+                s.E<MouHxBojueSlashReturnedEvent>().Count(r => r.UseId == e.Origin.UseId && r.ActionId == e.Origin.ActionId) == 1) &&
+            s.E<MouHxBojueCompletedEvent>().Count(e => e.FrameId == origin.FrameId) == 1 &&
+            !s.G.ResolutionStack.OfType<CardUseFrame>().Any(f => issued.Any(e => e.Origin.UseId == f.Id)),
+            "Both actual participants finish once through the common native protocol and resume the original Bojue parent exactly once.");
+
+        bool Paused(string trigger) => s.P?.SkillPrompt?.SkillId == CompletionPause &&
+            s.G.ResolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()?.TriggerId == trigger;
+        CardUseFrame Use() => s.G.ResolutionStack.OfType<CardUseFrame>().Single(f => f.MouHxBojueSlash is not null);
+    }
 
     public static void NativeCommittedPairMutualUseAndPersistentDirectionalTicketsCold()
     {
@@ -123,11 +166,11 @@ internal static class MouHuaXiongOlChecks
         private string Diagnostic() => JsonSerializer.Serialize(new { G.State.TurnNumber, G.State.CurrentSeat, G.State.Phase, Owner = V(), Prompt = P,
             Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())),
             Facts = G.Events.Where(e => e.Payload.GetType().Name.StartsWith("MouHx", StringComparison.Ordinal) || e.Payload is DamageAppliedEvent or NativeLogicalDiscardInvocationRecordedEvent or NativeDrawInvocationRecordedEvent).Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())) });
-        public static Scene Start()
+        public static Scene Start(bool pauseCompletion = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(pauseCompletion));
             ShanheStartingCard C(CardKind kind, int rank) => new(kind, Suit.Spade, rank);
-            var setup = new ShanheBattleSetup(7, 1, "mou-hua-xiong-ol-real", Hero, 6, 0, 0, 0, 0, [MouHuaXiongOlChecks.Driver],
+            var setup = new ShanheBattleSetup(7, 1, "mou-hua-xiong-ol-real", Hero, 6, 0, 0, 0, 0, pauseCompletion ? [MouHuaXiongOlChecks.Driver, CompletionPause] : [MouHuaXiongOlChecks.Driver],
                 [C(CardKind.Slash, 2), C(CardKind.Slash, 3), C(CardKind.Dodge, 4), C(CardKind.Dodge, 5), C(CardKind.Dodge, 6), C(CardKind.Dodge, 7)], [],
                 [new("fixture:mhxo-enemy-a", Hp: 12) { StartingHand = [] }, new("fixture:mhxo-enemy-b", Hp: 12) { StartingHand = [] }],
                 [new("fixture:mhxo-ally", Hp: 12) { StartingHand = [C(CardKind.Peach, 8), C(CardKind.Peach, 9)] }], new string('c', 64));
@@ -138,7 +181,7 @@ internal static class MouHuaXiongOlChecks
         }
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool pauseCompletion = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-mou-hua-xiong-ol", new(1, 0, 0));
         public void Register(IContentRegistryBuilder b)
@@ -153,6 +196,15 @@ internal static class MouHuaXiongOlChecks
             };
             var labels = new Dictionary<string, object> { [Driver] = new { name = "原生摸牌与决斗", description = "既有真实操作", activationLabels = new Dictionary<string, string> { ["draw-two"] = "真实摸二", ["direct-duel"] = "真实双人决斗" } },
                 [Quiet] = new { name = "安静同行", description = "原生跳过同行出牌阶段" } };
+            if (pauseCompletion)
+            {
+                defs = [.. defs, new { id = CompletionPause, revision = 1, triggers = new[] { ("issued", "cardUseCommitted"), ("completed", "cardUseCompleted") }.Select(row => new
+                {
+                    id = row.Item1, window = row.Item2, ownerRelation = "actor", cardKinds = new[] { "slash" }, optional = false,
+                    effects = new[] { new { op = "chooseOption", target = "owner", resultBind = "pause", options = new[] { new { id = "continue" } } } }
+                }).ToArray() }];
+                labels[CompletionPause] = new { name = "共同原生完成边界", description = "暂停真实发行和完成窗口", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } };
+            }
             var catalog = SkillProgramCatalog.Load(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = defs }),
                 JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, p) in catalog.Programs) b.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description) { Program = p, ProgramPresentation = catalog.Presentations[id] });

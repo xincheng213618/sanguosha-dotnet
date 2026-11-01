@@ -20,7 +20,7 @@ internal sealed partial class CharacterHuLieMouRuntime
         var r = f.MouHuLie!;
         var actor = _coreMatchParticipantsPlayersAccess._players[r.Actor];
         var target = _coreMatchParticipantsPlayersAccess._players[r.Target];
-        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, [r.Target], CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), physicalCardIds: [], conversionSource: r.Source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, [r.Target], CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), physicalCardIds: [], conversionSource: r.Source, standardZeroEntityAttackCompletion: true);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         if (use.MouHuLieSlash is null)
             throw new InvalidOperationException("Chuanyu native Slash must bind before its real declaration.");
@@ -69,25 +69,6 @@ internal sealed partial class CharacterHuLieMouRuntime
 
     internal bool IsMouHuLieUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouHuLieUse(use);
     internal Card MouHuLieRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouHuLieUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Chuanyu requires its own native zero-material representation.");
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 37500)]
-    internal bool FinishMouHuLieAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || !IsMouHuLieUse(attack.ResolutionId))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
 
     [NativeUseValidation(37500)]
     internal void ValidateMouHuLieNative(CardUseFrame use)

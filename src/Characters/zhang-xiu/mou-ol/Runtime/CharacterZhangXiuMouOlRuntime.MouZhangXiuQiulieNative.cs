@@ -13,7 +13,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, MouZhangXiuOl = r with { Stage = MouZhangXiuOlStage.Issuing } });
-        _coreProgramVirtualSlashOffersOperations.BeginOfferedProgramVirtualSlash(f, f.OwnerSeat, r.TargetSeat);
+        _coreProgramVirtualSlashOffersOperations.BeginOfferedProgramVirtualSlash(f, f.OwnerSeat, r.TargetSeat, standardZeroEntityAttackCompletion: true);
     }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 33000)]
@@ -40,25 +40,6 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
         if (use.MouZhangXiuOlQiulie is not { } o || use.CardId != 0 || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use, PhysicalCards.Count: 0 } a || a.ActionId != o.ActionId || o.UseId != use.Id || a.ProviderSeat != o.Source.OwnerSeat || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.FrameId)is not ProgramSkillFrame { MouZhangXiuOl: { Stage: MouZhangXiuOlStage.NativeUse, NativeReturned: false } r } parent || !ValidMouZhangXiuOl(parent) || o.Source != r.Source || o.GameplayHash != parent.GameplayHash || r.UseId != use.Id || r.ActionId != a.ActionId || o.TargetSeat != r.TargetSeat || o.Phase != r.Phase || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlQiulieIssuedEvent>().Count(e => e.Origin == o) != 1)
             return false;
         return _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Source.OwnerSeat, o.Source.OwnerSeat);
-    }
-
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 33000)]
-    internal bool FinishMouZhangXiuOlSlashAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { MouZhangXiuOlQiulie: not null } use || !IsMouZhangXiuOlSlash(use))
-            return false;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
     }
 
     [NativeUseValidation(33000)]

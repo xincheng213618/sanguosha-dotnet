@@ -79,7 +79,7 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     {
         if (!CanMoSimaYiRetaliationSlash(actor, target))
             return false;
-        _coreProgramVirtualSlashOffersOperations.BeginOfferedProgramVirtualSlash(f, actor, target);
+        _coreProgramVirtualSlashOffersOperations.BeginOfferedProgramVirtualSlash(f, actor, target, standardZeroEntityAttackCompletion: true);
         return true;
     }
 

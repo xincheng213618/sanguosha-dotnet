@@ -21,7 +21,6 @@ internal sealed partial class CharacterSunJianMouOlEntries
     internal bool ContinuePaidMouSunJianOl(ProgramSkillFrame f) => _resolve().ContinuePaidMouSunJianOl(f);
     internal bool DrainMouSunJianOlChildren(long id) => _resolve().DrainMouSunJianOlChildren(id);
     internal void FinishMouSunJianOl(ProgramSkillFrame f) => _resolve().FinishMouSunJianOl(f);
-    internal bool FinishMouSunJianOlCounterAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouSunJianOlCounterAttack(attack, out paused);
     internal bool HasMouSunJianOlHpSubject(int seat) => _resolve().HasMouSunJianOlHpSubject(seat);
     internal bool IsMouSunJianOlCounterUse(CardUseFrame use) => _resolve().IsMouSunJianOlCounterUse(use);
     internal bool IsMouSunJianOlDying() => _resolve().IsMouSunJianOlDying();

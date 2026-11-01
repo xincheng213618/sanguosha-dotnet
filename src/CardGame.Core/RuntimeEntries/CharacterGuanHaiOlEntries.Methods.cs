@@ -21,7 +21,6 @@ internal sealed partial class CharacterGuanHaiOlEntries
     internal PublicPersistentPileSource EnsureXieweiPile(CardConversionSource source) => _resolve().EnsureXieweiPile(source);
     internal bool ExecuteXieweiPlay(CharacterState actor, LegalAction a, IReadOnlyList<int> ids, IReadOnlyList<int> targets) => _resolve().ExecuteXieweiPlay(actor, a, ids, targets);
     internal void FinishGuanHai(ProgramSkillFrame f, bool applied) => _resolve().FinishGuanHai(f, applied);
-    internal bool FinishYouqueAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishYouqueAttack(attack, out paused);
     internal bool GuanHaiFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().GuanHaiFirstChild(f, child);
     internal bool GuanHaiMovementMatches(ProgramSkillFrame f, CardMovementRecord m) => _resolve().GuanHaiMovementMatches(f, m);
     internal ProgramSkillFrame? GuanHaiObserverRoot() => _resolve().GuanHaiObserverRoot();

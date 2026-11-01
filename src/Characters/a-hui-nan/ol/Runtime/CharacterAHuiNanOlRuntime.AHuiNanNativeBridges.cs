@@ -27,7 +27,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
             throw new InvalidOperationException("Jueman lost its committed third basic-card receipt.");
         var actor = _coreMatchParticipantsPlayersAccess._players[o.ActorSeat];
         var card = new Card(0, o.CardKind, Suit.None, 0);
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, targets, o.CardKind, physicalCardIds: [], aHuiNanJueman: o);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, targets, o.CardKind, physicalCardIds: [], aHuiNanJueman: o, standardZeroEntityAttackCompletion: CoreNativeCardClassificationsRuntime.IsSlashCard(o.CardKind));
         if (o.CardKind == CardKind.Peach)
         {
             _coreCardUseLifecycleOperations.BeginSimpleCardUse(id, new(0, SimpleCardUseEffect.Recovery, 1));
@@ -75,25 +75,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
 
     internal bool HasIssuedAHuiNanJuemanUse(long id) => IsAHuiNanJuemanUse(id);
     internal bool MatchesAHuiNanJuemanUseAction(long id, CardActionContext a, int cardId) => cardId == 0 && IsAHuiNanJuemanUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action is { } issued && a.ActionId == issued.ActionId && a.Type == CardActionType.Use && a.EffectiveKind == issued.EffectiveKind && a.ActorSeat == issued.ActorSeat && a.ProviderSeat == issued.ProviderSeat && a.PhysicalCards.Count == 0 && a.ConversionChain.SequenceEqual(issued.ConversionChain) && a.TargetSeats.SequenceEqual(issued.TargetSeats) && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.EffectiveIsRed == false;
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 130)]
-    internal bool FinishAHuiNanJuemanAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (!IsAHuiNanJuemanUse(attack.ResolutionId) || attack.Card is not null || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
 
     internal bool ContinueAHuiNanJuemanSimpleUse(long id, ProgramSimpleCardContinuation continuation)
     {

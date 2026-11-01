@@ -8,7 +8,6 @@ internal sealed partial class CharacterXiaoQiaoMouOlEntries
     internal void BeginMouXqProgramSlash(PromptChoice choice) => _resolve().BeginMouXqProgramSlash(choice);
     internal void CancelMouXqResponseAfterReveal(MouXiaoQiaoJueyanResponseRequest request, CharacterState actor) => _resolve().CancelMouXqResponseAfterReveal(request, actor);
     internal bool ContinueMouXqJueyanSimpleUse(long id, ProgramSimpleCardContinuation c) => _resolve().ContinueMouXqJueyanSimpleUse(id, c);
-    internal bool FinishMouXqJueyanAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouXqJueyanAttack(attack, out paused);
     internal bool HasMouXqJueyanDyingResponse(CharacterState actor) => _resolve().HasMouXqJueyanDyingResponse(actor);
     internal bool HasMouXqProgramSlash(CharacterState actor, IEnumerable<int> targets) => _resolve().HasMouXqProgramSlash(actor, targets);
     internal bool HasProspectiveMouXqQinglong(CharacterState actor, CharacterState target, NativeOwners.CardAttackHandle attack) => _resolve().HasProspectiveMouXqQinglong(actor, target, attack);

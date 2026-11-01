@@ -7,7 +7,6 @@ internal sealed partial class CharacterZhangXiuMouEntries
     internal void CaptureMouZhangXiuAnniversaryDiscards(CardMovementBatchContext batch) => _resolve().CaptureMouZhangXiuAnniversaryDiscards(batch);
     internal CardMovementBatchContext CompleteMovementBatchCaptureMouZhangXiuAnniversaryDiscards(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureMouZhangXiuAnniversaryDiscards(batch, completed);
     internal void ContinueMouZhangXiuAnniversary(long id) => _resolve().ContinueMouZhangXiuAnniversary(id);
-    internal bool FinishMouZhangXiuAnniversaryAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMouZhangXiuAnniversaryAttack(attack, out paused);
     internal bool IsIssuedMouZhangXiuAnniversaryUse(CardUseFrame use) => _resolve().IsIssuedMouZhangXiuAnniversaryUse(use);
     internal bool IsMouZhangXiuAnniversaryUse(long id) => _resolve().IsMouZhangXiuAnniversaryUse(id);
     internal void IssueMouZhangXiuAnniversarySlash(ProgramSkillFrame f) => _resolve().IssueMouZhangXiuAnniversarySlash(f);

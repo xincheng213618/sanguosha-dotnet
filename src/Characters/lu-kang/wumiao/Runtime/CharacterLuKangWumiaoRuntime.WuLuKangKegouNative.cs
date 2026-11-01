@@ -24,7 +24,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuLuKangKegou = r with { Stage = WuLuKangKegouStage.SlashIssuing, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, r.NativeTargets, CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), physicalCardIds: [], conversionSource: r.Source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, r.NativeTargets, CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), physicalCardIds: [], conversionSource: r.Source, standardZeroEntityAttackCompletion: true);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         if (use.WuLuKangKegouSlash is null)
             throw new InvalidOperationException("Kegou's native Slash was not bound before its declaration.");
@@ -75,26 +75,6 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
 
     internal bool IsWuLuKangKegouUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedWuLuKangKegouUse(use);
     internal Card WuLuKangKegouRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedWuLuKangKegouUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Kegou requires its issued native zero-entity representation.");
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 60)]
-    internal bool FinishWuLuKangKegouAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || !IsWuLuKangKegouUse(attack.ResolutionId))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
-
     [NativeUseValidation(29700)]
     internal void ValidateWuLuKangKegouNative(CardUseFrame use)
     {

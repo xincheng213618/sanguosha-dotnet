@@ -54,7 +54,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         if (p.Adjusted)
             _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats = p.Targets;
         var source = MouLiuChengSource(f);
-        var useId = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: source);
+        var useId = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: source, standardZeroEntityAttackCompletion: CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind));
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.MouLiuChengOrigin is null)
             throw new InvalidOperationException("MouLiuCheng must bind its distinct zero-material issuance before native effects.");
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind))
@@ -124,25 +124,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     }
 
     internal bool SkipMouLiuChengFinishedMovement(long id, Card c) => c.Id == 0 && IsMouLiuChengZeroUse(id) && c.Kind == _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind;
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 20)]
-    internal bool FinishMouLiuChengAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || !IsMouLiuChengUse(attack.ResolutionId) || attack.EffectiveCardKind is not { } kind || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
 
     [NativeUseValidation(29401)]
     internal void ValidateMouLiuChengNativeUse(CardUseFrame use)

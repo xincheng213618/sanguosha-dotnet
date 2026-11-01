@@ -19,7 +19,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
             throw new InvalidOperationException("Zongluan requires at least one real native legal target and cannot cancel its issued request.");
         var actor = _coreMatchParticipantsPlayersAccess._players[r.ActorSeat];
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { TaoQian = r with { Stage = TaoQianStage.SlashIssuing } });
-        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, r.Targets, CardKind.Slash, ignoresArmor: _coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(actor), physicalCardIds: [], conversionSource: r.Source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, r.Targets, CardKind.Slash, ignoresArmor: _coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(actor), physicalCardIds: [], conversionSource: r.Source, standardZeroEntityAttackCompletion: true);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         if (use.ZongluanSlash is null)
             throw new InvalidOperationException("Zongluan was not bound before its real native declaration.");
@@ -72,26 +72,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
 
     internal bool IsZongluanUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedZongluanUse(use);
     internal Card ZongluanRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedZongluanUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Zongluan requires its exact issued native zero-entity Slash.");
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 80)]
-    internal bool FinishZongluanAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || !IsZongluanUse(attack.ResolutionId))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
-
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 28120)]
     internal void CaptureZongluanDirectDamage(IGameEvent payload)
     {

@@ -363,6 +363,7 @@ var tests = new (string Name, Action Body)[]
     ("Mou Gongsun Zan OL: equal range native Slash and next actual Play expiry Cold", CardGame.Core.Tests.MouGongsunZanOlChecks.EqualRangeNativeSlashAndNextActualPlayExpiryCold),
     ("Mou Jiang Wei Mobile: real requested Slash gift charge awakening and Beifa Cold", CardGame.Core.Tests.MouJiangWeiMobileChecks.RealRequestedSlashGiftChargeAwakeningAndBeifaCold),
     ("Mou Hua Xiong OL: native committed pair and persistent directional tickets Cold", CardGame.Core.Tests.MouHuaXiongOlChecks.NativeCommittedPairMutualUseAndPersistentDirectionalTicketsCold),
+    ("Issued attack completion: frame owned committed and completed windows cold", CardGame.Core.Tests.MouHuaXiongOlChecks.StandardIssuedAttackCompletionIsFrameOwnedCold),
     ("Mou Dong Zhao OL: real damage gift and native suit-loss obligation Cold", CardGame.Core.Tests.MouDongZhaoOlChecks.RealDamageGiftAndNativeSuitLossObligationCold),
     ("Mou Gongsun Zan Mobile: real Hu original Played and Hand conversions Round charge Cold", CardGame.Core.Tests.MouGongsunZanMobileChecks.RealHuOriginalPlayedAndHandConversionsWithRoundChargeCold),
     ("Mou Xiao Qiao OL: real public Hand reveal returns and retained native uses Cold", CardGame.Core.Tests.MouXiaoQiaoOlChecks.RealMiluoRetainedUsesAndExternalRevealReturnCold),

@@ -30,7 +30,6 @@ internal sealed partial class CharacterLiuZhangOlEntries
     internal bool FengweiLive(CharacterState p) => _resolve().FengweiLive(p);
     internal int? FengweiMarkedHand(int seat) => _resolve().FengweiMarkedHand(seat);
     internal void FinishFengwei(ProgramSkillFrame f) => _resolve().FinishFengwei(f);
-    internal bool FinishZonghuAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishZonghuAttack(attack, out paused);
     internal void FinishZonghuAttempt(ProgramSkillFrame f, bool success) => _resolve().FinishZonghuAttempt(f, success);
     internal bool HasAcceptedZonghuKeAction(ProgramSkillFrame f, LegalAction a) => _resolve().HasAcceptedZonghuKeAction(f, a);
     internal bool HasSayingZonghuPayment(ProgramSkillFrame f, CardUseFrame? use = default) => _resolve().HasSayingZonghuPayment(f, use);

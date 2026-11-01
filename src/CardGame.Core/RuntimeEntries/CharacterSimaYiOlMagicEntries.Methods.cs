@@ -8,7 +8,6 @@ internal sealed partial class CharacterSimaYiOlMagicEntries
     internal bool CanMoSimaYiRetaliationSlash(int actor, int target) => _resolve().CanMoSimaYiRetaliationSlash(actor, target);
     internal bool CanOfferMoSimaYi(ProgramTriggerLegalityContext c) => _resolve().CanOfferMoSimaYi(c);
     internal void CaptureMoGuifuActualName(IGameEvent fact) => _resolve().CaptureMoGuifuActualName(fact);
-    internal bool FinishMoSimaYiSlash(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishMoSimaYiSlash(attack, out paused);
     internal bool HasMoGuifuNativeUse(int actor, int id, CardKind kind) => _resolve().HasMoGuifuNativeUse(actor, id, kind);
     internal bool IsMoGuifuHandLimitExempt(CharacterState owner, int id) => _resolve().IsMoGuifuHandLimitExempt(owner, id);
     internal bool IsMoSimaYiRetaliation(CardUseFrame use) => _resolve().IsMoSimaYiRetaliation(use);

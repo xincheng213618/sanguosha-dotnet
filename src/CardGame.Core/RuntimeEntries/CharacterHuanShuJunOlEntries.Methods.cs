@@ -25,7 +25,6 @@ internal sealed partial class CharacterHuanShuJunOlEntries
     internal bool DrainHuanShuJun(long id) => _resolve().DrainHuanShuJun(id);
     internal void ExecuteHuanpeiPaid(HuanpeiPaidOrigin p) => _resolve().ExecuteHuanpeiPaid(p);
     internal void FinishHuanShuJun(ProgramSkillFrame f) => _resolve().FinishHuanShuJun(f);
-    internal bool FinishHuanpeiAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishHuanpeiAttack(attack, out paused);
     internal void FinishUnissuedWenyiPeach(ProgramSkillFrame supplied) => _resolve().FinishUnissuedWenyiPeach(supplied);
     internal void GiveWenyiEquipment(ProgramSkillFrame f, int cardId) => _resolve().GiveWenyiEquipment(f, cardId);
     internal bool HasAcceptedHuanpeiKeAction(ProgramSkillFrame f, LegalAction action) => _resolve().HasAcceptedHuanpeiKeAction(f, action);

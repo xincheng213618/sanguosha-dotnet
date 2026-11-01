@@ -58,7 +58,7 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, f.OwnerSeat, f.OwnerSeat, null, null, null, p.Kind, p.Targets, [], [], effectiveSuit: Suit.None, effectiveRank: 0));
         var origin = new AnniversaryLiuYongSlashOrigin(f.Id, r.Source, r.Hash, id, action.ActionId, p.Kind, target.Seat);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryLiuYong = r with { Stage = AnniversaryLiuYongStage.NativeUse, UseId = id, ActionId = action.ActionId } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, f.OwnerSeat, 0, p.Kind, p.Targets, PhysicalCardIds: []) { Action = action, UnlimitedUse = true, AnniversaryLiuYongSlash = origin });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, f.OwnerSeat, 0, p.Kind, p.Targets, PhysicalCardIds: []) { UsesStandardZeroEntityAttackCompletion = true, Action = action, UnlimitedUse = true, AnniversaryLiuYongSlash = origin });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuYongNativeIssuedEvent(f.Id, id, action.ActionId, p.Kind));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
@@ -86,24 +86,6 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
     }
 
     internal bool IsAnniversaryLiuYongSlashUse(CardUseFrame use) => use.AnniversaryLiuYongSlash is { } o && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && use.UnlimitedUse && use.CardKind == o.Kind && CoreNativeCardClassificationsRuntime.IsSlashCard(o.Kind) && use.Action is { Type: CardActionType.Use, PhysicalCards.Count: 0, ConversionChain.Count: 0, EffectiveSuit: Suit.None, EffectiveRank: 0 } a && a.ActionId == o.ActionId && a.EffectiveKind == o.Kind && a.ProviderSeat == o.Source.OwnerSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { AnniversaryLiuYong: { Stage: AnniversaryLiuYongStage.NativeUse, GiftPaid: true } r } f && r.Source == o.Source && r.Hash == o.Hash && r.UseId == use.Id && r.ActionId == a.ActionId && r.Plan?.Kind == o.Kind && r.Plan.Targets.SequenceEqual([o.TargetSeat]) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuYongNativeIssuedEvent>().Count(e => e == new AnniversaryLiuYongNativeIssuedEvent(f.Id, use.Id, a.ActionId, o.Kind)) == 1 && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, f.OwnerSeat, f.OwnerSeat);
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 43400)]
-    internal bool CompleteAnniversaryLiuYongSlash(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { AnniversaryLiuYongSlash: not null } use || !IsAnniversaryLiuYongSlashUse(use))
-            return false;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
 
     [NativeUseValidation(43400)]
     internal void ValidateAnniversaryLiuYongSlash(CardUseFrame use)

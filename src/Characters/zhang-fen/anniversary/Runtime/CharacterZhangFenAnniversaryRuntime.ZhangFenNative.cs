@@ -13,7 +13,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actor.Seat, actor.Seat, null, null, null, CardKind.Slash, targets, [], [], effectiveSuit: Suit.None, effectiveRank: 0, effectiveIsRed: false));
         var origin = new DagongCheSlashOrigin(f.Id, f.InstructionIndex, r.Source, r.Hash, r.CartId, useId, action.ActionId, r.Turn, 1 + DagongUpgrades(r.CartId).Count(e => e.Choice == "discard"), r.IgnoreRangeArmor);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZhangFen = r with { Stage = ZhangFenStage.NativeUse, Targets = targets, UseId = useId, ActionId = action.ActionId }, VirtualBasicDraft = new(f.InstructionIndex, useId) });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(useId, actor.Seat, 0, CardKind.Slash, targets, IgnoresArmor: r.IgnoreRangeArmor, PhysicalCardIds: []) { Action = action, VirtualBasicReturn = new(f.Id, f.InstructionIndex), UnlimitedUse = true, DagongCheSlash = origin });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(useId, actor.Seat, 0, CardKind.Slash, targets, IgnoresArmor: r.IgnoreRangeArmor, PhysicalCardIds: []) { UsesStandardZeroEntityAttackCompletion = true, Action = action, VirtualBasicReturn = new(f.Id, f.InstructionIndex), UnlimitedUse = true, DagongCheSlash = origin });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DagongCheSlashIssuedEvent(origin));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
@@ -41,25 +41,6 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
             return;
         if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == o.FrameId)is not { } parent || use.Step != ResolutionFrameStep.Completed || !ExactDagongCheUse(use, parent))
             throw new InvalidOperationException("Dagong Che must return its exact completed original zero-material Slash.");
-    }
-
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 43500)]
-    internal bool CompleteDagongCheAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { DagongCheSlash: { } o } use || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == o.FrameId)is not { } f || !ExactDagongCheUse(use, f))
-            return false;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
     }
 
     [NativeAttackReturn(NativeAttackReturnPhase.AfterCleanup, 43500)]

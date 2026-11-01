@@ -24,7 +24,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { GuanHai = r with { Stage = GuanHaiStage.SlashIssuing, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, [target.Seat], CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), physicalCardIds: [], conversionSource: r.Source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, [target.Seat], CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), physicalCardIds: [], conversionSource: r.Source, standardZeroEntityAttackCompletion: true);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         if (use.YouqueSlash is null)
             throw new InvalidOperationException("Youque's native Slash was not bound before its declaration.");
@@ -73,25 +73,6 @@ internal sealed partial class CharacterGuanHaiOlRuntime
 
     internal bool IsYouqueUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedYouqueUse(use);
     internal Card YouqueRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedYouqueUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Youque requires its issued native zero-entity representation.");
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 70)]
-    internal bool FinishYouqueAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (attack.Card is not null || !IsYouqueUse(attack.ResolutionId))
-            return false;
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)!;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(use.Id, 0, use.CardKind));
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, use.Action!, SkillProgramTriggerWindow.CardUseCompleted, use.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
-        return true;
-    }
 
     [NativeUseValidation(27579)]
     internal void ValidateYouqueNative(CardUseFrame use)

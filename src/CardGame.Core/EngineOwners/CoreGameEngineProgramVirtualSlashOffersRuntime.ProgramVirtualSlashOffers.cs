@@ -79,7 +79,7 @@ internal sealed partial class CoreGameEngineProgramVirtualSlashOffersRuntime
         BeginOfferedProgramVirtualSlash(frame, actorSeat, selected.Targets[0]);
     }
 
-    internal void BeginOfferedProgramVirtualSlash(ProgramSkillFrame frame, int actorSeat, int targetSeat)
+    internal void BeginOfferedProgramVirtualSlash(ProgramSkillFrame frame, int actorSeat, int targetSeat, bool standardZeroEntityAttackCompletion = false)
     {
         if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || _coreNativeCardContinuationCursorsOperations.ActiveDuel is not null)
             throw new InvalidOperationException("A virtual Slash cannot overwrite an attack.");
@@ -87,7 +87,7 @@ internal sealed partial class CoreGameEngineProgramVirtualSlashOffersRuntime
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actorSeat, actorSeat, null, null, null, CardKind.Slash, [targetSeat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, actorSeat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: []) { Action = action });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, actorSeat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: []) { Action = action, UsesStandardZeroEntityAttackCompletion = standardZeroEntityAttackCompletion });
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(resolutionId, 0, CardKind.Slash, actorSeat));

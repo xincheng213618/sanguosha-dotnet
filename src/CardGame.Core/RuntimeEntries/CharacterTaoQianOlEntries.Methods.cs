@@ -24,7 +24,6 @@ internal sealed partial class CharacterTaoQianOlEntries
     internal bool DrainZhaohuo(long id) => _resolve().DrainZhaohuo(id);
     internal void FinishTaoQian(ProgramSkillFrame f) => _resolve().FinishTaoQian(f);
     internal void FinishZhaohuo(ProgramSkillFrame f) => _resolve().FinishZhaohuo(f);
-    internal bool FinishZongluanAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishZongluanAttack(attack, out paused);
     internal bool IsIssuedZhaohuoCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().IsIssuedZhaohuoCandidate(candidate, context);
     internal bool IsIssuedZongluanUse(CardUseFrame use) => _resolve().IsIssuedZongluanUse(use);
     internal bool IsTaoQianRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame child) => _resolve().IsTaoQianRecoveryParent(f, child);

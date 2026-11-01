@@ -32,7 +32,7 @@ internal sealed partial class CharacterDongChengMouRuntime
         if (!MouDongCheng.Valid(f) || f.MouDongCheng is not { Stage: MouDongChengStage.IssuingUse, Native: null, Actual: 1 } r || r.Targets.Any(t => !MouDcTargets(f, r.Kind).Contains(t)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDcMovementPaidEvent>().Count(e => e.FrameId == f.Id && e.CardId == r.CardId && e.Actual == 1 && e.Before == r.Before && e.After == r.After) != 1)
             throw new InvalidOperationException("Douwei's zero-material Use requires the actual discarded cost and still-legal reverse-range target set.");
         var card = new Card(0, r.Kind, Suit.None, 0);
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, f.OwnerSeat, r.Targets, r.Kind, physicalCardIds: [], conversionSource: r.Source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, f.OwnerSeat, r.Targets, r.Kind, physicalCardIds: [], conversionSource: r.Source, standardZeroEntityAttackCompletion: CoreNativeCardClassificationsRuntime.IsSlashCard(r.Kind) || r.Kind is CardKind.Duel or CardKind.FireAttack or CardKind.UnexpectedAssault);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         if (use.MouDongChengDouwei is null)
             throw new InvalidOperationException("Douwei must bind its original zero-material use before native declaration.");
@@ -127,25 +127,6 @@ internal sealed partial class CharacterDongChengMouRuntime
         _coreNativeCardContinuationCursorsOperations.ActiveDuel = null;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreNativeSlashUseOperations.BeginSlashTargetResolution(continued);
-        return true;
-    }
-
-    [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 37400)]
-    internal bool FinishMouDcZeroAttack(NativeOwners.CardAttackHandle attack, out bool paused)
-    {
-        paused = false;
-        if (!IsMouDcZeroUse(attack.ResolutionId) || attack.Card is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } u || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard?.ResolutionId == u.Id)
-            return false;
-        _coreNativeCardUseFramesOperations.SetCardUseStep(u.Id, ResolutionFrameStep.Completed);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(u.Id, 0, u.CardKind));
-        if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, u.Action!, SkillProgramTriggerWindow.CardUseCompleted, u.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))
-            paused = true;
-        else
-        {
-            _coreNativeCardUseCompletionOperations.PopFinishedCardUse(u.Id);
-            _coreNativeCardUseCompletionOperations.CompleteFinishedAttackCardUse(attack);
-        }
-
         return true;
     }
 

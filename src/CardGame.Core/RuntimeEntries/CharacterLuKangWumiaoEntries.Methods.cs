@@ -42,7 +42,6 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal bool DrainWuLuKangChildren(ProgramSkillFrame f) => _resolve().DrainWuLuKangChildren(f);
     internal void FinishWuLuKangDixian(ProgramSkillFrame f) => _resolve().FinishWuLuKangDixian(f);
     internal void FinishWuLuKangKegou(ProgramSkillFrame f) => _resolve().FinishWuLuKangKegou(f);
-    internal bool FinishWuLuKangKegouAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishWuLuKangKegouAttack(attack, out paused);
     internal void FinishWuLuKangShenduan(ProgramSkillFrame f) => _resolve().FinishWuLuKangShenduan(f);
     internal bool HasIssuedWuLuKangDixianUse(long useId, int actorSeat) => _resolve().HasIssuedWuLuKangDixianUse(useId, actorSeat);
     internal bool HasWuLuKangBeforeDamageObserver(long id) => _resolve().HasWuLuKangBeforeDamageObserver(id);
