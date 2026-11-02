@@ -536,6 +536,8 @@ internal sealed partial class ProgramAiEstimateContext
         var source = Binding(effect.SourceBind);
         var except = effect.ExceptBind is null ? null : Binding(effect.ExceptBind);
         var count = Math.Max(0, source.Count - (except?.Count ?? 0));
+        if (effect.ResultBind is { } result)
+            _bindings[result] = source with { Count = count, OwnerHeld = false, TargetHeld = false, ActivationInput = false };
         if (effect.Destination == SkillProgramCardDestination.OwnerHand && !source.OwnerHeld)
         {
             _ownerDraw += count;

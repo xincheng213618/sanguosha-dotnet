@@ -31,8 +31,8 @@
           "usesPerTurn": 1,
           "effects": [
             { "op": "captureSelectedCards", "target": "owner", "resultBind": "cost" },
-            { "op": "moveBoundCards", "target": "owner", "sourceBind": "cost", "destination": "discardPile" },
-            { "op": "draw", "target": "owner", "numberExpression": "boundCardCount", "sourceBind": "cost" }
+            { "op": "moveBoundCards", "target": "owner", "sourceBind": "cost", "destination": "discardPile", "resultBind": "cost-moved" },
+            { "op": "draw", "target": "owner", "numberExpression": "boundCardCount", "sourceBind": "cost-moved" }
           ]
         }
       ]

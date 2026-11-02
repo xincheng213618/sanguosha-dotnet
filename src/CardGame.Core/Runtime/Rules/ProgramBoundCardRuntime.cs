@@ -3,9 +3,12 @@ using CardGame.Core.RuntimeSkills;
 namespace CardGame.Core;
 /// <summary>Owns immutable bound-card selection, movement, cleanup and command answers on the original program frame.</summary>
 [ProgramRuntimeModule, ProgramCapability]
-internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IProgramBoundInstructionFacts instructions, IProgramBoundCardMovementOperations movement, IProgramBoundCardPaymentOperations payments, IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events, IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards) : IProgramCardSetBindings, IProgramBoundCardCleanup
+internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IProgramBoundInstructionFacts instructions, IProgramBoundCardMovementOperations movement, IProgramBoundCardPaymentOperations payments, IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events, IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards, ICardMovementHistoryQueries history) : IProgramCardSetBindings, IProgramBoundCardCleanup, IProgramBoundCardMovementResults
 {
     void IProgramBoundCardCleanup.Cleanup(ProgramSkillFrame frame, bool completed) => CleanupProgramBoundCards(frame, completed);
+    SkillProgramStepOutcome IProgramBoundCardMovementResults.Execute(ProgramSkillFrame frame, SkillProgramEffect effect, CardMoveReason reason) =>
+        MoveProgramBoundCards(frame.Id, frame.OwnerSeat, effect.SourceBind!, effect.ExceptBind,
+            effect.Destination!.Value, effect.DestinationZone, reason, resultBind: effect.ResultBind);
     private readonly IProgramBoundCardFacts _facts = facts;
     private readonly IProgramBoundInstructionFacts _instructions = instructions;
     private readonly IProgramBoundCardMovementOperations _movement = movement;
@@ -236,7 +239,7 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
             _movement.MoveCards(cards, CardLocation.Processing, CardLocation.DiscardPile, new CardMoveReason($"skill-program.{frame.SkillId}.{RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame)}." + (completed ? "complete-cleanup" : "cancel-cleanup")));
     }
 
-    internal SkillProgramStepOutcome MoveProgramBoundCards(long frameId, int ownerSeat, string sourceBind, string? exceptBind, SkillProgramCardDestination destination, CardZoneKind? destinationZone, CardMoveReason reason, IReadOnlyList<int>? bottomOrder = null)
+    internal SkillProgramStepOutcome MoveProgramBoundCards(long frameId, int ownerSeat, string sourceBind, string? exceptBind, SkillProgramCardDestination destination, CardZoneKind? destinationZone, CardMoveReason reason, IReadOnlyList<int>? bottomOrder = null, string? resultBind = null)
     {
         var frame = _frames.ActiveProgram(frameId);
         frame = _payments.FreezeSequentialDiscardTop(frame, sourceBind, exceptBind, destination);
@@ -269,6 +272,7 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
         var pindianAcquisitionBefore = _payments.BeginWholeHandAcquisition(frame, sourceBind, destination);
         if (selected.Length == 0)
         {
+            CaptureMovementResult(frameId, resultBind, 0, selected, reason);
             if (pindianAcquisitionBefore is { } emptyBefore)
                 _payments.CommitWholeHandAcquisition(frameId, sourceBind, emptyBefore);
             return SkillProgramStepOutcome.Continue;
@@ -319,9 +323,11 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
             logicalDiscard = _logicalDiscards.Capture(frame.OwnerSeat, source.SelectionActorSeat ?? ownerSeat, primaryIds, reason, frame.Id);
         }
 
+        var resultCursor = resultBind is null ? 0 : history.Read().Count;
         if (destination == SkillProgramCardDestination.DiscardPile && selected.Select(item => item.Location).Distinct().Count() > 1 && (ProgramInstructionResolver.Default.Resolve(frame, _instructions.Skill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect.AwaitMovementTriggers || _instructions.IsAtomicDiscard(frame, sourceBind) || _instructions.HasAtomicDiscardCapability))
         {
             _movement.MoveMultipleSources(selected.Select(item => item.CardId).ToArray(), target, reason, disclosure: CardMovementDisclosure.FaceUp);
+            CaptureMovementResult(frameId, resultBind, resultCursor, selected, reason);
             _logicalDiscards.Complete(logicalDiscard);
             return SkillProgramStepOutcome.Continue;
         }
@@ -349,12 +355,37 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
             }
         }
 
+        CaptureMovementResult(frameId, resultBind, resultCursor, selected, reason);
         _logicalDiscards.Complete(logicalDiscard);
         if (pindianAcquisitionBefore is { } acquisitionBefore)
             _payments.CommitWholeHandAcquisition(frameId, sourceBind, acquisitionBefore);
         _payments.CommitLostHpChained(frameId);
         _payments.CommitPhaseAlcohol(frameId);
         return SkillProgramStepOutcome.Continue;
+    }
+
+    private void CaptureMovementResult(long frameId, string? resultBind, int cursor,
+        IReadOnlyList<(int CardId, CardLocation Location)> selected, CardMoveReason reason)
+    {
+        if (resultBind is null) return;
+        var firstMoves = new Dictionary<int, CardMovementRecord>();
+        if (selected.Count > 0)
+        {
+            var sources = selected.ToDictionary(item => item.CardId, item => item.Location);
+            var records = history.Read();
+            for (var index = cursor; index < records.Count; index++)
+            {
+                var record = records[index];
+                if (sources.TryGetValue(record.CardId, out var source) && record.From == source && record.Reason == reason)
+                    firstMoves.TryAdd(record.CardId, record);
+            }
+        }
+        // A physical result includes normalized destinations such as generated
+        // equipment leaving the game. Later child moves cannot refresh it.
+        var moved = selected.Where(item => firstMoves.ContainsKey(item.CardId))
+            .Select(item => firstMoves[item.CardId]).ToArray();
+        SetProgramCardSet(frameId, resultBind, moved.Select(record => record.CardId).ToArray(),
+            SkillProgramCardSetVisibility.Private, moved.Select(record => record.To).ToArray(), isReadOnlySnapshot: true);
     }
 
     internal void ResolveProgramBoundCardOrderAnswer(PromptChoice selected)

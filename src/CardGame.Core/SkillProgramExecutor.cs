@@ -1003,12 +1003,15 @@ public sealed class MoveBoundCardsSkillProgramEffectHandler : ISkillProgramEffec
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame,
         int targetSeat, ISkillProgramEffectHost host)
     {
-        var outcome = host.MoveBoundCards(frame.Id, frame.OwnerSeat,
+        var reason = new CardMoveReason($"skill-program.{frame.SkillId}.{effect.Op}");
+        var outcome = effect.ResultBind is not null
+            ? host.GetCapability<IProgramBoundCardMovementResults>().Execute(frame, effect, reason)
+            : host.MoveBoundCards(frame.Id, frame.OwnerSeat,
             effect.SourceBind ?? throw new InvalidOperationException("moveBoundCards has no source bind."),
             effect.ExceptBind,
             effect.Destination ?? throw new InvalidOperationException("moveBoundCards has no destination."),
             effect.DestinationZone,
-            new CardMoveReason($"skill-program.{frame.SkillId}.{effect.Op}"));
+            reason);
         return effect.AwaitMovementTriggers && outcome == SkillProgramStepOutcome.Continue
             ? host.GetCapability<IBoundCardMovementContinuationHost>().AwaitBoundCardMovements(frame.Id, frame.OwnerSeat)
             : outcome;

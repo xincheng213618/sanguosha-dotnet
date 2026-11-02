@@ -301,3 +301,18 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 `audience` 默认 `targets`，`all` 包含原使用者和非目标无懈候选。`actorRef`、`opponentRef`、`responderRef` 可冻结 owner/eventSource/eventTarget，后者只限制该角色；没有声明则不增加这项过滤。`incomingKinds`、`requiredKinds` 限制响应牌种对，`matchUseKind` 另要求本次原牌种类与 incoming 一致。`while` 复用响应规则公开事实的表达式子集，在实际查询时读逻辑响应者和原使用者，不把材料提供者当成响应者。
 
 无前的原生额外目标步骤通过现有 ChoiceBindings 输出 slash/duel，完成该指令后由普通 JSON 条件签发实际一对；支付、原返回及已接受步骤的失源履约仍在原帧。当前 JSON host 需要真实 CardUse 上下文，未覆盖没有该上下文的直接决斗或反无懈链节点。`all` 也不会把原牌禁令传播到后继无懈的独立节点，濒死救援保持自己的边界。
+
+## 实际移牌结果
+
+普通同步移牌可将真正移动的实体写入一个新绑定，后续数量读取与原选择分开：
+
+```json
+{ "op":"moveBoundCards", "target":"owner", "sourceBind":"cost", "destination":"discardPile", "resultBind":"moved", "awaitMovementTriggers":true }
+{ "op":"draw", "target":"owner", "amountExpr":["boundCount","moved"] }
+```
+
+`resultBind` 目前仅用于无条件的 discardPile／ownerHand／drawPileTop 路径，必须与输入、排除及其他绑定不同名。实际零张也产生空结果，`boundCount` 为零而不是未知。原输入绑定不变；全手牌选择等奖励继续读取原选择语义。
+
+结果取本指令原生记录中的首次实际移动，按输入顺序冻结实体和真实目的地；OutsideGame 等标准目的地归一保留，后续再次移动不刷新结果。结果数是物理移动数，不自动等于“现在仍在目标牌区的数量”或某个技能的逻辑弃置数。
+
+结果固定为 private 观察绑定，沿原帧恢复，不获得临时材料清理权或再次移动许可。绑定在已有移动观察者窗口之前写入，await 仍由原游标处理，续接不重新移动或再次支付。底部排序、指定目标赠牌和专用牌区的返回结果尚不支持此字段；已接受材料在展示后如何执行，也属于另外的付款承诺概念。

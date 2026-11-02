@@ -52,6 +52,7 @@ internal sealed record CreateCardSet(string Name, int MaxCount, bool NeedsCleanu
 internal sealed record CaptureSourceCard(string Name, int MaximumCount = 1, bool OwnerHand = false,
     SkillProgramEffectTarget? CardOwner = null) : ProgramResourceOperation;
 internal sealed record CaptureActivationCards(string Name) : ProgramResourceOperation;
+internal sealed record CaptureMovementResult(string Source, string Result) : ProgramResourceOperation;
 internal sealed record ReadSingleCardSet(string Name) : ProgramResourceOperation;
 internal sealed record ReadFrozenSingleCardSet(string Name) : ProgramResourceOperation;
 internal sealed record SelectTargetSet(int Minimum, int Maximum) : ProgramResourceOperation;
@@ -835,7 +836,7 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
         static (effect, context) => context.Move(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "sourceBind", "exceptBind", "destination", "destinationZone", "condition", "awaitMovementTriggers");
+        r.AllowOnly("op", "target", "sourceBind", "exceptBind", "destination", "destinationZone", "condition", "awaitMovementTriggers", "resultBind");
         var target = FilterBoundCardsProgramOperationDescriptor.Owner(r);
         var source = r.RequiredIdentifier("sourceBind"); var except = r.OptionalIdentifier("exceptBind");
         if (source == except) throw new InvalidOperationException($"Invalid skill program at {r.Path}: exceptBind must differ.");
@@ -852,10 +853,16 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
                 (CardZoneKind.WoodenOxGrain or CardZoneKind.BuquWound or CardZoneKind.Authority or CardZoneKind.Chunlao or CardZoneKind.PrivateReserve))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.destinationZone: must be a persistent owner zone.");
         var awaitMovementTriggers = r.Has("awaitMovementTriggers") && r.RequiredBool("awaitMovementTriggers");
+        var result = r.OptionalIdentifier("resultBind");
+        if (result is not null && (result == source || result == except ||
+            destination is not (SkillProgramCardDestination.DiscardPile or SkillProgramCardDestination.OwnerHand or SkillProgramCardDestination.DrawPileTop)))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: movement result requires a distinct binding and discardPile, ownerHand or drawPileTop.");
         if (awaitMovementTriggers && destination is not (SkillProgramCardDestination.DiscardPile or SkillProgramCardDestination.DrawPileTop or SkillProgramCardDestination.OwnerHand or SkillProgramCardDestination.SelectedTargetHand or SkillProgramCardDestination.OwnerPersistentZone))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: awaited bound movement supports discardPile, drawPileTop, ownerHand, selectedTargetHand or a persistent owner zone.");
         var effect = new SkillProgramEffect(Op, target, 0, r.Condition(), sourceBind: source,
-            exceptBind: except, destination: destination, destinationZone: destinationZone, awaitMovementTriggers: awaitMovementTriggers);
+            exceptBind: except, destination: destination, destinationZone: destinationZone, awaitMovementTriggers: awaitMovementTriggers,
+            resultBind: result);
+        if (result is not null) RequireAlways(effect, r.Path);
         // A named-choice branch may gate a discard, a gain into the owner's own
         // hand (Pindian winnings, or Guzheng's optional claim of the remaining
         // cards), or a placement onto the draw pile top (Gongxin).
@@ -881,7 +888,8 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
         effect.Destination == SkillProgramCardDestination.PhaseOwnerHand
             ? [new RequireContext(ProgramContextCapability.PhaseOwner),
                 new MoveCardSet(effect.SourceBind!, effect.ExceptBind, effect.Destination.Value)]
-            : [new MoveCardSet(effect.SourceBind!, effect.ExceptBind, effect.Destination!.Value)];
+            : [new MoveCardSet(effect.SourceBind!, effect.ExceptBind, effect.Destination!.Value),
+                .. (effect.ResultBind is { } result ? new ProgramResourceOperation[] { new CaptureMovementResult(effect.SourceBind!, result) } : [])];
 }
 
 internal sealed class GiveBoundCardProgramOperationDescriptor : ProgramOperationDescriptorBase

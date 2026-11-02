@@ -50,6 +50,13 @@ internal interface IProgramBoundCardMovementOperations : IProgramRuntimeOperatio
     void PlaceAtTop(IReadOnlyList<int> ids);
 }
 
+// Optional physical results share the original bound-card instruction. They do
+// not create another movement producer or grant accepted-payment continuation.
+internal interface IProgramBoundCardMovementResults : IProgramRuntimeOperations
+{
+    SkillProgramStepOutcome Execute(ProgramSkillFrame frame, SkillProgramEffect effect, CardMoveReason reason);
+}
+
 // Existing native payment producers keep their exact frame identities and
 // receipts. The generic runtime only sequences their established adjacency.
 internal interface IProgramBoundCardPaymentOperations : IProgramRuntimeOperations

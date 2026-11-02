@@ -262,6 +262,15 @@ internal static class ProgramCompositionValidator
                             capturedPlacementBindings.Add(activationCards.Name);
                         break;
                     }
+                    case CaptureMovementResult moved:
+                    {
+                        var source = Get(moved.Source);
+                        var root = new Root(moved.Result, false, false, typedCardAtoms, expandedCardDomain);
+                        root.Consumed.UnionWith(root.Atoms.Keys);
+                        roots.Add(root);
+                        Add(moved.Result, new(root, root.Atoms.Keys.ToHashSet(), source.MaximumCount));
+                        break;
+                    }
                     case ReadCompletedActivationDiscard paid:
                     {
                         var source = Get(paid.Name);

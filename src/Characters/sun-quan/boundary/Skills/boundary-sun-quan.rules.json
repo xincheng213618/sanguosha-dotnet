@@ -16,8 +16,8 @@
           "usesPerPhase": 1,
           "effects": [
             { "op": "captureSelectedCards", "target": "owner", "resultBind": "exchange-cards" },
-            { "op": "moveBoundCards", "target": "owner", "sourceBind": "exchange-cards", "destination": "discardPile" },
-            { "op": "draw", "target": "owner", "numberExpression": "boundCardCount", "sourceBind": "exchange-cards" },
+            { "op": "moveBoundCards", "target": "owner", "sourceBind": "exchange-cards", "destination": "discardPile", "resultBind": "exchange-cards-moved" },
+            { "op": "draw", "target": "owner", "numberExpression": "boundCardCount", "sourceBind": "exchange-cards-moved" },
             { "op": "drawAllHandSelectedBonus", "target": "owner", "amount": 1 }
           ]
         }

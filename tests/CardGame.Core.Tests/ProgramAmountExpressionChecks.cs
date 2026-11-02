@@ -120,6 +120,41 @@ internal static class ProgramAmountExpressionChecks
             {"op":"markCards","target":"owner","bind":"gained","mark":"captured"},
             {"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":["gainCards","owner","incoming"]}
             """);
+        foreach (var destination in new[] { "discardPile", "ownerHand", "drawPileTop" })
+        {
+            var movement = Load($$"""
+                {"op":"revealTopCards","target":"owner","amount":2,"resultBind":"planned","visibility":"public"},
+                {"op":"moveBoundCards","target":"owner","sourceBind":"planned","destination":"{{destination}}","resultBind":"actual"},
+                {"op":"captureNumber","target":"owner","resultBind":"moved-count","valueExpr":["boundCount","actual"]}
+                """);
+            Need(movement.Activations.Single().Effects[1] is { Op: SkillProgramEffectOp.MoveBoundCards, ResultBind: "actual" },
+                "Synchronous bound movement declares its actual physical result before later steps consume it.");
+        }
+        const string revealSource = """{"op":"revealTopCards","target":"owner","amount":2,"resultBind":"planned","visibility":"public"},""";
+        foreach (var destination in new[] { "drawPileBottom", "selectedTargetHand", "phaseOwnerHand", "ownerPersistentZone" })
+        {
+            var zone = destination == "ownerPersistentZone" ? ",\"destinationZone\":\"woodenOxGrain\"" : "";
+            Reject(revealSource + $$"""{"op":"moveBoundCards","target":"owner","sourceBind":"planned","destination":"{{destination}}","resultBind":"actual"{{zone}}}""");
+        }
+        Reject(revealSource + """{"op":"moveBoundCards","target":"owner","sourceBind":"planned","destination":"discardPile","resultBind":1}""");
+        Reject(revealSource + """{"op":"moveBoundCards","target":"owner","sourceBind":"planned","destination":"discardPile","resultBind":"planned"}""");
+        Reject(revealSource + """
+            {"op":"captureNumber","target":"owner","resultBind":"actual","valueExpr":1},
+            {"op":"moveBoundCards","target":"owner","sourceBind":"planned","destination":"discardPile","resultBind":"actual"}
+            """);
+        Reject(revealSource + """
+            {"op":"captureNumber","target":"owner","resultBind":"early","valueExpr":["boundCount","actual"]},
+            {"op":"moveBoundCards","target":"owner","sourceBind":"planned","destination":"discardPile","resultBind":"actual"}
+            """);
+        Reject(revealSource + """
+            {"op":"moveBoundCards","target":"owner","sourceBind":"planned","destination":"discardPile","resultBind":"actual"},
+            {"op":"moveBoundCards","target":"owner","sourceBind":"actual","destination":"ownerHand"}
+            """);
+        var movementEstimate = ProgramCompositionAi.Estimate(Load(revealSource + """
+            {"op":"moveBoundCards","target":"owner","sourceBind":"planned","destination":"discardPile","resultBind":"actual"},
+            {"op":"draw","target":"owner","amountExpr":["boundCount","actual"]}
+            """).Activations.Single().Effects, new PlayerSkillContext(0, 4, 4, 2, TurnPhase.Play));
+        Need(movementEstimate.Hint.OwnerDraw == 2, "The movement result is available to subsequent AI quantity reads without an extra cost or a live hidden-card query.");
         foreach (var window in new[] { "dyingEntered", "dyingExited" })
         {
             var transition = $$"""
@@ -293,6 +328,46 @@ internal static class ProgramAmountExpressionChecks
             "An activation without an acquisition context cancels an unknown card capture and its suffix while preserving the already delivered draw.");
         _ = Cold(game, registry);
         CapturedGainCardsSurviveRealDrawChildrenCold();
+        ActualBoundMovementResultsSurviveChildrenCold();
+    }
+
+    private static void ActualBoundMovementResultsSurviveChildrenCold()
+    {
+        var (game, registry) = Create(nativeDraw: true);
+        Use(game, "live"); Play(game);
+        var beforeHand = View(game, 0).HandCount;
+        var original = View(game, 0).Hand.Take(2).Select(card => card.Id).ToArray();
+        Need(original.Length == 2, "The fixed shared fixture supplies two real move materials.");
+        Use(game, "move-result", cards: original);
+        Reach(game, () => game.PendingDecision?.SkillPrompt?.SkillId == Watch);
+        var parent = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Skill && frame.ActivationId == "move-result");
+        var source = parent.CardSetBindings.Single(binding => binding.Name == "planned");
+        var result = parent.CardSetBindings.Single(binding => binding.Name == "actual");
+        Need(source.CardIds.SequenceEqual(original) && source.SourceLocations.All(location => location == CardLocation.Hand(0)) &&
+            result.CardIds.SequenceEqual(original) && result.SourceLocations.All(location => location == CardLocation.DiscardPile) &&
+            result.IsReadOnlySnapshot && result.Visibility == SkillProgramCardSetVisibility.Private && View(game, 0).HandCount == beforeHand - 2,
+            "The movement result freezes actual destinations before observer children without changing its original source binding.");
+        var restored = Cold(game, registry);
+        foreach (var branch in new[] { game, restored })
+        {
+            var frozen = branch.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id).CardSetBindings.Single(binding => binding.Name == "actual");
+            Need(frozen.CardIds.SequenceEqual(result.CardIds) && frozen.SourceLocations.SequenceEqual(result.SourceLocations) && frozen.IsReadOnlySnapshot,
+                "Cold recovery retains the physical result on its original frame before the observer returns.");
+            FinishChildren(branch);
+            Need(View(branch, 0).HandCount == beforeHand &&
+                branch.CardMovements.Count(move => original.Contains(move.CardId) && move.From == CardLocation.Hand(0) &&
+                    move.To == CardLocation.DiscardPile && move.Reason.Value == "skill-program." + Skill + ".MoveBoundCards") == 2 &&
+                Events<ProgramAmountEvaluatedEvent>(branch).Single(fact => fact.FrameId == parent.Id).Amount == 2 &&
+                Events<ProgramSkillResolvedEvent>(branch).Count(fact => fact.FrameId == parent.Id && fact.Completed) == 1,
+                "Returning from the movement observer consumes the actual result once without moving or paying the original materials again.");
+        }
+        Need(State(game) == State(restored), "Physical result bindings produce the same events and views after cold recovery.");
+        Use(game, "empty-move-result"); Play(game);
+        var empty = Events<ProgramSkillResolvedEvent>(game).Last(fact => fact.SkillId == Skill && fact.ActivationId == "empty-move-result");
+        Need(empty.Completed && Events<ProgramExpressionNumberCapturedEvent>(game).Single(fact => fact.FrameId == empty.FrameId).Value == 0 &&
+            Events<ProgramAmountEvaluatedEvent>(game).Where(fact => fact.FrameId == empty.FrameId).Select(fact => fact.Amount).SequenceEqual([0, 1]),
+            "A real zero movement still produces a readable empty result and does not cancel the following sentinel draw.");
+        _ = Cold(game, registry);
     }
 
     private static void CapturedGainCardsSurviveRealDrawChildrenCold()
@@ -448,8 +523,8 @@ internal static class ProgramAmountExpressionChecks
     private static PlayerSnapshot View(GameEngine game, int seat) => game.CreateSnapshot(seat).Players[seat];
     private static T[] Events<T>(GameEngine game) where T : IGameEvent => game.Events.Select(e => e.Payload).OfType<T>().ToArray();
     private static int Moves(GameEngine game, string reason, int seat = 0) => game.CardMovements.Count(m => m.Reason.Value == reason && m.To == CardLocation.Hand(seat));
-    private static void Use(GameEngine game, string activation, int[]? targets = null, string skill = Skill) =>
-        Accept(game, new UseProgramSkillCommand(0, skill, activation, [], targets ?? [], game.Revision, game.PendingDecision!.PromptId));
+    private static void Use(GameEngine game, string activation, int[]? targets = null, string skill = Skill, int[]? cards = null) =>
+        Accept(game, new UseProgramSkillCommand(0, skill, activation, cards ?? [], targets ?? [], game.Revision, game.PendingDecision!.PromptId));
     private static void Accept(GameEngine game, GameCommand command)
     { var result = game.Submit(command); Need(result.Accepted, result.Error?.Message ?? "Amount-expression command rejected."); }
     private static void Reach(GameEngine game, Func<bool> done)
@@ -540,6 +615,15 @@ internal static class ProgramAmountExpressionChecks
                     {"op":"draw","target":"owner","amount":1},{"op":"draw","target":"owner","amountExpr":["number","saved-hand"]}]},
                   {"id":"gain-capture","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
                     {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true}]},
+                  {"id":"move-result","minCards":2,"maxCards":2,"sourceZones":["hand"],"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
+                    {"op":"captureSelectedCards","target":"owner","resultBind":"planned"},
+                    {"op":"moveBoundCards","target":"owner","sourceBind":"planned","destination":"discardPile","resultBind":"actual","awaitMovementTriggers":true},
+                    {"op":"draw","target":"owner","amountExpr":["boundCount","actual"]}]},
+                  {"id":"empty-move-result","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
+                    {"op":"revealTopCards","target":"owner","amountExpr":0,"resultBind":"planned","visibility":"public","onUnknownAmount":"cancelBinding"},
+                    {"op":"moveBoundCards","target":"owner","sourceBind":"planned","destination":"discardPile","resultBind":"actual"},
+                    {"op":"captureNumber","target":"owner","resultBind":"empty-move-count","valueExpr":["boundCount","actual"]},
+                    {"op":"draw","target":"owner","amountExpr":["+",1,["boundCount","actual"]]}]},
                   {"id":"unknown-card-binding","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
                     {"op":"draw","target":"owner","amount":1},
                     {"op":"captureCards","target":"owner","resultBind":"unavailable","cardsExpr":["gainCards","owner","incoming"]},
@@ -571,6 +655,9 @@ internal static class ProgramAmountExpressionChecks
                   {"id":"native-query","window":"nativeDrawStarting","subject":"owner","optional":false,"effects":[
                     {"op":"setChainedState","target":"owner","chained":false}]}]},
                  {"id":"{{Watch}}","revision":1,"triggers":[
+                  {"id":"paid-move-result","window":"cardsMoved","subject":"owner","optional":false,"movementOccurrence":"perBatch","sourceZones":["hand"],
+                   "movementReasons":["skill-program.{{Skill}}.MoveBoundCards"],"effects":[
+                    {"op":"chooseOption","target":"owner","resultBind":"resume","options":[{"id":"resume"}]}]},
                   {"id":"paid-child","window":"cardsGained","subject":"owner","optional":false,"movementOccurrence":"perBatch","destinationZones":["hand"],
                    "movementReasons":["{{ColdDrawReason}}"],"effects":[
                     {"op":"chooseOption","target":"owner","resultBind":"resume","options":[{"id":"resume"}]},{"op":"draw","target":"owner","amount":1}]}{{capturedCardTriggers}}]}]}

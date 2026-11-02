@@ -176,13 +176,14 @@
               "op": "moveBoundCards",
               "target": "owner",
               "sourceBind": "exchange-cards",
-              "destination": "discardPile"
+              "destination": "discardPile",
+              "resultBind": "exchange-cards-moved"
             },
             {
               "op": "draw",
               "target": "owner",
               "numberExpression": "boundCardCount",
-              "sourceBind": "exchange-cards"
+              "sourceBind": "exchange-cards-moved"
             },
             {
               "op": "drawAllHandSelectedBonus",

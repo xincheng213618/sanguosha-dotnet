@@ -295,6 +295,7 @@ internal static class PhysicalCardDrawRuntimeChecks
                 "Both typed replacement protocols coalesce their exact gain materials without relabeling a replacement as a draw invocation.");
         }
         ReadOnlyCardSnapshotsNeverOwnProcessingCleanup(game, registry);
+        BoundMovementResultsFreezeActualPhysicalMoves(game, registry);
     }
 
     private static void ReadOnlyCardSnapshotsNeverOwnProcessingCleanup(GameEngine game, ContentRegistry registry)
@@ -316,7 +317,7 @@ internal static class PhysicalCardDrawRuntimeChecks
         var runtime = new ProgramBoundCardRuntime(Port<IProgramBoundCardFacts>(), Port<IProgramBoundInstructionFacts>(),
             Port<IProgramBoundCardMovementOperations>(), Port<IProgramBoundCardPaymentOperations>(),
             new SubsetReturnFrames(frames), Port<IProgramRuntimePrompts>(), Port<IProgramRuntimeEvents>(),
-            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>());
+            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>(), Port<ICardMovementHistoryQueries>());
         var pindian = game.GetRuntimeModule<ProgramPindianRuntime>();
         var hasPending = typeof(ProgramPindianRuntime).GetMethod("HasPendingBoundCards", BindingFlags.Instance | BindingFlags.NonPublic)!;
         bool Pending() => (bool)hasPending.Invoke(pindian, null)!;
@@ -352,6 +353,104 @@ internal static class PhysicalCardDrawRuntimeChecks
         }
         finally { frames.Pop(frame.Id, frame.Kind); }
         Require(ReferenceEquals(frames.Top, originalTop), "The snapshot cleanup check restores the original resolution stack.");
+    }
+
+    private static void BoundMovementResultsFreezeActualPhysicalMoves(GameEngine game, ContentRegistry registry)
+    {
+        var match = (MatchRuntime)typeof(GameEngine).GetProperty("MatchRuntime", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var frames = match.Capabilities.Get<IProgramRuntimeFrames>();
+        var zones = (CardZoneStore)typeof(GameEngine).GetField("_cardZones", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var production = game.GetRuntimeModule<ProgramBoundCardRuntime>();
+        T Port<T>() => (T)typeof(ProgramBoundCardRuntime).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(field => field.FieldType == typeof(T)).GetValue(production)!;
+        var material = zones.CardsAt(CardLocation.DrawPile).Take(2).ToArray();
+        Require(material.Length == 2, "The existing deck supplies real movable and blocked hand materials.");
+        foreach (var card in material) zones.Move(card.Id, CardLocation.DrawPile, CardLocation.Hand(0));
+        var weapon = new Card(990001, CardKind.Crossbow, Suit.Spade, 1) { IsGeneralWeapon = true };
+        zones.AddGeneratedCard(weapon);
+        zones.Move(weapon.Id, CardLocation.OutsideGame, CardLocation.Equipment(0));
+        var history = Port<ICardMovementHistoryQueries>();
+        var runtime = new ProgramBoundCardRuntime(new BlockedDiscardFacts(Port<IProgramBoundCardFacts>(), material[1].Id),
+            Port<IProgramBoundInstructionFacts>(), new NestedMovementAfterFirst(Port<IProgramBoundCardMovementOperations>(), zones, material[0].Id),
+            Port<IProgramBoundCardPaymentOperations>(), frames, Port<IProgramRuntimePrompts>(), Port<IProgramRuntimeEvents>(),
+            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>(), history);
+        var program = registry.GetSkill("classic:xunxun").Program!;
+        var trigger = program.Triggers.Single();
+        var originalTop = frames.Top;
+        var frame = new ProgramSkillFrame(frames.NextId(), 0, program.Id, trigger.Id, program.GameplayHash, 2, [], []) { TriggerId = trigger.Id };
+        frames.Push(frame);
+        try
+        {
+            ProgramSkillCardSetBinding Result(string name) => frames.ActiveProgram(frame.Id).CardSetBindings.Single(binding => binding.Name == name);
+            void Move(string source, string result) => ((IProgramBoundCardMovementResults)runtime).Execute(frames.ActiveProgram(frame.Id),
+                new(SkillProgramEffectOp.MoveBoundCards, SkillProgramEffectTarget.Owner, 0, new(SkillProgramConditionKind.Always, 0, []),
+                    sourceBind: source, resultBind: result, destination: SkillProgramCardDestination.DiscardPile), new("fixture.bound-result.move"));
+            var before = history.Read().Count;
+            runtime.SetProgramCardSet(frame.Id, "empty-source", [], SkillProgramCardSetVisibility.Private);
+            Move("empty-source", "empty-result");
+            runtime.SetProgramCardSet(frame.Id, "blocked-source", [material[1].Id], SkillProgramCardSetVisibility.Private);
+            Move("blocked-source", "blocked-result");
+            Require(Result("empty-result").CardIds.Count == 0 && Result("blocked-result").CardIds.Count == 0 &&
+                Result("empty-result").IsReadOnlySnapshot && Result("blocked-result").IsReadOnlySnapshot && history.Read().Count == before &&
+                zones.GetLocation(material[1].Id) == CardLocation.Hand(0),
+                "Empty and fully prohibited moves produce real empty observation results without inventing a physical payment.");
+            runtime.SetProgramCardSet(frame.Id, "materials", [material[0].Id, material[1].Id, weapon.Id], SkillProgramCardSetVisibility.Private);
+            Move("materials", "actual-result");
+            var actual = Result("actual-result");
+            Require(actual.CardIds.SequenceEqual([material[0].Id, weapon.Id]) &&
+                actual.SourceLocations.SequenceEqual([CardLocation.DiscardPile, CardLocation.OutsideGame]) &&
+                actual.Visibility == SkillProgramCardSetVisibility.Private && actual.IsReadOnlySnapshot &&
+                zones.GetLocation(material[0].Id) == CardLocation.Processing && zones.GetLocation(weapon.Id) == CardLocation.OutsideGame &&
+                zones.GetLocation(material[1].Id) == CardLocation.Hand(0),
+                "The result retains first physical destinations, including real generated-weapon destruction, excludes the blocked material, and does not refresh from a later move of the same entity.");
+        }
+        finally { frames.Pop(frame.Id, frame.Kind); }
+        Require(ReferenceEquals(frames.Top, originalTop), "The movement-result check restores the original resolution stack.");
+    }
+
+    private sealed class BlockedDiscardFacts(IProgramBoundCardFacts facts, int blockedCard) : IProgramBoundCardFacts
+    {
+        public bool IsValidSeat(int seat) => facts.IsValidSeat(seat);
+        public bool IsHuman(int seat) => facts.IsHuman(seat);
+        public string Name(int seat) => facts.Name(seat);
+        public bool HasHpValue(int seat) => facts.HasHpValue(seat);
+        public int Hp(int seat) => facts.Hp(seat);
+        public int MaxHp(int seat) => facts.MaxHp(seat);
+        public IReadOnlyList<Card> Hand(int seat) => facts.Hand(seat);
+        public IReadOnlyList<Card> Equipment(int seat) => facts.Equipment(seat);
+        public IReadOnlyList<Card> CardsAt(CardLocation location) => facts.CardsAt(location);
+        public CardLocation Location(int cardId) => facts.Location(cardId);
+        public CardMovementRecord? LastMovement(int cardId) => facts.LastMovement(cardId);
+        public EquipmentSlot FieldEquipmentSlot(Card card) => facts.FieldEquipmentSlot(card);
+        public Suit EffectiveSuit(int seat, Card card) => facts.EffectiveSuit(seat, card);
+        public bool ForeignDiscardPrevented(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) =>
+            card.Id == blockedCard || facts.ForeignDiscardPrevented(chooser, card, source, intent);
+    }
+
+    private sealed class NestedMovementAfterFirst(IProgramBoundCardMovementOperations movement, CardZoneStore zones, int observedCard)
+        : IProgramBoundCardMovementOperations
+    {
+        private bool _moved;
+        private void AfterPrimaryMove()
+        {
+            if (_moved || zones.GetLocation(observedCard) != CardLocation.DiscardPile) return;
+            _moved = true;
+            var card = zones.CardsAt(CardLocation.DiscardPile).Single(item => item.Id == observedCard);
+            movement.Move(card, CardLocation.DiscardPile, CardLocation.Processing, new("fixture.bound-result.nested"));
+        }
+        public long Sequence => movement.Sequence;
+        public Card? DrawToProcessing(CardMoveReason reason) => movement.DrawToProcessing(reason);
+        public void Move(Card card, CardLocation source, CardLocation destination, CardMoveReason reason,
+            ProgramBoundCardGive? give = null, CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified)
+        { movement.Move(card, source, destination, reason, give, disclosure); AfterPrimaryMove(); }
+        public void MoveCards(IReadOnlyList<Card> cards, CardLocation source, CardLocation destination, CardMoveReason reason,
+            ProgramBoundCardGive? give = null, CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified)
+        { movement.MoveCards(cards, source, destination, reason, give, disclosure); AfterPrimaryMove(); }
+        public void MoveMultipleSources(IReadOnlyList<int> ids, CardLocation destination, CardMoveReason reason,
+            CardMovementDisclosure disclosure, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null)
+        { movement.MoveMultipleSources(ids, destination, reason, disclosure, afterPhysicalRecords); AfterPrimaryMove(); }
+        public void PlaceAtBottom(IReadOnlyList<int> ids) => movement.PlaceAtBottom(ids);
+        public void PlaceAtTop(IReadOnlyList<int> ids) => movement.PlaceAtTop(ids);
     }
 
     // Observe the subset's typed binding return before the real scheduler begins the next recipe instruction.
