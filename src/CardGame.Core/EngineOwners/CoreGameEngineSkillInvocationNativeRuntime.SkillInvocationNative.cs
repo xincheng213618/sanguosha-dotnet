@@ -16,7 +16,10 @@ internal sealed partial class CoreGameEngineSkillInvocationNativeRuntime
                 if (frame.ParentFrameId != 0 || frame.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Discard || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardPolicyResolvedEvent>().Any(e => e.OwnerSeat == frame.ActorSeat && e.SkillId == frame.SkillKey && e.Applied))
                     throw new InvalidOperationException("A discard policy invocation lost its accepted native choice.");
                 if (_coreMatchOutcomeWinnerAccess._winner == Winner.None)
+                {
+                    _actualPhases.RecordSkipped(ActualDiscardRecoveryPhaseKind.Discard, frame.ActorSeat);
                     _coreActualTurnsOperations.EndTurn();
+                }
                 return;
             case SkillInvocationReturnKind.FactionDefense:
                 if (_coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not { } defense || defense.OwnerSeat != frame.ActorSeat || defense.Source.SkillId != frame.SkillKey || defense.Source.SkillInstanceId != frame.SkillInstanceId || defense.InvocationOccurrenceKey != frame.OccurrenceKey)

@@ -23,48 +23,48 @@ internal sealed partial class ProgramEventHistoryIndex
 
     public ActualCardUseHistoryEntry? FindAction(long actionId)
     {
-        SynchronizeActualUses();
+        SynchronizeNativeHistory();
         return _actualActions.GetValueOrDefault(actionId);
     }
 
     public NativeCardUseHistorySnapshot? FindNativeUse(long nativeUseId)
     {
-        SynchronizeActualUses();
+        SynchronizeNativeHistory();
         return _nativeUses.GetValueOrDefault(nativeUseId);
     }
 
     public CardActionContext? FindLatestAction(long actionId)
     {
-        SynchronizeActualUses();
+        SynchronizeNativeHistory();
         return _latestActualActions.GetValueOrDefault(actionId);
     }
 
     public ActualCardUseHistoryEntry? FindFinalizedUse(long nativeUseId)
     {
-        SynchronizeActualUses();
+        SynchronizeNativeHistory();
         return _finalizedActions.TryGetValue(nativeUseId, out var actionId) ? _actualActions[actionId] : null;
     }
 
     public ActualCardUseHistoryEntry? PreviousFinalizedUse(long nativeUseId)
     {
-        SynchronizeActualUses();
+        SynchronizeNativeHistory();
         return _finalizedActions.TryGetValue(nativeUseId, out var actionId) &&
             _previousFinalizedActions.TryGetValue(actionId, out var previous) ? _actualActions[previous] : null;
     }
 
     public ActualCardUseHistoryEntry? FindCompletedUse(long nativeUseId)
     {
-        SynchronizeActualUses();
+        SynchronizeNativeHistory();
         return _completedNativeActions.TryGetValue(nativeUseId, out var actionId) ? _completedActualActions.GetValueOrDefault(actionId) : null;
     }
 
     public IReadOnlyList<ActualCardUseHistoryEntry> AcceptedPairAtCompletionFor(long actionId)
     {
-        SynchronizeActualUses();
+        SynchronizeNativeHistory();
         return _acceptedAtCompletion.GetValueOrDefault(actionId) ?? [];
     }
 
-    private void SynchronizeActualUses()
+    private void SynchronizeNativeHistory()
     {
         var stamp = CapturePendingProgramHistoryStamp();
         if (_actualCommittedCount == events.Count && _actualPendingGeneration == stamp.Generation) return;
@@ -78,13 +78,13 @@ internal sealed partial class ProgramEventHistoryIndex
             var current = offset < events.Count ? events[offset].Payload :
                 offset - events.Count < pendingEvents.Count ? pendingEvents[offset - events.Count] : null;
             var previous = _actualPendingWitness[index];
-            retained = ReferenceEquals(previous, current) || !IsActualUseFact(previous) && current is not null && !IsActualUseFact(current);
+            retained = ReferenceEquals(previous, current) || !IsNativeHistoryFact(previous) && current is not null && !IsNativeHistoryFact(current);
         }
         var start = _actualCommittedCount + _actualPendingWitness.Count;
         if (!retained)
         {
             _actualActions.Clear(); _finalizedActions.Clear(); _previousFinalizedActions.Clear();
-            _latestActualActions.Clear(); ClearCardUseFacts();
+            _latestActualActions.Clear(); ClearCardUseFacts(); _actualPhaseHistory.Clear();
             _nativeUses.Clear();
             _completedActualActions.Clear(); _completedNativeActions.Clear(); _acceptedAtCompletion.Clear();
             _lastFinalizedActions.Clear(); _acceptedActualUses.Clear(); _acceptedActualPositions.Clear();
@@ -92,7 +92,7 @@ internal sealed partial class ProgramEventHistoryIndex
             start = 0;
         }
         for (var index = start; index < events.Count + pendingEvents.Count; index++)
-            IndexActualUseFact(index < events.Count ? events[index].Payload : pendingEvents[index - events.Count], index + 1L);
+            IndexNativeHistoryFact(index < events.Count ? events[index].Payload : pendingEvents[index - events.Count], index + 1L);
         if (!knownAppend) _actualPendingWitness.Clear();
         for (var index = _actualPendingWitness.Count; index < pendingEvents.Count; index++)
             _actualPendingWitness.Add(pendingEvents[index]);
@@ -101,13 +101,15 @@ internal sealed partial class ProgramEventHistoryIndex
         _actualPendingResetGeneration = stamp.ResetGeneration;
     }
 
-    private static bool IsActualUseFact(IGameEvent payload) => payload is ActualCardActionRecordedEvent or
+    private static bool IsNativeHistoryFact(IGameEvent payload) => payload is ActualCardActionRecordedEvent or
         ActualCardUseTargetsFinalizedEvent or ActualCardUseTargetsCompletedEvent or ActualCardUseActionUpdatedEvent or
-        CardUseFinishedEvent or CardResponseCompletedEvent or NativeCardUseHistoryRecordedEvent;
+        CardUseFinishedEvent or CardResponseCompletedEvent or NativeCardUseHistoryRecordedEvent or
+        ActualDiscardRecoveryPhaseStartedEvent or ActualPhaseSkippedEvent;
 
-    private void IndexActualUseFact(IGameEvent payload, long cursor)
+    private void IndexNativeHistoryFact(IGameEvent payload, long cursor)
     {
         IndexCardUseFacts(payload, cursor);
+        IndexActualPhaseFact(payload, cursor);
         switch (payload)
         {
             case NativeCardUseHistoryRecordedEvent { Snapshot: var snapshot }:

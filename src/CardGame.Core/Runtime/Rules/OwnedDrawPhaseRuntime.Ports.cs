@@ -9,7 +9,6 @@ internal interface IOwnedDrawPhaseFacts : IProgramSelectionQuery
     bool HasAttemptCapability { get; }
     bool TracksNativeDrawThresholds { get; }
     bool TracksShanheS5PhaseSkips { get; }
-    bool TracksBoundaryZhuHuanPhaseSkips { get; }
     bool HasIssuedExtraDrawMarker(int seat);
     int RelativeTableOrder(int from, int target);
 }

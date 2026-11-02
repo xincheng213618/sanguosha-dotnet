@@ -9,22 +9,6 @@ internal sealed partial class CoreNianActivityProgramsRuntime
     SkillProgramStepOutcome INianActivityProgramHost.ExecuteNianActivity(ProgramSkillFrame f, SkillProgramEffect e) => ExecuteNianActivity(f, e);
     internal bool NianEnabled(CharacterState player, string id) => player.IsAlive && _contentRegistryOperations._contentRegistry.Skills.ContainsKey(id) && _coreNationalSkillsOperations.HasRuntimeSkill(player, id);
     internal bool NianOwnActualTurn(int seat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat == seat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase is not (TurnPhase.NotStarted or TurnPhase.Finished);
-    internal bool NianPhaseWasActuallySkipped(int seat, SkillProgramTurnPhase phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NianActualPhaseSkippedEvent>().Any(e => e.ActualTurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.OwnerSeat == seat && e.Phase == phase);
-    internal void RecordNianActualPhaseSkips(int owner, bool draw, bool play)
-    {
-        if (!NianEnabled(_coreMatchParticipantsPlayersAccess._players[owner], "nian:mengtai") || !NianOwnActualTurn(owner))
-            return;
-        foreach (var phase in new[]
-        {
-            SkillProgramTurnPhase.Draw,
-            SkillProgramTurnPhase.Play
-        }
-
-        )
-            if ((phase == SkillProgramTurnPhase.Draw ? draw : play) && !NianPhaseWasActuallySkipped(owner, phase))
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NianActualPhaseSkippedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, owner, phase));
-    }
-
     internal SkillProgramStepOutcome ExecuteNianActivity(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
@@ -32,12 +16,6 @@ internal sealed partial class CoreNianActivityProgramsRuntime
         var reason = new CardMoveReason($"skill-program.{(frame.SkillId)}.{(effect.Op)}");
         switch (effect.Op)
         {
-            case SkillProgramEffectOp.ApplyNianMengtaiDiscard:
-                return NianPhaseWasActuallySkipped(owner.Seat, SkillProgramTurnPhase.Play) ? _coreProgramTurnPhaseOperations.SkipProgramTurnPhases(frame, [SkillProgramTurnPhase.Discard]) : SkillProgramStepOutcome.Continue;
-            case SkillProgramEffectOp.DrawNianMengtaiEnding:
-                if (NianPhaseWasActuallySkipped(owner.Seat, SkillProgramTurnPhase.Draw))
-                    return _coreProgramNativeDrawOperations.BeginOperationProgramDraw(frame, owner.Seat, 3, reason);
-                break;
             case SkillProgramEffectOp.DiscardNianRuizhiRemainder:
             {
                 if (frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, TargetSeat: { } other } context || other == frame.OwnerSeat || other != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat || !_coreMatchParticipantsPlayersAccess._players[other].IsAlive || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId)is not { OwnerSeat: var turnOwner } || turnOwner != other)
@@ -95,12 +73,12 @@ internal sealed partial class CoreNianActivityProgramsRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    [ProgramNativeDrawReturn(SkillProgramEffectOp.DrawNianMengtaiEnding, SkillProgramEffectOp.DrawNianRenxingDamage, SkillProgramEffectOp.DrawNianRenxingRecovery, SkillProgramEffectOp.DrawNianBaonuReplacement)]
+    [ProgramNativeDrawReturn(SkillProgramEffectOp.DrawNianRenxingDamage, SkillProgramEffectOp.DrawNianRenxingRecovery, SkillProgramEffectOp.DrawNianBaonuReplacement)]
     internal void ReturnNianOperationDraw(ProgramSkillFrame frame, NativeDrawOutcome outcome)
     {
         var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
         var operation = plan.Instructions[frame.InstructionIndex - 1].Op;
-        var expected = operation == SkillProgramEffectOp.DrawNianBaonuReplacement ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NianBaonuDrawRolledEvent>().Single(e => e.ProgramFrameId == frame.Id && e.OwnerSeat == frame.OwnerSeat).DrawCount : operation == SkillProgramEffectOp.DrawNianMengtaiEnding ? 3 : 1;
+        var expected = operation == SkillProgramEffectOp.DrawNianBaonuReplacement ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NianBaonuDrawRolledEvent>().Single(e => e.ProgramFrameId == frame.Id && e.OwnerSeat == frame.OwnerSeat).DrawCount : 1;
         var reason = new CardMoveReason($"skill-program.{(frame.SkillId)}.{(operation)}");
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != frame.Id || frame.NativeDraw is not null || outcome.RecipientSeat != frame.OwnerSeat || outcome.RequestedCount != expected || outcome.SequenceAfter < outcome.SequenceBefore || outcome.SequenceAfter > _coreOutsidePhaseDrawDiscardOperations.OutsidePhaseMovementSequence || outcome.ActualDrawIds.Count > expected || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || outcome.AttemptFrameId is { } attempt && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == attempt && e.ParentFrameId == frame.Id && e.RecipientSeat == frame.OwnerSeat && e.RequestedCount == expected && e.Replaced == (outcome.Replacement is not null)) != 1)
             throw new InvalidOperationException("Nian's native draw lost its exact paid operation, requested count or typed replacement return.");

@@ -47,6 +47,9 @@ public sealed record NativeDrawAttemptStartedEvent(NativeDrawAttemptContext Cont
 public sealed record NativeDrawAttemptDecidedEvent(long AttemptFrameId, long ParentFrameId,
     int RecipientSeat, int RequestedCount, bool Replaced) : IGameEvent;
 
+/// <summary>A delivered instruction may finish its own return without authorizing a following step.</summary>
+public sealed record ProgramInstructionDelivery(int InstructionIndex, SkillProgramEffectOp Operation);
+
 /// <summary>The paid producer owns its recipient cursor and exact child return.</summary>
 public sealed record NativeDrawProducerReceipt(int InstructionIndex, int RequestedCount,
     string? ResultBind, SkillProgramCardSetVisibility Visibility, CardMoveReason Reason)
@@ -78,6 +81,8 @@ public sealed record NativeOperationDrawReturn(int InstructionIndex, SkillProgra
 
 public sealed partial record ProgramSkillFrame
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramInstructionDelivery? InstructionDelivery { get; init; }
     private readonly IReadOnlyList<NativeOperationDrawReturn> _nativeOperationDrawReturns = Array.AsReadOnly(Array.Empty<NativeOperationDrawReturn>());
     public IReadOnlyList<NativeOperationDrawReturn> NativeOperationDrawReturns
     {

@@ -53,7 +53,7 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
     {
         var skipped = (delayedEffects & facts.SkipDrawPhaseMask) != 0;
         if (frames.Top is not null || prompts.Current is not null || !owner.IsAlive || facts.Winner != Winner.None ||
-            !(skipped && (content.HasTriggerWindow(SkillProgramTriggerWindow.DrawPhaseSkipped) || facts.TracksShanheS5PhaseSkips || facts.TracksBoundaryZhuHuanPhaseSkips) ||
+            !(skipped && (content.HasTriggerWindow(SkillProgramTriggerWindow.DrawPhaseSkipped) || facts.TracksShanheS5PhaseSkips || content.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase)) ||
               !skipped && (phaseEnds.Tracks || facts.TracksNativeDrawThresholds || facts.HasIssuedExtraDrawMarker(owner.Seat) ||
                   content.HasTriggerOperation(SkillProgramEffectOp.ResolveGangshuAttributeIncrement)))) return false;
         var inherited = Array.AsReadOnly(PendingBatches().Where(batch => batch.ParentFrameId is null &&
@@ -116,7 +116,8 @@ internal sealed class OwnedDrawPhaseRuntime(IProgramRuntimeFrames frames, INativ
                     break;
                 case DrawPhaseObligationStage.SkipObservers:
                     frames.ReplaceTop(frame with { Stage = DrawPhaseObligationStage.Finished });
-                    if (content.HasTriggerWindow(SkillProgramTriggerWindow.DrawPhaseSkipped) || facts.TracksShanheS5PhaseSkips || facts.TracksBoundaryZhuHuanPhaseSkips)
+                    phaseOperations.RecordSkipped(ActualDiscardRecoveryPhaseKind.Draw, frame.OwnerSeat, frame.PhaseOccurrenceFrameId ?? (frame.IsExtra ? frame.Id : null), frame.IsExtra);
+                    if (content.HasTriggerWindow(SkillProgramTriggerWindow.DrawPhaseSkipped) || facts.TracksShanheS5PhaseSkips || content.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase))
                     {
                         events.AdvanceFact(new DrawPhaseSkippedEvent(frame.Id, frame.OwnerSeat, frame.ActualTurnNumber, frame.IsExtra));
                         if (TryBeginOwnedDrawPhaseWindow(frame.Id, SkillProgramTriggerWindow.DrawPhaseSkipped)) return;

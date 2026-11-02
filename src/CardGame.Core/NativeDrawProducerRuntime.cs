@@ -154,9 +154,14 @@ internal sealed class NativeDrawProducerRuntime(IProgramRuntimeFrames frames,
                 }
                 operations.CaptureLiushiPayment(frame, paid.RequestedCount, materialBefore, queries.MovementSequence,
                     drawn.Count, paid.ActiveAttemptId, paid.Replacement is not null);
+                frame = frames.ActiveProgram(id);
+                frames.ReplaceTop(frame = frame with
+                {
+                    NativeDraw = paid = paid with { RecipientApplied = true },
+                    InstructionDelivery = new(paid.InstructionIndex, SkillProgramEffectOp.Draw)
+                });
                 operations.CompleteDrawCards(id, seat, paid.ResultBind, paid.Visibility, paid.Reason, before, drawn);
                 frame = frames.ActiveProgram(id);
-                frames.ReplaceTop(frame = frame with { NativeDraw = paid = paid with { RecipientApplied = true } });
             }
             // A recipient's observers finish before the next actual attempt.
             if (operations.BeginRecoveryReplacement(id) ||

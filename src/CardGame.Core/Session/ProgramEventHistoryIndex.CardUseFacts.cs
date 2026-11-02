@@ -19,7 +19,7 @@ internal sealed partial class ProgramEventHistoryIndex
 
     public IReadOnlyList<CardUseHistoryFact> ReadCardUseFacts(CardUseHistoryPoint point, CardUseHistoryView view)
     {
-        SynchronizeActualUses();
+        SynchronizeNativeHistory();
         var key = (point.ActualTurn, point.TurnOwnerSeat);
         if (view is CardUseHistoryView.Observations or CardUseHistoryView.Confirmations)
             return (view == CardUseHistoryView.Confirmations ? _factConfirmations : _factObservations).TryGetValue(key, out var observations)

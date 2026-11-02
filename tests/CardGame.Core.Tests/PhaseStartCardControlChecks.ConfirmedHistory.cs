@@ -43,7 +43,8 @@ internal static partial class PhaseStartCardControlChecks
             {
                 Reach(g, p => Optional(p, "ol:tunjiang"));
                 g = Cold(g, registry); Activate(g);
-                Need(E<TunjiangDrawPaidEvent>(g).ToArray() is [{ Requested: > 0, Actual: > 0 }],
+                var root = E<ProgramBindingStartedEvent>(g).Single(e => e.SkillId == "ol:tunjiang");
+                Need(E<ProgramDrawCompletedEvent>(g).Where(e => e.FrameId == root.FrameId).ToArray() is [{ RequestedCount: > 0, ActualDrawCount: > 0 }],
                     "The real untouched Play phase qualifies the actual Tunjiang definition and pays its faction-count draw.");
                 g = Cold(g, registry);
             }
@@ -53,7 +54,10 @@ internal static partial class PhaseStartCardControlChecks
                 Need(!Optional(p, "ol:tunjiang"), "A real confirmed other-player target forbids Tunjiang, and an accepted reward cannot be offered again.");
                 return false;
             });
-            Need(E<TunjiangDrawPaidEvent>(g).Count() == (targeted ? 0 : 1),
+            var roots = E<ProgramBindingStartedEvent>(g).Where(e => e.SkillId == "ol:tunjiang").Select(e => e.FrameId).ToHashSet();
+            var draws = E<ProgramDrawCompletedEvent>(g).Where(e => roots.Contains(e.FrameId)).ToArray();
+            Need(draws.Length == (targeted ? 0 : 1) &&
+                g.CardMovements.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0) && m.Reason.Value == "skill-program.ol:tunjiang.Draw") == draws.Sum(e => e.ActualDrawCount),
                 "Tunjiang's real draw occurs once only for the eligible unskipped Play.");
             _ = Cold(g, registry);
         }

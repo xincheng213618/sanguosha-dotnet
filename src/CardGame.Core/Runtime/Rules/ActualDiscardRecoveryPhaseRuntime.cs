@@ -9,7 +9,7 @@ internal sealed class ActualDiscardRecoveryPhaseRuntime(IProgramRuntimeFrames fr
     ICardZoneQueries zones, ICardMovementHistoryQueries movements, IProgramTurnQueries turn,
     IProgramPhaseQueries phase, ISelectionParticipantQueries participants, IMatchParticipantStateAccess participantState,
     IProgramWindowCandidateQueries candidates, IProgramBindingFacts bindings, IProgramOwnedZoneDiscardFacts discards,
-    IActualDiscardRecoveryPhaseFacts facts, IActualPhaseQueryCache cache)
+    IActualDiscardRecoveryPhaseFacts facts, IActualPhaseQueryCache cache, IProgramPhaseScheduleState schedules)
     : IActualDiscardRecoveryPhaseQueries, IActualDiscardRecoveryPhaseOperations
 {
     private bool Tracks => content.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase) ||
@@ -51,6 +51,22 @@ internal sealed class ActualDiscardRecoveryPhaseRuntime(IProgramRuntimeFrames fr
             .Select(e => e.Phase.Token).DefaultIfEmpty().Max() + 1;
         events.AdvanceFact(new ActualDiscardRecoveryPhaseStartedEvent(new(token, turn.TurnNumber,
             turn.TurnOwnerSeat, actor, kind)));
+    }
+
+    public void RecordSkipped(ActualDiscardRecoveryPhaseKind kind, int actor, long? nativeFrameId = null, bool isExtra = false)
+    {
+        if (!Tracks || turn.TurnNumber < 1 || facts.Winner != Winner.None || !participants.IsAlive(actor)) return;
+        var instruction = 0;
+        if (nativeFrameId is null && schedules.Current is { } schedule &&
+            (kind == ActualDiscardRecoveryPhaseKind.Draw && schedule.Phase == TurnPhase.Draw ||
+             kind == ActualDiscardRecoveryPhaseKind.Play && schedule.Phase == TurnPhase.Play))
+        {
+            nativeFrameId = schedule.Frame.Id;
+            instruction = schedule.Frame.InstructionIndex;
+        }
+        var skipped = new ActualPhaseSkippedEvent(turn.TurnNumber, turn.TurnOwnerSeat, actor, kind,
+            nativeFrameId, instruction, isExtra);
+        if (!history.Read<ActualPhaseSkippedEvent>().Contains(skipped)) events.AdvanceFact(skipped);
     }
 
     public bool IsRecorded(ActualDiscardRecoveryPhaseKey key) =>

@@ -2,20 +2,31 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
-internal interface IMobileZhuHuanPingkouHost { SkillProgramStepOutcome Begin(ProgramSkillFrame frame); }
+internal interface IMobileZhuHuanPingkouHost { SkillProgramStepOutcome Begin(ProgramSkillFrame frame, int maximum); }
 internal sealed class ResolveMobileZhuHuanPingkouDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMobileZhuHuanPingkou;
     public override ISkillProgramEffectHandler Handler { get; } = new MobileZhuHuanPingkouHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy => new(ProgramOperationAiSemantic.SelectTarget, static (_, c) => c.PublicControlValue(3));
-    public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
+    {
+        reader.AllowOnly("op", "target", "condition", "amountExpr");
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(reader), 0, reader.Condition())
+            { AmountExpression = reader.RequiredIntExpression("amountExpr") };
+        RequireAlways(effect, reader.Path);
+        return effect;
+    }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [new RequireTriggerWindow(SkillProgramTriggerWindow.AfterTurnEnded)];
 }
 internal sealed class MobileZhuHuanPingkouHandler : ISkillProgramEffectHandler
 {
     public SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMobileZhuHuanPingkou;
-    public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int target, ISkillProgramEffectHost host) => host.GetCapability<IMobileZhuHuanPingkouHost>().Begin(frame);
+    public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int target, ISkillProgramEffectHost host)
+    {
+        var maximum = frame.MobileZhuHuanPingkou?.Maximum ?? host.EvaluateAmountExpression(frame, effect.AmountExpression!);
+        return maximum is > 0 ? host.GetCapability<IMobileZhuHuanPingkouHost>().Begin(frame, maximum.Value) : SkillProgramStepOutcome.Continue;
+    }
 }
 public sealed record MobileZhuHuanPingkouReceipt(CardConversionSource Source, string GameplayHash, int ActualTurn, long EndedFrame, int Maximum, bool Sealed = false, int Index = 0)
 {

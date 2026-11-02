@@ -19,9 +19,11 @@ internal sealed partial class CoreGameEngineShanheSourceChunlaoJudgment3161Runti
         var current = _coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat];
         _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase = TurnPhase.Draw;
         _coreActualDiscardRecoveryPhasesOperations.StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind.Draw, current.Seat);
-        var frame = new DrawPhaseObligationFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, false, (int)_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects, DrawPhaseObligationStage.Starting)
+        var frameId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
+        var frame = new DrawPhaseObligationFrame(frameId, current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, false, (int)_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects, DrawPhaseObligationStage.Starting)
         {
             DiscardRecoveryPhase = _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase(),
+            PhaseOccurrenceFrameId = frameId,
             ShanheSourceChunlaoJudgmentDraw = new(due[0].CardUseFrameId, current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, (int)_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects)
         };
         _coreRuntimeOperations.PushRuntimeFrame(frame);

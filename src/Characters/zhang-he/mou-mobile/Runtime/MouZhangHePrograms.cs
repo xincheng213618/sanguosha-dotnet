@@ -1,11 +1,6 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
-// This native boundary records a skip that has actually occurred, never a
-// requested skip or a fictitious phase-start/phase-end.
-public sealed record ProgramActualPhaseSkipContext(int OwnerSeat, int ActualTurn, SkillProgramTurnPhase Phase,
-    int DelayedEffects, bool AfterNormalDrawProgramsCompleted = false, bool DrawPhaseEndedProgramsCompleted = false,
-    bool ActualDrawCompletionCompleted = false);
 public sealed record MouZhangHeSkipEntitlement(long PlanFrameId, CardConversionSource Source, string GameplayHash,
     int ActualTurn, SkillProgramTurnPhase Phase);
 public sealed record MouZhangHeSkipBoundary(MouZhangHeSkipEntitlement Entitlement, ProgramActualPhaseSkipContext NativeReturn);

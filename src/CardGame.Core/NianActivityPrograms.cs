@@ -11,16 +11,6 @@ internal abstract class NianActivityOperationDescriptor : ProgramOperationDescri
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
 }
-internal sealed class ApplyNianMengtaiDiscardDescriptor : NianActivityOperationDescriptor
-{
-    public override SkillProgramEffectOp Op => SkillProgramEffectOp.ApplyNianMengtaiDiscard;
-    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [new RequireTriggerWindow(SkillProgramTriggerWindow.DiscardPhaseStarting)];
-}
-internal sealed class DrawNianMengtaiEndingDescriptor : NianActivityOperationDescriptor
-{
-    public override SkillProgramEffectOp Op => SkillProgramEffectOp.DrawNianMengtaiEnding;
-    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [new RequireTriggerWindow(SkillProgramTriggerWindow.TurnEnding)];
-}
 internal sealed class DiscardNianRuizhiRemainderDescriptor : NianActivityOperationDescriptor
 {
     public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard);
@@ -58,8 +48,6 @@ internal sealed class NianActivityEffectHandler(SkillProgramEffectOp op) : ISkil
         host.GetCapability<INianActivityProgramHost>().ExecuteNianActivity(frame, effect);
 }
 
-/// <summary>Only an actually skipped phase earns Mengtai, never a scheduled future skip.</summary>
-public sealed record NianActualPhaseSkippedEvent(int ActualTurnNumber, int OwnerSeat, SkillProgramTurnPhase Phase) : IGameEvent;
 public sealed record NianJingjueLossRecoveredEvent(long MovementBatchId, int OwnerSeat) : IGameEvent;
 public sealed record NianBaonuDrawRolledEvent(long ProgramFrameId, int OwnerSeat, int HpAtRoll, int DrawCount) : IGameEvent;
 public sealed record NianOwnedTransferProof(int CardId, int OwnerSeat, CardLocation OriginalFrom, int RecipientSeat,

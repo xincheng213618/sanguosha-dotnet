@@ -52,6 +52,18 @@ internal static class ActualPhaseEndChecks
             Need(ended.Select(e => e.Phase.Kind).SequenceEqual(expected) && ended.Select(e => e.Phase.Token).Distinct().Count() == ended.Length &&
                 ended.All(e => Events<ActualPhaseEndingEvent>(game).Count(s => s.BoundaryFrameId == e.BoundaryFrameId && s.Phase == e.Phase) == 1),
                 $"Each genuine {scenario} phase closes exactly once; skipped stages never manufacture an actual phase-ending window.");
+            IActualPhaseHistoryQueries phaseHistory = new ProgramEventHistoryIndex(game.Events, []);
+            var skipped = Events<ActualPhaseSkippedEvent>(game).Where(e => e.TurnNumber == 1 && e.ActorSeat == 0).ToArray();
+            var enteredCount = phaseHistory.CountPhases(1, 0, 0, null, ActualPhaseHistoryOutcome.Entered, game.Events.Count);
+            var skippedCount = phaseHistory.CountPhases(1, 0, 0, null, ActualPhaseHistoryOutcome.Skipped, game.Events.Count);
+            var expectedEntries = expected.Length + (scenario == "skip" ? 1 : 0);
+            Need(enteredCount == expectedEntries && skippedCount == (scenario == "skip" ? 3 : 0) &&
+                (scenario != "skip" || skipped.Select(e => e.Kind).Order().SequenceEqual(new[]
+                    { ActualDiscardRecoveryPhaseKind.Judgment, ActualDiscardRecoveryPhaseKind.Draw, ActualDiscardRecoveryPhaseKind.Discard }.Order())),
+                $"Shared phase history scene={scenario}, entered={enteredCount}/{expectedEntries}, skipped={skippedCount}; " +
+                $"starts={string.Join(';', Events<ActualDiscardRecoveryPhaseStartedEvent>(game).Select(e => $"{e.Phase.TurnNumber}/{e.Phase.ActualTurnOwnerSeat}/{e.Phase.ActorSeat}:{e.Phase.Kind}#{e.Phase.Token}"))}; " +
+                $"skips={string.Join(';', skipped.Select(e => $"{e.ActualTurnOwnerSeat}:{e.Kind}/{e.NativeFrameId}/{e.NativeInstructionIndex}/{e.IsExtra}"))}. " +
+                "Real entries include inserted Play and Discard's actual starting window before its later skip, exclude restoration, and retain the three actually skipped native phases.");
             if (scenario == "insert")
             {
                 var preparation = Events<ActualDiscardRecoveryPhaseStartedEvent>(game).Single(e => e.Phase.Kind == ActualDiscardRecoveryPhaseKind.Preparation && e.Phase.TurnNumber == 1).Phase;

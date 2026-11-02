@@ -4,10 +4,9 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhuHuanBoundaryMobileRuntime
 {
     internal const string BoundaryPingkouAction = "boundary-zhu-huan-pingkou", BoundaryPingkouGain = "skill.boundary-zhu-huan.pingkou.equipment";
-    internal bool TracksBoundaryZhuHuanPhaseSkips => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBoundaryZhuHuanPingkou) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileZhuHuanPingkou);
 
     internal static CardConversionSource BoundaryZhuHuanSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-    SkillProgramStepOutcome IBoundaryZhuHuanHost.Resolve(ProgramSkillFrame frame) => BeginBoundaryPingkou(frame);
+    SkillProgramStepOutcome IBoundaryZhuHuanHost.Resolve(ProgramSkillFrame frame, int maximum) => BeginBoundaryPingkou(frame, maximum);
     void IBoundaryZhuHuanHost.SkipDraw(ProgramSkillFrame frame) => SkipBoundaryZhuHuanDraw(frame);
     internal void SkipBoundaryZhuHuanDraw(ProgramSkillFrame frame)
     {
@@ -17,42 +16,6 @@ internal sealed partial class CharacterZhuHuanBoundaryMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramTurnPhaseSubstitutedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.SkillInstanceId, frame.OwnerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, context.Window, SkillProgramTurnPhase.Draw));
     }
 
-    internal void RecordBoundaryZhuHuanSkippedPhase(int owner, SkillProgramTurnPhase phase, long extraDrawFrameId = 0)
-    {
-        if (!TracksBoundaryZhuHuanPhaseSkips)
-            return;
-        if (owner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) || extraDrawFrameId < 0 || extraDrawFrameId != 0 && phase != SkillProgramTurnPhase.Draw)
-            throw new InvalidOperationException("Pingkou phase history requires a genuine current actual phase.");
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhuHuanPhaseSkippedEvent>().Any(e => e.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Phase == phase && e.ExtraDrawFrameId == extraDrawFrameId))
-            return;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryZhuHuanPhaseSkippedEvent(owner, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, phase, extraDrawFrameId));
-    }
-
-    // Observation precedes any hook that opens a child; re-entry deduplicates the same real occurrence.
-    [ProgramPipelineHook(ProgramPipelinePhase.ActualPhaseSkipped, 538)]
-    internal bool ObserveBoundaryZhuHuanSkippedPhase(ProgramActualPhaseSkipContext context)
-    {
-        if (TracksBoundaryZhuHuanPhaseSkips)
-        {
-            if (context.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber)
-                throw new InvalidOperationException("Pingkou cannot count another actual turn's phase.");
-            RecordBoundaryZhuHuanSkippedPhase(context.OwnerSeat, context.Phase);
-        }
-
-        return false;
-    }
-
-    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 53800)]
-    internal void ObserveBoundaryZhuHuanSkippedDraw(IGameEvent payload)
-    {
-        if (!TracksBoundaryZhuHuanPhaseSkips || payload is not DrawPhaseSkippedEvent e)
-            return;
-        if (e.ActualTurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || e.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _resolutionStackOperations._resolutionStack.OfType<DrawPhaseObligationFrame>().SingleOrDefault(f => f.Id == e.FrameId)is not { Skipped: true } native || native.IsExtra != e.IsExtra || native.OwnerSeat != e.OwnerSeat)
-            throw new InvalidOperationException("Pingkou requires the original skipped native Draw occurrence.");
-        RecordBoundaryZhuHuanSkippedPhase(e.OwnerSeat, SkillProgramTurnPhase.Draw, e.IsExtra ? e.FrameId : 0);
-    }
-
-    internal int BoundaryPingkouMaximum(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhuHuanPhaseSkippedEvent>().Count(e => e.OwnerSeat == owner && e.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 53800)]
     internal bool CanOfferBoundaryZhuHuan(ProgramTriggerLegalityContext gate)
     {
@@ -65,15 +28,15 @@ internal sealed partial class CharacterZhuHuanBoundaryMobileRuntime
                 "skip-discard-most-equipment" => _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Count > 0 && _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).All(p => _corePhysicalOwnedCardQueriesOperations.GetEquipment(p).Count <= _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner).Count),
                 _ => false
             });
-        return gate.SkillId != BoundaryZhuHuanComposition.Pingkou || owner.Seat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && BoundaryPingkouMaximum(owner.Seat) > 0 && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != owner.Seat);
+        return gate.SkillId != BoundaryZhuHuanComposition.Pingkou || owner.Seat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != owner.Seat);
     }
 
-    internal SkillProgramStepOutcome BeginBoundaryPingkou(ProgramSkillFrame supplied)
+    internal SkillProgramStepOutcome BeginBoundaryPingkou(ProgramSkillFrame supplied, int maximum)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.BoundaryZhuHuan is not null || frame.SkillId != BoundaryZhuHuanComposition.Pingkou || frame.InstructionIndex != 1 || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded } context || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !_resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().Any(p => p.Id == context.ParentFrameId && p.OwnerSeat == frame.OwnerSeat && p.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber) || BoundaryPingkouMaximum(frame.OwnerSeat) < 1)
+        if (frame.BoundaryZhuHuan is not null || frame.SkillId != BoundaryZhuHuanComposition.Pingkou || frame.InstructionIndex != 1 || frame.WindowContext is not { Window: SkillProgramTriggerWindow.AfterTurnEnded } context || frame.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !_resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().Any(p => p.Id == context.ParentFrameId && p.OwnerSeat == frame.OwnerSeat && p.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber) || maximum < 1)
             throw new InvalidOperationException("Pingkou requires its original actually ended turn and real skipped phases.");
-        var receipt = new BoundaryZhuHuanReceipt(BoundaryZhuHuanSource(frame), frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, context.ParentFrameId, BoundaryPingkouMaximum(frame.OwnerSeat), BoundaryZhuHuanStage.Targets);
+        var receipt = new BoundaryZhuHuanReceipt(BoundaryZhuHuanSource(frame), frame.GameplayHash, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, context.ParentFrameId, maximum, BoundaryZhuHuanStage.Targets);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { BoundaryZhuHuan = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryZhuHuanStartedEvent(frame.Id, receipt.Source, receipt.GameplayHash, receipt.ActualTurn, receipt.EndedFrame, receipt.Maximum));
         PublishBoundaryPingkou(frame);
@@ -226,7 +189,7 @@ internal sealed partial class CharacterZhuHuanBoundaryMobileRuntime
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    internal bool ValidBoundaryPingkou(ProgramSkillFrame frame) => frame.BoundaryZhuHuan is { } receipt && frame.InstructionIndex == 1 && frame.SkillId == BoundaryZhuHuanComposition.Pingkou && receipt.Source == BoundaryZhuHuanSource(frame) && receipt.GameplayHash == frame.GameplayHash && receipt.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && receipt.EndedFrame == frame.WindowContext?.ParentFrameId && frame.WindowContext?.Window == SkillProgramTriggerWindow.AfterTurnEnded && receipt.Maximum > 0 && receipt.Maximum == BoundaryPingkouMaximum(frame.OwnerSeat) && receipt.Targets.Count <= receipt.Maximum && receipt.Targets.Distinct().Count() == receipt.Targets.Count && receipt.Targets.All(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && s != frame.OwnerSeat) && receipt.Index >= 0 && receipt.Index <= receipt.Targets.Count && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhuHuanStartedEvent>().Count(e => e.FrameId == frame.Id && e.Source == receipt.Source && e.GameplayHash == receipt.GameplayHash && e.ActualTurn == receipt.ActualTurn && e.EndedFrame == receipt.EndedFrame && e.Maximum == receipt.Maximum) == 1 && (!receipt.Sealed || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhuHuanSealedEvent>().Count(e => e.FrameId == frame.Id && e.Count == receipt.Targets.Count) == 1 && receipt.Targets.SequenceEqual(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhuHuanTargetEvent>().Where(e => e.FrameId == frame.Id).OrderBy(e => _coreTableOrderOperations.RelativeTableOrder(frame.OwnerSeat, e.Target)).Select(e => e.Target)));
+    internal bool ValidBoundaryPingkou(ProgramSkillFrame frame) => frame.BoundaryZhuHuan is { } receipt && frame.InstructionIndex == 1 && frame.SkillId == BoundaryZhuHuanComposition.Pingkou && receipt.Source == BoundaryZhuHuanSource(frame) && receipt.GameplayHash == frame.GameplayHash && receipt.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && receipt.EndedFrame == frame.WindowContext?.ParentFrameId && frame.WindowContext?.Window == SkillProgramTriggerWindow.AfterTurnEnded && receipt.Maximum > 0 && receipt.Targets.Count <= receipt.Maximum && receipt.Targets.Distinct().Count() == receipt.Targets.Count && receipt.Targets.All(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && s != frame.OwnerSeat) && receipt.Index >= 0 && receipt.Index <= receipt.Targets.Count && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhuHuanStartedEvent>().Count(e => e.FrameId == frame.Id && e.Source == receipt.Source && e.GameplayHash == receipt.GameplayHash && e.ActualTurn == receipt.ActualTurn && e.EndedFrame == receipt.EndedFrame && e.Maximum == receipt.Maximum) == 1 && (!receipt.Sealed || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhuHuanSealedEvent>().Count(e => e.FrameId == frame.Id && e.Count == receipt.Targets.Count) == 1 && receipt.Targets.SequenceEqual(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhuHuanTargetEvent>().Where(e => e.FrameId == frame.Id).OrderBy(e => _coreTableOrderOperations.RelativeTableOrder(frame.OwnerSeat, e.Target)).Select(e => e.Target)));
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 53800)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 53800)]
     internal bool KeepIssuedBoundaryPingkou(ProgramSkillFrame frame) => frame.BoundaryZhuHuan is { Sealed: true } && ValidBoundaryPingkou(frame);

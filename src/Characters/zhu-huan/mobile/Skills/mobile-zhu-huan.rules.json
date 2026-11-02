@@ -1,6 +1,7 @@
 {
   "skills": [{ "id": "mobile:pingkou", "revision": 1,
-    "triggers": [{ "id": "actual-ended-skips", "window": "afterTurnEnded", "subject": "owner", "turnOwnerScope": "own", "optional": true,
-      "effects": [{ "op": "resolveMobileZhuHuanPingkou", "target": "owner" }] }]
+    "triggers": [{ "id": "actual-ended-skips", "window": "afterTurnEnded", "subject": "owner", "turnOwnerScope": "own", "optional": true, "evaluateConditionAtResolution": true,
+      "condition": { "kind": "expression", "expr": [">", ["phaseCount", "now", "owner", "all", "skipped"], 0] },
+      "effects": [{ "op": "resolveMobileZhuHuanPingkou", "target": "owner", "amountExpr": ["phaseCount", "now", "owner", "all", "skipped"] }] }]
   }]
 }

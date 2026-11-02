@@ -3,7 +3,8 @@ namespace CardGame.Core.NativeOwners;
 internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineProgramExpressionsEntries> getCoreGameEngineProgramExpressionsRuntime, Func<CardZoneStore> getCardZoneStore, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineHealthQueriesEntries> getCoreGameEngineHealthQueriesRuntime, Func<RuntimeEntries.CorePhysicalOwnedCardQueriesEntries> getCorePhysicalOwnedCardQueriesRuntime, Func<RuntimeEntries.CoreNativeRuleQueriesEntries> getCoreNativeRuleQueriesRuntime, Func<RuntimeEntries.CoreTableSeatQueriesEntries> getCoreTableSeatQueriesRuntime, ProgramSkillFrame? frame, ICardEntityMarkQueries? cardMarks = null, ISelectionWoundedQueries? wounded = null, RuntimeEntries.CoreGameEnginePublicPileSourcesEntries? piles = null, Func<int, int?>? equipmentSuitCount = null,
     int? triggerOwner = null, ProgramSkillWindowContext? triggerContext = null,
     SkillProgramTriggerFacts? triggerFacts = null, IActualCardUseHistoryQueries? history = null,
-    Func<CardUseHistoryPoint>? currentHistoryPoint = null) : IProgramExpressionWorld
+    Func<CardUseHistoryPoint>? currentHistoryPoint = null,
+    IActualPhaseHistoryQueries? phaseHistory = null) : IProgramExpressionWorld
 {
     private int Owner => frame?.OwnerSeat ?? triggerOwner!.Value;
     private ProgramSkillWindowContext? Context => frame?.WindowContext ?? triggerContext;
@@ -103,6 +104,12 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
             view == "confirmations" ? CardUseHistoryView.Confirmations : CardUseHistoryView.Latest);
     }
     private readonly Dictionary<CardUseHistoryPoint, CardUseHistoryFact?> _currentUses = [];
+    public int? PhaseCount(string moment, int actor, ActualDiscardRecoveryPhaseKind? kind, ActualPhaseHistoryOutcome outcome)
+    {
+        var point = moment == "window" ? WindowPoint : currentHistoryPoint?.Invoke();
+        return point is null ? null : phaseHistory?.CountPhases(point.ActualTurn, point.TurnOwnerSeat,
+            actor, kind, outcome, point.Cursor);
+    }
     public CardUseHistoryFact? CurrentUse()
     {
         if (WindowPoint is not { } point || history is null) return null;

@@ -13,8 +13,6 @@ internal sealed partial class CoreOwnedDrawPhaseRuntimePortsRuntime
 
     bool IOwnedDrawPhaseFacts.TracksShanheS5PhaseSkips => _coreShanheS5ShensuOperations.TracksShanheS5PhaseSkips;
 
-    bool IOwnedDrawPhaseFacts.TracksBoundaryZhuHuanPhaseSkips => _characterZhuHuanBoundaryMobileOperations.TracksBoundaryZhuHuanPhaseSkips;
-
     bool IOwnedDrawPhaseFacts.HasIssuedExtraDrawMarker(int seat) => _coreLeastHandMarkerDrawProgramsOperations.HasIssuedExtraDrawMarker(seat);
     int IOwnedDrawPhaseFacts.RelativeTableOrder(int from, int target) => _coreTableOrderOperations.RelativeTableOrder(from, target);
     bool IOwnedDrawPhaseNativeOperations.BeginRecoveryReplacement(long frameId) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(frameId, PostEventContinuation.DrawPhaseObligation);

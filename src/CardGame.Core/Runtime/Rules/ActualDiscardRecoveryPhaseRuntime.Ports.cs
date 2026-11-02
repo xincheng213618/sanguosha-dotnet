@@ -9,6 +9,7 @@ internal interface IActualDiscardRecoveryPhaseQueries : IProgramSelectionQuery
 internal interface IActualDiscardRecoveryPhaseOperations : IProgramRuntimeOperations
 {
     void Start(ActualDiscardRecoveryPhaseKind kind, int actor);
+    void RecordSkipped(ActualDiscardRecoveryPhaseKind kind, int actor, long? nativeFrameId = null, bool isExtra = false);
     void Clear();
     void Restore(ProgramPhaseSchedule schedule);
     void Restore(DrawPhaseObligationFrame parent);

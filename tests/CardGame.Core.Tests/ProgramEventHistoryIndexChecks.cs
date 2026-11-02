@@ -37,6 +37,7 @@ internal static class ProgramEventHistoryIndexChecks
         NativeUseVersionsKeepEndCutoffsAndLegacyIdentity();
         LateActionAliasesPreserveEarlierNativeDeclarations();
         ConfirmationsKeepOriginalTargetsAndFirstUseOrder();
+        ActualPhaseCountsKeepOccurrencesAndAsOfCutoffs();
     }
 
     private static void BoundaryQueriesKeepJournalOrderAndLiveTails()
@@ -325,6 +326,46 @@ internal static class ProgramEventHistoryIndexChecks
             borrowedConfirmation.Targets.SequenceEqual([1, 2]) && borrowedConfirmation.PrimaryTargets!.SequenceEqual([1]) &&
             new CardUseHistoryTestWorld(history, borrowedPoint).Seats("""["targets",["filter",["cardUses","window","confirmations"],["same",["useActor","use"],"turnOwner"]]]""")!.SequenceEqual([1, 2]),
             "The confirmations projection includes Borrowed Sword's raw paired victim even when designated Latest targets contain only the holder; its principal target remains only the holder.");
+    }
+
+    private static void ActualPhaseCountsKeepOccurrencesAndAsOfCutoffs()
+    {
+        var committed = new List<EventEnvelope>(); var pending = new List<IGameEvent>();
+        var history = new ProgramEventHistoryIndex(committed, pending);
+        IActualPhaseHistoryQueries phases = history;
+        var play = new ActualDiscardRecoveryPhaseKey(10, 1, 0, 0, ActualDiscardRecoveryPhaseKind.Play);
+        history.Append(new ActualDiscardRecoveryPhaseStartedEvent(play));
+        history.Append(new ActualDiscardRecoveryPhaseRestoredEvent(50, play));
+        history.Append(new ProgramTurnPhaseSubstitutedEvent(60, "fixture:request", "replace", "instance", 0, 1,
+            SkillProgramTriggerWindow.PlayPhaseStarting, SkillProgramTurnPhase.Play));
+        var enteredPoint = new CardUseHistoryPoint(1, 0, history.CardUseHistoryCursor);
+        const string eligible = """["and",[">",["phaseCount","window","owner","play","entered"],0],["==",["phaseCount","window","owner","play","skipped"],0]]""";
+        Require(new CardUseHistoryTestWorld(history, enteredPoint).Bool(eligible) == true &&
+            phases.CountPhases(1, 0, 0, ActualDiscardRecoveryPhaseKind.Play, ActualPhaseHistoryOutcome.Entered, 3) == 1 &&
+            phases.CountPhases(1, 0, 0, null, ActualPhaseHistoryOutcome.Skipped, 3) == 0,
+            "Restoring an entered phase and requesting a substitution create neither a new entry nor an actual skip.");
+        history.Append(new ActualDiscardRecoveryPhaseStartedEvent(play with { Token = 11 }));
+        history.Append(new ActualPhaseSkippedEvent(1, 0, 0, ActualDiscardRecoveryPhaseKind.Play, null, 0, false));
+        Require(new CardUseHistoryTestWorld(history, new(1, 0, 5)).Bool(eligible) == false &&
+            new CardUseHistoryTestWorld(history, enteredPoint).Bool(eligible) == true &&
+            phases.CountPhases(1, 0, 0, ActualDiscardRecoveryPhaseKind.Play, ActualPhaseHistoryOutcome.Entered, 5) == 2,
+            "Any actual Play skip excludes the turn even with two genuine entries, without changing the earlier eligibility cutoff.");
+        history.Append(new ActualPhaseSkippedEvent(1, 0, 0, ActualDiscardRecoveryPhaseKind.Draw, 100, 0, true));
+        history.Append(new ActualPhaseSkippedEvent(1, 0, 0, ActualDiscardRecoveryPhaseKind.Draw, 101, 0, true));
+        history.Append(new ActualPhaseSkippedEvent(1, 0, 1, ActualDiscardRecoveryPhaseKind.Draw, 102, 0, true));
+        history.Append(new ActualPhaseSkippedEvent(2, 1, 0, ActualDiscardRecoveryPhaseKind.Draw, null, 0, false));
+        Require(phases.CountPhases(1, 0, 0, ActualDiscardRecoveryPhaseKind.Draw, ActualPhaseHistoryOutcome.Skipped, 9) == 2 &&
+            phases.CountPhases(1, 0, 0, null, ActualPhaseHistoryOutcome.Skipped, 9) == 3 &&
+            phases.CountPhases(1, 0, 1, ActualDiscardRecoveryPhaseKind.Draw, ActualPhaseHistoryOutcome.Skipped, 9) == 1 &&
+            phases.CountPhases(2, 1, 0, null, ActualPhaseHistoryOutcome.Skipped, 9) == 1,
+            "Distinct extra Draw occurrences count independently while actor and actual-turn scopes remain separate.");
+        var payloads = pending.ToArray();
+        for (var index = 0; index < payloads.Length; index++)
+            committed.Add(new(new(index + 1), null, 1000 + index * 10, 1, "phase-history-cutoff", payloads[index]));
+        history.ClearPending();
+        Require(new CardUseHistoryTestWorld(history, enteredPoint).Bool(eligible) == true &&
+            phases.CountPhases(1, 0, 0, null, ActualPhaseHistoryOutcome.Skipped, 7) == 3,
+            "Pending commit keeps full-journal count cutoffs, independent of envelope sequence values.");
     }
 
     private sealed record BoundaryFact : IGameEvent;

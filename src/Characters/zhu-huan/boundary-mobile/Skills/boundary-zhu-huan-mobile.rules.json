@@ -5,6 +5,6 @@
       {"id":"skip-play-most-hp","window":"afterNormalDraw","subject":"owner","optional":true,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]},
       {"id":"skip-discard-most-equipment","window":"discardPhaseStarting","subject":"owner","optional":true,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["discard"]}]}
     ]},
-    {"id":"boundary:pingkou-mobile","revision":1,"triggers":[{"id":"actual-ended-skips","window":"afterTurnEnded","subject":"owner","turnOwnerScope":"own","optional":true,"effects":[{"op":"resolveBoundaryZhuHuanPingkou","target":"owner"}]}]}
+    {"id":"boundary:pingkou-mobile","revision":1,"triggers":[{"id":"actual-ended-skips","window":"afterTurnEnded","subject":"owner","turnOwnerScope":"own","optional":true,"evaluateConditionAtResolution":true,"condition":{"kind":"expression","expr":[">",["phaseCount","now","owner","all","skipped"],0]},"effects":[{"op":"resolveBoundaryZhuHuanPingkou","target":"owner","amountExpr":["phaseCount","now","owner","all","skipped"]}]}]}
   ]
 }

@@ -20,11 +20,9 @@ internal sealed partial class CoreNianActivityProgramsEntries
     internal bool NianDongmianForbidsTarget(int actor, int target) => _resolve().NianDongmianForbidsTarget(actor, target);
     internal bool NianEnabled(CharacterState player, string id) => _resolve().NianEnabled(player, id);
     internal bool NianOwnActualTurn(int seat) => _resolve().NianOwnActualTurn(seat);
-    internal bool NianPhaseWasActuallySkipped(int seat, SkillProgramTurnPhase phase) => _resolve().NianPhaseWasActuallySkipped(seat, phase);
     internal bool NianShouyiUnlimitedCardDistance(CharacterState player) => _resolve().NianShouyiUnlimitedCardDistance(player);
     internal bool? ProveNianJingjueMovement(SkillProgramTrigger trigger, ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().ProveNianJingjueMovement(trigger, candidate, context);
     internal bool? ProveNianRecovery(SkillProgramTrigger trigger, ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().ProveNianRecovery(trigger, candidate, context);
-    internal void RecordNianActualPhaseSkips(int owner, bool draw, bool play) => _resolve().RecordNianActualPhaseSkips(owner, draw, play);
     internal void ReturnNianOperationDraw(ProgramSkillFrame frame, NativeDrawOutcome outcome) => _resolve().ReturnNianOperationDraw(frame, outcome);
     internal ProgramSkillWindowContext? TryCreateNianJingjueContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate) => _resolve().TryCreateNianJingjueContext(frame, candidate);
 }

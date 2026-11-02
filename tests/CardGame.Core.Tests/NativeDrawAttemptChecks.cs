@@ -220,6 +220,10 @@ internal static class NativeDrawAttemptChecks
                     !g.CardMovements.Any(m => m.TurnNumber == skipped.ActualTurnNumber &&
                         m.To == CardLocation.Hand(0) && m.Reason == CardMoveReasons.Draw),
                     "The skip returns once without a physical normal draw or an early synthetic attempt.");
+                IActualPhaseHistoryQueries skippedHistory = new ProgramEventHistoryIndex(g.Events, []);
+                Need(skippedHistory.CountPhases(skipped.ActualTurnNumber, 0, 0, ActualDiscardRecoveryPhaseKind.Draw,
+                    ActualPhaseHistoryOutcome.Skipped, g.Events.Count) == 1,
+                    "The real normal Draw skip publishes one shared occurrence through cold observer returns.");
                 if (scene == "phase-skip") { _ = Cold(g, registry); continue; }
                 Need(E<ProgramLeastHandMarkerOrDrawEvent>(g).Single() is { TargetSeat: 1, GrantedMarker: true } &&
                     E<ExtraDrawPhaseStartedEvent>(g).Length == 0,
@@ -308,7 +312,99 @@ internal static class NativeDrawAttemptChecks
             Need(E<CardsDrawnEvent>(g).Skip(drawFactsBefore).SequenceEqual(
                     Enumerable.Repeat(new CardsDrawnEvent(recipient, 2), scene == "phase-extra" ? 2 : 1)),
                 "Normal and extra phases each publish one actual draw quantity, without repeating it at phase completion.");
+            IActualPhaseHistoryQueries phaseHistory = new ProgramEventHistoryIndex(g.Events, []);
+            Need(phaseHistory.CountPhases(normal.ActualTurnNumber, recipient, recipient, ActualDiscardRecoveryPhaseKind.Draw,
+                ActualPhaseHistoryOutcome.Entered, g.Events.Count) == (scene == "phase-extra" ? 2 : 1) &&
+                phaseHistory.CountPhases(normal.ActualTurnNumber, recipient, recipient, ActualDiscardRecoveryPhaseKind.Draw,
+                    ActualPhaseHistoryOutcome.Skipped, g.Events.Count) == 0,
+                "Normal and extra Draw are separate real entries; issued requests and native child returns cannot fabricate another entry or skip.");
             _ = Cold(g, registry);
+        }
+        DeliveredDrawFinishesOnlyItsOriginalInstruction();
+        DeliveredReplacementKeepsZeroDrawResultCold();
+    }
+
+    private static void DeliveredReplacementKeepsZeroDrawResultCold()
+    {
+        const string zenrun = "ol:zenrun";
+        var (g, registry) = Start("delivered-replacement");
+        Use(g, "draw");
+        Drive(g, () => Option(g, Watch, "before") || P(g)?.SkillPrompt?.SkillId == zenrun);
+        if (Option(g, Watch, "before")) Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "before");
+        Drive(g, () => P(g)?.SkillPrompt?.SkillId == zenrun);
+        var root = Producer(g); var id = root.Id;
+        var attempt = g.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single(f => f.Context.ParentFrameId == id);
+        Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
+        Drive(g, () => g.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Zenrun?.Stage == ZenrunStage.Target));
+        Answer(g, c => c.Parameters.GetValueOrDefault("branch") == "target" && c.Targets.SequenceEqual([1]));
+        for (var card = 0; card < 2; card++)
+            Answer(g, c => c.Parameters.GetValueOrDefault("branch") == "pick" && c.Parameters.GetValueOrDefault("source-zone") == nameof(CardZoneKind.Hand));
+        Answer(g, c => c.Parameters.GetValueOrDefault("branch") == "take");
+        Drive(g, () => g.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Zenrun?.Stage == ZenrunStage.VictimChoice));
+        g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("branch") == "draw");
+        Drive(g, () => Option(g, Driver, "after"));
+        Need(Producer(g).InstructionIndex == 2 && Producer(g).InstructionDelivery is null &&
+            Producer(g).NativeDraw is null && Producer(g).CardSetBindings.Single(b => b.Name == "actual").CardIds.Count == 0 &&
+            E<ProgramDrawCompletedEvent>(g).Count(e => e.FrameId == id && e.RequestedCount == 2 && e.ActualDrawCount == 0) == 1 &&
+            E<NativeDrawAttemptDecidedEvent>(g).Count(e => e.AttemptFrameId == attempt.Id && e.Replaced) == 1 &&
+            E<ZenrunPaidEvent>(g).Count(e => e.AttemptFrameId == attempt.Id && e.Count == 2) == 1 && PaidDraws(g).Length == 0,
+            "A real legal replacement completes the original Draw with zero DrawPile cards once; entering the following choice clears delivery instead of lending its receipt to that suffix.");
+        g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "after"); Play(g);
+        Need(E<ProgramDrawCompletedEvent>(g).Count(e => e.FrameId == id) == 1 &&
+            E<ProgramSkillResolvedEvent>(g).Count(e => e.FrameId == id && e.Completed) == 1 && PaidDraws(g).Length == 0,
+            "The zero-card replacement result cold-restores and finishes once without repeating the draw or replacement payment.");
+    }
+
+    private static void DeliveredDrawFinishesOnlyItsOriginalInstruction()
+    {
+        foreach (var scene in new[] { "delivered-loss", "delivered-loss-suffix", "delivered-death" })
+        {
+            var (g, registry) = Start(scene);
+            Use(g, "draw"); Drive(g, () => Option(g, Watch, "before"));
+            Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "before");
+            Drive(g, () => Option(g, Gain, "delivered"));
+            var producer = Producer(g); var id = producer.Id;
+            var deliveredBatches = new HashSet<long>();
+            RecordDeliveredBatch();
+            Need(producer.NativeDraw is { InstructionIndex: 1, RecipientApplied: true } &&
+                producer.InstructionDelivery is { InstructionIndex: 1, Operation: SkillProgramEffectOp.Draw } &&
+                E<ProgramDrawCompletedEvent>(g).Count(e => e.FrameId == id && e.ActualDrawCount == 2) == 1 && PaidDraws(g).Length == 2,
+                "Actual delivery and the original typed cursor are recorded before the real draw gain child can remove its source or owner.");
+            g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "delivered");
+            for (var step = 0; step < 90 && g.ResolutionStack.Any(f => f.Id == id); step++)
+            {
+                Need(!Option(g, Driver, "after"), "A delivered Draw cannot lend its permission to an unpaid following choice.");
+                if (Option(g, Gain, "delivered"))
+                {
+                    RecordDeliveredBatch();
+                    g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "delivered");
+                }
+                else if (P(g) is { PlayerSeat: 0, Kind: DecisionKind.RescueDying })
+                    Answer(g, c => c.Parameters.GetValueOrDefault("response") is "pass" or "let-die");
+                else
+                {
+                    Need(P(g) is not { PlayerSeat: 0 }, "The original delivered return must not open an unrelated human choice. " + Diagnostic(g));
+                    Accept(g, new AdvanceOneStepCommand(g.Revision));
+                }
+            }
+            Need(!g.ResolutionStack.Any(f => f.Id == id) && PaidDraws(g).Length == 2 &&
+                E<ProgramDrawCompletedEvent>(g).Count(e => e.FrameId == id) == 1 &&
+                !E<ProgramOptionChosenEvent>(g).Any(e => e.FrameId == id && e.ResultBind == "after") &&
+                E<ProgramSkillResolvedEvent>(g).Count(e => e.FrameId == id && e.Completed) == (scene.EndsWith("suffix", StringComparison.Ordinal) ? 0 : 1) &&
+                (scene == "delivered-death" ? !g.State.Players[0].IsAlive : g.State.Players[0].Skills?.Any(skill => skill.ContentId == Driver) != true),
+                "The paid terminal Draw returns once after loss/death; an unpaid suffix stays cancelled without repeating the delivered cards.");
+            _ = Cold(g, registry);
+
+            void RecordDeliveredBatch()
+            {
+                var child = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Gain);
+                var batch = child.WindowContext?.MovementBatch;
+                var window = g.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(f => f.Id == child.WindowContext!.ParentFrameId);
+                Need(batch is not null && batch.ParentFrameId == id && window.ResumeProgramFrameId == id &&
+                    batch.Movements.Count > 0 && batch.Movements.All(m => m.To == CardLocation.Hand(0) && m.Reason.Value == DrawReason) &&
+                    deliveredBatches.Add(batch.Id),
+                    $"Each gain prompt belongs to a distinct real movement batch returning to its paid Draw producer: producer={id}, batch={batch?.Id}, parent={batch?.ParentFrameId}, awaiting={batch?.AwaitingProgramFrameId}, resume={window.ResumeProgramFrameId}.");
+            }
         }
     }
 
@@ -430,7 +526,7 @@ internal static class NativeDrawAttemptChecks
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(scene));
         var g = GameEngine.CreateStandard(new GameOptions
         {
-            Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord, ModeId = Mode,
+            Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = scene == "delivered-death" ? Role.Renegade : Role.Lord, ModeId = Mode,
             UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 4
         }, registry);
         Accept(g, new StartGameCommand());
@@ -438,6 +534,13 @@ internal static class NativeDrawAttemptChecks
         Accept(g, new SelectGeneralCommand(0, Owner, g.Revision, P(g)!.PromptId));
         if (scene.StartsWith("phase-", StringComparison.Ordinal))
             Drive(g, () => scene == "phase-normal" ? Option(g, Watch, "before") : Option(g, PhaseWatch, "skipped"));
+        else if (scene == "delivered-replacement")
+        {
+            Drive(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard } || P(g)?.SkillPrompt?.SkillId == "ol:zenrun");
+            if (P(g)?.SkillPrompt?.SkillId == "ol:zenrun")
+                Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "skip");
+            Play(g);
+        }
         else Play(g);
         return (g, registry);
     }
@@ -469,6 +572,19 @@ internal static class NativeDrawAttemptChecks
                 Activation("pair", new { op = "draw", target = "selectedTargets", amount = 1 }, 2),
                 Activation("zero", new { op = "draw", target = "owner", numberExpression = "ownerLostHp", resultBind = "actual" })
             }, "after");
+            var delivered = scene.StartsWith("delivered-", StringComparison.Ordinal);
+            if (delivered)
+            {
+                object draw = new { op = "draw", target = "owner", amount = 2, resultBind = "actual", awaitMovementTriggers = true };
+                definitions.Single(d => (string)d["id"] == Driver)["activations"] = new[]
+                {
+                    new { id = "draw", minCards = 0, maxCards = 0, minTargets = 0, maxTargets = 0,
+                        targetKind = "anyLiving", usesPerTurn = (int?)null,
+                        effects = scene.EndsWith("suffix", StringComparison.Ordinal) || scene == "delivered-replacement" ? new[] { draw, Choice("after") } : new[] { draw } }
+                };
+                if (!scene.EndsWith("suffix", StringComparison.Ordinal) && scene != "delivered-replacement")
+                    presentation[Driver] = new { name = Driver, description = "真实摸牌前母帧边界", optionLabels = new Dictionary<string, string>() };
+            }
             Add(Quiet, "triggers", new[]
             {
                 new { id = "quiet", window = "afterNormalDraw", subject = "owner", optional = false,
@@ -500,6 +616,14 @@ internal static class NativeDrawAttemptChecks
                     movementReasons = phase ? new[] { CardMoveReasons.Draw.Value, "program.extra-draw-phase.draw" } : new[] { DrawReason },
                     optional = false, effects = new[] { Choice("gained") } }
             }, "gained");
+            if (delivered) Add(Gain, "triggers", new[]
+            {
+                new { id = "delivered-native-child", window = "cardsGained", subject = "owner",
+                    destinationZones = new[] { "hand" }, movementOccurrence = "perBatch", movementReasons = new[] { DrawReason }, optional = false,
+                    effects = new object[] { Choice("delivered"), scene == "delivered-death"
+                        ? new { op = "loseHp", target = "owner", amount = 20 }
+                        : new { op = "skillState", target = "owner", action = "lose", match = new { skillIds = new[] { Driver } }, until = Array.Empty<object>() } } }
+            }, "delivered");
             if (phase) Add(PhaseWatch, "triggers", new object[]
             {
                 new { id = "phase-ended", window = "drawPhaseEnded", subject = "owner", optional = false,
@@ -531,9 +655,16 @@ internal static class NativeDrawAttemptChecks
                 { Program = program, ProgramPresentation = catalog.Presentations[id] });
             var shared = new List<string>();
             if (native) shared.Add(Watch);
-            if (scene == "recipients" || phase) shared.Add(Gain);
+            if (scene == "recipients" || phase || delivered) shared.Add(Gain);
             if (phase) shared.Add(PhaseWatch);
             var ownerSkills = new List<string>(shared);
+            if (scene == "delivered-replacement")
+            {
+                var real = CharacterFixtureContent.EmbeddedProgramBundle("ol-sun-hong");
+                b.AddSkill(new("ol:zenrun", real.Presentations["ol:zenrun"].Name, real.Presentations["ol:zenrun"].Description)
+                    { Program = real.Programs["ol:zenrun"], ProgramPresentation = real.Presentations["ol:zenrun"] });
+                ownerSkills.Add("ol:zenrun");
+            }
             if (scene is "phase-skip" or "phase-extra") ownerSkills.Add(Skip);
             if (scene == "phase-extra") ownerSkills.Add(Extra);
             b.AddGeneral(new(Owner, "真实摸牌主人", "supporter", Driver, "qun", 8, ownerSkills));
@@ -543,8 +674,14 @@ internal static class NativeDrawAttemptChecks
             { PhysicalCards = Enumerable.Range(0, scene == "partial" ? 19 : scene == "empty" ? 18 : 72)
                 .Select(_ => new ContentDeckPhysicalCard("standard:crossbow", Suit.Club, 7)).ToArray() });
             b.AddMode(new(Mode, "原生摸牌请求", 4, 4,
-                new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 3 },
-                "fixture:native-draw-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. peers]));
+                scene == "delivered-death"
+                    ? new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 2, [nameof(Role.Renegade)] = 1 }
+                    : new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Rebel)] = 3 },
+                "fixture:native-draw-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. peers])
+            {
+                GeneralSelectionWeights = scene == "delivered-death" ? new Dictionary<string, int>
+                    { [Owner] = 1, [peers[0]] = 1000, [peers[1]] = 1000, [peers[2]] = 1000 } : null
+            });
         }
     }
 }

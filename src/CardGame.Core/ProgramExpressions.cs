@@ -45,6 +45,7 @@ internal interface IProgramExpressionWorld
     int? WindowStat(string stat, string participant) => null;
     IReadOnlyList<CardUseHistoryFact>? CardUses(string moment, string view) => null;
     CardUseHistoryFact? CurrentUse() => null;
+    int? PhaseCount(string moment, int actor, ActualDiscardRecoveryPhaseKind? kind, ActualPhaseHistoryOutcome outcome) => null;
 }
 
 internal static class ProgramExpressions
@@ -181,6 +182,18 @@ internal static class ProgramExpressions
             if (args[0].ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(args[0].GetString()) || args[0].GetString()!.Length > 128)
                 Fail(path, "a binding reference requires a nonempty identifier of at most 128 characters");
             return new(op, op == "boundIsEquipment" ? ProgramExpressionType.Bool : ProgramExpressionType.Int, [], name: args[0].GetString());
+        }
+        if (op == "phaseCount")
+        {
+            Arity(4, 4);
+            if (args[0].ValueKind != JsonValueKind.String || args[0].GetString() is not ("window" or "now"))
+                Fail(path, "phaseCount requires window or now");
+            var phase = args[2].ValueKind == JsonValueKind.String && args[2].GetString() == "all"
+                ? -1 : (int)ParseFactEnum<ActualDiscardRecoveryPhaseKind>(args[2], path + "[3]");
+            var outcome = ParseFactEnum<ActualPhaseHistoryOutcome>(args[3], path + "[4]");
+            return new(op, ProgramExpressionType.Int,
+                [Arg(1, ProgramExpressionType.Participant), new("int", ProgramExpressionType.Int, [], literal: (int)outcome)],
+                literal: phase, name: args[0].GetString());
         }
         if (op == "cardUses")
         {
@@ -342,6 +355,9 @@ internal static class ProgramExpressions
             case "int": return e.Literal;
             case "when": return EvaluateBool(e.Args[0], world, it, use) == true ? EvaluateInt(e.Args[1], world, it, use) : null;
             case "number": return world.Number(e.Name!);
+            case "phaseCount": return EvaluateParticipant(e.Args[0], world, it, use) is { } phaseActor
+                ? world.PhaseCount(e.Name!, phaseActor, e.Literal < 0 ? null : (ActualDiscardRecoveryPhaseKind)e.Literal,
+                    (ActualPhaseHistoryOutcome)e.Args[1].Literal) : null;
             case "windowHp" or "windowHandCount": return world.WindowStat(e.Op, e.Args[0].Name!);
             case "cardMarkCount": return EvaluateParticipant(e.Args[0], world, it, use) is { } markedSeat
                 ? world.CardMarkCount(markedSeat, e.Name!, (CardZoneKind)e.Literal) : null;

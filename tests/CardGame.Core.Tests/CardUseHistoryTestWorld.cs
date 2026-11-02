@@ -13,6 +13,8 @@ internal sealed class CardUseHistoryTestWorld(IActualCardUseHistoryQueries histo
     public IReadOnlyList<int>? ParticipantSet(string name) => null;
     public int? Stat(string stat, int seat) => null;
     public bool? Flag(string flag, int seat) => null;
+    public int? PhaseCount(string moment, int actor, ActualDiscardRecoveryPhaseKind? kind, ActualPhaseHistoryOutcome outcome) =>
+        (history as IActualPhaseHistoryQueries)?.CountPhases(point.ActualTurn, point.TurnOwnerSeat, actor, kind, outcome, point.Cursor);
     public IReadOnlyList<CardUseHistoryFact>? CardUses(string moment, string view) =>
         history.ReadCardUseFacts(point, Enum.Parse<CardUseHistoryView>(view, ignoreCase: true));
     public CardUseHistoryFact? CurrentUse() => CardUses("window", "latest")!.FirstOrDefault(f =>

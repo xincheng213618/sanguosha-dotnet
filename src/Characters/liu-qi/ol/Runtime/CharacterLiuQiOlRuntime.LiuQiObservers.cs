@@ -3,23 +3,10 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuQiOlRuntime
 {
-    internal void ObserveLiuQiPlayBoundary(int ownerSeat, int phaseInstance, bool skipped)
-    {
-        if (!HasTunjiangCapability || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1 || ownerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat))
-            return;
-        var owner = _coreMatchParticipantsPlayersAccess._players[ownerSeat];
-        var entry = new LiuQiPlayEntry(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, ownerSeat, phaseInstance, skipped);
-        if ((owner.LiuQiPlayEntries ?? []).Contains(entry))
-            return;
-        owner.LiuQiPlayEntries = (owner.LiuQiPlayEntries ?? []).Append(entry).ToArray();
-        _characterLiuQiOlHasIssuedLiuQiAccess._hasIssuedLiuQi = true;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LiuQiPlayEnteredEvent(entry));
-    }
-
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 450)]
     internal void ObserveLiuQiEvent(IGameEvent payload)
     {
-        if (!_characterLiuQiOlHasIssuedLiuQiAccess._hasIssuedLiuQi && !HasTunjiangCapability)
+        if (!_characterLiuQiOlHasIssuedLiuQiAccess._hasIssuedLiuQi)
             return;
         if (payload is CardActionAcceptedEvent { Action: { Type: CardActionType.Response, EffectiveKind: CardKind.Nullification } response } && _characterLiuQiOlHasIssuedLiuQiAccess._hasIssuedLiuQi)
         {
@@ -41,28 +28,19 @@ internal sealed partial class CharacterLiuQiOlRuntime
         {
             var owner = _coreMatchParticipantsPlayersAccess._players[ended.ActorSeat];
             owner.WenjiTurnNameGrants = null;
-            owner.LiuQiPlayEntries = null;
         }
         else if (payload is PlayerDiedEvent died)
         {
             var owner = _coreMatchParticipantsPlayersAccess._players[died.VictimSeat];
             owner.WenjiTurnNameGrants = null;
-            owner.LiuQiPlayEntries = null;
         }
-    }
-
-    private bool HasUnskippedLiuQiPlay(int owner)
-    {
-        if (owner != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1 || _coreMatchParticipantsPlayersAccess._players[owner].LiuQiPlayEntries is not { Count: > 0 } entries)
-            return false;
-        return entries.Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && !e.Skipped) && !entries.Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.Skipped);
     }
 
     internal bool LiuQiFirstChild(ProgramSkillFrame root, ResolutionFrame child)
     {
         if (!CanContinueLiuQi(root) || child is not CardsMovedTriggerWindowFrame moved || root.LiuQi is not { } r)
             return false;
-        return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == (r.Stage == LiuQiStage.GiftChildren ? WenjiGiftReason : TunjiangDrawReason));
+        return moved.Batch.ParentFrameId == root.Id && moved.Batch.AwaitingProgramFrameId == root.Id && moved.ResumeProgramFrameId is null && moved.Batch.OriginOwnerSeat == root.OwnerSeat && moved.Batch.OriginSkillId == root.SkillId && moved.Batch.OriginSkillInstanceId == root.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.To == CardLocation.Hand(root.OwnerSeat) && m.Reason.Value == WenjiGiftReason);
     }
 
     internal ProgramSkillFrame? LiuQiObserverRoot() => _coreObserverSubtreesOperations.FindProgramObserverRoot((r, c) => this.LiuQiFirstChild(r, c), (i) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(i));

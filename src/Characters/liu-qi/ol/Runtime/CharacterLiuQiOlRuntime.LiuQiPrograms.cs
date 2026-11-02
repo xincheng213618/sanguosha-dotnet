@@ -3,13 +3,11 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuQiOlRuntime
 {
-    internal const string WenjiGiftReason = "skill-program.wenji.gift", TunjiangDrawReason = "skill-program.tunjiang.draw";
+    internal const string WenjiGiftReason = "skill-program.wenji.gift";
     internal static CardConversionSource LiuQiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_liu_qi_ol_LiuQiPrograms.LiuQiSource(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 380)]
     internal bool CanOfferLiuQi(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
-        if (ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.DrawForUnskippedUntargetedPlay))
-            return HasUnskippedLiuQiPlay(candidate.OwnerSeat);
         if (ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.ReceiveWenjiGiftAndArmTurnName))
             return _coreDragonBoatGeneralsOperations.WenjiEligibleGiftRecipients(candidate.OwnerSeat, candidate.SkillId).Any();
         return true;
@@ -18,33 +16,12 @@ internal sealed partial class CharacterLiuQiOlRuntime
     internal SkillProgramStepOutcome BeginLiuQi(ProgramSkillFrame supplied, SkillProgramEffect e)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.LiuQi is not null || f.InstructionIndex != 1 || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || f.TriggerId is null || f.WindowContext is not { } w || w.Window != (e.Op == SkillProgramEffectOp.ReceiveWenjiGiftAndArmTurnName ? SkillProgramTriggerWindow.PlayPhaseStarting : SkillProgramTriggerWindow.TurnEnding) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
-            throw new InvalidOperationException("LiuQi requires its current unpaid own native phase trigger.");
-        var r = new LiuQiReceipt(LiuQiSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, w.ParentFrameId, e.Op == SkillProgramEffectOp.ReceiveWenjiGiftAndArmTurnName ? LiuQiStage.ChooseRecipient : LiuQiStage.DrawChildren);
-        if (e.Op == SkillProgramEffectOp.ReceiveWenjiGiftAndArmTurnName)
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LiuQi = r });
-            PublishWenjiChoice(f);
-            return SkillProgramStepOutcome.AwaitChoice;
-        }
-
-        r = r with
-        {
-            Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
-            After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
-            RequestedDraw = _coreRuleQueriesOperations.GetLivingFactionCount()
-        };
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { LiuQi = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        var actual = _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], r.RequestedDraw, true, new(TunjiangDrawReason)).Count;
-        r = r with
-        {
-            After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
-            ActualDraw = actual
-        };
-        _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { LiuQi = r });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TunjiangDrawPaidEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.WindowId, r.RequestedDraw, actual, r.Before, r.After));
-        _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
-        return SkillProgramStepOutcome.AwaitChild;
+        if (e.Op != SkillProgramEffectOp.ReceiveWenjiGiftAndArmTurnName || f.LiuQi is not null || f.InstructionIndex != 1 || f.OwnerSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || f.TriggerId is null || f.WindowContext is not { Window: SkillProgramTriggerWindow.PlayPhaseStarting } w || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
+            throw new InvalidOperationException("Wenji requires its current unpaid own native Play phase trigger.");
+        var r = new LiuQiReceipt(LiuQiSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, w.ParentFrameId, LiuQiStage.ChooseRecipient);
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { LiuQi = r });
+        PublishWenjiChoice(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
+        return SkillProgramStepOutcome.AwaitChoice;
     }
 
     internal IReadOnlyList<PromptChoice> LiuQiChoices(ProgramSkillFrame f)
@@ -68,7 +45,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
     [ProgramContinuation(ProgramContinuationKind.Resume, 23300)]
     internal bool ResumeLiuQi(long id)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiuQi.Stage: LiuQiStage.GiftChildren or LiuQiStage.DrawChildren } f || f.Id != id)
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LiuQi.Stage: LiuQiStage.GiftChildren } f || f.Id != id)
             return false;
         RequireLiuQi(f);
         if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(f.Id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(f.Id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(f.Id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(f.Id))
@@ -83,7 +60,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 160)]
     internal bool CanContinueLiuQi(ProgramSkillFrame f)
     {
-        if (f.LiuQi is not { Stage: LiuQiStage.GiftChildren or LiuQiStage.DrawChildren })
+        if (f.LiuQi is not { Stage: LiuQiStage.GiftChildren })
             return false;
         RequireLiuQi(f);
         return true;
@@ -106,8 +83,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
             if (r.CardId is not { } id || r.Name is not { } name || r.From is not { } from || r.RecipientSeat is not { } recipient || from.OwnerSeat != recipient || from.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || r.After <= r.Before || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WenjiGiftPaidEvent>().Count(e => e == new WenjiGiftPaidEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, recipient, id, from, name, r.Before, r.After)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == from && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == WenjiGiftReason) != 1)
                 throw new InvalidOperationException("Wenji lacks its exact once-paid recipient entity invoice.");
         }
-        else if (r.Stage == LiuQiStage.DrawChildren && (r.RequestedDraw < 1 || r.ActualDraw < 0 || r.ActualDraw > r.RequestedDraw || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TunjiangDrawPaidEvent>().Count(e => e == new TunjiangDrawPaidEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.WindowId, r.RequestedDraw, r.ActualDraw, r.Before, r.After)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == TunjiangDrawReason) != r.ActualDraw))
-            throw new InvalidOperationException("Tunjiang draw lacks its exact native payment interval.");
+
     }
 
     SkillProgramStepOutcome ILiuQiProgramHost.BeginLiuQi(ProgramSkillFrame f, SkillProgramEffect e) => BeginLiuQi(f, e);

@@ -91,9 +91,32 @@ Confirmations 每项是一份真实确认快照，后来更新不回写它。Lat
   "currentUse"]}
 ```
 
-魅魂用首次 finalized 的原窗口 point 读取这一跨所有使用者的确认历史，不能加 actor==owner。刘琦屯江在实际资格时读取 `now/confirmations`，并使用 `evaluateConditionAtResolution:true`；它的 Play entered/skipped 资格仍独立。界 current 窃听则使用 pre-TurnEnd 的原窗口 point 和 raw 确认目标，不能接收结束后新增动作，也不能把借刀 victim 从目标域漏掉。真实确认与急袭的 finalized-established ever 关系是不同概念。
+魅魂用首次 finalized 的原窗口 point 读取这一跨所有使用者的确认历史，不能加 actor==owner。刘琦屯江在实际资格时读取 `now/confirmations`，并以同一条件组合 `phaseCount` 的 Play entered/skipped 资格，使用 `evaluateConditionAtResolution:true` 保留求值时点。界 current 窃听则使用 pre-TurnEnd 的原窗口 point 和 raw 确认目标，不能接收结束后新增动作，也不能把借刀 victim 从目标域漏掉。真实确认与急袭的 finalized-established ever 关系是不同概念。
 
 `selectTarget` / `selectTargets` 可用 `targetSetExpr` 提供角色集合，与原目标类型和实际合法域取交集；提交时仍走共同输入校验。已支付步骤需继续使用原帧冻结的集合，不随之后子结算的新事实刷新菜单。已迁移复合效果按各自加载合同要求 `targetSetExpr`，不能缺字段后静默回退为人物历史扫描；该格式要求与旧语法退役统一处理，不逐字段另升版本。表达式只读视图可在同一次求值内缓存，不承载 pending、支付或游标。
+
+## 按回合和时点读取实际阶段
+
+```json
+["phaseCount","now","owner","play","entered"]
+["phaseCount","window","eventTarget","all","skipped"]
+```
+
+`phaseCount` 返回非负整数。时点为 `now` 或原窗口的 `window`；参与者是阶段行动者，仍受该时点的实际回合及回合拥有者范围限制。阶段可为 `preparation`、`judgment`、`draw`、`play`、`discard`、`ending` 或 `all`，结果为 `entered` 或 `skipped`。缺少可用时点或参与者时返回未知；已有范围内没有对应事实才返回零。读取自动声明既有实际阶段事实需求。
+
+entered 只计真实阶段开始，恢复旧 token 不增加次数；skipped 只计原生实际跳过边界。自然槽、插入阶段和额外摸牌各保留原 occurrence，不把请求、替代声明或付款次数当成实际结果。原窗口以完整 journal 游标为截点，后续子阶段不会倒灌。
+
+entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。原生弃牌开始窗已经进入后，技能才决定跳过弃牌阶段时，两项都计入；只有发出跳过请求、尚未到达真实跳过边界时仍不计 skipped。
+
+例如，要求至少实际进入过一次出牌阶段，且本回合没有任何一次出牌阶段被跳过：
+
+```json
+["and",
+  [">",["phaseCount","now","owner","play","entered"],0],
+  ["==",["phaseCount","now","owner","play","skipped"],0]]
+```
+
+同回合有多次 Play 时，一次 skip 就使该条件不成立。平寇可直接用 `phaseCount(...,"all","skipped")` 作数量表达式并在原步骤冻结；蒙态只判断相应种类是否大于零。跳阶段作为技能成本时仍读原支付事实，不能拿上述实际次数替换。
 
 ## 已签发的用牌加伤
 

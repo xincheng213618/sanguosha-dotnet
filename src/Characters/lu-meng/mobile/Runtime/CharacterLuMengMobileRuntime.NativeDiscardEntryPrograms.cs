@@ -83,7 +83,10 @@ internal sealed partial class CharacterLuMengMobileRuntime
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return;
         if (frame.Stage == NativeDiscardEntryStage.Skipping)
+        {
+            _actualPhases.RecordSkipped(ActualDiscardRecoveryPhaseKind.Discard, frame.Source.OwnerSeat);
             _coreActualTurnsOperations.EndTurn();
+        }
         else
             _coreActualDiscardPhaseOperations.BeginDiscardPhase(beforeEntryPolicyCompleted: true);
     }

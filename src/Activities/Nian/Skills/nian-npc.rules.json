@@ -5,9 +5,11 @@
     { "id": "nian:mengtai", "revision": 1,
       "triggers": [
         { "id": "actual-play-skip-protects-hand", "window": "discardPhaseStarting", "subject": "owner", "optional": false,
-          "effects": [{ "op": "applyNianMengtaiDiscard", "target": "owner" }] },
+          "condition": { "kind": "expression", "expr": [">", ["phaseCount", "now", "owner", "play", "skipped"], 0] },
+          "effects": [{ "op": "skipTurnPhases", "target": "owner", "phases": ["discard"] }] },
         { "id": "actual-draw-skip-ending-draw", "window": "turnEnding", "subject": "owner", "optional": false,
-          "effects": [{ "op": "drawNianMengtaiEnding", "target": "owner" }] }
+          "condition": { "kind": "expression", "expr": [">", ["phaseCount", "now", "owner", "draw", "skipped"], 0] },
+          "effects": [{ "op": "draw", "target": "owner", "amount": 3, "awaitMovementTriggers": true }] }
       ] },
     { "id": "nian:ruizhi", "revision": 1,
       "triggers": [{ "id": "other-preparation-keeps-two-zones", "window": "turnStartBeforeNormalFlow", "subject": "owner", "turnOwnerScope": "otherLiving", "optional": false,

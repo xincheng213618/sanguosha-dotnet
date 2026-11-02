@@ -57,6 +57,7 @@ internal sealed class SkillProgramDependencies
                 expression.Reads("cardUses") || expression.Reads("currentUse"))
                 ? ProgramTrackedFact.ActualCardUseHistory : ProgramTrackedFact.None) |
             (UsesSkillStatePhaseEnds || skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseStarted)
+                || programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).Any(expression => expression.Reads("phaseCount"))
                 ? ProgramTrackedFact.ActualDiscardRecoveryPhase : ProgramTrackedFact.None) |
             (programs.Any(program => program.DamageModifiers.Any(modifier =>
                 modifier.Condition == SkillProgramDamageModifierCondition.OwnerUsedHeartSlash) ||

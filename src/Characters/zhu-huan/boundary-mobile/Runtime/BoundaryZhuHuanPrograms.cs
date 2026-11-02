@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
-internal interface IBoundaryZhuHuanHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame); void SkipDraw(ProgramSkillFrame frame); }
+internal interface IBoundaryZhuHuanHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame, int maximum); void SkipDraw(ProgramSkillFrame frame); }
 internal sealed class SkipBoundaryZhuHuanDrawDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op=>SkillProgramEffectOp.SkipBoundaryZhuHuanDraw;
@@ -23,14 +23,24 @@ internal sealed class ResolveBoundaryZhuHuanPingkouDescriptor : ProgramOperation
     public override ISkillProgramEffectHandler Handler { get; } = new BoundaryZhuHuanHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy => new(ProgramOperationAiSemantic.SelectTarget, static (_,c)=>c.PublicControlValue(4));
-    public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)=>ParseOwnerAlways(reader);
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
+    {
+        reader.AllowOnly("op", "target", "condition", "amountExpr");
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(reader), 0, reader.Condition())
+            { AmountExpression = reader.RequiredIntExpression("amountExpr") };
+        RequireAlways(effect, reader.Path);
+        return effect;
+    }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect)=>[new RequireTriggerWindow(SkillProgramTriggerWindow.AfterTurnEnded)];
 }
 internal sealed class BoundaryZhuHuanHandler : ISkillProgramEffectHandler
 {
     public SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveBoundaryZhuHuanPingkou;
-    public SkillProgramStepOutcome Execute(SkillProgramEffect effect,ProgramSkillFrame frame,int target,ISkillProgramEffectHost host)=>
-        host.GetCapability<IBoundaryZhuHuanHost>().Resolve(frame);
+    public SkillProgramStepOutcome Execute(SkillProgramEffect effect,ProgramSkillFrame frame,int target,ISkillProgramEffectHost host)
+    {
+        var maximum = frame.BoundaryZhuHuan?.Maximum ?? host.EvaluateAmountExpression(frame, effect.AmountExpression!);
+        return maximum is > 0 ? host.GetCapability<IBoundaryZhuHuanHost>().Resolve(frame, maximum.Value) : SkillProgramStepOutcome.Continue;
+    }
 }
 internal static class BoundaryZhuHuanComposition
 {
@@ -64,7 +74,6 @@ public sealed record BoundaryZhuHuanReceipt(CardConversionSource Source,string G
 }
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public BoundaryZhuHuanReceipt? BoundaryZhuHuan {get;init;} }
-public sealed record BoundaryZhuHuanPhaseSkippedEvent(int OwnerSeat,int ActualTurn,SkillProgramTurnPhase Phase,long ExtraDrawFrameId):IGameEvent;
 public sealed record BoundaryZhuHuanStartedEvent(long FrameId,CardConversionSource Source,string GameplayHash,int ActualTurn,long EndedFrame,int Maximum):IGameEvent;
 public sealed record BoundaryZhuHuanTargetEvent(long FrameId,int Index,int Target):IGameEvent;
 public sealed record BoundaryZhuHuanSealedEvent(long FrameId,int Count):IGameEvent;

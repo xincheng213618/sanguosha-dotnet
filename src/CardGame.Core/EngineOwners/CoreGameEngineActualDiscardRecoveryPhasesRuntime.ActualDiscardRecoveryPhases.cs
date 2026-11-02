@@ -5,6 +5,7 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveryPhasesRuntime
 {
     internal ActualDiscardRecoveryPhaseKey? CurrentActualDiscardRecoveryPhase() => _actualDiscardRecoveryPhaseOperations.Get().Current();
     internal void StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind kind, int actor) => _actualDiscardRecoveryPhaseOperations.Get().Start(kind, actor);
+    internal void RecordActualPhaseSkipped(ActualDiscardRecoveryPhaseKind kind, int actor, long? nativeFrameId = null, bool isExtra = false) => _actualDiscardRecoveryPhaseOperations.Get().RecordSkipped(kind, actor, nativeFrameId, isExtra);
     internal bool IsRecordedActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKey phase) => _actualDiscardRecoveryPhaseOperations.Get().IsRecorded(phase);
     internal void ClearActualDiscardRecoveryPhase() => _actualDiscardRecoveryPhaseOperations.Get().Clear();
     internal void RestoreActualDiscardRecoveryPhase(ProgramPhaseSchedule schedule) => _actualDiscardRecoveryPhaseOperations.Get().Restore(schedule);

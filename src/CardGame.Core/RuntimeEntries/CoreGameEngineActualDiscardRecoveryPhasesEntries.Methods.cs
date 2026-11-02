@@ -11,5 +11,6 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveryPhasesEntries
     internal int[] MatchingActualDiscardRecoveryIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _resolve().MatchingActualDiscardRecoveryIndexes(batch, candidate);
     internal void RestoreActualDiscardRecoveryPhase(DrawPhaseObligationFrame parent) => _resolve().RestoreActualDiscardRecoveryPhase(parent);
     internal void RestoreActualDiscardRecoveryPhase2(ProgramPhaseSchedule schedule) => _resolve().RestoreActualDiscardRecoveryPhase(schedule);
+    internal void RecordActualPhaseSkipped(ActualDiscardRecoveryPhaseKind kind, int actor, long? nativeFrameId = null, bool isExtra = false) => _resolve().RecordActualPhaseSkipped(kind, actor, nativeFrameId, isExtra);
     internal void StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind kind, int actor) => _resolve().StartActualDiscardRecoveryPhase(kind, actor);
 }

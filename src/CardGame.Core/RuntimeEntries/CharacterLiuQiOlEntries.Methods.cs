@@ -14,7 +14,6 @@ internal sealed partial class CharacterLiuQiOlEntries
     internal bool LiuQiFirstChild(ProgramSkillFrame root, ResolutionFrame child) => _resolve().LiuQiFirstChild(root, child);
     internal ProgramSkillFrame? LiuQiObserverRoot() => _resolve().LiuQiObserverRoot();
     internal void ObserveLiuQiEvent(IGameEvent payload) => _resolve().ObserveLiuQiEvent(payload);
-    internal void ObserveLiuQiPlayBoundary(int ownerSeat, int phaseInstance, bool skipped) => _resolve().ObserveLiuQiPlayBoundary(ownerSeat, phaseInstance, skipped);
     internal void PublishWenjiChoice(ProgramSkillFrame f) => _resolve().PublishWenjiChoice(f);
     internal void RequireLiuQi(ProgramSkillFrame f) => _resolve().RequireLiuQi(f);
     internal void ResolveWenjiChoice(PromptChoice choice) => _resolve().ResolveWenjiChoice(choice);
@@ -22,5 +21,4 @@ internal sealed partial class CharacterLiuQiOlEntries
     internal bool ReturnLiuQiMovement(ProgramSkillFrame f) => _resolve().ReturnLiuQiMovement(f);
     internal bool TryAdvanceLiuQiSubtree() => _resolve().TryAdvanceLiuQiSubtree();
     internal IReadOnlyList<Card> WenjiPayableCards(int seat) => _resolve().WenjiPayableCards(seat);
-    internal bool HasTunjiangCapability { get => _resolve().HasTunjiangCapability; }
 }

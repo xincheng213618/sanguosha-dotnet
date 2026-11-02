@@ -136,7 +136,10 @@ internal sealed partial class CoreAlternativePhaseCostProgramsRuntime
     {
         var current = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         if (frame.ActualPhaseSubstitution is { SkippedPhase: SkillProgramTurnPhase.Judgment } receipt && receipt.ParentFrameId == frame.Id)
+        {
+            _actualPhases.RecordSkipped(ActualDiscardRecoveryPhaseKind.Judgment, current.Seat);
             _coreActualTurnsOperations.CompleteTurnStart(current, _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects, skippedActualJudgment: true);
+        }
         else
             _coreActualTurnsOperations.BeginDelayedJudgmentOrTurnStart(current);
     }

@@ -12,6 +12,8 @@ public sealed record DrawPhaseObligationFrame(long Id, int OwnerSeat, int Actual
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public ActualDiscardRecoveryPhaseKey? DiscardRecoveryPhase { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public long? PhaseOccurrenceFrameId { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public ShanheSourceChunlaoJudgmentDrawReceipt? ShanheSourceChunlaoJudgmentDraw { get; init; }
 }
 public sealed record DrawPhaseSkippedEvent(long FrameId, int OwnerSeat, int ActualTurnNumber, bool IsExtra) : IGameEvent;

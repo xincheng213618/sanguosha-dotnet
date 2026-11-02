@@ -1523,6 +1523,11 @@ public sealed class SkillProgramExecutor
                 return;
             }
 
+            if (frame.InstructionDelivery is not null)
+            {
+                frame = frame with { InstructionDelivery = null };
+                state.UpdateFrame(frame);
+            }
             var effect = plan.GetInstruction(frame.InstructionIndex).Effect;
             var handler = _effects?.Resolve(effect.Op) ?? ProgramOperationCatalog.Default.Resolve(effect.Op).Handler;
             // Commit the cursor before any primitive can suspend into a child.

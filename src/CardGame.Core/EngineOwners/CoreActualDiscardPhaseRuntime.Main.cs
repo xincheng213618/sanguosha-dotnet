@@ -10,12 +10,14 @@ internal sealed partial class CoreActualDiscardPhaseRuntime
         _characterCaoChunOlOperations.ExpireCaoChunPlayDebt(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
         if (_characterQiaoZhouOlOperations.TrySkipQiaoZhouDiscardPhase(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat]))
         {
+            _coreActualDiscardRecoveryPhasesOperations.RecordActualPhaseSkipped(ActualDiscardRecoveryPhaseKind.Discard, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat);
             _coreActualTurnsOperations.EndTurn();
             return;
         }
 
         if (_characterDuXiOlOperations.TrySkipDuXiDiscardPhase(_coreMatchParticipantsPlayersAccess._players[_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat]))
         {
+            _coreActualDiscardRecoveryPhasesOperations.RecordActualPhaseSkipped(ActualDiscardRecoveryPhaseKind.Discard, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat);
             _coreActualTurnsOperations.EndTurn();
             return;
         }
@@ -45,6 +47,7 @@ internal sealed partial class CoreActualDiscardPhaseRuntime
             return;
         if (_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDiscardPhase))
         {
+            _coreActualDiscardRecoveryPhasesOperations.RecordActualPhaseSkipped(ActualDiscardRecoveryPhaseKind.Discard, current.Seat);
             if (_programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, SkillProgramTurnPhase.Discard, (int)_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects)))
                 return;
             _coreMatchLogOperations.AddLog("DelayedCardEffect", $"{(current.Name)} 跳过弃牌阶段。", current.Seat);
@@ -94,6 +97,7 @@ internal sealed partial class CoreActualDiscardPhaseRuntime
         {
             if (_characterHuaTuoAnniversaryGodOperations.TryBeginSkillInvocation(0, current.Seat, skillId, $"discard-policy:{(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber)}:{(policyId)}", returnKind: SkillInvocationReturnKind.SkipDiscard))
                 return;
+            _coreActualDiscardRecoveryPhasesOperations.RecordActualPhaseSkipped(ActualDiscardRecoveryPhaseKind.Discard, current.Seat);
             _coreActualTurnsOperations.EndTurn();
         }
         else

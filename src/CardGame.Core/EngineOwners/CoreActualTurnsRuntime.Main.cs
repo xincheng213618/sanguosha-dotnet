@@ -155,8 +155,8 @@ internal sealed partial class CoreActualTurnsRuntime
             return;
         if (_coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipJudgmentPhase))
         {
+            _coreActualDiscardRecoveryPhasesOperations.RecordActualPhaseSkipped(ActualDiscardRecoveryPhaseKind.Judgment, current.Seat);
             _coreShanheS5ShensuOperations.RecordShanheS5ActualPhaseSkip(current.Seat, SkillProgramTurnPhase.Judgment);
-            _characterZhuHuanBoundaryMobileOperations.RecordBoundaryZhuHuanSkippedPhase(current.Seat, SkillProgramTurnPhase.Judgment);
             CompleteTurnStart(current, _coreDelayedTurnEffectsPendingTurnDelayedEffectsAccess._pendingTurnDelayedEffects);
         }
         else
@@ -240,9 +240,12 @@ internal sealed partial class CoreActualTurnsRuntime
 
     internal void CompleteTurnStartAfterDraw(CharacterState current, GameEngine.DelayedTurnEffects delayedEffects, bool afterNormalDrawProgramsCompleted = false, bool drawPhaseEndedProgramsCompleted = false, bool actualDrawCompletionCompleted = false)
     {
-        _coreNianActivityProgramsOperations.RecordNianActualPhaseSkips(current.Seat, delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase), delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase));
-        if (delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) && _programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, SkillProgramTurnPhase.Draw, (int)delayedEffects, afterNormalDrawProgramsCompleted, drawPhaseEndedProgramsCompleted, actualDrawCompletionCompleted)))
-            return;
+        if (delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase))
+        {
+            _coreActualDiscardRecoveryPhasesOperations.RecordActualPhaseSkipped(ActualDiscardRecoveryPhaseKind.Draw, current.Seat);
+            if (_programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, SkillProgramTurnPhase.Draw, (int)delayedEffects, afterNormalDrawProgramsCompleted, drawPhaseEndedProgramsCompleted, actualDrawCompletionCompleted)))
+                return;
+        }
         if (!drawPhaseEndedProgramsCompleted && !actualDrawCompletionCompleted && _coreDrawPhaseObligationsOperations.Value.TryBeginActualDrawCompletion(current, delayedEffects))
             return;
         if (!drawPhaseEndedProgramsCompleted && !delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipDrawPhase) && _coreProgramLifecycleOperations.TryBeginDrawPhaseEndedProgramWindow(current, delayedEffects))
@@ -255,9 +258,9 @@ internal sealed partial class CoreActualTurnsRuntime
             return;
         if (delayedEffects.HasFlag(GameEngine.DelayedTurnEffects.SkipPlayPhase))
         {
+            _coreActualDiscardRecoveryPhasesOperations.RecordActualPhaseSkipped(ActualDiscardRecoveryPhaseKind.Play, current.Seat);
             if (_programPipelineHooksOperations._programPipelineHooks.TryBeginPhaseSkipped(new(current.Seat, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, SkillProgramTurnPhase.Play, (int)delayedEffects, afterNormalDrawProgramsCompleted, drawPhaseEndedProgramsCompleted, actualDrawCompletionCompleted)))
                 return;
-            _characterLiuQiOlOperations.ObserveLiuQiPlayBoundary(current.Seat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, skipped: true);
             _coreActualDiscardPhaseOperations.BeginDiscardPhase();
             _coreMatchLogOperations.AddLog("DelayedCardEffect", $"{(current.Name)} 跳过出牌阶段。", current.Seat);
         }
@@ -290,7 +293,6 @@ internal sealed partial class CoreActualTurnsRuntime
         _coreActualDiscardRecoveryPhasesOperations.StartActualDiscardRecoveryPhase(ActualDiscardRecoveryPhaseKind.Play, current.Seat);
         _coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerPlayPhaseKillCountByCurrentPlayerSlashCountThisTurnUsedOrPlayedSlashDuringPlayPhaseWoodenOxUsedThisTurnAccess._playPhaseKillCountByCurrentPlayer = 0;
         _coreCurrentTurnStatisticsPlayPhaseDamageDealtByCurrentPlayerPlayPhaseKillCountByCurrentPlayerSlashCountThisTurnUsedOrPlayedSlashDuringPlayPhaseWoodenOxUsedThisTurnAccess._playPhaseDamageDealtByCurrentPlayer = 0;
-        _characterLiuQiOlOperations.ObserveLiuQiPlayBoundary(current.Seat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, skipped: false);
         _coreGrantedEntityPhasesOperations.IssueGrantedEntityPhaseBoundary(current);
         _coreMatchLogOperations.AddLog("PhaseChanged", $"{(current.Name)} 进入出牌阶段。", current.Seat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PhaseChangedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase, current.Seat));

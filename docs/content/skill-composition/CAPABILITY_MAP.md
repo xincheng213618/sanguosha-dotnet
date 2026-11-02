@@ -92,7 +92,7 @@
 | 展示 / 牌堆操作 | `revealTopCards`、`revealBoundCards` | 半成品 |
 | 视为使用 / 虚拟牌 | `useVirtualCard`、`useVirtualSlash` | 半成品 |
 | 标记 | `changeAttributedMarker`、`changeParticipantMarker` | 半成品 |
-| 阶段控制 | `skipTurnPhases`、`insertPhase` | 半成品 |
+| 阶段控制 | `skipTurnPhases`、`insertPhase`、`phaseCount` | 实际进入／跳过事实与读取已统一；调度、替代与付款仍分别归原协议 |
 | **获得 / 交给** | `giveSelected`、`takeRandomHandCardFromSelectedTargets` | **缺失**：“获得一张牌”“交给某人”没有统一动作 |
 | **使用 / 响应合法性** | 动作 `grantTurnCardActionProhibition` 等 | **缺失单一查询**：Core 与人物侧仍有分散的使用和响应限制查询 |
 | **技能状态（失效 / 失去 / 夺取）** | `skillState`、`skillGrants`；共享 mutation、物化器与 `SkillAvailability` | **部分完成**：普通负状态、条件派生授予、调用授权、原始准入及印刷主公资格已收口；剩余关系见下文；主公投影、私库及官渡印刷技能条件尚存 |
@@ -398,7 +398,7 @@ Issue、Candidates、Matches 重复 Mode/人物来源/印刷来源/Locked。Filt
 | 原生执行与恢复 | 开局快照、原生窗口限次、惑心已支付选择均在原帧；子移动沿既有类型化返回，没有旁路 pending。 |
 | 旧路径退役 | 韵筝最后一个负资格分支、旧 CurrentTurn 谓词、惑心自证事件及旧场景印刷资格路径删除。 |
 
-本批保留的不同概念：檀板可翻转；谋沮授/佐军是限定受体与牌区的租约；弦依赖真实批次提交点；拂乐包含别名版本和 RNG；谷音含开局来源关系。不能用永久 Any 查询代替。正向主公投影、私库、HP、装备花色、落雁与官渡派生来源链仍待继续审计，整体技能状态保持部分完成。没有剪测试或运行全量。
+本批保留的不同概念：檀板可翻转；谋沮授/佐军是限定受体与牌区的租约；弦依赖真实批次提交点；拂乐包含别名版本和 RNG；谷音含开局来源关系。不能用永久 Any 查询代替。正向主公投影、私库、HP、装备花色、落雁与官渡派生来源链仍待继续审计，整体技能状态保持部分完成。
 
 ### 原始准入与孔武装备技能限制
 
@@ -837,7 +837,7 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 | OL 蔡夫人窃听 | JSON 在原回合末候选截点的 window/latest 中判断：没有该回合角色真实声明且指定他人的用牌。`evaluateConditionAtResolution` 保留实际结算资格时点；Action 为空的真实原生 Use 同样参与，不需要人物 frozen bool 或上下文工厂计算历史答案。 |
 | 界移动蔡夫人窃听 | 仍读取原 TurnStarted／TurnEnded 区间内实际正数 DamageApplied 的来源与他人目标；它不是用牌关系，不与 OL 条件合并，也不因共享效果而附带无用用牌历史采集。 |
 | 界蔡夫人 current 窃听 | 从共享 pre-TurnEnd 截点的 window/confirmations 合并该回合使用者的原始确认目标，冻结原选项域；借刀 victim 不能被主要目标或 designated 投影漏掉，结束之后的新用牌也不能倒灌。 |
-| OL 刘琦屯江 | 在真实资格时用 now/confirmations 判断 owner 的实际 Play 确认是否含他人主要目标，`evaluateConditionAtResolution` 保留此时点，不因缺少窗口 point 而返回未知。Play entered/skipped 资格仍由原状态回答。 |
+| OL 刘琦屯江 | 在真实资格时组合 now/confirmations 的实际 Play 他人主要目标与 `phaseCount` 的进入／跳过条件，`evaluateConditionAtResolution` 保留此时点；奖励使用普通 `draw` 与存活势力数读取。 |
 | happy 神貂蝉魅魂 | 在首次 finalized 的原窗口 point 上，跨所有使用者筛确认时杀族与包含 owner 的原始目标，`first` 后用 `sameUse` 与当前牌比较；原本人回合结束触发保持独立无条件，原窗口 Event 次数覆盖 owner/binding 的重复发动。 |
 
 联翩／伺盗原文“于出牌阶段使用牌连续指定”“对一名其他角色连续使用两张牌”，以及薮影“本回合……不是第一张牌”，均没有持有后才开始记录的限制。中途获得或恢复技能时，此前真实动作参与判断；当前是否能发动仍在原资格阶段回答，不因历史存在就授予发动权。已接受调用和已支付成本沿原帧续接，不回扫新历史重判资格。
@@ -854,6 +854,8 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 
 真实的薮影弃牌／取消／处理中实体领取、急袭成本／RNG／无距离多目标顺手牵羊、窃听选项／装备移动／查看手牌／摸牌、魅魂花色声明／给牌／私看及 paid／mutation／子返回继续保留原协议。条件和目标集合已移入 JSON，相关专属复合 effect 仍有 C#，尚未达到只需组合共享 JSON 节点的目标；联翩、伺盗的真实后续效果也仍须按所属能力继续拆解。
 
+尚未收口的历史组合包括：苏飞／活动联翩仍在 C# 读取 finalized 前一张与主要目标交集；郭汜仍用单消费者 `AcceptedPairAtCompletionFor` 冻结本次完成截点的 accepted 尾部两项，不能改成最初接受时的前缀。OL／界移动窃听的复合效果仍有 C#，界移动版的实际伤害资格也未改成用牌历史条件。共同事实入口已经统一，不代表这些完整规则已能只写 JSON。
+
 已迁移的屯江外部目标、界 current 窃听与魅魂共同确认读取，按原架构标准分别判断；不扩张为整个用牌模块或纯 JSON 技能已完成：
 
 | 标准 | 状态与剩余范围 |
@@ -861,8 +863,8 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 | 一个概念，一个归属 | 已完成：真实确认事实、journal 索引与共同只读表达式各有唯一归属，没有人物确认账本。 |
 | 依赖方向 | 此子概念已完成：公共 capture、index、读取及 Boundary 效果 owner 不依赖人物；整个 CardActions／原生用牌模块的其他反向依赖仍待收口。 |
 | 层次分明 | 已完成：接受、声明、确认、finalized、更新、完成分别采样；确认元数据不冒充当前目标，资格与原生付款仍分层。 |
-| JSON 对应规则 | 部分完成：首次确认、Play 外部主要目标及确认目标集已用 JSON 组合；各人物专属复合 effect 和刘琦 PlayEntry 阶段资格仍在原实现。 |
-| 改动局部 | 已完成：通过共同 AST／事实字段接通确认历史消费者，没有为确认读取增加人物 registry、资格 callback 或 Core 人物写端；刘琦的阶段资格暂留原 CanOffer，Begin 不再重判此前阶段条件。 |
+| JSON 对应规则 | 首次确认、Play 外部主要目标及确认目标集已用 JSON 组合；屯江的阶段条件与奖励也已组成纯 JSON。其他人物专属复合 effect 仍部分完成。 |
+| 改动局部 | 已完成：通过共同 AST／事实字段接通确认历史消费者，没有为确认读取增加人物 registry、资格 callback 或 Core 人物写端；屯江阶段资格已转共享事实，不保留原 CanOffer／PlayEntry。 |
 | 只有一条路径 | 确认历史路径已完成：人物扫描、私有外部目标记录与 Boundary 旧关系扫描退役；真实 entered/skipped 状态不是确认历史的第二条路径，仍保留其独立含义。 |
 | 信任边界 | 已完成：原生 payload 与嵌套集合冻结、真实身份、命令、加载、内容指纹、隐私、付款、移动和原帧返回继续维护，不用假 ActionId 或刷新已接受资格。 |
 
@@ -870,6 +872,36 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 
 旧专属记账指令退役按唯一规则格式源统一处理，外部 Load／Inspector 明确拒绝旧格式，不保兼容别名；内置资源继续显式加载当前格式。规则 JSON 的实际组合变化参与内容指纹；已迁移复合效果必需的 `targetSetExpr` 和旧专属语法退役并入同一尚未发布的格式清理，不逐人物、指令或字段另升版本，也不引入 gameplay epoch、checkpoint RulesVersion 或包发布。旧局无法载入／回放时，沿已有桌面规则开新局并保留源存档，不自动覆盖。
 
-OL 刘琦的私有外部目标记录与魅魂首次目标扫描已由共同 confirmations 和表达式组合替代，界 current 窃听也不再用另一份初始目标关系扫描。刘琦 PlayEntry 的真实进入／跳过资格、问计无懈关系及各专属复合 effect 仍未收口；不能据共同确认读取已接通宣称这些人物 Runtime 已全部退役。CardActions、原生用牌和合法动作模块仍有其他反向依赖，整体使用／响应尚未完成依赖验收。
+OL 刘琦的私有外部目标记录与魅魂首次目标扫描已由共同 confirmations 和表达式组合替代，界 current 窃听也不再用另一份初始目标关系扫描。屯江已使用共享阶段事实与普通摸牌，问计无懈关系及其他人物专属复合 effect 仍未收口；不能据屯江纯 JSON 化宣称刘琦整个 Runtime 已退役。CardActions、原生用牌和合法动作模块仍有其他反向依赖，整体使用／响应尚未完成依赖验收。
 
 阶段次数上限尚缺按存活身份人数计算的共享数量读取与通用动态上限组合；OL 定叛的 `PhaseLimit` 仍在人物 C#，不能用固定一次取代“存活反贼数”。该规则不属于历史读取，不以新增定叛专属操作绕过。
+
+## 实际阶段历史与已交付摸牌
+
+### 阶段事实：共同归属与剩余捕获需求
+
+实际进入沿用 `ActualDiscardRecoveryPhaseStartedEvent`，实际跳过由 `ActualDiscardRecoveryPhaseRuntime.RecordSkipped` 在原生跳过边界发行 `ActualPhaseSkippedEvent`。`ProgramEventHistoryIndex` 从同一 journal 派生 `IActualPhaseHistoryQueries.CountPhases`；`phaseCount` 只读实际回合、回合拥有者、阶段行动者、阶段种类、结果和指定游标，不建人物状态表或第二套阶段调度。
+
+恢复原 phase token 不算再次进入。自然回合槽、插入阶段的原帧与指令、额外摸牌的原帧保留各自 occurrence，同一跳过边界恢复不会重复记数。额外摸牌和替代阶段仍沿各自真实生产者采样；调度请求、替代请求、跳阶段付款均不能单独充当“阶段已经跳过”的事实。source3161 的判定阶段替换实际进入 Draw，不因此制造 Judgment skipped。
+
+entered 也不等于阶段完整结束。弃牌阶段先进入原生开始窗，再由其中技能决定跳过时，该阶段既有 entered，也有随后真实 skipped；不能让两种结果互斥，也不能从阶段结束事件反推进入次数。屯江仍要求存在 Play entered 且完全没有 Play skipped，因此先进入后跳过的 Play 不会获得奖励。
+
+| 消费者 | 共同事实组合与完成状态 |
+|---|---|
+| OL 屯江 | 纯 JSON：本实际回合 owner 至少进入过一次 Play，且没有任何一次 Play 被跳过；确认历史中实际 Play 主要目标不含他人。符合后以 `draw` 的 `livingFactionCount` 数量摸牌，等待原生子结算。 |
+| 年兽蒙态 | 纯 JSON：实际跳过 Play 才在弃牌阶段跳过 Discard；实际跳过 Draw 才在回合结束阶段摸牌。读取真实历史，不在准备阶段提前替将来的 Play 记账。 |
+| 界移动／移动朱桓平寇 | 资格与可选目标上限共同读取实际 skipped 数量，Begin 冻结求值结果；同阶段种类的不同额外 Draw 分别计入。各版选人、伤害与装备后续仍属原效果，未宣称整技能纯 JSON。 |
+
+共享历史不以当时是否持有蒙态为采集条件，因此本回合实际跳过阶段后才获得或恢复技能，也读取此前真实事实；此前人物持有门控造成的漏记已修正。尚未真正跳过的后续 Play 不会提前触发收益，真正跳过的自身额外 Draw 也属于 Draw skipped。只获得技能不会补造一次跳过。
+
+剩余缺口是付款与阶段事实的不同含义：山河 S5 神速仍用原成本事件记录“以跳阶段支付”的义务；它不能直接改成全回合 skipped 次数。普通阶段条件已退出刘琦 PlayEntry、朱桓专属跳过事件和年兽专属跳过账本，S5 的真实支付事件继续保留。
+
+`phaseCount` 已从表达式声明既有阶段事实需求；原阶段 owner 的 `Tracks` 仍包含砺誓、谋陈宫及模式的旧需求门控，尚须迁回各能力定义。共同读取和本批消费者已接通，不代表整个阶段捕获或阶段控制已完成。
+
+### 摸牌交付：当前步骤的续接已统一
+
+普通 awaited `draw` 在原 `NativeDrawProducerReceipt` 标记实际交付，并在 `ProgramDrawCompletedEvent` 之前写入原帧的 `ProgramInstructionDelivery`。交付包括实际零张或合法替代，获得的替代实体仍不算 DrawPile 摸牌结果；签发请求、游标已前进或尚未返回的替代选择不等于已交付。
+
+共享续接只允许当前已交付收据排空自己的子窗；清空 `NativeDraw` 后，只有交付游标仍对应计划最后一条 Draw 时，才可在失源或死亡后完成原步骤。该权限不能执行未付的后续选择、摸牌或其他 suffix，也不授权尚未交付的请求。真实移动、实际数量、替代结果、子返回和完成继续使用原帧与既有原生协议。
+
+这项交付协议覆盖原生 Draw producer；不等待移动、没有 native attempt 的同步快速路径继续使用原语义，不因本概念补造收据。屯江与蒙态的声明显式使用 `awaitMovementTriggers`，没有把该选择隐含为人物特判。
