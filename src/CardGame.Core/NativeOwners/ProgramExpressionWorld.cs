@@ -16,6 +16,9 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
         getCoreTableSeatQueriesRuntime().IsValidPlayerSeat(seat) ? cardMarks?.CountMarked(seat, mark, zone) : null;
     public int? HandPrintedSuitCount(int seat, Suit suit) => Valid(seat) is null ? null :
         getCorePhysicalOwnedCardQueriesRuntime().GetHand(matchParticipantsState.ReferenceToPlayers[seat]).Count(card => card.Suit == suit);
+    public bool? SameTeam(int first, int second) => Valid(first) is null || Valid(second) is null ? null :
+        matchParticipantsState.ReferenceToPlayers[first].TeamId is { } team &&
+        matchParticipantsState.ReferenceToPlayers[second].TeamId == team;
     public int? PublicPileCount(int seat, string skillId) => Valid(seat) is null || piles is null ? null :
         piles.PublicPileSources(seat).Where(source => source.SkillId == skillId).Sum(source => piles.PublicPileCards(source).Count);
     public int? BindingStat(string stat, string name)
@@ -101,7 +104,9 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
         var point = moment == "window" ? WindowPoint : currentHistoryPoint?.Invoke();
         return point is null || history is null ? null : ReadHistory(point,
             view == "observations" ? CardUseHistoryView.Observations :
-            view == "confirmations" ? CardUseHistoryView.Confirmations : CardUseHistoryView.Latest);
+            view == "confirmations" ? CardUseHistoryView.Confirmations :
+            view == "accepted" ? CardUseHistoryView.Accepted :
+            view == "finalizations" ? CardUseHistoryView.Finalizations : CardUseHistoryView.Latest);
     }
     private readonly Dictionary<CardUseHistoryPoint, CardUseHistoryFact?> _currentUses = [];
     public int? PhaseCount(string moment, int actor, ActualDiscardRecoveryPhaseKind? kind, ActualPhaseHistoryOutcome outcome)

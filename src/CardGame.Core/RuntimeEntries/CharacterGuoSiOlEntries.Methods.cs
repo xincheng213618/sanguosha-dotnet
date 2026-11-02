@@ -8,7 +8,7 @@ internal sealed partial class CharacterGuoSiOlEntries
     internal bool CompleteGuoSiUseReturn(CardUseFrame use) => _resolve().CompleteGuoSiUseReturn(use);
     internal void ContinueGuoSiNativePayment(long id) => _resolve().ContinueGuoSiNativePayment(id);
     internal bool DrainGuoSi(ProgramSkillFrame f) => _resolve().DrainGuoSi(f);
-    internal SkillProgramStepOutcome ExecuteGuoSi(SkillProgramEffectOp op, ProgramSkillFrame supplied) => _resolve().ExecuteGuoSi(op, supplied);
+    internal SkillProgramStepOutcome ExecuteGuoSi(SkillProgramEffect effect, ProgramSkillFrame supplied) => _resolve().ExecuteGuoSi(effect, supplied);
     internal void FinishGuoSi(ProgramSkillFrame f) => _resolve().FinishGuoSi(f);
     internal PromptChoice GuoSiAiChoice(ProgramSkillFrame f) => _resolve().GuoSiAiChoice(f);
     internal IReadOnlyList<PromptChoice> GuoSiChoices(ProgramSkillFrame f) => _resolve().GuoSiChoices(f);

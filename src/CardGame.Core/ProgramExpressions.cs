@@ -45,6 +45,7 @@ internal interface IProgramExpressionWorld
     int? WindowStat(string stat, string participant) => null;
     IReadOnlyList<CardUseHistoryFact>? CardUses(string moment, string view) => null;
     CardUseHistoryFact? CurrentUse() => null;
+    bool? SameTeam(int first, int second) => null;
     int? PhaseCount(string moment, int actor, ActualDiscardRecoveryPhaseKind? kind, ActualPhaseHistoryOutcome outcome) => null;
 }
 
@@ -63,7 +64,7 @@ internal static class ProgramExpressions
         };
     }
 
-    public const int MaximumDepth = 8;
+    public const int MaximumDepth = 12;
     public const string Iterator = "it";
     public const string FactIterator = "use";
     public static readonly string[] Participants = ["turnOwner", "owner", "selectedTarget", "selectedFirst", "selectedSecond", "eventSource", "eventTarget"];
@@ -132,6 +133,7 @@ internal static class ProgramExpressions
         if (op == "not") { Arity(1, 1); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Bool)); }
         if (Comparisons.Contains(op)) { Arity(2, 2); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Int)); }
         if (op == "same") { Arity(2, 2); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
+        if (op == "sameTeam") { Arity(2, 2); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Flags.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Stats.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Participant)); }
         if (op is "windowHp" or "windowHandCount")
@@ -199,21 +201,37 @@ internal static class ProgramExpressions
         {
             Arity(2, 2);
             if (args[0].ValueKind != JsonValueKind.String || args[0].GetString() is not ("window" or "now") ||
-                args[1].ValueKind != JsonValueKind.String || args[1].GetString() is not ("latest" or "observations" or "confirmations"))
-                Fail(path, "cardUses requires window or now, and latest, observations or confirmations");
+                args[1].ValueKind != JsonValueKind.String || args[1].GetString() is not ("latest" or "observations" or "confirmations" or "accepted" or "finalizations"))
+                Fail(path, "cardUses requires window or now, and latest, observations, confirmations, accepted or finalizations");
             return new(op, ProgramExpressionType.FactSet, [], literal: args[0].GetString() == "now" ? 1 : 0, name: args[1].GetString());
         }
-        if (op is "useActor" or "useDeclarer" or "useTargets" or "useConfirmedTargets" or "usePrimaryTargets" or "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse")
+        if (op is "useActor" or "useDeclarer" or "useTargets" or "useConfirmedTargets" or "usePrimaryTargets" or "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse" or "useFinalized" or "useCompleted")
         {
             Arity(1, 1);
             var type = op is "useTargets" or "useConfirmedTargets" or "usePrimaryTargets" ? ProgramExpressionType.ParticipantSet :
-                op is "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse" ? ProgramExpressionType.Bool : ProgramExpressionType.Participant;
+                op is "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse" or "useFinalized" or "useCompleted" ? ProgramExpressionType.Bool : ProgramExpressionType.Participant;
             return new(op, type, [Arg(0, ProgramExpressionType.Fact)]);
         }
-        if (op == "first")
+        if (op is "first" or "last")
         {
             Arity(1, 1);
             return new(op, ProgramExpressionType.Fact, [Arg(0, ProgramExpressionType.FactSet)]);
+        }
+        if (op == "takeLast")
+        {
+            Arity(2, 2);
+            return new(op, ProgramExpressionType.FactSet,
+                [Arg(0, ProgramExpressionType.FactSet), Arg(1, ProgramExpressionType.Int)]);
+        }
+        if (op == "intersect")
+        {
+            Arity(2, 2);
+            return new(op, ProgramExpressionType.ParticipantSet, Each(ProgramExpressionType.ParticipantSet));
+        }
+        if (op == "samePlayPhase")
+        {
+            Arity(2, 2);
+            return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Fact));
         }
         if (op == "sameUse")
         {
@@ -232,9 +250,11 @@ internal static class ProgramExpressions
         }
         if (op == "usePhaseIs")
         {
-            Arity(2, 2);
+            Arity(2, 3);
+            if (args.Length == 3 && (args[2].ValueKind != JsonValueKind.String || args[2].GetString() != "accepted"))
+                Fail(path, "usePhaseIs stage must be accepted");
             return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.Fact)],
-                literal: (int)ParseFactEnum<TurnPhase>(args[1], path + "[2]"));
+                literal: (int)ParseFactEnum<TurnPhase>(args[1], path + "[2]"), name: args.Length == 3 ? "accepted" : null);
         }
         if (op == "atOrBefore")
         {
@@ -299,6 +319,9 @@ internal static class ProgramExpressions
             case "same":
                 return EvaluateParticipant(e.Args[0], world, it, use) is { } left && EvaluateParticipant(e.Args[1], world, it, use) is { } right
                     ? left == right : null;
+            case "sameTeam":
+                return EvaluateParticipant(e.Args[0], world, it, use) is { } firstSeat && EvaluateParticipant(e.Args[1], world, it, use) is { } secondSeat
+                    ? world.SameTeam(firstSeat, secondSeat) : null;
             case "contains":
                 return EvaluateParticipantSet(e.Args[0], world, it, use) is { } members &&
                     EvaluateParticipant(e.Args[1], world, it, use) is { } member ? members.Contains(member) : null;
@@ -313,14 +336,26 @@ internal static class ProgramExpressions
                 return EvaluateFact(e.Args[0], world, it, use)?.DeclaredKind is { } kind
                     ? ProgramCardKindMatch.Contains(e.Args.Skip(1).Select(arg => (CardKind)arg.Literal).ToArray(), kind) : null;
             case "usePhaseIs":
-                return EvaluateFact(e.Args[0], world, it, use)?.Phase is { } phase ? (int)phase == e.Literal : null;
-            case "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse":
+                var phaseFact = EvaluateFact(e.Args[0], world, it, use);
+                return (e.Name == "accepted" ? phaseFact?.AcceptedPhase : phaseFact?.Phase) is { } phase ? (int)phase == e.Literal : null;
+            case "samePlayPhase":
+                if (EvaluateFact(e.Args[0], world, it, use) is not { AcceptedPhase: { } firstPhase } firstPlay ||
+                    EvaluateFact(e.Args[1], world, it, use) is not { AcceptedPhase: { } secondPhase } secondPlay) return null;
+                if (firstPhase != TurnPhase.Play || secondPhase != TurnPhase.Play) return false;
+                return firstPlay.AcceptedActualTurn is { } firstTurn && secondPlay.AcceptedActualTurn is { } secondTurn &&
+                    firstPlay.AcceptedTurnOwnerSeat is { } firstOwner && secondPlay.AcceptedTurnOwnerSeat is { } secondOwner &&
+                    firstPlay.AcceptedPlayPhaseInstanceId is { } firstInstance && secondPlay.AcceptedPlayPhaseInstanceId is { } secondInstance
+                    ? firstTurn == secondTurn && firstOwner == secondOwner && firstInstance == secondInstance : null;
+            case "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse" or "useFinalized" or "useCompleted":
                 return EvaluateFact(e.Args[0], world, it, use) is { } fact
                     ? e.Op switch { "useEstablished" => fact.Established, "useDeclared" => fact.NativeUseId.HasValue,
-                        "useIsSelfNativeResponse" => fact.IsSelfNativeResponseUse, _ => fact.Type == CardActionType.Response } : null;
+                        "useIsSelfNativeResponse" => fact.IsSelfNativeResponseUse, "useFinalized" => fact.Finalized,
+                        "useCompleted" => fact.Completed, _ => fact.Type == CardActionType.Response } : null;
             case "atOrBefore":
                 return EvaluateFact(e.Args[0], world, it, use) is { } before && EvaluateFact(e.Args[1], world, it, use) is { } after
-                    ? before.ActionId is { } beforeAction && after.ActionId is { } afterAction
+                    ? before.AcceptedCursor is { } beforeCursor && after.AcceptedCursor is { } afterCursor
+                        ? beforeCursor <= afterCursor
+                        : before.ActionId is { } beforeAction && after.ActionId is { } afterAction
                         ? beforeAction <= afterAction : before.DeclarationCursor <= after.DeclarationCursor : null;
             case "all" or "any":
             {
@@ -411,6 +446,9 @@ internal static class ProgramExpressions
             case "usePrimaryTargets": return EvaluateFact(e.Args[0], world, it, use)?.PrimaryTargets;
             case "targets": return EvaluateFactSet(e.Args[0], world, it, use) is { } facts
                 ? Array.AsReadOnly(facts.SelectMany(fact => fact.Targets).Distinct().ToArray()) : null;
+            case "intersect": return EvaluateParticipantSet(e.Args[0], world, it, use) is { } left &&
+                    EvaluateParticipantSet(e.Args[1], world, it, use) is { } right
+                ? Array.AsReadOnly(left.Intersect(right).ToArray()) : null;
             case "filter":
             {
                 if (EvaluateParticipantSet(e.Args[0], world, it, use) is not { } seats) return null;
@@ -431,6 +469,9 @@ internal static class ProgramExpressions
         int? it, CardUseHistoryFact? use)
     {
         if (e.Op == "cardUses") return world.CardUses(e.Literal == 0 ? "window" : "now", e.Name!);
+        if (e.Op == "takeLast") return EvaluateFactSet(e.Args[0], world, it, use) is { } source &&
+                EvaluateInt(e.Args[1], world, it, use) is { } count
+            ? Array.AsReadOnly(source.TakeLast(Math.Max(0, count)).ToArray()) : null;
         if (e.Op != "filter") throw new InvalidOperationException($"Expression operator '{e.Op}' is not a fact set.");
         if (EvaluateFactSet(e.Args[0], world, it, use) is not { } facts) return null;
         var result = new List<CardUseHistoryFact>();
@@ -449,8 +490,8 @@ internal static class ProgramExpressions
         : EvaluateParticipantSet(e.Args[0], world, it, use)?.Select(seat => EvaluateBool(e.Args[1], world, seat, use));
 
     private static CardUseHistoryFact? EvaluateFact(ProgramExpression e, IProgramExpressionWorld world,
-        int? it, CardUseHistoryFact? use) => e.Op == "first"
-        ? EvaluateFactSet(e.Args[0], world, it, use)?.FirstOrDefault()
+        int? it, CardUseHistoryFact? use) => e.Op is "first" or "last"
+        ? EvaluateFactSet(e.Args[0], world, it, use) is { } facts ? e.Op == "first" ? facts.FirstOrDefault() : facts.LastOrDefault() : null
         : e.Name == FactIterator ? use : world.CurrentUse();
 
     private static int? EvaluateParticipant(ProgramExpression e, IProgramExpressionWorld world, int? it, CardUseHistoryFact? use) =>

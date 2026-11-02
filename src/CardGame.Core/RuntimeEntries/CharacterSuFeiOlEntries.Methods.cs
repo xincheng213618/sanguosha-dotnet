@@ -5,7 +5,6 @@ internal sealed partial class CharacterSuFeiOlEntries
     internal SkillProgramStepOutcome BeginSuFei(ProgramSkillFrame supplied, SkillProgramEffect effect) => _resolve().BeginSuFei(supplied, effect);
     internal bool CanContinueSuFei(ProgramSkillFrame f) => _resolve().CanContinueSuFei(f);
     internal bool CanGiveSuFei(ProgramSkillFrame f) => _resolve().CanGiveSuFei(f);
-    internal bool CanOfferSuFei(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => _resolve().CanOfferSuFei(c, t, w);
     internal bool DrainSuFei(ProgramSkillFrame f) => _resolve().DrainSuFei(f);
     internal void FinishSuFei(ProgramSkillFrame f) => _resolve().FinishSuFei(f);
     internal void PublishSuFeiChoice(ProgramSkillFrame f) => _resolve().PublishSuFeiChoice(f);

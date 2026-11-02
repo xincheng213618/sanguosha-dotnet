@@ -448,7 +448,9 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
         {
             HistoryPoint = window == SkillProgramTriggerWindow.CardUseTargetsFinalized
                 ? _actualUseHistory.FindAction(action.ActionId)?.HistoryPoint
-                : new(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber,
+                : (window == SkillProgramTriggerWindow.CardUseCompleted
+                    ? _actualUseHistory.FindAction(action.ActionId)?.CompletionPoint : null)
+                ?? new(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber,
                     _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat,
                     _actualUseHistory.CardUseHistoryCursor, CurrentActionId: action.ActionId)
         };

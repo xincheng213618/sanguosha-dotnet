@@ -818,11 +818,17 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 | `cardUses(window, latest)` | 在原窗口 `CardUseHistoryPoint` 截点读取每次用牌的最新已知关系；不把随后嵌套用牌或目标更新倒灌进等待中的窗口。 |
 | `cardUses(now, observations)` | 读取当前实际回合 scope 内各次真实采样，用 actor、响应类型及 `useEstablished` 筛选后组合曾经关系。 |
 | `cardUses(window或now, confirmations)` | 按真实确认顺序保留每次 TargetsConfirmed 的原始快照；重复确认与普通更新是不同事实，不以 finalized 的 Established 代替。 |
-| 身份与目标 | `useActor`、`useDeclarer` 分开回答当前使用者与首次接受者；`useTargets` 按所选视图读 designated 或原始确认目标，`useConfirmedTargets`／`usePrimaryTargets` 明确读取确认元数据。`useDeclared` 区分仅接受与真实原生声明。 |
-| 牌种与阶段 | `useKindIs` 读取声明时牌种并复用共同数组匹配；`usePhaseIs` 读取确认时实际阶段，不因后来 update 改成现阶段。 |
-| 时序与集合组合 | `atOrBefore(use,currentUse,"accepted")` 保留接受顺序；`first` 取所选事实集的首项，`sameUse` 比较真实用牌身份。`filter`、`targets`、`contains`、`any` 和 `count` 组合事实与角色集合，fact 的 `use` 与角色的 `it` 各自有作用域。 |
+| `cardUses(window或now, accepted)` | 保留原接受成员、归属和顺序；actor／targets 是截点时已知值，主要目标及 finalized／completed 状态取截至该截点已达到的真实阶段。 |
+| `cardUses(window或now, finalizations)` | 按首次 finalized 发生顺序读取不可变快照与当时规范化主要目标；后续目标更新和完成不回写。 |
+| 身份与目标 | `useActor`、`useDeclarer` 分开回答当前使用者与首次接受者；`useTargets` 按所选视图读 designated 或原始确认目标。`usePrimaryTargets` 在确认视图读确认元数据，在 accepted／finalizations 分别读已达阶段／首次 finalized 的主要目标。`useDeclared` 区分仅接受与真实原生声明。 |
+| 牌种与阶段 | `useKindIs` 读取声明时牌种并复用共同数组匹配；`usePhaseIs` 默认读取确认时实际阶段，显式 `accepted` 则读接受阶段，两者均不冒充当前阶段。`samePlayPhase` 比较接受时实际回合、回合拥有者与 Play 实例，不隐含 actor 相同。 |
+| 时序与集合组合 | `atOrBefore(use,currentUse,"accepted")` 保留接受顺序；`first`／`last`／`takeLast` 只在所选视图内取序，`sameUse` 比较真实用牌身份。`useFinalized`／`useCompleted` 读取已达阶段；`intersect` 保留左侧角色顺序。`filter`、`targets`、`contains`、`any` 和 `count` 组合事实与角色集合，fact 的 `use` 与角色的 `it` 各自有作用域。 |
 
 `CardUseHistoryPoint` 的 Cursor 是包含待提交事件的完整 journal 长度，不是公开 Envelope.Sequence；它还冻结实际回合、回合拥有者及可选的当前 native Use／Action 身份。窗口读取沿原 point，明确的 now 读取才取现值。目标集合结果在实际开始执行时冻结到原 receipt，子窗可以产生新历史，但不能重写已支付父帧的选择菜单。
+
+Accepted 与 Finalizations 是同一 journal 的共同视图，不另存 Pair 账本，也不改变 Latest／Observations／Confirmations 的含义。完成窗口的 `CompletionPoint` 在原 `ActualCardUseTargetsCompletedEvent` 处冻结，不在候选收集或嵌套子结算后刷新。顺序、阶段状态与交集由表达式组合，不能把“先取尾部两项，再检查完成”改成“先过滤完成项，再取两项”。
+
+原始队伍关系使用 `sameTeam` 读取实际 TeamId，包含自己；已知角色没有队伍时为假，参与者未知时为未知，不借用 AI 敌友估计。自然表达式组合仍受加载器有限深度约束，最多 12 层，不为人物组合增加专用读取或绕开边界。
 
 历史采集需求由表达式 AST 与真实能力声明推导，Triggered／Activated 分开；不保人物名开关，也不依赖当时是否有人有效持有某技能。普通 Use 与原有自身闪／无懈响应协议的差别可由 `useIsResponse`／`useIsSelfNativeResponse` 表达；群体响应、协助供给材料和 hosted effect 不能冒充新的实际 Use。
 
@@ -830,8 +836,8 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 
 | 规则族 | 使用共同事实的方式 |
 |---|---|
-| 苏飞联翩／活动连翩 | 按 finalized 发生顺序，找同实际出牌阶段的上一张牌并比较主要目标。嵌套牌的 finalized 次序不能用 accepted 次序替换。 |
-| 郭汜伺盗 | 读取本次完成窗口冻结的 accepted 尾部相邻两项；完成时的目标更新不能用 first-finalized 视图覆盖。外层牌内部的自身闪／无懈会打断这对关系，不能拿外层接受时的旧前缀跨过去。 |
+| 苏飞联翩／活动连翩 | JSON 在 window/finalizations 中筛同接受 Play 实例与同使用者的最后两项，以 `intersect` 比较当时主要目标并提供 `targetSetExpr`；活动另组合实际队伍和存活条件。嵌套牌的 finalized 次序不能用 accepted 次序替换。 |
+| 郭汜伺盗 | JSON 在本次完成窗口冻结的 accepted 中筛原同 Play／首次接受者及合格响应类型，先取尾部两项再要求都 finalized 且 completed，交主要目标并筛存活他人。当前牌须为本人实际 Play 的已完成 Use，且实际 actor、accepted declarer 与回合归属合格；完成目标不能用 first-finalized 覆盖。外层牌内部的自身闪／无懈会打断关系，不能拿外层接受时的旧前缀跨过去，也不要求尾项等于当前外层牌。 |
 | 花鬘薮影 | JSON 在首次 finalized 的 window/latest 视图计数：与当前 use 相同 declarer、完整指定目标包含 eventTarget、接受顺序不晚于当前牌，且属于普通 Use 或原自身原生响应协议。当前牌 actor 必须仍等于 declarer；owner 可为使用者或唯一目标，双向发动都保留。 |
 | 势邓艾急袭 | `targetSetExpr` 从 now/observations 筛出采样时 actor 为 owner、非响应且目标已经成立的事实，合并完整目标后排除自身。资格和 UI 读取同一表达式，Begin 冻结到 `ShiDaReceipt.History`；顺手牵羊合法性、成本和实际执行仍归原阶段。 |
 | OL 蔡夫人窃听 | JSON 在原回合末候选截点的 window/latest 中判断：没有该回合角色真实声明且指定他人的用牌。`evaluateConditionAtResolution` 保留实际结算资格时点；Action 为空的真实原生 Use 同样参与，不需要人物 frozen bool 或上下文工厂计算历史答案。 |
@@ -850,22 +856,22 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 
 ### 退役路径、信任边界与剩余缺口
 
-苏飞 LastUse／RecordedEvent、郭汜 Uses／UseStamp／PairQualifiedEvent、活动私有历史事件、花鬘 HuaManUses／DirectionalUse 和急袭专属记录事件、指令及 pipeline hook 已退役；核心不再调用这些人物历史记录器。薮影专属 ordinal 查询及重复序号证明、急袭专属 ever 查询、窃听 UsedOnAnotherAt 与人物上下文历史布尔也由共同事实组合替代，不保第二条兼容账本。
+苏飞 LastUse／RecordedEvent、郭汜 Uses／UseStamp／PairQualifiedEvent、活动私有历史事件、花鬘 HuaManUses／DirectionalUse 和急袭专属记录事件、指令及 pipeline hook 已退役；核心不再调用这些人物历史记录器。`PreviousFinalizedUse` 与 `AcceptedPairAtCompletionFor` 两个专用顺序查询由共同 finalizations／accepted 视图替代；薮影专属 ordinal 查询及重复序号证明、急袭专属 ever 查询、窃听 UsedOnAnotherAt 与人物上下文历史布尔也由共同事实组合替代，不保第二条兼容账本。
 
 真实的薮影弃牌／取消／处理中实体领取、急袭成本／RNG／无距离多目标顺手牵羊、窃听选项／装备移动／查看手牌／摸牌、魅魂花色声明／给牌／私看及 paid／mutation／子返回继续保留原协议。条件和目标集合已移入 JSON，相关专属复合 effect 仍有 C#，尚未达到只需组合共享 JSON 节点的目标；联翩、伺盗的真实后续效果也仍须按所属能力继续拆解。
 
-尚未收口的历史组合包括：苏飞／活动联翩仍在 C# 读取 finalized 前一张与主要目标交集；郭汜仍用单消费者 `AcceptedPairAtCompletionFor` 冻结本次完成截点的 accepted 尾部两项，不能改成最初接受时的前缀。OL／界移动窃听的复合效果仍有 C#，界移动版的实际伤害资格也未改成用牌历史条件。共同事实入口已经统一，不代表这些完整规则已能只写 JSON。
+苏飞／活动联翩的 finalized 前一张关系、郭汜完成截点的 accepted 尾部关系及其目标集已由 JSON 组合，不再留 C# 历史答案。仍未收口的是实际复合效果：联翩奖励与后续选择、伺盗材料／顺手牵羊、OL／界移动窃听选项与移动等仍有 C#；界移动版的实际伤害资格也不是用牌历史条件。共同历史组合已迁移，不代表这些完整技能已能只写 JSON。
 
-已迁移的屯江外部目标、界 current 窃听与魅魂共同确认读取，按原架构标准分别判断；不扩张为整个用牌模块或纯 JSON 技能已完成：
+共同确认读取及 accepted／finalizations 顺序组合，按原架构标准分别判断；不扩张为整个用牌模块或所有消费者已成为纯 JSON 技能：
 
 | 标准 | 状态与剩余范围 |
 |---|---|
-| 一个概念，一个归属 | 已完成：真实确认事实、journal 索引与共同只读表达式各有唯一归属，没有人物确认账本。 |
+| 一个概念，一个归属 | 历史读取已完成：真实事实、journal 索引与共同只读表达式各有唯一归属，没有人物确认或顺序 Pair 账本。 |
 | 依赖方向 | 此子概念已完成：公共 capture、index、读取及 Boundary 效果 owner 不依赖人物；整个 CardActions／原生用牌模块的其他反向依赖仍待收口。 |
 | 层次分明 | 已完成：接受、声明、确认、finalized、更新、完成分别采样；确认元数据不冒充当前目标，资格与原生付款仍分层。 |
-| JSON 对应规则 | 首次确认、Play 外部主要目标及确认目标集已用 JSON 组合；屯江的阶段条件与奖励也已组成纯 JSON。其他人物专属复合 effect 仍部分完成。 |
+| JSON 对应规则 | 首次确认、Play 外部主要目标、确认目标集及联翩／伺盗顺序和目标集已用 JSON 组合；屯江的阶段条件与奖励也已组成纯 JSON。其他人物专属复合 effect 仍部分完成。 |
 | 改动局部 | 已完成：通过共同 AST／事实字段接通确认历史消费者，没有为确认读取增加人物 registry、资格 callback 或 Core 人物写端；屯江阶段资格已转共享事实，不保留原 CanOffer／PlayEntry。 |
-| 只有一条路径 | 确认历史路径已完成：人物扫描、私有外部目标记录与 Boundary 旧关系扫描退役；真实 entered/skipped 状态不是确认历史的第二条路径，仍保留其独立含义。 |
+| 只有一条路径 | 已迁历史组合已完成：人物扫描、私有外部目标记录、Boundary 旧关系扫描及前一张／完成相邻对专用查询退役；真实 entered/skipped 状态不是用牌历史的第二条路径，仍保留其独立含义。 |
 | 信任边界 | 已完成：原生 payload 与嵌套集合冻结、真实身份、命令、加载、内容指纹、隐私、付款、移动和原帧返回继续维护，不用假 ActionId 或刷新已接受资格。 |
 
 新增接受、更新与目标事实复用原谋司马懿的隐藏目标投影，不能泄露隐藏目标。事实与只读结果冻结嵌套集合，`CardActionContext` 冻结目标、实体与转换来源，提交投影保持覆盖。命令、加载、内容指纹、回放、隐私、真实付款及移动义务没有因删除人物自证而放宽。

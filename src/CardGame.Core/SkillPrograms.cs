@@ -3528,7 +3528,7 @@ public sealed class SkillProgramCatalog
             {
                 AllowTrailingCommas = false,
                 CommentHandling = JsonCommentHandling.Disallow,
-                MaxDepth = MaximumDepth
+                MaxDepth = MaximumDepth + ProgramExpressions.MaximumDepth
             });
             RejectDuplicateProperties(document.RootElement, path);
             return document;

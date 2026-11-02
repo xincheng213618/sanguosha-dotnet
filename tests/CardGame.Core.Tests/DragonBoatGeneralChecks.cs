@@ -16,6 +16,13 @@ internal static class DragonBoatGeneralChecks
             HumanTeamId = "team:wei", ModeId = mode, UseInteractiveSetup = true, AdvanceAfterHumanCommands = false }, registry);
         Accept(g, new StartGameCommand()); Until(g, () => P(g)?.Kind == DecisionKind.SelectGeneral);
         var views = Enumerable.Range(0, 8).Select(seat => g.CreateSnapshot(seat)).ToArray();
+        var teamWorld = g.ComposeNativeTriggerExpressionWorld(new(0, "dragonboat:lianpian", "team-read", "team-read", "", 0), null, null);
+        var teammate = views[0].Players.First(p => p.Seat != 0 && p.TeamId == views[0].Players[0].TeamId).Seat;
+        var enemy = views[0].Players.First(p => p.TeamId != views[0].Players[0].TeamId).Seat;
+        using var ownTeam = JsonDocument.Parse("""["sameTeam","owner","owner"]""");
+        Need(ProgramExpressions.EvaluateBool(ProgramExpressions.Parse(ownTeam.RootElement, "team-read"), teamWorld) == true &&
+            teamWorld.SameTeam(0, teammate) == true && teamWorld.SameTeam(0, enemy) == false && teamWorld.SameTeam(0, -1) is null,
+            "The shared raw team read includes self and a real teammate, excludes enemies, and leaves invalid participants unknown.");
         var draft = views.Select(v => v.DragonBoatDraft!).ToArray();
         var offered = draft.SelectMany(d => d.GeneralIds).ToArray();
         Need(views[0].Players.GroupBy(p => p.TeamId).Count() == 4 && views[0].Players.GroupBy(p => p.TeamId).All(t => t.Count() == 2) &&

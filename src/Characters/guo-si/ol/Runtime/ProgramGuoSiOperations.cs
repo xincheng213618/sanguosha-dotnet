@@ -22,7 +22,7 @@ public sealed partial record CardUseFrame
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public long? GuoSiCostAfter {get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public bool? GuoSiCostDrained {get;init;}
 }
-internal interface IGuoSiProgramHost {SkillProgramStepOutcome ExecuteGuoSi(SkillProgramEffectOp op,ProgramSkillFrame f);}
+internal interface IGuoSiProgramHost {SkillProgramStepOutcome ExecuteGuoSi(SkillProgramEffect effect,ProgramSkillFrame f);}
 internal abstract class GuoSiDescriptor:ProgramOperationDescriptorBase
 {
  public override SkillProgramEffect Parse(ProgramOperationNodeReader r)=>ParseOwnerAlways(r);
@@ -33,7 +33,7 @@ internal abstract class GuoSiDescriptor:ProgramOperationDescriptorBase
 internal sealed class GuoSiHandler(SkillProgramEffectOp op):ISkillProgramEffectHandler
 {
  public SkillProgramEffectOp Op=>op;
- public SkillProgramStepOutcome Execute(SkillProgramEffect e,ProgramSkillFrame f,int target,ISkillProgramEffectHost h)=>h.GetCapability<IGuoSiProgramHost>().ExecuteGuoSi(op,f);
+ public SkillProgramStepOutcome Execute(SkillProgramEffect e,ProgramSkillFrame f,int target,ISkillProgramEffectHost h)=>h.GetCapability<IGuoSiProgramHost>().ExecuteGuoSi(e,f);
 }
 internal static class GuoSiContract
 {
@@ -46,6 +46,6 @@ internal static class GuoSiContract
  internal static void Trigger(string path,SkillProgramTrigger t)
  {
   if(!t.Effects.Any(e=>Own(e.Op)))return;
-  if(t.Effects is not[{Op:SkillProgramEffectOp.OfferSidaoCompletedPairSnatch,Condition.Kind:SkillProgramConditionKind.Always}]||t.Window!=SkillProgramTriggerWindow.CardUseCompleted||t.OwnerRelation!=SkillProgramCardActionOwnerRelation.Actor||!t.Optional||!t.IncludeResponseUses||t.UsageScope!=SkillUsageScope.Phase||t.UsageLimit!=1||t.CardKinds.Count!=0||t.CardCategories.Count!=0||t.MarkerCost is not null||t.Subject is not null||t.SourceSkillId is not null||t.SourceViewAsId is not null||t.DynamicUsageLimit is not null||t.NamedUsageGroup is not null||t.ChoiceGroup is not null||t.SingleActionInstance||t.Condition.Kind!=SkillProgramTriggerConditionKind.Always||t.EvaluateConditionAtResolution||t.Suits.Count!=0||t.SourceZones.Count!=0||t.DamageOccurrence is not null||t.MovementOccurrence is not null||t.OnlyDesignatedCardTargets||t.AllowNoEventTarget)throw new InvalidOperationException(path+": Sidao requires an optional actor completed Use and one actual Play quota.");
+  if(t.Effects is not[{Op:SkillProgramEffectOp.OfferSidaoCompletedPairSnatch,Condition.Kind:SkillProgramConditionKind.Always}]||t.Window!=SkillProgramTriggerWindow.CardUseCompleted||t.OwnerRelation!=SkillProgramCardActionOwnerRelation.Actor||!t.Optional||!t.IncludeResponseUses||t.UsageScope!=SkillUsageScope.Phase||t.UsageLimit!=1||t.CardKinds.Count!=0||t.CardCategories.Count!=0||t.MarkerCost is not null||t.Subject is not null||t.SourceSkillId is not null||t.SourceViewAsId is not null||t.DynamicUsageLimit is not null||t.NamedUsageGroup is not null||t.ChoiceGroup is not null||t.SingleActionInstance||t.Condition is not {Kind:SkillProgramTriggerConditionKind.All,Children:[{Kind:SkillProgramTriggerConditionKind.PhaseIsPlay},{Kind:SkillProgramTriggerConditionKind.Expression}]}||t.EvaluateConditionAtResolution||t.Suits.Count!=0||t.SourceZones.Count!=0||t.DamageOccurrence is not null||t.MovementOccurrence is not null||t.OnlyDesignatedCardTargets||t.AllowNoEventTarget)throw new InvalidOperationException(path+": Sidao requires an optional actor completed Use and one actual Play quota.");
  }
 }

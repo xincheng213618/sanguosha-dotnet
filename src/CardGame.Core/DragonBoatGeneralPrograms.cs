@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal interface IDragonBoatGeneralHost
 {
-    SkillProgramStepOutcome Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation, int targetSeat);
+    SkillProgramStepOutcome Execute(ProgramSkillFrame frame, SkillProgramEffect effect, int targetSeat);
 }
 
 internal abstract class DragonBoatGeneralDescriptor : ProgramOperationDescriptorBase
@@ -15,7 +15,14 @@ internal abstract class DragonBoatGeneralDescriptor : ProgramOperationDescriptor
 internal sealed class DrawDragonBoatConsecutiveTargetDescriptor : DragonBoatGeneralDescriptor
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.DrawDragonBoatConsecutiveTarget;
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualCardUseHistory);
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
+    {
+        reader.AllowOnly("op", "target", "condition", "targetSetExpr");
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(reader), 0, reader.Condition())
+            { TargetSetExpression = reader.ParticipantSetExpression("targetSetExpr") ?? throw new InvalidOperationException(reader.Path + ".targetSetExpr is required.") };
+        RequireAlways(effect, reader.Path);
+        return effect;
+    }
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         [new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseTargetsFinalized)];
@@ -54,7 +61,7 @@ internal sealed class DragonBoatGeneralHandler(SkillProgramEffectOp operation) :
 {
     public SkillProgramEffectOp Op => operation;
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat,
-        ISkillProgramEffectHost host) => host.GetCapability<IDragonBoatGeneralHost>().Execute(frame, operation, targetSeat);
+        ISkillProgramEffectHost host) => host.GetCapability<IDragonBoatGeneralHost>().Execute(frame, effect, targetSeat);
 }
 
 internal interface IDragonBoatAllyQuery : IProgramSelectionQuery { bool IsTeammate(int ownerSeat, int targetSeat); }

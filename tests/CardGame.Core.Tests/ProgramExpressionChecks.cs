@@ -27,12 +27,19 @@ internal static class ProgramExpressionChecks
             ("""[">",["publicPileCount","owner","invalid"],0]""", "requires a skill identifier"),
             ("""[">",["publicPileCount","owner",1],0]""", "requires a skill identifier"),
             ("""["ruleWounded","it"]""", "only available inside a participant-set"),
+            ("""["sameUse",["last","living"],"currentUse"]""", "expected a card-use fact set"),
+            ("""["any",["takeLast",["cardUses","window","accepted"],true],true]""", "expected an integer"),
+            ("""["usePhaseIs","currentUse","play","latest"]""", "stage must be accepted"),
+            ("""["any",["intersect",["cardUses","window","accepted"],"living"],true]""", "expected a participant set"),
         })
             Rejects(Draw.Replace("EXPR", expr), fragment);
         Rejects("""{"op":"draw","target":"owner","amount":1,"condition":{"kind":"expression","value":1,"expr":true}}""", "accepts only kind and expr");
         Rejects("""{"op":"draw","target":"owner","amount":1,"condition":{"kind":"expression"}}""", "expression requires expr");
         Rejects("""{"op":"draw","target":"owner","amount":1}""", "requires a composition instruction condition",
             activationCondition: """{"kind":"expression","expr":true}""");
+        var excessive = "true";
+        for (var depth = 0; depth <= ProgramExpressions.MaximumDepth; depth++) excessive = "[\"not\"," + excessive + "]";
+        Rejects(Draw.Replace("EXPR", excessive), "expression nesting exceeds");
 
         var world = new SkillContextExpressionWorld(
             new PlayerSkillContext(0, 4, 4, 2, TurnPhase.Play),
@@ -116,11 +123,22 @@ internal static class ProgramExpressionChecks
             Eval("""["==",["count",["cardUses","window","latest"],["atOrBefore","use","currentUse","accepted"]],2]""", world) == true &&
             Eval("""["same","turnOwner","owner"]""", world) == true,
             "Declaration, response roles and accepted ordering remain independent facts; ordering compares original long IDs or the legacy declaration cursor.");
+        var acceptedOrder = new CardUseFactsWorld(
+            [latest[0] with { ActionId = order + 10, AcceptedCursor = 1 }, current with { AcceptedCursor = 2 }],
+            [], current with { AcceptedCursor = 2 });
+        Need(Eval("""["==",["count",["cardUses","window","latest"],["atOrBefore","use","currentUse","accepted"]],2]""", acceptedOrder) == true,
+            "When actual acceptance cursors are available, action identity allocation cannot reverse the accepted order.");
         var unknown = new CardUseFactsWorld(null, null, null);
         const string missing = """["not",["any",["cardUses","window","latest"],true]]""";
         Need(Eval(missing, unknown) is null && Eval("""["not",["useDeclared","currentUse"]]""", unknown) is null &&
-            Eval("""["any",["cardUses","now","latest"],true]""", world) is null,
+            Eval("""["any",["cardUses","now","latest"],true]""", world) is null &&
+            Eval("""["sameUse",["last",["takeLast",["cardUses","window","latest"],2]],"currentUse"]""", unknown) is null &&
+            Eval("""["sameTeam","owner","owner"]""", world) is null,
             "Unknown histories, missing current use and unavailable moments remain unknown through not.");
+        Need(Eval("""["all",["takeLast",["cardUses","window","latest"],0],false]""", world) == true &&
+            Eval("""["sameUse",["last",["takeLast",["cardUses","window","latest"],0]],"currentUse"]""", world) is null &&
+            Seats("""["intersect",["useTargets","currentUse"],"livingOthers"]""")!.SequenceEqual([2]),
+            "Empty tails retain quantifier semantics and no last identity; intersection preserves the left target order.");
 
         var selection = Load($$"""{"op":"selectTarget","target":"owner","targetKind":"otherLiving","targetSetExpr":{{targets}}},{"op":"draw","target":"selectedTarget","amount":1}""");
         var otherSelection = Load($$"""{"op":"selectTarget","target":"owner","targetKind":"otherLiving","targetSetExpr":{{targets.Replace("observations", "latest", StringComparison.Ordinal)}}},{"op":"draw","target":"selectedTarget","amount":1}""");

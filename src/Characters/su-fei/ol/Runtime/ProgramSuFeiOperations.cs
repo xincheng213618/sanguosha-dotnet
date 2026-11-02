@@ -16,11 +16,17 @@ internal interface ISuFeiProgramHost {SkillProgramStepOutcome BeginSuFei(Program
 internal sealed class DrawThenOfferActualConsecutiveTargetGiftDescriptor:ProgramOperationDescriptorBase
 {
  public override SkillProgramEffectOp Op=>SkillProgramEffectOp.DrawThenOfferActualConsecutiveTargetGift;
- public override ProgramFactRequirements FactRequirements=>new(Triggered:ProgramTrackedFact.ActualCardUseHistory);
  public override ISkillProgramEffectHandler Handler{get;}=new SuFeiHandler();
  public override ProgramOperationInteraction Interaction=>ProgramOperationInteraction.Choice;
  public override ProgramOperationAiPolicy AiPolicy{get;}=new(ProgramOperationAiSemantic.GainCards,static(_,_)=>{});
- public override SkillProgramEffect Parse(ProgramOperationNodeReader r)=>ParseOwnerAlways(r);
+ public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
+ {
+  r.AllowOnly("op","target","condition","targetSetExpr");
+  var effect=new SkillProgramEffect(Op,FilterBoundCardsProgramOperationDescriptor.Owner(r),0,r.Condition())
+   {TargetSetExpression=r.ParticipantSetExpression("targetSetExpr")??throw new InvalidOperationException(r.Path+".targetSetExpr is required.")};
+  RequireAlways(effect,r.Path);
+  return effect;
+ }
  public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseTargetsFinalized)];
 }
 internal sealed class SuFeiHandler:ISkillProgramEffectHandler
@@ -34,6 +40,6 @@ internal static class SuFeiComposition
  internal static void Trigger(string path,SkillProgramTrigger t)
  {
   if(!ProgramInstructionResolver.Default.Features(t).HasOperation(SkillProgramEffectOp.DrawThenOfferActualConsecutiveTargetGift))return;
-  if(t.Window!=SkillProgramTriggerWindow.CardUseTargetsFinalized||t.Effects is not[{Op:SkillProgramEffectOp.DrawThenOfferActualConsecutiveTargetGift,Condition.Kind:SkillProgramConditionKind.Always}]||!t.Optional||t.OwnerRelation!=SkillProgramCardActionOwnerRelation.Actor||t.UsageScope!=SkillUsageScope.Turn||t.UsageLimit!=3||t.CardKinds.Count!=0||t.CardCategories.Count!=0)throw new InvalidOperationException(path+": Lianpian requires one optional actor native finalized Use with an actual-turn quota of three.");
+  if(t.Window!=SkillProgramTriggerWindow.CardUseTargetsFinalized||t.Effects is not[{Op:SkillProgramEffectOp.DrawThenOfferActualConsecutiveTargetGift,Condition.Kind:SkillProgramConditionKind.Always,TargetSetExpression:not null}]||t.Condition.Kind!=SkillProgramTriggerConditionKind.Expression||!t.Optional||t.OwnerRelation!=SkillProgramCardActionOwnerRelation.Actor||t.UsageScope!=SkillUsageScope.Turn||t.UsageLimit!=3||t.CardKinds.Count!=0||t.CardCategories.Count!=0)throw new InvalidOperationException(path+": Lianpian requires one optional actor native finalized Use with an actual-turn quota of three.");
  }
 }

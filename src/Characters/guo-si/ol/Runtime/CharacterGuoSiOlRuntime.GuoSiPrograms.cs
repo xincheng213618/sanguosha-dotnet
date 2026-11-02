@@ -5,8 +5,9 @@ internal sealed partial class CharacterGuoSiOlRuntime
 {
     internal const string TanbeiGainReason = "skill-program.tanbei.gain";
     internal static CardConversionSource GuoSiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_guo_si_ol_GuoSiPrograms.GuoSiSource(f);
-    internal SkillProgramStepOutcome ExecuteGuoSi(SkillProgramEffectOp op, ProgramSkillFrame supplied)
+    internal SkillProgramStepOutcome ExecuteGuoSi(SkillProgramEffect effect, ProgramSkillFrame supplied)
     {
+        var op = effect.Op;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.GuoSi is not null || f.InstructionIndex != 1 || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Guo Si requires the unpaid actual own Play source.");
@@ -19,11 +20,10 @@ internal sealed partial class CharacterGuoSiOlRuntime
             return SkillProgramStepOutcome.AwaitChoice;
         }
 
-        if (f.WindowContext?.CardUse is not { } identity)
-            throw new InvalidOperationException("Sidao requires its completed native use window.");
-        var commonTargets = SidaoTargets(identity, f.OwnerSeat);
+        var commonTargets = ProgramExpressions.EvaluateParticipantSet(effect.TargetSetExpression!,
+            _expressionWorlds.CreateProgramExpressionWorld(f)) ?? [];
         if (commonTargets.Count == 0 || SidaoActions(f.OwnerSeat, commonTargets).Count == 0)
-            throw new InvalidOperationException("Sidao requires real consecutive completed uses with a legal common target.");
+            throw new InvalidOperationException("Sidao requires a current legal Snatch within its selected target set.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { GuoSi = new(GuoSiSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, -1, GuoSiStage.SidaoChoice, commonTargets) });
         PublishGuoSiChoice(f);
         return SkillProgramStepOutcome.AwaitChoice;
@@ -169,5 +169,5 @@ internal sealed partial class CharacterGuoSiOlRuntime
             throw new InvalidOperationException("Sidao terminal completion requires its once-returned native use.");
     }
 
-    SkillProgramStepOutcome IGuoSiProgramHost.ExecuteGuoSi(SkillProgramEffectOp op, ProgramSkillFrame f) => ExecuteGuoSi(op, f);
+    SkillProgramStepOutcome IGuoSiProgramHost.ExecuteGuoSi(SkillProgramEffect effect, ProgramSkillFrame f) => ExecuteGuoSi(effect, f);
 }

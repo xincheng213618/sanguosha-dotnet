@@ -106,7 +106,10 @@ internal static class ProgramEventHistoryIndexChecks
         var accepted = history.ReadCardUseFacts(acceptedPoint, CardUseHistoryView.Latest);
         var beforeCompletion = history.FindFinalizedUse(20)!;
         Require(accepted.Select(e => e.ActionId!.Value).SequenceEqual([1L, 2L]) &&
-            history.PreviousFinalizedUse(10)?.NativeUseId == 20 && history.PreviousFinalizedUse(20) is null,
+            history.ReadCardUseFacts(history.FindFinalizedUse(10)!.HistoryPoint!, CardUseHistoryView.Finalizations)
+                .Select(e => e.NativeUseId).SequenceEqual(new long?[] { 20, 10 }) &&
+            history.ReadCardUseFacts(history.FindFinalizedUse(20)!.HistoryPoint!, CardUseHistoryView.Finalizations)
+                .Select(e => e.NativeUseId).SequenceEqual(new long?[] { 20 }),
             "A nested use may finalize first; repeated acceptance neither reorders nor duplicates the independent accepted prefix.");
         history.Append(new CardUseFinishedEvent(20, 0, CardKind.IronChain));
         Require(history.FindFinalizedUse(20) is { Completed: true } && history.FindFinalizedUse(10) is { Completed: false } &&
@@ -122,10 +125,14 @@ internal static class ProgramEventHistoryIndexChecks
                 .TakeLast(2).Select(e => e.ActionId!.Value).SequenceEqual([2L, 3L]),
             "The real response completion finalizes an empty target set and cuts the current accepted-use pair without a synthetic native ID.");
         history.Append(new ActualCardUseTargetsCompletedEvent(20, second, [2], 1, 0));
-        var completed = history.AcceptedPairAtCompletionFor(2);
+        var completionPoint = history.FindCompletedUse(20)!.HistoryPoint!;
+        var completed = history.ReadCardUseFacts(completionPoint, CardUseHistoryView.Accepted).TakeLast(2).ToArray();
         history.Append(new ActualCardActionRecordedEvent(Action(4), 1, 0, TurnPhase.Play, 7, false));
-        Require(completed.Select(e => e.Action.ActionId).SequenceEqual([2L, 3L]) &&
-            history.AcceptedPairAtCompletionFor(2).Select(e => e.Action.ActionId).SequenceEqual([2L, 3L]) &&
+        Require(completed.Select(e => e.ActionId).SequenceEqual(new long?[] { 2, 3 }) &&
+            completed.All(e => e.Finalized && e.Completed) &&
+            history.FindAction(2)!.CompletionPoint == completionPoint &&
+            history.ReadCardUseFacts(completionPoint, CardUseHistoryView.Accepted).TakeLast(2)
+                .Select(e => e.ActionId).SequenceEqual(new long?[] { 2, 3 }) &&
             history.ReadCardUseFacts(acceptedPoint, CardUseHistoryView.Latest).Select(e => e.ActionId!.Value).SequenceEqual([1L, 2L]),
             "Completion freezes the actual accepted tail after an intervening response; neither a later action nor the earlier acceptance prefix replaces it.");
         var changedTargets = new[] { 1 };
@@ -138,6 +145,20 @@ internal static class ProgramEventHistoryIndexChecks
             ((ActualCardUseTargetsCompletedEvent)CommittedEventProjection.Freeze(completion)).PrimaryTargets.SequenceEqual([1]) &&
             copied.PrimaryTargets is System.Collections.IList { IsReadOnly: true },
             "Completion targets stay detached from constructor and with inputs, without overwriting the earlier finalized view.");
+        var live = new CardUseHistoryPoint(1, 0, history.CardUseHistoryCursor, 10, 1);
+        Require(history.ReadCardUseFacts(live, CardUseHistoryView.Accepted).Single(f => f.ActionId == 1).PrimaryTargets!.SequenceEqual([1]) &&
+            history.ReadCardUseFacts(live, CardUseHistoryView.Finalizations).Single(f => f.ActionId == 1).PrimaryTargets!.SequenceEqual([2]),
+            "Accepted stage reads use the actual completion targets while finalization reads keep their original targets.");
+        var world = new CardUseHistoryTestWorld(history, live);
+        Require(world.Bool("""["sameUse",["last",["cardUses","window","finalizations"]],"currentUse"]""") == true &&
+            world.Bool("""["all",["takeLast",["cardUses","window","accepted"],2],["useCompleted","use"]]""") == false,
+            "Last follows finalization order, and taking the accepted tail before checking completion cannot skip an unfinished action.");
+        history.Append(new ActualCardActionRecordedEvent(Action(5), 1, 0, TurnPhase.Play, 8, false));
+        history.Append(new ActualCardUseTargetsFinalizedEvent(50, Action(5), [2], 1, 0));
+        var inserted = new CardUseHistoryTestWorld(history, history.FindFinalizedUse(50)!.HistoryPoint!);
+        Require(inserted.Int("""["count",["cardUses","window","finalizations"],["samePlayPhase","use","currentUse"]]""") == 1 &&
+            inserted.Bool("""["usePhaseIs","currentUse","play","accepted"]""") == true,
+            "A distinct inserted Play instance does not inherit the previous instance's consecutive finalizations.");
     }
 
     private static void LatestFactsKeepAcceptedDesignationsAcrossStages()

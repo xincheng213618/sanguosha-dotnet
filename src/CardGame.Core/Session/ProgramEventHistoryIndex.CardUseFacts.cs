@@ -14,6 +14,9 @@ internal sealed partial class ProgramEventHistoryIndex
     private readonly Dictionary<(int Turn, int Owner), List<(CardUseFactStream Stream, long FromCursor)>> _factUsesByTurn = [];
     private readonly Dictionary<(int Turn, int Owner), List<(long Cursor, CardUseHistoryFact Fact)>> _factObservations = [];
     private readonly Dictionary<(int Turn, int Owner), List<(long Cursor, CardUseHistoryFact Fact)>> _factConfirmations = [];
+    private readonly Dictionary<long, List<(long Cursor, CardUseHistoryFact Fact)>> _factAcceptedActions = [];
+    private readonly Dictionary<(int Turn, int Owner), List<long>> _factAcceptedByTurn = [];
+    private readonly Dictionary<(int Turn, int Owner), List<(long Cursor, CardUseHistoryFact Fact)>> _factFinalizations = [];
 
     public long CardUseHistoryCursor => events.Count + (long)pendingEvents.Count;
 
@@ -21,6 +24,15 @@ internal sealed partial class ProgramEventHistoryIndex
     {
         SynchronizeNativeHistory();
         var key = (point.ActualTurn, point.TurnOwnerSeat);
+        // Accepted membership/order is fixed at acceptance. Actor/Targets are observed as of the
+        // cutoff; PrimaryTargets is the latest finalized/completed stage result by that cutoff.
+        // Finalizations instead exposes immutable first-finalization snapshots in fact order.
+        if (view == CardUseHistoryView.Accepted)
+            return _factAcceptedByTurn.TryGetValue(key, out var accepted)
+                ? Array.AsReadOnly(accepted.Select(id => FactAt(_factAcceptedActions[id], point.Cursor)).OfType<CardUseHistoryFact>().ToArray()) : [];
+        if (view == CardUseHistoryView.Finalizations)
+            return _factFinalizations.TryGetValue(key, out var finalized)
+                ? Array.AsReadOnly(finalized.TakeWhile(item => item.Cursor <= point.Cursor).Select(item => item.Fact).ToArray()) : [];
         if (view is CardUseHistoryView.Observations or CardUseHistoryView.Confirmations)
             return (view == CardUseHistoryView.Confirmations ? _factConfirmations : _factObservations).TryGetValue(key, out var observations)
                 ? Array.AsReadOnly(observations.TakeWhile(item => item.Cursor <= point.Cursor).Select(item => item.Fact).ToArray()) : [];
@@ -29,26 +41,52 @@ internal sealed partial class ProgramEventHistoryIndex
         foreach (var membership in streams.Where(item => item.FromCursor <= point.Cursor &&
                      (item.Stream.RetiredAt is null || item.Stream.RetiredAt > point.Cursor)))
         {
-            var stream = membership.Stream;
-            var low = 0; var high = stream.Versions.Count;
-            while (low < high)
-            {
-                var middle = low + (high - low) / 2;
-                if (stream.Versions[middle].Cursor <= point.Cursor) low = middle + 1;
-                else high = middle;
-            }
-            if (low > 0) result.Add(stream.Versions[low - 1].Fact);
+            if (FactAt(membership.Stream.Versions, point.Cursor) is { } fact) result.Add(fact);
         }
         return Array.AsReadOnly(result.OrderBy(fact => fact.DeclarationCursor).ToArray());
+    }
+
+    private static CardUseHistoryFact? FactAt(IReadOnlyList<(long Cursor, CardUseHistoryFact Fact)> versions, long cursor)
+    {
+        var low = 0; var high = versions.Count;
+        while (low < high)
+        {
+            var middle = low + (high - low) / 2;
+            if (versions[middle].Cursor <= cursor) low = middle + 1;
+            else high = middle;
+        }
+        return low == 0 ? null : versions[low - 1].Fact;
     }
 
     private void ClearCardUseFacts()
     {
         _factActions.Clear(); _factNativeUses.Clear(); _factUsesByTurn.Clear(); _factObservations.Clear(); _factConfirmations.Clear();
+        _factAcceptedActions.Clear(); _factAcceptedByTurn.Clear(); _factFinalizations.Clear();
     }
 
     private void IndexCardUseFacts(IGameEvent payload, long cursor)
     {
+        if (payload is CardResponseCompletedEvent response)
+        {
+            if (_factAcceptedActions.TryGetValue(response.ActionId, out var versions))
+            {
+                var completed = versions[^1].Fact with { Finalized = true, Completed = true, PrimaryTargets = Array.Empty<int>() };
+                versions.Add((cursor, completed));
+                AppendLatestStageStatus(response.ActionId, completed, cursor);
+            }
+            return;
+        }
+        if (payload is CardUseFinishedEvent finished)
+        {
+            if (_completedNativeActions.TryGetValue(finished.ResolutionId, out var completedActionId) &&
+                _factAcceptedActions.TryGetValue(completedActionId, out var versions))
+            {
+                var completed = versions[^1].Fact with { Completed = true };
+                versions.Add((cursor, completed));
+                AppendLatestStageStatus(completedActionId, completed, cursor);
+            }
+            return;
+        }
         int turn, owner; long? nativeId, actionId; CardActionContext? action;
         IReadOnlyList<int> targets; bool established, selfResponse = false;
         switch (payload)
@@ -121,6 +159,7 @@ internal sealed partial class ProgramEventHistoryIndex
                 : previous?.PrimaryTargets,
             ConfirmationCursor = confirmation is null ? previous?.ConfirmationCursor : cursor
         };
+        fact = IndexAcceptedStage(payload, cursor, fact);
         stream.Versions.Add((cursor, fact));
         if (!_factObservations.TryGetValue((turn, owner), out var observations)) _factObservations[(turn, owner)] = observations = [];
         observations.Add((cursor, fact));
@@ -132,4 +171,55 @@ internal sealed partial class ProgramEventHistoryIndex
             confirmations.Add((cursor, fact with { Targets = confirmation.Targets }));
         }
     }
+
+    private CardUseHistoryFact IndexAcceptedStage(IGameEvent payload, long cursor, CardUseHistoryFact fact)
+    {
+        if (fact.ActionId is not { } actionId) return fact;
+        if (payload is ActualCardActionRecordedEvent accepted && !_factAcceptedActions.ContainsKey(actionId))
+        {
+            var issued = fact with
+            {
+                DeclarerSeat = accepted.Action.ActorSeat,
+                AcceptedActualTurn = accepted.ActualTurn, AcceptedTurnOwnerSeat = accepted.TurnOwner,
+                AcceptedPhase = accepted.Phase, AcceptedPlayPhaseInstanceId = accepted.PlayPhaseInstanceId,
+                AcceptedCursor = cursor, PrimaryTargets = null
+            };
+            _factAcceptedActions.Add(actionId, [(cursor, issued)]);
+            if (!_factAcceptedByTurn.TryGetValue((accepted.ActualTurn, accepted.TurnOwner), out var actions))
+                _factAcceptedByTurn[(accepted.ActualTurn, accepted.TurnOwner)] = actions = [];
+            actions.Add(actionId);
+            return WithAcceptedStage(fact, issued);
+        }
+        if (!_factAcceptedActions.TryGetValue(actionId, out var versions)) return fact;
+        var previous = versions[^1].Fact;
+        var stage = WithAcceptedStage(fact, previous) with { PrimaryTargets = previous.PrimaryTargets };
+        if (payload is ActualCardUseTargetsFinalizedEvent finalized && !_finalizedActions.ContainsKey(finalized.NativeUseId))
+        {
+            var finalizedFact = stage with { Finalized = true, PrimaryTargets = finalized.PrimaryTargets };
+            var key = (stage.AcceptedActualTurn!.Value, stage.AcceptedTurnOwnerSeat!.Value);
+            if (!_factFinalizations.TryGetValue(key, out var finalizations)) _factFinalizations[key] = finalizations = [];
+            finalizations.Add((cursor, finalizedFact));
+            stage = _completedActualActions.ContainsKey(actionId) ? stage with { Finalized = true } : finalizedFact;
+        }
+        else if (payload is ActualCardUseTargetsCompletedEvent completed && !_completedActualActions.ContainsKey(actionId))
+            stage = stage with { Finalized = true, Completed = _completedNativeUses.Contains(completed.NativeUseId),
+                PrimaryTargets = completed.PrimaryTargets };
+        versions.Add((cursor, stage));
+        return WithAcceptedStage(fact, stage);
+    }
+
+    private static CardUseHistoryFact WithAcceptedStage(CardUseHistoryFact fact, CardUseHistoryFact stage) => fact with
+    {
+        DeclarerSeat = stage.DeclarerSeat, AcceptedActualTurn = stage.AcceptedActualTurn,
+        AcceptedTurnOwnerSeat = stage.AcceptedTurnOwnerSeat, AcceptedPhase = stage.AcceptedPhase,
+        AcceptedPlayPhaseInstanceId = stage.AcceptedPlayPhaseInstanceId, AcceptedCursor = stage.AcceptedCursor,
+        Finalized = stage.Finalized, Completed = stage.Completed
+    };
+
+    private void AppendLatestStageStatus(long actionId, CardUseHistoryFact stage, long cursor)
+    {
+        if (_factActions.TryGetValue(actionId, out var stream) && stream.Versions.Count > 0)
+            stream.Versions.Add((cursor, WithAcceptedStage(stream.Versions[^1].Fact, stage)));
+    }
+
 }

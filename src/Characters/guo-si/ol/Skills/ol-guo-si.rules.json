@@ -34,10 +34,12 @@
           "optional": true,
           "usageScope": "phase",
           "usageLimit": 1,
+          "condition": {"kind":"all","children":[{"kind":"phaseIsPlay"},{"kind":"expression","expr":["and",["useDeclared","currentUse"],["not",["useIsResponse","currentUse"]],["useCompleted","currentUse"],["same",["useActor","currentUse"],"owner"],["same","owner","turnOwner"],["usePhaseIs","currentUse","play","accepted"],["same",["useDeclarer","currentUse"],"owner"],["and",[">=",["count",["takeLast",["filter",["cardUses","window","accepted"],["and",["samePlayPhase","use","currentUse"],["same",["useDeclarer","use"],"owner"],["or",["not",["useIsResponse","use"]],["useIsSelfNativeResponse","use"]]]],2],true],2],["all",["takeLast",["filter",["cardUses","window","accepted"],["and",["samePlayPhase","use","currentUse"],["same",["useDeclarer","use"],"owner"],["or",["not",["useIsResponse","use"]],["useIsSelfNativeResponse","use"]]]],2],["and",["useFinalized","use"],["useCompleted","use"]]]]]}]},
           "effects": [
             {
               "op": "offerSidaoCompletedPairSnatch",
-              "target": "owner"
+              "target": "owner",
+              "targetSetExpr": ["filter",["intersect",["usePrimaryTargets",["first",["takeLast",["filter",["cardUses","window","accepted"],["and",["samePlayPhase","use","currentUse"],["same",["useDeclarer","use"],"owner"],["or",["not",["useIsResponse","use"]],["useIsSelfNativeResponse","use"]]]],2]]],["usePrimaryTargets",["last",["takeLast",["filter",["cardUses","window","accepted"],["and",["samePlayPhase","use","currentUse"],["same",["useDeclarer","use"],"owner"],["or",["not",["useIsResponse","use"]],["useIsSelfNativeResponse","use"]]]],2]]]],["and",["alive","it"],["not",["same","it","owner"]]]]
             }
           ]
         }

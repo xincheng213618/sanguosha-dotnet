@@ -4,15 +4,8 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
 {
     internal bool DragonBoatAllies(int owner, int other) => _coreDragonBoatActivitiesOperations.IsDragonBoatActivity && _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(other) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[other].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].TeamId is { } team && _coreMatchParticipantsPlayersAccess._players[other].TeamId == team;
-    SkillProgramStepOutcome IDragonBoatGeneralHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation, int targetSeat) => BeginDragonBoatGeneral(frame, operation, targetSeat);
+    SkillProgramStepOutcome IDragonBoatGeneralHost.Execute(ProgramSkillFrame frame, SkillProgramEffect effect, int targetSeat) => BeginDragonBoatGeneral(frame, effect, targetSeat);
     bool IDragonBoatAllyQuery.IsTeammate(int ownerSeat, int targetSeat) => ownerSeat != targetSeat && DragonBoatAllies(ownerSeat, targetSeat);
-    internal IReadOnlyList<int> DragonBoatLianpianTargets(int ownerSeat, ProgramSkillWindowContext context)
-    {
-        if (!_coreDragonBoatActivitiesOperations.IsDragonBoatActivity || context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || _actualCardUseHistory.FindFinalizedUse(identity.ParentCardUseFrameId) is not { PrimaryTargets: { } targets } current || current.Action.ActionId != identity.CardActionId || current.Phase != TurnPhase.Play || current.Action.ActorSeat != current.TurnOwner || !DragonBoatAllies(ownerSeat, current.Action.ActorSeat) || _actualCardUseHistory.PreviousFinalizedUse(identity.ParentCardUseFrameId)?.PrimaryTargets is not { } previous)
-            return [];
-        return Array.AsReadOnly(previous.Intersect(targets).Where(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive).ToArray());
-    }
-
     internal DragonBoatDianhuArmedEvent? DragonBoatDianhuTarget(int ownerSeat, string instance) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DragonBoatDianhuArmedEvent>().SingleOrDefault(e => e.OwnerSeat == ownerSeat && e.SkillInstanceId == instance);
     internal bool DragonBoatDianhuQualified(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _coreDragonBoatActivitiesOperations.IsDragonBoatActivity && context is { Window: SkillProgramTriggerWindow.AfterDamageApplied, SourceSeat: { } source, TargetSeat: { } target, Amount: > 0, DamageFrameId: { } damageId } && DragonBoatAllies(candidate.OwnerSeat, source) && DragonBoatDianhuTarget(candidate.OwnerSeat, candidate.SkillInstanceId)is { } relation && relation.TargetSeat == target && context.OccurrenceIndex >= 0 && context.OccurrenceIndex < context.Amount && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().LastOrDefault(w => w.Id == context.ParentFrameId)is { } window && window.ParentFrameId == damageId && _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window)is { IsSourceLess: false, DamageWasApplied: true } attack && attack.SourceSeat == source && attack.TargetSeat == target && attack.DamageAmount == context.Amount;
     internal bool DragonBoatTunjiangQualified(int ownerSeat, ProgramSkillWindowContext context)
@@ -31,8 +24,6 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
             return true;
         if (!_coreDragonBoatActivitiesOperations.IsDragonBoatActivity)
             return false;
-        if (gate.SkillId == "dragonboat:lianpian")
-            return DragonBoatLianpianTargets(gate.OwnerSeat, gate.Context).Count > 0;
         if (gate.SkillId == "dragonboat:dianhu" && gate.Context.Window == SkillProgramTriggerWindow.AfterDamageApplied)
             return DragonBoatDianhuQualified(gate.Candidate, gate.Context);
         if (gate.SkillId == "dragonboat:tunjiang")
@@ -44,8 +35,9 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 42000, SkillProgramEffectOp.DrawAndOfferJianjiExactCard)]
     internal bool AllowsDragonBoatJianji(ProgramActivationLegalityContext gate) => gate.SkillId != "dragonboat:jianji" || _coreDragonBoatActivitiesOperations.IsDragonBoatActivity && _coreMatchParticipantsPlayersAccess._players.Any(p => p.Seat != gate.OwnerSeat && DragonBoatAllies(gate.OwnerSeat, p.Seat));
-    internal SkillProgramStepOutcome BeginDragonBoatGeneral(ProgramSkillFrame supplied, SkillProgramEffectOp operation, int targetSeat)
+    internal SkillProgramStepOutcome BeginDragonBoatGeneral(ProgramSkillFrame supplied, SkillProgramEffect effect, int targetSeat)
     {
+        var operation = effect.Op;
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (!_coreDragonBoatActivitiesOperations.IsDragonBoatActivity || frame.TriggerId is null || frame.WindowContext is not { } context || frame.DragonBoatGeneral is not null || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
             throw new InvalidOperationException("The activity general lost its actual unpaid trigger.");
@@ -70,9 +62,8 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
         var candidate = new ProgramTriggerCandidate(frame.OwnerSeat, frame.SkillId, frame.TriggerId, frame.SkillInstanceId, frame.GameplayHash, 0);
         if (operation == SkillProgramEffectOp.DrawDragonBoatDianhu && !DragonBoatDianhuQualified(candidate, context) || operation == SkillProgramEffectOp.DrawDragonBoatTunjiang && !DragonBoatTunjiangQualified(frame.OwnerSeat, context))
             throw new InvalidOperationException("The activity draw lost its exact native occurrence.");
-        var lianpianTargets = operation == SkillProgramEffectOp.DrawDragonBoatConsecutiveTarget ? DragonBoatLianpianTargets(frame.OwnerSeat, context) : null;
-        if (lianpianTargets is { Count: 0 })
-            throw new InvalidOperationException("Activity Lianpian requires consecutive real finalized targets.");
+        var lianpianTargets = operation == SkillProgramEffectOp.DrawDragonBoatConsecutiveTarget
+            ? ProgramExpressions.EvaluateParticipantSet(effect.TargetSetExpression!, _expressionWorlds.CreateProgramExpressionWorld(frame)) ?? [] : null;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { DragonBoatGeneral = new(frame.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, DragonBoatGeneralStage.Choosing, LianpianTargets: lianpianTargets) });
         if (operation == SkillProgramEffectOp.DrawDragonBoatDianhu)
         {

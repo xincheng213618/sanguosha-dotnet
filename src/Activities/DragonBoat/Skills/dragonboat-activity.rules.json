@@ -3,7 +3,9 @@
     {
       "id": "dragonboat:lianpian", "revision": 1,
       "triggers": [{ "id": "consecutive-team-use", "window": "cardUseTargetsFinalized", "ownerRelation": "observer", "optional": true,
-        "effects": [{ "op": "drawDragonBoatConsecutiveTarget", "target": "owner" }] }]
+        "condition": { "kind": "expression", "expr": ["and",["same",["useActor","currentUse"],"turnOwner"],["usePhaseIs","currentUse","play","accepted"],[">=",["count",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]],true],2],["sameTeam","owner",["useActor","currentUse"]],["alive",["useActor","currentUse"]],["any",["filter",["intersect",["usePrimaryTargets",["first",["takeLast",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]],2]]],["usePrimaryTargets",["last",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]]]]],["alive","it"]],true]] },
+        "effects": [{ "op": "drawDragonBoatConsecutiveTarget", "target": "owner",
+          "targetSetExpr": ["filter",["intersect",["usePrimaryTargets",["first",["takeLast",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]],2]]],["usePrimaryTargets",["last",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]]]]],["alive","it"]] }] }]
     },
     {
       "id": "dragonboat:dianhu", "revision": 1,

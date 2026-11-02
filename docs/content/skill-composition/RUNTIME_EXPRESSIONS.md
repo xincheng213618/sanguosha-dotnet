@@ -26,6 +26,7 @@
 | 参与者集合 | `"living"`（存活角色，座位顺序）、`"livingOthers"`（除拥有者外的存活角色） |
 | 逻辑 | `["and", b, b, ...]`、`["or", b, b, ...]`（2–8 项）、`["not", b]` |
 | 比较 | `["<" / "<=" / ">" / ">=" / "==" / "!=", i, i]`、`["same", p, p]` |
+| 原始队伍 | `["sameTeam", p, p]` 读取实际 TeamId，包含自己；已知角色没有队伍则为假，参与者未知则为未知，不使用 AI 敌友估计 |
 | 角色状态 | 布尔：`alive`、`hasHp`、`faceDown`、`chained`；整数：`hp`、`maxHp`、`lostHp`、`handCount`、`handLimit`、`equipmentCount` |
 | 窗口冻结事实 | `["windowHp", "owner" / "eventTarget"]`、`["windowHandCount", "owner" / "eventTarget"]` 读取原触发窗口的体力或手牌数；不读取后来子结算改变的现值 |
 | 运算 | `["+", i, ...]`、`["min", i, ...]`、`["max", i, ...]`（2–8 项）、`["-", i, i]`、`["floorDiv", i, i]`；`["when", b, i]` 在 b 为真时取 i，否则未知 |
@@ -35,7 +36,7 @@
 | 条件授予事实 | `["ruleWounded", p]` 读规则受伤；`["equipmentSuitCount", p]` 读独立来源改写后的装备花色数；`["publicPileCount", p, "skill:id"]` 读本人该技能全部来源的公共堆实体数 |
 | 量词 | `["all", set, b]`、`["any", set, b]` 返回布尔；`["count", set, b]` 返回整数；`b` 内用 `"it"` 表示当前成员 |
 
-加载时检查运算符、参数个数、类型、字面量范围、嵌套深度（8 层）以及 `"it"` 只能出现在量词谓词中。表达式随规则 JSON 规范化后进入技能玩法指纹，空白不影响指纹；新增该可选节点不改变规则格式版本。
+加载时检查运算符、参数个数、类型、字面量范围、嵌套深度（最多 12 层）以及 `"it"` 只能出现在角色集合谓词中。自然组合仍有有限深度，不能用无限展开代替机制边界。表达式随规则 JSON 规范化后进入技能玩法指纹，空白不影响指纹；新增该可选节点不改变规则格式版本。
 
 ## 求值语义
 
@@ -63,23 +64,34 @@
 | `["cardUses","window","latest"]` | 原窗口截点每次用牌的最新已知事实 |
 | `["cardUses","now","observations"]` | 当前实际回合逐次采样的事实；后续取消不抹除旧观察 |
 | `["cardUses","window","confirmations"]` | 原窗口截点以前每次真实原生目标确认的快照，按确认发生顺序；目标未改变也保留真实确认 |
+| `["cardUses","window","accepted"]` | 原接受成员与顺序不变，actor／targets 读取截点时已知值；主要目标及 finalized／completed 状态取截至截点已达到的阶段 |
+| `["cardUses","window","finalizations"]` | 按首次 finalized 发生顺序读取不可变快照，主要目标取当时的规范化结果；后来更新或完成不回写 |
 | `"currentUse"` / `"use"` | 当前窗口用牌／事实集合谓词中的成员 |
 | `["useActor",fact]` / `["useDeclarer",fact]` | 采样时使用者／首次接受者，均不等于材料提供者 |
 | `["useTargets",fact]` | Latest／Observations 为完整 designated 目标；Confirmations 为原 TargetsConfirmed 的 raw 目标 |
 | `["useConfirmedTargets",fact]` | 最近一次真实确认的原始完整目标；没有确认元数据则未知 |
-| `["usePrimaryTargets",fact]` | 最近一次真实确认的规范化主要目标；借刀只取持刀者，区别于包含 victim 的 raw 目标 |
+| `["usePrimaryTargets",fact]` | 按视图读取规范化主要目标：latest／observations 是最近确认，accepted 是已达 finalized／completed 阶段，finalizations 是首次 finalized；借刀只取持刀者，区别于包含 victim 的 raw 目标 |
 | `["useKindIs",fact,["slash","fireSlash","thunderSlash"]]` | 匹配原生声明时牌种，不读后来改写的 EffectiveKind；数组使用共同 ProgramCardKindMatch，完整旧杀族包含冰杀，单项 slash 仍仅普通杀 |
 | `["usePhaseIs",fact,"play"]` | 最近一次真实确认发生时的实际 TurnPhase，不是当前阶段；无采样元数据则未知 |
+| `["usePhaseIs",fact,"play","accepted"]` | 原接受时阶段；不代表当前仍在出牌阶段，也不代替确认时阶段 |
 | `["useEstablished",fact]` / `["useDeclared",fact]` | 目标已在实际 finalized 时成立／已有真实原生声明身份；目标确认本身不等于 Established |
+| `["useFinalized",fact]` / `["useCompleted",fact]` | 截点时已达到相应真实结算阶段；不把接受或确认当成完成 |
 | `["useIsResponse",fact]` / `["useIsSelfNativeResponse",fact]` | 实际响应类型／既有自身原生响应协议 |
-| `["atOrBefore",fact,"currentUse","accepted"]` | 原接受顺序的包含式截点；保留真实长整数 ID，无 Action 时读取真实声明顺序 |
-| `["first",facts]` | 所选事实集的首项；空集或未知集返回未知，不把接受、确认或完成顺序互换 |
+| `["atOrBefore",fact,"currentUse","accepted"]` | 双方有接受记录时按真实接受游标比较包含式截点；没有该元数据时保留真实长整数身份／声明顺序，不伪造 Action |
+| `["first",facts]` / `["last",facts]` | 所选事实集的首项／末项；空集或未知集返回未知，不把接受、确认或完成顺序互换 |
+| `["takeLast",facts,2]` | 取所选事实集的尾部两项，保持原顺序；数量可用整数表达式，已知非正数得到空集，未知数量仍未知 |
+| `["samePlayPhase",fact,fact]` | 两项均在 Play 接受，且接受时实际回合、回合拥有者与 Play 实例相同；不隐含使用者相同 |
 | `["sameUse",fact,fact]` | 双方有 native ID 时只比较该真实 ID；只有双方都没有 native ID 才比较真实 ActionId，单边缺失或没有可比身份时未知 |
 | `["filter",set,predicate]` / `["targets",facts]` | 筛选事实或角色集合／按所选视图的 Targets 去重合并；不会隐式改成主要目标 |
+| `["intersect",participants,participants]` | 角色集合交集，保持左侧顺序；任一集合未知时结果未知 |
 
 `any`、`all`、`count` 同时支持事实与角色集合。事实谓词用 `use`，角色谓词用 `it`，两种迭代可嵌套，`first(filter(...))` 保留外层角色绑定；`contains` 判断角色是否在集合中。筛选谓词未知时集合仍未知，不能把未知成员当作不匹配跳过。`turnOwner` 是窗口或明确 now 读取的实际回合拥有者。各视图均支持 `window` 和 `now`，表达式自动声明历史采集需求，与当前是否持有技能分开。
 
 Confirmations 每项是一份真实确认快照，后来更新不回写它。Latest／Observations 的 Targets 仍反映 designated 目标；其 `ConfirmedTargets`、`PrimaryTargets`、`Phase` 是最近确认留下的元数据，普通更新不擦除，也不能因此把更新当成新的确认。声明牌种同样独立于有效牌种，角色改写不制造另一条接受记录。
+
+Accepted 与 Finalizations 从同一 journal 派生，不增加 Pair 表，也不改变上述视图含义。前者用于按接受顺序选择关系、再检查截点时是否已完成；后者用于按首次 finalized 顺序比较牌，不用后来完成目标覆盖当时快照。`samePlayPhase` 只回答同一接受阶段，使用者、首次接受者、响应类型与当前实际阶段须由规则各自组合。
+
+完成窗口的 point 在真实 `ActualCardUseTargetsCompletedEvent` 处冻结；随后候选收集或嵌套子结算不能移动它。伺盗先在该截点选择合格 accepted 尾部两项，再要求两项 finalized 且 completed，最后交主要目标；不能先过滤未完成项后跨过去，也不要求尾项就是当前外层牌。联翩则在 finalizations 中取同阶段、同使用者的最后两项。两者的历史条件和 `targetSetExpr` 已能写入 JSON，真实复合支付与执行仍由原效果协议承担。
 
 跨角色首次成为杀目标可由共同表达式组合，不需要人物历史查询：
 

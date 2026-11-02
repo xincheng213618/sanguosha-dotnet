@@ -11,12 +11,14 @@ internal static partial class PhaseStartCardControlChecks
         var (g, registry) = StartDirected("history");
         var first = HistoryUse(g, CardKind.IronChain, [1]);
         Need(History(g).FindFinalizedUse(first.Id) is { Finalized: true, Completed: false } live && live.PrimaryTargets!.SequenceEqual([1]) &&
-            History(g).PreviousFinalizedUse(first.Id) is null && E<ActualCardActionRecordedEvent>(g).Count(e => e.Action.ActionId == first.Action!.ActionId) == 1,
+            History(g).ReadCardUseFacts(History(g).FindFinalizedUse(first.Id)!.HistoryPoint!, CardUseHistoryView.Finalizations).Count == 1 &&
+            E<ActualCardActionRecordedEvent>(g).Count(e => e.Action.ActionId == first.Action!.ActionId) == 1,
             "One actual accepted use is finalized before completion, without inventing a previous use.");
         g = Cold(g, registry); HistoryContinue(g);
         Need(History(g).FindFinalizedUse(first.Id) is { Completed: true }, "Only the actual native return marks the first use complete.");
         var second = HistoryUse(g, CardKind.IronChain, [1]);
-        Need(History(g).PreviousFinalizedUse(second.Id)?.NativeUseId == first.Id &&
+        Need(History(g).ReadCardUseFacts(History(g).FindFinalizedUse(second.Id)!.HistoryPoint!, CardUseHistoryView.Finalizations)
+                .TakeLast(2).Select(f => f.NativeUseId).SequenceEqual(new long?[] { first.Id, second.Id }) &&
             History(g).ReadCardUseFacts(new(g.State.TurnNumber, 0, History(g).CardUseHistoryCursor), CardUseHistoryView.Latest).Count(f => f.DeclarerSeat == 0 && f.ActionId <= second.Action!.ActionId) == 2 &&
             History(g).FindFinalizedUse(second.Id)!.PrimaryTargets!.SequenceEqual([1]),
             "Two real cards in the same actual Play share their true principal target and accepted order.");
@@ -90,14 +92,19 @@ internal static partial class PhaseStartCardControlChecks
             Need(History(g).ReadCardUseFacts(new(g.State.TurnNumber, 0, History(g).CardUseHistoryCursor), CardUseHistoryView.Latest)
                 .Where(f => f.DeclarerSeat == 0 && (f.Type == CardActionType.Use || f.IsSelfNativeResponseUse) && f.ActionId <= next.Action!.ActionId)
                 .TakeLast(2).Select(f => f.ActionId).SequenceEqual(new long?[] { response.ActionId, next.Action!.ActionId }) &&
-                History(g).PreviousFinalizedUse(next.Id)?.NativeUseId == first.Id,
+                History(g).ReadCardUseFacts(History(g).FindFinalizedUse(next.Id)!.HistoryPoint!, CardUseHistoryView.Finalizations)
+                    .Where(f => f.ActorSeat == 0).TakeLast(2).Select(f => f.NativeUseId).SequenceEqual(new long?[] { first.Id, next.Id }),
                 "Dodge interrupts the accepted pair while finalized-only history retains the previous real card use.");
             HistoryContinue(g, forbidSidao: true);
         }
         else
-            Need(History(g).AcceptedPairAtCompletionFor(interrupted.Action!.ActionId).Select(e => e.Action.ActionId)
-                .SequenceEqual([interrupted.Action.ActionId, response.ActionId]),
+        {
+            var point = History(g).FindCompletedUse(interrupted.Id)!.HistoryPoint!;
+            var accepted = History(g).ReadCardUseFacts(point, CardUseHistoryView.Accepted);
+            Need(accepted.Where(f => f.DeclarerSeat == 0 && (f.Type == CardActionType.Use || f.IsSelfNativeResponseUse))
+                .TakeLast(2).Select(f => f.ActionId!.Value).SequenceEqual([interrupted.Action!.ActionId, response.ActionId]),
                 "The actual Duel completion freezes its accepted tail after the nested counterspell, rather than its old acceptance-time prefix.");
+        }
         Need(E<CardResponseCompletedEvent>(g).Count(e => e.ActionId == response.ActionId) == 1,
             "The checked path contains one actual response completion and never publishes a Sidao offer across it.");
         _ = Cold(g, registry);
@@ -111,9 +118,11 @@ internal static partial class PhaseStartCardControlChecks
         var second = HistoryUse(g, CardKind.IronChain, [1]);
         Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         Reach(g, p => Optional(p, "ol:sidao"));
+        var completionPoint = History(g).FindCompletedUse(second.Id)!.HistoryPoint!;
+        var pair = History(g).ReadCardUseFacts(completionPoint, CardUseHistoryView.Accepted)
+            .Where(f => f.DeclarerSeat == 0 && (f.Type == CardActionType.Use || f.IsSelfNativeResponseUse)).TakeLast(2).ToArray();
         Need(History(g).FindCompletedUse(second.Id) is { Completed: true } &&
-            History(g).AcceptedPairAtCompletionFor(second.Action!.ActionId).Count == 2 &&
-            History(g).AcceptedPairAtCompletionFor(second.Action!.ActionId).All(e => e.PrimaryTargets!.SequenceEqual([1])),
+            pair.Length == 2 && pair.All(e => e.Finalized && e.Completed && e.PrimaryTargets!.SequenceEqual([1])),
             "Two genuinely completed same-target Uses offer the real Sidao skill.");
         Activate(g); Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "guo-si"));
         g = Cold(g, registry);

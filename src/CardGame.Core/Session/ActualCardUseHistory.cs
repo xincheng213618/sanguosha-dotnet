@@ -15,13 +15,14 @@ public sealed record ActualCardUseHistoryEntry(CardActionContext Action, int Act
     }
     public bool Finalized => PrimaryTargets is not null;
     public CardUseHistoryPoint? HistoryPoint { get; init; }
+    public CardUseHistoryPoint? CompletionPoint { get; init; }
 }
 
 /// <summary>A position in the full committed and pending journal, not an event sequence number.</summary>
 public sealed record CardUseHistoryPoint(int ActualTurn, int TurnOwnerSeat, long Cursor,
     long? CurrentNativeUseId = null, long? CurrentActionId = null);
 
-internal enum CardUseHistoryView { Latest, Observations, Confirmations }
+internal enum CardUseHistoryView { Latest, Observations, Confirmations, Accepted, Finalizations }
 
 /// <summary>Rule-neutral facts. Accepted actor and current actor are separate roles.</summary>
 public sealed record CardUseHistoryFact(long? NativeUseId, long? ActionId, int ActorSeat,
@@ -31,6 +32,13 @@ public sealed record CardUseHistoryFact(long? NativeUseId, long? ActionId, int A
     private readonly IReadOnlyList<int> _targets = Array.AsReadOnly(Targets.ToArray());
     public IReadOnlyList<int> Targets
     { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
+    public int? AcceptedActualTurn { get; init; }
+    public int? AcceptedTurnOwnerSeat { get; init; }
+    public TurnPhase? AcceptedPhase { get; init; }
+    public int? AcceptedPlayPhaseInstanceId { get; init; }
+    public long? AcceptedCursor { get; init; }
+    public bool Finalized { get; init; }
+    public bool Completed { get; init; }
     public CardKind? DeclaredKind { get; init; }
     public CardKind? EffectiveKind { get; init; }
     public TurnPhase? Phase { get; init; }
@@ -58,8 +66,6 @@ internal interface IActualCardUseHistoryQueries : IProgramSelectionQuery
     CardActionContext? FindLatestAction(long actionId);
     ActualCardUseHistoryEntry? FindFinalizedUse(long nativeUseId);
     ActualCardUseHistoryEntry? FindCompletedUse(long nativeUseId);
-    ActualCardUseHistoryEntry? PreviousFinalizedUse(long nativeUseId);
-    IReadOnlyList<ActualCardUseHistoryEntry> AcceptedPairAtCompletionFor(long actionId);
 }
 
 /// <summary>A declared native use need not have an accepted Action.</summary>

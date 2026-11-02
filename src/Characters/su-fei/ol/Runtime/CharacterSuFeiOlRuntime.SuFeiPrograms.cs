@@ -5,29 +5,12 @@ internal sealed partial class CharacterSuFeiOlRuntime
 {
     internal const string SuFeiDrawReason = "skill-program.lianpian.draw", SuFeiGiftReason = "skill-program.lianpian.gift";
     internal static CardConversionSource SuFeiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_su_fei_ol_SuFeiPrograms.SuFeiSource(f);
-    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 450)]
-    internal bool CanOfferSuFei(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
-    {
-        if (!ProgramInstructionResolver.Default.Features(t).HasOperation(SkillProgramEffectOp.DrawThenOfferActualConsecutiveTargetGift))
-            return true;
-        return w.CardUse is { } identity && SuFeiTargets(identity, c.OwnerSeat).Count > 0;
-    }
-
-    private IReadOnlyList<int> SuFeiTargets(ProgramCardUseContext identity, int ownerSeat)
-    {
-        if (_actualCardUseHistory.FindFinalizedUse(identity.ParentCardUseFrameId) is not { PrimaryTargets: { } targets } current || current.Action.ActionId != identity.CardActionId || current.Action.ActorSeat != ownerSeat || current.Phase != TurnPhase.Play || current.TurnOwner != ownerSeat || _actualCardUseHistory.PreviousFinalizedUse(identity.ParentCardUseFrameId)?.PrimaryTargets is not { } previous)
-            return [];
-        return Array.AsReadOnly(previous.Intersect(targets).Where(_coreTableSeatQueriesOperations.IsValidPlayerSeat).ToArray());
-    }
-
     internal SkillProgramStepOutcome BeginSuFei(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.SuFei is not null || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } w || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Lianpian lost its unpaid exact consecutive native use.");
-        var targets = SuFeiTargets(identity, f.OwnerSeat);
-        if (targets.Count == 0)
-            throw new InvalidOperationException("Lianpian requires consecutive real finalized targets.");
+        var targets = ProgramExpressions.EvaluateParticipantSet(effect.TargetSetExpression!, _expressionWorlds.CreateProgramExpressionWorld(f)) ?? [];
         var r = new SuFeiReceipt(SuFeiSource(f), f.GameplayHash, f.InstructionIndex, w.ParentFrameId, identity.ParentCardUseFrameId, identity.CardActionId, targets, SuFeiStage.DrawChildren, DrawBefore: _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, DrawAfter: _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { SuFei = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         var cards = _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], 1, true, new(SuFeiDrawReason));

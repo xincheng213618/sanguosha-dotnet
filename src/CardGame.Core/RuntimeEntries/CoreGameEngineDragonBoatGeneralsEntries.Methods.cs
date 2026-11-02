@@ -5,7 +5,6 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsEntries
     internal bool AllowsDragonBoatGeneralTrigger(ProgramTriggerLegalityContext gate) => _resolve().AllowsDragonBoatGeneralTrigger(gate);
     internal bool AllowsDragonBoatJianji(ProgramActivationLegalityContext gate) => _resolve().AllowsDragonBoatJianji(gate);
     internal void AnswerDragonBoatGeneral(PromptChoice choice) => _resolve().AnswerDragonBoatGeneral(choice);
-    internal SkillProgramStepOutcome BeginDragonBoatGeneral(ProgramSkillFrame supplied, SkillProgramEffectOp operation, int targetSeat) => _resolve().BeginDragonBoatGeneral(supplied, operation, targetSeat);
     internal PromptChoice ChooseDragonBoatGeneral(ProgramSkillFrame frame) => _resolve().ChooseDragonBoatGeneral(frame);
     internal bool ContinuePaidDragonBoatGeneral(ProgramSkillFrame frame) => _resolve().ContinuePaidDragonBoatGeneral(frame);
     internal bool DragonBoatAllies(int owner, int other) => _resolve().DragonBoatAllies(owner, other);
@@ -13,7 +12,6 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsEntries
     internal DragonBoatDianhuArmedEvent? DragonBoatDianhuTarget(int ownerSeat, string instance) => _resolve().DragonBoatDianhuTarget(ownerSeat, instance);
     internal IReadOnlyList<PromptChoice> DragonBoatGeneralChoices(ProgramSkillFrame frame) => _resolve().DragonBoatGeneralChoices(frame);
     internal PromptChoice? DragonBoatJianjiAiChoice(PendingDecision decision, ProgramSkillFrame frame) => _resolve().DragonBoatJianjiAiChoice(decision, frame);
-    internal IReadOnlyList<int> DragonBoatLianpianTargets(int ownerSeat, ProgramSkillWindowContext context) => _resolve().DragonBoatLianpianTargets(ownerSeat, context);
     internal bool DragonBoatTunjiangQualified(int ownerSeat, ProgramSkillWindowContext context) => _resolve().DragonBoatTunjiangQualified(ownerSeat, context);
     internal void IssueDragonBoatGeneralDraw(ProgramSkillFrame frame, int recipient, int count) => _resolve().IssueDragonBoatGeneralDraw(frame, recipient, count);
     internal void PublishDragonBoatGeneralChoice(ProgramSkillFrame frame) => _resolve().PublishDragonBoatGeneralChoice(frame);
