@@ -42,5 +42,4 @@ internal sealed partial class CharacterZhouFeiLeEntries
     internal void ReturnLeZhouFeiXianshuDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome) => _resolve().ReturnLeZhouFeiXianshuDraw(supplied, outcome);
     internal bool ReturnLeZhouFeiXianshuMovement(ProgramSkillFrame frame) => _resolve().ReturnLeZhouFeiXianshuMovement(frame);
     internal ProgramSkillWindowContext? TryCreateLingkongMovementContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate) => _resolve().TryCreateLingkongMovementContext(frame, candidate);
-    internal bool HasLeZhouFeiLingkongCapability { get => _resolve().HasLeZhouFeiLingkongCapability; }
 }

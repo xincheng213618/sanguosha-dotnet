@@ -46,7 +46,11 @@ internal abstract class MouFaZhengDescriptor : ProgramOperationDescriptorBase
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext c) => c.PaidReturnAccepted;
 }
 internal sealed class MouFaZhengIssueDescriptor : MouFaZhengDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.IssueMouFaZhengXuanhuo; }
-internal sealed class MouFaZhengTakeDescriptor : MouFaZhengDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.TakeMouFaZhengXuanhuoGain; }
+internal sealed class MouFaZhengTakeDescriptor : MouFaZhengDescriptor
+{
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.TakeMouFaZhengXuanhuoGain;
+    public override ProgramFactRequirements FactRequirements => base.FactRequirements.Union(new(Triggered: ProgramTrackedFact.MovementTiming));
+}
 internal sealed class MouFaZhengEnyuanDescriptor : MouFaZhengDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouFaZhengEnyuan; }
 internal sealed class MouFaZhengHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {

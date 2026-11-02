@@ -18,7 +18,10 @@ internal abstract class HappyHuaTuoDescriptor(SkillProgramEffectOp operation):Pr
     };
 }
 internal sealed class InitializeHappyHuaTuoMedicineDescriptor():HappyHuaTuoDescriptor(SkillProgramEffectOp.InitializeHappyHuaTuoMedicine);
-internal sealed class GainHappyHuaTuoMedicineDescriptor():HappyHuaTuoDescriptor(SkillProgramEffectOp.GainHappyHuaTuoMedicine);
+internal sealed class GainHappyHuaTuoMedicineDescriptor():HappyHuaTuoDescriptor(SkillProgramEffectOp.GainHappyHuaTuoMedicine)
+{
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.MovementTiming);
+}
 internal sealed class ResolveHappyHuaTuoMedicineDescriptor():HappyHuaTuoDescriptor(SkillProgramEffectOp.ResolveHappyHuaTuoMedicine);
 internal sealed class ResolveHappyHuaTuoShenzhenDescriptor():HappyHuaTuoDescriptor(SkillProgramEffectOp.ResolveHappyHuaTuoShenzhen);
 internal sealed class HappyHuaTuoHandler(SkillProgramEffectOp operation):ISkillProgramEffectHandler

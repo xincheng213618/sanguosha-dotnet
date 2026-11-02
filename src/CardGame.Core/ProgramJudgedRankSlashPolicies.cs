@@ -57,6 +57,7 @@ internal sealed class GrantJudgedRankSplitSlashTurnPolicyDescriptor : ProgramOpe
 }
 internal sealed class DrawFromOtherActualBasicDiscardDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.MovementTiming);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.DrawFromOtherActualBasicDiscard;
     public override ISkillProgramEffectHandler Handler { get; } = new DrawFromOtherActualBasicDiscardHandler();
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards,

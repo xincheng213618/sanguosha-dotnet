@@ -11,7 +11,8 @@ public enum ProgramTrackedFact
     NativeDrawInvocation = 16,
     NativeActionAppearance = 32,
     ActualCardUseHistory = 64,
-    ActualPhaseEnd = 128
+    ActualPhaseEnd = 128,
+    MovementTiming = 256
 }
 
 // Definition-only demand for shared native facts. Keep trigger and activation
@@ -31,5 +32,6 @@ internal readonly record struct ProgramFactRequirements(
         ~(ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.ActualDiscardRecoveryPhase |
           ProgramTrackedFact.NativeTrueUseProcessingEntry | ProgramTrackedFact.WholeActualUseDeclaration |
           ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.NativeActionAppearance |
-          ProgramTrackedFact.ActualCardUseHistory | ProgramTrackedFact.ActualPhaseEnd)) == ProgramTrackedFact.None;
+          ProgramTrackedFact.ActualCardUseHistory | ProgramTrackedFact.ActualPhaseEnd |
+          ProgramTrackedFact.MovementTiming)) == ProgramTrackedFact.None;
 }

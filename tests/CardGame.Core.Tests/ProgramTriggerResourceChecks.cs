@@ -71,6 +71,7 @@ internal static class ProgramTriggerResourceChecks
         NativeAppearanceFactDemand(program, game);
         ActualPhaseFactDemand(game, registry);
         NativeDrawFactDemand(registry);
+        MovementTimingFactDemand(game, registry);
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
         var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", flags)!.GetValue(game)!;
         var action = new CardActionContext(1, null, CardActionType.Use, 0, 0, null, null, 1,
@@ -267,6 +268,63 @@ internal static class ProgramTriggerResourceChecks
             var batches = capabilities.Get<ICardMovementBatchQueue>();
             return (cards, history.Read<NativeDrawInvocationRecordedEvent>().Skip(before).ToArray(), batches.PendingBatchAt(batches.PendingBatchCount - 1));
         }
+        static void Check(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
+    }
+
+    private static void MovementTimingFactDemand(GameEngine withoutDemand, ContentRegistry sharedCatalog)
+    {
+        const ProgramTrackedFact timing = ProgramTrackedFact.MovementTiming;
+        var activation = ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.ResolveDiciGiftRecoveryAndNeighborChain).FactRequirements;
+        var trigger = ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.ResolveBiriFirstNonDrawGain).FactRequirements;
+        Check((activation.Activated & timing) != 0 && (activation.Triggered & timing) == 0 &&
+            (trigger.Triggered & timing) != 0 && (trigger.Activated & timing) == 0,
+            "Movement timing descriptors preserve the real activation and trigger entry points.");
+        foreach (var id in new[] { "happy:renjie", "ol:renjie-2016", "mobile:mingzhe" })
+            Check(new SkillProgramDependencies([new ContentSkillDefinition(id, "Passive", "Passive")]).RequiresFact(timing),
+                "An unowned loaded passive must request its original movement timing: " + id);
+        var pure = new MatchNativeFactDemand(timing);
+        Check(pure.RequiresFact(timing) && !pure.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase) &&
+            !pure.RequiresFact(ProgramTrackedFact.ActualPhaseEnd) && !pure.RequiresFact(ProgramTrackedFact.NativeDrawInvocation),
+            "Movement timing alone does not manufacture phase identity, phase ends or draw invoices.");
+
+        var rules = JsonNode.Parse("""{"skills":[{"id":"fixture:optional-facts","revision":1,"triggers":[{"id":"outside-draw","window":"cardsGained","subject":"owner","optional":false,"destinationZones":["hand"],"movementOccurrence":"perBatch","gainPhaseQualification":"outsideOwnerDraw","effects":[{"op":"draw","target":"owner","amount":1}]}]}]}""")!;
+        rules["schemaVersion"] = SkillProgramCatalog.RulesSchemaVersion;
+        var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+            skills = new Dictionary<string, object> { ["fixture:optional-facts"] = new { name = "Timing", description = "Timing" } } });
+        var program = SkillProgramCatalog.Load(rules.ToJsonString(), presentation).Programs["fixture:optional-facts"];
+        var content = ContentRegistry.Build(new StandardContentPackage(), new FactsPackage(program));
+        Check(content.ProgramDependencies.RequiresFact(timing) &&
+            !content.ProgramDependencies.RequiresFact(ProgramTrackedFact.NativeDrawInvocation) &&
+            !content.ProgramDependencies.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase),
+            "A generic gain-phase qualifier requests only movement timing, without a character operation or holder.");
+        Check(withoutDemand.GetRuntimeModule<CoreGameEngineCardMovementProgramsRuntime>().CaptureMovementTiming() is null,
+            "The ordinary no-demand match preserves omitted movement timing.");
+        var game = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 5, ModeId = "identity:standard-5", HumanSeat = 0,
+            HumanRole = Role.Lord, UseInteractiveSetup = false, AdvanceAfterHumanCommands = false }, content);
+        Check(game.Submit(new StartGameCommand()).Accepted, "The unowned timing fixture starts normally.");
+        for (var i = 0; i < 60 && (game.State.TurnNumber <= 0 || game.State.Phase != TurnPhase.Play); i++)
+            Check(game.Submit(new AdvanceOneStepCommand(game.Revision)).Accepted, "The timing fixture advances its real native turn.");
+        Check(game.State.TurnNumber > 0 && game.State.Phase == TurnPhase.Play,
+            "The unowned timing fixture reaches a genuine native Play phase.");
+        var captured = game.GetRuntimeModule<CoreGameEngineCardMovementProgramsRuntime>().CaptureMovementTiming();
+        Check(captured == new CardMovementTiming(game.State.CurrentSeat, TurnPhase.Play, game.State.CurrentSeat),
+            "Catalog gain qualification captures the actual turn owner, native phase and phase actor even without a holder.");
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var cards = game.GetRuntimeModule<PhysicalCardDrawRuntime>().DrawCards(capabilities.Get<IMatchParticipantStateAccess>().Players[0], 1, false);
+        var batches = capabilities.Get<ICardMovementBatchQueue>();
+        var batch = batches.PendingBatchAt(batches.PendingBatchCount - 1);
+        Check(cards.Count == 1 && batch.MovementTiming == captured && batch.DiscardRecoveryPhase is null && batch.NativeDrawInvocation is null,
+            "The real physical batch carries the captured timing without synthetic phase identity or a draw invoice.");
+
+        var zones = (CardZoneStore)typeof(GameEngine).GetField("_cardZones", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var original = sharedCatalog.ProgramDependencies.RequiredFacts;
+        var modeDemand = Demand(timing);
+        Check(modeDemand.RequiresFact(timing) && !modeDemand.RequiresFact(ProgramTrackedFact.NativeDrawInvocation) &&
+            !modeDemand.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase) && !Demand(ProgramTrackedFact.None).RequiresFact(timing) &&
+            sharedCatalog.ProgramDependencies.RequiredFacts == original,
+            "Selected-mode timing demand composes per match without changing a shared catalog or another match's mask.");
+        INativeFactDemand Demand(ProgramTrackedFact mode) => (INativeFactDemand)new MatchCoreCapabilityProvider(zones,
+            content: sharedCatalog, modeRequiredFacts: mode).Bindings.Single(binding => binding.Contract == typeof(INativeFactDemand)).Instance;
         static void Check(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
     }
 

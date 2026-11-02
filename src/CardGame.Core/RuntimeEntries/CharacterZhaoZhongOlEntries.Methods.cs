@@ -72,7 +72,6 @@ internal sealed partial class CharacterZhaoZhongOlEntries
     internal bool ZhaoZhongObserverSuffix(int i) => _resolve().ZhaoZhongObserverSuffix(i);
     internal bool ZhaoZhongPaidMovement(ProgramSkillFrame f, CardMovementRecord m) => _resolve().ZhaoZhongPaidMovement(f, m);
     internal bool HasYintianCapability { get => _resolve().HasYintianCapability; }
-    internal bool HasZhaoZhongCapability { get => _resolve().HasZhaoZhongCapability; }
     internal bool YintianActualTurnOpen { get => _resolve().YintianActualTurnOpen; }
     internal bool ZhaoZhongActualTurnOpen { get => _resolve().ZhaoZhongActualTurnOpen; }
 }

@@ -89,9 +89,15 @@ internal abstract class ActualHandGainProgramDescriptor : ProgramOperationDescri
             Op == SkillProgramEffectOp.DiscardForeignTurnHandGains ? SkillProgramTriggerWindow.AfterTurnEnded : SkillProgramTriggerWindow.CardUseCompleted)];
 }
 internal sealed class DrawAfterActualOwnHandGainDescriptor : ActualHandGainProgramDescriptor
-{ public override SkillProgramEffectOp Op => SkillProgramEffectOp.DrawAfterActualOwnHandGain; }
+{
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.MovementTiming);
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.DrawAfterActualOwnHandGain;
+}
 internal sealed class DiscardForeignTurnHandGainsDescriptor : ActualHandGainProgramDescriptor
-{ public override SkillProgramEffectOp Op => SkillProgramEffectOp.DiscardForeignTurnHandGains; }
+{
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.MovementTiming);
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.DiscardForeignTurnHandGains;
+}
 internal sealed class GiveSameCategoryFromDeckDescriptor : ActualHandGainProgramDescriptor
 { public override SkillProgramEffectOp Op => SkillProgramEffectOp.GiveSameCategoryFromDeck; }
 internal sealed class ActualHandGainProgramHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler

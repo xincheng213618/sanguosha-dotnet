@@ -12,7 +12,6 @@ internal sealed partial class CoreGameEngineJudgedRankSlashPoliciesRuntime
         return !(IsOtherActualBasicDiscardTrigger(trigger) && !CanRunOtherActualBasicDiscard(candidate, context));
     }
 
-    internal bool HasOtherActualBasicDiscardCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawFromOtherActualBasicDiscard);
     internal bool HasJudgedRankSlashCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.GrantJudgedRankSplitSlashTurnPolicy);
 
     internal static bool IsOtherActualBasicDiscardTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_JudgedRankSlashPolicies.IsOtherActualBasicDiscardTrigger(trigger);

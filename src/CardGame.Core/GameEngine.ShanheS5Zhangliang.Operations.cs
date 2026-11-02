@@ -9,7 +9,7 @@ internal interface IOwnTurnEnemyHandGainProgramHost
 // the following shared Damage instruction owns all native damage children.
 internal sealed class BindOwnTurnEnemyHandGainDescriptor : ProgramOperationDescriptorBase
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.MovementTiming);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.BindOwnTurnEnemyHandGain;
     public override ISkillProgramEffectHandler Handler { get; } = new BindOwnTurnEnemyHandGainHandler();
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.CaptureSelectedCards, static (_, _) => { });

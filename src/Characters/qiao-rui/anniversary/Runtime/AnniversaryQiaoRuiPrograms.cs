@@ -15,7 +15,11 @@ internal abstract class AnniversaryQiaoRuiDescriptor : ProgramOperationDescripto
   SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouLastLoss => SkillProgramTriggerWindow.CardsMoved,
   _ => SkillProgramTriggerWindow.CardUseCompleted })];
 }
-internal sealed class ResolveAnniversaryQiaoRuiAishouDrawDescriptor : AnniversaryQiaoRuiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouDraw; }
+internal sealed class ResolveAnniversaryQiaoRuiAishouDrawDescriptor : AnniversaryQiaoRuiDescriptor
+{
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouDraw;
+    public override ProgramFactRequirements FactRequirements => base.FactRequirements.Union(new(Triggered: ProgramTrackedFact.MovementTiming));
+}
 internal sealed class ResolveAnniversaryQiaoRuiAishouPrepareDescriptor : AnniversaryQiaoRuiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouPrepare; }
 internal sealed class ResolveAnniversaryQiaoRuiAishouLastLossDescriptor : AnniversaryQiaoRuiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveAnniversaryQiaoRuiAishouLastLoss; }
 internal sealed class ResolveAnniversaryQiaoRuiSaoweiDescriptor : AnniversaryQiaoRuiDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveAnniversaryQiaoRuiSaowei; }

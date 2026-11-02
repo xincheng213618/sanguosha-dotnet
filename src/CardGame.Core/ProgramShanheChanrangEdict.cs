@@ -33,6 +33,7 @@ public sealed partial record ProgramSkillFrame
 internal interface IShanheChanrangHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame); }
 internal sealed class ResolveShanheChanrangEdictDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.MovementTiming);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveShanheChanrangEdict;
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);

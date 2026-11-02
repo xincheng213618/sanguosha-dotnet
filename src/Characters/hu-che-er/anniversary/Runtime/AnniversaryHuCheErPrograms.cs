@@ -14,8 +14,16 @@ internal abstract class AnniversaryHuCheErDescriptor : ProgramOperationDescripto
     { SkillProgramEffectOp.ResolveAnniversaryHuCheErDaoji => SkillProgramTriggerWindow.CardUseTargetsFinalized,
       SkillProgramEffectOp.RecordAnniversaryHuCheErFuzhongGain => SkillProgramTriggerWindow.CardsGained, _ => SkillProgramTriggerWindow.TurnEnding })];
 }
-internal sealed class ResolveAnniversaryHuCheErDaojiDescriptor : AnniversaryHuCheErDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveAnniversaryHuCheErDaoji; }
-internal sealed class RecordAnniversaryHuCheErFuzhongGainDescriptor : AnniversaryHuCheErDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.RecordAnniversaryHuCheErFuzhongGain; }
+internal sealed class ResolveAnniversaryHuCheErDaojiDescriptor : AnniversaryHuCheErDescriptor
+{
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveAnniversaryHuCheErDaoji;
+    public override ProgramFactRequirements FactRequirements => base.FactRequirements.Union(new(Triggered: ProgramTrackedFact.MovementTiming));
+}
+internal sealed class RecordAnniversaryHuCheErFuzhongGainDescriptor : AnniversaryHuCheErDescriptor
+{
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.RecordAnniversaryHuCheErFuzhongGain;
+    public override ProgramFactRequirements FactRequirements => base.FactRequirements.Union(new(Triggered: ProgramTrackedFact.MovementTiming));
+}
 internal sealed class SpendAnniversaryHuCheErFuzhongDescriptor : AnniversaryHuCheErDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.SpendAnniversaryHuCheErFuzhong; }
 internal sealed class AnniversaryHuCheErHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {

@@ -37,5 +37,4 @@ internal sealed partial class CharacterHuCheErAnniversaryEntries
     internal bool ReturnHuCheErMovement(ProgramSkillFrame f) => _resolve().ReturnHuCheErMovement(f);
     internal SkillProgramStepOutcome SpendHuCheErFour(ProgramSkillFrame supplied) => _resolve().SpendHuCheErFour(supplied);
     internal bool ValidHuCheEr(ProgramSkillFrame f) => _resolve().ValidHuCheEr(f);
-    internal bool HasAnniversaryHuCheErRules { get => _resolve().HasAnniversaryHuCheErRules; }
 }

@@ -23,6 +23,7 @@ internal abstract class ShanheSourceZhaoranDescriptor : ProgramOperationDescript
 }
 internal sealed class ArmShanheSourceZhaoranDescriptor : ShanheSourceZhaoranDescriptor
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.MovementTiming);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ArmShanheSourceZhaoran;
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         [new RequireTriggerWindow(SkillProgramTriggerWindow.PlayPhaseStarting)];

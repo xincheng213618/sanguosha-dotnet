@@ -89,7 +89,7 @@ internal abstract class GainGiftDescriptor : ProgramOperationDescriptorBase
 }
 internal sealed class GiveAfterBatchGainDescriptor : GainGiftDescriptor
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.MovementTiming);
 
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.GiveAfterBatchGain;
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
@@ -99,6 +99,7 @@ internal sealed class GiveAfterBatchGainDescriptor : GainGiftDescriptor
 }
 internal sealed class RevealRedLossAndDrawDescriptor : GainGiftDescriptor
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.MovementTiming);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.RevealRedLossAndDraw;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards,
         static (e, c) => c.Draw(new(SkillProgramEffectOp.Draw, SkillProgramEffectTarget.Owner, 1, e.Condition)));

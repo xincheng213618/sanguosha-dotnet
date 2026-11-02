@@ -6,5 +6,5 @@ public sealed record PengbiSkillGrantedEvent(long FrameId, int RecipientSeat, st
 public sealed record PengbiOtherChosenEvent(long FrameId, int? RecipientSeat) : IGameEvent;
 internal sealed class PengbiFirstActualTurnDescriptor() : ZhaoZhongDescriptor(SkillProgramEffectOp.ResolvePengbiFirstActualTurn)
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeDrawInvocation);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.MovementTiming);
 }

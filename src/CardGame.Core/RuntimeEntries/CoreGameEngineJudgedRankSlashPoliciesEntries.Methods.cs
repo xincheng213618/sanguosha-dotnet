@@ -21,5 +21,4 @@ internal sealed partial class CoreGameEngineJudgedRankSlashPoliciesEntries
     internal bool OtherActualBasicDiscardAlreadyIssued(int owner, string skill) => _resolve().OtherActualBasicDiscardAlreadyIssued(owner, skill);
     internal int[]? SelectWindowIndexes_MatchingOtherActualBasicDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger) => _resolve().SelectWindowIndexes_MatchingOtherActualBasicDiscardIndexes(batch, candidate, trigger);
     internal bool HasJudgedRankSlashCapability { get => _resolve().HasJudgedRankSlashCapability; }
-    internal bool HasOtherActualBasicDiscardCapability { get => _resolve().HasOtherActualBasicDiscardCapability; }
 }

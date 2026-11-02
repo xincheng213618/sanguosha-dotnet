@@ -17,6 +17,7 @@ internal sealed class ResolveAnniversaryMuShunJinjianDescriptor : AnniversaryMuS
 }
 internal sealed class ResolveAnniversaryMuShunShizhaoDescriptor : AnniversaryMuShunDescriptor
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.MovementTiming);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveAnniversaryMuShunShizhao;
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(SkillProgramTriggerWindow.CardsMoved)];
 }

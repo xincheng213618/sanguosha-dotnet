@@ -29,5 +29,4 @@ internal sealed partial class CoreGameEngineActualHandGainProgramsEntries
     internal bool SameCategoryGiftUsed(int owner, string skill, int turn, SkillProgramCardCategory category) => _resolve().SameCategoryGiftUsed(owner, skill, turn, category);
     internal PromptChoice SelectAiActualHandGain(PendingDecision decision, ProgramSkillFrame f) => _resolve().SelectAiActualHandGain(decision, f);
     internal int[]? SelectWindowIndexes_MatchingActualHandGainIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, CardLocation location) => _resolve().SelectWindowIndexes_MatchingActualHandGainIndexes(batch, candidate, trigger, location);
-    internal bool HasActualHandGainCapability { get => _resolve().HasActualHandGainCapability; }
 }
