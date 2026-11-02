@@ -53,6 +53,9 @@ internal sealed class SkillProgramDependencies
             programs.SelectMany(program => program.Activations).Aggregate(ProgramTrackedFact.None,
                 (facts, activation) => facts | resolver.Features(activation).FactRequirements.Activated) |
             ProgramPassiveFactRequirementsAttribute.ForSkills(definitions) |
+            (programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).Any(expression =>
+                expression.Reads("cardUses") || expression.Reads("currentUse"))
+                ? ProgramTrackedFact.ActualCardUseHistory : ProgramTrackedFact.None) |
             (UsesSkillStatePhaseEnds || skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseStarted)
                 ? ProgramTrackedFact.ActualDiscardRecoveryPhase : ProgramTrackedFact.None) |
             (programs.Any(program => program.DamageModifiers.Any(modifier =>

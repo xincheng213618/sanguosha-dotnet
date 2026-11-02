@@ -17,7 +17,7 @@ internal static partial class PhaseStartCardControlChecks
         Need(History(g).FindFinalizedUse(first.Id) is { Completed: true }, "Only the actual native return marks the first use complete.");
         var second = HistoryUse(g, CardKind.IronChain, [1]);
         Need(History(g).PreviousFinalizedUse(second.Id)?.NativeUseId == first.Id &&
-            History(g).AcceptedPairFor(second.Action!.ActionId).Count == 2 &&
+            History(g).ReadCardUseFacts(new(g.State.TurnNumber, 0, History(g).CardUseHistoryCursor), CardUseHistoryView.Latest).Count(f => f.DeclarerSeat == 0 && f.ActionId <= second.Action!.ActionId) == 2 &&
             History(g).FindFinalizedUse(second.Id)!.PrimaryTargets!.SequenceEqual([1]),
             "Two real cards in the same actual Play share their true principal target and accepted order.");
         g = Cold(g, registry); HistoryContinue(g);
@@ -82,7 +82,9 @@ internal static partial class PhaseStartCardControlChecks
         if (dodge)
         {
             var next = HistoryUse(g, CardKind.IronChain, [1], forbidSidao: true);
-            Need(History(g).AcceptedPairFor(next.Action!.ActionId).Select(e => e.Action.ActionId).SequenceEqual([response.ActionId, next.Action.ActionId]) &&
+            Need(History(g).ReadCardUseFacts(new(g.State.TurnNumber, 0, History(g).CardUseHistoryCursor), CardUseHistoryView.Latest)
+                .Where(f => f.DeclarerSeat == 0 && (f.Type == CardActionType.Use || f.IsSelfNativeResponseUse) && f.ActionId <= next.Action!.ActionId)
+                .TakeLast(2).Select(f => f.ActionId).SequenceEqual(new long?[] { response.ActionId, next.Action!.ActionId }) &&
                 History(g).PreviousFinalizedUse(next.Id)?.NativeUseId == first.Id,
                 "Dodge interrupts the accepted pair while finalized-only history retains the previous real card use.");
             HistoryContinue(g, forbidSidao: true);

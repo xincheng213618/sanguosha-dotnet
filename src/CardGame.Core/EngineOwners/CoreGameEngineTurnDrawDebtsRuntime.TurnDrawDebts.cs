@@ -21,7 +21,7 @@ internal sealed partial class CoreGameEngineTurnDrawDebtsRuntime
             if (action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind)
                 throw new InvalidOperationException("The damage-card debt differs from its actual use actor or effective kind.");
         }
-        else if (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use))
+        else if (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !_nativeCardUseAdmission.IsLegacyProducerUse(use))
             return;
         if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ActualTurnDamageCardUsedEvent>().Any(e => e.CardUseFrameId == use.Id))
             return;

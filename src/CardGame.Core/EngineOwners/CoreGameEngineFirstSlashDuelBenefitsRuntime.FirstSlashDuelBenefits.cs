@@ -15,7 +15,7 @@ internal sealed partial class CoreGameEngineFirstSlashDuelBenefitsRuntime
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId);
         if (use is null || use.SourceSeat != declared.SourceSeat || use.CardKind != declared.CardKind || use.CardId != declared.CardId || use.Action is { Type: not CardActionType.Use } || use.Action is { } action && (action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind))
             throw new InvalidOperationException("The first Slash/Duel ledger lost its actual declaration.");
-        if (use.Action is null && !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use))
+        if (use.Action is null && !_nativeCardUseAdmission.IsLegacyProducerUse(use))
             return;
         var old = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<FirstSlashDuelUseRecordedEvent>().Where(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && e.ActorSeat == use.SourceSeat).ToArray();
         if (old.Any(e => e.CardUseFrameId == use.Id))

@@ -190,7 +190,7 @@ internal static class ProgramCompositionValidator
             if (descriptor.RequiredCapabilities.HasFlag(ProgramContextCapability.PhaseInsertion) && bindings.Count != 0)
                 throw Error(nodePath, "card bindings cannot cross an independently interactive inserted phase");
             var expressions = Conditions(effect.Condition).Select(condition => condition.Expression)
-                .Append(effect.AmountExpression).Append(effect.ValueExpression).Where(expression => expression is not null)
+                .Append(effect.AmountExpression).Append(effect.ValueExpression).Append(effect.TargetSetExpression).Where(expression => expression is not null)
                 .SelectMany(expression => expression!.Nodes()).ToArray();
             var expressionReads = expressions.Where(expression => expression.Op.StartsWith("bound", StringComparison.Ordinal))
                 .Select(expression => (ProgramResourceOperation)new ReadCardSet(expression.Name!))

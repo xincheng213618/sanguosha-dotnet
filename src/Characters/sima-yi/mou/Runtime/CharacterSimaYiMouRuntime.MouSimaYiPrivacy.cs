@@ -32,6 +32,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
         ActualCardUseTargetsFinalizedEvent x => x.NativeUseId == u.Id,
         ActualCardUseTargetsCompletedEvent x => x.NativeUseId == u.Id,
         ActualCardUseActionUpdatedEvent x => x.NativeUseId == u.Id,
+        NativeCardUseHistoryRecordedEvent x => x.Snapshot.NativeUseId == u.Id,
         CardUsedEvent x => x.SourceSeat == u.SourceSeat && x.CardId == u.CardId && x.CardKind == u.CardKind && x.TargetSeat is { } t && u.TargetSeats.Contains(t),
         ProgramViewAsConvertedEvent x => x.FrameId == u.Id && x.IsUse,
         FangtianHalberdUsedEvent x => x.ResolutionId == u.Id,

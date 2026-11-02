@@ -22,9 +22,9 @@ internal sealed class ProgramInstructionFeatures
         FactRequirements = effects.Aggregate(default(ProgramFactRequirements), static (requirements, effect) =>
             requirements.Union(ProgramOperationCatalog.Default.FactRequirementsFor(effect.Op)));
         RequiresHandLimitContext = effects.Any(effect => effect.Condition.RequiresHandLimitContext ||
-            effect.AmountExpression?.Reads("handLimit") == true ||
-            effect.ValueExpression?.Reads("handLimit") == true ||
-            effect.Options.Any(option => option.Condition.RequiresHandLimitContext));
+                effect.Options.Any(option => option.Condition.RequiresHandLimitContext)) ||
+            effects.SelectMany(ExpressionRoots).Concat(triggerCondition is null ? [] : ExpressionRoots(triggerCondition))
+                .Any(expression => expression.Reads("handLimit"));
         FirstInstruction = effects.FirstOrDefault();
         FirstNonTargetSelection = effects.SkipWhile(effect => effect.Op == SkillProgramEffectOp.SelectTarget).FirstOrDefault();
         InitialDiscardPayments = Array.AsReadOnly(effects
@@ -86,6 +86,30 @@ internal sealed class ProgramInstructionFeatures
     internal IReadOnlyList<SkillProgramEffect> ForOperation(SkillProgramEffectOp op) => _operations.GetValueOrDefault(op) ?? Empty;
     internal SkillProgramEffect? First(SkillProgramEffectOp op) => ForOperation(op).FirstOrDefault();
     internal SkillProgramEffect? Single(SkillProgramEffectOp op) => ForOperation(op).SingleOrDefault();
+
+    internal static IEnumerable<ProgramExpression> ExpressionRoots(SkillProgram program) =>
+        program.Triggers.SelectMany(trigger => ExpressionRoots(trigger.Condition).Concat(trigger.Effects.SelectMany(ExpressionRoots)))
+            .Concat(program.Activations.SelectMany(activation => ExpressionRoots(activation.Condition).Concat(activation.Effects.SelectMany(ExpressionRoots))))
+            .Concat(program.Modifiers.SelectMany(modifier => ExpressionRoots(modifier.Condition)))
+            .Concat(program.ViewAs.SelectMany(rule => ExpressionRoots(rule.Condition)))
+            .Concat(program.CardPolicies.SelectMany(policy => ExpressionRoots(policy.Condition)))
+            .Concat(program.CardIdentities.SelectMany(identity => ExpressionRoots(identity.Condition)))
+            .Concat(program.SkillGrants.Select(rule => rule.While))
+            .Concat(program.SkillStates.SelectMany(declaration => new ProgramExpression?[]
+                { declaration.State.Match.Filter, declaration.State.While, declaration.When }.OfType<ProgramExpression>()));
+
+    private static IEnumerable<ProgramExpression> ExpressionRoots(SkillProgramEffect effect) =>
+        ExpressionRoots(effect.Condition).Concat(effect.Options.SelectMany(option => ExpressionRoots(option.Condition)))
+            .Concat(new ProgramExpression?[] { effect.AmountExpression, effect.ValueExpression, effect.TargetSetExpression,
+                effect.CurrentResponseRule?.Rule.While, effect.SkillState?.Match.Filter, effect.SkillState?.While }.OfType<ProgramExpression>());
+
+    private static IEnumerable<ProgramExpression> ExpressionRoots(SkillProgramTriggerCondition condition) =>
+        (condition.Expression is { } expression ? new[] { expression } : [])
+            .Concat(condition.Children.SelectMany(ExpressionRoots));
+
+    private static IEnumerable<ProgramExpression> ExpressionRoots(SkillProgramCondition condition) =>
+        (condition.Expression is { } expression ? new[] { expression } : [])
+            .Concat(condition.Children.SelectMany(ExpressionRoots));
 
     private static void Capture(SkillProgramTriggerCondition condition,
         ISet<SkillProgramTriggerConditionKind> kinds, ISet<SkillProgramTriggerValueKind> values)

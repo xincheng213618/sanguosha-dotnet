@@ -110,7 +110,7 @@ internal sealed partial class CharacterCaoZhiLeRuntime
                 RecordWenlanAccepted(declaredUse, use.Id, capture);
             // Exact legacy zero-material declarations acquire their Action only
             // at native completion. Preserve this earlier accepted order now.
-            if (capture.Source is not null && use.Action is null && use.CardId == 0 && ids.Count == 0 && _coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) && !WenlanEntries(use.SourceSeat).Any(e => e.NativeFrameId == use.Id && e.ActionId == 0))
+            if (capture.Source is not null && use.Action is null && use.CardId == 0 && ids.Count == 0 && _nativeCardUseAdmission.IsLegacyProducerUse(use) && !WenlanEntries(use.SourceSeat).Any(e => e.NativeFrameId == use.Id && e.ActionId == 0))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenlanActionAcceptedEvent(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, use.SourceSeat, NextWenlanOrdinal(use.SourceSeat), 0, use.Id, CardActionType.Use, use.SourceSeat, use.CardKind, capture));
             return;
         }

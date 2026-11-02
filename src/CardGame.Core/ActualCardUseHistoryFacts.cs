@@ -28,6 +28,7 @@ internal interface IActualCardUseHistoryCapture : IProgramRuntimeOperations
     void RecordFinalized(CardUseFrame use, CardActionContext action);
     void RecordCompleted(CardUseFrame use, CardActionContext action);
     void RecordUpdated(CardUseFrame use, CardActionContext action);
+    void RecordNativeChanged(CardUseFrame use);
 }
 
 internal static class ActualCardUseTargets

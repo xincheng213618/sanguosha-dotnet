@@ -13,7 +13,16 @@ internal sealed partial class CoreGameEngineAfterTurnEndedProgramsRuntime
         return candidate;
     }
 
-    internal ProgramSkillWindowContext CreateAfterTurnEndedContext(DeferredTurnEndFrame parent, ProgramTriggerCandidate candidate) => _characterCaiFuRenOlOperations.CreateOrdinaryCaiFuRenQietingContext(parent, candidate, _characterCaoYuOlOperations.CreateXiangxuAfterTurnEndedContext(parent, candidate, new ProgramSkillWindowContext(SkillProgramTriggerWindow.AfterTurnEnded, parent.Id, candidate.OwnerSeat, SourceSeat: parent.OwnerSeat, TargetSeat: parent.OwnerSeat, OccurrenceIndex: candidate.OccurrenceIndex, Facts: parent.AfterTurnEnded!.Items[parent.AfterTurnEnded.ItemIndex].Facts) { ActualEndedEquipment = _coreActualEndedTurnEquipmentOperations.IsActualEndedEquipmentTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate)) ? _coreActualEndedTurnEquipmentOperations.CaptureActualEndedEquipmentContext(parent) : null }));
+    internal ProgramSkillWindowContext CreateAfterTurnEndedContext(DeferredTurnEndFrame parent, ProgramTriggerCandidate candidate) =>
+        _characterCaoYuOlOperations.CreateXiangxuAfterTurnEndedContext(parent, candidate,
+            new ProgramSkillWindowContext(SkillProgramTriggerWindow.AfterTurnEnded, parent.Id, candidate.OwnerSeat,
+                SourceSeat: parent.OwnerSeat, TargetSeat: parent.OwnerSeat, OccurrenceIndex: candidate.OccurrenceIndex,
+                Facts: parent.AfterTurnEnded!.Items[parent.AfterTurnEnded.ItemIndex].Facts)
+            {
+                HistoryPoint = new(parent.TurnNumber, parent.OwnerSeat, _actualUseHistory.CardUseHistoryCursor),
+                ActualEndedEquipment = _coreActualEndedTurnEquipmentOperations.IsActualEndedEquipmentTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate))
+                    ? _coreActualEndedTurnEquipmentOperations.CaptureActualEndedEquipmentContext(parent) : null
+            });
     internal bool CanRunAfterTurnEndedCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, SkillProgramTrigger trigger)
     {
         var parent = _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().LastOrDefault();

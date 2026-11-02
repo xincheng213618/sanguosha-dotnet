@@ -426,6 +426,8 @@ internal static class ProgramRuntimeModuleChecks
     private sealed class FrameLifecycle : IResolutionLifecycle
     {
         public void CardUsePushed(CardUseFrame frame, CardActionContext action) { }
+        public void CardUseChanged(CardUseFrame previous, CardUseFrame current) { }
+        public void BeforeCardUseCompleted(CardUseFrame frame) { }
         public void BeforeDamageCompleted(DamageFrame frame) { }
         public void RecoveryCompleted(RecoveryFrame frame) { }
     }

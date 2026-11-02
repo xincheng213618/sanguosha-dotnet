@@ -40,6 +40,7 @@ internal static partial class PhaseStartCardControlChecks
         TargetQuotaAllowsSelfAndUsesOriginalIssuanceSlots();
         ActualCardUseHistoryKeepsNativeOrderAndPrincipalTargets();
         HuaManUsesFrozenDirectedHistory();
+        QietingUsesLatestDeclaredNativeHistory();
     }
 
     private static void DirectedPolicyIssuedAfterTurnEndSkipsThatOccurrence()
@@ -130,20 +131,24 @@ internal static partial class PhaseStartCardControlChecks
     private static (GameEngine, ContentRegistry) StartDirected(string scenario, int obtained = 0)
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new DirectedFixture(scenario));
+        var qieting = scenario.StartsWith("qieting", StringComparison.Ordinal);
         var target = new ShanheCombatantDefinition(DirectedPeer) { StartingHand = new[] { Suit.Heart, Suit.Spade, Suit.Diamond }.Take(obtained).Select(s => new ShanheStartingCard(CardKind.Dodge, s, 8)).ToArray() };
         ShanheStartingCard[] hand = scenario == "quota-self"
             ? [new(CardKind.Alcohol, Suit.Club, 7), new(CardKind.Alcohol, Suit.Heart, 8), new(CardKind.Slash, Suit.Spade, 9), new(CardKind.Duel, Suit.Diamond, 10)]
             : [new(CardKind.Slash, Suit.Club, 7), new(CardKind.Slash, Suit.Heart, 8), new(CardKind.Slash, Suit.Spade, 9), new(CardKind.Duel, Suit.Diamond, 10)];
         if (scenario.StartsWith("history", StringComparison.Ordinal) || scenario.StartsWith("souying", StringComparison.Ordinal)) hand = HistoryStartingHand();
-        var setup = new ShanheBattleSetup(7, 1, "directed-rights", Owner, 12, 0, 0, 0, 0, [],
+        if (qieting) hand = QietingStartingHand();
+        var setup = new ShanheBattleSetup(7, 1, "directed-rights", Owner, qieting && scenario != "qieting-legacy" ? 4 : 12, 0, 0, 0, 0, [],
             hand, [],
-            [target, new(DirectedPeer) { StartingHand = [] }], [new(DirectedPeer) { StartingHand = [],
+            [target, new(DirectedPeer) { StartingHand = [] }], [new(qieting ? QietingObserver : DirectedPeer) { StartingHand = [],
                 StartingEquipment = scenario.StartsWith("history", StringComparison.Ordinal) ? [new(CardKind.Crossbow, Suit.Club, 3)] : null }], new string('a', 64));
         var g = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0,
             HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId,
             ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 12 }, registry);
         Accept(g, new StartGameCommand());
-        if (scenario == "quota-bao") Reach(g, p => Optional(p, "ol:zhennan")); else Play(g);
+        if (scenario == "quota-bao") Reach(g, p => Optional(p, "ol:zhennan"));
+        else if (scenario == "qieting-legacy") Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-target"));
+        else Play(g);
         return (g, registry);
     }
 
@@ -165,6 +170,7 @@ internal static partial class PhaseStartCardControlChecks
             if (scenario == "weiwan") skills.AddRange(["le:qiqin", "le:weiwan"]);
             if (nativeQuotaSkill is not null) skills.Add(nativeQuotaSkill);
             if (scenario.StartsWith("souying", StringComparison.Ordinal)) RegisterSouyingFixture(b, skills);
+            if (scenario.StartsWith("qieting", StringComparison.Ordinal)) RegisterQietingFixture(b);
             if (scenario.StartsWith("history", StringComparison.Ordinal))
             {
                 foreach (var bundle in new[] { "ol-su-fei", "ol-guo-si" })
@@ -190,6 +196,7 @@ internal static partial class PhaseStartCardControlChecks
             ConfigureQuotaFixture(rules, scenario);
             ConfigureHistoryFixture(rules, scenario, skills);
             ConfigureHuaManHistoryFixture(rules, scenario, skills);
+            ConfigureQietingHistoryFixture(rules, scenario, skills);
             foreach (var skill in rules["skills"]!.AsArray())
             foreach (var activation in skill!["activations"]?.AsArray() ?? new JsonArray())
             {
@@ -222,7 +229,8 @@ internal static partial class PhaseStartCardControlChecks
                 scenario == "quota-fire" ? [Watch] : scenario == "quota-bao" ? ["fixture:quota-prevent"] :
                 scenario == "history-dodge" ? ["fixture:history-retaliate"] : []));
             b.AddDeck(new("fixture:directed-rights-deck", "固定实体", 0, 2, []) { PhysicalCards = Enumerable.Range(0, 64).Select(_ => new ContentDeckPhysicalCard("standard:slash", Suit.Club, 7)).ToArray() });
-            b.AddMode(new(ShanheBattleSetup.BattleModeId, "定向权利真实原生边界", 4, 4, new Dictionary<string, int>(), "fixture:directed-rights-deck", 2, [Owner, DirectedPeer], ContentModeKind.Team,
+            b.AddMode(new(ShanheBattleSetup.BattleModeId, "定向权利真实原生边界", 4, 4, new Dictionary<string, int>(), "fixture:directed-rights-deck", 2,
+                scenario.StartsWith("qieting", StringComparison.Ordinal) ? [Owner, DirectedPeer, QietingObserver] : [Owner, DirectedPeer], ContentModeKind.Team,
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));
         }
     }

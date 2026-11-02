@@ -8,11 +8,11 @@ internal sealed partial class CharacterCaiFuRenBoundaryMobileRuntime
     internal const string BoundaryMobileQietingSkill = "boundary:qieting-mobile", BoundaryMobileQietingHandReason = "skill-program.cai-fu-ren.qieting.hand";
     internal static bool IsBoundaryMobileQieting(ProgramSkillFrame frame) => frame.SkillId == BoundaryMobileQietingSkill;
     internal static bool IsKnownCaiFuRenQietingBinding(string skill, string? binding) => skill == "ol:qieting" && binding == "ordinary-turn-end" || skill == BoundaryMobileQietingSkill && binding == "mobile-turn-end";
-    internal bool CaiFuRenQietingDisqualified(string skill, OrdinaryQietingTurnContext qualification)
+    internal bool CaiFuRenQietingDisqualified(string skill, CardUseHistoryPoint qualification)
     {
         if (skill != BoundaryMobileQietingSkill)
-            return qualification.UsedOnAnother || _characterCaiFuRenOlOperations.OrdinaryQietingUsedOnAnother(qualification);
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Take(checked((int)qualification.HistoryCutoff)).ToArray();
+            return false;
+        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().Take(checked((int)qualification.Cursor)).ToArray();
         var end = Array.FindLastIndex(history, entry => entry is TurnEndedEvent ended && ended.TurnNumber == qualification.ActualTurn && ended.ActorSeat == qualification.TurnOwnerSeat);
         var start = end < 0 ? -1 : Array.FindLastIndex(history, end, entry => entry is TurnStartedEvent begun && begun.TurnNumber == qualification.ActualTurn && begun.ActorSeat == qualification.TurnOwnerSeat);
         return start < 0 || end <= start || history.Skip(start + 1).Take(end - start - 1).OfType<DamageAppliedEvent>().Any(damage => !damage.SourceLess && damage.Amount > 0 && damage.SourceSeat == qualification.TurnOwnerSeat && damage.TargetSeat != qualification.TurnOwnerSeat);

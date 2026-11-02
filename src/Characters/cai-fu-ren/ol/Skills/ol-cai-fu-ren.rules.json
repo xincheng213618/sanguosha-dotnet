@@ -15,6 +15,15 @@
       "triggers": [{
         "id": "ordinary-turn-end", "window": "afterTurnEnded", "subject": "owner",
         "turnOwnerScope": "otherLiving", "optional": true,
+        "evaluateConditionAtResolution": true,
+        "condition": {
+          "kind": "expression",
+          "expr": ["not", ["any", ["cardUses", "window", "latest"],
+            ["and", ["useDeclared", "use"],
+              ["same", ["useActor", "use"], "turnOwner"],
+              ["any", ["useTargets", "use"], ["not", ["same", "it", "turnOwner"]]]
+          ]]]
+        },
         "effects": [{ "op": "resolveOrdinaryCaiFuRenQieting", "target": "owner" }]
       }]
     }

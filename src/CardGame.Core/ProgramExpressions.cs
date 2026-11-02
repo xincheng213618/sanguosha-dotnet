@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace CardGame.Core;
 
-public enum ProgramExpressionType { Bool, Int, Participant, ParticipantSet }
+public enum ProgramExpressionType { Bool, Int, Participant, ParticipantSet, Fact, FactSet }
 
 /// <summary>
 /// Immutable typed expression read by <c>{"kind":"expression","expr":[...]}</c>
@@ -43,6 +43,8 @@ internal interface IProgramExpressionWorld
     int? HandPrintedSuitCount(int seat, Suit suit) => null;
     int? PublicPileCount(int seat, string skillId) => null;
     int? WindowStat(string stat, string participant) => null;
+    IReadOnlyList<CardUseHistoryFact>? CardUses(string moment, string view) => null;
+    CardUseHistoryFact? CurrentUse() => null;
 }
 
 internal static class ProgramExpressions
@@ -62,7 +64,8 @@ internal static class ProgramExpressions
 
     public const int MaximumDepth = 8;
     public const string Iterator = "it";
-    public static readonly string[] Participants = ["owner", "selectedTarget", "selectedFirst", "selectedSecond", "eventSource", "eventTarget"];
+    public const string FactIterator = "use";
+    public static readonly string[] Participants = ["turnOwner", "owner", "selectedTarget", "selectedFirst", "selectedSecond", "eventSource", "eventTarget"];
     public static readonly string[] Sets = ["living", "livingOthers"];
     private static readonly string[] Stats = ["hp", "maxHp", "lostHp", "handCount", "handLimit", "equipmentCount", "equipmentSuitCount"];
     private static readonly string[] Flags = ["alive", "hasHp", "faceDown", "chained", "ruleWounded", "inIssuedPhase", "inUpcomingTurnPrelude", "isTurnOwner", "inIssuedTurn", "inIssuedDying"];
@@ -74,7 +77,10 @@ internal static class ProgramExpressions
     public static ProgramExpression ParseInt(JsonElement node, string path) =>
         Parse(node, path, ProgramExpressionType.Int, 0, iteratorInScope: false);
 
-    private static ProgramExpression Parse(JsonElement node, string path, ProgramExpressionType expected, int depth, bool iteratorInScope)
+    public static ProgramExpression ParseParticipantSet(JsonElement node, string path) =>
+        Parse(node, path, ProgramExpressionType.ParticipantSet, 0, iteratorInScope: false);
+
+    private static ProgramExpression Parse(JsonElement node, string path, ProgramExpressionType? expected, int depth, bool iteratorInScope, bool factInScope = false)
     {
         if (depth > MaximumDepth) Fail(path, $"expression nesting exceeds {MaximumDepth}");
         var result = node.ValueKind switch
@@ -83,35 +89,37 @@ internal static class ProgramExpressions
                 new ProgramExpression("bool", ProgramExpressionType.Bool, [], node.GetBoolean() ? 1 : 0),
             JsonValueKind.Number when node.TryGetInt32(out var value) && value is >= -99 and <= 99 =>
                 new ProgramExpression("int", ProgramExpressionType.Int, [], value),
-            JsonValueKind.String => ParseName(node.GetString()!, path, iteratorInScope),
-            JsonValueKind.Array => ParseCall(node, path, depth, iteratorInScope),
+            JsonValueKind.String => ParseName(node.GetString()!, path, iteratorInScope, factInScope),
+            JsonValueKind.Array => ParseCall(node, path, depth, iteratorInScope, factInScope),
             _ => throw Failure(path, "must be a boolean, an integer from -99 to 99, a name or an [operator, ...] array")
         };
-        if (result.Type != expected) Fail(path, $"expected {Camel(expected)} but found {Camel(result.Type)}");
+        if (expected is { } expectedType && result.Type != expectedType) Fail(path, $"expected {Camel(expectedType)} but found {Camel(result.Type)}");
         return result;
     }
 
-    private static ProgramExpression ParseName(string name, string path, bool iteratorInScope)
+    private static ProgramExpression ParseName(string name, string path, bool iteratorInScope, bool factInScope)
     {
         if (name == "target") name = "selectedTarget";
         if (name == Iterator)
         {
-            if (!iteratorInScope) Fail(path, "'it' is only available inside all, any or count");
+            if (!iteratorInScope) Fail(path, "'it' is only available inside a participant-set filter, all, any or count");
             return new(name, ProgramExpressionType.Participant, [], name: name);
         }
+        if (name == FactIterator && !factInScope) Fail(path, "'use' is only available inside a fact-set filter, all, any or count");
+        if (name is FactIterator or "currentUse") return new(name, ProgramExpressionType.Fact, [], name: name);
         if (Participants.Contains(name)) return new(name, ProgramExpressionType.Participant, [], name: name);
         if (Sets.Contains(name)) return new(name, ProgramExpressionType.ParticipantSet, [], name: name);
         throw Failure(path, $"unknown name '{name}'");
     }
 
-    private static ProgramExpression ParseCall(JsonElement node, string path, int depth, bool iteratorInScope)
+    private static ProgramExpression ParseCall(JsonElement node, string path, int depth, bool iteratorInScope, bool factInScope)
     {
         var items = node.EnumerateArray().ToArray();
         if (items.Length == 0 || items[0].ValueKind != JsonValueKind.String) Fail(path, "an array must start with an operator name");
         var op = items[0].GetString()!;
         var args = items.Skip(1).ToArray();
-        ProgramExpression Arg(int index, ProgramExpressionType type, bool iterator = false) =>
-            Parse(args[index], $"{path}[{index + 1}]", type, depth + 1, iteratorInScope || iterator);
+        ProgramExpression Arg(int index, ProgramExpressionType? type, bool iterator = false, bool factIterator = false) =>
+            Parse(args[index], $"{path}[{index + 1}]", type, depth + 1, iteratorInScope || iterator, factInScope || factIterator);
         void Arity(int minimum, int maximum)
         {
             if (args.Length < minimum || args.Length > maximum)
@@ -174,29 +182,65 @@ internal static class ProgramExpressions
                 Fail(path, "a binding reference requires a nonempty identifier of at most 128 characters");
             return new(op, op == "boundIsEquipment" ? ProgramExpressionType.Bool : ProgramExpressionType.Int, [], name: args[0].GetString());
         }
-        if (op is "all" or "any" or "count")
+        if (op == "cardUses")
         {
             Arity(2, 2);
-            return new(op, op == "count" ? ProgramExpressionType.Int : ProgramExpressionType.Bool,
-                [Arg(0, ProgramExpressionType.ParticipantSet), Arg(1, ProgramExpressionType.Bool, iterator: true)]);
+            if (args[0].ValueKind != JsonValueKind.String || args[0].GetString() is not ("window" or "now") ||
+                args[1].ValueKind != JsonValueKind.String || args[1].GetString() is not ("latest" or "observations"))
+                Fail(path, "cardUses requires window or now, and latest or observations");
+            return new(op, ProgramExpressionType.FactSet, [], literal: args[0].GetString() == "now" ? 1 : 0, name: args[1].GetString());
+        }
+        if (op is "useActor" or "useDeclarer" or "useTargets" or "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse")
+        {
+            Arity(1, 1);
+            var type = op == "useTargets" ? ProgramExpressionType.ParticipantSet :
+                op is "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse" ? ProgramExpressionType.Bool : ProgramExpressionType.Participant;
+            return new(op, type, [Arg(0, ProgramExpressionType.Fact)]);
+        }
+        if (op == "atOrBefore")
+        {
+            Arity(3, 3);
+            if (args[2].ValueKind != JsonValueKind.String || args[2].GetString() != "accepted")
+                Fail(path, "atOrBefore requires the accepted order");
+            return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.Fact), Arg(1, ProgramExpressionType.Fact)], name: "accepted");
+        }
+        if (op == "targets")
+        {
+            Arity(1, 1);
+            return new(op, ProgramExpressionType.ParticipantSet, [Arg(0, ProgramExpressionType.FactSet)]);
+        }
+        if (op == "contains")
+        {
+            Arity(2, 2);
+            return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.ParticipantSet), Arg(1, ProgramExpressionType.Participant)]);
+        }
+        if (op is "all" or "any" or "count" or "filter")
+        {
+            Arity(2, 2);
+            var source = Arg(0, null);
+            if (source.Type is not (ProgramExpressionType.ParticipantSet or ProgramExpressionType.FactSet))
+                Fail(path, "all, any, count and filter require a participant set or a fact set");
+            return new(op, op == "filter" ? source.Type : op == "count" ? ProgramExpressionType.Int : ProgramExpressionType.Bool,
+                [source, Arg(1, ProgramExpressionType.Bool, iterator: source.Type == ProgramExpressionType.ParticipantSet,
+                    factIterator: source.Type == ProgramExpressionType.FactSet)]);
         }
         throw Failure(path, $"unknown operator '{op}'");
     }
 
     /// <summary>Three-valued result: null when a read fact is unknown or undefined.</summary>
-    public static bool? EvaluateBool(ProgramExpression e, IProgramExpressionWorld world, int? it = null)
+    public static bool? EvaluateBool(ProgramExpression e, IProgramExpressionWorld world, int? it = null, CardUseHistoryFact? use = null)
     {
         if (e.Op == "boundIsEquipment") return world.BindingStat(e.Op, e.Name!) is { } value ? value != 0 : null;
         switch (e.Op)
         {
             case "bool": return e.Literal != 0;
-            case "not": return !EvaluateBool(e.Args[0], world, it);
+            case "not": return !EvaluateBool(e.Args[0], world, it, use);
             case "and":
             {
                 bool? result = true;
                 foreach (var arg in e.Args)
                 {
-                    var value = EvaluateBool(arg, world, it);
+                    var value = EvaluateBool(arg, world, it, use);
                     if (value == false) return false;
                     if (value is null) result = null;
                 }
@@ -207,22 +251,32 @@ internal static class ProgramExpressions
                 bool? result = false;
                 foreach (var arg in e.Args)
                 {
-                    var value = EvaluateBool(arg, world, it);
+                    var value = EvaluateBool(arg, world, it, use);
                     if (value == true) return true;
                     if (value is null) result = null;
                 }
                 return result;
             }
             case "same":
-                return EvaluateParticipant(e.Args[0], world, it) is { } left && EvaluateParticipant(e.Args[1], world, it) is { } right
+                return EvaluateParticipant(e.Args[0], world, it, use) is { } left && EvaluateParticipant(e.Args[1], world, it, use) is { } right
                     ? left == right : null;
+            case "contains":
+                return EvaluateParticipantSet(e.Args[0], world, it, use) is { } members &&
+                    EvaluateParticipant(e.Args[1], world, it, use) is { } member ? members.Contains(member) : null;
+            case "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse":
+                return EvaluateFact(e.Args[0], world, use) is { } fact
+                    ? e.Op switch { "useEstablished" => fact.Established, "useDeclared" => fact.NativeUseId.HasValue,
+                        "useIsSelfNativeResponse" => fact.IsSelfNativeResponseUse, _ => fact.Type == CardActionType.Response } : null;
+            case "atOrBefore":
+                return EvaluateFact(e.Args[0], world, use) is { } before && EvaluateFact(e.Args[1], world, use) is { } after
+                    ? before.ActionId is { } beforeAction && after.ActionId is { } afterAction
+                        ? beforeAction <= afterAction : before.DeclarationCursor <= after.DeclarationCursor : null;
             case "all" or "any":
             {
-                if (world.ParticipantSet(e.Args[0].Name!) is not { } seats) return null;
+                if (EvaluatePredicates(e, world, it, use) is not { } values) return null;
                 bool? result = e.Op == "all";
-                foreach (var seat in seats)
+                foreach (var value in values)
                 {
-                    var value = EvaluateBool(e.Args[1], world, seat);
                     if (value == (e.Op == "any")) return value;
                     if (value is null) result = null;
                 }
@@ -231,7 +285,7 @@ internal static class ProgramExpressions
         }
         if (Comparisons.Contains(e.Op))
         {
-            if (EvaluateInt(e.Args[0], world, it) is not { } left || EvaluateInt(e.Args[1], world, it) is not { } right) return null;
+            if (EvaluateInt(e.Args[0], world, it, use) is not { } left || EvaluateInt(e.Args[1], world, it, use) is not { } right) return null;
             return e.Op switch
             {
                 "<" => left < right, "<=" => left <= right, ">" => left > right,
@@ -239,48 +293,48 @@ internal static class ProgramExpressions
             };
         }
         if (Flags.Contains(e.Op))
-            return EvaluateParticipant(e.Args[0], world, it) is { } seat ? world.Flag(e.Op, seat) : null;
+            return EvaluateParticipant(e.Args[0], world, it, use) is { } seat ? world.Flag(e.Op, seat) : null;
         throw new InvalidOperationException($"Expression operator '{e.Op}' is not boolean.");
     }
 
-    public static int? EvaluateInt(ProgramExpression e, IProgramExpressionWorld world, int? it = null)
+    public static int? EvaluateInt(ProgramExpression e, IProgramExpressionWorld world, int? it = null, CardUseHistoryFact? use = null)
     {
         switch (e.Op)
         {
             case "int": return e.Literal;
-            case "when": return EvaluateBool(e.Args[0], world, it) == true ? EvaluateInt(e.Args[1], world, it) : null;
+            case "when": return EvaluateBool(e.Args[0], world, it, use) == true ? EvaluateInt(e.Args[1], world, it, use) : null;
             case "number": return world.Number(e.Name!);
             case "windowHp" or "windowHandCount": return world.WindowStat(e.Op, e.Args[0].Name!);
-            case "cardMarkCount": return EvaluateParticipant(e.Args[0], world, it) is { } markedSeat
+            case "cardMarkCount": return EvaluateParticipant(e.Args[0], world, it, use) is { } markedSeat
                 ? world.CardMarkCount(markedSeat, e.Name!, (CardZoneKind)e.Literal) : null;
-            case "handPrintedSuitCount": return EvaluateParticipant(e.Args[0], world, it) is { } handSeat
+            case "handPrintedSuitCount": return EvaluateParticipant(e.Args[0], world, it, use) is { } handSeat
                 ? world.HandPrintedSuitCount(handSeat, (Suit)e.Literal) : null;
-            case "publicPileCount": return EvaluateParticipant(e.Args[0], world, it) is { } pileSeat
+            case "publicPileCount": return EvaluateParticipant(e.Args[0], world, it, use) is { } pileSeat
                 ? world.PublicPileCount(pileSeat, e.Name!) : null;
             case "choiceNumber" or "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank": return world.BindingStat(e.Op, e.Name!);
             case "-":
-                return EvaluateInt(e.Args[0], world, it) is { } left && EvaluateInt(e.Args[1], world, it) is { } right ? left - right : null;
+                return EvaluateInt(e.Args[0], world, it, use) is { } left && EvaluateInt(e.Args[1], world, it, use) is { } right ? left - right : null;
             case "floorDiv":
             {
-                if (EvaluateInt(e.Args[0], world, it) is not { } dividend ||
-                    EvaluateInt(e.Args[1], world, it) is not { } divisor || divisor == 0) return null;
+                if (EvaluateInt(e.Args[0], world, it, use) is not { } dividend ||
+                    EvaluateInt(e.Args[1], world, it, use) is not { } divisor || divisor == 0) return null;
                 var quotient = dividend / (long)divisor;
                 if (dividend % (long)divisor != 0 && (dividend < 0) != (divisor < 0)) quotient--;
                 return quotient is >= int.MinValue and <= int.MaxValue ? (int)quotient : null;
             }
             case "+" or "min" or "max":
             {
-                var values = e.Args.Select(arg => EvaluateInt(arg, world, it)).ToArray();
+                var values = e.Args.Select(arg => EvaluateInt(arg, world, it, use)).ToArray();
                 if (values.Any(value => value is null)) return null;
                 var numbers = values.Select(value => value!.Value);
                 return e.Op == "+" ? numbers.Sum() : e.Op == "min" ? numbers.Min() : numbers.Max();
             }
             case "count":
             {
-                if (world.ParticipantSet(e.Args[0].Name!) is not { } seats) return null;
+                if (EvaluatePredicates(e, world, it, use) is not { } values) return null;
                 var count = 0;
-                foreach (var seat in seats)
-                    switch (EvaluateBool(e.Args[1], world, seat))
+                foreach (var value in values)
+                    switch (value)
                     {
                         case null: return null;
                         case true: count++; break;
@@ -289,11 +343,61 @@ internal static class ProgramExpressions
             }
         }
         if (Stats.Contains(e.Op))
-            return EvaluateParticipant(e.Args[0], world, it) is { } seat ? world.Stat(e.Op, seat) : null;
+            return EvaluateParticipant(e.Args[0], world, it, use) is { } seat ? world.Stat(e.Op, seat) : null;
         throw new InvalidOperationException($"Expression operator '{e.Op}' is not an integer.");
     }
 
-    private static int? EvaluateParticipant(ProgramExpression e, IProgramExpressionWorld world, int? it) =>
+    public static IReadOnlyList<int>? EvaluateParticipantSet(ProgramExpression e, IProgramExpressionWorld world,
+        int? it = null, CardUseHistoryFact? use = null)
+    {
+        switch (e.Op)
+        {
+            case "useTargets": return EvaluateFact(e.Args[0], world, use)?.Targets;
+            case "targets": return EvaluateFactSet(e.Args[0], world, it, use) is { } facts
+                ? Array.AsReadOnly(facts.SelectMany(fact => fact.Targets).Distinct().ToArray()) : null;
+            case "filter":
+            {
+                if (EvaluateParticipantSet(e.Args[0], world, it, use) is not { } seats) return null;
+                var result = new List<int>();
+                foreach (var seat in seats)
+                {
+                    var accepted = EvaluateBool(e.Args[1], world, seat, use);
+                    if (accepted is null) return null;
+                    if (accepted == true) result.Add(seat);
+                }
+                return Array.AsReadOnly(result.ToArray());
+            }
+            default: return world.ParticipantSet(e.Name!);
+        }
+    }
+
+    private static IReadOnlyList<CardUseHistoryFact>? EvaluateFactSet(ProgramExpression e, IProgramExpressionWorld world,
+        int? it, CardUseHistoryFact? use)
+    {
+        if (e.Op == "cardUses") return world.CardUses(e.Literal == 0 ? "window" : "now", e.Name!);
+        if (e.Op != "filter") throw new InvalidOperationException($"Expression operator '{e.Op}' is not a fact set.");
+        if (EvaluateFactSet(e.Args[0], world, it, use) is not { } facts) return null;
+        var result = new List<CardUseHistoryFact>();
+        foreach (var fact in facts)
+        {
+            var accepted = EvaluateBool(e.Args[1], world, it, fact);
+            if (accepted is null) return null;
+            if (accepted == true) result.Add(fact);
+        }
+        return Array.AsReadOnly(result.ToArray());
+    }
+
+    private static IEnumerable<bool?>? EvaluatePredicates(ProgramExpression e, IProgramExpressionWorld world,
+        int? it, CardUseHistoryFact? use) => e.Args[0].Type == ProgramExpressionType.FactSet
+        ? EvaluateFactSet(e.Args[0], world, it, use)?.Select(fact => EvaluateBool(e.Args[1], world, it, fact))
+        : EvaluateParticipantSet(e.Args[0], world, it, use)?.Select(seat => EvaluateBool(e.Args[1], world, seat, use));
+
+    private static CardUseHistoryFact? EvaluateFact(ProgramExpression e, IProgramExpressionWorld world, CardUseHistoryFact? use) =>
+        e.Name == FactIterator ? use : world.CurrentUse();
+
+    private static int? EvaluateParticipant(ProgramExpression e, IProgramExpressionWorld world, int? it, CardUseHistoryFact? use) =>
+        e.Op is "useActor" or "useDeclarer" ? EvaluateFact(e.Args[0], world, use) is { } fact
+            ? e.Op == "useActor" ? fact.ActorSeat : fact.DeclarerSeat : null :
         e.Name == Iterator ? it : world.Participant(e.Name!);
 
     private static string Camel(ProgramExpressionType type) => type switch
@@ -301,7 +405,9 @@ internal static class ProgramExpressions
         ProgramExpressionType.Bool => "a boolean",
         ProgramExpressionType.Int => "an integer",
         ProgramExpressionType.Participant => "a participant",
-        _ => "a participant set"
+        ProgramExpressionType.ParticipantSet => "a participant set",
+        ProgramExpressionType.Fact => "a card-use fact",
+        _ => "a card-use fact set"
     };
 
     private static void Fail(string path, string message) => throw Failure(path, message);

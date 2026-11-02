@@ -33,7 +33,6 @@ internal sealed partial class CharacterDengAiMobileShiEntries
     internal bool ShiDaDyingObserver() => _resolve().ShiDaDyingObserver();
     internal bool ShiDaFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().ShiDaFirstChild(f, child);
     internal bool ShiDaHasJixiDiscard(ProgramTriggerCandidate candidate, int payer) => _resolve().ShiDaHasJixiDiscard(candidate, payer);
-    internal bool ShiDaHasJixiTarget(int owner) => _resolve().ShiDaHasJixiTarget(owner);
     internal bool ShiDaJixiDistance(ProgramCardDistanceQuery query) => _resolve().ShiDaJixiDistance(query);
     internal IReadOnlyList<CardMovementRecord> ShiDaLosses(int owner, CardMovementBatchContext? batch) => _resolve().ShiDaLosses(owner, batch);
     internal bool ShiDaMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => _resolve().ShiDaMovementProof(f, effect, pending);

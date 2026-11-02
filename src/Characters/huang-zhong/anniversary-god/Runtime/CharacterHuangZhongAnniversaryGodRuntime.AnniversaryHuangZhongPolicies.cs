@@ -45,7 +45,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
         {
             if (use.Action is { } action)
                 IssueAnniversaryHzActualUse(action, use.Id);
-            else if (_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.OriginFrameId == use.Id && e.CardActionId is null))
+            else if (_nativeCardUseAdmission.IsLegacyProducerUse(use) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.OriginFrameId == use.Id && e.CardActionId is null))
                 IssueAnniversaryHzLegacyUse(use);
         }
         else if (payload is CardActionAcceptedEvent accepted && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CurrentTurnCardUseKindsRecordedEvent>().Any(e => e.CardActionId == accepted.Action.ActionId))
@@ -107,7 +107,7 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodRuntime
             return false;
         var legacy = proof.Action is null;
         var actor = legacy ? proof.Actor : proof.Action!.ActorSeat;
-        if (legacy ? action is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(parent)is not { Action: null } use || use.SourceSeat != actor || use.CardKind != proof.LegacyKind || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) : action is null || !SameAnniversaryHzAction(proof.Action!, action))
+        if (legacy ? action is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(parent)is not { Action: null } use || use.SourceSeat != actor || use.CardKind != proof.LegacyKind || !_nativeCardUseAdmission.IsLegacyProducerUse(use) : action is null || !SameAnniversaryHzAction(proof.Action!, action))
             return false;
         return proof.StatusIds.All(id => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzBodyIssuedEvent>().Count(s => s.Id == id && s.Target == actor && s.Body == AnniversaryHzBody.Zhongshu) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryHzStatusConsumedEvent>().Count(s => s.Id == id && s.Reason == (legacy ? "legacy-use" : "use") && s.Origin == (legacy ? parent : action!.ActionId)) == 1);
     }

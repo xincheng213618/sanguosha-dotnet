@@ -8,7 +8,7 @@ internal sealed partial class CoreGameEngineActualTurnLegacyCompletionRuntime
         if (!(_coreCurrentTurnUseKindsOperations.TracksActualTurnUseOrdinal || _characterCaiYongLeOperations.HasLeCaiYongFeibaiCapability || _characterCaoZhiLeOperations.HasLeCaoZhiWenlanCapability || _characterKongShuOlOperations.HasKongShuCapability || _characterLiuYanOlOperations.HasLiuYanCapability || _characterCuiYanOlOperations.HasCuiYanCapability || _characterHuangYueyingOlMouOperations.HasMouHuangYueyingBingcaiCapability) || use.Action is not null)
             return use;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
-        if (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame parent || parent.Id != programParentId || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) || parent.InstructionIndex < 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LegacyActualUseCompletionCapturedEvent>().Any(e => e.CardUseFrameId == use.Id))
+        if (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame parent || parent.Id != programParentId || !_nativeCardUseAdmission.IsLegacyProducerUse(use) || parent.InstructionIndex < 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LegacyActualUseCompletionCapturedEvent>().Any(e => e.CardUseFrameId == use.Id))
             throw new InvalidOperationException("Legacy actual-use completion lost its exact zero-entity program producer.");
         var source = new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(frame => frame.Id != use.Id)?.Action?.ActionId, CardActionType.Use, use.SourceSeat, use.SourceSeat, null, null, null, use.CardKind, use.TargetSeats, [], [source], effectiveSuit: Suit.None, effectiveRank: 0));
@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineActualTurnLegacyCompletionRuntime
 
     internal bool IsExactLegacyActualUseCompletion(CardUseFrame use)
     {
-        if (use.Action is not { Type: CardActionType.Use } action || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use))
+        if (use.Action is not { Type: CardActionType.Use } action || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !_nativeCardUseAdmission.IsLegacyProducerUse(use))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
         if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame parent)

@@ -38,7 +38,7 @@ internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntim
         long? actionId;
         CardKind kind;
         bool nullification;
-        if (payload is CardUseDeclaredEvent declared && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == declared.ResolutionId)is { } use && use.SourceSeat == declared.SourceSeat && use.CardId == declared.CardId && use.CardKind == declared.CardKind && (use.Action is { Type: CardActionType.Use } || use.Action is null && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && _coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use)))
+        if (payload is CardUseDeclaredEvent declared && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == declared.ResolutionId)is { } use && use.SourceSeat == declared.SourceSeat && use.CardId == declared.CardId && use.CardKind == declared.CardKind && (use.Action is { Type: CardActionType.Use } || use.Action is null && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && _nativeCardUseAdmission.IsLegacyProducerUse(use)))
         {
             MarkNextActualUseProgramChild(use);
             frameId = use.Id;

@@ -1,8 +1,10 @@
+using CardGame.Core.EngineOwners;
+
 namespace CardGame.Core;
 
 /// <summary>Owns candidate preparation, ordered trigger admission, prerequisites and usage accounting.</summary>
 [ProgramRuntimeModule]
-internal sealed class ProgramTriggerRuntime
+internal sealed class ProgramTriggerRuntime(IKernelCreateProgramExpressionWorldOperations expressions)
 {
     internal IReadOnlyList<ProgramTriggerCandidate> CollectProgramTriggerCandidates<TQuery>(TQuery query,
         CharacterState owner,
@@ -64,7 +66,8 @@ internal sealed class ProgramTriggerRuntime
                 var plan = ProgramInstructionResolver.Default.Resolve(program,
                     ProgramInstructionSourceKind.Trigger, candidate.BindingId);
                 var trigger = plan.Trigger!;
-                return !query.IsPhaseNamePredictionResolver(candidate, program) && !trigger.DeferredTurnEndOnly && (!query.IsPhaseHandDebtResolver(candidate) || query.HasProgramPhaseHandDebt(candidate)) && (trigger.EvaluateConditionAtResolution || trigger.Condition.Evaluate(facts, candidate.SkillId, candidate.SkillInstanceId) || IsAwakeningProgramConditionOverridden(query, new(owner, program, plan, candidate, null))) &&
+                return !query.IsPhaseNamePredictionResolver(candidate, program) && !trigger.DeferredTurnEndOnly && (!query.IsPhaseHandDebtResolver(candidate) || query.HasProgramPhaseHandDebt(candidate)) && (trigger.EvaluateConditionAtResolution || trigger.Condition.Evaluate(facts, candidate.SkillId, candidate.SkillInstanceId,
+                    expression => ProgramExpressions.EvaluateBool(expression, expressions.CreateTriggerExpressionWorld(candidate, null, facts))) || IsAwakeningProgramConditionOverridden(query, new(owner, program, plan, candidate, null))) &&
                     HasInitialOwnedCardSelectionCandidates(query, owner, trigger) &&
                     query.CanTrigger(ProgramTriggerLegalityPhase.Collection,
                         new(owner, program, plan, candidate, null));
@@ -121,7 +124,17 @@ internal sealed class ProgramTriggerRuntime
         if (trigger.RequiredPolarity is { } polarity &&
             query.GetProgramConversionPolarity(owner.Seat, candidate.SkillId) != polarity) return false;
         if (query.DecideTriggerProof(ProgramTriggerProofPhase.DesignatedTarget, new NativeWindowTriggerProofRequest(owner, candidate, context, trigger)) == true) return false;
-        if (query.DecideTriggerProof(ProgramTriggerProofPhase.LegacyWindow, new CandidateTriggerProofRequest(candidate, context)) is { } legacyDecision) return legacyDecision;
+        if (query.DecideTriggerProof(ProgramTriggerProofPhase.LegacyWindow, new CandidateTriggerProofRequest(candidate, context)) is { } legacyDecision)
+        {
+            // Legacy window admission does not replace a declared expression.
+            // Issued, already-paid invocations were handled above and retain
+            // their original qualification instead of re-reading current facts.
+            if (!legacyDecision || !ProgramInstructionResolver.Default.Features(trigger).UsesCondition(SkillProgramTriggerConditionKind.Expression))
+                return legacyDecision;
+            var facts = trigger.EvaluateConditionAtResolution ? query.CaptureProgramTriggerFacts(owner) : context.Facts ?? query.CaptureProgramTriggerFacts(owner);
+            return trigger.Condition.Evaluate(facts, candidate.SkillId, candidate.SkillInstanceId,
+                expression => ProgramExpressions.EvaluateBool(expression, expressions.CreateTriggerExpressionWorld(candidate, context, facts)));
+        }
         var plan = ProgramInstructionResolver.Default.Resolve(program, ProgramInstructionSourceKind.Trigger, candidate.BindingId);
         var features = plan.Features;
         var legality = new ProgramTriggerLegalityContext(owner, program, plan, candidate, context);
@@ -133,9 +146,13 @@ internal sealed class ProgramTriggerRuntime
         if (!query.CanTrigger(ProgramTriggerLegalityPhase.BeforeCondition, legality)) return false;
         if (trigger.NoDyingAtActivation && (query.ActiveDying is not null || query.Players.Any(p => p.IsAlive && p.Hp <= 0))) return false;
         if (!query.CanTrigger(ProgramTriggerLegalityPhase.AfterDyingCheck, legality)) return false;
-        if (!IsAwakeningProgramConditionOverridden(query, legality) && !trigger.Condition.Evaluate(trigger.EvaluateConditionAtResolution ? query.CaptureProgramTriggerFacts(owner) : context.Facts ?? query.CaptureProgramTriggerFacts(owner),
-                candidate.SkillId, candidate.SkillInstanceId))
-            return false;
+        if (!IsAwakeningProgramConditionOverridden(query, legality))
+        {
+            var conditionFacts = trigger.EvaluateConditionAtResolution ? query.CaptureProgramTriggerFacts(owner) : context.Facts ?? query.CaptureProgramTriggerFacts(owner);
+            if (!trigger.Condition.Evaluate(conditionFacts, candidate.SkillId, candidate.SkillInstanceId,
+                    expression => ProgramExpressions.EvaluateBool(expression, expressions.CreateTriggerExpressionWorld(candidate, context, conditionFacts))))
+                return false;
+        }
         if (!HasInitialOwnedCardSelectionCandidates(query, owner, trigger)) return false;
         if (!query.CanTrigger(ProgramTriggerLegalityPhase.AfterCondition, legality)) return false;
         if (query.IsConfirmedActualStartingSubstitution(context)) return false;

@@ -2,6 +2,14 @@ namespace CardGame.Core;
 
 internal sealed partial class ProgramTargetSelectionRuntime
 {
+    private IReadOnlyList<int> FilterExpressionTargets(ProgramSkillFrame frame, SkillProgramEffect effect,
+        IReadOnlyList<int> domain)
+    {
+        if (effect.TargetSetExpression is not { } expression) return domain;
+        var targets = ProgramExpressions.EvaluateParticipantSet(expression, expressions.CreateProgramExpressionWorld(frame));
+        return targets is null ? [] : domain.Where(targets.Contains).ToArray();
+    }
+
     internal SkillProgramStepOutcome SelectProgramTargets(
         long frameId,
         int ownerSeat,
@@ -21,7 +29,7 @@ internal sealed partial class ProgramTargetSelectionRuntime
         {
             frames.ReplaceTop(frame = frame with { SelectedTargetSeats = Array.AsReadOnly(Array.Empty<int>()) });
         }
-        var targetSeats = GetProgramTargetSeats(ownerSeat, targetKind, frame.WindowContext);
+        var targetSeats = FilterExpressionTargets(frame, paused, GetProgramTargetSeats(ownerSeat, targetKind, frame.WindowContext));
         if (paused.AllTargets == true)
         {
             frames.ReplaceTop(frame with { SelectedTargetSeats = Array.AsReadOnly(targetSeats.ToArray()) });
@@ -160,7 +168,9 @@ internal sealed partial class ProgramTargetSelectionRuntime
         bool skipIfNoTarget = false)
     {
         var frame = frames.ActiveProgram(frameId);
-        var targetSeats = SelectionSeats(frame, targetKind, zones, marker, actorReference)
+        var effect = ProgramInstructionResolver.Default.Resolve(frame, content.Skill(frame.SkillId).Program!)
+            .GetPausedInstruction(frame.InstructionIndex).Effect;
+        var targetSeats = FilterExpressionTargets(frame, effect, SelectionSeats(frame, targetKind, zones, marker, actorReference))
             .Where(seat => SelectionTargetEligible(frame, targetKind, zones, seat, marker,
                 actorReference) && CanSelectPindianOpponent(frame, seat)).ToArray();
         if (targetSeats.Length == 0)
@@ -220,7 +230,8 @@ internal sealed partial class ProgramTargetSelectionRuntime
             selected.Targets.Count != 1 || selected.Cards.Count != 0)
             throw new InvalidOperationException("The selected target does not match the suspended instruction.");
         var targetSeat = selected.Targets.Single();
-        if (!SelectionTargetEligible(frame, targetKind, effect.Zones, targetSeat,
+        if (!FilterExpressionTargets(frame, effect, [targetSeat]).Contains(targetSeat) ||
+            !SelectionTargetEligible(frame, targetKind, effect.Zones, targetSeat,
             effect.Marker, effect.ActorReference) ||
             !CanSelectPindianOpponent(frame, targetSeat))
             throw new InvalidOperationException("The selected program target is no longer legal.");
@@ -258,7 +269,7 @@ internal sealed partial class ProgramTargetSelectionRuntime
              selected.Targets.Count > Hand(Player(frame.OwnerSeat)).Count) ||
             selected.Targets.Distinct().Count() != selected.Targets.Count)
             throw new InvalidOperationException("The selected targets do not match the suspended instruction.");
-        var legalTargets = GetProgramTargetSeats(frame.OwnerSeat, targetKind, frame.WindowContext);
+        var legalTargets = FilterExpressionTargets(frame, effect, GetProgramTargetSeats(frame.OwnerSeat, targetKind, frame.WindowContext));
         if (selected.Targets.Any(targetSeat => !legalTargets.Contains(targetSeat)))
             throw new InvalidOperationException("A selected program target is no longer legal.");
         if (targetKind == SkillProgramTargetKind.EquipmentExchangePair &&

@@ -209,7 +209,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
     {
         if (!HasMouZhaJiangCapability)
             return;
-        if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { } use && (use.Action is not null || _coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use)))
+        if (payload is CardUseDeclaredEvent declared && _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is { } use && (use.Action is not null || _nativeCardUseAdmission.IsLegacyProducerUse(use)))
         {
             IssueMouZhaJiangUse(use);
             return;

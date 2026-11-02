@@ -14,16 +14,16 @@ internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
         if (!TracksActualForeignUseTargets || payload is not TargetsConfirmedEvent targets)
             return;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == targets.ResolutionId);
-        if (use is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat) || !targets.TargetSeats.SequenceEqual(use.TargetSeats) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id && e.SourceSeat == use.SourceSeat && e.CardId == use.CardId && e.CardKind == use.CardKind))
+        var declared = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>()
+            .LastOrDefault(declaration => declaration.ResolutionId == targets.ResolutionId);
+        if (use is null || declared is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat) || !targets.TargetSeats.SequenceEqual(use.TargetSeats))
             return;
         var action = use.Action;
-        if (action is not null && (action.Type != CardActionType.Use || action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind))
+        if (!_nativeCardUseAdmission.IsDeclaredUse(use, declared))
             return;
         long? legacy = null;
-        if (action is null)
+        if (action is null && _nativeCardUseAdmission.IsLegacyProducerUse(use))
         {
-            if (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use))
-                return;
             var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
             if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame producer)
                 return;

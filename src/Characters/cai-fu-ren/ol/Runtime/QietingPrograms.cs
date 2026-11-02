@@ -2,12 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
-public sealed record OrdinaryQietingTurnContext(int ActualTurn, int TurnOwnerSeat, long HistoryCutoff, bool UsedOnAnother);
-public sealed record OrdinaryQietingActualUseEvent(int ActualTurn, int TurnOwnerSeat, long NativeUseId,
-    long? ActionId, int ActorSeat, bool UsedOnAnother, int DesignatedTargetCount) : IGameEvent;
 public enum OrdinaryQietingStage { Choice, MovementChildren, Draw, DrawChildren, Complete, Viewing }
 public sealed partial record OrdinaryQietingReceipt(CardConversionSource Source, string GameplayHash,
-    OrdinaryQietingTurnContext Qualification, long WindowId, int OccurrenceIndex, OrdinaryQietingStage Stage)
+    CardUseHistoryPoint Qualification, long WindowId, int OccurrenceIndex, OrdinaryQietingStage Stage)
 {
     public bool Paid { get; init; }
     public string? Option { get; init; }
@@ -20,7 +17,7 @@ public sealed partial record OrdinaryQietingReceipt(CardConversionSource Source,
     public IReadOnlyList<int> GrainIds { get => _grainIds; init => _grainIds = Array.AsReadOnly(value.ToArray()); }
 }
 public sealed record OrdinaryQietingStartedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
-    OrdinaryQietingTurnContext Qualification, long WindowId, int OccurrenceIndex) : IGameEvent;
+    CardUseHistoryPoint Qualification, long WindowId, int OccurrenceIndex) : IGameEvent;
 public sealed record OrdinaryQietingOptionIssuedEvent(long FrameId, string Option, int? CardId, CardKind? PrintedKind, long Before) : IGameEvent;
 public sealed record OrdinaryQietingEquipmentMovedEvent(long FrameId, int CardId, CardKind PrintedKind,
     CardLocation From, CardLocation To, long MovementSequence) : IGameEvent;

@@ -11,21 +11,22 @@ internal static partial class PhaseStartCardControlChecks
         var card = SouyingPlay(g, CardKind.Duel, [1]);
         Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("result-bind") == "souying-before"));
         var original = g.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardId == card);
-        Need(History(g).FinalizedDirectedTargetOrdinal(original.Id, 1) == 2,
+        var originalPoint = History(g).FindFinalizedUse(original.Id)!.HistoryPoint!;
+        Need(new CardUseHistoryTestWorld(History(g), originalPoint, target: 1).Int(CardUseHistoryTestWorld.DirectedCount) == 2,
             "The second real directed card freezes its own original qualification before the higher-priority observer runs.");
         g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-target"));
         Answer(g, c => c.Targets.SequenceEqual([1]));
         Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("result-bind") == "souying-after"));
         var nested = E<ActualCardUseTargetsFinalizedEvent>(g).Single(e => e.Action.ActionId > original.Action!.ActionId && e.Action.EffectiveKind == CardKind.Slash);
-        Need(History(g).FinalizedDirectedTargetOrdinal(nested.NativeUseId, 1) == 3 &&
-            History(g).FinalizedDirectedTargetOrdinal(original.Id, 1) == 2,
+        Need(new CardUseHistoryTestWorld(History(g), History(g).FindFinalizedUse(nested.NativeUseId)!.HistoryPoint!, target: 1).Int(CardUseHistoryTestWorld.DirectedCount) == 3 &&
+            new CardUseHistoryTestWorld(History(g), originalPoint, target: 1).Int(CardUseHistoryTestWorld.DirectedCount) == 2,
             "A real nested third use cannot refresh the waiting original card's frozen second-use ordinal.");
         g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         Reach(g, p => Optional(p, "ol:souying")); Activate(g);
         Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "huaman"));
         var paid = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.HuaMan is not null);
-        Need(paid.HuaMan!.Souying is { NativeUseId: var id, DirectionOrdinal: 2 } && id == original.Id,
+        Need(paid.HuaMan!.Souying is { NativeUseId: var id } && id == original.Id,
             "The actual Souying candidate retains its original second-use qualification after the nested child returns.");
         var cost = V(g, 0).Hand.Single(c => c.Kind == CardKind.DrawTwo).Id;
         g = Cold(g, registry); Answer(g, c => c.Cards.SequenceEqual([cost])); SouyingReachPlay(g, forbidOffer: true);
@@ -53,7 +54,7 @@ internal static partial class PhaseStartCardControlChecks
         Need(current.Action is { ActorSeat: 2, ProviderSeat: 0 } && current.TargetSeats.SequenceEqual([1]) &&
             updated.Action is { ActorSeat: 2, ProviderSeat: 0 } && updated.Action.ActionId == current.Action.ActionId &&
             frozen.Action is { ActorSeat: 0, ProviderSeat: 0 } && frozen.AcceptedActorSeat == 0 &&
-            History(g).FinalizedDirectedTargetOrdinal(current.Id, 1) == 2,
+            new CardUseHistoryTestWorld(History(g), frozen.HistoryPoint!, target: 1).Int(CardUseHistoryTestWorld.DirectedCount) == 2,
             "A real actor rewrite publishes the new actor while keeping the original provider, accepted identity and first-finalized qualification.");
         g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         SouyingReachPlay(g, forbidOffer: true);
@@ -71,8 +72,9 @@ internal static partial class PhaseStartCardControlChecks
         var hp = V(g, 0).Hp;
         Use(g, "souying-incoming", [1]); Reach(g, p => Optional(p, "ol:souying"));
         var original = g.ResolutionStack.OfType<CardUseFrame>().Single(f => f.SelectedActorDuelOrigin is not null);
+        var originalPoint = History(g).FindFinalizedUse(original.Id)!.HistoryPoint!;
         Need(original.SourceSeat == 1 && original.TargetSeats.SequenceEqual([0]) &&
-            History(g).FinalizedDirectedTargetOrdinal(original.Id, 0) == 2,
+            new CardUseHistoryTestWorld(History(g), originalPoint, target: 0).Int(CardUseHistoryTestWorld.DirectedCount) == 2,
             "The second actual foreign actor's Duel freezes the reverse direction in this same actual turn.");
         g = Cold(g, registry); Activate(g);
         Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "huaman"));
@@ -83,7 +85,7 @@ internal static partial class PhaseStartCardControlChecks
             !E<DamageAppliedEvent>(g).Any(e => e.SourceCardUseResolutionId == original.Id) &&
             g.CardMovements.Count(m => m.CardId == cost && m.To == CardLocation.DiscardPile && m.Reason.Value == "skill-program.huaman.discard") == 1 &&
             History(g).FindCompletedUse(original.Id)!.Action.EffectiveDesignatedTargetSeats.Count == 0 &&
-            History(g).FinalizedDirectedTargetOrdinal(original.Id, 0) == 2,
+            new CardUseHistoryTestWorld(History(g), originalPoint, target: 0).Int(CardUseHistoryTestWorld.DirectedCount) == 2,
             "A real target-side payment cancels the second incoming Duel, preserves the frozen ordinal and returns once without applying damage.");
         _ = Cold(g, registry);
     }

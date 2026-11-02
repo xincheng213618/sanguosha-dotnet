@@ -42,37 +42,13 @@ internal sealed partial class CoreGameEngineCurrentTurnUseKindsRuntime
         if (payload is not CardUseDeclaredEvent declared)
             return;
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == declared.ResolutionId);
-        if (use is null || use.SourceSeat != declared.SourceSeat || use.CardId != declared.CardId || use.CardKind != declared.CardKind || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat))
-            throw new InvalidOperationException("Actual turn use requires its exact declared card-use frame.");
+        if (use is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat) ||
+            !_nativeCardUseAdmission.IsDeclaredUse(use, declared))
+            return;
         var action = use.Action;
-        if (action is not null && action.Type != CardActionType.Use)
-            return;
-        if (action is not null && (action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind))
-            throw new InvalidOperationException("Actual turn use differs from its frozen effective action.");
-        // Legacy virtual uses have a real CardUse frame but deliberately no
-        // Action. They add a type, never a manufactured hand suit or action.
-        if (action is null && (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !IsActualTurnLegacyVirtualUse(use)))
-            return;
         if (_coreCurrentRoundActualUsesOperations.CurrentUseKindDeduplicationHistory().OfType<CurrentTurnCardUseKindsRecordedEvent>().Any(e => !e.IsNullificationUse && e.OriginFrameId == use.Id))
             return;
         RecordCurrentTurnUseKinds(use.Id, use.SourceSeat, action, use.CardKind, false);
-    }
-
-    internal bool IsActualTurnLegacyVirtualUse(CardUseFrame use)
-    {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-        if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame producer || producer.OwnerSeat != use.SourceSeat || producer.TriggerId is null && !TracksActualTurnUseOrdinal && !_coreCurrentRoundActualUsesOperations.TracksCurrentRoundActualUses && !_coreWholeActualTurnUsesOperations.TracksWholeActualTurnUseOrdinal && !_characterCaoZhiLeOperations.HasLeCaoZhiWenlanCapability)
-            return false;
-        var program = _contentRegistryOperations._contentRegistry.GetSkill(producer.SkillId).Program;
-        if (program is null || program.GameplayHash != producer.GameplayHash)
-            return false;
-        var paused = ProgramInstructionResolver.Default.Resolve(producer, program).GetPausedInstruction(producer.InstructionIndex).Effect;
-        if (use.CardKind == CardKind.Slash)
-            return producer.SelectedTargetSeats.Count == 1 && producer.SelectedTargetSeats.SequenceEqual(use.TargetSeats) && paused is { Op: SkillProgramEffectOp.UseVirtualCard, OutputKind: CardKind.Slash, UseCardActionWindows: false };
-        if (use.CardKind != CardKind.Alcohol || paused.Op != SkillProgramEffectOp.UseVirtualDyingAlcohol || producer.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.TargetSeat != use.SourceSeat || !use.TargetSeats.SequenceEqual([use.SourceSeat]))
-            return false;
-        var dying = _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(d => d.Id == context.ParentFrameId);
-        return dying is not null && dying.VictimSeat == use.SourceSeat && dying.ResponderIndex >= 0 && dying.ResponderIndex < dying.ResponderSeats.Count && dying.ResponderSeats[dying.ResponderIndex] == use.SourceSeat;
     }
 
     internal void RecordCurrentTurnUseKinds(long frameId, int actorSeat, CardActionContext? action, CardKind effectiveKind, bool nullificationUse, int? programInstructionIndex = null)

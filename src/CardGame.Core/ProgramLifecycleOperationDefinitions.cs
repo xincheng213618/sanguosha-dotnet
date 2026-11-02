@@ -178,7 +178,7 @@ internal sealed class SelectTargetsProgramOperationDescriptor : ProgramOperation
         static (effect, context) => context.SelectTargets(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "targetKind", "minimumTargets", "maximumTargets", "numberExpression", "sourceBind", "targetAiOrder", "condition", "replaceSelection", "allTargets");
+        r.AllowOnly("op", "target", "targetKind", "minimumTargets", "maximumTargets", "numberExpression", "sourceBind", "targetAiOrder", "condition", "replaceSelection", "allTargets", "targetSetExpr");
         var target = FilterBoundCardsProgramOperationDescriptor.Owner(r);
         var kind = r.RequiredEnum<SkillProgramTargetKind>("targetKind");
         var sourceBind = r.Has("sourceBind") ? r.RequiredIdentifier("sourceBind") : null;
@@ -241,6 +241,7 @@ internal sealed class SelectTargetsProgramOperationDescriptor : ProgramOperation
             minimumTargets: minimum, maximumTargets: maximum,
             targetAiOrder: aiOrder, sourceBind: sourceBind)
         {
+            TargetSetExpression = r.ParticipantSetExpression("targetSetExpr"),
             ReplaceSelection = r.Has("replaceSelection") ? r.RequiredBool("replaceSelection") : null,
             AllTargets = r.Has("allTargets") ? r.RequiredBool("allTargets") : null
         };

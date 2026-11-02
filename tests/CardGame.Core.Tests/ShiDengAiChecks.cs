@@ -60,7 +60,7 @@ internal static class ShiDengAiChecks
         s.Answer(c => c.Targets.SequenceEqual([1])); s.Watch("history-after");
         var history = ((ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!
             .GetValue(s.G)!).Get<IActualCardUseHistoryQueries>();
-        s.Need(history.EverDesignatedTargets(receipt.Turn, receipt.TurnOwner, 0).Order().SequenceEqual([1, 2]) &&
+        s.Need(new CardUseHistoryTestWorld(history, new(receipt.Turn, receipt.TurnOwner, history.CardUseHistoryCursor)).Seats(CardUseHistoryTestWorld.EstablishedOtherTargets)!.Order().SequenceEqual([1, 2]) &&
             s.Root!.ShiDengAi!.History.SequenceEqual([2]) && receipt.History.SequenceEqual([2]),
             "A real nested late Slash expands live ever-target history but cannot change the paid parent's frozen eligible targets.");
         s.Cold(); s.Continue("history-after"); s.Stage(ShiDaStage.Targets);

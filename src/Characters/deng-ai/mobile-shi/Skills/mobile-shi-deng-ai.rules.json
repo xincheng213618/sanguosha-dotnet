@@ -29,7 +29,12 @@
         {
           "id": "ending-jixi", "window": "afterTurnEnded", "subject": "owner",
           "turnOwnerScope": "anyLiving", "optional": true,
-          "effects": [{ "op": "resolveMobileShiDengAiJixi", "target": "owner" }]
+          "effects": [{ "op": "resolveMobileShiDengAiJixi", "target": "owner", "targetSetExpr":
+            ["filter", ["targets", ["filter", ["cardUses", "now", "observations"],
+              ["and", ["same", ["useActor", "use"], "owner"],
+                ["not", ["useIsResponse", "use"]], ["useEstablished", "use"]]
+            ]], ["not", ["same", "it", "owner"]]]
+          }]
         }
       ]
     }

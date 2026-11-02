@@ -32,8 +32,10 @@ internal static class ProgramEventHistoryIndexChecks
             "A separate match must not share typed history or cached pending state.");
         BoundaryQueriesKeepJournalOrderAndLiveTails();
         ActualUsesKeepAcceptedAndFinalizedOrdersSeparate();
-        DirectedOrdinalsUseAcceptedDesignationsAcrossStages();
-        EverTargetsKeepObservedNativeScopeAndFrozenSnapshots();
+        LatestFactsKeepAcceptedDesignationsAcrossStages();
+        ObservationsKeepNativeScopeAndFrozenSnapshots();
+        NativeUseVersionsKeepEndCutoffsAndLegacyIdentity();
+        LateActionAliasesPreserveEarlierNativeDeclarations();
     }
 
     private static void BoundaryQueriesKeepJournalOrderAndLiveTails()
@@ -98,13 +100,15 @@ internal static class ProgramEventHistoryIndexChecks
         history.Append(new ActualCardUseTargetsFinalizedEvent(20, second, [2], 1, 0));
         history.Append(new ActualCardUseTargetsFinalizedEvent(10, first, [2], 1, 0));
         history.Append(new ActualCardActionRecordedEvent(first, 1, 0, TurnPhase.Play, 7, false));
-        var accepted = history.AcceptedPairFor(2);
-        Require(accepted.Select(e => e.Action.ActionId).SequenceEqual([1L, 2L]) &&
+        var acceptedPoint = new CardUseHistoryPoint(1, 0, history.CardUseHistoryCursor);
+        var accepted = history.ReadCardUseFacts(acceptedPoint, CardUseHistoryView.Latest);
+        var beforeCompletion = history.FindFinalizedUse(20)!;
+        Require(accepted.Select(e => e.ActionId!.Value).SequenceEqual([1L, 2L]) &&
             history.PreviousFinalizedUse(10)?.NativeUseId == 20 && history.PreviousFinalizedUse(20) is null,
             "A nested use may finalize first; repeated acceptance neither reorders nor duplicates the independent accepted prefix.");
         history.Append(new CardUseFinishedEvent(20, 0, CardKind.IronChain));
         Require(history.FindFinalizedUse(20) is { Completed: true } && history.FindFinalizedUse(10) is { Completed: false } &&
-            !accepted[1].Completed && accepted is System.Collections.IList { IsReadOnly: true },
+            !beforeCompletion.Completed && accepted is System.Collections.IList { IsReadOnly: true },
             "Actual completion updates its own entry while the earlier exposed accepted snapshot remains immutable.");
         history.Append(new ActualCardActionRecordedEvent(response, 1, 0, TurnPhase.Play, 7, true));
         Require(history.FindAction(3) is { NativeUseId: null, PrimaryTargets: null, Completed: false },
@@ -112,14 +116,15 @@ internal static class ProgramEventHistoryIndexChecks
         history.Append(new CardResponseCompletedEvent(3, 30, 40, 0, 0, CardKind.Dodge,
             ProgramCardContinuation.Dodge, 1, 0, 0));
         Require(history.FindAction(3) is { NativeUseId: null, PrimaryTargets.Count: 0, Completed: true } &&
-            history.AcceptedPairFor(3).Select(e => e.Action.ActionId).SequenceEqual([2L, 3L]),
+            history.ReadCardUseFacts(new(1, 0, history.CardUseHistoryCursor), CardUseHistoryView.Latest)
+                .TakeLast(2).Select(e => e.ActionId!.Value).SequenceEqual([2L, 3L]),
             "The real response completion finalizes an empty target set and cuts the current accepted-use pair without a synthetic native ID.");
         history.Append(new ActualCardUseTargetsCompletedEvent(20, second, [2], 1, 0));
         var completed = history.AcceptedPairAtCompletionFor(2);
         history.Append(new ActualCardActionRecordedEvent(Action(4), 1, 0, TurnPhase.Play, 7, false));
         Require(completed.Select(e => e.Action.ActionId).SequenceEqual([2L, 3L]) &&
             history.AcceptedPairAtCompletionFor(2).Select(e => e.Action.ActionId).SequenceEqual([2L, 3L]) &&
-            history.AcceptedPairFor(2).Select(e => e.Action.ActionId).SequenceEqual([1L, 2L]),
+            history.ReadCardUseFacts(acceptedPoint, CardUseHistoryView.Latest).Select(e => e.ActionId!.Value).SequenceEqual([1L, 2L]),
             "Completion freezes the actual accepted tail after an intervening response; neither a later action nor the earlier acceptance prefix replaces it.");
         var changedTargets = new[] { 1 };
         var completion = new ActualCardUseTargetsCompletedEvent(10, first, changedTargets, 1, 0);
@@ -133,7 +138,7 @@ internal static class ProgramEventHistoryIndexChecks
             "Completion targets stay detached from constructor and with inputs, without overwriting the earlier finalized view.");
     }
 
-    private static void DirectedOrdinalsUseAcceptedDesignationsAcrossStages()
+    private static void LatestFactsKeepAcceptedDesignationsAcrossStages()
     {
         static CardActionContext Use(long id, int actor, int[] targets, CardKind kind = CardKind.IronChain) =>
             new(id, null, CardActionType.Use, actor, actor, null, null, null, kind, targets, [], [], designatedTargetSeats: targets);
@@ -142,13 +147,16 @@ internal static class ProgramEventHistoryIndexChecks
         history.Append(new ActualCardActionRecordedEvent(outer, 5, 0, TurnPhase.Draw, 7, false));
         history.Append(new ActualCardActionRecordedEvent(inner, 5, 0, TurnPhase.Finished, 8, false));
         history.Append(new ActualCardUseTargetsFinalizedEvent(20, inner, [2], 5, 0));
-        Require(history.FindFinalizedUse(10) is null && history.FinalizedDirectedTargetOrdinal(20, 2) == 2,
+        var innerPoint = new CardUseHistoryPoint(5, 0, history.CardUseHistoryCursor, 20, 2);
+        Require(history.FindFinalizedUse(10) is null &&
+            new CardUseHistoryTestWorld(history, innerPoint, target: 2).Int(CardUseHistoryTestWorld.DirectedCount) == 2,
             "A real foreign actor's unfinalized outer designation counts in the same actual turn across non-Play phases.");
         history.Append(new ActualCardUseActionUpdatedEvent(10, Use(1, 1, []), 5, 0));
         var third = Use(3, 1, [2]);
         history.Append(new ActualCardActionRecordedEvent(third, 5, 0, TurnPhase.Play, 9, false));
         history.Append(new ActualCardUseTargetsFinalizedEvent(30, third, [2], 5, 0));
-        Require(history.FinalizedDirectedTargetOrdinal(30, 2) == 2 && history.FinalizedDirectedTargetOrdinal(20, 2) == 2 &&
+        Require(new CardUseHistoryTestWorld(history, new(5, 0, history.CardUseHistoryCursor, 30, 3), target: 2).Int(CardUseHistoryTestWorld.DirectedCount) == 2 &&
+            new CardUseHistoryTestWorld(history, innerPoint, target: 2).Int(CardUseHistoryTestWorld.DirectedCount) == 2 &&
             history.FindAction(1) is { Completed: false, Finalized: false },
             "A target update changes future counts without finalizing its outer action or rewriting an already frozen qualification.");
 
@@ -159,7 +167,8 @@ internal static class ProgramEventHistoryIndexChecks
         var victim = Use(2, 0, [2]);
         history.Append(new ActualCardActionRecordedEvent(victim, 5, 0, TurnPhase.Play, 9, false));
         history.Append(new ActualCardUseTargetsFinalizedEvent(20, victim, [2], 5, 0));
-        Require(history.FindFinalizedUse(10)!.PrimaryTargets!.SequenceEqual([1]) && history.FinalizedDirectedTargetOrdinal(20, 2) == 2,
+        Require(history.FindFinalizedUse(10)!.PrimaryTargets!.SequenceEqual([1]) &&
+            new CardUseHistoryTestWorld(history, new(5, 0, history.CardUseHistoryCursor, 20, 2), target: 2).Int(CardUseHistoryTestWorld.DirectedCount) == 2,
             "Directed designation counts Borrowed Sword's paired victim even though consecutive primary-target history contains only its holder.");
 
         history = new([], []);
@@ -169,33 +178,92 @@ internal static class ProgramEventHistoryIndexChecks
         history.Append(new ActualCardUseTargetsFinalizedEvent(20, Use(2, 1, [2]), [2], 5, 0));
         history.Append(new ActualCardActionRecordedEvent(Use(3, 0, [2]), 5, 0, TurnPhase.Play, 9, false));
         history.Append(new ActualCardUseTargetsFinalizedEvent(30, Use(3, 0, [2]), [2], 5, 0));
-        Require(history.FindAction(1)!.AcceptedActorSeat == 0 && history.FinalizedDirectedTargetOrdinal(20, 2) == 1 &&
-            history.FinalizedDirectedTargetOrdinal(30, 2) == 2,
+        Require(history.FindAction(1)!.AcceptedActorSeat == 0 &&
+            new CardUseHistoryTestWorld(history, new(5, 0, history.CardUseHistoryCursor, 20, 2), target: 2).Int(CardUseHistoryTestWorld.DirectedCount) == 1 &&
+            new CardUseHistoryTestWorld(history, new(5, 0, history.CardUseHistoryCursor, 30, 3), target: 2).Int(CardUseHistoryTestWorld.DirectedCount) == 2,
             "An issued actor replacement never moves the already accepted action into another actor's history bucket.");
     }
 
-    private static void EverTargetsKeepObservedNativeScopeAndFrozenSnapshots()
+    private static void ObservationsKeepNativeScopeAndFrozenSnapshots()
     {
         static CardActionContext Use(long id, int actor, int[] targets) =>
             new(id, null, CardActionType.Use, actor, 0, null, null, null, CardKind.IronChain, targets, [], []);
         var history = new ProgramEventHistoryIndex([], []);
         history.Append(new ActualCardActionRecordedEvent(Use(1, 0, [2]), 1, 0, TurnPhase.Play, 1, false));
         history.Append(new ActualCardUseActionUpdatedEvent(10, Use(1, 0, [3]), 2, 1));
-        Require(history.EverDesignatedTargets(1, 0, 0).Count == 0 && history.EverDesignatedTargets(2, 1, 0).Count == 0,
+        Require(new CardUseHistoryTestWorld(history, new(1, 0, history.CardUseHistoryCursor)).Seats(CardUseHistoryTestWorld.EstablishedOtherTargets)!.Count == 0 &&
+            new CardUseHistoryTestWorld(history, new(2, 1, history.CardUseHistoryCursor)).Seats(CardUseHistoryTestWorld.EstablishedOtherTargets)!.Count == 0,
             "Acceptance and pre-finalized target edits do not claim that a target was actually observed.");
         history.Append(new ActualCardUseTargetsFinalizedEvent(10, Use(1, 0, [3]), [3], 2, 1));
-        var frozen = history.EverDesignatedTargets(2, 1, 0);
+        var frozen = new CardUseHistoryTestWorld(history, new(2, 1, history.CardUseHistoryCursor)).Seats(CardUseHistoryTestWorld.EstablishedOtherTargets)!;
         history.Append(new ActualCardUseActionUpdatedEvent(10, Use(1, 0, [4]), 2, 1));
         history.Append(new ActualCardUseTargetsCompletedEvent(10, Use(1, 0, []), [], 2, 1));
         Require(frozen.SequenceEqual([3]) && frozen is System.Collections.IList { IsReadOnly: true } &&
-            history.EverDesignatedTargets(2, 1, 0).Order().SequenceEqual([3, 4]) && history.EverDesignatedTargets(1, 0, 0).Count == 0,
+            new CardUseHistoryTestWorld(history, new(2, 1, history.CardUseHistoryCursor)).Seats(CardUseHistoryTestWorld.EstablishedOtherTargets)!.Order().SequenceEqual([3, 4]) &&
+            new CardUseHistoryTestWorld(history, new(1, 0, history.CardUseHistoryCursor)).Seats(CardUseHistoryTestWorld.EstablishedOtherTargets)!.Count == 0,
             "Observed targets remain after later cancellation, use the native observation scope and never mutate a captured snapshot.");
         history.Append(new ActualCardUseActionUpdatedEvent(10, Use(1, 2, [2, 5]), 2, 1));
         history.Append(new ActualCardActionRecordedEvent(Use(2, 2, [6]), 1, 0, TurnPhase.Finished, 1, false));
         history.Append(new ActualCardUseTargetsCompletedEvent(11, Use(2, 2, [6]), [6], 2, 1));
-        Require(history.EverDesignatedTargets(2, 1, 0).Order().SequenceEqual([3, 4]) &&
-            history.EverDesignatedTargets(2, 1, 2).Order().SequenceEqual([5, 6]) && frozen.SequenceEqual([3]),
+        Require(new CardUseHistoryTestWorld(history, new(2, 1, history.CardUseHistoryCursor)).Seats(CardUseHistoryTestWorld.EstablishedOtherTargets)!.Order().SequenceEqual([3, 4]) &&
+            new CardUseHistoryTestWorld(history, new(2, 1, history.CardUseHistoryCursor), owner: 2).Seats(CardUseHistoryTestWorld.EstablishedOtherTargets)!.Order().SequenceEqual([5, 6]) && frozen.SequenceEqual([3]),
             "Actor rewrites sample new native targets without moving the old actor's union; self targets are excluded and completed targets participate.");
+    }
+
+    private static void NativeUseVersionsKeepEndCutoffsAndLegacyIdentity()
+    {
+        var committed = new List<EventEnvelope>(); var pending = new List<IGameEvent>();
+        var history = new ProgramEventHistoryIndex(committed, pending);
+        var targets = new[] { 1 };
+        var original = new NativeCardUseHistorySnapshot(10, 1, 0, 0, CardKind.Slash, null, targets);
+        var captured = original with { DesignatedTargets = targets }; targets[0] = 3;
+        history.Append(new GameStartedEvent(4));
+        history.Append(new NativeCardUseHistoryRecordedEvent(captured));
+        history.Append(new OtherFact());
+        Require(history.FindNativeUse(10) is { NativeUseId: 10, ActionId: null } legacy && legacy.DesignatedTargets.SequenceEqual([1]) &&
+            captured.DesignatedTargets is System.Collections.IList { IsReadOnly: true } && new CardUseHistoryTestWorld(history, new(1, 0, 3), owner: 0).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == true,
+            "A declared legacy identity needs no Action; detached native targets participate at the complete journal cursor including unrelated facts.");
+        history.Append(new NativeCardUseHistoryRecordedEvent(original with { DesignatedTargets = [] }));
+        Require(new CardUseHistoryTestWorld(history, new(1, 0, 3), owner: 0).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == true && new CardUseHistoryTestWorld(history, new(1, 0, 4), owner: 0).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == false,
+            "An end cutoff retains the former target while a later cutoff sees cancellation, not the historical ever union.");
+        history.Append(new NativeCardUseHistoryRecordedEvent(original with { ActorSeat = 2, ActionId = 99 }));
+        Require(new CardUseHistoryTestWorld(history, new(1, 0, 5), owner: 0).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == false && new CardUseHistoryTestWorld(history, new(1, 0, 5), owner: 2).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == true &&
+            history.FindNativeUse(10) is { NativeUseId: 10, ActionId: 99, ActorSeat: 2 },
+            "A later genuine action identity and actor role update the same native use; original material ownership does not count as the actor.");
+        history.Append(new NativeCardUseHistoryRecordedEvent(new(20, 2, 1, 0, CardKind.Alcohol, null, [0])));
+        Require(new CardUseHistoryTestWorld(history, new(2, 1, 6), owner: 0).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == false && new CardUseHistoryTestWorld(history, new(2, 1, 6), owner: 2).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == false &&
+            new CardUseHistoryTestWorld(history, new(1, 0, 5), owner: 2).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == true, "A separate actual-turn scope stays independent and self Wine is never another-player targeting.");
+        var frozen = pending.Select(CommittedEventProjection.Freeze).ToArray();
+        for (var index = 0; index < frozen.Length; index++)
+            committed.Add(new(new(index + 1), null, 100 + index * 10, 1, "native-history-cutoff", frozen[index]));
+        history.ClearPending();
+        Require(new CardUseHistoryTestWorld(history, new(1, 0, 3), owner: 0).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == true && new CardUseHistoryTestWorld(history, new(1, 0, 4), owner: 0).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == false &&
+            new CardUseHistoryTestWorld(history, new(1, 0, 5), owner: 2).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == true && history.FindNativeUse(10)!.DesignatedTargets.SequenceEqual([1]),
+            "Pending-to-commit replacement preserves original journal-count cutoffs even when envelope sequences use a different scale.");
+    }
+
+    private static void LateActionAliasesPreserveEarlierNativeDeclarations()
+    {
+        var history = new ProgramEventHistoryIndex([], []);
+        var native = new NativeCardUseHistorySnapshot(10, 1, 0, 0, CardKind.Slash, null, [1]);
+        var action = new CardActionContext(99, null, CardActionType.Use, 0, 0, null, null, null, CardKind.Slash, [1], [], []);
+        history.Append(new NativeCardUseHistoryRecordedEvent(native));
+        history.Append(new ActualCardActionRecordedEvent(action, 1, 0, TurnPhase.Play, 1, false));
+        var before = new CardUseHistoryPoint(1, 0, 2);
+        history.Append(new NativeCardUseHistoryRecordedEvent(native with { ActionId = 99 }));
+        var old = history.ReadCardUseFacts(before, CardUseHistoryView.Latest);
+        var linked = history.ReadCardUseFacts(new(1, 0, 3), CardUseHistoryView.Latest);
+        Require(old.Count == 2 && old.Any(f => f.NativeUseId == 10 && f.ActionId is null) &&
+            linked is [{ NativeUseId: 10, ActionId: 99, DeclarerSeat: 0 }],
+            "A later real alias cannot erase the already-known native declaration at an earlier cutoff; only the linked view collapses the two identities.");
+
+        history = new([], []);
+        history.Append(new NativeCardUseHistoryRecordedEvent(native));
+        history.Append(new ActualCardActionRecordedEvent(action, 2, 1, TurnPhase.Play, 1, false));
+        history.Append(new NativeCardUseHistoryRecordedEvent(native with { ActionId = 99 }, 2, 1));
+        Require(history.ReadCardUseFacts(new(1, 0, 2), CardUseHistoryView.Latest) is [{ NativeUseId: 10, ActionId: null }] &&
+            history.ReadCardUseFacts(new(2, 1, 3), CardUseHistoryView.Latest) is [{ NativeUseId: 10, ActionId: 99 }],
+            "Linking in the accepted scope leaves the former scope's historical declaration in place and yields one canonical current identity.");
     }
 
     private sealed record BoundaryFact : IGameEvent;

@@ -42,7 +42,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
             var action = use.Action;
             if (action is not null && (action.Type != CardActionType.Use || action.ActorSeat != use.SourceSeat || action.EffectiveKind != use.CardKind))
                 return;
-            if (action is null && (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use)))
+            if (action is null && (use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !_nativeCardUseAdmission.IsLegacyProducerUse(use)))
                 return;
             if (!_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id && e.SourceSeat == use.SourceSeat && e.CardId == use.CardId && e.CardKind == use.CardKind))
                 return;

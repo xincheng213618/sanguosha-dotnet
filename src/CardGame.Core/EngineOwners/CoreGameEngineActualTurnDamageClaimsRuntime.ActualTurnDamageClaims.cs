@@ -31,7 +31,7 @@ internal sealed partial class CoreGameEngineActualTurnDamageClaimsRuntime
                 if (use.PhysicalCardIds is { } original && !original.SequenceEqual(materials))
                     return;
             }
-            else if (use.Action is null && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && (_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) || _coreDamageJudgmentSuitPaymentsOperations.LegacyDamageJudgmentVirtualProducer(use, applied.TargetSeat)is not null))
+            else if (use.Action is null && use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && (_nativeCardUseAdmission.IsLegacyProducerUse(use) || _coreDamageJudgmentSuitPaymentsOperations.LegacyDamageJudgmentVirtualProducer(use, applied.TargetSeat)is not null))
                 materials = [];
             else
                 return;

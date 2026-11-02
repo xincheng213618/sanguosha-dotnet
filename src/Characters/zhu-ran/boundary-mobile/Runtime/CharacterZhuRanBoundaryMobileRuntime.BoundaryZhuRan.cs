@@ -31,7 +31,7 @@ internal sealed partial class CharacterZhuRanBoundaryMobileRuntime
             if (actor != use.SourceSeat)
                 return;
         }
-        else if (!_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use))
+        else if (!_nativeCardUseAdmission.IsLegacyProducerUse(use))
             return;
         var old = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryDanshouUseActorEvent>().LastOrDefault(e => e.UseId == use.Id);
         var next = new BoundaryDanshouUseActorEvent(use.Id, use.Action?.ActionId, declared.TurnNumber, declared.TurnOwnerSeat, use.SourceSeat, use.Action?.ProviderSeat ?? use.SourceSeat);

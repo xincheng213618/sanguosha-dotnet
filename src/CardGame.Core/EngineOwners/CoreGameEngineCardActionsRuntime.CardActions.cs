@@ -444,7 +444,14 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
         var publicSuit = suits.Length == 1 ? suits[0] : (Suit? )null;
         bool? isRed = suits.Length == 0 ? null : suits.All(suit => suit is Suit.Heart or Suit.Diamond);
         var debit = _coreCardUseDebitsOperations.GetCardUseDebit(action.ActionId);
-        return new(window, parentFrameId, ownerSeat, SourceSeat: action.ActorSeat, TargetSeat: eventTargetSeat >= 0 ? eventTargetSeat : null, Facts: facts, CardUse: new(action.ActionId, parentFrameId, action.ActorSeat, eventTargetSeat >= 0 ? eventTargetSeat : null, action.EffectiveKind, publicSuit, isRed, debit is not null, debit, action.DesignatedTargetSeats));
+        return new(window, parentFrameId, ownerSeat, SourceSeat: action.ActorSeat, TargetSeat: eventTargetSeat >= 0 ? eventTargetSeat : null, Facts: facts, CardUse: new(action.ActionId, parentFrameId, action.ActorSeat, eventTargetSeat >= 0 ? eventTargetSeat : null, action.EffectiveKind, publicSuit, isRed, debit is not null, debit, action.DesignatedTargetSeats))
+        {
+            HistoryPoint = window == SkillProgramTriggerWindow.CardUseTargetsFinalized
+                ? _actualUseHistory.FindAction(action.ActionId)?.HistoryPoint
+                : new(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber,
+                    _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat,
+                    _actualUseHistory.CardUseHistoryCursor, CurrentActionId: action.ActionId)
+        };
     }
 
     internal static SkillProgramTriggerWindow GetCardActionWindow(ProgramCardTriggerWindowFrame frame) => frame.MouSimaYiPlayed?.Window ?? frame.MouLuSuAnniversaryPlayed?.Window ?? RuntimeSkills.RuntimeRules_Core_CardActions.GetCardActionWindow(frame);

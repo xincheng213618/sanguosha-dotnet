@@ -1,10 +1,6 @@
 using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
-public sealed partial record ProgramSkillWindowContext
-{
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public OrdinaryQietingTurnContext? OrdinaryQieting { get; init; }
-}
 public sealed partial record ProgramSkillFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public OrdinaryQietingReceipt? OrdinaryQieting { get; init; }
@@ -30,7 +26,7 @@ internal static class OrdinaryCaiFuRenComposition
         }
         else
         {
-            if (p.Id != "ol:qieting" || p.Activations.Count != 0 || p.Triggers is not [var t] || t.Id != "ordinary-turn-end" || t.Window != SkillProgramTriggerWindow.AfterTurnEnded || t.Subject != SkillProgramTriggerSubject.Owner || t.TurnOwnerScope != SkillProgramTurnOwnerScope.OtherLiving || !t.Optional || t.Condition.Kind != SkillProgramTriggerConditionKind.Always || t.UsageLimit is not null || t.UsageScope is not null || t.DynamicUsageLimit is not null || t.NamedUsageGroup is not null || t.MarkerCost is not null || t.ChoiceGroup is not null || t.OrderGroup is not null || t.EvaluateConditionAtResolution || t.OwnerRelation is not null || t.SourceSkillId is not null || t.SourceViewAsId is not null || t.CardKinds.Count != 0 || t.CardCategories.Count != 0 || t.Suits.Count != 0 || t.SourceZones.Count != 0 || t.DestinationZones.Count != 0 || t.MovementReasons.Count != 0 || t.ExcludedMovementReasons.Count != 0 || t.MovementOccurrence is not null || t.DamageOccurrence is not null || t.IncludeResponseUses || t.SingleActionInstance || t.DeferredTurnEndOnly || t.Effects is not [{ Op: SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }])
+            if (p.Id != "ol:qieting" || p.Activations.Count != 0 || p.Triggers is not [var t] || t.Id != "ordinary-turn-end" || t.Window != SkillProgramTriggerWindow.AfterTurnEnded || t.Subject != SkillProgramTriggerSubject.Owner || t.TurnOwnerScope != SkillProgramTurnOwnerScope.OtherLiving || !t.Optional || t.Condition.Kind != SkillProgramTriggerConditionKind.Expression || t.UsageLimit is not null || t.UsageScope is not null || t.DynamicUsageLimit is not null || t.NamedUsageGroup is not null || t.MarkerCost is not null || t.ChoiceGroup is not null || t.OrderGroup is not null || !t.EvaluateConditionAtResolution || t.OwnerRelation is not null || t.SourceSkillId is not null || t.SourceViewAsId is not null || t.CardKinds.Count != 0 || t.CardCategories.Count != 0 || t.Suits.Count != 0 || t.SourceZones.Count != 0 || t.DestinationZones.Count != 0 || t.MovementReasons.Count != 0 || t.ExcludedMovementReasons.Count != 0 || t.MovementOccurrence is not null || t.DamageOccurrence is not null || t.IncludeResponseUses || t.SingleActionInstance || t.DeferredTurnEndOnly || t.Effects is not [{ Op: SkillProgramEffectOp.ResolveOrdinaryCaiFuRenQieting, Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }])
                 throw new InvalidOperationException(path + ": ordinary Qieting requires its exact actual-turn foreign-use qualification and one option.");
         }
     }

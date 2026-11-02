@@ -27,7 +27,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
             return false;
         if (use.Action is { } action)
             return IsWenjiResponseForbidden(action, responderSeat);
-        if (use.SourceSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || responderSeat == use.SourceSeat || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id && e.SourceSeat == use.SourceSeat && e.CardId == 0 && e.CardKind == use.CardKind))
+        if (use.SourceSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || responderSeat == use.SourceSeat || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || !_nativeCardUseAdmission.IsLegacyProducerUse(use) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id && e.SourceSeat == use.SourceSeat && e.CardId == 0 && e.CardKind == use.CardKind))
             return false;
         return (_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].WenjiTurnNameGrants ?? []).Any(g => g.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && g.Source.OwnerSeat == use.SourceSeat && WenjiName(g.Name) == WenjiName(use.CardKind) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WenjiNameArmedEvent>().Count(e => e.Grant == g) == 1);
     }

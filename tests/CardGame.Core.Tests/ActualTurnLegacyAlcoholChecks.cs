@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Reflection;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
@@ -58,6 +59,11 @@ internal static class ActualTurnLegacyAlcoholChecks
         ReachOption(game, Hp, "hp-return");
         var wine = Wine(game);
         var wineId = wine.Id;
+        var nativeHistory = ((ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .GetValue(game)!).Get<IActualCardUseHistoryQueries>();
+        Require(nativeHistory.FindNativeUse(wineId) is { EffectiveKind: CardKind.Alcohol, ActorSeat: 0 } selfWine &&
+            selfWine.DesignatedTargets.All(seat => seat == 0) && new CardUseHistoryTestWorld(nativeHistory, new(turn, 0, nativeHistory.CardUseHistoryCursor)).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == false,
+            "The real self-dying Wine and preceding self DrawTwo never count as another-player targeting in native history.");
         var hpChild = game.ResolutionStack.OfType<HpChangedTriggerWindowFrame>().Single();
         var declared = Facts<CurrentTurnCardUseKindsRecordedEvent>(game).Single(e => e.OriginFrameId == wineId);
         Require(game.State.Players[0] is { Hp: 1, IsFaceDown: true } &&
@@ -208,6 +214,9 @@ internal static class ActualTurnLegacyAlcoholChecks
         public PackageManifest Manifest { get; } = new("legacy-actual-alcohol-fixture", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder builder)
         {
+            var qieting = CharacterFixtureContent.EmbeddedProgramBundle("ol-cai-fu-ren");
+            builder.AddSkill(new("ol:qieting", qieting.Presentations["ol:qieting"].Name, qieting.Presentations["ol:qieting"].Description)
+                { Program = qieting.Programs["ol:qieting"], ProgramPresentation = qieting.Presentations["ol:qieting"] });
             var peerMembers = recoveryPolicy ? """
                 "cardPolicies":[{"id":"real-lord-replacement","kind":"redirectOwnTurnFactionRecovery","factionId":"wu","ownerRole":"lord","value":1,"providerDrawCount":1}]
                 """ : "\"modifiers\":[{\"id\":\"quiet\",\"query\":\"handLimit\",\"operation\":\"add\",\"value\":1,\"priority\":0}]";

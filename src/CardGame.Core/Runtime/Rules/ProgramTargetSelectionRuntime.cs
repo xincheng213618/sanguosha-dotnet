@@ -1,3 +1,5 @@
+using CardGame.Core.EngineOwners;
+
 namespace CardGame.Core;
 
 internal interface IProgramTargetQueries : IProgramSelectionQuery
@@ -16,7 +18,8 @@ internal sealed partial class ProgramTargetSelectionRuntime(IProgramRuntimeFrame
     IMatchParticipantStateAccess state, IProgramContentQueries content,
     IProgramTurnQueries turn, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events,
     IProgramPindianPolicyQueries pindianPolicies,
-    IProgramTargetFacts facts, IProgramTargetResolvers resolvers, IProgramTargetSelectionProtocols protocols) : IProgramTargetQueries
+    IProgramTargetFacts facts, IProgramTargetResolvers resolvers, IProgramTargetSelectionProtocols protocols,
+    IKernelCreateProgramExpressionWorldOperations expressions) : IProgramTargetQueries
 {
     private IReadOnlyList<CharacterState> Players => state.Players;
     private CharacterState Player(int seat) => state.At(seat);

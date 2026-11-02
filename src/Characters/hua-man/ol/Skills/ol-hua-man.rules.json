@@ -66,6 +66,21 @@
           "optional": true,
           "usageScope": "turn",
           "usageLimit": 1,
+          "condition": {
+            "kind": "expression",
+            "expr": [
+              "and",
+              ["same", ["useActor", "currentUse"], ["useDeclarer", "currentUse"]],
+              [">", ["count", ["cardUses", "window", "latest"],
+                ["and",
+                  ["same", ["useDeclarer", "use"], ["useDeclarer", "currentUse"]],
+                  ["or", ["not", ["useIsResponse", "use"]], ["useIsSelfNativeResponse", "use"]],
+                  ["contains", ["useTargets", "use"], "eventTarget"],
+                  ["atOrBefore", "use", "currentUse", "accepted"]
+                ]
+              ], 1]
+            ]
+          },
           "effects": [
             {
               "op": "paySouyingDirectionalSoleTarget",

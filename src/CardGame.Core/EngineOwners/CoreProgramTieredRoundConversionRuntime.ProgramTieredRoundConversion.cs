@@ -80,7 +80,7 @@ internal sealed partial class CoreProgramTieredRoundConversionRuntime
                 throw new InvalidOperationException("Round-use tracking lost the accepted declared-use producer.");
             RecordTrueRoundCardName(use.Id, action.ActorSeat, action.ActionId, use.CardKind, false);
         }
-        else if (use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && _coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use))
+        else if (use.CardId == 0 && use.PhysicalCardIds is { Count: 0 } && _nativeCardUseAdmission.IsLegacyProducerUse(use))
             RecordTrueRoundCardName(use.Id, use.SourceSeat, null, use.CardKind, false);
     }
 

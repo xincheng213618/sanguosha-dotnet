@@ -91,6 +91,8 @@ internal static class MatchExecutionBoundaryChecks
             Require(ReferenceEquals(Scheduler.Frames.LastOrDefault(), frame), "Use must already be the active frame.");
             Calls.Add($"use:{frame.Id}");
         }
+        public void CardUseChanged(CardUseFrame previous, CardUseFrame current) { }
+        public void BeforeCardUseCompleted(CardUseFrame frame) { }
         public void BeforeDamageCompleted(DamageFrame frame)
         {
             Require(ReferenceEquals(Scheduler.Frames.LastOrDefault(), frame), "Damage must still be active before completion.");

@@ -76,7 +76,8 @@ public enum SkillProgramTriggerConditionKind
     NativeDrawActualTurnOrdinalIs = 27910,
     TurnOwnerUsedSameSuitCards = 1030,
     TurnOwnerFactionIs = 1027,
-    FengjiRoundChoicePending = 1028, FengjiSwapAvailable = 1029
+    FengjiRoundChoicePending = 1028, FengjiSwapAvailable = 1029,
+    Expression = 70000
 }
 public enum SkillProgramTriggerValueKind
 {
@@ -2376,6 +2377,8 @@ public sealed record SkillProgramTriggerFacts(
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public CardMovementTiming? MovementTiming { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public CardUseHistoryPoint? HistoryPoint { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? EventTargetDamageInstancesTakenThisTurn { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? AppliedDamageAmount { get; init; }
@@ -2625,18 +2628,24 @@ public sealed class SkillProgramTriggerCondition
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public HpChangeKind? HealthChangeKind { get; }
 
-    public bool Evaluate(SkillProgramTriggerFacts facts, string? skillId = null, string? skillInstanceId = null)
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramExpression? Expression { get; internal init; }
+
+    public bool Evaluate(SkillProgramTriggerFacts facts, string? skillId = null, string? skillInstanceId = null,
+        Func<ProgramExpression, bool?>? evaluateExpression = null)
     {
         if (skillId is not null && skillInstanceId is not null && facts.PublicPersistentPileCounts is { } counts)
         {
             var key = $"{skillId.Length}:{skillId}{skillInstanceId.Length}:{skillInstanceId}";
             facts = facts with { OwnedZoneCounts = facts.OwnedZoneCounts with { PublicPersistentPile = counts.GetValueOrDefault(key) } };
         }
-        return EvaluateCore(facts, skillId, skillInstanceId);
+        return EvaluateCore(facts, skillId, skillInstanceId, evaluateExpression) == true;
     }
-    private bool EvaluateCore(SkillProgramTriggerFacts facts, string? skillId, string? skillInstanceId) => Kind switch
+    private bool? EvaluateCore(SkillProgramTriggerFacts facts, string? skillId, string? skillInstanceId,
+        Func<ProgramExpression, bool?>? evaluateExpression) => Kind switch
     {
         SkillProgramTriggerConditionKind.Always => true,
+        SkillProgramTriggerConditionKind.Expression => evaluateExpression?.Invoke(Expression!),
         SkillProgramTriggerConditionKind.Compare => Compare(facts),
         SkillProgramTriggerConditionKind.ClassicIdentityMode => facts.IsClassicIdentityMode,
         SkillProgramTriggerConditionKind.BooleanState when skillId is not null && skillInstanceId is not null =>
@@ -2699,11 +2708,24 @@ public sealed class SkillProgramTriggerCondition
         SkillProgramTriggerConditionKind.FaceDown => facts.OwnerIsFaceDown,
         SkillProgramTriggerConditionKind.LordGeneralNotIn =>
             facts.LordGeneralId is null || !GeneralIds.Contains(facts.LordGeneralId, StringComparer.Ordinal),
-        SkillProgramTriggerConditionKind.All => Children.All(child => child.Evaluate(facts, skillId, skillInstanceId)),
-        SkillProgramTriggerConditionKind.Any => Children.Any(child => child.Evaluate(facts, skillId, skillInstanceId)),
-        SkillProgramTriggerConditionKind.Not => !HasUndefinedHpOperand(facts) && !Children[0].Evaluate(facts, skillId, skillInstanceId),
+        SkillProgramTriggerConditionKind.All => EvaluateChildren(facts, skillId, skillInstanceId, evaluateExpression, any: false),
+        SkillProgramTriggerConditionKind.Any => EvaluateChildren(facts, skillId, skillInstanceId, evaluateExpression, any: true),
+        SkillProgramTriggerConditionKind.Not => HasUndefinedHpOperand(facts) ? false : !Children[0].EvaluateCore(facts, skillId, skillInstanceId, evaluateExpression),
         _ => throw new InvalidOperationException($"Unsupported trigger condition kind '{Kind}'.")
     };
+
+    private bool? EvaluateChildren(SkillProgramTriggerFacts facts, string? skillId, string? skillInstanceId,
+        Func<ProgramExpression, bool?>? evaluateExpression, bool any)
+    {
+        var unknown = false;
+        foreach (var child in Children)
+        {
+            var value = child.EvaluateCore(facts, skillId, skillInstanceId, evaluateExpression);
+            if (value == any) return any;
+            if (value is null) unknown = true;
+        }
+        return unknown ? null : !any;
+    }
 
     private bool Compare(SkillProgramTriggerFacts facts)
     {
@@ -3106,6 +3128,8 @@ public sealed partial class SkillProgramEffect
     public SkillProgramNumberExpression? NumberExpression { get; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramExpression? AmountExpression { get; internal init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramExpression? TargetSetExpression { get; internal init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramCurrentResponseRule? CurrentResponseRule { get; internal init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -6857,8 +6881,14 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
     {
         if (depth >= MaximumDepth) Fail(path, $"trigger condition nesting exceeds {MaximumDepth}");
         RequireObject(node, path);
-        CheckProperties(node, path, "kind", "children", "left", "operator", "right", "stateId", "expectedValue", "generalIds", "conversionSkillId", "categories", "factions", "gender", "suits", "value", "damageNature", "hpChangeKind");
+        CheckProperties(node, path, "kind", "children", "left", "operator", "right", "stateId", "expectedValue", "generalIds", "conversionSkillId", "categories", "factions", "gender", "suits", "value", "damageNature", "hpChangeKind", "expr");
         var kind = EnumValue<SkillProgramTriggerConditionKind>(node, "kind", path);
+        var expression = node.TryGetProperty("expr", out var expressionNode)
+            ? ProgramExpressions.Parse(expressionNode, path + ".expr") : null;
+        if ((kind == SkillProgramTriggerConditionKind.Expression) != (expression is not null))
+            Fail(path, kind == SkillProgramTriggerConditionKind.Expression ? "expression requires expr" : "only expression accepts expr");
+        if (expression?.Nodes().Any(item => item.Op is "number" or "choiceNumber" || item.Op.StartsWith("bound", StringComparison.Ordinal)) == true)
+            Fail(path + ".expr", "trigger expressions cannot read instruction-local bindings");
         var actualTurnUseOrdinal = kind == SkillProgramTriggerConditionKind.CardActionActualTurnUseOrdinalIs;
         var nativeDrawOrdinal = kind == SkillProgramTriggerConditionKind.NativeDrawActualTurnOrdinalIs;
         if ((actualTurnUseOrdinal || nativeDrawOrdinal) != node.TryGetProperty("value", out _))
@@ -6966,7 +6996,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             factions, genderIs ? EnumValue<GeneralGender>(node, "gender", path) : null, suits, actualTurnUseOrdinal ? ordinal : null,
             damageNatureIs ? EnumValue<DamageNature>(node, "damageNature", path) : null,
             healthChangeKindIs ? EnumValue<HpChangeKind>(node, "hpChangeKind", path) : null,
-            nativeDrawOrdinal ? ordinal : null);
+            nativeDrawOrdinal ? ordinal : null) { Expression = expression };
     }
 
     private static IEnumerable<SkillProgramTriggerValue> EnumerateTriggerValues(

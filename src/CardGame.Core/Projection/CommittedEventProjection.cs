@@ -79,6 +79,7 @@ internal static class CommittedEventProjection
         ActualCardUseTargetsFinalizedEvent value => value,
         ActualCardUseTargetsCompletedEvent value => value,
         ActualCardUseActionUpdatedEvent value => value,
+        NativeCardUseHistoryRecordedEvent value => value,
         SourceKeshouPaidBranchEvent value => value with
         { Receipt = value.Receipt with { Materials = FreezeList(value.Receipt.Materials) } },
         AnniversaryCuiLieUseChangedEvent value => value with

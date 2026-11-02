@@ -3,6 +3,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class ActualCardUseHistoryCaptureRuntime(IProgramContentQueries content,
     IActualCardUseHistoryQueries history, IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
+    INativeCardUseAdmission admission,
     RuntimeEntries.CoreNativeCardContinuationCursorsEntries cursors,
     RuntimeEntries.CoreActiveNativeAttackQueriesEntries attacks,
     EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess turn,
@@ -10,6 +11,36 @@ internal sealed class ActualCardUseHistoryCaptureRuntime(IProgramContentQueries 
     : IActualCardUseHistoryCapture
 {
     public bool IsRequired => content.RequiresFact(ProgramTrackedFact.ActualCardUseHistory);
+
+    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 249)]
+    internal void RecordNativeDeclared(CardUseDeclaredEvent declared)
+    {
+        if (!IsRequired || turn._turnNumber < 1 || history.FindNativeUse(declared.ResolutionId) is not null ||
+            frames.Find(declared.ResolutionId) is not CardUseFrame use || !admission.IsDeclaredUse(use, declared))
+            return;
+        events.AdvanceFact(new NativeCardUseHistoryRecordedEvent(new(use.Id, turn._turnNumber,
+            turn._turnProgression.OwnerSeat, use.SourceSeat, use.CardKind, use.Action?.ActionId,
+            use.Action?.EffectiveDesignatedTargetSeats ?? use.TargetSeats)));
+    }
+
+    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 249)]
+    internal void RecordNativeConfirmed(TargetsConfirmedEvent confirmed)
+    {
+        if (IsRequired && frames.Find(confirmed.ResolutionId) is CardUseFrame use)
+            RecordNativeChanged(use);
+    }
+
+    public void RecordNativeChanged(CardUseFrame use)
+    {
+        if (!IsRequired || history.FindNativeUse(use.Id) is not { } original)
+            return;
+        var targets = use.Action?.EffectiveDesignatedTargetSeats ?? use.TargetSeats;
+        if (original.ActorSeat == use.SourceSeat && original.EffectiveKind == use.CardKind &&
+            original.ActionId == use.Action?.ActionId && original.DesignatedTargets.SequenceEqual(targets))
+            return;
+        events.AdvanceFact(new NativeCardUseHistoryRecordedEvent(original with
+        { ActorSeat = use.SourceSeat, EffectiveKind = use.CardKind, ActionId = use.Action?.ActionId, DesignatedTargets = targets }, turn._turnNumber, turn._turnProgression.OwnerSeat));
+    }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 499)]
     internal void RecordAccepted(CardActionAcceptedEvent accepted)

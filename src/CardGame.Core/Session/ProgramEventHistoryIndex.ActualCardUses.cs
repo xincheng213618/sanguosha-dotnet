@@ -6,9 +6,7 @@ internal sealed partial class ProgramEventHistoryIndex
     // finalization order differ when a use suspends for another use.
     private readonly Dictionary<long, ActualCardUseHistoryEntry> _actualActions = [];
     private readonly Dictionary<long, CardActionContext> _latestActualActions = [];
-    private readonly Dictionary<(int Turn, int Actor), List<long>> _actualTurnActions = [];
-    private readonly Dictionary<(long UseId, int Target), int> _finalizedDirectedTargetOrdinals = [];
-    private readonly Dictionary<(int Turn, int TurnOwner, int Actor), List<int>> _everDesignatedTargets = [];
+    private readonly Dictionary<long, NativeCardUseHistorySnapshot> _nativeUses = [];
     private readonly Dictionary<long, long> _finalizedActions = [];
     private readonly Dictionary<long, long> _previousFinalizedActions = [];
     private readonly Dictionary<long, ActualCardUseHistoryEntry> _completedActualActions = [];
@@ -29,17 +27,16 @@ internal sealed partial class ProgramEventHistoryIndex
         return _actualActions.GetValueOrDefault(actionId);
     }
 
+    public NativeCardUseHistorySnapshot? FindNativeUse(long nativeUseId)
+    {
+        SynchronizeActualUses();
+        return _nativeUses.GetValueOrDefault(nativeUseId);
+    }
+
     public CardActionContext? FindLatestAction(long actionId)
     {
         SynchronizeActualUses();
         return _latestActualActions.GetValueOrDefault(actionId);
-    }
-
-    public IReadOnlyList<int> EverDesignatedTargets(int actualTurn, int turnOwnerSeat, int actorSeat)
-    {
-        SynchronizeActualUses();
-        return _everDesignatedTargets.TryGetValue((actualTurn, turnOwnerSeat, actorSeat), out var targets)
-            ? Array.AsReadOnly(targets.ToArray()) : [];
     }
 
     public ActualCardUseHistoryEntry? FindFinalizedUse(long nativeUseId)
@@ -67,20 +64,6 @@ internal sealed partial class ProgramEventHistoryIndex
         return _acceptedAtCompletion.GetValueOrDefault(actionId) ?? [];
     }
 
-    public IReadOnlyList<ActualCardUseHistoryEntry> AcceptedPairFor(long actionId)
-    {
-        SynchronizeActualUses();
-        if (!_acceptedActualPositions.TryGetValue(actionId, out var position)) return [];
-        return position.Index == 0 ? Array.AsReadOnly(new[] { _actualActions[actionId] }) :
-            Array.AsReadOnly(new[] { _actualActions[position.Uses[position.Index - 1]], _actualActions[actionId] });
-    }
-
-    public int? FinalizedDirectedTargetOrdinal(long nativeUseId, int targetSeat)
-    {
-        SynchronizeActualUses();
-        return _finalizedDirectedTargetOrdinals.TryGetValue((nativeUseId, targetSeat), out var ordinal) ? ordinal : null;
-    }
-
     private void SynchronizeActualUses()
     {
         var stamp = CapturePendingProgramHistoryStamp();
@@ -101,14 +84,15 @@ internal sealed partial class ProgramEventHistoryIndex
         if (!retained)
         {
             _actualActions.Clear(); _finalizedActions.Clear(); _previousFinalizedActions.Clear();
-            _latestActualActions.Clear(); _actualTurnActions.Clear(); _finalizedDirectedTargetOrdinals.Clear(); _everDesignatedTargets.Clear();
+            _latestActualActions.Clear(); ClearCardUseFacts();
+            _nativeUses.Clear();
             _completedActualActions.Clear(); _completedNativeActions.Clear(); _acceptedAtCompletion.Clear();
             _lastFinalizedActions.Clear(); _acceptedActualUses.Clear(); _acceptedActualPositions.Clear();
             _completedNativeUses.Clear();
             start = 0;
         }
         for (var index = start; index < events.Count + pendingEvents.Count; index++)
-            IndexActualUseFact(index < events.Count ? events[index].Payload : pendingEvents[index - events.Count]);
+            IndexActualUseFact(index < events.Count ? events[index].Payload : pendingEvents[index - events.Count], index + 1L);
         if (!knownAppend) _actualPendingWitness.Clear();
         for (var index = _actualPendingWitness.Count; index < pendingEvents.Count; index++)
             _actualPendingWitness.Add(pendingEvents[index]);
@@ -119,24 +103,22 @@ internal sealed partial class ProgramEventHistoryIndex
 
     private static bool IsActualUseFact(IGameEvent payload) => payload is ActualCardActionRecordedEvent or
         ActualCardUseTargetsFinalizedEvent or ActualCardUseTargetsCompletedEvent or ActualCardUseActionUpdatedEvent or
-        CardUseFinishedEvent or CardResponseCompletedEvent;
+        CardUseFinishedEvent or CardResponseCompletedEvent or NativeCardUseHistoryRecordedEvent;
 
-    private void IndexActualUseFact(IGameEvent payload)
+    private void IndexActualUseFact(IGameEvent payload, long cursor)
     {
+        IndexCardUseFacts(payload, cursor);
         switch (payload)
         {
+            case NativeCardUseHistoryRecordedEvent { Snapshot: var snapshot }:
+                _nativeUses[snapshot.NativeUseId] = snapshot;
+                break;
             case ActualCardActionRecordedEvent fact when !_actualActions.ContainsKey(fact.Action.ActionId):
             {
                 var action = fact.Action;
                 _actualActions.Add(action.ActionId, new(action, fact.ActualTurn, fact.TurnOwner,
                     fact.Phase, fact.PlayPhaseInstanceId, fact.IsSelfNativeResponseUse));
                 _latestActualActions.Add(action.ActionId, action);
-                if (action.Type == CardActionType.Use || fact.IsSelfNativeResponseUse)
-                {
-                    var turnKey = (fact.ActualTurn, action.ActorSeat);
-                    if (!_actualTurnActions.TryGetValue(turnKey, out var turnUses)) _actualTurnActions[turnKey] = turnUses = [];
-                    turnUses.Add(action.ActionId);
-                }
                 if (fact.Phase != TurnPhase.Play || action.ActorSeat != fact.TurnOwner ||
                     action.Type != CardActionType.Use && !fact.IsSelfNativeResponseUse) break;
                 var key = (fact.ActualTurn, fact.PlayPhaseInstanceId, action.ActorSeat);
@@ -150,15 +132,10 @@ internal sealed partial class ProgramEventHistoryIndex
             {
                 var actionId = fact.Action.ActionId;
                 _actualActions[actionId] = accepted with { Action = fact.Action, NativeUseId = fact.NativeUseId,
-                    PrimaryTargets = fact.PrimaryTargets, Completed = _completedNativeUses.Contains(fact.NativeUseId) };
+                    PrimaryTargets = fact.PrimaryTargets, Completed = _completedNativeUses.Contains(fact.NativeUseId),
+                    HistoryPoint = new(accepted.ActualTurn, accepted.TurnOwner, cursor, fact.NativeUseId, actionId) };
                 _latestActualActions[actionId] = fact.Action;
                 _finalizedActions.Add(fact.NativeUseId, actionId);
-                ObserveDesignatedTargets(fact.Action, fact.ActualTurn, fact.TurnOwner);
-                if (accepted.AcceptedActorSeat == fact.Action.ActorSeat &&
-                    _actualTurnActions.TryGetValue((accepted.ActualTurn, accepted.AcceptedActorSeat), out var turnUses))
-                    foreach (var target in fact.Action.EffectiveDesignatedTargetSeats.Distinct())
-                        _finalizedDirectedTargetOrdinals[(fact.NativeUseId, target)] = turnUses.Count(id =>
-                            id <= actionId && _latestActualActions[id].EffectiveDesignatedTargetSeats.Contains(target));
                 if (accepted.Phase != TurnPhase.Play || fact.Action.ActorSeat != accepted.TurnOwner) break;
                 var key = (accepted.ActualTurn, accepted.PlayPhaseInstanceId, fact.Action.ActorSeat);
                 if (_lastFinalizedActions.TryGetValue(key, out var previous)) _previousFinalizedActions[actionId] = previous;
@@ -177,7 +154,6 @@ internal sealed partial class ProgramEventHistoryIndex
                 _completedActualActions[actionId] = completedAccepted with { Action = fact.Action, NativeUseId = fact.NativeUseId,
                     PrimaryTargets = fact.PrimaryTargets, Completed = _completedNativeUses.Contains(fact.NativeUseId) };
                 _latestActualActions[actionId] = fact.Action;
-                ObserveDesignatedTargets(fact.Action, fact.ActualTurn, fact.TurnOwner);
                 _completedNativeActions.Add(fact.NativeUseId, actionId);
                 if (_acceptedActualPositions.TryGetValue(actionId, out var position))
                 {
@@ -196,8 +172,6 @@ internal sealed partial class ProgramEventHistoryIndex
             }
             case ActualCardUseActionUpdatedEvent fact when _actualActions.ContainsKey(fact.Action.ActionId):
                 _latestActualActions[fact.Action.ActionId] = fact.Action;
-                if (_finalizedActions.ContainsKey(fact.NativeUseId))
-                    ObserveDesignatedTargets(fact.Action, fact.ActualTurn, fact.TurnOwner);
                 break;
             case CardResponseCompletedEvent fact when _actualActions.TryGetValue(fact.ActionId, out var response):
                 _actualActions[fact.ActionId] = response with { PrimaryTargets = Array.Empty<int>(), Completed = true };
@@ -206,12 +180,4 @@ internal sealed partial class ProgramEventHistoryIndex
         }
     }
 
-    private void ObserveDesignatedTargets(CardActionContext action, int actualTurn, int turnOwnerSeat)
-    {
-        if (action.Type != CardActionType.Use) return;
-        var key = (actualTurn, turnOwnerSeat, action.ActorSeat);
-        if (!_everDesignatedTargets.TryGetValue(key, out var targets)) _everDesignatedTargets[key] = targets = [];
-        foreach (var target in action.EffectiveDesignatedTargetSeats)
-            if (target != action.ActorSeat && !targets.Contains(target)) targets.Add(target);
-    }
 }

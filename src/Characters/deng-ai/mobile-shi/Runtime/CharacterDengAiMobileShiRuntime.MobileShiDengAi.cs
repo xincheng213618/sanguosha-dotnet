@@ -31,8 +31,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
     internal static bool ShiDaOwns(CardLocation location, int owner) => location.OwnerSeat == owner && location.Zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment;
     internal static bool ShiDaDamageCard(CardKind kind) => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(kind) || CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(kind) || kind == CardKind.Lightning;
     internal IReadOnlyList<CardMovementRecord> ShiDaLosses(int owner, CardMovementBatchContext? batch) => batch is null ? [] : batch.Movements.Where(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && ShiDaOwns(m.From, owner) && !ShiDaOwns(m.To, owner) && !ShiDaDamageCard(m.CardKind) && !IsShiDaDeferredEquipmentEntry(batch, m)).GroupBy(m => m.CardId).Select(group => group.OrderBy(m => m.Sequence).First()).ToArray();
-    private IReadOnlyList<int> ShiDaHistoricalTargets(int owner) => _actualCardUseHistory.EverDesignatedTargets(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, owner);
-    internal bool ShiDaHasJixiTarget(int owner) => !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Snatch, CardActionType.Use) && ShiDaHistoricalTargets(owner).Any(seat => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.HasTargetCard(_coreMatchParticipantsPlayersAccess._players[seat]) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Snatch, Suit.None, null) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, seat, CardKind.Snatch));
+    private bool ShiDaHasJixiTarget(int owner, IReadOnlyList<int> targets) => !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Snatch, CardActionType.Use) && targets.Any(seat => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.HasTargetCard(_coreMatchParticipantsPlayersAccess._players[seat]) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Snatch, Suit.None, null) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, seat, CardKind.Snatch));
     internal IReadOnlyList<PromptChoice> ShiDaCostChoices(long id, int owner, int payer) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(id, owner, payer, [CardZoneKind.Hand, CardZoneKind.Equipment, CardZoneKind.Judgment], OwnedCardMoveIntent.Discard);
     internal bool ShiDaHasJixiDiscard(ProgramTriggerCandidate candidate, int payer) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(payer) && new[]
     {
@@ -50,7 +49,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
             return trigger.Id == "full-charge" ? charge.Current == charge.Capacity : trigger.Id != "non-damage-loss" || charge.Current < charge.Capacity && ShiDaLosses(candidate.OwnerSeat, context.MovementBatch).Count > 0;
         }
 
-        return candidate.SkillId != ShiDaJixi || trigger.Id != "ending-jixi" || _coreTableSeatQueriesOperations.IsValidPlayerSeat(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && ShiDaHasJixiTarget(candidate.OwnerSeat) && ShiDaHasJixiDiscard(candidate, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
+        return candidate.SkillId != ShiDaJixi || trigger.Id != "ending-jixi" || _coreTableSeatQueriesOperations.IsValidPlayerSeat(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) && trigger.Effects[0].TargetSetExpression is { } expression && ProgramExpressions.EvaluateParticipantSet(expression, _expressionWorlds.CreateTriggerExpressionWorld(candidate, context, context.Facts)) is { } targets && ShiDaHasJixiTarget(candidate.OwnerSeat, targets) && ShiDaHasJixiDiscard(candidate, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
     }
 
     internal SkillProgramStepOutcome BeginShiDa(ProgramSkillFrame input, SkillProgramEffectOp op)
@@ -73,7 +72,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
         {
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
             After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
-            History = op == SkillProgramEffectOp.ResolveMobileShiDengAiJixi ? ShiDaHistoricalTargets(f.OwnerSeat) : [],
+            History = op == SkillProgramEffectOp.ResolveMobileShiDengAiJixi ? ProgramExpressions.EvaluateParticipantSet(_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)!.TargetSetExpression!, _expressionWorlds.CreateProgramExpressionWorld(f)) ?? [] : [],
             Paid = op == SkillProgramEffectOp.ResolveMobileShiDengAiFull
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiDengAi = r });
@@ -380,6 +379,15 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
         if (skillId is not (ShiDaTuntian or ShiDaJixi))
             return[];
         var charge = ShiDaCharge(owner.Seat);
-        return _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(i => i.SkillId == skillId).SelectMany(i => skillId == ShiDaTuntian ? new[] { new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "charge", ProgramPublicRuleStateKind.GameActivationProgress, charge.Current), new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "capacity", ProgramPublicRuleStateKind.GameActivationProgress, charge.Capacity) } : new[] { new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "eligible-targets", ProgramPublicRuleStateKind.GameActivationProgress, ShiDaHistoricalTargets(owner.Seat).Count) }).ToArray();
+        return _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Where(i => i.SkillId == skillId).SelectMany(i =>
+        {
+            if (skillId == ShiDaTuntian)
+                return new[] { new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "charge", ProgramPublicRuleStateKind.GameActivationProgress, charge.Current), new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "capacity", ProgramPublicRuleStateKind.GameActivationProgress, charge.Capacity) };
+            var program = _contentRegistryOperations._contentRegistry.GetSkill(skillId).Program!;
+            var trigger = program.Triggers.Single(t => t.Id == "ending-jixi");
+            var candidate = new ProgramTriggerCandidate(owner.Seat, skillId, trigger.Id, i.SkillInstanceId, program.GameplayHash, trigger.Priority);
+            var count = ProgramExpressions.EvaluateParticipantSet(trigger.Effects[0].TargetSetExpression!, _expressionWorlds.CreateTriggerExpressionWorld(candidate, null, null))?.Count ?? 0;
+            return new[] { new ProgramPublicRuleStateSnapshot(i.SkillInstanceId, "eligible-targets", ProgramPublicRuleStateKind.GameActivationProgress, count) };
+        }).ToArray();
     }
 }

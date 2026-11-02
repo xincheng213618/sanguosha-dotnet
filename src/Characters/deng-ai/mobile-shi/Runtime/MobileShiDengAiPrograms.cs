@@ -75,7 +75,14 @@ internal sealed class ResolveMobileShiDengAiFullDescriptor() : ShiDengAiDescript
 internal sealed class ResolveMobileShiDengAiTuntianDescriptor() : ShiDengAiDescriptor(SkillProgramEffectOp.ResolveMobileShiDengAiTuntian);
 internal sealed class ResolveMobileShiDengAiJixiDescriptor() : ShiDengAiDescriptor(SkillProgramEffectOp.ResolveMobileShiDengAiJixi)
 {
-    public override ProgramFactRequirements FactRequirements => base.FactRequirements with { Triggered = base.FactRequirements.Triggered | ProgramTrackedFact.ActualCardUseHistory };
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
+    {
+        r.AllowOnly("op", "target", "condition", "targetSetExpr");
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition())
+            { TargetSetExpression = r.ParticipantSetExpression("targetSetExpr") ?? throw new InvalidOperationException(r.Path + ".targetSetExpr is required.") };
+        RequireAlways(effect, r.Path);
+        return effect;
+    }
 }
 internal sealed class ShiDengAiHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {

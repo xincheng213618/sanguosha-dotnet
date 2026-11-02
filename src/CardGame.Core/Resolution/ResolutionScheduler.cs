@@ -3,6 +3,8 @@ namespace CardGame.Core;
 internal interface IResolutionLifecycle
 {
     void CardUsePushed(CardUseFrame frame, CardActionContext action);
+    void CardUseChanged(CardUseFrame previous, CardUseFrame current);
+    void BeforeCardUseCompleted(CardUseFrame frame);
     void BeforeDamageCompleted(DamageFrame frame);
     void RecoveryCompleted(RecoveryFrame frame);
 }
@@ -85,14 +87,26 @@ internal sealed class ResolutionScheduler(IResolutionLifecycle lifecycle) : INat
     {
         if (next.Id != expectedFrameId)
             throw new InvalidOperationException("A runtime write changed its selected owner identity.");
+        var previous = Find(expectedFrameId);
         Frames.Replace(next);
+        NotifyCardUseChanged(previous, next);
     }
 
     internal void ReplaceTop(ResolutionFrame next)
     {
         if (Frames.LastOrDefault()?.Id != next.Id)
             throw new InvalidOperationException("Only the active runtime frame may write its top continuation.");
+        var previous = Top;
         Frames.Replace(next);
+        NotifyCardUseChanged(previous, next);
+    }
+
+    private void NotifyCardUseChanged(ResolutionFrame? previous, ResolutionFrame next)
+    {
+        if (previous is CardUseFrame before && next is CardUseFrame after &&
+            (before.SourceSeat != after.SourceSeat || before.CardKind != after.CardKind ||
+             !ReferenceEquals(before.Action, after.Action) || !before.TargetSeats.SequenceEqual(after.TargetSeats)))
+            lifecycle.CardUseChanged(before, after);
     }
 
     internal void Complete(long frameId, ResolutionFrameKind expectedKind)
@@ -105,6 +119,8 @@ internal sealed class ResolutionScheduler(IResolutionLifecycle lifecycle) : INat
             throw new InvalidOperationException("A producer cannot complete with an unconsumed paid faction request cost.");
         if (expectedKind == ResolutionFrameKind.Damage && Frames.LastOrDefault() is DamageFrame damage && damage.Id == frameId)
             lifecycle.BeforeDamageCompleted(damage);
+        if (expectedKind == ResolutionFrameKind.CardUse && Frames.LastOrDefault() is CardUseFrame use && use.Id == frameId)
+            lifecycle.BeforeCardUseCompleted(use);
         var completed = Frames.CompleteTop(frameId, expectedKind);
         if (completed is RecoveryFrame recovery)
             lifecycle.RecoveryCompleted(recovery);

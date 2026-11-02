@@ -32,7 +32,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         if (first is null || first.OriginFrameId != id || first.CardActionId is not null)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == id);
-        if (index < 1 || index != _resolutionStackOperations._resolutionStack.Count - 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame parent || parent.Id != parentId || parent.OwnerSeat != use.SourceSeat || parent.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.ParentFrameId != dyingId || _coreDyingCursorRuntimeOperations.Value.ActiveDying?.FrameId != dyingId || !_coreCurrentTurnUseKindsOperations.IsActualTurnLegacyVirtualUse(use))
+        if (index < 1 || index != _resolutionStackOperations._resolutionStack.Count - 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame parent || parent.Id != parentId || parent.OwnerSeat != use.SourceSeat || parent.WindowContext is not { Window: SkillProgramTriggerWindow.SelfDyingResponse } context || context.ParentFrameId != dyingId || _coreDyingCursorRuntimeOperations.Value.ActiveDying?.FrameId != dyingId || !_nativeCardUseAdmission.IsLegacyProducerUse(use))
             throw new InvalidOperationException("Bingcai's legacy Alcohol requires its genuine accepted first-basic self-rescue producer.");
         use = _coreActualTurnLegacyCompletionOperations.NormalizeActualTurnLegacyCompletedUse(use, parentId);
         if (use.Action is null)

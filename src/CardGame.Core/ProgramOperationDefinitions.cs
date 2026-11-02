@@ -252,6 +252,8 @@ internal sealed class ProgramOperationNodeReader
     }
     internal ProgramExpression RequiredBoolExpression(string name) =>
         ProgramExpressions.Parse(_node.GetProperty(name), Path + "." + name);
+    internal ProgramExpression? ParticipantSetExpression(string name) => Has(name)
+        ? ProgramExpressions.ParseParticipantSet(_node.GetProperty(name), Path + "." + name) : null;
     internal SkillProgramUnknownAmountBehavior UnknownAmountBehavior()
     {
         if (!Has("onUnknownAmount")) return SkillProgramUnknownAmountBehavior.Skip;
@@ -975,7 +977,7 @@ internal sealed class SelectTargetProgramOperationDescriptor : ProgramOperationD
         static (effect, context) => context.SelectTarget(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "targetKind", "marker", "zones", "actorRef", "skipIfNoTarget", "condition");
+        r.AllowOnly("op", "target", "targetKind", "marker", "zones", "actorRef", "skipIfNoTarget", "condition", "targetSetExpr");
         var zones = r.Has("zones") ? r.RequiredEnumArray<CardZoneKind>("zones") : [];
         if (zones.Any(zone => zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment)))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.zones: selectTarget supports hand, equipment and judgment only.");
@@ -991,7 +993,8 @@ internal sealed class SelectTargetProgramOperationDescriptor : ProgramOperationD
                 $"Invalid skill program at {r.Path}: maximum attributed-marker targets require marker, and other target kinds forbid it.");
         var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0,
             r.Condition(), zones: zones, targetKind: targetKind, marker: marker,
-            actorReference: actorRef, skipIfNoTarget: skipIfNoTarget);
+            actorReference: actorRef, skipIfNoTarget: skipIfNoTarget)
+            { TargetSetExpression = r.ParticipantSetExpression("targetSetExpr") };
         if (effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs &&
             (targetKind is not (SkillProgramTargetKind.OtherLivingInAttackRange or
                 SkillProgramTargetKind.OtherLivingWithDiscardableHandOrEquipment or
