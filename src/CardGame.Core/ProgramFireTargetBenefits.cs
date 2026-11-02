@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 public sealed record ProgramFireTargetBenefit(int InstructionIndex, long DamageWindowId, long DamageFrameId,
     int OwnerSeat, int TargetSeat, int ActualTurnNumber, int ActualTurnOwnerSeat,
-    long SequenceBefore, long SequenceAfter, int DrawCount, long GrantSequence, CardUseEffectSource Source);
+    long SequenceBefore, long SequenceAfter, int DrawCount, CardUseEffectSource Source);
 public sealed record ProgramFireTargetDrawIssuedEvent(long ProgramFrameId, long DamageWindowId,
     int OwnerSeat, int TargetSeat, int ActualCount, long SequenceBefore, long SequenceAfter) : IGameEvent;
 

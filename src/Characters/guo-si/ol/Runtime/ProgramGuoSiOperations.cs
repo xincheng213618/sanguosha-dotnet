@@ -20,7 +20,6 @@ public sealed record GuoSiNativeReturnedEvent(GuoSiNativeReceipt Receipt):IGameE
 public sealed record GuoSiPairQualifiedEvent(long NativeUseId,int OwnerSeat,long FirstActionId,long SecondActionId):IGameEvent;
 public sealed partial class CharacterState
 {
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<GuoSiTurnPact>? GuoSiPacts {get;set;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<GuoSiUseStamp>? GuoSiUses {get;set;}
 }
 public sealed partial record ProgramSkillFrame

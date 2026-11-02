@@ -37,6 +37,7 @@ internal static partial class PhaseStartCardControlChecks
         DirectedPolicyIssuedAfterTurnEndSkipsThatOccurrence();
         DirectedDeclarationFreezesAnEmptySnapshot();
         foreach (var count in new[] { 2, 3 }) DirectedWeiwanUsesActualObtainedCount(count);
+        TargetQuotaAllowsSelfAndUsesOriginalIssuanceSlots();
     }
 
     private static void DirectedPolicyIssuedAfterTurnEndSkipsThatOccurrence()
@@ -128,13 +129,18 @@ internal static partial class PhaseStartCardControlChecks
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new DirectedFixture(scenario));
         var target = new ShanheCombatantDefinition(DirectedPeer) { StartingHand = new[] { Suit.Heart, Suit.Spade, Suit.Diamond }.Take(obtained).Select(s => new ShanheStartingCard(CardKind.Dodge, s, 8)).ToArray() };
+        ShanheStartingCard[] hand = scenario == "quota-self"
+            ? [new(CardKind.Alcohol, Suit.Club, 7), new(CardKind.Alcohol, Suit.Heart, 8), new(CardKind.Slash, Suit.Spade, 9), new(CardKind.Duel, Suit.Diamond, 10)]
+            : [new(CardKind.Slash, Suit.Club, 7), new(CardKind.Slash, Suit.Heart, 8), new(CardKind.Slash, Suit.Spade, 9), new(CardKind.Duel, Suit.Diamond, 10)];
         var setup = new ShanheBattleSetup(7, 1, "directed-rights", Owner, 12, 0, 0, 0, 0, [],
-            [new(CardKind.Slash, Suit.Club, 7), new(CardKind.Slash, Suit.Heart, 8), new(CardKind.Slash, Suit.Spade, 9), new(CardKind.Duel, Suit.Diamond, 10)], [],
+            hand, [],
             [target, new(DirectedPeer) { StartingHand = [] }], [new(DirectedPeer) { StartingHand = [] }], new string('a', 64));
         var g = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0,
             HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId,
             ShanheBattle = setup, UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 12 }, registry);
-        Accept(g, new StartGameCommand()); Play(g); return (g, registry);
+        Accept(g, new StartGameCommand());
+        if (scenario == "quota-bao") Reach(g, p => Optional(p, "ol:zhennan")); else Play(g);
+        return (g, registry);
     }
 
     private sealed class DirectedFixture(string scenario) : IGameContentPackage
@@ -143,14 +149,17 @@ internal static partial class PhaseStartCardControlChecks
         public void Register(IContentRegistryBuilder b)
         {
             var skills = new List<string> { Driver, DirectedSource, "fixture:directed-no-draw" };
-            string[] bundles = scenario switch { "freeze" => ["classic-yu-ji"], "weiwan" => ["le-xiao-qiao"], _ => [] };
+            var nativeQuotaSkill = scenario switch { "quota-fire" => "ol:huxiao", "quota-bao" => "ol:zhennan", "quota-guosi" => "ol:tanbei", _ => (string?)null };
+            string[] bundles = scenario switch { "freeze" => ["classic-yu-ji"], "weiwan" => ["le-xiao-qiao"],
+                "quota-fire" => ["ordinary-guan-yin-ping"], "quota-bao" => ["ol-bao-san-niang"], "quota-guosi" => ["ol-guo-si"], _ => [] };
             foreach (var bundle in bundles)
             {
                 var real = CharacterFixtureContent.EmbeddedProgramBundle(bundle);
-                foreach (var (id, program) in real.Programs) b.AddSkill(new(id, real.Presentations[id].Name, real.Presentations[id].Description) { Program = program, ProgramPresentation = real.Presentations[id] });
+                foreach (var (id, program) in real.Programs.Where(p => nativeQuotaSkill is null || p.Key == nativeQuotaSkill)) b.AddSkill(new(id, real.Presentations[id].Name, real.Presentations[id].Description) { Program = program, ProgramPresentation = real.Presentations[id] });
             }
             if (scenario == "freeze") skills.Add("classic:guhuo");
             if (scenario == "weiwan") skills.AddRange(["le:qiqin", "le:weiwan"]);
+            if (nativeQuotaSkill is not null) skills.Add(nativeQuotaSkill);
             var rules = JsonNode.Parse(SkillProgramTestJson.CurrentSchema("""
             {"schemaVersion":__RULES_SCHEMA__,"skills":[
               {"id":"fixture:directed-policy-source","revision":1,"activations":[
@@ -162,6 +171,7 @@ internal static partial class PhaseStartCardControlChecks
               {"id":"fixture:directed-no-draw","revision":1,"triggers":[{"id":"quiet-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"effects":[{"op":"adjustNormalDraw","target":"owner","amount":-2}]}]}
             ]}
             """))!;
+            ConfigureQuotaFixture(rules, scenario);
             foreach (var skill in rules["skills"]!.AsArray())
             foreach (var activation in skill!["activations"]?.AsArray() ?? new JsonArray())
             {
@@ -190,7 +200,8 @@ internal static partial class PhaseStartCardControlChecks
             var catalog = SkillProgramCatalog.Load(rules.ToJsonString(), labels);
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, id, id) { Program = program, ProgramPresentation = catalog.Presentations[id] });
             b.AddGeneral(new(Owner, "定向权利拥有者", "", "standard:none", "wei", 12, skills));
-            b.AddGeneral(new(DirectedPeer, "固定其他角色", "", "fixture:directed-no-draw", "qun", 20));
+            b.AddGeneral(new(DirectedPeer, "固定其他角色", "", "fixture:directed-no-draw", "qun", 20,
+                scenario == "quota-fire" ? [Watch] : scenario == "quota-bao" ? ["fixture:quota-prevent"] : []));
             b.AddDeck(new("fixture:directed-rights-deck", "固定实体", 0, 2, []) { PhysicalCards = Enumerable.Range(0, 64).Select(_ => new ContentDeckPhysicalCard("standard:slash", Suit.Club, 7)).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "定向权利真实原生边界", 4, 4, new Dictionary<string, int>(), "fixture:directed-rights-deck", 2, [Owner, DirectedPeer], ContentModeKind.Team,
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));

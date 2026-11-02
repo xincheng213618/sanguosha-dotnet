@@ -86,7 +86,6 @@ internal sealed partial class CharacterGuoSiOlRuntime
         int? id = branch == 0 && cards.Length > 0 ? cards[_randomOperations._random.Next(cards.Length)].Id : null;
         var from = id is { } entity ? _cardZonesOperations._cardZones.GetLocation(entity) : (CardLocation? )null;
         var pact = new GuoSiTurnPact(f.Id, r.Source, r.GameplayHash, r.Turn, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, r.Phase, f.OwnerSeat, r.Target, branch);
-        _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].GuoSiPacts = Array.AsReadOnly((_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].GuoSiPacts ?? []).Append(pact).ToArray());
         r = r with
         {
             Branch = branch,
@@ -108,6 +107,15 @@ internal sealed partial class CharacterGuoSiOlRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { GuoSi = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuoSiPactPaidEvent(pact, before, r.After, id.HasValue ? 1 : 0, randomBefore, r.RandomAfter));
+        _coreDirectedTurnCardPoliciesOperations.GrantDirectedCardPolicy(f, f.OwnerSeat, r.Target, [],
+            branch == 0 ? DirectedTurnCardPolicyEffect.ForbidTarget
+                : DirectedTurnCardPolicyEffect.IgnoreDistance | DirectedTurnCardPolicyEffect.BypassUseLimit,
+            new DirectedCardPolicyOptions
+            {
+                RequiresEffectiveSource = false, CaptureOnUse = false,
+                Until = [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Any, SkillStateBoundaryTiming.Before, true),
+                    new(SkillStateBoundaryEvent.TurnStarted, SkillStateSubject.Any, SkillStateBoundaryTiming.Before, true)]
+            });
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 

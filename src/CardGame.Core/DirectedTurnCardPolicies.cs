@@ -1,6 +1,7 @@
 namespace CardGame.Core;
 public sealed record DirectedTurnCardPolicy(long GrantSequence, int TurnNumber, int TurnSeat, long ParentFrameId, int EffectIndex, CardUseEffectSource Source, int ActorSeat, int TargetSeat, IReadOnlyList<CardKind> CardKinds, DirectedTurnCardPolicyEffect Effects)
 {
+    public int IssuanceSlot { get; init; }
     public bool RequiresEffectiveSource { get; init; } = true;
     public bool CaptureOnUse { get; init; }
     private readonly IReadOnlyList<SkillStateBoundaryEnd> _until = Array.AsReadOnly(Array.Empty<SkillStateBoundaryEnd>());
@@ -13,7 +14,8 @@ public sealed record DirectedCardPolicyOptions
     public bool RequiresEffectiveSource { get; init; } = true;
     public bool CaptureOnUse { get; init; }
     private readonly IReadOnlyList<SkillStateBoundarySpec> _until = Array.AsReadOnly(new[]
-        { new SkillStateBoundarySpec(SkillStateBoundaryEvent.TurnCleanup, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before) });
+        { new SkillStateBoundarySpec(SkillStateBoundaryEvent.TurnCleanup, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before),
+          new SkillStateBoundarySpec(SkillStateBoundaryEvent.TurnStarted, SkillStateSubject.Any, SkillStateBoundaryTiming.Before, SkipIssued: true) });
     public IReadOnlyList<SkillStateBoundarySpec> Until
     { get => _until; init => _until = Array.AsReadOnly(value.ToArray()); }
 }

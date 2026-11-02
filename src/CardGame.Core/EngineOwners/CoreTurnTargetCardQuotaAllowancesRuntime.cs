@@ -1,7 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.EngineOwners;
-[Core.ProgramRuntimeModule]
-internal sealed partial class CoreTurnTargetCardQuotaAllowancesRuntime(IKernelTurnCardUseEffectsAccess _turnCardUseEffectsOperations, ICoreTurnTargetCardQuotaAllowancesCoreProgramTargetRulesOperations _coreProgramTargetRulesOperations, EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatTurnNumberAccess _coreActualTurnProgressCurrentSeatTurnNumberAccess)
-{
-}

@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineFireTargetBenefitsRuntime
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             return SkillProgramStepOutcome.Continue;
         var before = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FireTargetBenefit = new(f.InstructionIndex, damage.Id, damage.ParentFrameId, f.OwnerSeat, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, before, before, 0, 0, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f)), PendingMovementContinuation = new(target, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FireTargetBenefit = new(f.InstructionIndex, damage.Id, damage.ParentFrameId, f.OwnerSeat, target, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, before, before, 0, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f)), PendingMovementContinuation = new(target, 0, null) });
         // Freeze only the promise; the quota does not exist during draw children.
         var drawn = _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[target], 1, true, new(FireTargetDrawReason));
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
@@ -51,12 +51,12 @@ internal sealed partial class CoreGameEngineFireTargetBenefitsRuntime
 
         // Draw and every original child have returned. Fulfil the frozen promise
         // once without rechecking a skill instance lost inside those children.
-        if (r.GrantSequence == 0 && _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-        {
-            var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantTargetCardQuotaAllowance(r.ActualTurnNumber, r.ActualTurnOwnerSeat, f.Id, r.InstructionIndex - 1, r.Source, r.TargetSeat, r.DamageWindowId);
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FireTargetBenefit = r with { GrantSequence = grant.GrantSequence } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnTargetCardQuotaAllowanceGrantedEvent(grant));
-        }
+        if (_coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
+            _coreDirectedTurnCardPoliciesOperations.GrantDirectedCardPolicy(f, f.OwnerSeat, r.TargetSeat, [],
+                DirectedTurnCardPolicyEffect.BypassUseLimit, new()
+                {
+                    RequiresEffectiveSource = false, CaptureOnUse = false
+                });
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { FireTargetBenefit = null });
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))

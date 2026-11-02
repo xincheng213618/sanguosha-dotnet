@@ -378,8 +378,11 @@ internal sealed partial class CharacterBaoSanNiangOlRuntime
             }
             else if (!damaged && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive)
             {
-                var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantTargetCardQuotaAllowance(r.ActualTurn, r.ActualTurnOwner, f.Id, r.OutcomeCursor, new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId), target, r.AssaultUseId!.Value);
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnTargetCardQuotaAllowanceGrantedEvent(grant));
+                _coreDirectedTurnCardPoliciesOperations.GrantDirectedCardPolicy(f, f.OwnerSeat, target, [],
+                    DirectedTurnCardPolicyEffect.BypassUseLimit, new()
+                    {
+                        RequiresEffectiveSource = false, CaptureOnUse = false
+                    }, issuanceSlot: r.OutcomeCursor);
             }
 
             _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { Bao2025 = f.Bao2025!with { MovementAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

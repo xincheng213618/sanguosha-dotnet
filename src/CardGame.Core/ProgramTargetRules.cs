@@ -102,6 +102,11 @@ internal sealed class ProgramTargetRuleCatalog
     };
 }
 
+internal interface IProgramTargetQuotaQueries : IProgramSelectionQuery
+{
+    bool HasTargetCardQuotaAllowance(int actorSeat, int targetSeat);
+}
+
 internal sealed class ProgramTargetRules
 {
     private readonly Func<ProgramDirectedTargetQuery, bool>[] _directedProhibitions;

@@ -75,13 +75,6 @@ internal sealed partial class CharacterGuoSiOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuoSiPairQualifiedEvent(id, a.ActorSeat, first.ActionId, second.ActionId));
     }
 
-    internal bool HasGuoSiTargetEffect(int actor, int target, DirectedTurnCardPolicyEffect effect)
-    {
-        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || _coreMatchParticipantsPlayersAccess._players[actor].GuoSiPacts is not { } pacts)
-            return false;
-        return pacts.Any(p => p.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && p.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && p.Actor == actor && p.Target == target && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GuoSiPactPaidEvent>().Count(e => e.Pact == p) == 1 && (p.Branch == 0 ? effect == DirectedTurnCardPolicyEffect.ForbidTarget : effect is DirectedTurnCardPolicyEffect.IgnoreDistance or DirectedTurnCardPolicyEffect.BypassSlashLimit));
-    }
-
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 510)]
     internal void ObserveGuoSiTurnExpiry(IGameEvent payload)
     {
@@ -89,8 +82,6 @@ internal sealed partial class CharacterGuoSiOlRuntime
             return;
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
         {
-            if (p.GuoSiPacts is not null)
-                p.GuoSiPacts = null;
             if (p.GuoSiUses is not null)
                 p.GuoSiUses = null;
         }
@@ -103,7 +94,4 @@ internal sealed partial class CharacterGuoSiOlRuntime
             return true;
         return _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && c.OwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && w.CardUse is { } i && _coreCardUseLifecycleOperations.LifecycleCardUse(i.ParentCardUseFrameId)is { GuoSiPair: { } q, Action: { } a } && a.ActionId == i.CardActionId && GuoSiQualified(c.OwnerSeat) && SidaoActions(c.OwnerSeat, q).Count > 0;
     }
-
-    [ProgramDistanceRule(ProgramDistanceStage.CardUseExemption, 100)]
-    internal bool DistanceCardUseExemption100HasGuoSiTargetEffect(ProgramCardDistanceQuery q) => HasGuoSiTargetEffect(q.Actor.Seat, q.Target.Seat, DirectedTurnCardPolicyEffect.IgnoreDistance);
 }

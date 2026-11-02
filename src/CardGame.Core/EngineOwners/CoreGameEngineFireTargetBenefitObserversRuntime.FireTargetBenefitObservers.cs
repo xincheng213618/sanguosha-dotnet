@@ -13,20 +13,8 @@ internal sealed partial class CoreGameEngineFireTargetBenefitObserversRuntime
         var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(parent);
         if (!attack.DamageWasApplied || attack.DamageAmount < 1 || attack.IsSourceLess || _coreNativeCardClassificationsOperations.GetDamageNature(attack) != DamageNature.Fire || attack.SourceSeat != f.OwnerSeat || attack.TargetSeat != r.TargetSeat || c.Amount != attack.DamageAmount)
             return false;
-        if (r.Source != CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f) || r.GrantSequence < 0)
+        if (r.Source != CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f))
             return false;
-        var grants = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnTargetCardQuotaAllowanceGrantedEvent>().Where(e => e.Allowance.ParentFrameId == f.Id).ToArray();
-        if (r.GrantSequence == 0)
-        {
-            if (grants.Length != 0 || _turnCardUseEffectsOperations._turnCardUseEffects.TargetCardQuotaAllowances.Any(g => g.ParentFrameId == f.Id))
-                return false;
-        }
-        else
-        {
-            var grant = _turnCardUseEffectsOperations._turnCardUseEffects.TargetCardQuotaAllowances.SingleOrDefault(g => g.GrantSequence == r.GrantSequence);
-            if (grant is null || grant.ParentFrameId != f.Id || grant.EffectIndex != r.InstructionIndex - 1 || grant.Source != r.Source || grant.TargetSeat != r.TargetSeat || grant.DamageWindowId != r.DamageWindowId || grant.TurnNumber != r.ActualTurnNumber || grant.TurnSeat != r.ActualTurnOwnerSeat || grants is not [var issued] || issued.Allowance != grant)
-                return false;
-        }
 
         var moves = _coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > r.SequenceBefore && m.Sequence <= r.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(r.TargetSeat) && m.Reason.Value == "program.fire-target-benefit.draw").ToArray();
         return moves.Length == r.DrawCount && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramFireTargetDrawIssuedEvent>().Count(e => e.ProgramFrameId == f.Id && e.DamageWindowId == r.DamageWindowId && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == r.TargetSeat && e.ActualCount == r.DrawCount && e.SequenceBefore == r.SequenceBefore && e.SequenceAfter == r.SequenceAfter) == 1;

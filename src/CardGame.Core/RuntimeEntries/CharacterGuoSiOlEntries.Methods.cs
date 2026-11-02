@@ -10,13 +10,11 @@ internal sealed partial class CharacterGuoSiOlEntries
     internal void CaptureGuoSiFinalizedUse(long id, CardActionContext a) => _resolve().CaptureGuoSiFinalizedUse(id, a);
     internal bool CompleteGuoSiUseReturn(CardUseFrame use) => _resolve().CompleteGuoSiUseReturn(use);
     internal void ContinueGuoSiNativePayment(long id) => _resolve().ContinueGuoSiNativePayment(id);
-    internal bool DistanceCardUseExemption100HasGuoSiTargetEffect(ProgramCardDistanceQuery q) => _resolve().DistanceCardUseExemption100HasGuoSiTargetEffect(q);
     internal bool DrainGuoSi(ProgramSkillFrame f) => _resolve().DrainGuoSi(f);
     internal SkillProgramStepOutcome ExecuteGuoSi(SkillProgramEffectOp op, ProgramSkillFrame supplied) => _resolve().ExecuteGuoSi(op, supplied);
     internal void FinishGuoSi(ProgramSkillFrame f) => _resolve().FinishGuoSi(f);
     internal PromptChoice GuoSiAiChoice(ProgramSkillFrame f) => _resolve().GuoSiAiChoice(f);
     internal IReadOnlyList<PromptChoice> GuoSiChoices(ProgramSkillFrame f) => _resolve().GuoSiChoices(f);
-    internal bool GuoSiDirectedTargetProhibited(ProgramDirectedTargetQuery query) => _resolve().GuoSiDirectedTargetProhibited(query);
     internal bool GuoSiFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => _resolve().GuoSiFinalizedAfterCategoryTargetWindow(query);
     internal bool GuoSiFirstChild(ProgramSkillFrame root, ResolutionFrame child) => _resolve().GuoSiFirstChild(root, child);
     internal bool GuoSiNativePaymentEdge(int index) => _resolve().GuoSiNativePaymentEdge(index);
@@ -26,8 +24,6 @@ internal sealed partial class CharacterGuoSiOlEntries
     internal bool GuoSiObserverSuffix(int index) => _resolve().GuoSiObserverSuffix(index);
     internal bool GuoSiQualified(int seat) => _resolve().GuoSiQualified(seat);
     internal bool GuoSiResponseUse(CardActionContext a) => _resolve().GuoSiResponseUse(a);
-    internal bool GuoSiTargetQuotaAllowed(ProgramTargetQuotaQuery query) => _resolve().GuoSiTargetQuotaAllowed(query);
-    internal bool HasGuoSiTargetEffect(int actor, int target, DirectedTurnCardPolicyEffect effect) => _resolve().HasGuoSiTargetEffect(actor, target, effect);
     internal bool IsGuoSiNativeUse(CardUseFrame use) => _resolve().IsGuoSiNativeUse(use);
     internal bool IsSuspendedGuoSiCompletedParent(CardUseFrame original) => _resolve().IsSuspendedGuoSiCompletedParent(original);
     internal void IssueSidao(ProgramSkillFrame f, LegalAction action) => _resolve().IssueSidao(f, action);
