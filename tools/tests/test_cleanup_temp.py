@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -31,6 +32,50 @@ class CleanupQueueChecks(unittest.TestCase):
 
     def add(self, *paths):
         cleanup.register(self.database, [str(path) for path in paths], str(self.work), "fixture complete")
+
+    def owned_file(self, prefix):
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", prefix=prefix,
+                                         suffix=".tmp", dir=self.work, delete=False) as stream:
+            stream.write("tiny owned file fixture")
+        path = Path(stream.name)
+        self.addCleanup(path.unlink, missing_ok=True)
+        return path
+
+    def test_regular_file_registration_and_cleanup_preserve_adjacent_paths(self):
+        target, sibling = self.owned_file("中文 [cards] "), self.owned_file("retained ")
+        cleanup.register(self.database, [str(target)], str(self.work), "file fixture complete",
+                         lock_root=str(self.work))
+        self.assertEqual([str(target)], [entry["path"] for entry in cleanup.load_database(self.database)["entries"]])
+
+        def remove_owned_file(command, **options):
+            self.assertEqual(str(target), options["env"]["CARD_CLEANUP_TARGET"])
+            self.assertEqual(str(self.work), options["env"]["CARD_CLEANUP_ROOT"])
+            self.assertEqual(str(self.work), options["env"]["CARD_CLEANUP_LOCK_ROOT"])
+            target.unlink()  # Simulate deletion of this test's one file; never execute the PowerShell command.
+            return subprocess.CompletedProcess(command, 0, "", "")
+
+        with patch.object(cleanup.subprocess, "run", side_effect=remove_owned_file) as remove:
+            self.assertEqual(0, cleanup.clean(self.database))
+        remove.assert_called_once()
+        self.assertFalse(target.exists())
+        self.assertTrue(sibling.is_file())
+        self.assertTrue(self.work.is_dir())
+        self.assertEqual([], cleanup.load_database(self.database)["entries"])
+
+    def test_linked_file_or_ancestor_is_rejected_before_registration_and_deletion(self):
+        target = self.owned_file("linked-check ")
+        before = self.database.read_bytes()
+        for linked in (target, target.parent):
+            with self.subTest(linked=str(linked)), \
+                    patch.object(cleanup, "is_link", side_effect=lambda item, linked=linked: item == linked), \
+                    patch.object(cleanup.subprocess, "run") as remove:
+                with self.assertRaisesRegex(ValueError, "Linked paths are not cleanup targets"):
+                    self.add(target)
+                with self.assertRaisesRegex(ValueError, "Linked paths are not cleanup targets"):
+                    cleanup.remove_directory({"path": str(target), "root": str(self.work)})
+                remove.assert_not_called()
+            self.assertEqual(before, self.database.read_bytes())
+            self.assertTrue(target.is_file())
 
     def test_registration_deduplicates_literal_unicode_paths_without_deletion(self):
         path = self.directory("中文 [cards] with spaces")

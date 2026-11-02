@@ -1,4 +1,4 @@
-"""Register disposable directories; run without options to clean the text queue.
+"""Register disposable files or directories; run without options to clean the text queue.
 
 Agents use --add or --list only. The user runs the cleanup command manually.
 Deletion uses PowerShell -LiteralPath on Windows and never scans for candidates.
@@ -52,7 +52,7 @@ def checked_target(value: str | Path, root_value: str | Path) -> Path:
     if any(item == path or item.is_relative_to(path) for item in protected):
         raise ValueError(f"Refusing a source, home or drive ancestor: {path}")
     if path.is_relative_to(REPO) and not any(path.is_relative_to(REPO / name) for name in (".artifacts", ".codex-artifacts", "artifacts")):
-        raise ValueError(f"Only disposable artifact directories may be cleaned inside the repository: {path}")
+        raise ValueError(f"Only disposable artifact paths may be cleaned inside the repository: {path}")
     return path
 
 
@@ -113,7 +113,7 @@ def save_database(database: Path, data: dict) -> None:
 def register(database: Path, paths: list[str], root: str, reason: str, lock_root: str | None = None) -> int:
     targets = [checked_target(path, root) for path in paths]
     if any(database.resolve().is_relative_to(target) for target in targets):
-        raise ValueError("A cleanup directory cannot contain its own database.")
+        raise ValueError("A cleanup target cannot contain its own database.")
     root_path = absolute_path(root).resolve()
     lock_path = absolute_path(lock_root).resolve() if lock_root else None
     if lock_path and any(target != lock_path and not target.is_relative_to(lock_path) for target in targets):
@@ -151,19 +151,23 @@ try {
         throw 'Resolved cleanup target escaped its registered root.'
     }
     $item = Get-Item -LiteralPath $target -Force
-    if (-not $item.PSIsContainer) { throw 'The registered target is not a directory.' }
-    for ($ancestor = $item; $null -ne $ancestor; $ancestor = $ancestor.Parent) {
+    if (-not $item.PSIsContainer -and $item -isnot [IO.FileInfo]) { throw 'The registered target is not a regular file or directory.' }
+    for ($ancestor = $item; $null -ne $ancestor;) {
         if ($ancestor.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Linked cleanup path refused.' }
+        $ancestor = if ($ancestor -is [IO.FileInfo]) { $ancestor.Directory } else { $ancestor.Parent }
     }
-    $linked = Get-ChildItem -LiteralPath $target -Recurse -Force |
-        Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint } | Select-Object -First 1
-    if ($null -ne $linked) { throw "Linked child refused: $($linked.FullName)" }
+    if ($item.PSIsContainer) {
+        $linked = Get-ChildItem -LiteralPath $target -Recurse -Force |
+            Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint } | Select-Object -First 1
+        if ($null -ne $linked) { throw "Linked child refused: $($linked.FullName)" }
+    }
     $consumers = @(Get-CimInstance Win32_Process | Where-Object {
         $_.ProcessId -ne $PID -and (
-            ($_.ExecutablePath -and $_.ExecutablePath.StartsWith($target + '\', [StringComparison]::OrdinalIgnoreCase)) -or
+            ($_.ExecutablePath -and ($_.ExecutablePath.Equals($target, [StringComparison]::OrdinalIgnoreCase) -or
+                $_.ExecutablePath.StartsWith($target + '\', [StringComparison]::OrdinalIgnoreCase))) -or
             ($_.CommandLine -and $_.CommandLine.IndexOf($target, [StringComparison]::OrdinalIgnoreCase) -ge 0))
     })
-    if ($consumers.Count -gt 0) { throw "Directory is in use by process IDs: $($consumers.ProcessId -join ', ')" }
+    if ($consumers.Count -gt 0) { throw "Path is in use by process IDs: $($consumers.ProcessId -join ', ')" }
     if ($env:CARD_CLEANUP_LOCK_ROOT) {
         $lockRoot = (Resolve-Path -LiteralPath $env:CARD_CLEANUP_LOCK_ROOT).Path
         $lockPath = Join-Path $lockRoot '.test-changed.lock'
@@ -173,8 +177,9 @@ try {
             if ($lockRoot.Equals($target, [StringComparison]::OrdinalIgnoreCase)) { $lease.Dispose(); $lease = $null }
         }
     }
-    Remove-Item -LiteralPath $target -Recurse -Force
-    if (Test-Path -LiteralPath $target) { throw 'Directory still exists after cleanup.' }
+    if ($item.PSIsContainer) { Remove-Item -LiteralPath $target -Recurse -Force }
+    else { Remove-Item -LiteralPath $target -Force }
+    if (Test-Path -LiteralPath $target) { throw 'Target still exists after cleanup.' }
 }
 catch { [Console]::Error.WriteLine($_.Exception.Message); exit 1 }
 finally { if ($null -ne $lease) { $lease.Dispose() } }
@@ -187,9 +192,9 @@ def remove_directory(entry: dict) -> None:
         lock_root = absolute_path(entry["lock_root"]).resolve()
         if target != lock_root and not target.is_relative_to(lock_root):
             raise ValueError("Verification lock is outside the target's ancestors.")
-    info = target.stat()  # Access failures must not be mistaken for an absent directory.
-    if not stat.S_ISDIR(info.st_mode):
-        raise ValueError(f"Not a directory: {target}")
+    info = target.stat()  # Access failures must not be mistaken for an absent target.
+    if not (stat.S_ISDIR(info.st_mode) or stat.S_ISREG(info.st_mode)):
+        raise ValueError(f"Not a regular file or directory: {target}")
     if os.name != "nt":
         raise RuntimeError("This workspace cleanup command requires Windows PowerShell.")
     shell = shutil.which("pwsh") or shutil.which("powershell")
@@ -208,7 +213,7 @@ def remove_directory(entry: dict) -> None:
         target.lstat()
     except FileNotFoundError:
         return
-    raise RuntimeError(f"Directory still exists after cleanup: {target}")
+    raise RuntimeError(f"Target still exists after cleanup: {target}")
 
 
 def clean(database: Path, *, dry_run: bool = False) -> int:
@@ -219,7 +224,7 @@ def clean(database: Path, *, dry_run: bool = False) -> int:
             try:
                 target = checked_target(entry["path"], entry["root"])
                 if database.resolve().is_relative_to(target):
-                    raise ValueError("A cleanup directory cannot contain its own database.")
+                    raise ValueError("A cleanup target cannot contain its own database.")
                 if dry_run:
                     print(f"[preview] {target} | {entry['reason']}")
                     continue
@@ -248,10 +253,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE, help="UTF-8 JSON text database")
     actions = parser.add_mutually_exclusive_group()
-    actions.add_argument("--add", nargs="+", metavar="DIRECTORY", help="Register exact owned paths; does not delete")
+    actions.add_argument("--add", nargs="+", metavar="PATH", help="Register exact owned paths; does not delete")
     actions.add_argument("--list", action="store_true", help="Read the pending queue without changes")
     actions.add_argument("--dry-run", action="store_true", help="Validate and preview without deletion or queue changes")
-    parser.add_argument("--root", help="Verified temporary/output root containing the registered directories")
+    parser.add_argument("--root", help="Verified temporary/output root containing the registered paths")
     parser.add_argument("--reason", default="Task-owned temporary output is no longer needed")
     parser.add_argument("--lock-root", help="Verification output root containing .test-changed.lock")
     args = parser.parse_args(argv)
