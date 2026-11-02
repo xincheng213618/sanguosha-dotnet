@@ -42,39 +42,10 @@ public sealed record WeiwanEntityObtainedEvent(long FrameId, int Index, int Card
     CardLocation From, CardLocation To, long MovementSequence, long BatchId) : IGameEvent;
 public sealed record WeiwanObtainPaidEvent(long FrameId, long BatchId, int PrimaryCount, int ActualCount,
     long Before, long After) : IGameEvent;
-public sealed record WeiwanTurnLease(long FrameId, CardConversionSource Source, string GameplayHash,
-    int ActorSeat, int TargetSeat, int ActualTurn, int TurnOwner, int ActualCount, long SequenceAfter);
-public sealed record WeiwanTurnLeaseIssuedEvent(WeiwanTurnLease Lease) : IGameEvent;
 public sealed record WeiwanHealthAppliedEvent(long FrameId, int TargetSeat, int Amount,
     int RemainingHp, bool PreventedByAppearance) : IGameEvent;
 public sealed record WeiwanCompletedEvent(long FrameId, int CardId, int TargetSeat, int ActualCount,
     WeiwanBranch Branch) : IGameEvent;
-
-// Empty snapshots are intentional: a later lease cannot retroactively authorize
-// or prohibit a use that was already accepted before its payment children.
-public sealed record WeiwanUseSnapshot(int ActorSeat, int ActualTurn, int TurnOwner, long CaptureSequence)
-{
-    private readonly IReadOnlyList<WeiwanTurnLease> _leases = Array.AsReadOnly(Array.Empty<WeiwanTurnLease>());
-    public IReadOnlyList<WeiwanTurnLease> Leases
-    { get => _leases; init => _leases = Array.AsReadOnly(value.ToArray()); }
-}
-public sealed record WeiwanUseReceipt(long UseId, long ActionId, CardKind OriginalKind,
-    WeiwanUseSnapshot Snapshot, long? DeclarationId);
-public sealed partial record CardUseFrame
-{
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public WeiwanUseReceipt? WeiwanUse { get; init; }
-}
-public sealed partial record DeclaredCardPayment
-{
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public WeiwanUseSnapshot? Weiwan { get; init; }
-}
-public sealed record WeiwanDeclarationCapturedEvent(long DeclarationId, long OwnerFrameId,
-    int ActorSeat, int ProviderSeat, int CardId, CardLocation From, CardKind DeclaredKind,
-    int ActualTurn, int TurnOwner, long CaptureSequence, int LeaseCount) : IGameEvent;
-public sealed record WeiwanDeclarationLeaseCapturedEvent(long DeclarationId, int Index, long LeaseFrameId) : IGameEvent;
-public sealed record WeiwanUseAcceptedEvent(long UseId, long ActionId, int ActorSeat, CardKind OriginalKind,
-    int ActualTurn, int TurnOwner, long CaptureSequence, int LeaseCount, long? DeclarationId) : IGameEvent;
-public sealed record WeiwanUseLeaseCapturedEvent(long UseId, int Index, long LeaseFrameId) : IGameEvent;
 
 internal interface ILeXiaoQiaoWeiwanHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame); }
 internal interface ILeXiaoQiaoWeiwanSelectionQuery : IProgramSelectionQuery { bool CanDiscard(int owner, Card card); }

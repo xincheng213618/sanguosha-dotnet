@@ -611,6 +611,11 @@ public sealed partial record CardUseFrame(
     IReadOnlyList<int>? PhysicalCardIds = null)
     : ResolutionFrame(Id, ResolutionFrameKind.CardUse, Step)
 {
+    private readonly IReadOnlyList<DirectedTurnCardPolicy>? _directedPolicies;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<DirectedTurnCardPolicy>? DirectedPolicies
+    { get => _directedPolicies; init => _directedPolicies = CommittedEventProjection.FreezeDirectedPolicies(value); }
+
     // Issued on the native use; command replay reconstructs this completion role.
     [JsonIgnore]
     internal bool UsesStandardZeroEntityAttackCompletion { get; init; }

@@ -385,7 +385,8 @@ public interface ISkillProgramEffectHost
         ProgramParticipantReference actorReference,
         ProgramParticipantReference targetReference,
         IReadOnlyList<CardKind> cardKinds,
-        DirectedTurnCardPolicyEffect effects);
+        DirectedTurnCardPolicyEffect effects,
+        DirectedCardPolicyOptions? options = null);
 }
 
 /// <summary>One reusable primitive operation, never one character or skill.</summary>

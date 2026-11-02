@@ -5,7 +5,7 @@ namespace CardGame.Core;
 public enum SkillStateAction { Suppress, Lose, Transfer }
 public enum SkillStateBoundaryEvent { TurnCleanup, TurnStarted, TurnEnded, RoundAdvanced, PhaseStarted, PhaseEnded, Death, DyingStarted, DyingEnded }
 public enum SkillStateBoundaryTiming { Before, After }
-public enum SkillStateSubject { Owner, Target, TurnOwner }
+public enum SkillStateSubject { Owner, Target, TurnOwner, Any }
 
 public sealed record SkillStateBoundarySpec(SkillStateBoundaryEvent Event, SkillStateSubject? Participant,
     SkillStateBoundaryTiming Timing = SkillStateBoundaryTiming.After, bool SkipIssued = false,
@@ -46,6 +46,12 @@ public sealed class SkillStateLifetime(SkillStateOrigin? origin, IReadOnlyList<S
 {
     public SkillStateOrigin? Origin { get; } = origin;
     public IReadOnlyList<SkillStateBoundaryEnd> Until { get; } = Array.AsReadOnly(until.ToArray());
+}
+
+internal interface IProgramRuleLifetimes : IProgramSelectionQuery
+{
+    SkillStateLifetime? CreateApplicationLifetime(int owner, int target,
+        IReadOnlyList<SkillStateBoundarySpec> until, SkillStateConditionContext context);
 }
 
 public sealed record SkillStateConditionContext(int OwnerSeat, int TargetSeat, ActualDiscardRecoveryPhaseKey? IssuedPhase = null,

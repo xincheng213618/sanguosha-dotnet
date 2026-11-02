@@ -3,7 +3,7 @@ using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
-internal static class PhaseStartCardControlChecks
+internal static partial class PhaseStartCardControlChecks
 {
     private const string Meibu = "ol:meibu", Mumu = "ol:mumu", Zhixi = "ol:zhixi";
     private const string Driver = "fixture:phase-control-driver", Watch = "fixture:phase-control-watch", Loss = "fixture:phase-control-loss";
@@ -44,6 +44,7 @@ internal static class PhaseStartCardControlChecks
             "The paid distance override is recipient-to-donor only, rather than the reverse direction or a symmetric distance.");
         range = Cold(range, rangeRegistry); Reach(range, _ => E<TurnEndedEvent>(range).Any(e => e.TurnNumber == directed.ActualTurnNumber && e.ActorSeat == 2));
         Need(range.GetCombatDistance(2, 0) == 2, "The directed override ends with exactly the same actual turn as the derived skill.");
+        DirectedPoliciesKeepAppliedRightsAndFreezeNativeUse();
     }
 
     private const string CostReason = "skill-program.other-play-restriction.cost";

@@ -114,7 +114,7 @@ internal sealed class GrantDirectedTurnCardPolicyProgramOperationDescriptor : Pr
         static (effect, context) => context.GrantDirectedTurnCardPolicy(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
     {
-        reader.AllowOnly("op", "target", "actorRef", "targetRef", "cardKinds", "effects", "condition");
+        reader.AllowOnly("op", "target", "actorRef", "targetRef", "cardKinds", "effects", "requiresEffectiveSource", "captureOnUse", "until", "condition");
         var target = FilterBoundCardsProgramOperationDescriptor.Owner(reader);
         var actor = reader.RequiredParticipantReference("actorRef", ProgramParticipantRef.Owner);
         var directedTarget = reader.RequiredParticipantReference("targetRef");
@@ -125,8 +125,22 @@ internal sealed class GrantDirectedTurnCardPolicyProgramOperationDescriptor : Pr
             throw new InvalidOperationException($"Invalid skill program at {reader.Path}.cardKinds: explicit cardKinds must not be empty.");
         if (flags == DirectedTurnCardPolicyEffect.None)
             throw new InvalidOperationException($"Invalid skill program at {reader.Path}: effects must not be empty.");
+        if (flags.HasFlag(DirectedTurnCardPolicyEffect.BypassUseLimit) && kinds.Count > 0)
+            throw new InvalidOperationException($"Invalid skill program at {reader.Path}.cardKinds: bypassUseLimit requires all card kinds.");
+        DirectedCardPolicyOptions? options = null;
+        if (reader.Has("requiresEffectiveSource") || reader.Has("captureOnUse") || reader.Has("until"))
+        {
+            var defaults = new DirectedCardPolicyOptions();
+            options = defaults with
+            {
+                RequiresEffectiveSource = reader.Has("requiresEffectiveSource") ? SkillStateDescriptor.Bool(reader.Node.GetProperty("requiresEffectiveSource"), reader.Path + ".requiresEffectiveSource") : defaults.RequiresEffectiveSource,
+                CaptureOnUse = reader.Has("captureOnUse") && SkillStateDescriptor.Bool(reader.Node.GetProperty("captureOnUse"), reader.Path + ".captureOnUse"),
+                Until = reader.Has("until") ? SkillStateDescriptor.ParseUntil(SkillStateDescriptor.Required(reader.Node, "until", System.Text.Json.JsonValueKind.Array, reader.Path), reader.Path + ".until") : defaults.Until
+            };
+        }
         return new(Op, target, 0, reader.Condition(), cardKinds: kinds,
-            actorReference: actor, targetReference: directedTarget, directedPolicyEffects: flags);
+            actorReference: actor, targetReference: directedTarget, directedPolicyEffects: flags)
+            { DirectedPolicyOptions = options };
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         ParticipantResources(effect.ActorReference, effect.TargetReference);
@@ -139,7 +153,7 @@ public sealed class GrantDirectedTurnCardPolicySkillProgramEffectHandler : ISkil
         ISkillProgramEffectHost host)
     {
         host.GrantDirectedTurnCardPolicy(frame, effect.ActorReference!, effect.TargetReference!,
-            effect.CardKinds, effect.DirectedPolicyEffects);
+            effect.CardKinds, effect.DirectedPolicyEffects, effect.DirectedPolicyOptions);
         return SkillProgramStepOutcome.Continue;
     }
 }

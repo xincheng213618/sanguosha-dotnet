@@ -35,6 +35,7 @@ internal static class SkillStateChecks
             ("boundary OR and atomic cleanup", BoundarySkipAndAlternativesClearBorrowedStateBeforeFacts),
             ("default cleanup timing", DefaultAfterCleanupExpiresOnTheNativeClock),
             ("nested boundary issuance", NestedFactIssuanceSkipsTheOriginalPhaseOccurrence),
+            ("directed after-End order", DirectedAfterEndObserversSeeExpiryBeforeLateIssuance),
             ("issued phase condition", IssuedPhaseConditionSurvivesInsertionAndRestoration),
             ("permanent death expiry", PermanentRestrictionExpiresOnItsTargetDeath),
             ("consumed Alcohol Slash", ConsumedAlcoholSlashQualifiesOnlyItsOriginalDamage)
@@ -582,7 +583,8 @@ internal static class SkillStateChecks
         var runtime = new ProgramSkillChangeRuntime(capabilities.Get<IProgramSkillChangeFacts>(), operations,
             capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
             capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(),
-            capabilities.Get<IProgramHealthChildQueries>());
+            capabilities.Get<IProgramHealthChildQueries>(), capabilities.Get<IProgramEventJournalQueries>(),
+            capabilities.Get<CardGame.Core.EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess>());
         var token = s.E<ActualDiscardRecoveryPhaseStartedEvent>().Last().Phase.Token;
         var source = s.RealGrants(0).Single(grant => grant.SkillId == Driver);
         var permanent = s.CounterGrants(0).Single().GrantId;
@@ -663,7 +665,8 @@ internal static class SkillStateChecks
         var runtime = new ProgramSkillChangeRuntime(facts, capabilities.Get<IProgramSkillChangeOperations>(),
             capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
             capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(),
-            capabilities.Get<IProgramHealthChildQueries>());
+            capabilities.Get<IProgramHealthChildQueries>(), capabilities.Get<IProgramEventJournalQueries>(),
+            capabilities.Get<CardGame.Core.EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess>());
         var source = s.RealGrants(0).Single(grant => grant.SkillId == Driver);
         var nested = new NestedPhaseIssuer { Runtime = runtime,
             Origin = new(900200, 0, new(Driver, "transfer", 0, source.SkillInstanceId)),
@@ -700,10 +703,58 @@ internal static class SkillStateChecks
         private void State() { }
     }
 
-    private sealed class FactSink : IRuleProgressionOperations
+    private static void DirectedAfterEndObserversSeeExpiryBeforeLateIssuance()
+    {
+        var s = Scene.Start();
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!;
+        var directed = capabilities.Get<CardGame.Core.EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess>();
+        var runtime = new ProgramSkillChangeRuntime(capabilities.Get<IProgramSkillChangeFacts>(), capabilities.Get<IProgramSkillChangeOperations>(),
+            capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
+            capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(), capabilities.Get<IProgramHealthChildQueries>(),
+            capabilities.Get<IProgramEventJournalQueries>(), directed);
+        var turn = s.G.State.TurnNumber;
+        var source = s.RealGrants(0).Single(grant => grant.SkillId == Driver);
+        var old = new DirectedTurnCardPolicy(900301, turn, 0, 900301, 0, new(Driver, "boundary-unit", 0, source.SkillInstanceId), 0, 1, [], DirectedTurnCardPolicyEffect.IgnoreDistance)
+        { Until = [new(SkillStateBoundaryEvent.TurnEnded, null, SkillStateBoundaryTiming.After, turn - 1, true)], RequiresEffectiveSource = false, CaptureOnUse = true };
+        directed._directedTurnCardPolicies.Add(old);
+        var probe = new DirectedEndOrderProbe { Policies = directed._directedTurnCardPolicies,
+            Late = old with { GrantSequence = 900302, ParentFrameId = 900302, Until =
+                [new(SkillStateBoundaryEvent.TurnEnded, null, SkillStateBoundaryTiming.After, turn, true),
+                 new(SkillStateBoundaryEvent.TurnStarted, null, SkillStateBoundaryTiming.Before, turn, true)] } };
+        var methods = typeof(DirectedEndOrderProbe).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Where(method => method.IsDefined(typeof(ProgramRuleObserverAttribute)))
+            .Append(typeof(ProgramSkillChangeRuntime).GetMethod("AfterBoundaryEvent", BindingFlags.Instance | BindingFlags.NonPublic)!);
+        var observers = new ProgramRuleObservers(ProgramRuleObserverCatalog.Discover(methods),
+            (method, type) => method.CreateDelegate(type, method.DeclaringType == typeof(DirectedEndOrderProbe) ? probe : runtime));
+        new RuleProgressionRuntime(observers, new FactSink(_ => probe.Queued = true)).AdvanceFact(new TurnEndedEvent(turn, 0));
+        Require(probe.Observed, "The actual shared AfterEvent order-25 adapter runs before an order-40 reader.");
+        runtime.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.TurnEnded, 0, SkillStateBoundaryTiming.After, turn));
+        Require(directed._directedTurnCardPolicies.SequenceEqual([probe.Late]), "The later ApplyAfter pass must retain the ticket issued after this same End fact.");
+        runtime.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.TurnStarted, 1, SkillStateBoundaryTiming.Before, turn + 1));
+        Require(directed._directedTurnCardPolicies.Count == 0, "The next actual Start's Before boundary expires the late any-seat ticket.");
+    }
+
+    private sealed class DirectedEndOrderProbe
+    {
+        internal List<DirectedTurnCardPolicy> Policies = null!;
+        internal DirectedTurnCardPolicy Late = null!;
+        internal bool Queued, Observed;
+        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 40)]
+        private void Before(IGameEvent _) { }
+        [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 1)]
+        private void State() { }
+        [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 40)]
+        private void ReadAndIssue(IGameEvent fact)
+        {
+            Require(fact is TurnEndedEvent && Queued && Policies.Count == 0, "A queued End fact is visible only after the old directed ticket has been removed.");
+            Policies.Add(Late); Observed = true;
+        }
+    }
+
+    private sealed class FactSink(Action<IGameEvent>? queue = null) : IRuleProgressionOperations
     {
         public void ApplySkillStateDeclarations(IGameEvent payload, SkillStateBoundaryTiming timing) { }
-        public void QueueFact(IGameEvent payload) { }
+        public void QueueFact(IGameEvent payload) => queue?.Invoke(payload);
         public bool BeginCharacterStateWindow() => false;
         public bool BeginHpChangedWindow() => false;
         public bool BeginCardsMovedWindow() => false;

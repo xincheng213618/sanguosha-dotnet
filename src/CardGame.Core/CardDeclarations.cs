@@ -16,6 +16,11 @@ public sealed record CardDeclarationParentReturn(CardDeclarationPurpose Purpose,
 public sealed partial record DeclaredCardPayment(long DeclarationId, long OwnerFrameId, int ProviderSeat,
     CardActionCost Cost, CardConversionSource Source, CardKind DeclaredKind, bool Claimed = false, bool IsRevealed = false, int? ActorSeat = null, Suit? FrozenSuit = null)
 {
+    private readonly IReadOnlyList<DirectedTurnCardPolicy>? _directedPolicies;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<DirectedTurnCardPolicy>? DirectedPolicies
+    { get => _directedPolicies; init => _directedPolicies = CommittedEventProjection.FreezeDirectedPolicies(value); }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public CardDeclarationPurpose? ReturnPurpose { get; init; }
     /// <summary>Original owned-entity rank, frozen before the declaration leaves Hand.</summary>

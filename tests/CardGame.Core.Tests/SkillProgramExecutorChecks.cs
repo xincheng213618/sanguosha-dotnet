@@ -805,7 +805,7 @@ internal static class SkillProgramExecutorChecks
 
         public void GrantDirectedTurnCardPolicy(ProgramSkillFrame frame,
             ProgramParticipantReference actorReference, ProgramParticipantReference targetReference,
-            IReadOnlyList<CardKind> cardKinds, DirectedTurnCardPolicyEffect effects) =>
+            IReadOnlyList<CardKind> cardKinds, DirectedTurnCardPolicyEffect effects, DirectedCardPolicyOptions? options = null) =>
             Calls.Add($"grant-directed:{frame.OwnerSeat}:{actorReference.Kind}:{targetReference.Kind}:" +
                       $"{string.Join(',', cardKinds)}:{effects}");
         public void DrawBoundCardCount(long frameId, int ownerSeat, int targetSeat, string sourceBind,

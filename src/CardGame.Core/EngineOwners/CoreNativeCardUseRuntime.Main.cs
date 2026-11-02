@@ -65,7 +65,6 @@ internal sealed partial class CoreNativeCardUseRuntime
         _characterCaiWenJiLeOperations.IssueBeifenUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterHuangGaiMouMobileOperations.IssueMouZhaJiangUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterZhouYuOlMouOperations.BindMouZuifengAlcoholUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
-        _characterXiaoQiaoLeOperations.IssueWeiwanUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterZhouYuOlMouOperations.IssueMouGuquUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterDiaoChanLeOperations.IssueDiouUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterGuanYuWumiaoOperations.IssueWuyouUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);

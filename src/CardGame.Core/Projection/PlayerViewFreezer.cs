@@ -84,8 +84,7 @@ internal static class PlayerViewFreezer
             Usages = FreezeViewList(state.Usages)!,
             BooleanStates = FreezeViewList(state.BooleanStates),
             PublicRuleStates = FreezeViewList(state.PublicRuleStates),
-            DirectedPolicies = state.DirectedPolicies is { } policies ? Array.AsReadOnly(policies.Select(policy => policy with
-                { CardKinds = FreezeViewList(policy.CardKinds)! }).ToArray()) : null,
+            DirectedPolicies = CommittedEventProjection.FreezeDirectedPolicies(state.DirectedPolicies),
             ActionProhibitions = state.ActionProhibitions is { } prohibitions ? Array.AsReadOnly(prohibitions.Select(policy => policy with
             {
                 CardKinds = FreezeViewList(policy.CardKinds)!,

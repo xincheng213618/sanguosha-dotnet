@@ -72,7 +72,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 
     internal DeclaredCardPayment CaptureDiouDeclaration(DeclaredCardPayment paid, CardDeclarationParentReturn parent)
     {
-        if (!HasDiouCapability || !CharacterXiaoQiaoLeRuntime.WeiwanDeclarationIsTrueUse(parent))
+        if (!HasDiouCapability || !CoreDirectedTurnCardPoliciesRuntime.DeclarationIsTrueUse(parent))
             return paid;
         var claims = new List<DiouUseClaim>();
         if (HasTanbanEntityMark(paid.Cost.CardId))

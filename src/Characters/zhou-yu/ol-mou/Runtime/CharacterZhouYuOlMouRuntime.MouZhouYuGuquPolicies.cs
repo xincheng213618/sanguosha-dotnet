@@ -104,7 +104,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
     internal bool IsMouGuquViewAsAllowed(CharacterState owner, CardKind kind, IReadOnlyList<int> ids, CardConversionSource source, bool forResponse, bool dyingUse = false, int? requestedUseTarget = null) => requestedUseTarget is not null || dyingUse || !forResponse ? IsMouGuquUseAllowed(owner.Seat, kind, ids, source) : IsMouGuquResponseAllowed(owner, kind, ids, source);
     internal DeclaredCardPayment CaptureMouGuquDeclaration(DeclaredCardPayment paid, CardDeclarationParentReturn parent)
     {
-        if (!HasMouGuquCapability || !CharacterXiaoQiaoLeRuntime.WeiwanDeclarationIsTrueUse(parent))
+        if (!HasMouGuquCapability || !CoreDirectedTurnCardPoliciesRuntime.DeclarationIsTrueUse(parent))
             return paid;
         if (paid.GuquPermit is not null || !IsMouGuquUseAllowed(parent.ActorSeat, paid.DeclaredKind, [paid.Cost.CardId], paid.Source))
             throw new InvalidOperationException("Guqu cannot accept a forbidden or previously paid declaration conversion.");

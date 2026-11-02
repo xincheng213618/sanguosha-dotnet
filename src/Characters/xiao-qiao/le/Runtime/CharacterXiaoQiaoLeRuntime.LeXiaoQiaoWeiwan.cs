@@ -132,7 +132,16 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Weiwan = r with { Branch = branch, Stage = branch == WeiwanBranch.LoseHp ? WeiwanStage.HealthIssuing : WeiwanStage.HealthChildren }, PendingMovementContinuation = new(r.TargetSeat, 0, null) });
             if (branch is WeiwanBranch.UnlimitedUse or WeiwanBranch.ForbidUse)
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WeiwanTurnLeaseIssuedEvent(new(f.Id, r.Source, r.GameplayHash, f.OwnerSeat, r.TargetSeat, r.ActualTurn, r.TurnOwner, r.ActualCount, r.After)));
+                _coreDirectedTurnCardPoliciesOperations.GrantDirectedCardPolicy(f, f.OwnerSeat, r.TargetSeat, [],
+                    branch == WeiwanBranch.UnlimitedUse
+                        ? DirectedTurnCardPolicyEffect.IgnoreDistance | DirectedTurnCardPolicyEffect.BypassUseLimit
+                        : DirectedTurnCardPolicyEffect.ForbidTarget,
+                    new DirectedCardPolicyOptions
+                    {
+                        RequiresEffectiveSource = false, CaptureOnUse = true,
+                        Until = [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Any, SkillStateBoundaryTiming.After, true),
+                            new(SkillStateBoundaryEvent.TurnStarted, SkillStateSubject.Any, SkillStateBoundaryTiming.Before, true)]
+                    });
             ContinueWeiwan(id);
             return;
         }

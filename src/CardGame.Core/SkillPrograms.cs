@@ -2028,7 +2028,8 @@ public enum DirectedTurnCardPolicyEffect
     ForbidTarget = 1,
     IgnoreDistance = 2,
     BypassSlashLimit = 4,
-    IgnoreArmor = 8
+    IgnoreArmor = 8,
+    BypassUseLimit = 16
 }
 
 public sealed record SkillProgramBooleanStateDefinition(

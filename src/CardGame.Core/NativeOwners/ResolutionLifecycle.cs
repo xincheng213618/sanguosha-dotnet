@@ -1,9 +1,10 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class ResolutionLifecycle(Func<RuntimeEntries.CoreGameEngineQinglongInsertionEntries> getCoreGameEngineQinglongInsertionRuntime, Func<RuntimeEntries.CoreGameEngineOriginalTargetAdditionsEntries> getCoreGameEngineOriginalTargetAdditionsRuntime, Func<RuntimeEntries.CharacterMaWanOlEntries> getCharacterMaWanOlRuntime, Func<RuntimeEntries.CharacterQianZhaoOlEntries> getCharacterQianZhaoOlRuntime, Func<RuntimeEntries.CoreGameEngineLateFixedTargetDamageCapScopesEntries> getCoreGameEngineLateFixedTargetDamageCapScopesRuntime, Func<RuntimeEntries.CoreGameEngineHpChangeProgramsEntries> getCoreGameEngineHpChangeProgramsRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineProgramRecoveryReceiptsEntries> getCoreGameEngineProgramRecoveryReceiptsRuntime) : IResolutionLifecycle
+internal sealed class ResolutionLifecycle(Func<RuntimeEntries.CoreDirectedTurnCardPoliciesEntries> directedPolicies, Func<RuntimeEntries.CoreGameEngineQinglongInsertionEntries> getCoreGameEngineQinglongInsertionRuntime, Func<RuntimeEntries.CoreGameEngineOriginalTargetAdditionsEntries> getCoreGameEngineOriginalTargetAdditionsRuntime, Func<RuntimeEntries.CharacterMaWanOlEntries> getCharacterMaWanOlRuntime, Func<RuntimeEntries.CharacterQianZhaoOlEntries> getCharacterQianZhaoOlRuntime, Func<RuntimeEntries.CoreGameEngineLateFixedTargetDamageCapScopesEntries> getCoreGameEngineLateFixedTargetDamageCapScopesRuntime, Func<RuntimeEntries.CoreGameEngineHpChangeProgramsEntries> getCoreGameEngineHpChangeProgramsRuntime, EngineStates.CoreMatchParticipantsState matchParticipantsState, Func<RuntimeEntries.CoreGameEngineProgramRecoveryReceiptsEntries> getCoreGameEngineProgramRecoveryReceiptsRuntime) : IResolutionLifecycle
 {
     public void CardUsePushed(CardUseFrame frame, CardActionContext action)
     {
+        directedPolicies().IssueDirectedUse(frame);
         getCoreGameEngineQinglongInsertionRuntime().BindQinglongInsertedUse(frame);
         getCoreGameEngineOriginalTargetAdditionsRuntime().IssueOriginalTargetAdditionPolicy(frame.Id, action);
         getCharacterMaWanOlRuntime().IssueMaWanHunjiangUse(frame.Id, action);

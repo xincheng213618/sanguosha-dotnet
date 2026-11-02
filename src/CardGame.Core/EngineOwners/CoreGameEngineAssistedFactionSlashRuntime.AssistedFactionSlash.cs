@@ -158,7 +158,7 @@ internal sealed partial class CoreGameEngineAssistedFactionSlashRuntime
 
         return ignoreDistance || _characterHuangfuSongWumiaoOperations.HasWuHfOrWuyouMaterialPrivilege(actor, kind, physicalCardIds) ||
             allowPotentialRank && physicalCardIds is null && _characterGuanYuWumiaoOperations.HasPotentialWuyouFactionSlash(actor, kind) ||
-            _characterXiaoQiaoLeOperations.HasWeiwanUseDistance(actor, target, kind) ||
+            _coreDirectedTurnCardPoliciesOperations.HasDirectedTurnCardPolicy(actor.Seat, target.Seat, kind, DirectedTurnCardPolicyEffect.IgnoreDistance) ||
             _characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(actor) || _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(actor) ||
             _coreFinalTargetSlashOperations.IsWithinSpecificSlashRange(actor, target, kind, effectiveRank) ||
             allowPotentialRank && effectiveRank is null && _coreFinalTargetSlashOperations.HasPotentialRankSlashRange(actor, target, kind);

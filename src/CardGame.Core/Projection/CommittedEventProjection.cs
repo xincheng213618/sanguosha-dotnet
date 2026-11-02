@@ -8,6 +8,16 @@ namespace CardGame.Core;
 /// </summary>
 internal static class CommittedEventProjection
 {
+    private static readonly IReadOnlyList<DirectedTurnCardPolicy> EmptyDirectedPolicies =
+        Array.AsReadOnly(Array.Empty<DirectedTurnCardPolicy>());
+
+    internal static DirectedTurnCardPolicy FreezeDirectedPolicy(DirectedTurnCardPolicy policy) => policy with
+    { CardKinds = FreezeList(policy.CardKinds), Until = FreezeList(policy.Until) };
+
+    internal static IReadOnlyList<DirectedTurnCardPolicy>? FreezeDirectedPolicies(IReadOnlyList<DirectedTurnCardPolicy>? policies) =>
+        policies is null ? null : policies.Count == 0 ? EmptyDirectedPolicies :
+        Array.AsReadOnly(policies.Select(FreezeDirectedPolicy).ToArray());
+
     // The invoice can also be embedded in trusted movement/payment frames. Its
     // action constructor already detaches every nested list; copy it explicitly
     // here so callers need not depend on the producer's object identity.
@@ -431,7 +441,7 @@ internal static class CommittedEventProjection
         TurnHandLimitCardKindExemptionGrantedEvent value => value with
         { Policy = value.Policy with { CardKinds = FreezeList(value.Policy.CardKinds) } },
         DirectedTurnCardPolicyGrantedEvent value => value with
-        { Policy = value.Policy with { CardKinds = FreezeList(value.Policy.CardKinds) } },
+        { Policy = FreezeDirectedPolicy(value.Policy) },
         DeferredPublicPileDepositedEvent value => value with
         { Deposit = value.Deposit with { CardIds = FreezeList(value.Deposit.CardIds) } },
         ProgramPublicPileSelectedEvent value => value with

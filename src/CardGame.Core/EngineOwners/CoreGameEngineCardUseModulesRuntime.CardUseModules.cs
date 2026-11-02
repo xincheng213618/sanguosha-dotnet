@@ -66,7 +66,6 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
         _stateChanges.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.TurnCleanup, turnSeat,
             SkillStateBoundaryTiming.Before, turnNumber));
         _coreNextSlashProgramsOperations.ExpireNextSlashDamage(turnNumber, turnSeat);
-        _coreDirectedTurnCardPoliciesOperations.ExpireDirectedTurnCardPolicies(turnNumber, turnSeat);
         _coreOriginalTargetAdditionsOperations.ExpireOriginalTargetAdditionGrants(turnNumber, turnSeat);
         _coreFixedDistanceOneDebtOperations.Value.ExpireFixedDistanceOneGrants(turnNumber, turnSeat);
         _coreBoundDiscardSlashBenefitsOperations.ResolveFirstRoundGameUsageRefunds(turnNumber, turnSeat);

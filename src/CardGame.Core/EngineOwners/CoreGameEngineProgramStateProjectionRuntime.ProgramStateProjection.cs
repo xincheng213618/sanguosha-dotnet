@@ -50,11 +50,11 @@ internal sealed partial class CoreGameEngineProgramStateProjectionRuntime
         {
             PublicRuleStates = _coreGameActivationProgressOperations.Value.GetSkillPublicRuleStates(owner, skillId),
             BooleanStates = states is null ? CoreGameEngineProgramStateProjectionDefinitions.EmptyProgramBooleanStateSnapshots : Array.AsReadOnly(states.ToArray()),
-            DirectedPolicies = _coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess._directedTurnCardPolicies.Count == 0 ? CoreGameEngineProgramStateProjectionDefinitions.EmptyDirectedPolicySnapshots : CreateNonemptyDirectedPolicySnapshots(owner, skillId),
+            DirectedPolicies = CreateNonemptyDirectedPolicySnapshots(owner, skillId),
             ActionProhibitions = _turnCardUseEffectsOperations._turnCardUseEffects.ActionProhibitions.Count == 0 ? CoreGameEngineProgramStateProjectionDefinitions.EmptyActionProhibitionSnapshots : CreateNonemptyActionProhibitionSnapshots(owner, skillId)
         };
     }
 
-    internal IReadOnlyList<DirectedTurnCardPolicy> CreateNonemptyDirectedPolicySnapshots(CharacterState owner, string skillId) => Array.AsReadOnly(_coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess._directedTurnCardPolicies.Where(item => item.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && item.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && item.Source.OwnerSeat == owner.Seat && item.Source.SkillId == skillId && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, skillId, item.Source.SkillInstanceId)).ToArray());
+    internal IReadOnlyList<DirectedTurnCardPolicy> CreateNonemptyDirectedPolicySnapshots(CharacterState owner, string skillId) => Array.AsReadOnly(_directedPolicies.ActiveDirectedPolicies().Where(item => item.Source.OwnerSeat == owner.Seat && item.Source.SkillId == skillId).ToArray());
     internal IReadOnlyList<TurnCardActionProhibition> CreateNonemptyActionProhibitionSnapshots(CharacterState owner, string skillId) => Array.AsReadOnly(_turnCardUseEffectsOperations._turnCardUseEffects.ActionProhibitions.Where(item => item.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && item.TurnSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && item.Source.OwnerSeat == owner.Seat && item.Source.SkillId == skillId && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, skillId, item.Source.SkillInstanceId)).ToArray());
 }

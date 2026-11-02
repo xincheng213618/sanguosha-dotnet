@@ -81,6 +81,8 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
         var global = kind is SkillStateBoundaryEvent.RoundAdvanced or SkillStateBoundaryEvent.DyingStarted or SkillStateBoundaryEvent.DyingEnded;
         if (global == (subject is not null))
             Fail(at + ".participant", global ? "is unavailable for a global boundary" : "is required for a participant boundary");
+        if (subject == SkillStateSubject.Any && kind is not (SkillStateBoundaryEvent.TurnStarted or SkillStateBoundaryEvent.TurnEnded))
+            Fail(at + ".participant", "any is available only for turnStarted and turnEnded boundaries");
         var timing = item.TryGetProperty("timing", out var timingNode)
             ? EnumValue<SkillStateBoundaryTiming>(timingNode, at + ".timing") : SkillStateBoundaryTiming.After;
         var skip = item.TryGetProperty("skipIssued", out var skipNode) && Bool(skipNode, at + ".skipIssued");
@@ -123,7 +125,7 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
             else if (!names.Contains(property.Name, StringComparer.Ordinal)) Fail(path + "." + property.Name, "unsupported property");
     }
 
-    private static JsonElement Required(JsonElement node, string name, JsonValueKind kind, string path)
+    internal static JsonElement Required(JsonElement node, string name, JsonValueKind kind, string path)
     {
         if (!node.TryGetProperty(name, out var value)) Fail(path + "." + name, "is required");
         if (value.ValueKind != kind) Fail(path + "." + name, "must be " + kind);
@@ -141,7 +143,7 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
         throw Failure(path, "unsupported " + typeof(T).Name);
     }
 
-    private static bool Bool(JsonElement node, string path) => node.ValueKind is JsonValueKind.True or JsonValueKind.False
+    internal static bool Bool(JsonElement node, string path) => node.ValueKind is JsonValueKind.True or JsonValueKind.False
         ? node.GetBoolean() : throw Failure(path, "must be a boolean");
     private static void Fail(string path, string message) => throw Failure(path, message);
     private static InvalidOperationException Failure(string path, string message) => new($"Invalid skill program at {path}: {message}.");

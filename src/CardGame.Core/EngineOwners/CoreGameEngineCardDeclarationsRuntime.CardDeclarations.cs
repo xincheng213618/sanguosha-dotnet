@@ -155,7 +155,7 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
         payment = _characterHuangGaiMouMobileOperations.CaptureMouZhaJiangDeclaration(payment, parent);
         payment = _characterLuKangWumiaoOperations.CaptureWuLuKangDixianDeclaration(payment, parent);
         payment = _characterGuanYuWumiaoOperations.CaptureWuyouDeclarationPayment(payment, parent);
-        payment = _characterXiaoQiaoLeOperations.CaptureWeiwanDeclarationPayment(payment, parent);
+        payment = _coreDirectedTurnCardPoliciesOperations.CaptureDirectedDeclarationPayment(payment, parent);
         payment = _characterZhouYuOlMouOperations.CaptureMouGuquDeclaration(payment, parent);
         payment = _characterDiaoChanLeOperations.CaptureDiouDeclaration(payment, parent);
         payment = _characterSunQuanOlMagicOperations.CaptureMoQuanyuDeclarationQuota(payment, parent, targets);

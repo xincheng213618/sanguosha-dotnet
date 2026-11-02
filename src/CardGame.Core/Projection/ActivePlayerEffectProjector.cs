@@ -125,8 +125,7 @@ internal sealed class ActivePlayerEffectProjector(IActivePlayerTurnEffectQueries
             Add(adjustment.SkillId, adjustment.OwnerSeat, "下一张基本牌或普通锦囊牌可增加或减少一个目标。",
                 ActivePlayerEffectExpiry.ConsumedOrTurnEnd, 1);
         foreach (var item in facts.DirectedTurnCardPolicies)
-            if (Current(item.TurnNumber, item.TurnSeat) && (item.ActorSeat == player.Seat || item.TargetSeat == player.Seat) &&
-                facts.HasRuntimeSkillInstance(item.Source.OwnerSeat, item.Source.SkillId, item.Source.SkillInstanceId))
+            if (item.ActorSeat == player.Seat || item.TargetSeat == player.Seat)
             {
                 var actor = item.ActorSeat == player.Seat ? "你" : SeatName(item.ActorSeat);
                 var target = item.TargetSeat == player.Seat ? "你" : SeatName(item.TargetSeat);
@@ -134,6 +133,7 @@ internal sealed class ActivePlayerEffectProjector(IActivePlayerTurnEffectQueries
                 if (item.Effects.HasFlag(DirectedTurnCardPolicyEffect.ForbidTarget)) details.Add("不能指定目标");
                 if (item.Effects.HasFlag(DirectedTurnCardPolicyEffect.IgnoreDistance)) details.Add("无距离限制");
                 if (item.Effects.HasFlag(DirectedTurnCardPolicyEffect.BypassSlashLimit)) details.Add("【杀】无次数限制");
+                if (item.Effects.HasFlag(DirectedTurnCardPolicyEffect.BypassUseLimit)) details.Add("使用牌无次数限制");
                 if (item.Effects.HasFlag(DirectedTurnCardPolicyEffect.IgnoreArmor)) details.Add("无视目标防具");
                 Add(item.Source.SkillId, item.Source.OwnerSeat, $"{actor}对{target}的{EffectCardNames(item.CardKinds)}：{string.Join("、", details)}。");
             }

@@ -11,7 +11,7 @@ internal enum ProgramSkillSourceRemoval
 /// children and expiry qualification remain with their original callers.
 /// </summary>
 [ProgramRuntimeModule, ProgramCapability]
-internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, IProgramSkillChangeOperations operations, ISkillGrantRevisionObservations observations, IMatchParticipantStateAccess participants, IProgramTurnQueries turn, IActualDiscardRecoveryPhaseQueries phases, IProgramHealthChildQueries healthChildren) : IProgramSkillAcquisitions
+internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, IProgramSkillChangeOperations operations, ISkillGrantRevisionObservations observations, IMatchParticipantStateAccess participants, IProgramTurnQueries turn, IActualDiscardRecoveryPhaseQueries phases, IProgramHealthChildQueries healthChildren, IProgramEventJournalQueries journal, EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess directed) : IProgramSkillAcquisitions, IProgramRuleLifetimes
 {
     void IProgramSkillAcquisitions.Grant(ProgramSkillFrame frame, int recipientSeat, IReadOnlyList<string> skillIds) => Grant(frame, recipientSeat, skillIds);
     SkillGrant IProgramSkillAcquisitions.GrantOwnedSource(ProgramSkillFrame frame, string sourceId, string skillId) => GrantOwnedSource(frame, sourceId, skillId);
@@ -94,6 +94,10 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
         IReadOnlyList<SkillStateBoundarySpec> until, SkillStateConditionContext context) =>
         NormalizeLifetime(null, owner, target, until, context);
 
+    SkillStateLifetime? IProgramRuleLifetimes.CreateApplicationLifetime(int owner, int target,
+        IReadOnlyList<SkillStateBoundarySpec> until, SkillStateConditionContext context) =>
+        CreateApplicationLifetime(owner, target, until, context);
+
     private SkillStateLifetime? NormalizeLifetime(SkillStateOrigin? origin, int owner, int target,
         IReadOnlyList<SkillStateBoundarySpec> until, SkillStateConditionContext? context = null)
     {
@@ -105,18 +109,22 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
                 SkillStateSubject.Owner => owner,
                 SkillStateSubject.Target => target,
                 SkillStateSubject.TurnOwner => turn.TurnOwnerSeat,
+                SkillStateSubject.Any when boundary.Event is SkillStateBoundaryEvent.TurnStarted or SkillStateBoundaryEvent.TurnEnded => null,
+                SkillStateSubject.Any => throw new InvalidOperationException("Any participant requires a turn-start or turn-end boundary."),
                 _ => null
             };
             if (seat is { } participant && !facts.IsValidSeat(participant)) return null;
-            var current = AdvancingBoundary(boundary.Event, seat, boundary.Phase) ?? _processingBoundary;
+            var any = boundary.Participant == SkillStateSubject.Any;
+            var current = AdvancingBoundary(boundary.Event, seat, boundary.Phase, any) ?? _processingBoundary;
             var occurrence = current is { } active && active.Event == boundary.Event &&
-                active.Seat == seat && active.Phase == boundary.Phase ? active.Occurrence : boundary.Event switch
+                (any || active.Seat == seat) && active.Phase == boundary.Phase ? active.Occurrence : boundary.Event switch
                 {
                     SkillStateBoundaryEvent.RoundAdvanced => facts.RoundNumber,
                     SkillStateBoundaryEvent.PhaseStarted or SkillStateBoundaryEvent.PhaseEnded => phases.Current()?.Token ?? 0,
                     SkillStateBoundaryEvent.DyingStarted or SkillStateBoundaryEvent.DyingEnded =>
                         context?.IssuedDyingFrameId ?? healthChildren?.ActiveDying?.Id ?? 0,
                     SkillStateBoundaryEvent.Death => seat is { } victim ? facts.DeathOccurrence(victim) : 0,
+                    SkillStateBoundaryEvent.TurnStarted or SkillStateBoundaryEvent.TurnEnded when any => LastAnyTurnOccurrence(boundary.Event),
                     _ => context?.IssuedTurnNumber ?? turn.TurnNumber
                 };
             ends.Add(new(boundary.Event, seat, boundary.Timing, occurrence, boundary.SkipIssued, boundary.Phase));
@@ -124,7 +132,15 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
         return new(origin, ends);
     }
 
-    private SkillStateBoundary? AdvancingBoundary(SkillStateBoundaryEvent kind, int? seat, ActualDiscardRecoveryPhaseKind? phase)
+    private long LastAnyTurnOccurrence(SkillStateBoundaryEvent kind) => journal.LastMatching(fact =>
+        kind == SkillStateBoundaryEvent.TurnStarted ? fact is TurnStartedEvent : fact is TurnEndedEvent) switch
+        {
+            TurnStartedEvent started => started.TurnNumber,
+            TurnEndedEvent ended => ended.TurnNumber,
+            _ => 0
+        };
+
+    private SkillStateBoundary? AdvancingBoundary(SkillStateBoundaryEvent kind, int? seat, ActualDiscardRecoveryPhaseKind? phase, bool any = false)
     {
         foreach (var item in facts.AdvancingFacts)
         {
@@ -139,7 +155,7 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
                 DyingResolvedEvent fact => new(SkillStateBoundaryEvent.DyingEnded, null, SkillStateBoundaryTiming.Before, fact.ResolutionId),
                 _ => null
             };
-            if (boundary is not null && boundary.Event == kind && boundary.Seat == seat && boundary.Phase == phase) return boundary;
+            if (boundary is not null && boundary.Event == kind && (any || boundary.Seat == seat) && boundary.Phase == phase) return boundary;
         }
         return null;
     }
@@ -150,14 +166,19 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
         _processingBoundary = boundary;
         try
         {
-            ExpireSkillStates(lifetime => lifetime.Until.Any(end => end.Event == boundary.Event &&
-                end.Seat == boundary.Seat && end.Timing == boundary.Timing && end.Phase == boundary.Phase &&
-                (end.Event == SkillStateBoundaryEvent.DyingEnded && !end.SkipIssued
-                    ? boundary.Occurrence == end.IssuedOccurrence
-                    : end.SkipIssued ? boundary.Occurrence > end.IssuedOccurrence : boundary.Occurrence >= end.IssuedOccurrence)));
+            directed._directedTurnCardPolicies.RemoveAll(policy => policy.Until.Any(end => MatchesBoundary(end, boundary)));
+            ExpireSkillStates(lifetime => lifetime.Until.Any(end => MatchesBoundary(end, boundary)));
         }
         finally { _processingBoundary = previous; }
     }
+
+    private static bool MatchesBoundary(SkillStateBoundaryEnd end, SkillStateBoundary boundary) =>
+        end.Event == boundary.Event &&
+        (end.Seat == boundary.Seat || end.Seat is null && end.Event is SkillStateBoundaryEvent.TurnStarted or SkillStateBoundaryEvent.TurnEnded) &&
+        end.Timing == boundary.Timing && end.Phase == boundary.Phase &&
+        (end.Event == SkillStateBoundaryEvent.DyingEnded && !end.SkipIssued
+            ? boundary.Occurrence == end.IssuedOccurrence
+            : end.SkipIssued ? boundary.Occurrence > end.IssuedOccurrence : boundary.Occurrence >= end.IssuedOccurrence);
 
     internal void RevokeSkillStateOrigin(SkillStateOrigin origin) => ExpireSkillStates(lifetime =>
         lifetime.Origin is { } issued && issued.FrameId == origin.FrameId && issued.EffectIndex == origin.EffectIndex &&
@@ -193,6 +214,8 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
     {
         switch (fact)
         {
+            case TurnStartedEvent started: ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.TurnStarted, started.ActorSeat, SkillStateBoundaryTiming.After, started.TurnNumber)); break;
+            case TurnEndedEvent ended: ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.TurnEnded, ended.ActorSeat, SkillStateBoundaryTiming.After, ended.TurnNumber)); break;
             case PlayerDiedEvent death: ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.Death, death.VictimSeat, SkillStateBoundaryTiming.After, facts.DeathOccurrence(death.VictimSeat))); break;
             case ActualDiscardRecoveryPhaseStartedEvent started: PhaseBoundary(started.Phase, SkillStateBoundaryEvent.PhaseStarted, SkillStateBoundaryTiming.After); break;
             case ActualPhaseEndedEvent ended: PhaseBoundary(ended.Phase, SkillStateBoundaryEvent.PhaseEnded, SkillStateBoundaryTiming.After); break;
