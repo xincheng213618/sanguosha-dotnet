@@ -8,6 +8,7 @@ internal sealed partial class ProgramEventHistoryIndex
     private readonly Dictionary<long, CardActionContext> _latestActualActions = [];
     private readonly Dictionary<(int Turn, int Actor), List<long>> _actualTurnActions = [];
     private readonly Dictionary<(long UseId, int Target), int> _finalizedDirectedTargetOrdinals = [];
+    private readonly Dictionary<(int Turn, int TurnOwner, int Actor), List<int>> _everDesignatedTargets = [];
     private readonly Dictionary<long, long> _finalizedActions = [];
     private readonly Dictionary<long, long> _previousFinalizedActions = [];
     private readonly Dictionary<long, ActualCardUseHistoryEntry> _completedActualActions = [];
@@ -26,6 +27,19 @@ internal sealed partial class ProgramEventHistoryIndex
     {
         SynchronizeActualUses();
         return _actualActions.GetValueOrDefault(actionId);
+    }
+
+    public CardActionContext? FindLatestAction(long actionId)
+    {
+        SynchronizeActualUses();
+        return _latestActualActions.GetValueOrDefault(actionId);
+    }
+
+    public IReadOnlyList<int> EverDesignatedTargets(int actualTurn, int turnOwnerSeat, int actorSeat)
+    {
+        SynchronizeActualUses();
+        return _everDesignatedTargets.TryGetValue((actualTurn, turnOwnerSeat, actorSeat), out var targets)
+            ? Array.AsReadOnly(targets.ToArray()) : [];
     }
 
     public ActualCardUseHistoryEntry? FindFinalizedUse(long nativeUseId)
@@ -87,7 +101,7 @@ internal sealed partial class ProgramEventHistoryIndex
         if (!retained)
         {
             _actualActions.Clear(); _finalizedActions.Clear(); _previousFinalizedActions.Clear();
-            _latestActualActions.Clear(); _actualTurnActions.Clear(); _finalizedDirectedTargetOrdinals.Clear();
+            _latestActualActions.Clear(); _actualTurnActions.Clear(); _finalizedDirectedTargetOrdinals.Clear(); _everDesignatedTargets.Clear();
             _completedActualActions.Clear(); _completedNativeActions.Clear(); _acceptedAtCompletion.Clear();
             _lastFinalizedActions.Clear(); _acceptedActualUses.Clear(); _acceptedActualPositions.Clear();
             _completedNativeUses.Clear();
@@ -139,6 +153,7 @@ internal sealed partial class ProgramEventHistoryIndex
                     PrimaryTargets = fact.PrimaryTargets, Completed = _completedNativeUses.Contains(fact.NativeUseId) };
                 _latestActualActions[actionId] = fact.Action;
                 _finalizedActions.Add(fact.NativeUseId, actionId);
+                ObserveDesignatedTargets(fact.Action, fact.ActualTurn, fact.TurnOwner);
                 if (accepted.AcceptedActorSeat == fact.Action.ActorSeat &&
                     _actualTurnActions.TryGetValue((accepted.ActualTurn, accepted.AcceptedActorSeat), out var turnUses))
                     foreach (var target in fact.Action.EffectiveDesignatedTargetSeats.Distinct())
@@ -162,6 +177,7 @@ internal sealed partial class ProgramEventHistoryIndex
                 _completedActualActions[actionId] = completedAccepted with { Action = fact.Action, NativeUseId = fact.NativeUseId,
                     PrimaryTargets = fact.PrimaryTargets, Completed = _completedNativeUses.Contains(fact.NativeUseId) };
                 _latestActualActions[actionId] = fact.Action;
+                ObserveDesignatedTargets(fact.Action, fact.ActualTurn, fact.TurnOwner);
                 _completedNativeActions.Add(fact.NativeUseId, actionId);
                 if (_acceptedActualPositions.TryGetValue(actionId, out var position))
                 {
@@ -180,11 +196,22 @@ internal sealed partial class ProgramEventHistoryIndex
             }
             case ActualCardUseActionUpdatedEvent fact when _actualActions.ContainsKey(fact.Action.ActionId):
                 _latestActualActions[fact.Action.ActionId] = fact.Action;
+                if (_finalizedActions.ContainsKey(fact.NativeUseId))
+                    ObserveDesignatedTargets(fact.Action, fact.ActualTurn, fact.TurnOwner);
                 break;
             case CardResponseCompletedEvent fact when _actualActions.TryGetValue(fact.ActionId, out var response):
                 _actualActions[fact.ActionId] = response with { PrimaryTargets = Array.Empty<int>(), Completed = true };
                 _completedActualActions[fact.ActionId] = _actualActions[fact.ActionId];
                 break;
         }
+    }
+
+    private void ObserveDesignatedTargets(CardActionContext action, int actualTurn, int turnOwnerSeat)
+    {
+        if (action.Type != CardActionType.Use) return;
+        var key = (actualTurn, turnOwnerSeat, action.ActorSeat);
+        if (!_everDesignatedTargets.TryGetValue(key, out var targets)) _everDesignatedTargets[key] = targets = [];
+        foreach (var target in action.EffectiveDesignatedTargetSeats)
+            if (target != action.ActorSeat && !targets.Contains(target)) targets.Add(target);
     }
 }

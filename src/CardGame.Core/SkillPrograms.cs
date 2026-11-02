@@ -695,7 +695,6 @@ public enum SkillProgramEffectOp
     ResolveMobileShiDengAiFull = 50301,
     ResolveMobileShiDengAiTuntian = 50302,
     ResolveMobileShiDengAiJixi = 50303,
-    ResolveMobileShiDengAiTargets = 50304,
     ResolveMobileShiXiaoQiaoHeyun = 50400,
     ResolveMobileShiXiaoQiaoYinhui = 50401,
     ResolveMobileShiZhangYanFeijing = 50500,
@@ -3457,7 +3456,7 @@ public sealed record ProgramBooleanStatePresentation(string TrueText, string Fal
 
 public sealed class SkillProgramCatalog
 {
-    public const int RulesSchemaVersion = 64;
+    public const int RulesSchemaVersion = 65;
     public const int PresentationSchemaVersion = 3;
     public const string RuntimeVersion = "skill-program-v62";
     private const int MaximumDepth = 16;

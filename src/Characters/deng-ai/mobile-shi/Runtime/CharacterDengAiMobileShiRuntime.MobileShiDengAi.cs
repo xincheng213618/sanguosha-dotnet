@@ -31,7 +31,7 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
     internal static bool ShiDaOwns(CardLocation location, int owner) => location.OwnerSeat == owner && location.Zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment;
     internal static bool ShiDaDamageCard(CardKind kind) => CoreGameEngineMouLuMengRuntime.IsDamageCardKind(kind) || CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(kind) || kind == CardKind.Lightning;
     internal IReadOnlyList<CardMovementRecord> ShiDaLosses(int owner, CardMovementBatchContext? batch) => batch is null ? [] : batch.Movements.Where(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && ShiDaOwns(m.From, owner) && !ShiDaOwns(m.To, owner) && !ShiDaDamageCard(m.CardKind) && !IsShiDaDeferredEquipmentEntry(batch, m)).GroupBy(m => m.CardId).Select(group => group.OrderBy(m => m.Sequence).First()).ToArray();
-    internal IReadOnlyList<int> ShiDaHistoricalTargets(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiDaTargetRecordedEvent>().Where(e => e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Actor == owner && e.Target != owner).Select(e => e.Target).Distinct().ToArray();
+    private IReadOnlyList<int> ShiDaHistoricalTargets(int owner) => _actualCardUseHistory.EverDesignatedTargets(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, owner);
     internal bool ShiDaHasJixiTarget(int owner) => !_coreCardUseModulesOperations.IsCardUseForbidden(owner, CardKind.Snatch, CardActionType.Use) && ShiDaHistoricalTargets(owner).Any(seat => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) && _coreMatchParticipantsPlayersAccess._players[seat].IsAlive && _corePhysicalOwnedCardQueriesOperations.HasTargetCard(_coreMatchParticipantsPlayersAccess._players[seat]) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[seat], CardKind.Snatch, Suit.None, null) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, seat, CardKind.Snatch));
     internal IReadOnlyList<PromptChoice> ShiDaCostChoices(long id, int owner, int payer) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(id, owner, payer, [CardZoneKind.Hand, CardZoneKind.Equipment, CardZoneKind.Judgment], OwnedCardMoveIntent.Discard);
     internal bool ShiDaHasJixiDiscard(ProgramTriggerCandidate candidate, int payer) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(payer) && new[]
@@ -66,15 +66,6 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
             return SkillProgramStepOutcome.Continue;
         }
 
-        if (op == SkillProgramEffectOp.ResolveMobileShiDengAiTargets)
-        {
-            var w = f.WindowContext;
-            if (f.SkillId != ShiDaJixi || w is null || w.Window is not (SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.CardUseCompleted) || !ShiDaWindowMatches(f, w.Window) || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == w.ParentFrameId)is not ProgramCardTriggerWindowFrame parent || parent.Action is not { Type: CardActionType.Use } a || a.ActorSeat != f.OwnerSeat || w.CardUse?.CardActionId != a.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(parent.ParentFrameId)is not { } use || use.Action?.ActionId != a.ActionId)
-                throw new InvalidOperationException("Jixi target history needs the same native actor and actual-use window.");
-            RecordShiDaTargets(use.Id, a);
-            return SkillProgramStepOutcome.Continue;
-        }
-
         var stage = op == SkillProgramEffectOp.ResolveMobileShiDengAiFull ? ShiDaStage.Drawing : op == SkillProgramEffectOp.ResolveMobileShiDengAiTuntian ? ShiDaStage.Amount : ShiDaStage.Cost;
         if (op == SkillProgramEffectOp.ResolveMobileShiDengAiFull ? f.SkillId != ShiDaTuntian || f.TriggerId != "full-charge" || !ShiDaWindowMatches(f, SkillProgramTriggerWindow.TurnStartBeforeNormalFlow) || ShiDaCharge(f.OwnerSeat)is var charge && charge.Current != charge.Capacity : op == SkillProgramEffectOp.ResolveMobileShiDengAiTuntian ? f.SkillId != ShiDaTuntian || f.TriggerId is not null || f.ActivationId != "spend-charge" || f.WindowContext is not null || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat != f.OwnerSeat : op != SkillProgramEffectOp.ResolveMobileShiDengAiJixi || f.SkillId != ShiDaJixi || f.TriggerId != "ending-jixi" || !ShiDaWindowMatches(f, SkillProgramTriggerWindow.AfterTurnEnded))
             throw new InvalidOperationException("Shi Deng Ai lost its actual Play or turn boundary.");
@@ -89,22 +80,6 @@ internal sealed partial class CharacterDengAiMobileShiRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiDaStartedEvent(f.Id, r.Source, r.Hash, op, r.Turn, r.TurnOwner, r.WindowId));
         ContinueShiDa(f.Id);
         return SkillProgramStepOutcome.AwaitChild;
-    }
-
-    internal void RecordShiDaTargets(long useId, CardActionContext action)
-    {
-        foreach (var seat in action.EffectiveDesignatedTargetSeats.Where(seat => seat != action.ActorSeat).Distinct())
-            if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiDaTargetRecordedEvent>().Any(e => e.Turn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.UseId == useId && e.ActionId == action.ActionId && e.Actor == action.ActorSeat && e.Target == seat))
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiDaTargetRecordedEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, action.ActorSeat, useId, action.ActionId, seat));
-    }
-
-    // Additions can themselves create observer windows before the whole Use completes.
-    [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 50300)]
-    internal void CaptureShiDaTargetUnion(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result)
-    {
-        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiDengAiTargets) || action.Type != CardActionType.Use || window is not (SkillProgramTriggerWindow.CardUseBeforeTargetEffects or SkillProgramTriggerWindow.CardEffectBeforeApply or SkillProgramTriggerWindow.CardUseCompleted) || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Action?.ActionId == action.ActionId)is not { } use)
-            return;
-        RecordShiDaTargets(use.Id, action);
     }
 
     internal PromptChoice ShiDaChoice(ProgramSkillFrame f, string branch, string label, int number = -1, int? target = null, int? card = null) => new(new($"shi-deng-ai.{(f.Id)}.{(f.ShiDengAi!.Stage)}.{(branch)}.{(number)}.{(target ?? -1)}.{(card ?? -1)}"), label, card is { } id ? [id] : [], target is { } seat ? [seat] : [], new Dictionary<string, string> { ["program-action"] = "mobile-shi-deng-ai", ["branch"] = branch, ["number"] = number.ToString(CultureInfo.InvariantCulture) });

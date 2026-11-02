@@ -40,7 +40,6 @@ public sealed record ShiDaEquipmentPlacedEvent(long UseId, long ActionId, int Ca
 public sealed record ShiDaEquipmentLossSettledEvent(long UseId, long ActionId, int CardId, long PaymentSequence, long? PlacementSequence, bool Lost) : IGameEvent;
 public sealed record ShiDaChargeChangedEvent(long FrameId, CardConversionSource Source, int Before, int After, int CapacityBefore, int CapacityAfter, long MovementBatchId) : IGameEvent;
 public sealed record ShiDaStartedEvent(long FrameId, CardConversionSource Source, string Hash, SkillProgramEffectOp Op, int Turn, int TurnOwner, long WindowId) : IGameEvent;
-public sealed record ShiDaTargetRecordedEvent(int Turn, int TurnOwner, int Actor, long UseId, long ActionId, int Target) : IGameEvent;
 public sealed record ShiDaSpentEvent(long FrameId, CardConversionSource Source, int Amount, int Recipients, CardConversionSource? Zaoxian) : IGameEvent;
 public sealed record ShiDaRecipientEvent(long FrameId, int Index, int Seat) : IGameEvent;
 public sealed record ShiDaRandomCandidateEvent(long FrameId, int Ordinal, int Index, int CardId) : IGameEvent;
@@ -74,8 +73,10 @@ internal abstract class ShiDengAiDescriptor(SkillProgramEffectOp op) : ProgramOp
 internal sealed class ResolveMobileShiDengAiGainDescriptor() : ShiDengAiDescriptor(SkillProgramEffectOp.ResolveMobileShiDengAiGain);
 internal sealed class ResolveMobileShiDengAiFullDescriptor() : ShiDengAiDescriptor(SkillProgramEffectOp.ResolveMobileShiDengAiFull);
 internal sealed class ResolveMobileShiDengAiTuntianDescriptor() : ShiDengAiDescriptor(SkillProgramEffectOp.ResolveMobileShiDengAiTuntian);
-internal sealed class ResolveMobileShiDengAiJixiDescriptor() : ShiDengAiDescriptor(SkillProgramEffectOp.ResolveMobileShiDengAiJixi);
-internal sealed class ResolveMobileShiDengAiTargetsDescriptor() : ShiDengAiDescriptor(SkillProgramEffectOp.ResolveMobileShiDengAiTargets);
+internal sealed class ResolveMobileShiDengAiJixiDescriptor() : ShiDengAiDescriptor(SkillProgramEffectOp.ResolveMobileShiDengAiJixi)
+{
+    public override ProgramFactRequirements FactRequirements => base.FactRequirements with { Triggered = base.FactRequirements.Triggered | ProgramTrackedFact.ActualCardUseHistory };
+}
 internal sealed class ShiDengAiHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {
     public SkillProgramEffectOp Op => op;
@@ -87,13 +88,12 @@ internal static class ShiDengAiComposition
     {
         static bool Plain(IReadOnlyList<SkillProgramEffect> effects, SkillProgramEffectOp op) => effects is [{ Target: SkillProgramEffectTarget.Owner, TargetReference: null, Condition.Kind: SkillProgramConditionKind.Always } effect] && effect.Op == op;
         var operations = program.Activations.SelectMany(a => a.Effects).Concat(program.Triggers.SelectMany(t => t.Effects));
-        if (!operations.Any(e => e.Op is SkillProgramEffectOp.ResolveMobileShiDengAiGain or SkillProgramEffectOp.ResolveMobileShiDengAiFull or SkillProgramEffectOp.ResolveMobileShiDengAiTuntian or SkillProgramEffectOp.ResolveMobileShiDengAiJixi or SkillProgramEffectOp.ResolveMobileShiDengAiTargets)) return;
+        if (!operations.Any(e => e.Op is SkillProgramEffectOp.ResolveMobileShiDengAiGain or SkillProgramEffectOp.ResolveMobileShiDengAiFull or SkillProgramEffectOp.ResolveMobileShiDengAiTuntian or SkillProgramEffectOp.ResolveMobileShiDengAiJixi)) return;
         var valid = program.Id == "mobile:shi-tuntian" ? program.Activations is [{ Id: "spend-charge", MinCards: 0, MaxCards: 0, MinTargets: 0, MaxTargets: 0, UsesPerTurn: null, UsesPerPhase: 1 } a] && Plain(a.Effects, SkillProgramEffectOp.ResolveMobileShiDengAiTuntian) &&
             program.Triggers.Count == 2 && program.Triggers.Any(t => t is { Id: "non-damage-loss", Window: SkillProgramTriggerWindow.CardsMoved, Subject: SkillProgramTriggerSubject.Owner, Optional: false, MovementOccurrence: SkillProgramMovementOccurrence.PerOwnerBatch } &&
                 t.SourceZones.SequenceEqual([CardZoneKind.Hand, CardZoneKind.Equipment, CardZoneKind.Judgment]) && Plain(t.Effects, SkillProgramEffectOp.ResolveMobileShiDengAiGain)) &&
             program.Triggers.Any(t => t is { Id: "full-charge", Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow, Subject: SkillProgramTriggerSubject.Owner, TurnOwnerScope: SkillProgramTurnOwnerScope.AnyLiving, Optional: false } && Plain(t.Effects, SkillProgramEffectOp.ResolveMobileShiDengAiFull)) :
-            program.Id == "mobile:shi-jixi" && program.Activations.Count == 0 && program.Triggers.Count == 3 && program.Triggers.Any(t => t is { Id: "ending-jixi", Window: SkillProgramTriggerWindow.AfterTurnEnded, Subject: SkillProgramTriggerSubject.Owner, TurnOwnerScope: SkillProgramTurnOwnerScope.AnyLiving, Optional: true } && Plain(t.Effects, SkillProgramEffectOp.ResolveMobileShiDengAiJixi)) &&
-            program.Triggers.Where(t => t.Id != "ending-jixi").All(t => t.Window is SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.CardUseCompleted && t.OwnerRelation == SkillProgramCardActionOwnerRelation.Actor && !t.Optional && !t.IncludeResponseUses && !t.AllowNoEventTarget && Plain(t.Effects, SkillProgramEffectOp.ResolveMobileShiDengAiTargets));
+            program.Id == "mobile:shi-jixi" && program.Activations.Count == 0 && program.Triggers is [{ Id: "ending-jixi", Window: SkillProgramTriggerWindow.AfterTurnEnded, Subject: SkillProgramTriggerSubject.Owner, TurnOwnerScope: SkillProgramTurnOwnerScope.AnyLiving, Optional: true } jixi] && Plain(jixi.Effects, SkillProgramEffectOp.ResolveMobileShiDengAiJixi);
         if (!valid || program.ViewAs.Count != 0 || program.CardPolicies.Count != 0) throw new InvalidOperationException(path + ": Shi Deng Ai requires native owner losses, once-Play charge payment and a true after-turn multi-target Snatch.");
     }
 }

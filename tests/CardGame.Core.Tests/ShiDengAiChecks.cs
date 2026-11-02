@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Reflection;
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
@@ -37,6 +38,46 @@ internal static class ShiDengAiChecks
         var lost = s.G.CardMovements.Skip(movement).Where(m => m.From == CardLocation.Hand(0) && m.To == CardLocation.DiscardPile).ToArray();
         s.Need(lost.Length >= 2 && s.Charge() == (Math.Min(before.Capacity, before.Current + lost.Length), before.Capacity), "One real batch containing several non-damage entities gains one point for each entity, capped by the current capacity.");
         s.Cold(); s.Replay();
+        JixiFreezesEverTargetsAcrossPaidNativeChildren();
+    }
+
+    private static void JixiFreezesEverTargetsAcrossPaidNativeChildren()
+    {
+        var s = Scene.Start(grow: false); s.Play();
+        s.Native(CardKind.IronChain, [2]); s.Play();
+        s.Native(CardKind.BaguaFormation); s.Watch("equipment-paid"); s.Continue("equipment-paid"); s.Play();
+        var equipment = s.V(0).Equipment.Single().Id;
+        s.Need(s.G.GetCombatDistance(0, 2) > 1, "The original historical target really lies outside ordinary Snatch distance.");
+        s.End(); s.Reach(() => s.P?.SkillPrompt?.SkillId == Jixi && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
+        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate"); s.Stage(ShiDaStage.Cost);
+        var frame = s.Root!.Id; var receipt = s.Root.ShiDengAi!;
+        s.Need(receipt.History.SequenceEqual([2]), "Actual native target history is frozen on the original Jixi receipt before its cost.");
+        s.Answer(c => Branch(c) == "cost" && c.Cards.SequenceEqual([equipment])); s.Watch("cost-paid");
+        s.Need(s.E<ShiDaCostPaidEvent>().Single().FrameId == frame && s.Zone(equipment) == CardLocation.DiscardPile,
+            "The exact original equipment is genuinely discarded before the suspended paid child.");
+        s.Cold(); s.Continue("cost-paid");
+        s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-target") == true);
+        s.Answer(c => c.Targets.SequenceEqual([1])); s.Watch("history-after");
+        var history = ((ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .GetValue(s.G)!).Get<IActualCardUseHistoryQueries>();
+        s.Need(history.EverDesignatedTargets(receipt.Turn, receipt.TurnOwner, 0).Order().SequenceEqual([1, 2]) &&
+            s.Root!.ShiDengAi!.History.SequenceEqual([2]) && receipt.History.SequenceEqual([2]),
+            "A real nested late Slash expands live ever-target history but cannot change the paid parent's frozen eligible targets.");
+        s.Cold(); s.Continue("history-after"); s.Stage(ShiDaStage.Targets);
+        s.Need(s.P!.Choices.Where(c => Branch(c) == "target").SelectMany(c => c.Targets).SequenceEqual([2]),
+            "The actual paid menu uses only the original snapshot, not the new target introduced by its child.");
+        s.Answer(c => Branch(c) == "target" && c.Targets.SequenceEqual([2])); s.Answer(c => Branch(c) == "snatch");
+        s.Reach(() => s.G.ResolutionStack.OfType<CardUseFrame>().Any(f => f.VirtualOrdinaryTrickOrigin?.SkillId == Jixi));
+        var use = s.G.ResolutionStack.OfType<CardUseFrame>().Single(f => f.VirtualOrdinaryTrickOrigin?.SkillId == Jixi);
+        s.Need(use.CardKind == CardKind.Snatch && use.TargetSeats.SequenceEqual([2]) && use.PhysicalCardIds.Count == 0 &&
+            use.VirtualOrdinaryTrickOrigin!.ParentProgramFrameId == frame, "The frozen distant target receives the actual zero-material native Snatch.");
+        s.Cold(); s.Play();
+        var claim = s.G.CardMovements.Single(m => m.From == CardLocation.Hand(2) && m.To == CardLocation.Processing && m.Reason.Value == "card.effect.snatch");
+        s.Need(s.E<ShiDaSnatchReturnedEvent>().Count(e => e.UseId == use.Id) == 1 &&
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) == 1 && s.E<ShiDaCostPaidEvent>().Count(e => e.FrameId == frame) == 1 &&
+            s.G.CardMovements.Count(m => m.CardId == claim.CardId && m.Sequence > claim.Sequence && m.From == CardLocation.Processing && m.To == CardLocation.Hand(0) && m.Reason.Value == "card.effect.snatch-finished") == 1,
+            "The original payment and true two-step Snatch claim return once after cold recovery.");
+        s.Cold();
     }
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
@@ -104,6 +145,7 @@ internal static class ShiDengAiChecks
             var growTrigger = grow ? """,{"id":"fill-after-full","window":"turnStartBeforeNormalFlow","subject":"owner","turnOwnerScope":"anyLiving","priority":-10,"optional":false,"isSkillInvocation":false,"effects":[{"op":"discardOwnedZoneCards","target":"owner","zones":["hand"]}]}""" : "";
             var fullWatch = grow ? """{"id":"full-paid","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["skill.mobile-shi-deng-ai.tuntian.full"],"optional":false,"isSkillInvocation":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"chooseOption","target":"owner","resultBind":"full-paid","options":[{"id":"full-paid"}]}]},""" : "";
             var equipmentWatch = grow ? "" : """{"id":"equipment-paid","window":"cardUseTargetsFinalized","ownerRelation":"actor","cardCategories":["equipment"],"optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"equipment-paid","options":[{"id":"equipment-paid"}]}]},""";
+            var historyChild = grow ? "" : """,{"op":"selectTarget","target":"owner","targetKind":"otherLiving"},{"op":"useVirtualSlash","target":"selectedTarget"},{"op":"chooseOption","target":"owner","resultBind":"history-after","options":[{"id":"history-after"}]}""";
             var rules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
               {"id":"{{Driver}}","revision":1,"modifiers":[{"id":"keep","query":"handLimit","operation":"add","value":30,"priority":0}],"triggers":[{"id":"no-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"effects":[{"op":"adjustNormalDraw","target":"owner","amount":-2}]}{{growTrigger}}],
@@ -111,12 +153,12 @@ internal static class ShiDengAiChecks
               {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"no-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"effects":[{"op":"adjustNormalDraw","target":"owner","amount":-2}]},{"id":"no-play","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]},
               {"id":"{{WatchSkill}}","revision":1,"triggers":[{{fullWatch}}{{equipmentWatch}}
                 {"id":"reward-paid","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["skill.mobile-shi-deng-ai.zaoxian.obtain"],"optional":false,"isSkillInvocation":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"chooseOption","target":"owner","resultBind":"reward-paid","options":[{"id":"reward-paid"}]}]},
-                {"id":"cost-paid","window":"cardsMoved","subject":"owner","sourceZones":["equipment"],"movementOccurrence":"perBatch","movementReasons":["skill.mobile-shi-deng-ai.jixi.discard"],"optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"cost-paid","options":[{"id":"cost-paid"}]}]}]}
+                {"id":"cost-paid","window":"cardsMoved","subject":"owner","sourceZones":["equipment"],"movementOccurrence":"perBatch","movementReasons":["skill.mobile-shi-deng-ai.jixi.discard"],"optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"cost-paid","options":[{"id":"cost-paid"}]}{{historyChild}}]}]}
             ]}
             """;
             var optionLabels = new Dictionary<string, string> { ["reward-paid"] = "继续原凿险", ["cost-paid"] = "继续原急袭" };
             if (grow) optionLabels["full-paid"] = "继续原摸牌";
-            else optionLabels["equipment-paid"] = "继续原装备";
+            else { optionLabels["equipment-paid"] = "继续原装备"; optionLabels["history-after"] = "继续原历史"; }
             var presentations = new Dictionary<string, object> { [Driver] = new { name = "真实失牌驱动", description = "保留普通回合与真实失牌。" }, [Quiet] = new { name = "安静同桌", description = "不干扰原生主流程。" },
                 [WatchSkill] = new { name = "已付原生子窗", description = "保留原付款与恢复边界。", optionLabels } };
             var catalog = SkillProgramCatalog.Load(rules, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = presentations }));

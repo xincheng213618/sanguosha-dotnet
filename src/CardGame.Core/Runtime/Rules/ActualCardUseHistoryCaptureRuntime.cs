@@ -5,7 +5,7 @@ internal sealed class ActualCardUseHistoryCaptureRuntime(IProgramContentQueries 
     IActualCardUseHistoryQueries history, IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     RuntimeEntries.CoreNativeCardContinuationCursorsEntries cursors,
     RuntimeEntries.CoreActiveNativeAttackQueriesEntries attacks,
-    EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberAccess turn,
+    EngineStates.Contracts.ICoreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess turn,
     EngineStates.Contracts.ICoreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess phase)
     : IActualCardUseHistoryCapture
 {
@@ -27,7 +27,7 @@ internal sealed class ActualCardUseHistoryCaptureRuntime(IProgramContentQueries 
             history.FindAction(action.ActionId) is null || history.FindFinalizedUse(use.Id) is not null)
             return;
         events.AdvanceFact(new ActualCardUseTargetsFinalizedEvent(use.Id, action,
-            ActualCardUseTargets.PrincipalTargets(action)));
+            ActualCardUseTargets.PrincipalTargets(action), turn._turnNumber, turn._turnProgression.OwnerSeat));
     }
 
     public void RecordCompleted(CardUseFrame use, CardActionContext action)
@@ -36,13 +36,17 @@ internal sealed class ActualCardUseHistoryCaptureRuntime(IProgramContentQueries 
             history.FindAction(action.ActionId) is null || history.FindCompletedUse(use.Id) is not null)
             return;
         events.AdvanceFact(new ActualCardUseTargetsCompletedEvent(use.Id, action,
-            ActualCardUseTargets.PrincipalTargets(action)));
+            ActualCardUseTargets.PrincipalTargets(action), turn._turnNumber, turn._turnProgression.OwnerSeat));
     }
 
     public void RecordUpdated(CardUseFrame use, CardActionContext action)
     {
-        if (IsRequired && action.Type == CardActionType.Use && history.FindAction(action.ActionId) is not null)
-            events.AdvanceFact(new ActualCardUseActionUpdatedEvent(use.Id, action));
+        if (!IsRequired || action.Type != CardActionType.Use || history.FindAction(action.ActionId) is not { } accepted ||
+            accepted.ActualTurn == turn._turnNumber && accepted.TurnOwner == turn._turnProgression.OwnerSeat &&
+            ReferenceEquals(history.FindLatestAction(action.ActionId), action))
+            return;
+        events.AdvanceFact(new ActualCardUseActionUpdatedEvent(use.Id, action,
+            turn._turnNumber, turn._turnProgression.OwnerSeat));
     }
 
     private bool IsSelfNativeResponseUse(CardActionContext action)

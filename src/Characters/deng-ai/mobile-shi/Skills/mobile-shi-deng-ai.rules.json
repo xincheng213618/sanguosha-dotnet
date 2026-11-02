@@ -27,16 +27,6 @@
       "id": "mobile:shi-jixi", "revision": 1,
       "triggers": [
         {
-          "id": "record-targets", "window": "cardUseTargetsFinalized", "ownerRelation": "actor",
-          "optional": false, "isSkillInvocation": false,
-          "effects": [{ "op": "resolveMobileShiDengAiTargets", "target": "owner" }]
-        },
-        {
-          "id": "record-completed-targets", "window": "cardUseCompleted", "ownerRelation": "actor",
-          "optional": false, "isSkillInvocation": false, "singleActionInstance": true,
-          "effects": [{ "op": "resolveMobileShiDengAiTargets", "target": "owner" }]
-        },
-        {
           "id": "ending-jixi", "window": "afterTurnEnded", "subject": "owner",
           "turnOwnerScope": "anyLiving", "optional": true,
           "effects": [{ "op": "resolveMobileShiDengAiJixi", "target": "owner" }]

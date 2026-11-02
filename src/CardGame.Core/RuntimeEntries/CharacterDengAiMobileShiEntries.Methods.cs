@@ -7,7 +7,6 @@ internal sealed partial class CharacterDengAiMobileShiEntries
     internal SkillProgramStepOutcome BeginShiDa(ProgramSkillFrame input, SkillProgramEffectOp op) => _resolve().BeginShiDa(input, op);
     internal bool CanOfferShiDa(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().CanOfferShiDa(candidate, trigger, context);
     internal void CaptureShiDaEquipmentLoss(CardMovementBatchContext batch) => _resolve().CaptureShiDaEquipmentLoss(batch);
-    internal void CaptureShiDaTargetUnion(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result) => _resolve().CaptureShiDaTargetUnion(action, window, result);
     internal void ChangeShiDaCharge(ProgramSkillFrame f, int amount, int capacity, long batch = 0L) => _resolve().ChangeShiDaCharge(f, amount, capacity, batch);
     internal void ChangeShiDaCharge2(long frameId, CardConversionSource source, string hash, int amount, int capacity, long batch) => _resolve().ChangeShiDaCharge(frameId, source, hash, amount, capacity, batch);
     internal PromptChoice ChooseShiDa(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseShiDa(p, f);
@@ -20,7 +19,6 @@ internal sealed partial class CharacterDengAiMobileShiEntries
     internal bool KeepPaidShiDa(ProgramSkillFrame f) => _resolve().KeepPaidShiDa(f);
     internal IReadOnlyList<ProgramPublicRuleStateSnapshot> MobileShiDengAiPublicStates(CharacterState owner, string skillId) => _resolve().MobileShiDengAiPublicStates(owner, skillId);
     internal void PublishShiDa(ProgramSkillFrame f) => _resolve().PublishShiDa(f);
-    internal void RecordShiDaTargets(long useId, CardActionContext action) => _resolve().RecordShiDaTargets(useId, action);
     internal bool ResumeShiDa(long id) => _resolve().ResumeShiDa(id);
     internal void ReturnShiDaDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) => _resolve().ReturnShiDaDraw(f, outcome);
     internal bool ReturnShiDaMovement(ProgramSkillFrame f) => _resolve().ReturnShiDaMovement(f);
@@ -36,7 +34,6 @@ internal sealed partial class CharacterDengAiMobileShiEntries
     internal bool ShiDaFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().ShiDaFirstChild(f, child);
     internal bool ShiDaHasJixiDiscard(ProgramTriggerCandidate candidate, int payer) => _resolve().ShiDaHasJixiDiscard(candidate, payer);
     internal bool ShiDaHasJixiTarget(int owner) => _resolve().ShiDaHasJixiTarget(owner);
-    internal IReadOnlyList<int> ShiDaHistoricalTargets(int owner) => _resolve().ShiDaHistoricalTargets(owner);
     internal bool ShiDaJixiDistance(ProgramCardDistanceQuery query) => _resolve().ShiDaJixiDistance(query);
     internal IReadOnlyList<CardMovementRecord> ShiDaLosses(int owner, CardMovementBatchContext? batch) => _resolve().ShiDaLosses(owner, batch);
     internal bool ShiDaMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => _resolve().ShiDaMovementProof(f, effect, pending);

@@ -3,10 +3,11 @@ namespace CardGame.Core;
 public sealed record ActualCardActionRecordedEvent(CardActionContext Action, int ActualTurn,
     int TurnOwner, TurnPhase Phase, int PlayPhaseInstanceId, bool IsSelfNativeResponseUse) : IGameEvent;
 
-public sealed record ActualCardUseActionUpdatedEvent(long NativeUseId, CardActionContext Action) : IGameEvent;
+public sealed record ActualCardUseActionUpdatedEvent(long NativeUseId, CardActionContext Action,
+    int ActualTurn, int TurnOwner) : IGameEvent;
 
 public sealed record ActualCardUseTargetsFinalizedEvent(long NativeUseId, CardActionContext Action,
-    IReadOnlyList<int> PrimaryTargets) : IGameEvent
+    IReadOnlyList<int> PrimaryTargets, int ActualTurn, int TurnOwner) : IGameEvent
 {
     private readonly IReadOnlyList<int> _primaryTargets = Array.AsReadOnly(PrimaryTargets.ToArray());
     public IReadOnlyList<int> PrimaryTargets
@@ -14,7 +15,7 @@ public sealed record ActualCardUseTargetsFinalizedEvent(long NativeUseId, CardAc
 }
 
 public sealed record ActualCardUseTargetsCompletedEvent(long NativeUseId, CardActionContext Action,
-    IReadOnlyList<int> PrimaryTargets) : IGameEvent
+    IReadOnlyList<int> PrimaryTargets, int ActualTurn, int TurnOwner) : IGameEvent
 {
     private readonly IReadOnlyList<int> _primaryTargets = Array.AsReadOnly(PrimaryTargets.ToArray());
     public IReadOnlyList<int> PrimaryTargets

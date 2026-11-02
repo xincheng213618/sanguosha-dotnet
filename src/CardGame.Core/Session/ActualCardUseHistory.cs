@@ -19,10 +19,12 @@ public sealed record ActualCardUseHistoryEntry(CardActionContext Action, int Act
 internal interface IActualCardUseHistoryQueries : IProgramSelectionQuery
 {
     ActualCardUseHistoryEntry? FindAction(long actionId);
+    CardActionContext? FindLatestAction(long actionId);
     ActualCardUseHistoryEntry? FindFinalizedUse(long nativeUseId);
     ActualCardUseHistoryEntry? FindCompletedUse(long nativeUseId);
     ActualCardUseHistoryEntry? PreviousFinalizedUse(long nativeUseId);
     IReadOnlyList<ActualCardUseHistoryEntry> AcceptedPairFor(long actionId);
     IReadOnlyList<ActualCardUseHistoryEntry> AcceptedPairAtCompletionFor(long actionId);
     int? FinalizedDirectedTargetOrdinal(long nativeUseId, int targetSeat);
+    IReadOnlyList<int> EverDesignatedTargets(int actualTurn, int turnOwnerSeat, int actorSeat);
 }

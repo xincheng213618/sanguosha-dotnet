@@ -1045,3 +1045,37 @@ Git blob 口径 src C# **+81／−193，净 −112 行、−10,206 字节**；�
 精确 Git blob 诊断（仅本批）：src C# +65／−98，净 −33 行／−4577 字节；人物净 −53 行／−4735 字节，共享净 +20 行／+158 字节。人物 Runtime throw 5444→5443，ProgramEventHistory 查询 4758→4758，自定义 IGameEvent 3500→3500，Runtime 文件 3754 不变。方向基线 2384→2382，其中共享到人物 1695→1693、人物到人物 689 不变；CardActions 人物依赖 54→53（48 direct＋5 Deferred），NativeCardUse 54（53＋1）、NativeLegalActions 38（33＋5）不变。
 
 bao-xin 650 行／54861 字节，liao-hua 159 行／13546 字节，xun-yu 1130 行／127104 字节，均未改动。恢复删除项 0；保留真实 paid／mutation／子返回链；没有剪测试或全量验证。真实角色改写先复现错误提示，再经两项来源资格修正通过；领取／反向取消／嵌套冻结及 cold 与前批机制共同走现 Phase 检查，其进程 14.028 秒。另 5 项相关检查与 5 项例行检查通过（composition 重叠），例行构建 3.307 秒、依赖验证 0.154 秒、测试进程 2.827 秒，仍未达到约 1 秒目标。
+
+## 曾指定目标并集：2026-11-03 势邓艾急袭
+
+急袭原文为“本回合成为过你牌目标的其他角色”。本批用共享 `EverDesignatedTargets(actualTurn, turnOwnerSeat, actorSeat)` 回答，结果按首次成立顺序去重，排除使用者自身，只统计真正 Use，不把响应或效果切片冒充新的用牌。每次返回只读副本，人物在原 `BeginShiDa` 时点冻结到 `ShiDaReceipt.History`；付款子窗中新出的牌可以扩充实时并集，但不能改写已支付父帧的目标菜单。
+
+语义区分：接受时的候选目标尚不计入；首次真实 finalized 时目标已经成立，后来取消或移除不抹去“曾经”；finalized 后的目标增加、角色改写及完成时目标继续累加。它不是某张牌的 latest targets，也不是薮影在首次 finalized 时冻结的 ordinal，不用一个模糊历史答案兼容三个含义。
+
+既有 `ActualCardUseTargetsFinalizedEvent`／`ActualCardUseActionUpdatedEvent`／`ActualCardUseTargetsCompletedEvent` 补齐采样时 `ActualTurn` 和实际回合拥有者。并集按该时点 native actor 归属，不把最初 accepted actor 或材料 provider 当作当前使用者；角色改写前后可分别留下关系，旧关系不搬家、不回删。已接受身份与其序号索引仍沿原不可变归属。相同 Action 的采样只在同回合 scope 内去重，跨 scope 不吞记录。
+
+共享捕获继续由能力定义声明需求；`ResolveMobileShiDengAiJixi` 只增加 Triggered 的实际用牌历史需求，Activated 维度不扩张。已有 before-effects／effect-before-apply／completed 路径需要补充已知 Action 时，取真实 native Use 的完整 Action，不用效果窗口的单目标 slice 污染最新目标视图，也不计 ActionId=0 的延时判定伪动作。没有新增 Observed 事件、窗口结束回调、人物能力开关或旁路 pending。
+
+删除 `ShiDaTargetRecordedEvent`、两处人物写方法、pipeline 采集 hook、执行器中的专属记录分支及三个转发。JSON 的 `record-targets`／`record-completed-targets` 两个不发动技能的触发器、`resolveMobileShiDengAiTargets` 描述符和旧枚举一起退役，只保留真正的 `ending-jixi`。原弃牌成本、RNG、原帧回执、无距离／多目标顺手牵羊及类型化子返回继续走已有协议。
+
+旧记录器在 finalized 窗口以普通 priority 0 节点执行，若高优先技能先取消目标，会漏记已成立的关系。本批按“成为过”修正这项记账时序收窄，不把它复制成新的通用观察器；只有接受、尚未真正成立的目标仍不计。采集也不再取决于当时是否持有急袭。用户另已明确确认：苏飞联翩／郭汜伺盗在阶段中途获得时，阶段此前真实用牌参与判断，原首次获得前漏记予以修正；已提交实现保持该口径。
+
+旧专属 JSON 指令退役属于本轮不兼容格式收口，`RulesSchemaVersion` 集中从 64 升到 65。本轮尚未发布的后续退役合并到这一次格式升级，不逐人物／指令继续抬版本。内嵌规则没有逐文件根版本号，本批只改急袭这一份规则 JSON；外部 `Load`／Inspector 仍要求显式受支持版本，旧指令不会通过兼容解析复活。测试夹具引用当前格式常量；默认指纹元数据保持原有固定语义，不引入 gameplay epoch、checkpoint RulesVersion 或包发布。旧局无法载入／回放时保留源存档并沿已有桌面规则开新局。
+
+七项验收：
+
+| 标准 | 状态与边界 |
+|---|---|
+| 一个概念，一个归属 | ever 关系由原 journal 派生索引统一累计，人物不再有目标事件账本。 |
+| 依赖方向 | 捕获／并集查询不依赖人物；删除旧人物 pipeline hook。三大用牌模块仍有其他反向依赖，本批不宣称整体通过完成验收。 |
+| 层次分明 | 成立／更新／完成是事实，ever 是只读历史关系；after-turn 发动资格及成本、原生使用仍在对应层。 |
+| JSON 对应规则 | 两个纯记账步骤已退；真正 `ResolveMobileShiDengAiJixi` 仍是专属复合效果，纯 JSON 目标尚未达成。 |
+| 改动局部 | 能力需求在描述符声明，不让人物向核心增加采集方法。 |
+| 只有一条路径 | 旧事件、写端、指令、触发器、描述符、枚举和转发同时退役，不保兼容账本。 |
+| 信任边界 | 人物信任原帧回执与共享历史；真实付款、输入、实体移动、隐私及冷恢复边界保留。 |
+
+下一批检查 OL 蔡夫人窃听的回合末“是否对他人用牌”：它需要结束时的最新关系，包含 `Action == null` 的 legacy 原生 Use，不能套 ever 或伪造 ActionId。OL 刘琦屯江需要初始确认目标，happy 神貂蝉魅魂需要跨使用者首次杀目标；保留各自时点与对象维度，不扩展人物私有账本。
+
+精确 Git blob 诊断（只含本批）：人物 C# 净 −25 行／−3335 字节，共享 C# 净 +34 行／+2167 字节；src C# 合计 +9 行／−1168 字节。急袭规则 JSON 另 −10 行／−551 字节，没有批量改1066份根版本。人物 Runtime throw 5443→5442，ProgramEventHistory 查询 4758→4756，自定义 IGameEvent 3500→3499；Runtime 文件 3754 不变。方向基线 2382（共享到人物1693、人物到人物689）不变，三个模块人物依赖 CardActions53（48＋5 Deferred）、NativeCardUse54（53＋1）、NativeLegalActions38（33＋5）不变；不能把删除pipeline记账hook虚报为构造依赖下降。
+
+bao-xin 650 行／54861 字节，liao-hua 159 行／13546 字节，xun-yu 1130 行／127104 字节，均未改动。7 项相关检查与 5 项例行检查通过，包括实际急袭付款后子窗扩展实时历史而原receipt不变、无距Snatch两段实体取得／一次返回／cold，及前两批历史与隐目标投影回归。格式机制检查比较1066内嵌bundle、2424程序和22真实registry的两种加载形式，未运行全量测试。恢复删除项0；保留真实付款／RNG／类型化返回，不剪测试。例行构建 2.567 秒、依赖验证 0.190 秒、测试进程 2.870 秒，约1秒目标仍未达到。

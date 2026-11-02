@@ -411,6 +411,10 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
                 }
             }
 
+        if (_actualUseHistoryCapture.IsRequired && action.Type == CardActionType.Use && window is
+            SkillProgramTriggerWindow.CardUseBeforeTargetEffects or SkillProgramTriggerWindow.CardEffectBeforeApply or SkillProgramTriggerWindow.CardUseCompleted &&
+            _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ActionId) is { Action: { } nativeAction } nativeUse)
+            _actualUseHistoryCapture.RecordUpdated(nativeUse, nativeAction);
         _programPipelineHooksOperations._programPipelineHooks.CollectIssuedCardTrigger(action, window, result);
         string GrantIdentity(ProgramCardTriggerCandidate candidate)
         {
