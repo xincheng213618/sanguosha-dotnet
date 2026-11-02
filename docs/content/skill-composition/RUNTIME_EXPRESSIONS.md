@@ -136,6 +136,14 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 
 同回合有多次 Play 时，一次 skip 就使该条件不成立。平寇可直接用 `phaseCount(...,"all","skipped")` 作数量表达式并在原步骤冻结；蒙态只判断相应种类是否大于零。跳阶段作为技能成本时仍读原支付事实，不能拿上述实际次数替换。
 
+## 摸牌调用事实的声明边界
+
+`NativeDrawActualTurnOrdinalIs` 属于触发条件，由 Triggered 定义需求编译推导 `NativeDrawInvocation`；`CurrentTurnDrawPhaseDrawCountHalfFloor` trait 也声明同一事实。操作描述符保持 Triggered／Activated 区分，既有被动声明与选中模式需求在对局 provider 合成，原生 invoice 采集只读 `INativeFactDemand`，不枚举人物开关。
+
+`NativeDrawInvocation` 不隐含阶段身份需求。读取 phase token 的操作或 trait 仍需声明 `ActualDiscardRecoveryPhase`；事实 mask 不能替代动态来源资格，也不把普通阶段需求变成额外 DrawSkipped 观察者帧。
+
+初始发牌、零请求和无真实摸牌实体仍不产生已记录的调用；实际回合开始前只接受原有类型化开局来源。零张或合法替代可以完成普通 `draw` 的当前步骤，但不能据此伪造 DrawPile invoice。ordinal、threshold、展骥资格、原帧付讫状态与 typed return 保留其冻结边界。现有散文、知意、灵箜完成资格 callback 尚未声明化，需求统一不代表整个摸牌执行链已解耦。
+
 ## 已签发的用牌加伤
 
 ```json

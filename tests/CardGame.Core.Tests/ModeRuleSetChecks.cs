@@ -74,10 +74,16 @@ internal static class ModeRuleSetChecks
             guandu.RuntimeRequirements == new ModeRuntimeRequirements(
                 RequiredFacts: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.ActualPhaseEnd,
                 CapturesRecipientDamageBase: true, TracksFinalizedCardTargets: true) &&
-            duel.RuntimeRequirements == new ModeRuntimeRequirements(TracksNativeDrawInvocations: true) &&
+            duel.RuntimeRequirements == new ModeRuntimeRequirements(RequiredFacts: ProgramTrackedFact.NativeDrawInvocation) &&
             dragon.RuntimeRequirements == new ModeRuntimeRequirements(TracksRoundEnding: true) &&
             hell.RuntimeRequirements == new ModeRuntimeRequirements() && wenhe.RuntimeRequirements == new ModeRuntimeRequirements(),
             "Each profile opts into only its original tracking mechanisms; duel recipient reevaluation does not imply a Guandu recipient base.");
+        var duelDemand = new MatchNativeFactDemand(duel.RuntimeRequirements.RequiredFacts);
+        Require(duelDemand.RequiresFact(ProgramTrackedFact.NativeDrawInvocation) &&
+            !duelDemand.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase) && !duelDemand.RequiresFact(ProgramTrackedFact.ActualPhaseEnd) &&
+            !new MatchNativeFactDemand(identity.RuntimeRequirements.RequiredFacts).RequiresFact(ProgramTrackedFact.NativeDrawInvocation) &&
+            !new MatchNativeFactDemand(guandu.RuntimeRequirements.RequiredFacts).RequiresFact(ProgramTrackedFact.NativeDrawInvocation),
+            "Only the selected duel mode requests draw invoices; neither its mask nor the Guandu phase closure creates unrelated native demands.");
     }
 
     internal static void DeathObjectivesPreserveEncounterAndRankingBoundaries()

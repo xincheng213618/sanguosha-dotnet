@@ -11,7 +11,7 @@ public sealed record ZongluanSlashReturnedEvent(long FrameId, long UseId, long A
 public sealed record ZongluanDiscardIssuedEvent(long FrameId, int DamageRecipientCount, int RequiredCount, long Before) : IGameEvent;
 public sealed record ZongluanDiscardEntityEvent(long FrameId, int Index, long BatchId, int CardId, CardKind Kind, CardLocation From, CardLocation To, long Sequence) : IGameEvent;
 internal sealed class ResolveZongluanDescriptor() : TaoQianDescriptor(SkillProgramEffectOp.ResolveZongluanPreparationSlashAndDiscard){
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.NativeDrawInvocation);
 
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);
 }

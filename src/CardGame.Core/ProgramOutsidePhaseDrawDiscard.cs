@@ -127,7 +127,7 @@ internal abstract class OutsidePhaseDrawDiscardDescriptor : ProgramOperationDesc
 }
 internal sealed class DrawAfterActualOutsideDrawDescriptor : OutsidePhaseDrawDiscardDescriptor
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeDrawInvocation);
  public override SkillProgramEffectOp Op => SkillProgramEffectOp.DrawAfterActualOutsideDraw; }
 internal sealed class DiscardAfterActualOutsideDiscardDescriptor : OutsidePhaseDrawDiscardDescriptor
 {

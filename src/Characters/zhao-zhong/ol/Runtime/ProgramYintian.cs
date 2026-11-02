@@ -45,6 +45,7 @@ internal interface IYintianHost
 }
 internal sealed class ResolveYintianFirstRecoveryDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveYintianFirstRecovery;
     public override ISkillProgramEffectHandler Handler { get; } = new YintianHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Automatic;

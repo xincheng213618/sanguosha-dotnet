@@ -89,6 +89,7 @@ public sealed record DouyuWinDrawEntityEvent(long FrameId, int Index, int CardId
 internal interface IDouyuHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame); }
 internal sealed class ResolveDouyuPreRevealSwapAndWinDrawDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveDouyuPreRevealSwapAndWinDraw;
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards,

@@ -95,7 +95,6 @@ internal sealed partial class CharacterLiuZhangOlEntries
     internal bool ZonghuSpent(int seat) => _resolve().ZonghuSpent(seat);
     internal bool ZonghuTurnOpen(int seat) => _resolve().ZonghuTurnOpen(seat);
     internal IEnumerable<int> ZonghuVictims(int actor) => _resolve().ZonghuVictims(actor);
-    internal bool HasFengweiCapability { get => _resolve().HasFengweiCapability; }
     internal bool HasZonghuCapability { get => _resolve().HasZonghuCapability; }
     internal int ZonghuCost { get => _resolve().ZonghuCost; }
 }

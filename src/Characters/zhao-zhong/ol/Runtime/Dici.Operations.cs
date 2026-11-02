@@ -16,12 +16,13 @@ public sealed record DiciNextChoiceEvent(long FrameId, long LeaseId, string Bran
 public sealed record DiciThunderIssuedEvent(long FrameId, long LeaseId, int SourceSeat, int TargetSeat) : IGameEvent;
 internal sealed class DiciGiftRecoveryAndNeighborChainDescriptor() : ZhaoZhongDescriptor(SkillProgramEffectOp.ResolveDiciGiftRecoveryAndNeighborChain)
 {
-    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeDrawInvocation);
 
     public override ProgramOperationLegalityPolicy LegalityPolicy { get; } = new(RequiresTargetHand: true, ExcludesOwnerAsTarget: true);
 
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);
 }
 internal sealed class IssuedDiciNextChainChoiceDescriptor() : ZhaoZhongDescriptor(SkillProgramEffectOp.ResolveIssuedDiciNextChainChoice){
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);
 }

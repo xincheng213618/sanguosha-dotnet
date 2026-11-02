@@ -8,7 +8,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
     internal const string TaoQianAction = "tao-qian";
     internal const string ZongluanDiscardReason = "skill-program.tao-qian.zongluan.discard";
     internal const string WenrenDrawReason = "skill-program.tao-qian.wenren.draw";
-    internal bool HasTaoQianCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZongluanPreparationSlashAndDiscard) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZhaohuoFirstVictimGift) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasActivationOperation(SkillProgramEffectOp.ResolveWenrenSequentialDraw);
 
     internal static CardConversionSource TaoQianSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_tao_qian_ol_TaoQian.TaoQianSource(f);
     SkillProgramStepOutcome ITaoQianHost.Resolve(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginTaoQian(f, op);

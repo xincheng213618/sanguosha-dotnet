@@ -12,6 +12,6 @@ public sealed record FeiYiRankEffectBoundEvent(long GrantId,long UseFrameId,long
 public sealed record FeiYiEffectRoundStartedEvent(long UseFrameId,long ActionId,int Round) : IGameEvent;
 internal sealed class RevealSingletonAndArmRankEffectsDescriptor():FeiYiDescriptor(SkillProgramEffectOp.RevealSingletonAndArmRankEffects)
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance | ProgramTrackedFact.NativeDrawInvocation);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(SkillProgramTriggerWindow.CardsMoved)];
 }

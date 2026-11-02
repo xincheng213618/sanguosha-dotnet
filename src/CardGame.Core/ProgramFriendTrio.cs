@@ -65,7 +65,9 @@ internal sealed class ObserveFriendPredictionDescriptor : FriendTrioDescriptor {
 internal sealed class EquipFriendXuanjianDescriptor : FriendTrioDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.EquipFriendXuanjian; }
 internal sealed class ReclaimFriendXuanjianDescriptor : FriendTrioDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ReclaimFriendXuanjian; }
 internal sealed class GainFriendCategoryMarkDescriptor : FriendTrioDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.GainFriendCategoryMark; }
-internal sealed class ExchangeFriendGainForDiscardDescriptor : FriendTrioDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ExchangeFriendGainForDiscard; }
+internal sealed class ExchangeFriendGainForDiscardDescriptor : FriendTrioDescriptor {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.ExchangeFriendGainForDiscard; }
 internal sealed class UseFriendDeckSuitsAtPlayEndDescriptor : FriendTrioDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.UseFriendDeckSuitsAtPlayEnd; }
 internal sealed class FriendTrioHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {

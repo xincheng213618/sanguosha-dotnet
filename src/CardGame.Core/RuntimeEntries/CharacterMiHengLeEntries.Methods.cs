@@ -63,7 +63,6 @@ internal sealed partial class CharacterMiHengLeEntries
     internal bool SiruiSlashAliasAllowed(CharacterState actor, bool forResponse) => _resolve().SiruiSlashAliasAllowed(actor, forResponse);
     internal bool TryGetSiruiDestroyedResponseCost(CardActionContext action, int cardId, scoped out CardMovementRecord movement) => _resolve().TryGetSiruiDestroyedResponseCost(action, cardId, out movement);
     internal bool ValidSiruiInvoice(ResolutionFrame frame, SiruiUseReceipt r, bool requirePayment) => _resolve().ValidSiruiInvoice(frame, r, requirePayment);
-    internal bool HasLeMiHengJiguCapability { get => _resolve().HasLeMiHengJiguCapability; }
     internal bool HasSiruiCapability { get => _resolve().HasSiruiCapability; }
     internal int JiguStartedSeatCount { get => _resolve().JiguStartedSeatCount; }
 }

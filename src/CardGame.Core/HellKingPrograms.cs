@@ -53,7 +53,9 @@ internal sealed class RollHellAssaultDescriptor : HellKingBindingDescriptor { pu
 internal sealed class BindHellRepeatedDamageTargetDescriptor : HellKingBindingDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.BindHellRepeatedDamageTarget; }
 internal sealed class DiscardHellRandomOtherMountDescriptor : HellKingOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.DiscardHellRandomOtherMount; public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(SkillProgramTriggerWindow.AfterTurnEnded)]; }
 internal sealed class RewardHellRecoverySourceDescriptor : HellKingOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.RewardHellRecoverySource; public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(SkillProgramTriggerWindow.AfterHpRecovered)]; }
-internal sealed class DiscardHellOutsideDrawGainDescriptor : HellKingOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.DiscardHellOutsideDrawGain; public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(SkillProgramTriggerWindow.CardsGained)]; }
+internal sealed class DiscardHellOutsideDrawGainDescriptor : HellKingOperationDescriptor {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.DiscardHellOutsideDrawGain; public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindow(SkillProgramTriggerWindow.CardsGained)]; }
 internal sealed class ExchangeHellReincarnationHpDescriptor : HellKingOperationDescriptor
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ExchangeHellReincarnationHp;

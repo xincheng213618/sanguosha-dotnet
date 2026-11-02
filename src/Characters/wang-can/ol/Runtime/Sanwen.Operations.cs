@@ -8,4 +8,6 @@ public sealed record SanwenGainProof(long BatchId,int ActualTurn,int OwnerSeat,I
  public IReadOnlyList<SanwenNamedEntity> Witnesses{get=>_witnesses;init=>_witnesses=Array.AsReadOnly(value.ToArray());}
 }
 internal sealed class ResolveSanwenActualGainDuplicatesDescriptor:WangCanDescriptor
-{public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveSanwenActualGainDuplicates;public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(SkillProgramTriggerWindow.CardsGained)];}
+{
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
+    public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveSanwenActualGainDuplicates;public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(SkillProgramTriggerWindow.CardsGained)];}

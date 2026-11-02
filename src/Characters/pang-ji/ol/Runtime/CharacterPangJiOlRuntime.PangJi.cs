@@ -8,7 +8,6 @@ internal sealed partial class CharacterPangJiOlRuntime
     internal const string BiguoCostReason = "skill-program.pang-ji.biguo.discard";
     internal const string BiguoObtainReason = "skill-program.pang-ji.biguo.obtain";
     internal const string BiguoResultBind = "biguo-contest", BiguoGainBind = "biguo-category-gain";
-    internal bool HasPangJiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBiguoDrawAndArmTargetPindian) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveBiguoTargetedPindianAndCategoryBan) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveDouyuPreRevealSwapAndWinDraw);
 
     internal static CardConversionSource PangJiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_pang_ji_ol_PangJi.PangJiSource(f);
     internal bool BiguoTurnOpen(int turn, int owner) => turn > 0 && turn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.TurnNumber == turn && _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat == owner && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == turn && e.ActorSeat == owner) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualTurnCursorReturnedEvent>().Any(e => e.ActualTurn == turn && e.OwnerSeat == owner);

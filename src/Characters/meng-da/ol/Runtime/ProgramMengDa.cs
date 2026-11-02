@@ -35,7 +35,7 @@ public sealed record GoudeCompletedEvent(long FrameId):IGameEvent;
 internal interface IMengDaHost{SkillProgramStepOutcome Resolve(ProgramSkillFrame f);}
 internal sealed class ResolveGoudeActualTurnEndDescriptor:ProgramOperationDescriptorBase
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.NativeDrawInvocation);
 
     public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveGoudeActualTurnEnd;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)=>ParseOwnerAlways(r);

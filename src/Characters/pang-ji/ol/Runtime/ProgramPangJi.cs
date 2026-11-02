@@ -56,11 +56,12 @@ internal abstract class PangJiDescriptor(SkillProgramEffectOp op) : ProgramOpera
         [new RequireTriggerWindow(op == SkillProgramEffectOp.ResolveBiguoDrawAndArmTargetPindian ? SkillProgramTriggerWindow.DrawPhaseEnded : SkillProgramTriggerWindow.CardUseTargetsFinalized)];
 }
 internal sealed class ResolveBiguoDrawDescriptor() : PangJiDescriptor(SkillProgramEffectOp.ResolveBiguoDrawAndArmTargetPindian){
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.NativeDrawInvocation);
 
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);
 }
 internal sealed class ResolveBiguoTargetDescriptor() : PangJiDescriptor(SkillProgramEffectOp.ResolveBiguoTargetedPindianAndCategoryBan){
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);
 }
 internal sealed class PangJiHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler

@@ -42,8 +42,8 @@ public static class StandardModeRuleProfiles
             requiresRoundTracking: wushuang || mode.NianActivity is not null || dragonBoat || guandu,
             requiresRecipientDamageReevaluation: wushuang || guandu,
             runtimeRequirements: new(
-                RequiredFacts: guandu ? ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.ActualPhaseEnd : ProgramTrackedFact.None,
-                TracksNativeDrawInvocations: wushuang,
+                RequiredFacts: (guandu ? ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.ActualPhaseEnd : ProgramTrackedFact.None) |
+                    (wushuang ? ProgramTrackedFact.NativeDrawInvocation : ProgramTrackedFact.None),
                 TracksRoundEnding: dragonBoat,
                 CapturesRecipientDamageBase: guandu,
                 TracksFinalizedCardTargets: guandu), allowsArmorGain: !wushuang)

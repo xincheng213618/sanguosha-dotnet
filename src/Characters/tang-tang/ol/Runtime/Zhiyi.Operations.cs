@@ -7,6 +7,7 @@ public sealed record ZhiyiGainFrozenEvent(TangTangGain Gain) : IGameEvent;
 public sealed record ZhiyiOpportunityPaidEvent(long FrameId, int OwnerSeat, int ActualTurn, int TurnOwner, long BatchId) : IGameEvent;
 public sealed record ZhiyiRecipientChosenEvent(long FrameId, int RecipientSeat) : IGameEvent;
 internal sealed class ResolveZhiyiGainColorBenefitDescriptor() : TangTangDescriptor(SkillProgramEffectOp.ResolveZhiyiGainColorBenefit) {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
     public override ProgramDependencyKinds TracksActualTurnCursorReturn => ProgramDependencyKinds.Trigger;
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.Frame.TangTang is { Paid: true };
 }

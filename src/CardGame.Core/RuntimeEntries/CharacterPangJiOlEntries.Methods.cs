@@ -94,5 +94,4 @@ internal sealed partial class CharacterPangJiOlEntries
     internal bool ValidDouyuMaterialPayment(long contestId, DouyuOriginalCard card) => _resolve().ValidDouyuMaterialPayment(contestId, card);
     internal bool WindowSettlement_IsBiguoPindianSettlementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => _resolve().WindowSettlement_IsBiguoPindianSettlementBatch(frame, batch);
     internal bool HasDouyuCapability { get => _resolve().HasDouyuCapability; }
-    internal bool HasPangJiCapability { get => _resolve().HasPangJiCapability; }
 }

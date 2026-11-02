@@ -59,6 +59,7 @@ internal abstract class LingkongDescriptor(SkillProgramEffectOp op) : ProgramOpe
 
 internal sealed class MarkLingkongFirstOutsideDrawGainDescriptor()
     : LingkongDescriptor(SkillProgramEffectOp.MarkLingkongFirstOutsideDrawGain){
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);
 }
 

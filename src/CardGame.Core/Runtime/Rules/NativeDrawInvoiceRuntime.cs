@@ -34,7 +34,7 @@ internal interface INativeDrawInvoiceQueries : IProgramSelectionQuery
 // joins its physical movement journal, pending batch and committed/pending fact.
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class NativeDrawInvoiceRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
-    IProgramContentQueries content, IProgramTurnQueries turn, IProgramEventHistoryQueries history,
+    IProgramContentQueries content, INativeFactDemand demand, IProgramTurnQueries turn, IProgramEventHistoryQueries history,
     ICardMovementHistoryQueries movements, ICardMovementBatchQueue batches,
     ICardMovementBatchNativeDrawInvoices batchInvoices, INativeDrawInvoiceFacts facts,
     IGameStartingDrawOrigins starting, IZhanjiDrawEntitlements zhanji, INativeDrawInvoiceCompletions native,
@@ -50,25 +50,7 @@ internal sealed class NativeDrawInvoiceRuntime(IProgramRuntimeFrames frames, IPr
         }
     }
 
-    public bool TracksInvocations =>
-        content.RequiresFact(ProgramTrackedFact.NativeDrawInvocation) ||
-        facts.ModeTracksInvocations ||
-        content.UsesTriggerCondition(SkillProgramTriggerConditionKind.NativeDrawActualTurnOrdinalIs) ||
-        content.UsesDrawPhaseDrawCountHandLimit ||
-        content.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuangYueyingLixian) ||
-        facts.HasPangJiCapability || facts.HasLeMiHengJiguCapability || facts.HasLeZhouFeiLingkongCapability ||
-        facts.HasTaoQianCapability ||
-        facts.HasZhaoZhongCapability ||
-        facts.HasHellZhiwangHolder ||
-        facts.HasFengweiCapability ||
-        facts.HasFeiYiHezhong ||
-        content.HasTriggerOperation(SkillProgramEffectOp.ResolveGoudeActualTurnEnd) ||
-        content.HasTriggerOperation(SkillProgramEffectOp.DrawAfterActualOutsideDraw) ||
-        content.HasTriggerOperation(SkillProgramEffectOp.ExchangeFriendGainForDiscard) ||
-        content.HasTriggerOperation(SkillProgramEffectOp.OfferNativeBatchHandGainOrCardLossBenefit) ||
-        content.HasTriggerOperation(SkillProgramEffectOp.DrawAfterActualPlayDrawInvocation) ||
-        content.HasTriggerOperation(SkillProgramEffectOp.BindOwnTurnEnemyHandGain) ||
-        facts.HasTangTangZhiyi || facts.HasYuanJiCapability || facts.HasSanwenCapability;
+    public bool TracksInvocations => demand.RequiresFact(ProgramTrackedFact.NativeDrawInvocation);
 
     public NativeDrawInvocationDraft? Capture(int owner, int requested, CardMoveReason reason,
         CardConversionSource? directProducer)

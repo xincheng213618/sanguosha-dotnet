@@ -50,5 +50,4 @@ internal sealed partial class CharacterWangCanOlEntries
     internal bool WangCanObserverSuffix(int index) => _resolve().WangCanObserverSuffix(index);
     internal bool WangCanSegmentMatches(ProgramSkillFrame f, WangCanReceipt r) => _resolve().WangCanSegmentMatches(f, r);
     internal bool HasDenglouCapability { get => _resolve().HasDenglouCapability; }
-    internal bool HasSanwenCapability { get => _resolve().HasSanwenCapability; }
 }

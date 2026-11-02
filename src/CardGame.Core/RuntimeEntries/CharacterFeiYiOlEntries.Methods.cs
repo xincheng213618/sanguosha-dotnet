@@ -52,5 +52,4 @@ internal sealed partial class CharacterFeiYiOlEntries
     internal bool TryBeginFeiYiExtraEffectRound(long id, bool afterAttack) => _resolve().TryBeginFeiYiExtraEffectRound(id, afterAttack);
     internal ProgramSkillWindowContext? TryCreateFeiYiSingletonContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate) => _resolve().TryCreateFeiYiSingletonContext(frame, candidate);
     internal void UpdateNativeExtraEffectState(long id, Func<ExtraCardEffectState, ExtraCardEffectState> update) => _resolve().UpdateNativeExtraEffectState(id, update);
-    internal bool HasFeiYiHezhong { get => _resolve().HasFeiYiHezhong; }
 }

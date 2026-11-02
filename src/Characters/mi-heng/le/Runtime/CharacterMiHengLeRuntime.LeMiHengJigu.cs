@@ -4,7 +4,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterMiHengLeRuntime
 {
     internal const string JiguDrawReason = "skill-program.mi-heng.jigu.draw";
-    internal bool HasLeMiHengJiguCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw);
 
     internal static CardConversionSource JiguSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.JiguSource(f);
     internal static bool IsJiguDamageTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.IsJiguDamageTrigger(t);

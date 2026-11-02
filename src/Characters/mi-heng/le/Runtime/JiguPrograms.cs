@@ -45,7 +45,7 @@ internal abstract class JiguDescriptor(SkillProgramEffectOp op) : ProgramOperati
 internal sealed class ResolveJiguDamageEquipmentDrawDescriptor()
     : JiguDescriptor(SkillProgramEffectOp.ResolveJiguDamageEquipmentDraw)
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeDrawInvocation);
 }
 internal sealed class JiguHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {

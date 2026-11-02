@@ -27,7 +27,7 @@ internal abstract class SpPangTongDescriptor(SkillProgramEffectOp op):ProgramOpe
 }
 internal sealed class DrawAfterActualPlayDrawInvocationDescriptor():SpPangTongDescriptor(SkillProgramEffectOp.DrawAfterActualPlayDrawInvocation)
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeDrawInvocation);
 public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(SkillProgramTriggerWindow.CardsGained)];}
 internal static class SpPangTongComposition
 {

@@ -36,7 +36,7 @@ public sealed record MouLixianNameUsedEvent(long FrameId, long UseId, long Actio
 public sealed record MouLixianNameAddedEvent(long FrameId, int OwnerSeat, CardKind OutputKind, CardConversionSource Source, string GameplayHash) : IGameEvent;
 internal sealed class MouLixianDescriptor : ProgramOperationDescriptorBase
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeDrawInvocation);
 
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouHuangYueyingLixian;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);

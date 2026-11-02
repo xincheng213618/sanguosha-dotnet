@@ -68,7 +68,6 @@ internal sealed partial class CharacterTaoQianOlEntries
     internal IReadOnlyList<PromptChoice> ZongluanDiscardCards(ProgramSkillFrame f) => _resolve().ZongluanDiscardCards(f);
     internal Card ZongluanRepresentation(long id) => _resolve().ZongluanRepresentation(id);
     internal int[] ZongluanTargets(int actor) => _resolve().ZongluanTargets(actor);
-    internal bool HasTaoQianCapability { get => _resolve().HasTaoQianCapability; }
     internal bool HasZhaohuoCapability { get => _resolve().HasZhaohuoCapability; }
     internal bool ZhaohuoActualTurnOpen { get => _resolve().ZhaohuoActualTurnOpen; }
 }

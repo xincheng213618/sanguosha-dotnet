@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 internal sealed class OfferNativeBatchHandGainOrCardLossBenefitDescriptor:ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
     public override SkillProgramEffectOp Op=>SkillProgramEffectOp.OfferNativeBatchHandGainOrCardLossBenefit;
     public override ISkillProgramEffectHandler Handler{get;}=new BuZhiHandler(true);
     public override ProgramOperationInteraction Interaction=>ProgramOperationInteraction.Choice;

@@ -227,8 +227,6 @@ internal sealed partial class CoreHellKingProgramsRuntime
         _coreCardUseLifecycleOperations.BeginSimpleCardUse(id, new(0, SimpleCardUseEffect.Alcohol));
         return SkillProgramStepOutcome.AwaitChild;
     }
-    internal bool HasHellZhiwangHolder => _contentRegistryOperations._contentRegistry.Skills.ContainsKey("hell:zhiwang") && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(p, "hell:zhiwang"));
-
     internal static bool IsHellZhiwangTrigger(SkillProgramTrigger trigger) => trigger.Window == SkillProgramTriggerWindow.CardsGained && trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.DiscardHellOutsideDrawGain);
     internal bool IsHellZhiwangMovement(CardMovementBatchContext batch, CardMovementRecord move, int gainer)
     {

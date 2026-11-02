@@ -70,6 +70,7 @@ internal static class ProgramTriggerResourceChecks
         if (!game.Submit(new StartGameCommand()).Accepted) throw new InvalidOperationException("Facts fixture failed to start.");
         NativeAppearanceFactDemand(program, game);
         ActualPhaseFactDemand(game, registry);
+        NativeDrawFactDemand(registry);
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
         var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", flags)!.GetValue(game)!;
         var action = new CardActionContext(1, null, CardActionType.Use, 0, 0, null, null, 1,
@@ -206,6 +207,69 @@ internal static class ProgramTriggerResourceChecks
         static void Check(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
     }
 
+    private static void NativeDrawFactDemand(ContentRegistry withoutDemand)
+    {
+        const ProgramTrackedFact draw = ProgramTrackedFact.NativeDrawInvocation, phase = ProgramTrackedFact.ActualDiscardRecoveryPhase;
+        var triggered = ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.DiscardHellOutsideDrawGain).FactRequirements;
+        var activated = ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.ResolveWenrenSequentialDraw).FactRequirements;
+        Check((triggered.Triggered & draw) != 0 && (triggered.Activated & draw) == 0 &&
+            (triggered.Triggered & phase) == 0 && (activated.Activated & draw) != 0 && (activated.Triggered & draw) == 0,
+            "Native draw descriptors retain trigger/activation demand; pure invoice demand does not invent phase identity.");
+        var passive = new SkillProgramDependencies([new ContentSkillDefinition("mou-ol:yangwei", "Passive", "Passive")]);
+        Check(passive.RequiresFact(draw) && passive.RequiresFact(phase), "Yangwei retains its independent passive draw and phase requirements.");
+        var trait = CharacterFixtureContent.EmbeddedProgramBundle("shanhe-current-jinnangji").Programs.Values.Single();
+        Check(Dependencies(trait).RequiresFact(draw) && Dependencies(trait).RequiresFact(phase),
+            "The actual draw-phase hand-limit trait requests both its native invoices and existing phase identity.");
+        var ordinal = CharacterFixtureContent.EmbeddedProgramBundle("shanhe-current-duoduo-yishan").Programs.Values.First();
+        Check(Dependencies(ordinal).RequiresFact(draw) && !Dependencies(ordinal).RequiresFact(phase),
+            "A native draw ordinal condition requests invoices without requiring actual phase identity.");
+        var pure = new MatchNativeFactDemand(draw);
+        Check(pure.RequiresFact(draw) && !pure.RequiresFact(phase) && !pure.RequiresFact(ProgramTrackedFact.ActualPhaseEnd),
+            "Native draw demand has no phase-end or phase-identity closure.");
+
+        var omitted = Draw(Start(withoutDemand));
+        Check(omitted.Cards.Count == 1 && omitted.Invoices.Length == 0 && omitted.Batch.NativeDrawInvocation is null,
+            "A real physical draw still moves its card but omits invoice facts without catalog or selected-mode demand.");
+        var zhiwang = CharacterFixtureContent.EmbeddedProgramBundle("hell-kings").Programs["hell:zhiwang"];
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new FactsPackage(zhiwang));
+        var game = Start(registry);
+        var actual = Draw(game);
+        var capabilities = Capabilities(game);
+        var hell = game.GetRuntimeModule<CoreHellKingProgramsRuntime>();
+        Check(!capabilities.Get<INativeFactDemand>().RequiresFact(phase) && actual.Cards.Count == 1 &&
+            actual.Invoices is [var invoice] && invoice.OwnerSeat == 0 && invoice.ActualCount == 1 &&
+            actual.Batch.NativeDrawInvocation is { } proof && proof.InvocationId == invoice.InvocationId &&
+            proof.Materials.Single().CardId == actual.Cards[0],
+            "An unowned real Hell descriptor records the original draw invoice and material without enabling phase identity.");
+        Check(hell.IsHellZhiwangGain(actual.Batch, 1, 0) && !hell.CollectHellZhiwangCandidates(actual.Batch).Any(),
+            "The genuine outside-Draw gain is classifiable, but catalog demand alone cannot grant any character a Zhiwang candidate.");
+
+        static SkillProgramDependencies Dependencies(SkillProgram program) =>
+            new([new ContentSkillDefinition(program.Id, "Facts", "Facts") { Program = program }]);
+        static ProgramCapabilityRegistry Capabilities(GameEngine game) => (ProgramCapabilityRegistry)typeof(GameEngine)
+            .GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        static GameEngine Start(ContentRegistry content)
+        {
+            var game = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 5, ModeId = "identity:standard-5", HumanSeat = 0,
+                HumanRole = Role.Lord, UseInteractiveSetup = false, AdvanceAfterHumanCommands = false }, content);
+            Check(game.Submit(new StartGameCommand()).Accepted, "The native draw-demand fixture must start normally.");
+            return game;
+        }
+        static (IReadOnlyList<int> Cards, NativeDrawInvocationRecordedEvent[] Invoices, CardMovementBatchContext Batch) Draw(GameEngine game)
+        {
+            for (var i = 0; i < 60 && (game.State.TurnNumber <= 0 || game.State.Phase != TurnPhase.Play); i++)
+                Check(game.Submit(new AdvanceOneStepCommand(game.Revision)).Accepted, "The native draw fixture must reach its real turn.");
+            Check(game.State.TurnNumber > 0 && game.State.Phase == TurnPhase.Play, "A native invoice test must run after real setup and outside Draw.");
+            var capabilities = Capabilities(game);
+            var history = capabilities.Get<IProgramEventHistoryQueries>();
+            var before = history.Read<NativeDrawInvocationRecordedEvent>().Count;
+            var cards = game.GetRuntimeModule<PhysicalCardDrawRuntime>().DrawCards(capabilities.Get<IMatchParticipantStateAccess>().Players[0], 1, false);
+            var batches = capabilities.Get<ICardMovementBatchQueue>();
+            return (cards, history.Read<NativeDrawInvocationRecordedEvent>().Skip(before).ToArray(), batches.PendingBatchAt(batches.PendingBatchCount - 1));
+        }
+        static void Check(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
+    }
+
     private static void AssertOmitted(SkillProgramTriggerFacts facts, string property)
     {
         if (JsonSerializer.Serialize(facts).Contains(property, StringComparison.Ordinal))
@@ -216,7 +280,7 @@ internal static class ProgramTriggerResourceChecks
     {
         public PackageManifest Manifest { get; } = new("optional-facts-test", new Version(1, 0, 0));
         public void Register(IContentRegistryBuilder builder) => builder.AddSkill(new ContentSkillDefinition(
-            "fixture:optional-facts", "Facts", "Facts") { Program = program, ExecutionForms = SkillExecutionForm.Trigger });
+            program.Id, "Facts", "Facts") { Program = program, ExecutionForms = SkillExecutionForm.Trigger });
     }
 
     private static void Reject(JsonNode rules, string presentation, string expected)
