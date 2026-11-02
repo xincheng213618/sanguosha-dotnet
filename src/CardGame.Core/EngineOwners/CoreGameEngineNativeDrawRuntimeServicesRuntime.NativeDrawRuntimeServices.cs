@@ -62,5 +62,4 @@ internal sealed partial class CoreGameEngineNativeDrawRuntimeServicesRuntime
     bool INativeDrawAttemptQueries.IsRedirectedGain(CardMovementRecord movement, CardLocation expectedTo) => _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(movement, expectedTo);
     NativeDrawPileSlashProof? INativeDrawAttemptQueries.DrawPileSlashReplacementProof(ProgramSkillFrame frame, NativeDrawAttemptContext context) => _characterZhangFeiOlMagicOperations.Value.NativeDrawPileSlashReplacementProof(frame, context);
     bool INativeDrawAttemptQueries.IsIssuedDrawPileSlashReplacement(NativeDrawAttemptContext context, NativeDrawReplacementResult replacement) => _characterZhangFeiOlMagicOperations.Value.IsIssuedNativeDrawPileSlashReplacement(context, replacement);
-    void INativeDrawAttemptOperations.CompleteLingkongReplacement(ProgramSkillFrame frame, NativeDrawAttemptFrame attempt, NativeDrawReplacementResult replacement) => _characterZhouFeiLeOperations.CompleteLingkongNativeDrawReplacement(frame, attempt, replacement);
 }

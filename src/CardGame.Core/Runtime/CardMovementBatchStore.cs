@@ -5,6 +5,11 @@ internal interface ICardMovementBatchNativeDrawInvoices : IProgramRuntimeOperati
     void AssignNativeDrawInvoice(int pendingIndex, NativeDrawInvocationProof proof);
 }
 
+internal interface ICardMovementHandGains : IProgramRuntimeOperations
+{
+    void AssignHandGains(int pendingIndex, IReadOnlyList<HandGainOccurrence>? receipts);
+}
+
 internal interface ICardMovementBatchQueue : IProgramRuntimeOperations
 {
     int PendingBatchCount { get; }
@@ -31,7 +36,7 @@ internal interface ICardMovementBatchLifecycle : IProgramRuntimeOperations
 // aliases to these exact collections while their metadata algorithms migrate.
 internal sealed class CardMovementBatchStore : ICardMovementBatchQueue, ICardMovementBatchNativeDrawInvoices,
     IGameStartingMovementBatchOrigins, ICardMovementEventSuppression,
-    ICardMovementBatchLifecycle
+    ICardMovementBatchLifecycle, ICardMovementHandGains
 {
     internal List<CardMovementBatchContext> PendingBatches { get; } = [];
     internal Stack<long> ActiveBatchIds { get; } = new();
@@ -41,6 +46,8 @@ internal sealed class CardMovementBatchStore : ICardMovementBatchQueue, ICardMov
     public CardMovementBatchContext PendingBatchAt(int index) => PendingBatches[index];
     public void AssignNativeDrawInvoice(int pendingIndex, NativeDrawInvocationProof proof) =>
         PendingBatches[pendingIndex] = PendingBatches[pendingIndex] with { NativeDrawInvocation = proof };
+    public void AssignHandGains(int pendingIndex, IReadOnlyList<HandGainOccurrence>? receipts) =>
+        PendingBatches[pendingIndex] = PendingBatches[pendingIndex] with { HandGains = receipts };
     public void AssignGameStartingMovementOrigin(int pendingIndex, GameStartingNativeMovementOrigin origin) =>
         PendingBatches[pendingIndex] = PendingBatches[pendingIndex] with { GameStartingMovementOrigin = origin };
     public void RemovePendingBatch(CardMovementBatchContext batch) => PendingBatches.Remove(batch);

@@ -121,7 +121,6 @@ internal interface ICardsMovedWindowPipeline : IProgramRuntimeOperations
     int[]? SelectLegacyMovementIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, CardLocation location);
     int[]? SelectDiscardBatchIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, ProgramInstructionFeatures features);
     int[]? SelectLegacyDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger);
-    void PrepareLingkongGainBatch(CardMovementBatchContext batch);
     IEnumerable<ProgramTriggerCandidate> CollectFirstDomainCandidates(CardMovementBatchContext batch);
     bool HasWenhePoisonDepartures(CardMovementBatchContext batch);
 }

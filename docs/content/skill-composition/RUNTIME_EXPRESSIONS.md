@@ -142,7 +142,7 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 
 `NativeDrawInvocation` 不隐含阶段身份需求。读取 phase token 的操作或 trait 仍需声明 `ActualDiscardRecoveryPhase`；事实 mask 不能替代动态来源资格，也不把普通阶段需求变成额外 DrawSkipped 观察者帧。
 
-初始发牌、零请求和无真实摸牌实体仍不产生已记录的调用；实际回合开始前只接受原有类型化开局来源。零张或合法替代可以完成普通 `draw` 的当前步骤，但不能据此伪造 DrawPile invoice。ordinal、threshold、展骥资格、原帧付讫状态与 typed return 保留其冻结边界。现有散文、知意、灵箜完成资格 callback 尚未声明化，需求统一不代表整个摸牌执行链已解耦。
+初始发牌、零请求和无真实摸牌实体仍不产生已记录的调用；实际回合开始前只接受原有类型化开局来源。零张或合法替代可以完成普通 `draw` 的当前步骤，但不能据此伪造 DrawPile invoice。ordinal、threshold、展骥资格、原帧付讫状态与 typed return 保留其冻结边界。整次获得由共同 `HandGainOccurrence` 收据冻结到原批次，散文、知意、灵箜不再从摸牌完成点接收回调；它们的实际复合效果仍待组合化，不能据此宣称整个摸牌执行链已纯 JSON。
 
 ## 已签发的用牌加伤
 

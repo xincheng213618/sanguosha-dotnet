@@ -32,6 +32,7 @@ internal sealed class MatchCoreCapabilityProvider
         if (movements is not null)
         {
             bindings.Add(new(typeof(ICardMovementBatchQueue), movements));
+            bindings.Add(new(typeof(ICardMovementHandGains), movements));
             bindings.Add(new(typeof(ICardMovementBatchNativeDrawInvoices), movements));
             bindings.Add(new(typeof(IGameStartingMovementBatchOrigins), movements));
             bindings.Add(new(typeof(ICardMovementEventSuppression), movements));

@@ -10,7 +10,4 @@ internal sealed partial class CoreNativeDrawInvoiceRuntimePortsRuntime
     EngineStatus INativeDrawInvoiceFacts.Status => _coreMatchOutcomeStatusWinnerAccess._status;
 
     bool INativeDrawInvoiceFacts.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
-    void INativeDrawInvoiceCompletions.CompleteSanwenNativeDrawQualification(NativeDrawInvocationProof proof) => _characterWangCanOlOperations.CompleteSanwenNativeDrawQualification(proof);
-    void INativeDrawInvoiceCompletions.CompleteTangTangNativeDrawQualification(NativeDrawInvocationProof proof) => _characterTangTangOlOperations.Value.CompleteTangTangNativeDrawQualification(proof);
-    void INativeDrawInvoiceCompletions.CompleteLingkongNativeDrawQualification(NativeDrawInvocationProof proof) => _characterZhouFeiLeOperations.CompleteLingkongNativeDrawQualification(proof);
 }

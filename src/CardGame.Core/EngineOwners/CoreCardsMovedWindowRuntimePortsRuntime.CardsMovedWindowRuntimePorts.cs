@@ -103,7 +103,6 @@ internal sealed partial class CoreCardsMovedWindowRuntimePortsRuntime
     int[]? ICardsMovedWindowPipeline.SelectLegacyMovementIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, CardLocation location) => _programPipelineHooksOperations._programPipelineHooks.SelectLegacyMovementIndexes(batch, candidate, trigger, location);
     int[]? ICardsMovedWindowPipeline.SelectDiscardBatchIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, ProgramInstructionFeatures features) => _programPipelineHooksOperations._programPipelineHooks.SelectDiscardBatchIndexes(batch, candidate, features);
     int[]? ICardsMovedWindowPipeline.SelectLegacyDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger) => _programPipelineHooksOperations._programPipelineHooks.SelectLegacyDiscardIndexes(batch, candidate, trigger);
-    void ICardsMovedWindowPipeline.PrepareLingkongGainBatch(CardMovementBatchContext batch) => _characterZhouFeiLeOperations.PrepareLingkongGainBatch(batch);
     IEnumerable<ProgramTriggerCandidate> ICardsMovedWindowPipeline.CollectFirstDomainCandidates(CardMovementBatchContext batch) => _coreGameDomainsOperations.CollectFirstDomainCandidates(batch);
     bool ICardsMovedWindowPipeline.HasWenhePoisonDepartures(CardMovementBatchContext batch) => _coreWenhePoisonOperations.HasWenhePoisonDepartures(batch);
 }

@@ -64,11 +64,6 @@ internal interface INativeDrawAttemptQueries : IProgramSelectionQuery
     bool IsIssuedDrawPileSlashReplacement(NativeDrawAttemptContext context, NativeDrawReplacementResult replacement);
 }
 
-internal interface INativeDrawAttemptOperations : IProgramRuntimeOperations
-{
-    void CompleteLingkongReplacement(ProgramSkillFrame frame, NativeDrawAttemptFrame attempt, NativeDrawReplacementResult replacement);
-}
-
 internal interface INativeDrawAttemptRuntime : IProgramRuntimeOperations
 {
     bool TryBegin(ResolutionFrame parent);

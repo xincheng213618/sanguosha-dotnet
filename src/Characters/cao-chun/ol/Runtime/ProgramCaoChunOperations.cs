@@ -48,7 +48,7 @@ public sealed partial record CardUseFrame
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public CardMovementBatchContext? CaoChunMaterialBatch
  {
   get=>_caoChunMaterialBatch;
-  init=>_caoChunMaterialBatch=value is null?null:value with{Movements=Array.AsReadOnly(value.Movements.ToArray()),SourceCounts=Array.AsReadOnly(value.SourceCounts.ToArray()),DestinationCounts=value.DestinationCounts is null?null:Array.AsReadOnly(value.DestinationCounts.ToArray()),SanwenGains=value.SanwenGains,LiJueUseDiscard=value.LiJueUseDiscard is{}li?CommittedEventProjection.FreezeLiJueUseDiscard(li):null,NativeDrawInvocation=value.NativeDrawInvocation is{}draw?draw with{Materials=draw.Materials}:null,NativeBuZhiDiscardInvocation=value.NativeBuZhiDiscardInvocation is{}discard?discard with{Zones=discard.Zones,Materials=discard.Materials}:null};
+  init=>_caoChunMaterialBatch=value is null?null:value with{Movements=Array.AsReadOnly(value.Movements.ToArray()),SourceCounts=Array.AsReadOnly(value.SourceCounts.ToArray()),DestinationCounts=value.DestinationCounts is null?null:Array.AsReadOnly(value.DestinationCounts.ToArray()),LiJueUseDiscard=value.LiJueUseDiscard is{}li?CommittedEventProjection.FreezeLiJueUseDiscard(li):null,NativeDrawInvocation=value.NativeDrawInvocation is{}draw?draw with{Materials=draw.Materials}:null,NativeBuZhiDiscardInvocation=value.NativeBuZhiDiscardInvocation is{}discard?discard with{Zones=discard.Zones,Materials=discard.Materials}:null};
  }
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public CaoChunHandUsePayment? CaoChunDebtQualification {get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public CaoChunNativeSlash? CaoChunSlash {get;init;}

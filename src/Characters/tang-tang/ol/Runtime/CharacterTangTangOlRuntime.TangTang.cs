@@ -42,7 +42,7 @@ internal sealed partial class CharacterTangTangOlRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { TangTang = r });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TangTangStartedEvent(f.Id, r.Source, r.GameplayHash, op, r.ActualTurn, r.TurnOwner, r.WindowId, r.PlayPhase?.Token ?? 0));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TangTangStartedEvent(f.Id, r.Source, r.GameplayHash, op, r.ActualTurn, r.TurnOwner, r.WindowId, r.PlayPhase?.Token ?? 0) { Gains = r.Gains });
         if (op == SkillProgramEffectOp.ResolveZhiyiGainColorBenefit)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhiyiOpportunityPaidEvent(f.Id, f.OwnerSeat, r.ActualTurn, r.TurnOwner, r.WindowId));
         PublishTangTang(f);

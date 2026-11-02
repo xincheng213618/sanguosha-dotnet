@@ -47,7 +47,6 @@ public sealed record CardUsePaymentMovementReceipt(long OwnerFrameId, long Actio
         {
             Movements = Array.AsReadOnly(value.Movements.ToArray()),
             SourceCounts = Array.AsReadOnly(value.SourceCounts.ToArray()),
-            SanwenGains = value.SanwenGains,
             DestinationCounts = value.DestinationCounts is null ? null : Array.AsReadOnly(value.DestinationCounts.ToArray()),
             LiJueUseDiscard = value.LiJueUseDiscard is { } usedTrick
                 ? CommittedEventProjection.FreezeLiJueUseDiscard(usedTrick) : null,

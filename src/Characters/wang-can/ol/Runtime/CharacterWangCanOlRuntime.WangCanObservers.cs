@@ -7,7 +7,7 @@ internal sealed partial class CharacterWangCanOlRuntime
     internal bool CanOfferWangCan(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {
         if (t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveSanwenActualGainDuplicates))
-            return _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && w.Sanwen is { } q && q.OwnerSeat == c.OwnerSeat && w.MovementBatch is { } batch && ValidSanwenProof(q, batch) && SanwenPayable(q).Count > 0;
+            return _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && w.Sanwen is { } q && SanwenPayable(q).Count > 0;
         if (t.Effects.Any(e => e.Op == SkillProgramEffectOp.ViewDenglouTopAndUseBasics))
             return c.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat]).Count == 0;
         return true;
@@ -20,8 +20,6 @@ internal sealed partial class CharacterWangCanOlRuntime
             return;
         if (r.Source != WangCanSource(f) || r.GameplayHash != f.GameplayHash || r.Instruction != f.InstructionIndex || r.WindowId != f.WindowContext?.ParentFrameId || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WangCanStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.WindowId == r.WindowId && e.ActualTurn == r.ActualTurn && e.Operation == _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op) != 1 || r.Entities.Distinct().Count() != r.Entities.Count || r.Remaining.Distinct().Count() != r.Remaining.Count)
             throw new InvalidOperationException("Wang Can lost its exact original source, window, instruction or physical receipt.");
-        if (r.Sanwen is { } q && (f.WindowContext?.Sanwen != q || f.WindowContext.MovementBatch is not { } batch || !ValidSanwenProof(q, batch)))
-            throw new InvalidOperationException("Sanwen lacks its original native gain batch and pre-gain witnesses.");
         if (r.Stage is WangCanStage.SanwenDiscard or WangCanStage.SanwenDraw or WangCanStage.QiaiGift or WangCanStage.DenglouViewChildren or WangCanStage.DenglouGain or WangCanStage.DenglouDiscard or WangCanStage.DenglouCancel)
         {
             if (!WangCanSegmentMatches(f, r) || f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null })

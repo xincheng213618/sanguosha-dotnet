@@ -39,7 +39,12 @@ public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public TangTangReceipt? TangTang { get; init; } }
 
 public sealed record TangTangStartedEvent(long FrameId, CardConversionSource Source, string GameplayHash, SkillProgramEffectOp Op,
-    int ActualTurn, int TurnOwner, long WindowId, long PlayToken) : IGameEvent;
+    int ActualTurn, int TurnOwner, long WindowId, long PlayToken) : IGameEvent
+{
+    private readonly IReadOnlyList<TangTangGain> _gains = [];
+    public IReadOnlyList<TangTangGain> Gains
+    { get => _gains; init => _gains = Array.AsReadOnly(value.ToArray()); }
+}
 public sealed record TangTangMovementMaterialEvent(long FrameId, int Step, int Index, int CardId, CardKind Kind, CardLocation From, Suit Suit) : IGameEvent;
 public sealed record TangTangGrainEvent(long FrameId, int Step, int Index, int CardId) : IGameEvent;
 public sealed record TangTangEntityMovedEvent(long FrameId, int Step, TangTangStage Stage, long BatchId, int CardId, CardKind Kind, CardLocation From, CardLocation To, long Sequence) : IGameEvent;

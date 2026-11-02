@@ -9,5 +9,5 @@ public sealed record SanwenGainProof(long BatchId,int ActualTurn,int OwnerSeat,I
 }
 internal sealed class ResolveSanwenActualGainDuplicatesDescriptor:WangCanDescriptor
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.HandGainOccurrence);
     public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveSanwenActualGainDuplicates;public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e)=>[new RequireTriggerWindow(SkillProgramTriggerWindow.CardsGained)];}

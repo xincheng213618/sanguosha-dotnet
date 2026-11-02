@@ -19,7 +19,7 @@ internal sealed partial class CharacterWangCanOlRuntime
             _ => WangCanStage.DenglouViewChildren
         };
         var r = new WangCanReceipt(source, f.GameplayHash, 1, w.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, initial, Sanwen: w.Sanwen);
-        if (op == SkillProgramEffectOp.ResolveSanwenActualGainDuplicates && (w.Window != SkillProgramTriggerWindow.CardsGained || w.Sanwen is not { } q || q.OwnerSeat != f.OwnerSeat || w.MovementBatch is not { } batch || !ValidSanwenProof(q, batch) || SanwenPayable(q).Count == 0))
+        if (op == SkillProgramEffectOp.ResolveSanwenActualGainDuplicates && (w.Sanwen is not { } q || SanwenPayable(q).Count == 0))
             throw new InvalidOperationException("Sanwen lost the frozen real gain batch or its original hand witnesses.");
         if (op == SkillProgramEffectOp.CollectQiaiLivingContributions && (w.Window != SkillProgramTriggerWindow.DyingEntering || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.VictimSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(entry => entry.Id == w.ParentFrameId)?.ResumeDyingFrameId != dying.Id))
             throw new InvalidOperationException("Qiai requires its actual own entering-dying frame.");

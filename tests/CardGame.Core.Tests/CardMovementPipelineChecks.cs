@@ -45,8 +45,15 @@ internal static class CardMovementPipelineChecks
                 return completed with { MovementTiming = new(0, TurnPhase.Draw, 1) };
             }
         };
+        var gains = new HandGainCapture(batch =>
+        {
+            calls.Add("gains");
+            Require(store.ActiveBatchId is null && batch.Movements.Count == 1,
+                "Shared gain capture sees the settled physical batch after committed observations.");
+            return batch;
+        });
         var coordinator = new CardMovementBatchCoordinator(frames, zones, facts, store, pipeline,
-            match.Capabilities.Get<IEquipmentMovementCapture>());
+            match.Capabilities.Get<IEquipmentMovementCapture>(), gains);
         IEnumerable<CardLocation> Sources()
         {
             Require(frames.NextId() == parent.Id + 1, "Source enumeration must precede batch identity allocation.");
@@ -77,7 +84,7 @@ internal static class CardMovementPipelineChecks
         coordinator.Complete(batch, movements, true);
         var completed = store.PendingBatches.Single();
         movements.Clear();
-        Require(calls.SequenceEqual(["begin", "observe", "facts", "complete"]) && completed.Movements.Count == 1 &&
+        Require(calls.SequenceEqual(["begin", "observe", "facts", "gains", "complete"]) && completed.Movements.Count == 1 &&
                 completed.MovementTiming?.PhaseActorSeat == 1 && store.ActiveBatchId is null,
             "Completion must preserve ordered hooks, the folded context and the frozen movement list.");
 
@@ -172,6 +179,15 @@ internal static class CardMovementPipelineChecks
         public Winner Winner => Winner.None;
         public EngineStatus Status => EngineStatus.Running;
         public ProgramSkillFrame? LastProgram => frames.OfType<ProgramSkillFrame>().LastOrDefault();
+    }
+
+    private sealed class HandGainCapture(Func<CardMovementBatchContext, CardMovementBatchContext> capture)
+        : IHandGainOccurrences
+    {
+        public CardMovementBatchContext Capture(CardMovementBatchContext batch) => capture(batch);
+        public void Complete(NativeDrawInvocationProof proof) => throw new NotSupportedException();
+        public void Complete(ProgramSkillFrame frame, NativeDrawAttemptFrame attempt,
+            NativeDrawReplacementResult replacement) => throw new NotSupportedException();
     }
 
     private sealed class BatchPipeline : ICardMovementBatchPipeline

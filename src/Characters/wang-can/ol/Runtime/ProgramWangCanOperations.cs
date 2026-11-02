@@ -18,11 +18,6 @@ public sealed record WangCanSegmentPaidEvent(long FrameId,CardConversionSource S
 public sealed record WangCanNativeIssuedEvent(long FrameId,CardConversionSource Source,string GameplayHash,long UseId,long ActionId,int ActorSeat,CardKind EffectiveKind):IGameEvent;
 public sealed record WangCanNativeReturnedEvent(long FrameId,long UseId,long ActionId):IGameEvent;
 public sealed record WangCanCompletedEvent(long FrameId,CardConversionSource Source,string GameplayHash):IGameEvent;
-public sealed partial record CardMovementBatchContext
-{
- private readonly IReadOnlyList<SanwenGainProof>? _sanwenGains;
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public IReadOnlyList<SanwenGainProof>? SanwenGains{get=>_sanwenGains;init=>_sanwenGains=value is null?null:Array.AsReadOnly(value.Select(q=>q with{Incoming=q.Incoming,Witnesses=q.Witnesses}).ToArray());}
-}
 public sealed partial record ProgramSkillWindowContext
 {[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public SanwenGainProof? Sanwen{get;init;}}
 public sealed partial record ProgramSkillFrame

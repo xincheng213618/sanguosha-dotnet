@@ -37,7 +37,7 @@ internal sealed class NativeDrawInvoiceRuntime(IProgramRuntimeFrames frames, IPr
     IProgramContentQueries content, INativeFactDemand demand, IProgramTurnQueries turn, IProgramEventHistoryQueries history,
     ICardMovementHistoryQueries movements, ICardMovementBatchQueue batches,
     ICardMovementBatchNativeDrawInvoices batchInvoices, INativeDrawInvoiceFacts facts,
-    IGameStartingDrawOrigins starting, IZhanjiDrawEntitlements zhanji, INativeDrawInvoiceCompletions native,
+    IGameStartingDrawOrigins starting, IZhanjiDrawEntitlements zhanji, IHandGainOccurrences handGains,
     INativeDrawOrdinalInvoices ordinals, INativeDrawThresholdInvoices thresholds,
     IActualDiscardRecoveryPhaseQueries actualPhases) : INativeDrawInvocationInvoices, INativeDrawInvoiceQueries
 {
@@ -122,9 +122,7 @@ internal sealed class NativeDrawInvoiceRuntime(IProgramRuntimeFrames frames, IPr
             proof.LastBatchId) { GameStartingOrigin = proof.GameStartingOrigin, GameStartingMovementOrigin = proof.GameStartingMovementOrigin,
                 ActualTurnDrawOrdinal = proof.ActualTurnDrawOrdinal, ProgramOrigin = proof.ProgramOrigin });
         thresholds.Complete(proof);
-        native.CompleteSanwenNativeDrawQualification(proof);
-        native.CompleteTangTangNativeDrawQualification(proof);
-        native.CompleteLingkongNativeDrawQualification(proof);
+        handGains.Complete(proof);
     }
 
     public bool IsValid(NativeDrawInvocationProof p)

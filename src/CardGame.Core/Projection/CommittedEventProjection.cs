@@ -81,6 +81,7 @@ internal static class CommittedEventProjection
         ActualCardUseActionUpdatedEvent value => value,
         NativeCardUseHistoryRecordedEvent value => value,
         ActualPhaseSkippedEvent value => value,
+        TangTangStartedEvent value => value with { Gains = FreezeList(value.Gains) },
         SourceKeshouPaidBranchEvent value => value with
         { Receipt = value.Receipt with { Materials = FreezeList(value.Receipt.Materials) } },
         AnniversaryCuiLieUseChangedEvent value => value with

@@ -33,13 +33,6 @@ internal sealed partial class CharacterTangTangOlRuntime
         foreach (var m in batch.Movements.Where(m => m.To.Zone == CardZoneKind.Hand && m.To.OwnerSeat is not null && m.From != m.To))
         {
             var recipient = m.To.OwnerSeat!.Value;
-            // The acquired batch is one set. Its members cannot witness one another
-            // for "other this-colour cards", even when two red cards arrive together.
-            var acquired = batch.Movements.Where(g => g.To == CardLocation.Hand(recipient) && g.From != g.To).Select(g => g.CardId).ToHashSet();
-            var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[recipient], _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId));
-            // A plain deck-to-hand obtain also counts. DrawCards' finer physical
-            // batches are reconciled to its whole invocation before any drain.
-            Add(recipient, false, suit, m.Sequence, m.From, acquired);
             CardMovementRecord? entry = IsTangTangOwnedZone(m.From) ? m : null;
             if (entry is null && m.From == CardLocation.Processing)
             {
@@ -48,19 +41,18 @@ internal sealed partial class CharacterTangTangOlRuntime
                     entry = previous;
             }
 
-            if (entry is not null && entry.From.OwnerSeat is { } issuer && issuer != recipient && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhiyiOwnedOriginEvent>().SingleOrDefault(e => e.Sequence == entry.Sequence && e.CardId == entry.CardId && e.From == entry.From)is { } original)
-                Add(issuer, true, original.Suit, entry.Sequence, entry.From, new HashSet<int>());
-            void Add(int ownerSeat, bool foreign, Suit effective, long entrySequence, CardLocation from, IReadOnlySet<int> excluded)
-            {
-                if (effective == Suit.None || !_coreMatchParticipantsPlayersAccess._players[ownerSeat].IsAlive)
-                    return;
-                var witness = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[ownerSeat]).Where(c => !excluded.Contains(c.Id)).Select(c => (Card: c, Suit: _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[ownerSeat], c))).FirstOrDefault(c => c.Suit != Suit.None && CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) == CoreNativeCardClassificationsRuntime.IsRedSuit(effective));
-                if (witness.Card is null)
-                    return;
-                var gain = new TangTangGain(batch.Id, ownerSeat, recipient, m.CardId, foreign, effective, entrySequence, m.Sequence, from, witness.Card.Id, witness.Suit);
-                gains.Add(gain);
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhiyiGainFrozenEvent(gain));
-            }
+            if (entry is null || entry.From.OwnerSeat is not { } issuer || issuer == recipient ||
+                _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhiyiOwnedOriginEvent>().SingleOrDefault(e => e.Sequence == entry.Sequence && e.CardId == entry.CardId && e.From == entry.From) is not { } original ||
+                original.Suit == Suit.None || !_coreMatchParticipantsPlayersAccess._players[issuer].IsAlive)
+                continue;
+            var witness = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[issuer])
+                .Select(c => (Card: c, Suit: _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[issuer], c)))
+                .FirstOrDefault(c => c.Suit != Suit.None && CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) == CoreNativeCardClassificationsRuntime.IsRedSuit(original.Suit));
+            if (witness.Card is null)
+                continue;
+            var gain = new TangTangGain(batch.Id, issuer, recipient, m.CardId, true, original.Suit,
+                entry.Sequence, m.Sequence, entry.From, witness.Card.Id, witness.Suit);
+            gains.Add(gain);
         }
 
         return gains.Count == 0 ? batch : batch with
@@ -69,50 +61,41 @@ internal sealed partial class CharacterTangTangOlRuntime
         };
     }
 
-    internal void CompleteTangTangNativeDrawQualification(NativeDrawInvocationProof proof)
+    internal static IReadOnlyList<TangTangGain> ProjectTangTangGains(CardMovementBatchContext batch)
     {
-        if (!HasTangTangZhiyi || !_coreOutsidePhaseDrawDiscardOperations.ValidNativeDrawInvocation(proof))
-            return;
-        var index = _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.FindIndex(b => b.Id == proof.LastBatchId && b.NativeDrawInvocation == proof);
-        if (index < 0)
-            throw new InvalidOperationException("Zhiyi lost the real native draw's final pending batch.");
-        for (var i = 0; i < _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Count; i++)
+        var gains = (batch.TangTangGains ?? []).Where(gain => gain.Foreign).ToList();
+        foreach (var occurrence in batch.HandGains ?? [])
         {
-            var pending = _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches[i];
-            if (pending.TangTangGains is not { } preliminary)
+            if (!occurrence.RecipientAlive)
                 continue;
-            var kept = preliminary.Where(g => g.Foreign || g.OwnerSeat != proof.OwnerSeat || g.GainSequence <= proof.SequenceBefore || g.GainSequence > proof.SequenceAfter).ToArray();
-            if (kept.Length != preliminary.Count)
-                _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches[i] = pending with
-                {
-                    TangTangGains = kept.Length == 0 ? null : kept
-                };
-        }
-
-        var batch = _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches[index];
-        var acquired = proof.Materials.Select(m => m.CardId).ToHashSet();
-        var gains = (batch.TangTangGains ?? []).ToList();
-        foreach (var material in proof.Materials)
-        {
-            var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[proof.OwnerSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(material.CardId));
-            if (suit == Suit.None)
-                continue;
-            var witness = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[proof.OwnerSeat]).Where(c => !acquired.Contains(c.Id)).Select(c => (Card: c, Suit: _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(_coreMatchParticipantsPlayersAccess._players[proof.OwnerSeat], c))).FirstOrDefault(c => c.Suit != Suit.None && CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) == CoreNativeCardClassificationsRuntime.IsRedSuit(suit));
-            if (witness.Card is null)
-                continue;
-            var gain = new TangTangGain(batch.Id, proof.OwnerSeat, proof.OwnerSeat, material.CardId, false, suit, material.MovementSequence, material.MovementSequence, CardLocation.DrawPile, witness.Card.Id, witness.Suit, proof.InvocationId);
-            gains.Add(gain);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhiyiGainFrozenEvent(gain));
-        }
-
-        if (gains.Count > 0)
-            _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches[index] = batch with
+            foreach (var incoming in occurrence.Incoming)
             {
-                TangTangGains = gains
-            };
+                if (incoming.EffectiveSuit == Suit.None)
+                    continue;
+                var witnesses = occurrence.PreviousHand.Where(card => card.EffectiveSuit != Suit.None &&
+                    CoreNativeCardClassificationsRuntime.IsRedSuit(card.EffectiveSuit) == CoreNativeCardClassificationsRuntime.IsRedSuit(incoming.EffectiveSuit)).Take(1).ToArray();
+                if (witnesses.Length == 0)
+                    continue;
+                gains.Add(new(batch.Id, occurrence.RecipientSeat, occurrence.RecipientSeat, incoming.CardId, false,
+                    incoming.EffectiveSuit, incoming.GainSequence, incoming.GainSequence, incoming.From,
+                    witnesses[0].CardId, witnesses[0].EffectiveSuit, occurrence.NativeDrawInvocationId ?? 0));
+            }
+        }
+        return Array.AsReadOnly(gains.ToArray());
     }
 
-    internal int TangTangGainOccurrence(CardMovementBatchContext batch, IEnumerable<TangTangGain> gains) => gains.Any(g => g.NativeDrawId != 0) ? batch.Movements.ToList().FindIndex(m => batch.NativeDrawInvocation?.Materials.Any(c => c.MovementSequence == m.Sequence) == true) : batch.Movements.ToList().FindIndex(m => m.Sequence == gains.Min(g => g.GainSequence));
+    internal static int TangTangGainOccurrence(CardMovementBatchContext batch, IEnumerable<TangTangGain> gains)
+    {
+        var selected = gains.ToArray();
+        if (selected.Length == 0)
+            return -1;
+        var owner = selected[0].OwnerSeat;
+        if (selected.Any(gain => !gain.Foreign) && batch.HandGains?.FirstOrDefault(gain => gain.RecipientSeat == owner &&
+                (gain.NativeDrawInvocationId is not null || gain.NativeDrawAttemptId is not null)) is { } occurrence)
+            return batch.Movements.ToList().FindIndex(movement => occurrence.Incoming.Any(card => card.GainSequence == movement.Sequence));
+        return batch.Movements.ToList().FindIndex(movement => movement.Sequence == selected.Min(gain => gain.GainSequence));
+    }
+
     [ProgramPipelineHook(ProgramPipelinePhase.BeginMovementBatch, 1000)]
     internal void CaptureMovementBatchStartTangTangOwnedOrigins(CardMovementBatchBuilder batch) => batch.TangTangOwnedOrigins = CaptureTangTangOwnedOrigins(batch.SourceCountsBefore.Keys);
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 2900)]

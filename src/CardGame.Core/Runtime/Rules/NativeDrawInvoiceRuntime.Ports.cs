@@ -8,10 +8,3 @@ internal interface INativeDrawInvoiceFacts : IProgramSelectionQuery
     EngineStatus Status { get; }
     bool IsValidSeat(int seat);
 }
-
-internal interface INativeDrawInvoiceCompletions : IProgramRuntimeOperations
-{
-    void CompleteSanwenNativeDrawQualification(NativeDrawInvocationProof proof);
-    void CompleteTangTangNativeDrawQualification(NativeDrawInvocationProof proof);
-    void CompleteLingkongNativeDrawQualification(NativeDrawInvocationProof proof);
-}

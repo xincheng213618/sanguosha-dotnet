@@ -1,44 +1,7 @@
-using System.Text.Json.Serialization;
-
 namespace CardGame.Core;
 
-public sealed record LingkongGainEntity(int CardId, CardKind PrintedKind, int GainSequence);
-
-public sealed record LingkongGainCapture(int RecipientSeat, int ActualTurn, int TurnOwner,
-    TurnPhase Phase, int PhaseActorSeat, bool First, CardConversionSource? Source, string? GameplayHash)
-{
-    private readonly IReadOnlyList<LingkongGainEntity> _entities = Array.AsReadOnly(Array.Empty<LingkongGainEntity>());
-    public IReadOnlyList<LingkongGainEntity> Entities
-    { get => _entities; init => _entities = Array.AsReadOnly(value.ToArray()); }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public long? NativeDrawInvocationId { get; init; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public long? NativeDrawAttemptId { get; init; }
-}
-
-public sealed partial record CardMovementBatchContext
-{
-    private readonly IReadOnlyList<LingkongGainCapture>? _lingkongGains;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IReadOnlyList<LingkongGainCapture>? LingkongGains
-    {
-        get => _lingkongGains;
-        init => _lingkongGains = value is null ? null : Array.AsReadOnly(value.Select(r => r with { Entities = r.Entities }).ToArray());
-    }
-}
-
-public sealed record LingkongOutsideGainObservedEvent(long BatchId, int RecipientSeat, int ActualTurn,
-    int TurnOwner, TurnPhase Phase, int PhaseActorSeat, int EntityCount,
-    int SequenceBefore, int SequenceAfter) : IGameEvent;
-public sealed record LingkongGainQualifiedEvent(long BatchId, CardConversionSource Source,
-    string GameplayHash, int ActualTurn, int TurnOwner, int EntityCount) : IGameEvent;
-public sealed record LingkongGainEntityIssuedEvent(long BatchId, int RecipientSeat, int CardId,
-    CardKind PrintedKind, int GainSequence) : IGameEvent;
 public sealed record LingkongGainMarkedEvent(long FrameId, long BatchId, CardConversionSource Source,
     string GameplayHash, int ActualTurn, int TurnOwner, int EntityCount) : IGameEvent;
-public sealed record LingkongGainInvocationBoundEvent(long BatchId, int RecipientSeat,
-    long? NativeDrawInvocationId, long? NativeDrawAttemptId, long? ParentFrameId,
-    int SequenceBefore, int SequenceAfter, int EntityCount) : IGameEvent;
 
 internal interface ILeZhouFeiLingkongHost
 {
@@ -59,7 +22,7 @@ internal abstract class LingkongDescriptor(SkillProgramEffectOp op) : ProgramOpe
 
 internal sealed class MarkLingkongFirstOutsideDrawGainDescriptor()
     : LingkongDescriptor(SkillProgramEffectOp.MarkLingkongFirstOutsideDrawGain){
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.MovementTiming);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.MovementTiming | ProgramTrackedFact.HandGainOccurrence);
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => context.State.CanContinueAfterOwnerDeath(context.Frame);
 }
 

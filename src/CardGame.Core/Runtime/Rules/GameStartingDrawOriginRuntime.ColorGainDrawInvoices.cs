@@ -36,7 +36,7 @@ internal sealed partial class GameStartingDrawOriginRuntime
             opportunity.TurnOwner != start.TurnOwner || opportunity.BatchId != child.WindowFrameId ||
             history.OfType<ZhiyiRecipientChosenEvent>().Where(chosen => chosen.FrameId == child.ProgramFrameId).ToArray() is not [var recipient] ||
             recipient.RecipientSeat != child.ParticipantSeat) return false;
-        return history.OfType<ZhiyiGainFrozenEvent>().Any(frozen => frozen.Gain is { Foreign: false, From: var from } gain &&
+        return start.Gains.Any(gain => gain is { Foreign: false, From: var from } &&
             from == CardLocation.DrawPile && gain.NativeDrawId == parent.InvocationId && gain.BatchId == child.OriginalBatchId &&
             gain.OwnerSeat == child.Source.OwnerSeat && gain.RecipientSeat == child.Source.OwnerSeat &&
             gain.GainSequence > parent.SequenceBefore && gain.GainSequence <= parent.SequenceAfter && gain.EntrySequence == gain.GainSequence &&

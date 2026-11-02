@@ -21,7 +21,7 @@ internal interface ICardMovementBatchPipeline : IProgramRuntimeOperations
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class CardMovementBatchCoordinator(IProgramRuntimeFrames frames, ICardZoneQueries cards,
     ICardMovementBatchFacts facts, ICardMovementBatchLifecycle batches, ICardMovementBatchPipeline pipeline,
-    IEquipmentMovementCapture equipment)
+    IEquipmentMovementCapture equipment, IHandGainOccurrences handGains)
     : IAtomicCardMovementBatches
 {
     public CardMovementBatchBuilder Begin(IEnumerable<CardLocation> sourceLocations,
@@ -87,6 +87,6 @@ internal sealed class CardMovementBatchCoordinator(IProgramRuntimeFrames frames,
             MouYishiSources = batch.MouYishiSources,
             EquipmentDepartures = batch.EquipmentDepartures
         };
-        batches.AppendCompletedBatch(pipeline.Complete(batch, completed));
+        batches.AppendCompletedBatch(pipeline.Complete(batch, handGains.Capture(completed)));
     }
 }

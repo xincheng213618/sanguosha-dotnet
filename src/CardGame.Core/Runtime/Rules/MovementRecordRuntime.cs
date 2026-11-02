@@ -6,7 +6,7 @@ internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovemen
     IMovementRecordJournal journal, IMovementRecordMaterials materials, IMovementRecordObservers observers,
     IMovementRecordOrigins origins, IMovementRecordNotifications notifications, IProgramRuntimeEvents events,
     ICardMovementEventSuppression suppression, ICardMovementBatchLifecycle batches,
-    RuntimeEntries.DeferredRuntime<GeneratedEquipmentRuntime> equipmentLifetime)
+    RuntimeEntries.DeferredRuntime<GeneratedEquipmentRuntime> equipmentLifetime, ICardMovementTimingQueries timing)
 {
     internal CardMovementRecord Record(
         Card card,
@@ -24,7 +24,7 @@ internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovemen
             card.Kind,
             from,
             to,
-            reason) { BatchId = batches.ActiveBatchId ?? 0, PrintedSuit = card.Suit, Disclosure = facts.PublishesDisclosure ? disclosure : CardMovementDisclosure.Unspecified,
+            reason) { BatchId = batches.ActiveBatchId ?? 0, MovementTiming = timing.Capture(), PrintedSuit = card.Suit, Disclosure = facts.PublishesDisclosure ? disclosure : CardMovementDisclosure.Unspecified,
                 ActualPlaySlashLoss = metadata.CaptureActualPlaySlashLoss(card, from, to),
                 RedOwnedLoss = metadata.CaptureRedOwnedLoss(card, from, to, facts.Sequence),
                 HappyMedicineHandLoss = metadata.CaptureHappyHuaTuoHandLoss(card, from, to, facts.Sequence),

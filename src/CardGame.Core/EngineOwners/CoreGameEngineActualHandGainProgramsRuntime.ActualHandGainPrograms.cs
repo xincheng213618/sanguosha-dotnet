@@ -9,24 +9,8 @@ internal sealed partial class CoreGameEngineActualHandGainProgramsRuntime
     internal bool HasActualHandGainCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DrawAfterActualOwnHandGain) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.DiscardForeignTurnHandGains);
 
     internal bool ActualHandGainTurnOpen(int owner) => _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat == owner && _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._phase is not (TurnPhase.NotStarted or TurnPhase.Finished) && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressPhaseTurnNumberTurnProgressionAccess._turnNumber && e.ActorSeat == owner);
-    internal CardLocation ActualHandGainOriginalSource(CardMovementRecord first, CardMovementBatchContext? batch = null)
-    {
-        var from = first.From;
-        var sequence = first.Sequence;
-        while (from == CardLocation.Processing)
-        {
-            var prior = batch?.Movements.Where(m => m.CardId == first.CardId && m.Sequence < sequence).MaxBy(m => m.Sequence);
-            var ledger = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == first.CardId && m.Sequence < sequence);
-            if (ledger is not null && (prior is null || ledger.Sequence > prior.Sequence))
-                prior = ledger;
-            if (prior?.To != CardLocation.Processing)
-                break;
-            from = prior.From;
-            sequence = prior.Sequence;
-        }
-
-        return from;
-    }
+    internal CardLocation ActualHandGainOriginalSource(CardMovementRecord first, CardMovementBatchContext? batch = null) =>
+        ActualHandGainFacts.OriginalSource(first, _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements, batch);
 
     internal int[] MatchingActualHandGainIndexes(CardMovementBatchContext batch, int owner, CardLocation location) => batch.Movements.Select((m, i) => (m, i)).GroupBy(x => x.m.CardId).Where(g => g.Any(x => x.m.To == CardLocation.Hand(owner) && ActualHandGainOriginalSource(x.m, batch) != CardLocation.Hand(owner))).Select(g => g.OrderBy(x => x.m.Sequence).Last()).Where(x => x.m.To == CardLocation.Hand(owner) && x.m.To == location).Select(x => x.i).Order().ToArray();
     internal ActualHandGainEntity[] ActualHandGainEntities(CardMovementBatchContext batch, int owner) => MatchingActualHandGainIndexes(batch, owner, CardLocation.Hand(owner)).Select(i =>

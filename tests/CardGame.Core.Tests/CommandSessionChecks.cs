@@ -127,6 +127,8 @@ internal static class CommandSessionChecks
         var choices = new[] { new PromptChoice(new ChoiceId("fixture"), "fixture", ids, choiceTargets, parameters)
             { ContentIds = contentIds } };
         var conversion = new CardConversionSource("fixture", "binding", 0, "instance");
+        var colorGains = new[] { new TangTangGain(51, 0, 0, 7, false, Suit.Heart,
+            1, 1, CardLocation.DrawPile, 8, Suit.Diamond, 52) };
         var naturalPlan = new LegalAction(LegalActionKind.Slash, 1, 1, "fixture")
         {
             TargetSeats = ids, SelectableCardIds = ids, SelectableTargetSeats = choiceTargets,
@@ -152,6 +154,8 @@ internal static class CommandSessionChecks
             new ProgramTongxieFollowUpResolvedEvent(1, "fixture", "binding", 0, 1, 2, ids, ids, ids),
             new RoundGainedTrickTargetOfferedEvent(1, 0, conversion,
                 new(conversion, "fixture", "fixture", 1, 0, 2, 3, 0, CardKind.Duel), ids, choices),
+            new TangTangStartedEvent(50, conversion, "fixture", SkillProgramEffectOp.ResolveZhiyiGainColorBenefit,
+                0, 0, 49, 0) { Gains = colorGains },
             new HuiyunNativeIssuedEvent(naturalInvoice),
             new HuiyunNativeReturnedEvent(naturalInvoice, 1)
         ];
@@ -166,6 +170,7 @@ internal static class CommandSessionChecks
         choiceTargets[0] = -1;
         contentIds[0] = "fixture:rewritten";
         parameters["fixture"] = "rewritten";
+        colorGains[0] = colorGains[0] with { CardId = -1 };
         choices[0] = choices[0] with { Description = "rewritten" };
         foreach (var item in frozen)
             AttemptCollectionMutation(item, new HashSet<object>(ReferenceEqualityComparer.Instance), ref attempts, ref rejected);

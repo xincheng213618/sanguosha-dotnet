@@ -7,11 +7,8 @@ internal sealed partial class CharacterWangCanOlEntries
     internal IReadOnlyList<LegalAction> BuildDenglouNativeBasicUseOptions(ProgramSkillFrame f) => _resolve().BuildDenglouNativeBasicUseOptions(f);
     internal bool CanContinueIssuedWangCan(ProgramSkillFrame f) => _resolve().CanContinueIssuedWangCan(f);
     internal bool CanOfferWangCan(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => _resolve().CanOfferWangCan(c, t, w);
-    internal IReadOnlyList<SanwenGainProof>? CaptureSanwenGainQualifications(CardMovementBatchContext batch) => _resolve().CaptureSanwenGainQualifications(batch);
     internal void CompleteDenglouNativeAttack(GameEngine.AttackCompletionReceipt completion) => _resolve().CompleteDenglouNativeAttack(completion);
     internal bool CompleteDenglouUseReturn(CardUseFrame use) => _resolve().CompleteDenglouUseReturn(use);
-    internal CardMovementBatchContext CompleteMovementBatchCaptureSanwenGainQualifications(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureSanwenGainQualifications(batch, completed);
-    internal void CompleteSanwenNativeDrawQualification(NativeDrawInvocationProof proof) => _resolve().CompleteSanwenNativeDrawQualification(proof);
     internal void ContinueDenglou(ProgramSkillFrame f) => _resolve().ContinueDenglou(f);
     internal void ContinueDenglouNativePayment(long id) => _resolve().ContinueDenglouNativePayment(id);
     internal void ContinueQiai(ProgramSkillFrame f) => _resolve().ContinueQiai(f);
@@ -36,12 +33,7 @@ internal sealed partial class CharacterWangCanOlEntries
     internal void ReturnDenglouNativeUse(CardUseFrame use) => _resolve().ReturnDenglouNativeUse(use);
     internal bool ReturnRegisteredCompleteDenglouNativeAttack(GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnRegisteredCompleteDenglouNativeAttack(completion);
     internal bool ReturnWangCanMovement(ProgramSkillFrame f) => _resolve().ReturnWangCanMovement(f);
-    internal SanwenGainProof? SanwenContextFor(CardMovementBatchContext batch, int owner) => _resolve().SanwenContextFor(batch, owner);
-    internal bool SanwenIncomingBelongs(CardMovementBatchContext batch, int owner, int id) => _resolve().SanwenIncomingBelongs(batch, owner, id);
-    internal IReadOnlyList<int> SanwenPayable(SanwenGainProof q) => _resolve().SanwenPayable(q);
     internal bool TryAdvanceWangCanSubtree() => _resolve().TryAdvanceWangCanSubtree();
-    internal ProgramSkillWindowContext? TrySanwenGain(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate) => _resolve().TrySanwenGain(frame, candidate);
-    internal bool ValidSanwenProof(SanwenGainProof q, CardMovementBatchContext batch) => _resolve().ValidSanwenProof(q, batch);
     internal void ValidateDenglouNativeUseReturn(CardUseFrame use) => _resolve().ValidateDenglouNativeUseReturn(use);
     internal PromptChoice WangCanAiChoice(ProgramSkillFrame f) => _resolve().WangCanAiChoice(f);
     internal IReadOnlyList<PromptChoice> WangCanChoices(ProgramSkillFrame f) => _resolve().WangCanChoices(f);

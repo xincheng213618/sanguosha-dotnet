@@ -5,8 +5,8 @@ namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed class NativeDrawAttemptRuntime(IProgramRuntimeFrames frames,
     IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
-    INativeDrawAttemptQueries queries, INativeDrawAttemptOperations operations,
-    IProgramWindowCursors cursors) : INativeDrawAttemptRuntime
+    INativeDrawAttemptQueries queries,
+    IProgramWindowCursors cursors, IHandGainOccurrences handGains) : INativeDrawAttemptRuntime
 {
     public bool TryBegin(ResolutionFrame parent)
     {
@@ -91,7 +91,7 @@ internal sealed class NativeDrawAttemptRuntime(IProgramRuntimeFrames frames,
         var replacement = new NativeDrawReplacementResult(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId,
             frame.ActivationId, sourceSeat, reason, sequenceBefore, after) { GainedIds = actual };
         frames.Replace(attempt.Id, attempt with { Replacement = replacement });
-        operations.CompleteLingkongReplacement(frame, attempt, replacement);
+        handGains.Complete(frame, attempt, replacement);
     }
 
     // A DrawPile replacement has a separate issued entitlement and material
@@ -117,6 +117,7 @@ internal sealed class NativeDrawAttemptRuntime(IProgramRuntimeFrames frames,
         if (!ValidReplacement(attempt.Context, replacement))
             throw new InvalidOperationException("A DrawPile replacement lost its issued Slash materials.");
         frames.Replace(attempt.Id, attempt with { Replacement = replacement });
+        handGains.Complete(frame, attempt, replacement);
     }
 
     private bool ValidReplacement(NativeDrawAttemptContext context, NativeDrawReplacementResult replacement)

@@ -224,6 +224,10 @@ internal static class ProgramTriggerResourceChecks
         var ordinal = CharacterFixtureContent.EmbeddedProgramBundle("shanhe-current-duoduo-yishan").Programs.Values.First();
         Check(Dependencies(ordinal).RequiresFact(draw) && !Dependencies(ordinal).RequiresFact(phase),
             "A native draw ordinal condition requests invoices without requiring actual phase identity.");
+        var acquisition = new MatchNativeFactDemand(ProgramTrackedFact.HandGainOccurrence);
+        Check(acquisition.RequiresFact(draw) && !acquisition.RequiresFact(phase) &&
+            !acquisition.RequiresFact(ProgramTrackedFact.MovementTiming),
+            "Whole acquisitions require real draw invoices for grouping, without manufacturing phase identity or movement timing.");
         var pure = new MatchNativeFactDemand(draw);
         Check(pure.RequiresFact(draw) && !pure.RequiresFact(phase) && !pure.RequiresFact(ProgramTrackedFact.ActualPhaseEnd),
             "Native draw demand has no phase-end or phase-identity closure.");

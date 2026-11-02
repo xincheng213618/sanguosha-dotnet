@@ -12,7 +12,8 @@ public enum ProgramTrackedFact
     NativeActionAppearance = 32,
     ActualCardUseHistory = 64,
     ActualPhaseEnd = 128,
-    MovementTiming = 256
+    MovementTiming = 256,
+    HandGainOccurrence = 512
 }
 
 // Definition-only demand for shared native facts. Keep trigger and activation
@@ -25,13 +26,17 @@ internal readonly record struct ProgramFactRequirements(
     internal ProgramFactRequirements Union(ProgramFactRequirements other) =>
         new(Triggered | other.Triggered, Activated | other.Activated);
 
-    internal static ProgramTrackedFact Close(ProgramTrackedFact facts) =>
-        (facts & ProgramTrackedFact.ActualPhaseEnd) != 0 ? facts | ProgramTrackedFact.ActualDiscardRecoveryPhase : facts;
+    internal static ProgramTrackedFact Close(ProgramTrackedFact facts)
+    {
+        if ((facts & ProgramTrackedFact.ActualPhaseEnd) != 0) facts |= ProgramTrackedFact.ActualDiscardRecoveryPhase;
+        if ((facts & ProgramTrackedFact.HandGainOccurrence) != 0) facts |= ProgramTrackedFact.NativeDrawInvocation;
+        return facts;
+    }
 
     internal bool IsValid => ((Triggered | Activated) &
         ~(ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.ActualDiscardRecoveryPhase |
           ProgramTrackedFact.NativeTrueUseProcessingEntry | ProgramTrackedFact.WholeActualUseDeclaration |
           ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.NativeActionAppearance |
           ProgramTrackedFact.ActualCardUseHistory | ProgramTrackedFact.ActualPhaseEnd |
-          ProgramTrackedFact.MovementTiming)) == ProgramTrackedFact.None;
+          ProgramTrackedFact.MovementTiming | ProgramTrackedFact.HandGainOccurrence)) == ProgramTrackedFact.None;
 }

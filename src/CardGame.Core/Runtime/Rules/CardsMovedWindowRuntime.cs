@@ -40,7 +40,6 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
 
     internal CardsMovedTriggerWindowFrame? CreateWindow(CardMovementBatchContext batch, long? resumeProgramFrameId = null)
     {
-        _pipeline.PrepareLingkongGainBatch(batch);
         var candidates = CollectCardsMovedProgramCandidates(batch).Concat(CollectDiscardPileReceivedCandidates(batch)).Concat(_pipeline.CollectFirstDomainCandidates(batch)).ToArray();
         if (candidates.Length == 0 && !_pipeline.HasWenhePoisonDepartures(batch))
             return null;
