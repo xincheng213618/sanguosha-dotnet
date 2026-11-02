@@ -186,16 +186,42 @@ internal static class ProgramExpressions
         {
             Arity(2, 2);
             if (args[0].ValueKind != JsonValueKind.String || args[0].GetString() is not ("window" or "now") ||
-                args[1].ValueKind != JsonValueKind.String || args[1].GetString() is not ("latest" or "observations"))
-                Fail(path, "cardUses requires window or now, and latest or observations");
+                args[1].ValueKind != JsonValueKind.String || args[1].GetString() is not ("latest" or "observations" or "confirmations"))
+                Fail(path, "cardUses requires window or now, and latest, observations or confirmations");
             return new(op, ProgramExpressionType.FactSet, [], literal: args[0].GetString() == "now" ? 1 : 0, name: args[1].GetString());
         }
-        if (op is "useActor" or "useDeclarer" or "useTargets" or "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse")
+        if (op is "useActor" or "useDeclarer" or "useTargets" or "useConfirmedTargets" or "usePrimaryTargets" or "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse")
         {
             Arity(1, 1);
-            var type = op == "useTargets" ? ProgramExpressionType.ParticipantSet :
+            var type = op is "useTargets" or "useConfirmedTargets" or "usePrimaryTargets" ? ProgramExpressionType.ParticipantSet :
                 op is "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse" ? ProgramExpressionType.Bool : ProgramExpressionType.Participant;
             return new(op, type, [Arg(0, ProgramExpressionType.Fact)]);
+        }
+        if (op == "first")
+        {
+            Arity(1, 1);
+            return new(op, ProgramExpressionType.Fact, [Arg(0, ProgramExpressionType.FactSet)]);
+        }
+        if (op == "sameUse")
+        {
+            Arity(2, 2);
+            return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Fact));
+        }
+        if (op == "useKindIs")
+        {
+            Arity(2, 2);
+            if (args[1].ValueKind != JsonValueKind.Array) Fail(path, "useKindIs requires an array of card kinds");
+            var kinds = args[1].EnumerateArray().Select((kind, index) =>
+                ParseFactEnum<CardKind>(kind, $"{path}[2][{index}]")).ToArray();
+            if (kinds.Distinct().Count() != kinds.Length) Fail(path, "useKindIs contains duplicate card kinds");
+            return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.Fact),
+                .. kinds.Select(kind => new ProgramExpression("int", ProgramExpressionType.Int, [], literal: (int)kind))]);
+        }
+        if (op == "usePhaseIs")
+        {
+            Arity(2, 2);
+            return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.Fact)],
+                literal: (int)ParseFactEnum<TurnPhase>(args[1], path + "[2]"));
         }
         if (op == "atOrBefore")
         {
@@ -263,12 +289,24 @@ internal static class ProgramExpressions
             case "contains":
                 return EvaluateParticipantSet(e.Args[0], world, it, use) is { } members &&
                     EvaluateParticipant(e.Args[1], world, it, use) is { } member ? members.Contains(member) : null;
+            case "sameUse":
+                if (EvaluateFact(e.Args[0], world, it, use) is not { } first ||
+                    EvaluateFact(e.Args[1], world, it, use) is not { } second) return null;
+                if (first.NativeUseId is { } firstNative && second.NativeUseId is { } secondNative)
+                    return firstNative == secondNative;
+                return first.NativeUseId is null && second.NativeUseId is null &&
+                    first.ActionId is { } firstAction && second.ActionId is { } secondAction ? firstAction == secondAction : null;
+            case "useKindIs":
+                return EvaluateFact(e.Args[0], world, it, use)?.DeclaredKind is { } kind
+                    ? ProgramCardKindMatch.Contains(e.Args.Skip(1).Select(arg => (CardKind)arg.Literal).ToArray(), kind) : null;
+            case "usePhaseIs":
+                return EvaluateFact(e.Args[0], world, it, use)?.Phase is { } phase ? (int)phase == e.Literal : null;
             case "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse":
-                return EvaluateFact(e.Args[0], world, use) is { } fact
+                return EvaluateFact(e.Args[0], world, it, use) is { } fact
                     ? e.Op switch { "useEstablished" => fact.Established, "useDeclared" => fact.NativeUseId.HasValue,
                         "useIsSelfNativeResponse" => fact.IsSelfNativeResponseUse, _ => fact.Type == CardActionType.Response } : null;
             case "atOrBefore":
-                return EvaluateFact(e.Args[0], world, use) is { } before && EvaluateFact(e.Args[1], world, use) is { } after
+                return EvaluateFact(e.Args[0], world, it, use) is { } before && EvaluateFact(e.Args[1], world, it, use) is { } after
                     ? before.ActionId is { } beforeAction && after.ActionId is { } afterAction
                         ? beforeAction <= afterAction : before.DeclarationCursor <= after.DeclarationCursor : null;
             case "all" or "any":
@@ -352,7 +390,9 @@ internal static class ProgramExpressions
     {
         switch (e.Op)
         {
-            case "useTargets": return EvaluateFact(e.Args[0], world, use)?.Targets;
+            case "useTargets": return EvaluateFact(e.Args[0], world, it, use)?.Targets;
+            case "useConfirmedTargets": return EvaluateFact(e.Args[0], world, it, use)?.ConfirmedTargets;
+            case "usePrimaryTargets": return EvaluateFact(e.Args[0], world, it, use)?.PrimaryTargets;
             case "targets": return EvaluateFactSet(e.Args[0], world, it, use) is { } facts
                 ? Array.AsReadOnly(facts.SelectMany(fact => fact.Targets).Distinct().ToArray()) : null;
             case "filter":
@@ -392,13 +432,23 @@ internal static class ProgramExpressions
         ? EvaluateFactSet(e.Args[0], world, it, use)?.Select(fact => EvaluateBool(e.Args[1], world, it, fact))
         : EvaluateParticipantSet(e.Args[0], world, it, use)?.Select(seat => EvaluateBool(e.Args[1], world, seat, use));
 
-    private static CardUseHistoryFact? EvaluateFact(ProgramExpression e, IProgramExpressionWorld world, CardUseHistoryFact? use) =>
-        e.Name == FactIterator ? use : world.CurrentUse();
+    private static CardUseHistoryFact? EvaluateFact(ProgramExpression e, IProgramExpressionWorld world,
+        int? it, CardUseHistoryFact? use) => e.Op == "first"
+        ? EvaluateFactSet(e.Args[0], world, it, use)?.FirstOrDefault()
+        : e.Name == FactIterator ? use : world.CurrentUse();
 
     private static int? EvaluateParticipant(ProgramExpression e, IProgramExpressionWorld world, int? it, CardUseHistoryFact? use) =>
-        e.Op is "useActor" or "useDeclarer" ? EvaluateFact(e.Args[0], world, use) is { } fact
+        e.Op is "useActor" or "useDeclarer" ? EvaluateFact(e.Args[0], world, it, use) is { } fact
             ? e.Op == "useActor" ? fact.ActorSeat : fact.DeclarerSeat : null :
         e.Name == Iterator ? it : world.Participant(e.Name!);
+
+    private static T ParseFactEnum<T>(JsonElement node, string path) where T : struct, Enum
+    {
+        if (node.ValueKind == JsonValueKind.String && Enum.TryParse<T>(node.GetString(), true, out var value) &&
+            Enum.GetName(value) is { } name && node.GetString() == char.ToLowerInvariant(name[0]) + name[1..])
+            return value;
+        throw Failure(path, $"must be a supported camelCase {typeof(T).Name}");
+    }
 
     private static string Camel(ProgramExpressionType type) => type switch
     {

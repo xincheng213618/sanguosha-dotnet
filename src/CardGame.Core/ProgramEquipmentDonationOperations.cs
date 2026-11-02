@@ -19,10 +19,6 @@ public sealed record EquipmentDonationPaidEvent(long ProgramFrameId, CardConvers
 public sealed record EquipmentDonationBenefitIssuedEvent(long ProgramFrameId, CardConversionSource Source,
     int RecipientSeat, string Benefit, int ActualDeliveredCount, int TargetSeat, int Ordinal) : IGameEvent;
 
-// One scalar per real target. No accepted action is invented for legacy virtual use.
-public sealed record ActualTurnForeignUseTargetEvent(int TurnNumber, int TurnOwnerSeat, long CardUseFrameId,
-    long? CardActionId, int ActorSeat, int ProviderSeat, CardKind EffectiveKind, int TargetSeat,
-    long? LegacyProducerProgramId) : IGameEvent;
 public sealed record ActualEndedTurnEquipmentContext(int TurnNumber, int TurnOwnerSeat,
     bool DamagedAnother, bool UsedOnAnother, int MaximumDistinctOptions);
 public enum ActualEndedTurnEquipmentStage { Offering, Moving, Complete }
@@ -67,7 +63,16 @@ internal sealed class ChooseEquipmentOrDrawAfterOtherActualTurnDescriptor : Prog
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards,
         static (_, c) => c.Draw(new SkillProgramEffect(SkillProgramEffectOp.Draw, SkillProgramEffectTarget.Owner, 1,
             new(SkillProgramConditionKind.Always, 0, []))));
-    public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
+    public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
+    {
+        r.AllowOnly("op", "target", "condition", "targetSetExpr");
+        if (!r.Has("targetSetExpr"))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: equipment options require targetSetExpr.");
+        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(r), 0, r.Condition())
+            { TargetSetExpression = r.ParticipantSetExpression("targetSetExpr") };
+        RequireAlways(effect, r.Path);
+        return effect;
+    }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) =>
         [new RequireTriggerWindow(SkillProgramTriggerWindow.AfterTurnEnded)];
 }

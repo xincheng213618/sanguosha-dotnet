@@ -17,9 +17,15 @@ internal static partial class PhaseStartCardControlChecks
         var card = SouyingPlay(g, CardKind.IronChain, [1]); Play(g);
         var useId = E<CardUseDeclaredEvent>(g).Single(e => e.CardId == card).ResolutionId;
         var latest = History(g).FindNativeUse(useId)!; var turn = g.State.TurnNumber;
+        var cancelledPoint = new CardUseHistoryPoint(turn, 0, History(g).CardUseHistoryCursor, useId);
+        var confirmation = History(g).ReadCardUseFacts(cancelledPoint, CardUseHistoryView.Confirmations).Single(f => f.NativeUseId == useId);
         Need(E<NativeCardUseHistoryRecordedEvent>(g).Any(e => e.Snapshot.NativeUseId == useId && e.Snapshot.DesignatedTargets.SequenceEqual([1])) &&
-            latest.DesignatedTargets.Count == 0 && new CardUseHistoryTestWorld(History(g), new(turn, 0, History(g).CardUseHistoryCursor)).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == false,
+            latest.DesignatedTargets.Count == 0 && confirmation.ConfirmedTargets!.SequenceEqual([1]) &&
+            new CardUseHistoryTestWorld(History(g), cancelledPoint).Bool(CardUseHistoryTestWorld.OtherDeclaredTarget) == false,
             "A real native card first targets another player, then cancels its targets; end qualification reads its latest version instead of an ever union.");
+        g = Cold(g, registry);
+        Need(History(g).ReadCardUseFacts(cancelledPoint, CardUseHistoryView.Confirmations).Single(f => f.NativeUseId == useId).ConfirmedTargets!.SequenceEqual([1]) &&
+            confirmation.ConfirmedTargets!.SequenceEqual([1]), "Actual confirmation remains immutable after native cancellation and cold recovery.");
         End(g);
         if (lateUse)
         {
@@ -89,16 +95,19 @@ internal static partial class PhaseStartCardControlChecks
     private static ShanheStartingCard[] QietingStartingHand() =>
         [new(CardKind.IronChain, Suit.Club, 7), new(CardKind.Dodge, Suit.Heart, 8), new(CardKind.Peach, Suit.Spade, 9),
             new(CardKind.Alcohol, Suit.Diamond, 10), new(CardKind.IronChain, Suit.Spade, 11), new(CardKind.Peach, Suit.Diamond, 12), new(CardKind.Dodge, Suit.Club, 13)];
-    private static void RegisterQietingFixture(IContentRegistryBuilder builder)
+    private static void RegisterQietingFixture(IContentRegistryBuilder builder, string scenario)
     {
-        foreach (var (bundle, id) in new[] { ("ol-cai-fu-ren", "ol:qieting"), ("boundary-cai-fu-ren-mobile", "boundary:qieting-mobile") })
+        var definitions = scenario == "qieting-confirmed-current"
+            ? new[] { ("boundary-cai-fu-ren", "boundary:qieting-current") }
+            : new[] { ("ol-cai-fu-ren", "ol:qieting"), ("boundary-cai-fu-ren-mobile", "boundary:qieting-mobile") };
+        foreach (var (bundle, id) in definitions)
         {
             var actual = CharacterFixtureContent.EmbeddedProgramBundle(bundle);
             builder.AddSkill(new(id, actual.Presentations[id].Name, actual.Presentations[id].Description)
                 { Program = actual.Programs[id], ProgramPresentation = actual.Presentations[id] });
         }
         builder.AddGeneral(new(QietingObserver, "真实窃听观察者", "", "fixture:directed-no-draw", "qun", 20,
-            ["ol:qieting", "boundary:qieting-mobile"]));
+            definitions.Select(item => item.Item2).ToArray()));
     }
     private static void ConfigureQietingHistoryFixture(JsonNode rules, string scenario, List<string> skills)
     {
@@ -111,7 +120,7 @@ internal static partial class PhaseStartCardControlChecks
         [{"id":"late-end-slash","window":"afterTurnEnded","subject":"owner","priority":100,"optional":false,"usageScope":"game","usageLimit":1,"effects":[
           {"op":"selectTarget","target":"owner","targetKind":"otherLiving"},{"op":"useVirtualSlash","target":"selectedTarget"}]}]
         """);
-        if (scenario == "qieting-reward") rules["skills"]![1]!["triggers"] = new JsonArray();
+        if (scenario is "qieting-reward" or "qieting-confirmed-current") rules["skills"]![1]!["triggers"] = new JsonArray();
         rules["skills"]!.AsArray().Add(JsonNode.Parse("""
         {"id":"fixture:phase-control-watch","revision":1,"triggers":[{"id":"qieting-native-live","window":"afterDamageApplied","subject":"any","damageOccurrence":"perDamage","condition":{"kind":"damageSourceIsOwner"},"optional":false,"usageScope":"game","usageLimit":1,
           "effects":[{"op":"chooseOption","target":"owner","resultBind":"qieting-live","options":[{"id":"continue"}]}]}]}

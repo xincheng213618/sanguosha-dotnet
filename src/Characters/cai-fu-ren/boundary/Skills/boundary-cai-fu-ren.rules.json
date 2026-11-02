@@ -7,6 +7,8 @@
     { "id": "boundary:qieting-current", "revision": 1, "minimumRulesVersion": 195,
       "triggers": [{ "id": "other-actual-turn-equipment-options", "window": "afterTurnEnded", "subject": "owner",
         "turnOwnerScope": "otherLiving", "optional": true,
-        "effects": [{ "op": "chooseEquipmentOrDrawAfterOtherActualTurn", "target": "owner" }] }] }
+        "effects": [{ "op": "chooseEquipmentOrDrawAfterOtherActualTurn", "target": "owner",
+          "targetSetExpr": ["targets", ["filter", ["cardUses", "window", "confirmations"],
+            ["same", ["useActor", "use"], "turnOwner"]]] }] }] }
   ]
 }

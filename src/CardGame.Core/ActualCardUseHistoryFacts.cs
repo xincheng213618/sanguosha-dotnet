@@ -33,14 +33,18 @@ internal interface IActualCardUseHistoryCapture : IProgramRuntimeOperations
 
 internal static class ActualCardUseTargets
 {
-    internal static int[] PrincipalTargets(CardActionContext action)
+    internal static int[] PrincipalTargets(CardActionContext action) => PrincipalTargets(action.EffectiveKind,
+        action.ActorSeat, action.TargetSeats, action.EffectiveDesignatedTargetSeats);
+
+    internal static int[] PrincipalTargets(CardKind kind, int actorSeat,
+        IReadOnlyList<int> targets, IReadOnlyList<int> designatedTargets)
     {
-        if (action.EffectiveKind == CardKind.BorrowedSword)
-            return action.TargetSeats.Count == 0 || action.TargetSeats.Count % 2 != 0
-                ? [] : action.TargetSeats.Where((_, index) => index % 2 == 0).Distinct().ToArray();
-        if (action.EffectiveKind == CardKind.DrawTwo && action.EffectiveDesignatedTargetSeats.Count == 0 &&
-            action.TargetSeats.Count == 1 && action.TargetSeats[0] == action.ActorSeat)
-            return [action.ActorSeat];
-        return action.EffectiveDesignatedTargetSeats.Distinct().ToArray();
+        if (kind == CardKind.BorrowedSword)
+            return targets.Count == 0 || targets.Count % 2 != 0
+                ? [] : targets.Where((_, index) => index % 2 == 0).Distinct().ToArray();
+        if (kind == CardKind.DrawTwo && designatedTargets.Count == 0 &&
+            targets.Count == 1 && targets[0] == actorSeat)
+            return [actorSeat];
+        return designatedTargets.Distinct().ToArray();
     }
 }

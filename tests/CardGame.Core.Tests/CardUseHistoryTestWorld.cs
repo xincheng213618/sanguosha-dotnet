@@ -14,7 +14,7 @@ internal sealed class CardUseHistoryTestWorld(IActualCardUseHistoryQueries histo
     public int? Stat(string stat, int seat) => null;
     public bool? Flag(string flag, int seat) => null;
     public IReadOnlyList<CardUseHistoryFact>? CardUses(string moment, string view) =>
-        history.ReadCardUseFacts(point, view == "latest" ? CardUseHistoryView.Latest : CardUseHistoryView.Observations);
+        history.ReadCardUseFacts(point, Enum.Parse<CardUseHistoryView>(view, ignoreCase: true));
     public CardUseHistoryFact? CurrentUse() => CardUses("window", "latest")!.FirstOrDefault(f =>
         point.CurrentActionId is { } action ? f.ActionId == action : point.CurrentNativeUseId is { } id && f.NativeUseId == id);
 

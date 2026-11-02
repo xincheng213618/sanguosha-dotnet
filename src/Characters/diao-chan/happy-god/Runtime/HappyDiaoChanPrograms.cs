@@ -63,12 +63,12 @@ internal static class HappyDiaoChanComposition
     {
         if(!p.Triggers.SelectMany(t=>t.Effects).Concat(p.Activations.SelectMany(a=>a.Effects)).Any(e=>e.Op is SkillProgramEffectOp.ResolveHappyDiaoChanMeihun or SkillProgramEffectOp.ResolveHappyDiaoChanHuoxin))return;
         var valid=p.Id==Meihun?p.Activations.Count==0&&p.Triggers is[
-            {Id:"owner-ended",Window:SkillProgramTriggerWindow.AfterTurnEnded,Subject:SkillProgramTriggerSubject.Owner,TurnOwnerScope:SkillProgramTurnOwnerScope.Own,Optional:true,Effects:[{Op:SkillProgramEffectOp.ResolveHappyDiaoChanMeihun}]},
-            {Id:"first-slash-target",Window:SkillProgramTriggerWindow.CardUseTargetsFinalized,OwnerRelation:SkillProgramCardActionOwnerRelation.Target,Optional:true,Effects:[{Op:SkillProgramEffectOp.ResolveHappyDiaoChanMeihun}]}]&&
+            {Id:"owner-ended",Window:SkillProgramTriggerWindow.AfterTurnEnded,Subject:SkillProgramTriggerSubject.Owner,TurnOwnerScope:SkillProgramTurnOwnerScope.Own,Optional:true,UsageScope:null,UsageLimit:null,Condition.Kind:SkillProgramTriggerConditionKind.Always,Effects:[{Op:SkillProgramEffectOp.ResolveHappyDiaoChanMeihun}]},
+            {Id:"first-slash-target",Window:SkillProgramTriggerWindow.CardUseTargetsFinalized,OwnerRelation:SkillProgramCardActionOwnerRelation.Target,Optional:true,UsageScope:SkillUsageScope.Event,UsageLimit:1,Condition.Kind:SkillProgramTriggerConditionKind.Expression,Effects:[{Op:SkillProgramEffectOp.ResolveHappyDiaoChanMeihun}]}]&&
                 p.Triggers[1].CardKinds.Order().SequenceEqual(new[]{CardKind.Slash,CardKind.FireSlash,CardKind.ThunderSlash}.Order()):
             p.Id==Huoxin&&p.Triggers.Count==0&&p.Activations is[{Id:"charm-contest",MinCards:0,MaxCards:0,MinTargets:0,MaxTargets:0,TargetKind:SkillProgramTargetKind.AnyLiving,UsesPerTurn:null,UsesPerPhase:1,UsesPerGame:null,Effects:[{Op:SkillProgramEffectOp.ResolveHappyDiaoChanHuoxin}]}];
         if(!valid||p.ViewAs.Count!=0||p.CardPolicies.Count!=0||p.Modifiers.Count!=0||p.BooleanStates.Count!=0||p.CardIdentities.Count!=0||p.Contributions.Count!=0||
-            p.Triggers.Any(t=>t.UsageLimit is not null||t.MarkerCost is not null||t.Condition.Kind!=SkillProgramTriggerConditionKind.Always)||
+            p.Triggers.Any(t=>t.MarkerCost is not null)||
             p.Triggers.SelectMany(t=>t.Effects).Concat(p.Activations.SelectMany(a=>a.Effects)).Any(e=>e.Target!=SkillProgramEffectTarget.Owner||e.Condition.Kind!=SkillProgramConditionKind.Always))
             throw new InvalidOperationException(path+": Happy Diao Chan requires her actual owner-ending/first Slash opportunity and one paid two-participant native contest.");
     }

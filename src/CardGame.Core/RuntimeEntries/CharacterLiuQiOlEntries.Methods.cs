@@ -6,7 +6,6 @@ internal sealed partial class CharacterLiuQiOlEntries
     internal bool CanContinueLiuQi(ProgramSkillFrame f) => _resolve().CanContinueLiuQi(f);
     internal bool CanOfferLiuQi(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().CanOfferLiuQi(candidate, trigger, context);
     internal void FinishLiuQi(ProgramSkillFrame f) => _resolve().FinishLiuQi(f);
-    internal bool HasUntargetedUnskippedLiuQiPlay(int owner) => _resolve().HasUntargetedUnskippedLiuQiPlay(owner);
     internal bool IsWenjiNullificationResponseForbidden(NullificationWindowFrame window, int responderSeat) => _resolve().IsWenjiNullificationResponseForbidden(window, responderSeat);
     internal bool IsWenjiResponseForbidden(CardActionContext originalUse, int responderSeat) => _resolve().IsWenjiResponseForbidden(originalUse, responderSeat);
     internal bool IsWenjiResponseForbidden2(long useId, int responderSeat) => _resolve().IsWenjiResponseForbidden(useId, responderSeat);

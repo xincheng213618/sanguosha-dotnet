@@ -99,7 +99,8 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     {
         var point = moment == "window" ? WindowPoint : currentHistoryPoint?.Invoke();
         return point is null || history is null ? null : ReadHistory(point,
-            view == "observations" ? CardUseHistoryView.Observations : CardUseHistoryView.Latest);
+            view == "observations" ? CardUseHistoryView.Observations :
+            view == "confirmations" ? CardUseHistoryView.Confirmations : CardUseHistoryView.Latest);
     }
     private readonly Dictionary<CardUseHistoryPoint, CardUseHistoryFact?> _currentUses = [];
     public CardUseHistoryFact? CurrentUse()

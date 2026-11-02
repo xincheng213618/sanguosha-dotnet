@@ -21,7 +21,7 @@ public sealed record ActualCardUseHistoryEntry(CardActionContext Action, int Act
 public sealed record CardUseHistoryPoint(int ActualTurn, int TurnOwnerSeat, long Cursor,
     long? CurrentNativeUseId = null, long? CurrentActionId = null);
 
-internal enum CardUseHistoryView { Latest, Observations }
+internal enum CardUseHistoryView { Latest, Observations, Confirmations }
 
 /// <summary>Rule-neutral facts. Accepted actor and current actor are separate roles.</summary>
 public sealed record CardUseHistoryFact(long? NativeUseId, long? ActionId, int ActorSeat,
@@ -31,6 +31,16 @@ public sealed record CardUseHistoryFact(long? NativeUseId, long? ActionId, int A
     private readonly IReadOnlyList<int> _targets = Array.AsReadOnly(Targets.ToArray());
     public IReadOnlyList<int> Targets
     { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
+    public CardKind? DeclaredKind { get; init; }
+    public CardKind? EffectiveKind { get; init; }
+    public TurnPhase? Phase { get; init; }
+    public long? ConfirmationCursor { get; init; }
+    private readonly IReadOnlyList<int>? _confirmedTargets;
+    public IReadOnlyList<int>? ConfirmedTargets
+    { get => _confirmedTargets; init => _confirmedTargets = value is null ? null : Array.AsReadOnly(value.ToArray()); }
+    private readonly IReadOnlyList<int>? _primaryTargets;
+    public IReadOnlyList<int>? PrimaryTargets
+    { get => _primaryTargets; init => _primaryTargets = value is null ? null : Array.AsReadOnly(value.ToArray()); }
 }
 
 public sealed partial record ProgramSkillWindowContext
@@ -59,7 +69,15 @@ public sealed record NativeCardUseHistorySnapshot(long NativeUseId, int ActualTu
     private readonly IReadOnlyList<int> _designatedTargets = Array.AsReadOnly(DesignatedTargets.ToArray());
     public IReadOnlyList<int> DesignatedTargets
     { get => _designatedTargets; init => _designatedTargets = Array.AsReadOnly(value.ToArray()); }
+    public CardKind DeclaredKind { get; init; } = EffectiveKind;
+}
+
+public sealed record CardUseConfirmation(IReadOnlyList<int> Targets, TurnPhase Phase, int PlayPhaseInstanceId)
+{
+    private readonly IReadOnlyList<int> _targets = Array.AsReadOnly(Targets.ToArray());
+    public IReadOnlyList<int> Targets
+    { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
 }
 
 public sealed record NativeCardUseHistoryRecordedEvent(NativeCardUseHistorySnapshot Snapshot,
-    int? ActualTurn = null, int? TurnOwnerSeat = null) : IGameEvent;
+    int? ActualTurn = null, int? TurnOwnerSeat = null, CardUseConfirmation? Confirmation = null) : IGameEvent;

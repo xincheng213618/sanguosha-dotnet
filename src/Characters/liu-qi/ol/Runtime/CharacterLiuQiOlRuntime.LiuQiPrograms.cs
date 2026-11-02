@@ -9,7 +9,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
     internal bool CanOfferLiuQi(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.DrawForUnskippedUntargetedPlay))
-            return HasUntargetedUnskippedLiuQiPlay(candidate.OwnerSeat);
+            return HasUnskippedLiuQiPlay(candidate.OwnerSeat);
         if (ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.ReceiveWenjiGiftAndArmTurnName))
             return _coreDragonBoatGeneralsOperations.WenjiEligibleGiftRecipients(candidate.OwnerSeat, candidate.SkillId).Any();
         return true;
@@ -28,8 +28,6 @@ internal sealed partial class CharacterLiuQiOlRuntime
             return SkillProgramStepOutcome.AwaitChoice;
         }
 
-        if (!HasUntargetedUnskippedLiuQiPlay(f.OwnerSeat))
-            throw new InvalidOperationException("Tunjiang lost its actual unskipped untargeted Play qualification.");
         r = r with
         {
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,

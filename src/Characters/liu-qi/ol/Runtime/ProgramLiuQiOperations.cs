@@ -1,10 +1,8 @@
 namespace CardGame.Core;
 public enum LiuQiStage { ChooseRecipient, ChooseGift, GiftChildren, DrawChildren }
 public sealed record LiuQiPlayEntry(int ActualTurn,int OwnerSeat,int PhaseInstance,bool Skipped);
-public sealed record LiuQiForeignTargetUse(int ActualTurn,int OwnerSeat,int PhaseInstance,long CardUseFrameId,long? ActionId,int TargetSeat);
 public sealed record LiuQiReceipt(CardConversionSource Source,string GameplayHash,int InstructionIndex,int ActualTurn,long WindowId,LiuQiStage Stage,int? RecipientSeat=null,int? CardId=null,CardLocation? From=null,CardKind? Name=null,long Before=0,long After=0,int RequestedDraw=0,int ActualDraw=0);
 public sealed record LiuQiPlayEnteredEvent(LiuQiPlayEntry Entry):IGameEvent;
-public sealed record LiuQiForeignUseRecordedEvent(LiuQiForeignTargetUse Use):IGameEvent;
 internal interface ILiuQiProgramHost {SkillProgramStepOutcome BeginLiuQi(ProgramSkillFrame frame,SkillProgramEffect effect);}
 internal abstract class LiuQiDescriptor:ProgramOperationDescriptorBase
 {
@@ -44,8 +42,6 @@ public sealed partial class CharacterState
  internal IReadOnlyList<WenjiTurnNameGrant>? WenjiTurnNameGrants {get=>_wenjiTurnNameGrants;set=>_wenjiTurnNameGrants=value is null?null:Array.AsReadOnly(value.ToArray());}
  private IReadOnlyList<LiuQiPlayEntry>? _liuQiPlayEntries;
  internal IReadOnlyList<LiuQiPlayEntry>? LiuQiPlayEntries {get=>_liuQiPlayEntries;set=>_liuQiPlayEntries=value is null?null:Array.AsReadOnly(value.ToArray());}
- private IReadOnlyList<LiuQiForeignTargetUse>? _liuQiForeignTargetUses;
- internal IReadOnlyList<LiuQiForeignTargetUse>? LiuQiForeignTargetUses {get=>_liuQiForeignTargetUses;set=>_liuQiForeignTargetUses=value is null?null:Array.AsReadOnly(value.ToArray());}
 }
 public sealed partial record NullificationWindowFrame
 {

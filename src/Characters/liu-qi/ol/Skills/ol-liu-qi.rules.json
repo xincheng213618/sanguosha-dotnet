@@ -29,6 +29,13 @@
           "subject": "owner",
           "turnOwnerScope": "own",
           "optional": true,
+          "evaluateConditionAtResolution": true,
+          "condition": {
+            "kind": "expression",
+            "expr": ["not", ["any", ["cardUses", "now", "confirmations"],
+              ["and", ["same", ["useActor", "use"], "owner"], ["usePhaseIs", "use", "play"],
+                ["any", ["usePrimaryTargets", "use"], ["not", ["same", "it", "owner"]]]]]]
+          },
           "effects": [
             {
               "op": "drawForUnskippedUntargetedPlay",

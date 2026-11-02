@@ -21,19 +21,6 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
     internal Card HappyDcCard(PromptChoice c, int seat) => _cardZonesOperations._cardZones.CardsAt(new(Enum.Parse<CardZoneKind>(c.Parameters["source-zone"]), seat))[int.Parse(c.Parameters["slot-index"], CultureInfo.InvariantCulture)];
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 42220, SkillProgramEffectOp.ResolveHappyDiaoChanHuoxin)]
     internal bool CanStartHappyHuoxin(CharacterState actor) => _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Any(card => HappyDcPairs(card.Id).Any() && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(actor.Seat, card, _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(actor, card), OwnedCardMoveIntent.Discard));
-    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 42220)]
-    internal bool CanOfferHappyMeihun(ProgramTriggerLegalityContext gate) => gate.SkillId != HappyDiaoChanComposition.Meihun || gate.Trigger.Id != "first-slash-target" || gate.WindowContext is { } context && HappyDcFirstSlash(gate.OwnerSeat, context);
-    internal bool HappyDcFirstSlash(int owner, ProgramSkillWindowContext context)
-    {
-        if (context.CardUse is not { } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.EffectiveKind))
-            return false;
-        var facts = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var start = Array.FindLastIndex(facts, e => e is TurnStartedEvent);
-        var since = facts.Skip(start + 1).ToArray();
-        var first = since.OfType<TargetsConfirmedEvent>().FirstOrDefault(e => e.TargetSeats.Contains(owner) && since.OfType<CardUseDeclaredEvent>().Any(d => d.ResolutionId == e.ResolutionId && CoreNativeCardClassificationsRuntime.IsSlashCard(d.CardKind)));
-        return first?.ResolutionId == use.ParentCardUseFrameId && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyDiaoChanStartedEvent>().Any(e => e.Operation == SkillProgramEffectOp.ResolveHappyDiaoChanMeihun && e.Source.OwnerSeat == owner && e.Source.BindingId == "first-slash-target" && e.ParentId == context.ParentFrameId);
-    }
-
     internal SkillProgramStepOutcome BeginHappyDc(ProgramSkillFrame supplied, SkillProgramEffectOp operation)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

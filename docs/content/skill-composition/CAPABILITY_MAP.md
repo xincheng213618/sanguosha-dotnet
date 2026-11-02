@@ -799,14 +799,15 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 | 事实时点 | 保留的含义 |
 |---|---|
 | accepted | 冻结实际回合、阶段、出牌阶段实例及首次接受归属，按实际 ActionId 去重。 |
-| 原生声明 | 保存真实 native Use 身份、使用者和指定目标；允许没有 `CardActionContext`，不伪造 ActionId。 |
+| 原生声明 | 保存真实 native Use 身份、声明牌种、使用者和指定目标；允许没有 `CardActionContext`，不伪造 ActionId。 |
+| TargetsConfirmed | 每次真实原生目标确认都保留原事件的完整目标、实际阶段及确认顺序；不以目标是否改变决定是否记录，也不等同 finalized。 |
 | 首次 finalized | 保存原生 Use 及当时目标，并留下该窗口的历史截点；接受时尚未成立的候选目标不能冒充已指定。 |
 | 角色／目标更新 | `UpdateProgramRoleCardUse` 发行更新事实，更新未来读取的当前目标，不伪装成完成，不覆盖首次 finalized。 |
 | completed | 在真实完成窗口保留当时 Action 与目标；完成顺序与接受顺序分别存在。 |
 
 `AcceptedActorSeat`／事实的 declarer 保留首次接受归属，当前 actor 是采样时的原生使用者；材料 provider 和 responder 保持原身份，不替代使用者。换 actor 不制造另一条接受记录，也不把旧记录搬到新 actor。事实采样保留当时实际回合及其拥有者，不能偷用最初接受 scope 回答所有规则。
 
-借刀的主要目标是原完整有序 TargetSeats 中的持刀者，不把被杀者计入交集；摸二只为原生空指定、唯一自己目标的精确形状补上自己。其他牌使用已指定目标。`ActualCardUseTargets.PrincipalTargets` 是主要目标交集的共同规范化；完整 `EffectiveDesignatedTargetSeats` 仍是另一份真实规则维度，不能被这个集合替代。
+借刀的主要目标是原完整有序 TargetSeats 中的持刀者，不把被杀者计入交集；摸二只为原生空指定、唯一自己目标的精确形状补上自己。其他牌使用已指定目标。`ActualCardUseTargets.PrincipalTargets` 是主要目标交集的共同规范化；完整 `EffectiveDesignatedTargetSeats` 仍是另一份真实规则维度，不能被这个集合替代。确认视图保留原始 TargetsConfirmed 目标，借刀被杀者仍在这份原始列表；Latest／Observations 的 Targets 则是当前 designated 目标。`ConfirmedTargets`、`PrimaryTargets` 和 `Phase` 保留最近一次真实确认的采样元数据，普通角色／目标更新不擦除它们。首次确认之前这些元数据未知，不能从 accepted 或当前阶段补猜。
 
 ### 表达式读取与冻结
 
@@ -816,8 +817,10 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 |---|---|
 | `cardUses(window, latest)` | 在原窗口 `CardUseHistoryPoint` 截点读取每次用牌的最新已知关系；不把随后嵌套用牌或目标更新倒灌进等待中的窗口。 |
 | `cardUses(now, observations)` | 读取当前实际回合 scope 内各次真实采样，用 actor、响应类型及 `useEstablished` 筛选后组合曾经关系。 |
-| 身份与目标 | `useActor`、`useDeclarer`、`useTargets` 分开回答当前使用者、首次接受者和完整指定目标。`useDeclared` 区分仅接受与真实原生声明。 |
-| 时序与集合组合 | `atOrBefore(use,currentUse,"accepted")` 保留接受顺序；`filter`、`targets`、`contains`、`any` 和 `count` 组合事实与角色集合，fact 的 `use` 与角色的 `it` 各自有作用域。 |
+| `cardUses(window或now, confirmations)` | 按真实确认顺序保留每次 TargetsConfirmed 的原始快照；重复确认与普通更新是不同事实，不以 finalized 的 Established 代替。 |
+| 身份与目标 | `useActor`、`useDeclarer` 分开回答当前使用者与首次接受者；`useTargets` 按所选视图读 designated 或原始确认目标，`useConfirmedTargets`／`usePrimaryTargets` 明确读取确认元数据。`useDeclared` 区分仅接受与真实原生声明。 |
+| 牌种与阶段 | `useKindIs` 读取声明时牌种并复用共同数组匹配；`usePhaseIs` 读取确认时实际阶段，不因后来 update 改成现阶段。 |
+| 时序与集合组合 | `atOrBefore(use,currentUse,"accepted")` 保留接受顺序；`first` 取所选事实集的首项，`sameUse` 比较真实用牌身份。`filter`、`targets`、`contains`、`any` 和 `count` 组合事实与角色集合，fact 的 `use` 与角色的 `it` 各自有作用域。 |
 
 `CardUseHistoryPoint` 的 Cursor 是包含待提交事件的完整 journal 长度，不是公开 Envelope.Sequence；它还冻结实际回合、回合拥有者及可选的当前 native Use／Action 身份。窗口读取沿原 point，明确的 now 读取才取现值。目标集合结果在实际开始执行时冻结到原 receipt，子窗可以产生新历史，但不能重写已支付父帧的选择菜单。
 
@@ -833,6 +836,9 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 | 势邓艾急袭 | `targetSetExpr` 从 now/observations 筛出采样时 actor 为 owner、非响应且目标已经成立的事实，合并完整目标后排除自身。资格和 UI 读取同一表达式，Begin 冻结到 `ShiDaReceipt.History`；顺手牵羊合法性、成本和实际执行仍归原阶段。 |
 | OL 蔡夫人窃听 | JSON 在原回合末候选截点的 window/latest 中判断：没有该回合角色真实声明且指定他人的用牌。`evaluateConditionAtResolution` 保留实际结算资格时点；Action 为空的真实原生 Use 同样参与，不需要人物 frozen bool 或上下文工厂计算历史答案。 |
 | 界移动蔡夫人窃听 | 仍读取原 TurnStarted／TurnEnded 区间内实际正数 DamageApplied 的来源与他人目标；它不是用牌关系，不与 OL 条件合并，也不因共享效果而附带无用用牌历史采集。 |
+| 界蔡夫人 current 窃听 | 从共享 pre-TurnEnd 截点的 window/confirmations 合并该回合使用者的原始确认目标，冻结原选项域；借刀 victim 不能被主要目标或 designated 投影漏掉，结束之后的新用牌也不能倒灌。 |
+| OL 刘琦屯江 | 在真实资格时用 now/confirmations 判断 owner 的实际 Play 确认是否含他人主要目标，`evaluateConditionAtResolution` 保留此时点，不因缺少窗口 point 而返回未知。Play entered/skipped 资格仍由原状态回答。 |
+| happy 神貂蝉魅魂 | 在首次 finalized 的原窗口 point 上，跨所有使用者筛确认时杀族与包含 owner 的原始目标，`first` 后用 `sameUse` 与当前牌比较；原本人回合结束触发保持独立无条件，原窗口 Event 次数覆盖 owner/binding 的重复发动。 |
 
 联翩／伺盗原文“于出牌阶段使用牌连续指定”“对一名其他角色连续使用两张牌”，以及薮影“本回合……不是第一张牌”，均没有持有后才开始记录的限制。中途获得或恢复技能时，此前真实动作参与判断；当前是否能发动仍在原资格阶段回答，不因历史存在就授予发动权。已接受调用和已支付成本沿原帧续接，不回扫新历史重判资格。
 
@@ -840,16 +846,30 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 
 急袭原文“本回合成为过你牌目标的其他角色”要求 ever：接受时的候选不计；首次真实 finalized 后成立的关系不会因后来取消而抹去，之后增加目标、角色改写和完成采样继续留下当时的关系。归属使用采样时 native actor，改写前后可以各留关系，旧关系不搬家、不回删；同一 Action 跨实际回合 scope 不吞记录。旧普通优先级记账节点会在高优先取消后漏记已成立关系，这项收窄已按“成为过”修正，不复制成新观察器。补充采样读取真实 native Use 的完整 Action，不用效果窗口的单目标 slice，也不计延时判定伪动作。
 
+魅魂的首次按原生确认发生顺序、跨使用者判断：先确认后取消仍占首次，不能用最新目标或接受次序取代；后来才在 finalized 加入的目标不冒充原始确认目标。现有完整普通／火／雷杀列表通过共同匹配已包含冰杀，本次未改变牌种范围。`first` 空集或未知集返回未知，`sameUse` 优先比较双方真实 native ID，只有双方都没有 native ID 才比较真实 ActionId，单边缺身份不猜测；后续选择与续接仍归原帧。
+
 ### 退役路径、信任边界与剩余缺口
 
 苏飞 LastUse／RecordedEvent、郭汜 Uses／UseStamp／PairQualifiedEvent、活动私有历史事件、花鬘 HuaManUses／DirectionalUse 和急袭专属记录事件、指令及 pipeline hook 已退役；核心不再调用这些人物历史记录器。薮影专属 ordinal 查询及重复序号证明、急袭专属 ever 查询、窃听 UsedOnAnotherAt 与人物上下文历史布尔也由共同事实组合替代，不保第二条兼容账本。
 
-真实的薮影弃牌／取消／处理中实体领取、急袭成本／RNG／无距离多目标顺手牵羊、窃听选项／装备移动／查看手牌／摸牌及 paid／mutation／子返回继续保留原协议。条件和目标集合已移入 JSON，相关专属复合 effect 仍有 C#，尚未达到只需组合共享 JSON 节点的目标；联翩、伺盗的真实后续效果也仍须按所属能力继续拆解。
+真实的薮影弃牌／取消／处理中实体领取、急袭成本／RNG／无距离多目标顺手牵羊、窃听选项／装备移动／查看手牌／摸牌、魅魂花色声明／给牌／私看及 paid／mutation／子返回继续保留原协议。条件和目标集合已移入 JSON，相关专属复合 effect 仍有 C#，尚未达到只需组合共享 JSON 节点的目标；联翩、伺盗的真实后续效果也仍须按所属能力继续拆解。
+
+已迁移的屯江外部目标、界 current 窃听与魅魂共同确认读取，按原架构标准分别判断；不扩张为整个用牌模块或纯 JSON 技能已完成：
+
+| 标准 | 状态与剩余范围 |
+|---|---|
+| 一个概念，一个归属 | 已完成：真实确认事实、journal 索引与共同只读表达式各有唯一归属，没有人物确认账本。 |
+| 依赖方向 | 此子概念已完成：公共 capture、index、读取及 Boundary 效果 owner 不依赖人物；整个 CardActions／原生用牌模块的其他反向依赖仍待收口。 |
+| 层次分明 | 已完成：接受、声明、确认、finalized、更新、完成分别采样；确认元数据不冒充当前目标，资格与原生付款仍分层。 |
+| JSON 对应规则 | 部分完成：首次确认、Play 外部主要目标及确认目标集已用 JSON 组合；各人物专属复合 effect 和刘琦 PlayEntry 阶段资格仍在原实现。 |
+| 改动局部 | 已完成：通过共同 AST／事实字段接通确认历史消费者，没有为确认读取增加人物 registry、资格 callback 或 Core 人物写端；刘琦的阶段资格暂留原 CanOffer，Begin 不再重判此前阶段条件。 |
+| 只有一条路径 | 确认历史路径已完成：人物扫描、私有外部目标记录与 Boundary 旧关系扫描退役；真实 entered/skipped 状态不是确认历史的第二条路径，仍保留其独立含义。 |
+| 信任边界 | 已完成：原生 payload 与嵌套集合冻结、真实身份、命令、加载、内容指纹、隐私、付款、移动和原帧返回继续维护，不用假 ActionId 或刷新已接受资格。 |
 
 新增接受、更新与目标事实复用原谋司马懿的隐藏目标投影，不能泄露隐藏目标。事实与只读结果冻结嵌套集合，`CardActionContext` 冻结目标、实体与转换来源，提交投影保持覆盖。命令、加载、内容指纹、回放、隐私、真实付款及移动义务没有因删除人物自证而放宽。
 
-旧专属记账指令退役按唯一规则格式源统一处理，外部 Load／Inspector 明确拒绝旧格式，不保兼容别名；内置资源继续显式加载当前格式。规则 JSON 的实际组合变化参与内容指纹，不逐人物或指令另升版本，也不引入 gameplay epoch、checkpoint RulesVersion 或包发布。旧局无法载入／回放时，沿已有桌面规则开新局并保留源存档，不自动覆盖。
+旧专属记账指令退役按唯一规则格式源统一处理，外部 Load／Inspector 明确拒绝旧格式，不保兼容别名；内置资源继续显式加载当前格式。规则 JSON 的实际组合变化参与内容指纹；已迁移复合效果必需的 `targetSetExpr` 和旧专属语法退役并入同一尚未发布的格式清理，不逐人物、指令或字段另升版本，也不引入 gameplay epoch、checkpoint RulesVersion 或包发布。旧局无法载入／回放时，沿已有桌面规则开新局并保留源存档，不自动覆盖。
 
-剩余历史维度仍需按实际规则补齐：OL 刘琦屯江读取初始确认目标，happy 神貂蝉魅魂读取跨使用者的首次杀目标，不能强套 latest、ever 或同一 actor 的连续使用。应补缺失的共同事实／截点并复用表达式组合，不新增人物历史谓词。CardActions、原生用牌和合法动作模块仍有其他反向依赖；这一历史概念的数据路径收口不代表整个使用／响应模块已完成依赖验收。
+OL 刘琦的私有外部目标记录与魅魂首次目标扫描已由共同 confirmations 和表达式组合替代，界 current 窃听也不再用另一份初始目标关系扫描。刘琦 PlayEntry 的真实进入／跳过资格、问计无懈关系及各专属复合 effect 仍未收口；不能据共同确认读取已接通宣称这些人物 Runtime 已全部退役。CardActions、原生用牌和合法动作模块仍有其他反向依赖，整体使用／响应尚未完成依赖验收。
 
 阶段次数上限尚缺按存活身份人数计算的共享数量读取与通用动态上限组合；OL 定叛的 `PhaseLimit` 仍在人物 C#，不能用固定一次取代“存活反贼数”。该规则不属于历史读取，不以新增定叛专属操作绕过。

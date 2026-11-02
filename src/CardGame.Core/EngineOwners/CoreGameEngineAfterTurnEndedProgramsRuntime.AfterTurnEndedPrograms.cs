@@ -13,16 +13,21 @@ internal sealed partial class CoreGameEngineAfterTurnEndedProgramsRuntime
         return candidate;
     }
 
-    internal ProgramSkillWindowContext CreateAfterTurnEndedContext(DeferredTurnEndFrame parent, ProgramTriggerCandidate candidate) =>
-        _characterCaoYuOlOperations.CreateXiangxuAfterTurnEndedContext(parent, candidate,
+    internal ProgramSkillWindowContext CreateAfterTurnEndedContext(DeferredTurnEndFrame parent, ProgramTriggerCandidate candidate)
+    {
+        var context = _characterCaoYuOlOperations.CreateXiangxuAfterTurnEndedContext(parent, candidate,
             new ProgramSkillWindowContext(SkillProgramTriggerWindow.AfterTurnEnded, parent.Id, candidate.OwnerSeat,
                 SourceSeat: parent.OwnerSeat, TargetSeat: parent.OwnerSeat, OccurrenceIndex: candidate.OccurrenceIndex,
                 Facts: parent.AfterTurnEnded!.Items[parent.AfterTurnEnded.ItemIndex].Facts)
             {
-                HistoryPoint = new(parent.TurnNumber, parent.OwnerSeat, _actualUseHistory.CardUseHistoryCursor),
-                ActualEndedEquipment = _coreActualEndedTurnEquipmentOperations.IsActualEndedEquipmentTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate))
-                    ? _coreActualEndedTurnEquipmentOperations.CaptureActualEndedEquipmentContext(parent) : null
+                HistoryPoint = new(parent.TurnNumber, parent.OwnerSeat, _actualUseHistory.CardUseHistoryCursor)
             });
+        return context with
+        {
+            ActualEndedEquipment = _coreActualEndedTurnEquipmentOperations.IsActualEndedEquipmentTrigger(_coreProgramLifecycleOperations.GetProgramTrigger2(candidate))
+                ? _coreActualEndedTurnEquipmentOperations.CaptureActualEndedEquipmentContext(parent, candidate, context) : null
+        };
+    }
     internal bool CanRunAfterTurnEndedCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, SkillProgramTrigger trigger)
     {
         var parent = _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().LastOrDefault();

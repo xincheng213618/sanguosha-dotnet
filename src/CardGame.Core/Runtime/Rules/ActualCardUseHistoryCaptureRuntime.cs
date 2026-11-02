@@ -23,11 +23,18 @@ internal sealed class ActualCardUseHistoryCaptureRuntime(IProgramContentQueries 
             use.Action?.EffectiveDesignatedTargetSeats ?? use.TargetSeats)));
     }
 
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 249)]
+    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 248)]
     internal void RecordNativeConfirmed(TargetsConfirmedEvent confirmed)
     {
-        if (IsRequired && frames.Find(confirmed.ResolutionId) is CardUseFrame use)
-            RecordNativeChanged(use);
+        if (!IsRequired || frames.Find(confirmed.ResolutionId) is not CardUseFrame use ||
+            history.FindNativeUse(use.Id) is not { } original)
+            return;
+        events.AdvanceFact(new NativeCardUseHistoryRecordedEvent(original with
+        {
+            ActorSeat = use.SourceSeat, EffectiveKind = use.CardKind, ActionId = use.Action?.ActionId,
+            DesignatedTargets = use.Action?.EffectiveDesignatedTargetSeats ?? use.TargetSeats
+        }, turn._turnNumber, turn._turnProgression.OwnerSeat,
+            new(confirmed.TargetSeats, turn._phase, phase._cardUseDebitPhaseInstanceId)));
     }
 
     public void RecordNativeChanged(CardUseFrame use)

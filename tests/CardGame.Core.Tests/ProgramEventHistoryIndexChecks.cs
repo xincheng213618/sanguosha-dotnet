@@ -36,6 +36,7 @@ internal static class ProgramEventHistoryIndexChecks
         ObservationsKeepNativeScopeAndFrozenSnapshots();
         NativeUseVersionsKeepEndCutoffsAndLegacyIdentity();
         LateActionAliasesPreserveEarlierNativeDeclarations();
+        ConfirmationsKeepOriginalTargetsAndFirstUseOrder();
     }
 
     private static void BoundaryQueriesKeepJournalOrderAndLiveTails()
@@ -264,6 +265,66 @@ internal static class ProgramEventHistoryIndexChecks
         Require(history.ReadCardUseFacts(new(1, 0, 2), CardUseHistoryView.Latest) is [{ NativeUseId: 10, ActionId: null }] &&
             history.ReadCardUseFacts(new(2, 1, 3), CardUseHistoryView.Latest) is [{ NativeUseId: 10, ActionId: 99 }],
             "Linking in the accepted scope leaves the former scope's historical declaration in place and yields one canonical current identity.");
+    }
+
+    private static void ConfirmationsKeepOriginalTargetsAndFirstUseOrder()
+    {
+        const string firstSlash = """["sameUse",["first",["filter",["cardUses","window","confirmations"],["and",["usePhaseIs","use","play"],["useKindIs","use",["slash","fireSlash","thunderSlash"]]]]],"currentUse"]""";
+        var history = new ProgramEventHistoryIndex([], []);
+        var targets = new[] { 1 };
+        var legacy = new NativeCardUseHistorySnapshot(10, 1, 0, 0, CardKind.ColdSlash, null, [1]);
+        history.Append(new NativeCardUseHistoryRecordedEvent(legacy, Confirmation: new(targets, TurnPhase.Play, 7)));
+        targets[0] = 3;
+        var firstPoint = new CardUseHistoryPoint(1, 0, 1, 10);
+        var frozen = history.ReadCardUseFacts(firstPoint, CardUseHistoryView.Confirmations);
+        history.Append(new NativeCardUseHistoryRecordedEvent(legacy with { DesignatedTargets = [] }));
+        history.Append(new NativeCardUseHistoryRecordedEvent(legacy with { EffectiveKind = CardKind.Duel, DesignatedTargets = [2] }));
+        var currentPoint = new CardUseHistoryPoint(1, 0, history.CardUseHistoryCursor, 10);
+        var latest = history.ReadCardUseFacts(currentPoint, CardUseHistoryView.Latest).Single();
+        Require(frozen is [{ NativeUseId: 10, ActionId: null, Phase: TurnPhase.Play, ConfirmationCursor: 1 }] &&
+            frozen[0].ConfirmedTargets!.SequenceEqual([1]) && frozen[0].PrimaryTargets!.SequenceEqual([1]) &&
+            latest.Targets.SequenceEqual([2]) && latest.DeclaredKind == CardKind.ColdSlash && latest.EffectiveKind == CardKind.Duel &&
+            history.ReadCardUseFacts(currentPoint, CardUseHistoryView.Confirmations).Single().ConfirmedTargets!.SequenceEqual([1]),
+            "Confirmation is a detached original snapshot; cancellation, later target additions and effective-kind changes only update the live use.");
+        var world = new CardUseHistoryTestWorld(history, currentPoint);
+        Require(world.Bool(firstSlash) == true && world.Bool("""["useKindIs","currentUse",["slash"]]""") == false &&
+            world.Seats("""["useConfirmedTargets","currentUse"]""")!.SequenceEqual([1]) &&
+            world.Seats("""["usePrimaryTargets","currentUse"]""")!.SequenceEqual([1]),
+            "The existing three-kind Slash matcher includes Cold and reads the original declared kind; the single Slash selector stays exact.");
+
+        var second = new CardActionContext(99, null, CardActionType.Use, 1, 1, null, null, null, CardKind.Slash, [2], [], []);
+        history.Append(new ActualCardActionRecordedEvent(second, 1, 0, TurnPhase.Play, 7, false));
+        history.Append(new NativeCardUseHistoryRecordedEvent(new(20, 1, 0, 1, CardKind.Slash, 99, [2]),
+            Confirmation: new([2], TurnPhase.Play, 7)));
+        Require(new CardUseHistoryTestWorld(history, new(1, 0, history.CardUseHistoryCursor, 20, 99), owner: 1).Bool(firstSlash) == false &&
+            new CardUseHistoryTestWorld(history, firstPoint).Bool(firstSlash) == true && frozen.Count == 1 &&
+            history.ReadCardUseFacts(new(1, 0, 0), CardUseHistoryView.Confirmations).Count == 0 &&
+            history.ReadCardUseFacts(new(2, 0, history.CardUseHistoryCursor), CardUseHistoryView.Confirmations).Count == 0,
+            "An Action-null use consumes the global first confirmation across actors; later facts and other actual turns cannot alter an earlier cursor.");
+        Require(new CardUseHistoryTestWorld(history, new(2, 0, history.CardUseHistoryCursor)).Bool(firstSlash) is null,
+            "An empty first or missing current use remains unknown through identity comparison.");
+
+        history = new([], []);
+        var outer = new NativeCardUseHistorySnapshot(30, 1, 0, 0, CardKind.Slash, null, [1]);
+        var inner = new NativeCardUseHistorySnapshot(40, 1, 0, 1, CardKind.Slash, null, [2]);
+        history.Append(new NativeCardUseHistoryRecordedEvent(outer));
+        history.Append(new NativeCardUseHistoryRecordedEvent(inner));
+        history.Append(new NativeCardUseHistoryRecordedEvent(inner, Confirmation: new([2], TurnPhase.Play, 7)));
+        history.Append(new NativeCardUseHistoryRecordedEvent(outer, Confirmation: new([1], TurnPhase.Play, 7)));
+        Require(history.ReadCardUseFacts(new(1, 0, 4), CardUseHistoryView.Confirmations).Select(f => f.NativeUseId).SequenceEqual(new long?[] { 40, 30 }) &&
+            new CardUseHistoryTestWorld(history, new(1, 0, 4, 40)).Bool(firstSlash) == true &&
+            new CardUseHistoryTestWorld(history, new(1, 0, 4, 30)).Bool(firstSlash) == false,
+            "First means actual confirmation order when an inner use confirms before the earlier-declared outer use.");
+
+        history = new([], []);
+        history.Append(new NativeCardUseHistoryRecordedEvent(new(50, 1, 0, 0, CardKind.BorrowedSword, null, [1]),
+            Confirmation: new([1, 2], TurnPhase.Play, 7)));
+        var borrowedPoint = new CardUseHistoryPoint(1, 0, 1, 50);
+        var borrowedConfirmation = history.ReadCardUseFacts(borrowedPoint, CardUseHistoryView.Confirmations).Single();
+        Require(history.ReadCardUseFacts(borrowedPoint, CardUseHistoryView.Latest).Single().Targets.SequenceEqual([1]) &&
+            borrowedConfirmation.Targets.SequenceEqual([1, 2]) && borrowedConfirmation.PrimaryTargets!.SequenceEqual([1]) &&
+            new CardUseHistoryTestWorld(history, borrowedPoint).Seats("""["targets",["filter",["cardUses","window","confirmations"],["same",["useActor","use"],"turnOwner"]]]""")!.SequenceEqual([1, 2]),
+            "The confirmations projection includes Borrowed Sword's raw paired victim even when designated Latest targets contain only the holder; its principal target remains only the holder.");
     }
 
     private sealed record BoundaryFact : IGameEvent;

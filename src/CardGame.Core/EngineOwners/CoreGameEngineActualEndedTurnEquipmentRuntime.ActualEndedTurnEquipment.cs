@@ -5,40 +5,10 @@ internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
 {
     internal const string ActualEndedEquipmentMoveReason = "program.actual-ended-turn.equipment";
     internal const string ActualEndedEquipmentDrawReason = "program.actual-ended-turn.draw";
-    internal bool TracksActualForeignUseTargets => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ChooseEquipmentOrDrawAfterOtherActualTurn);
 
     internal bool IsActualEndedEquipmentTrigger(SkillProgramTrigger trigger) => trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ChooseEquipmentOrDrawAfterOtherActualTurn);
-    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 300)]
-    internal void ObserveActualForeignUseTargets(IGameEvent payload)
-    {
-        if (!TracksActualForeignUseTargets || payload is not TargetsConfirmedEvent targets)
-            return;
-        var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == targets.ResolutionId);
-        var declared = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>()
-            .LastOrDefault(declaration => declaration.ResolutionId == targets.ResolutionId);
-        if (use is null || declared is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(use.SourceSeat) || !targets.TargetSeats.SequenceEqual(use.TargetSeats))
-            return;
-        var action = use.Action;
-        if (!_nativeCardUseAdmission.IsDeclaredUse(use, declared))
-            return;
-        long? legacy = null;
-        if (action is null && _nativeCardUseAdmission.IsLegacyProducerUse(use))
-        {
-            var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-            if (index <= 0 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame producer)
-                return;
-            legacy = producer.Id;
-        }
-
-        foreach (var seat in targets.TargetSeats.Distinct().Where(_coreTableSeatQueriesOperations.IsValidPlayerSeat))
-        {
-            if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ActualTurnForeignUseTargetEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && e.CardUseFrameId == use.Id && e.ActorSeat == use.SourceSeat && e.TargetSeat == seat))
-                continue;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ActualTurnForeignUseTargetEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, use.Id, action?.ActionId, use.SourceSeat, action?.ProviderSeat ?? use.SourceSeat, use.CardKind, seat, legacy));
-        }
-    }
-
-    internal ActualEndedTurnEquipmentContext? CaptureActualEndedEquipmentContext(DeferredTurnEndFrame parent)
+    internal ActualEndedTurnEquipmentContext? CaptureActualEndedEquipmentContext(DeferredTurnEndFrame parent,
+        ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
         if (!_coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent))
             return null;
@@ -51,15 +21,19 @@ internal sealed partial class CoreGameEngineActualEndedTurnEquipmentRuntime
             return null;
         var actual = history.Skip(start + 1).Take(end - start - 1).ToArray();
         var damaged = actual.OfType<DamageAppliedEvent>().Any(e => !e.SourceLess && e.Amount > 0 && e.SourceSeat == parent.OwnerSeat && e.TargetSeat != parent.OwnerSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(e.TargetSeat));
-        var used = actual.OfType<ActualTurnForeignUseTargetEvent>().Any(e => e.TurnNumber == parent.TurnNumber && e.TurnOwnerSeat == parent.OwnerSeat && e.ActorSeat == parent.OwnerSeat && e.TargetSeat != parent.OwnerSeat);
+        var effect = _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects[0];
+        var endedPoint = new CardUseHistoryPoint(parent.TurnNumber, parent.OwnerSeat, end + 1L);
+        var world = _expressions.CreateTriggerExpressionWorld(candidate, context with { HistoryPoint = endedPoint }, context.Facts);
+        if (ProgramExpressions.EvaluateParticipantSet(effect.TargetSetExpression!, world) is not { } targets)
+            return null;
+        var used = targets.Any(target => target != parent.OwnerSeat);
         return new(parent.TurnNumber, parent.OwnerSeat, damaged, used, !used ? 2 : !damaged ? 1 : 0);
     }
 
     internal bool MatchesActualEndedEquipmentContext(DeferredTurnEndFrame parent, ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, SkillProgramTrigger trigger, bool requireLivingTurnOwner = true)
     {
         var frozen = context.ActualEndedEquipment;
-        var actual = CaptureActualEndedEquipmentContext(parent);
-        return IsActualEndedEquipmentTrigger(trigger) && actual is not null && frozen is not null && frozen == actual && frozen.MaximumDistinctOptions > 0 && trigger.Window == SkillProgramTriggerWindow.AfterTurnEnded && trigger.TurnOwnerScope == SkillProgramTurnOwnerScope.OtherLiving && context.Window == trigger.Window && context.ParentFrameId == parent.Id && candidate.OwnerSeat != parent.OwnerSeat && (!requireLivingTurnOwner || _coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat].IsAlive) && context.OwnerSeat == candidate.OwnerSeat && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && context.OccurrenceIndex == candidate.OccurrenceIndex && _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(parent) == candidate;
+        return IsActualEndedEquipmentTrigger(trigger) && frozen is not null && frozen.TurnNumber == parent.TurnNumber && frozen.TurnOwnerSeat == parent.OwnerSeat && frozen.MaximumDistinctOptions > 0 && trigger.Window == SkillProgramTriggerWindow.AfterTurnEnded && trigger.TurnOwnerScope == SkillProgramTurnOwnerScope.OtherLiving && context.Window == trigger.Window && context.ParentFrameId == parent.Id && candidate.OwnerSeat != parent.OwnerSeat && (!requireLivingTurnOwner || _coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat].IsAlive) && context.OwnerSeat == candidate.OwnerSeat && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && context.OccurrenceIndex == candidate.OccurrenceIndex && _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(parent) == candidate;
     }
 
     internal bool MatchesActualEndedEquipmentRoot(ProgramSkillFrame f)

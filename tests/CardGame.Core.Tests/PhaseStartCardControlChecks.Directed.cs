@@ -170,7 +170,8 @@ internal static partial class PhaseStartCardControlChecks
             if (scenario == "weiwan") skills.AddRange(["le:qiqin", "le:weiwan"]);
             if (nativeQuotaSkill is not null) skills.Add(nativeQuotaSkill);
             if (scenario.StartsWith("souying", StringComparison.Ordinal)) RegisterSouyingFixture(b, skills);
-            if (scenario.StartsWith("qieting", StringComparison.Ordinal)) RegisterQietingFixture(b);
+            if (scenario.StartsWith("qieting", StringComparison.Ordinal)) RegisterQietingFixture(b, scenario);
+            RegisterConfirmedConsumerFixture(b, scenario, skills);
             if (scenario.StartsWith("history", StringComparison.Ordinal))
             {
                 foreach (var bundle in new[] { "ol-su-fei", "ol-guo-si" })
@@ -227,7 +228,7 @@ internal static partial class PhaseStartCardControlChecks
             b.AddGeneral(new(Owner, "定向权利拥有者", "", "standard:none", "wei", 12, skills));
             b.AddGeneral(new(DirectedPeer, "固定其他角色", "", "fixture:directed-no-draw", "qun", 20,
                 scenario == "quota-fire" ? [Watch] : scenario == "quota-bao" ? ["fixture:quota-prevent"] :
-                scenario == "history-dodge" ? ["fixture:history-retaliate"] : []));
+                scenario is "history-dodge" or "history-meihun" ? ["fixture:history-retaliate"] : []));
             b.AddDeck(new("fixture:directed-rights-deck", "固定实体", 0, 2, []) { PhysicalCards = Enumerable.Range(0, 64).Select(_ => new ContentDeckPhysicalCard("standard:slash", Suit.Club, 7)).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "定向权利真实原生边界", 4, 4, new Dictionary<string, int>(), "fixture:directed-rights-deck", 2,
                 scenario.StartsWith("qieting", StringComparison.Ordinal) ? [Owner, DirectedPeer, QietingObserver] : [Owner, DirectedPeer], ContentModeKind.Team,

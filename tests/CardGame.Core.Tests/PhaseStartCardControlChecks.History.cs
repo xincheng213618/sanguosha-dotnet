@@ -28,6 +28,10 @@ internal static partial class PhaseStartCardControlChecks
         Need(borrowed.Action!.TargetSeats.SequenceEqual([1, 2]) && History(g).FindFinalizedUse(borrowed.Id)!.PrimaryTargets!.SequenceEqual([1]) &&
             !History(g).FindFinalizedUse(unrelated.Id)!.PrimaryTargets!.Intersect(History(g).FindFinalizedUse(borrowed.Id)!.PrimaryTargets!).Any(),
             "A genuine Borrowed Sword records its weapon holder, while its paired Slash victim cannot create a false common target.");
+        var borrowedConfirmation = History(g).ReadCardUseFacts(new(g.State.TurnNumber, 0, History(g).CardUseHistoryCursor), CardUseHistoryView.Confirmations)
+            .Single(f => f.NativeUseId == borrowed.Id);
+        Need(borrowedConfirmation.ConfirmedTargets!.SequenceEqual([1, 2]) && borrowedConfirmation.PrimaryTargets!.SequenceEqual([1]),
+            "The real Borrowed Sword confirmation exposes its raw holder/victim payload separately from the shared principal-target view.");
         g = Cold(g, registry); HistoryContinue(g);
         Need(E<BorrowedSwordResolvedEvent>(g).Single(e => e.ResolutionId == borrowed.Id) is { WeaponOwnerSeat: 1, SlashTargetSeat: 2 },
             "The real compound card keeps its original holder/victim native resolution.");
@@ -38,6 +42,7 @@ internal static partial class PhaseStartCardControlChecks
         SuFeiUsesSharedFinalizedHistory();
         GuoSiTruePairOffersAndCompletesNativeSnatch();
         foreach (var dodge in new[] { false, true }) GuoSiResponsesCutAcceptedPairs(dodge);
+        ConfirmedNativeTargetsStayFrozenWhileLiveTargetsChange();
     }
 
     private static void SuFeiUsesSharedFinalizedHistory()
@@ -164,7 +169,7 @@ internal static partial class PhaseStartCardControlChecks
         {"id":"fixture:phase-control-watch","revision":1,"triggers":[{"id":"history-finalized","window":"cardUseTargetsFinalized","ownerRelation":"actor","priority":100,"optional":false,
           "effects":[{"op":"chooseOption","target":"owner","resultBind":"history-finalized","options":[{"id":"continue"}]}]}]}
         """));
-        if (scenario == "history-dodge")
+        if (scenario is "history-dodge" or "history-meihun")
         {
             rules["skills"]![1]!["activations"]!.AsArray().Add(JsonNode.Parse("""
             {"id":"history-poke","minTargets":1,"maxTargets":1,"usesPerTurn":null,"effects":[{"op":"damage","target":"selectedTarget","amount":1}]}
@@ -174,5 +179,6 @@ internal static partial class PhaseStartCardControlChecks
               "condition":{"kind":"not","children":[{"kind":"directCardUseDamage"}]},"effects":[{"op":"selectTarget","target":"owner","targetKind":"eventSource"},{"op":"useVirtualSlash","target":"selectedTarget"}]}]}
             """));
         }
+        ConfigureConfirmedHistoryFixture(rules, scenario);
     }
 }

@@ -13,6 +13,7 @@ internal sealed partial class ProgramEventHistoryIndex
     private readonly Dictionary<long, CardUseFactStream> _factNativeUses = [];
     private readonly Dictionary<(int Turn, int Owner), List<(CardUseFactStream Stream, long FromCursor)>> _factUsesByTurn = [];
     private readonly Dictionary<(int Turn, int Owner), List<(long Cursor, CardUseHistoryFact Fact)>> _factObservations = [];
+    private readonly Dictionary<(int Turn, int Owner), List<(long Cursor, CardUseHistoryFact Fact)>> _factConfirmations = [];
 
     public long CardUseHistoryCursor => events.Count + (long)pendingEvents.Count;
 
@@ -20,8 +21,8 @@ internal sealed partial class ProgramEventHistoryIndex
     {
         SynchronizeActualUses();
         var key = (point.ActualTurn, point.TurnOwnerSeat);
-        if (view == CardUseHistoryView.Observations)
-            return _factObservations.TryGetValue(key, out var observations)
+        if (view is CardUseHistoryView.Observations or CardUseHistoryView.Confirmations)
+            return (view == CardUseHistoryView.Confirmations ? _factConfirmations : _factObservations).TryGetValue(key, out var observations)
                 ? Array.AsReadOnly(observations.TakeWhile(item => item.Cursor <= point.Cursor).Select(item => item.Fact).ToArray()) : [];
         if (!_factUsesByTurn.TryGetValue(key, out var streams)) return [];
         var result = new List<CardUseHistoryFact>();
@@ -43,7 +44,7 @@ internal sealed partial class ProgramEventHistoryIndex
 
     private void ClearCardUseFacts()
     {
-        _factActions.Clear(); _factNativeUses.Clear(); _factUsesByTurn.Clear(); _factObservations.Clear();
+        _factActions.Clear(); _factNativeUses.Clear(); _factUsesByTurn.Clear(); _factObservations.Clear(); _factConfirmations.Clear();
     }
 
     private void IndexCardUseFacts(IGameEvent payload, long cursor)
@@ -103,12 +104,32 @@ internal sealed partial class ProgramEventHistoryIndex
         var previous = stream.Versions.LastOrDefault().Fact;
         var acceptedFact = acceptedStream?.Versions.FirstOrDefault().Fact;
         var actor = action?.ActorSeat ?? ((NativeCardUseHistoryRecordedEvent)payload).Snapshot.ActorSeat;
+        var nativeFact = payload as NativeCardUseHistoryRecordedEvent;
+        var confirmation = nativeFact?.Confirmation;
+        var effectiveKind = action?.EffectiveKind ?? nativeFact!.Snapshot.EffectiveKind;
         var fact = new CardUseHistoryFact(nativeId ?? previous?.NativeUseId, actionId ?? previous?.ActionId,
             actor, acceptedFact?.DeclarerSeat ?? previous?.DeclarerSeat ?? actor, action?.Type ?? acceptedFact?.Type ?? previous?.Type ?? CardActionType.Use,
             selfResponse || acceptedFact?.IsSelfNativeResponseUse == true || previous?.IsSelfNativeResponseUse == true, targets,
-            established || previous?.Established == true, stream.Versions.Count == 0 ? cursor : stream.Versions[0].Fact.DeclarationCursor);
+            established || previous?.Established == true, stream.Versions.Count == 0 ? cursor : stream.Versions[0].Fact.DeclarationCursor)
+        {
+            DeclaredKind = nativeFact?.Snapshot.DeclaredKind ?? previous?.DeclaredKind,
+            EffectiveKind = effectiveKind,
+            Phase = confirmation?.Phase ?? previous?.Phase,
+            ConfirmedTargets = confirmation?.Targets ?? previous?.ConfirmedTargets,
+            PrimaryTargets = confirmation is not null
+                ? ActualCardUseTargets.PrincipalTargets(effectiveKind, actor, confirmation.Targets, confirmation.Targets)
+                : previous?.PrimaryTargets,
+            ConfirmationCursor = confirmation is null ? previous?.ConfirmationCursor : cursor
+        };
         stream.Versions.Add((cursor, fact));
         if (!_factObservations.TryGetValue((turn, owner), out var observations)) _factObservations[(turn, owner)] = observations = [];
         observations.Add((cursor, fact));
+        if (confirmation is not null)
+        {
+            if (!_factConfirmations.TryGetValue((turn, owner), out var confirmations)) _factConfirmations[(turn, owner)] = confirmations = [];
+            // A confirmation observes its original native target payload. It
+            // does not replace the latest stream's designated-target relation.
+            confirmations.Add((cursor, fact with { Targets = confirmation.Targets }));
+        }
     }
 }
