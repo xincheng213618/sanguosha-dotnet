@@ -1,34 +1,22 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 public enum GuoSiStage { TargetChoice, MovementChildren, SidaoChoice, NativeUse, Completed }
-public sealed record GuoSiUseStamp(int Turn,int Phase,long ActionId,long NativeUseId,int ActorSeat, bool Finalized,bool Completed,IReadOnlyList<int> Targets)
-{
- private readonly IReadOnlyList<int> _targets=Array.AsReadOnly(Targets.ToArray());
- public IReadOnlyList<int> Targets {get=>_targets;init=>_targets=Array.AsReadOnly(value.ToArray());}
-}
-public sealed record GuoSiPair(GuoSiUseStamp First,GuoSiUseStamp Second,IReadOnlyList<int> CommonTargets)
-{
- private readonly IReadOnlyList<int> _targets=Array.AsReadOnly(CommonTargets.ToArray());
- public IReadOnlyList<int> CommonTargets {get=>_targets;init=>_targets=Array.AsReadOnly(value.ToArray());}
-}
 public sealed record GuoSiTurnPact(long FrameId,CardConversionSource Source,string GameplayHash,int Turn,int TurnOwner,int Phase,int Actor,int Target,int Branch);
-public sealed record GuoSiReceipt(CardConversionSource Source,string GameplayHash,int Instruction,int Turn,int Phase,int Target,GuoSiStage Stage,GuoSiPair? Pair=null,int Branch=-1,long Before=0,long After=0,int? SelectedId=null,CardLocation? SelectedFrom=null,uint RandomBefore=0,uint RandomAfter=0,GuoSiNativeReceipt? Native=null);
+public sealed record GuoSiReceipt(CardConversionSource Source,string GameplayHash,int Instruction,int Turn,int Phase,int Target,GuoSiStage Stage,IReadOnlyList<int>? CommonTargets=null,int Branch=-1,long Before=0,long After=0,int? SelectedId=null,CardLocation? SelectedFrom=null,uint RandomBefore=0,uint RandomAfter=0,GuoSiNativeReceipt? Native=null)
+{
+ private readonly IReadOnlyList<int>? _commonTargets=CommonTargets is null?null:Array.AsReadOnly(CommonTargets.ToArray());
+ public IReadOnlyList<int>? CommonTargets {get=>_commonTargets;init=>_commonTargets=value is null?null:Array.AsReadOnly(value.ToArray());}
+}
 public sealed record GuoSiNativeReceipt(long ProgramFrameId,CardConversionSource Source,string GameplayHash,int Turn,int Phase,int Instruction,long NativeUseId,long ActionId,long ParentActionId,int Material,int Target,LegalActionKind ActionKind,int? TargetCardId,CardKind? RequiredKind);
 public sealed record GuoSiPactPaidEvent(GuoSiTurnPact Pact,long Before,long After,int ActualCount,uint RandomBefore,uint RandomAfter):IGameEvent;
 public sealed record GuoSiNativeIssuedEvent(GuoSiNativeReceipt Receipt):IGameEvent;
 public sealed record GuoSiNativeReturnedEvent(GuoSiNativeReceipt Receipt):IGameEvent;
-public sealed record GuoSiPairQualifiedEvent(long NativeUseId,int OwnerSeat,long FirstActionId,long SecondActionId):IGameEvent;
-public sealed partial class CharacterState
-{
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<GuoSiUseStamp>? GuoSiUses {get;set;}
-}
 public sealed partial record ProgramSkillFrame
 {
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public GuoSiReceipt? GuoSi {get;init;}
 }
 public sealed partial record CardUseFrame
 {
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public GuoSiPair? GuoSiPair {get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public GuoSiNativeReceipt? GuoSiNative {get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public long? GuoSiCostBefore {get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public long? GuoSiCostAfter {get;init;}

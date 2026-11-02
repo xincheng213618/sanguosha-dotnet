@@ -10,15 +10,25 @@ internal sealed partial class CharacterSuFeiOlRuntime
     {
         if (!ProgramInstructionResolver.Default.Features(t).HasOperation(SkillProgramEffectOp.DrawThenOfferActualConsecutiveTargetGift))
             return true;
-        return w.CardUse is { } identity && _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is { SuFeiQualification: { } q, Action: { } a } && a.ActionId == identity.CardActionId && ValidSuFeiQualification(q, c.OwnerSeat);
+        return w.CardUse is { } identity && SuFeiTargets(identity, c.OwnerSeat).Count > 0;
+    }
+
+    private IReadOnlyList<int> SuFeiTargets(ProgramCardUseContext identity, int ownerSeat)
+    {
+        if (_actualCardUseHistory.FindFinalizedUse(identity.ParentCardUseFrameId) is not { PrimaryTargets: { } targets } current || current.Action.ActionId != identity.CardActionId || current.Action.ActorSeat != ownerSeat || current.Phase != TurnPhase.Play || current.TurnOwner != ownerSeat || _actualCardUseHistory.PreviousFinalizedUse(identity.ParentCardUseFrameId)?.PrimaryTargets is not { } previous)
+            return [];
+        return Array.AsReadOnly(previous.Intersect(targets).Where(_coreTableSeatQueriesOperations.IsValidPlayerSeat).ToArray());
     }
 
     internal SkillProgramStepOutcome BeginSuFei(ProgramSkillFrame supplied, SkillProgramEffect effect)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.SuFei is not null || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } w || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { SuFeiQualification: { } q, Action: { } a } use || a.ActionId != identity.CardActionId || !ValidSuFeiQualification(q, f.OwnerSeat) || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
+        if (f.SuFei is not null || f.InstructionIndex != 1 || f.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } w || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f))
             throw new InvalidOperationException("Lianpian lost its unpaid exact consecutive native use.");
-        var r = new SuFeiReceipt(SuFeiSource(f), f.GameplayHash, f.InstructionIndex, w.ParentFrameId, q, SuFeiStage.DrawChildren, DrawBefore: _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, DrawAfter: _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
+        var targets = SuFeiTargets(identity, f.OwnerSeat);
+        if (targets.Count == 0)
+            throw new InvalidOperationException("Lianpian requires consecutive real finalized targets.");
+        var r = new SuFeiReceipt(SuFeiSource(f), f.GameplayHash, f.InstructionIndex, w.ParentFrameId, identity.ParentCardUseFrameId, identity.CardActionId, targets, SuFeiStage.DrawChildren, DrawBefore: _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, DrawAfter: _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { SuFei = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         var cards = _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], 1, true, new(SuFeiDrawReason));
         r = r with
@@ -28,17 +38,17 @@ internal sealed partial class CharacterSuFeiOlRuntime
             ActualDraw = cards.Count
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { SuFei = r });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LianpianDrawPaidEvent(f.Id, r.Source, r.GameplayHash, q.Current.NativeUseId, q.Current.Action.ActionId, r.DrawBefore, r.DrawAfter, r.ActualDraw));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LianpianDrawPaidEvent(f.Id, r.Source, r.GameplayHash, r.NativeUseId, r.ActionId, r.DrawBefore, r.DrawAfter, r.ActualDraw));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal bool CanGiveSuFei(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && f.SuFei is { ActualDraw: 1, DrawnId: { } id } r && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(f.OwnerSeat) && r.Qualification.CommonTargets.Any(s => s != f.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[s].IsAlive);
+    internal bool CanGiveSuFei(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && f.SuFei is { ActualDraw: 1, DrawnId: { } id } r && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(f.OwnerSeat) && r.CommonTargets.Any(s => s != f.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[s].IsAlive);
     internal IReadOnlyList<PromptChoice> SuFeiChoices(ProgramSkillFrame f)
     {
         if (f.SuFei is not { Stage: SuFeiStage.ChoosingGift } r || !CanGiveSuFei(f))
             return[];
-        var choices = r.Qualification.CommonTargets.Where(s => s != f.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[s].IsAlive).Select(s => new PromptChoice(new($"lianpian.{(f.Id)}.give-{(s)}"), $"将刚摸到的牌交给{(_coreMatchParticipantsPlayersAccess._players[s].Name)}", [r.DrawnId!.Value], [s], new Dictionary<string, string> { { "program-action", "lianpian" }, { "branch", "give" } })).ToList();
+        var choices = r.CommonTargets.Where(s => s != f.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[s].IsAlive).Select(s => new PromptChoice(new($"lianpian.{(f.Id)}.give-{(s)}"), $"将刚摸到的牌交给{(_coreMatchParticipantsPlayersAccess._players[s].Name)}", [r.DrawnId!.Value], [s], new Dictionary<string, string> { { "program-action", "lianpian" }, { "branch", "give" } })).ToList();
         choices.Add(new(new($"lianpian.{(f.Id)}.keep"), "保留刚摸到的牌", [], [], new Dictionary<string, string> { { "program-action", "lianpian" }, { "branch", "keep" } }));
         return Array.AsReadOnly(choices.ToArray());
     }
@@ -83,7 +93,7 @@ internal sealed partial class CharacterSuFeiOlRuntime
         }
 
         var target = choice.Targets.Single();
-        if (!CanGiveSuFei(f) || !r.Qualification.CommonTargets.Contains(target) || !choice.Cards.SequenceEqual([r.DrawnId!.Value]))
+        if (!CanGiveSuFei(f) || !r.CommonTargets.Contains(target) || !choice.Cards.SequenceEqual([r.DrawnId!.Value]))
             throw new InvalidOperationException("Lianpian lost its exact drawn entity or common target.");
         r = r with
         {
@@ -100,7 +110,7 @@ internal sealed partial class CharacterSuFeiOlRuntime
                 GiftAfter = moves.Single().Sequence
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { SuFei = paid });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LianpianGiftPaidEvent(f.Id, paid.Source, paid.GameplayHash, paid.Qualification.Current.NativeUseId, paid.Qualification.Current.Action.ActionId, target, paid.GiftBefore, paid.GiftAfter));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LianpianGiftPaidEvent(f.Id, paid.Source, paid.GameplayHash, paid.NativeUseId, paid.ActionId, target, paid.GiftBefore, paid.GiftAfter));
         }));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
@@ -144,7 +154,7 @@ internal sealed partial class CharacterSuFeiOlRuntime
     }
     internal void RequireSuFei(ProgramSkillFrame f)
     {
-        if (f.SuFei is not { } r || r.Source != SuFeiSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.WindowId != f.WindowContext?.ParentFrameId || !ValidSuFeiQualification(r.Qualification, f.OwnerSeat) || r.DrawBefore > r.DrawAfter || r.DrawAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.ActualDraw is not (0 or 1) || r.DrawnId.HasValue != (r.ActualDraw == 1) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LianpianDrawPaidEvent>().Count(e => e == new LianpianDrawPaidEvent(f.Id, r.Source, r.GameplayHash, r.Qualification.Current.NativeUseId, r.Qualification.Current.Action.ActionId, r.DrawBefore, r.DrawAfter, r.ActualDraw)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.DrawBefore && m.Sequence <= r.DrawAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == SuFeiDrawReason && (r.DrawnId is null || m.CardId == r.DrawnId)) != r.ActualDraw)
+        if (f.SuFei is not { } r || r.Source != SuFeiSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || r.WindowId != f.WindowContext?.ParentFrameId || r.DrawBefore > r.DrawAfter || r.DrawAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.ActualDraw is not (0 or 1) || r.DrawnId.HasValue != (r.ActualDraw == 1) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LianpianDrawPaidEvent>().Count(e => e == new LianpianDrawPaidEvent(f.Id, r.Source, r.GameplayHash, r.NativeUseId, r.ActionId, r.DrawBefore, r.DrawAfter, r.ActualDraw)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.DrawBefore && m.Sequence <= r.DrawAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == SuFeiDrawReason && (r.DrawnId is null || m.CardId == r.DrawnId)) != r.ActualDraw)
             throw new InvalidOperationException("Lianpian lacks its exact native use, source, window or once-paid draw invoice.");
         if (r.Stage == SuFeiStage.ChoosingGift)
         {
@@ -153,7 +163,7 @@ internal sealed partial class CharacterSuFeiOlRuntime
         }
         else if (f.PendingMovementContinuation is not { SubjectSeat: var actor, BeforeCount: 0, CoverageResultBind: null } || actor != f.OwnerSeat)
             throw new InvalidOperationException("Lianpian paid child lost its owning movement return.");
-        if (r.Stage == SuFeiStage.GiftChildren && (r.GiftTarget is not { } target || !r.Qualification.CommonTargets.Contains(target) || r.DrawnId is not { } id || r.GiftAfter <= r.GiftBefore || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LianpianGiftPaidEvent>().Count(e => e == new LianpianGiftPaidEvent(f.Id, r.Source, r.GameplayHash, r.Qualification.Current.NativeUseId, r.Qualification.Current.Action.ActionId, target, r.GiftBefore, r.GiftAfter)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.GiftBefore && m.Sequence <= r.GiftAfter && m.CardId == id && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Hand(target) && m.Reason.Value == SuFeiGiftReason) != 1))
+        if (r.Stage == SuFeiStage.GiftChildren && (r.GiftTarget is not { } target || !r.CommonTargets.Contains(target) || r.DrawnId is not { } id || r.GiftAfter <= r.GiftBefore || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<LianpianGiftPaidEvent>().Count(e => e == new LianpianGiftPaidEvent(f.Id, r.Source, r.GameplayHash, r.NativeUseId, r.ActionId, target, r.GiftBefore, r.GiftAfter)) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.GiftBefore && m.Sequence <= r.GiftAfter && m.CardId == id && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Hand(target) && m.Reason.Value == SuFeiGiftReason) != 1))
             throw new InvalidOperationException("Lianpian cannot repeat or substitute its actual paid gift.");
     }
 

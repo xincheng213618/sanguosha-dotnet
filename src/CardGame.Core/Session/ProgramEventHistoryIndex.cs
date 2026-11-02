@@ -1,8 +1,8 @@
 namespace CardGame.Core;
 
 /// <summary>Incremental typed reads over this match's committed and pending facts.</summary>
-internal sealed class ProgramEventHistoryIndex(IReadOnlyList<EventEnvelope> events, List<IGameEvent> pendingEvents)
-    : IProgramEventHistoryQueries, IProgramEventBoundaryQueries, IProgramEventJournalQueries
+internal sealed partial class ProgramEventHistoryIndex(IReadOnlyList<EventEnvelope> events, List<IGameEvent> pendingEvents)
+    : IProgramEventHistoryQueries, IProgramEventBoundaryQueries, IProgramEventJournalQueries, IActualCardUseHistoryQueries
 {
     public IEnumerable<IGameEvent> Complete() => events.Select(item => item.Payload).Concat(pendingEvents);
 

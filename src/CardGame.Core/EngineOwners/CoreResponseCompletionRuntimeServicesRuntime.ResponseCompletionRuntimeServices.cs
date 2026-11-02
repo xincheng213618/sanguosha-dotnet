@@ -21,6 +21,7 @@ internal sealed partial class CoreResponseCompletionRuntimeServicesRuntime
     bool IResponseCompletionFacts.ContainsMovement(CardMovementRecord movement) => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(movement);
     CardMovementRecord? IResponseCompletionFacts.LastMovement(Func<CardMovementRecord, bool> predicate) => _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault(predicate);
     bool IResponseCompletionFacts.HasTriggerWindow(SkillProgramTriggerWindow window) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerWindow(window);
+    bool IResponseCompletionFacts.TracksActualCardUseHistory => _contentRegistryOperations._contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.ActualCardUseHistory);
     bool IResponseCompletionFacts.UsesTriggerCondition(SkillProgramTriggerConditionKind condition) => _contentRegistryOperations._contentRegistry.ProgramDependencies.UsesTriggerCondition(condition);
     bool IResponseCompletionFacts.IsValidPlayerSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool IResponseCompletionFacts.IsAlive(int playerIndex) => _coreMatchParticipantsPlayersAccess._players[playerIndex].IsAlive;

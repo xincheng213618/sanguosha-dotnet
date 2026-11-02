@@ -10,7 +10,7 @@ internal sealed partial class ResponseCompletionRuntime
     // after those children return, rather than using a premature live-owner gate.
     internal bool HasCardResponseCompletedObserver(CardActionContext action, ProgramCardContinuation continuation) =>
         action.Type == CardActionType.Response && IsResponseCompletionContinuation(continuation) &&
-        (_facts.HasTriggerWindow(SkillProgramTriggerWindow.CardResponseCompleted) ||
+        (_facts.HasTriggerWindow(SkillProgramTriggerWindow.CardResponseCompleted) || _facts.TracksActualCardUseHistory ||
          _frames.Top is { } paidParent && action.PhysicalCards.Any(cost =>
              _native.DestroyedEquipmentResponsePayment(action, paidParent.Id, cost, continuation) is not null) ||
          _native.HasJiyunResponseCompletion(action, continuation) ||

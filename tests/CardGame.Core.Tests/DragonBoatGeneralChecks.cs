@@ -96,9 +96,33 @@ internal static class DragonBoatGeneralChecks
             !g.GetHumanLegalActions().Any(a => a.ProgramSkillId == "dragonboat:jianji"),
             "The true use returns once and consumes the owner's one actual-Play Jianji use.");
         Cold(g, registry);
+        LianpianUsesActualTeamHistory();
     }
 
     private static IEnumerable<DragonBoatDrawPaidEvent> Paid(GameEngine g, string skill) => E<DragonBoatDrawPaidEvent>(g).Where(e => e.OwnerSeat == 0 && e.SkillId == skill);
+
+    private static void LianpianUsesActualTeamHistory()
+    {
+        var (g, registry) = Start("lianpian"); Play(g);
+        void Duel()
+        {
+            var action = g.GetHumanLegalActions().First(a => a.Kind == LegalActionKind.Duel && a.ConversionSource is null && a.TargetSeats.SequenceEqual([1]));
+            Accept(g, new PlayCardCommand(0, action.CardId!.Value, action.TargetSeats, g.Revision, P(g)!.PromptId));
+        }
+        Duel(); Play(g); Duel();
+        Until(g, () => P(g) is { PlayerSeat: 0 } p && p.SkillPrompt?.SkillId == "dragonboat:lianpian" &&
+            p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
+        Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
+        Until(g, () => P(g) is { PlayerSeat: 0 } p && p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "dragonboat-general"));
+        Need(P(g)!.Choices.SelectMany(c => c.Targets).Distinct().SequenceEqual([1]),
+            "Real activity Lianpian offers only the common principal target of two consecutive teammate Uses.");
+        Cold(g, registry); Answer(g, c => c.Targets.SequenceEqual([1])); Play(g);
+        var paid = Paid(g, "dragonboat:lianpian").Single();
+        Need(paid.RecipientSeat == 1 && paid.ActualCount == 1 &&
+            g.CardMovements.Count(m => m.Sequence > paid.SequenceBefore && m.Sequence <= paid.SequenceAfter && m.To == CardLocation.Hand(1)) == 1,
+            "The activity's real native draw pays exactly once from shared actual-use history.");
+        Cold(g, registry);
+    }
     private static IEnumerable<T> E<T>(GameEngine g) => g.Events.Select(e => e.Payload).OfType<T>();
     private static PlayerSnapshot V(GameEngine g, int seat) => g.CreateSnapshot(seat).Players[seat];
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 8).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);

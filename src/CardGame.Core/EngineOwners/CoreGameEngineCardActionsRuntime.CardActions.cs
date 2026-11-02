@@ -233,25 +233,14 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
                 }
         }
 
-        if (window == SkillProgramTriggerWindow.CardUseTargetsFinalized && _coreDragonBoatActivitiesOperations.IsDragonBoatActivity)
-        {
-            var nativeUse = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(use => use.Action?.ActionId == action.ActionId);
-            _coreDragonBoatGeneralsOperations.CaptureDragonBoatFinalizedUse(nativeUse.Id, action);
-        }
-
-        if (window == SkillProgramTriggerWindow.CardUseTargetsFinalized && _characterSuFeiOlOperations.HasSuFeiCapability)
-        {
-            var nativeUse = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(use => use.Action?.ActionId == action.ActionId);
-            _characterSuFeiOlOperations.CaptureSuFeiFinalizedUse(nativeUse.Id, action);
-        }
-
-        if (_characterGuoSiOlOperations.HasGuoSiCapability && action.Type == CardActionType.Use && window is SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.CardUseCompleted)
+        if (action.Type == CardActionType.Use && _actualUseHistoryCapture.IsRequired &&
+            window is SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.CardUseCompleted)
         {
             var nativeUse = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(use => use.Action?.ActionId == action.ActionId);
             if (window == SkillProgramTriggerWindow.CardUseTargetsFinalized)
-                _characterGuoSiOlOperations.CaptureGuoSiFinalizedUse(nativeUse.Id, action);
+                _actualUseHistoryCapture.RecordFinalized(nativeUse, action);
             else
-                _characterGuoSiOlOperations.CaptureGuoSiCompletedUse(nativeUse.Id, action);
+                _actualUseHistoryCapture.RecordCompleted(nativeUse, action);
         }
 
         if (window == SkillProgramTriggerWindow.CardUseTargetsFinalized && _characterYuanTanYuanShangOlOperations.HasNeifaCapability)
@@ -290,8 +279,6 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
         };
         _coreRuntimeOperations.PushRuntimeFrame(frame);
         _characterSunQuanOlMagicOperations.CaptureMoQuanyuSingleton(frame, window);
-        if (_characterGuoSiOlOperations.HasGuoSiCapability && window == SkillProgramTriggerWindow.CardUseCompleted && completedResponseReturn is not null)
-            _characterGuoSiOlOperations.CaptureGuoSiCompletedUse(frame.Id, action);
         _coreRuntimeOperations.AdvanceRuntimeTop<ProgramCardTriggerWindowFrame>();
         return true;
     }

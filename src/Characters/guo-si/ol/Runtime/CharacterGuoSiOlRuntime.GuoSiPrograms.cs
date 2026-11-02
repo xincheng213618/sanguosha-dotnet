@@ -19,9 +19,12 @@ internal sealed partial class CharacterGuoSiOlRuntime
             return SkillProgramStepOutcome.AwaitChoice;
         }
 
-        if (f.WindowContext?.CardUse is not { } i || _coreCardUseLifecycleOperations.LifecycleCardUse(i.ParentCardUseFrameId)is not { GuoSiPair: { } pair, Action: { } a } || a.ActionId != i.CardActionId || SidaoActions(f.OwnerSeat, pair).Count == 0)
-            throw new InvalidOperationException("Sidao requires its frozen completed native pair.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { GuoSi = new(GuoSiSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, -1, GuoSiStage.SidaoChoice, pair) });
+        if (f.WindowContext?.CardUse is not { } identity)
+            throw new InvalidOperationException("Sidao requires its completed native use window.");
+        var commonTargets = SidaoTargets(identity, f.OwnerSeat);
+        if (commonTargets.Count == 0 || SidaoActions(f.OwnerSeat, commonTargets).Count == 0)
+            throw new InvalidOperationException("Sidao requires real consecutive completed uses with a legal common target.");
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { GuoSi = new(GuoSiSource(f), f.GameplayHash, f.InstructionIndex, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, -1, GuoSiStage.SidaoChoice, commonTargets) });
         PublishGuoSiChoice(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -31,9 +34,9 @@ internal sealed partial class CharacterGuoSiOlRuntime
         var r = f.GuoSi!;
         if (r.Stage == GuoSiStage.TargetChoice)
             return Array.AsReadOnly(Enumerable.Range(0, 2).Select(b => new PromptChoice(new($"tanbei.{(f.Id)}.{(b)}"), b == 0 ? "令其随机获得你区域里的一张牌；其本回合不能对你使用牌" : "其本回合对你使用牌无距离和次数限制", [], [], new Dictionary<string, string> { { "program-action", "guo-si" }, { "option", b.ToString() } })).ToArray());
-        if (r.Stage != GuoSiStage.SidaoChoice || r.Pair is null)
+        if (r.Stage != GuoSiStage.SidaoChoice || r.CommonTargets is null)
             return[];
-        var choices = SidaoActions(f.OwnerSeat, r.Pair).Select((a, index) => new PromptChoice(new($"sidao.{(f.Id)}.{(index)}"), a.Description, [a.CardId!.Value], a.TargetSeats, new Dictionary<string, string> { { "program-action", "guo-si" }, { "option", index.ToString() } })).ToList();
+        var choices = SidaoActions(f.OwnerSeat, r.CommonTargets).Select((a, index) => new PromptChoice(new($"sidao.{(f.Id)}.{(index)}"), a.Description, [a.CardId!.Value], a.TargetSeats, new Dictionary<string, string> { { "program-action", "guo-si" }, { "option", index.ToString() } })).ToList();
         choices.Add(new(new($"sidao.{(f.Id)}.skip"), "不使用", [], [], new Dictionary<string, string> { { "program-action", "guo-si" }, { "option", "skip" } }));
         return Array.AsReadOnly(choices.ToArray());
     }
@@ -74,7 +77,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
                 return;
             }
 
-            var action = SidaoActions(f.OwnerSeat, r.Pair!)[int.Parse(choice.Parameters["option"])];
+            var action = SidaoActions(f.OwnerSeat, r.CommonTargets!)[int.Parse(choice.Parameters["option"])];
             IssueSidao(f, action);
             return;
         }
@@ -160,8 +163,6 @@ internal sealed partial class CharacterGuoSiOlRuntime
                 throw new InvalidOperationException("Tanbei lacks its exact paid target choice and native movement bounds.");
         }
 
-        if ((r.Stage is GuoSiStage.SidaoChoice or GuoSiStage.NativeUse or GuoSiStage.Completed) && (r.Pair is not { } pair || f.WindowContext?.CardUse is not { } identity || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)?.GuoSiPair != pair || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GuoSiPairQualifiedEvent>().Any(e => e.NativeUseId == identity.ParentCardUseFrameId && e.OwnerSeat == f.OwnerSeat && e.FirstActionId == pair.First.ActionId && e.SecondActionId == pair.Second.ActionId)))
-            throw new InvalidOperationException("Sidao lost its actual completed-window pair qualification.");
         if ((r.Stage is GuoSiStage.NativeUse or GuoSiStage.Completed) && (r.Native is not { } n || n.ParentActionId != f.WindowContext?.CardUse?.CardActionId || n.Phase != r.Phase || n.Turn != r.Turn || n.Instruction != r.Instruction || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GuoSiNativeIssuedEvent>().Count(e => e.Receipt == n) != 1))
             throw new InvalidOperationException("Sidao has no unique issued native use.");
         if (r.Stage == GuoSiStage.Completed && (r.Native is not { } returned || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GuoSiNativeReturnedEvent>().Count(e => e.Receipt == returned) != 1 || _coreCardUseLifecycleOperations.LifecycleCardUse(returned.NativeUseId)is not null))

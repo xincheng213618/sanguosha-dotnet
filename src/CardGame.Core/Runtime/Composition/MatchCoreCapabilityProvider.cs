@@ -22,6 +22,7 @@ internal sealed class MatchCoreCapabilityProvider
         if (history is not null) bindings.Add(new(typeof(IProgramEventHistoryQueries), history));
         if (history is IProgramEventBoundaryQueries boundaries) bindings.Add(new(typeof(IProgramEventBoundaryQueries), boundaries));
         if (history is IProgramEventJournalQueries journal) bindings.Add(new(typeof(IProgramEventJournalQueries), journal));
+        if (history is IActualCardUseHistoryQueries actualUses) bindings.Add(new(typeof(IActualCardUseHistoryQueries), actualUses));
         if (random is not null) bindings.Add(new(typeof(IMatchRandomSource), random));
         if (skillObservations is not null) bindings.Add(new(typeof(ISkillGrantRevisionObservations), skillObservations));
         if (movements is not null)

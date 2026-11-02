@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterGuoSiOlRuntime
 {
-    internal IReadOnlyList<LegalAction> SidaoActions(int owner, GuoSiPair pair)
+    internal IReadOnlyList<LegalAction> SidaoActions(int owner, IReadOnlyList<int> commonTargets)
     {
         if (!_coreMatchParticipantsPlayersAccess._players[owner].IsAlive)
             return[];
@@ -13,7 +13,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
         {
             var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, card);
             foreach (var o in _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, CardKind.Snatch, suit, enforceUsePermission: true, beneficiaryShieldSuit: suit, actualEffectiveColor: CoreGameEnginePublicPileColorsRuntime.SuitColor(suit), hasActualColor: true, physicalCardIds: [card.Id], includeNextActualUseAdjustment: false))
-                if (o.TargetSeats.Count == 1 && pair.CommonTargets.Contains(o.TargetSeats[0]) && _coreMatchParticipantsPlayersAccess._players[o.TargetSeats[0]].IsAlive && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, o.TargetSeats[0], CardKind.Snatch))
+                if (o.TargetSeats.Count == 1 && commonTargets.Contains(o.TargetSeats[0]) && _coreMatchParticipantsPlayersAccess._players[o.TargetSeats[0]].IsAlive && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, o.TargetSeats[0], CardKind.Snatch))
                     result.Add(new(o.ActionKind, card.Id, o.TargetSeats[0], $"将【{(card.DisplayName)}】当【顺手牵羊】对{(_coreMatchParticipantsPlayersAccess._players[o.TargetSeats[0]].Name)}使用", CardKind.Snatch, o.TargetCardId, Array.AsReadOnly(o.TargetSeats.ToArray())));
         }
 

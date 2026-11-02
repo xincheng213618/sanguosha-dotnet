@@ -1,29 +1,13 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 public enum SuFeiStage { DrawChildren, ChoosingGift, GiftChildren }
-public sealed record SuFeiActualUse(int ActualTurn,int PhaseInstance,long NativeUseId,CardActionContext Action,IReadOnlyList<int> PrimaryTargets)
-{
- private readonly IReadOnlyList<int> _targets=Array.AsReadOnly(PrimaryTargets.ToArray());
- public IReadOnlyList<int> PrimaryTargets {get=>_targets;init=>_targets=Array.AsReadOnly(value.ToArray());}
-}
-public sealed record SuFeiConsecutiveQualification(SuFeiActualUse Previous,SuFeiActualUse Current,IReadOnlyList<int> CommonTargets)
+public sealed record SuFeiReceipt(CardConversionSource Source,string GameplayHash,int InstructionIndex,long WindowId,long NativeUseId,long ActionId,IReadOnlyList<int> CommonTargets,SuFeiStage Stage,long DrawBefore=0,long DrawAfter=0,int? DrawnId=null,int ActualDraw=0,int? GiftTarget=null,long GiftBefore=0,long GiftAfter=0)
 {
  private readonly IReadOnlyList<int> _common=Array.AsReadOnly(CommonTargets.ToArray());
  public IReadOnlyList<int> CommonTargets {get=>_common;init=>_common=Array.AsReadOnly(value.ToArray());}
 }
-public sealed record SuFeiReceipt(CardConversionSource Source,string GameplayHash,int InstructionIndex,long WindowId,SuFeiConsecutiveQualification Qualification,SuFeiStage Stage,long DrawBefore=0,long DrawAfter=0,int? DrawnId=null,int ActualDraw=0,int? GiftTarget=null,long GiftBefore=0,long GiftAfter=0);
-public sealed record SuFeiActualUseRecordedEvent(SuFeiActualUse Use):IGameEvent;
 public sealed record LianpianDrawPaidEvent(long FrameId,CardConversionSource Source,string GameplayHash,long NativeUseId,long ActionId,long Before,long After,int ActualCount):IGameEvent;
 public sealed record LianpianGiftPaidEvent(long FrameId,CardConversionSource Source,string GameplayHash,long NativeUseId,long ActionId,int TargetSeat,long Before,long After):IGameEvent;
-public sealed partial class CharacterState
-{
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public SuFeiActualUse? SuFeiLastUse {get;set;}
-}
-public sealed partial record CardUseFrame
-{
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public SuFeiConsecutiveQualification? SuFeiQualification {get;init;}
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public SuFeiActualUse? SuFeiFinalizedUse {get;init;}
-}
 public sealed partial record ProgramSkillFrame
 {
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public SuFeiReceipt? SuFei {get;init;}
@@ -32,6 +16,7 @@ internal interface ISuFeiProgramHost {SkillProgramStepOutcome BeginSuFei(Program
 internal sealed class DrawThenOfferActualConsecutiveTargetGiftDescriptor:ProgramOperationDescriptorBase
 {
  public override SkillProgramEffectOp Op=>SkillProgramEffectOp.DrawThenOfferActualConsecutiveTargetGift;
+ public override ProgramFactRequirements FactRequirements=>new(Triggered:ProgramTrackedFact.ActualCardUseHistory);
  public override ISkillProgramEffectHandler Handler{get;}=new SuFeiHandler();
  public override ProgramOperationInteraction Interaction=>ProgramOperationInteraction.Choice;
  public override ProgramOperationAiPolicy AiPolicy{get;}=new(ProgramOperationAiSemantic.GainCards,static(_,_)=>{});

@@ -75,6 +75,9 @@ internal static class CommittedEventProjection
     // Rules see the original fact first; only the committed projection is copied.
     public static IGameEvent Freeze(IGameEvent payload) => payload switch
     {
+        // This fact freezes both constructor and with-assignment collection input.
+        ActualCardUseTargetsFinalizedEvent value => value,
+        ActualCardUseTargetsCompletedEvent value => value,
         SourceKeshouPaidBranchEvent value => value with
         { Receipt = value.Receipt with { Materials = FreezeList(value.Receipt.Materials) } },
         AnniversaryCuiLieUseChangedEvent value => value with
@@ -134,7 +137,6 @@ internal static class CommittedEventProjection
         JianjiUseReturnedEvent value => value with { Receipt = FreezeJianjiReceipt(value.Receipt) },
         HuiyunNativeIssuedEvent value => value with { Invoice = value.Invoice with { Plan = HuiyunFreeze.Action(value.Invoice.Plan) } },
         HuiyunNativeReturnedEvent value => value with { Invoice = value.Invoice with { Plan = HuiyunFreeze.Action(value.Invoice.Plan) } },
-        SuFeiActualUseRecordedEvent value => value with { Use = value.Use with { PrimaryTargets = FreezeList(value.Use.PrimaryTargets) } },
         SimaHuiChoiceStartedEvent value => value with { Candidates = FreezeList(value.Candidates) },
         SimaHuiTopViewedEvent value => value with { CardIds = FreezeList(value.CardIds) },
         SimaHuiUnassignedReturnedEvent value => value with { CardIds = FreezeList(value.CardIds) },

@@ -6,7 +6,6 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsEntries
     internal bool AllowsDragonBoatJianji(ProgramActivationLegalityContext gate) => _resolve().AllowsDragonBoatJianji(gate);
     internal void AnswerDragonBoatGeneral(PromptChoice choice) => _resolve().AnswerDragonBoatGeneral(choice);
     internal SkillProgramStepOutcome BeginDragonBoatGeneral(ProgramSkillFrame supplied, SkillProgramEffectOp operation, int targetSeat) => _resolve().BeginDragonBoatGeneral(supplied, operation, targetSeat);
-    internal void CaptureDragonBoatFinalizedUse(long useId, CardActionContext action) => _resolve().CaptureDragonBoatFinalizedUse(useId, action);
     internal PromptChoice ChooseDragonBoatGeneral(ProgramSkillFrame frame) => _resolve().ChooseDragonBoatGeneral(frame);
     internal bool ContinuePaidDragonBoatGeneral(ProgramSkillFrame frame) => _resolve().ContinuePaidDragonBoatGeneral(frame);
     internal bool DragonBoatAllies(int owner, int other) => _resolve().DragonBoatAllies(owner, other);

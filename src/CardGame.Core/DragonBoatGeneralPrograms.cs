@@ -15,6 +15,7 @@ internal abstract class DragonBoatGeneralDescriptor : ProgramOperationDescriptor
 internal sealed class DrawDragonBoatConsecutiveTargetDescriptor : DragonBoatGeneralDescriptor
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.DrawDragonBoatConsecutiveTarget;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualCardUseHistory);
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         [new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseTargetsFinalized)];

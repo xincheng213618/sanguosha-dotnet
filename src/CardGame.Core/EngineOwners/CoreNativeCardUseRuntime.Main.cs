@@ -117,7 +117,6 @@ internal sealed partial class CoreNativeCardUseRuntime
         _characterLuMengMouOperations.RecordYingboCardUse(resolutionId, sourceSeat, effectiveCardKind);
         _characterWangYunOlOperations.BindWangYunNativeUse(resolutionId);
         _characterZhangJiOlOperations.Value.BindZhangJiNativeUse(resolutionId);
-        _characterGuoSiOlOperations.BindGuoSiAcceptedUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterHuangQuanOlOperations.BindJianjiNativeUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterZhouYuMouOperations.BindMouZyNativeUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterJiangJiMouOperations.BindMouJjNativeUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);

@@ -171,6 +171,39 @@ internal static class CommandSessionChecks
             AttemptCollectionMutation(item, new HashSet<object>(ReferenceEqualityComparer.Instance), ref attempts, ref rejected);
         Require(rejected == attempts && bytes.SequenceEqual(frozen.Select(item => JsonSerializer.Serialize(item, item.GetType()))),
             "Nested committed collections must preserve their concrete type, values and serialized shape after source or observer writes.");
+        AssertActualUseHistoryTargetPrivacy();
+    }
+
+    private static void AssertActualUseHistoryTargetPrivacy()
+    {
+        var targets = new[] { 1 };
+        var action = new CardActionContext(140, null, CardActionType.Use, 0, 0, null, null, null,
+            CardKind.Slash, targets, [], []);
+        var use = new CardUseFrame(140, 0, 0, CardKind.Slash, targets) { Action = action };
+        IGameEvent[] facts = [new ActualCardActionRecordedEvent(action, 1, 0, TurnPhase.Play, 1, false),
+            new ActualCardUseTargetsFinalizedEvent(use.Id, action, targets),
+            new ActualCardUseTargetsCompletedEvent(use.Id, action, targets) with { PrimaryTargets = targets }];
+        EventEnvelope Envelope(int sequence, IGameEvent fact) => new(new(sequence), null, sequence, 1,
+            "actual-use-privacy", CommittedEventProjection.Freeze(fact));
+        var envelopes = facts.Select((fact, index) => Envelope(index + 1, fact)).ToArray();
+        var before = envelopes.Select(SerializeEvent).ToArray();
+        var held = envelopes.Where(item => CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime
+            .IsMouSmTargetFact(item.Payload, use)).Select(item => item.Sequence).ToHashSet();
+        var projection = new GameEngine.MouSmPublicProjection(held, new HashSet<long>(), new HashSet<long>());
+        targets[0] = 2;
+        var attempts = 0; var rejected = 0;
+        foreach (var item in envelopes)
+            AttemptCollectionMutation(item.Payload, new HashSet<object>(ReferenceEqualityComparer.Instance), ref attempts, ref rejected);
+        Require(held.Count == 3 && envelopes.All(item => CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime
+                .MouSmPublicEvent(item, projection) is null) && envelopes.All(item => ReferenceEquals(item,
+                CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime.MouSmPublicEvent(item, null))),
+            "Accepted, finalized and completed history must all retain the original hidden-target event boundary.");
+        var otherAction = new CardActionContext(141, null, CardActionType.Use, 0, 0, null, null, null,
+            CardKind.Slash, [2], [], []);
+        var other = Envelope(4, new ActualCardUseTargetsFinalizedEvent(use.Id + 1, otherAction, [2]));
+        Require(CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime.MouSmPublicEvent(other, projection) == other &&
+                attempts > 0 && rejected == attempts && before.SequenceEqual(envelopes.Select(SerializeEvent)),
+            "Target-history facts must reject collection writes, freeze source inputs and leave another use visible.");
     }
 
     // The transaction is exercised without constructing GameEngine or a content

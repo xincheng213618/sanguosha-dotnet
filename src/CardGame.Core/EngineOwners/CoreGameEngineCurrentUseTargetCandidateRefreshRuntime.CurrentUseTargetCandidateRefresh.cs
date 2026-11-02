@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEngineCurrentUseTargetCandidateRefreshRunt
 {
     internal CardUseFrame NormalizeImplicitDrawTwoUseTarget(CardUseFrame use)
     {
-        if (use.CardKind != CardKind.DrawTwo || use.TargetSeats.Count != 0 || use.Action is not { } old || !_coreProgramTargetWindowProtocolsOperations.TargetWindowProtocols.HasCardWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, new(use.CardKind)))
+        if (use.CardKind != CardKind.DrawTwo || use.TargetSeats.Count != 0 || use.Action is not { } old || !(_contentRegistryOperations._contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.ActualCardUseHistory) || _coreProgramTargetWindowProtocolsOperations.TargetWindowProtocols.HasCardWindow(ProgramTargetWindowStage.NormalizeImplicitDrawTwo, new(use.CardKind))))
             return use;
         var targets = Array.AsReadOnly(new[] { use.SourceSeat });
         var action = _coreDesignatedExtraTargetsOperations.CloneDesignatedExtraTargetAction(old, targets);

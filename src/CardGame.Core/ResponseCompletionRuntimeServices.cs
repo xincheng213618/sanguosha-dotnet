@@ -16,6 +16,7 @@ internal interface IResponseCompletionFacts : IProgramSelectionQuery
     bool ContainsMovement(CardMovementRecord movement);
     CardMovementRecord? LastMovement(Func<CardMovementRecord, bool> predicate);
     bool HasTriggerWindow(SkillProgramTriggerWindow window);
+    bool TracksActualCardUseHistory { get; }
     bool UsesTriggerCondition(SkillProgramTriggerConditionKind condition);
     bool IsValidPlayerSeat(int seat);
     bool IsAlive(int playerIndex);

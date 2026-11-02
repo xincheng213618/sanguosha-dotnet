@@ -6,32 +6,11 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
     internal bool DragonBoatAllies(int owner, int other) => _coreDragonBoatActivitiesOperations.IsDragonBoatActivity && _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(other) && _coreMatchParticipantsPlayersAccess._players[owner].IsAlive && _coreMatchParticipantsPlayersAccess._players[other].IsAlive && _coreMatchParticipantsPlayersAccess._players[owner].TeamId is { } team && _coreMatchParticipantsPlayersAccess._players[other].TeamId == team;
     SkillProgramStepOutcome IDragonBoatGeneralHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp operation, int targetSeat) => BeginDragonBoatGeneral(frame, operation, targetSeat);
     bool IDragonBoatAllyQuery.IsTeammate(int ownerSeat, int targetSeat) => ownerSeat != targetSeat && DragonBoatAllies(ownerSeat, targetSeat);
-    internal void CaptureDragonBoatFinalizedUse(long useId, CardActionContext action)
-    {
-        if (!_coreDragonBoatActivitiesOperations.IsDragonBoatActivity || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1 || action.Type != CardActionType.Use || action.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat)
-            return;
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { Action: { } actual } use || actual.ActionId != action.ActionId || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(actual, action) || !_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action))
-            throw new InvalidOperationException("Dragon Boat Lianpian requires its exact finalized native card use.");
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<DragonBoatActualUseEvent>().Any(e => e.UseId == useId))
-            return;
-        var targets = _characterSuFeiOlOperations.SuFeiPrimaryTargets(action);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DragonBoatActualUseEvent(useId, action.ActionId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, action.ActorSeat, targets.Length));
-        for (var index = 0; index < targets.Length; index++)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DragonBoatActualUseTargetEvent(useId, action.ActionId, index, targets[index]));
-    }
-
     internal IReadOnlyList<int> DragonBoatLianpianTargets(int ownerSeat, ProgramSkillWindowContext context)
     {
-        if (!_coreDragonBoatActivitiesOperations.IsDragonBoatActivity || context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || identity.ActorSeat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat || !DragonBoatAllies(ownerSeat, identity.ActorSeat) || _coreCardUseLifecycleOperations.LifecycleCardUse(identity.ParentCardUseFrameId)is not { Action: { } action } use || action.ActionId != identity.CardActionId)
-            return[];
-        var uses = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DragonBoatActualUseEvent>().Where(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseInstance == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && e.ActorSeat == action.ActorSeat).ToArray();
-        if (uses.Length < 2 || uses[^1].UseId != use.Id || uses[^1].ActionId != action.ActionId)
-            return[];
-        var previous = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DragonBoatActualUseTargetEvent>().Where(e => e.UseId == uses[^2].UseId && e.ActionId == uses[^2].ActionId).OrderBy(e => e.Index).Select(e => e.TargetSeat).ToArray();
-        var current = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DragonBoatActualUseTargetEvent>().Where(e => e.UseId == use.Id && e.ActionId == action.ActionId).OrderBy(e => e.Index).Select(e => e.TargetSeat).ToArray();
-        if (previous.Length != uses[^2].TargetCount || current.Length != uses[^1].TargetCount || !current.SequenceEqual(_characterSuFeiOlOperations.SuFeiPrimaryTargets(action)))
-            throw new InvalidOperationException("Activity Lianpian lost its actual consecutive target facts.");
-        return Array.AsReadOnly(previous.Intersect(current).Where(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive).ToArray());
+        if (!_coreDragonBoatActivitiesOperations.IsDragonBoatActivity || context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || _actualCardUseHistory.FindFinalizedUse(identity.ParentCardUseFrameId) is not { PrimaryTargets: { } targets } current || current.Action.ActionId != identity.CardActionId || current.Phase != TurnPhase.Play || current.Action.ActorSeat != current.TurnOwner || !DragonBoatAllies(ownerSeat, current.Action.ActorSeat) || _actualCardUseHistory.PreviousFinalizedUse(identity.ParentCardUseFrameId)?.PrimaryTargets is not { } previous)
+            return [];
+        return Array.AsReadOnly(previous.Intersect(targets).Where(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && _coreMatchParticipantsPlayersAccess._players[s].IsAlive).ToArray());
     }
 
     internal DragonBoatDianhuArmedEvent? DragonBoatDianhuTarget(int ownerSeat, string instance) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DragonBoatDianhuArmedEvent>().SingleOrDefault(e => e.OwnerSeat == ownerSeat && e.SkillInstanceId == instance);
@@ -91,7 +70,10 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
         var candidate = new ProgramTriggerCandidate(frame.OwnerSeat, frame.SkillId, frame.TriggerId, frame.SkillInstanceId, frame.GameplayHash, 0);
         if (operation == SkillProgramEffectOp.DrawDragonBoatDianhu && !DragonBoatDianhuQualified(candidate, context) || operation == SkillProgramEffectOp.DrawDragonBoatTunjiang && !DragonBoatTunjiangQualified(frame.OwnerSeat, context))
             throw new InvalidOperationException("The activity draw lost its exact native occurrence.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { DragonBoatGeneral = new(frame.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, DragonBoatGeneralStage.Choosing) });
+        var lianpianTargets = operation == SkillProgramEffectOp.DrawDragonBoatConsecutiveTarget ? DragonBoatLianpianTargets(frame.OwnerSeat, context) : null;
+        if (lianpianTargets is { Count: 0 })
+            throw new InvalidOperationException("Activity Lianpian requires consecutive real finalized targets.");
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { DragonBoatGeneral = new(frame.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, DragonBoatGeneralStage.Choosing, LianpianTargets: lianpianTargets) });
         if (operation == SkillProgramEffectOp.DrawDragonBoatDianhu)
         {
             IssueDragonBoatGeneralDraw(frame, frame.OwnerSeat, 1);
@@ -104,9 +86,9 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
 
     internal IReadOnlyList<PromptChoice> DragonBoatGeneralChoices(ProgramSkillFrame frame)
     {
-        if (frame.DragonBoatGeneral is not { Stage: DragonBoatGeneralStage.Choosing } || frame.WindowContext is not { } context)
+        if (frame.DragonBoatGeneral is not { Stage: DragonBoatGeneralStage.Choosing } receipt || frame.WindowContext is not { } context)
             return[];
-        var targets = frame.SkillId == "dragonboat:lianpian" ? DragonBoatLianpianTargets(frame.OwnerSeat, context) : DragonBoatTunjiangQualified(frame.OwnerSeat, context) ? new[]
+        var targets = frame.SkillId == "dragonboat:lianpian" ? receipt.LianpianTargets ?? [] : DragonBoatTunjiangQualified(frame.OwnerSeat, context) ? new[]
         {
             frame.OwnerSeat,
             _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat

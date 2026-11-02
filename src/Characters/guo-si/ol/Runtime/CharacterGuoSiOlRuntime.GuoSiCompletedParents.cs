@@ -5,7 +5,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
 {
     internal bool IsSuspendedGuoSiCompletedParent(CardUseFrame original)
     {
-        if (original.Step != ResolutionFrameStep.Completed || !HasGuoSiCapability || original.Action is not { Type: CardActionType.Use } action)
+        if (original.Step != ResolutionFrameStep.Completed || original.Action is not { Type: CardActionType.Use } action)
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == original.Id);
         if (index < 0 || index + 2 >= _resolutionStackOperations._resolutionStack.Count || _resolutionStackOperations._resolutionStack[index + 1] is not ProgramCardTriggerWindowFrame window || _resolutionStackOperations._resolutionStack[index + 2] is not ProgramSkillFrame program || window.ParentFrameId != original.Id || window.Continuation is not (ProgramCardContinuation.CompletedCard or ProgramCardContinuation.CompletedSlash) || window.CompletedResponseReturn is not null || !window.Activated || !CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(window.Action, action) || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || program.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } identity } context || context.ParentFrameId != window.Id || identity.ParentCardUseFrameId != original.Id || identity.CardActionId != action.ActionId || identity.ActorSeat != program.OwnerSeat || action.ActorSeat != program.OwnerSeat || program.GuoSi is not { Native: { } receipt } pending || receipt.ParentActionId != action.ActionId)

@@ -5,6 +5,8 @@ internal sealed partial class CoreGameEngineFinalizedCardTargetsRuntime
 {
     internal bool HasFinalizedTargetProgram(CardKind kind)
     {
+        if (_contentRegistryOperations._contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.ActualCardUseHistory))
+            return true;
         if (_coreProgramTargetWindowProtocolsOperations.TargetWindowProtocols.HasCardWindow(ProgramTargetWindowStage.FinalizedBeforeActivity, new(kind)))
             return true;
         if (_modeRulesOperations._modeRules.RuntimeRequirements.TracksFinalizedCardTargets)
@@ -22,7 +24,7 @@ internal sealed partial class CoreGameEngineFinalizedCardTargetsRuntime
         return _coreProgramTargetWindowProtocolsOperations.TargetWindowProtocols.HasCardWindow(ProgramTargetWindowStage.FinalizedAfterCategory, new(kind, category)) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasFinalizedCardTrigger(kind, category) || (_coreProgramTargetWindowProtocolsOperations.TargetWindowProtocols.HasCardWindow(ProgramTargetWindowStage.FinalizedInstantTrickRequirement, new(kind, category)) && CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind) && _contentRegistryOperations._contentRegistry.ProgramDependencies.HasFinalizedCardTrigger(kind, SkillProgramCardCategory.InstantTrick));
     }
 
-    internal IReadOnlyList<int> GetImplicitSelfCardUseTargets(CardKind kind, int sourceSeat, IReadOnlyList<int> targets) => _coreProgramTargetWindowProtocolsOperations.TargetWindowProtocols.HasCardWindow(ProgramTargetWindowStage.ImplicitSelfDrawTwo, new(kind)) && kind == CardKind.DrawTwo && targets.Count == 0 ? [sourceSeat] : targets.Count == 0 && (HasFinalizedTargetProgram(kind) && (kind == CardKind.Alcohol || CardCatalog.Get(kind).CategoryName == "装备牌") || _coreProgramCardUseNullificationOperations.Value.HasBeforeTargetCardProgram(kind) && kind is CardKind.Alcohol or CardKind.DrawTwo) ? [sourceSeat] : targets;
+    internal IReadOnlyList<int> GetImplicitSelfCardUseTargets(CardKind kind, int sourceSeat, IReadOnlyList<int> targets) => (_contentRegistryOperations._contentRegistry.ProgramDependencies.RequiresFact(ProgramTrackedFact.ActualCardUseHistory) || _coreProgramTargetWindowProtocolsOperations.TargetWindowProtocols.HasCardWindow(ProgramTargetWindowStage.ImplicitSelfDrawTwo, new(kind))) && kind == CardKind.DrawTwo && targets.Count == 0 ? [sourceSeat] : targets.Count == 0 && (HasFinalizedTargetProgram(kind) && (kind == CardKind.Alcohol || CardCatalog.Get(kind).CategoryName == "装备牌") || _coreProgramCardUseNullificationOperations.Value.HasBeforeTargetCardProgram(kind) && kind is CardKind.Alcohol or CardKind.DrawTwo) ? [sourceSeat] : targets;
     internal bool TryBeginEquipmentTargetPrograms(CharacterState source, Card equipment, long frameId)
     {
         if (_characterWeiYanHappyGodOperations.TryHappyWeiYanEquipmentCommitted(frameId, equipment) || _characterChengYuMouOperations.TryMouCyEquipmentCommitted(frameId, equipment) || _characterHuangZhongAnniversaryGodOperations.TryAnniversaryHzEquipmentCommitted(frameId, equipment) || _characterCaoZhenBoundaryMobileOperations.Value.TryBoundarySidiEquipmentCommitted(frameId, equipment))

@@ -13,7 +13,7 @@ internal sealed partial class CharacterHuaManOlRuntime
     internal void ObserveAcceptedHuaManUse(CardActionAcceptedEvent accepted) => ObserveHuaManAcceptedUse(accepted.Action);
     internal void ObserveHuaManAcceptedUse(CardActionContext action)
     {
-        if (!HasActualSouyingObserver() || !_coreCurrentTurnUseKindsOperations.HasOngoingActualUseTurn || action.Type != CardActionType.Use && !_characterGuoSiOlOperations.GuoSiResponseUse(action) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat))
+        if (!HasActualSouyingObserver() || !_coreCurrentTurnUseKindsOperations.HasOngoingActualUseTurn || action.Type != CardActionType.Use && _actualUseHistory.FindAction(action.ActionId)?.IsSelfNativeResponseUse != true || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat))
             return;
         var owner = _coreMatchParticipantsPlayersAccess._players[action.ActorSeat];
         var list = (owner.HuaManUses ?? []).Where(s => s.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber).ToArray();

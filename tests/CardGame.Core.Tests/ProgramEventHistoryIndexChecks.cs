@@ -31,6 +31,7 @@ internal static class ProgramEventHistoryIndexChecks
         Require(separate.Read<Fact>().Count == 0,
             "A separate match must not share typed history or cached pending state.");
         BoundaryQueriesKeepJournalOrderAndLiveTails();
+        ActualUsesKeepAcceptedAndFinalizedOrdersSeparate();
     }
 
     private static void BoundaryQueriesKeepJournalOrderAndLiveTails()
@@ -79,6 +80,55 @@ internal static class ProgramEventHistoryIndexChecks
         Require(ReferenceEquals(arrayJournal.LastMatching(fact => fact is BoundaryFact), committedBoundary) &&
                 arrayJournal.Complete().SequenceEqual(new IGameEvent[] { before, committedBoundary, after }),
             "The read-only committed-journal fallback retains the same order and exact payload identities.");
+    }
+
+    private static void ActualUsesKeepAcceptedAndFinalizedOrdersSeparate()
+    {
+        var history = new ProgramEventHistoryIndex([], []);
+        static CardActionContext Action(long id, CardActionType type = CardActionType.Use) =>
+            new(id, null, type, 0, 0, null, type == CardActionType.Response ? 0 : null, null,
+                type == CardActionType.Response ? CardKind.Dodge : CardKind.IronChain, [2], [], []);
+        var first = Action(1); var second = Action(2); var response = Action(3, CardActionType.Response);
+        history.Append(new ActualCardActionRecordedEvent(first, 1, 0, TurnPhase.Play, 7, false));
+        history.Append(new ActualCardActionRecordedEvent(second, 1, 0, TurnPhase.Play, 7, false));
+        Require(history.FindAction(1) is { NativeUseId: null, PrimaryTargets: null, Finalized: false, Completed: false },
+            "Acceptance does not invent a finalized target snapshot or native return.");
+        history.Append(new ActualCardUseTargetsFinalizedEvent(20, second, [2]));
+        history.Append(new ActualCardUseTargetsFinalizedEvent(10, first, [2]));
+        history.Append(new ActualCardActionRecordedEvent(first, 1, 0, TurnPhase.Play, 7, false));
+        var accepted = history.AcceptedPairFor(2);
+        Require(accepted.Select(e => e.Action.ActionId).SequenceEqual([1L, 2L]) &&
+            history.PreviousFinalizedUse(10)?.NativeUseId == 20 && history.PreviousFinalizedUse(20) is null,
+            "A nested use may finalize first; repeated acceptance neither reorders nor duplicates the independent accepted prefix.");
+        history.Append(new CardUseFinishedEvent(20, 0, CardKind.IronChain));
+        Require(history.FindFinalizedUse(20) is { Completed: true } && history.FindFinalizedUse(10) is { Completed: false } &&
+            !accepted[1].Completed && accepted is System.Collections.IList { IsReadOnly: true },
+            "Actual completion updates its own entry while the earlier exposed accepted snapshot remains immutable.");
+        history.Append(new ActualCardActionRecordedEvent(response, 1, 0, TurnPhase.Play, 7, true));
+        Require(history.FindAction(3) is { NativeUseId: null, PrimaryTargets: null, Completed: false },
+            "An accepted native response has no fabricated CardUse frame or target set.");
+        history.Append(new CardResponseCompletedEvent(3, 30, 40, 0, 0, CardKind.Dodge,
+            ProgramCardContinuation.Dodge, 1, 0, 0));
+        Require(history.FindAction(3) is { NativeUseId: null, PrimaryTargets.Count: 0, Completed: true } &&
+            history.AcceptedPairFor(3).Select(e => e.Action.ActionId).SequenceEqual([2L, 3L]),
+            "The real response completion finalizes an empty target set and cuts the current accepted-use pair without a synthetic native ID.");
+        history.Append(new ActualCardUseTargetsCompletedEvent(20, second, [2]));
+        var completed = history.AcceptedPairAtCompletionFor(2);
+        history.Append(new ActualCardActionRecordedEvent(Action(4), 1, 0, TurnPhase.Play, 7, false));
+        Require(completed.Select(e => e.Action.ActionId).SequenceEqual([2L, 3L]) &&
+            history.AcceptedPairAtCompletionFor(2).Select(e => e.Action.ActionId).SequenceEqual([2L, 3L]) &&
+            history.AcceptedPairFor(2).Select(e => e.Action.ActionId).SequenceEqual([1L, 2L]),
+            "Completion freezes the actual accepted tail after an intervening response; neither a later action nor the earlier acceptance prefix replaces it.");
+        var changedTargets = new[] { 1 };
+        var completion = new ActualCardUseTargetsCompletedEvent(10, first, changedTargets);
+        var copied = completion with { PrimaryTargets = changedTargets };
+        changedTargets[0] = 0;
+        history.Append(copied);
+        Require(history.FindCompletedUse(10)!.PrimaryTargets!.SequenceEqual([1]) &&
+            history.FindFinalizedUse(10)!.PrimaryTargets!.SequenceEqual([2]) &&
+            ((ActualCardUseTargetsCompletedEvent)CommittedEventProjection.Freeze(completion)).PrimaryTargets.SequenceEqual([1]) &&
+            copied.PrimaryTargets is System.Collections.IList { IsReadOnly: true },
+            "Completion targets stay detached from constructor and with inputs, without overwriting the earlier finalized view.");
     }
 
     private sealed record BoundaryFact : IGameEvent;
