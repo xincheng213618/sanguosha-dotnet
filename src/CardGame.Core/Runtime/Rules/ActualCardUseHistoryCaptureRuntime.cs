@@ -39,6 +39,12 @@ internal sealed class ActualCardUseHistoryCaptureRuntime(IProgramContentQueries 
             ActualCardUseTargets.PrincipalTargets(action)));
     }
 
+    public void RecordUpdated(CardUseFrame use, CardActionContext action)
+    {
+        if (IsRequired && action.Type == CardActionType.Use && history.FindAction(action.ActionId) is not null)
+            events.AdvanceFact(new ActualCardUseActionUpdatedEvent(use.Id, action));
+    }
+
     private bool IsSelfNativeResponseUse(CardActionContext action)
     {
         if (action.Type != CardActionType.Response || action.ActorSeat != action.ProviderSeat ||

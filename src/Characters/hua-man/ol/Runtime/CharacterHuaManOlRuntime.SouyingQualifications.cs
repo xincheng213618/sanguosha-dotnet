@@ -3,11 +3,18 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuaManOlRuntime
 {
-    internal bool HasActualSouyingObserver() => HasHuaManCapability && _coreMatchParticipantsPlayersAccess._players.Any(p => _coreNationalSkillsOperations.GetSkillBindingShard(p).ProgramInstances.Any(i => i.Program.Triggers.Any(t => t.Effects.Any(e => e.Op == SkillProgramEffectOp.PaySouyingDirectionalSoleTarget))));
-    internal bool ExactSouyingUse(ProgramSkillFrame f, out CardUseFrame use)
+    private SouyingQualification? GetSouyingQualification(ProgramSkillWindowContext context)
+    {
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } || _actualUseHistory.FindFinalizedUse(identity.ParentCardUseFrameId) is not { Action: { Type: CardActionType.Use } action } current || action.ActionId != identity.CardActionId || action.EffectiveDesignatedTargetSeats.Distinct().ToArray() is not [var target] || target == action.ActorSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
+            return null;
+        var ordinal = _actualUseHistory.FinalizedDirectedTargetOrdinal(identity.ParentCardUseFrameId, target);
+        return ordinal is > 1 ? new(current.ActualTurn, identity.ParentCardUseFrameId, action.ActionId, action.ActorSeat, action.ProviderSeat, target, ordinal.Value) : null;
+    }
+
+    private bool ExactSouyingUse(ProgramSkillFrame f, SouyingQualification q, out CardUseFrame use)
     {
         use = null !;
-        if (f.WindowContext is not { HuaManSouying: { } q, CardUse: { } context } w || q.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || q.DirectionOrdinal < 2 || f.OwnerSeat != q.ActorSeat && f.OwnerSeat != q.TargetSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(q.NativeUseId)is not { Action: { } action } actual || actual.HuaManSouyingQualification != q || context.ParentCardUseFrameId != actual.Id || context.CardActionId != action.ActionId || action.ActionId != q.ActionId || action.ActorSeat != q.ActorSeat || action.ProviderSeat != q.ProviderSeat || !action.EffectiveDesignatedTargetSeats.SequenceEqual([q.TargetSeat]))
+        if (f.WindowContext is not { CardUse: { } context } w || q.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || q.DirectionOrdinal < 2 || f.OwnerSeat != q.ActorSeat && f.OwnerSeat != q.TargetSeat || _coreCardUseLifecycleOperations.LifecycleCardUse(q.NativeUseId)is not { Action: { } action } actual || context.ParentCardUseFrameId != actual.Id || context.CardActionId != action.ActionId || action.ActionId != q.ActionId || action.ActorSeat != q.ActorSeat || action.ProviderSeat != q.ProviderSeat || !action.EffectiveDesignatedTargetSeats.SequenceEqual([q.TargetSeat]))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramCardTriggerWindowFrame parent || parent.Id != w.ParentFrameId || parent.ParentFrameId != actual.Id || CoreGameEngineCardActionsRuntime.GetCardActionWindow(parent) != SkillProgramTriggerWindow.CardUseTargetsFinalized || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, CoreGameEngineCardActionsRuntime.ToSharedCandidate(parent.Candidates[parent.CandidateIndex])))
@@ -20,7 +27,7 @@ internal sealed partial class CharacterHuaManOlRuntime
     internal bool ValidSouyingMutation(CardUseFrame use, SouyingNativeMutation r)
     {
         var q = r.Qualification;
-        if (use.HuaManSouyingQualification != q || use.Action is not { } action || action.ActionId != q.ActionId || action.ActorSeat != q.ActorSeat || action.ProviderSeat != q.ProviderSeat || q.NativeUseId != use.Id || q.DirectionOrdinal < 2 || q.ActorSeat == q.TargetSeat || r.Source.OwnerSeat != q.ActorSeat && r.Source.OwnerSeat != q.TargetSeat || r.Source.OwnerSeat != (r.Cancelled ? q.TargetSeat : q.ActorSeat) || r.PaymentBefore >= r.PaymentAfter || r.ClaimBefore > r.ClaimAfter || r.ClaimAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash)
+        if (use.Action is not { } action || action.ActionId != q.ActionId || action.ActorSeat != q.ActorSeat || action.ProviderSeat != q.ProviderSeat || q.NativeUseId != use.Id || q.DirectionOrdinal < 2 || q.ActorSeat == q.TargetSeat || r.Source.OwnerSeat != q.ActorSeat && r.Source.OwnerSeat != q.TargetSeat || r.Source.OwnerSeat != (r.Cancelled ? q.TargetSeat : q.ActorSeat) || r.PaymentBefore >= r.PaymentAfter || r.ClaimBefore > r.ClaimAfter || r.ClaimAfter > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash)
             return false;
         var trigger = _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.Triggers.SingleOrDefault(t => t.Id == r.Source.BindingId);
         if (trigger?.Effects is not [{ Op: SkillProgramEffectOp.PaySouyingDirectionalSoleTarget }] || trigger.Window != SkillProgramTriggerWindow.CardUseTargetsFinalized || trigger.OwnerRelation != SkillProgramCardActionOwnerRelation.Observer || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == r.ProgramFrameId && e.SkillId == r.Source.SkillId && e.BindingId == r.Source.BindingId && e.SkillInstanceId == r.Source.SkillInstanceId && e.OwnerSeat == r.Source.OwnerSeat && e.Window == trigger.Window) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<HuaManStartedEvent>().Count(e => e.FrameId == r.ProgramFrameId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurn == q.ActualTurn && e.Operation == SkillProgramEffectOp.PaySouyingDirectionalSoleTarget) != 1)

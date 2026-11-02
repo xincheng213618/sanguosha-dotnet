@@ -95,8 +95,7 @@ internal sealed partial class CoreGameEngineProgramCardUseRolesRuntime
             throw new InvalidOperationException("A card-use role change lost its parent.");
         var previous = (CardUseFrame)_resolutionStackOperations._resolutionStack[index];
         _coreRuntimeOperations.ReplaceRuntimeFrame(_resolutionStackOperations._resolutionStack[index].Id, use);
-        if (_characterHuaManOlOperations.HasHuaManCapability)
-            _characterHuaManOlOperations.CaptureHuaManCompletedUse(use.Id, action);
+        _actualUseHistoryCapture.RecordUpdated(use, action);
         for (var cursor = index + 1; cursor < _resolutionStackOperations._resolutionStack.Count; cursor++)
             if (_resolutionStackOperations._resolutionStack[cursor] is ProgramCardTriggerWindowFrame window && window.ParentFrameId == use.Id)
                 _coreRuntimeOperations.ReplaceRuntimeFrame(_resolutionStackOperations._resolutionStack[cursor].Id, window with { Action = action });

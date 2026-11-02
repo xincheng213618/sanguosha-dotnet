@@ -1,26 +1,17 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 public sealed record HuaManProgress(int MansiCards,bool Awakened=false);
-public sealed record HuaManDirectionalUse(int ActualTurn,long ActionId,long NativeUseId,int ActorSeat,int ProviderSeat,CardKind Kind,bool Finalized=false)
-{
- private readonly IReadOnlyList<int> _targets=Array.AsReadOnly(Array.Empty<int>());
- public IReadOnlyList<int> Targets{get=>_targets;init=>_targets=Array.AsReadOnly(value.ToArray());}
-}
 public enum HuaManStage{DiscardChoice,DiscardChildren,MansiDraw,ClaimChildren,XiliPayerDraw,XiliSourceDraw,MaximumChildren,RecoveryChildren,MaleChoice,GrantChildren}
 public sealed record HuaManReceipt(CardConversionSource Source,string GameplayHash,int Instruction,long WindowId,int ActualTurn,HuaManStage Stage,long Before=0,long After=0,int ActualCount=0,int? DiscardedId=null,int? OtherSeat=null,long? DamageAttemptResolutionId=null,int? DamageTargetSeat=null,SouyingQualification? Souying=null,int RecoveryRequested=0,bool Paid=false,int NativeOwnerHpBefore=0,int NativeOwnerHpAfter=0);
 public sealed partial class CharacterState
 {
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public HuaManProgress? HuaManProgress{get;set;}
- private IReadOnlyList<HuaManDirectionalUse> _huaManUses=Array.AsReadOnly(Array.Empty<HuaManDirectionalUse>());
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public IReadOnlyList<HuaManDirectionalUse>? HuaManUses{get=>_huaManUses.Count==0?null:_huaManUses;internal set=>_huaManUses=Array.AsReadOnly((value??[]).ToArray());}
 }
 public sealed partial record ProgramSkillFrame{[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public HuaManReceipt? HuaMan{get;init;}}
 public sealed partial record CardUseFrame
 {
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public SouyingQualification? HuaManSouyingQualification{get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public SouyingNativeMutation? HuaManSouyingMutation{get;init;}
 }
-public sealed partial record ProgramSkillWindowContext{[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public SouyingQualification? HuaManSouying{get;init;}}
 public sealed record HuaManStartedEvent(long FrameId,CardConversionSource Source,string GameplayHash,long WindowId,int ActualTurn,SkillProgramEffectOp Operation):IGameEvent;
 public sealed record HuaManMovementPaidEvent(long FrameId,CardConversionSource Source,string GameplayHash,HuaManStage Stage,long Before,long After,int ActualCount,int SubjectSeat):IGameEvent;
 public sealed record HuaManCompletedEvent(long FrameId,CardConversionSource Source,string GameplayHash):IGameEvent;

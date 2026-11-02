@@ -182,7 +182,8 @@ internal static class CommandSessionChecks
         var use = new CardUseFrame(140, 0, 0, CardKind.Slash, targets) { Action = action };
         IGameEvent[] facts = [new ActualCardActionRecordedEvent(action, 1, 0, TurnPhase.Play, 1, false),
             new ActualCardUseTargetsFinalizedEvent(use.Id, action, targets),
-            new ActualCardUseTargetsCompletedEvent(use.Id, action, targets) with { PrimaryTargets = targets }];
+            new ActualCardUseTargetsCompletedEvent(use.Id, action, targets) with { PrimaryTargets = targets },
+            new ActualCardUseActionUpdatedEvent(use.Id, action)];
         EventEnvelope Envelope(int sequence, IGameEvent fact) => new(new(sequence), null, sequence, 1,
             "actual-use-privacy", CommittedEventProjection.Freeze(fact));
         var envelopes = facts.Select((fact, index) => Envelope(index + 1, fact)).ToArray();
@@ -194,13 +195,13 @@ internal static class CommandSessionChecks
         var attempts = 0; var rejected = 0;
         foreach (var item in envelopes)
             AttemptCollectionMutation(item.Payload, new HashSet<object>(ReferenceEqualityComparer.Instance), ref attempts, ref rejected);
-        Require(held.Count == 3 && envelopes.All(item => CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime
+        Require(held.Count == 4 && envelopes.All(item => CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime
                 .MouSmPublicEvent(item, projection) is null) && envelopes.All(item => ReferenceEquals(item,
                 CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime.MouSmPublicEvent(item, null))),
-            "Accepted, finalized and completed history must all retain the original hidden-target event boundary.");
+            "Accepted, updated, finalized and completed history must all retain the original hidden-target event boundary.");
         var otherAction = new CardActionContext(141, null, CardActionType.Use, 0, 0, null, null, null,
             CardKind.Slash, [2], [], []);
-        var other = Envelope(4, new ActualCardUseTargetsFinalizedEvent(use.Id + 1, otherAction, [2]));
+        var other = Envelope(5, new ActualCardUseTargetsFinalizedEvent(use.Id + 1, otherAction, [2]));
         Require(CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime.MouSmPublicEvent(other, projection) == other &&
                 attempts > 0 && rejected == attempts && before.SequenceEqual(envelopes.Select(SerializeEvent)),
             "Target-history facts must reject collection writes, freeze source inputs and leave another use visible.");

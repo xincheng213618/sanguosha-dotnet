@@ -6,7 +6,7 @@ internal sealed partial class CharacterHuaManOlRuntime
     internal void PaySouyingMutation(ProgramSkillFrame f)
     {
         var r = f.HuaMan!;
-        if (r.Stage != HuaManStage.DiscardChildren || !r.Paid || r.Souying is not { } q || r.DiscardedId is not { } discarded || _coreCardUseLifecycleOperations.LifecycleCardUse(q.NativeUseId)is not { Action: { } action } use || use.Action.ActionId != q.ActionId || use.HuaManSouyingQualification != q || use.HuaManSouyingMutation is not null)
+        if (r.Stage != HuaManStage.DiscardChildren || !r.Paid || r.Souying is not { } q || r.DiscardedId is not { } discarded || _coreCardUseLifecycleOperations.LifecycleCardUse(q.NativeUseId)is not { Action: { } action } use || use.Action.ActionId != q.ActionId || use.HuaManSouyingMutation is not null)
             throw new InvalidOperationException("Paid Souying lost its native use, unique direction or actual discarded entity.");
         var cancel = f.OwnerSeat == q.TargetSeat;
         var ids = !cancel && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? action.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, id)).ToArray() : [];

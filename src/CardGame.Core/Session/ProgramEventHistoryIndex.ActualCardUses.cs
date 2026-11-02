@@ -5,6 +5,9 @@ internal sealed partial class ProgramEventHistoryIndex
     // A derived journal index, never pending execution state. Accepted order and
     // finalization order differ when a use suspends for another use.
     private readonly Dictionary<long, ActualCardUseHistoryEntry> _actualActions = [];
+    private readonly Dictionary<long, CardActionContext> _latestActualActions = [];
+    private readonly Dictionary<(int Turn, int Actor), List<long>> _actualTurnActions = [];
+    private readonly Dictionary<(long UseId, int Target), int> _finalizedDirectedTargetOrdinals = [];
     private readonly Dictionary<long, long> _finalizedActions = [];
     private readonly Dictionary<long, long> _previousFinalizedActions = [];
     private readonly Dictionary<long, ActualCardUseHistoryEntry> _completedActualActions = [];
@@ -58,6 +61,12 @@ internal sealed partial class ProgramEventHistoryIndex
             Array.AsReadOnly(new[] { _actualActions[position.Uses[position.Index - 1]], _actualActions[actionId] });
     }
 
+    public int? FinalizedDirectedTargetOrdinal(long nativeUseId, int targetSeat)
+    {
+        SynchronizeActualUses();
+        return _finalizedDirectedTargetOrdinals.TryGetValue((nativeUseId, targetSeat), out var ordinal) ? ordinal : null;
+    }
+
     private void SynchronizeActualUses()
     {
         var stamp = CapturePendingProgramHistoryStamp();
@@ -78,6 +87,7 @@ internal sealed partial class ProgramEventHistoryIndex
         if (!retained)
         {
             _actualActions.Clear(); _finalizedActions.Clear(); _previousFinalizedActions.Clear();
+            _latestActualActions.Clear(); _actualTurnActions.Clear(); _finalizedDirectedTargetOrdinals.Clear();
             _completedActualActions.Clear(); _completedNativeActions.Clear(); _acceptedAtCompletion.Clear();
             _lastFinalizedActions.Clear(); _acceptedActualUses.Clear(); _acceptedActualPositions.Clear();
             _completedNativeUses.Clear();
@@ -94,7 +104,8 @@ internal sealed partial class ProgramEventHistoryIndex
     }
 
     private static bool IsActualUseFact(IGameEvent payload) => payload is ActualCardActionRecordedEvent or
-        ActualCardUseTargetsFinalizedEvent or ActualCardUseTargetsCompletedEvent or CardUseFinishedEvent or CardResponseCompletedEvent;
+        ActualCardUseTargetsFinalizedEvent or ActualCardUseTargetsCompletedEvent or ActualCardUseActionUpdatedEvent or
+        CardUseFinishedEvent or CardResponseCompletedEvent;
 
     private void IndexActualUseFact(IGameEvent payload)
     {
@@ -105,6 +116,13 @@ internal sealed partial class ProgramEventHistoryIndex
                 var action = fact.Action;
                 _actualActions.Add(action.ActionId, new(action, fact.ActualTurn, fact.TurnOwner,
                     fact.Phase, fact.PlayPhaseInstanceId, fact.IsSelfNativeResponseUse));
+                _latestActualActions.Add(action.ActionId, action);
+                if (action.Type == CardActionType.Use || fact.IsSelfNativeResponseUse)
+                {
+                    var turnKey = (fact.ActualTurn, action.ActorSeat);
+                    if (!_actualTurnActions.TryGetValue(turnKey, out var turnUses)) _actualTurnActions[turnKey] = turnUses = [];
+                    turnUses.Add(action.ActionId);
+                }
                 if (fact.Phase != TurnPhase.Play || action.ActorSeat != fact.TurnOwner ||
                     action.Type != CardActionType.Use && !fact.IsSelfNativeResponseUse) break;
                 var key = (fact.ActualTurn, fact.PlayPhaseInstanceId, action.ActorSeat);
@@ -119,7 +137,13 @@ internal sealed partial class ProgramEventHistoryIndex
                 var actionId = fact.Action.ActionId;
                 _actualActions[actionId] = accepted with { Action = fact.Action, NativeUseId = fact.NativeUseId,
                     PrimaryTargets = fact.PrimaryTargets, Completed = _completedNativeUses.Contains(fact.NativeUseId) };
+                _latestActualActions[actionId] = fact.Action;
                 _finalizedActions.Add(fact.NativeUseId, actionId);
+                if (accepted.AcceptedActorSeat == fact.Action.ActorSeat &&
+                    _actualTurnActions.TryGetValue((accepted.ActualTurn, accepted.AcceptedActorSeat), out var turnUses))
+                    foreach (var target in fact.Action.EffectiveDesignatedTargetSeats.Distinct())
+                        _finalizedDirectedTargetOrdinals[(fact.NativeUseId, target)] = turnUses.Count(id =>
+                            id <= actionId && _latestActualActions[id].EffectiveDesignatedTargetSeats.Contains(target));
                 if (accepted.Phase != TurnPhase.Play || fact.Action.ActorSeat != accepted.TurnOwner) break;
                 var key = (accepted.ActualTurn, accepted.PlayPhaseInstanceId, fact.Action.ActorSeat);
                 if (_lastFinalizedActions.TryGetValue(key, out var previous)) _previousFinalizedActions[actionId] = previous;
@@ -137,6 +161,7 @@ internal sealed partial class ProgramEventHistoryIndex
                 var actionId = fact.Action.ActionId;
                 _completedActualActions[actionId] = completedAccepted with { Action = fact.Action, NativeUseId = fact.NativeUseId,
                     PrimaryTargets = fact.PrimaryTargets, Completed = _completedNativeUses.Contains(fact.NativeUseId) };
+                _latestActualActions[actionId] = fact.Action;
                 _completedNativeActions.Add(fact.NativeUseId, actionId);
                 if (_acceptedActualPositions.TryGetValue(actionId, out var position))
                 {
@@ -153,6 +178,9 @@ internal sealed partial class ProgramEventHistoryIndex
                 }
                 break;
             }
+            case ActualCardUseActionUpdatedEvent fact when _actualActions.ContainsKey(fact.Action.ActionId):
+                _latestActualActions[fact.Action.ActionId] = fact.Action;
+                break;
             case CardResponseCompletedEvent fact when _actualActions.TryGetValue(fact.ActionId, out var response):
                 _actualActions[fact.ActionId] = response with { PrimaryTargets = Array.Empty<int>(), Completed = true };
                 _completedActualActions[fact.ActionId] = _actualActions[fact.ActionId];

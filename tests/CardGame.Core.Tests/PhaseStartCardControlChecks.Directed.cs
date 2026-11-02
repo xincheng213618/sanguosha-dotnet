@@ -39,6 +39,7 @@ internal static partial class PhaseStartCardControlChecks
         foreach (var count in new[] { 2, 3 }) DirectedWeiwanUsesActualObtainedCount(count);
         TargetQuotaAllowsSelfAndUsesOriginalIssuanceSlots();
         ActualCardUseHistoryKeepsNativeOrderAndPrincipalTargets();
+        HuaManUsesFrozenDirectedHistory();
     }
 
     private static void DirectedPolicyIssuedAfterTurnEndSkipsThatOccurrence()
@@ -133,7 +134,7 @@ internal static partial class PhaseStartCardControlChecks
         ShanheStartingCard[] hand = scenario == "quota-self"
             ? [new(CardKind.Alcohol, Suit.Club, 7), new(CardKind.Alcohol, Suit.Heart, 8), new(CardKind.Slash, Suit.Spade, 9), new(CardKind.Duel, Suit.Diamond, 10)]
             : [new(CardKind.Slash, Suit.Club, 7), new(CardKind.Slash, Suit.Heart, 8), new(CardKind.Slash, Suit.Spade, 9), new(CardKind.Duel, Suit.Diamond, 10)];
-        if (scenario.StartsWith("history", StringComparison.Ordinal)) hand = HistoryStartingHand();
+        if (scenario.StartsWith("history", StringComparison.Ordinal) || scenario.StartsWith("souying", StringComparison.Ordinal)) hand = HistoryStartingHand();
         var setup = new ShanheBattleSetup(7, 1, "directed-rights", Owner, 12, 0, 0, 0, 0, [],
             hand, [],
             [target, new(DirectedPeer) { StartingHand = [] }], [new(DirectedPeer) { StartingHand = [],
@@ -163,6 +164,7 @@ internal static partial class PhaseStartCardControlChecks
             if (scenario == "freeze") skills.Add("classic:guhuo");
             if (scenario == "weiwan") skills.AddRange(["le:qiqin", "le:weiwan"]);
             if (nativeQuotaSkill is not null) skills.Add(nativeQuotaSkill);
+            if (scenario.StartsWith("souying", StringComparison.Ordinal)) RegisterSouyingFixture(b, skills);
             if (scenario.StartsWith("history", StringComparison.Ordinal))
             {
                 foreach (var bundle in new[] { "ol-su-fei", "ol-guo-si" })
@@ -171,8 +173,9 @@ internal static partial class PhaseStartCardControlChecks
                     foreach (var (id, program) in actual.Programs) b.AddSkill(new(id, actual.Presentations[id].Name, actual.Presentations[id].Description)
                         { Program = program, ProgramPresentation = actual.Presentations[id] });
                 }
-                b.AddCard(new("fixture:history-borrowed", "借刀杀人", "锦囊牌", "真实原生复合目标", CardKind.BorrowedSword));
             }
+            if (scenario.StartsWith("history", StringComparison.Ordinal) || scenario.StartsWith("souying", StringComparison.Ordinal))
+                b.AddCard(new("fixture:history-borrowed", "借刀杀人", "锦囊牌", "真实原生复合目标", CardKind.BorrowedSword));
             var rules = JsonNode.Parse(SkillProgramTestJson.CurrentSchema("""
             {"schemaVersion":__RULES_SCHEMA__,"skills":[
               {"id":"fixture:directed-policy-source","revision":1,"activations":[
@@ -186,6 +189,7 @@ internal static partial class PhaseStartCardControlChecks
             """))!;
             ConfigureQuotaFixture(rules, scenario);
             ConfigureHistoryFixture(rules, scenario, skills);
+            ConfigureHuaManHistoryFixture(rules, scenario, skills);
             foreach (var skill in rules["skills"]!.AsArray())
             foreach (var activation in skill!["activations"]?.AsArray() ?? new JsonArray())
             {

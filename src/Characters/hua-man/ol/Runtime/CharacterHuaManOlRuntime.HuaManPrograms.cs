@@ -37,11 +37,12 @@ internal sealed partial class CharacterHuaManOlRuntime
 
         if (op == SkillProgramEffectOp.PaySouyingDirectionalSoleTarget)
         {
-            if (!ExactSouyingUse(f, out var use) || use.HuaManSouyingMutation is not null)
+            var qualification = GetSouyingQualification(w);
+            if (qualification is null || !ExactSouyingUse(f, qualification, out var use) || use.HuaManSouyingMutation is not null)
                 throw new InvalidOperationException("Souying requires its actual directional sole designation.");
             BeginHuaMan(f, HuaManStage.DiscardChoice, op);
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HuaMan = f.HuaMan!with { Souying = w.HuaManSouying } });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HuaMan = f.HuaMan!with { Souying = qualification } });
             PublishHuaManChoice(f);
             return SkillProgramStepOutcome.AwaitChoice;
         }

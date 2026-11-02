@@ -78,6 +78,7 @@ internal static class CommittedEventProjection
         // This fact freezes both constructor and with-assignment collection input.
         ActualCardUseTargetsFinalizedEvent value => value,
         ActualCardUseTargetsCompletedEvent value => value,
+        ActualCardUseActionUpdatedEvent value => value,
         SourceKeshouPaidBranchEvent value => value with
         { Receipt = value.Receipt with { Materials = FreezeList(value.Receipt.Materials) } },
         AnniversaryCuiLieUseChangedEvent value => value with

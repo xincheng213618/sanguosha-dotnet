@@ -5,6 +5,8 @@ public sealed record ActualCardUseHistoryEntry(CardActionContext Action, int Act
     TurnPhase Phase, int PlayPhaseInstanceId, bool IsSelfNativeResponseUse,
     long? NativeUseId = null, IReadOnlyList<int>? PrimaryTargets = null, bool Completed = false)
 {
+    // Replacing a native role does not issue another accepted action.
+    public int AcceptedActorSeat { get; } = Action.ActorSeat;
     private readonly IReadOnlyList<int>? _primaryTargets = PrimaryTargets is null ? null : Array.AsReadOnly(PrimaryTargets.ToArray());
     public IReadOnlyList<int>? PrimaryTargets
     {
@@ -22,4 +24,5 @@ internal interface IActualCardUseHistoryQueries : IProgramSelectionQuery
     ActualCardUseHistoryEntry? PreviousFinalizedUse(long nativeUseId);
     IReadOnlyList<ActualCardUseHistoryEntry> AcceptedPairFor(long actionId);
     IReadOnlyList<ActualCardUseHistoryEntry> AcceptedPairAtCompletionFor(long actionId);
+    int? FinalizedDirectedTargetOrdinal(long nativeUseId, int targetSeat);
 }

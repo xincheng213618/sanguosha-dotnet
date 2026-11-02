@@ -32,6 +32,7 @@ internal static class ProgramEventHistoryIndexChecks
             "A separate match must not share typed history or cached pending state.");
         BoundaryQueriesKeepJournalOrderAndLiveTails();
         ActualUsesKeepAcceptedAndFinalizedOrdersSeparate();
+        DirectedOrdinalsUseAcceptedDesignationsAcrossStages();
     }
 
     private static void BoundaryQueriesKeepJournalOrderAndLiveTails()
@@ -129,6 +130,47 @@ internal static class ProgramEventHistoryIndexChecks
             ((ActualCardUseTargetsCompletedEvent)CommittedEventProjection.Freeze(completion)).PrimaryTargets.SequenceEqual([1]) &&
             copied.PrimaryTargets is System.Collections.IList { IsReadOnly: true },
             "Completion targets stay detached from constructor and with inputs, without overwriting the earlier finalized view.");
+    }
+
+    private static void DirectedOrdinalsUseAcceptedDesignationsAcrossStages()
+    {
+        static CardActionContext Use(long id, int actor, int[] targets, CardKind kind = CardKind.IronChain) =>
+            new(id, null, CardActionType.Use, actor, actor, null, null, null, kind, targets, [], [], designatedTargetSeats: targets);
+        var history = new ProgramEventHistoryIndex([], []);
+        var outer = Use(1, 1, [2]); var inner = Use(2, 1, [2]);
+        history.Append(new ActualCardActionRecordedEvent(outer, 5, 0, TurnPhase.Draw, 7, false));
+        history.Append(new ActualCardActionRecordedEvent(inner, 5, 0, TurnPhase.Finished, 8, false));
+        history.Append(new ActualCardUseTargetsFinalizedEvent(20, inner, [2]));
+        Require(history.FindFinalizedUse(10) is null && history.FinalizedDirectedTargetOrdinal(20, 2) == 2,
+            "A real foreign actor's unfinalized outer designation counts in the same actual turn across non-Play phases.");
+        history.Append(new ActualCardUseActionUpdatedEvent(10, Use(1, 1, [])));
+        var third = Use(3, 1, [2]);
+        history.Append(new ActualCardActionRecordedEvent(third, 5, 0, TurnPhase.Play, 9, false));
+        history.Append(new ActualCardUseTargetsFinalizedEvent(30, third, [2]));
+        Require(history.FinalizedDirectedTargetOrdinal(30, 2) == 2 && history.FinalizedDirectedTargetOrdinal(20, 2) == 2 &&
+            history.FindAction(1) is { Completed: false, Finalized: false },
+            "A target update changes future counts without finalizing its outer action or rewriting an already frozen qualification.");
+
+        history = new([], []);
+        var borrowed = Use(1, 0, [1, 2], CardKind.BorrowedSword);
+        history.Append(new ActualCardActionRecordedEvent(borrowed, 5, 0, TurnPhase.Play, 9, false));
+        history.Append(new ActualCardUseTargetsFinalizedEvent(10, borrowed, [1]));
+        var victim = Use(2, 0, [2]);
+        history.Append(new ActualCardActionRecordedEvent(victim, 5, 0, TurnPhase.Play, 9, false));
+        history.Append(new ActualCardUseTargetsFinalizedEvent(20, victim, [2]));
+        Require(history.FindFinalizedUse(10)!.PrimaryTargets!.SequenceEqual([1]) && history.FinalizedDirectedTargetOrdinal(20, 2) == 2,
+            "Directed designation counts Borrowed Sword's paired victim even though consecutive primary-target history contains only its holder.");
+
+        history = new([], []);
+        history.Append(new ActualCardActionRecordedEvent(Use(1, 0, [2]), 5, 0, TurnPhase.Play, 9, false));
+        history.Append(new ActualCardUseActionUpdatedEvent(10, Use(1, 1, [2])));
+        history.Append(new ActualCardActionRecordedEvent(Use(2, 1, [2]), 5, 0, TurnPhase.Play, 9, false));
+        history.Append(new ActualCardUseTargetsFinalizedEvent(20, Use(2, 1, [2]), [2]));
+        history.Append(new ActualCardActionRecordedEvent(Use(3, 0, [2]), 5, 0, TurnPhase.Play, 9, false));
+        history.Append(new ActualCardUseTargetsFinalizedEvent(30, Use(3, 0, [2]), [2]));
+        Require(history.FindAction(1)!.AcceptedActorSeat == 0 && history.FinalizedDirectedTargetOrdinal(20, 2) == 1 &&
+            history.FinalizedDirectedTargetOrdinal(30, 2) == 2,
+            "An issued actor replacement never moves the already accepted action into another actor's history bucket.");
     }
 
     private sealed record BoundaryFact : IGameEvent;

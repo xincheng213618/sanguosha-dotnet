@@ -3,6 +3,8 @@ namespace CardGame.Core;
 public sealed record ActualCardActionRecordedEvent(CardActionContext Action, int ActualTurn,
     int TurnOwner, TurnPhase Phase, int PlayPhaseInstanceId, bool IsSelfNativeResponseUse) : IGameEvent;
 
+public sealed record ActualCardUseActionUpdatedEvent(long NativeUseId, CardActionContext Action) : IGameEvent;
+
 public sealed record ActualCardUseTargetsFinalizedEvent(long NativeUseId, CardActionContext Action,
     IReadOnlyList<int> PrimaryTargets) : IGameEvent
 {
@@ -24,6 +26,7 @@ internal interface IActualCardUseHistoryCapture : IProgramRuntimeOperations
     bool IsRequired { get; }
     void RecordFinalized(CardUseFrame use, CardActionContext action);
     void RecordCompleted(CardUseFrame use, CardActionContext action);
+    void RecordUpdated(CardUseFrame use, CardActionContext action);
 }
 
 internal static class ActualCardUseTargets

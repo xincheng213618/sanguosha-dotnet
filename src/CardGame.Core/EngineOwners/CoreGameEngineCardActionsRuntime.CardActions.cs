@@ -249,14 +249,6 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
             _characterYuanTanYuanShangOlOperations.CaptureNeifaPaidEquipmentUse(nativeUse.Id, action);
         }
 
-        if (window == SkillProgramTriggerWindow.CardUseTargetsFinalized && _characterHuaManOlOperations.HasHuaManCapability && action.Type == CardActionType.Use)
-        {
-            var nativeUse = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(use => use.Action?.ActionId == action.ActionId);
-            _characterHuaManOlOperations.CaptureHuaManFinalizedUse(nativeUse.Id, action);
-        }
-
-        if (window == SkillProgramTriggerWindow.CardUseCompleted && _characterHuaManOlOperations.HasHuaManCapability && action.Type == CardActionType.Use && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ActionId)is { } huaManCompleted)
-            _characterHuaManOlOperations.CaptureHuaManCompletedUse(huaManCompleted.Id, action);
         if (_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveQigongActualDodgedSlashRequest) && window is SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.CardUseCommitted && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ActionId)is { Qigong: not null } qigongUse)
             _characterLvKuangLvXiangOlOperations.CompleteQigongNativePayment(qigongUse.Id);
         _coreQuotaTopProgramsOperations.RegisterFirstTurnTargetActions(action, window);
@@ -435,7 +427,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
     internal ProgramSkillWindowContext CreateCardActionProgramContext(ProgramCardTriggerWindowFrame frame, ProgramCardTriggerCandidate candidate)
     {
         var context = candidate.FrozenContext ?? CreateCardActionProgramContext(frame.Action, GetCardActionWindow(frame), frame.Id, candidate.OwnerSeat, candidate.OpponentSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], frame.Action));
-        return _characterPangJiOlOperations.CreateBiguoTargetContext(frame, candidate, _characterLiFengOlOperations.CreateJiyunCompletedUseContext(frame, candidate, _characterLiuPanOlOperations.CreatePijingIssuedContext(frame, candidate, _characterMaMiDiOlOperations.CreateMaMiDiIssuedContext(frame, candidate, _characterHuaManOlOperations.CreateHuaManCardUseContext(frame, ToSharedCandidate(candidate), context)))));
+        return _characterPangJiOlOperations.CreateBiguoTargetContext(frame, candidate, _characterLiFengOlOperations.CreateJiyunCompletedUseContext(frame, candidate, _characterLiuPanOlOperations.CreatePijingIssuedContext(frame, candidate, _characterMaMiDiOlOperations.CreateMaMiDiIssuedContext(frame, candidate, context))));
     }
 
     internal ProgramSkillWindowContext CreateCardActionProgramContext(CardActionContext action, SkillProgramTriggerWindow window, long parentFrameId, int ownerSeat, int eventTargetSeat, SkillProgramTriggerFacts facts)
@@ -448,10 +440,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
         var publicSuit = suits.Length == 1 ? suits[0] : (Suit? )null;
         bool? isRed = suits.Length == 0 ? null : suits.All(suit => suit is Suit.Heart or Suit.Diamond);
         var debit = _coreCardUseDebitsOperations.GetCardUseDebit(action.ActionId);
-        return new(window, parentFrameId, ownerSeat, SourceSeat: action.ActorSeat, TargetSeat: eventTargetSeat >= 0 ? eventTargetSeat : null, Facts: facts, CardUse: new(action.ActionId, parentFrameId, action.ActorSeat, eventTargetSeat >= 0 ? eventTargetSeat : null, action.EffectiveKind, publicSuit, isRed, debit is not null, debit, action.DesignatedTargetSeats))
-        {
-            HuaManSouying = _characterHuaManOlOperations.HasHuaManCapability ? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == action.ActionId)?.HuaManSouyingQualification : null
-        };
+        return new(window, parentFrameId, ownerSeat, SourceSeat: action.ActorSeat, TargetSeat: eventTargetSeat >= 0 ? eventTargetSeat : null, Facts: facts, CardUse: new(action.ActionId, parentFrameId, action.ActorSeat, eventTargetSeat >= 0 ? eventTargetSeat : null, action.EffectiveKind, publicSuit, isRed, debit is not null, debit, action.DesignatedTargetSeats));
     }
 
     internal static SkillProgramTriggerWindow GetCardActionWindow(ProgramCardTriggerWindowFrame frame) => frame.MouSimaYiPlayed?.Window ?? frame.MouLuSuAnniversaryPlayed?.Window ?? RuntimeSkills.RuntimeRules_Core_CardActions.GetCardActionWindow(frame);
