@@ -54,6 +54,100 @@ internal static class ProgramExpressionChecks
             "Undefined HP and unknown sets stay unknown through not and short-circuit only on a decided and/or operand.");
         ConditionalGrantFactsUseSharedReadsAndOrderedSuitRewrites();
         CardUseFactsComposeThroughExistingExpressions();
+        HandGainCardFactsComposeWithoutRefreshingTheirSnapshots();
+    }
+
+    private static void HandGainCardFactsComposeWithoutRefreshingTheirSnapshots()
+    {
+        var incoming = new List<HandGainCardSnapshot>
+        {
+            new(11, CardKind.Dodge, CardKind.FireSlash, Suit.Heart),
+            new(12, CardKind.Slash, CardKind.Dodge, Suit.Spade),
+            new(13, CardKind.Slash, CardKind.Slash, Suit.Heart, IsActualGain: false)
+        };
+        var previous = new List<HandGainCardSnapshot>
+        {
+            new(21, CardKind.Slash, CardKind.FireSlash, Suit.Heart),
+            new(22, CardKind.Slash, CardKind.Dodge, Suit.Spade)
+        };
+        var gain = new HandGainOccurrence(10, 0, 2, new(2, TurnPhase.Draw, 1), false, true)
+        { Incoming = incoming, PreviousHand = previous, InitiallyAlive = true };
+        var world = new HandGainFactsWorld(gain);
+        IReadOnlyList<HandGainCardSnapshot>? Cards(string expression, IProgramExpressionWorld facts)
+        {
+            using var document = JsonDocument.Parse(expression);
+            var parsed = ProgramExpressions.ParseCardSet(document.RootElement, "cards");
+            Need(parsed.Type == ProgramExpressionType.CardSet, "A gain collection has its own card-set type.");
+            return ProgramExpressions.EvaluateCardSet(parsed, facts);
+        }
+        const string allIncoming = """["gainCards","owner","incoming"]""";
+        const string actualIncoming = """["filter",["gainCards","owner","incoming"],["cardActualGain","card"]]""";
+        const string matchingWitness = """
+            ["filter",["gainCards","owner","incoming"],"incoming",
+              ["any",["gainCards","owner","previousHand"],"old",
+                ["and",["sameCardKind","incoming","old"],["sameCardSuit","incoming","old"]]]]
+            """;
+        Need(Cards(allIncoming, world)!.Select(card => card.CardId).SequenceEqual([11, 12, 13]) &&
+            Cards(actualIncoming, world)!.Select(card => card.CardId).SequenceEqual([11, 12]) &&
+            Eval("""["==",["count",["gainCards","owner","incoming"],["cardKindIs","card",["slash","fireSlash","thunderSlash"]]],2]""", world) == true &&
+            Eval("""["all",["gainCards","owner","previousHand"],["cardActualGain","card"]]""", world) == true,
+            "Physical arrivals include an original-material return; actual-gain filtering and the shared Slash kind matcher remain separate reads.");
+        Need(Cards(matchingWitness, world)!.Select(card => card.CardId).SequenceEqual([11, 12]) &&
+            Eval("""["==",["count",["gainCards","owner","incoming"],["any",["gainCards","owner","previousHand"],"old",["sameCardSuit","card","old"]]],3]""", world) == true &&
+            Eval("""["all","livingOthers",["any",["gainCards","owner","incoming"],"candidate",["and",["cardActualGain","candidate"],["not",["same","it","owner"]]]]]""", world) == true,
+            "Named card iterators retain both outer card and participant scopes; matching uses each frozen effective kind and suit, rather than its printed face.");
+        Need(Eval("""["and",["gainInitiallyAlive","owner"],["gainFirstOutsideDraw","owner"],["gainPhaseIs","owner","draw","selectedTarget"],["not",["gainPhaseIs","owner","draw","owner"]]]""", world) == true,
+            "Initial admission and the sampled phase actor remain independent of completion-time life and the actual turn owner.");
+
+        incoming[0] = incoming[0] with { EffectiveKind = CardKind.Peach, EffectiveSuit = Suit.Diamond };
+        incoming.Clear(); previous.Clear();
+        Need(Cards(matchingWitness, world)!.Select(card => card.CardId).SequenceEqual([11, 12]) &&
+            Eval("""["any",["gainCards","owner","incoming"],["and",["cardKindIs","card",["slash","fireSlash","thunderSlash"]],["cardSuitIs","card",["heart"]]]]""", world) == true,
+            "Later source-list changes cannot refresh either acquisition or old-hand card identities, kinds or suits.");
+
+        var unknown = new HandGainFactsWorld(null);
+        var empty = new HandGainFactsWorld(gain with { Incoming = [], PreviousHand = [], Timing = null });
+        Need(Cards(allIncoming, unknown) is null && Cards(actualIncoming, unknown) is null &&
+            Eval("""["not",["any",["gainCards","owner","incoming"],true]]""", unknown) is null &&
+            Eval("""["not",["gainInitiallyAlive","owner"]]""", unknown) is null &&
+            Eval("""["gainFirstOutsideDraw","selectedTarget"]""", world) is null &&
+            Eval("""["gainPhaseIs","owner","draw","owner"]""", empty) is null,
+            "Absent acquisitions, recipients and sampled timing remain unknown, including through negation and filtering.");
+        Need(Cards(actualIncoming, empty) is { Count: 0 } &&
+            Eval("""["and",["==",["count",["gainCards","owner","incoming"],true],0],["all",["gainCards","owner","incoming"],false],["not",["any",["gainCards","owner","incoming"],true]]]""", empty) == true,
+            "A real empty acquisition remains a known empty card set with ordinary count and quantifier semantics.");
+
+        foreach (var invalid in new[]
+        {
+            """["gainInitiallyAlive",1]""",
+            """["cardActualGain","card"]""",
+            """["any",["gainCards","owner","incoming"],["alive","card"]]""",
+            """["any","living",["cardActualGain","it"]]""",
+            """["any",["gainCards","owner","missing"],true]""",
+            """["any",["gainCards","owner","incoming"],["cardKindIs","card",["notACardKind"]]]""",
+            """["any",["gainCards","owner","incoming"],["cardSuitIs","card",["notASuit"]]]""",
+            """["any",["gainCards","owner","incoming"],"owner",true]""",
+            """["any",["gainCards","owner","incoming"],"entry",["any",["gainCards","owner","previousHand"],"entry",true]]""",
+            """["and",["any",["gainCards","owner","incoming"],"entry",true],["cardActualGain","entry"]]"""
+        })
+        {
+            try { Bool(invalid); }
+            catch (InvalidOperationException) { continue; }
+            throw new InvalidOperationException("Invalid typed or scoped card expression was accepted: " + invalid);
+        }
+        using var scalar = JsonDocument.Parse("true");
+        try { ProgramExpressions.ParseCardSet(scalar.RootElement, "cards"); }
+        catch (InvalidOperationException) { return; }
+        throw new InvalidOperationException("A boolean was accepted as a card-set expression.");
+    }
+
+    private sealed class HandGainFactsWorld(HandGainOccurrence? gain) : IProgramExpressionWorld
+    {
+        public int? Participant(string name) => name switch { "owner" => 0, "selectedTarget" => 1, "turnOwner" => 2, _ => null };
+        public IReadOnlyList<int>? ParticipantSet(string name) => name == "livingOthers" ? [1, 2] : null;
+        public int? Stat(string stat, int seat) => null;
+        public bool? Flag(string flag, int seat) => null;
+        public HandGainOccurrence? HandGain(int recipient) => gain?.RecipientSeat == recipient ? gain : null;
     }
 
     private static void ConditionalGrantFactsUseSharedReadsAndOrderedSuitRewrites()

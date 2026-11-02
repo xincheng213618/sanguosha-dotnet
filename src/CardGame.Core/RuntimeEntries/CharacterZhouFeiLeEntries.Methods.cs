@@ -5,7 +5,6 @@ internal sealed partial class CharacterZhouFeiLeEntries
     internal bool AdvanceLeZhouFeiXianshuChildren() => _resolve().AdvanceLeZhouFeiXianshuChildren();
     internal SkillProgramStepOutcome BeginLeZhouFeiXianshu(ProgramSkillFrame supplied) => _resolve().BeginLeZhouFeiXianshu(supplied);
     internal bool CanActivateLeZhouFeiXianshu(ProgramActivationLegalityContext gate) => _resolve().CanActivateLeZhouFeiXianshu(gate);
-    internal bool CanOfferLingkong(ProgramTriggerLegalityContext gate) => _resolve().CanOfferLingkong(gate);
     internal void CaptureLeZhouFeiXianshuHpLoss(ProgramSkillHpLostEvent fact) => _resolve().CaptureLeZhouFeiXianshuHpLoss(fact);
     internal void CaptureLeZhouFeiXianshuPreventedHpLoss(IdentityHpDeductionPreventedEvent fact) => _resolve().CaptureLeZhouFeiXianshuPreventedHpLoss(fact);
     internal void CompleteLeZhouFeiXianshu(ProgramSkillFrame frame) => _resolve().CompleteLeZhouFeiXianshu(frame);
@@ -22,7 +21,6 @@ internal sealed partial class CharacterZhouFeiLeEntries
     internal ProgramSkillFrame? LeZhouFeiXianshuObserverRoot() => _resolve().LeZhouFeiXianshuObserverRoot();
     internal bool LeZhouFeiXianshuPaidMovement(ProgramSkillFrame frame, CardMovementRecord movement) => _resolve().LeZhouFeiXianshuPaidMovement(frame, movement);
     internal ActualDiscardRecoveryPhaseKey? LeZhouFeiXianshuPlay(int ownerSeat) => _resolve().LeZhouFeiXianshuPlay(ownerSeat);
-    internal SkillProgramStepOutcome MarkLingkongGain(ProgramSkillFrame supplied) => _resolve().MarkLingkongGain(supplied);
     internal void ObserveLeZhouFeiXianshuHealth(IGameEvent fact) => _resolve().ObserveLeZhouFeiXianshuHealth(fact);
     internal bool ResumeLeZhouFeiXianshu(long id) => _resolve().ResumeLeZhouFeiXianshu(id);
     internal void ReturnLeZhouFeiXianshuDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome) => _resolve().ReturnLeZhouFeiXianshuDraw(supplied, outcome);

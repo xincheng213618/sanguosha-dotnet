@@ -250,6 +250,11 @@ internal sealed class ProgramOperationNodeReader
         if (!Has(name)) Fail(Path + "." + name, "is required");
         return ProgramExpressions.ParseInt(_node.GetProperty(name), Path + "." + name);
     }
+    internal ProgramExpression RequiredCardSetExpression(string name)
+    {
+        if (!Has(name)) Fail(Path + "." + name, "is required");
+        return ProgramExpressions.ParseCardSet(_node.GetProperty(name), Path + "." + name);
+    }
     internal ProgramExpression RequiredBoolExpression(string name) =>
         ProgramExpressions.Parse(_node.GetProperty(name), Path + "." + name);
     internal ProgramExpression? ParticipantSetExpression(string name) => Has(name)

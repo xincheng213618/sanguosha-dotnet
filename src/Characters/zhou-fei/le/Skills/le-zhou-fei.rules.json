@@ -26,11 +26,24 @@
             "hand"
           ],
           "movementOccurrence": "perBatch",
+          "condition": {
+            "kind": "expression",
+            "expr": [
+              "and",
+              ["gainFirstOutsideDraw", "owner"],
+              ["gainInitiallyAlive", "owner"],
+              ["not", ["gainPhaseIs", "owner", "draw", "owner"]],
+              ["any", ["gainCards", "owner", "incoming"], ["cardActualGain", "card"]]
+            ]
+          },
           "effects": [
             {
-              "op": "markLingkongFirstOutsideDrawGain",
-              "target": "owner"
-            }
+              "op": "captureCards",
+              "target": "owner",
+              "resultBind": "gained",
+              "cardsExpr": ["filter", ["gainCards", "owner", "incoming"], ["cardActualGain", "card"]]
+            },
+            { "op": "markCards", "target": "owner", "bind": "gained", "mark": "lingkong" }
           ]
         }
       ]

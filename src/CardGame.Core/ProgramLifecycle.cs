@@ -159,6 +159,9 @@ public sealed record ProgramSkillCardSetBinding(
     SkillProgramCardSetVisibility Visibility,
     IReadOnlyList<CardLocation> SourceLocations)
 {
+    /// <summary>Observes frozen entities without owning their Processing cleanup.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsReadOnlySnapshot { get; init; }
     /// <summary>Public suit frozen before a single-card transfer; remains readable if the card moves again.</summary>
     public Suit? FrozenRevealedSuit { get; init; }
     private IReadOnlyList<Suit>? _frozenSelectedSuits;

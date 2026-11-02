@@ -11,5 +11,5 @@ internal interface IProgramCardSetBindings : IProgramRuntimeOperations
 {
     void SetProgramCardSet(long frameId, string bind, IReadOnlyList<int> cardIds,
         SkillProgramCardSetVisibility visibility, IReadOnlyList<CardLocation>? sourceLocations = null,
-        Suit? frozenRevealedSuit = null, int? selectionActorSeat = null);
+        Suit? frozenRevealedSuit = null, int? selectionActorSeat = null, bool isReadOnlySnapshot = false);
 }

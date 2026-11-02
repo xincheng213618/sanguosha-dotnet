@@ -50,7 +50,7 @@ internal sealed class ProgramPindianRuntime(IProgramRuntimeFrames frames, ICardZ
         zones.CardsAt(CardLocation.Hand(seat)).Count, policies.ProhibitsPindianTarget(seat), policies.CanDiscardForPindian(seat));
 
     private bool HasPendingBoundCards() => frames.OfType<ProgramSkillFrame>()
-        .SelectMany(frame => frame.CardSetBindings).SelectMany(binding => binding.CardIds).Distinct()
+            .SelectMany(frame => frame.CardSetBindings).Where(binding => !binding.IsReadOnlySnapshot).SelectMany(binding => binding.CardIds).Distinct()
         .Any(cardId => zones.GetLocation(cardId) == CardLocation.Processing);
 
     private bool IsExactOwnPlayEndingPindian(ProgramSkillFrame frame, ProgramParticipantReference opponentReference,

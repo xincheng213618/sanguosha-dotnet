@@ -1,6 +1,6 @@
 # 表达式条件
 
-本页说明效果步骤的 `{"kind":"expression"}` 条件和整数 `amountExpr`，以及用它们替代人物专用操作的迁移方向。入口与其他条件见[技能配置、条件与顺序步骤](RUNTIME_CONFIGURATION.md)。
+本页说明效果步骤的 `{"kind":"expression"}` 条件、整数 `amountExpr` 与冻结牌集合表达式，以及用它们替代人物专用操作的迁移方向。入口与其他条件见[技能配置、条件与顺序步骤](RUNTIME_CONFIGURATION.md)。
 
 ## 为什么需要
 
@@ -136,13 +136,41 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 
 同回合有多次 Play 时，一次 skip 就使该条件不成立。平寇可直接用 `phaseCount(...,"all","skipped")` 作数量表达式并在原步骤冻结；蒙态只判断相应种类是否大于零。跳阶段作为技能成本时仍读原支付事实，不能拿上述实际次数替换。
 
+## 整次获得的冻结牌事实
+
+`Card` 是共同获得收据中的一张冻结牌事实，`CardSet` 是保留原顺序的事实集合；两者区别于真实用牌历史的 `Fact`／`FactSet`，也不等于当前手牌。读取使用原窗口 `MovementBatch.HandGains`，只开放当前程序或触发 owner 的收据。参与者不是 owner、缺少收据或缺少相应时点时返回未知，不能通过事件目标或迭代变量读取他人暗手；AI 没有这份私密收据时同样返回未知。
+
+| 写法 | 结果 |
+|---|---|
+| `["gainCards","owner","incoming"]` | 整次物理到手集合；保留回到原手等与真正获得不同的情况 |
+| `["gainCards","owner","previousHand"]` | 完成点排除全部 incoming 后冻结的原手牌，同次新牌不能互为旧手牌见证 |
+| `["gainInitiallyAlive","owner"]` | 首次到达时是否存活，不重新读取当前存活状态 |
+| `["gainFirstOutsideDraw","owner"]` | 收据中的首次 outside-Draw 事实；Processing 回到原手不消耗真正获得的首次 |
+| `["gainPhaseIs","owner","draw","owner"]` | 冻结阶段为 Draw，且阶段执行者为指定参与者；阶段使用 TurnPhase 的 camelCase 名称，自己的额外 Draw 仍匹配 |
+| `["cardActualGain","card"]` | 此实体是否真正获得，而非回到原手；不隐式过滤 incoming |
+| `["cardKindIs","card",["slash","fireSlash","thunderSlash"]]` | 匹配冻结有效牌种，使用共同种类匹配；完整旧三杀兼容寒冰杀，单项 slash 仅普通杀 |
+| `["cardSuitIs","card",["heart","diamond"]]` | 匹配冻结有效花色；可显式包含 none |
+| `["sameCardKind",card,card]` / `["sameCardSuit",card,card]` | 精确比较两份冻结有效种类／花色；不把杀族合并为同种，已知 None 与 None 相等 |
+
+`all`／`any`／`count`／`filter` 同时支持 CardSet，双参数形式在谓词内使用默认 `card`。三参数形式 `[运算符, 集合, "变量名", 谓词]` 只用于牌集合，允许嵌套比较 incoming 与 previousHand：
+
+```json
+["filter", ["gainCards", "owner", "incoming"], "newCard",
+  ["any", ["gainCards", "owner", "previousHand"], "oldCard",
+    ["sameCardKind", "newCard", "oldCard"]]]
+```
+
+变量只在自己的谓词内有效，内层保留外层牌变量及已有 `it`／`use`。变量名最多 128 字符，以字母或下划线开头，其余为字母、数字、下划线或连字符；不能覆盖保留名、参与者、集合名或已在作用域内的牌变量。嵌套两个默认 `card` 也会被拒绝，应改用不同的显式名称。筛选谓词未知时整个集合未知，不把该成员静默排除；已知空集合仍是空集合。例子只表达冻结同种关系，不替代实际支付和展示返回的规则。
+
+获得读取自动声明 `HandGainOccurrence` 需求，并由共同闭包包含整次摸牌识别所需的 `NativeDrawInvocation`；`gainPhaseIs`／`gainFirstOutsideDraw` 另声明 `MovementTiming`。读取不授权发动，首次来源、来源失去和死亡后的执行仍由原窗口授权处理。灵箜的获得资格使用这些普通条件，效果由 `captureCards` 接 `markCards` 组成；手牌上限收益与贤淑仍有独立实现。
+
 ## 摸牌调用事实的声明边界
 
 `NativeDrawActualTurnOrdinalIs` 属于触发条件，由 Triggered 定义需求编译推导 `NativeDrawInvocation`；`CurrentTurnDrawPhaseDrawCountHalfFloor` trait 也声明同一事实。操作描述符保持 Triggered／Activated 区分，既有被动声明与选中模式需求在对局 provider 合成，原生 invoice 采集只读 `INativeFactDemand`，不枚举人物开关。
 
 `NativeDrawInvocation` 不隐含阶段身份需求。读取 phase token 的操作或 trait 仍需声明 `ActualDiscardRecoveryPhase`；事实 mask 不能替代动态来源资格，也不把普通阶段需求变成额外 DrawSkipped 观察者帧。
 
-初始发牌、零请求和无真实摸牌实体仍不产生已记录的调用；实际回合开始前只接受原有类型化开局来源。零张或合法替代可以完成普通 `draw` 的当前步骤，但不能据此伪造 DrawPile invoice。ordinal、threshold、展骥资格、原帧付讫状态与 typed return 保留其冻结边界。整次获得由共同 `HandGainOccurrence` 收据冻结到原批次，散文、知意、灵箜不再从摸牌完成点接收回调；它们的实际复合效果仍待组合化，不能据此宣称整个摸牌执行链已纯 JSON。
+初始发牌、零请求和无真实摸牌实体仍不产生已记录的调用；实际回合开始前只接受原有类型化开局来源。零张或合法替代可以完成普通 `draw` 的当前步骤，但不能据此伪造 DrawPile invoice。ordinal、threshold、展骥资格、原帧付讫状态与 typed return 保留其冻结边界。整次获得由共同 `HandGainOccurrence` 收据冻结到原批次，散文、知意、灵箜不再从摸牌完成点接收回调；灵箜获得标记已组合为普通节点，散文付款／展示续接和知意实际复合效果仍有缺口，不能据此宣称整个摸牌执行链已纯 JSON。
 
 ## 已签发的用牌加伤
 
@@ -204,6 +232,16 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 ```
 
 `captureNumber` 把整数值保存到原帧的命名绑定；后续 `["number","before"]` 不会重算。值可为零或负数，不按操作数量截断；未知会取消整绑定。绑定只允许创建一次。原生复合操作也可通过同一捕获入口声明输出，例如伏枥的入口阵营数与伤害历史，不再保存第二份数值状态。
+
+```json
+{ "op": "captureCards", "target": "owner", "resultBind": "gained",
+  "cardsExpr": ["filter", ["gainCards", "owner", "incoming"], ["cardActualGain", "card"]] }
+{ "op": "markCards", "target": "owner", "bind": "gained", "mark": "lingkong" }
+```
+
+`captureCards` 将牌集合表达式结果的实体 ID 写入原帧的唯一命名绑定；表达式未知时取消整绑定，已知空集则正常绑定空集。该操作条件必须为 always，不支持可选公开可见性，结果固定 private；需要公开牌面时使用原有展示节点。捕获只建立观察引用，不选择、移动或支付，不把这些实体声明为稳定持有材料，也不取得 Processing 的清理权。过滤、选子集等派生绑定继承观察性质；同帧其他真正拥有的临时牌仍照原协议清理。卡牌随后移动不会改写收据中的冻结种类和花色，绑定后的其他操作仍遵守各自的实时材料校验。
+
+观察引用不授予失源或死亡续接。原窗口已有相应授权时，纯捕获和实体标记可通过执行器的死亡目标门；支付、选择及未签发步骤不能借此取得额外权限。散文仍需要实际弃置结果与展示子窗返回合同，不能将捕获集合的计划数量视作实际付款。
 
 `chooseOption` 的全部选项都声明整数 `number` 时，后续 `["choiceNumber","选项绑定名"]` 读取已接受选项的冻结整数；加载器验证生产顺序，数值不能由回答命令提供。`offerGeneratedEquipment.amountExpr` 可复用该整数。`["number","equipment.destroyedThisTurn"]` 是共享实体来源事实，读取当前技能、拥有者在本回合产生装备的销毁批次数；它不创建第二个可变计数器。
 

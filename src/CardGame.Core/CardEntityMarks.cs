@@ -121,6 +121,7 @@ internal abstract class CardEntityMarkDescriptor(SkillProgramEffectOp op) : Prog
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         op == SkillProgramEffectOp.MarkInitialHand ? [new RequireTriggerWindow(SkillProgramTriggerWindow.GameStarting)] : [new ReadCardSet(effect.SourceBind!)];
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) =>
+        op == SkillProgramEffectOp.MarkCards ||
         op == SkillProgramEffectOp.MarkInitialHand && context.Frame.WindowContext?.Window == SkillProgramTriggerWindow.GameStarting;
 }
 internal sealed class MarkInitialHandDescriptor() : CardEntityMarkDescriptor(SkillProgramEffectOp.MarkInitialHand);

@@ -1664,7 +1664,6 @@ public enum SkillProgramEffectOp
     ResolveBiguoTargetedPindianAndCategoryBan = 28131,
     ResolveDouyuPreRevealSwapAndWinDraw = 28132,
     ResolveJiguDamageEquipmentDraw = 28211,
-    MarkLingkongFirstOutsideDrawGain = 28311,
     ResolveXianshuGiftDrawAndHealth = 28320,
     ResolveBeifenLostMarkedSuitGains = 28420,
     ResolveYixianAllEquipmentObtainAndCompensate = 28530,
@@ -1891,6 +1890,7 @@ public enum SkillProgramEffectOp
     SelectPublicPile = 900001,
     DistributeBoundCards = 900002,
     CaptureNumber = 900003,
+    CaptureCards = 900007,
     SkillState = 900004,
     MarkInitialHand = 900005,
     MarkCards = 900006
@@ -3137,6 +3137,8 @@ public sealed partial class SkillProgramEffect
     public SkillProgramUnknownAmountBehavior OnUnknownAmount { get; internal init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramExpression? ValueExpression { get; internal init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramExpression? CardSetExpression { get; internal init; }
     public int MinimumValue { get; }
     public bool ClampToMaxHp { get; }
     public string? SourceBind { get; }

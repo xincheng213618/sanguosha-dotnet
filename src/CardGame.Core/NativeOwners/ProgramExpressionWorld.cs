@@ -8,6 +8,8 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
 {
     private int Owner => frame?.OwnerSeat ?? triggerOwner!.Value;
     private ProgramSkillWindowContext? Context => frame?.WindowContext ?? triggerContext;
+    public HandGainOccurrence? HandGain(int recipient) => recipient == Owner
+        ? Context?.MovementBatch?.HandGains?.SingleOrDefault(gain => gain.RecipientSeat == recipient) : null;
     private CardUseHistoryPoint? WindowPoint => Context?.HistoryPoint ?? Context?.Facts?.HistoryPoint ?? triggerFacts?.HistoryPoint;
     public int? Number(string name) => frame is null ? null : getCoreGameEngineProgramExpressionsRuntime().ReadProgramExpressionNumber(frame, name);
     public int? WindowStat(string stat, string participant) =>

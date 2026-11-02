@@ -100,7 +100,7 @@ internal sealed class ProgramInstructionFeatures
 
     private static IEnumerable<ProgramExpression> ExpressionRoots(SkillProgramEffect effect) =>
         ExpressionRoots(effect.Condition).Concat(effect.Options.SelectMany(option => ExpressionRoots(option.Condition)))
-            .Concat(new ProgramExpression?[] { effect.AmountExpression, effect.ValueExpression, effect.TargetSetExpression,
+            .Concat(new ProgramExpression?[] { effect.AmountExpression, effect.ValueExpression, effect.TargetSetExpression, effect.CardSetExpression,
                 effect.CurrentResponseRule?.Rule.While, effect.SkillState?.Match.Filter, effect.SkillState?.While }.OfType<ProgramExpression>());
 
     private static IEnumerable<ProgramExpression> ExpressionRoots(SkillProgramTriggerCondition condition) =>

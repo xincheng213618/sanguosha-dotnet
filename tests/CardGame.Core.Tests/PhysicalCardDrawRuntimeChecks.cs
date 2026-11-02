@@ -142,7 +142,7 @@ internal static class PhysicalCardDrawRuntimeChecks
 
     private static void HandGainOccurrencesKeepWholeAcquisitionsAndFrozenSources()
     {
-        var catalogs = new[] { "ol-wang-can", "ol-tang-tang", "le-zhou-fei" }
+        var catalogs = new[] { "ol-wang-can", "ol-tang-tang", "le-zhou-fei", "classic-li-dian" }
             .Select(CharacterFixtureContent.EmbeddedProgramBundle).ToArray();
         var registry = ContentRegistry.Build(new StandardContentPackage(), new GainProjectionPackage(catalogs));
         var game = GameEngine.CreateStandard(new GameOptions { Seed = 7 }, registry);
@@ -222,6 +222,13 @@ internal static class PhysicalCardDrawRuntimeChecks
             TriggerId = candidate.BindingId, SkillInstanceId = candidate.SkillInstanceId, WindowContext = context,
             InvocationAuthorization = authorization! with { ProgramFrameId = 904 }
         };
+        var ownerGain = markedBatch.HandGains!.Single();
+        var foreignGain = ownerGain with { RecipientSeat = candidate.OwnerSeat + 1 };
+        // HandGain reads only the supplied frame and context; unrelated world ports are deliberately absent.
+        var gainWorld = new CardGame.Core.NativeOwners.ProgramExpressionWorld(null!, null!, null!, null!, null!, null!, null!,
+            invocation with { WindowContext = context with { MovementBatch = markedBatch with { HandGains = [ownerGain, foreignGain] } } });
+        Require(ReferenceEquals(gainWorld.HandGain(candidate.OwnerSeat), ownerGain) && gainWorld.HandGain(foreignGain.RecipientSeat) is null,
+            "A gain expression reads its owner's frozen acquisition without exposing another recipient's private cards from the same batch.");
         Require(ProgramInvocations.Allows(invocation, issuedWindow) &&
                 !new ProgramInvocationAuthorization(1, 2, SkillProgramTriggerWindow.CardsMoved, candidate).RetainOwnerDeath,
             "The original admitted gain invocation is authorized while equipment-departure authorizations retain the default stop-on-death policy.");
@@ -287,6 +294,83 @@ internal static class PhysicalCardDrawRuntimeChecks
                     gain.NativeDrawAttemptId == attempt.Id && gain.NativeDrawInvocationId is null,
                 "Both typed replacement protocols coalesce their exact gain materials without relabeling a replacement as a draw invocation.");
         }
+        ReadOnlyCardSnapshotsNeverOwnProcessingCleanup(game, registry);
+    }
+
+    private static void ReadOnlyCardSnapshotsNeverOwnProcessingCleanup(GameEngine game, ContentRegistry registry)
+    {
+        var match = (MatchRuntime)typeof(GameEngine)
+            .GetProperty("MatchRuntime", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var frames = match.Capabilities.Get<IProgramRuntimeFrames>();
+        var zones = (CardZoneStore)typeof(GameEngine)
+            .GetField("_cardZones", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var materials = zones.CardsAt(CardLocation.DrawPile).Take(3).ToArray();
+        Require(materials.Length == 3, "The existing match deck supplies three real entities for the cleanup boundary.");
+        var observed = materials.Take(2).Select(card => card.Id).ToArray();
+        var materialId = materials[2].Id;
+        foreach (var card in materials)
+            zones.Move(card.Id, CardLocation.DrawPile, CardLocation.Processing);
+        var production = game.GetRuntimeModule<ProgramBoundCardRuntime>();
+        T Port<T>() => (T)typeof(ProgramBoundCardRuntime).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)
+            .Single(field => field.FieldType == typeof(T)).GetValue(production)!;
+        var runtime = new ProgramBoundCardRuntime(Port<IProgramBoundCardFacts>(), Port<IProgramBoundInstructionFacts>(),
+            Port<IProgramBoundCardMovementOperations>(), Port<IProgramBoundCardPaymentOperations>(),
+            new SubsetReturnFrames(frames), Port<IProgramRuntimePrompts>(), Port<IProgramRuntimeEvents>(),
+            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>());
+        var pindian = game.GetRuntimeModule<ProgramPindianRuntime>();
+        var hasPending = typeof(ProgramPindianRuntime).GetMethod("HasPendingBoundCards", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        bool Pending() => (bool)hasPending.Invoke(pindian, null)!;
+        var program = registry.GetSkill("classic:xunxun").Program!;
+        var trigger = program.Triggers.Single();
+        var originalTop = frames.Top;
+        var frame = new ProgramSkillFrame(frames.NextId(), 0, program.Id, trigger.Id, program.GameplayHash, 2, [], [])
+            { TriggerId = trigger.Id };
+        frames.Push(frame);
+        try
+        {
+            runtime.SetProgramCardSet(frame.Id, "snapshot", observed, SkillProgramCardSetVisibility.Private,
+                isReadOnlySnapshot: true);
+            runtime.FilterProgramBoundCards(frame.Id, "snapshot", "viewed", [], null, [], [], [], null);
+            Require(!Pending() && frames.ActiveProgram(frame.Id).CardSetBindings.All(binding => binding.IsReadOnlySnapshot),
+                "The actual Pindian pending-material query ignores read-only Processing snapshots and filtered bindings.");
+            Require(runtime.SelectProgramCardSubset(frame.Id, 0, "viewed", "gained", 2, 2, 208,
+                    SkillProgramSubsetAiOrder.MostCardsThenRankSum, true, false) == SkillProgramStepOutcome.AwaitChoice,
+                "The existing subset selection consumes a read-only snapshot through its original frame binding.");
+            var prompt = match.Capabilities.Get<IProgramRuntimePrompts>().Current!;
+            runtime.ResolveProgramCardSubsetAnswer(prompt.Choices.Single(choice => choice.Cards.SequenceEqual(observed)));
+            Require(frames.ActiveProgram(frame.Id).CardSetBindings.Single(binding => binding.Name == "gained").IsReadOnlySnapshot && !Pending(),
+                "An accepted subset preserves read-only provenance without acquiring another resolution's Processing materials.");
+            runtime.CleanupProgramBoundCards(frames.ActiveProgram(frame.Id), completed: false);
+            Require(observed.All(id => zones.GetLocation(id) == CardLocation.Processing),
+                "Cancellation cleanup preserves original, filtered and selected read-only snapshot entities.");
+            runtime.SetProgramCardSet(frame.Id, "material", [materialId], SkillProgramCardSetVisibility.Public);
+            Require(Pending(), "A real material binding still blocks another Pindian while its entity remains in Processing.");
+            runtime.CleanupProgramBoundCards(frames.ActiveProgram(frame.Id), completed: true);
+            Require(zones.GetLocation(materialId) == CardLocation.DiscardPile && !Pending() &&
+                    observed.All(id => zones.GetLocation(id) == CardLocation.Processing),
+                "Completion cleanup retires real bound materials while preserving read-only observations in the same frame.");
+        }
+        finally { frames.Pop(frame.Id, frame.Kind); }
+        Require(ReferenceEquals(frames.Top, originalTop), "The snapshot cleanup check restores the original resolution stack.");
+    }
+
+    // Observe the subset's typed binding return before the real scheduler begins the next recipe instruction.
+    private sealed class SubsetReturnFrames(IProgramRuntimeFrames frames) : IProgramRuntimeFrames
+    {
+        public ResolutionFrame? Top => frames.Top;
+        public ResolutionFrame? Find(long id) => frames.Find(id);
+        public ResolutionFrame? ParentOf(long id) => frames.ParentOf(id);
+        public ResolutionFrame? ChildOf(long id) => frames.ChildOf(id);
+        public IReadOnlyList<T> OfType<T>() where T : ResolutionFrame => frames.OfType<T>();
+        public ProgramSkillFrame ActiveProgram(long id) => frames.ActiveProgram(id);
+        public long NextId() => frames.NextId();
+        public void ReplaceTop(ResolutionFrame frame) => frames.ReplaceTop(frame);
+        public void Replace(long id, ResolutionFrame frame) => frames.Replace(id, frame);
+        public void Push(ResolutionFrame frame) => frames.Push(frame);
+        public void Pop(long id, ResolutionFrameKind kind) => frames.Pop(id, kind);
+        public void Advance(long id) => frames.Advance(id);
+        public void AdvanceTop<T>() where T : ResolutionFrame => frames.AdvanceTop<T>();
+        public void AdvanceProgram(long id) { }
     }
 
     private sealed class GainProjectionPackage(IReadOnlyList<SkillProgramCatalog> catalogs) : IGameContentPackage

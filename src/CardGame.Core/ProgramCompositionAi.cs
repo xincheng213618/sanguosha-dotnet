@@ -180,6 +180,13 @@ internal sealed partial class ProgramAiEstimateContext
             _expressionNumbers[effect.ResultBind!] = value;
         else PathCancelled = true;
     }
+    internal void CaptureExpressionCards(SkillProgramEffect effect)
+    {
+        if (ProgramExpressions.EvaluateCardSet(effect.CardSetExpression!, CurrentExpressionWorld()) is { } cards)
+            _bindings[effect.ResultBind!] = new(cards.Count,
+                EstimatedSuits.Select(suit => (double)cards.Count(card => card.EffectiveSuit == suit)).ToArray(), false);
+        else PathCancelled = true;
+    }
     private static readonly Suit[] EstimatedSuits = Enum.GetValues<Suit>();
     private sealed record CardSetEstimate(double Count, double[] Suits, bool OwnerHeld, bool TargetHeld = false,
         bool ActivationInput = false);

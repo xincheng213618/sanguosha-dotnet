@@ -159,11 +159,14 @@ internal static class CardEntityMarkChecks
             Submit(new UseProgramSkillCommand(0, Skill, "gain", [], [], game.Revision, Prompt()!.PromptId));
             Reach(() => Prompt()?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "skip") == true);
             game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
-            Reach(() => game.Events.Any(e => e.Payload is LingkongGainMarkedEvent marked && marked.ActualTurn > 0));
+            Reach(() => game.Events.Select(e => e.Payload).OfType<ProgramBindingResolvedEvent>().Any(e =>
+                e.SkillId == "le:lingkong" && e.BindingId == "mark-first-outside-draw-gain" && e.Activated && e.Completed));
             var gained = game.CardMovements.Where(m => m.Sequence > sequence && m.From == CardLocation.DrawPile &&
                 m.To == CardLocation.Hand(0) && m.Reason.Value == "skill-program." + Skill + ".Draw").Select(m => m.CardId).ToArray();
-            var mark = game.Events.Select(e => e.Payload).OfType<LingkongGainMarkedEvent>().Single(e => e.ActualTurn > 0);
-            Need(gained.Length == 2 && mark.EntityCount == 2 &&
+            var marks = game.Events.Select(e => e.Payload).OfType<CardEntityMarkedEvent>()
+                .Where(e => e.Mark == "lingkong" && gained.Contains(e.CardId)).ToArray();
+            Need(gained.Length == 2 && marks.Select(e => e.CardId).Order().SequenceEqual(gained.Order()) &&
+                    marks.Select(e => e.FrameId).Distinct().Count() == 1 && marks.All(e => e.InitialOwnerSeat is null) &&
                     gained.All(id => game.GetRuntimeModule<CardEntityMarkRuntime>().Has(id, "lingkong")) &&
                     game.Events.Select(e => e.Payload).OfType<ProgramBindingResolvedEvent>().Count(e =>
                         e.SkillId == "le:lingkong" && e.BindingId == "mark-first-outside-draw-gain" && e.Completed) == 1,
@@ -171,6 +174,15 @@ internal static class CardEntityMarkChecks
             Need(terminal == "gain-dead" ? !game.CreateSnapshot(0).Players[0].IsAlive :
                     game.CreateSnapshot(0).Players[0].Skills?.Any(skill => skill.Id == "le:lingkong") != true,
                 "The actual native child must remove the source or kill its owner before the retained gain mark.");
+            if (terminal == "gain-dead")
+            {
+                Reach(() => game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().All(window =>
+                    window.CandidateIndex >= window.Candidates.Count ||
+                    window.Candidates.Skip(window.CandidateIndex).All(candidate => candidate.BindingId != "gain-stop")));
+                Need(!game.Events.Select(e => e.Payload).OfType<CardEntityMarkedEvent>().Any(e =>
+                        e.Mark == "stop-gain" && gained.Contains(e.CardId)),
+                    "A captured source-loss authorization without ownerDeath retain must not execute captureCards or markCards after owner death.");
+            }
         }
     }
 
@@ -280,6 +292,13 @@ internal static class CardEntityMarkChecks
                   "movementOccurrence":"perBatch","destinationZones":["hand"],"usageScope":"game","usageLimit":1,
                   "condition":{"kind":"booleanState","stateId":"gain-ready","expectedValue":true},"effects":[
                 """ + operation + "]}"));
+                skill["triggers"]!.AsArray().Add(JsonNode.Parse("""
+                {"id":"gain-stop","window":"cardsGained","subject":"owner","priority":-10,"optional":false,
+                  "movementOccurrence":"perBatch","destinationZones":["hand"],"invocation":{"source":"initialHandGain"},
+                  "condition":{"kind":"booleanState","stateId":"gain-ready","expectedValue":true},"effects":[
+                    {"op":"captureCards","target":"owner","resultBind":"stop-gained","cardsExpr":["gainCards","owner","incoming"]},
+                    {"op":"markCards","target":"owner","bind":"stop-gained","mark":"stop-gain"}]}
+                """));
                 skill["activations"]!.AsArray().Add(JsonNode.Parse("""
                 {"id":"gain","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
                   "effects":[{"op":"setBooleanState","target":"owner","stateId":"gain-ready","value":true},
@@ -293,7 +312,7 @@ internal static class CardEntityMarkChecks
             }
             var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
                 skills = new Dictionary<string, object> { [Skill] = new { name = "Physical marks", description = "Shared physical mark fixture",
-                    cardMarks = new Dictionary<string, string> { ["opening"] = "开局", ["chosen"] = "所选" } } } });
+                    cardMarks = new Dictionary<string, string> { ["opening"] = "开局", ["chosen"] = "所选", ["stop-gain"] = "普通获得" } } } });
             var catalog = SkillProgramCatalog.Load(rules, presentation);
             builder.AddSkill(new(Skill, "Physical marks", "Shared physical mark fixture") { Program = catalog.Programs[Skill], ProgramPresentation = catalog.Presentations[Skill] });
             builder.AddSkill(new("fixture:card-mark-noop", "Peer", "No active rules"));

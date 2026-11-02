@@ -76,6 +76,50 @@ internal static class ProgramAmountExpressionChecks
             {"op":"revealTopCards","target":"owner","amount":1,"resultBind":"saved","visibility":"public"},
             {"op":"captureNumber","target":"owner","resultBind":"saved","valueExpr":1}
             """);
+        var capturedCards = Load("""
+            {"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":["gainCards","owner","incoming"]},
+            {"op":"markCards","target":"owner","bind":"gained","mark":"captured"}
+            """);
+        var spacedCards = Load("""
+            {"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":[ "gainCards", "owner", "incoming" ]},
+            {"op":"markCards","target":"owner","bind":"gained","mark":"captured"}
+            """);
+        var previousCards = Load("""
+            {"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":["gainCards","owner","previousHand"]},
+            {"op":"markCards","target":"owner","bind":"gained","mark":"captured"}
+            """);
+        Need(capturedCards.Activations.Single().Effects[0] is
+                { Op: SkillProgramEffectOp.CaptureCards, ResultBind: "gained", CardSetExpression.Type: ProgramExpressionType.CardSet } &&
+            capturedCards.GameplayHash == spacedCards.GameplayHash && capturedCards.GameplayHash != previousCards.GameplayHash,
+            "A typed card-set producer declares a later binding and fingerprints its expression without whitespace sensitivity.");
+        ProgramTrackedFact Demand(SkillProgram program) => new SkillProgramDependencies(
+            [new ContentSkillDefinition(program.Id, "capture", "capture") { Program = program }]).RequiredFacts;
+        var cardsDemand = Demand(capturedCards);
+        var timedCards = Load("""
+            {"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":
+              ["filter",["gainCards","owner","incoming"],["gainFirstOutsideDraw","owner"]]}
+            """);
+        Need(cardsDemand.HasFlag(ProgramTrackedFact.HandGainOccurrence | ProgramTrackedFact.NativeDrawInvocation) &&
+            (cardsDemand & (ProgramTrackedFact.MovementTiming | ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.ActualPhaseEnd)) == 0 &&
+            Demand(timedCards).HasFlag(ProgramTrackedFact.HandGainOccurrence | ProgramTrackedFact.MovementTiming),
+            "Nested card-set expressions declare acquisition demand; timing is required only by timing reads, without inventing phase demand.");
+        Reject("""{"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":true}""");
+        Reject("""{"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":"living"}""");
+        Reject("""{"op":"captureCards","target":"selectedTarget","resultBind":"gained","cardsExpr":["gainCards","owner","incoming"]}""");
+        foreach (var visibility in new[] { "private", "public" })
+            Reject($$"""{"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":["gainCards","owner","incoming"],"visibility":"{{visibility}}"}""");
+        Reject("""
+            {"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":["gainCards","owner","incoming"]},
+            {"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":["gainCards","owner","previousHand"]}
+            """);
+        Reject("""
+            {"op":"captureCards","target":"owner","resultBind":"saved","cardsExpr":["gainCards","owner","incoming"]},
+            {"op":"captureNumber","target":"owner","resultBind":"saved","valueExpr":1}
+            """);
+        Reject("""
+            {"op":"markCards","target":"owner","bind":"gained","mark":"captured"},
+            {"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":["gainCards","owner","incoming"]}
+            """);
         foreach (var window in new[] { "dyingEntered", "dyingExited" })
         {
             var transition = $$"""
@@ -138,6 +182,9 @@ internal static class ProgramAmountExpressionChecks
         var capture = Estimate("""{"op":"captureNumber","target":"owner","resultBind":"saved","valueExpr":["hp","eventTarget"]}""");
         Need(capture.Hint is { OwnerDraw: 1, OwnerHpLoss: 1 },
             "An unknown capture cancels the estimate path without erasing its already paid HP loss or completed draw.");
+        var cardCapture = Estimate("""{"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":["gainCards","owner","incoming"]}""");
+        Need(cardCapture.Hint is { OwnerDraw: 1, OwnerHpLoss: 1 },
+            "An AI without private acquisition facts cancels the card capture suffix and retains the completed prefix.");
         foreach (var op in new[] { "draw", "recover", "loseHp", "revealTopCards" })
         {
             var cleanup = op == "revealTopCards"
@@ -238,6 +285,46 @@ internal static class ProgramAmountExpressionChecks
             counts.All(e => e.Value == 0),
             "Zero draw and zero reveal both produce real empty bindings; bound counts and suits remain readable and the following sentinel draw runs once.");
         _ = Cold(game, registry);
+        hand = View(game, 0).HandCount; movements = game.CardMovements.Count;
+        Use(game, "unknown-card-binding"); Play(game);
+        Need(View(game, 0).HandCount == hand + 1 && game.CardMovements.Count == movements + 1 &&
+            Events<ProgramSkillResolvedEvent>(game).Last(e => e.SkillId == Skill) is { ActivationId: "unknown-card-binding", Completed: false } &&
+            game.GetRuntimeModule<CardEntityMarkRuntime>().MarkedCardIds("unknown-capture").Count == 0,
+            "An activation without an acquisition context cancels an unknown card capture and its suffix while preserving the already delivered draw.");
+        _ = Cold(game, registry);
+        CapturedGainCardsSurviveRealDrawChildrenCold();
+    }
+
+    private static void CapturedGainCardsSurviveRealDrawChildrenCold()
+    {
+        var (game, registry) = Create(nativeDraw: true, cardCapture: true);
+        Use(game, "gain-capture");
+        Reach(game, () => game.PendingDecision?.SkillPrompt?.SkillId == Watch);
+        var parent = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch && frame.TriggerId == "capture-cards");
+        var binding = parent.CardSetBindings.Single(item => item.Name == "gained");
+        var original = game.CardMovements.Where(move => move.Reason.Value == DrawReason && move.To == CardLocation.Hand(0)).Select(move => move.CardId).ToArray();
+        var child = game.CardMovements.Where(move => move.Reason.Value == "skill-program." + Watch + ".Draw" && move.To == CardLocation.Hand(0))
+            .Select(move => move.CardId).ToArray();
+        Need(original.Length == 1 && child.Length == 1 && !original.Intersect(child).Any() &&
+            binding.CardIds.SequenceEqual(original) && binding.Visibility == SkillProgramCardSetVisibility.Private && binding.IsReadOnlySnapshot &&
+            binding.SourceLocations.SequenceEqual([CardLocation.Hand(0)]) &&
+            game.GetRuntimeModule<CardEntityMarkRuntime>().MarkedCardIds("captured-gain").Count == 0 &&
+            game.CreateSnapshot(1).Players[0].Hand.Count == 0,
+            "The original private binding is frozen before a real nested draw adds another entity and suspends its parent before marking.");
+        var restored = Cold(game, registry);
+        foreach (var branch in new[] { game, restored })
+        {
+            var frozen = branch.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id).CardSetBindings.Single(item => item.Name == "gained");
+            Need(frozen.CardIds.SequenceEqual(original) && frozen.SourceLocations.SequenceEqual(binding.SourceLocations) && frozen.IsReadOnlySnapshot,
+                "Cold replay retains the original card binding and its captured source locations rather than rebuilding them from the child acquisition.");
+            FinishChildren(branch);
+            Need(branch.GetRuntimeModule<CardEntityMarkRuntime>().MarkedCardIds("captured-gain").SequenceEqual(original) &&
+                Events<CardEntityMarkedEvent>(branch).Count(mark => mark.FrameId == parent.Id && mark.Mark == "captured-gain") == 1 &&
+                Events<ProgramBindingResolvedEvent>(branch).Count(done => done.FrameId == parent.Id &&
+                    done.SkillId == Watch && done.BindingId == "capture-cards" && done.Completed) == 1,
+                "Returning from the paid child marks only the original captured entity once; the newer child entity cannot replace or extend that binding.");
+        }
+        Need(State(game) == State(restored), "Cold recovery at the nested acquisition preserves the exact binding, marking and final views.");
     }
 
     public static void PaidHealthChildrenResumeColdWithoutReevaluation()
@@ -403,9 +490,9 @@ internal static class ProgramAmountExpressionChecks
         Need(State(game) == State(restored), "Amount-expression checkpoint replay must preserve views and committed facts.");
         return restored;
     }
-    private static (GameEngine, ContentRegistry) Create(bool nativeDraw = false, bool fatalRescue = false)
+    private static (GameEngine, ContentRegistry) Create(bool nativeDraw = false, bool fatalRescue = false, bool cardCapture = false)
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(nativeDraw, fatalRescue));
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(nativeDraw, fatalRescue, cardCapture));
         var game = GameEngine.CreateStandard(new GameOptions
         {
             Seed = 31, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord, ModeId = Mode,
@@ -415,11 +502,21 @@ internal static class ProgramAmountExpressionChecks
     }
     private static void Need(bool ok, string message) { if (!ok) throw new InvalidOperationException(message); }
 
-    private sealed class Fixture(bool nativeDraw, bool fatalRescue) : IGameContentPackage
+    private sealed class Fixture(bool nativeDraw, bool fatalRescue, bool cardCapture) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-amount-expression", new(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
+            var capturedCardTriggers = cardCapture ? $$"""
+                ,{"id":"capture-cards","window":"cardsGained","subject":"owner","optional":false,"movementOccurrence":"perBatch","destinationZones":["hand"],
+                  "movementReasons":["{{DrawReason}}"],"effects":[
+                    {"op":"captureCards","target":"owner","resultBind":"gained","cardsExpr":["gainCards","owner","incoming"]},
+                    {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true},
+                    {"op":"markCards","target":"owner","bind":"gained","mark":"captured-gain"}]},
+                 {"id":"capture-pause","window":"cardsGained","subject":"owner","optional":false,"movementOccurrence":"perBatch","destinationZones":["hand"],
+                  "movementReasons":["skill-program.{{Watch}}.Draw"],"effects":[
+                    {"op":"chooseOption","target":"owner","resultBind":"resume","options":[{"id":"resume"}]}]}
+                """ : "";
             var catalog = SkillProgramCatalog.Load($$"""
                 {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
                  {"id":"{{Skill}}","revision":1,"activations":[
@@ -441,6 +538,13 @@ internal static class ProgramAmountExpressionChecks
                   {"id":"capture-binding","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
                     {"op":"captureNumber","target":"owner","resultBind":"saved-hand","valueExpr":["handCount","owner"]},
                     {"op":"draw","target":"owner","amount":1},{"op":"draw","target":"owner","amountExpr":["number","saved-hand"]}]},
+                  {"id":"gain-capture","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
+                    {"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true}]},
+                  {"id":"unknown-card-binding","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
+                    {"op":"draw","target":"owner","amount":1},
+                    {"op":"captureCards","target":"owner","resultBind":"unavailable","cardsExpr":["gainCards","owner","incoming"]},
+                    {"op":"markCards","target":"owner","bind":"unavailable","mark":"unknown-capture"},
+                    {"op":"draw","target":"owner","amount":2}]},
                   {"id":"zero-bindings","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[
                     {"op":"draw","target":"owner","amountExpr":0,"resultBind":"empty-draw","onUnknownAmount":"cancelBinding"},
                     {"op":"revealTopCards","target":"owner","amountExpr":0,"resultBind":"empty-reveal","visibility":"public","onUnknownAmount":"cancelBinding"},
@@ -469,7 +573,7 @@ internal static class ProgramAmountExpressionChecks
                  {"id":"{{Watch}}","revision":1,"triggers":[
                   {"id":"paid-child","window":"cardsGained","subject":"owner","optional":false,"movementOccurrence":"perBatch","destinationZones":["hand"],
                    "movementReasons":["{{ColdDrawReason}}"],"effects":[
-                    {"op":"chooseOption","target":"owner","resultBind":"resume","options":[{"id":"resume"}]},{"op":"draw","target":"owner","amount":1}]}]}]}
+                    {"op":"chooseOption","target":"owner","resultBind":"resume","options":[{"id":"resume"}]},{"op":"draw","target":"owner","amount":1}]}{{capturedCardTriggers}}]}]}
                 """, Presentation(Skill, ColdSkill, Watch, HealthSkill, HealthWatch, NativeGate));
             foreach (var (id, program) in catalog.Programs)
                 // The mandatory no-op state read supplies a real request subscriber
