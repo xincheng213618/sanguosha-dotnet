@@ -58,6 +58,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryMaTieFactionEvent(f.Id, r.Cursor, actor, r.Target, policy));
         var candidates = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actor, policy.FactionId);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(f.Id, FactionCardRequestPurpose.AssistedProgramUse, actor, candidates, policy.FactionId, targetSeat: r.Target, programSkillFrameId: f.Id, policySource: policy, assistedResultBind: MaTieFactionBind);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.AuthorizeProgramRequest(f.InstructionIndex);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(f.Id, actor, candidates, policy.SkillId, IsActiveUse: true, r.Target));
@@ -71,13 +72,6 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         if (!ValidMaTie(f) || r.Cursor >= r.Actors.Count || r.Stage is not (AnniversaryMaTieStage.Issuing or AnniversaryMaTieStage.NativeUse or AnniversaryMaTieStage.NativeReturned) || !pending.IsAssistedProgramUse || pending.OwnerFrameId != f.Id || pending.ResolutionId != f.Id || pending.ProgramSkillFrameId != f.Id || pending.OwnerSeat != r.Actors[r.Cursor] || pending.TargetSeat != r.Target || pending.PolicySource != policy || pending.ProviderFactionId != policy.FactionId || pending.AssistedResultBind != MaTieFactionBind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryMaTieFactionEvent>().Count(e => e.FrameId == f.Id && e.Index == r.Cursor && e.Actor == pending.OwnerSeat && e.Target == r.Target && e.Policy == policy) != 1)
             throw new InvalidOperationException("Quxian faction source lost its exact native policy, actor or original target occurrence.");
         return true;
-    }
-
-    internal bool AnniversaryMaTieFactionSupplyLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind)
-    {
-        if (pending.ProgramSkillFrameId is not { } id || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == id)is not { AnniversaryMaTie.FactionPolicy: not null } f)
-            return true;
-        return ValidateAnniversaryMaTieFactionParent(pending, f) && !_coreCardUseModulesOperations.IsCardUseForbidden(pending.OwnerSeat, kind, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(pending.OwnerSeat, f.AnniversaryMaTie!.Target, kind) && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(pending.OwnerSeat, SkillProgramCardTargetRestriction.SelfOnly);
     }
 
     internal bool PrepareAnniversaryMaTieFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind, CardConversionSource? conversion)

@@ -30,7 +30,6 @@ internal sealed partial class CharacterWuJingOlEntries
     internal bool FinishWuJingFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending) => _resolve().FinishWuJingFactionDeclined(id, pending);
     internal bool FinishWuJingPaidAdapter(ProgramSkillFrame f) => _resolve().FinishWuJingPaidAdapter(f);
     internal bool HasIssuedWuJingHejiDistance(long? useId, int actor) => _resolve().HasIssuedWuJingHejiDistance(useId, actor);
-    internal bool HasWuJingFactionDistance(int actor, int target) => _resolve().HasWuJingFactionDistance(actor, target);
     internal bool HasWuJingHejiTrickPaymentTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => _resolve().HasWuJingHejiTrickPaymentTail(use, continuation);
     internal bool HasWuJingZeroSupply(ProgramSkillFrame f) => _resolve().HasWuJingZeroSupply(f);
     internal bool IsIssuedWuJingHejiReward(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedWuJingHejiReward(c, context);

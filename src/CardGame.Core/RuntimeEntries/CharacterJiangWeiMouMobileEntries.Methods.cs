@@ -19,7 +19,6 @@ internal sealed partial class CharacterJiangWeiMouMobileEntries
     internal bool FinishMouJwFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending) => _resolve().FinishMouJwFactionDeclined(id, pending);
     internal void GainMouJwDiscardCharge(NativeLogicalDiscardInvocationRecordedEvent e) => _resolve().GainMouJwDiscardCharge(e);
     internal void GrantMouJwBeifa(ProgramSkillFrame f) => _resolve().GrantMouJwBeifa(f);
-    internal bool HasMouJwFactionDistance(int actor, int target) => _resolve().HasMouJwFactionDistance(actor, target);
     internal bool IsMouJwSlashQuery(CharacterState actor) => _resolve().IsMouJwSlashQuery(actor);
     internal void IssueMouJwSlash(ProgramSkillFrame f, int index) => _resolve().IssueMouJwSlash(f, index);
     internal bool KeepMouJwPaid(ProgramSkillFrame f) => _resolve().KeepMouJwPaid(f);
@@ -29,7 +28,6 @@ internal sealed partial class CharacterJiangWeiMouMobileEntries
     internal PromptChoice MouJwChoice(ProgramSkillFrame f, string branch, string text, int? card = default, int? target = default, int option = -1) => _resolve().MouJwChoice(f, branch, text, card, target, option);
     internal IReadOnlyList<PromptChoice> MouJwChoices(ProgramSkillFrame f) => _resolve().MouJwChoices(f);
     internal bool MouJwDying() => _resolve().MouJwDying();
-    internal bool MouJwFactionSupplyLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind) => _resolve().MouJwFactionSupplyLegal(pending, kind);
     internal bool MouJwFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MouJwFirstChild(f, child);
     internal bool MouJwLionChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MouJwLionChild(f, child);
     internal bool MouJwNativeEdge(int n) => _resolve().MouJwNativeEdge(n);

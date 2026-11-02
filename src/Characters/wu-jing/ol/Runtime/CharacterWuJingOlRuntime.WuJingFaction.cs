@@ -14,6 +14,7 @@ internal sealed partial class CharacterWuJingOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuJing = r with { Stage = WuJingStage.FactionRequest, FactionPolicy = policy } });
         var seats = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(f.OwnerSeat, policy.FactionId);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(f.Id, FactionCardRequestPurpose.AssistedProgramUse, f.OwnerSeat, seats, policy.FactionId, targetSeat: r.TargetSeat, programSkillFrameId: f.Id, policySource: policy, assistedResultBind: WuJingFactionBind);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: true);
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(f.Id, f.OwnerSeat, seats, policy.SkillId, IsActiveUse: true, r.TargetSeat));
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
@@ -28,7 +29,6 @@ internal sealed partial class CharacterWuJingOlRuntime
         return true;
     }
 
-    internal bool HasWuJingFactionDistance(int actor, int target) => _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsAssistedProgramUse: true, ProgramSkillFrameId: { } id } pending && pending.OwnerSeat == actor && pending.TargetSeat == target && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == id)is { WuJing: not null } owner && ValidateWuJingFactionParent(pending, owner) && WuJingFactionTarget(owner);
     internal bool PrepareWuJingFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind)
     {
         if (!ValidateWuJingFactionParent(pending, f))

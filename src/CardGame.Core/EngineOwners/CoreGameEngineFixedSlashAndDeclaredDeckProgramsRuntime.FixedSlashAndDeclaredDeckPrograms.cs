@@ -156,14 +156,9 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[draft.TargetSeat], cards[0], kind, actor.Seat, physicalCards: cards, countsTowardSlashLimit: false, usesZhuqueFan: kind == CardKind.FireSlash && (cards[0].Kind == CardKind.Slash || _coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(actor, cards[0])) && _coreNativeTargetLegalityOperations.HasZhuqueFan(actor), conversionSource: conversion, programSkillCardUseFrameId: frame.Id);
     }
 
-    internal bool IsFixedTargetFactionSlashLegal(ProgramSkillFrame frame, CardKind kind, int? effectiveRank = null, bool allowPotentialRank = true)
-    {
-        if (frame.FixedTargetSlash is not { } draft || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(draft.TargetSeat))
-            return false;
-        var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-        var target = _coreMatchParticipantsPlayersAccess._players[draft.TargetSeat];
-        return owner.IsAlive && target.IsAlive && owner.Seat != target.Seat && !_coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, kind, CardActionType.Use) && (draft.IgnoreDistance || _characterXiaoQiaoLeOperations.HasWeiwanUseDistance(owner, target, kind) || (_characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(owner) || _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(owner)) || _coreFinalTargetSlashOperations.IsWithinSpecificSlashRange(owner, target, kind, effectiveRank) || allowPotentialRank && effectiveRank is null && _coreFinalTargetSlashOperations.HasPotentialRankSlashRange(owner, target, kind)) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner.Seat, target.Seat, kind) && _coreRuleQueriesOperations.CanSpendSlashUse(owner, target, ignoresCount: true, kind) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target);
-    }
+    internal bool IsFixedTargetFactionSlashLegal(ProgramSkillFrame frame, CardKind kind, int? effectiveRank = null, bool allowPotentialRank = true) =>
+        frame.FixedTargetSlash is { } draft && _coreTableSeatQueriesOperations.IsValidPlayerSeat(draft.TargetSeat) &&
+        _coreAssistedFactionSlashOperations.IsAssistedProvidedSlashTarget(frame.OwnerSeat, draft.TargetSeat, kind, effectiveRank, allowPotentialRank, ignoreDistance: draft.IgnoreDistance);
 
     internal void BeginFixedTargetFactionSlash(ProgramSkillFrame frame)
     {
@@ -172,21 +167,12 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         var policy = _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], CardKind.Slash) ?? throw new InvalidOperationException("The fixed Slash lost its faction policy.");
         var candidates = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(frame.OwnerSeat, policy.FactionId);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(frame.Id, FactionCardRequestPurpose.AssistedProgramUse, frame.OwnerSeat, candidates, policy.FactionId, targetSeat: draft.TargetSeat, programSkillFrameId: frame.Id, policySource: policy, assistedResultBind: FixedTargetFactionResultBind);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.AuthorizeProgramRequest(frame.InstructionIndex, ignoreDistance: draft.IgnoreDistance, usesChoiceResult: true);
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(frame.Id, frame.OwnerSeat, candidates, policy.SkillId, IsActiveUse: true, draft.TargetSeat));
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateFixedTargetFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame frame)
-    {
-        if (frame.FixedTargetSlash is not { Issued: true } draft)
-            return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        var answer = frame.ChoiceBindings.SingleOrDefault(binding => binding.Name == FixedTargetFactionResultBind);
-        if ((effect.Op != SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner && !_characterLeiBoAnniversaryOperations.Value.IsAnniversaryLeiBoFixedSlash(frame)) || pending.AssistedResultBind != FixedTargetFactionResultBind || pending.OwnerSeat != frame.OwnerSeat || pending.TargetSeat != draft.TargetSeat || pending.PolicySource is null || ((frame.WindowContext?.Window != SkillProgramTriggerWindow.TurnEnding || frame.WindowContext.TargetSeat != draft.TargetSeat) && !_characterLeiBoAnniversaryOperations.Value.IsAnniversaryLeiBoFixedSlash(frame)) || (pending.ActiveAttack is null ? answer is not null : answer?.OptionId != "used-slash"))
-            throw new InvalidOperationException("A fixed faction Slash changed its owner, target or issued instruction.");
-        return true;
-    }
 
     internal SkillProgramStepOutcome BeginDeclaredDeckCriterion(ProgramSkillFrame frame)
     {

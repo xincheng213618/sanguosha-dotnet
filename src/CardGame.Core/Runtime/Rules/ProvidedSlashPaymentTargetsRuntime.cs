@@ -37,7 +37,7 @@ internal sealed class ProvidedSlashPaymentTargetsRuntime(IMatchParticipantStateA
         if (request.IsQinglongCrescentBladeUse)
             return qinglong.CanUseQinglongCrescentBladeTarget(actor, target, kind, color, false, suit, rank, physicalCardIds: ids);
         if (request.IsAssistedProgramUse)
-            return assisted.IsAssistedProvidedSlashTarget(actor.Seat, targetSeat, kind, rank, allowPotentialRank: false, physicalCardIds: ids, physicalSuit: suit, effectiveColor: color);
+            return assisted.IsAssistedProvidedSlashTarget(request, kind, rank, ids, suit, color);
         return targets.CanUseProvidedSlashTarget(actor, target, kind, suit, false, color, rank, physicalCardIds: ids);
     }
 

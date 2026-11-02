@@ -141,8 +141,8 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
     {
         if (frame.NearestLegalSlashRequest is not { AwaitingFaction: true, TargetSeat: { } target } draft || binding.Name != draft.ResultBind)
             return false;
-        if (!IsNearestLegalFactionOrigin(frame, draft.ActorSeat, target, binding.Name) || binding.ChooserSeat != draft.ActorSeat || binding.OptionId is not ("declined" or "used-slash") || !_coreCommandJournalStorageEventsPendingEventsAccess._events.Select(item => item.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents).OfType<ProgramOptionChosenEvent>().Any(fact => fact.FrameId == frame.Id && fact.SkillId == frame.SkillId && fact.BindingId == CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame) && fact.OwnerSeat == frame.OwnerSeat && fact.ResultBind == binding.Name && fact.ChooserSeat == binding.ChooserSeat && fact.OptionId == binding.OptionId))
-            throw new InvalidOperationException("A nearest faction result changed its exact owning instruction, actor or committed fact.");
+        if (binding.ChooserSeat != draft.ActorSeat || binding.OptionId is not ("declined" or "used-slash"))
+            throw new InvalidOperationException("A nearest faction result has an invalid chooser or result kind.");
         return true;
     }
 
@@ -188,17 +188,6 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
     }
 
     internal bool NearestSlashPaymentHasRange(CharacterState actor, int target, IReadOnlyList<Card> cards, CardConversionSource? conversion, CardKind kind) => _coreAssistedPhysicalCardsOperations.AssistedSlashPaymentHasRange(actor, target, cards, conversion) || (_coreProvenanceCardPoliciesOperations.HasProvenanceUseDistance2(actor, cards.Select(c => c.Id).ToArray()) || _coreGrantedEntityPhasesOperations.HasGrantedPhaseEntityDistance(actor, cards.Select(c => c.Id).ToArray())) || _coreCardConversionsOperations.IgnoresProgramSlashDistance(actor, conversion) || _coreCardConversionsOperations.IgnoresSpGuanYuWushengDistance(actor, cards[0]) || _coreCurrentTurnShownCardBenefitsOperations.HasSlashUseDistanceBySuit(actor, kind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, cards[0])) || _coreTurnRedSlashBenefitsOperations.HasTurnRedSlashPolicy(actor.Seat, kind, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, cards[0])) || _coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance(actor, cards[0]) || _coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(actor, _coreMatchParticipantsPlayersAccess._players[target], kind) || _coreCardConversionsOperations.IgnoresSlashUseDistance(actor);
-    internal bool IsNearestLegalFactionOrigin(ProgramSkillFrame frame, int actor, int target, string? bind) => ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect.Op == SkillProgramEffectOp.RequestLegalSlashByNearest && frame.NearestLegalSlashRequest is { AwaitingFaction: true } draft && draft.ActorSeat == actor && draft.TargetSeat == target && draft.ResultBind == bind && draft.NearestSeats.Contains(target) && frame.SelectedTargetSeats.SequenceEqual([actor]) && actor != frame.OwnerSeat;
-    internal bool ValidateNearestLegalFactionParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame frame)
-    {
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        if (effect.Op != SkillProgramEffectOp.RequestLegalSlashByNearest)
-            return false;
-        var answer = frame.ChoiceBindings.SingleOrDefault(binding => binding.Name == pending.AssistedResultBind);
-        if (pending.TargetSeat is not { } target || !IsNearestLegalFactionOrigin(frame, pending.OwnerSeat, target, pending.AssistedResultBind) || pending.PolicySource is null || (pending.ActiveAttack is null ? answer is not null : answer?.OptionId != "used-slash"))
-            throw new InvalidOperationException("Nearest faction child changed its frozen parent, actor, target or paid result.");
-        return true;
-    }
 
     internal int[] UnlimitedVirtualSlashTargets(ProgramSkillFrame frame) => _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && target.IsAlive && target.Seat != frame.OwnerSeat && _coreRuleQueriesOperations.CanSpendSlashUse(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], target, ignoresCount: true, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target)).Select(target => target.Seat).ToArray();
     internal IReadOnlyList<PromptChoice> UnlimitedVirtualSlashChoices(ProgramSkillFrame frame)

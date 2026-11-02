@@ -76,12 +76,17 @@ public sealed record BorrowedSwordState
     public CardKind? EffectiveSlashKind { get; init; }
 }
 
+public sealed record ProgramAssistedSlashAuthorization(int InstructionIndex, bool IgnoreDistance = false,
+    int? RangeOwnerSeat = null, bool UsesChoiceResult = false);
+
 public sealed record FactionCardRequestState
 {
     public string? InvocationOccurrenceKey { get; init; }
     public bool Active { get; init; } = true;
     public FactionResponsePolicySource? PolicySource { get; init; }
     public string? AssistedResultBind { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramAssistedSlashAuthorization? AssistedAuthorization { get; init; }
     public FactionCardRequestPurpose Purpose { get; init; }
     public int OwnerSeat { get; init; }
     public IReadOnlyList<int> CandidateSeats { get; init; } = [];

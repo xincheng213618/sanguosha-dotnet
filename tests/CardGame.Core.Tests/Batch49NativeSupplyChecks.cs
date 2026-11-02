@@ -8,6 +8,7 @@ internal static class Batch49NativeSupplyChecks
 {
     private const string Owner = "fixture:b49-saying-owner", Mode = "identity:classic-b49-supply";
     private const string Supplier = "fixture:b49-supplier", Provider = "fixture:b49-converted-provider", Watch = "fixture:b49-native-watch", Quiet = "fixture:b49-quiet";
+    private const string Generic = "fixture:b49-generic-request";
     private static string Scene = "";
 
     public static void SayingZeroSuppliersKeepForeignActorAndNativeReturnsCold()
@@ -101,6 +102,7 @@ internal static class Batch49NativeSupplyChecks
         }
         SayingConvertedFactionSupplyCold();
         AssistedFactionFanFallbackUsesTheFinalKindCold();
+        GenericFactionSupplyCommitsOneChoiceResultCold();
     }
 
     private static void SayingConvertedFactionSupplyCold()
@@ -120,6 +122,11 @@ internal static class Batch49NativeSupplyChecks
         Answer(g, c => c.Targets.SequenceEqual([actor]));
         Reach(g, () => Own(g)?.SunYuan?.Stage == SunYuanStage.ObtainCard);
         Answer(g, c => c.Parameters.GetValueOrDefault("branch") == "card" && c.Parameters.GetValueOrDefault("source-zone") == nameof(CardZoneKind.Hand));
+        Reach(g, () => g.GetRuntimeModule<CoreNativeCardContinuationCursorsRuntime>().ActiveFactionCardRequest is { IsAssistedProgramUse: true, AwaitingProviders: true } && P(g) is { Kind: DecisionKind.RespondSlash });
+        var authorization = CheckAssistedAuthorization(g, ignoreDistance: false, usesChoiceResult: false);
+        g = Cold(g, registry);
+        Need(CheckAssistedAuthorization(g, ignoreDistance: false, usesChoiceResult: false) == authorization,
+            "The real converted supplier window preserves its original instruction authorization across Cold.");
         Reach(g, () => P(g) is { PlayerSeat: 0 } p && p.SkillPrompt?.SkillId == Watch);
         var f = Own(g)!; var prepared = E<SayingSlashPreparedEvent>(g).Single(e => e.FrameId == f.Id);
         var issued = E<SayingSlashIssuedEvent>(g).Single(e => e.FrameId == f.Id);
@@ -180,6 +187,7 @@ internal static class Batch49NativeSupplyChecks
         Reach(g, () => cursors.ActiveFactionCardRequest is { IsAssistedProgramUse: true, AwaitingProviders: true } &&
             P(g) is { Kind: DecisionKind.RespondSlash });
         var request = cursors.ActiveFactionCardRequest!;
+        var authorization = CheckAssistedAuthorization(g, ignoreDistance: false, usesChoiceResult: false);
         var provider = request.CurrentCandidateSeat;
         var materialId = g.CreateSnapshot(provider).Players[provider].Hand.First(c => c.Kind == CardKind.Slash).Id;
         var material = g.GetRuntimeModule<CoreGameEngineCardAttackStateRuntime>().GetAttackCard(materialId);
@@ -190,6 +198,8 @@ internal static class Batch49NativeSupplyChecks
             "A real assisted request retains a supplied normal Slash only through its actor's legal Fire Slash fallback.");
         var frameId = Own(g)!.Id;
         g = Cold(g, registry);
+        Need(CheckAssistedAuthorization(g, ignoreDistance: false, usesChoiceResult: false) == authorization,
+            "The real Fan supplier window preserves the exact authorization across Cold.");
         Reach(g, () => P(g) is { PlayerSeat: 0 } p && p.SkillPrompt?.SkillId == Watch);
         var issued = E<SayingSlashIssuedEvent>(g).Single(e => e.FrameId == frameId);
         var use = g.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Id == issued.UseId);
@@ -210,6 +220,69 @@ internal static class Batch49NativeSupplyChecks
             g.CreateSnapshot(0).Players[0].Hp == hp - 1,
             "Cold recovery finishes the final Fire Slash, pays its provider once and returns to the original assisted parent once.");
         _ = Cold(g, registry);
+    }
+
+    private static void GenericFactionSupplyCommitsOneChoiceResultCold()
+    {
+        Scene = "generic-faction";
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(Scene));
+        var g = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord,
+            ModeId = Mode, UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 8 }, registry);
+        Accept(g, new StartGameCommand());
+        Reach(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.SelectGeneral });
+        Accept(g, new SelectGeneralCommand(0, Owner, g.Revision, P(g)!.PromptId));
+        Reach(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
+        var actor = g.CreateSnapshot(0).Players.Single(p => p.GeneralId == "fixture:b49-peer-1").Seat;
+        Need(actor != 0 && g.CreateSnapshot(actor).Players[actor].Hand.All(c => c.Kind == CardKind.Crossbow),
+            "The actual generic-request actor owns its faction policy but no self Slash or self conversion.");
+        Accept(g, new UseProgramSkillCommand(0, Generic, "request", [], [actor], g.Revision, P(g)!.PromptId));
+        Reach(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.ProgramTrigger } p && p.Choices.Any(c => c.Targets.SequenceEqual([0])));
+        Answer(g, c => c.Targets.SequenceEqual([0]));
+        Reach(g, () => g.GetRuntimeModule<CoreNativeCardContinuationCursorsRuntime>().ActiveFactionCardRequest is { IsAssistedProgramUse: true, AwaitingProviders: true } && P(g) is { Kind: DecisionKind.RespondSlash });
+        var request = g.GetRuntimeModule<CoreNativeCardContinuationCursorsRuntime>().ActiveFactionCardRequest!;
+        var frameId = request.ProgramSkillFrameId!.Value;
+        var authorization = CheckAssistedAuthorization(g, ignoreDistance: false, usesChoiceResult: true);
+        Need(request.OwnerSeat == actor && request.TargetSeat == 0 && request.CurrentCandidateSeat != actor,
+            "The real CoreBegin request retains its foreign actor and actual ally provider.");
+        g = Cold(g, registry);
+        Need(CheckAssistedAuthorization(g, ignoreDistance: false, usesChoiceResult: true) == authorization,
+            "The generic request restores its original choice-result authorization before payment.");
+        Reach(g, () => P(g) is { PlayerSeat: 0 } p && p.SkillPrompt?.SkillId == Watch);
+        var use = g.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Action is { } a && a.ActorSeat == actor && a.RequesterSeat == actor && a.ProviderSeat != actor && u.TargetSeats.SequenceEqual([0]));
+        var useId = use.Id; var action = use.Action!; var cost = action.PhysicalCards.Single();
+        Need(cost.CardKind == CardKind.Crossbow && action.ConversionChain is [var source] && source.SkillId == Provider &&
+            g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == frameId).ChoiceBindings.Count(b => b.Name == "reply" && b.OptionId == "used-slash") == 1 &&
+            E<ProgramOptionChosenEvent>(g).Count(e => e.FrameId == frameId && e.ResultBind == "reply" && e.OptionId == "used-slash" && e.ChooserSeat == actor) == 1,
+            "CoreBegin pays the ally's converted Crossbow and commits exactly one ordinary used-slash result to its real parent.");
+        g = Cold(g, registry);
+        Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+        Reach(g, () => P(g) is { PlayerSeat: 0 } p && p.SkillPrompt?.SkillId == Generic && p.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") == "continue"));
+        Need(E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == useId) == 1 &&
+            E<ProgramOptionChosenEvent>(g).Count(e => e.FrameId == frameId && e.ResultBind == "reply" && e.OptionId == "used-slash") == 1 &&
+            g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == frameId).ChoiceBindings.Count(b => b.Name == "reply" && b.OptionId == "used-slash") == 1 &&
+            g.CardMovements.Count(m => m.CardId == cost.CardId && m.From == cost.From && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use) == 1,
+            "The real native return advances to the JSON suffix without paying or committing its result twice.");
+        g = Cold(g, registry);
+        Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+        Reach(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
+        Need(E<ProgramSkillResolvedEvent>(g).Count(e => e.FrameId == frameId && e.OwnerSeat == 0 &&
+            e.SkillId == Generic && e.ActivationId == "request" && e.Completed) == 1 &&
+            !g.ResolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == frameId),
+            "The ordinary generic activation completes once and pops its original frame after its real native child and suffix.");
+        _ = Cold(g, registry);
+    }
+
+    private static ProgramAssistedSlashAuthorization CheckAssistedAuthorization(GameEngine g, bool ignoreDistance, bool usesChoiceResult)
+    {
+        var request = g.GetRuntimeModule<CoreNativeCardContinuationCursorsRuntime>().ActiveFactionCardRequest
+            ?? throw new InvalidOperationException("The authorization check requires a real active faction request.");
+        var frame = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == request.ProgramSkillFrameId);
+        var authorization = request.AssistedAuthorization
+            ?? throw new InvalidOperationException("The real assisted request has no original-frame authorization.");
+        Need(request.OwnerFrameId == frame.Id && authorization.InstructionIndex == frame.InstructionIndex &&
+            authorization.IgnoreDistance == ignoreDistance && authorization.RangeOwnerSeat is null && authorization.UsesChoiceResult == usesChoiceResult,
+            "Assisted authorization freezes this exact original instruction, range policy and choice-result contract.");
+        return authorization;
     }
 
     private static ProgramSkillFrame? Own(GameEngine g) => g.ResolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.SunYuan is not null);
@@ -249,7 +322,7 @@ internal static class Batch49NativeSupplyChecks
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, "ol:sun-yuan");
-            var factionScene = scene is "faction-converted" or "faction-fan";
+            var factionScene = scene is "faction-converted" or "faction-fan" or "generic-faction";
             if (scene == "huanpei") CharacterFixtureContent.Register(b, "ol:huan-shu-jun");
             static JsonNode N(string text) => JsonNode.Parse(text)!;
             var supplier = N($$"""
@@ -286,13 +359,14 @@ internal static class Batch49NativeSupplyChecks
                 defs.Add(N($$"""{"id":"{{Provider}}","revision":1,"viewAs":[{"id":"crossbow-slash","inputKinds":["crossbow"],"inputSuits":[],"sourceZones":["hand"],"outputKind":"slash","forPlay":true,"forResponse":false}]}"""));
                 defs[2]!["triggers"]!.AsArray().Add(N("""{"id":"actual-native-supply-child","window":"cardSupplyCompleted","ownerRelation":"actor","cardKinds":["slash","fireSlash","thunderSlash"],"optional":false,"effects":[{"op":"draw","target":"owner","amount":1}]}"""));
             }
+            if (scene == "generic-faction") defs.Add(N($$"""{"id":"{{Generic}}","revision":1,"activations":[{"id":"request","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"requestSlashAgainstChosenTarget","target":"selectedTarget","resultBind":"reply"},{"op":"chooseOption","target":"owner","resultBind":"done","options":[{"id":"continue"}]}]}]}"""));
             if (scene == "faction-fan") defs.Add(N("""{"id":"fixture:b49-normal-only","revision":1,"cardPolicies":[{"id":"normal-only","kind":"prohibitTarget","cardKinds":["slash"]}]}"""));
-            var labels = defs.Select(n => n!["id"]!.GetValue<string>()).ToDictionary(id => id, id => new { name = id, description = "真实飒影供应边界", optionLabels = id == Watch ? new Dictionary<string, string> { ["continue"] = "继续原生伤害" } : new Dictionary<string, string>() });
+            var labels = defs.Select(n => n!["id"]!.GetValue<string>()).ToDictionary(id => id, id => new { name = id, description = "真实飒影供应边界", optionLabels = id == Watch || id == Generic ? new Dictionary<string, string> { ["continue"] = "继续原生伤害" } : new Dictionary<string, string>() });
             var catalog = SkillProgramCatalog.Load(new JsonObject { ["schemaVersion"] = SkillProgramCatalog.RulesSchemaVersion, ["skills"] = defs }.ToJsonString(), JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, id, "真实原生供应") { Program = program, ProgramPresentation = catalog.Presentations[id] });
             const string pick = "fixture:b49-pick";
             b.AddSkill(new(pick, "本人", "固定公开选择") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => -100000000d) });
-            b.AddGeneral(new(Owner, "真实飒影本人", "supporter", pick, "wu", 12, ["ol:saying", Watch, .. scene == "faction-fan" ? new[] { "fixture:b49-normal-only" } : Array.Empty<string>()], GeneralGender.Female));
+            b.AddGeneral(new(Owner, "真实飒影本人", "supporter", pick, "wu", 12, [scene == "generic-faction" ? Generic : "ol:saying", Watch, .. scene == "faction-fan" ? new[] { "fixture:b49-normal-only" } : Array.Empty<string>()], GeneralGender.Female));
             var peers = Enumerable.Range(1, 3).Select(i => "fixture:b49-peer-" + i).ToArray();
             foreach (var peer in peers) b.AddGeneral(new(peer, "真实供给角色", "supporter", Quiet, factionScene ? "shu" : "wei", 12,
                 [scene == "huanpei" ? "ol:huanpei" : factionScene && peer != peers[0] ? Provider : Supplier], GeneralGender.Male));

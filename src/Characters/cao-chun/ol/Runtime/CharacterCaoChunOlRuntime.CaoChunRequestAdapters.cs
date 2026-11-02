@@ -48,6 +48,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CaoChun = f.CaoChun!with { Faction = new(f.Id, target, policy) } });
         var seats = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(f.OwnerSeat, policy.FactionId);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(f.Id, FactionCardRequestPurpose.AssistedProgramUse, f.OwnerSeat, seats, policy.FactionId, targetSeat: target, programSkillFrameId: f.Id, policySource: policy, assistedResultBind: CaoChunFactionBind);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: false, usesChoiceResult: false);
         _coreMatchOutcomeStatusAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(f.Id, f.OwnerSeat, seats, policy.SkillId, IsActiveUse: true, target));
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();

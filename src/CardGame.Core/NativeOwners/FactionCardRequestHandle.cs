@@ -35,6 +35,15 @@ internal sealed class FactionCardRequestHandle : GameEngine.ICardContinuationHan
     public FactionResponsePolicySource? PolicySource { get => State.PolicySource; }
     public string InvocationOccurrenceKey => State.InvocationOccurrenceKey ?? throw new InvalidOperationException("A faction slash lost its accepted skill occurrence.");
     public string? AssistedResultBind { get => State.AssistedResultBind; }
+    public ProgramAssistedSlashAuthorization? AssistedAuthorization => State.AssistedAuthorization;
+    public void AuthorizeProgramRequest(int instructionIndex, bool ignoreDistance = false, int? rangeOwnerSeat = null,
+        bool usesChoiceResult = false) => Update(state =>
+    {
+        if (state.Purpose != FactionCardRequestPurpose.AssistedProgramUse || state.ProgramSkillFrameId != OwnerFrameId ||
+            state.AssistedAuthorization is not null)
+            throw new InvalidOperationException("An assisted Slash authorization requires its original program request and may be issued only once.");
+        return state with { AssistedAuthorization = new(instructionIndex, ignoreDistance, rangeOwnerSeat, usesChoiceResult) };
+    });
     public long ResolutionId => OwnerFrameId;
     public FactionCardRequestPurpose Purpose { get => State.Purpose; }
     public int OwnerSeat { get => State.OwnerSeat; }

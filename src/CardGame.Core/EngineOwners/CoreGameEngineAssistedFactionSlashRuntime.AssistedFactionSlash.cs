@@ -118,25 +118,63 @@ internal sealed partial class CoreGameEngineAssistedFactionSlashRuntime
     }
 
     internal bool CanSupplyAssistedFactionSlash(NativeOwners.FactionCardRequestHandle pending, CardKind kind, IReadOnlyList<Card> cards, bool isTrueZhangba = false) =>
-        _characterJiangWeiMouMobileOperations.MouJwFactionSupplyLegal(pending, kind) &&
-        _characterMaTieAnniversaryOperations.AnniversaryMaTieFactionSupplyLegal(pending, kind) &&
         (!CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(pending) || !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(pending.OwnerSeat, cards.Select(c => c.Id).ToArray())) &&
         _providedSlashPaymentTargets.CanSupply(pending, kind, cards, isTrueZhangba);
     internal IReadOnlyList<IReadOnlyList<Card>> GetFactionRequestZhangbaPairs(NativeOwners.FactionCardRequestHandle pending, CharacterState provider) => _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(provider).Where(pair => CanSupplyAssistedFactionSlash(pending, CardKind.Slash, pair, isTrueZhangba: true)).ToArray();
     internal IReadOnlyList<ProgramMultiCardViewAsSelection> GetFactionRequestMultiCardSelections(NativeOwners.FactionCardRequestHandle pending, CharacterState provider) => (pending.IsAssistedProgramUse ? CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.SelectMany(kind => _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(provider, kind, false, ignoreSuitUseProhibition: true).Where(item => _corePlayCardHistoryOperations.ViewAsRule(item.Source)is { RoundDistinctBasicUse: null, LeiluanBasicUse: null } || item.OutputKind == kind)) : _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(provider, pending.RequiredKind, !CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(pending), ignoreSuitUseProhibition: true)).Where(selection => _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.RoundDistinctBasicUse is null && _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.LeiluanBasicUse is null && CanSupplyAssistedFactionSlash(pending, selection.OutputKind, selection.Cards) && !_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, selection.OutputKind, selection.Cards, selection.Source)).ToArray();
-    internal bool CanRequestAssistedProgramFactionSlash(int actorSeat, int targetSeat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[actorSeat], CardKind.Slash)is not null && CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => IsAssistedProvidedSlashTarget(actorSeat, targetSeat, kind));
-    internal bool HasQigongFactionDistance(int actorSeat, int targetSeat) => _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsAssistedProgramUse: true, ProgramSkillFrameId: { } frameId } request && request.OwnerSeat == actorSeat && request.TargetSeat == targetSeat && _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == frameId)is ProgramSkillFrame program && _characterLvKuangLvXiangOlOperations.QigongAdapterActor(program, actorSeat, targetSeat, program.InstructionIndex, frameId, request.ResolutionId) && _characterLvKuangLvXiangOlOperations.ValidateQigongFactionSlashParent(request, program);
-    internal bool IsAssistedProvidedSlashTarget(int actorSeat, int targetSeat, CardKind kind, int? effectiveRank = null, bool allowPotentialRank = true, IReadOnlyList<int>? physicalCardIds = null, Suit? physicalSuit = null, bool? effectiveColor = null) => _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive && actorSeat != targetSeat && (_characterHuangfuSongWumiaoOperations.HasWuHfOrWuyouMaterialPrivilege(_coreMatchParticipantsPlayersAccess._players[actorSeat], kind, physicalCardIds) || allowPotentialRank && physicalCardIds is null && _characterGuanYuWumiaoOperations.HasPotentialWuyouFactionSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat], kind) || (HasQigongFactionDistance(actorSeat, targetSeat) || _characterWuJingOlOperations.HasWuJingFactionDistance(actorSeat, targetSeat) || _characterJiangWeiMouMobileOperations.HasMouJwFactionDistance(actorSeat, targetSeat) ? true : _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsAssistedProgramUse: true, ProgramSkillFrameId: { } fixedFrameId } && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == fixedFrameId)is { FixedTargetSlash: { } fixedDraft } fixedFrame && fixedFrame.OwnerSeat == actorSeat && fixedDraft.TargetSeat == targetSeat ? _coreFixedSlashAndDeclaredDeckProgramsOperations.IsFixedTargetFactionSlashLegal(fixedFrame, kind, effectiveRank, allowPotentialRank) : _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsAssistedProgramUse: true, ProgramSkillFrameId: { } giftFrameId } && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == giftFrameId)is { CompletedCardGiftDraft.RecipientSeat: { } recipient } giftFrame && recipient == actorSeat ? _coreCompletedCardGiftsOperations.Value.CompletedGiftSlashTargets(giftFrame, actorSeat).Contains(targetSeat) : _characterXiaoQiaoLeOperations.HasWeiwanUseDistance(_coreMatchParticipantsPlayersAccess._players[actorSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat], kind) || (_characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(_coreMatchParticipantsPlayersAccess._players[actorSeat]) || _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(_coreMatchParticipantsPlayersAccess._players[actorSeat])) || _coreFinalTargetSlashOperations.IsWithinSpecificSlashRange(_coreMatchParticipantsPlayersAccess._players[actorSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat], kind, effectiveRank) || allowPotentialRank && effectiveRank is null && _coreFinalTargetSlashOperations.HasPotentialRankSlashRange(_coreMatchParticipantsPlayersAccess._players[actorSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat], kind))) && _coreRuleQueriesOperations.CanSpendSlashUse(_coreMatchParticipantsPlayersAccess._players[actorSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat], ignoresCount: true, kind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[targetSeat], kind, physicalSuit, effectiveColor) && (!(HasQigongFactionDistance(actorSeat, targetSeat) || _characterWuJingOlOperations.HasWuJingFactionDistance(actorSeat, targetSeat) || _characterJiangWeiMouMobileOperations.HasMouJwFactionDistance(actorSeat, targetSeat)) || !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actorSeat, targetSeat, kind) && !_coreCardUseModulesOperations.IsCardUseForbidden(actorSeat, kind, CardActionType.Use));
-    internal void BeginAssistedProgramFactionSlashRequest(ProgramSkillFrame frame, int actorSeat, int targetSeat, string resultBind)
+    internal bool CanRequestAssistedProgramFactionSlash(int actorSeat, int targetSeat, bool ignoreDistance = false, int? rangeOwnerSeat = null) =>
+        _coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) &&
+        _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[actorSeat], CardKind.Slash) is not null &&
+        CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind =>
+            IsAssistedSlashTarget(actorSeat, targetSeat, kind, null, true, null, null, null, ignoreDistance, rangeOwnerSeat));
+
+    internal bool IsAssistedProvidedSlashTarget(int actorSeat, int targetSeat, CardKind kind, int? effectiveRank = null, bool allowPotentialRank = true, IReadOnlyList<int>? physicalCardIds = null, Suit? physicalSuit = null, bool? effectiveColor = null, bool ignoreDistance = false, int? rangeOwnerSeat = null) =>
+        IsAssistedSlashTarget(actorSeat, targetSeat, kind, effectiveRank, allowPotentialRank, physicalCardIds, physicalSuit, effectiveColor, ignoreDistance, rangeOwnerSeat);
+
+    internal bool IsAssistedProvidedSlashTarget(NativeOwners.FactionCardRequestHandle request, CardKind kind, int? effectiveRank, IReadOnlyList<int> physicalCardIds, Suit? physicalSuit, bool? effectiveColor)
     {
-        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame current || current.Id != frame.Id || !_characterSunYuanOlOperations.IsSayingFactionOrigin(current, actorSeat, targetSeat, resultBind) && !_characterLiYiOlOperations.IsChanshuangFactionOrigin(current, actorSeat, targetSeat, resultBind) && !_characterPangTongHappyGodOperations.Value.IsHappyPangTongFactionOrigin(current, actorSeat, targetSeat, resultBind) && (current.SelectedTargetSeats is not [var selected] || selected != actorSeat || current.OwnerSeat == actorSeat) || !(current.CompletedCardGiftDraft is { RecipientSeat: { } recipient, RequestTargetSeat: { } giftTarget } && recipient == actorSeat && giftTarget == targetSeat ? _coreCompletedCardGiftsOperations.Value.CompletedGiftSlashTargets(current, actorSeat).Contains(targetSeat) && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[actorSeat], CardKind.Slash)is not null : CanRequestAssistedProgramFactionSlash(actorSeat, targetSeat)))
-            throw new InvalidOperationException("An assisted faction Slash lost its program parent, actor or target.");
-        var instruction = ProgramInstructionResolver.Default.Resolve(current, _contentRegistryOperations._contentRegistry.GetSkill(current.SkillId).Program!).GetPausedInstruction(current.InstructionIndex).Effect;
-        if (!(instruction.Op == SkillProgramEffectOp.RequestSlashAgainstChosenTarget && instruction.ResultBind == resultBind || instruction.Op == SkillProgramEffectOp.OfferCompletedCardGift && resultBind == "completed-card-gift-slash" && current.CompletedCardGiftDraft is not null || _coreNearestLegalSlashRequestsOperations.IsNearestLegalFactionOrigin(current, actorSeat, targetSeat, resultBind) || _characterLiYiOlOperations.IsChanshuangFactionOrigin(current, actorSeat, targetSeat, resultBind) || _characterSunYuanOlOperations.IsSayingFactionOrigin(current, actorSeat, targetSeat, resultBind) || _characterPangTongHappyGodOperations.Value.IsHappyPangTongFactionOrigin(current, actorSeat, targetSeat, resultBind)) || current.ChoiceBindings.Any(binding => binding.Name == resultBind))
-            throw new InvalidOperationException("An assisted faction Slash must answer its paused card request exactly once.");
+        if (request.TargetSeat is not { } targetSeat || request.AssistedAuthorization is not { } authorization ||
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == request.OwnerFrameId) is not { } owner ||
+            owner.InstructionIndex != authorization.InstructionIndex)
+            return false;
+        return IsAssistedSlashTarget(request.OwnerSeat, targetSeat, kind, effectiveRank, false, physicalCardIds, physicalSuit, effectiveColor, authorization.IgnoreDistance, authorization.RangeOwnerSeat);
+    }
+
+    private bool IsAssistedSlashTarget(int actorSeat, int targetSeat, CardKind kind, int? effectiveRank, bool allowPotentialRank, IReadOnlyList<int>? physicalCardIds, Suit? physicalSuit, bool? effectiveColor, bool ignoreDistance, int? rangeOwnerSeat)
+    {
+        var actor = _coreMatchParticipantsPlayersAccess._players[actorSeat];
+        var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
+        if (!actor.IsAlive || !target.IsAlive || actorSeat == targetSeat ||
+            _coreCardUseModulesOperations.HasTurnCardTargetRestriction(actorSeat, SkillProgramCardTargetRestriction.SelfOnly) ||
+            _coreCardUseModulesOperations.IsCardUseForbidden(actorSeat, kind, CardActionType.Use) ||
+            _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actorSeat, targetSeat, kind) ||
+            _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, kind, physicalSuit, effectiveColor) ||
+            !_coreRuleQueriesOperations.CanSpendSlashUse(actor, target, ignoresCount: true, kind))
+            return false;
+
+        if (rangeOwnerSeat is { } rangeOwner)
+            return _coreMatchParticipantsPlayersAccess._players[rangeOwner].IsAlive && rangeOwner != actorSeat &&
+                rangeOwner != targetSeat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(rangeOwner, targetSeat);
+
+        return ignoreDistance || _characterHuangfuSongWumiaoOperations.HasWuHfOrWuyouMaterialPrivilege(actor, kind, physicalCardIds) ||
+            allowPotentialRank && physicalCardIds is null && _characterGuanYuWumiaoOperations.HasPotentialWuyouFactionSlash(actor, kind) ||
+            _characterXiaoQiaoLeOperations.HasWeiwanUseDistance(actor, target, kind) ||
+            _characterCaiWenJiLeOperations.HasBeifenPreUsePrivilege(actor) || _characterHuangGaiMouMobileOperations.HasMouZhaJiangPreUsePrivilege(actor) ||
+            _coreFinalTargetSlashOperations.IsWithinSpecificSlashRange(actor, target, kind, effectiveRank) ||
+            allowPotentialRank && effectiveRank is null && _coreFinalTargetSlashOperations.HasPotentialRankSlashRange(actor, target, kind);
+    }
+
+    internal void BeginAssistedProgramFactionSlashRequest(ProgramSkillFrame frame, int actorSeat, int targetSeat, string resultBind, bool ignoreDistance = false, int? rangeOwnerSeat = null)
+    {
+        if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not null ||
+            _resolutionStackOperations._resolutionStack.LastOrDefault() is not ProgramSkillFrame current || current.Id != frame.Id ||
+            current.ChoiceBindings.Any(binding => binding.Name == resultBind) ||
+            !CanRequestAssistedProgramFactionSlash(actorSeat, targetSeat, ignoreDistance, rangeOwnerSeat))
+            throw new InvalidOperationException("An assisted faction Slash requires its unanswered original program request and legal participants.");
         var policy = _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[actorSeat], CardKind.Slash)!;
         var candidates = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actorSeat, policy.FactionId);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(frame.Id, FactionCardRequestPurpose.AssistedProgramUse, actorSeat, candidates, policy.FactionId, targetSeat: targetSeat, programSkillFrameId: frame.Id, policySource: policy, assistedResultBind: resultBind);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.AuthorizeProgramRequest(current.InstructionIndex, ignoreDistance, rangeOwnerSeat, usesChoiceResult: true);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreMatchOutcomeStatusAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(frame.Id, actorSeat, candidates, policy.SkillId, IsActiveUse: true, targetSeat));
@@ -145,29 +183,14 @@ internal sealed partial class CoreGameEngineAssistedFactionSlashRuntime
 
     internal void ValidateAssistedFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame frame)
     {
-        if (_characterPangTongHappyGodOperations.Value.ValidateHappyPangTongFactionParent(pending, frame))
-            return;
-        if (_characterLvKuangLvXiangOlOperations.ValidateQigongFactionSlashParent(pending, frame))
-            return;
-        if (_characterCaoChunOlOperations.ValidateCaoChunFactionSlashParent(pending, frame))
-            return;
-        if (_characterJiangWeiMouMobileOperations.ValidateMouJwFactionParent(pending, frame))
-            return;
-        if (_characterMaTieAnniversaryOperations.ValidateAnniversaryMaTieFactionParent(pending, frame))
-            return;
-        if (_characterWuJingOlOperations.ValidateWuJingFactionParent(pending, frame))
-            return;
-        if (_characterLiYiOlOperations.ValidateChanshuangFactionSlashParent(pending, frame))
-            return;
-        if (_characterSunYuanOlOperations.ValidateSayingFactionSlashParent(pending, frame))
-            return;
-        if (_coreFixedSlashAndDeclaredDeckProgramsOperations.ValidateFixedTargetFactionSlashParent(pending, frame))
-            return;
-        if (_coreNearestLegalSlashRequestsOperations.ValidateNearestLegalFactionParent(pending, frame))
-            return;
-        var effect = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
-        var answered = frame.ChoiceBindings.SingleOrDefault(binding => binding.Name == pending.AssistedResultBind);
-        if (!(effect.Op == SkillProgramEffectOp.RequestSlashAgainstChosenTarget && effect.ResultBind == pending.AssistedResultBind || effect.Op == SkillProgramEffectOp.OfferCompletedCardGift && pending.AssistedResultBind == "completed-card-gift-slash" && frame.CompletedCardGiftDraft is { } gift && gift.RecipientSeat == pending.OwnerSeat && gift.RequestTargetSeat == pending.TargetSeat) || frame.SelectedTargetSeats is not [var actor] || actor != pending.OwnerSeat || frame.OwnerSeat == actor || pending.TargetSeat is not { } target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || pending.PolicySource is null || (pending.ActiveAttack is null ? answered is not null : answered?.OptionId != "used-slash"))
-            throw new InvalidOperationException("An assisted faction Slash changed its instruction, participants or result.");
+        if (pending.AssistedAuthorization is not { } authorization || pending.OwnerFrameId != frame.Id ||
+            authorization.InstructionIndex != frame.InstructionIndex || pending.PolicySource is null || pending.AssistedResultBind is null)
+            throw new InvalidOperationException("An assisted faction Slash lost its original issued program request.");
+        if (authorization.UsesChoiceResult)
+        {
+            var answered = frame.ChoiceBindings.SingleOrDefault(binding => binding.Name == pending.AssistedResultBind);
+            if (pending.ActiveAttack is null ? answered is not null : answered?.OptionId != "used-slash")
+                throw new InvalidOperationException("An assisted faction Slash changed its original choice result.");
+        }
     }
 }

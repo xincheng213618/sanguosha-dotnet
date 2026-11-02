@@ -72,6 +72,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LvKuangLvXiang = r with { Faction = new(f.Id, r.Actor, r.Target, policy) } });
         var seats = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(r.Actor, policy.FactionId);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(f.Id, FactionCardRequestPurpose.AssistedProgramUse, r.Actor, seats, policy.FactionId, targetSeat: r.Target, programSkillFrameId: f.Id, policySource: policy, assistedResultBind: QigongFactionBind);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: true);
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(f.Id, r.Actor, seats, policy.SkillId, IsActiveUse: true, r.Target));
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();

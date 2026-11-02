@@ -193,7 +193,7 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
         if (selected.Parameters["gift-option"] == "faction")
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { CompletedCardGiftDraft = draft with { RequestTargetSeat = target } });
-            _coreAssistedFactionSlashOperations.BeginAssistedProgramFactionSlashRequest(frame, actor.Seat, target, CompletedGiftFactionResultBind);
+            _coreAssistedFactionSlashOperations.BeginAssistedProgramFactionSlashRequest(frame, actor.Seat, target, CompletedGiftFactionResultBind, ignoreDistance: true, rangeOwnerSeat: frame.OwnerSeat);
             return;
         }
 

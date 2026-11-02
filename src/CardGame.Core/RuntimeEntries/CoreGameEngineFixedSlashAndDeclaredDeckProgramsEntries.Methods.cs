@@ -17,5 +17,4 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsEnt
     internal void ResumeDeclaredDeckCriterion(ProgramSkillFrame frame) => _resolve().ResumeDeclaredDeckCriterion(frame);
     internal PromptChoice SelectAiFixedSlashAndDeclaredDeck(PendingDecision decision, ProgramSkillFrame frame) => _resolve().SelectAiFixedSlashAndDeclaredDeck(decision, frame);
     internal bool TryResumeFixedSlashAndDeclaredDeck(long frameId) => _resolve().TryResumeFixedSlashAndDeclaredDeck(frameId);
-    internal bool ValidateFixedTargetFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame frame) => _resolve().ValidateFixedTargetFactionSlashParent(pending, frame);
 }

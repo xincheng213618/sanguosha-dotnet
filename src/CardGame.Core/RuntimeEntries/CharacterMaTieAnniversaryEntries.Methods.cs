@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterMaTieAnniversaryEntries
 {
     internal bool AdvanceMaTieChildren() => _resolve().AdvanceMaTieChildren();
-    internal bool AnniversaryMaTieFactionSupplyLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind) => _resolve().AnniversaryMaTieFactionSupplyLegal(pending, kind);
     internal bool AnniversaryMaTieRequestActor(ProgramSkillFrame f, int actor) => _resolve().AnniversaryMaTieRequestActor(f, actor);
     internal int[] AnniversaryMaTieRequestTargets(ProgramSkillFrame f, int actor) => _resolve().AnniversaryMaTieRequestTargets(f, actor);
     internal ProgramSkillFrame? AnniversaryMaTieSlotParent(EquipmentSlotNamedUseDraft slot) => _resolve().AnniversaryMaTieSlotParent(slot);

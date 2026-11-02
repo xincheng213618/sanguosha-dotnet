@@ -25,6 +25,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiangWeiFactionRequestedEvent(f.Id, r.Cursor, actor, f.OwnerSeat, policy));
         var candidates = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actor, policy.FactionId);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(f.Id, FactionCardRequestPurpose.AssistedProgramUse, actor, candidates, policy.FactionId, targetSeat: f.OwnerSeat, programSkillFrameId: f.Id, policySource: policy, assistedResultBind: MouJwFactionBind);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: true);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(f.Id, actor, candidates, policy.SkillId, IsActiveUse: true, f.OwnerSeat));
@@ -40,14 +41,6 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         return true;
     }
 
-    internal bool MouJwFactionSupplyLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind)
-    {
-        if (pending.ProgramSkillFrameId is not { } id || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == id)is not { MouJiangWei.FactionPolicy: not null } f)
-            return true;
-        return ValidateMouJwFactionParent(pending, f) && !_coreCardUseModulesOperations.IsCardUseForbidden(pending.OwnerSeat, kind, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(pending.OwnerSeat, f.OwnerSeat, kind) && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(pending.OwnerSeat, SkillProgramCardTargetRestriction.SelfOnly);
-    }
-
-    internal bool HasMouJwFactionDistance(int actor, int target) => _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { IsAssistedProgramUse: true, ProgramSkillFrameId: { } id } p && p.OwnerSeat == actor && p.TargetSeat == target && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == id)is { MouJiangWei.FactionPolicy: not null } f && f.OwnerSeat == target && ValidateMouJwFactionParent(p, f);
     internal bool PrepareMouJwFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind, CardConversionSource? conversion)
     {
         if (!ValidateMouJwFactionParent(pending, f))

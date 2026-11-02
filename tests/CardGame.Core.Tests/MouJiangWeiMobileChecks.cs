@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core.Campaigns;
+using CardGame.Core.EngineOwners;
 namespace CardGame.Core.Tests;
 internal static class MouJiangWeiMobileChecks
 {
@@ -23,6 +24,27 @@ internal static class MouJiangWeiMobileChecks
             "Native discard-phase invoices, carrying the phase frozen before their actual payment, replenish real charge up to four; normal use payments do not.");
         s.Taunt(); s.Choose("target", 1); s.Choose("target", 2); s.Choose("confirm");
         s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondSlash, SourceSeat: 2 } p && p.Choices.Any(c => c.Parameters.GetValueOrDefault("response") == "faction-slash-slash"));
+        var factionRequest = s.G.GetRuntimeModule<CoreNativeCardContinuationCursorsRuntime>().ActiveFactionCardRequest!;
+        var factionParent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == factionRequest.ProgramSkillFrameId);
+        var factionAuthorization = factionRequest.AssistedAuthorization;
+        s.Need(factionAuthorization is { IgnoreDistance: true, UsesChoiceResult: false, RangeOwnerSeat: null } &&
+            factionAuthorization.InstructionIndex == factionParent.InstructionIndex && factionRequest.OwnerSeat == 2 && factionRequest.TargetSeat == 0 &&
+            s.G.GetCombatDistance(2, 0) > s.G.GetAttackRange(2),
+            "The genuine distant Tiaoxin request authorizes its exact original instruction without a generic choice-result binding or a range increase.");
+        var suppliedChoice = s.P!.Choices.First(c => c.Parameters.GetValueOrDefault("response") == "faction-slash-slash" &&
+            c.Cards.Count == 1 && s.V().Hand.Any(h => h.Id == c.Cards[0] && h.Kind == CardKind.Slash));
+        var suppliedMaterial = s.G.GetRuntimeModule<CoreGameEngineCardAttackStateRuntime>().GetAttackCard(suppliedChoice.Cards.Single());
+        var suppliedKind = Enum.Parse<CardKind>(suppliedChoice.Parameters["response-card-kind"]);
+        var previewAllowed = s.G.GetRuntimeModule<CoreGameEngineAssistedFactionSlashRuntime>().IsAssistedProvidedSlashTarget(
+            2, 0, CardKind.Slash, allowPotentialRank: false, physicalCardIds: []);
+        var paymentAllowed = s.G.GetRuntimeModule<ProvidedSlashPaymentTargetsRuntime>().CanSupply(factionRequest, suppliedKind, [suppliedMaterial]);
+        s.Need(previewAllowed && paymentAllowed,
+            $"The active Tiaoxin invocation preserves its existing shared SpecificSlashExemption for previews, while the authorized request accepts its real provider's material and published kind. previewAllowed={previewAllowed}; paymentAllowed={paymentAllowed}; suppliedKind={suppliedKind}.");
+        s.Cold();
+        var restoredFaction = s.G.GetRuntimeModule<CoreNativeCardContinuationCursorsRuntime>().ActiveFactionCardRequest!;
+        s.Need(restoredFaction.AssistedAuthorization == factionAuthorization &&
+            s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == restoredFaction.ProgramSkillFrameId).InstructionIndex == factionAuthorization!.InstructionIndex,
+            "Cold preserves the original distant request's authorization before its human provider pays.");
         s.Answer(c => c.Parameters.GetValueOrDefault("response") == "faction-slash-slash" && c.Cards.Count == 1 && s.V().Hand.Any(h => h.Id == c.Cards[0] && h.Kind == CardKind.Slash));
         s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge });
         var suppliedUse = s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.MouJiangWeiRequest is not null);
