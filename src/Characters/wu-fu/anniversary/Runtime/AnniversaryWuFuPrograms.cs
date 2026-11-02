@@ -64,7 +64,7 @@ internal sealed class ResolveAnniversaryWuFuJuekaiDescriptor : ProgramOperationD
     public override ISkillProgramEffectHandler Handler { get; } = new AnniversaryWuFuHandler(SkillProgramEffectOp.ResolveAnniversaryWuFuJuekai);
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.IssuePlayUsePolicy, static (_, c) => c.PublicControlValue(2));
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [];
-    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualPhaseEnd);
 }
 internal sealed class AnniversaryWuFuHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {

@@ -69,6 +69,7 @@ internal static class ProgramTriggerResourceChecks
             HumanRole = Role.Lord, UseInteractiveSetup = false, AdvanceAfterHumanCommands = false }, registry);
         if (!game.Submit(new StartGameCommand()).Accepted) throw new InvalidOperationException("Facts fixture failed to start.");
         NativeAppearanceFactDemand(program, game);
+        ActualPhaseFactDemand(game, registry);
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
         var players = (IReadOnlyList<CharacterState>)global::FixtureRuntimeAccess.Engine.GetField("_players", flags)!.GetValue(game)!;
         var action = new CardActionContext(1, null, CardActionType.Use, 0, 0, null, null, 1,
@@ -135,6 +136,74 @@ internal static class ProgramTriggerResourceChecks
                 .CaptureCardUseAction(card, 0, [], card.Kind, [card.Id])!;
             return (action, card);
         }
+    }
+
+    private static void ActualPhaseFactDemand(GameEngine game, ContentRegistry withoutPhaseDemand)
+    {
+        const ProgramTrackedFact phase = ProgramTrackedFact.ActualDiscardRecoveryPhase, end = ProgramTrackedFact.ActualPhaseEnd;
+        var trigger = ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.ChooseLishiPunishments).FactRequirements;
+        var activation = ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.ResolveMouHuCheErKongwu).FactRequirements;
+        Check((trigger.Triggered & end) != 0 && (trigger.Activated & end) == 0 &&
+            (activation.Activated & end) != 0 && (activation.Triggered & end) == 0,
+            "Phase-end operation demand must preserve trigger versus activation admission.");
+        Check((ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.InitializeMouSimaShiSanshi).FactRequirements.Triggered & end) == 0 &&
+            (ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.ResolveMouSimaShiChenlve).FactRequirements.Activated & end) != 0 &&
+            (ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.RemoveMouSimaShiChenlve).FactRequirements.Triggered & end) != 0,
+            "Only Sima Shi's real issued phase-end consumers require ends; initialization is not an end consumer.");
+
+        var phaseEnd = Program("""{"triggers":[{"id":"end","window":"actualPhaseEnded","subject":"owner","optional":false,"effects":[{"op":"draw","target":"owner","amount":1}]}]}""");
+        Check(Requires(phaseEnd, end) && Requires(phaseEnd, phase),
+            "A pure phase-end window declares end facts and closes over phase identity, without a character operation.");
+        var phaseStart = Program("""{"activations":[{"id":"state","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"skillState","target":"owner","action":"suppress","match":{"skillIds":["fixture:optional-facts"]},"until":[{"event":"phaseStarted","participant":{"kind":"owner"},"phase":"play"}]}]}]}""");
+        Check(Requires(phaseStart, phase) && !Requires(phaseStart, end), "A phase-start lifetime needs identity without manufacturing end demand.");
+        var declaration = JsonNode.Parse("""{"skillStates":[{"target":"owner","action":"suppress","on":{"event":"turnStarted","participant":{"kind":"owner"},"timing":"before"},"match":{"skillIds":["fixture:optional-facts"]},"until":[{"event":"turnEnded","participant":{"kind":"owner"},"timing":"after"}]}]}""")!;
+        var turnOnly = Program(declaration.ToJsonString());
+        Check(!Requires(turnOnly, phase) && !Requires(turnOnly, end), "A turn declaration does not request unrelated actual phases.");
+        declaration["skillStates"]![0]!["until"]!.AsArray().Add(JsonNode.Parse("""{"event":"phaseEnded","participant":{"kind":"owner"},"phase":"play"}"""));
+        Check(Requires(Program(declaration.ToJsonString()), end), "A legal event declaration's additional phase-end boundary participates in catalog demand.");
+        var passive = new SkillProgramDependencies([new ContentSkillDefinition("ol:liangzhu", "Passive", "Passive")]);
+        Check(passive.RequiresFact(phase) && !passive.RequiresFact(end), "A passive definition requests phase identity without an instruction or an end consumer.");
+
+        var zones = (CardZoneStore)typeof(GameEngine).GetField("_cardZones", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var catalog = ContentRegistry.Build(new StandardContentPackage(), new FactsPackage(phaseEnd));
+        var plainMode = CardGame.Modes.Standard.StandardModeRuleProfiles.Create(withoutPhaseDemand.Modes["identity:standard-5"], new GameOptions());
+        var guanduMode = CardGame.Modes.Standard.StandardModeRuleProfiles.Create(new ContentModeDefinition("fixture:phase-guandu", "Guandu", 2, 8,
+            new Dictionary<string, int>(), ModeKind: ContentModeKind.Team)
+        { GuanduActivity = new(new Dictionary<string, IReadOnlyList<string>>(), new Dictionary<string, string>(), [], []) }, new GameOptions());
+        var plain = Demand(withoutPhaseDemand, plainMode.RuntimeRequirements.RequiredFacts);
+        var modeOnly = Demand(withoutPhaseDemand, guanduMode.RuntimeRequirements.RequiredFacts);
+        var catalogOnly = Demand(catalog, ProgramTrackedFact.None);
+        Check(!plain.RequiresFact(phase) && !plain.RequiresFact(end) && modeOnly.RequiresFact(phase) && modeOnly.RequiresFact(end) &&
+            catalogOnly.RequiresFact(phase) && catalogOnly.RequiresFact(end) && !withoutPhaseDemand.ProgramDependencies.RequiresFact(end),
+            "Selected-mode and catalog demand compose per match; sharing a catalog must not leak a mode's phase requirements.");
+        Check(!Demand(withoutPhaseDemand, ProgramTrackedFact.None).RequiresFact(end), "Constructing an end-demanding match does not alter later no-demand matches.");
+        var closed = new MatchNativeFactDemand(end);
+        Check(closed.RequiresFact(phase) && closed.RequiresFact(end) && !closed.RequiresFact(ProgramTrackedFact.NativeActionAppearance),
+            "End-demand closure adds only its real identity dependency.");
+        try { _ = new MatchNativeFactDemand((ProgramTrackedFact)int.MinValue); throw new InvalidOperationException("Unknown native fact bits were accepted."); }
+        catch (ArgumentOutOfRangeException) { }
+        try
+        {
+            _ = new ModeRuleSet(plainMode.Opening, plainMode.Death, plainMode.Cards, false, false, false, false,
+                runtimeRequirements: new(RequiredFacts: (ProgramTrackedFact)int.MinValue));
+            throw new InvalidOperationException("A mode profile accepted unknown native fact bits.");
+        }
+        catch (ArgumentException) { }
+
+        INativeFactDemand Demand(ContentRegistry content, ProgramTrackedFact mode) => (INativeFactDemand)new MatchCoreCapabilityProvider(zones,
+            content: content, modeRequiredFacts: mode).Bindings.Single(binding => binding.Contract == typeof(INativeFactDemand)).Instance;
+        static bool Requires(SkillProgram program, ProgramTrackedFact fact) =>
+            new SkillProgramDependencies([new ContentSkillDefinition(program.Id, "Facts", "Facts") { Program = program }]).RequiresFact(fact);
+        static SkillProgram Program(string fields)
+        {
+            var skill = JsonNode.Parse(fields)!.AsObject();
+            skill["id"] = "fixture:optional-facts"; skill["revision"] = 1;
+            var rules = new JsonObject { ["schemaVersion"] = SkillProgramCatalog.RulesSchemaVersion, ["skills"] = new JsonArray(skill) };
+            var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                skills = new Dictionary<string, object> { ["fixture:optional-facts"] = new { name = "Facts", description = "Facts" } } });
+            return SkillProgramCatalog.Load(rules.ToJsonString(), presentation).Programs["fixture:optional-facts"];
+        }
+        static void Check(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
     }
 
     private static void AssertOmitted(SkillProgramTriggerFacts facts, string property)

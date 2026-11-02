@@ -5,16 +5,6 @@ internal sealed partial class CoreActualPhaseEndRuntimePortsRuntime
 {
     Winner IActualPhaseEndFacts.Winner => _coreMatchOutcomeWinnerAccess._winner;
 
-    bool IActualPhaseEndFacts.HasLishiCapability => _characterZhongHuiAnniversaryGodOperations.HasLishiCapability;
-
-    bool IActualPhaseEndFacts.HasMouSimaShi => _characterSimaShiMouOperations.HasMouSimaShi;
-
-    bool IActualPhaseEndFacts.HasMouHuCheEr => _characterHuCheErMouOperations.HasMouHuCheEr;
-
-    bool IActualPhaseEndFacts.ModeTracksActualPhaseEnds => _modeRulesOperations._modeRules.RuntimeRequirements.TracksActualPhaseEnds;
-
-    bool IActualPhaseEndFacts.HasOlLuShi => _characterLuShiOlOperations.Value.HasOlLuShi;
-
     IReadOnlyList<ActualPhaseEndItem> IActualPhaseEndIssuedItems.Qingya(ActualDiscardRecoveryPhaseKey phase) => _characterYaDanOlOperations.CollectQingyaPhaseEndCandidates(phase);
     IReadOnlyList<ActualPhaseEndItem> IActualPhaseEndIssuedItems.MouSimaShi(ActualDiscardRecoveryPhaseKey phase) => _characterSimaShiMouOperations.CollectMouSimaShiPhaseEndCandidates(phase);
     IReadOnlyList<ActualPhaseEndItem> IActualPhaseEndIssuedItems.ShiHuangZu(ActualDiscardRecoveryPhaseKey phase) => _characterHuangZuMobileShiOperations.CollectShiHzPhaseEndCandidates(phase);

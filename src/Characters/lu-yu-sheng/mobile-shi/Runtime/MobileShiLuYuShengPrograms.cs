@@ -136,7 +136,7 @@ internal sealed class ResolveMobileShiRunweiPhaseEndDescriptor : ProgramOperatio
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards,
         static (_, context) => context.PublicControlValue(1));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);
-    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard, Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard);
+    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard, Triggered: ProgramTrackedFact.ActualPhaseEnd | ProgramTrackedFact.NativeLogicalDiscard);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         [new RequireTriggerWindow(SkillProgramTriggerWindow.ActualPhaseEnded)];
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Automatic;

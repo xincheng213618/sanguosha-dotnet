@@ -11,7 +11,7 @@ internal abstract class OlLuShiDescriptor(SkillProgramEffectOp op) : ProgramOper
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, c) => c.PublicControlValue(3));
     public override ProgramFactRequirements FactRequirements => op == SkillProgramEffectOp.ResolveOlLuShiZhuyan
-        ? new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard)
+        ? new(Triggered: ProgramTrackedFact.ActualPhaseEnd | ProgramTrackedFact.NativeLogicalDiscard)
         : new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         op == SkillProgramEffectOp.ResolveOlLuShiZhuyan ? [new RequireTriggerWindow(SkillProgramTriggerWindow.DiscardPhaseEnded)] : [];

@@ -54,7 +54,11 @@ internal abstract class MouSimaShiDescriptor : ProgramOperationDescriptorBase
     public override ISkillProgramEffectHandler Handler => new MouSimaShiHandler(Op);
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, c) => c.PublicControlValue(4));
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeActionAppearance | ProgramTrackedFact.NativeTrueUseProcessingEntry, Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeActionAppearance | ProgramTrackedFact.NativeTrueUseProcessingEntry);
+    public override ProgramFactRequirements FactRequirements => new(
+        Triggered: (Op == SkillProgramEffectOp.RemoveMouSimaShiChenlve ? ProgramTrackedFact.ActualPhaseEnd : ProgramTrackedFact.ActualDiscardRecoveryPhase) |
+            ProgramTrackedFact.NativeActionAppearance | ProgramTrackedFact.NativeTrueUseProcessingEntry,
+        Activated: (Op == SkillProgramEffectOp.ResolveMouSimaShiChenlve ? ProgramTrackedFact.ActualPhaseEnd : ProgramTrackedFact.ActualDiscardRecoveryPhase) |
+            ProgramTrackedFact.NativeActionAppearance | ProgramTrackedFact.NativeTrueUseProcessingEntry);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [];
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext c) => c.State.CanContinueAfterOwnerDeath(c.Frame);
 }

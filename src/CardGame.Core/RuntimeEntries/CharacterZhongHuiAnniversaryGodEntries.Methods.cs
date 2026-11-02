@@ -41,5 +41,4 @@ internal sealed partial class CharacterZhongHuiAnniversaryGodEntries
     internal void SettleLishiDrawPhase(ProgramSkillFrame f) => _resolve().SettleLishiDrawPhase(f);
     internal IReadOnlyList<PromptChoice> ShenZhChoices(ProgramSkillFrame f) => _resolve().ShenZhChoices(f);
     internal bool TryReturnLishiJudgment(JudgmentFrame j) => _resolve().TryReturnLishiJudgment(j);
-    internal bool HasLishiCapability { get => _resolve().HasLishiCapability; }
 }

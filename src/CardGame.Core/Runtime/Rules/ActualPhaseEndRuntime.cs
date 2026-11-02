@@ -5,7 +5,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed class ActualPhaseEndRuntime(IProgramRuntimeFrames frames, INativeFrameRoutingFacts nativeFrames,
     IProgramRuntimePrompts prompts, IProgramRuntimeEvents events, IProgramEventJournalQueries history,
-    IMatchParticipantStateAccess participants, IProgramContentQueries content, IProgramTurnQueries turn,
+    IMatchParticipantStateAccess participants, INativeFactDemand demand, IProgramTurnQueries turn,
     ICardMovementBatchQueue movementBatches, IProgramMovementWindows movementWindows,
     IProgramWindowCandidateQueries candidates, IProgramWindowCursors cursors,
     IActualDiscardRecoveryPhaseQueries actualPhases, IActualDiscardRecoveryPhaseOperations phaseOperations,
@@ -14,13 +14,7 @@ internal sealed class ActualPhaseEndRuntime(IProgramRuntimeFrames frames, INativ
     IQuHuangPhaseEndQueries quHuang)
     : IActualPhaseEndQueries, IActualPhaseEndOperations
 {
-    public bool Tracks => content.UsesSkillStatePhaseEnds || facts.HasLishiCapability || facts.HasMouSimaShi || facts.HasMouHuCheEr ||
-        facts.ModeTracksActualPhaseEnds || facts.HasOlLuShi ||
-        content.HasTriggerOperation(SkillProgramEffectOp.ResolveQingyaNextActualPhaseUse) ||
-        content.HasTriggerOperation(SkillProgramEffectOp.ResolveNishouIssuedCurrentPhaseSwap) ||
-        content.HasActivationOperation(SkillProgramEffectOp.ResolveAnniversaryWuFuJuekai) ||
-        content.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiHuangZuPhaseUse) ||
-        content.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiRunweiPhaseEnd);
+    public bool Tracks => demand.RequiresFact(ProgramTrackedFact.ActualPhaseEnd);
 
     public void ConfirmActualDiscardPhaseExecution()
     {

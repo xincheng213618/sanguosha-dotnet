@@ -11,5 +11,5 @@ internal sealed class ResolveNishouEquipmentLossChoiceDescriptor:QuHuangDescript
     public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance);
 public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveNishouEquipmentLossChoice;}
 internal sealed class ResolveNishouIssuedCurrentPhaseSwapDescriptor:QuHuangDescriptor {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualPhaseEnd);
 public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveNishouIssuedCurrentPhaseSwap;}

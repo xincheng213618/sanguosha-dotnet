@@ -45,7 +45,9 @@ internal abstract class ShiHuangZuDescriptor(SkillProgramEffectOp op) : ProgramO
     public override ISkillProgramEffectHandler Handler => new ShiHuangZuHandler(op);
     public override ProgramOperationInteraction Interaction => op is SkillProgramEffectOp.ResolveMobileShiHuangZuChizhang or SkillProgramEffectOp.ResolveMobileShiHuangZuStore ? ProgramOperationInteraction.Automatic : ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, c) => c.PublicControlValue(4));
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeTrueUseProcessingEntry);
+    public override ProgramFactRequirements FactRequirements => new(Triggered:
+        (op == SkillProgramEffectOp.ResolveMobileShiHuangZuPhaseUse ? ProgramTrackedFact.ActualPhaseEnd : ProgramTrackedFact.ActualDiscardRecoveryPhase) |
+        ProgramTrackedFact.NativeTrueUseProcessingEntry);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => op switch
     {
         SkillProgramEffectOp.ResolveMobileShiHuangZuChizhang => [new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseTargetsFinalized), new ReadCardSet("chizhang-payment")],

@@ -26,6 +26,8 @@ public sealed class ModeRuleSet
         RequiresRoundTracking = requiresRoundTracking;
         RequiresRecipientDamageReevaluation = requiresRecipientDamageReevaluation;
         RuntimeRequirements = runtimeRequirements ?? new ModeRuntimeRequirements();
+        if (!new ProgramFactRequirements(Triggered: RuntimeRequirements.RequiredFacts).IsValid)
+            throw new ArgumentException("A mode profile requires known native facts.", nameof(runtimeRequirements));
         SupportsGodFactionSelection = supportsGodFactionSelection;
         ReducesFirstActorInitialHand = reducesFirstActorInitialHand;
         AllowsDiscardRecycling = allowsDiscardRecycling;

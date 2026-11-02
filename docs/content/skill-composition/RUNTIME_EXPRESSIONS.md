@@ -114,7 +114,13 @@ Accepted 与 Finalizations 从同一 journal 派生，不增加 Pair 表，也�
 ["phaseCount","window","eventTarget","all","skipped"]
 ```
 
-`phaseCount` 返回非负整数。时点为 `now` 或原窗口的 `window`；参与者是阶段行动者，仍受该时点的实际回合及回合拥有者范围限制。阶段可为 `preparation`、`judgment`、`draw`、`play`、`discard`、`ending` 或 `all`，结果为 `entered` 或 `skipped`。缺少可用时点或参与者时返回未知；已有范围内没有对应事实才返回零。读取自动声明既有实际阶段事实需求。
+`phaseCount` 返回非负整数。时点为 `now` 或原窗口的 `window`；参与者是阶段行动者，仍受该时点的实际回合及回合拥有者范围限制。阶段可为 `preparation`、`judgment`、`draw`、`play`、`discard`、`ending` 或 `all`，结果为 `entered` 或 `skipped`。缺少可用时点或参与者时返回未知；已有范围内没有对应事实才返回零。`phaseCount` 自动声明 `ActualDiscardRecoveryPhase` 身份事实需求，不因普通进入／跳过数量读取而请求阶段末观察窗口。
+
+实际阶段捕获从定义需求编译：操作描述符区分 Triggered／Activated，通用 trait、被动声明、表达式、窗口和技能状态 Until 共同参与。`PhaseStarted` 期限和 `phaseCount` 需要阶段身份；`PhaseEnded` 期限与 `ActualPhaseEnded` 窗口声明阶段结束需求，结束需求经同一闭包包含身份需求。期限收集同时包含效果的 Until 与持续声明的 `State.Until`。
+
+内容目录的 RequiredFacts 保持不可变；当前模式的 RequiredFacts 只在对局 provider 合成至同一只读 `INativeFactDemand`，不污染其他使用该目录的对局。未知模式需求或未知 mask 位明确拒绝。该声明机制无需规则 JSON 或存档格式升级。
+
+需求声明不扩张执行协议：`ActualPhaseEnded` 仍用于特定已签发事项的单候选原生窗口，并不自动收集任意普通 observer。现有阶段末 collectors、迟到事项及 typed return 保留原归属。OwnedDraw 也不因模式的阶段 mask 额外打开 DrawSkipped 帧，共享实际 skip fallback 仍在原生跳过边界采样。
 
 entered 只计真实阶段开始，恢复旧 token 不增加次数；skipped 只计原生实际跳过边界。自然槽、插入阶段和额外摸牌各保留原 occurrence，不把请求、替代声明或付款次数当成实际结果。原窗口以完整 journal 游标为截点，后续子阶段不会倒灌。
 

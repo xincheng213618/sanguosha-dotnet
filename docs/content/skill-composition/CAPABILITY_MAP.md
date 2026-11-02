@@ -884,7 +884,7 @@ OL 刘琦的私有外部目标记录与魅魂首次目标扫描已由共同 conf
 
 ## 实际阶段历史与已交付摸牌
 
-### 阶段事实：共同归属与剩余捕获需求
+### 阶段事实：实际进入与跳过
 
 实际进入沿用 `ActualDiscardRecoveryPhaseStartedEvent`，实际跳过由 `ActualDiscardRecoveryPhaseRuntime.RecordSkipped` 在原生跳过边界发行 `ActualPhaseSkippedEvent`。`ProgramEventHistoryIndex` 从同一 journal 派生 `IActualPhaseHistoryQueries.CountPhases`；`phaseCount` 只读实际回合、回合拥有者、阶段行动者、阶段种类、结果和指定游标，不建人物状态表或第二套阶段调度。
 
@@ -902,7 +902,26 @@ entered 也不等于阶段完整结束。弃牌阶段先进入原生开始窗，
 
 剩余缺口是付款与阶段事实的不同含义：山河 S5 神速仍用原成本事件记录“以跳阶段支付”的义务；它不能直接改成全回合 skipped 次数。普通阶段条件已退出刘琦 PlayEntry、朱桓专属跳过事件和年兽专属跳过账本，S5 的真实支付事件继续保留。
 
-`phaseCount` 已从表达式声明既有阶段事实需求；原阶段 owner 的 `Tracks` 仍包含砺誓、谋陈宫及模式的旧需求门控，尚须迁回各能力定义。共同读取和本批消费者已接通，不代表整个阶段捕获或阶段控制已完成。
+### 阶段捕获需求：内容声明与对局模式合成
+
+`ActualDiscardRecoveryPhaseRuntime` 与 `ActualPhaseEndRuntime` 的 `Tracks` 统一读取本对局的 `INativeFactDemand`。能力不再通过立世、智迟等人物开关回答是否捕获；目录是否需要事实与当前人物是否持有、有效是不同问题。
+
+不可变内容目录编译 `ProgramDependencies.RequiredFacts`，操作描述符仍区分 Triggered／Activated。被动能力声明、通用 modifier／view-as／card-policy trait、表达式读取、触发窗口和技能状态期限共同参与编译；状态期限包括效果内的 Until 与持续声明的 `State.Until`，不能漏掉后者。仅需实际阶段身份的能力声明 `ActualDiscardRecoveryPhase`；确实依赖阶段结束的能力声明 `ActualPhaseEnd`，统一依赖闭包自动补齐身份事实。
+
+当前选中模式的 `RequiredFacts` 在 `MatchCoreCapabilityProvider` 与程序目录需求合成，生成该对局只读 mask，不修改共享 catalog。官渡原实际阶段与阶段结束开关改由模式合同声明，其余模式运行需求保留原语义；模式边界与编译后的 mask 都拒绝未知位，不静默忽略未知需求。同一目录用于不同模式时，不能互相残留捕获需求。
+
+声明归属按真实能力判断：立世、沉略签发／阶段末移除、孔武、OL 卢氏的阶段快照，以及倾轧、泥首、伍孚、黄祖、润微的阶段末工作归对应入口。司马师初始化不再充当所有阶段末能力的代理；沉略的主动签发与触发移除分别声明。智迟自身只读回合保护状态，旧的阶段捕获门已过时，直接退役；明策真正使用阶段身份的入口已有声明，不增加一条无用被动需求。
+
+OwnedDraw 的 producer 启用继续保留原目录需求含义。模式要求捕获阶段事实，不等于要求额外打开 DrawSkipped 观察者帧；共享实际 skip fallback 在原生跳过边界保留原时序，不把调度请求提前记为结果，也不新增观察者 pending。
+
+| 概念范围 | 状态与剩余缺口 |
+|---|---|
+| 阶段事实捕获需求 | 已统一：定义声明、模式合成与依赖闭包回答同一对局 mask；需求查询不再反向调用人物。 |
+| 实际进入／跳过历史 | 由既有原生生产者和 journal 派生，保原 token、occurrence、插入阶段及恢复边界。 |
+| 阶段末已签发事项 | 仍部分完成：倾轧、司马师、黄祖、陆郁生的具体 collectors 及泥首迟到事项仍在原收集流程，未声明化。 |
+| ActualPhaseEnded 窗口 | 保持特定已签发事项的单候选协议，没有泛化为任意普通 observer 的广播窗口。 |
+
+捕获需求依赖退役不代表整个阶段结束概念或原阶段末模块的反向依赖已完成。真实事项资格、排序、迟到追加、支付及类型化回程仍归原拥有者；不能仅因 Tracks 改读 mask 就给整个模块标记完成。此能力合同调整不改变规则 JSON 或存档格式，也不提升相应版本。
 
 ### 摸牌交付：当前步骤的续接已统一
 

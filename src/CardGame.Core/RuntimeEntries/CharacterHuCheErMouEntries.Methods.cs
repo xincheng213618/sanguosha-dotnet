@@ -30,6 +30,5 @@ internal sealed partial class CharacterHuCheErMouEntries
     internal void SettleMouHuCheErNative(MouHuCheErSlashOrigin o) => _resolve().SettleMouHuCheErNative(o);
     internal bool ValidMouHuCheEr(ProgramSkillFrame f) => _resolve().ValidMouHuCheEr(f);
     internal void ValidateMouHuCheErNative(CardUseFrame use) => _resolve().ValidateMouHuCheErNative(use);
-    internal bool HasMouHuCheEr { get => _resolve().HasMouHuCheEr; }
     internal MouHuCheErRuntime MouHuCheErRuntime { get => _resolve().MouHuCheErRuntime; }
 }

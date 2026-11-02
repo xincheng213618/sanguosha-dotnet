@@ -71,8 +71,9 @@ internal static class ModeRuleSetChecks
         var dragon = StandardModeRuleProfiles.Create(Mode("activity:dragon", ContentModeKind.Team) with
             { DragonBoatActivity = new(new Dictionary<string, IReadOnlyList<string>>()) }, options);
         Require(identity.RuntimeRequirements == new ModeRuntimeRequirements() &&
-            guandu.RuntimeRequirements == new ModeRuntimeRequirements(TracksActualDiscardRecoveryPhases: true,
-                TracksActualPhaseEnds: true, CapturesRecipientDamageBase: true, TracksFinalizedCardTargets: true) &&
+            guandu.RuntimeRequirements == new ModeRuntimeRequirements(
+                RequiredFacts: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.ActualPhaseEnd,
+                CapturesRecipientDamageBase: true, TracksFinalizedCardTargets: true) &&
             duel.RuntimeRequirements == new ModeRuntimeRequirements(TracksNativeDrawInvocations: true) &&
             dragon.RuntimeRequirements == new ModeRuntimeRequirements(TracksRoundEnding: true) &&
             hell.RuntimeRequirements == new ModeRuntimeRequirements() && wenhe.RuntimeRequirements == new ModeRuntimeRequirements(),

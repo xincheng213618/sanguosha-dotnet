@@ -31,6 +31,4 @@ internal interface IActualDiscardPhaseQueryCacheState
 internal interface IActualDiscardRecoveryPhaseFacts : IProgramSelectionQuery
 {
     Winner Winner { get; }
-    bool ModeTracksActualDiscardRecoveryPhases { get; }
-    bool HasLishiCapability { get; }
 }

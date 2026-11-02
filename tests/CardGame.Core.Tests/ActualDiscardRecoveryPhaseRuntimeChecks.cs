@@ -14,6 +14,9 @@ internal static class ActualDiscardRecoveryPhaseRuntimeChecks
         global::FixtureRuntimeAccess.Engine.GetField("_phase", flags)!.SetValue(game, TurnPhase.Play);
         global::FixtureRuntimeAccess.Engine.GetField("_turnProgression", flags)!.SetValue(game, new ActualTurnProgression(ActualTurnKind.Normal, 0, 1));
         var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", flags)!.GetValue(game)!;
+        var demand = capabilities.Get<INativeFactDemand>();
+        Require(demand.RequiresFact(ProgramTrackedFact.ActualPhaseEnd) && demand.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase),
+            "The match binds one compiled native demand whose phase-end consumers include the original phase-identity dependency.");
         var history = (ProgramEventHistoryIndex)capabilities.Get<IProgramEventHistoryQueries>();
         var committed = (List<EventEnvelope>)global::FixtureRuntimeAccess.Engine.GetField("_events", flags)!.GetValue(game)!;
         var pending = (List<IGameEvent>)global::FixtureRuntimeAccess.Engine.GetField("_pendingEvents", flags)!.GetValue(game)!;

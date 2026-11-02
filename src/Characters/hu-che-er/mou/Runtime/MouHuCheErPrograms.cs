@@ -63,7 +63,7 @@ internal sealed class ResolveMouHuCheErKongwuDescriptor : ProgramOperationDescri
     public override ISkillProgramEffectHandler Handler { get; } = new MouHuCheErHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.Damage, static (_, c) => c.PublicControlValue(4));
-    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.NativeActionAppearance);
+    public override ProgramFactRequirements FactRequirements => new(Activated: ProgramTrackedFact.ActualPhaseEnd | ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.NativeActionAppearance);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [];
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext c) => c.State.CanContinueAfterOwnerDeath(c.Frame);
 }

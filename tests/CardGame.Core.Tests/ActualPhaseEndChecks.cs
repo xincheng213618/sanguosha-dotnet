@@ -9,7 +9,7 @@ internal static class ActualPhaseEndChecks
 
     public static void SixActualPhaseEndsKeepTypedColdReturnsAndSkipRestorationBoundaries()
     {
-        foreach (var scenario in new[] { "plain", "insert", "skip" })
+        foreach (var scenario in new[] { "plain", "insert", "skip", "none" })
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(scenario));
             var game = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 4,
@@ -18,6 +18,16 @@ internal static class ActualPhaseEndChecks
             Accept(game, new StartGameCommand());
             Drive(game, () => Prompt(game) is { Kind: DecisionKind.SelectGeneral });
             Accept(game, new SelectGeneralCommand(0, Owner, game.Revision, Prompt(game)!.PromptId));
+            if (scenario == "none")
+            {
+                Drive(game, () => game.State.TurnNumber > 1);
+                Need(Events<ActualDiscardRecoveryPhaseStartedEvent>(game).Length == 0 &&
+                    Events<ActualPhaseEndingEvent>(game).Length == 0 && Events<ActualPhaseEndedEvent>(game).Length == 0 &&
+                    !game.ResolutionStack.OfType<ActualPhaseEndFrame>().Any(),
+                    "A real ordinary turn with no phase consumer keeps native phase identity and ending facts omitted.");
+                _ = Cold(game, registry);
+                continue;
+            }
             if (scenario != "skip")
             {
                 Drive(game, () => Prompt(game)?.SkillPrompt?.SkillId == Watch ||
@@ -113,16 +123,21 @@ internal static class ActualPhaseEndChecks
         public PackageManifest Manifest { get; } = new("fixture-actual-phase-end", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
-            CharacterFixtureContent.Register(b, "ol:ya-dan");
+            var phaseDemand = scenario == "none" ? "" : """
+              {"id":"fixture:phase-end-demand","revision":1,"triggers":[{"id":"unowned-phase-consumer","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"skillState","target":"owner","action":"suppress","match":{"skillIds":["fixture:phase-end-idle"]},"until":[{"event":"phaseEnded","participant":{"kind":"owner"},"phase":"play"}]}]}]},
+            """;
             var rules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
+              {{phaseDemand}}
               {"id":"{{Watch}}","revision":1,"triggers":[{"id":"real-discard-child","window":"discardPileReceived","subject":"owner","discardOwnerScope":"own","movementReasons":["rule.hand-limit-discard"],"movementOccurrence":"perBatch","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}]}]},
               {"id":"{{Insert}}","revision":1,"triggers":[{"id":"extra-play","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{"op":"insertPhase","target":"owner","phase":"play","phaseContinuation":"beforeNormalPreparation"}]}]},
               {"id":"{{Skip}}","revision":1,"triggers":[{"id":"skip-judgment-draw","window":"turnStartBeforeNormalFlow","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["judgment","draw"]}]},{"id":"skip-discard","window":"discardPhaseStarting","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["discard"]}]}]}]}
             """;
-            var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = new Dictionary<string, object>
+            var labels = new Dictionary<string, object>
             { [Watch] = new { name = "实际弃牌子窗", description = "原生移动", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } },
-              [Insert] = new { name = "插入出牌", description = "实际原生插入" }, [Skip] = new { name = "跳过阶段", description = "不制造实际结束" } } });
+              [Insert] = new { name = "插入出牌", description = "实际原生插入" }, [Skip] = new { name = "跳过阶段", description = "不制造实际结束" } };
+            if (scenario != "none") labels["fixture:phase-end-demand"] = new { name = "阶段事实需求", description = "未授予角色的目录期限需求" };
+            var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels });
             var catalog = SkillProgramCatalog.Load(rules, presentation);
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, id, "实际阶段结束") { Program = program, ProgramPresentation = catalog.Presentations[id] });
             b.AddSkill(new("fixture:phase-end-idle", "固定角色", "无运行能力"));

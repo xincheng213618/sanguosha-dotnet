@@ -19,11 +19,6 @@ internal interface IActualPhaseEndOperations : IProgramRuntimeOperations
 internal interface IActualPhaseEndFacts : IProgramSelectionQuery
 {
     Winner Winner { get; }
-    bool HasLishiCapability { get; }
-    bool HasMouSimaShi { get; }
-    bool HasMouHuCheEr { get; }
-    bool ModeTracksActualPhaseEnds { get; }
-    bool HasOlLuShi { get; }
 }
 
 // Domain owners qualify their own issued entitlements. The phase-end runtime

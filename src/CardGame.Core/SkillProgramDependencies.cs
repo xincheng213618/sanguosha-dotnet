@@ -26,7 +26,8 @@ internal sealed class SkillProgramDependencies
         var triggers = programs.SelectMany(program => program.Triggers).ToArray();
         var skillStateBoundaries = triggers.SelectMany(trigger => trigger.Effects)
             .Concat(programs.SelectMany(program => program.Activations).SelectMany(activation => activation.Effects))
-            .SelectMany(effect => effect.SkillState?.Until ?? []).ToArray();
+            .SelectMany(effect => effect.SkillState?.Until ?? [])
+            .Concat(programs.SelectMany(program => program.SkillStates).SelectMany(declaration => declaration.State.Until)).ToArray();
         UsesSkillStatePhaseEnds = skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseEnded);
         UsesConsumedAlcoholSlash = triggers.Any(trigger => trigger.RequiresConsumedAlcoholSlash);
         HpSensitiveSkillIds = definitions.Where(skill => skill.Program?.SkillGrants.Any(rule =>
@@ -48,7 +49,7 @@ internal sealed class SkillProgramDependencies
         UsesDrawPhaseDrawCountHandLimit = programs.Any(program => program.Modifiers.Any(modifier =>
             modifier.ValueExpression == SkillRuleValueExpression.CurrentTurnDrawPhaseDrawCountHalfFloor));
         var resolver = ProgramInstructionResolver.Default;
-        RequiredFacts = triggers.Aggregate(ProgramTrackedFact.None, (facts, trigger) =>
+        RequiredFacts = ProgramFactRequirements.Close(triggers.Aggregate(ProgramTrackedFact.None, (facts, trigger) =>
                 facts | resolver.Features(trigger).FactRequirements.Triggered) |
             programs.SelectMany(program => program.Activations).Aggregate(ProgramTrackedFact.None,
                 (facts, activation) => facts | resolver.Features(activation).FactRequirements.Activated) |
@@ -56,13 +57,18 @@ internal sealed class SkillProgramDependencies
             (programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).Any(expression =>
                 expression.Reads("cardUses") || expression.Reads("currentUse"))
                 ? ProgramTrackedFact.ActualCardUseHistory : ProgramTrackedFact.None) |
-            (UsesSkillStatePhaseEnds || skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseStarted)
+            (UsesSkillStatePhaseEnds || triggers.Any(trigger => trigger.Window == SkillProgramTriggerWindow.ActualPhaseEnded)
+                ? ProgramTrackedFact.ActualPhaseEnd : ProgramTrackedFact.None) |
+            (skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseStarted) || UsesDrawPhaseDrawCountHandLimit ||
+                programs.Any(program => program.ViewAs.Any(rule => rule.EqualNameLengthUse) ||
+                    program.CardPolicies.Any(policy => policy.Kind == SkillProgramCardPolicyKind.HellShiyouIntercept)) ||
+                triggers.Any(trigger => trigger.Window == SkillProgramTriggerWindow.NativeDrawStarting)
                 || programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).Any(expression => expression.Reads("phaseCount"))
                 ? ProgramTrackedFact.ActualDiscardRecoveryPhase : ProgramTrackedFact.None) |
             (programs.Any(program => program.DamageModifiers.Any(modifier =>
                 modifier.Condition == SkillProgramDamageModifierCondition.OwnerUsedHeartSlash) ||
                 program.ViewAs.Any(rule => rule.RankTwoDamageUse || rule.EqualNameLengthUse))
-                ? ProgramTrackedFact.NativeActionAppearance : ProgramTrackedFact.None);
+                ? ProgramTrackedFact.NativeActionAppearance : ProgramTrackedFact.None));
         _conditions = triggers.SelectMany(trigger => resolver.Features(trigger).ConditionKinds).ToFrozenSet();
         TracksActualTurnUseOrdinal = triggers.Any(trigger => trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.NullifyWushuangSecondUse)) || UsesTriggerCondition(SkillProgramTriggerConditionKind.CardActionActualTurnUseOrdinalIs) ||
             triggers.Any(trigger => trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ResolveCuipoActualTurnUse));

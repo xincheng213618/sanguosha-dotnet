@@ -247,7 +247,7 @@ internal static IReadOnlyList<MethodInfo> RuntimeModuleMethods => ProgramRuntime
         ProgramCapabilityCatalog.Default, new MatchRuntimeAdapterFactory(this),
         Enumerable.ToArray(Enumerable.Concat(new MatchCoreCapabilityProvider(_cardZones, ProgramHistory, _cardMovementBatches, _contentRegistry,
             _players, _cardMovements, _cardSnapshotCache, turnEffects: _turnCardUseEffects, random: _random,
-            skillObservations: _skillGrantRevisions).Bindings, __GeneratedActualStateOwnerBindings())),
+            skillObservations: _skillGrantRevisions, modeRequiredFacts: _modeRules.RuntimeRequirements.RequiredFacts).Bindings, __GeneratedActualStateOwnerBindings())),
         resolutionScheduler: _resolutionScheduler);
     internal object GetRuntimeModuleInstance(Type type) => MatchRuntime.GetModule(type);
     internal T GetRuntimeModule<T>() where T : class => (T)GetRuntimeModuleInstance(typeof(T));

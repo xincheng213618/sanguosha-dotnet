@@ -32,7 +32,10 @@ internal abstract class ShenZhongHuiDescriptor(SkillProgramEffectOp op) : Progra
     public override ISkillProgramEffectHandler Handler { get; } = new ShenZhongHuiHandler(op);
     public override ProgramOperationInteraction Interaction => op is SkillProgramEffectOp.ResolveLinjieRound or SkillProgramEffectOp.ChooseLishiPunishments or SkillProgramEffectOp.ResolveLishiPhase ? ProgramOperationInteraction.Choice : ProgramOperationInteraction.Automatic;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, c) => c.PublicControlValue(2));
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.NativeActionAppearance);
+    public override ProgramFactRequirements FactRequirements => new(Triggered:
+        (op is SkillProgramEffectOp.ChooseLishiPunishments or SkillProgramEffectOp.ResolveLishiPhase
+            ? ProgramTrackedFact.ActualPhaseEnd : ProgramTrackedFact.ActualDiscardRecoveryPhase) |
+        ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.NativeActionAppearance);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new RequireTriggerWindows(op switch
     {
         SkillProgramEffectOp.ResolveLinjieRound => [SkillProgramTriggerWindow.RoundStarting],

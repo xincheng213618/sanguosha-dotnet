@@ -70,7 +70,7 @@ internal sealed class QingyaBetweenDescriptor:ProgramOperationDescriptorBase
 }
 internal sealed class QingyaNextPhaseDescriptor:ProgramOperationDescriptorBase
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualPhaseEnd);
 
     public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveQingyaNextActualPhaseUse;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)=>ParseOwnerAlways(r);

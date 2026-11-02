@@ -1,7 +1,7 @@
 namespace CardGame.Core;
 
 [Flags]
-internal enum ProgramTrackedFact
+public enum ProgramTrackedFact
 {
     None = 0,
     NativeLogicalDiscard = 1,
@@ -10,7 +10,8 @@ internal enum ProgramTrackedFact
     WholeActualUseDeclaration = 8,
     NativeDrawInvocation = 16,
     NativeActionAppearance = 32,
-    ActualCardUseHistory = 64
+    ActualCardUseHistory = 64,
+    ActualPhaseEnd = 128
 }
 
 // Definition-only demand for shared native facts. Keep trigger and activation
@@ -23,9 +24,12 @@ internal readonly record struct ProgramFactRequirements(
     internal ProgramFactRequirements Union(ProgramFactRequirements other) =>
         new(Triggered | other.Triggered, Activated | other.Activated);
 
+    internal static ProgramTrackedFact Close(ProgramTrackedFact facts) =>
+        (facts & ProgramTrackedFact.ActualPhaseEnd) != 0 ? facts | ProgramTrackedFact.ActualDiscardRecoveryPhase : facts;
+
     internal bool IsValid => ((Triggered | Activated) &
         ~(ProgramTrackedFact.NativeLogicalDiscard | ProgramTrackedFact.ActualDiscardRecoveryPhase |
           ProgramTrackedFact.NativeTrueUseProcessingEntry | ProgramTrackedFact.WholeActualUseDeclaration |
           ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.NativeActionAppearance |
-          ProgramTrackedFact.ActualCardUseHistory)) == ProgramTrackedFact.None;
+          ProgramTrackedFact.ActualCardUseHistory | ProgramTrackedFact.ActualPhaseEnd)) == ProgramTrackedFact.None;
 }

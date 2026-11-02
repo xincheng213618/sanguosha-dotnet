@@ -5,17 +5,14 @@ namespace CardGame.Core;
 // existing owners; this module keeps no phase cursor or recovery sidecar.
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class ActualDiscardRecoveryPhaseRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
-    IProgramContentQueries content, IProgramEventHistoryQueries history, IProgramEventJournalQueries journal,
+    INativeFactDemand demand, IProgramEventHistoryQueries history, IProgramEventJournalQueries journal,
     ICardZoneQueries zones, ICardMovementHistoryQueries movements, IProgramTurnQueries turn,
     IProgramPhaseQueries phase, ISelectionParticipantQueries participants, IMatchParticipantStateAccess participantState,
     IProgramWindowCandidateQueries candidates, IProgramBindingFacts bindings, IProgramOwnedZoneDiscardFacts discards,
     IActualDiscardRecoveryPhaseFacts facts, IActualPhaseQueryCache cache, IProgramPhaseScheduleState schedules)
     : IActualDiscardRecoveryPhaseQueries, IActualDiscardRecoveryPhaseOperations
 {
-    private bool Tracks => content.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase) ||
-        content.UsesDrawPhaseDrawCountHandLimit || facts.ModeTracksActualDiscardRecoveryPhases || facts.HasLishiCapability ||
-        content.UsesEqualNameLengthUse || content.HasCardPolicy(SkillProgramCardPolicyKind.HellShiyouIntercept) ||
-        content.HasTriggerWindow(SkillProgramTriggerWindow.NativeDrawStarting) || content.HasSkill(MouChenGongComposition.Zhichi);
+    private bool Tracks => demand.RequiresFact(ProgramTrackedFact.ActualDiscardRecoveryPhase);
 
     public ActualDiscardRecoveryPhaseKey? Current()
     {

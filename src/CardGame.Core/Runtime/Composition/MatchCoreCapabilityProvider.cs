@@ -10,7 +10,8 @@ internal sealed class MatchCoreCapabilityProvider
         CardMovementBatchStore? movements = null, ContentRegistry? content = null,
         IReadOnlyList<CharacterState>? players = null, IReadOnlyList<CardMovementRecord>? cardMovements = null,
         CardSnapshotCache? cardSnapshots = null, TurnCardUseEffectStore? turnEffects = null,
-        IMatchRandomSource? random = null, SkillGrantRevisionStore? skillObservations = null)
+        IMatchRandomSource? random = null, SkillGrantRevisionStore? skillObservations = null,
+        ProgramTrackedFact modeRequiredFacts = ProgramTrackedFact.None)
     {
         ArgumentNullException.ThrowIfNull(cards);
         var bindings = new List<ProgramNativeCapabilityBinding>
@@ -19,6 +20,8 @@ internal sealed class MatchCoreCapabilityProvider
             new(typeof(ICardZoneQueries), cards),
             new(typeof(ICardDrawPileOrder), cards)
         };
+        bindings.Add(new(typeof(INativeFactDemand), new MatchNativeFactDemand(
+            (content?.ProgramDependencies.RequiredFacts ?? ProgramTrackedFact.None) | modeRequiredFacts)));
         if (history is not null) bindings.Add(new(typeof(IProgramEventHistoryQueries), history));
         if (history is IProgramEventBoundaryQueries boundaries) bindings.Add(new(typeof(IProgramEventBoundaryQueries), boundaries));
         if (history is IProgramEventJournalQueries journal) bindings.Add(new(typeof(IProgramEventJournalQueries), journal));
