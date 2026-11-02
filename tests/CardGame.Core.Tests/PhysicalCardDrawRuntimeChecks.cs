@@ -147,7 +147,6 @@ internal static class PhysicalCardDrawRuntimeChecks
         var registry = ContentRegistry.Build(new StandardContentPackage(), new GainProjectionPackage(catalogs));
         var game = GameEngine.CreateStandard(new GameOptions { Seed = 7 }, registry);
         var sanwen = game.GetRuntimeModule<CharacterWangCanOlRuntime>();
-        var lingkong = game.GetRuntimeModule<CharacterZhouFeiLeRuntime>();
         foreach (var hasOldWitness in new[] { false, true })
         {
             var f = new HandGainDrawPorts();
@@ -204,12 +203,43 @@ internal static class PhysicalCardDrawRuntimeChecks
         marking.AfterMove = count => { if (count == 1) marking.Owner.SkillGrants.SetEnabled("gain-source", false); };
         marking.Draw.DrawCards(marking.Owner, 2, log: false);
         var markedBatch = marking.Batches.PendingBatches[^1];
-        Require(lingkong.CollectLingkongMovementCandidates(marking.Batches.PendingBatches[0]).Count == 0 &&
-                lingkong.CollectLingkongMovementCandidates(markedBatch) is [var candidate] &&
+        var movementWindows = game.GetRuntimeModule<CardsMovedWindowRuntime>();
+        var firstWindow = movementWindows.CreateWindow(marking.Batches.PendingBatches[0]);
+        var issuedWindow = movementWindows.CreateWindow(markedBatch)!;
+        var candidate = issuedWindow.Candidates.Single(c => c.SkillId == "le:lingkong");
+        issuedWindow = issuedWindow with { CandidateIndex = issuedWindow.Candidates.ToList().IndexOf(candidate) };
+        var context = issuedWindow.Contexts![issuedWindow.CandidateIndex];
+        var authorization = ProgramInvocations.Find(issuedWindow, candidate, context);
+        Require(firstWindow?.Candidates.All(c => c.SkillId != "le:lingkong") != false &&
                 markedBatch.HandGains is [{ Sources.Count: 0, InitialSources: [var initial], Incoming.Count: 2 }] &&
-                candidate == initial && candidate.SkillId == "le:lingkong" &&
+                candidate == initial && context.Window == SkillProgramTriggerWindow.CardsGained &&
+                ReferenceEquals(context.MovementBatch, markedBatch) && authorization is { RetainOwnerDeath: true } &&
                 markedBatch.HandGains[0].Incoming.Select(c => c.CardId).SequenceEqual([13, 12]),
-            "The real Lingkong collector keeps its first accepted source and the full Draw2 occurrence after source loss, without publishing an earlier split candidate.");
+            "The shared movement window freezes the initial source, canonical gain context and one declared invocation authorization after source loss.");
+        var invocation = new ProgramSkillFrame(904, candidate.OwnerSeat, candidate.SkillId, candidate.BindingId,
+            candidate.GameplayHash, 0, [], [])
+        {
+            TriggerId = candidate.BindingId, SkillInstanceId = candidate.SkillInstanceId, WindowContext = context,
+            InvocationAuthorization = authorization! with { ProgramFrameId = 904 }
+        };
+        Require(ProgramInvocations.Allows(invocation, issuedWindow) &&
+                !new ProgramInvocationAuthorization(1, 2, SkillProgramTriggerWindow.CardsMoved, candidate).RetainOwnerDeath,
+            "The original admitted gain invocation is authorized while equipment-departure authorizations retain the default stop-on-death policy.");
+        foreach (var (name, changedFrame, changedWindow) in new[]
+        {
+            ("no ticket", invocation with { InvocationAuthorization = null }, issuedWindow),
+            ("other program frame", invocation with { Id = invocation.Id + 1 }, issuedWindow),
+            ("other binding", invocation with { TriggerId = "other" }, issuedWindow),
+            ("other activation", invocation with { ActivationId = "other" }, issuedWindow),
+            ("other instance", invocation with { SkillInstanceId = "other" }, issuedWindow),
+            ("other content", invocation with { GameplayHash = "other" }, issuedWindow),
+            ("other occurrence", invocation with { WindowContext = context with { OccurrenceIndex = context.OccurrenceIndex + 1 } }, issuedWindow),
+            ("other context", invocation with { WindowContext = context with { Amount = context.Amount + 1 } }, issuedWindow),
+            ("copied window identity", invocation, issuedWindow with { Id = issuedWindow.Id + 1 }),
+            ("window advanced", invocation, issuedWindow with { CandidateIndex = issuedWindow.Candidates.Count }),
+            ("window ticket removed", invocation, issuedWindow with { InvocationAuthorizations = [] })
+        })
+            Require(!ProgramInvocations.Allows(changedFrame, changedWindow), "A gain authorization cannot be borrowed by " + name + ".");
 
         var timing = new HandGainDrawPorts { Timing = new(1, TurnPhase.Draw, 0) };
         timing.Move(timing.Card(13), CardLocation.DrawPile, CardLocation.Hand(0), CardMoveReasons.Draw);

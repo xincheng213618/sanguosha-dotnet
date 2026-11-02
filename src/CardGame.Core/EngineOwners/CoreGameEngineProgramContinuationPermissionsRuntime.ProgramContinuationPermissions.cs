@@ -3,8 +3,14 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramContinuationPermissionsRuntime
 {
-    internal bool CanContinueProgramAfterOwnerDeath(ProgramSkillFrame frame) => _coreProgramRuntimeHooksOperations.RuntimeHooks.CanContinue(ProgramRuntimePhase.AfterOwnerDeath, frame);
-    internal bool CanContinueProgramAfterSkillLoss(ProgramSkillFrame frame) => _coreProgramRuntimeHooksOperations.RuntimeHooks.CanContinue(ProgramRuntimePhase.AfterSkillLoss, frame);
+    internal bool CanContinueProgramAfterOwnerDeath(ProgramSkillFrame frame) =>
+        frame.InvocationAuthorization?.RetainOwnerDeath == true && HasInvocationAuthorization(frame) ||
+        _coreProgramRuntimeHooksOperations.RuntimeHooks.CanContinue(ProgramRuntimePhase.AfterOwnerDeath, frame);
+    internal bool CanContinueProgramAfterSkillLoss(ProgramSkillFrame frame) => HasInvocationAuthorization(frame) ||
+        _coreProgramRuntimeHooksOperations.RuntimeHooks.CanContinue(ProgramRuntimePhase.AfterSkillLoss, frame);
+
+    private bool HasInvocationAuthorization(ProgramSkillFrame frame) => ProgramInvocations.Allows(frame,
+        frame.WindowContext is { } context ? _frames.Find(context.ParentFrameId) : null);
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 1)]
     internal bool RetainDeliveredProgramStep(ProgramSkillFrame frame) => frame.TriggerId is null &&

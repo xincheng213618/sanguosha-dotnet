@@ -5300,7 +5300,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
     private static SkillProgramTrigger ParseTrigger(JsonElement node, string path, string skillId)
     {
         RequireObject(node, path);
-        CheckProperties(node, path, "id", "window", "sourceSkillId", "sourceViewAsId", "cardKinds", "isSkillInvocation", "ownEquipmentOnly",
+        CheckProperties(node, path, "id", "window", "sourceSkillId", "sourceViewAsId", "cardKinds", "isSkillInvocation", "ownEquipmentOnly", "invocation",
             "cardCategories", "damageCardKinds", "sourceZones", "movementOccurrence", "damageOccurrence",
             "subject", "suits", "minimumRank", "maximumRank", "excludedReasons", "judgmentReasons",
             "judgmentSource", "optional", "condition", "priority", "usageScope", "usageLimit",
@@ -6491,12 +6491,27 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             (window != SkillProgramTriggerWindow.CardUseBeforeTargetEffects ||
              ownerRelation != SkillProgramCardActionOwnerRelation.Target || includeResponseUses))
             Fail(path + ".effects", "whole-use nullification requires an actual use's before-target-effects target owner");
+        SkillProgramTriggerInvocation? invocation = null;
+        if (node.TryGetProperty("invocation", out var invocationNode))
+        {
+            var invocationPath = path + ".invocation";
+            RequireObject(invocationNode, invocationPath);
+            CheckProperties(invocationNode, invocationPath, "source", "ownerDeath");
+            invocation = new(EnumValue<SkillProgramInvocationSource>(invocationNode, "source", invocationPath),
+                invocationNode.TryGetProperty("ownerDeath", out _)
+                    ? EnumValue<SkillProgramInvocationOwnerDeath>(invocationNode, "ownerDeath", invocationPath)
+                    : SkillProgramInvocationOwnerDeath.Stop);
+            if (window != SkillProgramTriggerWindow.CardsGained || subject != SkillProgramTriggerSubject.Owner ||
+                movementOccurrence != SkillProgramMovementOccurrence.PerBatch || !destinationZones.SequenceEqual([CardZoneKind.Hand]))
+                Fail(invocationPath, "initialHandGain requires an owner cardsGained perBatch hand trigger");
+        }
         var parsedTrigger = new SkillProgramTrigger(id, window, sourceSkillId, sourceViewAsId, subject, suits,
             minimumRank, maximumRank, excludedReasons, judgmentReasons, judgmentSource,
             cardKinds, sourceZones, movementOccurrence, damageOccurrence, drawPhaseMode, optional,
             condition, effects, priority, usageScope, usageLimit, choiceGroup, ownerRelation,
             cardCategories: cardCategories, damageCardKinds: damageCardKinds, turnOwnerScope: turnOwnerScope)
         {
+            Invocation = invocation,
             OwnEquipmentOnly = node.TryGetProperty("ownEquipmentOnly", out _) && RequiredBool(node, "ownEquipmentOnly", path),
             DynamicUsageLimit = dynamicLimit, NamedUsageGroup = namedUsage, GainPhaseQualification = gainPhase, RequireDamageSource = requireDamageSource,
             RequiresConsumedAlcoholSlash = requiresConsumedAlcoholSlash,
@@ -6522,6 +6537,12 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             HpChangeOccurrence = hpChangeOccurrence,
             MarkerCost = ParseMarkerCost(node, path)
         };
+        if (invocation?.OwnerDeath == SkillProgramInvocationOwnerDeath.Retain &&
+            (parsedTrigger.Optional || parsedTrigger.MarkerCost is not null))
+            Fail(path + ".invocation.ownerDeath", "retain requires a mandatory trigger without a marker cost");
+        if (invocation is not null && (parsedTrigger.MovementReasons.Count != 0 ||
+            parsedTrigger.ExcludedMovementReasons.Count != 0 || parsedTrigger.IgnoreOwnSkillMovements))
+            Fail(path + ".invocation", "initialHandGain does not support movement reason or own-skill filters");
         EquipmentMovementRuntime.ValidateTrigger(path, parsedTrigger);
         if ((contractedCommittedSingleAction || window == SkillProgramTriggerWindow.CardUseCommitted && includeResponseUses && !recordsCommittedSuit &&
             (effects.Count != 1 || effects[0].Op is not (SkillProgramEffectOp.IssueCardNoResponseAndPlayUseBan or SkillProgramEffectOp.RecordOpeningTurnUse or SkillProgramEffectOp.HoldUsedSuitHandAndDraw or SkillProgramEffectOp.NullifyMatchingHandUse or SkillProgramEffectOp.DrawShenwuMingwanUse))) &&

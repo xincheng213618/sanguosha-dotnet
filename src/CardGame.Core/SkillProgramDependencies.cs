@@ -54,6 +54,8 @@ internal sealed class SkillProgramDependencies
             programs.SelectMany(program => program.Activations).Aggregate(ProgramTrackedFact.None,
                 (facts, activation) => facts | resolver.Features(activation).FactRequirements.Activated) |
             ProgramPassiveFactRequirementsAttribute.ForSkills(definitions) |
+            (triggers.Any(trigger => trigger.Invocation?.Source == SkillProgramInvocationSource.InitialHandGain)
+                ? ProgramTrackedFact.HandGainOccurrence : ProgramTrackedFact.None) |
             (UsesGainPhaseQualification ? ProgramTrackedFact.MovementTiming : ProgramTrackedFact.None) |
             (UsesDrawPhaseDrawCountHandLimit || triggers.Any(trigger =>
                 resolver.Features(trigger).ConditionKinds.Contains(SkillProgramTriggerConditionKind.NativeDrawActualTurnOrdinalIs))

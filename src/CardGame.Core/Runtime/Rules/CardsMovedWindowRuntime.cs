@@ -43,11 +43,15 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
         var candidates = CollectCardsMovedProgramCandidates(batch).Concat(CollectDiscardPileReceivedCandidates(batch)).Concat(_pipeline.CollectFirstDomainCandidates(batch)).ToArray();
         if (candidates.Length == 0 && !_pipeline.HasWenhePoisonDepartures(batch))
             return null;
+        var initialSources = CollectInitialHandGainCandidates(batch).ToHashSet();
         var window = new CardsMovedTriggerWindowFrame(batch.Id, batch, Array.AsReadOnly(candidates), ResumeProgramFrameId: resumeProgramFrameId);
         return window with
         {
-            InvocationAuthorizations = Array.AsReadOnly(candidates.Where(c => _equipment.Value.IsDeparture(batch, c))
-                .Select(c => new ProgramInvocationAuthorization(window.Id, batch.ParentFrameId ?? 0, SkillProgramTriggerWindow.CardsMoved, c)).ToArray()),
+            InvocationAuthorizations = Array.AsReadOnly(candidates.Where(c => initialSources.Contains(c) || _equipment.Value.IsDeparture(batch, c))
+                .Select(c => new ProgramInvocationAuthorization(window.Id, batch.ParentFrameId ?? 0,
+                    initialSources.Contains(c) ? SkillProgramTriggerWindow.CardsGained : SkillProgramTriggerWindow.CardsMoved, c,
+                    RetainOwnerDeath: initialSources.Contains(c) &&
+                        _facts.GetProgramTrigger(c).Invocation?.OwnerDeath == SkillProgramInvocationOwnerDeath.Retain)).ToArray()),
             Contexts = Array.AsReadOnly(candidates.Select(c => CreateCardsMovedProgramContext(window, c)).ToArray())
         };
     }
@@ -316,6 +320,8 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
                     .Distinct())
                 {
                     var trigger = _facts.GetProgramTrigger(candidate);
+                    if (trigger.Invocation is not null)
+                        continue;
                     if (_pipeline.ExcludeOrdinaryMovementCandidate(candidate, trigger))
                         continue;
                     if (!RuntimeSkills.RuntimeRules_Core_CardMovementPrograms.IsGainPhaseQualified(trigger, ownerSeat, batch.MovementTiming))
@@ -366,9 +372,18 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
                 }
             }
 
+        candidates.AddRange(CollectInitialHandGainCandidates(batch));
         _pipeline.CollectMovementCandidates(batch, candidates);
         return candidates.OrderBy(candidate => _selection.RelativeTableOrder(_facts.CurrentSeat, candidate.OwnerSeat)).ThenByDescending(candidate => candidate.Priority).ThenBy(candidate => candidate.SkillId, StringComparer.Ordinal).ThenBy(candidate => candidate.BindingId, StringComparer.Ordinal).ThenBy(candidate => candidate.SkillInstanceId, StringComparer.Ordinal).ThenBy(candidate => candidate.OccurrenceIndex).ToArray();
     }
+
+    private IEnumerable<ProgramTriggerCandidate> CollectInitialHandGainCandidates(CardMovementBatchContext batch) =>
+        (batch.HandGains ?? []).Where(gain => gain.InitiallyAlive)
+            .SelectMany(gain => gain.InitialSources.Where(candidate => candidate.OwnerSeat == gain.RecipientSeat &&
+                _facts.GetProgramTrigger(candidate).Invocation?.Source == SkillProgramInvocationSource.InitialHandGain))
+            .GroupBy(candidate => (candidate.OwnerSeat, candidate.SkillId, candidate.BindingId))
+            .Select(group => group.OrderByDescending(candidate => candidate.Priority)
+                .ThenBy(candidate => candidate.SkillInstanceId, StringComparer.Ordinal).First());
 
     internal IReadOnlyList<ProgramTriggerCandidate> CollectDiscardPileReceivedCandidates(CardMovementBatchContext batch)
     {
@@ -491,9 +506,18 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
         // Re-entering one must keep the same frozen facts as its owning cursor.
         if (frame.Contexts is { } contexts)
             return contexts[frame.CandidateIndex];
+        var trigger = _facts.GetProgramTrigger(candidate);
+        if (trigger.Invocation?.Source == SkillProgramInvocationSource.InitialHandGain)
+        {
+            var gain = frame.Batch.HandGains!.Single(gain => gain.RecipientSeat == candidate.OwnerSeat &&
+                gain.InitialSources.Contains(candidate));
+            return new(trigger.Window, frame.Id, candidate.OwnerSeat, SourceSeat: frame.Batch.OriginOwnerSeat,
+                TargetSeat: candidate.OwnerSeat, OccurrenceIndex: candidate.OccurrenceIndex,
+                Facts: _facts.CaptureProgramTriggerFacts(candidate.OwnerSeat) with
+                { MovementTiming = gain.Timing, MovedCardCount = gain.Incoming.Count }, MovementBatch: frame.Batch);
+        }
         if (_pipeline.CreateMovementContext(frame, candidate)is { } specialized)
             return specialized;
-        var trigger = _facts.GetProgramTrigger(candidate);
         var features = ProgramInstructionResolver.Default.Features(trigger);
         if (trigger.Window == SkillProgramTriggerWindow.DiscardPileReceived)
         {

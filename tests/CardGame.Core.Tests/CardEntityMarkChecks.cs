@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
@@ -123,6 +124,101 @@ internal static class CardEntityMarkChecks
             Need(terminal == "dead" ? !player.IsAlive : player.Skills?.Any(skill => skill.Id == Skill) != true,
                 "The fixture must actually reach its native source-loss or owner-death branch before the retained marker completes.");
         }
+        IssuedGainMarksRetainOnlyTheirOriginalWindow();
+        GainInvocationDeclarationsRejectInvalidShapes();
+    }
+
+    private static void IssuedGainMarksRetainOnlyTheirOriginalWindow()
+    {
+        foreach (var terminal in new[] { "gain-lost", "gain-dead" })
+        {
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(terminal));
+            var game = Create(registry);
+            PendingDecision? Prompt() => game.CreateSnapshot(0).PendingDecision;
+            void Submit(GameCommand command)
+            { var result = game.Submit(command); Need(result.Accepted, result.Error?.Message ?? "Rejected gain authorization command."); }
+            void Reach(Func<bool> done)
+            {
+                for (var step = 0; step < 180; step++)
+                {
+                    if (done()) return;
+                    if (Prompt() is { } prompt)
+                    {
+                        var choice = prompt.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("program-action") == "skip") ??
+                            (prompt.Kind == DecisionKind.RescueDying ? prompt.Choices.FirstOrDefault(c => c.Cards.Count == 0) : null);
+                        Need(choice is not null, "Unexpected gain authorization boundary: " + terminal + "; " + JsonSerializer.Serialize(prompt));
+                        Submit(new AnswerPromptCommand(0, prompt.PromptId, choice!.Id, game.Revision));
+                    }
+                    else Submit(new AdvanceOneStepCommand(game.Revision));
+                }
+                throw new InvalidOperationException("The issued gain mark did not finish: " + terminal);
+            }
+            Submit(new StartGameCommand());
+            Reach(() => Prompt() is { Kind: DecisionKind.PlayCard });
+            var sequence = game.CardMovements.LastOrDefault()?.Sequence ?? 0;
+            Submit(new UseProgramSkillCommand(0, Skill, "gain", [], [], game.Revision, Prompt()!.PromptId));
+            Reach(() => Prompt()?.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "skip") == true);
+            game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+            Reach(() => game.Events.Any(e => e.Payload is LingkongGainMarkedEvent marked && marked.ActualTurn > 0));
+            var gained = game.CardMovements.Where(m => m.Sequence > sequence && m.From == CardLocation.DrawPile &&
+                m.To == CardLocation.Hand(0) && m.Reason.Value == "skill-program." + Skill + ".Draw").Select(m => m.CardId).ToArray();
+            var mark = game.Events.Select(e => e.Payload).OfType<LingkongGainMarkedEvent>().Single(e => e.ActualTurn > 0);
+            Need(gained.Length == 2 && mark.EntityCount == 2 &&
+                    gained.All(id => game.GetRuntimeModule<CardEntityMarkRuntime>().Has(id, "lingkong")) &&
+                    game.Events.Select(e => e.Payload).OfType<ProgramBindingResolvedEvent>().Count(e =>
+                        e.SkillId == "le:lingkong" && e.BindingId == "mark-first-outside-draw-gain" && e.Completed) == 1,
+                "One shared initial-gain authorization finishes the original two-card mark after an earlier movement child, without duplicate payment or binding.");
+            Need(terminal == "gain-dead" ? !game.CreateSnapshot(0).Players[0].IsAlive :
+                    game.CreateSnapshot(0).Players[0].Skills?.Any(skill => skill.Id == "le:lingkong") != true,
+                "The actual native child must remove the source or kill its owner before the retained gain mark.");
+        }
+    }
+
+    private static void GainInvocationDeclarationsRejectInvalidShapes()
+    {
+        var valid = JsonNode.Parse(SkillProgramTestJson.CurrentSchema("""
+        {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"fixture:gain-invocation","revision":1,"triggers":[{
+          "id":"issued","window":"cardsGained","subject":"owner","movementOccurrence":"perBatch",
+          "destinationZones":["hand"],"optional":false,"invocation":{"source":"initialHandGain","ownerDeath":"retain"},
+          "effects":[{"op":"setChainedState","target":"owner","chained":true}]}]}]}
+        """))!;
+        var presentation = JsonSerializer.Serialize(new
+        {
+            schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+            skills = new Dictionary<string, object> { ["fixture:gain-invocation"] = new { name = "Gain invocation", description = "Shared window authorization" } }
+        });
+        SkillProgramCatalog.Load(valid.ToJsonString(), presentation);
+        var ordinary = valid.DeepClone();
+        ordinary["skills"]![0]!["triggers"]![0]!["invocation"]!.AsObject().Remove("ownerDeath");
+        Need(SkillProgramCatalog.Load(ordinary.ToJsonString(), presentation).Programs["fixture:gain-invocation"].Triggers[0].Invocation?.OwnerDeath ==
+                SkillProgramInvocationOwnerDeath.Stop, "Omitted death behavior retains the explicit default stop policy.");
+        var paidOrdinary = ordinary.DeepClone();
+        paidOrdinary["skills"]![0]!["triggers"]![0]!["markerCost"] = JsonNode.Parse("""{"marker":"ren","amount":1}""");
+        SkillProgramCatalog.Load(paidOrdinary.ToJsonString(), presentation);
+        foreach (var invalid in new[] { "window", "optional", "markerCost", "movementReasons", "excludedMovementReasons", "ignoreOwnSkillMovements" })
+        {
+            var copy = valid.DeepClone();
+            var trigger = copy["skills"]![0]!["triggers"]![0]!;
+            if (invalid == "window")
+            {
+                trigger["window"] = "cardsMoved";
+                trigger.AsObject().Remove("destinationZones");
+                trigger["sourceZones"] = new JsonArray("hand");
+            }
+            else if (invalid == "optional") trigger["optional"] = true;
+            else if (invalid == "markerCost") trigger["markerCost"] = JsonNode.Parse("""{"marker":"ren","amount":1}""");
+            else if (invalid == "ignoreOwnSkillMovements") trigger[invalid] = true;
+            else trigger[invalid] = new JsonArray("rule.draw");
+            var expected = invalid switch
+            {
+                "window" => "initialHandGain requires an owner cardsGained perBatch hand trigger",
+                "optional" or "markerCost" => "retain requires a mandatory trigger without a marker cost",
+                _ => "initialHandGain does not support movement reason or own-skill filters"
+            };
+            try { SkillProgramCatalog.Load(copy.ToJsonString(), presentation); }
+            catch (InvalidOperationException error) when (error.Message.Contains(expected, StringComparison.Ordinal)) { continue; }
+            throw new InvalidOperationException("Invalid gain invocation was accepted: " + invalid);
+        }
     }
 
     private static GameEngine Create(ContentRegistry registry)
@@ -161,7 +257,7 @@ internal static class CardEntityMarkChecks
                 {"id":"drop","minCards":1,"maxCards":1,"sourceZones":["hand"],"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
                   "effects":[{"op":"discardSelected","target":"owner","amount":1}]}]}]}
             """;
-            if (terminal is not null)
+            if (terminal is "lost" or "dead")
             {
                 var definition = System.Text.Json.Nodes.JsonNode.Parse(rules)!;
                 definition["skills"]![0]!["triggers"]![0]!["effects"]!.AsArray().Add(System.Text.Json.Nodes.JsonNode.Parse(
@@ -170,13 +266,39 @@ internal static class CardEntityMarkChecks
                         : """{"op":"loseHp","target":"owner","amount":10}"""));
                 rules = definition.ToJsonString();
             }
+            var gainScenario = terminal is "gain-lost" or "gain-dead";
+            if (gainScenario)
+            {
+                var definition = JsonNode.Parse(rules)!;
+                var skill = definition["skills"]![0]!;
+                skill["states"] = JsonNode.Parse("""[{"id":"gain-ready","initialValue":false,"visibility":"public","resetScope":"game","reacquirePolicy":"preserveUntilGameEnd"}]""");
+                var operation = terminal == "gain-lost" ?
+                    """{"op":"skillState","target":"owner","action":"lose","match":{"skillIds":["le:lingkong"]}}""" :
+                    """{"op":"loseHp","target":"owner","amount":10}""";
+                skill["triggers"]!.AsArray().Add(JsonNode.Parse("""
+                {"id":"gain-terminal","window":"cardsGained","subject":"owner","priority":1000,"optional":false,
+                  "movementOccurrence":"perBatch","destinationZones":["hand"],"usageScope":"game","usageLimit":1,
+                  "condition":{"kind":"booleanState","stateId":"gain-ready","expectedValue":true},"effects":[
+                """ + operation + "]}"));
+                skill["activations"]!.AsArray().Add(JsonNode.Parse("""
+                {"id":"gain","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
+                  "effects":[{"op":"setBooleanState","target":"owner","stateId":"gain-ready","value":true},
+                    {"op":"draw","target":"owner","amount":2,"awaitMovementTriggers":true}]}
+                """));
+                rules = definition.ToJsonString();
+                var lingkong = CharacterFixtureContent.EmbeddedProgramBundle("le-zhou-fei");
+                foreach (var (id, program) in lingkong.Programs)
+                    builder.AddSkill(new(id, lingkong.Presentations[id].Name, lingkong.Presentations[id].Description)
+                    { Program = program, ProgramPresentation = lingkong.Presentations[id] });
+            }
             var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
                 skills = new Dictionary<string, object> { [Skill] = new { name = "Physical marks", description = "Shared physical mark fixture",
                     cardMarks = new Dictionary<string, string> { ["opening"] = "开局", ["chosen"] = "所选" } } } });
             var catalog = SkillProgramCatalog.Load(rules, presentation);
             builder.AddSkill(new(Skill, "Physical marks", "Shared physical mark fixture") { Program = catalog.Programs[Skill], ProgramPresentation = catalog.Presentations[Skill] });
             builder.AddSkill(new("fixture:card-mark-noop", "Peer", "No active rules"));
-            builder.AddGeneral(new(Owner, "Mark owner", "", Skill, "wei", 4));
+            builder.AddGeneral(new(Owner, "Mark owner", "", Skill, "wei", 4,
+                AdditionalSkillIds: gainScenario ? ["le:lingkong"] : null));
             builder.AddGeneral(new(Peer, "Mark peer", "", "fixture:card-mark-noop", "wei", 8));
             builder.AddDeck(new(Deck, "Fixed physical cards", 0, 2, []) { PhysicalCards = Enumerable.Range(0, 60)
                 .Select(_ => new ContentDeckPhysicalCard("standard:slash", Suit.Club, 7)).ToArray() });

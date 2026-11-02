@@ -2,9 +2,21 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
+public enum SkillProgramInvocationSource { InitialHandGain }
+public enum SkillProgramInvocationOwnerDeath { Stop, Retain }
+public sealed record SkillProgramTriggerInvocation(SkillProgramInvocationSource Source,
+    SkillProgramInvocationOwnerDeath OwnerDeath = SkillProgramInvocationOwnerDeath.Stop);
+
+public sealed partial class SkillProgramTrigger
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public SkillProgramTriggerInvocation? Invocation { get; internal init; }
+}
+
 /// <summary>Permission for one admitted binding in its original native window; never skill ownership.</summary>
 public sealed record ProgramInvocationAuthorization(long WindowId, long NativeFrameId,
-    SkillProgramTriggerWindow Window, ProgramTriggerCandidate Candidate, long ProgramFrameId = 0);
+    SkillProgramTriggerWindow Window, ProgramTriggerCandidate Candidate, long ProgramFrameId = 0,
+    bool RetainOwnerDeath = false);
 
 public abstract partial record ResolutionFrame
 {
@@ -30,10 +42,13 @@ internal static class ProgramInvocations
     {
         if (parent is CardsMovedTriggerWindowFrame movement)
         {
-            if (movement.Id != context.ParentFrameId || context.MovementBatch?.Id != movement.Batch.Id ||
-                context.Window != SkillProgramTriggerWindow.CardsMoved || candidate.OwnerSeat != context.OwnerSeat ||
+            if (movement.Id != context.ParentFrameId || context.MovementBatch != movement.Batch ||
+                context.Window is not (SkillProgramTriggerWindow.CardsMoved or SkillProgramTriggerWindow.CardsGained) ||
+                candidate.OwnerSeat != context.OwnerSeat || context.OccurrenceIndex != candidate.OccurrenceIndex ||
                 movement.CandidateIndex < 0 || movement.CandidateIndex >= movement.Candidates.Count ||
-                movement.Candidates[movement.CandidateIndex] != candidate) return null;
+                movement.Candidates[movement.CandidateIndex] != candidate ||
+                movement.Contexts is { } contexts && (movement.CandidateIndex >= contexts.Count ||
+                    contexts[movement.CandidateIndex] != context)) return null;
             return movement.InvocationAuthorizations?.SingleOrDefault(a => a.ProgramFrameId == 0 &&
                 a.WindowId == movement.Id && a.NativeFrameId == (movement.Batch.ParentFrameId ?? 0) &&
                 a.Window == context.Window && a.Candidate == candidate);
@@ -52,7 +67,8 @@ internal static class ProgramInvocations
     internal static bool Allows(ProgramSkillFrame frame, ResolutionFrame? parent) =>
         frame.InvocationAuthorization is { } authorization && authorization.ProgramFrameId == frame.Id &&
         frame.OwnerSeat == authorization.Candidate.OwnerSeat && frame.SkillId == authorization.Candidate.SkillId &&
-        frame.TriggerId == authorization.Candidate.BindingId && frame.SkillInstanceId == authorization.Candidate.SkillInstanceId &&
+        frame.TriggerId == authorization.Candidate.BindingId && frame.ActivationId == authorization.Candidate.BindingId &&
+        frame.SkillInstanceId == authorization.Candidate.SkillInstanceId &&
         frame.GameplayHash == authorization.Candidate.GameplayHash && frame.WindowContext is { } context &&
         Find(parent, authorization.Candidate, context) == (authorization with { ProgramFrameId = 0 });
 }

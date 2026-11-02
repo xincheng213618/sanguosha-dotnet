@@ -20,6 +20,7 @@
           "id": "mark-first-outside-draw-gain",
           "window": "cardsGained",
           "subject": "owner",
+          "invocation": { "source": "initialHandGain", "ownerDeath": "retain" },
           "optional": false,
           "destinationZones": [
             "hand"
