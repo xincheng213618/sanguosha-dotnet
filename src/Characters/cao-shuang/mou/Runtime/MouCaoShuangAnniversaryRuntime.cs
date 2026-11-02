@@ -1,10 +1,14 @@
 using System.Globalization;
+using StageNode = CardGame.Core.ProgramStageNode<CardGame.Core.MouCaoShuangAnniversaryRuntime, CardGame.Core.MouCaoShuangAnniversaryReceipt, CardGame.Core.MouCaoShuangAnniversaryStage>;
+using StagePlan = CardGame.Core.ProgramStagePlan<CardGame.Core.MouCaoShuangAnniversaryRuntime, CardGame.Core.MouCaoShuangAnniversaryReceipt, CardGame.Core.MouCaoShuangAnniversaryStage>;
 namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed class MouCaoShuangAnniversaryRuntime(IMouCaoShuangAnniversaryFacts facts, IMouCaoShuangAnniversaryNative native,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws, IProgramAwakeningOverrideQuery awakeningConditions) : IMouCaoShuangAnniversaryRuntime
 {
-    internal const string Jianzhuan = "mou:jianzhuan",Fanshi = "mou:fanshi",Fudou = "mou:fudou",Action = "mou-cao-shuang-anniversary",DiscardReason = "skill.mou:jianzhuan.discard",DrawReason = "skill-program.mou:jianzhuan.draw";
+    internal const string Jianzhuan = "mou:jianzhuan", Fanshi = "mou:fanshi", Fudou = "mou:fudou", Action = "mou-cao-shuang-anniversary", DiscardReason = "skill.mou:jianzhuan.discard", DrawReason = "skill-program.mou:jianzhuan.draw";
+    private IMouCaoShuangAnniversaryNative Native => native;
+    private IMouCaoShuangAnniversaryFacts Facts => facts;
     private static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     internal static int[] Items(int mask) => Enumerable.Range(1, 4).Where(i => (mask & 1 << (i - 1)) != 0).ToArray();
     internal int Remaining(int owner) => facts.History<MouCaoShuangAnniversaryDeletedEvent>().Where(e => e.Owner == owner).Aggregate(15, (mask, e) => mask & ~(1 << (e.Option - 1)));
@@ -100,62 +104,86 @@ internal sealed class MouCaoShuangAnniversaryRuntime(IMouCaoShuangAnniversaryFac
         if (r.Operation != SkillProgramEffectOp.ResolveMouCaoShuangFanshi) { Complete(f); return; }
         frames.ReplaceTop(f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.NextRepeat, Repeat = r.Repeat + 1, Cards = [], Draw = null }, PendingMovementContinuation = null }); Continue(f.Id);
     }
-    internal void Continue(long id)
+    internal void Continue(long id) => ProgramStageRuntime.Run(id, frames, prompts, this, Stages.Plan);
+    private ProgramStageResult ChooseCards(ProgramSkillFrame f, MouCaoShuangAnniversaryReceipt r)
     {
-        while (prompts.Current is null && frames.Top is ProgramSkillFrame { MouCaoShuangAnniversary: { } r } f && f.Id == id)
+        if (r.Cards.Count < r.Required && Choices(f).Count > 0) { Publish(f); return ProgramStageResult.Yield; }
+        if (r.Cards.Count == 0) { ItemDone(f, 0); return ProgramStageResult.Yield; }
+        f = f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.MoveChildren, Before = facts.Sequence, After = facts.Sequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) };
+        ProgramStageRuntime.Issue(frames, f, native.Move);
+        return ProgramStageResult.Continue;
+    }
+    private ProgramStageResult CardsMoved(ProgramSkillFrame f, MouCaoShuangAnniversaryReceipt r)
+    {
+        if (r.Option == 3) BeginDraw(f, r.Payer, r.Cards.Count, true);
+        else ItemDone(f, r.Cards.Count);
+        return ProgramStageResult.Yield;
+    }
+    private ProgramStageResult DrawCompleted(ProgramSkillFrame f, MouCaoShuangAnniversaryReceipt r)
+    {
+        if (r.Operation == SkillProgramEffectOp.ResolveMouCaoShuangFudou)
         {
-            if (!Valid(f)) throw new InvalidOperationException("Mou Cao Shuang lost his real use/phase, accepted item or child cursor.");
-            if (facts.Finished) { Complete(f); return; }
-            if (r.Stage is MouCaoShuangAnniversaryStage.Option or MouCaoShuangAnniversaryStage.Target) { Publish(f); return; }
-            if (r.Stage == MouCaoShuangAnniversaryStage.Cards)
-            {
-                if (r.Cards.Count < r.Required && Choices(f).Count > 0) { Publish(f); return; }
-                if (r.Cards.Count == 0) { ItemDone(f, 0); return; }
-                frames.ReplaceTop(f = f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.MoveChildren, Before = facts.Sequence, After = facts.Sequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) }); native.Move(f); continue;
-            }
-            if (r.Stage == MouCaoShuangAnniversaryStage.MoveChildren)
-            {
-                if (native.Drain(f)) return; frames.ReplaceTop(f = f with { PendingMovementContinuation = null });
-                if (r.Option == 3) { BeginDraw(f, r.Payer, r.Cards.Count, true); return; }
-                ItemDone(f, r.Cards.Count); return;
-            }
-            if (r.Stage == MouCaoShuangAnniversaryStage.Drawing) return;
-            if (r.Stage == MouCaoShuangAnniversaryStage.DrawChildren)
-            {
-                if (native.Drain(f)) return; frames.ReplaceTop(f = f with { PendingMovementContinuation = null });
-                if (r.Operation == SkillProgramEffectOp.ResolveMouCaoShuangFudou) { frames.ReplaceTop(f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.Fudou, Draw = null } }); continue; }
-                if (r.Option == 3) native.CompleteRecast(f, r.Draw!.ActualDrawIds.Count);
-                ItemDone(frames.ActiveProgram(id), r.Option == 3 ? r.Cards.Count : r.Draw!.ActualDrawIds.Count + r.Draw.ReplacementGainedIds.Count); return;
-            }
-            if (r.Stage == MouCaoShuangAnniversaryStage.NextRepeat)
-            {
-                var remaining = Items(r.Remaining);
-                if (remaining.Length > 0 && r.Repeat < 3 * remaining.Length) { BeginItem(f, remaining[r.Repeat % remaining.Length]); return; }
-                frames.ReplaceTop(f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.Maximum } }); continue;
-            }
-            if (r.Stage == MouCaoShuangAnniversaryStage.Maximum)
-            { frames.ReplaceTop(f = f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.Recover } }); native.Maximum(f); continue; }
-            if (r.Stage == MouCaoShuangAnniversaryStage.Recover)
-            { frames.ReplaceTop(f = f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.RecoveryChildren } }); if (facts.Alive(f.OwnerSeat)) native.Recover(f); continue; }
-            if (r.Stage == MouCaoShuangAnniversaryStage.RecoveryChildren)
-            { if (native.Drain(f)) return; frames.ReplaceTop(f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.Grant } }); continue; }
-            if (r.Stage == MouCaoShuangAnniversaryStage.Grant)
-            { native.Grant(f); frames.ReplaceTop(frames.ActiveProgram(id) with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.GrantChildren } }); continue; }
-            if (r.Stage == MouCaoShuangAnniversaryStage.GrantChildren)
-            { if (native.Drain(f)) return; Complete(frames.ActiveProgram(id)); return; }
-            if (r.Stage == MouCaoShuangAnniversaryStage.HpChildren)
-            { if (native.Drain(f)) return; frames.ReplaceTop(f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.Fudou } }); continue; }
-            if (r.Stage == MouCaoShuangAnniversaryStage.Fudou)
-            {
-                if (r.Cursor >= 2) { Complete(f); return; }
-                var target = r.Cursor == 0 ? f.OwnerSeat : r.Other;
-                frames.ReplaceTop(f = f with { MouCaoShuangAnniversary = r with { Cursor = r.Cursor + 1 } });
-                if (!facts.Alive(target)) continue;
-                if (r.Red) { BeginDraw(f, target, 1, false); return; }
-                frames.ReplaceTop(f = f with { MouCaoShuangAnniversary = f.MouCaoShuangAnniversary! with { Stage = MouCaoShuangAnniversaryStage.HpChildren, Payer = target } });
-                events.AdvanceFact(new MouCaoShuangAnniversaryHpIssuedEvent(f.Id, r.Cursor, target)); native.LoseHp(f, target); continue;
-            }
+            frames.ReplaceTop(f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.Fudou, Draw = null } });
+            return ProgramStageResult.Continue;
         }
+        if (r.Option == 3) native.CompleteRecast(f, r.Draw!.ActualDrawIds.Count);
+        ItemDone(frames.ActiveProgram(f.Id), r.Option == 3 ? r.Cards.Count : r.Draw!.ActualDrawIds.Count + r.Draw.ReplacementGainedIds.Count);
+        return ProgramStageResult.Yield;
+    }
+    private ProgramStageResult NextRepeat(ProgramSkillFrame f, MouCaoShuangAnniversaryReceipt r)
+    {
+        var remaining = Items(r.Remaining);
+        if (remaining.Length > 0 && r.Repeat < 3 * remaining.Length)
+        { BeginItem(f, remaining[r.Repeat % remaining.Length]); return ProgramStageResult.Yield; }
+        frames.ReplaceTop(f with { MouCaoShuangAnniversary = r with { Stage = MouCaoShuangAnniversaryStage.Maximum } });
+        return ProgramStageResult.Continue;
+    }
+    private ProgramStageResult ResolveFudou(ProgramSkillFrame f, MouCaoShuangAnniversaryReceipt r)
+    {
+        if (r.Cursor >= 2) { Complete(f); return ProgramStageResult.Yield; }
+        var target = r.Cursor == 0 ? f.OwnerSeat : r.Other;
+        frames.ReplaceTop(f = f with { MouCaoShuangAnniversary = r with { Cursor = r.Cursor + 1 } });
+        if (!facts.Alive(target)) return ProgramStageResult.Continue;
+        if (r.Red) { BeginDraw(f, target, 1, false); return ProgramStageResult.Yield; }
+        frames.ReplaceTop(f = f with { MouCaoShuangAnniversary = f.MouCaoShuangAnniversary! with { Stage = MouCaoShuangAnniversaryStage.HpChildren, Payer = target } });
+        events.AdvanceFact(new MouCaoShuangAnniversaryHpIssuedEvent(f.Id, r.Cursor, target)); native.LoseHp(f, target);
+        return ProgramStageResult.Continue;
+    }
+    private static class Stages
+    {
+        internal static readonly StagePlan Plan = new(
+            read: static f => f.MouCaoShuangAnniversary,
+            stage: static r => r.Stage,
+            nodes:
+            [
+                StageNode.Prompt(MouCaoShuangAnniversaryStage.Option, static (runtime, f, _) => runtime.Publish(f)),
+                StageNode.Prompt(MouCaoShuangAnniversaryStage.Target, static (runtime, f, _) => runtime.Publish(f)),
+                StageNode.Run(MouCaoShuangAnniversaryStage.Cards, static (runtime, f, r) => runtime.ChooseCards(f, r)),
+                StageNode.AwaitChildren(MouCaoShuangAnniversaryStage.MoveChildren,
+                    static (runtime, f, _) => runtime.Native.Drain(f), static (runtime, f, r) => runtime.CardsMoved(f, r), clearMovement: true),
+                StageNode.AwaitExternalReturn(MouCaoShuangAnniversaryStage.Drawing),
+                StageNode.AwaitChildren(MouCaoShuangAnniversaryStage.DrawChildren,
+                    static (runtime, f, _) => runtime.Native.Drain(f), static (runtime, f, r) => runtime.DrawCompleted(f, r), clearMovement: true),
+                StageNode.Run(MouCaoShuangAnniversaryStage.NextRepeat, static (runtime, f, r) => runtime.NextRepeat(f, r)),
+                StageNode.RunTo(MouCaoShuangAnniversaryStage.Maximum, MouCaoShuangAnniversaryStage.Recover,
+                    static (runtime, f, _) => runtime.Native.Maximum(f)),
+                StageNode.RunTo(MouCaoShuangAnniversaryStage.Recover, MouCaoShuangAnniversaryStage.RecoveryChildren,
+                    static (runtime, f, _) => { if (runtime.Facts.Alive(f.OwnerSeat)) runtime.Native.Recover(f); }),
+                StageNode.ChildrenTo(MouCaoShuangAnniversaryStage.RecoveryChildren, MouCaoShuangAnniversaryStage.Grant),
+                StageNode.RunTo(MouCaoShuangAnniversaryStage.Grant, MouCaoShuangAnniversaryStage.GrantChildren,
+                    static (runtime, f, _) => runtime.Native.Grant(f), commitBefore: false),
+                StageNode.ChildrenComplete(MouCaoShuangAnniversaryStage.GrantChildren),
+                StageNode.Run(MouCaoShuangAnniversaryStage.Fudou, static (runtime, f, r) => runtime.ResolveFudou(f, r)),
+                StageNode.ChildrenTo(MouCaoShuangAnniversaryStage.HpChildren, MouCaoShuangAnniversaryStage.Fudou)
+            ],
+            stopBeforeStage: static (runtime, f, _) =>
+            {
+                if (!runtime.Facts.Finished) return false;
+                runtime.Complete(f); return true;
+            },
+            withStage: static (f, r, next) => f with { MouCaoShuangAnniversary = r with { Stage = next } },
+            drain: static (runtime, f, _) => runtime.Native.Drain(f),
+            complete: static (runtime, f) => runtime.Complete(f));
     }
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMouCaoShuangJianzhuan, SkillProgramEffectOp.ResolveMouCaoShuangFanshi, SkillProgramEffectOp.ResolveMouCaoShuangFudou)]
     private void DrawReturned(ProgramSkillFrame f, NativeDrawOutcome outcome)

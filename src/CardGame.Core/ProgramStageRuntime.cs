@@ -91,7 +91,6 @@ internal sealed class ProgramStagePlan<TRuntime, TReceipt, TStage>
     private readonly IReadOnlyDictionary<TStage, ProgramStageNode<TRuntime, TReceipt, TStage>> _nodes;
     internal Func<ProgramSkillFrame, TReceipt?> Read { get; }
     internal Func<TReceipt, TStage> Stage { get; }
-    internal Action<TRuntime, ProgramSkillFrame, TReceipt> Validate { get; }
     internal Func<TRuntime, ProgramSkillFrame, TReceipt, bool>? StopBeforeStage { get; }
     internal Func<ProgramSkillFrame, TReceipt, TStage, ProgramSkillFrame>? WithStage { get; }
     internal Func<TRuntime, ProgramSkillFrame, TReceipt, bool>? Drain { get; }
@@ -99,7 +98,6 @@ internal sealed class ProgramStagePlan<TRuntime, TReceipt, TStage>
     internal Action<TRuntime, ProgramSkillFrame, TReceipt>? AfterChildren { get; }
 
     internal ProgramStagePlan(Func<ProgramSkillFrame, TReceipt?> read, Func<TReceipt, TStage> stage,
-        Action<TRuntime, ProgramSkillFrame, TReceipt> validate,
         IEnumerable<ProgramStageNode<TRuntime, TReceipt, TStage>> nodes,
         Func<TRuntime, ProgramSkillFrame, TReceipt, bool>? stopBeforeStage = null,
         Func<ProgramSkillFrame, TReceipt, TStage, ProgramSkillFrame>? withStage = null,
@@ -109,7 +107,6 @@ internal sealed class ProgramStagePlan<TRuntime, TReceipt, TStage>
     {
         Read = read ?? throw new ArgumentNullException(nameof(read));
         Stage = stage ?? throw new ArgumentNullException(nameof(stage));
-        Validate = validate ?? throw new ArgumentNullException(nameof(validate));
         ArgumentNullException.ThrowIfNull(nodes);
         var entries = nodes.ToArray();
         if (entries.Length == 0 || entries.Any(node => node is null) ||
@@ -148,7 +145,6 @@ internal static class ProgramStageRuntime
         ArgumentNullException.ThrowIfNull(plan);
         while (TryRead(id, frames, prompts, plan, out var frame, out var receipt))
         {
-            plan.Validate(runtime, frame, receipt);
             if (plan.StopBeforeStage?.Invoke(runtime, frame, receipt) == true) return;
             if (!TryRead(id, frames, prompts, plan, out frame, out receipt)) return;
             var node = plan.Resolve(receipt);

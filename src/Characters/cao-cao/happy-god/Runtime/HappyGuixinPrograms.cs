@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
 internal interface IHappyGuixinHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame); }
@@ -32,29 +31,6 @@ internal static class HappyGuixinComposition
             throw new InvalidOperationException(path + ": Happy Guixin requires one optional per-damage-point random owner acquisition with conditional turnover.");
     }
 }
-
-public enum HappyGuixinStage { Visiting, MovementChildren, TurnoverChildren, Finished }
-public sealed record HappyGuixinPayment(MobileGuixinPayment Movement, uint RandomBefore, uint RandomAfter)
-{
-    private readonly IReadOnlyList<OlGuixinCandidate> _candidates = Array.AsReadOnly(Array.Empty<OlGuixinCandidate>());
-    public IReadOnlyList<OlGuixinCandidate> Candidates { get => _candidates; init => _candidates = Array.AsReadOnly(value.ToArray()); }
-}
-public sealed record HappyGuixinReceipt(CardConversionSource Source, string GameplayHash,
-    long DamageWindowId, long DamageFrameId, int OccurrenceIndex, int DamageAmount)
-{
-    private readonly IReadOnlyList<int> _seats = Array.AsReadOnly(Array.Empty<int>());
-    private readonly IReadOnlyList<HappyGuixinPayment> _payments = Array.AsReadOnly(Array.Empty<HappyGuixinPayment>());
-    public IReadOnlyList<int> OtherSeats { get => _seats; init => _seats = Array.AsReadOnly(value.ToArray()); }
-    public IReadOnlyList<HappyGuixinPayment> Payments { get => _payments; init => _payments = Array.AsReadOnly(value.Select(p => p with
-        { Candidates = p.Candidates, Movement = p.Movement with { Movements = p.Movement.Movements } }).ToArray()); }
-    public int Cursor { get; init; }
-    public HappyGuixinStage Stage { get; init; }
-    public bool TurnoverIssued { get; init; }
-    public bool? FaceDownBefore { get; init; }
-    public bool? FaceDownAfter { get; init; }
-}
-public sealed partial record ProgramSkillFrame
-{ [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public HappyGuixinReceipt? HappyGuixin { get; init; } }
 
 // Foreign hand identities, the frozen random pool, and RNG state remain on the original frame.
 public sealed record HappyGuixinStartedEvent(long FrameId, CardConversionSource Source, string GameplayHash,

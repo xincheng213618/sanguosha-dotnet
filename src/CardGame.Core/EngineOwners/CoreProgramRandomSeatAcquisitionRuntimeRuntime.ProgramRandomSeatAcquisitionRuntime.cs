@@ -5,13 +5,8 @@ using System.Globalization;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreProgramRandomSeatAcquisitionRuntimeRuntime
 {
-    internal ProgramRandomSeatAcquisitionRuntime SeatAcquisitions => _programRandomSeatAcquisitionOperations.Get();
-
     Winner IProgramSeatAcquisitionFacts.Winner => _coreMatchOutcomeWinnerAccess._winner;
 
-    int IProgramSeatAcquisitionFacts.PlayerCount => _coreMatchParticipantsPlayersAccess._players.Count;
-
-    bool IProgramSeatAcquisitionFacts.IsValidSeat(int seat) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(seat);
     bool IProgramSeatAcquisitionFacts.IsAlive(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive;
     bool IProgramSeatAcquisitionFacts.IsFaceDown(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsFaceDown;
     bool IProgramSeatAcquisitionFacts.CannotTurnOver(int seat) => _coreShenwuNpcProgramsOperations.ShenwuCannotTurnOver(_coreMatchParticipantsPlayersAccess._players[seat]);
@@ -34,18 +29,12 @@ internal sealed partial class CoreProgramRandomSeatAcquisitionRuntimeRuntime
             _ => throw new InvalidOperationException("Unsupported seat-acquisition source.")};
         return new ProgramSeatAcquisitionCandidate(cards[slot].Id, new(zone, target));
     }).Where(c => c.From.Zone != CardZoneKind.Judgment || !_resolutionStackOperations._resolutionStack.OfType<JudgmentFrame>().Any(j => j.TargetSeat == target && j.CardId == c.CardId)).OrderBy(c => c.CardId).ToArray());
-    CardLocation? IProgramSeatAcquisitionFacts.DestinationAt(int id, long sequence) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == id && m.Sequence <= sequence)?.To;
-    CardLocation IProgramSeatAcquisitionFacts.ExpectedDestination(int owner, int id, CardLocation from)
-    {
-        var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
-        var expected = card.IsGeneralWeapon && from.Zone == CardZoneKind.Equipment || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(card, from, CardLocation.Hand(owner)) ? CardLocation.OutsideGame : CardLocation.Hand(owner);
-        return _coreEphemeralCardMaterialsOperations.NormalizeEphemeralCardDestination(card, from, expected);
-    }
-
-    bool IProgramSeatAcquisitionFacts.IsRecorded(CardMovementRecord movement) => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m == movement) == 1;
-    SkillProgramEffect? IProgramSeatAcquisitionFacts.PausedEffect(ProgramSkillFrame f) => ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
     int IProgramSeatAcquisitionOperations.NextRandom(int count) => _randomOperations._random.Next(count);
-    void IProgramSeatAcquisitionOperations.Obtain(int id, int recipient, CardMoveReason reason, CardMovementDisclosure disclosure, Action<long, IReadOnlyList<CardMovementRecord>> paid) => _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), reason, paid, disclosure: disclosure);
+    void IProgramSeatAcquisitionOperations.Obtain(long producerFrameId, int id, int recipient, CardMoveReason reason,
+        CardMovementDisclosure disclosure, Action<long?, IReadOnlyList<CardMovementRecord>> settled) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), reason,
+            disclosure: disclosure, afterRequestSettled: result => settled(result.MovementBatchId, result.Movements),
+            producerFrameId: producerFrameId);
     bool IProgramSeatAcquisitionOperations.DrainChildren(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     void IProgramSeatAcquisitionOperations.TurnOver(ProgramSkillFrame f) => _coreProgramLifecycleOperations.TurnOverProgramTarget(f.Id, f.OwnerSeat, f.OwnerSeat);
     void IProgramSeatAcquisitionOperations.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);

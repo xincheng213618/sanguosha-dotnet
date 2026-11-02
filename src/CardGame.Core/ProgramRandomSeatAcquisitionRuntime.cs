@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.Json.Serialization;
 using AcquisitionNode = CardGame.Core.ProgramStageNode<CardGame.Core.ProgramSeatAcquisitionCall, CardGame.Core.ProgramSeatAcquisitionReceipt, CardGame.Core.ProgramSeatAcquisitionStage>;
 namespace CardGame.Core;
@@ -7,7 +6,7 @@ public enum ProgramSeatAcquisitionMode { PrioritizedRegion, AllRegionsConditiona
 public enum ProgramSeatAcquisitionStage { PriorityChoice, Visiting, MovementChildren, TurnoverChildren, Finished }
 public sealed record ProgramSeatAcquisitionCandidate(int CardId, CardLocation From);
 public sealed record ProgramSeatAcquisitionPayment(int Cursor, int TargetSeat, int CardId, CardLocation From,
-    long BatchId, long Before, long After, uint RandomBefore, uint RandomAfter)
+    long? BatchId, long Before, long After, uint RandomBefore, uint RandomAfter)
 {
     private readonly IReadOnlyList<ProgramSeatAcquisitionCandidate> _candidates = Array.AsReadOnly(Array.Empty<ProgramSeatAcquisitionCandidate>());
     private readonly IReadOnlyList<CardMovementRecord> _movements = Array.AsReadOnly(Array.Empty<CardMovementRecord>());
@@ -36,8 +35,6 @@ internal sealed record ProgramSeatAcquisitionDamagePoint(long WindowId, long Dam
 internal interface IProgramSeatAcquisitionFacts : IProgramSelectionQuery
 {
     Winner Winner { get; }
-    int PlayerCount { get; }
-    bool IsValidSeat(int seat);
     bool IsAlive(int seat);
     bool IsFaceDown(int seat);
     bool CannotTurnOver(int seat);
@@ -47,16 +44,12 @@ internal interface IProgramSeatAcquisitionFacts : IProgramSelectionQuery
     ProgramSeatAcquisitionDamagePoint? DamagePoint(ProgramSkillFrame frame);
     IReadOnlyList<int> OtherSeats(int owner);
     IReadOnlyList<ProgramSeatAcquisitionCandidate> Candidates(ProgramSkillFrame frame, int target);
-    CardLocation? DestinationAt(int cardId, long sequence);
-    CardLocation ExpectedDestination(int owner, int cardId, CardLocation from);
-    bool IsRecorded(CardMovementRecord movement);
-    SkillProgramEffect? PausedEffect(ProgramSkillFrame frame);
 }
 internal interface IProgramSeatAcquisitionOperations : IProgramRuntimeOperations
 {
     int NextRandom(int count);
-    void Obtain(int cardId, int recipient, CardMoveReason reason, CardMovementDisclosure disclosure,
-        Action<long, IReadOnlyList<CardMovementRecord>> paid);
+    void Obtain(long producerFrameId, int cardId, int recipient, CardMoveReason reason, CardMovementDisclosure disclosure,
+        Action<long?, IReadOnlyList<CardMovementRecord>> settled);
     bool DrainChildren(ProgramSkillFrame frame);
     void TurnOver(ProgramSkillFrame frame);
     void Finish(ProgramSkillFrame frame);
@@ -67,9 +60,7 @@ internal interface IProgramSeatAcquisitionPolicy
 {
     ProgramSeatAcquisitionMode Mode { get; }
     string SkillId { get; }
-    SkillProgramEffectOp Operation { get; }
     string Reason { get; }
-    string InvalidReceiptMessage { get; }
     void PublishPriority(ProgramSkillFrame frame);
     bool ShouldTurnOver(ProgramSkillFrame frame, ProgramSeatAcquisitionReceipt receipt, bool before);
     IGameEvent Started(ProgramSkillFrame frame, ProgramSeatAcquisitionReceipt receipt);
@@ -77,21 +68,22 @@ internal interface IProgramSeatAcquisitionPolicy
     IGameEvent Paid(ProgramSkillFrame frame, ProgramSeatAcquisitionPayment payment);
     IGameEvent Turned(ProgramSkillFrame frame, int obtained, bool before, bool after);
     IGameEvent Completed(ProgramSkillFrame frame, ProgramSeatAcquisitionReceipt receipt, bool cancelled);
-    bool ValidStarted(ProgramSkillFrame frame, ProgramSeatAcquisitionReceipt receipt);
-    bool ValidPriority(ProgramSkillFrame frame, ProgramSeatAcquisitionReceipt receipt);
-    bool ValidSkipped(ProgramSkillFrame frame, int cursor, int target);
-    bool HasSkipped(ProgramSkillFrame frame, int cursor);
-    bool ValidPaid(ProgramSkillFrame frame, ProgramSeatAcquisitionPayment payment);
-    bool ValidTurned(ProgramSkillFrame frame, ProgramSeatAcquisitionReceipt receipt);
-    bool NoTurnoverEvent(ProgramSkillFrame frame);
+
 }
 // A synchronous invocation context contains only the coordinator and its policy.
 // It is never retained between Run calls; all pending data is SeatAcquisition.
 internal sealed record ProgramSeatAcquisitionCall(ProgramRandomSeatAcquisitionRuntime Runtime, IProgramSeatAcquisitionPolicy Policy);
 
-[ProgramRuntimeModule]
+internal interface IProgramSeatAcquisitions : IProgramRuntimeOperations
+{
+    SkillProgramStepOutcome Begin(ProgramSkillFrame frame, IProgramSeatAcquisitionPolicy policy);
+    bool Resume(long id, IProgramSeatAcquisitionPolicy policy);
+    bool RetainPaid(ProgramSkillFrame frame, IProgramSeatAcquisitionPolicy policy);
+}
+
+[ProgramRuntimeModule, ProgramCapability]
 internal sealed class ProgramRandomSeatAcquisitionRuntime(IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts,
-    IProgramRuntimeEvents events, IProgramSeatAcquisitionFacts facts, IProgramSeatAcquisitionOperations operations)
+    IProgramRuntimeEvents events, IProgramSeatAcquisitionFacts facts, IProgramSeatAcquisitionOperations operations) : IProgramSeatAcquisitions
 {
     internal static IReadOnlyList<CardZoneKind> Priority(CardZoneKind preferred) => preferred switch
     {
@@ -100,10 +92,11 @@ internal sealed class ProgramRandomSeatAcquisitionRuntime(IProgramRuntimeFrames 
         CardZoneKind.Judgment => [CardZoneKind.Judgment, CardZoneKind.Hand, CardZoneKind.Equipment],
         _ => throw new InvalidOperationException("A seat acquisition requires one HEJ priority region.")
     };
+    internal static int MovedSeats(ProgramSeatAcquisitionReceipt receipt) => receipt.Payments.Count(p => p.Movements.Count > 0);
     internal static int ActualObtained(ProgramSkillFrame f) => f.SeatAcquisition!.Payments.Sum(p =>
         p.Movements.Count(m => m.To == CardLocation.Hand(f.OwnerSeat)));
     private static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
-    internal SkillProgramStepOutcome Begin(ProgramSkillFrame supplied, IProgramSeatAcquisitionPolicy policy)
+    public SkillProgramStepOutcome Begin(ProgramSkillFrame supplied, IProgramSeatAcquisitionPolicy policy)
     {
         var f = frames.ActiveProgram(supplied.Id); var origin = facts.DamagePoint(f);
         if (f.SeatAcquisition is not null || f.SkillId != policy.SkillId || f.InstructionIndex != 1 ||
@@ -115,15 +108,15 @@ internal sealed class ProgramRandomSeatAcquisitionRuntime(IProgramRuntimeFrames 
         frames.ReplaceTop(f = f with { SeatAcquisition = r });
         events.AdvanceFact(policy.Started(f, r)); Resume(f.Id, policy); return SkillProgramStepOutcome.AwaitChild;
     }
-    internal bool Resume(long id, IProgramSeatAcquisitionPolicy policy)
+    public bool Resume(long id, IProgramSeatAcquisitionPolicy policy)
     {
-        if (frames.Top is not ProgramSkillFrame { SeatAcquisition: { } r } f || f.Id != id || r.Mode != policy.Mode) return false;
+        if (frames.Top is not ProgramSkillFrame { SeatAcquisition: { } r } f || f.Id != id || r.Mode != policy.Mode || f.SkillId != policy.SkillId) return false;
         ProgramStageRuntime.Run(id, frames, prompts, new ProgramSeatAcquisitionCall(this, policy), Stages.Plan); return true;
     }
     private static class Stages
     {
         internal static readonly ProgramStagePlan<ProgramSeatAcquisitionCall, ProgramSeatAcquisitionReceipt, ProgramSeatAcquisitionStage> Plan = new(
-            static f => f.SeatAcquisition, static r => r.Stage, static (c, f, _) => c.Runtime.Require(f, c.Policy),
+            static f => f.SeatAcquisition, static r => r.Stage,
             [AcquisitionNode.Prompt(ProgramSeatAcquisitionStage.PriorityChoice, static (c, f, _) => c.Policy.PublishPriority(f)),
              AcquisitionNode.Run(ProgramSeatAcquisitionStage.Visiting, static (c, f, r) => c.Runtime.Visit(f, r, c.Policy)),
              AcquisitionNode.ChildrenTo(ProgramSeatAcquisitionStage.MovementChildren, ProgramSeatAcquisitionStage.Visiting,
@@ -173,14 +166,17 @@ internal sealed class ProgramRandomSeatAcquisitionRuntime(IProgramRuntimeFrames 
         var selected = pool[operations.NextRandom(pool.Count)]; var randomAfter = facts.RandomState; var beforeMove = facts.MovementSequence;
         ProgramStageRuntime.Issue(frames, f with { SeatAcquisition = r with { Stage = ProgramSeatAcquisitionStage.MovementChildren },
             PendingMovementContinuation = new(f.OwnerSeat, 0, null) }, _ =>
-            operations.Obtain(selected.CardId, f.OwnerSeat, new(policy.Reason),
+            operations.Obtain(f.Id, selected.CardId, f.OwnerSeat, new(policy.Reason),
                 selected.From.Zone == CardZoneKind.Hand ? CardMovementDisclosure.FaceDown : CardMovementDisclosure.FaceUp, (batch, records) =>
                 {
                     var parent = frames.ActiveProgram(f.Id);
                     var payment = new ProgramSeatAcquisitionPayment(r.Cursor, target, selected.CardId, selected.From, batch, beforeMove,
                         facts.MovementSequence, randomBefore, randomAfter) { Candidates = candidates, Movements = records };
                     frames.ReplaceTop(parent = parent with { SeatAcquisition = parent.SeatAcquisition! with { Payments = parent.SeatAcquisition.Payments.Append(payment).ToArray() } });
-                    events.AdvanceFact(policy.Paid(parent, payment));
+                    // A destination replacement can settle the random request
+                    // without moving its entity. Keep its RNG/cursor receipt, but
+                    // publish physical payment only for actual movement records.
+                    if (records.Count > 0) events.AdvanceFact(policy.Paid(parent, payment));
                 }));
         return ProgramStageResult.Continue;
     }
@@ -192,58 +188,7 @@ internal sealed class ProgramRandomSeatAcquisitionRuntime(IProgramRuntimeFrames 
         frames.ReplaceTop(f = f with { SeatAcquisition = r with { Stage = ProgramSeatAcquisitionStage.Finished } });
         events.AdvanceFact(policy.Completed(f, f.SeatAcquisition!, cancelled)); operations.Finish(f);
     }
-    internal void Require(ProgramSkillFrame f, IProgramSeatAcquisitionPolicy policy)
-    {
-        if (!Valid(f, policy) || f.PendingMovementContinuation is { } p && !MovementProof(f, facts.PausedEffect(f), p, policy))
-            throw new InvalidOperationException(policy.InvalidReceiptMessage);
-    }
-    internal bool MovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p, IProgramSeatAcquisitionPolicy policy) =>
-        effect?.Op == policy.Operation && f.SeatAcquisition is { Stage: ProgramSeatAcquisitionStage.MovementChildren } && p == f.PendingMovementContinuation &&
-        p.SubjectSeat == f.OwnerSeat && p.BeforeCount == 0 && p.CoverageResultBind is null && Valid(f, policy);
-    internal bool RetainPaid(ProgramSkillFrame f, IProgramSeatAcquisitionPolicy policy) =>
-        f.SeatAcquisition is { } r && r.Mode == policy.Mode && (r.Payments.Count > 0 || r.TurnoverIssued) && Valid(f, policy);
-    private bool Valid(ProgramSkillFrame f, IProgramSeatAcquisitionPolicy policy)
-    {
-        if (f.SeatAcquisition is not { } r || r.Mode != policy.Mode || f.SkillId != policy.SkillId || f.InstructionIndex != 1 ||
-            r.Source != Source(f) || r.GameplayHash != f.GameplayHash || !Enum.IsDefined(r.Stage) || facts.DamagePoint(f) is not { } origin ||
-            origin.WindowId != r.DamageWindowId || origin.DamageFrameId != r.DamageFrameId || origin.Amount != r.DamageAmount || origin.OccurrenceIndex != r.OccurrenceIndex ||
-            r.OtherSeats.Count != facts.PlayerCount - 1 || r.OtherSeats.Distinct().Count() != r.OtherSeats.Count ||
-            r.OtherSeats.Any(seat => !facts.IsValidSeat(seat) || seat == f.OwnerSeat) || r.Cursor < 0 || r.Cursor > r.OtherSeats.Count ||
-            r.OtherSeats is not System.Collections.IList { IsReadOnly: true } || r.Payments is not System.Collections.IList { IsReadOnly: true } ||
-            r.Payments.Select(p => p.Cursor).Distinct().Count() != r.Payments.Count || !policy.ValidStarted(f, r) || !policy.ValidPriority(f, r)) return false;
-        if (r.Mode == ProgramSeatAcquisitionMode.PrioritizedRegion)
-        {
-            if (r.PreferredZone is null) return r.Stage is ProgramSeatAcquisitionStage.PriorityChoice or ProgramSeatAcquisitionStage.Finished && r.Cursor == 0 &&
-                r.Payments.Count == 0 && !r.TurnoverIssued && r.FaceDownBefore is null && r.FaceDownAfter is null && f.PendingMovementContinuation is null;
-            if (!IsArea(r.PreferredZone.Value) || r.Stage == ProgramSeatAcquisitionStage.PriorityChoice) return false;
-        }
-        else if (r.PreferredZone is not null || r.Stage == ProgramSeatAcquisitionStage.PriorityChoice) return false;
-        var prior = -1L;
-        for (var cursor = 0; cursor <= r.Cursor && cursor < r.OtherSeats.Count; cursor++)
-        {
-            var payments = r.Payments.Where(p => p.Cursor == cursor).ToArray();
-            if (payments.Length == 0)
-            { if (cursor < r.Cursor && !policy.ValidSkipped(f, cursor, r.OtherSeats[cursor])) return false; continue; }
-            if (payments is not [var p]) return false;
-            if (p.TargetSeat != r.OtherSeats[cursor] || p.From.OwnerSeat != p.TargetSeat || !IsArea(p.From.Zone) ||
-                p.CardId <= 0 || p.BatchId <= 0 || p.Before < prior || p.Before < 0 || p.After <= p.Before || p.After > facts.MovementSequence ||
-                p.Movements is not System.Collections.IList { IsReadOnly: true } || p.Movements is not [var movement] ||
-                movement.CardId != p.CardId || movement.From != p.From || movement.Sequence <= p.Before || movement.Sequence != p.After ||
-                movement.Reason.Value != policy.Reason || !facts.IsRecorded(movement) || !policy.ValidPaid(f, p) || policy.HasSkipped(f, cursor) ||
-                p.Candidates is not System.Collections.IList { IsReadOnly: true } || p.Candidates.Count == 0 ||
-                p.Candidates.Select(c => c.CardId).Distinct().Count() != p.Candidates.Count || !p.Candidates.OrderBy(c => c.CardId).SequenceEqual(p.Candidates) ||
-                p.Candidates.Any(c => c.CardId <= 0 || c.From.OwnerSeat != p.TargetSeat || !IsArea(c.From.Zone) || facts.DestinationAt(c.CardId, p.Before) != c.From)) return false;
-            var pool = RandomPool(r, p.Candidates); var random = new DeterministicRandom(unchecked((int)p.RandomBefore)); var selected = pool[random.Next(pool.Count)];
-            if (p.RandomBefore == 0 || random.State != p.RandomAfter || selected.CardId != p.CardId || selected.From != p.From ||
-                movement.To != facts.ExpectedDestination(f.OwnerSeat, p.CardId, p.From)) return false;
-            prior = p.After;
-        }
-        if (r.Payments.Any(p => p.Cursor < 0 || p.Cursor >= r.OtherSeats.Count || p.Cursor > r.Cursor) ||
-            r.Stage == ProgramSeatAcquisitionStage.MovementChildren && (r.Cursor >= r.OtherSeats.Count || r.Payments.All(p => p.Cursor != r.Cursor)) ||
-            r.Stage == ProgramSeatAcquisitionStage.Visiting && r.Payments.Any(p => p.Cursor == r.Cursor)) return false;
-        if (r.TurnoverIssued) return r.Cursor == r.OtherSeats.Count && r.Stage is ProgramSeatAcquisitionStage.TurnoverChildren or ProgramSeatAcquisitionStage.Finished &&
-            r.FaceDownBefore.HasValue && r.FaceDownAfter.HasValue && policy.ShouldTurnOver(f, r, r.FaceDownBefore.Value) && policy.ValidTurned(f, r);
-        return r.FaceDownBefore is null && r.FaceDownAfter is null && r.Stage != ProgramSeatAcquisitionStage.TurnoverChildren && policy.NoTurnoverEvent(f);
-    }
-    private static bool IsArea(CardZoneKind zone) => zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment;
+    public bool RetainPaid(ProgramSkillFrame f, IProgramSeatAcquisitionPolicy policy) =>
+        f.SkillId == policy.SkillId && f.SeatAcquisition is { } r && r.Mode == policy.Mode &&
+        (r.Payments.Count > 0 || r.TurnoverIssued);
 }

@@ -18,10 +18,7 @@ cai-wen-ji/le	CardGame.Core.ShuangjiaMarkRuntime	CardGame.Core.IDistanceRuleRunt
 cai-yong/le	CardGame.Core.EngineOwners.CharacterCaiYongLeRuntime	CardGame.Core.RuntimeEntries.CharacterSunHongOlEntries	sun-hong/ol	CardGame.Core.EngineOwners.CharacterSunHongOlRuntime
 cai-yong/le	CardGame.Core.EngineOwners.CharacterCaiYongLeRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 cao-ang/mou	CardGame.Core.EngineOwners.CharacterCaoAngMouRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
-cao-cao/happy-god	CardGame.Core.EngineOwners.CharacterCaoCaoHappyGodRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterCaoCaoMobileGodRuntime>	cao-cao/mobile-god	CardGame.Core.EngineOwners.CharacterCaoCaoMobileGodRuntime
-cao-cao/happy-god	CardGame.Core.EngineOwners.CharacterCaoCaoHappyGodRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterCaoCaoOlGodRuntime>	cao-cao/ol-god	CardGame.Core.EngineOwners.CharacterCaoCaoOlGodRuntime
 cao-cao/mobile-god	CardGame.Core.EngineOwners.CharacterCaoCaoMobileGodRuntime	CardGame.Core.RuntimeEntries.CharacterZuoCiHappyGodEntries	zuo-ci/happy-god	CardGame.Core.EngineOwners.CharacterZuoCiHappyGodRuntime
-cao-cao/ol-god	CardGame.Core.EngineOwners.CharacterCaoCaoOlGodRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterCaoCaoMobileGodRuntime>	cao-cao/mobile-god	CardGame.Core.EngineOwners.CharacterCaoCaoMobileGodRuntime
 cao-cao/ol-magic	CardGame.Core.EngineOwners.CharacterCaoCaoOlMagicRuntime	CardGame.Core.RuntimeEntries.CharacterHuangQuanMouEntries	huang-quan/mou	CardGame.Core.EngineOwners.CharacterHuangQuanMouRuntime
 cao-cao/ol-magic	CardGame.Core.EngineOwners.CharacterCaoCaoOlMagicRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 cao-chun/ol	CardGame.Core.EngineOwners.CharacterCaoChunOlRuntime	CardGame.Core.RuntimeEntries.CharacterGuoTuOlEntries	guo-tu/ol	CardGame.Core.EngineOwners.CharacterGuoTuOlRuntime

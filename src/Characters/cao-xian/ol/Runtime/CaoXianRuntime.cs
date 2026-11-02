@@ -1,9 +1,13 @@
 using System.Globalization;
+using StageNode = CardGame.Core.ProgramStageNode<CardGame.Core.CaoXianRuntime, CardGame.Core.CaoXianReceipt, CardGame.Core.CaoXianStage>;
+using StagePlan = CardGame.Core.ProgramStagePlan<CardGame.Core.CaoXianRuntime, CardGame.Core.CaoXianReceipt, CardGame.Core.CaoXianStage>;
 namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed class CaoXianRuntime(ICaoXianFacts facts, ICaoXianNative native, IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts, IProgramOperationDraws draws) : ICaoXianRuntime
 {
     internal const string Lingxi = "ol:lingxi",Zhifou = "ol:zhifou",Action = "cao-xian-anniversary";
+    private ICaoXianNative Native => native;
+    private ICaoXianFacts Facts => facts;
     internal static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     private CaoXianZhifouPaidEvent[] Paid(int owner) => facts.History<CaoXianZhifouPaidEvent>().Where(e => e.Source.OwnerSeat == owner && e.ActualTurn == facts.Turn).ToArray();
     private int[] Options(int owner) => Enumerable.Range(1, 3).Except(facts.History<CaoXianOptionEvent>().Where(e => e.Owner == owner && e.ActualTurn == facts.Turn).Select(e => e.Option)).ToArray();
@@ -75,7 +79,9 @@ internal sealed class CaoXianRuntime(ICaoXianFacts facts, ICaoXianNative native,
     }
     private void StartMove(ProgramSkillFrame f, CaoXianStage stage)
     {
-        var r = f.CaoXian!; frames.ReplaceTop(f = f with { CaoXian = r with { Stage = stage, Before = facts.Sequence, After = facts.Sequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) }); native.Move(f); Continue(f.Id);
+        var r = f.CaoXian!;
+        f = f with { CaoXian = r with { Stage = stage, Before = facts.Sequence, After = facts.Sequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) };
+        ProgramStageRuntime.Issue(frames, f, native.Move); Continue(f.Id);
     }
     internal void MovesPaid(long id, IReadOnlyList<CardMovementRecord> moves)
     {
@@ -89,36 +95,69 @@ internal sealed class CaoXianRuntime(ICaoXianFacts facts, ICaoXianNative native,
             foreach (var m in moves) events.AdvanceFact(new CaoXianZhifouRemovedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.CompletedUseId, r.ActionId, r.Pile, m.CardId, m.CardKind, m.Sequence));
         }
     }
-    internal void Continue(long id)
+    internal void Continue(long id) => ProgramStageRuntime.Run(id, frames, prompts, this, Stages.Plan);
+    private ProgramStageResult ChoosePile(ProgramSkillFrame f, CaoXianReceipt r)
     {
-        while (prompts.Current is null && frames.Top is ProgramSkillFrame { CaoXian: { } r } f && f.Id == id)
+        var piles = facts.Piles(f.OwnerSeat, f.SkillInstanceId).Where(p => facts.PileCards(p).Count >= r.X).ToArray();
+        if (piles.Length == 0) { Complete(f); return ProgramStageResult.Yield; }
+        if (piles is [var pile])
         {
-            if (!Valid(f)) throw new InvalidOperationException("Cao Xian lost her exact native parent, physical wing source or completed-use receipt.");
-            if (r.Stage == CaoXianStage.Drawing) return;
-            if (r.Stage is CaoXianStage.RemoveChildren or CaoXianStage.EffectChildren or CaoXianStage.AdjustChildren or CaoXianStage.DrawChildren)
-            {
-                if (native.Drain(f)) return; frames.ReplaceTop(f = f with { PendingMovementContinuation = null });
-                if (r.Stage != CaoXianStage.RemoveChildren) { Complete(f); return; }
-                if (!facts.Alive(f.OwnerSeat) || facts.Finished) { Complete(f); return; }
-                frames.ReplaceTop(f with { CaoXian = r with { Stage = CaoXianStage.OptionTarget, Cards = [] } }); continue;
-            }
-            if (!facts.Alive(f.OwnerSeat) || facts.Finished) { Complete(f); return; }
-            if (r.Stage == CaoXianStage.Pile)
-            {
-                var piles = facts.Piles(f.OwnerSeat, f.SkillInstanceId).Where(p => facts.PileCards(p).Count >= r.X).ToArray(); if (piles.Length == 0) { Complete(f); return; }
-                if (piles is [var pile]) { frames.ReplaceTop(f with { CaoXian = r with { Pile = pile, Stage = CaoXianStage.RemoveCards } }); continue; }
-            }
-            if (r.Stage is CaoXianStage.StoreCards or CaoXianStage.EffectCards or CaoXianStage.AdjustCards)
-            {
-                if (r.Cards.Count >= r.Required || AvailableCards(f).Count == 0)
-                {
-                    if (r.Cards.Count == 0) { Complete(f); return; }
-                    StartMove(f, r.Stage == CaoXianStage.AdjustCards ? CaoXianStage.AdjustChildren : CaoXianStage.EffectChildren); return;
-                }
-            }
-            if (r.Stage == CaoXianStage.RemoveCards && AvailableCards(f).Count == 0) { if (r.Cards.Count < r.X) { Complete(f); return; } StartMove(f, CaoXianStage.RemoveChildren); return; }
-            Publish(f); return;
+            frames.ReplaceTop(f with { CaoXian = r with { Pile = pile, Stage = CaoXianStage.RemoveCards } });
+            return ProgramStageResult.Continue;
         }
+        Publish(f); return ProgramStageResult.Yield;
+    }
+    private ProgramStageResult ChooseCards(ProgramSkillFrame f, CaoXianReceipt r)
+    {
+        if (r.Cards.Count >= r.Required || AvailableCards(f).Count == 0)
+        {
+            if (r.Cards.Count == 0) Complete(f);
+            else StartMove(f, r.Stage == CaoXianStage.AdjustCards ? CaoXianStage.AdjustChildren : CaoXianStage.EffectChildren);
+        }
+        else Publish(f);
+        return ProgramStageResult.Yield;
+    }
+    private ProgramStageResult ChooseRemovedCards(ProgramSkillFrame f, CaoXianReceipt r)
+    {
+        if (AvailableCards(f).Count == 0)
+        {
+            if (r.Cards.Count < r.X) Complete(f);
+            else StartMove(f, CaoXianStage.RemoveChildren);
+        }
+        else Publish(f);
+        return ProgramStageResult.Yield;
+    }
+    private static class Stages
+    {
+        internal static readonly StagePlan Plan = new(
+            read: static f => f.CaoXian,
+            stage: static r => r.Stage,
+            nodes:
+            [
+                StageNode.Run(CaoXianStage.Pile, static (runtime, f, r) => runtime.ChoosePile(f, r)),
+                StageNode.Run(CaoXianStage.StoreCards, static (runtime, f, r) => runtime.ChooseCards(f, r)),
+                StageNode.Run(CaoXianStage.RemoveCards, static (runtime, f, r) => runtime.ChooseRemovedCards(f, r)),
+                StageNode.Prompt(CaoXianStage.OptionTarget, static (runtime, f, _) => runtime.Publish(f)),
+                StageNode.Run(CaoXianStage.EffectCards, static (runtime, f, r) => runtime.ChooseCards(f, r)),
+                StageNode.Run(CaoXianStage.AdjustCards, static (runtime, f, r) => runtime.ChooseCards(f, r)),
+                StageNode.AwaitExternalReturn(CaoXianStage.Drawing),
+                StageNode.ChildrenTo(CaoXianStage.RemoveChildren, CaoXianStage.OptionTarget,
+                    update: static r => r with { Cards = [] }, clearMovement: true,
+                    completeWhen: static (runtime, f, _) => !runtime.Facts.Alive(f.OwnerSeat) || runtime.Facts.Finished),
+                StageNode.ChildrenComplete(CaoXianStage.EffectChildren, clearMovement: true),
+                StageNode.ChildrenComplete(CaoXianStage.AdjustChildren, clearMovement: true),
+                StageNode.ChildrenComplete(CaoXianStage.DrawChildren, clearMovement: true)
+            ],
+            stopBeforeStage: static (runtime, f, r) =>
+            {
+                // Paid children and outstanding native draws finish before this guard.
+                if (r.Stage is CaoXianStage.Drawing or CaoXianStage.RemoveChildren or CaoXianStage.EffectChildren or CaoXianStage.AdjustChildren or CaoXianStage.DrawChildren) return false;
+                if (!runtime.Facts.Alive(f.OwnerSeat) || runtime.Facts.Finished) { runtime.Complete(f); return true; }
+                return false;
+            },
+            withStage: static (f, r, next) => f with { CaoXian = r with { Stage = next } },
+            drain: static (runtime, f, _) => runtime.Native.Drain(f),
+            complete: static (runtime, f) => runtime.Complete(f));
     }
     [ProgramNativeDrawReturn(SkillProgramEffectOp.AdjustCaoXianLingxi)] private void DrawReturned(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
