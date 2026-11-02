@@ -9,7 +9,6 @@ internal sealed partial class CoreGameEngineTurnRedSlashBenefitsEntries
     internal void GrantTurnRedSlashBenefits(ProgramSkillFrame frame) => _resolve().GrantTurnRedSlashBenefits(frame);
     internal bool HasTurnRedSlashPolicy(int actor, CardKind kind, Suit? suit) => _resolve().HasTurnRedSlashPolicy(actor, kind, suit);
     internal bool HasTurnRedSlashPolicyForColor(int actor, CardKind kind, bool? color) => _resolve().HasTurnRedSlashPolicyForColor(actor, kind, color);
-    internal bool IsRedSlashProviderPaymentLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind, IReadOnlyList<Card> cards, bool isTrueZhangba = false) => _resolve().IsRedSlashProviderPaymentLegal(pending, kind, cards, isTrueZhangba);
     internal bool? PhysicalGroupColor(CharacterState owner, IReadOnlyList<Card> cards) => _resolve().PhysicalGroupColor(owner, cards);
     internal bool CapturesActionColor { get => _resolve().CapturesActionColor; }
     internal bool HasTurnRedSlashCapability { get => _resolve().HasTurnRedSlashCapability; }

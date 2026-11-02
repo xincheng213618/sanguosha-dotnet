@@ -37,27 +37,6 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
     internal bool HasWuyouPotentialSlash(CharacterState actor) => HasWuyouCapability && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Any(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && ActiveWuyouLease(actor.Seat, card.Id)is { } lease && (CoreNativeCardClassificationsRuntime.IsSlashCard(lease.EffectiveKind) || CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, false).Count != 0)));
     internal bool HasPublicWuyouContributionPotential(CharacterState actor) => HasWuyouCapability && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuyouStartedEvent>().Any(started => started.DonorSeat == actor.Seat);
     internal bool HasPotentialWuyouFactionSlash(CharacterState actor, CardKind kind) => HasWuyouCapability && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(actor, CardKind.Slash)is { } policy && _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actor.Seat, policy.FactionId).Any(seat => HasPublicWuyouContributionPotential(_coreMatchParticipantsPlayersAccess._players[seat]));
-    internal bool IsWuyouFactionPaymentLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind, IReadOnlyList<Card> cards, bool isTrueZhangba = false)
-    {
-        if (!HasWuyouCapability || !CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(pending) || pending.TargetSeat is not { } targetSeat || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !HasPotentialWuyouFactionSlash(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat], kind))
-            return true;
-        var providerSeat = pending.CurrentCandidateSeat;
-        var actor = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
-        var provider = _coreMatchParticipantsPlayersAccess._players[providerSeat];
-        var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
-        var ids = cards.Select(card => card.Id).ToArray();
-        var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards);
-        var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, cards);
-        var rank = _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(actor, provider, cards, isTrueZhangba, kind);
-        if (pending.IsBorrowedSwordUse)
-            return _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, kind, physicalSuit: suit, allowAnyPhysicalSuit: false, effectiveColor: color, effectiveRank: rank, physicalCardIds: ids);
-        if (pending.IsQinglongCrescentBladeUse)
-            return _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, kind, color, allowAnyColor: false, physicalSuit: suit, effectiveRank: rank, physicalCardIds: ids);
-        if (pending.IsAssistedProgramUse)
-            return _coreAssistedFactionSlashOperations.IsAssistedProvidedSlashTarget(actor.Seat, targetSeat, kind, rank, allowPotentialRank: false, physicalCardIds: ids);
-        return _coreNativeEquipmentAndFactionQueriesOperations.CanUseProvidedSlashTarget(actor, target, kind, physicalSuit: suit, allowAnyPhysicalSuit: false, effectiveColor: color, effectiveRank: rank, physicalCardIds: ids);
-    }
-
     internal void IssueWuyouUse(CardUseFrame use)
     {
         if (!HasWuyouCapability || use.Action is not { Type: CardActionType.Use, PhysicalCards: [var material] } action || material.From.Zone != CardZoneKind.Hand || material.From.OwnerSeat != action.ProviderSeat)

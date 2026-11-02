@@ -13,7 +13,6 @@ internal sealed partial class CoreGameEngineFinalTargetSlashEntries
     internal bool HasFinalTargetSlashHpDamage(GameEngine.IDamageAttempt attack) => _resolve().HasFinalTargetSlashHpDamage(attack);
     internal bool HasPotentialRankSlashRange(CharacterState actor, CharacterState target, CardKind kind) => _resolve().HasPotentialRankSlashRange(actor, target, kind);
     internal bool HasRankSlashRange(CharacterState actor, CardKind kind) => _resolve().HasRankSlashRange(actor, kind);
-    internal bool IsSpecificRankProviderPaymentLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind, IReadOnlyList<Card> cards, bool isTrueZhangba = false) => _resolve().IsSpecificRankProviderPaymentLegal(pending, kind, cards, isTrueZhangba);
     internal bool IsWithinSpecificSlashRange(CharacterState actor, CharacterState target, CardKind kind, int? rank, long? existingUseFrameId = default, int? excludedEquipmentId = default, EquipmentSlot? excludedEquipmentSlot = default) => _resolve().IsWithinSpecificSlashRange(actor, target, kind, rank, existingUseFrameId, excludedEquipmentId, excludedEquipmentSlot);
     internal void IssueFinalTargetSlashReceipt(ProgramSkillFrame frame, SkillProgramEffect effect) => _resolve().IssueFinalTargetSlashReceipt(frame, effect);
     internal int? ProvidedSpecificSlashRank(CharacterState actor, CharacterState provider, IReadOnlyList<Card> cards, bool isTrueZhangba, CardKind kind = (CardKind)0) => _resolve().ProvidedSpecificSlashRank(actor, provider, cards, isTrueZhangba, kind);

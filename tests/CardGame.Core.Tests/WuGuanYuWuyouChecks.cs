@@ -1,9 +1,11 @@
 using System.Collections;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 namespace CardGame.Core.Tests;
 
@@ -50,6 +52,7 @@ internal static class WuGuanYuWuyouChecks
         provider.Need(offered.Length == 1 && offered[0].Cards.SequenceEqual([id]) && offered[0].Parameters.GetValueOrDefault("conversion-skill-id") == WySkill &&
             provider.V().Hand.Count >= 2 && provider.V().Hand.All(card => card.Kind == CardKind.Slash),
             "Only the exact live named entity can pay this distant true requester Use; other real Slashes cannot borrow its material-specific range permission.");
+        ProvidedSlashPaymentsUseOnlyActualMaterials(provider, id, ordinary, caller);
         provider.RejectChoice(new ChoiceId(offered[0].Id.Value.Replace("card-" + id, "card-" + ordinary, StringComparison.Ordinal))); provider.Private(0); provider.Cold();
         provider.Answer(c => c.Id == offered[0].Id); provider.Reach(() => provider.Hold("supplied")); provider.Cold();
         var supplied = provider.E<WuyouUseAcceptedEvent>().Single().Receipt;
@@ -88,6 +91,41 @@ internal static class WuGuanYuWuyouChecks
             combo.E<DamageAppliedEvent>().Any(e => e.SourceSeat == 0 && e.TargetSeat == 2 && e.Amount == 1 && e.Nature == DamageNature.Fire) &&
             !combo.G.GetHumanLegalActions().Any(a => a.Kind == LegalActionKind.Slash || a.ConversionSource is { SkillId: "wumiao:juewu", BindingId: "rank-two-fireSlash" }),
             "The combined native Use finishes and deals real fire damage once; Juewu's name quota and ordinary Slash debits remain spent after the physical naming lease leaves Hand."); combo.Cold();
+    }
+
+    private static void ProvidedSlashPaymentsUseOnlyActualMaterials(WyScenario scenario, int namedCardId, int ordinaryCardId, int actorSeat)
+    {
+        var game = scenario.G;
+        var pending = game.GetRuntimeModule<CoreNativeCardContinuationCursorsRuntime>().ActiveFactionCardRequest
+            ?? throw new InvalidOperationException("The material check requires the real active faction request.");
+        var payments = game.GetRuntimeModule<ProvidedSlashPaymentTargetsRuntime>();
+        var cards = game.GetRuntimeModule<CoreGameEngineCardAttackStateRuntime>();
+        var named = cards.GetAttackCard(namedCardId);
+        var ordinary = cards.GetAttackCard(ordinaryCardId);
+        var players = (IReadOnlyList<CharacterState>)FixtureRuntimeAccess.Engine
+            .GetField("_players", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        scenario.Need(pending.OwnerSeat == actorSeat && actorSeat != 0 && pending.CurrentCandidateSeat == 0 &&
+            pending.TargetSeat is not null,
+            "The shared material query uses a genuine foreign actor and human provider, not the provider as the actor.");
+        var actor = players[actorSeat];
+        var target = players[pending.TargetSeat!.Value];
+        var preview = game.GetRuntimeModule<CoreNativeEquipmentAndFactionQueriesRuntime>();
+        var revision = game.Revision;
+        var events = game.Events.Count;
+        var zones = JsonSerializer.Serialize(game.CreateCardZoneDiagnostics());
+        scenario.Need(preview.CanUseProvidedSlashTarget(actor, target, CardKind.Slash),
+            "The target preview may use the provider's potential Wuyou material before a payment is selected.");
+        scenario.Need(payments.CanUse(pending, CardKind.Slash, [named]) &&
+            payments.CanSupply(pending, CardKind.Slash, [named]) &&
+            !payments.CanUse(pending, CardKind.Slash, [ordinary]) &&
+            !payments.CanSupply(pending, CardKind.Slash, [ordinary]),
+            "After selection, only the actual named provider entity grants this actor's distant Slash permission.");
+        scenario.Need(!payments.CanUse(pending, CardKind.Slash, []) &&
+            !payments.CanSupply(pending, CardKind.Slash, []),
+            "A determined empty payment cannot borrow a potential named entity's range privilege.");
+        scenario.Need(game.Revision == revision && game.Events.Count == events &&
+            JsonSerializer.Serialize(game.CreateCardZoneDiagnostics()) == zones,
+            "Payment-target queries do not pay cards, publish facts or advance the real request.");
     }
 
     private sealed class WyScenario(string scene, GameEngine game, ContentRegistry registry)

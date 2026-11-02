@@ -21,5 +21,6 @@ internal sealed partial class CoreNativeFactionSlashEntries
     internal void ResolveFactionSlashProgramMultiCardCandidateResponse(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, ProgramMultiCardViewAsSelection selection) => _resolve().ResolveFactionSlashProgramMultiCardCandidateResponse(pending, provider, selection);
     internal void ResolveFactionSlashZhangbaCandidateResponse(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> pair) => _resolve().ResolveFactionSlashZhangbaCandidateResponse(pending, provider, pair);
     internal void ResolveFactionSlashZhuqueFanChoice(NativeOwners.FactionCardRequestHandle pending, bool convertToFireSlash) => _resolve().ResolveFactionSlashZhuqueFanChoice(pending, convertToFireSlash);
+    internal bool CanConvertFactionSlashToFire(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind baseEffectiveKind) => _resolve().CanConvertFactionSlashToFire(pending, provider, physicalCards, baseEffectiveKind);
     internal bool TryBeginFactionSlashZhuqueFanChoice(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind baseEffectiveKind) => _resolve().TryBeginFactionSlashZhuqueFanChoice(pending, provider, physicalCards, baseEffectiveKind);
 }

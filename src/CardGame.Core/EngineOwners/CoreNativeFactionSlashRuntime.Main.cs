@@ -537,7 +537,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         var selectedSlash = physicalCards.FirstOrDefault() ?? throw new InvalidOperationException("An active FactionSlash Slash must retain a physical card.");
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[pending.TargetSeat ?? throw new InvalidOperationException("An active FactionSlash use has no target.")];
-        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.IsProgramSkillUse || (pending.IsAssistedProgramUse ? !_coreAssistedFactionSlashOperations.IsAssistedProvidedSlashTarget(owner.Seat, target.Seat, effectiveKind, _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), allowPotentialRank: false, physicalCardIds: physicalCards.Select(c => c.Id).ToArray()) : !_coreNativeEquipmentAndFactionQueriesOperations.CanUseProvidedSlashTarget(owner, target, effectiveKind, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, physicalCards), allowAnyPhysicalSuit: false, effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), physicalCardIds: physicalCards.Select(c => c.Id).ToArray())))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !pending.IsProgramSkillUse || !_providedSlashPaymentTargets.CanUse(pending, effectiveKind, physicalCards, conversionSource is null && physicalCards.Count == 2))
         {
             throw new InvalidOperationException("The active FactionSlash target is no longer legal.");
         }
@@ -577,7 +577,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         var borrowedSword = pending.BorrowedSword ?? throw new InvalidOperationException("A Borrowed Sword FactionSlash use has no parent resolution.");
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[pending.TargetSeat ?? throw new InvalidOperationException("A Borrowed Sword FactionSlash use has no target.")];
-        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, borrowedSword) || !pending.IsBorrowedSwordUse || !_coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(owner, target, effectiveKind, physicalSuit: _coreCurrentTurnShownCardBenefitsOperations.HasSlashUseDistanceBySuit(owner, effectiveKind, Suit.Diamond) ? _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, physicalCards) : null, allowAnyPhysicalSuit: false, effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), physicalCardIds: _coreProgramCardPoliciesOperations.HasCardPolicy(owner, SkillProgramCardPolicyKind.RoundGainedOtherSourceUse) ? physicalCards.Select(c => c.Id).ToArray() : null))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, borrowedSword) || !pending.IsBorrowedSwordUse || !_providedSlashPaymentTargets.CanUse(pending, effectiveKind, physicalCards, conversionSource is null && physicalCards.Count == 2))
         {
             throw new InvalidOperationException("The Borrowed Sword FactionSlash target is no longer legal.");
         }
@@ -607,7 +607,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         var qinglong = pending.QinglongCrescentBlade ?? throw new InvalidOperationException("A Qinglong Crescent Blade FactionSlash use has no parent resolution.");
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[pending.TargetSeat ?? throw new InvalidOperationException("A Qinglong Crescent Blade FactionSlash use has no target.")];
-        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, qinglong) || !pending.IsQinglongCrescentBladeUse || !_coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(owner, target, effectiveKind, _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, physicalCards), allowAnyColor: false, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, conversionSource is null && physicalCards.Count == 2, effectiveKind), physicalCardIds: physicalCards.Select(c => c.Id).ToArray()))
+        if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest, pending) || !CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade, qinglong) || !pending.IsQinglongCrescentBladeUse || !_providedSlashPaymentTargets.CanUse(pending, effectiveKind, physicalCards, conversionSource is null && physicalCards.Count == 2))
         {
             throw new InvalidOperationException("The Qinglong Crescent Blade FactionSlash target is no longer legal.");
         }
@@ -632,49 +632,34 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(providerReward, provider.Seat);
     }
 
+    internal bool CanConvertFactionSlashToFire(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind baseEffectiveKind)
+    {
+        var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
+        return !((!pending.IsProgramSkillUse && !pending.IsBorrowedSwordUse) || baseEffectiveKind != CardKind.Slash || (physicalCards.Count == 1 && physicalCards[0].Kind != CardKind.Slash && !_characterGuanYuWumiaoOperations.IsWuyouIdentityKind(provider, physicalCards[0], CardKind.Slash) && !_coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(provider, physicalCards[0])) || !_coreNativeTargetLegalityOperations.HasZhuqueFan(owner));
+    }
+
     internal bool TryBeginFactionSlashZhuqueFanChoice(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind baseEffectiveKind)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
-        if ((!pending.IsProgramSkillUse && !pending.IsBorrowedSwordUse) || baseEffectiveKind != CardKind.Slash || (physicalCards.Count == 1 && physicalCards[0].Kind != CardKind.Slash && !_characterGuanYuWumiaoOperations.IsWuyouIdentityKind(provider, physicalCards[0], CardKind.Slash) && !_coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(provider, physicalCards[0])) || !_coreNativeTargetLegalityOperations.HasZhuqueFan(owner))
-        {
+        if (!CanConvertFactionSlashToFire(pending, provider, physicalCards, baseEffectiveKind))
             return false;
-        }
 
-        if (_characterCuiYanOlOperations.HasCuiYanCapability && physicalCards.Count == 1)
+        var conversion = _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion;
+        var normalAllowed = _providedSlashPaymentTargets.CanUse(pending, CardKind.Slash, physicalCards, physicalCards.Count == 2) &&
+            !_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, CardKind.Slash, physicalCards, conversion);
+        var fireAllowed = _providedSlashPaymentTargets.CanUse(pending, CardKind.FireSlash, physicalCards, physicalCards.Count == 2) &&
+            !_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, CardKind.FireSlash, physicalCards, conversion);
+        if (!normalAllowed || !fireAllowed)
         {
-            var conversion = _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion;
-            var normalAllowed = !_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, CardKind.Slash, physicalCards, conversion);
-            var fireAllowed = !_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, CardKind.FireSlash, physicalCards, conversion);
-            if (pending.IsAssistedProgramUse && pending.TargetSeat is { } exactTarget)
-            {
-                normalAllowed &= _coreAssistedFactionSlashOperations.IsAssistedProvidedSlashTarget(owner.Seat, exactTarget, CardKind.Slash, _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, false), allowPotentialRank: false, physicalCardIds: physicalCards.Select(c => c.Id).ToArray());
-                fireAllowed &= _coreAssistedFactionSlashOperations.IsAssistedProvidedSlashTarget(owner.Seat, exactTarget, CardKind.FireSlash, _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, false, CardKind.FireSlash), allowPotentialRank: false, physicalCardIds: physicalCards.Select(c => c.Id).ToArray());
-            }
-
-            if (!normalAllowed || !fireAllowed)
-            {
-                if (!normalAllowed && !fireAllowed)
-                    throw new InvalidOperationException("The supplied Slash has no legal native suit after the requester's fan conversion.");
-                _coreNativePromptBoundaryOperations.ClearPendingDecision();
-                var kind = fireAllowed ? CardKind.FireSlash : CardKind.Slash;
-                if (pending.IsBorrowedSwordUse)
-                    BeginBorrowedSwordFactionSlashSlash(pending, provider, physicalCards, kind, usesZhuqueFan: fireAllowed);
-                else
-                    BeginProvidedFactionSlashSlash(pending, provider, physicalCards, kind, usesZhuqueFan: fireAllowed);
-                return true;
-            }
-        }
-
-        if (pending.IsAssistedProgramUse && pending.TargetSeat is { } assistedTarget)
-        {
-            var normalAllowed = _coreAssistedFactionSlashOperations.IsAssistedProvidedSlashTarget(owner.Seat, assistedTarget, CardKind.Slash, _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, physicalCards.Count == 2), allowPotentialRank: false, physicalCardIds: physicalCards.Select(c => c.Id).ToArray());
-            var fireAllowed = _coreAssistedFactionSlashOperations.IsAssistedProvidedSlashTarget(owner.Seat, assistedTarget, CardKind.FireSlash, _coreFinalTargetSlashOperations.ProvidedSpecificSlashRank(owner, provider, physicalCards, physicalCards.Count == 2, CardKind.FireSlash), allowPotentialRank: false, physicalCardIds: physicalCards.Select(c => c.Id).ToArray());
-            if (normalAllowed != fireAllowed)
-            {
-                _coreNativePromptBoundaryOperations.ClearPendingDecision();
-                BeginProvidedFactionSlashSlash(pending, provider, physicalCards, fireAllowed ? CardKind.FireSlash : CardKind.Slash, usesZhuqueFan: fireAllowed);
-                return true;
-            }
+            if (!normalAllowed && !fireAllowed)
+                throw new InvalidOperationException("The supplied Slash has no legal native kind after the requester's fan conversion.");
+            _coreNativePromptBoundaryOperations.ClearPendingDecision();
+            var kind = fireAllowed ? CardKind.FireSlash : CardKind.Slash;
+            if (pending.IsBorrowedSwordUse)
+                BeginBorrowedSwordFactionSlashSlash(pending, provider, physicalCards, kind, usesZhuqueFan: fireAllowed);
+            else
+                BeginProvidedFactionSlashSlash(pending, provider, physicalCards, kind, usesZhuqueFan: fireAllowed);
+            return true;
         }
 
         if (!pending.AwaitingProviders || pending.AwaitingZhuqueFanChoice || physicalCards.Count == 0 || provider.Seat != pending.CurrentCandidateSeat)

@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static class Batch49NativeSupplyChecks
 {
@@ -99,6 +100,7 @@ internal static class Batch49NativeSupplyChecks
             _ = Cold(g, registry);
         }
         SayingConvertedFactionSupplyCold();
+        AssistedFactionFanFallbackUsesTheFinalKindCold();
     }
 
     private static void SayingConvertedFactionSupplyCold()
@@ -153,6 +155,63 @@ internal static class Batch49NativeSupplyChecks
         _ = Cold(g, registry);
     }
 
+    private static void AssistedFactionFanFallbackUsesTheFinalKindCold()
+    {
+        Scene = "faction-fan";
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(Scene));
+        var g = GameEngine.CreateStandard(new GameOptions { Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord,
+            ModeId = Mode, UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 8 }, registry);
+        Accept(g, new StartGameCommand());
+        Reach(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.SelectGeneral });
+        Accept(g, new SelectGeneralCommand(0, Owner, g.Revision, P(g)!.PromptId));
+        Reach(g, () => P(g) is { PlayerSeat: 0 } p && p.SkillPrompt?.SkillId == "ol:saying" &&
+            p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
+        var actor = g.CreateSnapshot(0).Players.Single(p => p.GeneralId == "fixture:b49-peer-1").Seat;
+        Need(actor != 0 && g.CreateSnapshot(actor).Players[actor].Equipment.Any(c => c.Kind == CardKind.ZhuqueFan),
+            "The actual Supplier general legally equips the generated Fan through its GameStarting program: " +
+            JsonSerializer.Serialize(new { Players = g.CreateSnapshot(0, revealAll: true).Players.Select(p => new { p.Seat, p.GeneralId, Equipment = p.Equipment.Select(c => c.Kind) }),
+                Started = E<ProgramSkillStartedEvent>(g).Select(e => new { e.OwnerSeat, e.SkillId }) }));
+        Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
+        Reach(g, () => Own(g)?.SunYuan?.Stage == SunYuanStage.Target);
+        Answer(g, c => c.Targets.SequenceEqual([actor]));
+        Reach(g, () => Own(g)?.SunYuan?.Stage == SunYuanStage.ObtainCard);
+        Answer(g, c => c.Parameters.GetValueOrDefault("branch") == "card" && c.Parameters.GetValueOrDefault("source-zone") == nameof(CardZoneKind.Hand));
+        var cursors = g.GetRuntimeModule<CoreNativeCardContinuationCursorsRuntime>();
+        Reach(g, () => cursors.ActiveFactionCardRequest is { IsAssistedProgramUse: true, AwaitingProviders: true } &&
+            P(g) is { Kind: DecisionKind.RespondSlash });
+        var request = cursors.ActiveFactionCardRequest!;
+        var provider = request.CurrentCandidateSeat;
+        var materialId = g.CreateSnapshot(provider).Players[provider].Hand.First(c => c.Kind == CardKind.Slash).Id;
+        var material = g.GetRuntimeModule<CoreGameEngineCardAttackStateRuntime>().GetAttackCard(materialId);
+        var payments = g.GetRuntimeModule<ProvidedSlashPaymentTargetsRuntime>();
+        Need(request.OwnerSeat == actor && request.TargetSeat == 0 && provider != actor &&
+            !payments.CanUse(request, CardKind.Slash, [material]) &&
+            payments.CanUse(request, CardKind.FireSlash, [material]) && payments.CanSupply(request, CardKind.Slash, [material]),
+            "A real assisted request retains a supplied normal Slash only through its actor's legal Fire Slash fallback.");
+        var frameId = Own(g)!.Id;
+        g = Cold(g, registry);
+        Reach(g, () => P(g) is { PlayerSeat: 0 } p && p.SkillPrompt?.SkillId == Watch);
+        var issued = E<SayingSlashIssuedEvent>(g).Single(e => e.FrameId == frameId);
+        var use = g.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Id == issued.UseId);
+        Need(use.CardKind == CardKind.FireSlash && use.Action is { } action && action.ActorSeat == actor &&
+            action.ProviderSeat == provider && action.PhysicalCards.Select(c => c.CardId).SequenceEqual([materialId]) &&
+            E<ZhuqueFanConvertedEvent>(g).Count(e => e.SourceSeat == actor && e.PhysicalCardIds.SequenceEqual([materialId])) == 1 &&
+            !E<DamageAppliedEvent>(g).Any(e => e.SourceSeat == actor && e.TargetSeat == 0),
+            "Fallback issues one real Fire Slash with the original provider entity before its native damage child.");
+        var hp = g.CreateSnapshot(0).Players[0].Hp;
+        g = Cold(g, registry);
+        Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+        Reach(g, () => E<SunYuanCompletedEvent>(g).Any(e => e.FrameId == frameId));
+        Need(E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == issued.UseId && e.CardKind == CardKind.FireSlash) == 1 &&
+            E<SayingSlashReturnedEvent>(g).Count(e => e.FrameId == frameId && e.UseId == issued.UseId) == 1 &&
+            g.CardMovements.Count(m => m.CardId == materialId && m.From == CardLocation.Hand(provider) &&
+                m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use) == 1 &&
+            E<DamageRequestedEvent>(g).Any(e => e.SourceSeat == actor && e.TargetSeat == 0 && e.Nature == DamageNature.Fire) &&
+            g.CreateSnapshot(0).Players[0].Hp == hp - 1,
+            "Cold recovery finishes the final Fire Slash, pays its provider once and returns to the original assisted parent once.");
+        _ = Cold(g, registry);
+    }
+
     private static ProgramSkillFrame? Own(GameEngine g) => g.ResolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.SunYuan is not null);
     private static PendingDecision? P(GameEngine g) => Enumerable.Range(0, 4).Select(s => g.CreateSnapshot(s).PendingDecision).FirstOrDefault(p => p is not null);
     private static T[] E<T>(GameEngine g) where T : IGameEvent => g.Events.Select(e => e.Payload).OfType<T>().ToArray();
@@ -190,6 +249,7 @@ internal static class Batch49NativeSupplyChecks
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, "ol:sun-yuan");
+            var factionScene = scene is "faction-converted" or "faction-fan";
             if (scene == "huanpei") CharacterFixtureContent.Register(b, "ol:huan-shu-jun");
             static JsonNode N(string text) => JsonNode.Parse(text)!;
             var supplier = N($$"""
@@ -197,11 +257,12 @@ internal static class Batch49NativeSupplyChecks
                 """);
             var rule = supplier["viewAs"]![0]!;
             if (scene == "huanpei") supplier["viewAs"] = new JsonArray();
-            else if (scene == "faction-converted")
+            else if (factionScene)
             {
                 supplier["viewAs"] = new JsonArray();
                 supplier["cardPolicies"] = N("""[{"id":"actual-request","kind":"factionResponseRequest","requiredCardKinds":["slash"],"factionId":"shu"}]""");
                 supplier["modifiers"] = N("""[{"id":"native-request-range","query":"attackRange","operation":"add","value":3,"priority":0}]""");
+                if (scene == "faction-fan") supplier["triggers"] = N($$"""[{"id":"equip-real-fan","window":"gameStarting","subject":"owner","optional":false,"effects":[{"op":"offerGeneratedEquipment","target":"owner","amount":1,"source":"{{BuiltInEquipmentContent.ForgedSource}}","resultBind":"native-fan","templates":[{"kind":"zhuqueFan","suit":"spade","rank":5}]},{"op":"placeBoundEquipment","target":"owner","sourceBind":"native-fan"}]}]""");
             }
             else if (scene == "round") rule["roundOnceCardlessBasic"] = N("""{"usageGroup":"b49-native-round","usesPerRound":1}""");
             else
@@ -220,23 +281,24 @@ internal static class Batch49NativeSupplyChecks
                 N($$"""{"id":"{{Watch}}","revision":1,"triggers":[{"id":"true-damage-child","window":"beforeDamageApplied","subject":"damageTarget","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"child","options":[{"id":"continue"}]}]}]}"""),
                 N($$"""{"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}"""));
             if (scene == "huanpei") defs.RemoveAt(0);
-            if (scene == "faction-converted")
+            if (factionScene)
             {
                 defs.Add(N($$"""{"id":"{{Provider}}","revision":1,"viewAs":[{"id":"crossbow-slash","inputKinds":["crossbow"],"inputSuits":[],"sourceZones":["hand"],"outputKind":"slash","forPlay":true,"forResponse":false}]}"""));
                 defs[2]!["triggers"]!.AsArray().Add(N("""{"id":"actual-native-supply-child","window":"cardSupplyCompleted","ownerRelation":"actor","cardKinds":["slash","fireSlash","thunderSlash"],"optional":false,"effects":[{"op":"draw","target":"owner","amount":1}]}"""));
             }
+            if (scene == "faction-fan") defs.Add(N("""{"id":"fixture:b49-normal-only","revision":1,"cardPolicies":[{"id":"normal-only","kind":"prohibitTarget","cardKinds":["slash"]}]}"""));
             var labels = defs.Select(n => n!["id"]!.GetValue<string>()).ToDictionary(id => id, id => new { name = id, description = "真实飒影供应边界", optionLabels = id == Watch ? new Dictionary<string, string> { ["continue"] = "继续原生伤害" } : new Dictionary<string, string>() });
             var catalog = SkillProgramCatalog.Load(new JsonObject { ["schemaVersion"] = SkillProgramCatalog.RulesSchemaVersion, ["skills"] = defs }.ToJsonString(), JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, id, "真实原生供应") { Program = program, ProgramPresentation = catalog.Presentations[id] });
             const string pick = "fixture:b49-pick";
             b.AddSkill(new(pick, "本人", "固定公开选择") { SelectionWeights = Enum.GetValues<Role>().ToDictionary(role => role, _ => -100000000d) });
-            b.AddGeneral(new(Owner, "真实飒影本人", "supporter", pick, "wu", 12, ["ol:saying", Watch], GeneralGender.Female));
+            b.AddGeneral(new(Owner, "真实飒影本人", "supporter", pick, "wu", 12, ["ol:saying", Watch, .. scene == "faction-fan" ? new[] { "fixture:b49-normal-only" } : Array.Empty<string>()], GeneralGender.Female));
             var peers = Enumerable.Range(1, 3).Select(i => "fixture:b49-peer-" + i).ToArray();
-            foreach (var peer in peers) b.AddGeneral(new(peer, "真实供给角色", "supporter", Quiet, scene == "faction-converted" ? "shu" : "wei", 12,
-                [scene == "huanpei" ? "ol:huanpei" : scene == "faction-converted" && peer != peers[0] ? Provider : Supplier], GeneralGender.Male));
-            b.AddCard(new("fixture:b49-card", "诸葛连弩", "装备牌", "未转换的真实实体", CardKind.Crossbow));
+            foreach (var peer in peers) b.AddGeneral(new(peer, "真实供给角色", "supporter", Quiet, factionScene ? "shu" : "wei", 12,
+                [scene == "huanpei" ? "ol:huanpei" : factionScene && peer != peers[0] ? Provider : Supplier], GeneralGender.Male));
+            b.AddCard(new("fixture:b49-card", scene == "faction-fan" ? "真实供给杀" : "诸葛连弩", scene == "faction-fan" ? "基本牌" : "装备牌", "未转换的真实实体", scene == "faction-fan" ? CardKind.Slash : CardKind.Crossbow));
             b.AddDeck(new("fixture:b49-deck", "固定同质真实牌堆", 4, 2, []) { PhysicalCards = Enumerable.Range(0, 72).Select(i => new ContentDeckPhysicalCard("fixture:b49-card", Suit.Club, i % 13 + 1)).ToArray() });
-            b.AddMode(new(Mode, "真实供应共享机制", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [scene == "faction-converted" ? nameof(Role.Renegade) : nameof(Role.Rebel)] = 3 }, "fixture:b49-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. peers]));
+            b.AddMode(new(Mode, "真实供应共享机制", 4, 4, new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [factionScene ? nameof(Role.Renegade) : nameof(Role.Rebel)] = 3 }, "fixture:b49-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. peers]));
         }
     }
 }

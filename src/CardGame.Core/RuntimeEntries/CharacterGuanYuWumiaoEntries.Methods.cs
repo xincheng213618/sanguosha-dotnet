@@ -60,7 +60,6 @@ internal sealed partial class CharacterGuanYuWumiaoEntries
     internal bool IsWumiaoFloodPrimaryDiscardMovement(WumiaoFloodReceipt r, CardMovementRecord movement) => _resolve().IsWumiaoFloodPrimaryDiscardMovement(r, movement);
     internal bool IsWumiaoFloodRecoveryAttempt(CardUseFrame use, RecoveryAttempt attempt) => _resolve().IsWumiaoFloodRecoveryAttempt(use, attempt);
     internal bool IsWumiaoFloodRecoveryReturn(CardUseFrame use, RecoveryReplacementFrame frame) => _resolve().IsWumiaoFloodRecoveryReturn(use, frame);
-    internal bool IsWuyouFactionPaymentLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind, IReadOnlyList<Card> cards, bool isTrueZhangba = false) => _resolve().IsWuyouFactionPaymentLegal(pending, kind, cards, isTrueZhangba);
     internal bool IsWuyouIdentityKind(CharacterState holder, Card card, CardKind kind) => _resolve().IsWuyouIdentityKind(holder, card, kind);
     internal bool IsWuyouIdentityMaterial(CharacterState holder, Card card, CardKind kind, CardConversionSource? source) => _resolve().IsWuyouIdentityMaterial(holder, card, kind, source);
     internal void IssueJuewuUse(CardUseFrame supplied) => _resolve().IssueJuewuUse(supplied);

@@ -245,7 +245,7 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
         if (r.Intent is RequestedDeckBasicIntent.BorrowedSword or RequestedDeckBasicIntent.Qinglong or RequestedDeckBasicIntent.ProgramSlash or RequestedDeckBasicIntent.ProgramNearestSlash or RequestedDeckBasicIntent.AssistedSlash or RequestedDeckBasicIntent.NearestLegalSlash)
             return RequestedDeckBasicTargets(view, card).Length > 0;
         if (r.Intent == RequestedDeckBasicIntent.FactionSlash && _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { } faction)
-            return _coreTurnRedSlashBenefitsOperations.IsRedSlashProviderPaymentLegal(faction, card.Kind, [card]);
+            return _providedSlashPaymentTargets.CanUse(faction, card.Kind, [card]);
         return true;
     }
 

@@ -151,7 +151,9 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         if (n.Intent == ZonghuIntent.Qinglong)
             return _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.ResolutionId == n.OwnerFrameId && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, null, false, Suit.None, 0, []);
         if (n.Intent == ZonghuIntent.FactionSlashUse && _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { } fr)
-            return fr.CurrentCandidateSeat == n.ProviderSeat && fr.CandidateIndex == n.Cursor && _coreTurnRedSlashBenefitsOperations.IsRedSlashProviderPaymentLegal(fr, kind, []) && (fr.IsBorrowedSwordUse ? _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None, false, null, 0, []) : fr.IsQinglongCrescentBladeUse ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, null, false, Suit.None, 0, []) : _coreNativeEquipmentAndFactionQueriesOperations.CanUseProvidedSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None, false, null, 0, []));
+            return fr.OwnerSeat == n.ActorSeat && fr.TargetSeat == target &&
+                fr.CurrentCandidateSeat == n.ProviderSeat && fr.CandidateIndex == n.Cursor &&
+                _providedSlashPaymentTargets.CanUse(fr, kind, []);
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.OwnerFrameId);
         var ignore = false;
         return _coreRuleQueriesOperations.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[target], false, kind, physicalCardIds: []) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], new(0, kind, Suit.None, 0), effectiveKind: kind, ignoreDistance: ignore, noEffectiveRank: true, physicalCardIds: []);

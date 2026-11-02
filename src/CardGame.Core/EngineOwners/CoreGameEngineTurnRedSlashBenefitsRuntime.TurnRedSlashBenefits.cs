@@ -31,24 +31,6 @@ internal sealed partial class CoreGameEngineTurnRedSlashBenefitsRuntime
         return colors.Length == 1 ? colors[0] : null;
     }
 
-    internal bool IsRedSlashProviderPaymentLegal(NativeOwners.FactionCardRequestHandle pending, CardKind kind, IReadOnlyList<Card> cards, bool isTrueZhangba = false)
-    {
-        if (!_characterGuanYuWumiaoOperations.IsWuyouFactionPaymentLegal(pending, kind, cards, isTrueZhangba))
-            return false;
-        if (CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(pending) && _coreFinalTargetSlashOperations.HasRankSlashRange(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat], kind))
-            return _coreFinalTargetSlashOperations.IsSpecificRankProviderPaymentLegal(pending, kind, cards, isTrueZhangba);
-        if (!CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(pending) || pending.IsAssistedProgramUse || pending.TargetSeat is not { } target || (!_turnCardUseEffectsOperations._turnCardUseEffects.HasRedSlashPolicy(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, pending.OwnerSeat) && !_coreCurrentTurnShownCardBenefitsOperations.HasSlashUseDistanceBySuit(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat], kind, Suit.Diamond)))
-            return true;
-        var actor = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
-        var color = PhysicalGroupColor(actor, cards);
-        var suit = _coreCurrentTurnShownCardBenefitsOperations.HasSlashUseDistanceBySuit(actor, kind, Suit.Diamond) ? _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards) : null;
-        if (pending.IsBorrowedSwordUse)
-            return _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, physicalSuit: suit, allowAnyPhysicalSuit: false, effectiveColor: color);
-        if (pending.IsQinglongCrescentBladeUse)
-            return _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, color, allowAnyColor: false, physicalSuit: suit);
-        return _coreNativeEquipmentAndFactionQueriesOperations.CanUseProvidedSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, physicalSuit: suit, allowAnyPhysicalSuit: false, effectiveColor: color);
-    }
-
     void ITurnRedSlashProgramHost.GrantTurnRedSlashBenefits(ProgramSkillFrame frame) => GrantTurnRedSlashBenefits(frame);
     [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 180)]
     [ProgramDistanceRule(ProgramDistanceStage.BorrowedPhysicalSlash, 70)]
