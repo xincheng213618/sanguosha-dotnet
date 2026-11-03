@@ -141,12 +141,19 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     }
     public IReadOnlyList<CardUseHistoryFact>? CardUses(string moment, string view)
     {
-        var point = moment == "window" ? WindowPoint : currentHistoryPoint?.Invoke();
+        var point = moment switch
+        {
+            "window" => WindowPoint,
+            "turnEnd" => (WindowPoint ?? currentHistoryPoint?.Invoke()) is { } scope
+                ? history?.FindTurnEndPoint(scope.ActualTurn, scope.TurnOwnerSeat) : null,
+            _ => currentHistoryPoint?.Invoke()
+        };
         return point is null || history is null ? null : ReadHistory(point,
             view == "observations" ? CardUseHistoryView.Observations :
             view == "confirmations" ? CardUseHistoryView.Confirmations :
             view == "accepted" ? CardUseHistoryView.Accepted :
-            view == "finalizations" ? CardUseHistoryView.Finalizations : CardUseHistoryView.Latest);
+            view == "finalizations" ? CardUseHistoryView.Finalizations :
+            view == "actualUses" ? CardUseHistoryView.ActualUses : CardUseHistoryView.Latest);
     }
     private readonly Dictionary<CardUseHistoryPoint, CardUseHistoryFact?> _currentUses = [];
     public int? PhaseCount(string moment, int actor, ActualDiscardRecoveryPhaseKind? kind, ActualPhaseHistoryOutcome outcome)

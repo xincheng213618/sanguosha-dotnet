@@ -302,10 +302,11 @@ internal static class ProgramExpressions
         if (op == "cardUses")
         {
             Arity(2, 2);
-            if (args[0].ValueKind != JsonValueKind.String || args[0].GetString() is not ("window" or "now") ||
-                args[1].ValueKind != JsonValueKind.String || args[1].GetString() is not ("latest" or "observations" or "confirmations" or "accepted" or "finalizations"))
-                Fail(path, "cardUses requires window or now, and latest, observations, confirmations, accepted or finalizations");
-            return new(op, ProgramExpressionType.FactSet, [], literal: args[0].GetString() == "now" ? 1 : 0, name: args[1].GetString());
+            if (args[0].ValueKind != JsonValueKind.String || args[0].GetString() is not ("window" or "now" or "turnEnd") ||
+                args[1].ValueKind != JsonValueKind.String || args[1].GetString() is not ("latest" or "observations" or "confirmations" or "accepted" or "finalizations" or "actualUses"))
+                Fail(path, "cardUses requires window, now or turnEnd, and latest, observations, confirmations, accepted, finalizations or actualUses");
+            return new(op, ProgramExpressionType.FactSet, [], literal: args[0].GetString() switch
+                { "now" => 1, "turnEnd" => 2, _ => 0 }, name: args[1].GetString());
         }
         if (op is "useActor" or "useDeclarer" or "useTargets" or "useConfirmedTargets" or "usePrimaryTargets" or "useEstablished" or "useIsResponse" or "useDeclared" or "useIsSelfNativeResponse" or "useFinalized" or "useCompleted")
         {
@@ -319,7 +320,7 @@ internal static class ProgramExpressions
             Arity(1, 1);
             return new(op, ProgramExpressionType.Fact, [Arg(0, ProgramExpressionType.FactSet)]);
         }
-        if (op == "takeLast")
+        if (op is "takeFirst" or "takeLast")
         {
             Arity(2, 2);
             return new(op, ProgramExpressionType.FactSet,
@@ -342,13 +343,16 @@ internal static class ProgramExpressions
         }
         if (op == "useKindIs")
         {
-            Arity(2, 2);
+            Arity(2, 3);
+            if (args.Length == 3 && (args[2].ValueKind != JsonValueKind.String || args[2].GetString() != "effective"))
+                Fail(path, "useKindIs stage must be effective");
             if (args[1].ValueKind != JsonValueKind.Array) Fail(path, "useKindIs requires an array of card kinds");
             var kinds = args[1].EnumerateArray().Select((kind, index) =>
                 ParseFactEnum<CardKind>(kind, $"{path}[2][{index}]")).ToArray();
             if (kinds.Distinct().Count() != kinds.Length) Fail(path, "useKindIs contains duplicate card kinds");
             return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.Fact),
-                .. kinds.Select(kind => new ProgramExpression("int", ProgramExpressionType.Int, [], literal: (int)kind))]);
+                .. kinds.Select(kind => new ProgramExpression("int", ProgramExpressionType.Int, [], literal: (int)kind))],
+                name: args.Length == 3 ? "effective" : null);
         }
         if (op == "usePhaseIs")
         {
@@ -498,7 +502,8 @@ internal static class ProgramExpressions
                 return first.NativeUseId is null && second.NativeUseId is null &&
                     first.ActionId is { } firstAction && second.ActionId is { } secondAction ? firstAction == secondAction : null;
             case "useKindIs":
-                return EvaluateFact(e.Args[0], world, it, use, cards)?.DeclaredKind is { } kind
+                var kindFact = EvaluateFact(e.Args[0], world, it, use, cards);
+                return (e.Name == "effective" ? kindFact?.EffectiveKind : kindFact?.DeclaredKind) is { } kind
                     ? ProgramCardKindMatch.Contains(e.Args.Skip(1).Select(arg => (CardKind)arg.Literal).ToArray(), kind) : null;
             case "usePhaseIs":
                 var phaseFact = EvaluateFact(e.Args[0], world, it, use, cards);
@@ -662,10 +667,10 @@ internal static class ProgramExpressions
     private static IReadOnlyList<CardUseHistoryFact>? EvaluateFactSet(ProgramExpression e, IProgramExpressionWorld world,
         int? it, CardUseHistoryFact? use, IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards)
     {
-        if (e.Op == "cardUses") return world.CardUses(e.Literal == 0 ? "window" : "now", e.Name!);
-        if (e.Op == "takeLast") return EvaluateFactSet(e.Args[0], world, it, use, cards) is { } source &&
+        if (e.Op == "cardUses") return world.CardUses(e.Literal switch { 1 => "now", 2 => "turnEnd", _ => "window" }, e.Name!);
+        if (e.Op is "takeFirst" or "takeLast") return EvaluateFactSet(e.Args[0], world, it, use, cards) is { } source &&
                 EvaluateInt(e.Args[1], world, it, use, cards) is { } count
-            ? Array.AsReadOnly(source.TakeLast(Math.Max(0, count)).ToArray()) : null;
+            ? Array.AsReadOnly((e.Op == "takeFirst" ? source.Take(Math.Max(0, count)) : source.TakeLast(Math.Max(0, count))).ToArray()) : null;
         if (e.Op != "filter") throw new InvalidOperationException($"Expression operator '{e.Op}' is not a fact set.");
         if (EvaluateFactSet(e.Args[0], world, it, use, cards) is not { } facts) return null;
         var result = new List<CardUseHistoryFact>();

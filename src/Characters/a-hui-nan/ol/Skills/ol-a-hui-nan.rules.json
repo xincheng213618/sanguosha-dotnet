@@ -1,1 +1,25 @@
-{"skills":[{"id":"ol:jueman","revision":1,"triggers":[{"id":"actual-end-own","window":"afterTurnEnded","subject":"owner","turnOwnerScope":"own","optional":false,"effects":[{"op":"resolveJuemanFirstBasicTurnEnd","target":"owner"}]},{"id":"actual-end-foreign","window":"afterTurnEnded","subject":"owner","turnOwnerScope":"otherLiving","optional":false,"effects":[{"op":"resolveJuemanFirstBasicTurnEnd","target":"owner"}]}]}]}
+{
+  "skills": [{
+    "id": "ol:jueman",
+    "revision": 1,
+    "triggers": [{
+      "id": "actual-end-draw",
+      "window": "afterTurnEnded",
+      "subject": "owner",
+      "turnOwnerScope": "anyLiving",
+      "optional": false,
+      "invocation": { "source": "afterTurnEnded" },
+      "condition": { "kind": "expression", "expr": ["and",[">=",["count",["takeFirst",["filter",["cardUses","turnEnd","actualUses"],["or",["and",["useDeclared","use"],["useKindIs","use",["slash","fireSlash","thunderSlash","coldSlash","dodge","peach","alcohol"]]],["and",["useIsResponse","use"],["useIsSelfNativeResponse","use"],["useKindIs","use",["dodge"],"effective"]]]],2],true],2],["==",["count",["takeFirst",["filter",["cardUses","turnEnd","actualUses"],["or",["and",["useDeclared","use"],["useKindIs","use",["slash","fireSlash","thunderSlash","coldSlash","dodge","peach","alcohol"]]],["and",["useIsResponse","use"],["useIsSelfNativeResponse","use"],["useKindIs","use",["dodge"],"effective"]]]],2],["same",["useActor","use"],"owner"]],1]] },
+      "effects": [{ "op": "draw", "target": "owner", "amount": 1, "awaitMovementTriggers": true }]
+    }, {
+      "id": "actual-end-third-basic",
+      "window": "afterTurnEnded",
+      "subject": "owner",
+      "turnOwnerScope": "anyLiving",
+      "optional": false,
+      "invocation": { "source": "afterTurnEnded" },
+      "condition": { "kind": "expression", "expr": ["and",[">=",["count",["filter",["cardUses","turnEnd","actualUses"],["or",["and",["useDeclared","use"],["useKindIs","use",["slash","fireSlash","thunderSlash","coldSlash","dodge","peach","alcohol"]]],["and",["useIsResponse","use"],["useIsSelfNativeResponse","use"],["useKindIs","use",["dodge"],"effective"]]]],true],3],["==",["count",["takeFirst",["filter",["cardUses","turnEnd","actualUses"],["or",["and",["useDeclared","use"],["useKindIs","use",["slash","fireSlash","thunderSlash","coldSlash","dodge","peach","alcohol"]]],["and",["useIsResponse","use"],["useIsSelfNativeResponse","use"],["useKindIs","use",["dodge"],"effective"]]]],2],["same",["useActor","use"],"owner"]],0]] },
+      "effects": [{ "op": "resolveJuemanFirstBasicTurnEnd", "target": "owner" }]
+    }]
+  }]
+}

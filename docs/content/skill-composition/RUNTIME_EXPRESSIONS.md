@@ -384,3 +384,15 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 结果绑定在真实生产时捕获原来源，排除后续子结算移走或离手重入的材料，也不包含后来另摸的牌。替代获得不作为 DrawPile 摸牌结果。历史集合和绑定集合缺少牌面时，cardKindIs、cardSuitIs、sameCardKind、sameCardSuit 等读取保持 unknown；AI 不借实体历史身份读取他人后来暗手里的具体位置或驻留。
 
 实际回合后程序可声明 `"invocation":{"source":"afterTurnEnded"}`。它只在真实接受时保留原父候选的调用权限；失去来源可继续本次程序，死亡仍缺省停止新后缀。只曝光提示不取得授权，也不会给没有该声明的普通程序放宽续接。
+
+## 真正声明的使用与原回合结束点
+
+`["cardUses","turnEnd","actualUses"]` 读取原实际回合真正结束时的使用序列。ActualUses 包含真正原生声明及严格自有原生响应，按该源的位置排序；accepted-only 尝试不进入，Response 类型及无 Action 身份保持原义。Actor 是原声明／响应时的实际使用者，EffectiveKind 读取截至该点的真实更新。`turnEnd` 尚不存在时为 unknown，不能当作零次。
+
+`window` 仍表示候选原窗口的截点，`now` 仍表示当前实际点；它们不会被 turnEnd 覆盖。回合后此前的使用可以进入 window，却不进入原 turnEnd。
+
+这些是规则执行侧的原始事实，可能含尚未公开的声明目标。AI 的估值上下文不转交原始历史集合；缺少面向观察者的事实投影时保持 unknown，不能因为其他窗口读取已授权就开放全部历史。
+
+`["takeFirst", factSet, 2]` 返回最前两条共同事实，负数按零处理；takeLast 保持原行为。`["useKindIs","use",["dodge"],"effective"]` 显式读取有效牌种，省略最后参数仍读原 DeclaredKind。对未原生声明的 Response，默认声明牌种仍可为 unknown，应根据实际响应身份选择 effective，而不是造一个声明。
+
+例如按真正使用的前两张基本牌判定时，可先筛原生声明的基本牌和真实自有闪响应，再以 takeFirst 与 count／same 组合。不能把所有 Response 都排除或全部纳入，也不能把 useDeclarer 的 accepted 使用者当作原生声明时 Actor。

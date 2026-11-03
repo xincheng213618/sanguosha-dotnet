@@ -54,6 +54,7 @@ internal static class ProgramExpressionChecks
             "Undefined HP and unknown sets stay unknown through not and short-circuit only on a decided and/or operand.");
         ConditionalGrantFactsUseSharedReadsAndOrderedSuitRewrites();
         CardUseFactsComposeThroughExistingExpressions();
+        ActualUseSlicesKeepTheirMomentKindAndAiBoundary();
         HandGainCardFactsComposeWithoutRefreshingTheirSnapshots();
         PublicRevealCardsKeepScopesAndUnknownFaces();
     }
@@ -376,6 +377,66 @@ internal static class ProgramExpressionChecks
         public IReadOnlyList<CardUseHistoryFact>? CardUses(string moment, string view) =>
             moment != "window" ? null : view == "latest" ? latest : observations;
         public CardUseHistoryFact? CurrentUse() => current;
+    }
+
+    private static void ActualUseSlicesKeepTheirMomentKindAndAiBoundary()
+    {
+        CardUseHistoryFact[] facts =
+        [
+            new(10, 1, 0, 0, CardActionType.Use, false, [1], false, 1)
+                { DeclaredKind = CardKind.Slash, EffectiveKind = CardKind.FireSlash },
+            new(null, 2, 1, 1, CardActionType.Response, true, [], false, 2)
+                { EffectiveKind = CardKind.Dodge },
+            new(30, null, 2, 2, CardActionType.Use, false, [0], false, 3)
+                { DeclaredKind = CardKind.Peach, EffectiveKind = CardKind.Peach }
+        ];
+        var world = new ActualUseFactsWorld(facts);
+        const string firstTwo = """["takeFirst",["cardUses","turnEnd","actualUses"],2]""";
+        Need(Eval($$"""["==",["count",{{firstTwo}},true],2]""", world) == true &&
+            Eval($$"""["same",["useActor",["first",{{firstTwo}}]],"owner"]""", world) == true &&
+            Eval($$"""["useIsResponse",["last",{{firstTwo}}]]""", world) == true &&
+            world.LastRead == ("turnEnd", "actualUses"),
+            "The typed prefix reads the requested actual-use view at the actual turn-end moment and preserves declaration order.");
+        Need(Eval("""["==",["count",["takeFirst",["cardUses","turnEnd","actualUses"],-1],true],0]""", world) == true &&
+            Eval("""["==",["count",["takeFirst",["cardUses","turnEnd","actualUses"],["handCount","eventTarget"]],true],0]""", world) is null &&
+            Eval($$"""["not",["any",{{firstTwo}},true]]""", new ActualUseFactsWorld(null)) is null,
+            "A negative prefix is empty; an unknown length or unavailable turn-end point stays unknown.");
+        const string firstUse = """["first",["cardUses","turnEnd","actualUses"]]""";
+        var declared = $$"""["useKindIs",{{firstUse}},["slash"]]""";
+        var effective = $$"""["useKindIs",{{firstUse}},["slash"],"effective"]""";
+        Need(Eval(declared, world) == true && Eval(effective, world) == false &&
+            Eval($$"""["useKindIs",{{firstUse}},["fireSlash"],"effective"]""", world) == true &&
+            Eval($$"""["useKindIs",{{firstUse}},["fireSlash"]]""", world) == false &&
+            Load(Draw.Replace("EXPR", declared)).GameplayHash != Load(Draw.Replace("EXPR", effective)).GameplayHash,
+            "The default original declared kind and the explicit effective kind remain separate reads and definition fingerprints.");
+        var ai = new SkillContextExpressionWorld(new(0, 4, 4, 1, TurnPhase.Play), null, ownerWindowFacts: world);
+        var reads = world.Reads;
+        Need(Eval($$"""["==",["count",{{firstTwo}},true],2]""", ai) is null &&
+            Eval($$"""["contains",["useTargets",["first",{{firstTwo}}]],"owner"]""", ai) is null &&
+            Eval("""["any",["cardUses","turnEnd","accepted"],true]""", ai) is null &&
+            Eval("""["any",["cardUses","turnEnd","latest"],true]""", ai) is null && world.Reads == reads &&
+            Eval($$"""["any",{{firstTwo}},true]""", new SkillContextExpressionWorld(new(0, 4, 4, 1, TurnPhase.Play), null)) is null,
+            "AI does not read raw journal history or held native targets without a viewer-safe projection, even when another authorized window world is present.");
+        Rejects(Draw.Replace("EXPR", """["any",["takeFirst",["cardUses","turnEnd","actualUses"],true],true]"""), "expected an integer");
+        Rejects(Draw.Replace("EXPR", $$"""["useKindIs",{{firstUse}},["slash"],"completed"]"""), "stage must be effective");
+        Rejects(Draw.Replace("EXPR", """["any",["cardUses","turnEnd","initial"],true]"""), "cardUses requires");
+        Rejects(Draw.Replace("EXPR", """["any",["cardUses","afterTurn","actualUses"],true]"""), "cardUses requires");
+    }
+
+    private sealed class ActualUseFactsWorld(IReadOnlyList<CardUseHistoryFact>? facts) : IProgramExpressionWorld
+    {
+        public (string Moment, string View)? LastRead { get; private set; }
+        public int Reads { get; private set; }
+        public int? Participant(string name) => name == "owner" ? 0 : null;
+        public IReadOnlyList<int>? ParticipantSet(string name) => null;
+        public int? Stat(string stat, int seat) => null;
+        public bool? Flag(string flag, int seat) => null;
+        public IReadOnlyList<CardUseHistoryFact>? CardUses(string moment, string view)
+        {
+            LastRead = (moment, view);
+            Reads++;
+            return facts;
+        }
     }
 
     private sealed class WoundedFacts : ISelectionWoundedQueries

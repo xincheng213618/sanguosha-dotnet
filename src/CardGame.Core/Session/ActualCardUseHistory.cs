@@ -22,7 +22,7 @@ public sealed record ActualCardUseHistoryEntry(CardActionContext Action, int Act
 public sealed record CardUseHistoryPoint(int ActualTurn, int TurnOwnerSeat, long Cursor,
     long? CurrentNativeUseId = null, long? CurrentActionId = null);
 
-internal enum CardUseHistoryView { Latest, Observations, Confirmations, Accepted, Finalizations }
+internal enum CardUseHistoryView { Latest, Observations, Confirmations, Accepted, Finalizations, ActualUses }
 
 /// <summary>Rule-neutral facts. Accepted actor and current actor are separate roles.</summary>
 public sealed record CardUseHistoryFact(long? NativeUseId, long? ActionId, int ActorSeat,
@@ -61,6 +61,7 @@ internal interface IActualCardUseHistoryQueries : IProgramSelectionQuery
 {
     NativeCardUseHistorySnapshot? FindNativeUse(long nativeUseId);
     long CardUseHistoryCursor { get; }
+    CardUseHistoryPoint? FindTurnEndPoint(int actualTurn, int turnOwnerSeat);
     IReadOnlyList<CardUseHistoryFact> ReadCardUseFacts(CardUseHistoryPoint point, CardUseHistoryView view);
     ActualCardUseHistoryEntry? FindAction(long actionId);
     CardActionContext? FindLatestAction(long actionId);

@@ -363,6 +363,7 @@ internal static partial class ProgramAmountExpressionChecks
         ActualBoundMovementResultsSurviveChildrenCold();
         AcceptedMaterialsKeepTheirOriginalCommitmentCold();
         DailiUsesSharedHistoryAndOriginalDrawBindingsCold();
+        JuemanDrawUsesRealBasicPrefixCold();
     }
 
     private static void AcceptedMaterialsKeepTheirOriginalCommitmentCold()

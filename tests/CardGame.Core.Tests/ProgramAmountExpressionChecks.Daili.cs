@@ -203,14 +203,17 @@ internal static partial class ProgramAmountExpressionChecks
         public PackageManifest Manifest { get; } = new("fixture-shared-turn-end", new(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
-            foreach (var (resource, id) in new[] { ("ol-luo-xian", Daili), ("mou-xiao-qiao-ol", "mou-ol:jueyan") })
+            var jueman = scenario.StartsWith("jueman-", StringComparison.Ordinal);
+            var sources = new List<(string Resource, string Skill)> { ("ol-luo-xian", Daili), ("mou-xiao-qiao-ol", "mou-ol:jueyan") };
+            if (jueman) sources.Add(("ol-a-hui-nan", Jueman));
+            foreach (var (resource, id) in sources)
             {
                 var bundle = CharacterFixtureContent.EmbeddedProgramBundle(resource);
                 builder.AddSkill(new(id, bundle.Presentations[id].Name, bundle.Presentations[id].Description)
                     { Program = bundle.Programs[id], ProgramPresentation = bundle.Presentations[id] });
             }
             static string Pause(string id) => "{\"op\":\"chooseOption\",\"target\":\"owner\",\"resultBind\":\"" + id + "\",\"options\":[{\"id\":\"" + id + "\"}]}";
-            var activeSkill = scenario == "unpermitted" ? DailiOrdinary : Daili;
+            var activeSkill = jueman ? Jueman : scenario == "unpermitted" ? DailiOrdinary : Daili;
             var flipEffects = Pause("flip");
             if (scenario is "changed" or "empty" or "unpermitted")
                 flipEffects += "," + JsonSerializer.Serialize(new { op = "skillState", target = "owner", action = "lose", match = new { skillIds = new[] { activeSkill } } }) + "," + Pause("flip-return");
@@ -234,6 +237,14 @@ internal static partial class ProgramAmountExpressionChecks
                 { ["flip"] = "翻面返回", ["draw"] = "摸牌已交付", ["reward"] = "奖励返回" };
             if (scenario is "changed" or "empty" or "unpermitted") optionLabels["flip-return"] = "返回原指令";
             if (scenario != "death-draw") optionLabels["draw-return"] = "返回展示";
+            var juemanWatch = "";
+            if (jueman)
+            {
+                var effects = Pause("jueman-draw") + "," + JsonSerializer.Serialize(new { op = "skillState", target = "owner", action = "lose", match = new { skillIds = new[] { Jueman } } }) + "," + Pause("jueman-return");
+                juemanWatch = "," + $$$"""{"id":"jueman-paid-draw","window":"cardsGained","subject":"owner","movementOccurrence":"perBatch","destinationZones":["hand"],"movementReasons":["{{{JuemanDrawReason}}}"],"optional":false,"usageScope":"game","usageLimit":1,"effects":[{{{effects}}}]}""";
+                optionLabels["jueman-draw"] = "基本牌奖励已交付";
+                optionLabels["jueman-return"] = "失源后返回";
+            }
             var catalog = SkillProgramCatalog.Load($$$"""
                 {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
                   {"id":"{{{DailiDriver}}}","revision":1,"activations":[
@@ -248,7 +259,7 @@ internal static partial class ProgramAmountExpressionChecks
                     {"id":"flip","window":"characterTurnedOver","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,"effects":[{{{flipEffects}}}]},
                     {"id":"draw","window":"cardsGained","subject":"owner","movementOccurrence":"perBatch","destinationZones":["hand"],"movementReasons":["{{{DailiDrawReason}}}"],"optional":false,"usageScope":"game","usageLimit":1,"effects":[
                       {{{drawEffects}}}]},
-                    {"id":"reward","window":"cardsGained","subject":"owner","movementOccurrence":"perBatch","destinationZones":["hand"],"movementReasons":["skill-program.mou-ol:jueyan.Draw"],"optional":false,"usageScope":"game","usageLimit":1,"effects":[{{{Pause("reward")}}}]}]},
+                    {"id":"reward","window":"cardsGained","subject":"owner","movementOccurrence":"perBatch","destinationZones":["hand"],"movementReasons":["skill-program.mou-ol:jueyan.Draw"],"optional":false,"usageScope":"game","usageLimit":1,"effects":[{{{Pause("reward")}}}]}{{{juemanWatch}}}]},
                   {"id":"{{{DailiOrdinary}}}","revision":1,"triggers":[{"id":"ordinary-after-end","window":"afterTurnEnded","subject":"owner","turnOwnerScope":"own","optional":true,
                     "effects":[{"op":"turnOver","target":"owner"},{"op":"draw","target":"owner","amount":3,"awaitMovementTriggers":true}]}]},
                   {"id":"{{{AcceptedQuiet}}}","revision":1,"triggers":[{"id":"quiet","window":"drawPhaseStarting","subject":"owner","optional":false,"effects":[{"op":"adjustNormalDraw","target":"owner","amount":-2}]}]},

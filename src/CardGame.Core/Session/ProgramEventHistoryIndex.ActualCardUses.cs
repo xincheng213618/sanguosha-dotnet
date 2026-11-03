@@ -85,7 +85,7 @@ internal sealed partial class ProgramEventHistoryIndex
     private static bool IsNativeHistoryFact(IGameEvent payload) => payload is ActualCardActionRecordedEvent or
         ActualCardUseTargetsFinalizedEvent or ActualCardUseTargetsCompletedEvent or ActualCardUseActionUpdatedEvent or
         CardUseFinishedEvent or CardResponseCompletedEvent or NativeCardUseHistoryRecordedEvent or
-        ActualDiscardRecoveryPhaseStartedEvent or ActualPhaseSkippedEvent;
+        ActualDiscardRecoveryPhaseStartedEvent or ActualPhaseSkippedEvent or TurnStartedEvent or TurnEndedEvent;
 
     private void IndexNativeHistoryFact(IGameEvent payload, long cursor)
     {

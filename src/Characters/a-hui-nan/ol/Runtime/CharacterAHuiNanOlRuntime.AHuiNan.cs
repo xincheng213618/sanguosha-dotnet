@@ -5,21 +5,22 @@ using System.Globalization;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterAHuiNanOlRuntime
 {
-    internal const string AHuiNanDrawReason = "skill-program.a-hui-nan.jueman.draw";
     internal static bool AHuiNanBasicKind(CardKind kind) => RuntimeSkills.RuntimeRules_a_hui_nan_ol_AHuiNan.AHuiNanBasicKind(kind);
     internal bool HasAHuiNanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveJuemanFirstBasicTurnEnd);
 
     internal static CardConversionSource AHuiNanSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_a_hui_nan_ol_AHuiNan.AHuiNanSource(f);
-    internal AHuiNanBasicUseSnapshot[] AHuiNanHistory(int turn) => RuntimeSkills.RuntimeRules_Core_CurrentTurnUseKinds.ActualTurnBasicUses(
-        _coreAlternatingBenefitsOperations.CompleteProgramEventHistory(), turn, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
-        .Take(3).Select(e => new AHuiNanBasicUseSnapshot(e.ActorSeat, e.EffectiveCardKind!.Value)).ToArray();
+    internal AHuiNanBasicUseSnapshot[] AHuiNanHistory(int turn) =>
+        _actualUseHistory.FindTurnEndPoint(turn, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat) is { } point
+            ? _actualUseHistory.ReadCardUseFacts(point, CardUseHistoryView.ActualUses)
+                .Where(fact => fact.EffectiveKind is { } kind && AHuiNanBasicKind(kind))
+                .Take(3).Select(fact => new AHuiNanBasicUseSnapshot(fact.ActorSeat, fact.EffectiveKind!.Value)).ToArray()
+            : [];
     internal bool AHuiNanEndingParent(ProgramTriggerCandidate c, ProgramSkillWindowContext context, out DeferredTurnEndFrame? parent)
     {
         parent = _resolutionStackOperations._resolutionStack.OfType<DeferredTurnEndFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId);
-        return HasAHuiNanCapability && c.SkillId == "ol:jueman" && c.BindingId is ("actual-end-own" or "actual-end-foreign") && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && context.Window == SkillProgramTriggerWindow.AfterTurnEnded && context.OwnerSeat == c.OwnerSeat && parent is not null && _coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent) && _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(parent) == c && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && context.OccurrenceIndex == c.OccurrenceIndex && context.Facts == parent.AfterTurnEnded!.Items[parent.AfterTurnEnded.ItemIndex].Facts && c.BindingId == (c.OwnerSeat == parent.OwnerSeat ? "actual-end-own" : "actual-end-foreign") && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash == c.GameplayHash;
+        return HasAHuiNanCapability && c.SkillId == "ol:jueman" && c.BindingId == "actual-end-third-basic" && _coreTableSeatQueriesOperations.IsValidPlayerSeat(c.OwnerSeat) && context.Window == SkillProgramTriggerWindow.AfterTurnEnded && context.OwnerSeat == c.OwnerSeat && parent is not null && _coreAfterTurnEndedProgramsOperations.IsActualAfterTurnEndedParent(parent) && _coreAfterTurnEndedProgramsOperations.AfterTurnEndedCandidate(parent) == c && context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat && context.OccurrenceIndex == c.OccurrenceIndex && context.Facts == parent.AfterTurnEnded!.Items[parent.AfterTurnEnded.ItemIndex].Facts && _contentRegistryOperations._contentRegistry.GetSkill(c.SkillId).Program?.GameplayHash == c.GameplayHash;
     }
 
-    internal bool IsAHuiNanJuemanEndingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && AHuiNanEndingParent(c, context, out _) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat], c.SkillId, c.SkillInstanceId);
     internal bool AHuiNanStartedBinding(ProgramSkillFrame f)
     {
         if (f.SkillId != "ol:jueman" || f.TriggerId is null || f.ActivationId != f.TriggerId || f.WindowContext is not { } context)
@@ -36,8 +37,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
             throw new InvalidOperationException("Jueman requires its genuine started actual-turn-end binding.");
         var history = AHuiNanHistory(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber);
         var own = history.Take(2).Count(e => e.ActorSeat == f.OwnerSeat);
-        var stage = history.Length >= 2 && own == 1 ? AHuiNanJuemanStage.DrawChildren : history.Length == 3 && own == 0 ? AHuiNanJuemanStage.UseChoice : AHuiNanJuemanStage.NoEffect;
-        var r = new AHuiNanJuemanReceipt(AHuiNanSource(f), f.GameplayHash, 1, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, stage)
+        var r = new AHuiNanJuemanReceipt(AHuiNanSource(f), f.GameplayHash, 1, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, AHuiNanJuemanStage.UseChoice)
         {
             History = history,
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
@@ -45,14 +45,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AHuiNanJueman = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AHuiNanJuemanStartedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, history.Length, own, history.Length == 3 ? history[2].Kind : null));
-        if (stage == AHuiNanJuemanStage.DrawChildren)
-        {
-            var count = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive ? _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], 1, true, new(AHuiNanDrawReason)).Count : 0;
-            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AHuiNanJueman = f.AHuiNanJueman!with { DrawCount = count, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AHuiNanJuemanDrawnEvent(f.Id, f.OwnerSeat, count, r.Before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
-        }
-
         ContinueAHuiNan(f.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }
@@ -103,15 +95,15 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AHuiNanJueman: { } r } f || f.Id != id)
             return;
-        if (r.Stage is AHuiNanJuemanStage.DrawChildren or AHuiNanJuemanStage.NativeChildren)
+        if (r.Stage == AHuiNanJuemanStage.NativeChildren)
         {
             if (DrainAHuiNan(id))
                 return;
-            FinishAHuiNan(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), r.Stage == AHuiNanJuemanStage.DrawChildren ? "draw" : "used");
+            FinishAHuiNan(_coreProgramLifecycleOperations.GetActiveProgramFrame(id), "used");
             return;
         }
 
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || r.Stage == AHuiNanJuemanStage.NoEffect)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
         {
             FinishAHuiNan(f, "no-effect");
             return;
@@ -124,7 +116,7 @@ internal sealed partial class CharacterAHuiNanOlRuntime
     internal void FinishAHuiNan(ProgramSkillFrame f, string outcome)
     {
         var r = f.AHuiNanJueman!;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AHuiNanJuemanCompletedEvent(f.Id, r.DrawCount, r.Use is not null, outcome));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AHuiNanJuemanCompletedEvent(f.Id, r.Use is not null, outcome));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AHuiNanJueman = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }

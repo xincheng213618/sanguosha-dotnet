@@ -19,7 +19,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
         return[];
     }
 
-    internal bool IsAHuiNanJuemanSlashQuery(CharacterState actor) => HasAHuiNanCapability && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { AHuiNanJueman: { Stage: AHuiNanJuemanStage.UseChoice } r } f && f.OwnerSeat == actor.Seat && r.History.Count == 3 && CoreNativeCardClassificationsRuntime.IsSlashCard(r.History[2].Kind) && ValidAHuiNan(f);
     internal bool MatchesAHuiNanJueman(ProgramSkillFrame f, AHuiNanJuemanUseOrigin o) => f.AHuiNanJueman is { Stage: AHuiNanJuemanStage.NativeUse, Use: { } expected } r && o == expected && o.ProgramFrameId == f.Id && o.Source == r.Source && o.GameplayHash == r.GameplayHash && o.ActualTurn == r.ActualTurn && o.ActorSeat == f.OwnerSeat && r.History.Count == 3 && r.History[2].Kind == o.CardKind && ValidAHuiNan(f);
     internal void BeginAHuiNanJuemanUse(ProgramSkillFrame f, AHuiNanJuemanUseOrigin o, IReadOnlyList<int> targets)
     {

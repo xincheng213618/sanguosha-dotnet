@@ -17,13 +17,31 @@ internal sealed partial class ProgramEventHistoryIndex
     private readonly Dictionary<long, List<(long Cursor, CardUseHistoryFact Fact)>> _factAcceptedActions = [];
     private readonly Dictionary<(int Turn, int Owner), List<long>> _factAcceptedByTurn = [];
     private readonly Dictionary<(int Turn, int Owner), List<(long Cursor, CardUseHistoryFact Fact)>> _factFinalizations = [];
+    private readonly Dictionary<(int Turn, int Owner), List<(long Cursor, CardUseHistoryFact Fact)>> _factActualUses = [];
+    private readonly Dictionary<(int Turn, int Owner), long> _actualTurnStartCursors = [];
+    private readonly Dictionary<(int Turn, int Owner), CardUseHistoryPoint> _actualTurnEndPoints = [];
 
     public long CardUseHistoryCursor => events.Count + (long)pendingEvents.Count;
+
+    public CardUseHistoryPoint? FindTurnEndPoint(int actualTurn, int turnOwnerSeat)
+    {
+        SynchronizeNativeHistory();
+        return _actualTurnEndPoints.GetValueOrDefault((actualTurn, turnOwnerSeat));
+    }
 
     public IReadOnlyList<CardUseHistoryFact> ReadCardUseFacts(CardUseHistoryPoint point, CardUseHistoryView view)
     {
         SynchronizeNativeHistory();
         var key = (point.ActualTurn, point.TurnOwnerSeat);
+        if (view == CardUseHistoryView.ActualUses)
+        {
+            if (!_factActualUses.TryGetValue(key, out var actualUses)) return [];
+            var start = _actualTurnStartCursors.GetValueOrDefault(key);
+            return Array.AsReadOnly(actualUses.Where(item => item.Cursor > start && item.Cursor <= point.Cursor)
+                .Select(item => item.Fact.NativeUseId is { } id && _factNativeUses.TryGetValue(id, out var stream) &&
+                    FactAt(stream.Versions, point.Cursor) is { } current
+                        ? item.Fact with { EffectiveKind = current.EffectiveKind } : item.Fact).ToArray());
+        }
         // Accepted membership/order is fixed at acceptance. Actor/Targets are observed as of the
         // cutoff; PrimaryTargets is the latest finalized/completed stage result by that cutoff.
         // Finalizations instead exposes immutable first-finalization snapshots in fact order.
@@ -62,10 +80,25 @@ internal sealed partial class ProgramEventHistoryIndex
     {
         _factActions.Clear(); _factNativeUses.Clear(); _factUsesByTurn.Clear(); _factObservations.Clear(); _factConfirmations.Clear();
         _factAcceptedActions.Clear(); _factAcceptedByTurn.Clear(); _factFinalizations.Clear();
+        _factActualUses.Clear(); _actualTurnStartCursors.Clear(); _actualTurnEndPoints.Clear();
     }
 
     private void IndexCardUseFacts(IGameEvent payload, long cursor)
     {
+        if (payload is TurnStartedEvent started)
+        {
+            var key = (started.TurnNumber, started.ActorSeat);
+            _actualTurnStartCursors[key] = cursor;
+            _actualTurnEndPoints.Remove(key);
+            return;
+        }
+        if (payload is TurnEndedEvent ended)
+        {
+            var key = (ended.TurnNumber, ended.ActorSeat);
+            if (ended.TurnNumber > 0 && _actualTurnStartCursors.ContainsKey(key))
+                _actualTurnEndPoints.TryAdd(key, new(ended.TurnNumber, ended.ActorSeat, cursor));
+            return;
+        }
         if (payload is CardResponseCompletedEvent response)
         {
             if (_factAcceptedActions.TryGetValue(response.ActionId, out var versions))
@@ -161,6 +194,18 @@ internal sealed partial class ProgramEventHistoryIndex
         };
         fact = IndexAcceptedStage(payload, cursor, fact);
         stream.Versions.Add((cursor, fact));
+        // Native declarations occupy their actual declaration position, even
+        // without an Action. Accepted-only requests do not occupy a use slot.
+        // A genuine self-supplied native response is itself a real use at its
+        // accepted response boundary. Later role changes cannot change its actor.
+        if (payload is NativeCardUseHistoryRecordedEvent declaration &&
+                !_nativeUses.ContainsKey(declaration.Snapshot.NativeUseId) ||
+            payload is ActualCardActionRecordedEvent { Action.Type: CardActionType.Response,
+                IsSelfNativeResponseUse: true } acceptedResponse && !_actualActions.ContainsKey(acceptedResponse.Action.ActionId))
+        {
+            if (!_factActualUses.TryGetValue((turn, owner), out var uses)) _factActualUses[(turn, owner)] = uses = [];
+            uses.Add((cursor, fact with { DeclarationCursor = cursor }));
+        }
         if (!_factObservations.TryGetValue((turn, owner), out var observations)) _factObservations[(turn, owner)] = observations = [];
         observations.Add((cursor, fact));
         if (confirmation is not null)

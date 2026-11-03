@@ -9,8 +9,6 @@ internal sealed partial class CharacterAHuiNanOlRuntime
             return false;
         if (child is CardUseFrame use)
             return r.Stage == AHuiNanJuemanStage.NativeUse && use.AHuiNanJueman is { } o && MatchesAHuiNanJueman(f, o) && IsAHuiNanJuemanUse(use.Id);
-        if (child is CardsMovedTriggerWindowFrame moved)
-            return r.Stage == AHuiNanJuemanStage.DrawChildren && moved.ResumeProgramFrameId == f.Id && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && (m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == AHuiNanDrawReason || m.Reason == CardMoveReasons.Reshuffle));
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
     }
 
