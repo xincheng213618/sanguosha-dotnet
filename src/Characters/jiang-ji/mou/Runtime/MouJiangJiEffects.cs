@@ -19,7 +19,7 @@ internal sealed partial class MouJiangJiRuntime
  {
   if(!ValidEffects(use)||use.MouJiangJiRounds is not{}r||r.Started>=r.Grants.Count||r.Active)throw new InvalidOperationException("Yingshi cannot begin an unrelated or already active extra effect.");
   var grant=r.Grants[r.Started];var index=Array.IndexOf(use.TargetSeats.ToArray(),grant.Target);if(use.CardKind==CardKind.BorrowedSword&&index%2!=0)index=-1;
-  var nativeState=r.Native with{WholeGroupRepeated=true,MaterialClaims=previous?.MaterialClaims??r.Native.MaterialClaims,FrozenGroupDamageSourceSeat=previous?.FrozenGroupDamageSourceSeat??r.Native.FrozenGroupDamageSourceSeat};
+  var nativeState=r.Native with{WholeGroupRepeated=true,FrozenGroupDamageSourceSeat=previous?.FrozenGroupDamageSourceSeat??r.Native.FrozenGroupDamageSourceSeat};
   var result=r with{Started=r.Started+1,Active=true,ActiveIndex=index,ActiveTarget=grant.Target,Native=nativeState};events.AdvanceFact(new MouJiangJiEffectStartedEvent(use.Id,r.ActionId,grant.FrameId,result.Started,grant.Target));return result;
  }
  internal MouJiangJiEffectRounds CompleteEffect(CardUseFrame use)

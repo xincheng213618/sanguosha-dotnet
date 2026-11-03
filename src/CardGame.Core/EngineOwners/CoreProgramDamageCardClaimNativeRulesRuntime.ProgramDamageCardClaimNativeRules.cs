@@ -13,5 +13,4 @@ internal sealed partial class CoreProgramDamageCardClaimNativeRulesRuntime
 
     long? IProgramDamageCardClaimNativeRules.ActiveGroupOwnerId => _coreNativeCardContinuationCursorsOperations.ActiveGroupCard?.OwnerFrameId;
 
-    void IProgramDamageCardClaimNativeRules.CaptureExtraEffectClaims(ProgramSkillFrame frame, DamageTriggerWindowFrame window, IReadOnlyList<Card> cards, long sequenceBefore, CardMoveReason reason) => _coreExtraEffectMaterialClaimsOperations.CaptureExtraEffectMaterialClaims(frame, _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window), cards, sequenceBefore, reason);
 }

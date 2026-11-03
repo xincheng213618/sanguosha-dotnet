@@ -56,13 +56,8 @@ public sealed record ExtraCardEffectState
     public IReadOnlyList<ExtraEffectAttackSeed> OriginalAttacks { get => _attacks; init => _attacks = Array.AsReadOnly(value.ToArray()); }
     public FangtianHalberdState? Fangtian { get; init; }
     public int? FrozenGroupDamageSourceSeat { get; init; }
-    private IReadOnlyList<ExtraEffectMaterialClaim> _materialClaims = [];
-    public IReadOnlyList<ExtraEffectMaterialClaim> MaterialClaims { get => _materialClaims; init => _materialClaims = Array.AsReadOnly(value.ToArray()); }
 }
 public sealed record ExtraEffectAttackSeed(int TargetIndex, CardAttackState Attack);
-public sealed record ExtraEffectMaterialClaim(long CardUseFrameId, long ActionId, int CardId, long ProgramFrameId,
-    string SkillId, string BindingId, string SkillInstanceId, string GameplayHash, int EffectIndex, int RecipientSeat,
-    long DamageWindowFrameId, long DamageFrameId, long MovementSequence, string MovementReason);
 public sealed partial record CardUseFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ExtraCardEffectState? ExtraCardEffect { get; init; } }
 public sealed record ExtraForeignCardSlot(int Slot, int? PublicCardId, CardLocation? PublicLocation);

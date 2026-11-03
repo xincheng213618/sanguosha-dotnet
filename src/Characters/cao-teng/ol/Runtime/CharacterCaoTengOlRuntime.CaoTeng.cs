@@ -238,9 +238,9 @@ internal sealed partial class CharacterCaoTengOlRuntime
                             group.SetClaimedPhysicalCards(claimed.ToArray());
                         }
 
+                        _cardUseMaterialClaims.Capture(attack.ResolutionId, f.OwnerSeat, cards, r.Before, new(CaoTengJianxiongClaimReason));
                         foreach (var card in cards)
                             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoTengJianxiongClaimedEvent(f.Id, card.Id, _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence > r.Before && m.CardId == card.Id && m.From == CardLocation.Processing && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == CaoTengJianxiongClaimReason).Sequence));
-                        _coreExtraEffectMaterialClaimsOperations.CaptureExtraEffectMaterialClaims(f, attack, cards, r.Before, new(CaoTengJianxiongClaimReason));
                     }
                 }
 

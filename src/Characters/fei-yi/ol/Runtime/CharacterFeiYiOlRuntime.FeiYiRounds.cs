@@ -60,7 +60,6 @@ internal sealed partial class CharacterFeiYiOlRuntime
         var native = r.Native with
         {
             WholeGroupRepeated = true,
-            MaterialClaims = r.Started == 0 && use.ExtraCardEffect is { } fengzi ? fengzi.MaterialClaims : r.Native.MaterialClaims,
             FrozenGroupDamageSourceSeat = r.Started == 0 ? use.ExtraCardEffect?.FrozenGroupDamageSourceSeat ?? r.Native.FrozenGroupDamageSourceSeat : r.Native.FrozenGroupDamageSourceSeat
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(id, use with { FeiYiRounds = r with { Started = r.Started + 1, Native = native }, TargetIndex = 0, Step = ResolutionFrameStep.ResolvingEffect, FireAttackSelection = null, ColorFireAttack = null, UnexpectedAssaultReveal = null, VirtualBasicEffectApplied = false });

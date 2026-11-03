@@ -38,7 +38,10 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
         }
 
         _coreNativeCardContinuationCursorsOperations.ActiveGroupCard = group;
-        _coreExtraEffectMaterialClaimsOperations.RestoreExtraEffectGroupMaterialClaims(group);
+        var claimed = _cardUseMaterialClaims.ClaimedCardIds(group.ResolutionId)
+            .Where(id => _cardUseMaterialClaims.CanFinishClaimedMaterial(group.ResolutionId, id)).ToArray();
+        if (claimed.Length > 0)
+            group.SetClaimedPhysicalCards(group.DamageClaimedPhysicalCardIds.Concat(claimed).Distinct().ToArray());
         _coreExtraCardEffectRoundsOperations.CaptureExtraGroupDamageSource(group);
         _coreMatchLogOperations.AddLog("CardUsed", $"{(source.Name)} 使用【{(CardCatalog.Get(pending.EffectCardKind).DisplayName)}】，依次攻击 {(pending.TargetSeats.Count)} 名角色。", source.Seat);
         if (!_coreExtraCardEffectRoundsOperations.IsExtraCardEffectRound(pending.ParentFrameId))

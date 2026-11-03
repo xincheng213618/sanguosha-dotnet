@@ -57,7 +57,6 @@ internal sealed partial class CoreGameEngineShanheSchoolTrickRuntime
         var native = round.Native with
         {
             WholeGroupRepeated = true,
-            MaterialClaims = previous?.MaterialClaims ?? round.Native.MaterialClaims,
             FrozenGroupDamageSourceSeat = previous?.FrozenGroupDamageSourceSeat ?? round.Native.FrozenGroupDamageSourceSeat
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(id, use with { ShanheSchoolTrick = round with { Started = true, Active = true, Native = native }, TargetIndex = 0, Step = ResolutionFrameStep.ResolvingEffect, FireAttackSelection = null, ColorFireAttack = null, UnexpectedAssaultReveal = null, VirtualBasicEffectApplied = false });

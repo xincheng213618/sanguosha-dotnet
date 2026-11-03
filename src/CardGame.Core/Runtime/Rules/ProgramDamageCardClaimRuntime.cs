@@ -16,7 +16,7 @@ internal interface IProgramDamageCardClaims : IProgramRuntimeOperations
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class ProgramDamageCardClaimRuntime(IProgramRuntimeFrames frames, ICardZoneQueries zones,
     IProgramBoundCardMovementOperations movement, IProgramRuntimeEvents events,
-    IProgramDamageCardClaimNativeRules nativeRules) : IProgramDamageCardMaterialQueries, IProgramDamageCardClaims
+    IProgramDamageCardClaimNativeRules nativeRules, ICardUseMaterialClaims claims) : IProgramDamageCardMaterialQueries, IProgramDamageCardClaims
 {
     public ProgramDamageCardMaterial? Read(long attackFrameId)
     {
@@ -62,12 +62,13 @@ internal sealed class ProgramDamageCardClaimRuntime(IProgramRuntimeFrames frames
         var cards = GetClaimable(frame);
         if (cards.Length == 0) return;
         var damage = nativeRules.CurrentDamageWindow!;
+        var attackOwner = nativeRules.SelectAttackOwner(damage);
         var before = movement.Sequence;
         movement.MoveCards(cards, CardLocation.Processing, CardLocation.Hand(ownerSeat), reason);
         if (nativeRules.ActiveGroupOwnerId is { } groupOwnerId) RecordGroupClaims(groupOwnerId, damage, cards);
+        if (attackOwner.IsNativeCard) claims.Capture(attackOwner.FrameId, ownerSeat, cards, before, reason);
         events.AdvanceFact(new ProgramDamageCardsClaimedEvent(frame.Id, frame.SkillId, frame.TriggerId!, ownerSeat,
             Array.AsReadOnly(cards.Select(card => card.Id).ToArray())));
-        nativeRules.CaptureExtraEffectClaims(frame, damage, cards, before, reason);
     }
 
     private CardResolutionContinuations Continuations(long ownerId) => frames.Find(ownerId) switch

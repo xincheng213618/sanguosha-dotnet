@@ -26,11 +26,9 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
             return false;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != id)
             throw new InvalidOperationException("Quanyu must await the complete original native effect and its children.");
-        var previous = _characterFeiYiOlOperations.NativeExtraEffectState(use);
         var native = r.Native with
         {
-            WholeGroupRepeated = true,
-            MaterialClaims = previous?.MaterialClaims ?? r.Native.MaterialClaims
+            WholeGroupRepeated = true
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(id, use with { MoQuanyuExtraRound = r with { Started = true, Active = true, Native = native }, TargetIndex = 0, Step = ResolutionFrameStep.ResolvingEffect });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoQuanyuExtraRoundStartedEvent(r.ProgramFrameId, id, r.ActionId));

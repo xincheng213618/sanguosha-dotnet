@@ -60,12 +60,10 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
             return false;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != id || r.Active)
             throw new InvalidOperationException("Bingcai must await the previous whole native effect and its children.");
-        var previous = _characterFeiYiOlOperations.NativeExtraEffectState(use);
         var grant = r.Grants[r.Started];
         var native = r.Native with
         {
-            WholeGroupRepeated = true,
-            MaterialClaims = previous?.MaterialClaims ?? r.Native.MaterialClaims
+            WholeGroupRepeated = true
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(id, use with { MouBingcaiRounds = r with { Started = r.Started + 1, Active = true, Native = native }, TargetIndex = 0, Step = ResolutionFrameStep.ResolvingEffect, VirtualBasicEffectApplied = false, FireAttackSelection = null, ColorFireAttack = null, UnexpectedAssaultReveal = null });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouBingcaiExtraEffectRoundStartedEvent(id, action.ActionId, grant.FrameId, r.Started + 1));

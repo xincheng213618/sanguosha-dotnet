@@ -488,7 +488,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineExtendedViewAsEntries ExtendedViewAsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineExtendedViewAsEntries, EngineOwners.CoreGameEngineExtendedViewAsRuntime>(Core.RuntimeEntries.CoreGameEngineExtendedViewAsEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineExtraEffectMaterialClaimsEntries ExtraEffectMaterialClaimsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineExtraEffectMaterialClaimsEntries, EngineOwners.CoreGameEngineExtraEffectMaterialClaimsRuntime>(Core.RuntimeEntries.CoreGameEngineExtraEffectMaterialClaimsEntries.Create);
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineExtraEffectsAndRankGuessObserversRuntime> ExtraEffectsAndRankGuessObserversEntries => GetDeferredModule<EngineOwners.CoreGameEngineExtraEffectsAndRankGuessObserversRuntime>();
 

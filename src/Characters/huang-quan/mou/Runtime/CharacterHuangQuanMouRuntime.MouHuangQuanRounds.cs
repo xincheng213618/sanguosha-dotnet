@@ -86,7 +86,6 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         var native = r.Native with
         {
             WholeGroupRepeated = true,
-            MaterialClaims = previous?.MaterialClaims ?? r.Native.MaterialClaims,
             FrozenGroupDamageSourceSeat = previous?.FrozenGroupDamageSourceSeat ?? r.Native.FrozenGroupDamageSourceSeat
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(id, u with { MouHqRounds = r with { Started = r.Started + 1, Active = true, Native = native }, TargetIndex = 0, Step = ResolutionFrameStep.ResolvingEffect, FireAttackSelection = null, ColorFireAttack = null, UnexpectedAssaultReveal = null, VirtualBasicEffectApplied = false });

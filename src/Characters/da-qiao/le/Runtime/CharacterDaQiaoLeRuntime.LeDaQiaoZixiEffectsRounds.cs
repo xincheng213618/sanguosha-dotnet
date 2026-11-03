@@ -83,7 +83,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
         var native = r.Native with
         {
             WholeGroupRepeated = true,
-            MaterialClaims = previous?.MaterialClaims ?? r.Native.MaterialClaims,
             FrozenGroupDamageSourceSeat = previous?.FrozenGroupDamageSourceSeat ?? r.Native.FrozenGroupDamageSourceSeat
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(id, use with { ZixiEffectRounds = r with { Started = r.Started + 1, Native = native, Active = true, ActiveTargetIndex = targetIndex, ActiveTargetSeat = grant.CurrentTargetSeat }, TargetIndex = targetIndex < 0 ? use.TargetSeats.Count : targetIndex, Step = ResolutionFrameStep.ResolvingEffect, SequentialTrick = null, AdjustedSimpleContinuation = null, FireAttackSelection = null, ColorFireAttack = null, UnexpectedAssaultReveal = null, VirtualBasicEffectApplied = false });

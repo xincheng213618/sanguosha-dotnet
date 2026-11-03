@@ -42,8 +42,7 @@ public sealed record ZixiExtraEffectRounds(long ActionId, ExtraCardEffectState N
             ChainedTargetSeats = Array.AsReadOnly(seed.Attack.ChainedTargetSeats.ToArray()),
             ResponseProhibitingSkillNames = Array.AsReadOnly(seed.Attack.ResponseProhibitingSkillNames.ToArray()),
             RangePreventionVisitedTargets = seed.Attack.RangePreventionVisitedTargets is { } visited ? Array.AsReadOnly(visited.ToArray()) : null
-        } }).ToArray(),
-        MaterialClaims = state.MaterialClaims.ToArray()
+        } }).ToArray()
     };
 }
 public sealed partial record ProgramSkillFrame

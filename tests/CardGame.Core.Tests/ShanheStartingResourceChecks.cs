@@ -117,6 +117,42 @@ internal static class ShanheStartingResourceChecks
             "The absent/false contract keeps its authored equipment-bearing deck, direct starting equipment and original provenance shape.");
         old.Card(oldDraw, []); old.Until(() => old.At(UseWatch)); Need(old.Zone(oldDraw) == CardLocation.DiscardPile && old.E<ShanheStartingResourceDestroyedEvent>().Length == 0,
             "Old false recipes preserve their original physical use/discard lifecycle without new exits."); old.Cold(); old.Continue(); old.Play();
+        ClaimSurvivesRepeatedGroupEffect();
+    }
+
+    private static void ClaimSurvivesRepeatedGroupEffect()
+    {
+        var s = Scene.Start(true, claim: true, repeatedClaim: true); s.Play();
+        var material = s.Initial(false, 0); var cost = s.Initial(false, 1);
+        s.Card(material, []); s.Until(() => s.At("ol:fengzi"));
+        s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
+        s.Until(() => s.At("ol:fengzi") && s.P!.Choices.Any(c => c.Parameters.GetValueOrDefault("branch") == "cost"));
+        s.Answer(c => c.Parameters.GetValueOrDefault("branch") == "cost" && c.Cards.SequenceEqual([cost]));
+        s.Until(() => s.At(UseWatch));
+        var use = s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.CardId == material);
+        var receipt = use.MaterialClaims.Single();
+        Need(use.ExtraCardEffect is { WholeGroupRepeated: true } && receipt.CardId == material && receipt.RecipientSeat == 1 &&
+            use.Continuations.GroupCard!.DamageClaimedPhysicalCardIds.SequenceEqual([material]) &&
+            s.G.CardMovements.Single(m => m.Sequence == receipt.MovementSequence) is { From.Zone: CardZoneKind.Processing, To: var destination } &&
+            destination == CardLocation.Hand(1) && s.Zone(material) == CardLocation.Hand(1) &&
+            s.E<ProgramDamageCardsClaimedEvent>().Count(e => e.CardIds.Contains(material)) == 1 &&
+            s.E<DamageAppliedEvent>().Count(e => e.SourceSeat == 0 && e.TargetSeat == 1 && e.Amount == 1) == 2 &&
+            s.E<ExtraCardEffectStartedEvent>().Count(e => e.CardUseFrameId == use.Id) == 1 &&
+            s.E<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id) == 1 &&
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) == 1 &&
+            s.E<ShanheStartingResourceDestroyedEvent>().All(e => e.CardId != material),
+            "The real first Arrow Barrage's claimed entity survives Fengzi's second effect and the rebuilt group's material state; the one paid native use still damages twice and finishes once.");
+        s.Cold();
+        var restored = s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Id == use.Id);
+        Need(restored.MaterialClaims.SequenceEqual(use.MaterialClaims) && restored.Action!.ActionId == use.Action!.ActionId &&
+            restored.Continuations.GroupCard!.DamageClaimedPhysicalCardIds.SequenceEqual([material]),
+            "Cold replay reconstructs the original use's receipt after the extra group effect, without another claim or a per-effect ledger.");
+        s.Continue(); s.Play();
+        Need(s.Zone(material) == CardLocation.Hand(1) &&
+            s.G.CardMovements.Count(m => m.CardId == material && m.From == CardLocation.Processing && m.To == CardLocation.Hand(1)) == 1 &&
+            s.E<ProgramDamageCardsClaimedEvent>().Count(e => e.CardIds.Contains(material)) == 1 &&
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) == 1,
+            "Returning from the real completed-use child does not reclaim, discard or repay the original material.");
     }
 
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
@@ -136,9 +172,16 @@ internal static class ShanheStartingResourceChecks
         public void Use(string activation, IReadOnlyList<int>? cards = null, IReadOnlyList<int>? targets = null) => Accept(new UseProgramSkillCommand(0, Driver, activation, cards ?? [], targets ?? [], G.Revision, P!.PromptId));
         public void Card(int id, IReadOnlyList<int> targets, bool conversion = false, int? targetCardId = null)
         {
-            var a = G.GetHumanLegalActions().First(a => a.CardId == id && (a.ConversionSource is not null) == conversion &&
+            var legal = G.GetHumanLegalActions();
+            var a = legal.FirstOrDefault(a => a.CardId == id && (a.ConversionSource is not null) == conversion &&
                 a.TargetSeats.SequenceEqual(targets) && (targetCardId is null || a.TargetCardId == targetCardId));
-            Accept(new PlayCardCommand(0, id, targets, G.Revision, P!.PromptId, a.PlayedCardKind, a.TargetCardId) { ConversionSource = a.ConversionSource, AdditionalConversionSources = a.AdditionalConversionSources });
+            Need(a is not null, "Missing requested starting-resource action: " + JsonSerializer.Serialize(new
+            {
+                id, targets, conversion, targetCardId, Hand = V().Hand.Select(c => new { c.Id, c.Kind }).ToArray(),
+                Legal = legal.Select(action => new { action.Kind, action.CardId, action.PlayedCardKind, action.TargetSeat,
+                    action.TargetSeats, Conversion = action.ConversionSource?.SkillId }).ToArray()
+            }));
+            Accept(new PlayCardCommand(0, id, targets, G.Revision, P!.PromptId, a!.PlayedCardKind, a.TargetCardId) { ConversionSource = a.ConversionSource, AdditionalConversionSources = a.AdditionalConversionSources });
         }
         public void Play() => Until(() => P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         public void Until(Func<bool> predicate)
@@ -160,10 +203,10 @@ internal static class ShanheStartingResourceChecks
             Need(State(G) == State(restored), "Cold replay retains the exact origin entities, native payment/cleanup/response frame, all views and movement prefix."); G = restored;
         }
         public static Scene Start(bool contract, bool claim = false, IReadOnlyList<ShanheStartingCard>? extra = null,
-            IReadOnlyList<ShanheStartingCard>? enemyEquipment = null)
+            IReadOnlyList<ShanheStartingCard>? enemyEquipment = null, bool repeatedClaim = false)
         {
-            var r = ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true), new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(), new Fixture(claim));
-            ShanheStartingCard[] cards = claim ? [new(CardKind.Slash, Suit.Heart, 9)] :
+            var r = ContentRegistry.Build(new StandardContentPackage(), new StandardActiveSkillExpansionPackage(true), new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(), new Fixture(claim, repeatedClaim));
+            ShanheStartingCard[] cards = repeatedClaim ? [new(CardKind.ArrowBarrage, Suit.Spade, 9), new(CardKind.DrawTwo, Suit.Heart, 8)] : claim ? [new(CardKind.Slash, Suit.Heart, 9)] :
                 [new(CardKind.DrawTwo, Suit.Heart, 1), new(CardKind.Dodge, Suit.Heart, 2), new(CardKind.Dodge, Suit.Spade, 3), new(CardKind.IronChain, Suit.Club, 4), new(CardKind.Peach, Suit.Heart, 5), new(CardKind.Lightning, Suit.Heart, 6)];
             var setup = new ShanheBattleSetup(83, 1, "fixture:starting-resources", Owner, 20, 0, 0, 0, 0, [], [.. cards, .. (extra ?? [])],
                 claim ? [] : [new(CardKind.Crossbow, Suit.Spade, 1), new(CardKind.BaguaFormation, Suit.Club, 2)],
@@ -176,7 +219,7 @@ internal static class ShanheStartingResourceChecks
         }
     }
 
-    private sealed class Fixture(bool claim) : IGameContentPackage
+    private sealed class Fixture(bool claim, bool repeatedClaim) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-shanhe-starting-resources", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
@@ -199,7 +242,10 @@ internal static class ShanheStartingResourceChecks
             var catalog = SkillProgramCatalog.Load(rules.ToJsonString(), JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = names }));
             foreach (var (id, program) in catalog.Programs) b.AddSkill(new(id, id, "真实实体夹具") { Program = program, ProgramPresentation = catalog.Presentations[id] });
             b.AddSkill(new("fixture:starting-resource-noop", "固定敌军", "无额外能力"));
-            b.AddGeneral(new(Owner, "初始资源拥有者", "supporter", Driver, "shu", 20, ["classic:longdan", UseWatch, ResponseWatch, BoardWatch]));
+            var ownerSkills = new List<string> { "classic:longdan", UseWatch, ResponseWatch, BoardWatch };
+            if (repeatedClaim)
+                ownerSkills.Add("ol:fengzi");
+            b.AddGeneral(new(Owner, "初始资源拥有者", "supporter", Driver, "shu", 20, ownerSkills));
             b.AddGeneral(new(Enemy, "真实敌方", "supporter", claim ? "classic:jianxiong" : "fixture:starting-resource-noop", "wei", 20));
             var standard = ContentRegistry.Build(new StandardContentPackage());
             foreach (var kind in new[] { CardKind.IronChain, CardKind.Indulgence, CardKind.Crossbow })

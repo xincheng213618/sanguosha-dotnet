@@ -20,11 +20,19 @@ internal static class BoundaryCaoCaoMobileChecks
         s.Reach(s.Offered); var hand = s.V(0).HandCount; var hp = s.V(0).Hp;
         s.Activate(); s.Reach(() => s.P?.SkillPrompt?.SkillId == Watch && s.P.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") == "continue"));
         var frame = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == Skill); var frameId = frame.Id;
+        var use = s.G.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardId == material);
+        var receipt = use.MaterialClaims.Single();
         s.Need(frame.InstructionIndex == 1 && frame.PendingMovementContinuation is { SubjectSeat: 0 } &&
             s.V(0).HandCount == hand + 1 && s.V(0).Hand.Any(c => c.Id == material) && s.Moves(DrawReason) == 0 &&
+            receipt.CardId == material && receipt.RecipientSeat == 0 &&
+            s.G.CardMovements.Single(m => m.Sequence == receipt.MovementSequence) is { From.Zone: CardZoneKind.Processing, To: var destination } &&
+            destination == CardLocation.Hand(0) &&
             s.E<ProgramDamageCardsClaimedEvent>().Count(e => e.FrameId == frameId && e.OwnerSeat == 0 && e.CardIds.SequenceEqual([material])) == 1,
             "The actual Duel material is obtained on the original damage frame before the mobile draw; its genuine gain child interrupts the still-paid claim instruction.");
-        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+        s.Cold();
+        s.Need(s.G.ResolutionStack.OfType<CardUseFrame>().Single(f => f.Id == use.Id).MaterialClaims.SequenceEqual(use.MaterialClaims),
+            "Cold replay retains the material receipt on the original native use while its claimant's actual gain child is still suspended.");
+        s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("advanced-value") == Skill) == true);
         s.Answer(c => c.Parameters.GetValueOrDefault("advanced-value") == Skill);
         s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("advanced-value") == "finish") == true);

@@ -34,7 +34,7 @@ public sealed record MouHqEffectRounds(long ActionId,ExtraCardEffectState Native
         OriginalAttacks=x.OriginalAttacks.Select(s=>s with{Attack=s.Attack with{
             PhysicalCardIds=Array.AsReadOnly(s.Attack.PhysicalCardIds.ToArray()),ChainedTargetSeats=Array.AsReadOnly(s.Attack.ChainedTargetSeats.ToArray()),
             ResponseProhibitingSkillNames=Array.AsReadOnly(s.Attack.ResponseProhibitingSkillNames.ToArray()),
-            RangePreventionVisitedTargets=s.Attack.RangePreventionVisitedTargets is{}v?Array.AsReadOnly(v.ToArray()):null}}).ToArray(),MaterialClaims=x.MaterialClaims.ToArray()};
+            RangePreventionVisitedTargets=s.Attack.RangePreventionVisitedTargets is{}v?Array.AsReadOnly(v.ToArray()):null}}).ToArray()};
 }
 public sealed partial record CardUseFrame
 {
