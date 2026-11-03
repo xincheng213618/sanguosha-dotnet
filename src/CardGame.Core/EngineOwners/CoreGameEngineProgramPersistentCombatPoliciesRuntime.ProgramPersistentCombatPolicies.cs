@@ -36,10 +36,18 @@ internal sealed partial class CoreGameEngineProgramPersistentCombatPoliciesRunti
     {
         if (!_coreLordSkillProjectionsOperations.HasSkillRoleQualification(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], frame.SkillId, frame.SkillInstanceId, Role.Lord) || frame.SelectedTargetSeats.Count is < 1 or > 2 || frame.SelectedTargetSeats.Distinct().Count() != frame.SelectedTargetSeats.Count || frame.SelectedTargetSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat) || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive))
             throw new InvalidOperationException("A game-long faction range grant requires a lord and one or two distinct living targets.");
-        var state = new GameEngine.ProgramGameFactionRangeTargets(frame.OwnerSeat, frame.SkillId, factionId, frame.SelectedTargetSeats.ToArray());
-        _coreGameEngineProgramPersistentCombatPoliciesProgramGameFactionRangeTargetsProgramPlayDamageHandLimitsAccess._programGameFactionRangeTargets.Add(state);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramGameFactionAttackRangeTargetsGrantedEvent(state.OwnerSeat, state.SkillId, state.FactionId, state.TargetSeats));
+        using var declaration = System.Text.Json.JsonDocument.Parse(System.Text.Json.JsonSerializer.Serialize(new[] { "isFaction", "eventSource", factionId }));
+        var condition = ProgramExpressions.Parse(declaration.RootElement, "attack-range.faction");
+        var options = new DirectedCardPolicyOptions
+        {
+            RequiresEffectiveSource = false, CaptureOnUse = false, Until = [], While = condition
+        };
+        foreach (var actor in _coreMatchParticipantsPlayersAccess._players.Where(actor => actor.Seat != frame.OwnerSeat))
+            foreach (var target in frame.SelectedTargetSeats.Where(target => target != actor.Seat))
+                _coreDirectedTurnCardPoliciesOperations.GrantDirectedCardPolicy(frame, actor.Seat, target, [],
+                    DirectedTurnCardPolicyEffect.InAttackRange, options,
+                    issuanceSlot: actor.Seat * _coreMatchParticipantsPlayersAccess._players.Count + target);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramGameFactionAttackRangeTargetsGrantedEvent(frame.OwnerSeat, frame.SkillId, factionId, Array.AsReadOnly(frame.SelectedTargetSeats.ToArray())));
     }
 
-    internal bool IsGameFactionAttackRangeTarget(int actorSeat, int targetSeat) => actorSeat != targetSeat && _coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) && _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive && (_characterSunXiuBoundaryMobileOperations.Value.IsBoundarySunXiuFactionRangeTarget(actorSeat, targetSeat) || _coreGameEngineProgramPersistentCombatPoliciesProgramGameFactionRangeTargetsProgramPlayDamageHandLimitsAccess._programGameFactionRangeTargets.Any(state => actorSeat != state.OwnerSeat && state.TargetSeats.Contains(targetSeat) && string.Equals(_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[actorSeat]), state.FactionId, StringComparison.Ordinal)));
 }

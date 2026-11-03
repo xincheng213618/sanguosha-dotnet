@@ -2,9 +2,6 @@ namespace CardGame.Core;
 
 internal interface IHeQiSelectionQueries : IProgramSelectionQuery
 {
-    bool HasRoundRange(int sourceSeat, int targetSeat);
-    int CombatDistance(int sourceSeat, int targetSeat);
-    int AttackRange(int seat);
     int EquipmentSlotCapacity(int seat, EquipmentSlot slot);
     int EquipmentCountInSlot(int seat, EquipmentSlot slot);
 }
@@ -30,9 +27,7 @@ internal static class ShanxiRuntime
     internal static bool AllowsTarget(int ownerSeat, int targetSeat, IProgramSelectionQueries queries)
     {
         if (targetSeat == ownerSeat || !queries.Get<ISelectionParticipantQueries>().IsAlive(targetSeat)) return false;
-        var range = queries.Get<IHeQiSelectionQueries>();
-        return !range.HasRoundRange(targetSeat, ownerSeat) &&
-            range.CombatDistance(targetSeat, ownerSeat) > range.AttackRange(targetSeat);
+        return !queries.Get<IAttackRangeQueries>().IsWithinAttackRange(targetSeat, ownerSeat);
     }
 }
 

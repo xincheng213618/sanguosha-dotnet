@@ -19,7 +19,7 @@ internal sealed partial class CoreGameEngineWushuangZengouRuntime
     {
         if (!UsesActualDodgeZengou(c.SkillId))
             return true;
-        return WushuangZengouWindow(context)is { } w && w.Action.ActorSeat != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[w.Action.ActorSeat].IsAlive && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(c.OwnerSeat, w.Action.ActorSeat) && _coreCardUseLifecycleOperations.LifecycleCardUse(w.AttackOwnerFrameId!.Value)?.WushuangZengouInvalidation?.Payment.ActionId != w.Action.ActionId;
+        return WushuangZengouWindow(context)is { } w && w.Action.ActorSeat != c.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[w.Action.ActorSeat].IsAlive && _attackRanges.IsWithinAttackRange(c.OwnerSeat, w.Action.ActorSeat) && _coreCardUseLifecycleOperations.LifecycleCardUse(w.AttackOwnerFrameId!.Value)?.WushuangZengouInvalidation?.Payment.ActionId != w.Action.ActionId;
     }
 
     internal Card[] WushuangZengouCosts(ProgramSkillFrame f) => WushuangZengouCosts(f.OwnerSeat, f.SkillId, f.SkillInstanceId);
@@ -73,7 +73,7 @@ internal sealed partial class CoreGameEngineWushuangZengouRuntime
         if (f.WushuangZengou is not { Stage: "choosing" } r || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != f.OwnerSeat || !CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([selected], WushuangZengouChoices(f).Where(c => c.Id == selected.Id).ToArray()) || WushuangZengouWindow(f.WindowContext)?.Action.ActionId != r.ActionId)
             throw new InvalidOperationException("Zengou lost its exact unpaid Dodge use or published choice.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, r.DodgerSeat))
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !_attackRanges.IsWithinAttackRange(f.OwnerSeat, r.DodgerSeat))
         {
             CompleteWushuangZengou(f);
             return;

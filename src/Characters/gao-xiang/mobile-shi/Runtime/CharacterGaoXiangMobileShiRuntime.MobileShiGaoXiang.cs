@@ -54,8 +54,8 @@ internal sealed partial class CharacterGaoXiangMobileShiRuntime
     internal IEnumerable<int> ShiZxSlashTargetSeats(int ownerSeat, int receiverSeat) => _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != ownerSeat && player.Seat != receiverSeat && ShiZxRangeCoverage(player.Seat).Contains(receiverSeat)).Select(player => player.Seat);
     internal HashSet<int> ShiZxRangeCoverage(int seat)
     {
-        var range = _coreNativeRuleQueriesOperations.GetAttackRange(seat);
-        return _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != seat && _coreNativeRuleQueriesOperations.GetCombatDistance(seat, player.Seat) <= range).Select(player => player.Seat).ToHashSet();
+
+        return _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != seat && _attackRanges.IsWithinAttackRange(seat, player.Seat)).Select(player => player.Seat).ToHashSet();
     }
 
     internal void PublishShiZx(ProgramSkillFrame f, ShiZxStage stage, (int Seat, int? Card)[] options, IReadOnlyList<int> selected)

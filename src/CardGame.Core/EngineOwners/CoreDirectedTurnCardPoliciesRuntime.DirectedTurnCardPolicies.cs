@@ -19,6 +19,10 @@ internal sealed partial class CoreDirectedTurnCardPoliciesRuntime
         if (effects.HasFlag(DirectedTurnCardPolicyEffect.BypassUseLimit) && cardKinds.Count > 0)
             throw new InvalidOperationException("An all-use quota allowance requires all card kinds.");
         options ??= new();
+        if (effects.HasFlag(DirectedTurnCardPolicyEffect.InAttackRange) &&
+            (effects != DirectedTurnCardPolicyEffect.InAttackRange || cardKinds.Count > 0 || options.CaptureOnUse) ||
+            options.While is not null && effects != DirectedTurnCardPolicyEffect.InAttackRange)
+            throw new InvalidOperationException("An attack-range relation is independent of card-specific policy effects and card-use snapshots.");
         var effectIndex = frame.InstructionIndex - 1;
         var source = CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame);
         var normalizedKinds = cardKinds.Distinct().Order().ToArray();
@@ -26,7 +30,8 @@ internal sealed partial class CoreDirectedTurnCardPoliciesRuntime
         if (existing is not null)
         {
             if (existing.Source != source || existing.ActorSeat != actorSeat || existing.TargetSeat != targetSeat || !existing.CardKinds.SequenceEqual(normalizedKinds) || existing.Effects != effects ||
-                existing.RequiresEffectiveSource != options.RequiresEffectiveSource || existing.CaptureOnUse != options.CaptureOnUse)
+                existing.RequiresEffectiveSource != options.RequiresEffectiveSource || existing.CaptureOnUse != options.CaptureOnUse ||
+                (existing.While is null ? options.While is not null : options.While is null || !existing.While.StructurallyEquals(options.While)))
                 throw new InvalidOperationException("A directed-policy grant key changed its meaning.");
             return;
         }
@@ -35,7 +40,7 @@ internal sealed partial class CoreDirectedTurnCardPoliciesRuntime
             new(frame.OwnerSeat, targetSeat, IssuedTurnNumber: _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber))
             ?? throw new InvalidOperationException("A directed policy requires a valid boundary lifetime.");
         var policy = new DirectedTurnCardPolicy(++_coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesDirectedTurnCardPolicySequenceAccess._directedTurnCardPolicySequence, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, frame.Id, effectIndex, source, actorSeat, targetSeat, Array.AsReadOnly(normalizedKinds), effects)
-        { IssuanceSlot = issuanceSlot, Until = lifetime.Until, RequiresEffectiveSource = options.RequiresEffectiveSource, CaptureOnUse = options.CaptureOnUse };
+        { IssuanceSlot = issuanceSlot, Until = lifetime.Until, RequiresEffectiveSource = options.RequiresEffectiveSource, CaptureOnUse = options.CaptureOnUse, While = options.While };
         _coreDirectedTurnCardPoliciesDirectedTurnCardPoliciesDirectedTurnCardPolicySequenceAccess._directedTurnCardPolicies.Add(policy);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DirectedTurnCardPolicyGrantedEvent(policy));
     }

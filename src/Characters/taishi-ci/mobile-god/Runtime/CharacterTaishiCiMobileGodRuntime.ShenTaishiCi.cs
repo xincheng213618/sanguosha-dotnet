@@ -10,15 +10,6 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     internal static CardConversionSource ShenTscSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal bool ShenTscMissionOver(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenTaishiCiPoweiMissionEvent>().Any(e => e.OwnerSeat == owner);
     internal int ShenTscWei(int seat, int owner) => _coreMatchParticipantsPlayersAccess._players[seat].MarkerSourceCounts.GetValueOrDefault((PlayerMarkerKind.ShenTaishiCiWei, owner));
-    internal bool HasShenTaishiCiPoweiRange(int actor, int target) => _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenTaishiCiPoweiRangeEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.AttackerSeat == actor && e.OwnerSeat == target) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TurnEndedEvent>().Any(e => e.TurnNumber == _coreActualTurnProgressTurnNumberAccess._turnNumber && e.ActorSeat == actor);
-    [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 38200)]
-    [ProgramDistanceRule(ProgramDistanceStage.VirtualSlash, 38200)]
-    [ProgramDistanceRule(ProgramDistanceStage.ProvidedSlash, 38200)]
-    [ProgramDistanceRule(ProgramDistanceStage.BorrowedSlash, 38200)]
-    [ProgramDistanceRule(ProgramDistanceStage.BorrowedPhysicalSlash, 38200)]
-    [ProgramDistanceRule(ProgramDistanceStage.BorrowedPaidWeaponSlash, 38200)]
-    [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 38200)]
-    internal bool ShenTscPoweiSlashRange(ProgramSlashDistanceQuery q) => HasShenTaishiCiPoweiRange(q.Actor.Seat, q.Target.Seat);
     SkillProgramStepOutcome IShenTaishiCiHost.Powei(ProgramSkillFrame f) => ResolveShenTscPowei(f);
     void IShenTaishiCiHost.Dulie(ProgramSkillFrame f) => ResolveShenTscDulie(f);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 38200)]
@@ -235,7 +226,12 @@ internal sealed partial class CharacterTaishiCiMobileGodRuntime
     internal void GrantShenTscRange(ProgramSkillFrame f)
     {
         var r = f.ShenTaishiCiPowei!;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenTaishiCiPoweiRangeEvent(f.Id, f.OwnerSeat, r.TargetSeat, r.ActualTurn));
+        _coreDirectedTurnCardPoliciesOperations.GrantDirectedCardPolicy(f, r.TargetSeat, f.OwnerSeat, [],
+            DirectedTurnCardPolicyEffect.InAttackRange, new()
+            {
+                RequiresEffectiveSource = false, CaptureOnUse = false,
+                Until = [new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.TurnOwner)]
+            });
     }
 
     internal void FinishShenTscPowei(ProgramSkillFrame f)

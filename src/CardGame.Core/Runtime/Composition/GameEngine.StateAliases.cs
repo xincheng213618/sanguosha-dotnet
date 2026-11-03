@@ -97,7 +97,6 @@ public sealed partial class GameEngine
     private ref readonly List<ProgramBooleanStateLease> _programBooleanStateLeases => ref _programBooleanStateExpiration.ReferenceToProgramBooleanStateLeases;
     private ref ProgramPhaseSchedule? _programPhaseSchedule => ref phaseScheduleStorage.Current;
     private ref readonly Dictionary<int, ProgramPlayDamageHandLimit> _programPlayDamageHandLimits => ref _programPersistentCombatPolicies.ReferenceToProgramPlayDamageHandLimits;
-    private ref readonly List<ProgramGameFactionRangeTargets> _programGameFactionRangeTargets => ref _programPersistentCombatPolicies.ReferenceToProgramGameFactionRangeTargets;
     private ref readonly Dictionary<ProgramBooleanStateKey, bool> _programBooleanStates => ref _programPersistentState.ReferenceToProgramBooleanStates;
     private ref readonly List<ProgramPhaseColorRestriction> _programPhaseColorRestrictions => ref _programPhaseColorRestrictions2.ReferenceToProgramPhaseColorRestrictions;
     private ref readonly Dictionary<(int Owner, string Skill, string Instance), PublicPersistentPileSource> _publicPersistentPiles => ref _publicPileSources.ReferenceToPublicPersistentPiles;

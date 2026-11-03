@@ -14,17 +14,17 @@ internal sealed partial class CoreGameEngineProgramCardPaymentsRuntime
     {
         if (!_coreMatchParticipantsPlayersAccess._players[subjectSeat].IsAlive)
             return 0;
-        var range = _coreNativeRuleQueriesOperations.GetAttackRange(subjectSeat);
-        return _coreMatchParticipantsPlayersAccess._players.Count(player => player.IsAlive && player.Seat != subjectSeat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(subjectSeat, player.Seat));
+
+        return _coreMatchParticipantsPlayersAccess._players.Count(player => player.IsAlive && player.Seat != subjectSeat && _attackRanges.IsWithinAttackRange(subjectSeat, player.Seat));
     }
 
     internal bool WouldEquipmentRemovalReduceCoverage(int subjectSeat, int equipmentCardId)
     {
         if (!_coreMatchParticipantsPlayersAccess._players[subjectSeat].IsAlive || !_corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[subjectSeat]).Any(card => card.Id == equipmentCardId))
             return false;
-        var subject = _coreMatchParticipantsPlayersAccess._players[subjectSeat];
-        var projectedRange = CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(subject, equipmentCardId));
-        var projectedCount = _coreMatchParticipantsPlayersAccess._players.Count(player => player.IsAlive && player.Seat != subjectSeat && (_characterSunYuanOlOperations.HasSayingRoundRange(subjectSeat, player.Seat) || _coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(subjectSeat, player.Seat) || CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(subject, player, equipmentCardId)) <= projectedRange));
+
+
+        var projectedCount = _coreMatchParticipantsPlayersAccess._players.Count(player => player.IsAlive && player.Seat != subjectSeat && _attackRanges.IsWithinAttackRange(subjectSeat, player.Seat, equipmentCardId));
         return projectedCount < CountLivingInAttackRange(subjectSeat);
     }
 

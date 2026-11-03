@@ -9,7 +9,6 @@ internal sealed partial class CharacterSunXiuBoundaryMobileRuntime
     internal static CardConversionSource BoundarySunXiuSource(ProgramSkillFrame frame) => new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
     SkillProgramStepOutcome IBoundarySunXiuHost.Resolve(ProgramSkillFrame frame) => BeginBoundaryXingxue(frame);
     bool IBoundarySunXiuSelectionQuery.HasOwnedRegionCards(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat).Count + _cardZonesOperations._cardZones.CardsAt(CardLocation.Judgment(seat)).Count > 0;
-    internal bool IsBoundarySunXiuFactionRangeTarget(int actorSeat, int targetSeat) => _coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && owner.Seat != actorSeat && _coreNationalSkillsOperations.HasRuntimeSkill(owner, BoundarySunXiuComposition.Zhaofu) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(owner, BoundarySunXiuComposition.Zhaofu, null, Role.Lord) && string.Equals(_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[actorSeat]), "wu", StringComparison.Ordinal) && _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, targetSeat) == 1);
     internal SkillProgramStepOutcome BeginBoundaryXingxue(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

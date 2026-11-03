@@ -127,7 +127,7 @@ internal sealed partial class CharacterDianWeiHappyGodRuntime
             {
                 if (_coreTreatedWoundedOperations.IsRuleWounded(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))
                     choices.Add(Make("recover", "回复1点体力。"));
-                foreach (var seat in _coreTableOrderOperations.CurrentTableOrder().Where(s => s != f.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[s].IsAlive && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, s)))
+                foreach (var seat in _coreTableOrderOperations.CurrentTableOrder().Where(s => s != f.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[s].IsAlive && _attackRanges.IsWithinAttackRange(f.OwnerSeat, s)))
                     choices.Add(Make("damage", $"对{(_coreMatchParticipantsPlayersAccess._players[seat].Name)}造成1点伤害。", [seat]));
             }
         }

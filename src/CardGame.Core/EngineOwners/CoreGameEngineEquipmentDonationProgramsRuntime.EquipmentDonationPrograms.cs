@@ -131,7 +131,7 @@ internal sealed partial class CoreGameEngineEquipmentDonationProgramsRuntime
         if (receipt.Stage != EquipmentDonationStage.SelectingTargets)
             throw new InvalidOperationException("Donation target prompt has no selecting receipt.");
         if (receipt.DamageTargets.Count < receipt.ActualDeliveredCount)
-            foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != receipt.RecipientSeat && !receipt.DamageTargets.Contains(p.Seat) && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(receipt.RecipientSeat, p.Seat)).OrderBy(p => p.Seat))
+            foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != receipt.RecipientSeat && !receipt.DamageTargets.Contains(p.Seat) && _attackRanges.IsWithinAttackRange(receipt.RecipientSeat, p.Seat)).OrderBy(p => p.Seat))
                 Add($"target:{(target.Seat)}", $"选择 {(target.Name)}。", [target.Seat]);
         Add("confirm", "确认已选目标；可不选择任何角色。", receipt.DamageTargets);
         return choices;
@@ -165,7 +165,7 @@ internal sealed partial class CoreGameEngineEquipmentDonationProgramsRuntime
                 };
                 break;
             case "confirm":
-                if (receipt.DamageTargets.Any(seat => !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(receipt.RecipientSeat, seat)))
+                if (receipt.DamageTargets.Any(seat => !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || !_attackRanges.IsWithinAttackRange(receipt.RecipientSeat, seat)))
                     throw new InvalidOperationException("A donation target left the recipient's actual range before confirmation.");
                 _coreRuntimeOperations.ReplaceRuntimeTop(f with { EquipmentDonation = receipt with { Stage = EquipmentDonationStage.Damaging }, ReexecuteParticipantInstruction = true });
                 _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);

@@ -13,6 +13,6 @@ internal sealed partial class CharacterFaZhengBoundaryMobileRuntime
             throw new InvalidOperationException("Mobile Xuanhuo must retain its original draw-replacement frame and exact commanded actor.");
         // A privilege to use a particular Slash without distance does not enlarge
         // the attack range named by this skill's target-selection instruction.
-        return _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && target.IsAlive && target.Seat != actor && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(actor, target.Seat)).Select(target => target.Seat).ToArray();
+        return _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && target.IsAlive && target.Seat != actor && _attackRanges.IsWithinAttackRange(actor, target.Seat)).Select(target => target.Seat).ToArray();
     }
 }

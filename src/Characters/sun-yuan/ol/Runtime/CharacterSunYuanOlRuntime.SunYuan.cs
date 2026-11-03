@@ -214,9 +214,15 @@ internal sealed partial class CharacterSunYuanOlRuntime
                 return;
             }
 
-            if (!_coreProgramDodgeResponsesOperations.IsWithinAttackRange(r.Holder, f.OwnerSeat))
+            if (!_attackRanges.IsWithinAttackRange(r.Holder, f.OwnerSeat))
             {
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SayingRangeGrantedEvent(id, r.Source, _coreActualRoundProgressRoundNumberAccess._roundNumber, f.OwnerSeat, r.Holder));
+                var options = new DirectedCardPolicyOptions
+                {
+                    RequiresEffectiveSource = false, CaptureOnUse = false,
+                    Until = [new(SkillStateBoundaryEvent.RoundAdvanced, null)]
+                };
+                _coreDirectedTurnCardPoliciesOperations.GrantDirectedCardPolicy(f, f.OwnerSeat, r.Holder, [], DirectedTurnCardPolicyEffect.InAttackRange, options, issuanceSlot: 0);
+                _coreDirectedTurnCardPoliciesOperations.GrantDirectedCardPolicy(f, r.Holder, f.OwnerSeat, [], DirectedTurnCardPolicyEffect.InAttackRange, options, issuanceSlot: 1);
                 FinishSunYuan(f, true);
                 return;
             }

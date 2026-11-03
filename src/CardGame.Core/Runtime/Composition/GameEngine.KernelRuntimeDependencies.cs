@@ -377,6 +377,8 @@ public sealed partial class GameEngine
     private sealed class KernelCreateProgramExpressionWorldOperationsAdapter(GameEngine engine) : IKernelCreateProgramExpressionWorldOperations
     {
         public NativeOwners.ProgramExpressionWorld CreateProgramExpressionWorld(ProgramSkillFrame frame) => engine.ComposeNativeProgramExpressionWorld(frame);
+        public IProgramExpressionWorld CreateAttackRangeExpressionWorld(int sourceOwner, int actor, int target) =>
+            engine.ComposeNativeAttackRangeExpressionWorld(sourceOwner, actor, target);
         public IProgramExpressionWorld CreateTriggerExpressionWorld(ProgramTriggerCandidate candidate,
             ProgramSkillWindowContext? context, SkillProgramTriggerFacts? facts) =>
             engine.ComposeNativeTriggerExpressionWorld(candidate, context, facts);

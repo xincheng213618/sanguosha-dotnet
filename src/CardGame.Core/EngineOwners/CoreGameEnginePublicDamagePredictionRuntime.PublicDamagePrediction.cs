@@ -113,7 +113,7 @@ internal sealed partial class CoreGameEnginePublicDamagePredictionRuntime
                         SkillProgramDamageModifierCondition.OwnerUsedHeartSlash => issuedAttack is null ? prospectiveSuit == Suit.Heart : _coreHeartSlashDamageOperations.Value.MatchesOwnerUsedHeartSlash(issuedAttack),
                         SkillProgramDamageModifierCondition.SourceHandBelowLimit => Math.Max(0, source.HandCount - paidHandCards) < modifier.SourceHandCountLimit,
                         SkillProgramDamageModifierCondition.SourceNotFewerHandAndEquipmentThanTarget => target.HandCount <= Math.Max(0, source.HandCount - paidHandCards) && target.Equipment.Count <= source.Equipment.Count,
-                        SkillProgramDamageModifierCondition.SourceOutsideTargetAttackRange => !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(targetSeat, sourceSeat),
+                        SkillProgramDamageModifierCondition.SourceOutsideTargetAttackRange => !_attackRanges.IsWithinAttackRange(targetSeat, sourceSeat),
                         SkillProgramDamageModifierCondition.OwnerRoundSlashUseOrdinalWithinLimit or SkillProgramDamageModifierCondition.OwnerActualTurnElementalSlashUseOrdinalWithinLimit or SkillProgramDamageModifierCondition.OwnerGameSlashUseOrdinalMultipleOfThree => _coreSlashUseOrdinalsOperations.MatchesSlashUseOrdinalModifier(modifier, issuedAttack, sourceSeat, effective),
                         _ => false
                     });

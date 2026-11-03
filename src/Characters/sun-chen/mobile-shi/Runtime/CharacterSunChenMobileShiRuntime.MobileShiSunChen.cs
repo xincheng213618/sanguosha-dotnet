@@ -251,7 +251,7 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
 
             if (r.Stage == ShiScStage.DiscardChildren)
             {
-                var participants = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, p.Seat)).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(f.OwnerSeat, p.Seat)).Select(p => p.Seat).ToArray();
+                var participants = _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && _attackRanges.IsWithinAttackRange(f.OwnerSeat, p.Seat)).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(f.OwnerSeat, p.Seat)).Select(p => p.Seat).ToArray();
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiSunChen = r with { Stage = ShiScStage.Votes, Participants = participants } });
                 for (var i = 0; i < participants.Length; i++)
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiScParticipantEvent(id, i, participants[i]));

@@ -14,7 +14,7 @@ internal sealed partial class CharacterZhouYuLeRuntime
         return _coreMatchSetupSetupCompleteAccess._setupComplete && _coreMatchOutcomeWinnerAccess._winner == Winner.None && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat == actor && _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && phase is { Kind: ActualDiscardRecoveryPhaseKind.Play } && phase.ActorSeat == actor && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(phase) ? phase : null;
     }
 
-    internal int[] PingluTargets(int actor) => _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != actor && _coreNativeRuleQueriesOperations.GetCombatDistance(actor, player.Seat) <= _coreNativeRuleQueriesOperations.GetAttackRange(actor)).OrderBy(player => _coreTableOrderOperations.RelativeTableOrder(actor, player.Seat)).Select(player => player.Seat).ToArray();
+    internal int[] PingluTargets(int actor) => _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != actor && _attackRanges.IsWithinAttackRange(actor, player.Seat)).OrderBy(player => _coreTableOrderOperations.RelativeTableOrder(actor, player.Seat)).Select(player => player.Seat).ToArray();
     internal bool HasPingluCustody(int owner, ActualDiscardRecoveryPhaseKey phase)
     {
         var starts = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PingluStartedEvent>().Where(e => e.Source.OwnerSeat == owner && e.Phase == phase).Select(e => e.FrameId).ToHashSet();

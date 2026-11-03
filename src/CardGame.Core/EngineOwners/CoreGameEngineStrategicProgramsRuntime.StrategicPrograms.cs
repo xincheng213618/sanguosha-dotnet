@@ -79,7 +79,7 @@ internal sealed partial class CoreGameEngineStrategicProgramsRuntime
                         SkillProgramCardPolicyKind.MarkerTurnBonuses when player.MarkerSourceCounts.GetValueOrDefault((PlayerMarkerKind.Camp, source.Seat)) > 0 && query is SkillRuleQuery.DrawCount or SkillRuleQuery.SlashLimit or SkillRuleQuery.HandLimit => 1,
                         SkillProgramCardPolicyKind.WoundedPopulationBonuses when source.Seat == player.Seat && query == SkillRuleQuery.HandLimit && WoundedCount() >= 1 => 1,
                         SkillProgramCardPolicyKind.WoundedPopulationBonuses when source.Seat == player.Seat && query == SkillRuleQuery.DrawCount && WoundedCount() >= 3 => 1,
-                        SkillProgramCardPolicyKind.WoundedInRangeHandLimitPenalty when query == SkillRuleQuery.HandLimit && source.Seat != player.Seat && _coreTreatedWoundedOperations.IsRuleWounded(player) && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(source.Seat, player.Seat) => -1,
+                        SkillProgramCardPolicyKind.WoundedInRangeHandLimitPenalty when query == SkillRuleQuery.HandLimit && source.Seat != player.Seat && _coreTreatedWoundedOperations.IsRuleWounded(player) && _attackRanges.IsWithinAttackRange(source.Seat, player.Seat) => -1,
                         _ => 0
                     };
                     if (value != 0)

@@ -317,6 +317,7 @@ internal interface IKernelCreateProgramAttackHandleOperations : IProgramRuntimeO
 internal interface IKernelCreateProgramExpressionWorldOperations : IProgramRuntimeOperations
 {
     NativeOwners.ProgramExpressionWorld CreateProgramExpressionWorld(ProgramSkillFrame frame);
+    IProgramExpressionWorld CreateAttackRangeExpressionWorld(int sourceOwner, int actor, int target);
     IProgramExpressionWorld CreateTriggerExpressionWorld(ProgramTriggerCandidate candidate,
         ProgramSkillWindowContext? context, SkillProgramTriggerFacts? facts);
 }

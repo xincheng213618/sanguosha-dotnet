@@ -63,8 +63,8 @@ internal sealed partial class CharacterHuangChongMobileShiRuntime
 
     internal IEnumerable<int> ShiHcRangeSeats(int seat)
     {
-        var range = _coreNativeRuleQueriesOperations.GetAttackRange(seat);
-        return _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != seat && _coreNativeRuleQueriesOperations.GetCombatDistance(seat, player.Seat) <= range).Select(player => player.Seat).ToArray();
+
+        return _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != seat && _attackRanges.IsWithinAttackRange(seat, player.Seat)).Select(player => player.Seat).ToArray();
     }
 
     internal void ContinueShiHcChoosers(ProgramSkillFrame f)

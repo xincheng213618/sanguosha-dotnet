@@ -9,7 +9,7 @@ internal sealed partial class CharacterDaQiaoMobileRuntime
     {
         if (owner == attack.SourceSeat || !_coreProgramAttackEffectsOperations.Value.IsProgramSlashRedirectBaseTarget(attack, owner, target))
             return false;
-        return _characterTaishiCiMobileGodOperations.HasShenTaishiCiPoweiRange(owner, target) || _characterSunYuanOlOperations.HasSayingRoundRange(owner, target) || _coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(owner, target) || CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target], excludedEquipment)) <= CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(_coreMatchParticipantsPlayersAccess._players[owner], excludedEquipment));
+        return _attackRanges.IsWithinAttackRange(owner, target, excludedEquipment);
     }
 
     internal bool IsPostCostSlashRedirectPaymentPair(ProgramSkillFrame frame, NativeOwners.CardAttackHandle attack, int target, CardLocation source, Card card) => source.OwnerSeat == frame.OwnerSeat && source.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _cardZonesOperations._cardZones.GetLocation(card.Id) == source && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(frame.OwnerSeat, card, source, OwnedCardMoveIntent.Discard) && IsPostCostSlashRedirectTarget(attack, frame.OwnerSeat, target, source.Zone == CardZoneKind.Equipment ? card.Id : null);

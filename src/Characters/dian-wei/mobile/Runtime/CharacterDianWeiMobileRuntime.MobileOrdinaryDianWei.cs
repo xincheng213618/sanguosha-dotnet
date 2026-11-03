@@ -7,8 +7,8 @@ internal sealed partial class CharacterDianWeiMobileRuntime
     {
         distance = CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target], excludedWeapon));
         range = CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateAttackRange(_coreMatchParticipantsPlayersAccess._players[owner], excludedWeapon));
-        special = _characterTaishiCiMobileGodOperations.HasShenTaishiCiPoweiRange(owner, target) || _characterSunYuanOlOperations.HasSayingRoundRange(owner, target) || _coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(owner, target);
-        return special || distance <= range;
+        special = _attackRanges.HasRelation(owner, target);
+        return _attackRanges.IsWithinAttackRange(owner, target, excludedWeapon);
     }
 
     internal bool AllowsMobileOrdinaryQiangxiWeaponTarget(int owner, int weapon, int target)

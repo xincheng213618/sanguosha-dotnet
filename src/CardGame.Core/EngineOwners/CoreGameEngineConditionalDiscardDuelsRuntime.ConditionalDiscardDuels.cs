@@ -21,7 +21,7 @@ internal sealed partial class CoreGameEngineConditionalDiscardDuelsRuntime
     internal SkillProgramStepOutcome BeginConditionalDiscardDuel(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (f.ConditionalDiscardDuel is not null || f.SelectedTargetSeats is not [var target] || !ConditionalDuelSourceCurrent(f) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, target))
+        if (f.ConditionalDiscardDuel is not null || f.SelectedTargetSeats is not [var target] || !ConditionalDuelSourceCurrent(f) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_attackRanges.IsWithinAttackRange(f.OwnerSeat, target))
             return SkillProgramStepOutcome.Continue;
         var source = new CardConversionSource(f.SkillId, f.ActivationId!, f.OwnerSeat, f.SkillInstanceId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ConditionalDiscardDuel = new(f.InstructionIndex, source, f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, target, ConditionalDiscardDuelStage.OwnerChoice) });

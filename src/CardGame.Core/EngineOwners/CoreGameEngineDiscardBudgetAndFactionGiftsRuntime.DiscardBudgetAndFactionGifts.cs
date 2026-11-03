@@ -205,12 +205,12 @@ internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsRuntime
     {
         if (f.WindowContext is not { Window: SkillProgramTriggerWindow.BeforeDamageApplied, SourceSeat: { } source, TargetSeat: { } target })
             throw new InvalidOperationException("Range prevention requires its real damage window.");
-        if (source == f.OwnerSeat && source == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(target, source))
+        if (source == f.OwnerSeat && source == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && !_attackRanges.IsWithinAttackRange(target, source))
             _coreDamagePreventionProgramsOperations.PreventProgramCurrentDamage(f);
         return SkillProgramStepOutcome.Continue;
     }
 
-    internal int[] OutsideRangePlayers(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(p.Seat, owner)).Select(p => p.Seat).ToArray();
+    internal int[] OutsideRangePlayers(int owner) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && !_attackRanges.IsWithinAttackRange(p.Seat, owner)).Select(p => p.Seat).ToArray();
     internal IReadOnlyList<PromptChoice> OutsideRangeDiscardChoices(ProgramSkillFrame f) => _coreProgramOtherOwnedCardDiscardsOperations.BuildOtherOwnedCardDiscardChoices(f.Id, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment, CardZoneKind.Judgment], new($"skill-program.{(f.SkillId)}.ChooseOtherOwnedCardDiscard")).Where(c => OutsideRangePlayers(f.OwnerSeat).Contains(c.Targets.Single())).Select(c => c with { Parameters = new Dictionary<string, string>(c.Parameters) { ["program-action"] = "outside-range-discard" } }).ToArray();
     internal SkillProgramStepOutcome BeginOutsideRangeDiscard(ProgramSkillFrame f)
     {

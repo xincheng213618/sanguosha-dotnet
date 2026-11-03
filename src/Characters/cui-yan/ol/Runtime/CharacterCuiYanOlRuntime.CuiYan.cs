@@ -22,7 +22,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
         return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CuiYanEndQualifiedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == p.OwnerSeat && e.OwnerSeat == c.OwnerSeat && e.UsedOrPlayed && e.WasTargeted);
     }
 
-    internal IReadOnlyList<int> CuiYanDamageTargets(int owner) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && (_characterSunYuanOlOperations.HasSayingRoundRange(owner, p.Seat) || _coreNativeRuleQueriesOperations.GetCombatDistance(owner, p.Seat) <= _coreNativeRuleQueriesOperations.GetAttackRange(owner))).Select(p => p.Seat).ToArray());
+    internal IReadOnlyList<int> CuiYanDamageTargets(int owner) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != owner && _attackRanges.IsWithinAttackRange(owner, p.Seat)).Select(p => p.Seat).ToArray());
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27470)]
     internal bool CanOfferCuiYan(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context)
     {

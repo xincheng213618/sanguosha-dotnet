@@ -14,7 +14,7 @@ internal sealed partial class CharacterShiXieMobileRuntime
             return false;
         if (candidate.SkillId == MobileShiXieComposition.Biluan)
             return c.Window == SkillProgramTriggerWindow.DrawPhaseStarting && candidate.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players.Any(p => p.IsAlive && p.Seat != candidate.OwnerSeat && _coreNativeRuleQueriesOperations.GetCombatDistance(p.Seat, candidate.OwnerSeat) == 1);
-        return candidate.SkillId == MobileShiXieComposition.Lixia && c.Window == SkillProgramTriggerWindow.TurnEnding && candidate.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat, candidate.OwnerSeat);
+        return candidate.SkillId == MobileShiXieComposition.Lixia && c.Window == SkillProgramTriggerWindow.TurnEnding && candidate.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat && !_attackRanges.IsWithinAttackRange(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat, candidate.OwnerSeat);
     }
 
     internal SkillProgramStepOutcome ChangeMobileShiXieDistance(ProgramSkillFrame supplied, SkillProgramEffectOp op)

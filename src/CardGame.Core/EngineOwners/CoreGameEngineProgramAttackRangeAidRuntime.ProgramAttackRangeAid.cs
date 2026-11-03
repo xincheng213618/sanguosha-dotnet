@@ -11,7 +11,7 @@ internal sealed partial class CoreGameEngineProgramAttackRangeAidRuntime
         var targetSeat = active.SelectedTargetSeats.Single();
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive)
             throw new InvalidOperationException("The attack-range aid target is no longer alive.");
-        var responders = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != targetSeat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(player.Seat, targetSeat)).OrderBy(player => _coreTableOrderOperations.RelativeTableOrder(active.OwnerSeat, player.Seat)).Select(player => player.Seat).ToArray();
+        var responders = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != targetSeat && _attackRanges.IsWithinAttackRange(player.Seat, targetSeat)).OrderBy(player => _coreTableOrderOperations.RelativeTableOrder(active.OwnerSeat, player.Seat)).Select(player => player.Seat).ToArray();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramAttackRangeAidStartedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, targetSeat, Array.AsReadOnly(responders)));
         _coreMatchLogOperations.AddLog("ActiveSkill", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId).Name)}】，" + $"共有 {(responders.Length)} 名角色依次响应。", active.OwnerSeat, targetSeat);
         if (responders.Length == 0)

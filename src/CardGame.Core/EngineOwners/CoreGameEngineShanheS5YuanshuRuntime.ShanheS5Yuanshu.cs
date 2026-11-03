@@ -10,6 +10,6 @@ internal sealed partial class CoreGameEngineShanheS5YuanshuRuntime
     {
         if (!CoreNativeCardClassificationsRuntime.IsSlashCard(query.Kind) || !_contentRegistryOperations._contentRegistry.ProgramDependencies.HasCardPolicy(SkillProgramCardPolicyKind.SlashMustTargetOverHpHandOwner) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(query.ActorSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(query.TargetSeat) || !_coreMatchParticipantsPlayersAccess._players[query.ActorSeat].IsAlive)
             return false;
-        return _coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && owner.HasHpValue && owner.Seat != query.ActorSeat && owner.Seat != query.TargetSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > owner.Hp && _coreProgramCardPoliciesOperations.HasCardPolicy(owner, SkillProgramCardPolicyKind.SlashMustTargetOverHpHandOwner) && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(query.ActorSeat, owner.Seat));
+        return _coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && owner.HasHpValue && owner.Seat != query.ActorSeat && owner.Seat != query.TargetSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count > owner.Hp && _coreProgramCardPoliciesOperations.HasCardPolicy(owner, SkillProgramCardPolicyKind.SlashMustTargetOverHpHandOwner) && _attackRanges.IsWithinAttackRange(query.ActorSeat, owner.Seat));
     }
 }

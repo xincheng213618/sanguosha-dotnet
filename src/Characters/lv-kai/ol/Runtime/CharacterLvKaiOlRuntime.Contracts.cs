@@ -6,9 +6,3 @@ internal interface ICharacterLvKaiOlCoreEquipmentContentOperations : IProgramRun
 {
     EquipmentContentRegistry EquipmentRules { get; }
 }
-
-internal interface ICharacterLvKaiOlCoreNativeRuleQueriesOperations : IProgramRuntimeOperations
-{
-    int GetSeatDistance(int sourceSeat, int targetSeat);
-    int GetAttackRange(int sourceSeat);
-}

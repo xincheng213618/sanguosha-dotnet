@@ -87,5 +87,4 @@ internal sealed partial class CoreGameEngineProgramDodgeResponsesRuntime
         }
     }
 
-    internal bool IsWithinAttackRange(int actorSeat, int targetSeat) => _characterTaishiCiMobileGodOperations.HasShenTaishiCiPoweiRange(actorSeat, targetSeat) || _characterSunYuanOlOperations.HasSayingRoundRange(actorSeat, targetSeat) || _coreProgramPersistentCombatPoliciesOperations.IsGameFactionAttackRangeTarget(actorSeat, targetSeat) || _coreNativeRuleQueriesOperations.GetCombatDistance(actorSeat, targetSeat) <= _coreNativeRuleQueriesOperations.GetAttackRange(actorSeat);
 }

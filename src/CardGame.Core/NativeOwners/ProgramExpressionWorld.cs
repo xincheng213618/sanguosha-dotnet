@@ -8,7 +8,8 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     ProgramTriggerCandidate? triggerCandidate = null,
     IPublicCardRevealHistoryQueries? publicReveals = null, ICardZoneEntryQueries? zoneEntries = null,
     IProgramTurnQueries? revealTurn = null, IActualDiscardRecoveryPhaseQueries? revealPhases = null,
-    INativeGivenCardQueries? givenCards = null) : IProgramExpressionWorld
+    INativeGivenCardQueries? givenCards = null, Func<int, string?>? factions = null,
+    int? relationActor = null, int? relationTarget = null) : IProgramExpressionWorld
 {
     private int Owner => frame?.OwnerSeat ?? triggerOwner!.Value;
     private ProgramSkillWindowContext? Context => frame?.WindowContext ?? triggerContext;
@@ -63,6 +64,10 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     public bool? SameTeam(int first, int second) => Valid(first) is null || Valid(second) is null ? null :
         matchParticipantsState.ReferenceToPlayers[first].TeamId is { } team &&
         matchParticipantsState.ReferenceToPlayers[second].TeamId == team;
+    public bool? IsFaction(int seat, string factionId) => Valid(seat) is null || factions?.Invoke(seat) is not { } faction
+        ? null : string.Equals(faction, factionId, StringComparison.Ordinal);
+    public int? CombatDistance(int source, int target) => Valid(source) is null || Valid(target) is null
+        ? null : getCoreNativeRuleQueriesRuntime().GetCombatDistance(source, target);
     public int? PublicPileCount(int seat, string skillId) => Valid(seat) is null || piles is null ? null :
         piles.PublicPileSources(seat).Where(source => source.SkillId == skillId).Sum(source => piles.PublicPileCards(source).Count);
     public int? BindingStat(string stat, string name)
@@ -94,8 +99,8 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
         "selectedTarget" => frame?.SelectedTargetSeats is [var seat] ? seat : null,
         "selectedFirst" => frame?.SelectedTargetSeats.Count >= 1 ? frame.SelectedTargetSeats[0] : null,
         "selectedSecond" => frame?.SelectedTargetSeats.Count >= 2 ? frame.SelectedTargetSeats[1] : null,
-        "eventSource" => Context?.SourceSeat,
-        "eventTarget" => Context?.TargetSeat,
+        "eventSource" => relationActor ?? Context?.SourceSeat,
+        "eventTarget" => relationTarget ?? Context?.TargetSeat,
         "turnOwner" => (WindowPoint ?? currentHistoryPoint?.Invoke())?.TurnOwnerSeat,
         _ => null
     });

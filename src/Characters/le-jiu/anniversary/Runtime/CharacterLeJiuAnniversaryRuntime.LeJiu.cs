@@ -9,14 +9,14 @@ internal sealed partial class CharacterLeJiuAnniversaryRuntime
     internal static CardConversionSource LeJiuSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     internal CardUseFrame? LeJiuContextUse(ProgramSkillWindowContext w) => w.CardUse is { } info && _coreCardUseLifecycleOperations.LifecycleCardUse(info.ParentCardUseFrameId)is { Action: { Type: CardActionType.Use } a } use && a.ActionId == info.CardActionId && a.ActorSeat == info.ActorSeat && use.SourceSeat == a.ActorSeat && use.CardKind == a.EffectiveKind && (CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || use.CardKind == CardKind.Duel) ? use : null;
     internal bool LeJiuHasCost(int owner) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(owner)).Any(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard));
-    internal bool HasAnniversaryLeJiuUseObserver(CharacterState actor) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmAnniversaryLeJiuCuijin) && actor.IsAlive && _coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(owner, AnniversaryLeJiuComposition.Skill) && (owner.Seat == actor.Seat || _coreProgramDodgeResponsesOperations.IsWithinAttackRange(owner.Seat, actor.Seat)));
+    internal bool HasAnniversaryLeJiuUseObserver(CharacterState actor) => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmAnniversaryLeJiuCuijin) && actor.IsAlive && _coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(owner, AnniversaryLeJiuComposition.Skill) && (owner.Seat == actor.Seat || _attackRanges.IsWithinAttackRange(owner.Seat, actor.Seat)));
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 44100, SkillProgramEffectOp.ArmAnniversaryLeJiuCuijin, SkillProgramEffectOp.BindAnniversaryLeJiuCuijinCompletion)]
     internal bool CanOfferLeJiu(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {
         if (LeJiuContextUse(w)is not { } use)
             return false;
         if (t.Id == AnniversaryLeJiuComposition.Pay)
-            return w.Window == SkillProgramTriggerWindow.CardUseCommitted && (c.OwnerSeat == use.SourceSeat || _coreProgramDodgeResponsesOperations.IsWithinAttackRange(c.OwnerSeat, use.SourceSeat)) && LeJiuHasCost(c.OwnerSeat) && !(use.LeJiuCuijin ?? []).Any(g => g.Source.OwnerSeat == c.OwnerSeat && g.Source.SkillInstanceId == c.SkillInstanceId);
+            return w.Window == SkillProgramTriggerWindow.CardUseCommitted && (c.OwnerSeat == use.SourceSeat || _attackRanges.IsWithinAttackRange(c.OwnerSeat, use.SourceSeat)) && LeJiuHasCost(c.OwnerSeat) && !(use.LeJiuCuijin ?? []).Any(g => g.Source.OwnerSeat == c.OwnerSeat && g.Source.SkillInstanceId == c.SkillInstanceId);
         return t.Id == AnniversaryLeJiuComposition.Reward && w.Window == SkillProgramTriggerWindow.CardUseCompleted && use.Step == ResolutionFrameStep.Completed && !use.CausedDamage && LeJiuGrantFor(use, c)is not null;
     }
 
@@ -27,7 +27,7 @@ internal sealed partial class CharacterLeJiuAnniversaryRuntime
             throw new InvalidOperationException("Cuijin requires the exact original committed native Slash or Duel and observer candidate.");
         if (f.InstructionIndex == 1)
         {
-            if (f.LeJiuCuijin is not null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive || f.OwnerSeat != use.SourceSeat && !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, use.SourceSeat) || !LeJiuHasCost(f.OwnerSeat))
+            if (f.LeJiuCuijin is not null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive || f.OwnerSeat != use.SourceSeat && !_attackRanges.IsWithinAttackRange(f.OwnerSeat, use.SourceSeat) || !LeJiuHasCost(f.OwnerSeat))
                 throw new InvalidOperationException("Cuijin must freeze its legal range and original use before the real discard cost.");
             var r = new LeJiuCuijinFrame(LeJiuSource(f), f.GameplayHash, w.ParentFrameId, use.Id, use.Action!.ActionId, use.SourceSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { LeJiuCuijin = r });

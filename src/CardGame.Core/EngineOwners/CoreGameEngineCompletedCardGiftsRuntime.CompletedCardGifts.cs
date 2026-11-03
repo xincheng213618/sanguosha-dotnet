@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
         return sources.Where(action => action.PhysicalCards.Count > 0 && action.PhysicalCards.All(cost => _cardZonesOperations._cardZones.GetLocation(cost.CardId)is { Zone: CardZoneKind.Processing or CardZoneKind.DiscardPile })).ToArray();
     }
 
-    internal int[] CompletedGiftSlashTargets(ProgramSkillFrame frame, int actorSeat) => _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && target.IsAlive && target.Seat != actorSeat && target.Seat != frame.OwnerSeat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(frame.OwnerSeat, target.Seat)).Select(target => target.Seat).ToArray();
+    internal int[] CompletedGiftSlashTargets(ProgramSkillFrame frame, int actorSeat) => _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && target.IsAlive && target.Seat != actorSeat && target.Seat != frame.OwnerSeat && _attackRanges.IsWithinAttackRange(frame.OwnerSeat, target.Seat)).Select(target => target.Seat).ToArray();
     internal SkillProgramStepOutcome OfferProgramCompletedCardGift(ProgramSkillFrame frame)
     {
         var action = CompletedGiftAction(frame);

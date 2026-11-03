@@ -1,10 +1,11 @@
 using System.Reflection;
 using CardGame.Core;
 
-internal static class ProgramDistanceRuleChecks
+internal static partial class ProgramDistanceRuleChecks
 {
     public static void OrderedArithmeticAndNativeDistanceQueries()
     {
+        AttackRangeRelationsKeepTheirDirectionSourcesAndActualBoundaries();
         CheckIndependentDistanceComposition();
         var supplied = Methods(typeof(Fixture)).Reverse().ToList();
         var catalog = ProgramDistanceCatalog.Discover(supplied);

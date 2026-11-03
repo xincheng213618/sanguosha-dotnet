@@ -4,5 +4,4 @@ internal interface ICoreGameEngineProgramPersistentCombatPoliciesProgramGameFact
 {
     ref readonly Dictionary<int, GameEngine.ProgramPlayDamageHandLimit> _programPlayDamageHandLimits { get; }
 
-    ref readonly List<GameEngine.ProgramGameFactionRangeTargets> _programGameFactionRangeTargets { get; }
 }

@@ -7,7 +7,7 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var owner = _coreMatchParticipantsPlayersAccess._players[active.OwnerSeat];
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || frame.WindowContext is not { CardUse: { } cardUse, TargetSeat: { } dodgerSeat } || dodgerSeat == active.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[dodgerSeat].IsAlive || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(active.OwnerSeat, dodgerSeat))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !owner.IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(active) || frame.WindowContext is not { CardUse: { } cardUse, TargetSeat: { } dodgerSeat } || dodgerSeat == active.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[dodgerSeat].IsAlive || !_attackRanges.IsWithinAttackRange(active.OwnerSeat, dodgerSeat))
             return SkillProgramStepOutcome.Continue;
         var attack = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(item => item.Id == cardUse.ParentCardUseFrameId);
         if (attack is null || attack.TargetSeats.Count != 1 || (attack.Enhancements & CurrentCardEnhancement.Uncancelable) != 0)
@@ -49,7 +49,7 @@ internal sealed partial class CharacterQingheGongzhuOlRuntime
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != active.OwnerSeat)
             throw new InvalidOperationException("The Zengou cost chooser changed while suspended.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (active.WindowContext is not { CardUse: { } cardUse, TargetSeat: { } dodgerSeat } || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[dodgerSeat].IsAlive || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(active.OwnerSeat, dodgerSeat))
+        if (active.WindowContext is not { CardUse: { } cardUse, TargetSeat: { } dodgerSeat } || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[dodgerSeat].IsAlive || !_attackRanges.IsWithinAttackRange(active.OwnerSeat, dodgerSeat))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(active, "谮构的目标已失效，剩余结算取消。");
             return;

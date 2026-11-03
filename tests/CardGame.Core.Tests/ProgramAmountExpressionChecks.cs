@@ -18,6 +18,7 @@ internal static partial class ProgramAmountExpressionChecks
 
     public static void LoaderHashAndTypedEvaluation()
     {
+        AttackRangeDeclarationsAndFactsAreTypedAndFingerprinted();
         GiveBoundCardTargetsAndAwaitAreTypedAndFingerprinted();
         DeclaredGiveIsTypedAndDistinctFromMovement();
         NativeGiveOccurrenceIsScopedAndDeclaresSharedFactDemand();

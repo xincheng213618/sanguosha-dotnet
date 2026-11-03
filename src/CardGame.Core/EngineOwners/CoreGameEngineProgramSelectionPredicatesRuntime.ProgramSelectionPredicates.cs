@@ -28,7 +28,7 @@ internal sealed partial class CoreGameEngineProgramSelectionPredicatesRuntime
     int IProgramSelectionTargetState.HandCount(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count;
     int IProgramSelectionTargetState.MarkerCount(int seat, PlayerMarkerKind marker) => _coreMatchParticipantsPlayersAccess._players[seat].Markers.GetValueOrDefault(marker);
     bool IProgramSelectionTargetState.IsFarthestInRange(int ownerSeat, int targetSeat) => _coreAdvancedLifecycleOperations.IsFarthestInRange(_coreMatchParticipantsPlayersAccess._players[ownerSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat]);
-    bool IProgramSelectionTargetState.IsWithinAttackRange(int ownerSeat, int targetSeat) => _coreProgramDodgeResponsesOperations.IsWithinAttackRange(ownerSeat, targetSeat);
+    bool IProgramSelectionTargetState.IsWithinAttackRange(int ownerSeat, int targetSeat) => _attackRanges.IsWithinAttackRange(ownerSeat, targetSeat);
     int IProgramSelectionTargetState.TurnUsage(int ownerSeat, string skillId, string usageId) => _skillRuntimeStateOperations._skillRuntimeState.GetUsage(ownerSeat, skillId, usageId, SkillUsageScope.Turn);
     IEnumerable<GameTargetHandHpChoiceIssuedEvent> IProgramSelectionTargetState.HandHpIssuedTargets => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<GameTargetHandHpChoiceIssuedEvent>();
 

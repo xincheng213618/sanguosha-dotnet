@@ -54,6 +54,8 @@ internal interface IProgramExpressionWorld
     IReadOnlyList<ProgramExpressionCardFact>? BoundCards(string name) => null;
     bool? CardStillAtSource(ProgramExpressionCardFact card) => null;
     bool? SameTeam(int first, int second) => null;
+    bool? IsFaction(int seat, string factionId) => null;
+    int? CombatDistance(int source, int target) => null;
     int? WindowAmount() => null;
     IReadOnlyList<ProgramExpressionCardFact>? GivenCards(int giver, int recipient) => null;
     int? PhaseCount(string moment, int actor, ActualDiscardRecoveryPhaseKind? kind, ActualPhaseHistoryOutcome outcome) => null;
@@ -153,6 +155,14 @@ internal static class ProgramExpressions
         if (Comparisons.Contains(op)) { Arity(2, 2); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Int)); }
         if (op == "same") { Arity(2, 2); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (op == "sameTeam") { Arity(2, 2); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
+        if (op == "distance") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Participant)); }
+        if (op == "isFaction")
+        {
+            Arity(2, 2);
+            if (args[1].ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(args[1].GetString()) || args[1].GetString()!.Length > 128)
+                Fail(path, "isFaction requires a faction identifier");
+            return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.Participant)], name: args[1].GetString());
+        }
         if (Flags.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Stats.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Participant)); }
         if (op == "publicRevealCards")
@@ -495,6 +505,9 @@ internal static class ProgramExpressions
             case "sameTeam":
                 return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } firstSeat && EvaluateParticipant(e.Args[1], world, it, use, cards) is { } secondSeat
                     ? world.SameTeam(firstSeat, secondSeat) : null;
+            case "isFaction":
+                return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } factionSeat
+                    ? world.IsFaction(factionSeat, e.Name!) : null;
             case "contains":
                 return EvaluateParticipantSet(e.Args[0], world, it, use, cards) is { } members &&
                     EvaluateParticipant(e.Args[1], world, it, use, cards) is { } member ? members.Contains(member) : null;
@@ -566,6 +579,10 @@ internal static class ProgramExpressions
             case "when": return EvaluateBool(e.Args[0], world, it, use, cards) == true ? EvaluateInt(e.Args[1], world, it, use, cards) : null;
             case "number": return world.Number(e.Name!);
             case "windowAmount": return world.WindowAmount();
+            case "distance":
+                return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } distanceSource &&
+                    EvaluateParticipant(e.Args[1], world, it, use, cards) is { } distanceTarget
+                    ? world.CombatDistance(distanceSource, distanceTarget) : null;
             case "gainActualTurn": return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } gainOwner ? world.HandGain(gainOwner)?.ActualTurn : null;
             case "phaseCount": return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } phaseActor
                 ? world.PhaseCount(e.Name!, phaseActor, e.Literal < 0 ? null : (ActualDiscardRecoveryPhaseKind)e.Literal,

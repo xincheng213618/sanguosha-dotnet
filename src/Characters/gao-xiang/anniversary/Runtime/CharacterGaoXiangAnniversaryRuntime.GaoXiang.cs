@@ -26,7 +26,7 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
     internal int GaoXiangHp(ProgramSkillFrame f, int seat) => _characterDaQiaoXiaoQiaoHappyGodOperations.HappyQiaoQueryValue(f, seat, "gao-xiang-target-hp");
     internal int GaoXiangChooser(ProgramSkillFrame f) => f.GaoXiangChiying!.Stage == GaoXiangChiyingStage.Actor ? f.OwnerSeat : f.GaoXiangChiying.Actor;
     internal IReadOnlyList<PromptChoice> GaoXiangCardChoices(ProgramSkillFrame f, int victim) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.GaoXiangChiying!.Actor, victim, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard);
-    internal IEnumerable<int> GaoXiangVictimCandidates(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.GaoXiangChiying!.Actor && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.GaoXiangChiying.Actor, p.Seat) && GaoXiangCardChoices(f, p.Seat).Count > 0).Select(p => p.Seat);
+    internal IEnumerable<int> GaoXiangVictimCandidates(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.GaoXiangChiying!.Actor && _attackRanges.IsWithinAttackRange(f.GaoXiangChiying.Actor, p.Seat) && GaoXiangCardChoices(f, p.Seat).Count > 0).Select(p => p.Seat);
     internal IReadOnlyList<PromptChoice> GaoXiangChoices(ProgramSkillFrame f)
     {
         var r = f.GaoXiangChiying!;

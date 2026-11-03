@@ -15,7 +15,7 @@ internal sealed partial class CoreGameEnginePhaseStartCardControlRuntime
     internal bool CanOfferPhaseStartCardControl(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (trigger.Effects is [{ Op: SkillProgramEffectOp.GrantOtherPlayUseRestriction }])
-            return HasPhaseStartControlBoundary(candidate.OwnerSeat, context, PhaseStartCardControlKind.OtherPlayRestriction) && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, candidate.OwnerSeat) && OtherPlayRestrictionCosts(candidate.OwnerSeat).Length > 0;
+            return HasPhaseStartControlBoundary(candidate.OwnerSeat, context, PhaseStartCardControlKind.OtherPlayRestriction) && _attackRanges.IsWithinAttackRange(_coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, candidate.OwnerSeat) && OtherPlayRestrictionCosts(candidate.OwnerSeat).Length > 0;
         if (trigger.Effects is [{ Op: SkillProgramEffectOp.ChooseStartingEquipmentControl }])
             return HasPhaseStartControlBoundary(candidate.OwnerSeat, context, PhaseStartCardControlKind.StartingEquipment) && StartingEquipmentControlChoices(candidate.OwnerSeat).Any();
         return true;

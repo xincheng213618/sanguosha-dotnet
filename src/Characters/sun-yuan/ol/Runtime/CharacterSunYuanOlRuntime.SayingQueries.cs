@@ -4,7 +4,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunYuanOlRuntime
 {
     internal const string SayingObtainReason = "skill-program.sun-yuan.saying.obtain";
-    internal bool HasSayingRoundRange(int actor, int target) => HasSunYuanCapability && actor != target && _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SayingRangeGrantedEvent>().Any(e => e.Round == _coreActualRoundProgressRoundNumberAccess._roundNumber && (e.OwnerSeat == actor && e.Holder == target || e.Holder == actor && e.OwnerSeat == target));
     internal bool TryGetSayingSlashRequest(ProgramSkillFrame f, out int actorSeat, out IReadOnlyList<int> targetSeats)
     {
         actorSeat = -1;
@@ -28,8 +27,6 @@ internal sealed partial class CharacterSunYuanOlRuntime
         return top.EquipmentSlotNamedUse is { OriginalParentId: { } parent } && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == parent)is { } owner && top.OwnerSeat == actor.Seat && _coreMatchParticipantsPlayersAccess._players[owner.OwnerSeat].IsAlive && _coreSayingTieredSuppliesOperations.SayingEquipmentSlotPaymentRidesOn(owner, top);
     }
 
-    [ProgramDistanceRule(ProgramDistanceStage.SpecificSlashExemption, 10)]
-    internal bool DistanceSpecificSlashExemption10HasSayingRoundRange(ProgramSlashDistanceQuery q) => HasSayingRoundRange(q.Actor.Seat, q.Target.Seat);
     [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaBeforeLimit, 40)]
     internal bool SayingSlashQuotaBeforeLimit(ProgramSlashQuotaQuery query) => IsSayingSlashQuery(query.Actor);
 }

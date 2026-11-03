@@ -441,3 +441,30 @@ CardsMoved／CardsGained 绑定可声明 `"invocation":{"source":"movement"}`，
 ```
 
 `["windowAmount"]` 读取原窗口数量；`["givenCards","owner","eventTarget"]` 读取当前实际回合结束段内双方的已给予实体，可用 captureCards 冻结为排除集合。它保留实体与交付驻留，不猜牌面，非给予双方的私密读取返回未知。表达式自动声明共同给予事实需求。
+
+
+## 攻击范围关系的只读事实与声明
+
+- `["isFaction", "eventSource", "wu"]`：读取该角色当前生效的势力；未定义或不可读时返回 unknown。
+- `["distance", "owner", "eventTarget"]`：读取现有有向距离查询的结果，包括模式转换与距离修正。自身数值距离为零，范围成员关系单独排除自身。
+
+普通范围应用复用策略节点，显式说明来源资格与期限：
+
+```json
+{"op":"grantDirectedTurnCardPolicy","target":"owner",
+ "actorRef":{"kind":"owner"},"targetRef":{"kind":"selectedTarget"},
+ "effects":["inAttackRange"],"requiresEffectiveSource":false,
+ "captureOnUse":false,"until":[],"while":["isFaction","eventSource","wu"]}
+```
+
+范围关系不带 `cardKinds`，不能与其他策略效果混用，不捕获为某张用牌的距离豁免；期限继续复用现有 `until`。以上空期限是本局持续，回合或轮次关系须声明实际边界。
+
+持续来源直接写在 program 中：
+
+```json
+"attackRangeRelations":[{"id":"near-source","ownerRole":"lord",
+ "while":["and",["not",["same","eventSource","owner"]],
+   ["isFaction","eventSource","wu"],["==",["distance","owner","eventTarget"],1]]}]
+```
+
+关系表达式中的 `owner` 是来源，`eventSource` 是范围使用者，`eventTarget` 是待判断角色；这是只读关系上下文，不创建事件或结算帧。`ownerRole` 使用现有实际技能来源资格；来源需存活且有效。`while` 只读持久座位事实，不能读取帧绑定、窗口历史、手牌上限或技能递归事实。unknown 不授予关系；AI 没有对应事实时仍保持 unknown。

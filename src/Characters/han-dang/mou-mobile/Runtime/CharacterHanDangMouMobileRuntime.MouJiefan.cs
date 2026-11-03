@@ -17,7 +17,7 @@ internal sealed partial class CharacterHanDangMouMobileRuntime
     internal int MouHanDangProjectedUses(int owner, string skill, int fallback) => skill == MouHanDangJiefan && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p ? MouHanDangPhaseUses(owner, p) : fallback;
     [ProgramActivationLegality(ProgramActivationLegalityPhase.AfterCommonStart, 30700, SkillProgramEffectOp.ResolveMouHanDangJiefan)]
     internal bool CanStartMouHanDangJiefan(CharacterState owner) => !MouHanDangJiefanDisabled(owner.Seat) && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Play } p && p.ActorSeat == owner.Seat && _coreActualDiscardRecoveryPhasesOperations.IsRecordedActualDiscardRecoveryPhase(p) && MouHanDangPhaseUses(owner.Seat, p) == 0;
-    internal IReadOnlyList<int> MouHanDangRangeSeats(int target, int first) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != target && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(p.Seat, target)).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(first, p.Seat)).Select(p => p.Seat).ToArray());
+    internal IReadOnlyList<int> MouHanDangRangeSeats(int target, int first) => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != target && _attackRanges.IsWithinAttackRange(p.Seat, target)).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(first, p.Seat)).Select(p => p.Seat).ToArray());
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMouHanDangJiefan)]
     internal void ReturnMouHanDangDraw(ProgramSkillFrame f, NativeDrawOutcome d)
     {

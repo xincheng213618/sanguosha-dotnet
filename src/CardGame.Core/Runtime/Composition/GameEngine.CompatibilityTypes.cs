@@ -78,7 +78,6 @@ internal sealed record ProgramOrdinaryTrickUseOption(
         public bool NextActualUseAdjusted { get; init; }
     }
     internal sealed record ProgramPlayDamageHandLimit(int OwnerSeat, string SkillId, string SkillInstanceId, int TurnNumber, int PhaseInstanceId, int DamageCount);
-    internal sealed record ProgramGameFactionRangeTargets(int OwnerSeat, string SkillId, string FactionId, IReadOnlyList<int> TargetSeats);
 
     internal readonly record struct ProgramBooleanStateKey(int OwnerSeat, string SkillId, string SkillInstanceId, string StateId);
 internal readonly record struct ProgramSkillChangeContext(ProgramSkillFrame Frame, CharacterState Owner);

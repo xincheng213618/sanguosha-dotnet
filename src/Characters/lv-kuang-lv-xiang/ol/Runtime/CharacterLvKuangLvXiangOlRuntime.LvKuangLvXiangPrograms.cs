@@ -6,7 +6,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
     internal const string LiehouReason = "skill-program.liehou.hand-relay";
     internal static CardConversionSource LvKuangLvXiangSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_lv_kuang_lv_xiang_ol_LvKuangLvXiangPrograms.LvKuangLvXiangSource(f);
     internal bool LvKuangLvXiangCurrent(ProgramSkillFrame f) => _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash == f.GameplayHash;
-    internal bool LvKuangLvXiangActivationTargetAllowed(CharacterState target, SkillProgramActivation a, int ownerSeat) => !ProgramInstructionResolver.Default.Features(a).HasOperation(SkillProgramEffectOp.ResolveLiehouRangeHandRelay) || target.IsAlive && target.Seat != ownerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count > 0 && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(ownerSeat, target.Seat);
+    internal bool LvKuangLvXiangActivationTargetAllowed(CharacterState target, SkillProgramActivation a, int ownerSeat) => !ProgramInstructionResolver.Default.Features(a).HasOperation(SkillProgramEffectOp.ResolveLiehouRangeHandRelay) || target.IsAlive && target.Seat != ownerSeat && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count > 0 && _attackRanges.IsWithinAttackRange(ownerSeat, target.Seat);
     internal bool QigongOriginal(ProgramTriggerCandidate c, ProgramSkillWindowContext w, out CardUseFrame original, bool requireLivingTarget = true)
     {
         original = null !;
@@ -64,10 +64,10 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
                 result.Add(LvChoice(f, "actor", $"actor-{(p.Seat)}", "令" + p.Name + "使用杀", targets: [p.Seat]));
         if (r.Stage == "slash")
             return QigongSlashChoices(f);
-        if (r.Stage == "receive" && _coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, r.Target))
+        if (r.Stage == "receive" && _coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _attackRanges.IsWithinAttackRange(f.OwnerSeat, r.Target))
             result.AddRange(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, r.Target, r.Target, [CardZoneKind.Hand], OwnedCardMoveIntent.Transfer).Select(c => LvChoice(f, "receive", "receive-" + c.Cards.Single(), "交给其一张手牌", c.Cards, extra: c.Parameters)));
         if (r.Stage == "give" && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
-            foreach (var p in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && p.Seat != r.Target && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, p.Seat)))
+            foreach (var p in _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && p.Seat != r.Target && _attackRanges.IsWithinAttackRange(f.OwnerSeat, p.Seat)))
                 foreach (var choice in _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand], OwnedCardMoveIntent.Transfer))
                     result.Add(LvChoice(f, "give", $"give-{(choice.Cards.Single())}-{(p.Seat)}", "交给" + p.Name + "一张手牌", choice.Cards, [p.Seat], choice.Parameters));
         return Array.AsReadOnly(result.Select(PromptChoiceProjection.Freeze).ToArray());

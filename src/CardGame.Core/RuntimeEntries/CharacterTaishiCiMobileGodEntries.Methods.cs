@@ -10,7 +10,6 @@ internal sealed partial class CharacterTaishiCiMobileGodEntries
     internal bool DrainShenTscPowei(ProgramSkillFrame f) => _resolve().DrainShenTscPowei(f);
     internal void FinishShenTscPowei(ProgramSkillFrame f) => _resolve().FinishShenTscPowei(f);
     internal void GrantShenTscRange(ProgramSkillFrame f) => _resolve().GrantShenTscRange(f);
-    internal bool HasShenTaishiCiPoweiRange(int actor, int target) => _resolve().HasShenTaishiCiPoweiRange(actor, target);
     internal void PublishShenTscPowei(ProgramSkillFrame f) => _resolve().PublishShenTscPowei(f);
     internal void ResolveShenTscDulie(ProgramSkillFrame f) => _resolve().ResolveShenTscDulie(f);
     internal SkillProgramStepOutcome ResolveShenTscPowei(ProgramSkillFrame supplied) => _resolve().ResolveShenTscPowei(supplied);
@@ -20,7 +19,6 @@ internal sealed partial class CharacterTaishiCiMobileGodEntries
     internal int[] ShenTscDiscardCards(int owner) => _resolve().ShenTscDiscardCards(owner);
     internal bool ShenTscMayTake(int owner, int actor) => _resolve().ShenTscMayTake(owner, actor);
     internal bool ShenTscMissionOver(int owner) => _resolve().ShenTscMissionOver(owner);
-    internal bool ShenTscPoweiSlashRange(ProgramSlashDistanceQuery q) => _resolve().ShenTscPoweiSlashRange(q);
     internal void ShenTscSetWei(ProgramSkillFrame f, int seat, int count) => _resolve().ShenTscSetWei(f, seat, count);
     internal int ShenTscWei(int seat, int owner) => _resolve().ShenTscWei(seat, owner);
     internal bool TryCompleteShenTaishiCiCancelledSlash(ProgramCardTriggerWindowFrame window) => _resolve().TryCompleteShenTaishiCiCancelledSlash(window);

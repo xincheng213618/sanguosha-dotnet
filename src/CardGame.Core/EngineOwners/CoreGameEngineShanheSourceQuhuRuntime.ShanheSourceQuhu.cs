@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineShanheSourceQuhuRuntime
             throw new InvalidOperationException("Source Quhu lost its exact original winning Pindian and chosen target.");
         var source = new ProgramParticipantReference(ProgramParticipantRef.ResultOpponent, "__active-pindian-result");
         var opponent = _coreProgramCardPaymentsOperations.ResolveProgramParticipant(frame, source);
-        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(opponent) || !_coreMatchParticipantsPlayersAccess._players[opponent].IsAlive || opponent == targetSeat || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(opponent, targetSeat))
+        if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(opponent) || !_coreMatchParticipantsPlayersAccess._players[opponent].IsAlive || opponent == targetSeat || !_attackRanges.IsWithinAttackRange(opponent, targetSeat))
             throw new InvalidOperationException("Source Quhu requires its original living opponent's actual attack range.");
         // Native program damage owns the already-advanced cursor, source and child return.
         return _coreSkillProgramsOperations.BeginProgramSkillDamage(frame, targetSeat, Math.Min(5, _coreMatchParticipantsPlayersAccess._players[opponent].MaxHp), source);

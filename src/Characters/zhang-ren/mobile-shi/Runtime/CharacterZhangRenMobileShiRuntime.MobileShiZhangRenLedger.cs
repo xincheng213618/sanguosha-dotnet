@@ -40,16 +40,14 @@ internal sealed partial class CharacterZhangRenMobileShiRuntime
     {
         if (!HasShiZrCapability || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[user].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkill(_coreMatchParticipantsPlayersAccess._players[user], ShiZhangRenComposition.YinXianSkill))
             return false;
-        var range = _coreNativeRuleQueriesOperations.GetAttackRange(user);
-        if (range <= 0)
-            return false;
+
         var farthest = -1;
         for (var seat = 0; seat < _coreMatchParticipantsPlayersAccess._players.Count; seat++)
         {
             if (seat == user || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive)
                 continue;
             var distance = _coreNativeRuleQueriesOperations.GetCombatDistance(user, seat);
-            if (distance >= 1 && distance <= range && distance > farthest)
+            if (distance >= 1 && _attackRanges.IsWithinAttackRange(user, seat) && distance > farthest)
                 farthest = distance;
         }
 

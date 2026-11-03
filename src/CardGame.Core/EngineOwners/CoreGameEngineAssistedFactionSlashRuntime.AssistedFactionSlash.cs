@@ -154,7 +154,7 @@ internal sealed partial class CoreGameEngineAssistedFactionSlashRuntime
 
         if (rangeOwnerSeat is { } rangeOwner)
             return _coreMatchParticipantsPlayersAccess._players[rangeOwner].IsAlive && rangeOwner != actorSeat &&
-                rangeOwner != targetSeat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(rangeOwner, targetSeat);
+                rangeOwner != targetSeat && _attackRanges.IsWithinAttackRange(rangeOwner, targetSeat);
 
         return ignoreDistance || _characterHuangfuSongWumiaoOperations.HasWuHfOrWuyouMaterialPrivilege(actor, kind, physicalCardIds) ||
             allowPotentialRank && physicalCardIds is null && _characterGuanYuWumiaoOperations.HasPotentialWuyouFactionSlash(actor, kind) ||

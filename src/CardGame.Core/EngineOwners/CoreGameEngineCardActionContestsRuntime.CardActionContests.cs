@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineCardActionContestsRuntime
         if (trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ReplaceAllSlashTargets))
         {
             var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(u => u.Id == context.CardUse?.ParentCardUseFrameId);
-            if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || use?.Action is not { } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat == owner.Seat || use.TargetSeats.Count == 0 || use.TargetSeats.Contains(owner.Seat) || !_coreProgramDodgeResponsesOperations.IsWithinAttackRange(action.ActorSeat, owner.Seat) || _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count == 0)
+            if (context.Window != SkillProgramTriggerWindow.CardUseCommitted || use?.Action is not { } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || action.ActorSeat == owner.Seat || use.TargetSeats.Count == 0 || use.TargetSeats.Contains(owner.Seat) || !_attackRanges.IsWithinAttackRange(action.ActorSeat, owner.Seat) || _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Count == 0)
                 return false;
         }
 

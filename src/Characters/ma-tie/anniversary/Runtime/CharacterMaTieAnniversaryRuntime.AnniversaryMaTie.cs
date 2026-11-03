@@ -115,7 +115,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         {
             case "target":
                 var target = choice.Targets.Single();
-                var queue = Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(i => _coreTableOrderOperations.TableStepSeat(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat, i)).Where(s => s != target && _coreMatchParticipantsPlayersAccess._players[s].IsAlive && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(s, target)).ToArray();
+                var queue = Enumerable.Range(0, _coreMatchDefinitionPlayerCountAccess._playerCount).Select(i => _coreTableOrderOperations.TableStepSeat(_coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._currentSeat, i)).Where(s => s != target && _coreMatchParticipantsPlayersAccess._players[s].IsAlive && _attackRanges.IsWithinAttackRange(s, target)).ToArray();
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryMaTie = r with { Target = target, Actors = queue, Stage = AnniversaryMaTieStage.SlashChoice } });
                 for (var i = 0; i < queue.Length; i++)
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryMaTieQueueEvent(f.Id, target, i, queue[i]));

@@ -6,9 +6,3 @@ internal interface ICharacterDuKuiAnniversaryCoreEquipmentContentOperations : IP
 {
     EquipmentContentRegistry EquipmentRules { get; }
 }
-
-internal interface ICharacterDuKuiAnniversaryCoreNativeRuleQueriesOperations : IProgramRuntimeOperations
-{
-    int GetCombatDistance(int sourceSeat, int targetSeat);
-    int GetAttackRange(int sourceSeat);
-}

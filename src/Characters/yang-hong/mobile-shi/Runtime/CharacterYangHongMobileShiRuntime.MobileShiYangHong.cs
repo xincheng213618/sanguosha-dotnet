@@ -174,8 +174,8 @@ internal sealed partial class CharacterYangHongMobileShiRuntime
 
     internal HashSet<int> ShiYhRangeCoverage(int seat)
     {
-        var range = _coreNativeRuleQueriesOperations.GetAttackRange(seat);
-        return _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != seat && _coreNativeRuleQueriesOperations.GetCombatDistance(seat, player.Seat) <= range).Select(player => player.Seat).ToHashSet();
+
+        return _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != seat && _attackRanges.IsWithinAttackRange(seat, player.Seat)).Select(player => player.Seat).ToHashSet();
     }
 
     internal IReadOnlyList<PromptChoice> ShiYhChoices(ProgramSkillFrame f)

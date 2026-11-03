@@ -114,7 +114,7 @@ internal sealed class GrantDirectedTurnCardPolicyProgramOperationDescriptor : Pr
         static (effect, context) => context.GrantDirectedTurnCardPolicy(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
     {
-        reader.AllowOnly("op", "target", "actorRef", "targetRef", "cardKinds", "effects", "requiresEffectiveSource", "captureOnUse", "until", "condition");
+        reader.AllowOnly("op", "target", "actorRef", "targetRef", "cardKinds", "effects", "requiresEffectiveSource", "captureOnUse", "until", "while", "condition");
         var target = FilterBoundCardsProgramOperationDescriptor.Owner(reader);
         var actor = reader.RequiredParticipantReference("actorRef", ProgramParticipantRef.Owner);
         var directedTarget = reader.RequiredParticipantReference("targetRef");
@@ -128,16 +128,21 @@ internal sealed class GrantDirectedTurnCardPolicyProgramOperationDescriptor : Pr
         if (flags.HasFlag(DirectedTurnCardPolicyEffect.BypassUseLimit) && kinds.Count > 0)
             throw new InvalidOperationException($"Invalid skill program at {reader.Path}.cardKinds: bypassUseLimit requires all card kinds.");
         DirectedCardPolicyOptions? options = null;
-        if (reader.Has("requiresEffectiveSource") || reader.Has("captureOnUse") || reader.Has("until"))
+        if (reader.Has("requiresEffectiveSource") || reader.Has("captureOnUse") || reader.Has("until") || reader.Has("while"))
         {
             var defaults = new DirectedCardPolicyOptions();
             options = defaults with
             {
                 RequiresEffectiveSource = reader.Has("requiresEffectiveSource") ? SkillStateDescriptor.Bool(reader.Node.GetProperty("requiresEffectiveSource"), reader.Path + ".requiresEffectiveSource") : defaults.RequiresEffectiveSource,
                 CaptureOnUse = reader.Has("captureOnUse") && SkillStateDescriptor.Bool(reader.Node.GetProperty("captureOnUse"), reader.Path + ".captureOnUse"),
-                Until = reader.Has("until") ? SkillStateDescriptor.ParseUntil(SkillStateDescriptor.Required(reader.Node, "until", System.Text.Json.JsonValueKind.Array, reader.Path), reader.Path + ".until") : defaults.Until
+                Until = reader.Has("until") ? SkillStateDescriptor.ParseUntil(SkillStateDescriptor.Required(reader.Node, "until", System.Text.Json.JsonValueKind.Array, reader.Path), reader.Path + ".until") : defaults.Until,
+                While = reader.Has("while") ? AttackRangeRelationParser.ParseWhile(reader.Node.GetProperty("while"), reader.Path + ".while") : null
             };
         }
+        if (flags.HasFlag(DirectedTurnCardPolicyEffect.InAttackRange) &&
+            (flags != DirectedTurnCardPolicyEffect.InAttackRange || kinds.Count > 0 || options?.CaptureOnUse == true) ||
+            options?.While is not null && flags != DirectedTurnCardPolicyEffect.InAttackRange)
+            throw new InvalidOperationException($"Invalid skill program at {reader.Path}: an attack-range relation is independent of card kinds, card-use capture and other policy effects; while requires that relation.");
         return new(Op, target, 0, reader.Condition(), cardKinds: kinds,
             actorReference: actor, targetReference: directedTarget, directedPolicyEffects: flags)
             { DirectedPolicyOptions = options };

@@ -4,7 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramVirtualSlashOffersRuntime
 {
 
-    internal int[] GetProgramVirtualSlashOfferTargets(int actorSeat) => _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && target.IsAlive && target.Seat != actorSeat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(actorSeat, target.Seat) && !_coreCardUseModulesOperations.IsCardUseForbidden(actorSeat, CardKind.Slash, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actorSeat, target.Seat, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target)).Select(target => target.Seat).ToArray();
+    internal int[] GetProgramVirtualSlashOfferTargets(int actorSeat) => _coreMatchParticipantsPlayersAccess._players.Where(target => _coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive && target.IsAlive && target.Seat != actorSeat && _attackRanges.IsWithinAttackRange(actorSeat, target.Seat) && !_coreCardUseModulesOperations.IsCardUseForbidden(actorSeat, CardKind.Slash, CardActionType.Use) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actorSeat, target.Seat, CardKind.Slash) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(target)).Select(target => target.Seat).ToArray();
     internal SkillProgramStepOutcome OfferProgramVirtualSlashOrDraw(ProgramSkillFrame frame, int actorSeat)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);

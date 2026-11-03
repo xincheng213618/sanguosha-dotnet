@@ -16,7 +16,6 @@ public sealed record ShenTaishiCiPoweiStartedEvent(long FrameId, CardConversionS
 public sealed record ShenTaishiCiPoweiPaidEvent(long FrameId, string Branch, int CardId, CardLocation From,
     CardLocation To, long Sequence) : IGameEvent;
 public sealed record ShenTaishiCiPoweiMissionEvent(long FrameId, int OwnerSeat, bool Success) : IGameEvent;
-public sealed record ShenTaishiCiPoweiRangeEvent(long FrameId, int OwnerSeat, int AttackerSeat, int ActualTurn) : IGameEvent;
 public sealed record ShenTaishiCiDulieCancelledEvent(long FrameId, long UseId, long ActionId, int OwnerSeat, int RemainingTargetCount) : IGameEvent;
 public sealed record ShenTaishiCiDulieRetainedTargetEvent(long FrameId, long UseId, int Index, int TargetSeat) : IGameEvent;
 

@@ -12,7 +12,6 @@ internal sealed partial class CharacterSunYuanOlEntries
     internal PromptChoice ChooseSunYuanAi(PendingDecision p) => _resolve().ChooseSunYuanAi(p);
     internal bool ContinueIssuedSunYuan(ProgramSkillFrame f) => _resolve().ContinueIssuedSunYuan(f);
     internal void ContinueSunYuan(long id) => _resolve().ContinueSunYuan(id);
-    internal bool DistanceSpecificSlashExemption10HasSayingRoundRange(ProgramSlashDistanceQuery q) => _resolve().DistanceSpecificSlashExemption10HasSayingRoundRange(q);
     internal bool DongxinCanPay(int owner, int victim) => _resolve().DongxinCanPay(owner, victim);
     internal bool DongxinContextLegal(int owner, string direction, ProgramSkillWindowContext c) => _resolve().DongxinContextLegal(owner, direction, c);
     internal bool DongxinDirectionAvailable(int owner, string direction) => _resolve().DongxinDirectionAvailable(owner, direction);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterSunYuanOlEntries
     internal bool HasDongxinEntitySlashQuota(CharacterState actor, CardKind kind, IReadOnlyList<int> ids) => _resolve().HasDongxinEntitySlashQuota(actor, kind, ids);
     internal bool HasIssuedDongxinEntitySlashQuota(long? useId, int actor) => _resolve().HasIssuedDongxinEntitySlashQuota(useId, actor);
     internal bool HasIssuedDongxinSlashDebitExemption(long useId, int actorSeat) => _resolve().HasIssuedDongxinSlashDebitExemption(useId, actorSeat);
-    internal bool HasSayingRoundRange(int actor, int target) => _resolve().HasSayingRoundRange(actor, target);
     internal bool HasSayingWeijiePayment(ProgramSkillFrame f, CardUseFrame? use = default) => _resolve().HasSayingWeijiePayment(f, use);
     internal bool IsIssuedSayingUse(CardUseFrame use) => _resolve().IsIssuedSayingUse(use);
     internal bool IsSayingFactionOrigin(ProgramSkillFrame f, int actor, int target, string resultBind) => _resolve().IsSayingFactionOrigin(f, actor, target, resultBind);

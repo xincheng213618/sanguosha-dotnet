@@ -38,7 +38,7 @@ internal sealed partial class CharacterTianYuMouMobileRuntime
             return SkillProgramStepOutcome.AwaitChoice;
         }
 
-        if (_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat).All(p => _coreProgramDodgeResponsesOperations.IsWithinAttackRange(f.OwnerSeat, p.Seat)))
+        if (_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat).All(p => _attackRanges.IsWithinAttackRange(f.OwnerSeat, p.Seat)))
         {
             var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).FirstOrDefault(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouTianYuSlashObtainedEvent(f.Id, f.OwnerSeat, card?.Id));

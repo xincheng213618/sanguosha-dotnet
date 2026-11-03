@@ -143,7 +143,7 @@ internal sealed partial class CoreGameEngineAdvancedLifecycleRuntime
     internal bool IsFarthestInRange(CharacterState owner, CharacterState target)
     {
         var range = _coreNativeRuleQueriesOperations.GetAttackRange(owner.Seat);
-        var legal = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != owner.Seat && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(owner.Seat, player.Seat)).ToArray();
+        var legal = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != owner.Seat && _attackRanges.IsWithinAttackRange(owner.Seat, player.Seat)).ToArray();
         return legal.Contains(target) && _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, target.Seat) == legal.Max(player => _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, player.Seat));
     }
 

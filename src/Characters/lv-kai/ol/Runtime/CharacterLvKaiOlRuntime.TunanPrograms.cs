@@ -17,7 +17,7 @@ internal sealed partial class CharacterLvKaiOlRuntime
         }
 
         var canUse = card.Kind == CardKind.Slash || card.Kind == CardKind.Peach && !_coreCardUseModulesOperations.IsCardUseForbidden(user, CardKind.Peach, CardActionType.Use) || _coreEquipmentContentOperations.EquipmentRules.IsEquipment(card.Kind);
-        var slashVictims = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != user && _coreNativeRuleQueriesOperations.GetSeatDistance(user, player.Seat) <= _coreNativeRuleQueriesOperations.GetAttackRange(user)).Select(player => player.Seat).ToArray();
+        var slashVictims = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != user && _attackRanges.IsWithinAttackRange(user, player.Seat)).Select(player => player.Seat).ToArray();
         if (!canUse && slashVictims.Length == 0)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), "图南没有可行的使用方式，剩余结算取消。");
@@ -70,7 +70,7 @@ internal sealed partial class CharacterLvKaiOlRuntime
         // Both slash shapes pick their victim in a follow-up prompt; the real
         // use ignores distance, the converted Slash keeps the normal distance.
         var unlimited = branch == "use";
-        var victims = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != user && (unlimited || _coreNativeRuleQueriesOperations.GetSeatDistance(user, player.Seat) <= _coreNativeRuleQueriesOperations.GetAttackRange(user))).Select(player => player.Seat).ToArray();
+        var victims = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != user && (unlimited || _attackRanges.IsWithinAttackRange(user, player.Seat))).Select(player => player.Seat).ToArray();
         if (victims.Length == 0)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), "图南的杀没有合法目标，剩余结算取消。");

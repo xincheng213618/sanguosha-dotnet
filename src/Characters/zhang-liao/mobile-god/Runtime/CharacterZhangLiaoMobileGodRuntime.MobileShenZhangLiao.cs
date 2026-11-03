@@ -26,7 +26,7 @@ internal sealed partial class CharacterZhangLiaoMobileGodRuntime
         EquipmentSlot.Treasure => "宝物栏",
         _ => throw new InvalidOperationException("Unknown equipment slot.")};
     internal string[] MobileDuoruiSkills(int seat) => _contentRegistryOperations._contentRegistry.Generals[_coreMatchParticipantsPlayersAccess._players[seat].General.Id].SkillIds.Concat(_coreMatchParticipantsPlayersAccess._players[seat].SecondaryGeneral is { } second ? _contentRegistryOperations._contentRegistry.Generals[second.Id].SkillIds : []).Distinct(StringComparer.Ordinal).Where(id => (_contentRegistryOperations._contentRegistry.GetSkill(id).Tags & (SkillTag.Limited | SkillTag.Awakening | SkillTag.Lord)) == 0 && id is not ("mobile-god:powei" or "mou-mobile:jieyin")).Order(StringComparer.Ordinal).ToArray();
-    internal bool MobileZhitiOpponent(int owner, int opponent) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(opponent) && owner != opponent && _coreMatchParticipantsPlayersAccess._players[opponent].IsAlive && _coreTreatedWoundedOperations.IsRuleWounded(_coreMatchParticipantsPlayersAccess._players[opponent]) && _coreProgramDodgeResponsesOperations.IsWithinAttackRange(owner, opponent);
+    internal bool MobileZhitiOpponent(int owner, int opponent) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(opponent) && owner != opponent && _coreMatchParticipantsPlayersAccess._players[opponent].IsAlive && _coreTreatedWoundedOperations.IsRuleWounded(_coreMatchParticipantsPlayersAccess._players[opponent]) && _attackRanges.IsWithinAttackRange(owner, opponent);
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 39950)]
     internal void ExpireMobileDuorui(IGameEvent fact)
     {

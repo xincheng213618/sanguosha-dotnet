@@ -9,7 +9,6 @@ public sealed record SayingSelection(int ActorSeat,int ProviderSeat,int TargetSe
     public override int GetHashCode()=>HashCode.Combine(ActorSeat,ProviderSeat,TargetSeat,Kind,Materials.Count,Sources.Count);
 }
 public sealed record SayingNativeOrigin(long ProgramFrameId,CardConversionSource Source,string GameplayHash,int ActualTurn,long UseId,long ActionId,SayingSelection Selection,CardActionContext OriginalAction,long BeforePayment);
-public sealed record SayingRangeGrantedEvent(long FrameId,CardConversionSource Source,int Round,int OwnerSeat,int Holder):IGameEvent;
 public sealed record SayingRequestIssuedEvent(long FrameId,int ActorSeat,int TargetSeat):IGameEvent;
 public sealed record SayingFactionRequestedEvent(long FrameId,int ActorSeat,int TargetSeat,FactionResponsePolicySource Source):IGameEvent;
 public sealed record SayingSlashPreparedEvent(long FrameId,int ActorSeat,int ProviderSeat,int TargetSeat,CardKind Kind,string SelectionHash):IGameEvent;
