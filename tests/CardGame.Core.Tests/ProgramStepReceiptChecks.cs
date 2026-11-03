@@ -14,6 +14,7 @@ internal static partial class ProgramStepReceiptChecks
         AcceptedCardActionStaysWithItsOriginalCandidate();
         AcceptedMovementStaysWithItsOriginalCandidate();
         AcceptedMovementContinuesOnlyItsOriginalOrdinaryProgramCold();
+        ExactForeignTransferSelectsBeforeOneRequestAndFallsBackAtomicallyCold();
         NativeGiveFeedsTuichengAndJiyuanFromOneOriginalBatchCold();
         foreach (var scenario in new[] { "anxu", "anxu-before-payment-loss", "anxu-source-loss", "anxu-owner-death", "anxu-moved-away", "zhijian", "zhijian-source-loss", "zhijian-owner-death" })
         {

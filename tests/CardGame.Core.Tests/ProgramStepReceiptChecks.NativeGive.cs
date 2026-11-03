@@ -48,7 +48,8 @@ internal static partial class ProgramStepReceiptChecks
         if (withJiyuan)
         {
             Need(P(game)!.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate") &&
-                !E<MouHqReplyEvent>(game).Any() && !E<ProgramBindingStartedEvent>(game).Any(fact => fact.SkillId == Tuicheng),
+                !E<NativeCardsGivenEvent>(game).Any(fact => fact.Giver == 1 && fact.Recipient == 0) &&
+                !E<ProgramBindingStartedEvent>(game).Any(fact => fact.SkillId == Tuicheng),
                 "At equal priority the real boundary Jiyuan candidate precedes Mou Tuicheng; neither consumer is silently skipped.");
             game = NativeGiveCold(game, registry); Answer(game, choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
             Reach(game, () => P(game)?.SkillPrompt?.SkillId == Jiyuan &&
@@ -57,7 +58,8 @@ internal static partial class ProgramStepReceiptChecks
             Reach(game, () => P(game)?.SkillPrompt?.SkillId == Tuicheng);
             var reward = game.CardMovements.Single(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(1) &&
                 move.Reason.Value == "skill-program." + Jiyuan + ".Draw");
-            var replies = P(game)!.Choices.Where(choice => choice.Parameters.GetValueOrDefault("branch") == "card").SelectMany(choice => choice.Cards).ToArray();
+            var replies = P(game)!.Choices.Where(choice => choice.Parameters.GetValueOrDefault("program-action") == "select-and-move-owned-card")
+                .SelectMany(choice => choice.Cards).ToArray();
             Need(P(game) is { PlayerSeat: 1 } && replies.SequenceEqual([reward.CardId]) && !replies.Contains(originals[0]) &&
                 game.CreateSnapshot(1).Players[1].Hand.Any(card => card.Id == originals[0]) &&
                 E<ProgramDrawCompletedEvent>(game).Count(fact => fact.RecipientSeat == 1 && fact.RequestedCount == 1 && fact.ActualDrawCount == 1) == 1,
@@ -72,21 +74,27 @@ internal static partial class ProgramStepReceiptChecks
                 returned.CompletionSequence == reply.Sequence &&
                 game.CardMovements.Count(move => move.CardId == reward.CardId && move.From == CardLocation.Hand(1) && move.To == CardLocation.Hand(0)) == 1 &&
                 game.CreateSnapshot(1).Players[1].Hand.Select(card => card.Id).SequenceEqual([originals[0]]) &&
-                E<MouHqReplyEvent>(game).Single() is { RequiredCount: 1, Gave: true } && !E<MouHqDrawReturnedEvent>(game).Any(),
+                E<ProgramExpressionNumberCapturedEvent>(game).Single(fact => fact.FrameId == replyFrameId && fact.Name == "count").Value == 1 &&
+                !E<ProgramDrawCompletedEvent>(game).Any(fact => fact.FrameId == replyFrameId),
                 "The reply is a distinct actual Give from recipient to original giver, using only the Jiyuan draw; a paid reply does not also award Tuicheng's fallback Draw.");
         }
         else
         {
-            Need(E<MouHqReplyEvent>(game).Single() is { RequiredCount: 1, Gave: false } &&
-                E<NativeDrawAttemptStartedEvent>(game).Count(fact => fact.Context.Reason.Value == "skill-program.mou:tuicheng.draw") == 1 &&
+            var fallbackFrame = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Tuicheng);
+            Need(!E<NativeCardsGivenEvent>(game).Any(fact => fact.Giver == 1 && fact.Recipient == 0) &&
+                fallbackFrame.CardSetBindings.Single(binding => binding.Name == "reply").CardIds.Count == 0 &&
+                E<ProgramDrawCompletedEvent>(game).Single(fact => fact.FrameId == fallbackFrame.Id) is { RequestedCount: 1, ActualDrawCount: 1, RecipientSeat: 0 } &&
+                E<NativeDrawAttemptStartedEvent>(game).Count(fact => fact.Context.Reason.Value == "skill-program.mou:tuicheng.Draw") == 1 &&
                 !E<ProgramBindingStartedEvent>(game).Any(fact => fact.SkillId == Jiyuan),
                 "An otherwise empty recipient cannot return the very card just given this turn, so Tuicheng issues one real equal-count Draw.");
             game = NativeGiveCold(game, registry); Answer(game, choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
         }
         Reach(game, () => P(game) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
+        var tuichengFrameId = E<ProgramBindingStartedEvent>(game).Single(fact => fact.SkillId == Tuicheng).FrameId;
         Need(E<NativeCardsGivenEvent>(game).Count(fact => fact.Giver == 0 && fact.Recipient == 1) == 1 &&
-            E<NativeCardsGivenEvent>(game).Count() == (withJiyuan ? 2 : 1) && E<MouHqReplyEvent>(game).Count() == 1 &&
-            (withJiyuan || E<MouHqDrawReturnedEvent>(game).Single() is { RequestedCount: 1, ActualCount: 1 }) &&
+            E<NativeCardsGivenEvent>(game).Count() == (withJiyuan ? 2 : 1) &&
+            E<ProgramExpressionNumberCapturedEvent>(game).Count(fact => fact.FrameId == tuichengFrameId && fact.Name == "count" && fact.Value == 1) == 1 &&
+            E<ProgramDrawCompletedEvent>(game).Count(fact => fact.FrameId == tuichengFrameId && fact.RequestedCount == 1 && fact.ActualDrawCount == 1) == (withJiyuan ? 0 : 1) &&
             E<ProgramBindingResolvedEvent>(game).Count(fact => fact.SkillId == Tuicheng && fact.Activated && fact.Completed) == 1 &&
             E<ProgramBindingResolvedEvent>(game).Count(fact => fact.SkillId == Jiyuan && fact.Activated && fact.Completed) == (withJiyuan ? 1 : 0) &&
             game.CardMovements.Count(move => move.CardId == originals[0] && move.From == CardLocation.Hand(0) && move.To == CardLocation.Hand(1)) == 1,
@@ -95,7 +103,8 @@ internal static partial class ProgramStepReceiptChecks
         Accept(game, new UseProgramSkillCommand(0, GiveDriver, "move", [originals[1]], [2], game.Revision, P(game)!.PromptId));
         Reach(game, () => P(game) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         Need(game.CardMovements.Any(move => move.CardId == originals[1] && move.From == CardLocation.Hand(0) && move.To == CardLocation.Hand(2)) &&
-            E<NativeCardsGivenEvent>(game).Count() == (withJiyuan ? 2 : 1) && E<MouHqReplyEvent>(game).Count() == 1 &&
+            E<NativeCardsGivenEvent>(game).Count() == (withJiyuan ? 2 : 1) &&
+            E<ProgramBindingStartedEvent>(game).Count(fact => fact.SkillId == Tuicheng) == 1 &&
             E<NativeDrawAttemptStartedEvent>(game).Count() == draws,
             "An ordinary real Hand-to-Hand movement is not a declared Give and cannot trigger either Give consumer or fabricate another reward.");
         _ = NativeGiveCold(game, registry);
@@ -134,7 +143,7 @@ internal static partial class ProgramStepReceiptChecks
                     {"id":"move","minCards":1,"maxCards":1,"sourceZones":["hand"],"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[
                       {"op":"captureSelectedCards","target":"owner","resultBind":"moved"},{"op":"moveBoundCards","target":"owner","sourceBind":"moved","destination":"selectedTargetHand"}]}]},
                   {"id":"{{GiveWatch}}","revision":1,"triggers":[
-                    {"id":"tuicheng-draw-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["skill-program.mou:tuicheng.draw"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid-draw","options":[{"id":"continue"}]}]},
+                    {"id":"tuicheng-draw-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["skill-program.mou:tuicheng.Draw"],"optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid-draw","options":[{"id":"continue"}]}]},
                     {"id":"native-request","window":"nativeDrawStarting","subject":"owner","optional":false,"effects":[{"op":"setChainedState","target":"owner","chained":false}]}]},
                   {"id":"{{GiveQuiet}}","revision":1,"triggers":[{"id":"no-normal-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"effects":[{"op":"adjustNormalDraw","target":"owner","amount":-2}]}]}]}
                 """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,

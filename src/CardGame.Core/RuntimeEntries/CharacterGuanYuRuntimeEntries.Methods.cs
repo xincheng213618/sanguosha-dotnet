@@ -22,7 +22,6 @@ internal sealed partial class CharacterGuanYuRuntimeEntries
     internal bool GuanFocusSlashQuotaAfterLimit(ProgramSlashQuotaQuery query) => _resolve().GuanFocusSlashQuotaAfterLimit(query);
     internal int GuanFocusedSlashCount(GuanPhaseFocusEvent focus) => _resolve().GuanFocusedSlashCount(focus);
     internal bool GuanOpeningUseExists(int owner, bool red) => _resolve().GuanOpeningUseExists(owner, red);
-    internal CardActionContext GuanParentAction(ProgramSkillFrame frame) => _resolve().GuanParentAction(frame);
     internal GuanPhaseFocusEvent? GuanPhaseFocus(int owner) => _resolve().GuanPhaseFocus(owner);
     internal bool GuanSparedThisTurn(int owner, int target) => _resolve().GuanSparedThisTurn(owner, target);
     internal void ReturnDemonRoundHolds() => _resolve().ReturnDemonRoundHolds();

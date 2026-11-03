@@ -5,7 +5,7 @@
         "effects": [{ "op": "selectTarget", "target": "owner", "targetKind": "otherLiving" }, { "op": "initializeAnniversaryLeiBoSilei", "target": "owner" }] },
       { "id": "marked-source-loot", "window": "afterDamageApplied", "subject": "any", "damageOccurrence": "perDamage", "optional": true,
         "effects": [{ "op": "recordAnniversaryLeiBoSileiLoot", "target": "owner" },
-          { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "eventTarget" }, "zones": ["hand", "equipment"], "count": 1, "destination": "ownerHand", "skipIfNoCards": true, "awaitMovementTriggers": true }] },
+          { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "eventTarget" }, "zones": ["hand", "equipment"], "count": 1, "destination": "ownerHand", "allowSameOwnerHandReturn": true, "skipIfNoCards": true, "awaitMovementTriggers": true }] },
       { "id": "marked-victim-reply", "window": "afterDamageApplied", "subject": "any", "damageOccurrence": "perDamage", "optional": false,
         "effects": [{ "op": "requestAnniversaryLeiBoSileiSlash", "target": "owner" }, { "op": "settleAnniversaryLeiBoSileiPenalty", "target": "owner" }] }
     ] },

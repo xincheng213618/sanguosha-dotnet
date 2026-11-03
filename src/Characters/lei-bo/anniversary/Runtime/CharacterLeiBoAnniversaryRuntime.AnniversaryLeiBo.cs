@@ -82,7 +82,6 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    internal bool IsAnniversaryLeiBoSelfLoot(ProgramSkillFrame f, SkillProgramEffect e) => f.SkillId == AnniversaryLeiBoComposition.Silei && f.TriggerId == "marked-source-loot" && f.ActivationId == f.TriggerId && f.InstructionIndex == 2 && e is { Op: SkillProgramEffectOp.SelectAndMoveOwnedCard, Destination: SkillProgramCardDestination.OwnerHand, Amount: 1 } && e.CardOwnerRef?.Kind == ProgramParticipantRef.EventTarget && e.ChooserRef?.Kind == ProgramParticipantRef.Owner && f.WindowContext is { TargetSeat: { } target, SourceSeat: { } source } c && target == f.OwnerSeat && source != target && LeiBoDamageParent(f) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLeiBoLootInvokedEvent>().Count(x => x.FrameId == f.Id && x.Source == LeiBoSource(f) && x.Hash == f.GameplayHash && x.WindowId == c.ParentFrameId && x.DamageId == c.DamageFrameId && x.Victim == target && x.Turn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && x.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat) == 1;
     internal SkillProgramStepOutcome RequestLeiBoSlash(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

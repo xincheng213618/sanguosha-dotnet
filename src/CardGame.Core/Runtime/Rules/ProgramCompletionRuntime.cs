@@ -70,7 +70,8 @@ internal sealed class ProgramCompletionRuntime(IProgramRuntimeFrames frames, IPr
             if (frame.PendingMovementContinuation is not null || !payment.MovementCommitted ||
                 payment.ActiveChildFrameId is not null)
                 throw new InvalidOperationException("A selected-card payment cannot return before its movement children finish.");
-            var valid = (payment.Operation != SkillProgramEffectOp.SelectAndMoveOwnedCard || payment.Movement is { Delivered: true }) &&
+            var valid = ProgramInstructionDeliveries.HasSettledOwnedRequest(frame) ||
+                (payment.Operation != SkillProgramEffectOp.SelectAndMoveOwnedCard || payment.Movement is { Delivered: true }) &&
                 facts.Alive(frame.OwnerSeat) &&
                 (facts.CanInvokeProgramSkill(frame) ||
                  facts.CanContinueConditionalGrant(frame) || facts.CanContinuePhaseAlcohol(frame) ||

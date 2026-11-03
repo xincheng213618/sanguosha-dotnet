@@ -6,6 +6,7 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     bool IProgramPaidCardFacts.CanContinueAfterOwnerDeath(ProgramSkillFrame frame) => _continuationPermissions.Value.CanContinueProgramAfterOwnerDeath(frame);
     bool IProgramPaidCardFacts.CanContinueAfterSkillLoss(ProgramSkillFrame frame) => _continuationPermissions.Value.CanContinueProgramAfterSkillLoss(frame);
     bool? IProgramPaidCardFacts.EvaluateOptionExpression(ProgramSkillFrame frame, ProgramExpression expression) => ProgramExpressions.EvaluateBool(expression, _expressionWorld.CreateProgramExpressionWorld(frame));
+    int? IProgramPaidCardFacts.EvaluateCountExpression(ProgramSkillFrame frame, ProgramExpression expression) => ProgramExpressions.EvaluateInt(expression, _expressionWorld.CreateProgramExpressionWorld(frame));
     int IProgramPaidCardFacts.PlayerCount => _coreMatchDefinitionPlayerCountAccess._playerCount;
     long IProgramPaidCardFacts.ActiveMovementBatchId => _activeCardMovementBatchIdsOperations._activeCardMovementBatchIds.Peek();
 
@@ -28,9 +29,9 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     IReadOnlyList<Card> IProgramPaidCardFacts.Judgment(int seat) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetJudgment(_coreMatchParticipantsPlayersAccess._players[seat]).ToArray());
     IReadOnlyList<Card> IProgramPaidCardFacts.CardsAt(CardLocation location) => Array.AsReadOnly(_cardZonesOperations._cardZones.CardsAt(location).ToArray());
     CardLocation IProgramPaidCardFacts.Location(int cardId) => _cardZonesOperations._cardZones.GetLocation(cardId);
-    int IProgramPaidCardFacts.ProviderSeat(ProgramSkillFrame frame) => _characterGuanYuRuntimeOperations.GuanParentAction(frame).ProviderSeat;
+    int IProgramPaidCardFacts.ProviderSeat(ProgramSkillFrame frame) => _resolutionStackOperations._resolutionStack
+        .OfType<ProgramCardTriggerWindowFrame>().Single(parent => parent.Id == frame.WindowContext!.ParentFrameId).Action.ProviderSeat;
     SkillProgramEffect IProgramPaidCardFacts.OwnedSelectionEffect(ProgramSkillFrame frame) => _coreProgramOwnedCardsOperations.GetOwnedSelectionEffect(frame);
-    bool IProgramPaidCardFacts.IsSatisfiedOwnHandReward(ProgramSkillFrame frame, SkillProgramEffect effect) => _characterLeiBoAnniversaryOperations.Value.IsAnniversaryLeiBoSelfLoot(frame, effect);
     bool IProgramPaidCardFacts.ForeignDiscardPrevented(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) => _coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, card, source, intent);
     bool IProgramPaidCardFacts.SelfDiscardForbidden(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) => _coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(chooser, card, source, intent);
     bool IProgramPaidCardFacts.AllowsOwnedCardPayment(ProgramSkillFrame frame, CardLocation source, Card card) => _characterDaQiaoMobileOperations.AllowsPostCostSlashRedirectPayment(frame, source, card);
@@ -74,6 +75,18 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
         if (throughProcessing && !((IProgramPaidCardOperations)this).MoveToProcessing(frame, card, source, reason, disclosure, beforeFact))
             return;
         _corePhysicalMovementFacadesOperations.MoveCard(card, throughProcessing ? CardLocation.Processing : source, destination, reason, _nativeGivenCards.Completion(frame.Id, giver, destination.OwnerSeat!.Value, [card.Id], before, beforeFact), disclosure: disclosure);
+    }
+
+    void IProgramPaidCardOperations.MoveCards(ProgramSkillFrame frame, IReadOnlyList<int> cardIds,
+        CardLocation destination, CardMoveReason reason, int? giver, Action<HappyWeiYanGainRequestSettlement> settled)
+    {
+        var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cardIds, destination, reason,
+            disclosure: CardMovementDisclosure.FaceDown,
+            afterRequestSettled: giver is { } source
+                ? _nativeGivenCards.RequestCompletion(frame.Id, source, destination.OwnerSeat!.Value, cardIds, before, settled)
+                : settled,
+            producerFrameId: frame.Id);
     }
 
     bool IProgramPaidCardOperations.BeginMovementWindow() => _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow();

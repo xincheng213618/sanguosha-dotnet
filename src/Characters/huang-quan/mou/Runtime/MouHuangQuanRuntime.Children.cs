@@ -4,7 +4,6 @@ internal sealed partial class MouHuangQuanRuntime
     private bool FirstChild(ProgramSkillFrame f,ResolutionFrame child)
     {
         if(f.MouHuangQuan is not{}r||!Valid(f))return false;
-        if(child is NativeDrawAttemptFrame draw)return r.Stage==MouHqStage.Drawing&&RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.NativeDrawAttemptRidesOn(draw,f);
         if(child is CardsMovedTriggerWindowFrame moved)return f.PendingMovementContinuation is not null&&RuntimeSkills.RuntimeRules_Core_CommonRules.ProgramMovementReturnMatches(f,moved)&&moved.Batch.Movements.All(m=>m.Sequence>r.Before&&m.Sequence<=r.After);
         return facts.MovementRecoveryChild(f,child);
     }

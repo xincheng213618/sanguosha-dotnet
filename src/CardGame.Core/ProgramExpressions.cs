@@ -54,6 +54,8 @@ internal interface IProgramExpressionWorld
     IReadOnlyList<ProgramExpressionCardFact>? BoundCards(string name) => null;
     bool? CardStillAtSource(ProgramExpressionCardFact card) => null;
     bool? SameTeam(int first, int second) => null;
+    int? WindowAmount() => null;
+    IReadOnlyList<ProgramExpressionCardFact>? GivenCards(int giver, int recipient) => null;
     int? PhaseCount(string moment, int actor, ActualDiscardRecoveryPhaseKind? kind, ActualPhaseHistoryOutcome outcome) => null;
 }
 
@@ -162,6 +164,8 @@ internal static class ProgramExpressions
             if (purpose is not ("all" or "explicit")) Fail(path, "publicRevealCards purpose requires all or explicit");
             return new(op, ProgramExpressionType.CardSet, [], name: scope, literal: purpose == "explicit" ? 1 : 0);
         }
+        if (op == "windowAmount") { Arity(0, 0); return new(op, ProgramExpressionType.Int, []); }
+        if (op == "givenCards") { Arity(2, 2); return new(op, ProgramExpressionType.CardSet, Each(ProgramExpressionType.Participant)); }
         if (op == "boundCards")
         {
             Arity(1, 1);
@@ -561,6 +565,7 @@ internal static class ProgramExpressions
             case "int": return e.Literal;
             case "when": return EvaluateBool(e.Args[0], world, it, use, cards) == true ? EvaluateInt(e.Args[1], world, it, use, cards) : null;
             case "number": return world.Number(e.Name!);
+            case "windowAmount": return world.WindowAmount();
             case "gainActualTurn": return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } gainOwner ? world.HandGain(gainOwner)?.ActualTurn : null;
             case "phaseCount": return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } phaseActor
                 ? world.PhaseCount(e.Name!, phaseActor, e.Literal < 0 ? null : (ActualDiscardRecoveryPhaseKind)e.Literal,
@@ -648,6 +653,10 @@ internal static class ProgramExpressions
     {
         if (e.Op == "publicRevealCards") return world.PublicRevealCards(e.Name!, e.Literal == 1 ? "explicit" : "all");
         if (e.Op == "boundCards") return world.BoundCards(e.Name!);
+        if (e.Op == "givenCards")
+            return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } giver &&
+                EvaluateParticipant(e.Args[1], world, it, use, cards) is { } recipient
+                    ? world.GivenCards(giver, recipient) : null;
         if (e.Op == "gainCards")
             return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } recipient && world.HandGain(recipient) is { } gain
                 ? Array.AsReadOnly((e.Name == "incoming" ? gain.Incoming : gain.PreviousHand)
@@ -756,6 +765,9 @@ internal sealed class SkillContextExpressionWorld(PlayerSkillContext owner, Play
     public int? WindowStat(string stat, string participant) => ProgramExpressions.ReadWindowStat(windowFacts, stat, participant, selectedTarget is not null);
     public int? BindingStat(string stat, string name) => bindingStat?.Invoke(stat, name);
     public int? Number(string name) => number?.Invoke(name);
+    public int? WindowAmount() => ownerWindowFacts?.WindowAmount();
+    public IReadOnlyList<ProgramExpressionCardFact>? GivenCards(int giver, int recipient) =>
+        giver == owner.Seat || recipient == owner.Seat ? ownerWindowFacts?.GivenCards(giver, recipient) : null;
     public HandGainOccurrence? HandGain(int recipient) => recipient == owner.Seat ? ownerWindowFacts?.HandGain(recipient) : null;
     public bool? GainHasSource(int recipient, string moment) => recipient == owner.Seat ? ownerWindowFacts?.GainHasSource(recipient, moment) : null;
     public bool? CardAt(int cardId, int seat, CardZoneKind zone) =>

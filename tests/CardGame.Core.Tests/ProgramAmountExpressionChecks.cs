@@ -21,6 +21,7 @@ internal static partial class ProgramAmountExpressionChecks
         GiveBoundCardTargetsAndAwaitAreTypedAndFingerprinted();
         DeclaredGiveIsTypedAndDistinctFromMovement();
         NativeGiveOccurrenceIsScopedAndDeclaresSharedFactDemand();
+        ExactOwnedTransferIsTypedAndKeepsItsLegacySingleCardContract();
         var compact = Load("""{"op":"draw","target":"owner","amountExpr":["-",4,["handCount","owner"]]}""");
         var spaced = Load("""{"op":"draw","target":"owner","amountExpr":[ "-", 4, [ "handCount", "owner" ] ]}""");
         var changed = Load("""{"op":"draw","target":"owner","amountExpr":["-",5,["handCount","owner"]]}""");

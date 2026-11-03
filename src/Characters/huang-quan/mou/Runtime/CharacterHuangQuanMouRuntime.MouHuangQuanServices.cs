@@ -3,7 +3,6 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangQuanMouRuntime
 {
-    bool IMouHuangQuanFacts.GameOver => _coreMatchOutcomeWinnerAccess._winner != Winner.None;
 
     int IMouHuangQuanFacts.Turn => _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber;
 
@@ -21,18 +20,16 @@ internal sealed partial class CharacterHuangQuanMouRuntime
     IEnumerable<T> IMouHuangQuanFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouHuangQuanFacts.ParentMatches(ProgramSkillFrame f) => MouHqParent(f);
     MouHqOriginalUse? IMouHuangQuanFacts.OriginalUse(int owner, ProgramSkillWindowContext? context) => TryMouHqOriginalUse(owner, context, out var u, out _) ? new(u.Id, u.Action!.ActionId, u.SourceSeat == owner) : null;
-    IReadOnlyList<NativeGiveFact> IMouHuangQuanFacts.Gifts(int giver, int turn, int turnOwner) => _givenCards.GiftsForCurrentScope(giver, turn, turnOwner);
     IReadOnlyList<MouHqEntity> IMouHuangQuanFacts.TransferEntities(ProgramSkillFrame f, int actor) => Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, actor, actor, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Transfer, destination: SkillProgramCardDestination.OwnerHand).Select(c => new MouHqEntity(c.Cards.Single(), _cardZonesOperations._cardZones.GetLocation(c.Cards.Single()))).ToArray());
     double IMouHuangQuanFacts.HelpValue(int actor, int target) => _coreAiBrainsAiBrainsAccess._aiBrains[actor].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(actor), target, new(0, 0, 0, 0, 1, 0, true, false));
-    int IMouHuangQuanFacts.KeepValue(int actor, int card) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(card), _coreMatchParticipantsPlayersAccess._players[actor]);
     bool IMouHuangQuanFacts.MovementRecoveryChild(ProgramSkillFrame f, ResolutionFrame child)
     {
-        if (f.MouHuangQuan is not { Paid: true, Stage: MouHqStage.GiveChildren or MouHqStage.ReplyChildren } r)
+        if (f.MouHuangQuan is not { Paid: true, Stage: MouHqStage.GiveChildren } r)
             return false;
         foreach (var entity in r.Selected.Where(x => x.From.Zone == CardZoneKind.Equipment && _coreAdvancedLifecycleOperations.GetAdvancedCard(x.CardId).Kind == CardKind.SilverLion))
         {
             var seat = entity.From.OwnerSeat!.Value;
-            var reason = r.Stage == MouHqStage.GiveChildren ? MouHuangQuanRuntime.MouHqGiveReason : MouHuangQuanRuntime.MouHqReplyReason;
+            var reason = MouHuangQuanRuntime.MouHqGiveReason;
             if (!_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == entity.CardId && m.From == entity.From && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == reason))
                 continue;
             if (child is RecoveryReplacementFrame recovery && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, f) && recovery.Return.Continuation == PostEventContinuation.Program && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason?.Value == reason && recovery.Attempt.SourceSeat == seat && recovery.Attempt.TargetSeat == seat)
@@ -44,13 +41,13 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         return false;
     }
 
-    void IMouHuangQuanNative.Give(ProgramSkillFrame f, int giver, int recipient, IReadOnlyList<int> ids, bool reply, long before)
+    void IMouHuangQuanNative.Give(ProgramSkillFrame f, int giver, int recipient, IReadOnlyList<int> ids, long before)
     {
         if (ids.Count == 0)
             return;
-        if (!ValidMouHq(f) || f.MouHuangQuan is not { Paid: true } r || r.Selected.Count != ids.Count || r.Selected.Any(x => !ids.Contains(x.CardId) || _cardZonesOperations._cardZones.GetLocation(x.CardId) != x.From) || (reply ? r.Recipient : f.OwnerSeat) != giver || (reply ? f.OwnerSeat : r.Recipient) != recipient || before != r.Before)
-            throw new InvalidOperationException("Qiaodui/Tuicheng native payment lost its exact issued sources and payer.");
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(reply ? MouHuangQuanRuntime.MouHqReplyReason : MouHuangQuanRuntime.MouHqGiveReason), (_, moves) =>
+        if (!ValidMouHq(f) || f.MouHuangQuan is not { Paid: true } r || r.Selected.Count != ids.Count || r.Selected.Any(x => !ids.Contains(x.CardId) || _cardZonesOperations._cardZones.GetLocation(x.CardId) != x.From) || f.OwnerSeat != giver || r.Recipient != recipient || before != r.Before)
+            throw new InvalidOperationException("Qiaodui native payment lost its exact issued sources and payer.");
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(MouHuangQuanRuntime.MouHqGiveReason), (_, moves) =>
         {
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(current with { MouHuangQuan = current.MouHuangQuan!with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

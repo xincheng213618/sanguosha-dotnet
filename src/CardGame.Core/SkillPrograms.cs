@@ -740,7 +740,6 @@ public enum SkillProgramEffectOp
     ResolveMouCaoHongXianju = 35901,
     SettleMouCaoHongXianju = 35902,
     ResolveMouHuangQuanQiaodui = 35700,
-    ResolveMouHuangQuanTuicheng = 35701,
     ResolveMouHuCheErKongwu = 35800,
     ResolveMouZhugeJinTaozhou = 35600,
     ResolveMouZhugeJinHoude = 35601,

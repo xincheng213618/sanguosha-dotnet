@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
-public enum MouHqStage { Cards, Recipient, GiveChildren, Reply, ReplyChildren, Drawing, DrawChildren, Effect }
+public enum MouHqStage { Cards, Recipient, GiveChildren }
 public sealed record MouHqEntity(int CardId,CardLocation From);
 public sealed record MouHqReceipt(CardConversionSource Source,string GameplayHash,int Turn,int TurnOwner,long WindowId)
 {
@@ -14,8 +14,6 @@ public sealed record MouHqReceipt(CardConversionSource Source,string GameplayHas
     public int Count{get;init;}
     public long Before{get;init;}
     public long After{get;init;}
-    public NativeGiveFact? Gift{get;init;}
-    public NativeDrawOutcome? Draw{get;init;}
     private IReadOnlyList<MouHqEntity> _selected=[];
     public IReadOnlyList<MouHqEntity> Selected{get=>_selected;init=>_selected=Array.AsReadOnly(value.ToArray());}
 }
@@ -45,8 +43,6 @@ public sealed partial record CardUseFrame
 }
 public sealed record MouHqStartedEvent(long FrameId,CardConversionSource Source,string GameplayHash,int Turn,int TurnOwner,long WindowId,long UseId,long ActionId):IGameEvent;
 public sealed record MouHqCommittedEvent(long FrameId,int OwnerSeat,int Recipient,int Count,int Turn,int TurnOwner):IGameEvent;
-public sealed record MouHqReplyEvent(long FrameId,int Recipient,int RequiredCount,bool Gave):IGameEvent;
-public sealed record MouHqDrawReturnedEvent(long FrameId,int RequestedCount,int ActualCount,int ReplacementCount,long? AttemptId):IGameEvent;
 public sealed record MouHqEffectIssuedEvent(MouHqEffectGrant Grant,bool Repeats):IGameEvent;
 public sealed record MouHqEffectRoundStartedEvent(long UseId,long ActionId,long FrameId,int Round):IGameEvent;
 public sealed record MouHqEffectRoundCompletedEvent(long UseId,long ActionId,long FrameId,int Round):IGameEvent;
@@ -67,7 +63,3 @@ internal abstract class MouHuangQuanDescriptor:ProgramOperationDescriptorBase
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext c)=>c.State.CanContinueAfterOwnerDeath(c.Frame);
 }
 internal sealed class ResolveMouHuangQuanQiaoduiDescriptor:MouHuangQuanDescriptor{public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveMouHuangQuanQiaodui;}
-internal sealed class ResolveMouHuangQuanTuichengDescriptor:MouHuangQuanDescriptor
-{
-    public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveMouHuangQuanTuicheng;
-}

@@ -48,7 +48,7 @@ internal abstract record ProgramResourceOperation;
 internal sealed record CreateNumberBinding(string Name) : ProgramResourceOperation;
 internal sealed record ReadNumberBinding(string Name) : ProgramResourceOperation;
 internal sealed record CreateCardSet(string Name, int MaxCount, bool NeedsCleanup,
-    bool AlreadyMoved = false, SkillProgramEffectTarget? CardOwner = null) : ProgramResourceOperation;
+    bool AlreadyMoved = false, SkillProgramEffectTarget? CardOwner = null, bool Consumed = false) : ProgramResourceOperation;
 internal sealed record CaptureSourceCard(string Name, int MaximumCount = 1, bool OwnerHand = false,
     SkillProgramEffectTarget? CardOwner = null) : ProgramResourceOperation;
 internal sealed record CaptureActivationCards(string Name) : ProgramResourceOperation;

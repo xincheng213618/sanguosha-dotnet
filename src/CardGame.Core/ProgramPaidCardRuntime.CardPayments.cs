@@ -45,10 +45,15 @@ internal sealed partial class ProgramPaidCardRuntime
         var chooserSeat = ResolveProgramParticipant(active, chooser);
         var cardOwnerSeat = ResolveProgramParticipant(active, cardOwner);
         var destinationSeat = destinationRef is null ? (int?)null : ResolveProgramParticipant(active, destinationRef);
+        var requestEffect = _facts.OwnedSelectionEffect(active);
         if (destination == SkillProgramCardDestination.SelectedTargetHand &&
             (destinationSeat is not { } seat || !_facts.IsAlive(seat) ||
              seat == cardOwnerSeat && !allowSameOwnerHandReturn))
+        {
+            if (ProgramOwnedCardRequests.IsExact(requestEffect))
+                return InsufficientOwnedRequest(active, requestEffect);
             throw new InvalidOperationException("A selected-target transfer requires a distinct living recipient.");
+        }
         if (destination == SkillProgramCardDestination.SelectedTargetEquipment &&
             (destinationSeat is not { } recipientSeat || !_facts.IsAlive(recipientSeat) ||
              recipientSeat == cardOwnerSeat))
@@ -66,39 +71,7 @@ internal sealed partial class ProgramPaidCardRuntime
             destination, destinationSeat, prohibitReplacingEquipment,
             correspondingZoneSeat: prohibitReplacingEquipment && zones.Contains(CardZoneKind.Equipment)
                 ? destinationSeat : null);
-        if (choices.Count == 0)
-        {
-            if (skipIfNoCards)
-            {
-                if (_facts.OwnedSelectionEffect(active).FreezeMovedCardSuit && resultBind is not null)
-                    _operations.SetCardSet(frame.Id, resultBind, [], SkillProgramCardSetVisibility.Public, []);
-                return SkillProgramStepOutcome.Continue;
-            }
-            _operations.Cancel(active, "没有可支付的区域牌，技能结算已取消。");
-            return SkillProgramStepOutcome.AwaitChild;
-        }
-        if (_facts.OwnedSelectionEffect(active).AllowDecline)
-            choices = Array.AsReadOnly(choices.Append(new PromptChoice(
-                new ChoiceId($"program-field-decline.frame-{active.Id}"), "不移动场上的牌。", [], [],
-                new System.Collections.ObjectModel.ReadOnlyDictionary<string, string>(new Dictionary<string, string>
-                { ["program-action"] = "decline-owned-field-move", ["frame-id"] = active.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) }))).ToArray());
-        var visibleCardIds = choices.SelectMany(choice => choice.Cards).Distinct().Order().ToArray();
-        var skill = _facts.Skill(frame.SkillId);
-        _prompts.Set(new PendingDecision(
-            DecisionKind.ProgramTrigger, chooserSeat,
-            destination == SkillProgramCardDestination.SelectedTargetHand
-                ? "请选择一张区域牌交给目标。" : "请选择一张区域牌支付。", visibleCardIds, [],
-            chooserSeat)
-        {
-            PromptId = _prompts.NextId(),
-            IsPrivate = true,
-            TargetSeat = frame.WindowContext?.TargetSeat ?? cardOwnerSeat,
-            SkillPrompt = new SkillPromptPresentation(frame.SkillId, skill.Name,
-                destination == SkillProgramCardDestination.SelectedTargetHand
-                    ? $"{skill.Name} · 选择转交牌" : $"{skill.Name} · 选择支付牌", skill.Description),
-            Choices = choices
-        }, _facts.IsHuman(chooserSeat));
-        return SkillProgramStepOutcome.AwaitChoice;
+        return BeginOwnedCardRequest(active, requestEffect, chooserSeat, cardOwnerSeat, choices, skipIfNoCards);
     }
 
     internal bool HasOwnedProgramCardCategory(int ownerSeat,
@@ -175,6 +148,7 @@ internal sealed partial class ProgramPaidCardRuntime
     internal void ResolveSelectAndMoveOwnedCardChoice(
         ProgramSkillFrame frame, SkillProgramEffect effect, PromptChoice selected)
     {
+        if (ResolveOwnedCardRequestSelection(ref frame, effect, selected)) return;
         var chooserSeat = ResolveProgramParticipant(frame, effect.ChooserRef!);
         var ownerSeat = ResolveProgramParticipant(frame, effect.CardOwnerRef!);
         if (!_facts.IsAlive(frame.OwnerSeat) || !_facts.IsAlive(chooserSeat) || !_facts.IsAlive(ownerSeat) ||
@@ -293,7 +267,7 @@ internal sealed partial class ProgramPaidCardRuntime
             effect.CardOwnerRef?.Kind == ProgramParticipantRef.Owner &&
             effect.TargetReference?.Kind == ProgramParticipantRef.CardProvider && effect.AwaitMovementTriggers;
         if (destination == source && source == CardLocation.Hand(ownerSeat) &&
-            (selfProviderReward || _facts.IsSatisfiedOwnHandReward(frame, effect)))
+            (selfProviderReward || effect.AllowSameOwnerHandReturn))
         {
             // Obtaining one's own hand card is already satisfied. Do not manufacture
             // a hand loss/gain pair or unrelated movement-trigger rewards.

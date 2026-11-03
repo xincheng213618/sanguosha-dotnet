@@ -30,10 +30,13 @@
           "movementOccurrence": "perNativeGive",
           "invocation": { "source": "movement" },
           "effects": [
-            {
-              "op": "resolveMouHuangQuanTuicheng",
-              "target": "owner"
-            }
+            { "op": "captureNumber", "target": "owner", "valueExpr": ["windowAmount"], "resultBind": "count" },
+            { "op": "captureCards", "target": "owner", "cardsExpr": ["givenCards", "owner", "eventTarget"], "resultBind": "forbidden" },
+            { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "eventTarget" }, "cardOwnerRef": { "kind": "eventTarget" },
+              "zones": ["hand", "equipment"], "destination": "ownerHand", "countExpr": ["number", "count"], "exceptBind": "forbidden",
+              "onInsufficient": "bindEmpty", "resultBind": "reply", "awaitMovementTriggers": true, "giveBy": "materialOwner" },
+            { "op": "draw", "target": "owner", "amountExpr": ["number", "count"], "awaitMovementTriggers": true,
+              "condition": { "kind": "expression", "expr": ["==", ["boundCount", "reply"], 0] } }
           ]
         }
       ]

@@ -154,6 +154,7 @@ internal sealed partial class CoreAlternativePhaseCostProgramsRuntime
         if (effect.Op != SkillProgramEffectOp.SelectAndMoveOwnedCard || !effect.AllowDecline || !effect.AwaitMovementTriggers || effect.Destination != SkillProgramCardDestination.SelectedTargetCorrespondingZone)
             throw new InvalidOperationException("Only an explicitly optional public field move may be declined.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { OwnedCardSelection = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 }

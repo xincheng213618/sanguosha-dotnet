@@ -10,13 +10,16 @@ internal sealed class SelectAndMoveOwnedCardProgramOperationDescriptor : Program
 
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "chooserRef", "cardOwnerRef", "zones", "count", "destination", "targetRef", "resultBind", "cardCategories", "cardKinds", "suits", "suitFrom", "skipIfNoCards", "allowSameOwnerHandReturn", "coverageResultBind", "awaitMovementTriggers", "revealBeforeMove", "freezeMovedCardSuit", "prohibitReplacingEquipment", "allowDecline", "condition", "slashRedirectPostCostRange", "giveBy");
+        r.AllowOnly("op", "target", "chooserRef", "cardOwnerRef", "zones", "count", "countExpr", "exceptBind", "onInsufficient", "destination", "targetRef", "resultBind", "cardCategories", "cardKinds", "suits", "suitFrom", "skipIfNoCards", "allowSameOwnerHandReturn", "coverageResultBind", "awaitMovementTriggers", "revealBeforeMove", "freezeMovedCardSuit", "prohibitReplacingEquipment", "allowDecline", "condition", "slashRedirectPostCostRange", "giveBy");
         var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
         if (target != SkillProgramEffectTarget.Owner)
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.target: must be owner.");
-        var count = r.RequiredInt("count");
-        if (count != 1)
-            throw new InvalidOperationException($"Invalid skill program at {r.Path}.count: must be 1.");
+        if (r.Has("count") == r.Has("countExpr"))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: requires exactly one count or countExpr.");
+        var countExpression = r.Has("countExpr") ? r.RequiredIntExpression("countExpr") : null;
+        var count = countExpression is null ? r.RequiredInt("count") : 0;
+        if (countExpression is null && count is < 1 or > 20)
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}.count: must be between 1 and 20.");
         var zones = r.RequiredEnumArray<CardZoneKind>("zones");
         if (zones.Count == 0 || zones.Any(zone => zone is not (CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment)))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.zones: must contain hand, equipment, or judgment.");
@@ -94,7 +97,8 @@ internal sealed class SelectAndMoveOwnedCardProgramOperationDescriptor : Program
             cardOwnerRef.Kind == ProgramParticipantRef.Owner &&
             r.Has("targetRef") && r.RequiredParticipantReference("targetRef").Kind == ProgramParticipantRef.CardProvider &&
             zones.All(zone => zone is CardZoneKind.Hand or CardZoneKind.Equipment) && awaitMovementTriggers;
-        if (allowSameOwnerHandReturn && (destination != SkillProgramCardDestination.SelectedTargetHand ||
+        if (allowSameOwnerHandReturn && destination != SkillProgramCardDestination.OwnerHand &&
+            (destination != SkillProgramCardDestination.SelectedTargetHand ||
             !providerReward && (zones.Any(zone => zone is not (CardZoneKind.Equipment or CardZoneKind.Judgment)) ||
             r.RequiredParticipantReference("targetRef") != cardOwnerRef)))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: same-owner hand returns require matching cardOwnerRef/targetRef and public non-hand source zones.");
@@ -121,9 +125,19 @@ internal sealed class SelectAndMoveOwnedCardProgramOperationDescriptor : Program
             revealBeforeMove: revealBeforeMove, cardKinds: cardKinds,
             prohibitReplacingEquipment: prohibitReplacingEquipment, allowDecline: allowDecline,
             freezeMovedCardSuit: r.Has("freezeMovedCardSuit") && r.RequiredBool("freezeMovedCardSuit"),
-            suitFrom: suitFrom)
+            suitFrom: suitFrom, exceptBind: r.OptionalIdentifier("exceptBind"))
         { SlashRedirectPostCostRange = r.Has("slashRedirectPostCostRange") ? r.RequiredBool("slashRedirectPostCostRange") : null,
-          GiveBy = ProgramCardGiving.Parse(r, destination) };
+          GiveBy = ProgramCardGiving.Parse(r, destination), CountExpression = countExpression,
+          OnInsufficient = r.Has("onInsufficient") ? r.RequiredEnum<ProgramInsufficientCardBehavior>("onInsufficient") : null };
+        if (ProgramOwnedCardRequests.IsExact(effect) &&
+            (chooserRef != cardOwnerRef || zones.Distinct().Count() != zones.Count ||
+             zones.Any(zone => zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) ||
+             destination is not (SkillProgramCardDestination.OwnerHand or SkillProgramCardDestination.SelectedTargetHand) ||
+             effect.ResultBind is null || effect.ResultBind == effect.ExceptBind || !awaitMovementTriggers ||
+             skipIfNoCards || allowDecline || allowSameOwnerHandReturn || revealBeforeMove ||
+             prohibitReplacingEquipment || effect.FreezeMovedCardSuit || coverageResultBind is not null ||
+             suitFrom is not null || effect.SlashRedirectPostCostRange == true))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: exact card requests require one material chooser, hand/equipment sources, a hand destination, resultBind and awaited mandatory movement.");
         var optionalEquipmentDiscard = effect.FreezeMovedCardSuit && effect.AwaitMovementTriggers &&
             effect.Destination == SkillProgramCardDestination.DiscardPile && effect.CardCategories is [SkillProgramCardCategory.Equipment] &&
             effect.ChooserRef?.Kind == ProgramParticipantRef.SelectedTarget && effect.CardOwnerRef?.Kind == ProgramParticipantRef.SelectedTarget;
@@ -147,15 +161,17 @@ internal sealed class SelectAndMoveOwnedCardProgramOperationDescriptor : Program
         ParticipantResources(effect.ChooserRef, effect.CardOwnerRef, effect.TargetReference)
             .Concat(effect.GiveBy == ProgramGiveActor.SelectedTarget ? new ProgramResourceOperation[] { new ReadSelectedTarget() } : [])
             .Concat(effect.SlashRedirectPostCostRange == true ? new ProgramResourceOperation[] { new ReadSelectedTarget() } : [])
+            .Concat(effect.ExceptBind is { } except ? new ProgramResourceOperation[] { new ReadCardSet(except) } : [])
             .Concat(effect.CoverageResultBind is { } coverage
                 ? new ProgramResourceOperation[] { new CreateCoverageResult(coverage) }
                 : Array.Empty<ProgramResourceOperation>())
             .Concat(effect.ResultBind is { } bind
-                ? new ProgramResourceOperation[] { new CreateCardSet(bind, 1, false,
+                ? new ProgramResourceOperation[] { new CreateCardSet(bind, effect.CountExpression is not null ? int.MaxValue : effect.Amount, false,
                     AlreadyMoved: effect.RevealBeforeMove,
-                    CardOwner: effect.Destination is SkillProgramCardDestination.SelectedTargetHand
+                    CardOwner: ProgramOwnedCardRequests.IsExact(effect) ? null : effect.Destination is SkillProgramCardDestination.SelectedTargetHand
                         or SkillProgramCardDestination.SelectedTargetEquipment
-                        ? SkillProgramEffectTarget.SelectedTarget : SkillProgramEffectTarget.Owner) }
+                        ? SkillProgramEffectTarget.SelectedTarget : SkillProgramEffectTarget.Owner,
+                    Consumed: ProgramOwnedCardRequests.IsExact(effect)) }
                 : Array.Empty<ProgramResourceOperation>()).ToArray();
 }
 

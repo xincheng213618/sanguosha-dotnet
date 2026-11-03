@@ -22,6 +22,7 @@ internal interface IProgramPaidCardFacts : IProgramSelectionQuery
     bool CanContinueAfterOwnerDeath(ProgramSkillFrame frame);
     bool CanContinueAfterSkillLoss(ProgramSkillFrame frame);
     bool? EvaluateOptionExpression(ProgramSkillFrame frame, ProgramExpression expression);
+    int? EvaluateCountExpression(ProgramSkillFrame frame, ProgramExpression expression);
     IReadOnlyList<Card> Hand(int seat);
     IReadOnlyList<Card> Equipment(int seat);
     IReadOnlyList<Card> Judgment(int seat);
@@ -29,7 +30,6 @@ internal interface IProgramPaidCardFacts : IProgramSelectionQuery
     CardLocation Location(int cardId);
     int ProviderSeat(ProgramSkillFrame frame);
     SkillProgramEffect OwnedSelectionEffect(ProgramSkillFrame frame);
-    bool IsSatisfiedOwnHandReward(ProgramSkillFrame frame, SkillProgramEffect effect);
     bool ForeignDiscardPrevented(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent);
     bool SelfDiscardForbidden(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent);
     bool AllowsOwnedCardPayment(ProgramSkillFrame frame, CardLocation source, Card card);
@@ -61,6 +61,8 @@ internal interface IProgramPaidCardOperations : IProgramRuntimeOperations
     bool SettleRetainedGain(ProgramSkillFrame frame, Card card, CardLocation source,
         CardLocation destination, CardMoveReason reason);
     void Give(ProgramSkillFrame frame, int giver, Card card, CardLocation source, CardLocation destination, CardMoveReason reason, bool throughProcessing, CardMovementDisclosure disclosure, Action<CardMovementRecord>? beforeFact = null);
+    void MoveCards(ProgramSkillFrame frame, IReadOnlyList<int> cardIds, CardLocation destination,
+        CardMoveReason reason, int? giver, Action<HappyWeiYanGainRequestSettlement> settled);
     bool BeginMovementWindow();
     bool BeginPublicHandReveal(long frameId, string returnKey);
     void ReturnMovement(long frameId);

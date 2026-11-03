@@ -219,7 +219,8 @@ internal sealed class PlayerViewProjector(ICardZoneQueries zones, IProgramCardSn
         // older prompts. The private runtime draft stays on its owning frame.
         if (visibleDecision is { Kind: DecisionKind.ProgramTrigger } &&
             match.LastFrame is ProgramSkillFrame { OwnedCardSelection: { } owned } &&
-            visibleDecision.Choices.All(choice => choice.Parameters.GetValueOrDefault("program-action") is "select-owned-cards" or "finish-owned-cards"))
+            visibleDecision.Choices.All(choice => choice.Parameters.GetValueOrDefault("program-action") is
+                "select-owned-cards" or "finish-owned-cards" or "select-and-move-owned-card" or "decline-owned-field-move"))
             visibleDecision = visibleDecision with
             {
                 RequiredCardCount = owned.RequiredCount - owned.SelectedCardIds.Count,

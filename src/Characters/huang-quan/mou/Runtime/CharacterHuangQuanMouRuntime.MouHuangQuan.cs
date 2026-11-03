@@ -3,9 +3,9 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterHuangQuanMouRuntime
 {
-    internal const string MouHqQiaodui = MouHuangQuanRuntime.MouHqQiaodui, MouHqTuicheng = MouHuangQuanRuntime.MouHqTuicheng;
+    internal const string MouHqQiaodui = MouHuangQuanRuntime.MouHqQiaodui;
     internal MouHuangQuanRuntime MouHuangQuan => _mouHuangQuanOperations.Get();
-    internal bool HasMouHuangQuan => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuangQuanTuicheng);
+    internal bool HasMouHuangQuan => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuangQuanQiaodui);
 
     internal bool ValidMouHq(ProgramSkillFrame f) => MouHuangQuan.Valid(f);
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedBeforeActivity, 35700)]
@@ -37,6 +37,6 @@ internal sealed partial class CharacterHuangQuanMouRuntime
             return c.OwnerSeat == f.OwnerSeat && c.SkillId == f.SkillId && c.TriggerId == f.TriggerId && c.SkillInstanceId == f.SkillInstanceId && c.GameplayHash == f.GameplayHash;
         }
 
-        return f.SkillId == MouHqTuicheng;
+        return false;
     }
 }

@@ -28,7 +28,8 @@ internal sealed partial class CoreGameEngineProgramContinuationPermissionsRuntim
             draw.InstructionIndex == frame.InstructionIndex)
             return true;
         return frame.NativeDraw is null &&
-            (frame.PendingMovementContinuation is not null && ProgramInstructionDeliveries.HasDeliveredMovement(frame) ||
+            (ProgramInstructionDeliveries.HasPendingOwnedRequest(frame) ||
+             frame.PendingMovementContinuation is not null && ProgramInstructionDeliveries.HasDeliveredMovement(frame) ||
              ProgramInstructionDeliveries.CanFinish(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!));
     }
 }

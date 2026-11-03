@@ -190,7 +190,7 @@ internal static class ProgramCompositionValidator
             if (descriptor.RequiredCapabilities.HasFlag(ProgramContextCapability.PhaseInsertion) && bindings.Count != 0)
                 throw Error(nodePath, "card bindings cannot cross an independently interactive inserted phase");
             var expressions = Conditions(effect.Condition).Select(condition => condition.Expression)
-                .Append(effect.AmountExpression).Append(effect.ValueExpression).Append(effect.TargetSetExpression).Append(effect.CardSetExpression).Where(expression => expression is not null)
+                .Append(effect.AmountExpression).Append(effect.CountExpression).Append(effect.ValueExpression).Append(effect.TargetSetExpression).Append(effect.CardSetExpression).Where(expression => expression is not null)
                 .SelectMany(expression => expression!.Nodes()).ToArray();
             var expressionReads = expressions.Where(expression => expression.Op.StartsWith("bound", StringComparison.Ordinal) || expression.Op == "cardInBinding")
                 .Select(expression => (ProgramResourceOperation)new ReadCardSet(expression.Name!))
@@ -223,7 +223,7 @@ internal static class ProgramCompositionValidator
                         break;
                     case CreateCardSet create:
                     {
-                        var root = new Root(create.Name, create.NeedsCleanup, !create.NeedsCleanup,
+                        var root = new Root(create.Name, create.NeedsCleanup, !create.NeedsCleanup && !create.Consumed,
                             typedCardAtoms, expandedCardDomain, create.AlreadyMoved);
                         roots.Add(root);
                         if (effect.Condition.Kind == SkillProgramConditionKind.ChoiceIs &&
@@ -232,6 +232,7 @@ internal static class ProgramCompositionValidator
                         if (effect.Condition.Kind == SkillProgramConditionKind.JudgmentOutcomeMatchesSuits)
                             choiceGuardedBindings.Add(create.Name, effect.Condition);
                         Add(create.Name, new(root, root.Atoms.Keys.ToHashSet(), create.MaxCount, create.CardOwner));
+                        if (create.Consumed) root.Consumed.UnionWith(root.Atoms.Keys);
                         if (create.AlreadyMoved)
                         {
                             root.Consumed.UnionWith(root.Atoms.Keys);

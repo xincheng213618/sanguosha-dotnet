@@ -7,10 +7,14 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     IActualPhaseHistoryQueries? phaseHistory = null, IOwnedCardMoveQueries? ownedMoves = null,
     ProgramTriggerCandidate? triggerCandidate = null,
     IPublicCardRevealHistoryQueries? publicReveals = null, ICardZoneEntryQueries? zoneEntries = null,
-    IProgramTurnQueries? revealTurn = null, IActualDiscardRecoveryPhaseQueries? revealPhases = null) : IProgramExpressionWorld
+    IProgramTurnQueries? revealTurn = null, IActualDiscardRecoveryPhaseQueries? revealPhases = null,
+    INativeGivenCardQueries? givenCards = null) : IProgramExpressionWorld
 {
     private int Owner => frame?.OwnerSeat ?? triggerOwner!.Value;
     private ProgramSkillWindowContext? Context => frame?.WindowContext ?? triggerContext;
+    public int? WindowAmount() => Context?.Amount;
+    public IReadOnlyList<ProgramExpressionCardFact>? GivenCards(int giver, int recipient) =>
+        ProgramGivenCards.Read(givenCards, revealTurn, Owner, giver, recipient);
     public HandGainOccurrence? HandGain(int recipient) => recipient == Owner
         ? Context?.MovementBatch?.HandGains?.SingleOrDefault(gain => gain.RecipientSeat == recipient) : null;
     public bool? GainHasSource(int recipient, string moment)

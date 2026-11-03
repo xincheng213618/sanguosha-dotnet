@@ -428,3 +428,16 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 ```
 
 CardsMoved／CardsGained 绑定可声明 `"invocation":{"source":"movement"}`，在实际接受后保留本次调用的来源权限；仅展示可选提示不授予权限。它绑定原移动窗口、候选游标及实际程序帧，不是技能授予，也不提前支付后续步骤。`ownerDeath` 缺省 `stop`；来源丢失和死亡不能互相替代。InitialHandGain 的原事实边界预签语义保持独立。
+
+足额区域牌请求复用 `selectAndMoveOwnedCard`：固定 `count` 或 `countExpr` 二选一；新精确请求使用同一 chooserRef／cardOwnerRef、hand／equipment 与 Hand 目的地，要求 resultBind 和 awaitMovementTriggers。可用 exceptBind 排除已绑定实体，onInsufficient 默认 cancelBinding，bindEmpty 则在不足时返回空集合。结果是已经接受的选择，不是实际收到牌，不能以实际 Give 是否出现决定是否再次补偿。
+
+```json
+{ "op":"selectAndMoveOwnedCard", "target":"owner",
+  "chooserRef":{"kind":"eventTarget"}, "cardOwnerRef":{"kind":"eventTarget"},
+  "zones":["hand","equipment"], "destination":"ownerHand",
+  "countExpr":["number","count"], "exceptBind":"forbidden",
+  "onInsufficient":"bindEmpty", "resultBind":"reply",
+  "awaitMovementTriggers":true, "giveBy":"materialOwner" }
+```
+
+`["windowAmount"]` 读取原窗口数量；`["givenCards","owner","eventTarget"]` 读取当前实际回合结束段内双方的已给予实体，可用 captureCards 冻结为排除集合。它保留实体与交付驻留，不猜牌面，非给予双方的私密读取返回未知。表达式自动声明共同给予事实需求。

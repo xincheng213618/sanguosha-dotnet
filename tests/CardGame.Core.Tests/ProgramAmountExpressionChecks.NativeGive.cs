@@ -5,6 +5,7 @@ internal static partial class ProgramAmountExpressionChecks
 {
     private static void NativeGiveOccurrenceIsScopedAndDeclaresSharedFactDemand()
     {
+        GivenCardExpressionsKeepScopeAndKnownIdentity();
         const string trigger = """
             {"id":"give","window":"cardsMoved","subject":"owner","movementOccurrence":"perNativeGive","optional":false,
               "effects":[{"op":"selectTarget","target":"owner","targetKind":"eventTarget"},{"op":"draw","target":"selectedTarget","amount":1}]}
