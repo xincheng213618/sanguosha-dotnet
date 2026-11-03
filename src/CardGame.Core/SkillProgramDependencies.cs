@@ -51,6 +51,8 @@ internal sealed class SkillProgramDependencies
         var resolver = ProgramInstructionResolver.Default;
         RequiredFacts = ProgramFactRequirements.Close(triggers.Aggregate(ProgramTrackedFact.None, (facts, trigger) =>
                 facts | resolver.Features(trigger).FactRequirements.Triggered) |
+            (triggers.Any(trigger => trigger.UsageScope == SkillUsageScope.Round)
+                ? ProgramTrackedFact.ActualRound : ProgramTrackedFact.None) |
             programs.SelectMany(program => program.Activations).Aggregate(ProgramTrackedFact.None,
                 (facts, activation) => facts | resolver.Features(activation).FactRequirements.Activated) |
             ProgramPassiveFactRequirementsAttribute.ForSkills(definitions) |

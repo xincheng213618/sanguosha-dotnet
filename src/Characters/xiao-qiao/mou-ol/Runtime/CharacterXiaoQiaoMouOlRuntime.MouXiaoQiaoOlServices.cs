@@ -5,13 +5,10 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
 {
     internal MouXiaoQiaoOlRuntime MouXiaoQiaoOl => _mouXiaoQiaoOlOperations.Get();
 
-    bool IMouXiaoQiaoOlFacts.Enabled => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerWindow(SkillProgramTriggerWindow.PublicHandRevealed);
 
-    bool IMouXiaoQiaoOlFacts.SetupComplete => _coreMatchSetupSetupCompleteAccess._setupComplete;
 
     int IMouXiaoQiaoOlFacts.Round => _coreActualRoundProgressRoundNumberAccess._roundNumber;
 
-    int IMouXiaoQiaoOlFacts.Turn => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber;
 
     int IMouXiaoQiaoOlFacts.CurrentSeat => _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat;
 
@@ -27,7 +24,6 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     bool IMouXiaoQiaoOlFacts.Human(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
     string IMouXiaoQiaoOlFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
     SkillProgram IMouXiaoQiaoOlFacts.Program(string id) => _contentRegistryOperations._contentRegistry.GetSkill(id).Program!;
-    bool IMouXiaoQiaoOlFacts.HasSource(CardConversionSource s) => _coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[s.OwnerSeat], s.SkillId, s.SkillInstanceId!);
     IEnumerable<T> IMouXiaoQiaoOlFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     IReadOnlyList<Card> IMouXiaoQiaoOlFacts.Hand(int seat) => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]);
     IReadOnlyList<Card> IMouXiaoQiaoOlFacts.Equipment(int seat) => _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat]);
@@ -38,14 +34,13 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     bool? IMouXiaoQiaoOlFacts.EffectiveRed(int seat, int id) => CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[seat], _coreAdvancedLifecycleOperations.GetAdvancedCard(id)));
     IReadOnlyList<CardMovementRecord> IMouXiaoQiaoOlFacts.Movements(long before, long after) => Array.AsReadOnly(_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > before && m.Sequence <= after).ToArray());
     IReadOnlyList<MouXiaoQiaoOlUsePlan> IMouXiaoQiaoOlFacts.NativePlans(int seat, CardKind kind, CardConversionSource source) => MouXqNativePlans(_coreMatchParticipantsPlayersAccess._players[seat], kind, source);
-    IReadOnlyList<ProgramTriggerCandidate> IMouXiaoQiaoOlFacts.Sources(int seat, string skillId) => Array.AsReadOnly(_coreProgramLifecycleOperations.CollectProgramTriggerCandidates(_coreMatchParticipantsPlayersAccess._players[seat], SkillProgramTriggerWindow.PublicHandRevealed).Where(c => c.SkillId == skillId).ToArray());
+    IReadOnlyList<CardConversionSource> IMouXiaoQiaoOlFacts.RetainedSources(int seat) => MouXqRetainedSources(_coreMatchParticipantsPlayersAccess._players[seat]);
     SkillPromptPresentation IMouXiaoQiaoOlFacts.SkillPrompt(string id)
     {
         var s = _contentRegistryOperations._contentRegistry.GetSkill(id);
         return new(id, s.Name, s.Name, s.Description);
     }
 
-    double IMouXiaoQiaoOlFacts.KeepValue(int seat, int id) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[seat]);
     double IMouXiaoQiaoOlFacts.TargetValue(int owner, int target, bool helpful) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), target, helpful ? new(0, 0, 0, 0, 1, 0, true, false) : new(0, 0, 1, 0, 0, 0, false, false));
     bool IMouXiaoQiaoOlFacts.IsResponseRequest(ProgramSkillFrame f) => IsMouXqJueyanResponseRequest(f);
     bool IMouXiaoQiaoOlFacts.ActorLineage(long useId, long actionId, int originalActor, int actor, int provider, CardActionType type) => _characterZhouYuOlMouOperations.MouGuquActorLineageMatches(useId, actionId, originalActor, actor, provider, type);

@@ -5646,11 +5646,12 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
         {
             var supportsDamageSourceConversion = window == SkillProgramTriggerWindow.AfterDamageApplied;
             var supportsDiscardCardFilter = window == SkillProgramTriggerWindow.DiscardPileReceived;
+            var supportsSuitFilter = supportsDiscardCardFilter || window == SkillProgramTriggerWindow.PublicHandRevealed;
             if ((!supportsDamageSourceConversion &&
                  (node.TryGetProperty("sourceSkillId", out _) || node.TryGetProperty("sourceViewAsId", out _))) ||
                 (!supportsDiscardCardFilter && node.TryGetProperty("cardKinds", out _)) ||
                 (!supportsDiscardCardFilter && node.TryGetProperty("cardCategories", out _)) ||
-                (!supportsDiscardCardFilter && node.TryGetProperty("suits", out _)) ||
+                (!supportsSuitFilter && node.TryGetProperty("suits", out _)) ||
                 node.TryGetProperty("minimumRank", out _) || node.TryGetProperty("maximumRank", out _) ||
                 node.TryGetProperty("excludedReasons", out _) || node.TryGetProperty("judgmentReasons", out _) ||
                 node.TryGetProperty("judgmentSource", out _))
@@ -5709,7 +5710,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                     (node.TryGetProperty("sourceSkillId", out _) || node.TryGetProperty("sourceViewAsId", out _)))
                     Fail(path, "owner after-damage triggers do not accept card-conversion source fields");
             }
-            if (supportsDiscardCardFilter && node.TryGetProperty("suits", out _))
+            if (supportsSuitFilter && node.TryGetProperty("suits", out _))
             {
                 suits = EnumArray<Suit>(node, "suits", path);
                 if (suits.Distinct().Count() != suits.Count)
@@ -6503,9 +6504,16 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                 invocationNode.TryGetProperty("ownerDeath", out _)
                     ? EnumValue<SkillProgramInvocationOwnerDeath>(invocationNode, "ownerDeath", invocationPath)
                     : SkillProgramInvocationOwnerDeath.Stop);
-            if (window != SkillProgramTriggerWindow.CardsGained || subject != SkillProgramTriggerSubject.Owner ||
-                movementOccurrence != SkillProgramMovementOccurrence.PerBatch || !destinationZones.SequenceEqual([CardZoneKind.Hand]))
-                Fail(invocationPath, "initialHandGain requires an owner cardsGained perBatch hand trigger");
+            if (invocation.Source == SkillProgramInvocationSource.InitialHandGain)
+            {
+                if (window != SkillProgramTriggerWindow.CardsGained || subject != SkillProgramTriggerSubject.Owner ||
+                    movementOccurrence != SkillProgramMovementOccurrence.PerBatch || !destinationZones.SequenceEqual([CardZoneKind.Hand]))
+                    Fail(invocationPath, "initialHandGain requires an owner cardsGained perBatch hand trigger");
+            }
+            else if (window != SkillProgramTriggerWindow.PublicHandRevealed || subject != SkillProgramTriggerSubject.Owner ||
+                optional || node.TryGetProperty("markerCost", out _) || usageScope == SkillUsageScope.Event ||
+                node.TryGetProperty("evaluateConditionAtResolution", out var lateQualification) && lateQualification.ValueKind == JsonValueKind.True)
+                Fail(invocationPath, "publicHandReveal requires mandatory owner issuance without marker payment, Event usage or late qualification");
         }
         var parsedTrigger = new SkillProgramTrigger(id, window, sourceSkillId, sourceViewAsId, subject, suits,
             minimumRank, maximumRank, excludedReasons, judgmentReasons, judgmentSource,
@@ -6542,7 +6550,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
         if (invocation?.OwnerDeath == SkillProgramInvocationOwnerDeath.Retain &&
             (parsedTrigger.Optional || parsedTrigger.MarkerCost is not null))
             Fail(path + ".invocation.ownerDeath", "retain requires a mandatory trigger without a marker cost");
-        if (invocation is not null && (parsedTrigger.MovementReasons.Count != 0 ||
+        if (invocation?.Source == SkillProgramInvocationSource.InitialHandGain && (parsedTrigger.MovementReasons.Count != 0 ||
             parsedTrigger.ExcludedMovementReasons.Count != 0 || parsedTrigger.IgnoreOwnSkillMovements))
             Fail(path + ".invocation", "initialHandGain does not support movement reason or own-skill filters");
         EquipmentMovementRuntime.ValidateTrigger(path, parsedTrigger);

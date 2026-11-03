@@ -6,6 +6,7 @@ internal sealed partial class CoreProgramBindingRuntimePortsRuntime
     ContentSkillDefinition IProgramBindingFacts.Skill(string skillId) => _contentRegistryOperations._contentRegistry.GetSkill(skillId);
     SkillProgramTrigger IProgramBindingFacts.Trigger(ProgramTriggerCandidate candidate) => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
     bool IProgramBindingFacts.CanRun(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _coreProgramLifecycleOperations.CanRunProgramTrigger(candidate, context);
+    bool IProgramBindingFacts.CanIssue(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _coreProgramLifecycleOperations.CanRunProgramTrigger(candidate, context, atIssuance: true);
     bool IProgramBindingFacts.IsHuman(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].IsHuman;
     string IProgramBindingFacts.Name(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].Name;
     int IProgramBindingFacts.ActualPlayPhaseUseCount(int seat) => _coreActualPlayPhaseCardUsesOperations.GetActualPlayPhaseUseCount(seat);

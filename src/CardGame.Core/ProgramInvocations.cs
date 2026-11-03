@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
-public enum SkillProgramInvocationSource { InitialHandGain }
+public enum SkillProgramInvocationSource { InitialHandGain, PublicHandReveal }
 public enum SkillProgramInvocationOwnerDeath { Stop, Retain }
 public sealed record SkillProgramTriggerInvocation(SkillProgramInvocationSource Source,
     SkillProgramInvocationOwnerDeath OwnerDeath = SkillProgramInvocationOwnerDeath.Stop);
@@ -16,7 +16,7 @@ public sealed partial class SkillProgramTrigger
 /// <summary>Permission for one admitted binding in its original native window; never skill ownership.</summary>
 public sealed record ProgramInvocationAuthorization(long WindowId, long NativeFrameId,
     SkillProgramTriggerWindow Window, ProgramTriggerCandidate Candidate, long ProgramFrameId = 0,
-    bool RetainOwnerDeath = false);
+    bool RetainOwnerDeath = false, bool UsageReserved = false);
 
 public abstract partial record ResolutionFrame
 {

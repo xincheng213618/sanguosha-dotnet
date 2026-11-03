@@ -10,7 +10,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleEntries
     internal void BeginDyingProgramBinding(ProgramTriggerCandidate candidate, DyingFrame dying) => _resolve().BeginDyingProgramBinding(candidate, dying);
     internal void BeginNormalTurnStartAfterProgramBindings(CharacterState current) => _resolve().BeginNormalTurnStartAfterProgramBindings(current);
     internal void BeginProgramBinding(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().BeginProgramBinding(candidate, context);
-    internal bool CanRunProgramTrigger(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().CanRunProgramTrigger(candidate, context);
+    internal bool CanRunProgramTrigger(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, bool atIssuance = false) => _resolve().CanRunProgramTrigger(candidate, context, atIssuance);
     internal void CancelProgramBindingAndCleanup(ProgramSkillFrame frame, string reason) => _resolve().CancelProgramBindingAndCleanup(frame, reason);
     internal void CancelScheduledProgramPhase() => _resolve().CancelScheduledProgramPhase();
     internal (int Value, bool Undefined, int? FixedMinimum, IReadOnlyList<SkillProgramUnselectedDualHpFacts>? Unselected) CaptureProgramLivingHpFacts() => _resolve().CaptureProgramLivingHpFacts();

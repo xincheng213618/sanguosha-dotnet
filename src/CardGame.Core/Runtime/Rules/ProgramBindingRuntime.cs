@@ -13,7 +13,8 @@ internal sealed class ProgramBindingRuntime(IProgramRuntimeFrames frames, IProgr
         native.ConsumeEarnedActualEnding(candidate, context);
         native.ConsumePrepDiscardEnding(candidate, context);
         native.ConsumeFixedDistanceDebt(candidate, context);
-        if (!facts.Trigger(candidate).Effects.Any(e => e.Op is SkillProgramEffectOp.DiscardSameCategoryForExtraEffect or SkillProgramEffectOp.PayTwoForChosenAssaultAndApplyTargetOutcomes or SkillProgramEffectOp.DyingRecipientChooseReplaceOrGrantThenRecover or SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage))
+        var authorization = ProgramInvocations.Find(frames.Find(context.ParentFrameId), candidate, context);
+        if (authorization?.UsageReserved != true && !facts.Trigger(candidate).Effects.Any(e => e.Op is SkillProgramEffectOp.DiscardSameCategoryForExtraEffect or SkillProgramEffectOp.PayTwoForChosenAssaultAndApplyTargetOutcomes or SkillProgramEffectOp.DyingRecipientChooseReplaceOrGrantThenRecover or SkillProgramEffectOp.GuessTargetCategoriesAndArmTurnDamage))
             native.ConsumeUsage(candidate, context);
         native.PayMarkerCost(candidate.OwnerSeat, facts.Trigger(candidate).MarkerCost,
             candidate.SkillId, candidate.BindingId);
@@ -28,7 +29,7 @@ internal sealed class ProgramBindingRuntime(IProgramRuntimeFrames frames, IProgr
             WindowContext = context,
             DyingAlcoholPermission = native.CaptureDyingAlcoholPermission(candidate, context)
         };
-        if (ProgramInvocations.Find(frames.Find(context.ParentFrameId), candidate, context) is { } authorization)
+        if (authorization is not null)
             frame = frame with { InvocationAuthorization = authorization with { ProgramFrameId = frame.Id } };
         frame = conditionalGrants.CaptureSource(frame);
         native.AttachAfterTurnEndedChild(frame, candidate, context);

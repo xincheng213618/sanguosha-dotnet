@@ -16,19 +16,27 @@ internal static class MouXiaoQiaoOlComposition
         }
         if (p.ViewAs.Count != 0 || p.CardIdentities.Count != 0 || p.CardPolicies.Count != 0 || p.Modifiers.Count != 0 ||
             p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.SkillGrants.Count != 0 || p.Contributions.Count != 0 ||
-            p.Activations is not [var a] || p.Triggers is not [var t] || a.Effects.Count != 1 || t.Effects.Count != 1 ||
-            a.Effects[0].Target != SkillProgramEffectTarget.Owner || t.Effects[0].Target != SkillProgramEffectTarget.Owner ||
-            a.Effects[0].Condition.Kind != SkillProgramConditionKind.Always || t.Effects[0].Condition.Kind != SkillProgramConditionKind.Always ||
-            a.MinTargets != 0 || a.MaxTargets != 0 || a.UsesPerTurn is not null || a.UsesPerGame is not null || t.Optional ||
-            t.Subject != SkillProgramTriggerSubject.Owner || t.UsageLimit is not null || t.MarkerCost is not null)
+            p.Activations is not [var a] || a.Effects.Count != 1 ||
+            a.Effects[0].Target != SkillProgramEffectTarget.Owner ||
+            a.Effects[0].Condition.Kind != SkillProgramConditionKind.Always ||
+            a.MinTargets != 0 || a.MaxTargets != 0 || a.UsesPerTurn is not null || a.UsesPerGame is not null)
             throw new InvalidOperationException(path + ": Mou Xiao Qiao requires the complete native gift/use and real Round/reveal bindings.");
-        var valid = p.Id == MouXiaoQiaoOlRuntime.Miluo
-            ? a.Id == "reveal-and-give" && a.MinCards == 0 && a.MaxCards == 0 && a.UsesPerPhase == 1 &&
-                a.Effects[0].Op == SkillProgramEffectOp.ResolveMouXiaoQiaoMiluo && t.Id == "round-end-consequence" &&
-                t.Window == SkillProgramTriggerWindow.RoundEnding && t.Effects[0].Op == SkillProgramEffectOp.ResolveMouXiaoQiaoMiluoRoundEnd
-            : a.Id == "retained-hand-use" && a.MinCards == 1 && a.MaxCards == 1 && a.SourceZones.SequenceEqual([CardZoneKind.Hand]) &&
-                a.UsesPerPhase is null && a.Effects[0].Op == SkillProgramEffectOp.ResolveMouXiaoQiaoJueyan && t.Id == "public-hand-first-suit" &&
-                t.Window == SkillProgramTriggerWindow.PublicHandRevealed && t.Effects[0] is { Op: SkillProgramEffectOp.Draw, Amount: 1, AwaitMovementTriggers: true };
+        if (p.Id == MouXiaoQiaoOlRuntime.Jueyan)
+        {
+            // Reward qualification is ordinary declared trigger data. Only the
+            // still-native retained-use payment protocol belongs to this guard.
+            if (a.Id != "retained-hand-use" || a.MinCards != 1 || a.MaxCards != 1 ||
+                !a.SourceZones.SequenceEqual([CardZoneKind.Hand]) || a.UsesPerPhase is not null ||
+                a.Effects[0].Op != SkillProgramEffectOp.ResolveMouXiaoQiaoJueyan)
+                throw new InvalidOperationException(path + ": Jueyan changed its retained-Hand activation protocol.");
+            return;
+        }
+        var valid = a.Id == "reveal-and-give" && a.MinCards == 0 && a.MaxCards == 0 && a.UsesPerPhase == 1 &&
+            a.Effects[0].Op == SkillProgramEffectOp.ResolveMouXiaoQiaoMiluo && p.Triggers is [var t] &&
+            t.Id == "round-end-consequence" && t.Window == SkillProgramTriggerWindow.RoundEnding &&
+            !t.Optional && t.Subject == SkillProgramTriggerSubject.Owner && t.UsageLimit is null && t.MarkerCost is null &&
+            t.Effects is [{ Op: SkillProgramEffectOp.ResolveMouXiaoQiaoMiluoRoundEnd,
+                Target: SkillProgramEffectTarget.Owner, Condition.Kind: SkillProgramConditionKind.Always }];
         if (!valid) throw new InvalidOperationException(path + ": Mou Xiao Qiao changed a reserved payment, target or Round budget binding.");
     }
 }

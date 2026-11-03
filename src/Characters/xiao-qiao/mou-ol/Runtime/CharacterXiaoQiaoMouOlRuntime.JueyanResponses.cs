@@ -24,10 +24,9 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         }
         else
             return[];
-        var source = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(actor, SkillProgramTriggerWindow.PublicHandRevealed).FirstOrDefault(c => c.SkillId == MouXiaoQiaoOlRuntime.Jueyan);
+        var source = MouXqRetainedSources(actor).FirstOrDefault();
         if (source is null)
             return[];
-        var conversion = new CardConversionSource(source.SkillId, "retained-hand-use", actor.Seat, source.SkillInstanceId);
         return Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(actor).Where(card => _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card) == kind && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && MouXiaoQiaoOl.JueyanAvailable(actor.Seat, card.Id)).Select(card =>
         {
             var parameters = new Dictionary<string, string>
@@ -36,7 +35,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
                 ["output-kind"] = kind.ToString(),
                 ["dying-use"] = dying ? "true" : "false"
             };
-            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, conversion);
+            CoreGameEngineCardConversionsRuntime.AddConversionParameters(parameters, source);
             return new PromptChoice(new($"jueyan.response.{(actor.Seat)}.{(card.Id)}.{(kind)}.{(source.SkillInstanceId)}"), $"绝颜：展示并保留【{(card.DisplayName)}】，视为使用之。", [card.Id], [], parameters);
         }).ToArray());
     }

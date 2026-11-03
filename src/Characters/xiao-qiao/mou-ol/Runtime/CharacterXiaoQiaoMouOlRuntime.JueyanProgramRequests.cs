@@ -15,10 +15,9 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         if (allowed.Length == 0 || targets.Any(t => !allowed.Contains(t)))
             return[];
         var actor = _coreMatchParticipantsPlayersAccess._players[actorSeat];
-        var candidate = _coreProgramLifecycleOperations.CollectProgramTriggerCandidates(actor, SkillProgramTriggerWindow.PublicHandRevealed).FirstOrDefault(c => c.SkillId == MouXiaoQiaoOlRuntime.Jueyan);
-        if (candidate is null)
+        var source = MouXqRetainedSources(actor).FirstOrDefault();
+        if (source is null)
             return[];
-        var source = new CardConversionSource(candidate.SkillId, "retained-hand-use", actorSeat, candidate.SkillInstanceId);
         var choices = new List<PromptChoice>();
         foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, c)) && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, c) && MouXiaoQiaoOl.JueyanAvailable(actorSeat, c.Id)))
             foreach (var target in targets.Distinct())

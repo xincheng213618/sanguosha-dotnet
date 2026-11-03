@@ -101,7 +101,7 @@ internal sealed class ProgramTriggerRuntime(IKernelCreateProgramExpressionWorldO
 
     internal bool CanRunProgramTrigger<TQuery>(TQuery query,
         ProgramTriggerCandidate candidate,
-        ProgramSkillWindowContext context)
+        ProgramSkillWindowContext context, bool atIssuance = false)
         where TQuery : IProgramTriggerDamageQuery, IProgramTriggerCardsQuery, IProgramTriggerContentQuery, IProgramTriggerEligibilityQuery, IProgramTriggerSelectionQuery, IProgramTriggerUsageQuery, IProgramTriggerWindowQuery
     {
         if (!query.IsValidPlayerSeat(candidate.OwnerSeat) || candidate.OwnerSeat != context.OwnerSeat) return false;
@@ -109,7 +109,7 @@ internal sealed class ProgramTriggerRuntime(IKernelCreateProgramExpressionWorldO
             ProgramInstructionResolver.Default.FindTrigger(eventProgram, candidate.BindingId) is { UsageScope: SkillUsageScope.Event, UsageLimit: { } eventLimit } &&
             query.GetUsage(candidate.OwnerSeat, candidate.SkillId, candidate.BindingId, SkillUsageScope.Event, context) >= eventLimit)
             return false;
-        if (query.DecideIssued(candidate, context) is { } issuedDecision) return issuedDecision;
+        if (!atIssuance && query.DecideIssued(candidate, context) is { } issuedDecision) return issuedDecision;
         var owner = query.Players[candidate.OwnerSeat];
         var authorization = ProgramInvocations.Find(query.Frames.FirstOrDefault(frame => frame.Id == context.ParentFrameId), candidate, context);
         if (context.Window != SkillProgramTriggerWindow.OwnerDied && !owner.IsAlive && authorization?.RetainOwnerDeath != true &&
@@ -221,6 +221,14 @@ internal sealed class ProgramTriggerRuntime(IKernelCreateProgramExpressionWorldO
                 effect.MinimumTargets))
             return false;
         if (features.ForOperation(SkillProgramEffectOp.SelectTargets).Any(effect => effect.TargetKind == SkillProgramTargetKind.LivingWhoseAttackRangeIncludesLord && query.GetProgramTargetSeats(owner.Seat, effect.TargetKind.Value, context).Count < effect.MinimumTargets)) return false;
+        if (atIssuance)
+            return trigger.Invocation?.Source == SkillProgramInvocationSource.PublicHandReveal &&
+                context.Window == SkillProgramTriggerWindow.PublicHandRevealed &&
+                context.PublicHandReveal is { } reveal && reveal.RevealFrameId == context.ParentFrameId &&
+                reveal.Source == new CardConversionSource(candidate.SkillId, candidate.BindingId,
+                    candidate.OwnerSeat, candidate.SkillInstanceId) && reveal.GameplayHash == candidate.GameplayHash &&
+                query.Frames.Any(frame => frame.Id == context.ParentFrameId) &&
+                (trigger.Suits.Count == 0 || trigger.Suits.Contains(reveal.Suit));
         return CanRunProgramTriggerWindow(query, owner, trigger, features, candidate, context);
     }
 
@@ -579,21 +587,11 @@ internal sealed class ProgramTriggerRuntime(IKernelCreateProgramExpressionWorldO
     }
 
     internal string ProgramTriggerUsageId<TQuery>(TQuery query, ProgramTriggerCandidate candidate)
-        where TQuery : IProgramTriggerContentQuery
-    {
-        var trigger = GetProgramTrigger(query, candidate);
-        if (trigger.UsageScope == SkillUsageScope.Event) return candidate.BindingId;
-        if (trigger.NamedUsageGroup is { } named) return $"named-group:{named}";
-        if (trigger.DynamicUsageLimit is not null) return $"named-binding:{candidate.BindingId}";
-        var usageBinding = trigger.ChoiceGroup is { } choiceGroup
-            ? $"choice-group:{choiceGroup}"
-            : candidate.BindingId;
-        return $"{usageBinding}@{candidate.SkillInstanceId}";
-    }
+        where TQuery : IProgramTriggerContentQuery =>
+        ProgramTriggerUsageRules.Id(GetProgramTrigger(query, candidate), candidate);
 
     internal int? ProgramTriggerUsageLimit<TQuery>(TQuery query, SkillProgramTrigger trigger)
         where TQuery : IProgramTriggerUsageQuery =>
-        trigger.DynamicUsageLimit is { Kind: SkillProgramDynamicUsageLimitKind.AlivePlayersCapped } dynamic
-            ? Math.Min(dynamic.Cap, query.AlivePlayerCount) : trigger.UsageLimit;
+        ProgramTriggerUsageRules.Limit(trigger, query.AlivePlayerCount);
 
 }

@@ -62,8 +62,6 @@ public sealed record MouXiaoQiaoMiluoGiftEvent(long FrameId, int OwnerSeat, int 
 public sealed record MouXiaoQiaoMiluoConsequenceEvent(long FrameId, int OwnerSeat, int Round, int TargetSeat, bool Recover) : IGameEvent;
 public sealed record MouXiaoQiaoJueyanUsedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
     int Round, int CardId, CardKind OutputKind, Suit ShownSuit, bool RedBasic) : IGameEvent;
-public sealed record MouXiaoQiaoJueyanSuitClaimedEvent(long RevealFrameId, CardConversionSource Source, string GameplayHash,
-    int Round, Suit Suit, int CardId) : IGameEvent;
 public sealed record MouXiaoQiaoJueyanNativeIssuedEvent(long FrameId, long UseId, long ActionId, int ActorSeat, CardKind Kind) : IGameEvent;
 public sealed record MouXiaoQiaoJueyanNativeReturnedEvent(long FrameId, long UseId, long ActionId) : IGameEvent;
 public sealed record MouXiaoQiaoJueyanBatchSignedEvent(long FrameId,long UseId,long BatchId,long? ParentBatchId,int Count):IGameEvent;

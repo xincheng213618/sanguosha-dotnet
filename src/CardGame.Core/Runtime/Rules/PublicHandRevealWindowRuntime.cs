@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal interface IPublicHandRevealWindows : IProgramRuntimeOperations
 {
-    void Issue(long parentFrameId, PublicHandRevealClaim claim);
+    void Issue(long parentFrameId, PublicHandRevealClaim claim, SkillProgramTriggerFacts? facts = null);
     bool Begin(long parentFrameId, PublicHandRevealReturnKind returnKind);
     bool Begin(long parentFrameId, string returnKey);
     bool Suspends(long frameId);
@@ -18,7 +18,7 @@ internal sealed class PublicHandRevealWindowRuntime(IProgramRuntimeFrames frames
     IPublicHandRevealNativeReturns returns,
     EngineStates.Contracts.ICoreMatchOutcomeWinnerAccess outcome) : IPublicHandRevealWindows
 {
-    public void Issue(long parentFrameId, PublicHandRevealClaim claim)
+    public void Issue(long parentFrameId, PublicHandRevealClaim claim, SkillProgramTriggerFacts? facts = null)
     {
         if (frames.Find(parentFrameId) is not { } parent || claim.RevealFrameId != parentFrameId ||
             claim.Source.OwnerSeat < 0 || claim.Source.OwnerSeat >= participants.Players.Count ||
@@ -28,7 +28,8 @@ internal sealed class PublicHandRevealWindowRuntime(IProgramRuntimeFrames frames
             throw new InvalidOperationException("A public Hand reveal requires its actual producer and declared source binding.");
         frames.Replace(parent.Id, parent with
         {
-            PublicHandRevealClaims = (parent.PublicHandRevealClaims ?? []).Append(claim).ToArray()
+            PublicHandRevealClaims = (parent.PublicHandRevealClaims ?? []).Append(claim).ToArray(),
+            PublicHandRevealCapturedFacts = (parent.PublicHandRevealCapturedFacts ?? []).Append(facts).ToArray()
         });
     }
 
@@ -39,7 +40,9 @@ internal sealed class PublicHandRevealWindowRuntime(IProgramRuntimeFrames frames
     {
         if (frames.Top is not { PublicHandRevealClaims: { Count: > 0 } all } parent || parent.Id != parentFrameId)
             return false;
+        var capturedFacts = parent.PublicHandRevealCapturedFacts;
         if (parent.PublicHandRevealConsumedCount < 0 || parent.PublicHandRevealConsumedCount > all.Count ||
+            capturedFacts is null || capturedFacts.Count != all.Count ||
             returnKind == PublicHandRevealReturnKind.Registered && string.IsNullOrWhiteSpace(returnKey))
             throw new InvalidOperationException("A public Hand reveal lost its original producer cursor or native return.");
         var claims = all.Skip(parent.PublicHandRevealConsumedCount).ToArray();
@@ -47,6 +50,7 @@ internal sealed class PublicHandRevealWindowRuntime(IProgramRuntimeFrames frames
         var window = new PublicHandRevealWindowFrame(frames.NextId(), parentFrameId, returnKind)
         {
             Claims = claims,
+            CapturedFacts = capturedFacts.Skip(parent.PublicHandRevealConsumedCount).ToArray(),
             ReturnKey = returnKey
         };
         window = window with
@@ -54,7 +58,7 @@ internal sealed class PublicHandRevealWindowRuntime(IProgramRuntimeFrames frames
             InvocationAuthorizations = Array.AsReadOnly(claims.Select((q, index) =>
                 new ProgramInvocationAuthorization(window.Id, parentFrameId,
                     SkillProgramTriggerWindow.PublicHandRevealed, Candidate(q, index),
-                    RetainOwnerDeath: q.RetainOwnerDeath)).ToArray())
+                    RetainOwnerDeath: q.RetainOwnerDeath, UsageReserved: q.UsageReserved)).ToArray())
         };
         frames.ReplaceTop(parent with { PublicHandRevealConsumedCount = all.Count });
         frames.Push(window);
@@ -65,7 +69,7 @@ internal sealed class PublicHandRevealWindowRuntime(IProgramRuntimeFrames frames
 
     internal static ProgramTriggerCandidate Candidate(PublicHandRevealClaim claim, int index) =>
         new(claim.Source.OwnerSeat, claim.Source.SkillId, claim.Source.BindingId,
-            claim.Source.SkillInstanceId!, claim.GameplayHash, 0, index);
+            claim.Source.SkillInstanceId!, claim.GameplayHash, claim.Priority, index);
 
     public bool Suspends(long frameId)
     {
@@ -89,7 +93,8 @@ internal sealed class PublicHandRevealWindowRuntime(IProgramRuntimeFrames frames
     internal void Advance(PublicHandRevealWindowFrame window)
     {
         if (frames.Top?.Id != window.Id || frames.ParentOf(window.Id)?.Id != window.ParentFrameId ||
-            window.ClaimIndex < 0 || window.ClaimIndex > window.Claims.Count)
+            window.ClaimIndex < 0 || window.ClaimIndex > window.Claims.Count ||
+            window.CapturedFacts.Count != window.Claims.Count)
             throw new InvalidOperationException("A public Hand reveal cannot advance before its owning child returns.");
         while (window.ClaimIndex < window.Claims.Count)
         {
@@ -99,7 +104,8 @@ internal sealed class PublicHandRevealWindowRuntime(IProgramRuntimeFrames frames
                 var candidate = Candidate(claim, window.ClaimIndex);
                 bindings.Begin(candidate, new(SkillProgramTriggerWindow.PublicHandRevealed,
                     window.Id, candidate.OwnerSeat, SourceSeat: candidate.OwnerSeat, TargetSeat: candidate.OwnerSeat,
-                    OccurrenceIndex: candidate.OccurrenceIndex) { PublicHandReveal = claim });
+                    OccurrenceIndex: candidate.OccurrenceIndex, Facts: window.CapturedFacts[window.ClaimIndex])
+                    { PublicHandReveal = claim });
                 return;
             }
             CompleteCandidate(window);

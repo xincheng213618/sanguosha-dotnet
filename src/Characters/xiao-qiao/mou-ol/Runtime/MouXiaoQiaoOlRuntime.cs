@@ -4,10 +4,7 @@ namespace CardGame.Core;
 
 internal interface IMouXiaoQiaoOlFacts : IProgramSelectionQuery
 {
-    bool Enabled { get; }
-    bool SetupComplete { get; }
     int Round { get; }
-    int Turn { get; }
     int CurrentSeat { get; }
     TurnPhase Phase { get; }
     Winner Winner { get; }
@@ -17,7 +14,6 @@ internal interface IMouXiaoQiaoOlFacts : IProgramSelectionQuery
     bool Human(int seat);
     string Name(int seat);
     SkillProgram Program(string id);
-    bool HasSource(CardConversionSource source);
     IEnumerable<T> History<T>() where T : IGameEvent;
     IReadOnlyList<Card> Hand(int seat);
     IReadOnlyList<Card> Equipment(int seat);
@@ -28,9 +24,8 @@ internal interface IMouXiaoQiaoOlFacts : IProgramSelectionQuery
     bool? EffectiveRed(int seat, int id);
     IReadOnlyList<CardMovementRecord> Movements(long before, long after);
     IReadOnlyList<MouXiaoQiaoOlUsePlan> NativePlans(int seat, CardKind kind, CardConversionSource source);
-    IReadOnlyList<ProgramTriggerCandidate> Sources(int seat, string skillId);
+    IReadOnlyList<CardConversionSource> RetainedSources(int seat);
     SkillPromptPresentation SkillPrompt(string skillId);
-    double KeepValue(int seat, int cardId);
     double TargetValue(int owner, int target, bool helpful);
     bool IsResponseRequest(ProgramSkillFrame frame);
     bool ActorLineage(long useId,long actionId,int originalActor,int actor,int provider,CardActionType type);
@@ -58,7 +53,7 @@ internal interface IMouXiaoQiaoOlOperations : IProgramRuntimeOperations
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IMouXiaoQiaoOlOperations operations,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
-    IPublicHandRevealWindows reveals, IPublicCardRevealQueries publicReveals, IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouXiaoQiaoOlRuntime
+    IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouXiaoQiaoOlRuntime
 {
     internal const string Miluo = "mou-ol:miluo",Jueyan = "mou-ol:jueyan";
     internal const string GiveReason = "skill-program.mou-ol:miluo.give";

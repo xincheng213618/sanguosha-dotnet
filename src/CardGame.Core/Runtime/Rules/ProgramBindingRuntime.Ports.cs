@@ -5,6 +5,7 @@ internal interface IProgramBindingFacts : IProgramSelectionQuery
     ContentSkillDefinition Skill(string skillId);
     SkillProgramTrigger Trigger(ProgramTriggerCandidate candidate);
     bool CanRun(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
+    bool CanIssue(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
     bool IsHuman(int seat);
     string Name(int seat);
     int ActualPlayPhaseUseCount(int seat);

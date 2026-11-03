@@ -339,4 +339,21 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 
 `sourceLoss` 可为 stop／retain，`ownerDeath` 可为 stop／drain，分别缺省 stop。retain 让本次已接受程序继续履约，不是重新授予技能。drain 排空已发出的原 post 窗口，只完成原承诺的付款，不新发摸牌、选择或其他步骤；原帧仍负责子返回与游标，观察绑定本身不创造这些权限。
 
-散文的共享组合正在验证。PublicHandReveal 仍由既有绝颜窗口 owner 和桥接返回执行，OwnDiscard 的旧事实桥接尚未退役。AI 只能消费已有授权范围内的事实，缺少私密收据或动态资格时保持未知，不能补猜暗手；本段不将支持范围等同于完整验证结论。
+散文的共享组合已接入原帧承诺，PublicHandReveal 使用共同窗口与原生返回；OwnDiscard 的旧事实桥接尚未退役。AI 只能消费已有授权范围内的事实，缺少私密收据或动态资格时保持未知，不能补猜暗手。
+
+## 公开展示时签发的声明
+
+真实公开展示可在原事件资格阶段签发后续调用：
+
+```json
+{
+  "id":"first-public-heart", "window":"publicHandRevealed", "subject":"owner", "optional":false,
+  "suits":["heart"], "usageScope":"round", "usageLimit":1, "namedUsageGroup":"first-public-heart",
+  "invocation":{"source":"publicHandReveal","ownerDeath":"retain"},
+  "effects":[{"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true}]
+}
+```
+
+沿用 `suits` 的实际有效花色筛选与现有次数组，无须人物专属表达式。具名次数在原展示时占用，不含技能实例；开始已签发调用时不会再占用。失去再获得技能不清空本轮额度，真正的轮次边界才重置。未声明次数限制时不制造预留。
+
+`ownerDeath` 与来源失效后的调用权限独立，默认 stop；retain 也不会启动已死者尚未开始的奖励。资格事实私存原帧，后续窗口数量读取仍来自原展示时点；它们不进入公共 claim 事件。此来源当前要求 mandatory owner，不支持 marker 付款、Event scope 预留或 `evaluateConditionAtResolution:true`，避免将已签发资格改为以后重新判断。

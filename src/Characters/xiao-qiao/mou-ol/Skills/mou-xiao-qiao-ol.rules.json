@@ -1,14 +1,6 @@
 {
   "skills": [
-    { "id": "mou-ol:miluo", "revision": 1,
-      "activations": [ { "id": "reveal-and-give", "minCards": 0, "maxCards": 0, "minTargets": 0, "maxTargets": 0, "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": 1,
-        "effects": [ { "op": "resolveMouXiaoQiaoMiluo", "target": "owner" } ] } ],
-      "triggers": [ { "id": "round-end-consequence", "window": "roundEnding", "subject": "owner", "optional": false,
-        "effects": [ { "op": "resolveMouXiaoQiaoMiluoRoundEnd", "target": "owner" } ] } ] },
-    { "id": "mou-ol:jueyan", "revision": 1,
-      "activations": [ { "id": "retained-hand-use", "minCards": 1, "maxCards": 1, "sourceZones": ["hand"], "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null,
-        "effects": [ { "op": "resolveMouXiaoQiaoJueyan", "target": "owner" } ] } ],
-      "triggers": [ { "id": "public-hand-first-suit", "window": "publicHandRevealed", "subject": "owner", "optional": false,
-        "effects": [ { "op": "draw", "target": "owner", "amount": 1, "awaitMovementTriggers": true } ] } ] }
+    {"id":"mou-ol:miluo","revision":1,"activations":[{"id":"reveal-and-give","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"otherLiving","usesPerTurn":null,"usesPerPhase":1,"effects":[{"op":"resolveMouXiaoQiaoMiluo","target":"owner"}]}],"triggers":[{"id":"round-end-consequence","window":"roundEnding","subject":"owner","optional":false,"effects":[{"op":"resolveMouXiaoQiaoMiluoRoundEnd","target":"owner"}]}]},
+    {"id":"mou-ol:jueyan","revision":1,"activations":[{"id":"retained-hand-use","minCards":1,"maxCards":1,"sourceZones":["hand"],"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"resolveMouXiaoQiaoJueyan","target":"owner"}]}],"triggers":[{"id":"public-hand-first-heart","window":"publicHandRevealed","subject":"owner","optional":false,"suits":["heart"],"usageScope":"round","usageLimit":1,"namedUsageGroup":"first-public-heart","invocation":{"source":"publicHandReveal","ownerDeath":"retain"},"effects":[{"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true}]},{"id":"public-hand-first-diamond","window":"publicHandRevealed","subject":"owner","optional":false,"suits":["diamond"],"usageScope":"round","usageLimit":1,"namedUsageGroup":"first-public-diamond","invocation":{"source":"publicHandReveal","ownerDeath":"retain"},"effects":[{"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true}]},{"id":"public-hand-first-spade","window":"publicHandRevealed","subject":"owner","optional":false,"suits":["spade"],"usageScope":"round","usageLimit":1,"namedUsageGroup":"first-public-spade","invocation":{"source":"publicHandReveal","ownerDeath":"retain"},"effects":[{"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true}]},{"id":"public-hand-first-club","window":"publicHandRevealed","subject":"owner","optional":false,"suits":["club"],"usageScope":"round","usageLimit":1,"namedUsageGroup":"first-public-club","invocation":{"source":"publicHandReveal","ownerDeath":"retain"},"effects":[{"op":"draw","target":"owner","amount":1,"awaitMovementTriggers":true}]}]}
   ]
 }
