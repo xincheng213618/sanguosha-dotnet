@@ -26,7 +26,6 @@ internal sealed partial class CharacterZhangYanOlEntries
     internal bool IsZhangYanSujiUse(CardUseFrame use) => _resolve().IsZhangYanSujiUse(use);
     internal void ObserveZhangYanLangdaoOutcome(IGameEvent payload) => _resolve().ObserveZhangYanLangdaoOutcome(payload);
     internal void PublishZhangYan(ProgramSkillFrame f) => _resolve().PublishZhangYan(f);
-    internal void RecordZhangYanLangdaoRedirect(ProgramSkillFrame redirector, long useId, int originalSeat, int newSeat) => _resolve().RecordZhangYanLangdaoRedirect(redirector, useId, originalSeat, newSeat);
     internal void ResolveZhangYanLangdao(ProgramSkillFrame f) => _resolve().ResolveZhangYanLangdao(f);
     internal bool ResumeZhangYan(long id) => _resolve().ResumeZhangYan(id);
     internal bool ReturnZhangYanMovement(ProgramSkillFrame f) => _resolve().ReturnZhangYanMovement(f);

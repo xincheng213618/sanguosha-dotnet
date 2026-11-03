@@ -27,7 +27,6 @@ public sealed record KenshangMaterialEvent(long UseId,int Index,CardActionCost C
 public sealed record KenshangDamageEvent(long UseId,long ActionId,long DamageFrameId,int SourceSeat,int TargetSeat,int Amount,bool Chain):IGameEvent;
 public sealed record KenshangTargetSelectedEvent(long ProgramFrameId,long UseId,int Index,int TargetSeat):IGameEvent;
 public sealed record KenshangTargetsCommittedEvent(long ProgramFrameId,long UseId,long ActionId,int Count):IGameEvent;
-public sealed record KenshangRedirectedEvent(long ProgramFrameId,long UseId,long ActionId,CardConversionSource Source,string GameplayHash,int InstructionIndex,int TargetIndex,int PreviousSeat,int TargetSeat):IGameEvent;
 public sealed record KenshangDrawIssuedEvent(long ProgramFrameId,long UseId,long ActionId,int DamageTotal,int MaterialCount,long Before,long After,int ActualCount):IGameEvent;
 internal interface IKenshangHost{SkillProgramStepOutcome Resolve(ProgramSkillFrame f,SkillProgramEffectOp op);}
 internal abstract class KenshangDescriptor:ProgramOperationDescriptorBase

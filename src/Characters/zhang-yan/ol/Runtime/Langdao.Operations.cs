@@ -11,7 +11,6 @@ public sealed record ZhangYanLangdaoUse(long ProgramFrameId,long WindowId,long A
 public sealed record ZhangYanLangdaoOptionFrozenEvent(long FrameId,int Index,LangdaoOption Option):IGameEvent;
 public sealed record ZhangYanLangdaoVoteRevealedEvent(long FrameId,int Index,int Seat,LangdaoOption Option):IGameEvent;
 public sealed record ZhangYanLangdaoTargetAddedEvent(long FrameId,long UseId,long ActionId,int Target,int Index):IGameEvent;
-public sealed record ZhangYanLangdaoRedirectedEvent(long ProgramFrameId,long UseId,long ActionId,CardConversionSource Source,string GameplayHash,int InstructionIndex,int TargetIndex,int OriginalTarget,int NewTarget):IGameEvent;
 public sealed record ZhangYanLangdaoKilledEvent(long UseId,long ActionId,long DyingId,long DamageId,int Victim):IGameEvent;
 public sealed record ZhangYanLangdaoSettledEvent(long UseId,long ActionId,CardConversionSource Source,bool Killed):IGameEvent;
 public sealed record ZhangYanLangdaoOptionRemovedEvent(long UseId,long ActionId,CardConversionSource Source,LangdaoOption Option):IGameEvent;

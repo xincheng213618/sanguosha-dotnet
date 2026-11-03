@@ -161,9 +161,9 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(multi.ResolutionId);
         // The old group cursor counts completed original targets. Enhanced
         // targets use a last-resolved index, so resume at original count - 1.
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && multi.TargetSeats.Count > 0 && use is not null && (((_characterQianZhaoOlOperations.HasWeifuTargetTail(use) || ((_characterYangFuOlOperations.HasBingzhongTargetTail(use) || _characterMaChengOlOperations.HasChenglieTargetTail(use)) || _characterLiuPanOlOperations.HasPijingTargetTail(use))) || _characterMaWanOlOperations.HasMaWanHunjiangTargetTail(use) || (_characterZhangYanOlOperations.HasZhangYanLangdaoTargetTail(use) || _characterMaXiuMaTieOlOperations.HasKenshangTargetTail(use))) || _coreSameTypeActualUseAidOperations.HasSameTypeAidTargetTail(use) || _coreShortRangeSlashTargetsOperations.HasShortRangeSlashTail(use) || (_coreDesignatedExtraTargetsOperations.HasDesignatedExtraTargetTail(use) || _coreRecipientCategorySlashTargetsOperations.HasRecipientCategorySlashTargetTail(use))) && multi.SourceSeat == use.SourceSeat && multi.EffectiveCardKind == use.CardKind && use.TargetSeats.Count > multi.TargetSeats.Count)
-            return multi.TargetSeats.Count - 1;
-        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && multi.TargetSeats.Count > 0 && use is not null && HasIssuedOriginalTargetAdditionTail(use) && multi.SourceSeat == use.SourceSeat && multi.EffectiveCardKind == use.CardKind && use.TargetSeats.Count > multi.TargetSeats.Count && use.TargetSeats.Skip(multi.TargetSeats.Count).Any(target => use.OriginalTargetAddition!.Grants.Any(g => g.Source.OwnerSeat == use.SourceSeat && g.TargetSeat == target)))
+        if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && multi.TargetSeats.Count > 0 &&
+            use is not null && multi.SourceSeat == use.SourceSeat && multi.EffectiveCardKind == use.CardKind &&
+            use.TargetSeats.Count > multi.TargetSeats.Count)
             return multi.TargetSeats.Count - 1;
         return multi.TargetSeats.Count;
     }

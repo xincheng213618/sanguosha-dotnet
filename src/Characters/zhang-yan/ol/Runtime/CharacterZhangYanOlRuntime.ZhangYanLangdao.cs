@@ -76,31 +76,8 @@ internal sealed partial class CharacterZhangYanOlRuntime
         return votes is [{ Index: 0 } first, { Index: 1 } second] && first.Seat == r.OriginalActor && second.Seat == r.OriginalTarget && votes.Count(v => v.Option == LangdaoOption.ExtraTarget) == r.ExtraCount && votes.Select(v => v.Option).Distinct().SequenceEqual(r.SelectedOptions);
     }
 
-    internal bool HasZhangYanLangdaoTargetTail(CardUseFrame use)
-    {
-        if (use.ZhangYanLangdao is not { AddedTargets.Count: > 0 } r || !IsZhangYanLangdaoIssued(use))
-            return false;
-        var actual = r.OriginalTargets.Concat(r.AddedTargets).ToArray();
-        if (!r.AddedTargets.Select((seat, i) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYanLangdaoTargetAddedEvent>().Count(e => e.FrameId == r.ProgramFrameId && e.UseId == use.Id && e.ActionId == r.ActionId && e.Target == seat && e.Index == i) == 1).All(x => x))
-            return false;
-        foreach (var e in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYanLangdaoRedirectedEvent>().Where(e => e.UseId == use.Id))
-        {
-            if (e.ActionId != r.ActionId || e.TargetIndex < 0 || e.TargetIndex >= actual.Length || actual[e.TargetIndex] != e.OriginalTarget || e.Source.OwnerSeat != e.OriginalTarget || _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program is not { } p || p.GameplayHash != e.GameplayHash || ProgramInstructionResolver.Default.Find(p, ProgramInstructionSourceKind.Trigger, e.Source.BindingId)is not { } plan || e.InstructionIndex < 1 || e.InstructionIndex > plan.Instructions.Count || plan.GetPausedInstruction(e.InstructionIndex).Effect.Op != SkillProgramEffectOp.RedirectCurrentAttack || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(f => f.FrameId == e.ProgramFrameId && f.OwnerSeat == e.Source.OwnerSeat && f.SkillId == e.Source.SkillId && f.BindingId == e.Source.BindingId && f.SkillInstanceId == e.Source.SkillInstanceId && f.Window == SkillProgramTriggerWindow.SlashTargetRedirecting) != 1)
-                return false;
-            actual[e.TargetIndex] = e.NewTarget;
-        }
-
-        return use.TargetSeats.SequenceEqual(actual);
-    }
-
-    internal void RecordZhangYanLangdaoRedirect(ProgramSkillFrame redirector, long useId, int originalSeat, int newSeat)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { ZhangYanLangdao: { AddedTargets.Count: > 0 } r, Action: { } a } use)
-            return;
-        if (_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(redirector)?.Op != SkillProgramEffectOp.RedirectCurrentAttack || redirector.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } c } ctx || c.ParentCardUseFrameId != use.Id || c.CardActionId != a.ActionId || ctx.TargetSeat != originalSeat || redirector.OwnerSeat != originalSeat || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != newSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhangYanLangdaoRedirectedEvent>().Any(e => e.ProgramFrameId == redirector.Id && e.UseId == useId))
-            throw new InvalidOperationException("Langdao redirect lost its actual original cursor and native paid source.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhangYanLangdaoRedirectedEvent(redirector.Id, useId, a.ActionId, ZhangYanSource(redirector), redirector.GameplayHash, redirector.InstructionIndex, use.TargetIndex, originalSeat, newSeat));
-    }
+    internal bool HasZhangYanLangdaoTargetTail(CardUseFrame use) =>
+        use.ZhangYanLangdao is { AddedTargets.Count: > 0 };
 
     internal bool TryGetZhangYanVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primary)
     {

@@ -51,19 +51,10 @@ internal sealed partial class CoreGameEngineProgramAttackEffectsRuntime
         var previousSeat = attack.TargetSeat;
         attack.SetDamageParticipants(attack.SourceSeat, targetSeat);
         attack.SetIgnoresArmor(_coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat]) || _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat], attack.EffectiveCardKind ?? CardKind.Slash));
-        _coreNativeCardUseFramesOperations.RedirectCardUseTarget(attack.ResolutionId, previousSeat, targetSeat);
-        _coreCurrentSlashFireOffersOperations.RecordCurrentSlashFireRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _coreShortRangeSlashTargetsOperations.RecordShortRangeSlashRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _characterMaWanOlOperations.RecordMaWanHunjiangRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _characterZhangYanOlOperations.RecordZhangYanLangdaoRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _characterQianZhaoOlOperations.RecordWeifuRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _characterYangFuOlOperations.RecordBingzhongRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _characterMaChengOlOperations.RecordChenglieRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _characterDaQiaoLeOperations.RecordZixiExtraEffectRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _characterLiuPanOlOperations.RecordPijingRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _characterMaXiuMaTieOlOperations.RecordKenshangRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _coreDesignatedExtraTargetsOperations.RecordDesignatedExtraTargetRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
+        var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == attack.ResolutionId);
+        _coreNativeCardUseFramesOperations.RedirectCardUseTarget(attack.ResolutionId, use.TargetIndex, previousSeat, targetSeat);
         _coreCurrentEnhancementSlashRedirectsOperations.RecordCurrentEnhancementSlashRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
+        _characterDaQiaoLeOperations.RecordZixiExtraEffectRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
         _coreSoleTargetRedirectOperations.RecordSoleTargetAfterProtectionRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Name)}】，将【杀】转移给 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)}。", frame.OwnerSeat, targetSeat);
     }

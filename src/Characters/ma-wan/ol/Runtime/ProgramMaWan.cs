@@ -46,8 +46,6 @@ public sealed record MaWanHunjiangEntitledEvent(long FrameId, CardConversionSour
 public sealed record MaWanHunjiangDrawIssuedEvent(long FrameId, int OwnerSeat, int Count, int SequenceBefore, int SequenceAfter) : IGameEvent;
 public sealed record MaWanHunjiangUseIssuedEvent(long UseId, long ActionId, long GrantFrameId, CardConversionSource Source, int TargetSeat, int ActualTurnNumber, long PhaseInstanceId) : IGameEvent;
 public sealed record MaWanHunjiangTargetAddedEvent(long ProgramFrameId, long UseId, long ActionId, CardConversionSource Source, int TargetSeat, int AddedIndex) : IGameEvent;
-public sealed record MaWanHunjiangRedirectedEvent(long ProgramFrameId, long UseId, long ActionId, CardConversionSource Source, string GameplayHash,
-    int InstructionIndex, int TargetIndex, int OriginalTargetSeat, int NewTargetSeat) : IGameEvent;
 
 public sealed record MaWanHunjiangUseReceipt(long UseId, long ActionId, int ActorSeat, int ActualTurnNumber, long PhaseInstanceId, bool Offered = false)
 {

@@ -118,155 +118,6 @@ internal sealed partial class CoreGameEngineCurrentSlashFireOffersRuntime
             throw new InvalidOperationException("A fire conversion draft lost its exact committed Slash producer.");
     }
 
-    internal (int[] Designated, int[] Actual, int[] Planned) RebuildCurrentSlashFireTargets(CardUseFrame use)
-    {
-        var p = use.CurrentSlashFirePolicy!;
-        var confirmed = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().Single(e => e.ResolutionId == use.Id);
-        var designated = confirmed.TargetSeats.ToList();
-        var actual = designated.ToList();
-        var planned = designated.ToList();
-        var after = false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory();
-        foreach (var e in history)
-        {
-            if (e is ProgramCurrentSlashFireChangedEvent changed && changed.CardUseFrameId == use.Id && changed.ProgramFrameId == p.ProgramFrameId)
-            {
-                if (after || !designated.SequenceEqual(p.OriginalAction.TargetSeats))
-                    throw new InvalidOperationException("A fire conversion lost its exact earlier target enhancements.");
-                after = true;
-                if (p.ExtraTargetSeat is { } extra)
-                {
-                    designated.Add(extra);
-                    actual.Add(extra);
-                    planned.Add(extra);
-                }
-
-                continue;
-            }
-
-            if (e is SoleTargetReplacedEvent replacement && replacement.CardUseFrameId == use.Id)
-            {
-                if (!after || !actual.SequenceEqual(designated) || !_coreSoleTargetQuarantineOperations.IsSoleTargetReplacementFact(use, replacement, actual))
-                    throw new InvalidOperationException("A protected converted Slash lost its exact paid replacement.");
-                designated = replacement.AfterTargets.ToList();
-                actual = designated.ToList();
-                continue;
-            }
-
-            if (e is SoleTargetAfterProtectionRedirectedEvent protectedRedirect && protectedRedirect.CardUseFrameId == use.Id)
-            {
-                if (!after || !actual.SequenceEqual(designated) || !_coreSoleTargetRedirectOperations.IsSoleTargetAfterProtectionRedirectFact(use, protectedRedirect, actual))
-                    throw new InvalidOperationException("A protected converted Slash lost its exact new-target redirect.");
-                designated = protectedRedirect.AfterTargets.ToList();
-                actual = designated.ToList();
-                continue;
-            }
-
-            if (e is SouyingNativeMutationEvent { Cancelled: true } souying && souying.NativeUseId == use.Id)
-            {
-                if (!after || !_characterHuaManOlOperations.IsHuaManSouyingMutationFact(use, souying, actual))
-                    throw new InvalidOperationException("A converted Slash lost its exact paid Souying cancellation.");
-                designated.Clear();
-                actual.Clear();
-                planned.Clear();
-                continue;
-            }
-
-            if (e is ShortRangeSlashTargetResolvedEvent { Added: true } shortRange && shortRange.CardUseFrameId == use.Id)
-            {
-                if (!_coreShortRangeSlashTargetsOperations.IsShortRangeSlashTargetFact(use, shortRange, designated) || !shortRange.Receipt!.OriginalTargets.SequenceEqual(actual))
-                    throw new InvalidOperationException("A short-range fire tail lost its complete native finalized prefix.");
-                designated.Add(shortRange.Receipt.AddedTargetSeat);
-                actual.Add(shortRange.Receipt.AddedTargetSeat);
-                // Finalized-tail issuance does not enlarge or rewrite the already
-                // prepared original Fangtian plan. Its native cursor handles the
-                // extra target after that original group completes.
-                continue;
-            }
-
-            if (e is ChenglieTargetsAppliedEvent chenglie && chenglie.UseId == use.Id)
-            {
-                if (!actual.SequenceEqual(designated) || !_characterMaChengOlOperations.IsChenglieAppliedTargetFact(use, chenglie, designated, out var chenglieTargets))
-                    throw new InvalidOperationException("A Chenglie fire tail lost its exact finalized target prefix.");
-                designated = chenglieTargets.ToList();
-                actual = chenglieTargets.ToList();
-                // Finalized additions preserve the prepared original Fangtian plan.
-                continue;
-            }
-
-            if (e is BingzhongTargetsAppliedEvent { AddedCount: > 0 } bingzhong && bingzhong.UseId == use.Id)
-            {
-                if (use.BingzhongTail is not { } tail || !_characterYangFuOlOperations.HasBingzhongTargetTail(use) || bingzhong != new BingzhongTargetsAppliedEvent(tail.FrameId, tail.UseId, tail.ActionId, tail.Source, tail.GameplayHash, tail.X, tail.Ordinal, tail.OriginalActor, tail.ProviderSeat, tail.OriginalTargets.Count, tail.AddedTargets.Count) || !tail.OriginalTargets.SequenceEqual(designated) || !tail.OriginalTargets.SequenceEqual(actual))
-                    throw new InvalidOperationException("A Bingzhong fire tail lost its exact finalized target prefix.");
-                designated.AddRange(tail.AddedTargets);
-                actual.AddRange(tail.AddedTargets);
-                // These finalized additions retain the already prepared native
-                // Fangtian plan and run through the ordinary enhanced cursor.
-                continue;
-            }
-
-            if (e is PijingTargetsAppliedEvent pijing && pijing.UseId == use.Id)
-            {
-                if (!actual.SequenceEqual(designated) || !_characterLiuPanOlOperations.IsPijingAppliedTargetFact(use, pijing, designated, out var resultTargets))
-                    throw new InvalidOperationException("A Pijing fire tail lost its exact original target sequence and paid mutation.");
-                designated = resultTargets.ToList();
-                actual = resultTargets.ToList();
-                planned = resultTargets.ToList();
-                continue;
-            }
-
-            int? added = e switch
-            {
-                CurrentCardEnhancedEvent { Enhancement: CurrentCardEnhancement.ExtraTarget } enhancement when enhancement.CardUseFrameId == use.Id && enhancement.CardActionId == p.OriginalAction.ActionId => enhancement.ExtraTargetSeat,
-                OriginalTargetAdditionResolvedEvent addition when addition.CardUseFrameId == use.Id && addition.ActionId == p.OriginalAction.ActionId && addition.Added => addition.TargetSeat,
-                SameTypeAidTargetAddedEvent aid when _coreSameTypeActualUseAidOperations.IsSameTypeAidTargetFact(use, aid) => aid.RecipientSeat,
-                _ => null
-            };
-            if (added is { } target)
-            {
-                designated.Add(target);
-                actual.Add(target);
-                planned.Add(target);
-            }
-
-            if (e is SlashTargetsReplacedEvent replaced && replaced.CardUseFrameId == use.Id)
-            {
-                if (!replaced.PreviousTargets.SequenceEqual(actual))
-                    throw new InvalidOperationException("A converted Slash target replacement lost its exact preceding target chain.");
-                designated = replaced.Targets.ToList();
-                actual = designated.ToList();
-                planned = designated.ToList();
-            }
-
-            if (e is ProgramCurrentSlashFireRedirectedEvent redirected && redirected.CardUseFrameId == use.Id)
-            {
-                if (_coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionCapability && history.OfType<SoleTargetAfterProtectionRedirectedEvent>().Any(f => f.ProgramFrameId == redirected.ProgramFrameId && f.CardUseFrameId == use.Id && f.ActionId == redirected.ActionId && f.Source == redirected.Source && f.TargetIndex == redirected.TargetIndex && f.PreviousTargetSeat == redirected.OriginalTargetSeat && f.NewTargetSeat == redirected.NewTargetSeat))
-                    continue;
-                actual[redirected.TargetIndex] = redirected.NewTargetSeat;
-            }
-
-            if (after && e is CardActionAcceptedEvent accepted && accepted.Action.ActionId == p.OriginalAction.ActionId)
-            {
-                if (!accepted.Action.TargetSeats.SequenceEqual(actual))
-                    throw new InvalidOperationException("A finalized converted Slash lost its ordered actual targets.");
-                designated = actual.ToList();
-            }
-        }
-
-        if (!after)
-            throw new InvalidOperationException("A changed Slash lost its effective-kind change fact.");
-        return (designated.ToArray(), actual.ToArray(), planned.ToArray());
-    }
-
-    internal void RecordCurrentSlashFireRedirect(ProgramSkillFrame redirector, long useId, int originalSeat, int newSeat)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { CurrentSlashFirePolicy: not null, Action: { } action } use)
-            return;
-        if (redirector.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } context } || context.ParentCardUseFrameId != useId || context.CardActionId != action.ActionId || redirector.OwnerSeat != originalSeat || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != newSeat)
-            throw new InvalidOperationException("A changed Slash redirect lost its exact owning program.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCurrentSlashFireRedirectedEvent(redirector.Id, useId, action.ActionId, new(redirector.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(redirector), redirector.OwnerSeat, redirector.SkillInstanceId), use.TargetIndex, originalSeat, newSeat));
-    }
-
     internal bool TryGetCurrentSlashFirePrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primary)
     {
         primary = [];
@@ -313,12 +164,17 @@ internal sealed partial class CoreGameEngineCurrentSlashFireOffersRuntime
     internal bool IsCurrentSlashFireChangedUse(CardUseFrame use) => use.CurrentSlashFirePolicy is { Converted: true } && use.CardKind == CardKind.FireSlash;
     internal void AssertCurrentSlashFirePolicy(CardUseFrame use)
     {
-        if (use.CurrentSlashFirePolicy is not { } p)
+        if (use.CurrentSlashFirePolicy is not { } policy)
             return;
-        var old = p.OriginalAction;
-        var current = use.Action;
-        var targets = RebuildCurrentSlashFireTargets(use);
-        if (current is null || p.Source.OwnerSeat != use.SourceSeat || old.ActionId != current.ActionId || old.ActorSeat != current.ActorSeat || old.ProviderSeat != current.ProviderSeat || old.Type != current.Type || old.EffectiveKind != p.OriginalKind || !CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(p.OriginalKind) || use.CardKind != CardKind.FireSlash || current.EffectiveKind != CardKind.FireSlash || !old.PhysicalCards.SequenceEqual(current.PhysicalCards) || p.Converted != (p.OriginalKind != CardKind.FireSlash) || !current.ConversionChain.SequenceEqual(p.Converted ? old.ConversionChain.Append(p.Source) : old.ConversionChain) || p.ExtraTargetSeat is { } extra && (old.TargetSeats.Contains(extra) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(extra)) || !current.TargetSeats.SequenceEqual(targets.Designated) || !use.TargetSeats.SequenceEqual(targets.Actual) || (use.TargetSeats.Count == 0 ? !use.SlashTargetsCancelled || use.TargetIndex != 0 : use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count) || use.CardAttack is not { EffectiveCardKind: CardKind.FireSlash } attack || use.TargetSeats.Count > 0 && attack.TargetSeat != use.TargetSeats[use.TargetIndex] || attack.DamageNatureOverride is not (null or DamageNature.Fire) || use.PreparedTargetAttacks?.Any(a => a.EffectiveCardKind != CardKind.FireSlash || a.DamageNatureOverride is not (null or DamageNature.Fire)) == true || use.Continuations.FangtianHalberd is { } multi && (multi.EffectiveCardKind != CardKind.FireSlash || !multi.TargetSeats.SequenceEqual(targets.Planned)) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id && e.SourceSeat == use.SourceSeat && e.CardKind == p.OriginalKind) || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramCurrentSlashFireChangedEvent>().Any(e => e.ProgramFrameId == p.ProgramFrameId && e.CardUseFrameId == use.Id && e.ActionId == old.ActionId && e.Source == p.Source && e.OriginalKind == p.OriginalKind && e.FinalKind == CardKind.FireSlash && e.ExtraTargetSeat == p.ExtraTargetSeat))
-            throw new InvalidOperationException("A changed Slash lost its original frozen action, exact effective change or extra-target proof.");
+        var original = policy.OriginalAction;
+        if (use.CardKind != CardKind.FireSlash || use.Action is not { EffectiveKind: CardKind.FireSlash } current ||
+            original.ActionId != current.ActionId || original.ActorSeat != current.ActorSeat ||
+            original.ProviderSeat != current.ProviderSeat || original.Type != current.Type ||
+            original.EffectiveKind != policy.OriginalKind ||
+            !CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Contains(policy.OriginalKind) ||
+            !original.PhysicalCards.SequenceEqual(current.PhysicalCards) ||
+            policy.Converted != (policy.OriginalKind != CardKind.FireSlash) ||
+            !current.ConversionChain.SequenceEqual(policy.Converted ? original.ConversionChain.Append(policy.Source) : original.ConversionChain))
+            throw new InvalidOperationException("A changed Slash lost its original action or issued effective-kind change.");
     }
 }

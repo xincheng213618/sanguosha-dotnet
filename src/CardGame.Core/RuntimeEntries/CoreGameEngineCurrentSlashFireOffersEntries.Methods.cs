@@ -15,8 +15,6 @@ internal sealed partial class CoreGameEngineCurrentSlashFireOffersEntries
     internal bool HasCommittedSlashFireCapability(CharacterState owner) => _resolve().HasCommittedSlashFireCapability(owner);
     internal bool IsCurrentSlashFireChangedUse(CardUseFrame use) => _resolve().IsCurrentSlashFireChangedUse(use);
     internal void PublishCurrentSlashFirePrompt(ProgramSkillFrame f) => _resolve().PublishCurrentSlashFirePrompt(f);
-    internal (int[] Designated, int[] Actual, int[] Planned) RebuildCurrentSlashFireTargets(CardUseFrame use) => _resolve().RebuildCurrentSlashFireTargets(use);
-    internal void RecordCurrentSlashFireRedirect(ProgramSkillFrame redirector, long useId, int originalSeat, int newSeat) => _resolve().RecordCurrentSlashFireRedirect(redirector, useId, originalSeat, newSeat);
     internal void ResolveCurrentSlashFireChoice(PromptChoice selected) => _resolve().ResolveCurrentSlashFireChoice(selected);
     internal bool TryGetCurrentSlashFirePrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, scoped out IReadOnlyList<int> primary) => _resolve().TryGetCurrentSlashFirePrimaryReturn(use, parent, out primary);
 }

@@ -18,11 +18,8 @@ internal sealed partial class CharacterMaXiuMaTieOlEntries
     internal bool HasAcceptedKenshangKeAction(ProgramSkillFrame f, LegalAction action) => _resolve().HasAcceptedKenshangKeAction(f, action);
     internal bool HasKenshangProgramSlash(CharacterState actor, IEnumerable<int> targets) => _resolve().HasKenshangProgramSlash(actor, targets);
     internal bool HasKenshangRequestPrompt() => _resolve().HasKenshangRequestPrompt();
-    internal bool HasKenshangTargetTail(CardUseFrame use) => _resolve().HasKenshangTargetTail(use);
-    internal bool HasKenshangTargetTail2(CardUseFrame use, CardActionContext action) => _resolve().HasKenshangTargetTail(use, action);
     internal bool IsIssuedKenshangCandidate(ProgramTriggerCandidate c) => _resolve().IsIssuedKenshangCandidate(c);
     internal bool IsKenshangRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsKenshangRecoveryParent(f, recovery);
-    internal bool IsKenshangTargetsReplacedFact(CardUseFrame use, SlashTargetsReplacedEvent fact) => _resolve().IsKenshangTargetsReplacedFact(use, fact);
     internal void IssueKenshangUse(long id, CardActionContext action) => _resolve().IssueKenshangUse(id, action);
     internal IReadOnlyList<PromptChoice> KenshangBorrowedSlashChoices(NativeOwners.BorrowedSwordHandle pending) => _resolve().KenshangBorrowedSlashChoices(pending);
     internal int KenshangDamageTotal(CardUseFrame use) => _resolve().KenshangDamageTotal(use);
@@ -44,7 +41,6 @@ internal sealed partial class CharacterMaXiuMaTieOlEntries
     internal void PublishKenshangTargets(ProgramSkillFrame f) => _resolve().PublishKenshangTargets(f);
     internal bool QualifyKenshang(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => _resolve().QualifyKenshang(c, t, context);
     internal void RecordKenshangDamage(GameEngine.IDamageAttempt attack, long damageId, int amount) => _resolve().RecordKenshangDamage(attack, damageId, amount);
-    internal void RecordKenshangRedirect(ProgramSkillFrame f, long id, int previous, int next) => _resolve().RecordKenshangRedirect(f, id, previous, next);
     internal CardUseFrame RequireKenshangUse(ProgramSkillFrame f) => _resolve().RequireKenshangUse(f);
     internal bool ResumeKenshang(long id) => _resolve().ResumeKenshang(id);
     internal bool ReturnKenshangMovement(ProgramSkillFrame f) => _resolve().ReturnKenshangMovement(f);

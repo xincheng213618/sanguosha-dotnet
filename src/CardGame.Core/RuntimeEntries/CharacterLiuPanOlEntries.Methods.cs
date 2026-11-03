@@ -17,11 +17,9 @@ internal sealed partial class CharacterLiuPanOlEntries
     internal void DrawPijingReciprocal(ProgramSkillFrame f) => _resolve().DrawPijingReciprocal(f);
     internal void FinishPijing(ProgramSkillFrame f) => _resolve().FinishPijing(f);
     internal bool HasPijingTargetTail(CardUseFrame use) => _resolve().HasPijingTargetTail(use);
-    internal bool HasPijingTargetTail2(CardUseFrame use, CardActionContext action) => _resolve().HasPijingTargetTail(use, action);
     internal bool HasPijingZeroTargetTail(CardUseFrame use) => _resolve().HasPijingZeroTargetTail(use);
     internal bool IsIssuedPijingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedPijingCandidate(c, context);
     internal bool IsLiuPanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsLiuPanRecoveryParent(f, recovery);
-    internal bool IsPijingAppliedTargetFact(CardUseFrame use, PijingTargetsAppliedEvent fact, IReadOnlyList<int> precedingTargets, scoped out IReadOnlyList<int> resultTargets) => _resolve().IsPijingAppliedTargetFact(use, fact, precedingTargets, out resultTargets);
     internal void IssuePijingGift(ProgramSkillFrame f) => _resolve().IssuePijingGift(f);
     internal bool LiuPanFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().LiuPanFirstChild(f, child);
     internal bool LiuPanNormalizeImplicitDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => _resolve().LiuPanNormalizeImplicitDrawTwoTargetWindow(query);
@@ -35,7 +33,6 @@ internal sealed partial class CharacterLiuPanOlEntries
     internal void PublishPijing(ProgramSkillFrame f) => _resolve().PublishPijing(f);
     internal bool QualifyPijing(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => _resolve().QualifyPijing(c, t, context);
     internal CardUseFrame RebasePijingSlashTargets(CardUseFrame use, IReadOnlyList<int> targets) => _resolve().RebasePijingSlashTargets(use, targets);
-    internal void RecordPijingRedirect(ProgramSkillFrame f, long useId, int previousSeat, int nextSeat) => _resolve().RecordPijingRedirect(f, useId, previousSeat, nextSeat);
     internal bool RejectPijingDesignatedTarget(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, SkillProgramTrigger trigger) => _resolve().RejectPijingDesignatedTarget(candidate, context, trigger);
     internal CardUseFrame RequirePijingUse(ProgramSkillFrame f, scoped out ProgramCardTriggerWindowFrame window) => _resolve().RequirePijingUse(f, out window);
     internal bool ResumePijing(long id) => _resolve().ResumePijing(id);

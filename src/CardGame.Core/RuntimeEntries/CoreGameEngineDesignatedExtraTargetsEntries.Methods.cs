@@ -16,8 +16,6 @@ internal sealed partial class CoreGameEngineDesignatedExtraTargetsEntries
     internal bool HasDesignatedExtraTargetTail(CardUseFrame use) => _resolve().HasDesignatedExtraTargetTail(use);
     internal bool HasDiscardedDesignatedCardName(CardKind kind) => _resolve().HasDiscardedDesignatedCardName(kind);
     internal bool IsDesignatedExtraTargetFact(CardUseFrame use, DesignatedExtraTargetResolvedEvent fact, IReadOnlyList<int> originalTargets) => _resolve().IsDesignatedExtraTargetFact(use, fact, originalTargets);
-    internal bool IsDesignatedExtraTargetRedirectFact(CardUseFrame use, DesignatedExtraTargetRedirectedEvent fact, IReadOnlyList<int> actualTargets) => _resolve().IsDesignatedExtraTargetRedirectFact(use, fact, actualTargets);
-    internal void RecordDesignatedExtraTargetRedirect(ProgramSkillFrame redirector, long useId, int originalSeat, int newSeat) => _resolve().RecordDesignatedExtraTargetRedirect(redirector, useId, originalSeat, newSeat);
     internal CardUseFrame RequireDesignatedExtraTargetParent(ProgramSkillFrame frame, scoped out ProgramCardTriggerWindowFrame window) => _resolve().RequireDesignatedExtraTargetParent(frame, out window);
     internal void ResolveDesignatedExtraTargetChoice(PromptChoice selected) => _resolve().ResolveDesignatedExtraTargetChoice(selected);
     internal PromptChoice SelectAiDesignatedExtraTargetChoice(PendingDecision decision, ProgramSkillFrame frame) => _resolve().SelectAiDesignatedExtraTargetChoice(decision, frame);

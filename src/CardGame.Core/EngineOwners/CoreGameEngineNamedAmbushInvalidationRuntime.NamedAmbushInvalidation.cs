@@ -12,8 +12,8 @@ internal sealed partial class CoreGameEngineNamedAmbushInvalidationRuntime
         if (original.ActorSeat == action.ActorSeat && original.EffectiveKind == action.EffectiveKind && original.ConversionChain.SequenceEqual(action.ConversionChain))
             return true;
         // A paid ineffective state follows the same real use through later
-        // proven role/kind changes; its hand qualification stays at issuance.
-        return !fact.Use.ResponseUse && _coreCardUseLifecycleOperations.LifecycleCardUse(parent)is { Action: { } current } use && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(current, action) && _coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action) && _coreCompletedCategoryUseProofOperations.RebuildAcceptedActualHandGainUse(use, original, action, history, offer.i);
+        // native role/kind changes; its hand qualification stays at issuance.
+        return !fact.Use.ResponseUse && _coreCardUseLifecycleOperations.LifecycleCardUse(parent)is { Action: { } current } use && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(current, action) && _coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(use, action);
     }
 
     internal void InvalidateNamedAmbushUse(ProgramSkillFrame f)

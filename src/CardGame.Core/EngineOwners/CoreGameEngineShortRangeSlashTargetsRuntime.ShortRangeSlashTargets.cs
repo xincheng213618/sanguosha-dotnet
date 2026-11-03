@@ -135,14 +135,6 @@ internal sealed partial class CoreGameEngineShortRangeSlashTargetsRuntime
         return best.Choice is not null && best.Score > 0 ? best.Choice : decision.Choices.Single(c => c.Targets.Count == 0);
     }
 
-    internal bool IsShortRangeSlashTargetFact(CardUseFrame use, ShortRangeSlashTargetResolvedEvent fact, IReadOnlyList<int> originalTargets)
-    {
-        if (!fact.Added || fact.Receipt is not { } r || use.ShortRangeSlashTarget is not { } issued || fact.CardUseFrameId != use.Id || r.CardUseFrameId != use.Id || fact.ActionId != r.ActionId || fact.Source != r.Source || issued.ProgramFrameId != r.ProgramFrameId || issued.Source != r.Source || issued.GameplayHash != r.GameplayHash || issued.CardUseFrameId != r.CardUseFrameId || issued.ActionId != r.ActionId || issued.ActorSeat != r.ActorSeat || issued.AddedTargetSeat != r.AddedTargetSeat || !issued.OriginalTargets.SequenceEqual(r.OriginalTargets) || r.ActorSeat != use.SourceSeat || r.Source.OwnerSeat != r.ActorSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || r.OriginalTargets.Count == 0 || !r.OriginalTargets.SequenceEqual(originalTargets) || (r.OriginalTargets.Distinct().Count() != r.OriginalTargets.Count && !TryGetShortRangeFinalizedPrefix(use, r, out _)) || r.OriginalTargets.Contains(r.AddedTargetSeat) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.AddedTargetSeat) || r.AddedTargetSeat == r.ActorSeat || (r.ActionId != use.Action?.ActionId && !(r.ActionId is null && use.Action is not null && _coreActualHandGainProgramsOperations.IsNormalizedLegacyCompletedCategoryUse(use, r.ActorSeat, use.CardKind, use.TargetSeats))) || use.Action is { } action && (action.Type != CardActionType.Use || action.ActorSeat != r.ActorSeat || action.EffectiveKind != use.CardKind) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program is not { } program || program.GameplayHash != r.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == r.Source.BindingId)is not { } trigger || trigger.Effects is not [{ Op: SkillProgramEffectOp.OfferShortRangeSlashTarget }] || trigger.Window is not (SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.OtherActualUseTargeted))
-            return false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        return history.OfType<ShortRangeSlashTargetResolvedEvent>().Count(e => e.CardUseFrameId == use.Id) == 1 && history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == r.ProgramFrameId && e.OwnerSeat == r.ActorSeat && e.SkillId == r.Source.SkillId && e.BindingId == r.Source.BindingId && e.SkillInstanceId == r.Source.SkillInstanceId && e.Window == trigger.Window) == 1 && history.OfType<ProgramCardUseTargetAddedEvent>().Count(e => e.FrameId == r.ProgramFrameId && e.SkillId == r.Source.SkillId && e.OwnerSeat == r.ActorSeat && e.CardUseFrameId == use.Id && e.TargetSeat == r.AddedTargetSeat) == 1;
-    }
-
     internal bool TryGetShortRangeFinalizedPrefix(CardUseFrame use, ShortRangeSlashTargetReceipt receipt, out CardActionContext finalized)
     {
         finalized = null !;
@@ -163,53 +155,7 @@ internal sealed partial class CoreGameEngineShortRangeSlashTargetsRuntime
         return true;
     }
 
-    internal void RecordShortRangeSlashRedirect(ProgramSkillFrame redirector, long useId, int originalSeat, int newSeat)
-    {
-        // Converted fire Slashes already have their mature dedicated redirect fact.
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { ShortRangeSlashTarget: not null, CurrentSlashFirePolicy: null, Action: { } action } use)
-            return;
-        var source = new CardConversionSource(redirector.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(redirector), redirector.OwnerSeat, redirector.SkillInstanceId);
-        var program = _contentRegistryOperations._contentRegistry.GetSkill(redirector.SkillId).Program!;
-        var effect = ProgramInstructionResolver.Default.Resolve(redirector, program).GetPausedInstruction(redirector.InstructionIndex).Effect;
-        if (redirector.GameplayHash != program.GameplayHash || effect.Op != SkillProgramEffectOp.RedirectCurrentAttack || newSeat != CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(redirector, effect.Target) || redirector.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } context } windowContext || context.ParentCardUseFrameId != useId || context.CardActionId != action.ActionId || context.ActorSeat != use.SourceSeat || windowContext.SourceSeat != use.SourceSeat || windowContext.TargetSeat != originalSeat || redirector.OwnerSeat != originalSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == windowContext.ParentFrameId)is not { } window || window.ParentFrameId != useId || window.Action.ActionId != action.ActionId || window.Continuation != ProgramCardContinuation.SlashTargetRedirecting || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(redirector, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != newSeat || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramActualSlashTargetRedirectedEvent>().Any(e => e.ProgramFrameId == redirector.Id && e.CardUseFrameId == useId && e.InstructionIndex == redirector.InstructionIndex))
-            throw new InvalidOperationException("A short-range native redirect lost its exact program, paused instruction or actual target cursor.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramActualSlashTargetRedirectedEvent(redirector.Id, useId, action.ActionId, source, redirector.GameplayHash, redirector.InstructionIndex, use.TargetIndex, originalSeat, newSeat));
-    }
-
-    internal bool IsShortRangeSlashRedirectFact(CardUseFrame use, ProgramActualSlashTargetRedirectedEvent fact, IReadOnlyList<int> actualTargets)
-    {
-        if (use.ShortRangeSlashTarget is null || use.CurrentSlashFirePolicy is not null || fact.CardUseFrameId != use.Id || fact.ActionId is null || fact.ActionId != use.Action?.ActionId || fact.Source.OwnerSeat != fact.OriginalTargetSeat || fact.TargetIndex < 0 || fact.TargetIndex >= actualTargets.Count || actualTargets[fact.TargetIndex] != fact.OriginalTargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(fact.NewTargetSeat) || fact.NewTargetSeat == use.SourceSeat || fact.NewTargetSeat == fact.OriginalTargetSeat || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program is not { } program || program.GameplayHash != fact.GameplayHash || ProgramInstructionResolver.Default.Find(program, ProgramInstructionSourceKind.Trigger, fact.Source.BindingId)is not { } plan || plan.Trigger?.Window != SkillProgramTriggerWindow.SlashTargetRedirecting || fact.InstructionIndex < 1 || fact.InstructionIndex > plan.Instructions.Count || plan.GetPausedInstruction(fact.InstructionIndex).Effect.Op != SkillProgramEffectOp.RedirectCurrentAttack)
-            return false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        return history.OfType<ProgramActualSlashTargetRedirectedEvent>().Count(e => e == fact) == 1 && history.OfType<ProgramActualSlashTargetRedirectedEvent>().Count(e => e.ProgramFrameId == fact.ProgramFrameId && e.CardUseFrameId == use.Id && e.InstructionIndex == fact.InstructionIndex) == 1 && history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == fact.ProgramFrameId && e.SkillId == fact.Source.SkillId && e.BindingId == fact.Source.BindingId && e.SkillInstanceId == fact.Source.SkillInstanceId && e.OwnerSeat == fact.Source.OwnerSeat && e.Window == SkillProgramTriggerWindow.SlashTargetRedirecting) == 1;
-    }
-
-    internal bool HasShortRangeSlashTail(CardUseFrame use)
-    {
-        if (use.ShortRangeSlashTarget is not { } receipt || receipt.CardUseFrameId != use.Id || receipt.ActorSeat != use.SourceSeat || (receipt.ActionId != use.Action?.ActionId && !(receipt.ActionId is null && use.Action is not null && _coreActualHandGainProgramsOperations.IsNormalizedLegacyCompletedCategoryUse(use, receipt.ActorSeat, use.CardKind, use.TargetSeats))) || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || receipt.OriginalTargets.Count == 0 || receipt.OriginalTargets.Contains(receipt.AddedTargetSeat) || receipt.Source.OwnerSeat != receipt.ActorSeat || (use.Enhancements & CurrentCardEnhancement.ExtraTarget) == 0 || use.TargetSeats.Count != receipt.OriginalTargets.Count + 1 || use.Action is { } action && (action.Type != CardActionType.Use || action.ActorSeat != receipt.ActorSeat || action.EffectiveKind != use.CardKind) || _contentRegistryOperations._contentRegistry.GetSkill(receipt.Source.SkillId).Program is not { } program || program.GameplayHash != receipt.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == receipt.Source.BindingId)?.Effects is not [{ Op: SkillProgramEffectOp.OfferShortRangeSlashTarget }])
-            return false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var resolved = Array.FindIndex(history, e => e is ShortRangeSlashTargetResolvedEvent fact && fact.Receipt is { } frozen && frozen.ProgramFrameId == receipt.ProgramFrameId && frozen.Source == receipt.Source && frozen.GameplayHash == receipt.GameplayHash && frozen.CardUseFrameId == receipt.CardUseFrameId && frozen.ActionId == receipt.ActionId && frozen.ActorSeat == receipt.ActorSeat && frozen.AddedTargetSeat == receipt.AddedTargetSeat && frozen.OriginalTargets.SequenceEqual(receipt.OriginalTargets) && fact.Added && fact.CardUseFrameId == use.Id && fact.ActionId == receipt.ActionId && fact.Source == receipt.Source);
-        if (resolved < 0 || history[resolved] is not ShortRangeSlashTargetResolvedEvent resolvedFact || !IsShortRangeSlashTargetFact(use, resolvedFact, receipt.OriginalTargets) || history.OfType<ShortRangeSlashTargetResolvedEvent>().Count(e => e.CardUseFrameId == use.Id) != 1 || history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == receipt.ProgramFrameId && e.OwnerSeat == receipt.ActorSeat && e.SkillId == receipt.Source.SkillId && e.BindingId == receipt.Source.BindingId && e.SkillInstanceId == receipt.Source.SkillInstanceId) != 1)
-            return false;
-        var designated = receipt.OriginalTargets.Append(receipt.AddedTargetSeat).ToArray();
-        var prefix = designated.ToArray();
-        foreach (var fact in history.Skip(resolved + 1))
-        {
-            if (fact is ProgramActualSlashTargetRedirectedEvent redirected && redirected.CardUseFrameId == use.Id)
-            {
-                if (!IsShortRangeSlashRedirectFact(use, redirected, prefix))
-                    return false;
-                prefix[redirected.TargetIndex] = redirected.NewTargetSeat;
-            }
-            else if (fact is ProgramCurrentSlashFireRedirectedEvent fire && fire.CardUseFrameId == use.Id && fire.ActionId == use.Action?.ActionId && fire.TargetIndex >= 0 && fire.TargetIndex < prefix.Length && prefix[fire.TargetIndex] == fire.OriginalTargetSeat)
-                prefix[fire.TargetIndex] = fire.NewTargetSeat;
-        }
-
-        // Native redirect changes actual seats, while Action keeps the designation.
-        // The exact legacy normalizer is issued only at completion with actual seats.
-        return use.TargetSeats.SequenceEqual(prefix) && (use.Action is null || receipt.ActionId is null && _coreActualHandGainProgramsOperations.IsNormalizedLegacyCompletedCategoryUse(use, receipt.ActorSeat, use.CardKind, prefix) || use.Action.TargetSeats.SequenceEqual(designated));
-    }
+    internal bool HasShortRangeSlashTail(CardUseFrame use) => use.ShortRangeSlashTarget is not null;
 
     internal bool TryGetShortRangeVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> target)
     {

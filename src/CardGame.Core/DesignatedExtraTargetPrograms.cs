@@ -19,10 +19,6 @@ public sealed record DesignatedExtraTargetResolvedEvent(long ProgramFrameId, lon
     int InstructionIndex, CardConversionSource Source, string GameplayHash,
     IReadOnlyList<int> OriginalTargetSeats, IReadOnlyList<int> AddedTargetSeats,
     IReadOnlyList<int> ResultTargetSeats) : IGameEvent;
-public sealed record DesignatedExtraTargetRedirectedEvent(long ProgramFrameId, long CardUseFrameId, long ActionId,
-    CardConversionSource Source, string GameplayHash, int InstructionIndex, int TargetIndex,
-    int OriginalTargetSeat, int NewTargetSeat) : IGameEvent;
-
 internal static class DesignatedExtraTargetContract
 {
     internal static void ValidateTrigger(string path, SkillProgramTrigger trigger)

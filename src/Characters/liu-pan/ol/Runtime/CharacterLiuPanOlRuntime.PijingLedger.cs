@@ -104,81 +104,8 @@ internal sealed partial class CharacterLiuPanOlRuntime
 
     [ProgramIssuedTrigger(500)]
     internal bool IsIssuedPijingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => PijingIssuedGroup(c, context, out var use, out _)is { } g && _coreMatchParticipantsPlayersAccess._players[g.HolderSeat].IsAlive && use.SourceSeat == g.HolderSeat && g.Grants.All(id => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingGrantConsumedEvent>().Any(e => e.GrantId == id));
-    internal bool HasPijingTargetTail(CardUseFrame use) => use.Action is { } a && HasPijingTargetTail(use, a);
-    internal bool HasPijingTargetTail(CardUseFrame use, CardActionContext action)
-    {
-        if (use.PijingTail is not { } r || use.Id != r.UseId || action.ActionId != r.ActionId || action.ProviderSeat != r.ProviderSeat || !action.TargetSeats.SequenceEqual(r.Final) || _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash != r.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingTargetsAppliedEvent>().Count(e => e == new PijingTargetsAppliedEvent(r.FrameId, r.UseId, r.ActionId, r.Source, r.GameplayHash, r.ActorSeat, r.ProviderSeat, r.Original.Count, r.Final.Count, r.Reciprocal)) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingTargetSlotEvent>().Where(e => e.FrameId == r.FrameId && !e.Final).OrderBy(e => e.Index).Select(e => e.Seat).SequenceEqual(r.Original) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingTargetSlotEvent>().Where(e => e.FrameId == r.FrameId && e.Final).OrderBy(e => e.Index).Select(e => e.Seat).SequenceEqual(r.Final) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().SingleOrDefault(e => e.ResolutionId == use.Id)is not { } declared || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, declared.SourceSeat, r.ProviderSeat))
-            return false;
-        var actual = r.Final.ToArray();
-        var after = false;
-        foreach (var fact in _coreAlternatingBenefitsOperations.CompleteProgramEventHistory())
-        {
-            if (fact is PijingTargetsAppliedEvent applied && applied.FrameId == r.FrameId)
-            {
-                after = true;
-                continue;
-            }
-
-            if (!after)
-                continue;
-            if (fact is PijingRedirectedEvent e && e.UseId == use.Id)
-            {
-                if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || e.ActionId != r.ActionId || e.TargetIndex < 0 || e.TargetIndex >= actual.Length || actual[e.TargetIndex] != e.PreviousSeat || e.Source.OwnerSeat != e.PreviousSeat || _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash != e.GameplayHash)
-                    return false;
-                actual[e.TargetIndex] = e.Seat;
-            }
-
-            if (fact is LiuliRedirectedEvent liuli && liuli.ResolutionId == use.Id)
-            {
-                var at = Array.IndexOf(actual, liuli.OriginalTargetSeat);
-                if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || at < 0)
-                    return false;
-                actual[at] = liuli.NewTargetSeat;
-            }
-        }
-
-        return actual.SequenceEqual(use.TargetSeats);
-    }
-
-    internal bool HasPijingZeroTargetTail(CardUseFrame use) => HasPijingTargetTail(use) && use.TargetSeats.Count == 0;
-    internal bool IsPijingAppliedTargetFact(CardUseFrame use, PijingTargetsAppliedEvent fact, IReadOnlyList<int> precedingTargets, out IReadOnlyList<int> resultTargets)
-    {
-        resultTargets = [];
-        if (use.Action is not { } action || fact.UseId != use.Id || fact.ActionId != action.ActionId || fact.ProviderSeat != action.ProviderSeat || fact.Source.SkillId != "ol:pijing" || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program?.GameplayHash != fact.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingTargetsAppliedEvent>().Count(e => e == fact) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingStartedEvent>().SingleOrDefault(e => e.FrameId == fact.FrameId)is not { } start || start.Source != fact.Source || start.GameplayHash != fact.GameplayHash || start.UseId != fact.UseId || start.ActionId != fact.ActionId || start.ActorSeat != fact.ActorSeat || start.ProviderSeat != fact.ProviderSeat || start.Reciprocal != fact.Reciprocal || start.OriginalCount != fact.OriginalCount)
-            return false;
-        var before = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingTargetSlotEvent>().Where(e => e.FrameId == fact.FrameId && !e.Final).OrderBy(e => e.Index).ToArray();
-        var after = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingTargetSlotEvent>().Where(e => e.FrameId == fact.FrameId && e.Final).OrderBy(e => e.Index).ToArray();
-        if (before.Length != fact.OriginalCount || after.Length != fact.FinalCount || !before.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, before.Length)) || !after.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, after.Length)) || !before.Select(e => e.Seat).SequenceEqual(precedingTargets))
-            return false;
-        var selected = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingToggleSelectedEvent>().Where(e => e.FrameId == fact.FrameId).OrderBy(e => e.Index).ToArray();
-        if (!selected.Select(e => e.Index).SequenceEqual(Enumerable.Range(0, selected.Length)) || selected.Length > start.X || selected.Select(e => e.Seat).Distinct().Count() != selected.Length || selected.Any(e => e.Seat == start.ActorSeat || e.Remove && start.Reciprocal))
-            return false;
-        var toggles = new List<PijingToggle>();
-        foreach (var item in selected)
-        {
-            var pair = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingTogglePairEvent>().Where(e => e.FrameId == fact.FrameId && e.Index == item.Index).OrderBy(e => e.PairIndex).ToArray();
-            if (pair.Length != item.PairCount || !pair.Select(e => e.PairIndex).SequenceEqual(Enumerable.Range(0, pair.Length)) || pair.Length != (use.CardKind == CardKind.BorrowedSword ? 2 : 1) || pair[0].Seat != item.Seat)
-                return false;
-            toggles.Add(new(item.Seat, item.Remove, pair.Select(e => e.Seat).ToArray()));
-        }
-
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<PijingTogglePairEvent>().Any(e => e.FrameId == fact.FrameId && (e.Index < 0 || e.Index >= selected.Length)))
-            return false;
-        var folded = PijingFoldTargets(precedingTargets, toggles, use.CardKind);
-        if (!folded.SequenceEqual(after.Select(e => e.Seat)))
-            return false;
-        resultTargets = folded;
-        return true;
-    }
-
-    internal void RecordPijingRedirect(ProgramSkillFrame f, long useId, int previousSeat, int nextSeat)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { PijingTail: not null, Action: { } a } use)
-            return;
-        if (_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.RedirectCurrentAttack || f.OwnerSeat != previousSeat || f.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } c } context || c.ParentCardUseFrameId != useId || c.CardActionId != a.ActionId || context.TargetSeat != previousSeat || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != nextSeat)
-            throw new InvalidOperationException("Pijing cannot borrow an unrelated target redirect.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PijingRedirectedEvent(use.Id, a.ActionId, f.Id, PijingSource(f), f.GameplayHash, f.InstructionIndex, use.TargetIndex, previousSeat, nextSeat));
-    }
+    internal bool HasPijingTargetTail(CardUseFrame use) => use.PijingTail is not null;
+    internal bool HasPijingZeroTargetTail(CardUseFrame use) => use.PijingTail is not null && use.TargetSeats.Count == 0;
 
     [ProgramTriggerProof(ProgramTriggerProofPhase.DesignatedTarget, 10)]
     internal bool RejectPijingDesignatedTarget(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, SkillProgramTrigger trigger) => context.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && trigger.OwnerRelation == SkillProgramCardActionOwnerRelation.Target && context.CardUse is { } designatedUse && _coreCardUseLifecycleOperations.LifecycleCardUse(designatedUse.ParentCardUseFrameId)is { Action: { } designatedAction } currentUse && designatedAction.ActionId == designatedUse.CardActionId && HasPijingTargetTail(currentUse) && !(trigger.OnlyDesignatedCardTargets ? designatedAction.EffectiveDesignatedTargetSeats : currentUse.TargetSeats).Contains(candidate.OwnerSeat);

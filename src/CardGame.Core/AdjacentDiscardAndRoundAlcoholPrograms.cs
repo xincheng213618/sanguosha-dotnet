@@ -28,9 +28,6 @@ public sealed record CurrentSlashFirePolicy(long ProgramFrameId, CardConversionS
     CardKind OriginalKind, int? ExtraTargetSeat, bool Converted);
 public sealed record ProgramCurrentSlashFireChangedEvent(long ProgramFrameId, long CardUseFrameId, long ActionId,
     CardConversionSource Source, CardKind OriginalKind, CardKind FinalKind, int? ExtraTargetSeat) : IGameEvent;
-public sealed record ProgramCurrentSlashFireRedirectedEvent(long ProgramFrameId, long CardUseFrameId, long ActionId,
-    CardConversionSource Source, int TargetIndex, int OriginalTargetSeat, int NewTargetSeat) : IGameEvent;
-
 public sealed record ProgramAdjacentDiscardReceipt(int InstructionIndex, int CardId,
     int DiscardMovementSequence, int StoreMovementSequence, CardZoneKind Zone);
 public enum CompletedUsePaymentStage { Choosing, Paid }

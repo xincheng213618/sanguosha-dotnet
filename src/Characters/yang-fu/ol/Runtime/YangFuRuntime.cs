@@ -220,39 +220,8 @@ var r = f.YangFu!; var choices = BingzhongChoices(f);
         }
         return actor == action.ActorSeat && actor == use.SourceSeat;
     }
-    internal bool HasBingzhongTargetTail(CardUseFrame use) => use.Action is { } a && HasBingzhongTargetTail(use, a);
-    internal bool HasBingzhongTargetTail(CardUseFrame use, CardActionContext action)
-    {
-        if (use.BingzhongTail is not { AddedTargets.Count: > 0 } r || action.ActionId != r.ActionId || r.UseId != use.Id || r.Source.SkillId != "ol:bingzhong" || r.Source.BindingId != "first-dynamic-x-targets" ||
-            r.X < 1 || r.Ordinal < 1 || r.Ordinal > r.X || r.AddedTargets.Count / (use.CardKind == CardKind.BorrowedSword ? 2 : 1) > r.X ||
-            !action.TargetSeats.SequenceEqual(r.OriginalTargets.Concat(r.AddedTargets)) || r.Source.OwnerSeat != r.OriginalActor ||
-            facts.History<CardUseDeclaredEvent>().SingleOrDefault(e => e.ResolutionId == use.Id) is not { } declaration ||
-            !YangFuActorChain(use, declaration.SourceSeat, r.ProviderSeat, r.ActionId) ||
-            facts.Skill(r.Source.SkillId).Program?.GameplayHash != r.GameplayHash ||
-            facts.History<BingzhongTargetsAppliedEvent>().Count(e => e == new BingzhongTargetsAppliedEvent(r.FrameId, r.UseId, r.ActionId, r.Source, r.GameplayHash, r.X, r.Ordinal, r.OriginalActor, r.ProviderSeat, r.OriginalTargets.Count, r.AddedTargets.Count)) != 1 ||
-            !facts.History<BingzhongOriginalTargetEvent>().Where(e => e.FrameId == r.FrameId).OrderBy(e => e.Index).Select(e => e.Seat).SequenceEqual(r.OriginalTargets) ||
-            !facts.History<BingzhongTargetSelectedEvent>().Where(e => e.FrameId == r.FrameId).OrderBy(e => e.Index).Select(e => e.Seat).SequenceEqual(r.AddedTargets)) return false;
-        var actual = r.OriginalTargets.Concat(r.AddedTargets).ToArray();
-        foreach (var e in facts.History<BingzhongRedirectedEvent>().Where(e => e.UseId == use.Id))
-        {
-            if (!RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(use.CardKind) || e.ActionId != r.ActionId || e.TargetIndex < 0 || e.TargetIndex >= actual.Length || actual[e.TargetIndex] != e.PreviousSeat || e.Source.OwnerSeat != e.PreviousSeat ||
-                facts.Skill(e.Source.SkillId).Program is not { } p || p.GameplayHash != e.GameplayHash ||
-                ProgramInstructionResolver.Default.Find(p, ProgramInstructionSourceKind.Trigger, e.Source.BindingId) is not { } plan || plan.Trigger?.Window != SkillProgramTriggerWindow.SlashTargetRedirecting ||
-                e.InstructionIndex < 1 || e.InstructionIndex > plan.Instructions.Count || plan.GetPausedInstruction(e.InstructionIndex).Effect.Op != SkillProgramEffectOp.RedirectCurrentAttack ||
-                facts.History<ProgramBindingStartedEvent>().Count(b => b.FrameId == e.FrameId && b.OwnerSeat == e.Source.OwnerSeat && b.SkillId == e.Source.SkillId && b.SkillInstanceId == e.Source.SkillInstanceId && b.BindingId == e.Source.BindingId) != 1) return false;
-            actual[e.TargetIndex] = e.Seat;
-        }
-        return actual.SequenceEqual(use.TargetSeats);
-    }
-    internal void RecordBingzhongRedirect(ProgramSkillFrame f, long useId, int previousSeat, int nextSeat)
-    {
-        if (facts.CardUse(useId) is not { BingzhongTail: { AddedTargets.Count: > 0 }, Action: { } a } use) return;
-        if (facts.PausedEffect(f)?.Op != SkillProgramEffectOp.RedirectCurrentAttack || f.OwnerSeat != previousSeat ||
-            f.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } c } context || c.ParentCardUseFrameId != useId || c.CardActionId != a.ActionId ||
-            context.TargetSeat != previousSeat || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != nextSeat)
-            throw new InvalidOperationException("Bingzhong cannot acknowledge an unrelated native redirect.");
-        events.AdvanceFact(new BingzhongRedirectedEvent(f.Id, use.Id, a.ActionId, YangFuSource(f), f.GameplayHash, f.InstructionIndex, use.TargetIndex, previousSeat, nextSeat));
-    }
+    internal bool HasBingzhongTargetTail(CardUseFrame use) =>
+        use.BingzhongTail is { AddedTargets.Count: > 0 };
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBingzhongExtraTargets)]
     private PromptChoice ChooseAiBingzhong(PendingDecision decision, ProgramSkillFrame f)
     {

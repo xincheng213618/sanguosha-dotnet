@@ -42,71 +42,7 @@ internal sealed partial class CharacterMaChengOlRuntime
         return u;
     }
 
-    internal bool IsChenglieAppliedTargetFact(CardUseFrame use, ChenglieTargetsAppliedEvent e, IReadOnlyList<int> precedingTargets, out IReadOnlyList<int> resultTargets)
-    {
-        resultTargets = [];
-        if (use.Action is not { } a || e.UseId != use.Id || e.ActionId != a.ActionId || e.ProviderSeat != a.ProviderSeat || e.Source.SkillId != "ol:chenglie" || e.Source.BindingId != "extra-targets" || e.Source.OwnerSeat != e.ActorSeat || e.AddedCount is < 1 or > 2 || _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash != e.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChenglieTargetsAppliedEvent>().Count(x => x == e) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChenglieStartedEvent>().SingleOrDefault(x => x.FrameId == e.FrameId)is not { Outcome: false } started || started.Source != e.Source || started.GameplayHash != e.GameplayHash || started.UseId != e.UseId || started.ActionId != e.ActionId || started.OriginalCount != e.OriginalCount)
-            return false;
-        var original = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChenglieTargetSlotEvent>().Where(x => x.FrameId == e.FrameId && !x.Added).OrderBy(x => x.Index).ToArray();
-        var added = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChenglieTargetSlotEvent>().Where(x => x.FrameId == e.FrameId && x.Added).OrderBy(x => x.Index).ToArray();
-        if (original.Length != e.OriginalCount || added.Length != e.AddedCount || !original.Select(x => x.Index).SequenceEqual(Enumerable.Range(0, original.Length)) || !added.Select(x => x.Index).SequenceEqual(Enumerable.Range(0, added.Length)) || !original.Select(x => x.Seat).SequenceEqual(precedingTargets) || added.Any(x => x.Seat == e.ActorSeat || precedingTargets.Contains(x.Seat)) || added.Select(x => x.Seat).Distinct().Count() != added.Length)
-            return false;
-        resultTargets = Array.AsReadOnly(precedingTargets.Concat(added.Select(x => x.Seat)).ToArray());
-        return true;
-    }
-
-    internal bool HasChenglieTargetTail(CardUseFrame use) => use.Action is { } a && HasChenglieTargetTail(use, a);
-    internal bool HasChenglieTargetTail(CardUseFrame use, CardActionContext action)
-    {
-        if (use.ChenglieLease is not { } r || r.UseId != use.Id || r.ActionId != action.ActionId || action.ProviderSeat != r.ProviderSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChenglieTargetsAppliedEvent>().SingleOrDefault(e => e.FrameId == r.SetupFrameId)is not { } applied || applied.Source != r.Source || applied.GameplayHash != r.GameplayHash || !IsChenglieAppliedTargetFact(use, applied, r.Original, out var final) || !final.SequenceEqual(r.Original.Concat(r.Added)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().SingleOrDefault(e => e.ResolutionId == use.Id)is not { } declared || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, declared.SourceSeat, r.ProviderSeat))
-            return false;
-        var designated = final.ToArray();
-        var actual = final.ToArray();
-        var after = false;
-        foreach (var fact in _coreAlternatingBenefitsOperations.CompleteProgramEventHistory())
-        {
-            if (fact is ChenglieTargetsAppliedEvent own && own.FrameId == r.SetupFrameId)
-            {
-                after = true;
-                continue;
-            }
-
-            if (!after)
-                continue;
-            if (fact is ChenglieRedirectedEvent redirect && redirect.UseId == use.Id)
-            {
-                if (redirect.ActionId != r.ActionId || redirect.TargetIndex < 0 || redirect.TargetIndex >= actual.Length || actual[redirect.TargetIndex] != redirect.PreviousSeat || redirect.Source.OwnerSeat != redirect.PreviousSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(redirect.Seat) || _contentRegistryOperations._contentRegistry.GetSkill(redirect.Source.SkillId).Program is not { } program || program.GameplayHash != redirect.GameplayHash || !program.Triggers.Any(t => t.Id == redirect.Source.BindingId && t.Window == SkillProgramTriggerWindow.SlashTargetRedirecting && t.Effects.Any(e => e.Op == SkillProgramEffectOp.RedirectCurrentAttack)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == redirect.FrameId && e.OwnerSeat == redirect.PreviousSeat && e.SkillId == redirect.Source.SkillId && e.SkillInstanceId == redirect.Source.SkillInstanceId && e.BindingId == redirect.Source.BindingId && e.Window == SkillProgramTriggerWindow.SlashTargetRedirecting) != 1)
-                    return false;
-                actual[redirect.TargetIndex] = redirect.Seat;
-            }
-            else if (fact is LiuliRedirectedEvent liuli && liuli.ResolutionId == use.Id)
-            {
-                var index = Array.IndexOf(actual, liuli.OriginalTargetSeat);
-                if (index < 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(liuli.NewTargetSeat))
-                    return false;
-                actual[index] = liuli.NewTargetSeat;
-            }
-            else if (fact is PijingTargetsAppliedEvent pijing && pijing.UseId == use.Id)
-            {
-                if (!actual.SequenceEqual(designated) || !_characterLiuPanOlOperations.IsPijingAppliedTargetFact(use, pijing, designated, out var changed))
-                    return false;
-                designated = changed.ToArray();
-                actual = changed.ToArray();
-            }
-        }
-
-        return action.TargetSeats.SequenceEqual(designated) && use.TargetSeats.SequenceEqual(actual) && r.Cards.Select(c => c.Index).SequenceEqual(Enumerable.Range(0, r.Cards.Count)) && r.Cards.Select(c => c.CardId).Distinct().Count() == r.Cards.Count && r.Cards.All(c => ValidChenglieAttachment(r, c));
-    }
-
-    internal bool ValidChenglieAttachment(ChenglieLease r, ChenglieAttachment c) => c.Index >= 0 && c.Index < r.Original.Count + r.Added.Count && c.HolderSeat == r.Original.Concat(r.Added).ElementAt(c.Index) && c.Location == new CardLocation(CardZoneKind.PrivatePersistentPile, c.HolderSeat, $"chenglie:{(r.UseId)}:{(r.SetupFrameId)}:{(c.Index)}") && c.Red == CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChenglieAttachmentPlacedEvent>().Count(e => e == new ChenglieAttachmentPlacedEvent(r.SetupFrameId, r.UseId, r.ActionId, c.Index, c.HolderSeat, c.CardId, c.Kind, c.Suit, c.Red, c.Location, c.Sequence)) == 1 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == c.Sequence && m.CardId == c.CardId && m.CardKind == c.Kind && m.From == CardLocation.Processing && m.To == c.Location && m.Reason.Value == ChenglieAssignReason);
-    internal void RecordChenglieRedirect(ProgramSkillFrame f, long useId, int previousSeat, int nextSeat)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { ChenglieLease: not null, Action: { } a } use)
-            return;
-        if (_corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.RedirectCurrentAttack || f.OwnerSeat != previousSeat || f.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } c } context || c.ParentCardUseFrameId != useId || c.CardActionId != a.ActionId || context.TargetSeat != previousSeat || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != nextSeat)
-            throw new InvalidOperationException("Chenglie cannot claim an unrelated native redirect.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChenglieRedirectedEvent(useId, a.ActionId, f.Id, ChenglieSource(f), f.GameplayHash, use.TargetIndex, previousSeat, nextSeat));
-    }
+    internal bool HasChenglieTargetTail(CardUseFrame use) => use.ChenglieLease is not null;
 
     internal bool HasChenglieResponseObserver(CardActionContext a, ProgramCardContinuation continuation) => HasMaChengCapability && a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Dodge && continuation is (ProgramCardContinuation.Dodge or ProgramCardContinuation.FactionDefenseDodge) && a.ParentActionId is { } parent && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(u => u.Action?.ActionId == parent && u.ChenglieLease is { Ready: true, Settled: false } r && r.Cards.Any(c => c.HolderSeat == a.ActorSeat));
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27560)]

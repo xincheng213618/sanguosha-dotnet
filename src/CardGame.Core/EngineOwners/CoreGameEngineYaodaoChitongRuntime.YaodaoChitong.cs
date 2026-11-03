@@ -57,7 +57,7 @@ internal sealed partial class CoreGameEngineYaodaoChitongRuntime
         {
             attack.SetDamageParticipants(attack.SourceSeat, next);
             attack.SetIgnoresArmor(_coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat]) || _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], _coreMatchParticipantsPlayersAccess._players[next], use.CardKind));
-            _coreNativeCardUseFramesOperations.RedirectCardUseTarget(use.Id, r.OriginalTargetSeat, next);
+            _coreNativeCardUseFramesOperations.RedirectCardUseTarget(use.Id, r.TargetIndex, r.OriginalTargetSeat, next);
         }
 
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new YaodaoChitongResolvedEvent(f.Id, use.Id, r.ActionId, r.TargetIndex, r.OriginalTargetSeat, selected, outcome.JudgmentFrameId, outcome.Suit, candidates.Length));

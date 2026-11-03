@@ -1,5 +1,7 @@
+using System.Reflection;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static partial class SkillProgramTargetOrderChecks
 {
@@ -61,7 +63,55 @@ internal static partial class SkillProgramTargetOrderChecks
         var replay = GameReplay.Restore(game.CreateCheckpoint(), registry);
         Require(SnapshotJson.Serialize(game.State) == SnapshotJson.Serialize(replay.State),
             "Multi-target trigger and Liuli continuation did not replay exactly.");
+        NativeRedirectChangesOnlyItsCurrentExecutionSlot(game);
         RedirectTargetsAndPaymentsSharePostCostRange();
+    }
+
+    private static void NativeRedirectChangesOnlyItsCurrentExecutionSlot(GameEngine game)
+    {
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine)
+            .GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var frames = capabilities.Get<IProgramRuntimeFrames>();
+        var native = game.GetRuntimeModule<CoreNativeCardUseFramesRuntime>();
+        var priorTop = frames.Top;
+        var action = new CardActionContext(90001, null, CardActionType.Use, 0, 0, null, null, null,
+            CardKind.Slash, [1, 3], [], [], designatedTargetSeats: [1, 3]);
+        // Different original slots can now hold the same actual seat. No private
+        // character ledger is needed to identify which slot the native cursor owns.
+        var owner = new CardUseFrame(frames.NextId(), 0, 0, CardKind.Slash, Array.AsReadOnly(new[] { 2, 2 }),
+            TargetIndex: 1) { Action = action };
+        frames.Push(owner);
+        try
+        {
+            native.RedirectCardUseTarget(owner.Id, 1, 2, 4);
+            var changed = (CardUseFrame)frames.Find(owner.Id)!;
+            Require(changed.TargetSeats.SequenceEqual([2, 4]) && changed.TargetIndex == 1 &&
+                    owner.TargetSeats.SequenceEqual([2, 2]) && ReferenceEquals(changed.Action, action) &&
+                    action.TargetSeats.SequenceEqual([1, 3]) && action.EffectiveDesignatedTargetSeats.SequenceEqual([1, 3]),
+                "A repeated actual seat redirects only the current native slot; it must not rewrite the primary slot, prior frame or immutable designated action.");
+            var completion = game.GetRuntimeModule<CoreGameEngineCompletedCategoryUseProofRuntime>();
+            CardActionContext Completed(long id = 90001, int actor = 0, int provider = 0,
+                IReadOnlyList<int>? targets = null, IReadOnlyList<CardActionCost>? materials = null) =>
+                new(id, null, CardActionType.Use, actor, provider, null, null, null, CardKind.Slash,
+                    targets ?? [1, 3], materials ?? [], [], designatedTargetSeats: [1, 3]);
+            Require(completion.HasExactAcceptedActualHandGainUse(changed, action) &&
+                    !completion.HasExactAcceptedActualHandGainUse(changed, Completed(id: 90002)) &&
+                    !completion.HasExactAcceptedActualHandGainUse(changed, Completed(actor: 1)) &&
+                    !completion.HasExactAcceptedActualHandGainUse(changed, Completed(provider: 1)) &&
+                    !completion.HasExactAcceptedActualHandGainUse(changed, Completed(targets: [2, 4])) &&
+                    !completion.HasExactAcceptedActualHandGainUse(changed, Completed(materials: [new(90001, CardKind.Slash, CardLocation.Hand(0))])),
+                "Completion consumes the exact current native Action independently of redirected execution slots; a different Action, actor, provider, ordered targets or material cannot substitute for it.");
+            foreach (var (index, previous) in new[] { (0, 2), (1, 2), (-1, 4), (2, 4) })
+            {
+                var rejected = false;
+                try { native.RedirectCardUseTarget(owner.Id, index, previous, 3); }
+                catch (InvalidOperationException) { rejected = true; }
+                Require(rejected && ReferenceEquals(frames.Find(owner.Id), changed),
+                    "The shared native boundary rejects an unrelated cursor, stale old seat and out-of-range slot before changing any execution target.");
+            }
+        }
+        finally { frames.Pop(owner.Id, owner.Kind); }
+        Require(ReferenceEquals(frames.Top, priorTop), "The controlled native-slot check restores its original owning stack.");
     }
 
     private sealed class Fixture : IGameContentPackage

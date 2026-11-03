@@ -6,7 +6,7 @@ internal sealed partial class CoreGameEngineCurrentEnhancementVirtualReturnRunti
     internal bool TryGetCurrentEnhancementVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primaryTarget)
     {
         primaryTarget = [];
-        if (use is not { CardId: 0, CardKind: CardKind.Slash, PhysicalCardIds.Count: 0, ProgramUseCommitted: true, ProgramUseAccepted: true, TargetSeats.Count: 2 } || !_coreCurrentEnhancementSlashRedirectsOperations.HasCurrentEnhancementVirtualProducer(use) || use.CardAttack is not { CardId: null, EffectiveCardKind: CardKind.Slash, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id || attack.SourceSeat != use.SourceSeat || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash, PhysicalCards.Count: 0, TargetSeats.Count: 2, EffectiveSuit: Suit.None, EffectiveRank: 0 } action || action.ActorSeat != use.SourceSeat || action.ProviderSeat != use.SourceSeat || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || parent.OwnerSeat != use.SourceSeat || parent.InstructionIndex < 1 || string.IsNullOrWhiteSpace(parent.SkillInstanceId) || string.IsNullOrWhiteSpace(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent)) || use.EnhancementOwnerSeat != action.ActorSeat || !use.Enhancements.HasFlag(CurrentCardEnhancement.ExtraTarget))
+        if (use is not { CardId: 0, CardKind: CardKind.Slash, PhysicalCardIds.Count: 0, ProgramUseCommitted: true, ProgramUseAccepted: true, TargetSeats.Count: 2 } || use.CardAttack is not { CardId: null, EffectiveCardKind: CardKind.Slash, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id || attack.SourceSeat != use.SourceSeat || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash, PhysicalCards.Count: 0, TargetSeats.Count: 2, EffectiveSuit: Suit.None, EffectiveRank: 0 } action || action.ActorSeat != use.SourceSeat || action.ProviderSeat != use.SourceSeat || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || parent.OwnerSeat != use.SourceSeat || parent.InstructionIndex < 1 || string.IsNullOrWhiteSpace(parent.SkillInstanceId) || string.IsNullOrWhiteSpace(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent)) || use.EnhancementOwnerSeat != action.ActorSeat || !use.Enhancements.HasFlag(CurrentCardEnhancement.ExtraTarget))
             return false;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
         if (index < 1 || !ReferenceEquals(_resolutionStackOperations._resolutionStack[index - 1], parent) || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash)
@@ -35,32 +35,9 @@ internal sealed partial class CoreGameEngineCurrentEnhancementVirtualReturnRunti
         }
         else if (history.OfType<ProgramSkillStartedEvent>().Count(e => e.FrameId == parent.Id && e.SkillId == parent.SkillId && e.ActivationId == parent.ActivationId && e.OwnerSeat == parent.OwnerSeat) != 1)
             return false;
-        var additionIndex = Array.IndexOf(history, addition);
-        if (history.Take(additionIndex + 1).OfType<CurrentEnhancementSlashRedirectedEvent>().Any(e => e.CardUseFrameId == use.Id))
-            return false;
-        IReadOnlyList<int> actualTargets = Array.AsReadOnly(new[] { selected, extra });
-        var acceptedSeen = false;
-        foreach (var fact in history.Skip(additionIndex + 1))
-        {
-            if (fact is CurrentEnhancementSlashRedirectedEvent redirected && redirected.CardUseFrameId == use.Id)
-            {
-                if (redirected.TargetIndex != (acceptedSeen ? 1 : 0) || !_coreCurrentEnhancementSlashRedirectsOperations.IsCurrentEnhancementSlashRedirectFact(use, redirected, actualTargets, history))
-                    return false;
-                actualTargets = redirected.AfterTargets;
-            }
-            else if (ReferenceEquals(fact, acceptedFact))
-            {
-                if (!actualTargets.SequenceEqual(finalized.TargetSeats))
-                    return false;
-                acceptedSeen = true;
-            }
-        }
-
-        if (!acceptedSeen || !use.TargetSeats.SequenceEqual(actualTargets))
-            return false;
-        // Duplicate seats are legal only when the exact native redirect facts
-        // reconstruct them. The producer receives the primary actual cursor.
-        primaryTarget = Array.AsReadOnly(new[] { actualTargets[0] });
+        // Target slots are native execution state; the accepted designated
+        // targets above remain the original producer's qualification.
+        primaryTarget = Array.AsReadOnly(new[] { use.TargetSeats[0] });
         return true;
     }
 }

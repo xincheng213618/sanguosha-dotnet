@@ -3,37 +3,8 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterQianZhaoOlRuntime
 {
-    internal bool HasWeifuTargetTail(CardUseFrame use)
-    {
-        if (use.WeifuUse is not { Offered: true, AddedTargets.Count: > 0 } r || !WeifuUseProof(use) || use.Action is not { Type: CardActionType.Use } action || !WeifuCanAddTargets(use) || !action.TargetSeats.SequenceEqual(r.OriginalTargets.Concat(r.AddedTargets)))
-            return false;
-        for (var i = 0; i < r.AddedTargets.Count; i++)
-        {
-            var index = i;
-            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeifuTargetAddedEvent>().Count(e => e.UseId == use.Id && e.ActionId == action.ActionId && e.Index == index && e.TargetSeat == r.AddedTargets[index] && e.Source.OwnerSeat == r.ActorSeat && e.Source.SkillId == "ol:weifu" && e.Source.BindingId == "issued-category-targets" && r.Grants.Any(g => g.Source.SkillInstanceId == e.Source.SkillInstanceId && g.Source.OwnerSeat == e.Source.OwnerSeat)) != 1)
-                return false;
-        }
-
-        var actual = r.OriginalTargets.Concat(r.AddedTargets).ToArray();
-        foreach (var redirect in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeifuRedirectedEvent>().Where(e => e.UseId == use.Id))
-        {
-            if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || redirect.ActionId != action.ActionId || redirect.TargetIndex < 0 || redirect.TargetIndex >= actual.Length || actual[redirect.TargetIndex] != redirect.PreviousSeat || redirect.Source.OwnerSeat != redirect.PreviousSeat || _contentRegistryOperations._contentRegistry.GetSkill(redirect.Source.SkillId).Program is not { } p || p.GameplayHash != redirect.GameplayHash || ProgramInstructionResolver.Default.Find(p, ProgramInstructionSourceKind.Trigger, redirect.Source.BindingId)is not { } plan || plan.Trigger?.Window != SkillProgramTriggerWindow.SlashTargetRedirecting || redirect.InstructionIndex < 1 || redirect.InstructionIndex > plan.Instructions.Count || plan.GetPausedInstruction(redirect.InstructionIndex).Effect.Op != SkillProgramEffectOp.RedirectCurrentAttack || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == redirect.FrameId && e.OwnerSeat == redirect.Source.OwnerSeat && e.SkillId == redirect.Source.SkillId && e.BindingId == redirect.Source.BindingId && e.SkillInstanceId == redirect.Source.SkillInstanceId) != 1)
-                return false;
-            actual[redirect.TargetIndex] = redirect.TargetSeat;
-        }
-
-        return use.TargetSeats.SequenceEqual(actual);
-    }
-
-    internal void RecordWeifuRedirect(ProgramSkillFrame redirector, long useId, int previousSeat, int nextSeat)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { WeifuUse: { Offered: true, AddedTargets.Count: > 0 }, Action: { } action } use)
-            return;
-        var p = _contentRegistryOperations._contentRegistry.GetSkill(redirector.SkillId).Program!;
-        if (p.GameplayHash != redirector.GameplayHash || redirector.InstructionIndex < 1 || ProgramInstructionResolver.Default.Resolve(redirector, p).GetPausedInstruction(redirector.InstructionIndex).Effect is not { Op: SkillProgramEffectOp.RedirectCurrentAttack } effect || nextSeat != CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(redirector, effect.Target) || redirector.OwnerSeat != previousSeat || redirector.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } context } c || context.ParentCardUseFrameId != use.Id || context.CardActionId != action.ActionId || c.TargetSeat != previousSeat || c.SourceSeat != use.SourceSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.Continuation != ProgramCardContinuation.SlashTargetRedirecting || window.ParentFrameId != use.Id || window.Action.ActionId != action.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(redirector, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != nextSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WeifuRedirectedEvent>().Any(e => e.FrameId == redirector.Id && e.UseId == use.Id && e.InstructionIndex == redirector.InstructionIndex))
-            throw new InvalidOperationException("Weifu's native redirect lost its exact producer and current target cursor.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WeifuRedirectedEvent(redirector.Id, use.Id, action.ActionId, QianZhaoSource(redirector), redirector.GameplayHash, redirector.InstructionIndex, use.TargetIndex, previousSeat, nextSeat));
-    }
+    internal bool HasWeifuTargetTail(CardUseFrame use) =>
+        use.WeifuUse is { Offered: true, AddedTargets.Count: > 0 };
 
     internal bool TryGetWeifuVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primary)
     {

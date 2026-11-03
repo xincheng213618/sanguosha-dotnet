@@ -170,13 +170,6 @@ public sealed record TargetsConfirmedEvent(
     long ResolutionId,
     IReadOnlyList<int> TargetSeats) : IGameEvent;
 
-public sealed record LiuliRedirectedEvent(
-    long ResolutionId,
-    int SourceSeat,
-    int OriginalTargetSeat,
-    int NewTargetSeat,
-    int DiscardedCardId) : IGameEvent;
-
 public sealed record CardUseFinishedEvent(
     long ResolutionId,
     int CardId,

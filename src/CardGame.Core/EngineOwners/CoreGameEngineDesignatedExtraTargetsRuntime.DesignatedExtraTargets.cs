@@ -244,26 +244,6 @@ internal sealed partial class CoreGameEngineDesignatedExtraTargetsRuntime
     }
 
     internal bool HasDesignatedExtraTargetTail(CardUseFrame use) => _characterChengYuMouOlOperations.HasMouLidanTargetTail(use) || _characterSunQuanOlMagicOperations.HasMoQuanyuAddedTargetTail(use) || _characterLiuPanOlOperations.HasPijingTargetTail(use) || _coreDamageTargetBudgetOperations.HasDamageTargetBudgetTail(use) || _coreAdjacentRedTargetsOperations.HasAdjacentRedTargetTail(use) || use.BeiMiHuTargetMutation is { Kind: "append" } && _characterBeiMiHuOlOperations.ValidBeiMiHuTargetMutation(use) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DesignatedExtraTargetResolvedEvent>().Any(e => IsDesignatedExtraTargetFact(use, e, e.OriginalTargetSeats) && use.Action!.TargetSeats.Count >= e.ResultTargetSeats.Count && use.Action.TargetSeats.Take(e.ResultTargetSeats.Count).SequenceEqual(e.ResultTargetSeats) && use.TargetSeats.Count == use.Action.TargetSeats.Count);
-    internal void RecordDesignatedExtraTargetRedirect(ProgramSkillFrame redirector, long useId, int originalSeat, int newSeat)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { Action: { } action } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !(HasDesignatedExtraTargetTail(use) || _coreRecipientCategorySlashTargetsOperations.HasRecipientCategorySlashTargetTail(use)))
-            return;
-        var source = new CardConversionSource(redirector.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(redirector), redirector.OwnerSeat, redirector.SkillInstanceId);
-        var program = _contentRegistryOperations._contentRegistry.GetSkill(redirector.SkillId).Program!;
-        var effect = ProgramInstructionResolver.Default.Resolve(redirector, program).GetPausedInstruction(redirector.InstructionIndex).Effect;
-        if (redirector.GameplayHash != program.GameplayHash || effect.Op != SkillProgramEffectOp.RedirectCurrentAttack || newSeat != CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(redirector, effect.Target) || redirector.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } context } windowContext || context.ParentCardUseFrameId != useId || context.CardActionId != action.ActionId || context.ActorSeat != use.SourceSeat || windowContext.SourceSeat != use.SourceSeat || windowContext.TargetSeat != originalSeat || redirector.OwnerSeat != originalSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == windowContext.ParentFrameId)is not { } window || window.ParentFrameId != useId || window.Action.ActionId != action.ActionId || window.Continuation != ProgramCardContinuation.SlashTargetRedirecting || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(redirector, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != newSeat || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DesignatedExtraTargetRedirectedEvent>().Any(e => e.ProgramFrameId == redirector.Id && e.CardUseFrameId == useId && e.InstructionIndex == redirector.InstructionIndex))
-            throw new InvalidOperationException("A designated extra target redirect lost its exact native producer and target cursor.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DesignatedExtraTargetRedirectedEvent(redirector.Id, useId, action.ActionId, source, redirector.GameplayHash, redirector.InstructionIndex, use.TargetIndex, originalSeat, newSeat));
-    }
-
-    internal bool IsDesignatedExtraTargetRedirectFact(CardUseFrame use, DesignatedExtraTargetRedirectedEvent fact, IReadOnlyList<int> actualTargets)
-    {
-        if (!(HasDesignatedExtraTargetTail(use) || _coreRecipientCategorySlashTargetsOperations.HasRecipientCategorySlashTargetTail(use)) || fact.CardUseFrameId != use.Id || fact.ActionId != use.Action?.ActionId || fact.Source.OwnerSeat != fact.OriginalTargetSeat || fact.TargetIndex < 0 || fact.TargetIndex >= actualTargets.Count || actualTargets[fact.TargetIndex] != fact.OriginalTargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(fact.NewTargetSeat) || fact.NewTargetSeat == use.SourceSeat || fact.NewTargetSeat == fact.OriginalTargetSeat || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program is not { } program || program.GameplayHash != fact.GameplayHash || ProgramInstructionResolver.Default.Find(program, ProgramInstructionSourceKind.Trigger, fact.Source.BindingId)is not { } plan || plan.Trigger?.Window != SkillProgramTriggerWindow.SlashTargetRedirecting || fact.InstructionIndex < 1 || fact.InstructionIndex > plan.Instructions.Count || plan.GetPausedInstruction(fact.InstructionIndex).Effect.Op != SkillProgramEffectOp.RedirectCurrentAttack)
-            return false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        return history.OfType<DesignatedExtraTargetRedirectedEvent>().Count(e => e.ProgramFrameId == fact.ProgramFrameId && e.CardUseFrameId == use.Id && e.InstructionIndex == fact.InstructionIndex) == 1 && history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == fact.ProgramFrameId && e.OwnerSeat == fact.Source.OwnerSeat && e.SkillId == fact.Source.SkillId && e.BindingId == fact.Source.BindingId && e.SkillInstanceId == fact.Source.SkillInstanceId && e.Window == SkillProgramTriggerWindow.SlashTargetRedirecting) == 1;
-    }
-
     internal bool TryGetDesignatedExtraTargetVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> targets)
     {
         targets = [];
@@ -300,7 +280,7 @@ internal sealed partial class CoreGameEngineDesignatedExtraTargetsRuntime
     internal bool ContinueDesignatedVirtualBasicEffect(long id, ProgramSimpleCardContinuation continuation)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id);
-        if (use is not { VirtualBasicReturn: not null, AdjustedSimpleContinuation: not null } || !((_characterQianZhaoOlOperations.HasWeifuTargetTail(use) || ((_characterYangFuOlOperations.HasBingzhongTargetTail(use) || _characterMaChengOlOperations.HasChenglieTargetTail(use)) || _characterLiuPanOlOperations.HasPijingTargetTail(use))) || HasDesignatedExtraTargetTail(use) || _coreRecipientCategorySlashTargetsOperations.HasRecipientCategorySlashTargetTail(use)))
+        if (use is not { VirtualBasicReturn: not null, AdjustedSimpleContinuation: not null })
             return false;
         if (continuation.CardId != 0 || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.CardKind is not (CardKind.Peach or CardKind.Alcohol) || use.VirtualBasicEffectApplied == true || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.AdjustedSimpleContinuation.Effect != continuation.Effect)
             throw new InvalidOperationException("A designated virtual basic effect lost its real zero-material continuation.");
@@ -343,7 +323,7 @@ internal sealed partial class CoreGameEngineDesignatedExtraTargetsRuntime
     internal bool TryContinueDesignatedVirtualBasicUse(long id)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id);
-        if (use is not { VirtualBasicReturn: not null, AdjustedSimpleContinuation: { } continuation } || !((_characterQianZhaoOlOperations.HasWeifuTargetTail(use) || ((_characterYangFuOlOperations.HasBingzhongTargetTail(use) || _characterMaChengOlOperations.HasChenglieTargetTail(use)) || _characterLiuPanOlOperations.HasPijingTargetTail(use))) || HasDesignatedExtraTargetTail(use) || _coreRecipientCategorySlashTargetsOperations.HasRecipientCategorySlashTargetTail(use)))
+        if (use is not { VirtualBasicReturn: not null, AdjustedSimpleContinuation: { } continuation })
             return false;
         var next = use.TargetIndex + 1;
         while (next < use.TargetSeats.Count && !_coreMatchParticipantsPlayersAccess._players[use.TargetSeats[next]].IsAlive)

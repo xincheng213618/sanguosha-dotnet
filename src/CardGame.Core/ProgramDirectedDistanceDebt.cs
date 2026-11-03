@@ -21,9 +21,6 @@ public sealed record ShortRangeSlashTargetReceipt(long ProgramFrameId, CardConve
 public sealed record ShortRangeSlashTargetResolvedEvent(long CardUseFrameId, long? ActionId,
     CardConversionSource Source, bool Added, ShortRangeSlashTargetReceipt? Receipt) : IGameEvent;
 // Scalar proof for native redirect of this batch's issued short-range Slash only.
-public sealed record ProgramActualSlashTargetRedirectedEvent(long ProgramFrameId, long CardUseFrameId, long? ActionId,
-    CardConversionSource Source, string GameplayHash, int InstructionIndex, int TargetIndex,
-    int OriginalTargetSeat, int NewTargetSeat) : IGameEvent;
 public sealed record ShortRangeSlashTargetDraft(long CardUseFrameId, long? ActionId, int InstructionIndex);
 public sealed record ShortRangeSlashResponseRequirement(int ActorSeat, int TargetSeat, int RequiredDodgeResponses);
 

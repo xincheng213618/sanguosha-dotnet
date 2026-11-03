@@ -40,7 +40,6 @@ internal sealed partial class CharacterQianZhaoOlEntries
     internal ProgramSkillFrame? QianZhaoObserverRoot() => _resolve().QianZhaoObserverRoot();
     internal bool QianZhaoSilverLion(ProgramSkillFrame f, int target, CardMoveReason? reason) => _resolve().QianZhaoSilverLion(f, target, reason);
     internal bool QualifyQianZhao(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => _resolve().QualifyQianZhao(c, t, context);
-    internal void RecordWeifuRedirect(ProgramSkillFrame redirector, long useId, int previousSeat, int nextSeat) => _resolve().RecordWeifuRedirect(redirector, useId, previousSeat, nextSeat);
     internal CardUseFrame RequireWeifuTargetUse(ProgramSkillFrame f) => _resolve().RequireWeifuTargetUse(f);
     internal bool ResumeKuansai(long id) => _resolve().ResumeKuansai(id);
     internal bool ResumeWeifu(long id) => _resolve().ResumeWeifu(id);

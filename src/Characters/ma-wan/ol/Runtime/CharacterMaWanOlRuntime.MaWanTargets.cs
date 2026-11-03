@@ -86,30 +86,8 @@ internal sealed partial class CharacterMaWanOlRuntime
         FinishMaWan(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }
 
-    internal bool HasMaWanHunjiangTargetTail(CardUseFrame use)
-    {
-        if (use.MaWanHunjiang is not { Offered: true, AddedTargets.Count: > 0 } r || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || action.EffectiveKind != use.CardKind || action.ActorSeat != use.SourceSeat || r.ActorSeat != use.SourceSeat || r.UseId != use.Id || r.ActionId != action.ActionId || r.AddedTargets.Distinct().Count() != r.AddedTargets.Count || !r.AddedTargets.All(s => action.EffectiveDesignatedTargetSeats.Contains(s) && r.Grants.Any(g => g.TargetSeat == s && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MaWanHunjiangTargetAddedEvent>().Count(e => e.UseId == use.Id && e.ActionId == action.ActionId && e.Source.SkillId == g.Source.SkillId && e.Source.SkillInstanceId == g.Source.SkillInstanceId && e.Source.OwnerSeat == g.Source.OwnerSeat && e.Source.BindingId == "issued-phase-slash-targets" && e.TargetSeat == s) == 1)))
-            return false;
-        var actual = action.TargetSeats.ToArray();
-        foreach (var redirect in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MaWanHunjiangRedirectedEvent>().Where(e => e.UseId == use.Id))
-        {
-            if (redirect.ActionId != action.ActionId || redirect.TargetIndex < 0 || redirect.TargetIndex >= actual.Length || actual[redirect.TargetIndex] != redirect.OriginalTargetSeat || redirect.Source.OwnerSeat != redirect.OriginalTargetSeat || _contentRegistryOperations._contentRegistry.GetSkill(redirect.Source.SkillId).Program is not { } p || p.GameplayHash != redirect.GameplayHash || ProgramInstructionResolver.Default.Find(p, ProgramInstructionSourceKind.Trigger, redirect.Source.BindingId)is not { } plan || plan.Trigger?.Window != SkillProgramTriggerWindow.SlashTargetRedirecting || redirect.InstructionIndex < 1 || redirect.InstructionIndex > plan.Instructions.Count || plan.GetPausedInstruction(redirect.InstructionIndex).Effect.Op != SkillProgramEffectOp.RedirectCurrentAttack || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingStartedEvent>().Count(e => e.FrameId == redirect.ProgramFrameId && e.OwnerSeat == redirect.Source.OwnerSeat && e.SkillId == redirect.Source.SkillId && e.BindingId == redirect.Source.BindingId && e.SkillInstanceId == redirect.Source.SkillInstanceId) != 1)
-                return false;
-            actual[redirect.TargetIndex] = redirect.NewTargetSeat;
-        }
-
-        return use.TargetSeats.SequenceEqual(actual);
-    }
-
-    internal void RecordMaWanHunjiangRedirect(ProgramSkillFrame redirector, long useId, int originalSeat, int newSeat)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { MaWanHunjiang: { Offered: true, AddedTargets.Count: > 0 }, Action: { } action } use)
-            return;
-        var p = _contentRegistryOperations._contentRegistry.GetSkill(redirector.SkillId).Program!;
-        if (p.GameplayHash != redirector.GameplayHash || redirector.InstructionIndex < 1 || ProgramInstructionResolver.Default.Resolve(redirector, p).GetPausedInstruction(redirector.InstructionIndex).Effect is not { Op: SkillProgramEffectOp.RedirectCurrentAttack } effect || newSeat != CoreGameEngineProgramChoicesRuntime.ResolveProgramEffectTarget(redirector, effect.Target) || redirector.OwnerSeat != originalSeat || redirector.WindowContext is not { Window: SkillProgramTriggerWindow.SlashTargetRedirecting, CardUse: { } context } c || context.ParentCardUseFrameId != use.Id || context.CardActionId != action.ActionId || c.TargetSeat != originalSeat || c.SourceSeat != use.SourceSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == c.ParentFrameId)is not { } window || window.Continuation != ProgramCardContinuation.SlashTargetRedirecting || window.ParentFrameId != use.Id || window.Action.ActionId != action.ActionId || window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count || !CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(redirector, CoreGameEngineCardActionsRuntime.ToSharedCandidate(window.Candidates[window.CandidateIndex])) || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count || use.TargetSeats[use.TargetIndex] != newSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MaWanHunjiangRedirectedEvent>().Any(e => e.ProgramFrameId == redirector.Id && e.UseId == use.Id && e.InstructionIndex == redirector.InstructionIndex))
-            throw new InvalidOperationException("Hunjiang's native target redirect lost its exact owning producer and actual target cursor.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MaWanHunjiangRedirectedEvent(redirector.Id, use.Id, action.ActionId, new(redirector.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(redirector), redirector.OwnerSeat, redirector.SkillInstanceId), redirector.GameplayHash, redirector.InstructionIndex, use.TargetIndex, originalSeat, newSeat));
-    }
+    internal bool HasMaWanHunjiangTargetTail(CardUseFrame use) =>
+        use.MaWanHunjiang is { Offered: true, AddedTargets.Count: > 0 };
 
     internal bool TryGetMaWanVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primary)
     {

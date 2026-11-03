@@ -36,8 +36,6 @@ public sealed record WeifuUseIssuedEvent(long UseId, long ActionId, int ActorSea
 public sealed record WeifuActorChangedEvent(long UseId, long ActionId, long ProgramFrameId, CardConversionSource Producer,
     string GameplayHash, int InstructionIndex, int PreviousActor, int Actor, int Provider) : IGameEvent;
 public sealed record WeifuTargetAddedEvent(long FrameId, long UseId, long ActionId, CardConversionSource Source, int TargetSeat, int Index) : IGameEvent;
-public sealed record WeifuRedirectedEvent(long FrameId, long UseId, long ActionId, CardConversionSource Source, string GameplayHash,
-    int InstructionIndex, int TargetIndex, int PreviousSeat, int TargetSeat) : IGameEvent;
 internal sealed class ResolveWeifuJudgmentDescriptor() : QianZhaoDescriptor(SkillProgramEffectOp.ResolveWeifuJudgment)
 {
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => [new ConsumeSelectedCards(1)];

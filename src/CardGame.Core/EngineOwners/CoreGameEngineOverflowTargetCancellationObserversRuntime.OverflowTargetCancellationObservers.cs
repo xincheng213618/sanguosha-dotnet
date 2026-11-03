@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationObserversR
         {
             if (prior[i] is not CardActionAcceptedEvent { Action: var accepted } || accepted.ActionId != before.ActionId || accepted.Type != CardActionType.Use || accepted.ProviderSeat != before.ProviderSeat || accepted.ParentActionId != before.ParentActionId || accepted.RequesterSeat != before.RequesterSeat || accepted.ResponderSeat != before.ResponderSeat || accepted.OpponentSeat != before.OpponentSeat || accepted.EffectiveSuit != before.EffectiveSuit || accepted.EffectiveRank != before.EffectiveRank || !accepted.PhysicalCards.SequenceEqual(before.PhysicalCards))
                 continue;
-            if (_coreCompletedCategoryUseProofOperations.RebuildAcceptedActualHandGainUse(previousUse, accepted, before, prior, i))
+            if (_coreCompletedCategoryUseProofOperations.HasExactAcceptedActualHandGainUse(previousUse, before))
                 return true;
         }
 

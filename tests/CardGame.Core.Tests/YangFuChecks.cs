@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static partial class YangFuChecks
 {
@@ -21,16 +22,18 @@ internal static partial class YangFuChecks
         Need(accepted is[var original]&&original.Action.TargetSeats.SequenceEqual([1])&&use.Action!.TargetSeats.SequenceEqual([1,3])&&
             tail.OriginalTargets.SequenceEqual([1])&&tail.AddedTargets.SequenceEqual([3]),
             "Bingzhong extends the owning native action from its frozen single-target acceptance and retains the exact typed target tail.");
-        var proof=global::FixtureRuntimeAccess.Engine.GetMethod("RebuildAcceptedActualHandGainUse",BindingFlags.Instance|BindingFlags.NonPublic)!;
-        bool Rebuild(CardUseFrame candidate,IGameEvent[] facts)
-        {
-            var at=Array.FindIndex(facts,e=>e is CardActionAcceptedEvent a&&a.Action.ActionId==tail.ActionId);
-            return (bool)proof.Invoke(g,[candidate,accepted[0].Action,candidate.Action!,facts,at])!;
-        }
-        Need(Rebuild(use,history)&&!Rebuild(use with{BingzhongTail=tail with{OriginalTargets=[3],AddedTargets=[1]}},history)&&
-            !Rebuild(use,history.Where(e=>e is not YangFuStartedEvent s||s.FrameId!=tail.FrameId).ToArray())&&
-            !Rebuild(use,history.Where(e=>e is not BingzhongTargetSelectedEvent s||s.FrameId!=tail.FrameId).ToArray()),
-            "Acceptance reconstruction requires the genuine preceding targets, Yang Fu start and every selected extra target; an applied summary alone cannot authorize the mutation.");
+        var proof=g.GetRuntimeModule<CoreGameEngineCompletedCategoryUseProofRuntime>();var current=use.Action!;
+        CardActionContext Completed(long? id=null,int? actor=null,int? provider=null,IReadOnlyList<int>? targets=null,IReadOnlyList<CardActionCost>? cards=null)=>
+            new(id??current.ActionId,current.ParentActionId,current.Type,actor??current.ActorSeat,provider??current.ProviderSeat,
+                current.RequesterSeat,current.ResponderSeat,current.OpponentSeat,current.EffectiveKind,targets??current.TargetSeats,
+                cards??current.PhysicalCards,current.ConversionChain,current.DesignatedTargetSeats,current.EffectiveSuit,current.EffectiveRank,current.EffectiveIsRed,current.FactionOrigin);
+        Need(proof.HasExactAcceptedActualHandGainUse(use,current)&&
+            !proof.HasExactAcceptedActualHandGainUse(use,Completed(id:current.ActionId+1))&&
+            !proof.HasExactAcceptedActualHandGainUse(use,Completed(actor:(current.ActorSeat+1)%g.State.Players.Count))&&
+            !proof.HasExactAcceptedActualHandGainUse(use,Completed(provider:(current.ProviderSeat+1)%g.State.Players.Count))&&
+            !proof.HasExactAcceptedActualHandGainUse(use,Completed(targets:[3,1]))&&
+            !proof.HasExactAcceptedActualHandGainUse(use,Completed(cards:[..current.PhysicalCards,new(90001,CardKind.Slash,CardLocation.Hand(current.ProviderSeat))])),
+            "Native completion matches the current Action identity, participants, ordered designated targets and actual materials. Acceptance and target mutation were committed at their shared boundaries, without reconstructing character event ledgers.");
     }
     private static void Need(bool yes,string message){if(!yes)throw new InvalidOperationException(message);}
     private static void Accept(GameEngine g,GameCommand c){var result=g.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single());Need(result.Accepted,result.Error?.Message??"Rejected actual Yang Fu command.");}

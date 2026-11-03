@@ -28,7 +28,6 @@ public sealed record PijingMovementPaidEvent(long FrameId,PijingStage Stage,int 
 public sealed record PijingGiftCompletedEvent(long FrameId,int Index,long GrantId):IGameEvent;
 public sealed record PijingNextChoiceEvent(long FrameId,long GroupId,string Choice):IGameEvent;
 public sealed record PijingCompletedEvent(long FrameId):IGameEvent;
-public sealed record PijingRedirectedEvent(long UseId,long ActionId,long FrameId,CardConversionSource Source,string GameplayHash,int InstructionIndex,int TargetIndex,int PreviousSeat,int Seat):IGameEvent;
 public sealed record PijingTargetTail(long FrameId,long UseId,long ActionId,CardConversionSource Source,string GameplayHash,int ActorSeat,int ProviderSeat,bool Reciprocal,IReadOnlyList<int> Original,IReadOnlyList<int> Final)
 {
     private IReadOnlyList<int> _original=Array.AsReadOnly(Original.ToArray()),_final=Array.AsReadOnly(Final.ToArray());

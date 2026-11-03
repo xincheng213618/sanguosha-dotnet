@@ -5,8 +5,6 @@ internal sealed partial class CharacterYangFuOlRuntime
 {
     internal IReadOnlyList<IReadOnlyList<int>> BingzhongLegalTargets(CardUseFrame use) => _yangFuOperations.Get().BingzhongLegalTargets(use);
     internal bool HasBingzhongTargetTail(CardUseFrame use) => _yangFuOperations.Get().HasBingzhongTargetTail(use);
-    internal bool HasBingzhongTargetTail(CardUseFrame use, CardActionContext action) => _yangFuOperations.Get().HasBingzhongTargetTail(use, action);
-    internal void RecordBingzhongRedirect(ProgramSkillFrame frame, long useId, int previousSeat, int nextSeat) => _yangFuOperations.Get().RecordBingzhongRedirect(frame, useId, previousSeat, nextSeat);
     bool IYangFuTargetFacts.TryGetDesignatedExtraTargetUse(int owner, ProgramSkillWindowContext context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window) => _coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(owner, context, out use, out window);
     bool IYangFuTargetFacts.DesignatedExtraTargetCandidateMatches(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, ProgramCardTriggerWindowFrame window) => _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window);
     int? IYangFuTargetFacts.CapturedWholeActualTurnActorUseOrdinal(CardActionContext action) => _coreWholeActualTurnUsesOperations.CapturedWholeActualTurnActorUseOrdinal(action);

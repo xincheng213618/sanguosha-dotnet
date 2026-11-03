@@ -24,7 +24,6 @@ public sealed partial record CardUseFrame {[JsonIgnore(Condition=JsonIgnoreCondi
 public sealed record ChenglieStartedEvent(long FrameId,CardConversionSource Source,string GameplayHash,long UseId,long ActionId,long WindowId,long SetupFrameId,bool Outcome,int OriginalCount):IGameEvent;
 public sealed record ChenglieTargetSlotEvent(long FrameId,bool Added,int Index,int Seat):IGameEvent;
 public sealed record ChenglieTargetsAppliedEvent(long FrameId,long UseId,long ActionId,CardConversionSource Source,string GameplayHash,int ActorSeat,int ProviderSeat,int OriginalCount,int AddedCount):IGameEvent;
-public sealed record ChenglieRedirectedEvent(long UseId,long ActionId,long FrameId,CardConversionSource Source,string GameplayHash,int TargetIndex,int PreviousSeat,int Seat):IGameEvent;
 public sealed record ChenglieRevealedCardEvent(long FrameId,int Index,int CardId,CardKind Kind,Suit Suit,int Rank):IGameEvent;
 public sealed record ChenglieSwapSelectedEvent(long FrameId,int HandCardId,int TopCardId):IGameEvent;
 public sealed record ChenglieCardMovedEvent(long FrameId,ChenglieStage Stage,int Index,int CardId,CardLocation From,CardLocation To,CardMoveReason Reason,long Sequence):IGameEvent;

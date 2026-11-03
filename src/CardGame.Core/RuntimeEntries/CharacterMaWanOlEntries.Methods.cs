@@ -26,7 +26,6 @@ internal sealed partial class CharacterMaWanOlEntries
     internal bool MaWanObserverSuffix(int root) => _resolve().MaWanObserverSuffix(root);
     internal CardConversionSource MaWanSource(ProgramSkillFrame f) => _resolve().MaWanSource(f);
     internal void PublishMaWan(ProgramSkillFrame f) => _resolve().PublishMaWan(f);
-    internal void RecordMaWanHunjiangRedirect(ProgramSkillFrame redirector, long useId, int originalSeat, int newSeat) => _resolve().RecordMaWanHunjiangRedirect(redirector, useId, originalSeat, newSeat);
     internal CardUseFrame RequireMaWanUse(ProgramSkillFrame f) => _resolve().RequireMaWanUse(f);
     internal void ResolveMaWanVotes(ProgramSkillFrame f) => _resolve().ResolveMaWanVotes(f);
     internal bool ResumeMaWan(long id) => _resolve().ResumeMaWan(id);

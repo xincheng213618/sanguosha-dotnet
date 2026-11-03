@@ -27,9 +27,7 @@ internal sealed partial class CharacterMaChengOlEntries
     internal void FinishChenglieMovement(long id) => _resolve().FinishChenglieMovement(id);
     internal bool HasChenglieResponseObserver(CardActionContext a, ProgramCardContinuation continuation) => _resolve().HasChenglieResponseObserver(a, continuation);
     internal bool HasChenglieTargetTail(CardUseFrame use) => _resolve().HasChenglieTargetTail(use);
-    internal bool HasChenglieTargetTail2(CardUseFrame use, CardActionContext action) => _resolve().HasChenglieTargetTail(use, action);
     internal IReadOnlyList<NamedAmbushPileSnapshot>? IncludeChenglieSnapshots(IReadOnlyList<NamedAmbushPileSnapshot>? ordinary, int holder, int viewer, bool revealAll) => _resolve().IncludeChenglieSnapshots(ordinary, holder, viewer, revealAll);
-    internal bool IsChenglieAppliedTargetFact(CardUseFrame use, ChenglieTargetsAppliedEvent e, IReadOnlyList<int> precedingTargets, scoped out IReadOnlyList<int> resultTargets) => _resolve().IsChenglieAppliedTargetFact(use, e, precedingTargets, out resultTargets);
     internal bool IsChengliePrivateProcessingCard(int cardId) => _resolve().IsChengliePrivateProcessingCard(cardId);
     internal bool IsIssuedChenglieCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedChenglieCandidate(c, context);
     internal bool IsMaChengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsMaChengRecoveryParent(f, recovery);
@@ -40,7 +38,6 @@ internal sealed partial class CharacterMaChengOlEntries
     internal bool QualifyChenglie(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => _resolve().QualifyChenglie(c, t, context);
     internal CardUseFrame RebaseChenglieSlashTargets(CardUseFrame use, IReadOnlyList<int> targets) => _resolve().RebaseChenglieSlashTargets(use, targets);
     internal void RecordChenglieMove(long id, CardMovementRecord m) => _resolve().RecordChenglieMove(id, m);
-    internal void RecordChenglieRedirect(ProgramSkillFrame f, long useId, int previousSeat, int nextSeat) => _resolve().RecordChenglieRedirect(f, useId, previousSeat, nextSeat);
     internal void RecordChenglieResponse(IGameEvent fact) => _resolve().RecordChenglieResponse(fact);
     internal CardUseFrame RequireChenglieParent(ProgramSkillFrame f) => _resolve().RequireChenglieParent(f);
     internal bool ResumeChenglie(long id) => _resolve().ResumeChenglie(id);
@@ -49,7 +46,6 @@ internal sealed partial class CharacterMaChengOlEntries
     internal bool ShouldAllowChenglie(ProgramSkillFrame f) => _resolve().ShouldAllowChenglie(f);
     internal void StartChenglieMovement(ref ProgramSkillFrame f, ChenglieStage stage, int participant) => _resolve().StartChenglieMovement(ref f, stage, participant);
     internal bool TryGetChenglieUse(ProgramSkillWindowContext c, scoped out CardUseFrame use, scoped out ProgramCardTriggerWindowFrame window) => _resolve().TryGetChenglieUse(c, out use, out window);
-    internal bool ValidChenglieAttachment(ChenglieLease r, ChenglieAttachment c) => _resolve().ValidChenglieAttachment(r, c);
     internal IReadOnlyList<Card> WithoutChengliePrivateProcessing(IReadOnlyList<Card> cards) => _resolve().WithoutChengliePrivateProcessing(cards);
     internal bool HasMaChengCapability { get => _resolve().HasMaChengCapability; }
 }
