@@ -196,7 +196,7 @@ internal sealed partial class CharacterZhouQunOlRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZhouQun = r with { Shown = shown, ShownCards = r.ShownCards.Append(shown).ToArray(), Stage = ZhouQunStage.RevealChildren, Repeat = true } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChenshuoHandShownEvent(f.Id, r.Revealed.Count, shown));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, f.TriggerId!, r.Peer, "chenshuo-hand", [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "chenshuo-selected-hand"))
+            if (_publicHandRevealWindows.Begin(f.Id, "chenshuo-selected-hand"))
                 return;
             ContinueZhouQun(f.Id);
             return;

@@ -98,7 +98,7 @@ internal sealed partial class CoreGameEngineRevealRecastProgramsRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), owner.Seat, effect.ResultBind!, [_coreSnapshotValueProjectionOperations.ToSnapshot(ownerCard), _coreSnapshotValueProjectionOperations.ToSnapshot(targetCard)]));
         _coreProgramSlashRequestOperations.CommitProgramChoiceResult(frame.Id, effect.ResultBind!, outcome, target.Seat, "双方同时公开实体手牌。");
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(frame.Id, PublicHandRevealReturnKind.Program))
+        if (_publicHandRevealWindows.Begin(frame.Id, PublicHandRevealReturnKind.Program))
             return;
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }

@@ -155,7 +155,7 @@ internal sealed partial class CharacterTangTangOlRuntime
             else
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { TangTang = r with { Peer = peer, Stage = TangTangStage.ShowChildren, Selected = [], Candidates = [], Viewed = [] } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZexingPeerChosenEvent(f.Id, f.OwnerSeat, r.ActualTurn, r.TurnOwner, peer, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZexingPeerChosenEvent>().Count(e => e.FrameId == f.Id)));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "zexing-shown-card"))
+            if (_publicHandRevealWindows.Begin(f.Id, "zexing-shown-card"))
                 return;
             ContinueTangTang(f.Id);
             return;

@@ -101,7 +101,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, [_coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(r.RevealedCard!.Value))]));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FeiYiHezhongPaidEvent(f.Id, r.Source, r.GameplayHash, r.Turn, r.TurnOwner, r.BatchId!.Value, r.RevealedCard.Value, r.RevealedRank!.Value, greater));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { FeiYi = r with { Greater = greater, Paid = true } });
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "hezhong-direction-hand"))
+            if (_publicHandRevealWindows.Begin(f.Id, "hezhong-direction-hand"))
                 return;
             BeginFeiYiDraw(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), true);
             return;
@@ -204,4 +204,13 @@ internal sealed partial class CharacterFeiYiOlRuntime
     internal bool ContinuePaidFeiYi(ProgramSkillFrame f) => f.FeiYi is { Paid: true } r && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FeiYiStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
     [ProgramAiChoice(SkillProgramEffectOp.YanruParityDrawDiscard, SkillProgramEffectOp.RevealSingletonAndArmRankEffects)]
     internal PromptChoice AiFeiYi(PendingDecision p, ProgramSkillFrame f) => p.Choices.FirstOrDefault(c => c.Parameters["branch"] == "finish") ?? p.Choices.Where(c => c.Parameters["branch"] != "unpick").OrderBy(c => c.Cards.Count == 0 ? 0 : CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Cards[0]), _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).First();
+
+    [PublicHandRevealReturn("hezhong-direction-hand")]
+    internal void ReturnHezhongPublicHand(ProgramSkillFrame f)
+    {
+        if (f.FeiYi is not { Paid: true, Greater: not null, Stage: FeiYiStage.DirectionChoice })
+            throw new InvalidOperationException("Hezhong lost its accepted direction and revealed card.");
+        BeginFeiYiDraw(f, true);
+    }
+
 }

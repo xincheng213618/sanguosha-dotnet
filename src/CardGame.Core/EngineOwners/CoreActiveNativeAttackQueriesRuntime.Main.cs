@@ -7,9 +7,9 @@ internal sealed partial class CoreActiveNativeAttackQueriesRuntime
     {
         get => _resolutionStackOperations._resolutionStack.LastOrDefault(frame => frame switch
         {
-            CardUseFrame use => use.CardAttack?.Active == true && !_characterXiaoQiaoMouOlOperations.MouXiaoQiaoOl.PublicRevealSuspends(use.Id) && !_characterGuoSiOlOperations.IsSuspendedGuoSiCompletedParent(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedCompletedAttack(use) && !_characterLiuChengMouMobileOperations.IsMouLiuChengSuspendedCompletedAttack(use),
-            ProgramSkillFrame program => program.CardAttack?.Active == true && !_characterXiaoQiaoMouOlOperations.MouXiaoQiaoOl.PublicRevealSuspends(program.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(program),
-            JudgmentFrame judgment => judgment.CardAttack?.Active == true && !_characterXiaoQiaoMouOlOperations.MouXiaoQiaoOl.PublicRevealSuspends(judgment.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(judgment),
+            CardUseFrame use => use.CardAttack?.Active == true && !_publicHandRevealWindows.Suspends(use.Id) && !_characterGuoSiOlOperations.IsSuspendedGuoSiCompletedParent(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedCompletedAttack(use) && !_characterLiuChengMouMobileOperations.IsMouLiuChengSuspendedCompletedAttack(use),
+            ProgramSkillFrame program => program.CardAttack?.Active == true && !_publicHandRevealWindows.Suspends(program.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(program),
+            JudgmentFrame judgment => judgment.CardAttack?.Active == true && !_publicHandRevealWindows.Suspends(judgment.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(judgment),
             _ => false
         })is { } owner ? _kernelCoreMainOperations.CreateCardAttackHandle(owner.Id) : null;
         set

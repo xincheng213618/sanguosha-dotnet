@@ -40,6 +40,18 @@ internal static class ProgramInvocations
     internal static ProgramInvocationAuthorization? Find(ResolutionFrame? parent,
         ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
+        if (parent is PublicHandRevealWindowFrame reveal)
+        {
+            if (reveal.Id != context.ParentFrameId || context.Window != SkillProgramTriggerWindow.PublicHandRevealed ||
+                reveal.ClaimIndex < 0 || reveal.ClaimIndex >= reveal.Claims.Count ||
+                context.PublicHandReveal != reveal.Claims[reveal.ClaimIndex] ||
+                candidate.OwnerSeat != context.OwnerSeat || candidate.OccurrenceIndex != context.OccurrenceIndex ||
+                candidate != PublicHandRevealWindowRuntime.Candidate(reveal.Claims[reveal.ClaimIndex], reveal.ClaimIndex))
+                return null;
+            return reveal.InvocationAuthorizations?.SingleOrDefault(a => a.ProgramFrameId == 0 &&
+                a.WindowId == reveal.Id && a.NativeFrameId == reveal.ParentFrameId &&
+                a.Window == context.Window && a.Candidate == candidate);
+        }
         if (parent is CardsMovedTriggerWindowFrame movement)
         {
             if (movement.Id != context.ParentFrameId || context.MovementBatch != movement.Batch ||

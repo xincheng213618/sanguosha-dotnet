@@ -5,10 +5,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
 {
     internal MouXiaoQiaoOlRuntime MouXiaoQiaoOl => _mouXiaoQiaoOlOperations.Get();
 
-    internal bool TryBeginPublicHandRevealWindow(long parentId, PublicHandRevealReturnKind returned) => MouXiaoQiaoOl.BeginPublicReveal(parentId, returned);
-    internal bool TryBeginPublicHandRevealWindow(long parentId, string key) => MouXiaoQiaoOl.BeginPublicReveal(parentId, PublicHandRevealReturnKind.Registered, key);
-    internal bool IsPublicHandRevealProducerSuspended(long parentId, string key) => MouXiaoQiaoOl.RevealProducerSuspended(parentId, key);
-    bool IMouXiaoQiaoOlFacts.Enabled => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouXiaoQiaoJueyanReveal);
+    bool IMouXiaoQiaoOlFacts.Enabled => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerWindow(SkillProgramTriggerWindow.PublicHandRevealed);
 
     bool IMouXiaoQiaoOlFacts.SetupComplete => _coreMatchSetupSetupCompleteAccess._setupComplete;
 
@@ -73,7 +70,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
 
     void IMouXiaoQiaoOlOperations.Finish(ProgramSkillFrame f) => _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     void IMouXiaoQiaoOlOperations.Reveal(ProgramSkillFrame f, IReadOnlyList<int> ids) => _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, "mou-xiao-qiao-public-hand", Array.AsReadOnly(ids.Select(id => _closedHandCardViewQueriesSource.Get().Project(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray())));
-    bool IMouXiaoQiaoOlOperations.BeginRevealChildren(long id) => TryBeginPublicHandRevealWindow(id, PublicHandRevealReturnKind.Program);
+    bool IMouXiaoQiaoOlOperations.BeginRevealChildren(long id) => _publicHandRevealWindows.Begin(id, PublicHandRevealReturnKind.Program);
     void IMouXiaoQiaoOlOperations.Gift(ProgramSkillFrame f, int id, int target) => _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _cardZonesOperations._cardZones.GetLocation(id), CardLocation.Hand(target), new(MouXiaoQiaoOlRuntime.GiveReason), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, f.OwnerSeat, target, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null), disclosure: CardMovementDisclosure.FaceUp);
     void IMouXiaoQiaoOlOperations.Recover(ProgramSkillFrame f, int target) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, target, 1, null, null);
     void IMouXiaoQiaoOlOperations.LoseHp(ProgramSkillFrame f, int target) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(f.Id, f.SkillId, target, 1);
@@ -84,26 +81,6 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     bool IMouXiaoQiaoOlOperations.BeginSkillsChanged(long id) => _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id);
     void IMouXiaoQiaoOlOperations.IssueNativeUse(ProgramSkillFrame f, MouXiaoQiaoOlUsePlan p) => IssueMouXqNativeUse(f, p);
     void IMouXiaoQiaoOlOperations.SignNativeBatches(ProgramSkillFrame f, CardUseFrame use) => SignMouXqNativeBatches(f, use);
-    void IMouXiaoQiaoOlOperations.BeginRevealTrigger(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _coreProgramLifecycleOperations.BeginProgramBinding(c, context);
-    void IMouXiaoQiaoOlOperations.ReturnRevealWindow(PublicHandRevealWindowFrame w)
-    {
-        if (w.ReturnKind == PublicHandRevealReturnKind.Program)
-        {
-            if (!_kernelCoreGameEngineProgramContinuationsOperations.TryResume(CoreGameEngineProgramContinuationsDefinitions.ProgramContinuations.Value, w.ParentFrameId))
-                _coreRuntimeOperations.AdvanceRuntimeProgram(w.ParentFrameId);
-        }
-        else if (w.ReturnKind == PublicHandRevealReturnKind.FireAttack)
-        {
-            var use = _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId) ?? throw new InvalidOperationException("Public reveal lost its actual FireAttack.");
-            var id = use.FireAttackSelection?.RevealedCardId ?? throw new InvalidOperationException("FireAttack cannot replace its frozen revealed entity.");
-            _coreNativeFireAttackOperations.BeginFireAttackDiscard(use, _coreAdvancedLifecycleOperations.GetAdvancedCard(id));
-        }
-        else if (w.ReturnKind == PublicHandRevealReturnKind.Registered)
-            _nativeCardGameCorePublicHandRevealReturnsOperations.Return(PublicHandRevealReturns.Default, w.ReturnKey!, _resolutionStackOperations._resolutionStack.Single(x => x.Id == w.ParentFrameId));
-        else
-            _coreRuntimeOperations.AdvanceRuntimeFrame(w.ParentFrameId);
-    }
-
     bool IMouXiaoQiaoOlOperations.BeginResponse(PromptChoice choice) => BeginMouXqJueyanResponse(choice);
     void IMouXiaoQiaoOlOperations.ReturnResponse(ProgramSkillFrame f) => ReturnMouXqJueyanResponse(f);
 }

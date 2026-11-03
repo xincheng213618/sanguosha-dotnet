@@ -140,6 +140,6 @@ internal sealed partial class CoreNativeCardContinuationCursorsRuntime
     }
 
     internal TargetCardSelectionFrame? ActiveTargetCardSelection => _resolutionStackOperations._resolutionStack.OfType<TargetCardSelectionFrame>().LastOrDefault();
-    internal NullificationWindowFrame? ActiveNullificationWindow => _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault(window => !_characterXiaoQiaoMouOlOperations.MouXiaoQiaoOl.PublicRevealSuspends(window.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedCounterspell(window) && !_characterLiuChengMouMobileOperations.IsMouLiuChengSuspendedCounterspell(window));
+    internal NullificationWindowFrame? ActiveNullificationWindow => _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault(window => !_publicHandRevealWindows.Suspends(window.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedCounterspell(window) && !_characterLiuChengMouMobileOperations.IsMouLiuChengSuspendedCounterspell(window));
     internal CardUseFrame? ActiveFireAttack => _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { FireAttackSelection: not null } frame ? frame : null;
 }

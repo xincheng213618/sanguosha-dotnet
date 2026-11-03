@@ -16,7 +16,7 @@ internal sealed partial class CharacterPangTongOlSpRuntime
     bool ISpPangTongNativeFacts.RecoveryRidesOn(ResolutionFrame child, ResolutionFrame parent) => _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent);
     bool ISpPangTongNativeFacts.SameNameObserverSuffix(long rootFrameId) => _coreSameNameHandDiscardOrDamageObserversOperations.SameNameHandObserverSuffix(_resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == rootFrameId));
     IReadOnlyList<PromptChoice> ISpPangTongNativeEntries.OwnedCardPaymentChoices(long frameId, int chooser, int owner, IReadOnlyList<CardZoneKind> zones, OwnedCardMoveIntent intent) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(frameId, chooser, owner, zones, intent);
-    bool ISpPangTongNativeEntries.BeginPublicHandReveal(long frameId, string returnKey) => _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frameId, returnKey);
+    bool ISpPangTongNativeEntries.BeginPublicHandReveal(long frameId, string returnKey) => _publicHandRevealWindows.Begin(frameId, returnKey);
     void ISpPangTongNativeEntries.Recover(long frameId, int owner, int target, int amount) => _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(frameId, owner, target, amount, null, null);
     void ISpPangTongNativeEntries.ChangeMaximumHp(ProgramSkillFrame frame, int amount) => _coreProgramLifecycleOperations.ChangeProgramMaximumHp(frame, amount);
     void ISpPangTongNativeEntries.PublishState() => _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();

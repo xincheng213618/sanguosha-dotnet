@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
 public enum MouXiaoQiaoOlStage { GiftCards, GiftRecipient, RevealChildren, GiftChildren, EndChoice, HealthChildren,
-    UseChoice, NativeIssuing, NativeUse, NativeChildren, Drawing, DrawChildren }
+    UseChoice, NativeIssuing, NativeUse, NativeChildren }
 public sealed record MouXiaoQiaoOlGift(int CardId, CardKind PrintedKind, CardLocation From, int RecipientSeat);
 public sealed record MouXiaoQiaoOlUsePlan(CardKind Kind, LegalActionKind ActionKind, int? TargetCardId,
     CardKind? RequiredKind, string Description, bool Adjusted = false)
@@ -29,7 +29,6 @@ public sealed record MouXiaoQiaoOlReceipt(CardConversionSource Source, string Ga
     public long UseId { get; init; }
     public long ActionId { get; init; }
     public bool NativeReturned { get; init; }
-    public NativeDrawOutcome? Draw { get; init; }
     private readonly IReadOnlyList<MouXiaoQiaoOlGift> _gifts = Array.AsReadOnly(Array.Empty<MouXiaoQiaoOlGift>());
     public IReadOnlyList<MouXiaoQiaoOlGift> Gifts { get => _gifts; init => _gifts = Array.AsReadOnly(value.ToArray()); }
 }
@@ -51,26 +50,10 @@ public sealed partial record CardUseFrame
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public MouXiaoQiaoOlNativeOrigin? MouXiaoQiaoOlOrigin { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public MouXiaoQiaoJueyanResponseGrant? MouXiaoQiaoJueyanRescueOrigin { get; init; }
 }
-public sealed record PublicHandRevealClaim(long RevealFrameId, CardConversionSource Source, string GameplayHash, int Round, Suit Suit, int CardId);
-public enum PublicHandRevealReturnKind { Program, FireAttack, NativeFrame, Registered }
-public sealed record PublicHandRevealWindowFrame(long Id, long ParentFrameId, PublicHandRevealReturnKind ReturnKind,
-    int ClaimIndex = 0, ResolutionFrameStep Step = ResolutionFrameStep.ResolvingEffect)
-    : ResolutionFrame(Id, ResolutionFrameKind.PublicHandRevealWindow, Step), IProgramChildResolutionFrame
-{
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public string? ReturnKey { get; init; }
-    private readonly IReadOnlyList<PublicHandRevealClaim> _claims = Array.AsReadOnly(Array.Empty<PublicHandRevealClaim>());
-    public IReadOnlyList<PublicHandRevealClaim> Claims { get => _claims; init => _claims = Array.AsReadOnly(value.ToArray()); }
-}
 public abstract partial record ResolutionFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public MouXiaoQiaoJueyanResponseGrant? MouXiaoQiaoJueyanResponseGrant { get; init; }
-    private readonly IReadOnlyList<PublicHandRevealClaim>? _publicHandRevealClaims;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IReadOnlyList<PublicHandRevealClaim>? PublicHandRevealClaims
-    { get => _publicHandRevealClaims; init => _publicHandRevealClaims = value is null ? null : Array.AsReadOnly(value.ToArray()); }
 }
-public sealed partial record ProgramSkillWindowContext
-{ [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public PublicHandRevealClaim? PublicHandReveal { get; init; } }
 public sealed record MouXiaoQiaoOlStartedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
     SkillProgramEffectOp Operation, int Round, long ParentFrameId) : IGameEvent;
 public sealed record MouXiaoQiaoMiluoAcceptedEvent(long FrameId, int OwnerSeat, int Round, int Count) : IGameEvent;
@@ -81,16 +64,12 @@ public sealed record MouXiaoQiaoJueyanUsedEvent(long FrameId, CardConversionSour
     int Round, int CardId, CardKind OutputKind, Suit ShownSuit, bool RedBasic) : IGameEvent;
 public sealed record MouXiaoQiaoJueyanSuitClaimedEvent(long RevealFrameId, CardConversionSource Source, string GameplayHash,
     int Round, Suit Suit, int CardId) : IGameEvent;
-public sealed record PublicHandRevealWindowStartedEvent(long WindowId, long ParentFrameId, PublicHandRevealReturnKind ReturnKind, int Count, string? ReturnKey = null) : IGameEvent;
-public sealed record PublicHandRevealClaimReturnedEvent(long WindowId, int Index, PublicHandRevealClaim Claim) : IGameEvent;
-public sealed record PublicHandRevealWindowReturnedEvent(long WindowId, long ParentFrameId) : IGameEvent;
 public sealed record MouXiaoQiaoJueyanNativeIssuedEvent(long FrameId, long UseId, long ActionId, int ActorSeat, CardKind Kind) : IGameEvent;
 public sealed record MouXiaoQiaoJueyanNativeReturnedEvent(long FrameId, long UseId, long ActionId) : IGameEvent;
 public sealed record MouXiaoQiaoJueyanBatchSignedEvent(long FrameId,long UseId,long BatchId,long? ParentBatchId,int Count):IGameEvent;
 public sealed record MouXiaoQiaoJueyanMovementSignedEvent(long FrameId,long UseId,long BatchId,int CardId,CardKind Kind,CardLocation From,CardLocation To,CardMoveReason Reason,long Sequence):IGameEvent;
 public sealed record MouXiaoQiaoJueyanResponseGrantedEvent(MouXiaoQiaoJueyanResponseGrant Grant) : IGameEvent;
 public sealed record MouXiaoQiaoJueyanResponseIssuedEvent(long ParentFrameId, long ProgramFrameId, long ActionId, int ActorSeat, CardKind Kind) : IGameEvent;
-public sealed record MouXiaoQiaoOlDrawReturnedEvent(long FrameId, int Requested, int Actual, int Replacement, long? AttemptId) : IGameEvent;
 public sealed record MouXiaoQiaoOlCompletedEvent(long FrameId, SkillProgramEffectOp Operation) : IGameEvent;
 
 internal interface IMouXiaoQiaoOlRuntime : IProgramRuntimeOperations
@@ -108,14 +87,12 @@ internal abstract class MouXiaoQiaoOlDescriptor : ProgramOperationDescriptorBase
     {
         SkillProgramEffectOp.ResolveMouXiaoQiaoMiluoRoundEnd => [new RequireTriggerWindow(SkillProgramTriggerWindow.RoundEnding)],
         SkillProgramEffectOp.ResolveMouXiaoQiaoJueyan => [new CaptureActivationCards("jueyan-hand"), new RetainOwnedCardSet("jueyan-hand")],
-        SkillProgramEffectOp.ResolveMouXiaoQiaoJueyanReveal => [new RequireTriggerWindow(SkillProgramTriggerWindow.PublicHandRevealed)],
         _ => []
     };
 }
 internal sealed class ResolveMouXiaoQiaoMiluoDescriptor : MouXiaoQiaoOlDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouXiaoQiaoMiluo; }
 internal sealed class ResolveMouXiaoQiaoMiluoRoundEndDescriptor : MouXiaoQiaoOlDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouXiaoQiaoMiluoRoundEnd; }
 internal sealed class ResolveMouXiaoQiaoJueyanDescriptor : MouXiaoQiaoOlDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouXiaoQiaoJueyan; }
-internal sealed class ResolveMouXiaoQiaoJueyanRevealDescriptor : MouXiaoQiaoOlDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouXiaoQiaoJueyanReveal; }
 internal sealed class MouXiaoQiaoOlHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
 {
     public SkillProgramEffectOp Op => op;

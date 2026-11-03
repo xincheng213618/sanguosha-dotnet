@@ -270,7 +270,7 @@ internal sealed partial class CoreGameEngineNamedDefenseAndPublicDraftRuntime
 
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { PublicHandDraft = frame.PublicHandDraft!with { Stage = 2 } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramHandDraftRevealedEvent(frame.Id, frame.SkillId, frame.OwnerSeat, draft.RecipientSeats, selected));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frame.Id, "public-hand-draft-roster"))
+            if (_publicHandRevealWindows.Begin(frame.Id, "public-hand-draft-roster"))
                 return;
             ReturnPublicHandDraftReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));
             return;

@@ -15,7 +15,7 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
         if (f.AnniversaryHeYan is not { } r)
             return false;
         if (child is PublicHandRevealWindowFrame reveal)
-            return r.Stage == AnniversaryHeYanStage.Revealing && reveal.ParentFrameId == f.Id && reveal.ReturnKind == PublicHandRevealReturnKind.Registered && reveal.ReturnKey == HeYanRevealReturn && _characterXiaoQiaoMouOlOperations.IsPublicHandRevealProducerSuspended(f.Id, HeYanRevealReturn);
+            return r.Stage == AnniversaryHeYanStage.Revealing && reveal.ParentFrameId == f.Id && reveal.ReturnKind == PublicHandRevealReturnKind.Registered && reveal.ReturnKey == HeYanRevealReturn && _publicHandRevealWindows.ProducerSuspended(f.Id, HeYanRevealReturn);
         if (child is NativeDrawAttemptFrame draw)
             return r.Stage == AnniversaryHeYanStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.DrawTarget && draw.Context.RequestedCount == r.DrawAmount && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
         if (r.Stage is not (AnniversaryHeYanStage.MovementChildren or AnniversaryHeYanStage.DrawChildren))

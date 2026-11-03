@@ -100,7 +100,7 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
         var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[target]).Select(c => c.Id).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HandComparisonDraft = new(target, source, cards, Math.Min(_coreMatchParticipantsPlayersAccess._players[target].Hp, cards.Length), [], "reveal") });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramHandComparisonSourceRevealedEvent(f.Id, f.OwnerSeat, source));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "hand-comparison-source"))
+        if (_publicHandRevealWindows.Begin(f.Id, "hand-comparison-source"))
             return SkillProgramStepOutcome.AwaitChild;
         PublishHandComparison(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
         return SkillProgramStepOutcome.AwaitChoice;
@@ -169,7 +169,7 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HandComparisonDraft = d });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramHandComparisonCardRevealedEvent(f.Id, d.TargetSeat, id));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "hand-comparison-target"))
+            if (_publicHandRevealWindows.Begin(f.Id, "hand-comparison-target"))
             {
                 return;
             }
@@ -280,4 +280,13 @@ internal sealed partial class CoreGameEngineHandComparisonRuntime
         PublishHandComparison(f);
         return;
     }
+
+    [PublicHandRevealReturn("hand-comparison-source")]
+    internal void ReturnHandComparisonSource(ProgramSkillFrame f)
+    {
+        if (f.HandComparisonDraft is not { Stage: "reveal" })
+            throw new InvalidOperationException("A Hand comparison lost its frozen source and target roster.");
+        PublishHandComparison(f);
+    }
+
 }

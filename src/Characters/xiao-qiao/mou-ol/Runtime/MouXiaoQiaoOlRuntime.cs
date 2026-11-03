@@ -52,8 +52,6 @@ internal interface IMouXiaoQiaoOlOperations : IProgramRuntimeOperations
     bool BeginSkillsChanged(long id);
     void IssueNativeUse(ProgramSkillFrame frame, MouXiaoQiaoOlUsePlan plan);
     void SignNativeBatches(ProgramSkillFrame frame,CardUseFrame use);
-    void BeginRevealTrigger(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context);
-    void ReturnRevealWindow(PublicHandRevealWindowFrame window);
     bool BeginResponse(PromptChoice choice);
     void ReturnResponse(ProgramSkillFrame frame);
 }
@@ -61,10 +59,10 @@ internal interface IMouXiaoQiaoOlOperations : IProgramRuntimeOperations
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IMouXiaoQiaoOlOperations operations,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
-    IProgramOperationDraws draws, IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouXiaoQiaoOlRuntime
+    IPublicHandRevealWindows reveals, IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouXiaoQiaoOlRuntime
 {
     internal const string Miluo = "mou-ol:miluo",Jueyan = "mou-ol:jueyan";
-    internal const string GiveReason = "skill-program.mou-ol:miluo.give",DrawReason = "skill-program.mou-ol:jueyan.draw";
+    internal const string GiveReason = "skill-program.mou-ol:miluo.give";
     private static CardConversionSource Source(ProgramSkillFrame f) => new(f.SkillId, f.TriggerId ?? f.ActivationId, f.OwnerSeat, f.SkillInstanceId);
     private static bool SameChoice(PromptChoice a, PromptChoice b) => a.Id == b.Id && a.Cards.SequenceEqual(b.Cards) &&
         a.Targets.SequenceEqual(b.Targets) && a.Parameters.Count == b.Parameters.Count && a.Parameters.All(p => b.Parameters.GetValueOrDefault(p.Key) == p.Value);
@@ -92,7 +90,6 @@ internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IM
         var f = frames.ActiveProgram(supplied.Id);
         if (f.MouXiaoQiaoOl is not null) { Continue(f.Id); return SkillProgramStepOutcome.AwaitChild; }
         if (f.InstructionIndex != 1) throw new InvalidOperationException("Mou Xiao Qiao cannot repeat the accepted instruction.");
-        if (operation == SkillProgramEffectOp.ResolveMouXiaoQiaoJueyanReveal) return BeginSuitReward(f);
         var end = operation == SkillProgramEffectOp.ResolveMouXiaoQiaoMiluoRoundEnd;
         if (end ? f.SkillId != Miluo || f.TriggerId != "round-end-consequence" || f.WindowContext?.Window != SkillProgramTriggerWindow.RoundEnding :
             operation == SkillProgramEffectOp.ResolveMouXiaoQiaoMiluo && (f.SkillId != Miluo || f.ActivationId != "reveal-and-give" ||
@@ -213,7 +210,7 @@ internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IM
             }
             Complete(f); return;
         }
-        if (r.Stage is MouXiaoQiaoOlStage.HealthChildren or MouXiaoQiaoOlStage.NativeChildren or MouXiaoQiaoOlStage.DrawChildren)
+        if (r.Stage is MouXiaoQiaoOlStage.HealthChildren or MouXiaoQiaoOlStage.NativeChildren)
         { if (!Drain(id)) Complete(frames.ActiveProgram(id)); return; }
         if (r.Stage is MouXiaoQiaoOlStage.GiftCards or MouXiaoQiaoOlStage.GiftRecipient or MouXiaoQiaoOlStage.EndChoice or MouXiaoQiaoOlStage.UseChoice) Publish(f);
     }
@@ -232,9 +229,7 @@ internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IM
         !facts.History<MouXiaoQiaoOlCompletedEvent>().Any(e => e.FrameId == f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 34000)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 34000)]
-    internal bool PreservePaid(ProgramSkillFrame f) => f.MouXiaoQiaoOl is { Paid: true } && Valid(f) ||
-        f.SkillId==Jueyan&&f.TriggerId=="public-hand-first-suit"&&f.InstructionIndex is 0 or 1&&f.WindowContext is{}context&&
-        IssuedRevealCandidate(new(f.OwnerSeat,f.SkillId,f.TriggerId,f.SkillInstanceId,f.GameplayHash,0),context);
+    internal bool PreservePaid(ProgramSkillFrame f) => f.MouXiaoQiaoOl is { Paid: true } && Valid(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveMouXiaoQiaoMiluo, SkillProgramEffectOp.ResolveMouXiaoQiaoMiluoRoundEnd, SkillProgramEffectOp.ResolveMouXiaoQiaoJueyan)]
     internal PromptChoice Ai(PendingDecision prompt, ProgramSkillFrame f, SkillProgramEffect effect)
     {

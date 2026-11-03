@@ -41,4 +41,29 @@ internal sealed partial class CoreGameEngineRevealedFireAttackPaymentRuntime
         _coreNativeFireAttackOperations.BeginFireAttackDiscard(use, _coreAdvancedLifecycleOperations.GetAdvancedCard(revealed));
         return true;
     }
+
+    [PublicHandRevealReturn("fire-attack-retained-payment")]
+    internal void ReturnFireAttackRetainedPublicHand(CardUseFrame pending)
+    {
+        var r = pending.PublicHandRevealSelection ?? throw new InvalidOperationException("FireAttack lost its retained payment reveal.");
+        if (r.ReturnKey != "fire-attack-retained-payment" || r.ActionId != pending.Action?.ActionId || r.ActorSeat != pending.SourceSeat || pending.CardKind != CardKind.FireAttack)
+            throw new InvalidOperationException("FireAttack changed its original accepted source and retained card.");
+        _publicHandRevealFrames.ReplaceTop(pending = pending with { PublicHandRevealSelection = null });
+        var source = _coreMatchParticipantsPlayersAccess._players[pending.SourceSeat];
+        var target = _coreMatchParticipantsPlayersAccess._players[CoreNativeFireAttackRuntime.GetFireAttackTargetSeat(pending)];
+        var revealed = _coreAdvancedLifecycleOperations.GetAdvancedCard(pending.FireAttackSelection!.RevealedCardId!.Value);
+        var matchingDiscard = _coreAdvancedLifecycleOperations.GetAdvancedCard(r.CardId);
+        var revealInstead = true;
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FireAttackResolvedEvent(pending.Id, source.Seat, target.Seat, revealed.Id, revealed.Suit, matchingDiscard.Id, CausedDamage: true));
+        _coreMatchLogOperations.AddLog("CardEffect", $"{(source.Name)} {((revealInstead ? "展示" : "弃置"))}【{(matchingDiscard.DisplayName)}】，{(target.Name)} 受到 1 点火焰伤害。", source.Seat, target.Seat);
+        var attackCard = _coreNativeFireAttackOperations.GetFireAttackEffectCard(pending);
+        _coreNativeFireAttackOperations.SetFireAttackSelection(pending.Id, null);
+        var attack = _kernelCoreMainOperations.CreateCardAttackHandle(pending.Id, source.Seat, target.Seat, (_coreVirtualOrdinaryTrickUsesOperations.IsProgramVirtualOrdinaryTrickUse(pending.Id) || _coreTieredRoundZeroReturnsOperations.IsTieredRoundZeroFireAttackUse(pending.Id) || _characterZhugeLiangMouOperations.IsMouZhijueZeroUse(pending.Id) || _characterDiaoChanLeOperations.IsDiouZeroUse(pending.Id) || _characterXiaoQiaoMouOlOperations.IsMouXqJueyanUse(pending.Id) || _characterQinLangOlOperations.IsQinLangXianyingUse(pending.Id)) ? null : attackCard, damageAmount: 1, playedCardKind: CardKind.FireAttack, physicalCards: _coreNativeTrickUseOperations.GetCardUsePhysicalCards(pending.Id));
+        _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
+        if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
+        {
+            _coreNativeAttackCompletionOperations.CompleteAttack(attack);
+        }
+    }
+
 }

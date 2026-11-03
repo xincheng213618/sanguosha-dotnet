@@ -156,7 +156,7 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGanNingGuessedEvent(f.Id, r.TargetSeat, suit, correct, r.Wrong, r.Phase!));
             if (correct)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, f.ActivationId, f.OwnerSeat, "qixi-hand", Array.AsReadOnly(hand.Select(c => _closedHandCardViewQueriesSource.Get().Project(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], c)).ToArray())));
-            if (correct && _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "qixi-guessed-hand"))
+            if (correct && _publicHandRevealWindows.Begin(f.Id, "qixi-guessed-hand"))
                 return;
             PublishMouGn(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
             return;
@@ -370,4 +370,13 @@ internal sealed partial class CharacterGanNingMouMobileRuntime
             return p.Choices.OrderByDescending(c => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets.Single()])).ThenBy(c => c.Targets.Single()).First();
         return p.Choices.First();
     }
+
+    [PublicHandRevealReturn("qixi-guessed-hand")]
+    internal void ReturnQixiPublicHand(ProgramSkillFrame f)
+    {
+        if (f.MouGanNing is not { Stage: MouGanNingStage.Discard })
+            throw new InvalidOperationException("Qixi lost its accepted correct-guess reveal.");
+        PublishMouGn(f);
+    }
+
 }

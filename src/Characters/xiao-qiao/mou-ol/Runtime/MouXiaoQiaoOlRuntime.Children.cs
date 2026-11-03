@@ -11,8 +11,6 @@ internal sealed partial class MouXiaoQiaoOlRuntime
     {
         if (f.MouXiaoQiaoOl is not { } r || !Valid(f)) return false;
         if (child is PublicHandRevealWindowFrame revealed) return revealed.ParentFrameId == f.Id && r.Stage == MouXiaoQiaoOlStage.RevealChildren;
-        if (child is NativeDrawAttemptFrame draw) return r.Stage == MouXiaoQiaoOlStage.Drawing &&
-            RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.NativeDrawAttemptRidesOn(draw, f);
         if (child is CardsMovedTriggerWindowFrame moved) return f.PendingMovementContinuation is not null &&
             RuntimeSkills.RuntimeRules_Core_CommonRules.ProgramMovementReturnMatches(f, moved) &&
             moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After);

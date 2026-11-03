@@ -9,6 +9,6 @@
       "activations": [ { "id": "retained-hand-use", "minCards": 1, "maxCards": 1, "sourceZones": ["hand"], "minTargets": 0, "maxTargets": 0, "targetKind": "anyLiving", "usesPerTurn": null,
         "effects": [ { "op": "resolveMouXiaoQiaoJueyan", "target": "owner" } ] } ],
       "triggers": [ { "id": "public-hand-first-suit", "window": "publicHandRevealed", "subject": "owner", "optional": false,
-        "effects": [ { "op": "resolveMouXiaoQiaoJueyanReveal", "target": "owner" } ] } ] }
+        "effects": [ { "op": "draw", "target": "owner", "amount": 1, "awaitMovementTriggers": true } ] } ] }
   ]
 }

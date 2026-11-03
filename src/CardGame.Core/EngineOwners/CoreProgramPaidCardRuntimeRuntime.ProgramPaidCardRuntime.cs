@@ -77,7 +77,7 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     }
 
     bool IProgramPaidCardOperations.BeginMovementWindow() => _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow();
-    bool IProgramPaidCardOperations.BeginPublicHandReveal(long frameId, string returnKey) => _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frameId, returnKey);
+    bool IProgramPaidCardOperations.BeginPublicHandReveal(long frameId, string returnKey) => _publicHandRevealWindows.Begin(frameId, returnKey);
     void IProgramPaidCardOperations.ReturnMovement(long frameId) => _coreRuntimeOperations.ReturnRuntimeProgramMovement(frameId);
     void IProgramPaidCardOperations.Log(string type, string message, int? actor) => _coreMatchLogOperations.AddLog(type, message, actor);
 }

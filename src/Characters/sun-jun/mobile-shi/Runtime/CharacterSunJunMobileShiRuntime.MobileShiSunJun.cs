@@ -101,7 +101,7 @@ internal sealed partial class CharacterSunJunMobileShiRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShiSunJun = r with { Stage = ShiSunJunStage.RevealChildren, Revealed = card } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiSunJunRevealedEvent(f.Id, r.Target, card));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, f.ActivationId, f.OwnerSeat, "xiongtu-hand", Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(card)) })));
-            if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "mobile-shi-sun-jun-hand"))
+            if (!_publicHandRevealWindows.Begin(f.Id, "mobile-shi-sun-jun-hand"))
                 AfterShiSjPublicReveal(f);
             return;
         }
@@ -187,7 +187,7 @@ internal sealed partial class CharacterSunJunMobileShiRuntime
 
         if (r.Stage == ShiSunJunStage.RevealChildren)
         {
-            if (!_characterXiaoQiaoMouOlOperations.IsPublicHandRevealProducerSuspended(id, "mobile-shi-sun-jun-hand"))
+            if (!_publicHandRevealWindows.ProducerSuspended(id, "mobile-shi-sun-jun-hand"))
                 AfterShiSjPublicReveal(f);
             return;
         }

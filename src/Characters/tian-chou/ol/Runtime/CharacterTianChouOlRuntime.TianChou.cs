@@ -112,7 +112,7 @@ internal sealed partial class CharacterTianChouOlRuntime
         // A selected foreign hand remains hidden until this real card is revealed and moved.
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PublicHandRevealSelection = new("shandao-hand-top", f.InstructionIndex, 0, card.Id, card.Kind, from, CardLocation.DrawPile, f.OwnerSeat, f.OwnerSeat) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "shandao-hand-top"))
+        if (_publicHandRevealWindows.Begin(f.Id, "shandao-hand-top"))
             return;
         ContinueShandaoAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
     }

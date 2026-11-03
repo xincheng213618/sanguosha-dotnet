@@ -50,7 +50,7 @@ internal sealed partial class CoreGameEngineCompletedUndamagedTargetRevealObserv
             return false;
         if (r.RevealedMaterials.Count == 0 ? reveals.Length != 0 : reveals is not [var shown] || shown.SkillId != f.SkillId || shown.BindingId != CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f) || shown.OwnerSeat != f.OwnerSeat || !shown.Cards.Select(c => c.Id).SequenceEqual(r.RevealedMaterials.Select(m => m.CardId)) || shown.Cards.Zip(r.RevealedMaterials).Any(p => p.First.Kind != p.Second.PrintedKind || p.First.Suit != p.Second.EffectiveSuit))
             return false;
-        if (_characterXiaoQiaoMouOlOperations.IsPublicHandRevealProducerSuspended(f.Id, "completed-target-hand-reveal"))
+        if (_publicHandRevealWindows.ProducerSuspended(f.Id, "completed-target-hand-reveal"))
             return !r.MovementIssued && r.BatchId is null && r.SequenceBefore == r.SequenceAfter && f.PendingMovementContinuation is null && movements.Length == 0 && completions.Length == 0;
         if (r.PaidMaterials.Count == 0)
             return r.Stage == CompletedUndamagedTargetRevealStage.Complete && !r.MovementIssued && r.BatchId is null && r.SequenceAfter == r.SequenceBefore && f.PendingMovementContinuation is null && movements.Length == 0 && completions is [var empty] && empty.SelectedCount == r.SelectedSlots.Count && empty.ActualDiscardCount == 0;

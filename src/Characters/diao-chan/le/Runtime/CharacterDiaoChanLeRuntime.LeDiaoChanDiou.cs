@@ -89,7 +89,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Diou = r with { Paid = true, ShownCardId = card.Id, ShownPrintedKind = card.Kind, OutputKind = kind, FirstShow = first, SameName = same, ActualTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, TurnOwner = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, ShowSequence = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Stage = DiouStage.UseChoice } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouShownEvent(f.Id, f.OwnerSeat, card.Id, card.Kind, kind, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, first, same));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "diou-retained-hand", [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "diou-retained-hand"))
+            if (_publicHandRevealWindows.Begin(f.Id, "diou-retained-hand"))
                 return;
             PublishDiou(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
             return;
@@ -254,4 +254,13 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 
         return p.Choices.OrderByDescending(Score).First();
     }
+
+    [PublicHandRevealReturn("diou-retained-hand")]
+    internal void ReturnDiouPublicHand(ProgramSkillFrame f)
+    {
+        if (f.Diou is not { Paid: true, Stage: DiouStage.UseChoice })
+            throw new InvalidOperationException("Diou lost its paid retained-Hand reveal.");
+        PublishDiou(f);
+    }
+
 }

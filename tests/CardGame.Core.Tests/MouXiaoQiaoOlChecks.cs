@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Reflection;
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core.Campaigns;
@@ -7,7 +8,7 @@ namespace CardGame.Core.Tests;
 
 internal static class MouXiaoQiaoOlChecks
 {
-    private const string Hero="mou:xiao-qiao-ol",Driver="fixture:mouxq-driver",Hold="fixture:mouxq-reveal-draw",Quiet="fixture:mouxq-quiet";
+    private const string Hero="mou:xiao-qiao-ol",Driver="fixture:mouxq-driver",Hold="fixture:mouxq-reveal-draw",Quiet="fixture:mouxq-quiet",PlainReward="fixture:public-reveal-plain";
     public static void RealMiluoRetainedUsesAndExternalRevealReturnCold()
     {
         var s=Scene.Start();s.Play();var dodge=s.V().Hand.First(c=>c.Kind==CardKind.Dodge&&c.Suit==Suit.Heart).Id;
@@ -16,9 +17,15 @@ internal static class MouXiaoQiaoOlChecks
         s.Skill("mou-ol:miluo","reveal-and-give",[]);s.Answer(c=>c.Cards.SequenceEqual([dodge]));s.Branch("recipient",1);
         s.Answer(c=>c.Cards.SequenceEqual([giftSlash]));s.Branch("recipient",2);s.Branch("confirm");
         s.Reach(()=>s.P?.SkillPrompt?.SkillId==Hold);s.Need(s.E<MouXiaoQiaoMiluoGiftEvent>().Length==0&&s.G.ResolutionStack.OfType<PublicHandRevealWindowFrame>().Any(),"The first actual public Hand-suit Draw child resolves before either original gift moves.");
+        var issuedReveal = s.G.ResolutionStack.OfType<PublicHandRevealWindowFrame>().Single();
+        s.Need(issuedReveal.Claims.Count > 0 && issuedReveal.Claims.All(claim => claim.RetainOwnerDeath) &&
+            issuedReveal.InvocationAuthorizations is { } retainedAuthorizations && retainedAuthorizations.Count == issuedReveal.Claims.Count &&
+            retainedAuthorizations.All(authorization => authorization.RetainOwnerDeath),
+            "Jueyan explicitly retains its already issued reward's owner-death policy in both claims and invocation authorizations.");
         s.Cold();s.Answer(_=>true);s.Play();
+        var suitRewards = s.E<ProgramBindingStartedEvent>().Where(e => e.SkillId == "mou-ol:jueyan" && e.BindingId == "public-hand-first-suit").Select(e => e.FrameId).ToHashSet();
         s.Need(s.E<MouXiaoQiaoMiluoGiftEvent>()is[{CardId:var giftA},{CardId:var giftB}]&&giftA==dodge&&giftB==giftSlash&&s.E<MouXiaoQiaoJueyanSuitClaimedEvent>().Count(e=>e.Source.OwnerSeat==0)==2&&
-            s.E<MouXiaoQiaoOlDrawReturnedEvent>().Count(e=>e.Requested==1&&e.Actual==1)==2,"Miluo's two genuine Hand gifts follow two independent first-suit Draw1 returns exactly once after Cold.");
+            s.E<ProgramDrawCompletedEvent>().Count(e=>suitRewards.Contains(e.FrameId)&&e.RequestedCount==1&&e.ActualDrawCount==1)==2,"Miluo's two genuine Hand gifts follow two independent first-suit Draw1 returns exactly once after Cold.");
         s.Skill("mou-ol:jueyan","retained-hand-use",[retained]);s.Reach(()=>s.HasBranch("use"));s.Branch("use");s.Play();
         var drawnUse=s.E<CardUseDeclaredEvent>().Last(e=>e.CardKind==CardKind.DrawTwo);
         s.Need(drawnUse.CardId==0&&s.V().Hand.Any(c=>c.Id==retained)&&s.E<CardUseFinishedEvent>().Count(e=>e.ResolutionId==drawnUse.ResolutionId)==1&&
@@ -28,13 +35,78 @@ internal static class MouXiaoQiaoOlChecks
             !s.G.GetHumanLegalActions().Any(a=>a.SkillId=="mou-ol:jueyan"),"The red-basic allowance is separate, uses a neutral native Slash, retains its original entity, and both Round branches are now spent.");
         var fire=s.V().Hand.First(c=>c.Kind==CardKind.FireAttack).Id;s.Native(fire,1);s.Reach(()=>s.P is{PlayerSeat:0,Kind:DecisionKind.FireAttackDiscard});
         var reveals=s.G.Events.Select(e=>e.Payload).ToList();var shown=reveals.FindLastIndex(e=>e is FireAttackCardRevealedEvent);
-        var reward=reveals.FindLastIndex(e=>e is MouXiaoQiaoOlDrawReturnedEvent d&&d.Requested==1);
+        var targetRewards = s.E<ProgramBindingStartedEvent>().Where(e => e.SkillId == "mou-ol:jueyan" && e.BindingId == "public-hand-first-suit" && e.OwnerSeat == 1).Select(e => e.FrameId).ToHashSet();
+        var reward=reveals.FindLastIndex(e=>e is ProgramDrawCompletedEvent d&&d.RequestedCount==1&&targetRewards.Contains(d.FrameId));
         s.Need(shown>=0&&reward>shown&&s.E<MouXiaoQiaoJueyanSuitClaimedEvent>().Any(e=>e.Source.OwnerSeat==1)&&!s.E<FireAttackResolvedEvent>().Any(),"An external real FireAttack Hand reveal pays its owner's first-suit Draw1 before returning to the original source's discard prompt.");
         s.Answer(c=>c.Cards.Count==0);s.Play();s.Skill(Driver,"strip",[],[2]);
         s.Reach(()=>s.P?.SkillPrompt?.SkillId==Driver);s.Answer(c=>c.Cards.Count==0&&c.Parameters.GetValueOrDefault("source-zone")=="Hand"&&c.Parameters.GetValueOrDefault("slot-index")=="0");
         s.Play();s.End();s.Reach(()=>s.HasBranch("lose"));s.Branch("lose",2);
         s.Reach(()=>s.E<RoundEndedEvent>().Any(e=>e.RoundNumber==1));s.Need(s.E<MouXiaoQiaoMiluoConsequenceEvent>().Any(e=>e.TargetSeat==2&&!e.Recover)&&s.E<ProgramSkillHpLostEvent>().Any(e=>e.SkillId=="mou-ol:miluo"&&e.TargetSeat==2&&e.Amount==1),"At the actual Round end, the original recipient's current Hand determines the one real HP-loss consequence.");
+        SharedWindowRunsDeclaredClaimsWithoutACharacterLedger();
     }
+    private static void SharedWindowRunsDeclaredClaimsWithoutACharacterLedger()
+    {
+        var s = Scene.Start(); s.Play();
+        var match = (MatchRuntime)typeof(GameEngine).GetProperty("MatchRuntime", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!;
+        var frames = match.Capabilities.Get<IProgramRuntimeFrames>();
+        var windows = match.Capabilities.Get<IPublicHandRevealWindows>();
+        var owner = match.Capabilities.Get<IMatchParticipantStateAccess>().At(0);
+        var candidate = match.Capabilities.Get<IProgramWindowCandidateQueries>().Shard(owner)
+            .GetTriggerCandidates(SkillProgramTriggerWindow.PublicHandRevealed).Single(source => source.SkillId == PlainReward);
+        var source = new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId);
+        var materials = s.V().Hand.Take(2).ToArray();
+        var handBefore = s.V().HandCount;
+        s.Skill(Driver, "parent", []);
+        s.Reach(() => s.P?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "parent-start") == true);
+        var parent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Driver);
+        windows.Issue(parent.Id, new(parent.Id, source, candidate.GameplayHash, 1, materials[0].Suit, materials[0].Id));
+        windows.Issue(parent.Id, new(parent.Id, source, candidate.GameplayHash, 1, materials[1].Suit, materials[1].Id));
+        s.Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "parent-start");
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Hold);
+        var outer = s.G.ResolutionStack.OfType<PublicHandRevealWindowFrame>().Single();
+        var held = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Hold);
+        s.Need(outer.Claims.All(claim => !claim.RetainOwnerDeath) &&
+            outer.InvocationAuthorizations is { } defaultAuthorizations && defaultAuthorizations.Count == outer.Claims.Count &&
+            defaultAuthorizations.All(authorization => !authorization.RetainOwnerDeath),
+            "Ordinary issued claims keep the default owner-death stop policy; source-independent permission does not grant death retention.");
+        s.Need(outer.ParentFrameId == parent.Id && outer.Claims.Count == 2 && outer.ClaimIndex == 0 &&
+            frames.Find(parent.Id)!.PublicHandRevealConsumedCount == 2 && windows.Suspends(parent.Id) &&
+            s.E<MouXiaoQiaoJueyanSuitClaimedEvent>().Length == 0,
+            "A shared window accepts ordinary declared Draw1 claims, reserves their producer cursor once and suspends the original parent without a character proof ledger.");
+
+        // These direct trusted Issue calls are not accepted commands. Test frame
+        // serialization here; the real reveal scenarios above separately prove
+        // command-prefix checkpoint replay.
+        var restoredParent = JsonSerializer.Deserialize<ProgramSkillFrame>(JsonSerializer.Serialize((ProgramSkillFrame)frames.Find(parent.Id)!))!;
+        var restoredWindow = JsonSerializer.Deserialize<PublicHandRevealWindowFrame>(JsonSerializer.Serialize(outer))!;
+        frames.Replace(parent.Id, restoredParent);
+        frames.Replace(outer.Id, restoredWindow);
+        s.Need(restoredParent.PublicHandRevealConsumedCount == 2 && restoredWindow.Claims.SequenceEqual(outer.Claims) &&
+            restoredWindow.ClaimIndex == 0 && restoredWindow.Claims is IList<PublicHandRevealClaim> { IsReadOnly: true } &&
+            windows.Suspends(parent.Id),
+            "Frame serialization preserves the committed producer count, immutable claims and suspended child cursor.");
+
+        windows.Issue(held.Id, new(held.Id, source, candidate.GameplayHash, 1, materials[0].Suit, materials[0].Id));
+        s.Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
+        s.Reach(() => s.P?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "parent-return") == true);
+        var started = s.E<PublicHandRevealWindowStartedEvent>();
+        var inner = started.Single(window => window.ParentFrameId == held.Id);
+        var returned = s.G.Events.Select(item => item.Payload).ToList();
+        var innerReturn = returned.FindIndex(fact => fact is PublicHandRevealWindowReturnedEvent done && done.WindowId == inner.WindowId);
+        var outerReturn = returned.FindIndex(fact => fact is PublicHandRevealWindowReturnedEvent done && done.WindowId == outer.Id);
+        s.Need(started.Count(window => window.ParentFrameId == parent.Id) == 1 && innerReturn >= 0 && outerReturn > innerReturn &&
+            s.E<PublicHandRevealClaimReturnedEvent>().Count(fact => fact.WindowId == outer.Id) == 2 &&
+            s.E<PublicHandRevealClaimReturnedEvent>().Count(fact => fact.WindowId == inner.WindowId) == 1 &&
+            s.V().HandCount == handBefore + 3 && s.V().Skills?.Any(skill => skill.Id == PlainReward) != true,
+            "Nested claims return before the outer cursor; already issued ordinary rewards finish after their source is lost, with each Draw1 paid once.");
+        var issued = s.E<PublicHandRevealWindowStartedEvent>().Length;
+        s.Need(!windows.Begin(parent.Id, PublicHandRevealReturnKind.Program) &&
+            s.E<PublicHandRevealWindowStartedEvent>().Length == issued &&
+            frames.Find(parent.Id)!.PublicHandRevealConsumedCount == 2,
+            "A completed producer cannot open its consumed claims again without consulting returned-event history.");
+        s.Answer(choice => choice.Parameters.GetValueOrDefault("option-id") == "parent-return"); s.Play();
+    }
+
     private sealed class Scene(GameEngine game,ContentRegistry registry)
     {
         public GameEngine G=game;public PendingDecision? P=>Enumerable.Range(0,4).Select(i=>G.CreateSnapshot(i).PendingDecision).FirstOrDefault(p=>p is not null);
@@ -64,7 +136,7 @@ internal static class MouXiaoQiaoOlChecks
         public static Scene Start()
         {
             var r=ContentRegistry.Build(new StandardContentPackage(),new Fixture());
-            var setup=new ShanheBattleSetup(7,1,"mouxq-real",Hero,3,0,0,0,0,[Driver,Hold],[new(CardKind.DrawTwo,Suit.Heart,4),new(CardKind.Dodge,Suit.Heart,2),new(CardKind.FireAttack,Suit.Spade,5),new(CardKind.Slash,Suit.Diamond,6),new(CardKind.Slash,Suit.Spade,8)],[],
+            var setup=new ShanheBattleSetup(7,1,"mouxq-real",Hero,3,0,0,0,0,[Driver,Hold,PlainReward],[new(CardKind.DrawTwo,Suit.Heart,4),new(CardKind.Dodge,Suit.Heart,2),new(CardKind.FireAttack,Suit.Spade,5),new(CardKind.Slash,Suit.Diamond,6),new(CardKind.Slash,Suit.Spade,8)],[],
                 [new("fixture:mouxq-enemy-a",Hp:12){StartingHand=[]},new("fixture:mouxq-enemy-b",Hp:12){StartingHand=[]}],[new("fixture:mouxq-ally",Hp:12){StartingHand=[new(CardKind.Dodge,Suit.Spade,6)]}],new string('f',64));
             var g=GameEngine.CreateStandard(new(){Seed=setup.BattleSeed,PlayerCount=4,HumanSeat=0,HumanRole=null,HumanTeamId=ShanheBattleSetup.PlayerTeamId,ModeId=ShanheBattleSetup.BattleModeId,ShanheBattle=setup,UseInteractiveSetup=false,UseInteractiveDiscard=false,AdvanceAfterHumanCommands=false,MaxTurns=8},r);var s=new Scene(g,r);s.Accept(new StartGameCommand());return s;
         }
@@ -78,10 +150,22 @@ internal static class MouXiaoQiaoOlChecks
             foreach(var k in new[]{CardKind.Slash,CardKind.Dodge,CardKind.FireAttack,CardKind.DrawTwo}){var c=CardCatalog.Get(k);b.AddCard(new("fixture:mouxq-"+k,c.DisplayName,c.CategoryName,c.Description,k));}
             var defs=new object[]{
                 new{id=Quiet,revision=1,triggers=new[]{new{id="quiet",window="afterNormalDraw",subject="owner",optional=false,effects=new[]{new{op="skipTurnPhases",target="owner",phases=new[]{"play"}}}}}},
-                new{id=Hold,revision=1,triggers=new[]{new{id="hold",window="cardsGained",subject="owner",destinationZones=new[]{"hand"},movementOccurrence="perBatch",movementReasons=new[]{"skill-program.mou-ol:jueyan.draw"},optional=false,usageScope="game",usageLimit=1,effects=new[]{new{op="chooseOption",target="owner",resultBind="held",options=new[]{new{id="continue"}}}}}}},
-                new{id=Driver,revision=1,activations=new[]{new{id="strip",minCards=0,maxCards=0,minTargets=1,maxTargets=1,targetKind="otherLiving",usesPerTurn=(int?)null,effects=new[]{new{op="selectAndMoveOwnedCard",target="owner",chooserRef=new{kind="owner"},cardOwnerRef=new{kind="selectedTarget"},zones=new[]{"hand"},count=1,destination="discardPile",awaitMovementTriggers=true}}}}}
+                new{id=Hold,revision=1,triggers=new object[]{
+                    new{id="hold",window="cardsGained",subject="owner",destinationZones=new[]{"hand"},movementOccurrence="perBatch",movementReasons=new[]{"skill-program.mou-ol:jueyan.Draw"},optional=false,usageScope="game",usageLimit=1,effects=new[]{new{op="chooseOption",target="owner",resultBind="held",options=new[]{new{id="continue"}}}}},
+                    new{id="plain-hold",window="cardsGained",subject="owner",destinationZones=new[]{"hand"},movementOccurrence="perBatch",movementReasons=new[]{"skill-program."+PlainReward+".Draw"},optional=false,usageScope="game",usageLimit=1,effects=new object[]{
+                        new{op="chooseOption",target="owner",resultBind="held",options=new[]{new{id="continue"}}},
+                        new{op="skillState",target="owner",action="lose",match=new{skillIds=new[]{PlainReward}}}}}}},
+
+                new{id=Driver,revision=1,activations=new object[]{
+                    new{id="strip",minCards=0,maxCards=0,minTargets=1,maxTargets=1,targetKind="otherLiving",usesPerTurn=(int?)null,effects=new[]{new{op="selectAndMoveOwnedCard",target="owner",chooserRef=new{kind="owner"},cardOwnerRef=new{kind="selectedTarget"},zones=new[]{"hand"},count=1,destination="discardPile",awaitMovementTriggers=true}}},
+                    new{id="parent",minCards=0,maxCards=0,minTargets=0,maxTargets=0,targetKind="anyLiving",usesPerTurn=(int?)null,effects=new[]{
+                        new{op="chooseOption",target="owner",resultBind="parent-start",options=new[]{new{id="parent-start"}}},
+                        new{op="chooseOption",target="owner",resultBind="parent-return",options=new[]{new{id="parent-return"}}}}}}},
+                new{id=PlainReward,revision=1,triggers=new[]{new{id="plain-reward",window="publicHandRevealed",subject="owner",optional=false,
+                    effects=new[]{new{op="draw",target="owner",amount=1,awaitMovementTriggers=true}}}}}
+
             };
-            var labels=new Dictionary<string,object>{[Quiet]=new{name="原生安静同行",description="正常摸牌后跳过出牌阶段。"},[Driver]=new{name="实际弃牌夹具",description="执行原生指定角色手牌弃置。"},[Hold]=new{name="实际展示奖励停点",description="只在第一次真实展示奖励摸牌后暂停。",optionLabels=new Dictionary<string,string>{{"continue","继续真实展示续接"}}}};
+            var labels=new Dictionary<string,object>{[Quiet]=new{name="原生安静同行",description="正常摸牌后跳过出牌阶段。"},[PlainReward]=new{name="普通展示受益",description="共享窗口签发的一次摸牌。"},[Driver]=new{name="实际弃牌夹具",description="执行原生指定角色手牌弃置。",optionLabels=new Dictionary<string,string>{{"parent-start","开始共享展示"},{"parent-return","结束共享展示"}}},[Hold]=new{name="实际展示奖励停点",description="只在第一次真实展示奖励摸牌后暂停。",optionLabels=new Dictionary<string,string>{{"continue","继续真实展示续接"}}}};
             var catalog=SkillProgramCatalog.Load(JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.RulesSchemaVersion,skills=defs}),JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.PresentationSchemaVersion,skills=labels}));
             foreach(var(id,p)in catalog.Programs)b.AddSkill(new(id,catalog.Presentations[id].Name,catalog.Presentations[id].Description){Program=p,ProgramPresentation=catalog.Presentations[id]});
             b.AddGeneral(new("fixture:mouxq-ally","实际展示受益者","","standard:none","wu",12,[Quiet,"mou-ol:jueyan"]));

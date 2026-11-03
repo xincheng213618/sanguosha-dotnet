@@ -41,7 +41,7 @@ internal sealed partial class CoreNativeFireAttackRuntime
         _coreNativeCardUseFramesOperations.SetCardUseStep(pending.Id, ResolutionFrameStep.AwaitingResponse);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FireAttackCardRevealedEvent(pending.Id, pending.SourceSeat, GetFireAttackTargetSeat(pending), revealed.Id, revealed.Kind, revealed.Suit));
         _coreMatchLogOperations.AddLog("CardRevealed", $"{(target.Name)} 展示了【{(revealed.DisplayName)}】（{(revealed.Suit)}），等待攻击者{((_coreRevealedFireAttackPaymentOperations.FireAttackPaymentIsReveal(pending.SourceSeat) ? "展示" : "弃置"))}同花色手牌。", target.Seat, pending.SourceSeat);
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow(pending.Id, PublicHandRevealReturnKind.FireAttack))
+        if (_publicHandRevealWindows.Begin(pending.Id, PublicHandRevealReturnKind.FireAttack))
             return;
         BeginFireAttackDiscard(_coreNativeCardContinuationCursorsOperations.ActiveFireAttack ?? throw new InvalidOperationException("FireAttack lost its revealed selection."), revealed);
     }
@@ -109,7 +109,7 @@ internal sealed partial class CoreNativeFireAttackRuntime
         {
             pending = SetFireAttackSelection(pending.Id, pending.FireAttackSelection!with { RevealedPaymentCardId = matchingDiscard.Id });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(pending.Id, [_coreSnapshotValueProjectionOperations.ToSnapshot(matchingDiscard)]));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(pending.Id, "native-fire-attack-payment"))
+            if (_publicHandRevealWindows.Begin(pending.Id, "native-fire-attack-payment"))
                 return;
             _coreRevealedFireAttackPaymentOperations.ContinueRevealedFireAttackPayment(pending);
             return;

@@ -85,7 +85,7 @@ internal sealed partial class CoreGameEngineZhaoguMirrorRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ZhaoguMirror = frame.ZhaoguMirror!with { Template = _coreSnapshotValueProjectionOperations.ToSnapshot(card), Stage = ZhaoguMirrorStage.RevealChildren } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(frame.Id, frame.SkillId, frame.TriggerId!, frame.OwnerSeat, ZhaoguRevealKey, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
-        if (!_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frame.Id, ZhaoguRevealKey))
+        if (!_publicHandRevealWindows.Begin(frame.Id, ZhaoguRevealKey))
             ContinueZhaoguAfterReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));
     }
 

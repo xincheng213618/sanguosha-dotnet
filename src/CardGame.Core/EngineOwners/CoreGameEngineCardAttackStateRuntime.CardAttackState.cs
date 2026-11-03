@@ -60,9 +60,9 @@ internal sealed partial class CoreGameEngineCardAttackStateRuntime
 
     internal long? FindCardContinuationOwner(Func<CardResolutionContinuations, bool> matches) => _resolutionStackOperations._resolutionStack.LastOrDefault(frame => frame switch
     {
-        CardUseFrame use => matches(use.Continuations) && !_characterXiaoQiaoMouOlOperations.MouXiaoQiaoOl.PublicRevealSuspends(use.Id) && !_characterGuoSiOlOperations.IsSuspendedGuoSiCompletedParent(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedCompletedAttack(use) && !_characterLiuChengMouMobileOperations.IsMouLiuChengSuspendedCompletedAttack(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(use),
-        ProgramSkillFrame program => matches(program.Continuations) && !_characterXiaoQiaoMouOlOperations.MouXiaoQiaoOl.PublicRevealSuspends(program.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(program),
-        JudgmentFrame judgment => matches(judgment.Continuations) && !_characterXiaoQiaoMouOlOperations.MouXiaoQiaoOl.PublicRevealSuspends(judgment.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(judgment),
+        CardUseFrame use => matches(use.Continuations) && !_publicHandRevealWindows.Suspends(use.Id) && !_characterGuoSiOlOperations.IsSuspendedGuoSiCompletedParent(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedCompletedAttack(use) && !_characterLiuChengMouMobileOperations.IsMouLiuChengSuspendedCompletedAttack(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(use),
+        ProgramSkillFrame program => matches(program.Continuations) && !_publicHandRevealWindows.Suspends(program.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(program),
+        JudgmentFrame judgment => matches(judgment.Continuations) && !_publicHandRevealWindows.Suspends(judgment.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(judgment),
         _ => false
     })?.Id;
     internal static SuspendedDecisionState CaptureSuspendedDecision(PendingDecision prompt) => RuntimeSkills.RuntimeRules_Core_CardAttackState.CaptureSuspendedDecision(prompt);

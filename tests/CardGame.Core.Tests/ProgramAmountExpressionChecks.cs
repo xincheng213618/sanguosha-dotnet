@@ -779,7 +779,7 @@ internal static class ProgramAmountExpressionChecks
                       {"op":"draw","target":"owner","amount":2,"awaitMovementTriggers":true}]}]},
                   {"id":"{{{AcceptedWatch}}}","revision":1,"triggers":[
                     {"id":"reveal-child","window":"cardsGained","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,
-                      "movementOccurrence":"perBatch","destinationZones":["hand"],"movementReasons":["skill-program.mou-ol:jueyan.draw"],"effects":[
+                      "movementOccurrence":"perBatch","destinationZones":["hand"],"movementReasons":["skill-program.mou-ol:jueyan.Draw"],"effects":[
                         {"op":"chooseOption","target":"owner","resultBind":"start","options":[{"id":"reveal-start"}]}{{{alteration}}},
                         {"op":"chooseOption","target":"owner","resultBind":"returned","options":[{"id":"reveal-return"}]}]},
                     {"id":"discard-child","window":"cardsMoved","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,

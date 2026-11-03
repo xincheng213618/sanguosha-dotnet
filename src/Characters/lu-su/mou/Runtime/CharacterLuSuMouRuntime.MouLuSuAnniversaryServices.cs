@@ -67,7 +67,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(r.Cards.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray())));
         foreach (var id in r.Cards)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLuSuAnniversaryShownEvent(f.Id, id));
-        _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "mou-lu-su-mingshi-three");
+        _publicHandRevealWindows.Begin(f.Id, "mou-lu-su-mingshi-three");
     }
 
     void IMouLuSuAnniversaryNative.Gift(ProgramSkillFrame f, int card)

@@ -47,7 +47,7 @@ internal sealed partial class CoreGameEngineProgramHandControlRuntime
                 HandControlDraft = new(effect.Op, stage, maximum, [], RevealedCardIds: stage == "color" ? hand.Select(card => card.Id).ToArray() : null)
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(frame);
-            if (stage == "color" && _characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(frame.Id, "hand-color-whole-hand"))
+            if (stage == "color" && _publicHandRevealWindows.Begin(frame.Id, "hand-color-whole-hand"))
                 return SkillProgramStepOutcome.AwaitChild;
         }
 

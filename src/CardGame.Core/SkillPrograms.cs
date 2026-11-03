@@ -773,7 +773,6 @@ public enum SkillProgramEffectOp
     ResolveMouXiaoQiaoMiluo = 34000,
     ResolveMouXiaoQiaoMiluoRoundEnd = 34001,
     ResolveMouXiaoQiaoJueyan = 34002,
-    ResolveMouXiaoQiaoJueyanReveal = 34003,
     PrepareMouZhangHeQiaobian = 34200, ResolveMouZhangHeSkippedPhase = 34201, ResolveMouZhangHeEnding = 34202,
     ResolveMouZhuRanZhenwei = 34400, ResolveMouZhuRanHeyuan = 34401,
     ObtainWushuangDeckCards = 62000,

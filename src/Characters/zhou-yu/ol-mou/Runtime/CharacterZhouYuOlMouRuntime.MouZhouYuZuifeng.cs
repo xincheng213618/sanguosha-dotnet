@@ -136,7 +136,7 @@ internal sealed partial class CharacterZhouYuOlMouRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouZuifeng = r with { Stage = MouZuifengStage.DamageChildren, ShownId = card.Id, ShownKind = card.Kind, ShownSuit = suit, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZuifengShownEvent(f.Id, f.OwnerSeat, r.TargetSeat, card.Id, card.Kind, suit, same));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "zuifeng-selected-hand"))
+            if (_publicHandRevealWindows.Begin(f.Id, "zuifeng-selected-hand"))
                 return;
             ContinueZuifengAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
             return;

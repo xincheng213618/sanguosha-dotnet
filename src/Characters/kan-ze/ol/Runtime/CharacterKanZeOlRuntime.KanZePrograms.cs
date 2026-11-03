@@ -87,7 +87,7 @@ internal sealed partial class CharacterKanZeOlRuntime
             _coreProgramLifecycleOperations.SetProgramCardSet(f.Id, XiashuShownBind, shown, SkillProgramCardSetVisibility.Public);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(shown.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray())));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { XiashuPaid = r with { Stage = XiashuStage.OwnerClaim } });
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "xiashu-selected-hand"))
+            if (_publicHandRevealWindows.Begin(f.Id, "xiashu-selected-hand"))
                 return;
             if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[r.Invoice.RecipientSeat].IsAlive)
             {
@@ -142,4 +142,16 @@ internal sealed partial class CharacterKanZeOlRuntime
 
     SkillProgramStepOutcome IKanZeProgramHost.BeginXiashu(ProgramSkillFrame f, int target) => BeginXiashu(f, target);
     SkillProgramStepOutcome IKanZeProgramHost.ArmKuanshi(ProgramSkillFrame f, int target) => ArmKuanshi(f, target);
+
+    [PublicHandRevealReturn("xiashu-selected-hand")]
+    internal void ReturnXiashuPublicHand(ProgramSkillFrame f)
+    {
+        if (f.XiashuPaid is not { Stage: XiashuStage.OwnerClaim })
+            throw new InvalidOperationException("Xiashu lost its frozen recipient Hand reveal.");
+        if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[f.XiashuPaid.Invoice.RecipientSeat].IsAlive)
+            FinishXiashu(f);
+        else
+            PublishXiashuDecision(f);
+    }
+
 }

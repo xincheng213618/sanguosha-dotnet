@@ -17,7 +17,7 @@ internal sealed partial class CharacterRuiJiOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQingliangRevealEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, action.ActorSeat, hand.Length));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 清靓：展示所有手牌（{(hand.Length)} 张）。", owner.Seat);
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id)with { RuiJiQingliang = new RuiJiQingliangState(parent.Id, action.ActorSeat, "option") });
-        if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(active.Id, "qingliang-hand"))
+        if (_publicHandRevealWindows.Begin(active.Id, "qingliang-hand"))
             return SkillProgramStepOutcome.AwaitChild;
         PresentQingliangOptionPrompt(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id));
         return SkillProgramStepOutcome.AwaitChoice;
@@ -134,4 +134,13 @@ internal sealed partial class CharacterRuiJiOlRuntime
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
     }
+
+    [PublicHandRevealReturn("qingliang-hand")]
+    internal void ReturnQingliangPublicHand(ProgramSkillFrame f)
+    {
+        if (f.RuiJiQingliang is not { Stage: "option" })
+            throw new InvalidOperationException("Qingliang lost its issued whole-Hand reveal.");
+        PresentQingliangOptionPrompt(f);
+    }
+
 }

@@ -120,7 +120,7 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
                 throw new InvalidOperationException("The blind reveal lost its frozen target-hand entity.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PhaseNamePrediction = r with { Stage = PhaseNamePredictionStage.Guessing, RevealedCardId = id } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(_coreCardAttackStateOperations.GetAttackCard(id)) })));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "phase-name-hand"))
+            if (_publicHandRevealWindows.Begin(f.Id, "phase-name-hand"))
                 return;
             PublishPredictionChoice(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
             return;
@@ -308,4 +308,13 @@ internal sealed partial class CoreGameEnginePhaseNamePredictionRuntime
 
     SkillProgramStepOutcome IPhaseNamePredictionHost.BeginPhaseNamePrediction(ProgramSkillFrame f, string state) => BeginPhaseNamePrediction(f, state);
     SkillProgramStepOutcome IPhaseNamePredictionHost.SettlePhaseNamePrediction(ProgramSkillFrame f, string state) => SettlePhaseNamePrediction(f, state);
+
+    [PublicHandRevealReturn("phase-name-hand")]
+    internal void ReturnPhasePredictionPublicHand(ProgramSkillFrame f)
+    {
+        if (f.PhaseNamePrediction is not { Stage: PhaseNamePredictionStage.Guessing, RevealedCardId: not null })
+            throw new InvalidOperationException("A name prediction lost its accepted blind reveal.");
+        PublishPredictionChoice(f);
+    }
+
 }

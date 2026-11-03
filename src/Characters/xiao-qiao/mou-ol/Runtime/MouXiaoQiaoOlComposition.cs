@@ -6,7 +6,7 @@ internal static class MouXiaoQiaoOlComposition
     internal static void Validate(string path, SkillProgram p)
     {
         static bool Owned(SkillProgramEffectOp op) => op is SkillProgramEffectOp.ResolveMouXiaoQiaoMiluo or
-            SkillProgramEffectOp.ResolveMouXiaoQiaoMiluoRoundEnd or SkillProgramEffectOp.ResolveMouXiaoQiaoJueyan or SkillProgramEffectOp.ResolveMouXiaoQiaoJueyanReveal;
+            SkillProgramEffectOp.ResolveMouXiaoQiaoMiluoRoundEnd or SkillProgramEffectOp.ResolveMouXiaoQiaoJueyan;
         var ours = p.Id is MouXiaoQiaoOlRuntime.Miluo or MouXiaoQiaoOlRuntime.Jueyan;
         if (!ours)
         {
@@ -28,7 +28,7 @@ internal static class MouXiaoQiaoOlComposition
                 t.Window == SkillProgramTriggerWindow.RoundEnding && t.Effects[0].Op == SkillProgramEffectOp.ResolveMouXiaoQiaoMiluoRoundEnd
             : a.Id == "retained-hand-use" && a.MinCards == 1 && a.MaxCards == 1 && a.SourceZones.SequenceEqual([CardZoneKind.Hand]) &&
                 a.UsesPerPhase is null && a.Effects[0].Op == SkillProgramEffectOp.ResolveMouXiaoQiaoJueyan && t.Id == "public-hand-first-suit" &&
-                t.Window == SkillProgramTriggerWindow.PublicHandRevealed && t.Effects[0].Op == SkillProgramEffectOp.ResolveMouXiaoQiaoJueyanReveal;
+                t.Window == SkillProgramTriggerWindow.PublicHandRevealed && t.Effects[0] is { Op: SkillProgramEffectOp.Draw, Amount: 1, AwaitMovementTriggers: true };
         if (!valid) throw new InvalidOperationException(path + ": Mou Xiao Qiao changed a reserved payment, target or Round budget binding.");
     }
 }
