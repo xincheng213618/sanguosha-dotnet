@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 internal interface ITriggeredCardProgramHost
 {
-    SkillProgramStepOutcome UseTriggeredVirtualSlash(ProgramSkillFrame frame, int targetSeat);
+    SkillProgramStepOutcome UseTriggeredVirtualSlash(ProgramSkillFrame frame, int targetSeat, string? resultBind);
     SkillProgramStepOutcome UseDiscardedCardAsDelayedTrick(ProgramSkillFrame frame, int targetSeat, CardKind kind);
     SkillProgramStepOutcome PayEquipmentColorDiscard(ProgramSkillFrame frame, string resultBind);
     void GrantPlayPhaseColorRestriction(ProgramSkillFrame frame, string sourceBind, int targetSeat);
@@ -15,16 +15,17 @@ internal sealed class UseVirtualSlashProgramOperationDescriptor : ProgramOperati
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.UseSelectedCardsAs, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "targetRef", "condition");
+        r.AllowOnly("op", "target", "targetRef", "resultBind", "condition");
         var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
         var reference = r.Has("targetRef") ? r.RequiredParticipantReference("targetRef") : null;
         if (reference is null && target != SkillProgramEffectTarget.SelectedTarget ||
             reference is not null && (target != SkillProgramEffectTarget.Owner || reference.Kind != ProgramParticipantRef.EventTarget))
             throw new InvalidOperationException("Virtual Slash requires a selected target or the event target.");
-        return new(Op, target, 0, r.Condition(), targetReference: reference);
+        return new(Op, target, 0, r.Condition(), targetReference: reference, resultBind: r.OptionalIdentifier("resultBind"));
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
-        effect.TargetReference is null ? [new ReadSelectedTarget()] : ParticipantResources(effect.TargetReference);
+        ProgramCardUseResultResources.Append(effect, effect.TargetReference is null
+            ? [new ReadSelectedTarget()] : ParticipantResources(effect.TargetReference));
 }
 
 public sealed class UseVirtualSlashProgramHandler : ISkillProgramEffectHandler
@@ -32,7 +33,7 @@ public sealed class UseVirtualSlashProgramHandler : ISkillProgramEffectHandler
     public SkillProgramEffectOp Op => SkillProgramEffectOp.UseVirtualSlash;
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat, ISkillProgramEffectHost host) =>
         host.GetCapability<ITriggeredCardProgramHost>().UseTriggeredVirtualSlash(frame,
-            effect.TargetReference is { } reference ? host.ResolveParticipant(frame, reference) : targetSeat);
+            effect.TargetReference is { } reference ? host.ResolveParticipant(frame, reference) : targetSeat, effect.ResultBind);
 }
 
 internal sealed class UseDiscardedCardAsDelayedTrickProgramOperationDescriptor : ProgramOperationDescriptorBase

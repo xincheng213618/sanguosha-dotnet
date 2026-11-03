@@ -220,8 +220,6 @@ var r = f.YangFu!; var choices = BingzhongChoices(f);
         }
         return actor == action.ActorSeat && actor == use.SourceSeat;
     }
-    internal bool HasBingzhongTargetTail(CardUseFrame use) =>
-        use.BingzhongTail is { AddedTargets.Count: > 0 };
     [ProgramAiChoice(SkillProgramEffectOp.ResolveBingzhongExtraTargets)]
     private PromptChoice ChooseAiBingzhong(PendingDecision decision, ProgramSkillFrame f)
     {

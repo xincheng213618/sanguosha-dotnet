@@ -8,14 +8,15 @@ internal sealed class OfferVirtualSlashOrDrawProgramOperationDescriptor : Progra
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.UseSelectedCardsAs, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "condition");
+        r.AllowOnly("op", "target", "resultBind", "condition");
         var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
         if (target != SkillProgramEffectTarget.SelectedTarget) throw new InvalidOperationException("A virtual Slash offer requires a selected actor.");
-        var effect = new SkillProgramEffect(Op, target, 0, r.Condition());
+        var effect = new SkillProgramEffect(Op, target, 0, r.Condition(), resultBind: r.OptionalIdentifier("resultBind"));
         RequireAlways(effect, r.Path);
         return effect;
     }
-    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [new ReadSelectedTarget()];
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
+        ProgramCardUseResultResources.Append(effect, [new ReadSelectedTarget()]);
 }
 
 public sealed class OfferVirtualSlashOrDrawSkillProgramEffectHandler : ISkillProgramEffectHandler

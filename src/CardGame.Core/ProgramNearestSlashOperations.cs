@@ -41,16 +41,17 @@ internal sealed class OfferUnlimitedVirtualSlashDescriptor : ProgramOperationDes
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.UseSelectedCardsAs, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
     {
-        reader.AllowOnly("op", "target", "condition");
+        reader.AllowOnly("op", "target", "resultBind", "condition");
         if (reader.RequiredEnum<SkillProgramEffectTarget>("target") != SkillProgramEffectTarget.Owner)
             throw new InvalidOperationException("An optional unlimited virtual Slash belongs to its current owner.");
         var effect = new SkillProgramEffect(Op, SkillProgramEffectTarget.Owner, 0, reader.Condition(),
             outputKind: CardKind.Slash, targetRestriction: SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget,
-            useCardActionWindows: true);
+            useCardActionWindows: true, resultBind: reader.OptionalIdentifier("resultBind"));
         RequireAlways(effect, reader.Path);
         return effect;
     }
-    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [new ReplaceSingleTarget()];
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
+        ProgramCardUseResultResources.Append(effect, [new ReplaceSingleTarget()]);
 }
 
 public sealed class RequestLegalSlashByNearestHandler : ISkillProgramEffectHandler

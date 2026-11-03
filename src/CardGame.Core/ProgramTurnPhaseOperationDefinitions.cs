@@ -35,7 +35,7 @@ internal sealed class UseVirtualCardProgramOperationDescriptor : ProgramOperatio
 
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
     {
-        reader.AllowOnly("op", "target", "outputKind", "targetRestriction", "condition", "useCardActionWindows");
+        reader.AllowOnly("op", "target", "outputKind", "targetRestriction", "condition", "useCardActionWindows", "resultBind");
         var target = reader.RequiredEnum<SkillProgramEffectTarget>("target");
         var kind = reader.RequiredEnum<CardKind>("outputKind");
         var restriction = reader.RequiredEnum<SkillProgramCardTargetRestriction>("targetRestriction");
@@ -43,12 +43,13 @@ internal sealed class UseVirtualCardProgramOperationDescriptor : ProgramOperatio
             restriction is not (SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget or SkillProgramCardTargetRestriction.NormalSlashTarget))
             throw new InvalidOperationException($"Invalid skill program at {reader.Path}: virtual card use currently supports one selected Slash with normal or unlimited distance.");
         var effect = new SkillProgramEffect(Op, target, 0, reader.Condition(), outputKind: kind,
-            targetRestriction: restriction, useCardActionWindows: reader.Has("useCardActionWindows") && reader.RequiredBool("useCardActionWindows"));
+            targetRestriction: restriction, useCardActionWindows: reader.Has("useCardActionWindows") && reader.RequiredBool("useCardActionWindows"),
+            resultBind: reader.OptionalIdentifier("resultBind"));
         if (effect.Condition.Kind is not (SkillProgramConditionKind.Always or SkillProgramConditionKind.ChoiceIs))
             throw new InvalidOperationException($"Invalid skill program at {reader.Path}.condition: a virtual card use accepts always or a named-choice branch.");
         return effect;
     }
 
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
-        [new ReadSelectedTarget()];
+        ProgramCardUseResultResources.Append(effect, [new ReadSelectedTarget()]);
 }

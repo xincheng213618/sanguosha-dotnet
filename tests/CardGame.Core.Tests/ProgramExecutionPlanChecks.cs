@@ -35,6 +35,7 @@ internal static class ProgramExecutionPlanChecks
         Require(nullIdError.ParamName == "bindingId",
             "A null trigger ID must retain the execution plan's original argument boundary.");
         RedirectPaymentPlansFollowOriginalInstructionIndices();
+        NativeUseResultBindingsAreTypedAndReadAfterTheirProducer();
 
         SkillProgram WithTriggers(params SkillProgramTrigger[] triggers) => new(loaded.Id, loaded.Revision,
             loaded.GameplayHash, loaded.RuntimeVersion, loaded.MinimumRulesVersion, loaded.Modifiers,
@@ -45,6 +46,54 @@ internal static class ProgramExecutionPlanChecks
             trigger.MinimumRank, trigger.MaximumRank, trigger.ExcludedReasons, trigger.JudgmentReasons,
             trigger.JudgmentSource, trigger.CardKinds, trigger.SourceZones, trigger.MovementOccurrence,
             trigger.DamageOccurrence, trigger.DrawPhaseMode, trigger.Optional, trigger.Condition, instructions);
+    }
+
+    private static void NativeUseResultBindingsAreTypedAndReadAfterTheirProducer()
+    {
+        const string select = """{"op":"selectTarget","target":"owner","targetKind":"otherLiving"}""";
+        const string use = """{"op":"useVirtualSlash","target":"selectedTarget","resultBind":"native-result"}""";
+        const string guard = """{"kind":"expression","expr":["==",["count",["useResultTargets","native-result"],true],1]}""";
+        var suffix = "{\"op\":\"draw\",\"target\":\"owner\",\"amount\":1,\"condition\":" + guard + "}";
+        SkillProgram Parse(string effects, bool active = false)
+        {
+            var binding = new Dictionary<string, object> { ["id"] = "use", ["effects"] = JsonSerializer.Deserialize<JsonElement>("[" + effects + "]") };
+            if (active)
+            {
+                binding["minCards"] = binding["maxCards"] = binding["minTargets"] = binding["maxTargets"] = 0;
+                binding["targetKind"] = "otherLiving";
+                binding["usesPerTurn"] = 1;
+            }
+            else { binding["window"] = "playPhaseStarting"; binding["subject"] = "owner"; binding["optional"] = true; }
+            var definition = new Dictionary<string, object> { ["id"] = "fixture:use-result-plan", ["revision"] = 1,
+                [active ? "activations" : "triggers"] = new[] { binding } };
+            return SkillProgramCatalog.Load(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = new[] { definition } }),
+                JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                skills = new Dictionary<string, object> { ["fixture:use-result-plan"] = new { name = "Native result", description = "Explicit original-frame result" } } }))
+                .Programs["fixture:use-result-plan"];
+        }
+        foreach (var producer in new[]
+        {
+            use,
+            """{"op":"useVirtualCard","target":"selectedTarget","outputKind":"slash","targetRestriction":"distanceUnlimitedAgainstTarget","useCardActionWindows":true,"resultBind":"native-result"}""",
+            """{"op":"offerVirtualSlashOrDraw","target":"selectedTarget","resultBind":"native-result"}""",
+            """{"op":"offerUnlimitedVirtualSlash","target":"owner","resultBind":"native-result"}"""
+        })
+        {
+            var active = producer.Contains("offerUnlimitedVirtualSlash", StringComparison.Ordinal);
+            var parsed = Parse(string.Join(',', select, producer, suffix), active);
+            Require((active ? parsed.Activations.Single().Effects : parsed.Triggers.Single().Effects)[1].ResultBind == "native-result" &&
+                    parsed.GameplayHash != Parse(string.Join(',', select, producer, suffix).Replace("native-result", "another-result", StringComparison.Ordinal), active).GameplayHash,
+                "The four existing use instructions declare typed native results whose producer and later expression reads participate in the gameplay fingerprint.");
+        }
+        foreach (var invalid in new[]
+        {
+            string.Join(',', select, suffix, use), string.Join(',', select, use, use),
+            string.Join(',', select, use[..^1] + ",\"condition\":" + guard + "}"),
+            string.Join(',', select, """{"op":"captureNumber","target":"owner","resultBind":"native-result","valueExpr":1}""", use),
+            string.Join(',', select, use, """{"op":"captureNumber","target":"owner","resultBind":"native-result","valueExpr":1}""")
+        }) RequireThrows<InvalidOperationException>(() => Parse(invalid));
+        using var wrongType = JsonDocument.Parse("""["useResultTargets",1]""");
+        RequireThrows<InvalidOperationException>(() => ProgramExpressions.ParseParticipantSet(wrongType.RootElement, "native-result"));
     }
 
     private static void RedirectPaymentPlansFollowOriginalInstructionIndices()

@@ -25,13 +25,18 @@ internal sealed partial class ProgramTargetSelectionRuntime
         if (paused is { Op: SkillProgramEffectOp.SelectTargets,
                 NumberExpression: SkillProgramNumberExpression.BoundCardCount, SourceBind: not null })
             return protocols.SelectNamedBoundTargets(frame, paused);
-        if (paused.ReplaceSelection == true)
+        if (paused.ReplaceSelection == true && paused.AllTargets != true)
         {
             frames.ReplaceTop(frame = frame with { SelectedTargetSeats = Array.AsReadOnly(Array.Empty<int>()) });
         }
         var targetSeats = FilterExpressionTargets(frame, paused, GetProgramTargetSeats(ownerSeat, targetKind, frame.WindowContext));
         if (paused.AllTargets == true)
         {
+            if (paused.ReplaceSelection == true && targetSeats.Count != 1)
+            {
+                protocols.Cancel(frame, "表达式没有唯一存活目标，技能剩余结算取消。");
+                return SkillProgramStepOutcome.AwaitChild;
+            }
             frames.ReplaceTop(frame with { SelectedTargetSeats = Array.AsReadOnly(targetSeats.ToArray()) });
             return SkillProgramStepOutcome.Continue;
         }

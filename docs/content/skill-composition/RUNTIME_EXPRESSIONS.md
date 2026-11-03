@@ -487,3 +487,16 @@ CardsMoved／CardsGained 绑定可声明 `"invocation":{"source":"movement"}`，
 加载器编译三项指令的关联，不要求整段程序恰好三步。付款可保留原有的 `resultBind`／`freezeMovedCardSuit`；付款与转移之间可放不改变选中目标、不插入独立阶段的真实效果，转移后也可继续其他效果。关联中的选择、付款和转移必须无条件，付款固定为一张本人手牌或装备并等待移动子结算；静态牌种、类别、花色过滤可复用，动态 `countExpr`、`exceptBind` 和 `suitFrom` 尚不支持；初始选择不附带区域、标记、actorRef 或 targetSetExpr 筛选，加载器明确拒绝这些未组合的形状。
 
 目标资格先要求至少存在一张配对材料，菜单与提交使用同一材料枚举。装备材料按移去该实体后的转移者攻击范围判断，手牌材料保留装备；不能继承来杀者的距离豁免。真实付款及其子结算都留在原帧，返回后原目标不再合法则取消转移并恢复原杀，已付款不退款或重选。该声明不产生额外失源或死亡续接权限，附加效果保留自己的规则和生命周期。
+
+
+## 原指令的原生用牌结果
+
+`useVirtualSlash`、`useVirtualCard`、`offerUnlimitedVirtualSlash`、`offerVirtualSlashOrDraw` 可选 `resultBind`，命名空间与其他帧绑定互斥。后续 `["useResultTargets","bind"]`返回该次原生完成执行目标的角色集合；原结果另保存有序槽位，表达式集合按首次出现去重。没有发行或尚未完成为 unknown，已完成但所有目标取消为空集合。
+
+```json
+{"op":"useVirtualSlash","target":"selectedTarget","resultBind":"attack"}
+```
+
+后续条件可用 `["count",["useResultTargets","attack"],true]` 判断目标数，或用 `filter`、`intersect` 与存活角色集合组合。结果不隐式替换父 `selectedTarget`。需要后续选择实际目标时，由 JSON 显式 `selectTargets`／`targetSetExpr`／`replaceSelection` 表达；`anyLiving` 配合 `allTargets` 可自动消费已经由表达式限定的存活目标集合，`minimumTargets:1` / `maximumTargets:1` 保留单目标资源契约，超限不会任取第一名。
+
+同一原生 use 的结果只交付一次，额外结算与重复完成不重采样；循环进入同一发行指令的新 occurrence 时清除旧绑定，拒绝可选出杀或条件未满足不会读取上一轮结果。提示续接与原生子返回不清除已经交付的本次结果。结果保留原生真实身份，无 Action 的合法路径仍为无 Action。

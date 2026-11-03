@@ -118,48 +118,6 @@ internal sealed partial class CoreGameEngineCurrentSlashFireOffersRuntime
             throw new InvalidOperationException("A fire conversion draft lost its exact committed Slash producer.");
     }
 
-    internal bool TryGetCurrentSlashFirePrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primary)
-    {
-        primary = [];
-        if (use.CurrentSlashFirePolicy is not { OriginalKind: CardKind.Slash } policy || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || policy.OriginalAction is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash, PhysicalCards.Count: 0 } action || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().SingleOrDefault(e => e.ResolutionId == use.Id)?.TargetSeats is not [var target] || use.CardAttack is not { CardId: null, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id || attack.SourceSeat != use.SourceSeat || use.SourceSeat != action.ActorSeat || action.ProviderSeat != use.SourceSeat || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || action.EffectiveSuit != Suit.None || action.EffectiveRank != 0 || parent.InstructionIndex < 1 || string.IsNullOrWhiteSpace(parent.SkillInstanceId) || string.IsNullOrWhiteSpace(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent)))
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        if (index < 1 || !ReferenceEquals(_resolutionStackOperations._resolutionStack[index - 1], parent) || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } definition || definition.GameplayHash != parent.GameplayHash || history.OfType<CardUseDeclaredEvent>().SingleOrDefault(e => e.ResolutionId == use.Id)is not { CardId: 0, CardKind: CardKind.Slash } declared || declared.SourceSeat != use.SourceSeat)
-            return false;
-        if (parent.TriggerId is { } triggerId)
-        {
-            if (parent.WindowContext is not { } context || history.OfType<ProgramBindingStartedEvent>().SingleOrDefault(e => e.FrameId == parent.Id)is not { } started || started.SkillId != parent.SkillId || started.BindingId != triggerId || started.SkillInstanceId != parent.SkillInstanceId || started.OwnerSeat != parent.OwnerSeat || started.Window != context.Window)
-                return false;
-        }
-        else if (!history.OfType<ProgramSkillStartedEvent>().Any(e => e.FrameId == parent.Id && e.SkillId == parent.SkillId && e.ActivationId == parent.ActivationId && e.OwnerSeat == parent.OwnerSeat))
-            return false;
-        // The policy and its change fact tie this frozen original ActionId to
-        // the same declared use, even after the actual target cursor advances.
-        AssertCurrentSlashFirePolicy(use);
-        var effect = ProgramInstructionResolver.Default.Resolve(parent, definition).GetPausedInstruction(parent.InstructionIndex).Effect;
-        var producer = new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
-        var originalSelection = effect.Op switch
-        {
-            SkillProgramEffectOp.UseVirtualCard or SkillProgramEffectOp.OfferUnlimitedVirtualSlash => parent.SelectedTargetSeats.SequenceEqual([target]),
-            SkillProgramEffectOp.OfferVirtualSlashOrDraw => parent.SelectedTargetSeats.SequenceEqual([use.SourceSeat]),
-            SkillProgramEffectOp.UseVirtualSlash => effect.TargetReference is null ? parent.SelectedTargetSeats.SequenceEqual([target]) : effect.TargetReference.Kind == ProgramParticipantRef.EventTarget && parent.WindowContext?.TargetSeat == target,
-            _ => false
-        };
-        var exact = effect.Op switch
-        {
-            SkillProgramEffectOp.UseVirtualCard or SkillProgramEffectOp.OfferUnlimitedVirtualSlash => parent.OwnerSeat == use.SourceSeat && effect.OutputKind == CardKind.Slash && effect.TargetRestriction is (SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget or SkillProgramCardTargetRestriction.NormalSlashTarget) && (action.ConversionChain.Count == 0 || action.ConversionChain.SequenceEqual([producer])),
-            SkillProgramEffectOp.OfferVirtualSlashOrDraw => action.ConversionChain.Count == 0,
-            SkillProgramEffectOp.UseVirtualSlash => parent.OwnerSeat == use.SourceSeat && action.ConversionChain.SequenceEqual([producer]),
-            _ => false
-        };
-        if (!exact || !originalSelection || use.ShortRangeSlashTarget is not null && !_coreShortRangeSlashTargetsOperations.HasShortRangeSlashTail(use))
-            return false;
-        // Extra targets and redirects belong to the child use. Its exact
-        // producer resumes with the original frozen singleton selection.
-        primary = Array.AsReadOnly(new[] { target });
-        return true;
-    }
 
     internal bool IsCurrentSlashFireChangedUse(CardUseFrame use) => use.CurrentSlashFirePolicy is { Converted: true } && use.CardKind == CardKind.FireSlash;
     internal void AssertCurrentSlashFirePolicy(CardUseFrame use)

@@ -75,8 +75,18 @@ internal static partial class LeDaQiaoZixiChecks
         s.Private(); s.Cold(); s.Answer(c => c.Targets.SequenceEqual([3]));
         var liuliCost = s.Hand().First(c => c.Kind == CardKind.Crossbow).Id;
         s.Reach(() => s.P?.SkillPrompt?.SkillId == "classic:liuli" && s.P.Choices.Any(c => c.Cards.SequenceEqual([liuliCost])));
-        s.Private(); s.Cold(); s.Answer(c => c.Cards.SequenceEqual([liuliCost])); s.Play();
+        s.Private(); s.Cold(); s.Answer(c => c.Cards.SequenceEqual([liuliCost]));
+        s.Reach(() => s.P?.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") == "offer-returned") == true);
         var redirectedUse = s.E<CardUseDeclaredEvent>().Single(e => e.SourceSeat == 1 && e.CardKind == CardKind.Slash);
+        var offerParent = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == ZdDriver && f.ActivationId == "offer");
+        var useResult = offerParent.CardUseResults.Single(r => r.Bind == "offer-use");
+        s.Need(offerParent.SelectedTargetSeats.SequenceEqual([1]) && useResult.InstructionIndex == 1 &&
+            useResult.NativeUseId == redirectedUse.ResolutionId && useResult.DeclarerSeat == 1 && useResult.ActorSeat == 1 && useResult.ProviderSeat == 1 &&
+            useResult.Kind == CardKind.Slash && useResult.IssuedTargetSeats.SequenceEqual([0]) && useResult.TargetSeats.SequenceEqual([3]),
+            "The real foreign actor remains the original parent's selected participant; its explicit native result separately records the paid Slash's issued target and actual post-Liuli target.");
+        s.Need(useResult.IssuedTargetSeats is IList<int> { IsReadOnly: true } && useResult.TargetSeats is IList<int> { IsReadOnly: true },
+            "The delivered native target lists are frozen before the original parent exposes its suffix."); s.Private(); s.Cold();
+        s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "offer-returned"); s.Play();
         var liuli = s.E<ProgramBindingStartedEvent>().Single(e => e.SkillId == "classic:liuli" && e.BindingId == "redirect-slash" && e.OwnerSeat == 0 && e.Window == SkillProgramTriggerWindow.SlashTargetRedirecting);
         s.Need(s.E<ProgramBindingResolvedEvent>().Count(e => e.FrameId == liuli.FrameId && e.SkillId == liuli.SkillId && e.BindingId == liuli.BindingId &&
                 e.SkillInstanceId == liuli.SkillInstanceId && e.OwnerSeat == 0 && e.Window == liuli.Window && e.Activated && e.Completed) == 1 &&
@@ -286,6 +296,12 @@ internal static partial class LeDaQiaoZixiChecks
                 A("damage", "{\"op\":\"damage\",\"target\":\"selectedTarget\",\"amount\":1}", targets: 1),
                 A("dying", "{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":13}"),
                 A("offer", "{\"op\":\"offerVirtualSlashOrDraw\",\"target\":\"selectedTarget\"}", targets: 1));
+            if (scene == "redirect")
+            {
+                var offer = acts.Single(n => n!["id"]!.GetValue<string>() == "offer")!["effects"]!.AsArray();
+                offer[0]!["resultBind"] = "offer-use";
+                offer.Add(N(Choice("offer-returned")));
+            }
             if (scene == "replacement") acts.Add(A("grant-zenrun", "{\"op\":\"grantSkills\",\"target\":\"owner\",\"skillIds\":[\"ol:zenrun\"]}"));
             var duel = A("duel", "{\"op\":\"useSelectedActorDuel\",\"target\":\"owner\"}", targets: 1); duel["targetKind"] = "otherLiving"; duel["usesPerPhase"] = 2; acts.Add(duel);
             acts.Single(n => n!["id"]!.GetValue<string>() == "place")!["cardCategories"] = N("[\"equipment\"]");

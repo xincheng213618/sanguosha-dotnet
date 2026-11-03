@@ -76,10 +76,10 @@ internal sealed partial class CoreGameEngineProgramVirtualSlashOffersRuntime
 
         if (!selectingTarget || selected.Targets.Count != 1 || !targets.Contains(selected.Targets[0]) || option != $"target-{(selected.Targets[0])}")
             throw new InvalidOperationException("The virtual Slash target is no longer legal.");
-        BeginOfferedProgramVirtualSlash(frame, actorSeat, selected.Targets[0]);
+        BeginOfferedProgramVirtualSlash(frame, actorSeat, selected.Targets[0], resultBind: effect.ResultBind);
     }
 
-    internal void BeginOfferedProgramVirtualSlash(ProgramSkillFrame frame, int actorSeat, int targetSeat, bool standardZeroEntityAttackCompletion = false)
+    internal void BeginOfferedProgramVirtualSlash(ProgramSkillFrame frame, int actorSeat, int targetSeat, bool standardZeroEntityAttackCompletion = false, string? resultBind = null)
     {
         if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is not null || _coreNativeCardContinuationCursorsOperations.ActiveDuel is not null)
             throw new InvalidOperationException("A virtual Slash cannot overwrite an attack.");
@@ -87,7 +87,13 @@ internal sealed partial class CoreGameEngineProgramVirtualSlashOffersRuntime
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actorSeat, actorSeat, null, null, null, CardKind.Slash, [targetSeat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, actorSeat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: []) { Action = action, UsesStandardZeroEntityAttackCompletion = standardZeroEntityAttackCompletion });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, actorSeat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: [])
+        {
+            Action = action,
+            UsesStandardZeroEntityAttackCompletion = standardZeroEntityAttackCompletion,
+            ProgramResultSink = resultBind is { } bind
+                ? new(frame.Id, frame.InstructionIndex, bind, actorSeat, actorSeat, [targetSeat]) : null
+        });
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(resolutionId, 0, CardKind.Slash, actorSeat));

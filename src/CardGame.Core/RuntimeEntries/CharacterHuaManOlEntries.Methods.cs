@@ -31,6 +31,5 @@ internal sealed partial class CharacterHuaManOlEntries
     internal bool ReturnHuaManMovement(ProgramSkillFrame f) => _resolve().ReturnHuaManMovement(f);
     internal PromptChoice SelectHuaManAi(ProgramSkillFrame f) => _resolve().SelectHuaManAi(f);
     internal bool TryAdvanceHuaManSubtree() => _resolve().TryAdvanceHuaManSubtree();
-    internal bool TryGetSouyingCancelledVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, scoped out IReadOnlyList<int> primaryTarget) => _resolve().TryGetSouyingCancelledVirtualPrimaryReturn(use, parent, out primaryTarget);
     internal bool ValidSouyingMutation(CardUseFrame use, SouyingNativeMutation r) => _resolve().ValidSouyingMutation(use, r);
 }

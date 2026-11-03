@@ -58,20 +58,6 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
             virtualUse = _coreActualTurnLegacyCompletionOperations.NormalizeActualTurnLegacyCompletedUse(virtualUse, attack.ProgramSkillCardUseFrameId);
             if (virtualUse.Action is { } virtualAction)
             {
-                if (attack.ProgramSkillCardUseFrameId is { } programParentId && virtualUse.SharedSlashBenefit is null && virtualUse.ForeignTurnContestSlashReturn is null && virtualUse.PindianWinnerSlashReturn is null && virtualUse.InspectedHandSlashReturn is null && virtualUse.KuangfuSlashReturn is null && virtualUse.HeJinMouzhu is null && virtualUse.WuAnGuoLiyong is null && !_characterDianWeiMouOperations.IsMouDianWeiSlashUse(virtualUse.Id) && !_characterWuJingOlOperations.IsWuJingHejiZeroUse(virtualUse) && !_characterMengDaOlOperations.IsGoudeSlashUse(virtualUse.Id) && !_characterYaDanOlOperations.IsIssuedQingyaUse(virtualUse.Id) && !_characterYangFuOlOperations.IsSuyiSlashUse(virtualUse.Id) && !_characterLiYiOlOperations.HasIssuedChanshuangSlash(virtualUse.Id, virtualUse.SourceSeat) && !_characterWangChangAnniversaryOperations.Value.IsWangChangSlash(virtualUse) && !_coreShanheS5XuncanOperations.IsShanheS5YunshenUse(virtualUse.Id))
-                {
-                    var parentIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == programParentId);
-                    if (parentIndex < 0 || _resolutionStackOperations._resolutionStack[parentIndex] is not ProgramSkillFrame parent)
-                        throw new InvalidOperationException("The virtual Slash lost its selected-target program parent.");
-                    if (parent.YangHong is null && parent.GaoXiang is null)
-                    {
-                        IReadOnlyList<int> primaryTarget = virtualUse.TargetSeats;
-                        if (virtualUse.TargetSeats.Count != 1 && !_coreOriginalTargetAdditionsOperations.TryGetOriginalTargetVirtualSlashReturn(virtualUse, parent, out primaryTarget))
-                            throw new InvalidOperationException("The virtual Slash lost its selected-target program parent.");
-                        _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { SelectedTargetSeats = primaryTarget });
-                    }
-                }
-
                 _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.Completed);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseFinishedEvent(attack.ResolutionId, 0, virtualUse.CardKind));
                 if (_coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreCardActionsOperations.TryBeginProgramCardWindow(attack, virtualAction, SkillProgramTriggerWindow.CardUseCompleted, virtualUse.TargetSeats, ProgramCardContinuation.CompletedSlash, cardUseCausedDamage: attack.CardUseCausedDamage))

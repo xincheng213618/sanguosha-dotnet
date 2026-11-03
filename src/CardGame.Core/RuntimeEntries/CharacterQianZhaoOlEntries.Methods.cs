@@ -23,7 +23,6 @@ internal sealed partial class CharacterQianZhaoOlEntries
     internal void FreezeWeifuActorChange(IGameEvent fact) => _resolve().FreezeWeifuActorChange(fact);
     internal void FreezeWeifuJudgmentResult(IGameEvent payload) => _resolve().FreezeWeifuJudgmentResult(payload);
     internal bool HasIssuedWeifuCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().HasIssuedWeifuCandidate(c, context);
-    internal bool HasWeifuTargetTail(CardUseFrame use) => _resolve().HasWeifuTargetTail(use);
     internal bool HasWeifuUseDistance(CharacterState actor, CardKind kind, long? cardUseFrameId) => _resolve().HasWeifuUseDistance(actor, kind, cardUseFrameId);
     internal bool IsQianZhaoRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsQianZhaoRecoveryParent(f, recovery);
     internal bool IsWeifuJudgment(JudgmentFrame j, ProgramSkillFrame f) => _resolve().IsWeifuJudgment(j, f);
@@ -44,7 +43,6 @@ internal sealed partial class CharacterQianZhaoOlEntries
     internal bool ResumeKuansai(long id) => _resolve().ResumeKuansai(id);
     internal bool ResumeWeifu(long id) => _resolve().ResumeWeifu(id);
     internal bool ReturnQianZhaoMovement(ProgramSkillFrame f) => _resolve().ReturnQianZhaoMovement(f);
-    internal bool TryGetWeifuVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, scoped out IReadOnlyList<int> primary) => _resolve().TryGetWeifuVirtualPrimaryReturn(use, parent, out primary);
     internal bool TryReturnWeifuJudgment(JudgmentFrame j) => _resolve().TryReturnWeifuJudgment(j);
     internal bool WeifuCurrentActorMatches(CardUseFrame use, WeifuUseReceipt r) => _resolve().WeifuCurrentActorMatches(use, r);
     internal bool WeifuNormalizeImplicitDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => _resolve().WeifuNormalizeImplicitDrawTwoTargetWindow(query);

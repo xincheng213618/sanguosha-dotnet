@@ -245,17 +245,23 @@ internal sealed class SelectTargetsProgramOperationDescriptor : ProgramOperation
             ReplaceSelection = r.Has("replaceSelection") ? r.RequiredBool("replaceSelection") : null,
             AllTargets = r.Has("allTargets") ? r.RequiredBool("allTargets") : null
         };
-        if (effect.AllTargets == true && (kind != SkillProgramTargetKind.CurrentCardUseTargets ||
+        var automaticSingleton = IsAutomaticSingleton(effect);
+        if (effect.AllTargets == true && !automaticSingleton && (kind != SkillProgramTargetKind.CurrentCardUseTargets ||
             minimum != 1 || maximum != 64 || numberExpression is not null || sourceBind is not null))
-            throw new InvalidOperationException($"Invalid skill program at {r.Path}: allTargets requires the complete current card-use target set without a count expression.");
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: allTargets requires the complete current card-use target set or one explicit living expression target.");
         if (effect.ReplaceSelection is not null &&
-            (effect.ReplaceSelection != true || kind != SkillProgramTargetKind.AnyLivingChained || minimum != 0 ||
+            !automaticSingleton && (effect.ReplaceSelection != true || kind != SkillProgramTargetKind.AnyLivingChained || minimum != 0 ||
                 numberExpression is not null || sourceBind is not null || aiOrder != SkillProgramTargetAiOrder.SupportDraw ||
                 effect.Condition.Kind != SkillProgramConditionKind.Always))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: replacement selection requires an unconditional empty-safe chained support target set.");
         return effect;
     }
+    private static bool IsAutomaticSingleton(SkillProgramEffect effect) => effect is
+        { AllTargets: true, ReplaceSelection: true, TargetKind: SkillProgramTargetKind.AnyLiving,
+          MinimumTargets: 1, MaximumTargets: 1, TargetAiOrder: SkillProgramTargetAiOrder.Stable,
+          TargetSetExpression: not null, NumberExpression: null, SourceBind: null };
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
+        IsAutomaticSingleton(effect) ? [new ReplaceSingleTarget()] :
         effect.AllTargets == true ? [new RequireContext(ProgramContextCapability.CardAction), new SelectTargetSet(0, 64)] :
         effect.ReplaceSelection == true ? [new ReplaceSingleTargetWithSet()] : effect.SourceBind is not null
             ? [new ReadCardSet(effect.SourceBind), new SelectTargetSet(effect.MinimumTargets, effect.MaximumTargets)]

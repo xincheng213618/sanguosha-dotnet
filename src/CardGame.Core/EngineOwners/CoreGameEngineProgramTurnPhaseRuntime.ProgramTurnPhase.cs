@@ -55,7 +55,12 @@ internal sealed partial class CoreGameEngineProgramTurnPhaseRuntime
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var nativeWindows = instruction.UseCardActionWindows || _coreCurrentSlashFireOffersOperations.HasCommittedSlashFireCapability(source) || _characterLuBuHappyGodOperations.HasHappyLuBuWuqianCapability(source) || _characterLeJiuAnniversaryOperations.Value.HasAnniversaryLeJiuUseObserver(source);
         var action = nativeWindows || _characterHuangYueyingOlMouOperations.HasMouHuangYueyingBingcaiCapability || _characterZhouQunOlOperations.Value.HasZhouQunCapability || _characterKongShuOlOperations.HasKongShuCapability || _characterMaChengOlOperations.HasMaChengCapability || _characterCuiYanOlOperations.HasCuiYanCapability || _characterLiYiOlOperations.HasLiYiCapability || _characterCaiWenJiLeOperations.HasLeCaiWenJiBeifenCapability || _characterLiuYanOlOperations.HasLiuYanCapability || _coreNativeLogicalDiscardsOperations.TracksNativeLogicalDiscards || _characterLiuZanMobileOperations.TracksAlternateActualUseColor || _coreSoleTargetProtectionOperations.Value.HasSoleTargetProtectionParticipant || phaseControlParticipant || _characterSunHaoOlOperations.Value.HasSunHaoCanshiCapability ? _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, source.Seat, source.Seat, null, null, null, cardKind, [targetSeat], [], Array.AsReadOnly(new[] { new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId) }), effectiveSuit: Suit.None, effectiveRank: 0)) : null;
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, source.Seat, 0, cardKind, Array.AsReadOnly(new[] { targetSeat }), PhysicalCardIds: Array.AsReadOnly(Array.Empty<int>())) { Action = action });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, source.Seat, 0, cardKind, [targetSeat], PhysicalCardIds: [])
+        {
+            Action = action,
+            ProgramResultSink = instruction.ResultBind is { } bind
+                ? new(active.Id, active.InstructionIndex, bind, source.Seat, source.Seat, [targetSeat]) : null
+        });
         if (action is not null)
             _corePhaseNamePredictionOperations.ObservePhaseNamePredictionUse(action);
         else

@@ -11,7 +11,10 @@ internal sealed partial class CoreNativeCardUseFramesRuntime
             throw new InvalidOperationException($"Resolution frame {(frameId)} is not a CardUse frame.");
         }
 
-        _coreRuntimeOperations.ReplaceRuntimeFrame(_resolutionStackOperations._resolutionStack[index].Id, cardUse with { Step = step });
+        var updated = cardUse with { Step = step };
+        _coreRuntimeOperations.ReplaceRuntimeFrame(updated.Id, updated);
+        if (step == ResolutionFrameStep.Completed)
+            _programUseResults.Capture(updated);
     }
 
     internal void RedirectCardUseTarget(long frameId, int targetIndex, int originalTargetSeat, int redirectedTargetSeat)

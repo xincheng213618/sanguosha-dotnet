@@ -103,58 +103,6 @@ internal sealed partial class CoreGameEngineOriginalTargetAdditionsRuntime
         };
     }
 
-    internal bool HasIssuedOriginalTargetAdditionTail(CardUseFrame use) => use.OriginalTargetAddition is { Added: true } receipt && use.Action is { Type: CardActionType.Use } action && use.SourceSeat == action.ActorSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && action.EffectiveKind == use.CardKind && receipt.Grants.Any(g => g.Source.OwnerSeat == action.ActorSeat && action.EffectiveDesignatedTargetSeats.Contains(g.TargetSeat));
-    internal bool TryGetOriginalTargetVirtualSlashReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primaryTarget)
-    {
-        primaryTarget = Array.Empty<int>();
-        if (_characterQianZhaoOlOperations.TryGetWeifuVirtualPrimaryReturn(use, parent, out primaryTarget))
-            return true;
-        if (_characterMaWanOlOperations.TryGetMaWanVirtualPrimaryReturn(use, parent, out primaryTarget))
-            return true;
-        if (_characterZhangYanOlOperations.TryGetZhangYanVirtualPrimaryReturn(use, parent, out primaryTarget))
-            return true;
-        if (_characterHuaManOlOperations.TryGetSouyingCancelledVirtualPrimaryReturn(use, parent, out primaryTarget))
-            return true;
-        if (_coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetVirtualPrimaryReturn(use, parent, out primaryTarget))
-            return true;
-        if (_coreShortRangeSlashTargetsOperations.TryGetShortRangeVirtualPrimaryReturn(use, parent, out primaryTarget))
-            return true;
-        if (_coreForeignContestAidObserversOperations.Value.TryGetSameTypeAidVirtualPrimaryReturn(use, parent, out primaryTarget))
-            return true;
-        if (_coreCurrentSlashFireOffersOperations.TryGetCurrentSlashFirePrimaryReturn(use, parent, out primaryTarget))
-            return true;
-        if (_coreCurrentEnhancementVirtualReturnOperations.Value.TryGetCurrentEnhancementVirtualPrimaryReturn(use, parent, out primaryTarget))
-            return true;
-        if (!HasIssuedOriginalTargetAdditionTail(use) || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.CardAttack is not { CardId: null, EffectiveCardKind: CardKind.Slash, PhysicalCardIds.Count: 0 } attack || attack.SourceSeat != use.SourceSeat || attack.ProgramSkillCardUseFrameId != parent.Id || use.TargetSeats.Count < 2 || use.TargetSeats.Distinct().Count() != use.TargetSeats.Count || use.Action is not { Type: CardActionType.Use, EffectiveKind: CardKind.Slash } action || action.ActorSeat != use.SourceSeat || action.ProviderSeat != action.ActorSeat || action.PhysicalCards.Count != 0 || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || !action.TargetSeats.SequenceEqual(use.TargetSeats) || action.EffectiveSuit != Suit.None || action.EffectiveRank != 0 || string.IsNullOrWhiteSpace(parent.SkillId) || string.IsNullOrWhiteSpace(parent.SkillInstanceId) || string.IsNullOrWhiteSpace(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent)) || parent.InstructionIndex <= 0)
-            return false;
-        var useIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
-        if (useIndex <= 0 || !ReferenceEquals(_resolutionStackOperations._resolutionStack[useIndex - 1], parent) || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash)
-            return false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var declared = history.OfType<CardUseDeclaredEvent>().SingleOrDefault(e => e.ResolutionId == use.Id);
-        var targets = history.OfType<TargetsConfirmedEvent>().SingleOrDefault(e => e.ResolutionId == use.Id);
-        var accepted = history.OfType<CardActionAcceptedEvent>().Select(e => e.Action).FirstOrDefault(original => original.ActionId == action.ActionId && original.Type == CardActionType.Use);
-        if (declared is not { CardId: 0, CardKind: CardKind.Slash } || declared.SourceSeat != action.ActorSeat || targets is not { TargetSeats.Count: 1 } || accepted is null || accepted.ActorSeat != action.ActorSeat || accepted.ProviderSeat != action.ActorSeat || accepted.EffectiveKind != CardKind.Slash || accepted.PhysicalCards.Count != 0 || accepted.TargetSeats.Count != 1 || accepted.TargetSeats[0] != use.TargetSeats[0] || !accepted.ConversionChain.SequenceEqual(action.ConversionChain))
-            return false;
-        var additionalTarget = use.TargetSeats[^1];
-        if (!use.OriginalTargetAddition!.Grants.Any(grant => grant.Source.OwnerSeat == action.ActorSeat && grant.TargetSeat == additionalTarget && history.OfType<OriginalTargetAdditionIssuedEvent>().Any(issued => issued.CardUseFrameId == use.Id && issued.ActionId == action.ActionId && issued.Grant == grant)) || !history.OfType<OriginalTargetAdditionResolvedEvent>().Any(resolved => resolved.CardUseFrameId == use.Id && resolved.ActionId == action.ActionId && resolved.ActorSeat == action.ActorSeat && resolved.Added && resolved.TargetSeat == additionalTarget))
-            return false;
-        var paused = ProgramInstructionResolver.Default.Resolve(parent, program).GetPausedInstruction(parent.InstructionIndex).Effect;
-        var originalTarget = targets.TargetSeats[0];
-        var exactProducer = paused.Op switch
-        {
-            SkillProgramEffectOp.OfferVirtualSlashOrDraw => parent.SelectedTargetSeats is [var actor] && actor == action.ActorSeat && action.ConversionChain.Count == 0,
-            SkillProgramEffectOp.UseVirtualSlash => parent.OwnerSeat == action.ActorSeat && action.ConversionChain.Count == 1 && action.ConversionChain[0] == new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId) && (paused.TargetReference is null ? parent.SelectedTargetSeats is [var selected] && selected == originalTarget : paused.TargetReference.Kind == ProgramParticipantRef.EventTarget && parent.WindowContext?.TargetSeat == originalTarget),
-            SkillProgramEffectOp.UseVirtualCard or SkillProgramEffectOp.OfferUnlimitedVirtualSlash => parent.OwnerSeat == action.ActorSeat && parent.SelectedTargetSeats is [var selected] && selected == originalTarget && action.ConversionChain.Count == 0 && paused.UseCardActionWindows && paused.OutputKind == CardKind.Slash && paused.TargetRestriction == SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget && (parent.TriggerId is not null || paused.Op == SkillProgramEffectOp.OfferUnlimitedVirtualSlash),
-            _ => false
-        };
-        if (!exactProducer)
-            return false;
-        // Use the primary post-redirection target, exactly as the old single
-        // target path does. The extra target must not overwrite its producer.
-        primaryTarget = Array.AsReadOnly(new[] { use.TargetSeats[0] });
-        return true;
-    }
 
     internal int CompletedFangtianOriginalTargetIndex(NativeOwners.FangtianHalberdHandle multi)
     {

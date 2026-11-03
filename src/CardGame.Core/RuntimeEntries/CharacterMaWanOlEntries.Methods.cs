@@ -15,7 +15,6 @@ internal sealed partial class CharacterMaWanOlEntries
     internal bool DrainMaWan(long id) => _resolve().DrainMaWan(id);
     internal void FinishMaWan(ProgramSkillFrame f) => _resolve().FinishMaWan(f);
     internal bool HasIssuedMaWanHunjiangCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().HasIssuedMaWanHunjiangCandidate(candidate, context);
-    internal bool HasMaWanHunjiangTargetTail(CardUseFrame use) => _resolve().HasMaWanHunjiangTargetTail(use);
     internal void IssueMaWanHunjiangUse(long id, CardActionContext? action) => _resolve().IssueMaWanHunjiangUse(id, action);
     internal IReadOnlyList<PromptChoice> MaWanChoices(ProgramSkillFrame f) => _resolve().MaWanChoices(f);
     internal int MaWanChooser(ProgramSkillFrame f) => _resolve().MaWanChooser(f);
@@ -29,6 +28,5 @@ internal sealed partial class CharacterMaWanOlEntries
     internal CardUseFrame RequireMaWanUse(ProgramSkillFrame f) => _resolve().RequireMaWanUse(f);
     internal void ResolveMaWanVotes(ProgramSkillFrame f) => _resolve().ResolveMaWanVotes(f);
     internal bool ResumeMaWan(long id) => _resolve().ResumeMaWan(id);
-    internal bool TryGetMaWanVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, scoped out IReadOnlyList<int> primary) => _resolve().TryGetMaWanVirtualPrimaryReturn(use, parent, out primary);
     internal bool HasMaWanCapability { get => _resolve().HasMaWanCapability; }
 }

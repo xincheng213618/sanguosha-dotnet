@@ -13,14 +13,11 @@ internal sealed partial class CoreGameEngineDesignatedExtraTargetsEntries
     internal IReadOnlyList<IReadOnlyList<int>> DesignatedExtraTargetCandidates(CardUseFrame use) => _resolve().DesignatedExtraTargetCandidates(use);
     internal bool DesignatedExtraTargetFinalizedInstantTrickRequirementTargetWindow(ProgramTargetCardWindowQuery query) => _resolve().DesignatedExtraTargetFinalizedInstantTrickRequirementTargetWindow(query);
     internal CardConversionSource DesignatedExtraTargetSource(ProgramSkillFrame frame) => _resolve().DesignatedExtraTargetSource(frame);
-    internal bool HasDesignatedExtraTargetTail(CardUseFrame use) => _resolve().HasDesignatedExtraTargetTail(use);
     internal bool HasDiscardedDesignatedCardName(CardKind kind) => _resolve().HasDiscardedDesignatedCardName(kind);
-    internal bool IsDesignatedExtraTargetFact(CardUseFrame use, DesignatedExtraTargetResolvedEvent fact, IReadOnlyList<int> originalTargets) => _resolve().IsDesignatedExtraTargetFact(use, fact, originalTargets);
     internal CardUseFrame RequireDesignatedExtraTargetParent(ProgramSkillFrame frame, scoped out ProgramCardTriggerWindowFrame window) => _resolve().RequireDesignatedExtraTargetParent(frame, out window);
     internal void ResolveDesignatedExtraTargetChoice(PromptChoice selected) => _resolve().ResolveDesignatedExtraTargetChoice(selected);
     internal PromptChoice SelectAiDesignatedExtraTargetChoice(PendingDecision decision, ProgramSkillFrame frame) => _resolve().SelectAiDesignatedExtraTargetChoice(decision, frame);
     internal bool TryContinueDesignatedVirtualBasicUse(long id) => _resolve().TryContinueDesignatedVirtualBasicUse(id);
     internal bool TryGetDesignatedExtraTargetUse(int owner, ProgramSkillWindowContext context, scoped out CardUseFrame use, scoped out ProgramCardTriggerWindowFrame window) => _resolve().TryGetDesignatedExtraTargetUse(owner, context, out use, out window);
-    internal bool TryGetDesignatedExtraTargetVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, scoped out IReadOnlyList<int> targets) => _resolve().TryGetDesignatedExtraTargetVirtualPrimaryReturn(use, parent, out targets);
     internal bool WasDesignatedExtraTargetOffered(CardUseFrame use, CardConversionSource source) => _resolve().WasDesignatedExtraTargetOffered(use, source);
 }

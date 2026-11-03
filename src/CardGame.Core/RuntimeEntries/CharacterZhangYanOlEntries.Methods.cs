@@ -17,7 +17,6 @@ internal sealed partial class CharacterZhangYanOlEntries
     internal bool DrainZhangYan(ProgramSkillFrame f) => _resolve().DrainZhangYan(f);
     internal void FinishZhangYan(ProgramSkillFrame f, bool applied) => _resolve().FinishZhangYan(f, applied);
     internal bool HasIssuedZhangYanSujiRewardCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().HasIssuedZhangYanSujiRewardCandidate(c, context);
-    internal bool HasZhangYanLangdaoTargetTail(CardUseFrame use) => _resolve().HasZhangYanLangdaoTargetTail(use);
     internal bool IsZhangYanLangdaoIssued(CardUseFrame use) => _resolve().IsZhangYanLangdaoIssued(use);
     internal bool IsZhangYanNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _resolve().IsZhangYanNativeSettlementBatch(f, batch);
     internal bool IsZhangYanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsZhangYanRecoveryParent(f, recovery);
@@ -31,7 +30,6 @@ internal sealed partial class CharacterZhangYanOlEntries
     internal bool ReturnZhangYanMovement(ProgramSkillFrame f) => _resolve().ReturnZhangYanMovement(f);
     internal bool ReturnZhangYanSujiAttack(GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnZhangYanSujiAttack(completion);
     internal void ReturnZhangYanSujiUse(CardUseFrame use) => _resolve().ReturnZhangYanSujiUse(use);
-    internal bool TryGetZhangYanVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, scoped out IReadOnlyList<int> primary) => _resolve().TryGetZhangYanVirtualPrimaryReturn(use, parent, out primary);
     internal void ValidateZhangYanSujiUse(CardUseFrame use) => _resolve().ValidateZhangYanSujiUse(use);
     internal bool WindowSettlement_IsZhangYanNativeSettlementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => _resolve().WindowSettlement_IsZhangYanNativeSettlementBatch(frame, batch);
     internal IReadOnlyList<LangdaoOption> ZhangYanAvailableOptions(CardConversionSource source) => _resolve().ZhangYanAvailableOptions(source);

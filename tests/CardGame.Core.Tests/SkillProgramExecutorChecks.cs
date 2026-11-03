@@ -29,6 +29,53 @@ internal static class SkillProgramExecutorChecks
                     "draw:0:0:1:::Private:skill-program.fixture:executor.Draw"
                 ]),
             "Resuming after the child must continue at the next effect without paying LoseHp twice.");
+        NativeUseResultsFollowInstructionOccurrences();
+    }
+
+    private static void NativeUseResultsFollowInstructionOccurrences()
+    {
+        var previous = new ProgramCardUseResultBinding("native-result", 1, 72, null,
+            0, 0, 0, CardKind.Slash, [1], [1]);
+        var unrelated = previous with { Bind = "other-result", NativeUseId = 73 };
+        foreach (var (op, json, skipped) in new[]
+        {
+            (SkillProgramEffectOp.UseVirtualSlash,
+                """{"op":"useVirtualSlash","target":"selectedTarget","resultBind":"native-result"}""", false),
+            (SkillProgramEffectOp.UseVirtualCard,
+                """{"op":"useVirtualCard","target":"selectedTarget","outputKind":"slash","targetRestriction":"normalSlashTarget","resultBind":"native-result"}""", false),
+            (SkillProgramEffectOp.OfferUnlimitedVirtualSlash,
+                """{"op":"offerUnlimitedVirtualSlash","target":"owner","resultBind":"native-result"}""", false),
+            (SkillProgramEffectOp.OfferVirtualSlashOrDraw,
+                """{"op":"offerVirtualSlashOrDraw","target":"selectedTarget","resultBind":"native-result"}""", false),
+            (SkillProgramEffectOp.UseVirtualSlash,
+                """{"op":"useVirtualSlash","target":"selectedTarget","resultBind":"native-result","condition":{"kind":"handCountAtLeast","value":2}}""", true)
+        })
+        {
+            var program = Program(json + "," + """{"op":"loseHp","target":"owner","amount":1}""",
+                minTargets: 1, maxTargets: 1);
+            foreach (var reexecuting in skipped ? new[] { false } : new[] { false, true })
+            {
+                var runtime = Runtime(program, selectedTargets: [1]);
+                runtime.LoseHpOutcome = SkillProgramStepOutcome.AwaitChild;
+                runtime.Frame = runtime.Frame! with
+                {
+                    InstructionIndex = reexecuting ? 1 : 0,
+                    ReexecuteParticipantInstruction = reexecuting,
+                    CardUseResults = [previous, unrelated]
+                };
+                var unissued = new UnissuedNativeUseHandler(op);
+                new SkillProgramExecutor(new SkillProgramEffectCatalog(
+                    [unissued, new LoseHpSkillProgramEffectHandler()]))
+                    .Run(runtime.Frame.Id, runtime, runtime);
+
+                Require(runtime.Frame is { InstructionIndex: 2 } frame && runtime.Completed is null &&
+                        frame.CardUseResults.Contains(unrelated) &&
+                        (frame.CardUseResults.SingleOrDefault(result => result.Bind == "native-result") is { }) == reexecuting &&
+                        unissued.Calls == (skipped ? 0 : 1) &&
+                        runtime.Calls.SequenceEqual(["lose-hp:0:1"]),
+                    $"{op}: a new skipped or unissued occurrence must leave its result unknown, while replay of the same occurrence preserves it and unrelated results.");
+            }
+        }
     }
 
     public static void InvalidSelectedCostCancelsRemainingEffectsAtomically()
@@ -983,6 +1030,18 @@ internal static class SkillProgramExecutorChecks
 
         public void RefundCardUseDebit(ProgramSkillFrame frame) =>
             throw new NotSupportedException("The executor fixture does not exercise RefundCardUseDebit.");
+    }
+
+    private sealed class UnissuedNativeUseHandler(SkillProgramEffectOp op) : ISkillProgramEffectHandler
+    {
+        public SkillProgramEffectOp Op => op;
+        internal int Calls { get; private set; }
+        public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame,
+            int targetSeat, ISkillProgramEffectHost host)
+        {
+            Calls++;
+            return SkillProgramStepOutcome.Continue;
+        }
     }
 
     private sealed class DuplicateDrawHandler : ISkillProgramEffectHandler

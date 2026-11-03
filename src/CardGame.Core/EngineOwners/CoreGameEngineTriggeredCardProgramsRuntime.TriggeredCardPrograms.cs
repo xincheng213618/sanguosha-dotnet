@@ -14,7 +14,7 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
         return card.Suit is Suit.Spade or Suit.Club && ProgramCardSetFilter.Matches(card.Kind, card.Suit, [], [SkillProgramCardCategory.Basic], [], []) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.SupplyShortage, card.Suit, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[ownerSeat], card)));
     }
 
-    internal SkillProgramStepOutcome UseTriggeredProgramVirtualSlash(ProgramSkillFrame frame, int targetSeat)
+    internal SkillProgramStepOutcome UseTriggeredProgramVirtualSlash(ProgramSkillFrame frame, int targetSeat, string? resultBind = null)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || targetSeat == active.OwnerSeat || _coreCardUseModulesOperations.IsCardUseForbidden(active.OwnerSeat, CardKind.Slash, CardActionType.Use) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(active.OwnerSeat, targetSeat, CardKind.Slash) || _coreNativeDamagePoliciesOperations.IsSlashProhibited(_coreMatchParticipantsPlayersAccess._players[targetSeat]))
@@ -26,7 +26,12 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var provenance = new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, active.SkillInstanceId);
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, source.Seat, source.Seat, null, null, null, CardKind.Slash, [targetSeat], [], [provenance], effectiveSuit: Suit.None, effectiveRank: 0));
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, source.Seat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: []) { Action = action });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, source.Seat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: [])
+        {
+            Action = action,
+            ProgramResultSink = resultBind is { } bind
+                ? new(active.Id, active.InstructionIndex, bind, source.Seat, source.Seat, [targetSeat]) : null
+        });
         _characterMengDaOlOperations.IssueGoudeSlashUse(resolutionId, active, action);
         _coreShanheS5ZhulingOperations.Value.IssueShanheS5JixianSlashUse(resolutionId, active, action);
         _characterYangFuOlOperations.IssueSuyiSlashUse(resolutionId, active, action);
@@ -128,7 +133,7 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
     }
 
-    SkillProgramStepOutcome ITriggeredCardProgramHost.UseTriggeredVirtualSlash(ProgramSkillFrame frame, int targetSeat) => UseTriggeredProgramVirtualSlash(frame, targetSeat);
+    SkillProgramStepOutcome ITriggeredCardProgramHost.UseTriggeredVirtualSlash(ProgramSkillFrame frame, int targetSeat, string? resultBind) => UseTriggeredProgramVirtualSlash(frame, targetSeat, resultBind);
     SkillProgramStepOutcome ITriggeredCardProgramHost.UseDiscardedCardAsDelayedTrick(ProgramSkillFrame frame, int targetSeat, CardKind kind) => UseProgramDiscardedCardAsDelayedTrick(frame, targetSeat, kind);
     SkillProgramStepOutcome ITriggeredCardProgramHost.PayEquipmentColorDiscard(ProgramSkillFrame frame, string resultBind) => PayProgramEquipmentColorDiscard(frame, resultBind);
     void ITriggeredCardProgramHost.GrantPlayPhaseColorRestriction(ProgramSkillFrame frame, string sourceBind, int targetSeat) => _coreProgramPhaseColorRestrictionsOperations.GrantProgramPlayPhaseColorRestriction(frame, sourceBind, targetSeat);

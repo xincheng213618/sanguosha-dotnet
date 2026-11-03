@@ -14,6 +14,8 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     private int Owner => frame?.OwnerSeat ?? triggerOwner!.Value;
     private ProgramSkillWindowContext? Context => frame?.WindowContext ?? triggerContext;
     public int? WindowAmount() => Context?.Amount;
+    public IReadOnlyList<int>? UseResultTargets(string bind) =>
+        frame?.CardUseResults.SingleOrDefault(result => result.Bind == bind)?.TargetSeats;
     public IReadOnlyList<ProgramExpressionCardFact>? GivenCards(int giver, int recipient) =>
         ProgramGivenCards.Read(givenCards, revealTurn, Owner, giver, recipient);
     public HandGainOccurrence? HandGain(int recipient) => recipient == Owner

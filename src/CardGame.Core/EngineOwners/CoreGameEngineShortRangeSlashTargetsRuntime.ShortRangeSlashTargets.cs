@@ -135,68 +135,8 @@ internal sealed partial class CoreGameEngineShortRangeSlashTargetsRuntime
         return best.Choice is not null && best.Score > 0 ? best.Choice : decision.Choices.Single(c => c.Targets.Count == 0);
     }
 
-    internal bool TryGetShortRangeFinalizedPrefix(CardUseFrame use, ShortRangeSlashTargetReceipt receipt, out CardActionContext finalized)
-    {
-        finalized = null !;
-        if (!use.ProgramUseAccepted || receipt.ActionId is null || receipt.CardUseFrameId != use.Id || use.Action is not { Type: CardActionType.Use } current || current.ActionId != receipt.ActionId || current.ActorSeat != receipt.ActorSeat || current.ActorSeat != use.SourceSeat || current.EffectiveKind != use.CardKind)
-            return false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var bindings = history.Select((fact, index) => (fact, index)).Where(item => item.fact is ProgramBindingStartedEvent started && started.FrameId == receipt.ProgramFrameId && started.SkillId == receipt.Source.SkillId && started.BindingId == receipt.Source.BindingId && started.OwnerSeat == receipt.ActorSeat && started.SkillInstanceId == receipt.Source.SkillInstanceId && started.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized).ToArray();
-        if (bindings is not [var binding])
-            return false;
-        var issuances = history.Select((fact, index) => (fact, index)).Where(item => item.fact is ShortRangeSlashTargetResolvedEvent resolved && resolved.Added && resolved.CardUseFrameId == use.Id && resolved.ActionId == receipt.ActionId && resolved.Source == receipt.Source && resolved.Receipt is { } issued && issued.ProgramFrameId == receipt.ProgramFrameId && issued.CardUseFrameId == use.Id && issued.ActionId == receipt.ActionId && issued.GameplayHash == receipt.GameplayHash && issued.ActorSeat == receipt.ActorSeat && issued.AddedTargetSeat == receipt.AddedTargetSeat && issued.OriginalTargets.SequenceEqual(receipt.OriginalTargets)).ToArray();
-        var companions = history.Select((fact, index) => (fact, index)).Where(item => item.fact is ProgramCardUseTargetAddedEvent added && added.FrameId == receipt.ProgramFrameId && added.SkillId == receipt.Source.SkillId && added.OwnerSeat == receipt.ActorSeat && added.CardUseFrameId == use.Id && added.TargetSeat == receipt.AddedTargetSeat).ToArray();
-        if (issuances is not [var issuance] || companions is not [var companion] || companion.index <= binding.index || issuance.index <= companion.index)
-            return false;
-        var accepted = history.Take(binding.index).OfType<CardActionAcceptedEvent>().LastOrDefault(e => e.Action.ActionId == current.ActionId)?.Action;
-        if (accepted is null || accepted.Type != CardActionType.Use || accepted.ActorSeat != current.ActorSeat || accepted.ProviderSeat != current.ProviderSeat || accepted.EffectiveKind != current.EffectiveKind || accepted.ParentActionId != current.ParentActionId || accepted.RequesterSeat != current.RequesterSeat || accepted.ResponderSeat != current.ResponderSeat || accepted.OpponentSeat != current.OpponentSeat || accepted.EffectiveSuit != current.EffectiveSuit || accepted.EffectiveRank != current.EffectiveRank || accepted.EffectiveIsRed != current.EffectiveIsRed || !accepted.PhysicalCards.SequenceEqual(current.PhysicalCards) || !accepted.ConversionChain.SequenceEqual(current.ConversionChain) || !accepted.TargetSeats.SequenceEqual(receipt.OriginalTargets))
-            return false;
-        finalized = accepted;
-        return true;
-    }
 
-    internal bool HasShortRangeSlashTail(CardUseFrame use) => use.ShortRangeSlashTarget is not null;
 
-    internal bool TryGetShortRangeVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> target)
-    {
-        target = [];
-        if (!HasShortRangeSlashTail(use) || use.ShortRangeSlashTarget is not { OriginalTargets.Count: 1 } receipt || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.CardAttack is not { CardId: null, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id || parent.InstructionIndex < 1 || use.Action is not { Type: CardActionType.Use } action || action.ProviderSeat != receipt.ActorSeat || action.PhysicalCards.Count != 0 || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash)
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame exact || exact.Id != parent.Id)
-            return false;
-        var paused = ProgramInstructionResolver.Default.Resolve(parent, program).GetPausedInstruction(parent.InstructionIndex).Effect;
-        if (receipt.ActionId is null && _coreActualHandGainProgramsOperations.IsNormalizedLegacyCompletedCategoryUse(use, receipt.ActorSeat, use.CardKind, use.TargetSeats))
-        {
-            var normalized = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CompletedCategoryVirtualUseNormalizedEvent>().Single(e => e.CardUseFrameId == use.Id);
-            var original = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().SingleOrDefault(e => e.ResolutionId == use.Id);
-            var issuedUse = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().SingleOrDefault(e => e.ResolutionId == use.Id);
-            var legacyIssuer = new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
-            if (normalized.ProgramParentFrameId != parent.Id || normalized.ProducerSource != legacyIssuer || normalized.ProducerGameplayHash != parent.GameplayHash || normalized.ProducerInstructionIndex != parent.InstructionIndex || parent.OwnerSeat != receipt.ActorSeat || paused.Op != SkillProgramEffectOp.UseVirtualCard || paused.UseCardActionWindows || !CoreNativeCardClassificationsRuntime.IsSlashCard(paused.OutputKind ?? CardKind.Dodge) || original is not { TargetSeats.Count: 1 } || !receipt.OriginalTargets.SequenceEqual(original.TargetSeats) || parent.SelectedTargetSeats is not [var legacySelected] || legacySelected != original.TargetSeats[0] || issuedUse is not { CardId: 0 } || issuedUse.SourceSeat != receipt.ActorSeat || issuedUse.CardKind != paused.OutputKind)
-                return false;
-            target = Array.AsReadOnly(original.TargetSeats.ToArray());
-            return true;
-        }
-
-        if (!TryGetShortRangeFinalizedPrefix(use, receipt, out var accepted))
-            return false;
-        var declared = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TargetsConfirmedEvent>().SingleOrDefault(e => e.ResolutionId == use.Id);
-        var declaredUse = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().SingleOrDefault(e => e.ResolutionId == use.Id);
-        if (accepted is null || accepted.Type != CardActionType.Use || accepted.ActorSeat != receipt.ActorSeat || accepted.ProviderSeat != receipt.ActorSeat || accepted.EffectiveKind != action.EffectiveKind || accepted.EffectiveSuit != Suit.None || accepted.EffectiveRank != 0 || accepted.RequesterSeat is not null || accepted.ResponderSeat is not null || accepted.OpponentSeat is not null || accepted.PhysicalCards.Count != 0 || accepted.TargetSeats.Count != 1 || declared is not { TargetSeats.Count: 1 } || !accepted.TargetSeats.SequenceEqual(receipt.OriginalTargets) || declaredUse is not { CardId: 0 } || declaredUse.SourceSeat != receipt.ActorSeat || declaredUse.CardKind != action.EffectiveKind || !accepted.ConversionChain.SequenceEqual(action.ConversionChain))
-            return false;
-        var issuer = new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
-        var exactProducer = paused.Op switch
-        {
-            SkillProgramEffectOp.UseVirtualSlash => parent.OwnerSeat == action.ActorSeat && action.ConversionChain.SequenceEqual([issuer]) && (paused.TargetReference is null ? parent.SelectedTargetSeats is [var selected] && selected == declared.TargetSeats[0] : paused.TargetReference.Kind == ProgramParticipantRef.EventTarget && parent.WindowContext?.TargetSeat == declared.TargetSeats[0]),
-            SkillProgramEffectOp.OfferVirtualSlashOrDraw => parent.SelectedTargetSeats is [var actor] && actor == action.ActorSeat && action.ConversionChain.Count == 0,
-            SkillProgramEffectOp.UseVirtualCard or SkillProgramEffectOp.OfferUnlimitedVirtualSlash => parent.OwnerSeat == action.ActorSeat && parent.SelectedTargetSeats is [var selected] && selected == declared.TargetSeats[0] && action.ConversionChain.Count == 0 && paused.UseCardActionWindows && paused.OutputKind == CardKind.Slash && paused.TargetRestriction == SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget,
-            _ => false
-        };
-        if (!exactProducer)
-            return false;
-        target = Array.AsReadOnly(declared.TargetSeats.ToArray());
-        return true;
-    }
 
     internal void AppendShortRangeLegacyCandidate(CardUseFrame use, long windowId, List<(ProgramTriggerCandidate Candidate, ProgramSkillWindowContext Context)> entries)
     {

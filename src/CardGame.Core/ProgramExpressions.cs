@@ -35,6 +35,7 @@ internal interface IProgramExpressionWorld
 {
     int? Participant(string name);
     IReadOnlyList<int>? ParticipantSet(string name);
+    IReadOnlyList<int>? UseResultTargets(string bind) => null;
     int? Stat(string stat, int seat);
     bool? Flag(string flag, int seat);
     int? BindingStat(string stat, string name) => null;
@@ -173,6 +174,13 @@ internal static class ProgramExpressions
             if (scope is not ("all" or "actualTurn" or "actualPhase")) Fail(path, "publicRevealCards requires all, actualTurn or actualPhase");
             if (purpose is not ("all" or "explicit")) Fail(path, "publicRevealCards purpose requires all or explicit");
             return new(op, ProgramExpressionType.CardSet, [], name: scope, literal: purpose == "explicit" ? 1 : 0);
+        }
+        if (op == "useResultTargets")
+        {
+            Arity(1, 1);
+            if (args[0].ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(args[0].GetString()) || args[0].GetString()!.Length > 128)
+                Fail(path, "useResultTargets requires a binding identifier");
+            return new(op, ProgramExpressionType.ParticipantSet, [], name: args[0].GetString());
         }
         if (op == "windowAmount") { Arity(0, 0); return new(op, ProgramExpressionType.Int, []); }
         if (op == "givenCards") { Arity(2, 2); return new(op, ProgramExpressionType.CardSet, Each(ProgramExpressionType.Participant)); }
@@ -640,6 +648,8 @@ internal static class ProgramExpressions
     {
         switch (e.Op)
         {
+            case "useResultTargets": return world.UseResultTargets(e.Name!) is { } targets
+                ? Array.AsReadOnly(targets.Distinct().ToArray()) : null;
             case "useTargets": return EvaluateFact(e.Args[0], world, it, use, cards)?.Targets;
             case "useConfirmedTargets": return EvaluateFact(e.Args[0], world, it, use, cards)?.ConfirmedTargets;
             case "usePrimaryTargets": return EvaluateFact(e.Args[0], world, it, use, cards)?.PrimaryTargets;
@@ -782,6 +792,7 @@ internal sealed class SkillContextExpressionWorld(PlayerSkillContext owner, Play
     public int? WindowStat(string stat, string participant) => ProgramExpressions.ReadWindowStat(windowFacts, stat, participant, selectedTarget is not null);
     public int? BindingStat(string stat, string name) => bindingStat?.Invoke(stat, name);
     public int? Number(string name) => number?.Invoke(name);
+    public IReadOnlyList<int>? UseResultTargets(string bind) => ownerWindowFacts?.UseResultTargets(bind);
     public int? WindowAmount() => ownerWindowFacts?.WindowAmount();
     public IReadOnlyList<ProgramExpressionCardFact>? GivenCards(int giver, int recipient) =>
         giver == owner.Seat || recipient == owner.Seat ? ownerWindowFacts?.GivenCards(giver, recipient) : null;

@@ -1498,7 +1498,8 @@ public sealed class SkillProgramExecutor
             // has returned its typed result. Its cursor already records payment.
             if (frame.SelectedCardPayment is not null && frame.SelectedCardPaymentResult is null)
                 return;
-            if (frame.ReexecuteParticipantInstruction)
+            var reexecutingInstruction = frame.ReexecuteParticipantInstruction;
+            if (reexecutingInstruction)
             {
                 frame = frame with { InstructionIndex = frame.InstructionIndex - 1, ReexecuteParticipantInstruction = false };
                 state.UpdateFrame(frame);
@@ -1533,6 +1534,17 @@ public sealed class SkillProgramExecutor
             }
             var effect = plan.GetInstruction(frame.InstructionIndex).Effect;
             var handler = _effects?.Resolve(effect.Op) ?? ProgramOperationCatalog.Default.Resolve(effect.Op).Handler;
+            // Entering a new occurrence invalidates that instruction's old output,
+            // including when its condition or optional offer issues no native use.
+            // Prompt and child returns replay the same occurrence instead.
+            if (!reexecutingInstruction && effect.ResultBind is { } resultBind &&
+                effect.Op is (SkillProgramEffectOp.UseVirtualSlash or SkillProgramEffectOp.UseVirtualCard or
+                    SkillProgramEffectOp.OfferUnlimitedVirtualSlash or SkillProgramEffectOp.OfferVirtualSlashOrDraw) &&
+                frame.CardUseResults.Any(result => result.Bind == resultBind))
+                frame = frame with
+                {
+                    CardUseResults = frame.CardUseResults.Where(result => result.Bind != resultBind).ToArray()
+                };
             // Commit the cursor before any primitive can suspend into a child.
             frame = frame with { InstructionIndex = frame.InstructionIndex + 1 };
             state.UpdateFrame(frame);

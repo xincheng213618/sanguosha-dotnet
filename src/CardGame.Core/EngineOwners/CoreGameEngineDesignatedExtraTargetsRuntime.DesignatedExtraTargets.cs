@@ -231,49 +231,7 @@ internal sealed partial class CoreGameEngineDesignatedExtraTargetsRuntime
         return decision.Choices.Where(c => c.Targets.Count > 0).FirstOrDefault(c => use.CardKind == CardKind.BorrowedSword ? !CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[1]]) : Helpful(c.Targets[0]) == CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[c.Targets[0]])) ?? decision.Choices.Single(c => c.Targets.Count == 0);
     }
 
-    internal bool IsDesignatedExtraTargetFact(CardUseFrame use, DesignatedExtraTargetResolvedEvent fact, IReadOnlyList<int> originalTargets)
-    {
-        if (_coreShanheXiashengOperations.Value.IsShanheXiashengTargetFact(use, fact, originalTargets))
-            return true;
-        if (_characterWuYiBoundaryMobileOperations.Value.IsBoundaryWuYiTargetFact(use, fact, originalTargets))
-            return true;
-        if (use.Action is not { Type: CardActionType.Use } action || fact.CardUseFrameId != use.Id || fact.ActionId != action.ActionId || fact.Source.OwnerSeat != action.ActorSeat || fact.InstructionIndex != 1 || !fact.OriginalTargetSeats.SequenceEqual(originalTargets) || fact.OriginalTargetSeats.Count == 0 || fact.AddedTargetSeats.Count != (use.CardKind == CardKind.BorrowedSword ? 2 : 1) || fact.AddedTargetSeats.Any(seat => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(seat)) || (use.CardKind == CardKind.BorrowedSword ? originalTargets.Where((_, i) => i % 2 == 0) : originalTargets).Contains(fact.AddedTargetSeats[0]) || !fact.ResultTargetSeats.SequenceEqual(originalTargets.Concat(fact.AddedTargetSeats)) || _contentRegistryOperations._contentRegistry.GetSkill(fact.Source.SkillId).Program is not { } program || program.GameplayHash != fact.GameplayHash || program.Triggers.SingleOrDefault(t => t.Id == fact.Source.BindingId)is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized } trigger || trigger.Effects is not [{ Op: SkillProgramEffectOp.AddOneDistanceFreeCurrentUseTarget }])
-            return false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        return history.OfType<DesignatedExtraTargetResolvedEvent>().Count(e => e.ProgramFrameId == fact.ProgramFrameId) == 1 && history.OfType<DesignatedExtraTargetOfferedEvent>().Count(e => e.ProgramFrameId == fact.ProgramFrameId && e.CardUseFrameId == use.Id && e.ActionId == fact.ActionId && e.InstructionIndex == fact.InstructionIndex && e.Source == fact.Source && e.GameplayHash == fact.GameplayHash && e.OriginalTargetSeats.SequenceEqual(originalTargets) && e.CandidateTargetSeats.Contains(fact.AddedTargetSeats[0])) == 1 && history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == fact.ProgramFrameId && e.OwnerSeat == action.ActorSeat && e.SkillId == fact.Source.SkillId && e.BindingId == fact.Source.BindingId && e.SkillInstanceId == fact.Source.SkillInstanceId && e.Window == trigger.Window) == 1 && history.OfType<ProgramCardUseTargetAddedEvent>().Count(e => e.FrameId == fact.ProgramFrameId && e.CardUseFrameId == use.Id && e.OwnerSeat == action.ActorSeat && e.SkillId == fact.Source.SkillId && e.TargetSeat == fact.AddedTargetSeats[0]) == 1;
-    }
 
-    internal bool HasDesignatedExtraTargetTail(CardUseFrame use) => _characterChengYuMouOlOperations.HasMouLidanTargetTail(use) || _characterSunQuanOlMagicOperations.HasMoQuanyuAddedTargetTail(use) || _characterLiuPanOlOperations.HasPijingTargetTail(use) || _coreDamageTargetBudgetOperations.HasDamageTargetBudgetTail(use) || _coreAdjacentRedTargetsOperations.HasAdjacentRedTargetTail(use) || use.BeiMiHuTargetMutation is { Kind: "append" } && _characterBeiMiHuOlOperations.ValidBeiMiHuTargetMutation(use) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DesignatedExtraTargetResolvedEvent>().Any(e => IsDesignatedExtraTargetFact(use, e, e.OriginalTargetSeats) && use.Action!.TargetSeats.Count >= e.ResultTargetSeats.Count && use.Action.TargetSeats.Take(e.ResultTargetSeats.Count).SequenceEqual(e.ResultTargetSeats) && use.TargetSeats.Count == use.Action.TargetSeats.Count);
-    internal bool TryGetDesignatedExtraTargetVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> targets)
-    {
-        targets = [];
-        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !(HasDesignatedExtraTargetTail(use) || _coreRecipientCategorySlashTargetsOperations.HasRecipientCategorySlashTargetTail(use) || ((_characterYangFuOlOperations.HasBingzhongTargetTail(use) || _characterMaChengOlOperations.HasChenglieTargetTail(use)) || _characterLiuPanOlOperations.HasPijingTargetTail(use))) || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.CardAttack is not { CardId: null, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id || use.Action is not { Type: CardActionType.Use } action || action.ActorSeat != use.SourceSeat || action.ProviderSeat != use.SourceSeat || action.PhysicalCards.Count != 0 || action.RequesterSeat is not null || action.ResponderSeat is not null || action.OpponentSeat is not null || action.EffectiveSuit != Suit.None || action.EffectiveRank != 0 || parent.InstructionIndex < 1 || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } program || program.GameplayHash != parent.GameplayHash)
-            return false;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1].Id != parent.Id)
-            return false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        var declared = history.OfType<TargetsConfirmedEvent>().SingleOrDefault(e => e.ResolutionId == use.Id);
-        var declaredUse = history.OfType<CardUseDeclaredEvent>().SingleOrDefault(e => e.ResolutionId == use.Id);
-        var accepted = history.OfType<CardActionAcceptedEvent>().Select(e => e.Action).FirstOrDefault(a => a.ActionId == action.ActionId);
-        if (declared is not { TargetSeats.Count: 1 } || declaredUse is not { CardId: 0 } || declaredUse.SourceSeat != use.SourceSeat || declaredUse.CardKind != use.CardKind || accepted is not { Type: CardActionType.Use, TargetSeats.Count: 1, PhysicalCards.Count: 0 } || accepted.ActorSeat != action.ActorSeat || accepted.ProviderSeat != action.ProviderSeat || accepted.EffectiveKind != use.CardKind || !accepted.ConversionChain.SequenceEqual(action.ConversionChain))
-            return false;
-        var effect = ProgramInstructionResolver.Default.Resolve(parent, program).GetPausedInstruction(parent.InstructionIndex).Effect;
-        var issuer = new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId);
-        var exactProducer = effect.Op switch
-        {
-            SkillProgramEffectOp.RepeatShenDengAiCuixin => _characterDengAiAnniversaryGodOperations.IsShenDaCuixinUse(use.Id) && parent.OwnerSeat == use.SourceSeat && action.ConversionChain.Count == 0,
-            SkillProgramEffectOp.ResolveMouChengYuDanchi => _characterChengYuMouOlOperations.IsMouDanchiUse(use.Id) && parent.OwnerSeat == use.SourceSeat && action.ConversionChain.Count == 0,
-            SkillProgramEffectOp.UseVirtualSlash => parent.OwnerSeat == use.SourceSeat && action.ConversionChain.SequenceEqual([issuer]) && (effect.TargetReference is null ? parent.SelectedTargetSeats is [var selected] && selected == declared.TargetSeats[0] : effect.TargetReference.Kind == ProgramParticipantRef.EventTarget && parent.WindowContext?.TargetSeat == declared.TargetSeats[0]),
-            SkillProgramEffectOp.OfferVirtualSlashOrDraw => parent.SelectedTargetSeats is [var actor] && actor == use.SourceSeat && action.ConversionChain.Count == 0,
-            SkillProgramEffectOp.UseVirtualCard or SkillProgramEffectOp.OfferUnlimitedVirtualSlash => parent.OwnerSeat == use.SourceSeat && parent.SelectedTargetSeats is [var selected] && selected == declared.TargetSeats[0] && (action.ConversionChain.Count == 0 || _coreDamageTargetBudgetOperations.HasDamageTargetBudgetTail(use) && action.ConversionChain.SequenceEqual([issuer])) && effect.UseCardActionWindows && effect.OutputKind == CardKind.Slash && effect.TargetRestriction == SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget,
-            _ => false
-        };
-        if (!exactProducer)
-            return false;
-        targets = Array.AsReadOnly(new[] { _characterLiuPanOlOperations.HasPijingTargetTail(use) ? declared.TargetSeats[0] : use.TargetSeats[0] });
-        return true;
-    }
 
     internal bool ContinueDesignatedVirtualBasicEffect(long id, ProgramSimpleCardContinuation continuation)
     {

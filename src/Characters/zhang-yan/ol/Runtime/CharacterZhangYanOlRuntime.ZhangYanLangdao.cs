@@ -76,34 +76,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
         return votes is [{ Index: 0 } first, { Index: 1 } second] && first.Seat == r.OriginalActor && second.Seat == r.OriginalTarget && votes.Count(v => v.Option == LangdaoOption.ExtraTarget) == r.ExtraCount && votes.Select(v => v.Option).Distinct().SequenceEqual(r.SelectedOptions);
     }
 
-    internal bool HasZhangYanLangdaoTargetTail(CardUseFrame use) =>
-        use.ZhangYanLangdao is { AddedTargets.Count: > 0 };
 
-    internal bool TryGetZhangYanVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> primary)
-    {
-        primary = [];
-        if (!HasZhangYanLangdaoTargetTail(use) || use.CardId != 0 || use.PhysicalCardIds is not { Count: 0 } || use.CardAttack is not { CardId: null, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id || use.Action is not { Type: CardActionType.Use } a || a.ProviderSeat != a.ActorSeat || a.PhysicalCards.Count != 0 || parent.InstructionIndex < 1)
-            return false;
-        var at = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-        if (at < 1 || _resolutionStackOperations._resolutionStack[at - 1].Id != parent.Id || _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is not { } p || p.GameplayHash != parent.GameplayHash)
-            return false;
-        var declared = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TargetsConfirmedEvent>().SingleOrDefault(e => e.ResolutionId == use.Id);
-        if (declared is not { TargetSeats.Count: 1 })
-            return false;
-        var original = declared.TargetSeats[0];
-        var op = ProgramInstructionResolver.Default.Resolve(parent, p).GetPausedInstruction(parent.InstructionIndex).Effect;
-        var exact = op.Op switch
-        {
-            SkillProgramEffectOp.OfferVirtualSlashOrDraw => parent.SelectedTargetSeats.SequenceEqual([a.ActorSeat]) && a.ConversionChain.Count == 0,
-            SkillProgramEffectOp.UseVirtualSlash => parent.OwnerSeat == a.ActorSeat && a.ConversionChain.SequenceEqual([new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId)]) && (op.TargetReference is null ? parent.SelectedTargetSeats.SequenceEqual([original]) : op.TargetReference.Kind == ProgramParticipantRef.EventTarget && parent.WindowContext?.TargetSeat == original),
-            SkillProgramEffectOp.UseVirtualCard or SkillProgramEffectOp.OfferUnlimitedVirtualSlash => parent.OwnerSeat == a.ActorSeat && parent.SelectedTargetSeats.SequenceEqual([original]) && op.OutputKind == CardKind.Slash && op.TargetRestriction is SkillProgramCardTargetRestriction.DistanceUnlimitedAgainstTarget or SkillProgramCardTargetRestriction.NormalSlashTarget,
-            _ => false
-        };
-        if (!exact)
-            return false;
-        primary = Array.AsReadOnly(new[] { use.TargetSeats[0] });
-        return true;
-    }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27001)]
     internal void ObserveZhangYanLangdaoOutcome(IGameEvent payload)
