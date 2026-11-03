@@ -1963,7 +1963,7 @@ public enum SkillProgramTriggerWindow
     DuelResponseFailed = 39950
 }
 public enum SkillProgramTriggerSubject { Owner, Any, Source, DamageSource, DamageTarget }
-public enum SkillProgramMovementOccurrence { PerBatch, PerCard, PerSourceOwner = 700, PerOwnerBatch = 761, PerThirdPartyHandGain = 762, PerOwnerSourceHandGain = 763, PerOtherLastHandLoss = 1031 }
+public enum SkillProgramMovementOccurrence { PerBatch, PerCard, PerSourceOwner = 700, PerOwnerBatch = 761, PerThirdPartyHandGain = 762, PerOwnerSourceHandGain = 763, PerOtherLastHandLoss = 1031, PerNativeGive = 1032 }
 public enum SkillProgramCardCountExpression { NextPhaseActivationOrdinal = 760, OwnerHpAtLeastOne = 40650 }
 public enum SkillProgramHpChangeOccurrence { PerEvent, PerPoint }
 public enum SkillProgramDamageOccurrence { PerDamage, PerDamagePoint }
@@ -5499,12 +5499,20 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             wuZishengEffects.GetArrayLength() == 1 && wuZishengEffects[0].ValueKind == JsonValueKind.Object &&
             wuZishengEffects[0].TryGetProperty("op", out var wuZishengOp) && wuZishengOp.ValueKind == JsonValueKind.String &&
             string.Equals(wuZishengOp.GetString(), "resolveWuZhangFeiMovementDamage", StringComparison.OrdinalIgnoreCase);
-        var isMouHqGiveMovement = skillId == "mou:tuicheng" && id == "after-native-give" &&
-            window == SkillProgramTriggerWindow.CardsMoved &&
-            node.TryGetProperty("effects", out var mouHqGiveEffects) && mouHqGiveEffects.ValueKind == JsonValueKind.Array &&
-            mouHqGiveEffects.GetArrayLength() == 1 && mouHqGiveEffects[0].ValueKind == JsonValueKind.Object &&
-            mouHqGiveEffects[0].TryGetProperty("op", out var mouHqGiveOp) && mouHqGiveOp.ValueKind == JsonValueKind.String &&
-            string.Equals(mouHqGiveOp.GetString(), "resolveMouHuangQuanTuicheng", StringComparison.OrdinalIgnoreCase);
+        var isNativeGiveMovement = node.TryGetProperty("movementOccurrence", out _) &&
+            EnumValue<SkillProgramMovementOccurrence>(node, "movementOccurrence", path) == SkillProgramMovementOccurrence.PerNativeGive;
+        if (isNativeGiveMovement)
+        {
+            if (window != SkillProgramTriggerWindow.CardsMoved)
+                Fail(path + ".movementOccurrence", "perNativeGive requires a cardsMoved boundary");
+            // A logical Give can contain different physical outcomes and source
+            // zones. Its completion movement does not represent its card set.
+            foreach (var field in new[] { "sourceZones", "destinationZones", "suits", "cardKinds", "cardCategories",
+                "movementReasons", "excludedMovementReasons", "movementDiscardOnly", "ignoreOwnSkillMovements",
+                "discardOwnerScope", "gainPhaseQualification", "ownerZoneLoss" })
+                if (node.TryGetProperty(field, out _))
+                    Fail(path + "." + field, "perNativeGive does not accept physical movement filters");
+        }
         var isHpWindow = window is SkillProgramTriggerWindow.AfterHpLost or SkillProgramTriggerWindow.AfterHpRecovered or SkillProgramTriggerWindow.AfterHealthChanged;
         foreach (var field in new[] { "movementOccurrence", "movementReasons", "excludedMovementReasons", "ignoreOwnSkillMovements" })
             if (!isMovementWindow && node.TryGetProperty(field, out _))
@@ -5740,12 +5748,14 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                     if (!destinationZones.SequenceEqual([CardZoneKind.DiscardPile]))
                         Fail(path + ".destinationZones", "the exact global discard or used-Trick invoice requires discardPile");
                 }
-                sourceZones = (isWuZishengMovement || isMouHqGiveMovement) && !node.TryGetProperty("sourceZones", out _)
+                sourceZones = (isWuZishengMovement || isNativeGiveMovement) && !node.TryGetProperty("sourceZones", out _)
                     ? [] : EnumArray<CardZoneKind>(node, "sourceZones", path);
                 movementOccurrence = EnumValue<SkillProgramMovementOccurrence>(node, "movementOccurrence", path);
-                if (isYuandiMovement || isGuYinMovement || isWuZishengMovement || isMouHqGiveMovement
+                if (isNativeGiveMovement && subject != SkillProgramTriggerSubject.Owner)
+                    Fail(path + ".subject", "perNativeGive requires the logical giver owner");
+                if (!isNativeGiveMovement && (isYuandiMovement || isGuYinMovement || isWuZishengMovement
                     ? sourceZones.Count != 0 || movementOccurrence != SkillProgramMovementOccurrence.PerBatch ||
-                        subject != (isWuZishengMovement || isMouHqGiveMovement ? SkillProgramTriggerSubject.Owner : SkillProgramTriggerSubject.Any)
+                        subject != (isWuZishengMovement ? SkillProgramTriggerSubject.Owner : SkillProgramTriggerSubject.Any)
                     : sourceZones.Count == 0 || sourceZones.Distinct().Count() != sourceZones.Count ||
                     movementOccurrence != SkillProgramMovementOccurrence.PerOwnerBatch && sourceZones.Count != 1 &&
                         !(movementOccurrence == SkillProgramMovementOccurrence.PerCard &&
@@ -5763,7 +5773,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                              rawEffects.EnumerateArray().Any(e => e.ValueKind == JsonValueKind.Object &&
                              e.TryGetProperty("op", out var op) && op.ValueKind == JsonValueKind.String && op.GetString() == "revealRedLossAndDraw") &&
                              zone is CardZoneKind.PojunHold or CardZoneKind.PrivateReserve or CardZoneKind.PublicDeferredPile or
-                                 CardZoneKind.PublicPersistentPile or CardZoneKind.PrivateTurnHold)))
+                                  CardZoneKind.PublicPersistentPile or CardZoneKind.PrivateTurnHold))))
                     Fail(path + ".sourceZones",
                         "cardsMoved requires exactly one owner-scoped source zone");
                 movementOccurrence = EnumValue<SkillProgramMovementOccurrence>(
@@ -6248,7 +6258,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
             Fail(path + ".effects", "damageAppliedBeforeDying supports only owner attributed-marker records");
         if (effects.Any(effect => ContainsCardUseColorCondition(effect.Condition)) && !isCardActionWindow)
             Fail(path + ".effects", "cardUseIsRed requires a card-action trigger");
-        if (window != SkillProgramTriggerWindow.AfterDamageApplied &&
+        if (!isNativeGiveMovement && window != SkillProgramTriggerWindow.AfterDamageApplied &&
             !(window == SkillProgramTriggerWindow.BeforeDamageApplied && subject == SkillProgramTriggerSubject.DamageSource) &&
             window is not (SkillProgramTriggerWindow.JudgmentReplacing or SkillProgramTriggerWindow.JudgmentFinalized) &&
             ownerRelation is not (SkillProgramCardActionOwnerRelation.Target or
@@ -6275,7 +6285,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                 SkillProgramTriggerWindow.DiscardPhaseEnded or
                 SkillProgramTriggerWindow.OtherActualUseTargeted) &&
             !(window == SkillProgramTriggerWindow.CardsGained && movementOccurrence == SkillProgramMovementOccurrence.PerSourceOwner) &&
-            !contractedCommittedSingleAction)
+            !contractedCommittedSingleAction && !isNativeGiveMovement)
             Fail(path + ".effects", "eventSource requires a source-bearing damage, death, judgment, movement or actual-use trigger");
         if (window == SkillProgramTriggerWindow.JudgmentReplacing &&
             (effects[0].Op is not (SkillProgramEffectOp.ReplaceJudgment or SkillProgramEffectOp.DelegateJudgmentReplacement or SkillProgramEffectOp.ReplaceJudgmentFromPublicRice) ||

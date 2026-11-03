@@ -24,6 +24,12 @@ public sealed record NativeCardsGivenEvent(long Id, long ProducerId, int Giver, 
         Count, Turn, TurnOwner, CompletionSequence);
 }
 
+public sealed partial record ProgramSkillWindowContext
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public NativeGiveFact? NativeGive { get; init; }
+}
+
 internal interface INativeGivenCardOperations : IProgramRuntimeOperations
 {
     void Record(long producerId, int giver, int recipient, IReadOnlyList<int> intended, long before,

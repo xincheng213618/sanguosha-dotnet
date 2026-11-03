@@ -58,6 +58,9 @@ internal sealed class SkillProgramDependencies
             ProgramPassiveFactRequirementsAttribute.ForSkills(definitions) |
             (triggers.Any(trigger => trigger.Invocation?.Source == SkillProgramInvocationSource.InitialHandGain)
                 ? ProgramTrackedFact.HandGainOccurrence : ProgramTrackedFact.None) |
+            (triggers.Any(trigger => trigger.Window == SkillProgramTriggerWindow.CardsMoved &&
+                trigger.MovementOccurrence == SkillProgramMovementOccurrence.PerNativeGive)
+                ? ProgramTrackedFact.NativeGive : ProgramTrackedFact.None) |
             (programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).SelectMany(expression => expression.Nodes())
                 .Any(expression => expression.Op is "gainCards" or "gainInitiallyAlive" or "gainFirstOutsideDraw" or "gainPhaseIs" or "gainActualTurn" or "gainRecipientAlive" or "gainHasSource")
                 ? ProgramTrackedFact.HandGainOccurrence : ProgramTrackedFact.None) |

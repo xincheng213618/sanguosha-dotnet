@@ -27,7 +27,7 @@
           "window": "cardsMoved",
           "subject": "owner",
           "optional": false,
-          "movementOccurrence": "perBatch",
+          "movementOccurrence": "perNativeGive",
           "effects": [
             {
               "op": "resolveMouHuangQuanTuicheng",

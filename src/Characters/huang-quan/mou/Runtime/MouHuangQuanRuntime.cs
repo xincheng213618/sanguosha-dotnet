@@ -5,12 +5,11 @@ internal sealed partial class MouHuangQuanRuntime(IMouHuangQuanFacts facts,IMouH
 {
     internal const string MouHqQiaodui="mou:qiaodui",MouHqTuicheng="mou:tuicheng",MouHqGiveReason="skill-program.mou:qiaodui.give",MouHqReplyReason="skill-program.mou:tuicheng.reply",MouHqDrawReason="skill-program.mou:tuicheng.draw";
     internal static CardConversionSource MouHqSource(ProgramSkillFrame f)=>new(f.SkillId,f.TriggerId??f.ActivationId,f.OwnerSeat,f.SkillInstanceId);
-    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification,35700,SkillProgramEffectOp.ResolveMouHuangQuanQiaodui,SkillProgramEffectOp.ResolveMouHuangQuanTuicheng)]
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification,35700,SkillProgramEffectOp.ResolveMouHuangQuanQiaodui)]
     private bool OfferMouHq(ProgramTriggerCandidate c,SkillProgramTrigger t,ProgramSkillWindowContext context)
     {
         if(t.Effects is[{Op:SkillProgramEffectOp.ResolveMouHuangQuanQiaodui}])return facts.Alive(c.OwnerSeat)&&facts.OriginalUse(c.OwnerSeat,context) is not null&&
             facts.Living.Any(p=>p!=c.OwnerSeat)&&!facts.History<MouHqCommittedEvent>().Any(e=>e.OwnerSeat==c.OwnerSeat&&e.Turn==facts.Turn&&e.TurnOwner==facts.TurnOwner);
-        if(t.Effects is[{Op:SkillProgramEffectOp.ResolveMouHuangQuanTuicheng}])return context.MouHqGift is{}g&&g.Giver==c.OwnerSeat&&g.Movements.Count>0;
         return true;
     }
     public SkillProgramStepOutcome Resolve(ProgramSkillFrame supplied,SkillProgramEffectOp op)
@@ -25,7 +24,7 @@ internal sealed partial class MouHuangQuanRuntime(IMouHuangQuanFacts facts,IMouH
         }
         else
         {
-            var gift=f.WindowContext.MouHqGift!;r=r with{Stage=MouHqStage.Reply,Gift=gift,Recipient=gift.Recipient,Count=gift.Movements.Count,Paid=true};
+            var gift=f.WindowContext.NativeGive!;r=r with{Stage=MouHqStage.Reply,Gift=gift,Recipient=gift.Recipient,Count=gift.Movements.Count,Paid=true};
         }
         frames.ReplaceTop(f=f with{MouHuangQuan=r});events.AdvanceFact(new MouHqStartedEvent(f.Id,r.Source,r.GameplayHash,r.Turn,r.TurnOwner,r.WindowId,r.UseId,r.ActionId));PublishMouHq(f);return SkillProgramStepOutcome.AwaitChoice;
     }

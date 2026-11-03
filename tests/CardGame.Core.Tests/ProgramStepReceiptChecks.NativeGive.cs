@@ -12,6 +12,7 @@ internal static partial class ProgramStepReceiptChecks
     private static void NativeGiveFeedsTuichengAndJiyuanFromOneOriginalBatchCold()
     {
         foreach (var withJiyuan in new[] { false, true }) NativeGiveConsumersCold(withJiyuan);
+        DeclaredNativeGiveUsesLogicalOccurrencesAndOriginalMovementWindowsCold();
     }
 
     private static void NativeGiveConsumersCold(bool withJiyuan)

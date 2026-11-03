@@ -5,6 +5,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
 {
     internal const string MouHqQiaodui = MouHuangQuanRuntime.MouHqQiaodui, MouHqTuicheng = MouHuangQuanRuntime.MouHqTuicheng;
     internal MouHuangQuanRuntime MouHuangQuan => _mouHuangQuanOperations.Get();
+    internal bool HasMouHuangQuan => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMouHuangQuanTuicheng);
 
     internal bool ValidMouHq(ProgramSkillFrame f) => MouHuangQuan.Valid(f);
     [ProgramTargetWindow(ProgramTargetWindowStage.FinalizedBeforeActivity, 35700)]
@@ -36,6 +37,6 @@ internal sealed partial class CharacterHuangQuanMouRuntime
             return c.OwnerSeat == f.OwnerSeat && c.SkillId == f.SkillId && c.TriggerId == f.TriggerId && c.SkillInstanceId == f.SkillInstanceId && c.GameplayHash == f.GameplayHash;
         }
 
-        return f.SkillId == MouHqTuicheng && _resolutionStackOperations._resolutionStack[at - 1] is CardsMovedTriggerWindowFrame moved && moved.CandidateIndex >= 0 && moved.CandidateIndex < moved.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, moved.Candidates[moved.CandidateIndex]) && context.MouHqGift is { } g && _givenCards.GiftsForBatch(moved.Batch, f.OwnerSeat).Any(x => x.Id == g.Id);
+        return f.SkillId == MouHqTuicheng;
     }
 }

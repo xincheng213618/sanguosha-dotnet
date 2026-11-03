@@ -39,8 +39,8 @@
           "id": "native-give-draw",
           "window": "cardsMoved",
           "subject": "owner",
-          "movementOccurrence": "perBatch",
-          "sourceZones": ["hand"],
+          "movementOccurrence": "perNativeGive",
+          "condition": { "kind": "expression", "expr": ["alive", "eventTarget"] },
           "optional": true,
           "priority": 0,
           "effects": [

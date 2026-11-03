@@ -18,7 +18,8 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
     private readonly IProgramRuntimeEvents _events;
     private readonly IProgramRuntimePrompts _prompts;
     private readonly IProgramWindowCursors _cursors;
-    internal CardsMovedWindowRuntime(ICardsMovedWindowNativeProofs native,ICardsMovedWindowCardUseProofs cardUse,ICardsMovedWindowNativeReturns returns,ICardsMovedWindowCardUseContinuations cardUseContinuations,ICardsMovedWindowSelections selection,ICardsMovedWindowOperations operations,ICardsMovedWindowFacts facts,ICardsMovedWindowPipeline pipeline,ICardMovementBatchQueue batches,IProgramEventHistoryQueries history,ICardZoneQueries zones,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramWindowCursors cursors, RuntimeEntries.DeferredRuntime<EquipmentMovementRuntime> equipment)
+    private readonly INativeGivenCardQueries _givenCards;
+    internal CardsMovedWindowRuntime(ICardsMovedWindowNativeProofs native,ICardsMovedWindowCardUseProofs cardUse,ICardsMovedWindowNativeReturns returns,ICardsMovedWindowCardUseContinuations cardUseContinuations,ICardsMovedWindowSelections selection,ICardsMovedWindowOperations operations,ICardsMovedWindowFacts facts,ICardsMovedWindowPipeline pipeline,ICardMovementBatchQueue batches,IProgramEventHistoryQueries history,ICardZoneQueries zones,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramWindowCursors cursors, RuntimeEntries.DeferredRuntime<EquipmentMovementRuntime> equipment, INativeGivenCardQueries givenCards)
     {
         _equipment = equipment;
         _native = native;
@@ -36,6 +37,7 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
         _events = events;
         _prompts = prompts;
         _cursors = cursors;
+        _givenCards = givenCards;
     }
 
     internal CardsMovedTriggerWindowFrame? CreateWindow(CardMovementBatchContext batch, long? resumeProgramFrameId = null)
@@ -320,6 +322,8 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
                     .Distinct())
                 {
                     var trigger = _facts.GetProgramTrigger(candidate);
+                    if (trigger.MovementOccurrence == SkillProgramMovementOccurrence.PerNativeGive)
+                        continue;
                     if (trigger.Invocation is not null)
                         continue;
                     if (_pipeline.ExcludeOrdinaryMovementCandidate(candidate, trigger))
@@ -377,9 +381,34 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
             }
 
         candidates.AddRange(CollectInitialHandGainCandidates(batch));
+        candidates.AddRange(CollectNativeGiveCandidates(batch));
         _pipeline.CollectMovementCandidates(batch, candidates);
         return candidates.OrderBy(candidate => _selection.RelativeTableOrder(_facts.CurrentSeat, candidate.OwnerSeat)).ThenByDescending(candidate => candidate.Priority).ThenBy(candidate => candidate.SkillId, StringComparer.Ordinal).ThenBy(candidate => candidate.BindingId, StringComparer.Ordinal).ThenBy(candidate => candidate.SkillInstanceId, StringComparer.Ordinal).ThenBy(candidate => candidate.OccurrenceIndex).ToArray();
     }
+
+    private IEnumerable<ProgramTriggerCandidate> CollectNativeGiveCandidates(CardMovementBatchContext batch)
+    {
+        for (var giver = 0; giver < _facts.PlayerCount; giver++)
+        {
+            if (!_facts.IsAlive(giver)) continue;
+            var bindings = _facts.CollectProgramTriggerCandidates(giver, SkillProgramTriggerWindow.CardsMoved)
+                .Where(candidate => _facts.GetProgramTrigger(candidate).MovementOccurrence == SkillProgramMovementOccurrence.PerNativeGive)
+                .ToArray();
+            if (bindings.Length == 0) continue;
+            var gifts = _givenCards.GiftsForBatch(batch, giver);
+            foreach (var candidate in bindings)
+                for (var occurrence = 0; occurrence < gifts.Count; occurrence++)
+                    yield return candidate with { OccurrenceIndex = occurrence };
+        }
+    }
+
+    [ProgramTriggerProof(ProgramTriggerProofPhase.MovementOwner, 10, ProgramTriggerProofMatch.Decision)]
+    private bool? MatchNativeGiveOccurrence(SkillProgramTrigger trigger, ProgramTriggerCandidate candidate,
+        ProgramSkillWindowContext context, CardMovementBatchContext batch) =>
+        trigger.MovementOccurrence == SkillProgramMovementOccurrence.PerNativeGive
+            ? context.NativeGive is { } gift && gift.Giver == candidate.OwnerSeat &&
+                _givenCards.GiftsForBatch(batch, candidate.OwnerSeat).Any(current => current.Id == gift.Id)
+            : null;
 
     private IEnumerable<ProgramTriggerCandidate> CollectInitialHandGainCandidates(CardMovementBatchContext batch) =>
         (batch.HandGains ?? []).Where(gain => gain.InitiallyAlive)
@@ -511,6 +540,16 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
         if (frame.Contexts is { } contexts)
             return contexts[frame.CandidateIndex];
         var trigger = _facts.GetProgramTrigger(candidate);
+        if (trigger.MovementOccurrence == SkillProgramMovementOccurrence.PerNativeGive)
+        {
+            var gift = _givenCards.GiftsForBatch(frame.Batch, candidate.OwnerSeat)[candidate.OccurrenceIndex];
+            return new(trigger.Window, frame.Id, candidate.OwnerSeat, SourceSeat: gift.Giver,
+                TargetSeat: gift.Recipient, Amount: gift.Movements.Count, OccurrenceIndex: candidate.OccurrenceIndex,
+                Facts: _facts.CaptureProgramTriggerFacts(candidate.OwnerSeat) with
+                { MovedCardCount = gift.Movements.Count, MovementTiming = frame.Batch.MovementTiming },
+                MovementBatch: frame.Batch, MovementIndex: Array.FindIndex(frame.Batch.Movements.ToArray(),
+                    movement => movement.Sequence == gift.CompletionSequence)) { NativeGive = gift };
+        }
         if (trigger.Invocation?.Source == SkillProgramInvocationSource.InitialHandGain)
         {
             var gain = frame.Batch.HandGains!.Single(gain => gain.RecipientSeat == candidate.OwnerSeat &&

@@ -412,3 +412,17 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 所选角色按既有参与者绑定校验；materialOwner 必须能从原材料得到唯一实际持有人，没有持有人的牌堆材料应明确声明真正的 giver。内建 `giveBoundCard` 等给予节点保留自己的逻辑给予者，不重复填写声明。
 
 共享事实只记录完整请求中真正进入原收牌者手牌的实体，合法替代和销毁不会被数量表达式误算成给予。原生给予的通用 JSON 触发 occurrence 尚未声明化；当前两个消费者仍按原窗口读取共同事实，不新增人物专属读取语法。
+
+`cardsMoved` 可用 `movementOccurrence: "perNativeGive"` 声明每次实际给予触发，`subject` 固定为 `owner`（逻辑给予者）。它不接受 sourceZones、destinationZones、牌面或原因等物理移动过滤；普通 perCard／perBatch 保持各自口径。接收者是 `eventTarget`，给予者是 `eventSource`，存活等资格由 expression 组合；声明本身自动要求共同给予事实，不需人物需求标记。候选仍留在原移动帧，一次给予多张牌只有一个逻辑 occurrence，完成的物理移动索引与它分开。
+
+```json
+{
+  "id": "after-give", "window": "cardsMoved", "subject": "owner",
+  "movementOccurrence": "perNativeGive", "optional": true,
+  "condition": {"kind": "expression", "expr": ["alive", "eventTarget"]},
+  "effects": [
+    {"op": "selectTarget", "target": "owner", "targetKind": "eventTarget"},
+    {"op": "draw", "target": "selectedTarget", "amount": 1}
+  ]
+}
+```

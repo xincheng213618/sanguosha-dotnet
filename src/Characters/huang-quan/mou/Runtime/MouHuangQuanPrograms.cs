@@ -70,5 +70,4 @@ internal sealed class ResolveMouHuangQuanQiaoduiDescriptor:MouHuangQuanDescripto
 internal sealed class ResolveMouHuangQuanTuichengDescriptor:MouHuangQuanDescriptor
 {
     public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveMouHuangQuanTuicheng;
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeGive);
 }
