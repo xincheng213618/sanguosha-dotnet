@@ -10,8 +10,6 @@ public sealed record ProgramQiaoliDistributionEvent(long FrameId, string SkillId
     int OwnerSeat, int CardId, int? RecipientSeat) : IGameEvent;
 public sealed record ProgramQiaoliEndingGainEvent(long FrameId, string SkillId, string BindingId,
     int OwnerSeat, int CardId, int TurnNumber) : IGameEvent;
-public sealed record ProgramQingliangRevealEvent(long FrameId, string SkillId, string BindingId,
-    int OwnerSeat, int ActorSeat, int CardCount) : IGameEvent;
 public sealed record ProgramQingliangResolutionEvent(long FrameId, string SkillId, string BindingId,
     int OwnerSeat, int ActorSeat, string Choice, int DiscardCount, bool Nullified) : IGameEvent;
 

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -109,6 +110,74 @@ internal static class LeDiaoChanChecks
             sequential.E<DiouNativeReturnedEvent>().Count(e => e.UseId == duelUse.UseId) == 1 && sequential.E<DiouDrawReturnedEvent>().Single().ActualCount == 2 &&
             sequential.V().Hand.Any(c => c.Id == duelShow),
             "A genuine next-card target grant resolves both ordered Duel targets through one neutral whole Use, then returns and earns Draw2 once after its second resumable cursor.");
+        SharedPublicRevealDescriptionsKeepPhysicalHandEntriesSeparate();
+    }
+
+    private static void SharedPublicRevealDescriptionsKeepPhysicalHandEntriesSeparate()
+    {
+        var s = Scene.Start("shared-reveal");
+        static MatchRuntime Runtime(Scene scene) => (MatchRuntime)typeof(GameEngine)
+            .GetProperty("MatchRuntime", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(scene.G)!;
+        long? Entry(int owner, int card) => Runtime(s).Capabilities.Get<ICurrentHandEntryQueries>().CurrentHandEntry(owner, card);
+        var reveals = Runtime(s).Capabilities.Get<IPublicCardRevealQueries>();
+        var card = s.V().Hand.First(c => !Marked(c));
+        var entry = Entry(0, card.Id);
+        s.Need(entry is not null, "The shared residency query reads the real opening Hand entry without a character reveal ledger.");
+        s.Show(card.Id);
+        var first = s.E<ProgramCardsRevealedEvent>().Last(e => e.SkillId == Driver && e.BindingId == "show");
+        var firstDescription = reveals.Describe(first);
+        s.Need(firstDescription.FrameId == first.FrameId && firstDescription.CardIds.SequenceEqual([card.Id]) &&
+            first is { OwnerSeat: 0, Bind: "selected" } && Entry(0, card.Id) == entry &&
+            s.E<ProgramSkillResolvedEvent>().Any(e => e.FrameId == first.FrameId && e.SkillId == Driver && e.ActivationId == "show"),
+            "A real JSON Hand show describes its original program frame, binding and exact entity without moving the card.");
+        s.Show(card.Id);
+        var repeated = s.E<ProgramCardsRevealedEvent>().Last(e => e.SkillId == Driver && e.BindingId == "show");
+        s.Need(repeated.FrameId != first.FrameId && reveals.Describe(repeated).CardIds.SequenceEqual([card.Id]) && Entry(0, card.Id) == entry,
+            "Repeated explicit shows remain separate source facts and do not create a new physical Hand entry.");
+        s.Use("give", [card.Id], [1]); s.Play();
+        var peerEntry = Entry(1, card.Id);
+        s.Need(Entry(0, card.Id) is null && peerEntry is not null && peerEntry != entry &&
+            s.G.CardMovements.Any(m => m.Sequence == peerEntry && m.CardId == card.Id && m.From == CardLocation.Hand(0) && m.To == CardLocation.Hand(1)),
+            "A real gift ends the former residency and records the recipient's own physical Hand entry.");
+        s.Take(1, card.Id); s.Play();
+        var returnedEntry = Entry(0, card.Id);
+        s.Need(Entry(1, card.Id) is null && returnedEntry is not null && returnedEntry != entry && returnedEntry != peerEntry &&
+            s.G.CardMovements.Any(m => m.Sequence == returnedEntry && m.CardId == card.Id && m.From == CardLocation.Hand(1) && m.To == CardLocation.Hand(0)) &&
+            firstDescription.CardIds.SequenceEqual([card.Id]),
+            "Leaving and returning creates a new Hand residency while the earlier immutable public fact still names its original card.");
+        s.Cold();
+        s.Need(Entry(0, card.Id) == returnedEntry && Entry(1, card.Id) is null,
+            "Command-prefix recovery preserves the shared journal-derived entry after the actual give and take.");
+
+        var mutableCards = new List<CardSnapshot> { card, card };
+        IGameEvent[] explicitSources =
+        [
+            new CardsRevealedEvent(9001, mutableCards),
+            new ProgramCardsRevealedEvent(9002, Driver, "show", 0, "selected", mutableCards),
+            new FireAttackCardRevealedEvent(9003, 1, 0, card.Id, card.Kind, card.Suit),
+            new ProgramHandComparisonSourceRevealedEvent(9004, 0, card.Id),
+            new ProgramHandComparisonCardRevealedEvent(9005, 0, card.Id)
+        ];
+        // Pure classification inputs exercise all native source shapes; they are not injected into match history.
+        var descriptions = explicitSources.Select(reveals.Describe).ToArray();
+        mutableCards.Clear();
+        s.Need(descriptions.Select(d => d.FrameId).SequenceEqual([9001L, 9002L, 9003L, 9004L, 9005L]) &&
+            descriptions.All(d => d.CardIds.SequenceEqual([card.Id]) && d.CardIds is IList<int> { IsReadOnly: true }),
+            "All five explicit native reveal shapes retain their own frame and return a frozen distinct entity list independent of the source collection.");
+        IGameEvent[] nonShows =
+        [
+            new ProgramPrivateHandViewedEvent(first.FrameId, Driver, 0, 1, s.V(1).HandCount),
+            new PindianCardsRevealedEvent(first.FrameId, [new(0, card.Id, card.Rank, card.Rank)], false),
+            new PindianResultDeterminedEvent(first.FrameId, Driver, new(0, 1, card.Id, card.Id + 1, card.Rank, card.Rank))
+        ];
+        s.Need(nonShows.All(e => reveals.Describe(e) is { FrameId: 0, CardIds.Count: 0 }),
+            "Private views and native Pindian reveal or comparison facts are not explicit public Hand shows.");
+        var beforeUse = s.G.Events.Count;
+        _ = s.Study(); s.Play();
+        var nativeUse = s.G.Events.Skip(beforeUse).Select(e => e.Payload).ToArray();
+        s.Need(nativeUse.OfType<CardUseDeclaredEvent>().Any() && nativeUse.OfType<CardUseFinishedEvent>().Any() &&
+            nativeUse.All(e => reveals.Describe(e).CardIds.Count == 0),
+            "A real ordinary native Use exposes its own card-use facts without becoming an explicit public Hand show.");
     }
 
     // Fixed small real games; no mutation of engine state, seed searches or complete-match simulation.

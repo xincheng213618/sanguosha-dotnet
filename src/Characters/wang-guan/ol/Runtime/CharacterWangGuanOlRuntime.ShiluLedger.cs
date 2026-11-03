@@ -7,7 +7,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
 
     internal GameEngine.ProgramCardIdentityMatch? ShiluIdentity(CharacterState owner, Card card)
     {
-        if (!HasShiluCapability || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Hand(owner.Seat) || _characterLuoXianOlOperations.CurrentHandEntry(owner.Seat, card.Id)is not { } entry)
+        if (!HasShiluCapability || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Hand(owner.Seat) || _currentHandEntries.CurrentHandEntry(owner.Seat, card.Id)is not { } entry)
             return null;
         var e = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiluHandIdentityGrantedEvent>().LastOrDefault(e => e.HolderSeat == owner.Seat && e.CardId == card.Id && e.HandEntry == entry && !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == card.Id && m.Sequence > e.MovementCutoff && m.From == CardLocation.Hand(owner.Seat) && m.To != m.From));
         if (e is null)

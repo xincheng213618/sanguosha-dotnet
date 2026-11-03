@@ -6,7 +6,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
     internal void PayTongduGift(ProgramSkillFrame f, LiuBaEntity card)
     {
         var r = f.LiuBa!;
-        var entry = _characterLuoXianOlOperations.CurrentHandEntry(r.Recipient, card.CardId) ?? throw new InvalidOperationException("Tongdu requires the selected original Hand entry.");
+        var entry = _currentHandEntries.CurrentHandEntry(r.Recipient, card.CardId) ?? throw new InvalidOperationException("Tongdu requires the selected original Hand entry.");
         PrepareLiuBaMovement(ref f, LiuBaStage.GiftChildren, [card]);
         if (r.Recipient == f.OwnerSeat)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TongduGiftIssuedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, r.Recipient, card.CardId, card.Kind, entry, null));

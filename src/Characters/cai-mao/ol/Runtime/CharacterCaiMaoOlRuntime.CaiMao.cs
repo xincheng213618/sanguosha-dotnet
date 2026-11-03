@@ -134,7 +134,7 @@ internal sealed partial class CharacterCaiMaoOlRuntime
                 if (!_coreMatchParticipantsPlayersAccess._players[holder].IsAlive || hand.Length == 0)
                     continue;
                 var card = hand[_randomOperations._random.Next(hand.Length)];
-                var entry = _characterLuoXianOlOperations.CurrentHandEntry(holder, card.Id) ?? throw new InvalidOperationException("Zuolian needs a real original hand entry.");
+                var entry = _currentHandEntries.CurrentHandEntry(holder, card.Id) ?? throw new InvalidOperationException("Zuolian needs a real original hand entry.");
                 var reveal = new CaiMaoReveal(holder, card.Id, card.Kind, entry, CaiMaoRevealPrefix + reveals.Count);
                 reveals.Add(reveal);
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = (_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { CaiMao = r = r with { Reveals = reveals.ToArray() } }));

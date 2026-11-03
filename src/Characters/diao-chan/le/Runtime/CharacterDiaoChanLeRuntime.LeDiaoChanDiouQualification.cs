@@ -148,17 +148,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     {
         if (!HasDiouCapability || !_coreMatchSetupSetupCompleteAccess._setupComplete || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber <= 0)
             return;
-        var(frame, ids) = payload switch
-        {
-            CardsRevealedEvent e => (e.ResolutionId, e.Cards.Select(c => c.Id).ToArray()),
-            ProgramCardsRevealedEvent e => (e.FrameId, e.Cards.Select(c => c.Id).ToArray()),
-            FireAttackCardRevealedEvent e => (e.ResolutionId, new[] { e.CardId }),
-            ProgramHandComparisonCardRevealedEvent e => (e.FrameId, new[] { e.CardId }),
-            ProgramHandComparisonSourceRevealedEvent e => (e.FrameId, new[] { e.CardId }),
-            ProgramHandDraftRevealedEvent e => (e.FrameId, _characterWangGuanOlOperations.MiuyanDraftHandIds(e).ToArray()),
-            ProgramQingliangRevealEvent e => (e.FrameId, _characterWangGuanOlOperations.MiuyanQingliangHandIds(e).ToArray()),
-            ProgramJuanxiaTrickUsedEvent { TrickKind: "FireAttack", CardId: > 0 } e => (e.FrameId, _characterWangGuanOlOperations.MiuyanJuanxiaHandIds(e).ToArray()),
-            _ => (0L, Array.Empty<int>())};
+        var (frame, ids) = _publicCardReveals.Describe(payload);
         foreach (var p in _coreMatchParticipantsPlayersAccess._players)
             foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetHand(p).Where(c => ids.Contains(c.Id)))
                 if (!DiouWasShownThisTurn(card.Id))

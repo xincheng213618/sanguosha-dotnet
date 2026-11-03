@@ -47,16 +47,6 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
 
     double IMouXiaoQiaoOlFacts.KeepValue(int seat, int id) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[seat]);
     double IMouXiaoQiaoOlFacts.TargetValue(int owner, int target, bool helpful) => _coreAiBrainsAiBrainsAccess._aiBrains[owner].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(owner), target, helpful ? new(0, 0, 0, 0, 1, 0, true, false) : new(0, 0, 1, 0, 0, 0, false, false));
-    (long FrameId, IReadOnlyList<int> CardIds) IMouXiaoQiaoOlFacts.PublicReveal(IGameEvent p) => p switch
-    {
-        CardsRevealedEvent x => (x.ResolutionId, x.Cards.Select(c => c.Id).ToArray()),
-        ProgramCardsRevealedEvent x => (x.FrameId, x.Cards.Select(c => c.Id).ToArray()),
-        FireAttackCardRevealedEvent x => (x.ResolutionId, [x.CardId]),
-        ProgramHandComparisonCardRevealedEvent x => (x.FrameId, [x.CardId]),
-        ProgramHandComparisonSourceRevealedEvent x => (x.FrameId, [x.CardId]),
-        ProgramHandDraftRevealedEvent x => (x.FrameId, _characterWangGuanOlOperations.MiuyanDraftHandIds(x).ToArray()),
-        ProgramQingliangRevealEvent x => (x.FrameId, _characterWangGuanOlOperations.MiuyanQingliangHandIds(x).ToArray()),
-        _ => (0, Array.Empty<int>())};
     bool IMouXiaoQiaoOlFacts.IsResponseRequest(ProgramSkillFrame f) => IsMouXqJueyanResponseRequest(f);
     bool IMouXiaoQiaoOlFacts.ActorLineage(long useId, long actionId, int originalActor, int actor, int provider, CardActionType type) => _characterZhouYuOlMouOperations.MouGuquActorLineageMatches(useId, actionId, originalActor, actor, provider, type);
     bool IMouXiaoQiaoOlFacts.GiftRecoveryChild(ProgramSkillFrame f, ResolutionFrame child)

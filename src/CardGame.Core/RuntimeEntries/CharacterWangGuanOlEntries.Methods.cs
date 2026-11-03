@@ -19,9 +19,6 @@ internal sealed partial class CharacterWangGuanOlEntries
     internal void IssueMiuyanUse(long useId, CardActionContext? action) => _resolve().IssueMiuyanUse(useId, action);
     internal CardUseFrame? MiuyanCandidateUse(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().MiuyanCandidateUse(c, context);
     internal IReadOnlyList<WangGuanHandEntity> MiuyanClaimEntities(MiuyanUseInvoice use, int owner) => _resolve().MiuyanClaimEntities(use, owner);
-    internal IEnumerable<int> MiuyanDraftHandIds(ProgramHandDraftRevealedEvent e) => _resolve().MiuyanDraftHandIds(e);
-    internal IEnumerable<int> MiuyanJuanxiaHandIds(ProgramJuanxiaTrickUsedEvent e) => _resolve().MiuyanJuanxiaHandIds(e);
-    internal IEnumerable<int> MiuyanQingliangHandIds(ProgramQingliangRevealEvent e) => _resolve().MiuyanQingliangHandIds(e);
     internal bool MiuyanUseProof(CardUseFrame use) => _resolve().MiuyanUseProof(use);
     internal void ObserveMiuyanPhaseHandReveal(IGameEvent fact) => _resolve().ObserveMiuyanPhaseHandReveal(fact);
     internal void PublishWangGuan(ProgramSkillFrame f) => _resolve().PublishWangGuan(f);

@@ -153,7 +153,7 @@ internal sealed partial class CharacterMengDaOlRuntime
         if (r.Stage != GoudeStage.DiscardCard || r.TargetSeat is not { } holder)
             throw new InvalidOperationException("Goude cannot pay an unissued branch.");
         var selected = r.Materials.Single(m => m.Slot.ToString(System.Globalization.CultureInfo.InvariantCulture) == choice.Parameters["slot-index"]);
-        if (_characterLuoXianOlOperations.CurrentHandEntry(holder, selected.CardId) != selected.HandEntry || !GoudeDiscardMaterials(f.OwnerSeat, holder).Contains(selected))
+        if (_currentHandEntries.CurrentHandEntry(holder, selected.CardId) != selected.HandEntry || !GoudeDiscardMaterials(f.OwnerSeat, holder).Contains(selected))
             throw new InvalidOperationException("Goude cannot substitute its original selected hand entity.");
         var paymentBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Goude = r with { PaidMaterial = selected, Stage = GoudeStage.MovementChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });

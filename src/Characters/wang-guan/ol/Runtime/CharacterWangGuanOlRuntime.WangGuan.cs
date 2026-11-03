@@ -147,7 +147,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
         {
             var holder = choice.Targets.Single();
             var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[holder]);
-            var entities = hand.Select((c, i) => new WangGuanHandEntity(c.Id, c.Kind, holder, i, _characterLuoXianOlOperations.CurrentHandEntry(holder, c.Id)!.Value)).ToArray();
+            var entities = hand.Select((c, i) => new WangGuanHandEntity(c.Id, c.Kind, holder, i, _currentHandEntries.CurrentHandEntry(holder, c.Id)!.Value)).ToArray();
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangGuan = r with { Stage = WangGuanStage.ShiluCard, HolderSeat = holder, Entities = entities } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiluHolderChosenEvent(f.Id, holder, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
             for (var i = 0; i < entities.Length; i++)
@@ -159,7 +159,7 @@ internal sealed partial class CharacterWangGuanOlRuntime
         if (r.Stage != WangGuanStage.ShiluCard || r.HolderSeat is not { } target)
             throw new InvalidOperationException("Shilu cannot select an entity before its post-draw holder.");
         var selected = r.Entities.Single(e => e.Slot.ToString() == choice.Parameters["slot-index"]);
-        if (!_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _characterLuoXianOlOperations.CurrentHandEntry(target, selected.CardId) != selected.Entry)
+        if (!_coreMatchParticipantsPlayersAccess._players[target].IsAlive || _currentHandEntries.CurrentHandEntry(target, selected.CardId) != selected.Entry)
             throw new InvalidOperationException("Shilu cannot replace its frozen original opaque hand entity.");
         _coreProgramRevealsOperations.CommitProgramHandReveal(f.Id, target, ShiluRevealBind, [selected.CardId]);
         var holderFact = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiluHolderChosenEvent>().Single(e => e.FrameId == f.Id);

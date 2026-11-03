@@ -32,7 +32,6 @@ internal interface IMouXiaoQiaoOlFacts : IProgramSelectionQuery
     SkillPromptPresentation SkillPrompt(string skillId);
     double KeepValue(int seat, int cardId);
     double TargetValue(int owner, int target, bool helpful);
-    (long FrameId, IReadOnlyList<int> CardIds) PublicReveal(IGameEvent payload);
     bool IsResponseRequest(ProgramSkillFrame frame);
     bool ActorLineage(long useId,long actionId,int originalActor,int actor,int provider,CardActionType type);
     bool GiftRecoveryChild(ProgramSkillFrame frame, ResolutionFrame child);
@@ -59,7 +58,7 @@ internal interface IMouXiaoQiaoOlOperations : IProgramRuntimeOperations
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IMouXiaoQiaoOlOperations operations,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
-    IPublicHandRevealWindows reveals, IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouXiaoQiaoOlRuntime
+    IPublicHandRevealWindows reveals, IPublicCardRevealQueries publicReveals, IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouXiaoQiaoOlRuntime
 {
     internal const string Miluo = "mou-ol:miluo",Jueyan = "mou-ol:jueyan";
     internal const string GiveReason = "skill-program.mou-ol:miluo.give";

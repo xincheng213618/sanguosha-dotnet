@@ -64,5 +64,4 @@ public sealed class DrawAndDraftLowHandPopulationProgramHandler : ISkillProgramE
 public sealed record ProgramNamedTargetDefense(string LedgerId, CardKind? Name = null, int Stage = 0);
 public sealed record ProgramPublicHandDraft(IReadOnlyList<int> RecipientSeats, IReadOnlyList<int> CardIds, int Stage = 0, int Cursor = 0);
 public sealed record ProgramDefenseNameDeclaredEvent(long FrameId, string SkillId, int OwnerSeat, CardKind Name) : IGameEvent;
-public sealed record ProgramHandDraftRevealedEvent(long FrameId, string SkillId, int OwnerSeat, IReadOnlyList<int> RecipientSeats, IReadOnlyList<int> CardIds) : IGameEvent;
 public sealed record ProgramHandDraftCardObtainedEvent(long FrameId, string SkillId, int OwnerSeat, int RecipientSeat, int CardId) : IGameEvent;

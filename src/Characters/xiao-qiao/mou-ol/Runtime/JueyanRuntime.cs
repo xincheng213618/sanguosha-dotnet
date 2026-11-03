@@ -52,7 +52,7 @@ internal sealed partial class MouXiaoQiaoOlRuntime
     internal void CapturePublicHandReveal(IGameEvent payload)
     {
         if (!facts.Enabled || !facts.SetupComplete || facts.Turn <= 0 || facts.Round <= 0) return;
-        var (parentId, ids) = facts.PublicReveal(payload);
+        var (parentId, ids) = publicReveals.Describe(payload);
         if (ids.Count == 0 || frames.Find(parentId) is not { } parent) return;
         foreach (var owner in Enumerable.Range(0, facts.PlayerCount).Where(facts.Alive))
         {

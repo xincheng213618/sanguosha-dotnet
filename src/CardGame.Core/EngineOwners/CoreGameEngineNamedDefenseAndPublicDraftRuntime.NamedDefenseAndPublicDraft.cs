@@ -269,7 +269,11 @@ internal sealed partial class CoreGameEngineNamedDefenseAndPublicDraftRuntime
             }
 
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { PublicHandDraft = frame.PublicHandDraft!with { Stage = 2 } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramHandDraftRevealedEvent(frame.Id, frame.SkillId, frame.OwnerSeat, draft.RecipientSeats, selected));
+            var shown = selected.Select(cardId => _cardZonesOperations._cardZones.CardsAt(CardLocation.Hand(frame.OwnerSeat))
+                .Single(card => card.Id == cardId)).Select(_snapshots.Snapshot).ToArray();
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(
+                frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame),
+                frame.OwnerSeat, "public-hand-draft-roster", Array.AsReadOnly(shown)));
             if (_publicHandRevealWindows.Begin(frame.Id, "public-hand-draft-roster"))
                 return;
             ReturnPublicHandDraftReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));

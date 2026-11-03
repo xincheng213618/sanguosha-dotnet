@@ -10,7 +10,7 @@ internal sealed partial class CharacterCaiMaoOlRuntime
         var exchanges = new List<CaiMaoExchange>();
         foreach (var old in r.Reveals)
         {
-            if (!_coreMatchParticipantsPlayersAccess._players[old.HolderSeat].IsAlive || _characterLuoXianOlOperations.CurrentHandEntry(old.HolderSeat, old.CardId) != old.HandEntry)
+            if (!_coreMatchParticipantsPlayersAccess._players[old.HolderSeat].IsAlive || _currentHandEntries.CurrentHandEntry(old.HolderSeat, old.CardId) != old.HandEntry)
                 continue;
             Card? card = null;
             CardLocation from = default;

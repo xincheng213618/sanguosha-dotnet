@@ -14,7 +14,9 @@ internal sealed partial class CharacterRuiJiOlRuntime
             return SkillProgramStepOutcome.Continue;
         var hand = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).OrderBy(card => card.Id).ToArray();
         _coreProgramLifecycleOperations.SetProgramCardSet(active.Id, QingliangRevealBinding, hand.Select(card => card.Id).ToArray(), SkillProgramCardSetVisibility.Public);
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramQingliangRevealEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, action.ActorSeat, hand.Length));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(
+            active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active),
+            active.OwnerSeat, QingliangRevealBinding, Array.AsReadOnly(hand.Select(_snapshots.Snapshot).ToArray())));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 清靓：展示所有手牌（{(hand.Length)} 张）。", owner.Seat);
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id)with { RuiJiQingliang = new RuiJiQingliangState(parent.Id, action.ActorSeat, "option") });
         if (_publicHandRevealWindows.Begin(active.Id, "qingliang-hand"))
