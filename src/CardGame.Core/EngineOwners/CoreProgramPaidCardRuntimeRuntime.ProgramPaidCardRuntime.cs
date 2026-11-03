@@ -73,7 +73,7 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         if (throughProcessing && !((IProgramPaidCardOperations)this).MoveToProcessing(frame, card, source, reason, disclosure, beforeFact))
             return;
-        _corePhysicalMovementFacadesOperations.MoveCard(card, throughProcessing ? CardLocation.Processing : source, destination, reason, _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, giver, destination.OwnerSeat!.Value, [card.Id], before, beforeFact), disclosure: disclosure);
+        _corePhysicalMovementFacadesOperations.MoveCard(card, throughProcessing ? CardLocation.Processing : source, destination, reason, _nativeGivenCards.Completion(frame.Id, giver, destination.OwnerSeat!.Value, [card.Id], before, beforeFact), disclosure: disclosure);
     }
 
     bool IProgramPaidCardOperations.BeginMovementWindow() => _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow();

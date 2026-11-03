@@ -124,7 +124,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuyouContributionPaidEvent(f.Id, r.DonorSeat, f.OwnerSeat, r.ContributionCardId, r.ContributionPrintedKind, 0, r.Before, r.Before, true));
         }
         else
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([r.ContributionCardId], CardLocation.Hand(f.OwnerSeat), new(WuyouContributionReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.DonorSeat, f.OwnerSeat, [r.ContributionCardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) =>
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([r.ContributionCardId], CardLocation.Hand(f.OwnerSeat), new(WuyouContributionReason), _nativeGivenCards.CompletionRecords(f.Id, r.DonorSeat, f.OwnerSeat, [r.ContributionCardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) =>
             {
                 var move = moves.Single();
                 var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
@@ -245,7 +245,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
         if (f.OwnerSeat == r.DonorSeat)
             CommitWuyouReturn(f, 0, before, true);
         else
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(r.DonorSeat), new(WuyouReturnReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, r.DonorSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) => CommitWuyouReturn(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), batch, moves.Single().Sequence, false)));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(r.DonorSeat), new(WuyouReturnReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, r.DonorSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) => CommitWuyouReturn(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), batch, moves.Single().Sequence, false)));
         ContinueWuyou(f.Id);
     }
 

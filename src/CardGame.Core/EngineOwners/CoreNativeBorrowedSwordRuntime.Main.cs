@@ -213,7 +213,7 @@ internal sealed partial class CoreNativeBorrowedSwordRuntime
             foreach (var weapon in weapons)
             {
                 _corePhysicalMovementFacadesOperations.MoveCard(weapon, CardLocation.Equipment(weaponOwner.Seat), CardLocation.Processing, CardMoveReasons.BorrowedSwordGive, movement => _characterBianFuRenOlOperations.RecordBianFuRenOwnedTransferProducer(movement, source.Seat, pending.ResolutionId));
-                var obtained = _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(weapon, CardLocation.Hand(source.Seat), CardMoveReasons.BorrowedSwordGive, _characterHuangQuanMouOperations.NativeGiveCompletion(pending.ResolutionId, weaponOwner.Seat, source.Seat, [weapon.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+                var obtained = _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(weapon, CardLocation.Hand(source.Seat), CardMoveReasons.BorrowedSwordGive, _nativeGivenCards.Completion(pending.ResolutionId, weaponOwner.Seat, source.Seat, [weapon.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
                 if (obtained)
                     transferred.Add(weapon);
                 _coreMatchLogOperations.AddLog("CardEffect", obtained ? $"{(weaponOwner.Name)} 未使用【杀】，将【{(weapon.DisplayName)}】交给 {(source.Name)}。" : $"{(weaponOwner.Name)} 未使用【杀】，【{(weapon.DisplayName)}】离开装备区后销毁。", weaponOwner.Seat, source.Seat);

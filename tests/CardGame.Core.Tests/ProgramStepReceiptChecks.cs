@@ -3,7 +3,7 @@ using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
 
-internal static class ProgramStepReceiptChecks
+internal static partial class ProgramStepReceiptChecks
 {
     private const string Anxu = "mobile:anxu", Zhijian = "boundary:zhijian-mobile";
     private const string Ally = "fixture:step-recipient", Donor = "fixture:step-donor", Other = "fixture:step-other";
@@ -12,6 +12,7 @@ internal static class ProgramStepReceiptChecks
     public static void DeliveredStepsRetainPaidReturnsWithoutRepeatingMovement()
     {
         AcceptedCardActionStaysWithItsOriginalCandidate();
+        NativeGiveFeedsTuichengAndJiyuanFromOneOriginalBatchCold();
         foreach (var scenario in new[] { "anxu", "anxu-before-payment-loss", "anxu-source-loss", "anxu-owner-death", "anxu-moved-away", "zhijian", "zhijian-source-loss", "zhijian-owner-death" })
         {
             var skill = scenario.StartsWith("anxu", StringComparison.Ordinal) ? Anxu : Zhijian;

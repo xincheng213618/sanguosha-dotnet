@@ -19,6 +19,7 @@ internal static partial class ProgramAmountExpressionChecks
     public static void LoaderHashAndTypedEvaluation()
     {
         GiveBoundCardTargetsAndAwaitAreTypedAndFingerprinted();
+        DeclaredGiveIsTypedAndDistinctFromMovement();
         var compact = Load("""{"op":"draw","target":"owner","amountExpr":["-",4,["handCount","owner"]]}""");
         var spaced = Load("""{"op":"draw","target":"owner","amountExpr":[ "-", 4, [ "handCount", "owner" ] ]}""");
         var changed = Load("""{"op":"draw","target":"owner","amountExpr":["-",5,["handCount","owner"]]}""");
@@ -647,6 +648,30 @@ internal static partial class ProgramAmountExpressionChecks
         {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{Skill}}","revision":1,"activations":[
           {"id":"test","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{{effect}}]}]}]}
         """, Presentation(Skill)).Programs[Skill];
+    private static void DeclaredGiveIsTypedAndDistinctFromMovement()
+    {
+        const string producer = """{"op":"selectTarget","target":"owner","targetKind":"otherLiving"},{"op":"draw","target":"owner","amount":1,"resultBind":"given","awaitMovementTriggers":true},""";
+        const string move = """{"op":"moveBoundCards","target":"owner","sourceBind":"given","destination":"selectedTargetHand"}""";
+        var ordinary = Load(producer + move);
+        var declared = Load(producer + move.Replace("\"selectedTargetHand\"", "\"selectedTargetHand\",\"giveBy\":\"owner\""));
+        var material = Load(producer + move.Replace("\"selectedTargetHand\"", "\"selectedTargetHand\",\"giveBy\":\"materialOwner\""));
+        Need(ordinary.Activations[0].Effects[2].GiveBy is null &&
+            declared.Activations[0].Effects[2].GiveBy == ProgramGiveActor.Owner &&
+            material.Activations[0].Effects[2].GiveBy == ProgramGiveActor.MaterialOwner &&
+            ordinary.GameplayHash != declared.GameplayHash && declared.GameplayHash != material.GameplayHash,
+            "Give intent and its logical giver are declared data, distinct from an ordinary move with the same physical destination.");
+        const string selection = """
+            {"op":"selectTarget","target":"owner","targetKind":"otherLiving"},
+            {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},
+             "zones":["hand"],"count":1,"destination":"selectedTargetHand","targetRef":{"kind":"selectedTarget"},"giveBy":"materialOwner"}
+            """;
+        Need(Load(selection).Activations[0].Effects[1].GiveBy == ProgramGiveActor.MaterialOwner,
+            "A selected-card Give declares the actual material owner without a character whitelist.");
+        Reject(producer + move.Replace("\"selectedTargetHand\"", "\"discardPile\",\"giveBy\":\"owner\""));
+        Reject(producer + move.Replace("\"selectedTargetHand\"", "\"selectedTargetHand\",\"giveBy\":true"));
+        Reject(producer + move.Replace("\"selectedTargetHand\"", "\"selectedTargetHand\",\"giveBy\":\"unknown\""));
+    }
+
     private static void GiveBoundCardTargetsAndAwaitAreTypedAndFingerprinted()
     {
         const string producer = """{"op":"draw","target":"owner","amount":1,"resultBind":"drawn"},""";

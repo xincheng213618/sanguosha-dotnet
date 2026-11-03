@@ -85,7 +85,7 @@ internal sealed partial class CoreGameEngineProgramOwnedCardDistributionsRuntime
         var card = _cardZonesOperations._cardZones.CardsAt(from).Single(item => item.Id == cardId);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Processing, expectedReason);
-        _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(card, CardLocation.Hand(targetSeat), expectedReason, _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, distribution.CardOwnerSeat, targetSeat, [cardId], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+        _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(card, CardLocation.Hand(targetSeat), expectedReason, _nativeGivenCards.Completion(frame.Id, distribution.CardOwnerSeat, targetSeat, [cardId], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         var givenIds = distribution.GivenCardIds.Append(cardId).ToArray();
         var targetSeats = distribution.TargetSeats.Append(targetSeat).ToArray();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramOwnedCardDistributedEvent(frame.Id, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), distribution.CardOwnerSeat, targetSeat, cardId, givenIds.Length, distribution.RequiredCount));

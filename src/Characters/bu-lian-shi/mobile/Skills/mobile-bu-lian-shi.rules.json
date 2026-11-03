@@ -7,7 +7,7 @@
       "continueAfterSkillLossAfter": "mobile-anxu-gift",
       "effects": [
         { "op": "selectTargets", "target": "owner", "targetKind": "otherLivingUnequalHandPair", "minimumTargets": 2, "maximumTargets": 2, "targetAiOrder": "supportFirstThenOpposeSecond" },
-        { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "selectedSecond" }, "cardOwnerRef": { "kind": "selectedSecond" }, "zones": ["hand"], "count": 1,
+        { "giveBy": "materialOwner", "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "selectedSecond" }, "cardOwnerRef": { "kind": "selectedSecond" }, "zones": ["hand"], "count": 1,
           "destination": "selectedTargetHand", "targetRef": { "kind": "selectedFirst" }, "resultBind": "mobile-anxu-gift", "awaitMovementTriggers": true },
         { "op": "chooseOption", "target": "owner", "resultBind": "mobile-anxu-benefit", "condition": { "kind": "expression", "expr": ["and", ["alive", "selectedFirst"], ["alive", "selectedSecond"], ["==", ["handCount", "selectedFirst"], ["handCount", "selectedSecond"]]] },
           "options": [{ "id": "draw" }, { "id": "recover", "condition": { "kind": "wounded" } }] },

@@ -97,7 +97,7 @@ internal sealed partial class CharacterDongZhuoMouOlRuntime
     void IMouDongZhuoOlNative.Give(ProgramSkillFrame f, int id, int recipient)
     {
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), new(MouDongZhuoOlRuntime.GiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null), disclosure: CardMovementDisclosure.FaceUp);
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), new(MouDongZhuoOlRuntime.GiftReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null), disclosure: CardMovementDisclosure.FaceUp);
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(x => x.Id == f.Id);
         var paid = parent.MouDongZhuoOl!;
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, parent with { MouDongZhuoOl = paid with { Before = before, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

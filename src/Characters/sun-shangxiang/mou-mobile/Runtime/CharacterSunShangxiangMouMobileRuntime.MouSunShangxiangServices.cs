@@ -40,7 +40,7 @@ internal sealed partial class CharacterSunShangxiangMouMobileRuntime
     double IMouSunShangxiangFacts.HelpValue(int actor, int target) => _coreAiBrainsAiBrainsAccess._aiBrains[actor].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(actor), target, new(0, 0, 0, 0, 1, 0, true, false));
     double IMouSunShangxiangFacts.KeepValue(int actor, int id) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), _coreMatchParticipantsPlayersAccess._players[actor]);
     void IMouSunShangxiangNative.Mark(ProgramSkillFrame f, int previous, int current, bool initial) => ChangeMouSsxZhu(f, previous, current, initial);
-    void IMouSunShangxiangNative.Give(ProgramSkillFrame f, int payer, IReadOnlyList<int> ids) => _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(f.OwnerSeat), new(MouSsxGiveReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, payer, f.OwnerSeat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, moves) =>
+    void IMouSunShangxiangNative.Give(ProgramSkillFrame f, int payer, IReadOnlyList<int> ids) => _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(f.OwnerSeat), new(MouSsxGiveReason), _nativeGivenCards.CompletionRecords(f.Id, payer, f.OwnerSeat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, moves) =>
     {
         foreach (var move in moves)
             SealMouSsxMove(f.Id, move, false);

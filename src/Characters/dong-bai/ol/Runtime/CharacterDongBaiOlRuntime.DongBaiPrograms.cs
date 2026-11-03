@@ -241,7 +241,7 @@ internal sealed partial class CharacterDongBaiOlRuntime
             After = before
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LianZhu = r });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), new(LianZhuReason(r.Stage)), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), new(LianZhuReason(r.Stage)), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
         {
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var paid = r with

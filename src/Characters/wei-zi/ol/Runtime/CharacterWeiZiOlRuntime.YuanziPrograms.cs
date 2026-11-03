@@ -13,7 +13,7 @@ internal sealed partial class CharacterWeiZiOlRuntime
         if (hand.Length == 0)
             return SkillProgramStepOutcome.Continue;
         var presentation = _contentRegistryOperations._contentRegistry!.GetSkill(active.SkillId);
-        _corePhysicalMovementFacadesOperations.MoveCards(hand, CardLocation.Hand(active.OwnerSeat), CardLocation.Hand(boundarySeat), new($"skill-program.{(active.SkillId)}.yuanzi-give"), _characterHuangQuanMouOperations.NativeGiveCompletion(active.Id, active.OwnerSeat, boundarySeat, hand.Select(c => c.Id).ToArray(), _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+        _corePhysicalMovementFacadesOperations.MoveCards(hand, CardLocation.Hand(active.OwnerSeat), CardLocation.Hand(boundarySeat), new($"skill-program.{(active.SkillId)}.yuanzi-give"), _nativeGivenCards.Completion(active.Id, active.OwnerSeat, boundarySeat, hand.Select(c => c.Id).ToArray(), _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(presentation.Name)}】，将所有手牌（{(hand.Length)}张）交给 {(_coreMatchParticipantsPlayersAccess._players[boundarySeat].Name)}。", active.OwnerSeat, boundarySeat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramYuanziInvokedEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.OwnerSeat, boundarySeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())

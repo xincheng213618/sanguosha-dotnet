@@ -210,7 +210,7 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
             if (cards.Length == 0)
                 Commit(before);
             else
-                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, CardLocation.Hand(frame.OwnerSeat), new(CurrentTurnHandExchangeReason(frame, "gift")), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, receipt.ParticipantSeat, frame.OwnerSeat, cards, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) => Commit(records.Max(movement => movement.Sequence))));
+                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, CardLocation.Hand(frame.OwnerSeat), new(CurrentTurnHandExchangeReason(frame, "gift")), _nativeGivenCards.CompletionRecords(frame.Id, receipt.ParticipantSeat, frame.OwnerSeat, cards, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) => Commit(records.Max(movement => movement.Sequence))));
             DrainCurrentTurnHandExchangeMovement(frame.Id);
             return true;
         }
@@ -255,7 +255,7 @@ internal sealed partial class CoreGameEngineCurrentTurnHandExchangeRuntime
         if (receipt.RequiredReturnCount == 0)
             Commit(before);
         else
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(receipt.SelectedCardIds, CardLocation.Hand(receipt.ParticipantSeat), new(CurrentTurnHandExchangeReason(frame, "return")), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, receipt.ParticipantSeat, receipt.SelectedCardIds, before, (_, records) => Commit(records.Max(movement => movement.Sequence))));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(receipt.SelectedCardIds, CardLocation.Hand(receipt.ParticipantSeat), new(CurrentTurnHandExchangeReason(frame, "return")), _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, receipt.ParticipantSeat, receipt.SelectedCardIds, before, (_, records) => Commit(records.Max(movement => movement.Sequence))));
         DrainCurrentTurnHandExchangeMovement(frame.Id);
     }
 

@@ -160,7 +160,7 @@ internal sealed partial class CoreGameEngineUnequalHandHpEndingRuntime
         var logicalDiscard = cardId is { } cost && to == CardLocation.DiscardPile ? _coreNativeLogicalDiscardsOperations.CaptureNativeLogicalDiscardInvocation(f.OwnerSeat, f.OwnerSeat, [cost], reason, f.Id) : null;
         var count = cardId is null ? _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[subject], 1, true, reason).Count : 1;
         if (cardId is { } paid)
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([paid], to, reason, (step == "gift" ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, subject, [paid], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([paid], to, reason, (step == "gift" ? _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, subject, [paid], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
         _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(logicalDiscard);
         var payment = new UnequalHandHpPayment(step, subject, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, count, cardId, from, to);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);

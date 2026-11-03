@@ -52,8 +52,6 @@ internal sealed class MatchCoreCapabilityProvider
         }
         if (cardMovements is not null)
             bindings.Add(new(typeof(ICardMovementHistoryQueries), new CardMovementHistoryQueries(cardMovements)));
-        if (players is not null && cardMovements is not null && history is not null)
-            bindings.Add(new(typeof(INativeGivenCardQueries), new NativeGivenCardQueries(players, cardMovements, history)));
         Bindings = Array.AsReadOnly(bindings.ToArray());
     }
 }

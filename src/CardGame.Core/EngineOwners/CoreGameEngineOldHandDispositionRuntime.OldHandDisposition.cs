@@ -142,7 +142,7 @@ internal sealed partial class CoreGameEngineOldHandDispositionRuntime
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { OldHandDisposition = r with { Stage = "movement", ReturnStage = next, TargetSeat = target, PaidIds = ids, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         var logicalDiscard = destination == CardLocation.DiscardPile ? _coreNativeLogicalDiscardsOperations.CaptureNativeLogicalDiscardInvocation(f.OwnerSeat, f.OwnerSeat, ids, new(OldHandDispositionReason), f.Id) : null;
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, new(OldHandDispositionReason), (next == "give" ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, target!.Value, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, new(OldHandDispositionReason), (next == "give" ? _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, target!.Value, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
         {
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var paid = active.OldHandDisposition!;

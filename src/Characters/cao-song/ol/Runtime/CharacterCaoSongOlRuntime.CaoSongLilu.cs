@@ -148,7 +148,7 @@ internal sealed partial class CharacterCaoSongOlRuntime
             var grows = previous is null || ids.Count > previous;
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { CaoSongLilu = receipt with { Stage = CaoSongLiluStage.GiftChildren, GiftCount = ids.Count, PreviousGiftCount = previous, Grows = grows, SequenceBefore = before, SequenceAfter = before }, Step = ResolutionFrameStep.ResolvingEffect });
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(LiluGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, recipient, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(LiluGiftReason), _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, recipient, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
             frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             receipt = frame.CaoSongLilu!with
             {

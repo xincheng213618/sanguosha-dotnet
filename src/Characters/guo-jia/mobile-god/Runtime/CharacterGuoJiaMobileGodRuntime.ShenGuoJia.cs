@@ -298,7 +298,7 @@ internal sealed partial class CharacterGuoJiaMobileGodRuntime
     {
         var ids = frame.ShenGuoJia!.Cards.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToArray();
         frame = SetShenGuoJiaChildren(frame, target < 0 ? ShenGuoJiaStage.CleanupChildren : ShenGuoJiaStage.GainChildren);
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, target < 0 ? CardLocation.DiscardPile : CardLocation.Hand(target), new(target < 0 ? "skill-program.mobile:huishi.cleanup" : "skill-program.mobile:huishi.give"), target < 0 ? null : _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, target, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, _) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, target < 0 ? CardLocation.DiscardPile : CardLocation.Hand(target), new(target < 0 ? "skill-program.mobile:huishi.cleanup" : "skill-program.mobile:huishi.give"), target < 0 ? null : _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, target, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, _) =>
         {
         }));
         FinishShenGuoJiaIssue(frame.Id);

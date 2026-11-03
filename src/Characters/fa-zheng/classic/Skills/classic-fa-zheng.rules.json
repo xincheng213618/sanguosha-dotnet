@@ -74,6 +74,7 @@
               ]
             },
             {
+              "giveBy": "materialOwner",
               "op": "selectAndMoveOwnedCard",
               "target": "owner",
               "chooserRef": {

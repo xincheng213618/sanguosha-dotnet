@@ -125,7 +125,7 @@ internal sealed partial class CharacterHuLieMouRuntime
         {
             MouHuLieRules.Given(f.Id, moves);
             if (r.Cards.All(c => c.From.OwnerSeat == f.OwnerSeat) && r.Target != f.OwnerSeat)
-                _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, f.OwnerSeat, r.Target, r.Cards.Select(c => c.Id).ToArray(), r.Before);
+                _nativeGivenCards.Record(f.Id, f.OwnerSeat, r.Target, r.Cards.Select(c => c.Id).ToArray(), r.Before);
         }, disclosure: CardMovementDisclosure.FaceUp);
     }
 

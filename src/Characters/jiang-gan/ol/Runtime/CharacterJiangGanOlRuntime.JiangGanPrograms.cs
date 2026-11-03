@@ -166,7 +166,7 @@ internal sealed partial class CharacterJiangGanOlRuntime
             throw new InvalidOperationException("The Daoshu give-back card must differ from the taken card's suit.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { DaoshuGuess = null });
-        _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(owner.Seat), CardLocation.Hand(state.TargetSeat), new($"skill-program.{(frame.SkillId)}.daoshu-give"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, owner.Seat, state.TargetSeat, [card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+        _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(owner.Seat), CardLocation.Hand(state.TargetSeat), new($"skill-program.{(frame.SkillId)}.daoshu-give"), _nativeGivenCards.Completion(frame.Id, owner.Seat, state.TargetSeat, [card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 的【盗书】未猜中花色，交给 {(target.Name)} 【{(card.DisplayName)}】。", owner.Seat, state.TargetSeat);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDaoshuEvent(active.Id, active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), owner.Seat, state.TargetSeat, state.ChosenSuit, true, false, card.Id, Array.Empty<int>()));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())

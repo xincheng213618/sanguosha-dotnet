@@ -216,7 +216,7 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
             }
         }
 
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(BoundaryZhongyongReason), afterRequestSettled: recipient == f.OwnerSeat ? Settled : _characterHuangQuanMouOperations.NativeGiveRequestCompletion(f.Id, f.OwnerSeat, recipient, ids, r.Before, Settled), producerFrameId: f.Id);
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(BoundaryZhongyongReason), afterRequestSettled: recipient == f.OwnerSeat ? Settled : _nativeGivenCards.RequestCompletion(f.Id, f.OwnerSeat, recipient, ids, r.Before, Settled), producerFrameId: f.Id);
         var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var paid = current.BoundaryZhongyong!;
         _coreRuntimeOperations.ReplaceRuntimeTop(current with { BoundaryZhongyong = paid with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

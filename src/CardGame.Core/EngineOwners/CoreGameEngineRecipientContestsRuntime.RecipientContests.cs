@@ -23,7 +23,7 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
         var before = _coreUniqueHpPeerProgramsOperations.Value.RecipientContestSequence;
         var r = new RecipientContestReceipt(1, _coreUniqueHpPeerProgramsOperations.Value.RecipientContestSource(f), f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat, recipient, bind, ids, before, before);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { RecipientContest = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(RecipientContestGiftReason(f)), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, ids, _coreCardMovementJournalMovementSequenceAccess._movementSequence, (_, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(RecipientContestGiftReason(f)), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, ids, _coreCardMovementJournalMovementSequenceAccess._movementSequence, (_, records) =>
         {
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var paid = r with

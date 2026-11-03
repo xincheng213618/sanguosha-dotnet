@@ -61,6 +61,7 @@
               "resultBind": "command-gift"
             },
             {
+              "giveBy": "owner",
               "op": "moveBoundCards",
               "target": "owner",
               "sourceBind": "command-gift",

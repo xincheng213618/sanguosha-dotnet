@@ -193,7 +193,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Zonghu = r with { Stage = ZonghuStage.CostChildren, Before = before, After = before, GrainIds = grain }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         for (var i = 0; i < materials.Length; i++)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZonghuGiftSelectedEvent(f.Id, i, materials[i].Card.Id));
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Selected, CardLocation.Hand(recipient), new(ZonghuGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, r.Selected, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Selected, CardLocation.Hand(recipient), new(ZonghuGiftReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, r.Selected, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) =>
         {
             var gifts = moves.Select(m => new ZonghuGift(m.CardId, materials.Single(x => x.Card.Id == m.CardId).Card.Kind, m.From, m.Sequence, batch)).OrderBy(g => Array.IndexOf(r.Selected.ToArray(), g.CardId)).ToArray();
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);

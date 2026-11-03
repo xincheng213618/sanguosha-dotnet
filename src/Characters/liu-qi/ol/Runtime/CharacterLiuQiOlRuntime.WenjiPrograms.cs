@@ -71,7 +71,7 @@ internal sealed partial class CharacterLiuQiOlRuntime
             Stage = LiuQiStage.GiftChildren
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { LiuQi = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(f.OwnerSeat), new(WenjiGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.RecipientSeat!.Value, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(f.OwnerSeat), new(WenjiGiftReason), _nativeGivenCards.CompletionRecords(f.Id, r.RecipientSeat!.Value, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
         {
             var paid = r with
             {

@@ -32,12 +32,14 @@
        "leftoverBind": "leftover"
       },
       {
+       "giveBy": "selectedTarget",
        "op": "moveBoundCards",
        "target": "owner",
        "sourceBind": "group-owner",
        "destination": "ownerHand"
       },
       {
+       "giveBy": "selectedTarget",
        "op": "moveBoundCards",
        "target": "owner",
        "sourceBind": "group-chooser",

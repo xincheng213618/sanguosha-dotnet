@@ -108,7 +108,7 @@ internal sealed partial class CharacterLuSuHappyGodRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyDingzhouMovementPaidEvent(frame.Id, stage, batch, moves.Count, before, moves[^1].Sequence));
         }
 
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, destination, new(HappyDingzhouReason + stage), stage is HappyDingzhouStage.FieldGiftChildren or HappyDingzhouStage.HandReturnChildren ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, destination.OwnerSeat!.Value, cards, before, Paid) : Paid, disclosure: stage == HappyDingzhouStage.FieldGainChildren ? CardMovementDisclosure.FaceUp : CardMovementDisclosure.FaceDown);
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, destination, new(HappyDingzhouReason + stage), stage is HappyDingzhouStage.FieldGiftChildren or HappyDingzhouStage.HandReturnChildren ? _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, destination.OwnerSeat!.Value, cards, before, Paid) : Paid, disclosure: stage == HappyDingzhouStage.FieldGainChildren ? CardMovementDisclosure.FaceUp : CardMovementDisclosure.FaceDown);
     }
 
     internal void FinishHappyDingzhou(ProgramSkillFrame frame)

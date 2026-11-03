@@ -66,7 +66,7 @@ internal sealed partial class CharacterZhangXiuMouRuntime
                 throw new InvalidOperationException("Mou Zhang Xiu native movement changed its actual destination.");
             MouZhangXiuAnniversaryRules.MovesPaid(f.Id, moves);
             if (!obtain && !discard)
-                _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, f.OwnerSeat, recipient, ids, r.Before);
+                _nativeGivenCards.Record(f.Id, f.OwnerSeat, recipient, ids, r.Before);
         }
 
         var reason = new CardMoveReason(discard ? MouZhangXiuAnniversaryRuntime.DiscardReason : obtain ? MouZhangXiuAnniversaryRuntime.ClaimReason : distribute ? MouZhangXiuAnniversaryRuntime.DistributionReason : MouZhangXiuAnniversaryRuntime.GiveReason);

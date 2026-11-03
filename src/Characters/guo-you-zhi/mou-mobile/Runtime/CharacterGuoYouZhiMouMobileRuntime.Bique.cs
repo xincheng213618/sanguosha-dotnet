@@ -194,7 +194,7 @@ internal sealed partial class CharacterGuoYouZhiMouMobileRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouGuoYouZhi = r with { Stage = MouGuoYouZhiStage.GiftChildren, Gifts = gifts, Paid = true, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(r.ActorSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGuoYouZhiGiftAcceptedEvent(f.Id, r.ActorSeat, gifts.Length));
         if (gifts.Length > 0)
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(gifts.Select(g => g.CardId).ToArray(), CardLocation.Hand(r.ActorSeat), new(MouGyzGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, r.ActorSeat, gifts.Select(g => g.CardId).ToArray(), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null), disclosure: CardMovementDisclosure.FaceDown);
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(gifts.Select(g => g.CardId).ToArray(), CardLocation.Hand(r.ActorSeat), new(MouGyzGiftReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, r.ActorSeat, gifts.Select(g => g.CardId).ToArray(), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null), disclosure: CardMovementDisclosure.FaceDown);
         SealMouGyz(f.Id);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         r = f.MouGuoYouZhi!;

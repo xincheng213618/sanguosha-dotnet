@@ -28,7 +28,7 @@
     { "id": "ol:panshi", "revision": 1, "triggers": [
       { "id": "preparation-tribute", "window": "turnStartBeforeNormalFlow", "subject": "owner", "optional": false, "effects": [
         { "op": "selectTarget", "target": "owner", "targetKind": "livingCixiaoOwner" },
-        { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" }, "zones": ["hand"], "count": 1, "destination": "selectedTargetHand", "targetRef": { "kind": "selectedTarget" }, "awaitMovementTriggers": true }
+        { "giveBy": "materialOwner", "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" }, "zones": ["hand"], "count": 1, "destination": "selectedTargetHand", "targetRef": { "kind": "selectedTarget" }, "awaitMovementTriggers": true }
       ] }
     ] }
   ]

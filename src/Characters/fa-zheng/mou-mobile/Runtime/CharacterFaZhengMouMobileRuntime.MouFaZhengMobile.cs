@@ -159,7 +159,7 @@ internal sealed partial class CharacterFaZhengMouMobileRuntime
             if (purpose == "take")
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouFaZhengObtainedEvent(f.Id, paid.MarkId, from.OwnerSeat.Value, move.To == CardLocation.Hand(f.OwnerSeat) ? 1 : 0, move.Sequence));
             if (purpose != "take")
-                _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, from.OwnerSeat!.Value, target, [card.Id], f.MouFaZheng!.Before);
+                _nativeGivenCards.Record(f.Id, from.OwnerSeat!.Value, target, [card.Id], f.MouFaZheng!.Before);
         }, disclosure: from.Zone == CardZoneKind.Hand ? CardMovementDisclosure.FaceDown : CardMovementDisclosure.FaceUp);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouFaZheng = f.MouFaZheng!with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

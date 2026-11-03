@@ -126,7 +126,7 @@ internal sealed partial class CoreGameEngineShanheChanrangEdictRuntime
         if (!_coreMatchParticipantsPlayersAccess._players[giver].IsAlive || !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || !ShanheChanrangCards(giver).Any(candidate => candidate.Id == card))
             throw new InvalidOperationException("The edict payment lost its actual giver, living recipient or owned entity.");
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheChanrang = draft with { Stage = "paid", PaidCardId = card, Choices = [] } });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card], CardLocation.Hand(recipient), CoreGameEngineShanheChanrangEdictDefinitions.ShanheChanrangGiveReason, _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, giver, recipient, [card], _coreCardMovementJournalMovementSequenceAccess._movementSequence, (_, movements) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card], CardLocation.Hand(recipient), CoreGameEngineShanheChanrangEdictDefinitions.ShanheChanrangGiveReason, _nativeGivenCards.CompletionRecords(frame.Id, giver, recipient, [card], _coreCardMovementJournalMovementSequenceAccess._movementSequence, (_, movements) =>
         {
             var move = movements.Single(item => item.CardId == card && item.To == CardLocation.Hand(recipient));
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);

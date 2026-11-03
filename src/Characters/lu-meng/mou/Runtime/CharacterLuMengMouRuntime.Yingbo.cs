@@ -86,7 +86,7 @@ internal sealed partial class CharacterLuMengMouRuntime
         if (action == "yingbo-gift" && selected.Cards is [var cardId] && cardId == pending.Card.Id && selected.Targets is [var selectedTarget] && _coreTableSeatQueriesOperations.IsValidPlayerSeat(selectedTarget) && selectedTarget != pending.SourceSeat && _coreMatchParticipantsPlayersAccess._players[selectedTarget].IsAlive)
         {
             targetSeat = selectedTarget;
-            _corePhysicalMovementFacadesOperations.MoveCard(pending.Card, CardLocation.Processing, CardLocation.Hand(selectedTarget), new CardMoveReason("skill.yingbo.gift"), _characterHuangQuanMouOperations.NativeGiveCompletion(pending.ResolutionId, pending.SourceSeat, selectedTarget, [pending.Card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+            _corePhysicalMovementFacadesOperations.MoveCard(pending.Card, CardLocation.Processing, CardLocation.Hand(selectedTarget), new CardMoveReason("skill.yingbo.gift"), _nativeGivenCards.Completion(pending.ResolutionId, pending.SourceSeat, selectedTarget, [pending.Card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         }
         else if (action == "yingbo-skip" && selected.Cards.Count == 0 && selected.Targets.Count == 0)
         {

@@ -16,7 +16,7 @@ internal sealed partial class CharacterZhaoYunBoundaryMobileRuntime
 
         var card = _cardZonesOperations._cardZones.CardsAt(source).Single(c => c.Id == binding.CardIds[0]);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
-        _corePhysicalMovementFacadesOperations.MoveCard(card, source, CardLocation.Hand(recipient), new CardMoveReason($"skill-program.{(frame.SkillId)}.{(SkillProgramEffectOp.GiveMobileYajiaoRevealedCard)}"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, frame.OwnerSeat, recipient, binding.CardIds, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence), disclosure: CardMovementDisclosure.FaceUp);
+        _corePhysicalMovementFacadesOperations.MoveCard(card, source, CardLocation.Hand(recipient), new CardMoveReason($"skill-program.{(frame.SkillId)}.{(SkillProgramEffectOp.GiveMobileYajiaoRevealedCard)}"), _nativeGivenCards.Completion(frame.Id, frame.OwnerSeat, recipient, binding.CardIds, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence), disclosure: CardMovementDisclosure.FaceUp);
         if (_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
             return SkillProgramStepOutcome.AwaitChild;
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { PendingMovementContinuation = null });

@@ -120,7 +120,7 @@ internal sealed partial class CoreGameEngineLostHpOwnedGiftsRuntime
         var before = PaidTargetMovementSequence;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Processing, new(LostHpGiftMoveReason));
-        _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(card, CardLocation.Hand(target), new(LostHpGiftMoveReason), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, frame.OwnerSeat, target, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
+        _coreAdvancedWeaponsOperations.MoveProcessingCardUnlessDestroyed(card, CardLocation.Hand(target), new(LostHpGiftMoveReason), _nativeGivenCards.Completion(frame.Id, frame.OwnerSeat, target, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
         // Native Silver Lion removal can append a queued recovery to this owning frame.
         // Merge the paid receipt into that current frame, never the pre-movement copy.
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);

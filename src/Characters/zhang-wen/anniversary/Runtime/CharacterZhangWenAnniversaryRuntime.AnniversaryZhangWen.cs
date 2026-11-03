@@ -119,7 +119,7 @@ internal sealed partial class CharacterZhangWenAnniversaryRuntime
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZhangWenSibian = f.ZhangWenSibian!with { Stage = stage }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         if (ids.Count > 0)
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, reason, stage == ZhangWenSibianStage.FinishChildren && destination.OwnerSeat is { } recipient ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, ids, before) : null, disclosure: CardMovementDisclosure.FaceUp);
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, reason, stage == ZhangWenSibianStage.FinishChildren && destination.OwnerSeat is { } recipient ? _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, ids, before) : null, disclosure: CardMovementDisclosure.FaceUp);
         AddZhangWenSibianStep(f.Id, stage, before);
     }
 

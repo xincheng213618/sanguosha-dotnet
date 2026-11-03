@@ -198,7 +198,7 @@ internal sealed partial class CharacterGuoJiaHappyGodRuntime
         var ids = f.HappyGuoJia!.Cards.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyGuoJia = f.HappyGuoJia with { Target = target } });
         f = HappyGjChildren(f, target < 0 ? HappyGuoJiaStage.CleanupChildren : HappyGuoJiaStage.GainChildren);
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, target < 0 ? CardLocation.DiscardPile : CardLocation.Hand(target), new(target < 0 ? "skill-program.happy:huishi.cleanup" : "skill-program.happy:huishi.give"), target < 0 ? null : _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, target, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, _) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, target < 0 ? CardLocation.DiscardPile : CardLocation.Hand(target), new(target < 0 ? "skill-program.happy:huishi.cleanup" : "skill-program.happy:huishi.give"), target < 0 ? null : _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, target, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, _) =>
         {
         }));
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);

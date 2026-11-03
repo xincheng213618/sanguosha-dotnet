@@ -191,7 +191,7 @@ internal sealed partial class CharacterSunCeMobileGodRuntime
         var target = choice.Targets.Single();
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect, ShenSunCe = r with { Stage = ShenSunCeStage.GiftChildren, CardId = card, RecipientSeat = target, SequenceBefore = before, SequenceAfter = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card], CardLocation.Hand(target), new(ShenSunCeGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, target, [card], before, null));
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card], CardLocation.Hand(target), new(ShenSunCeGiftReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, target, [card], before, null));
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var movement = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence > before && m.CardId == card && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Hand(target) && m.Reason.Value == ShenSunCeGiftReason);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShenSunCe = f.ShenSunCe!with { SequenceAfter = movement.Sequence } });

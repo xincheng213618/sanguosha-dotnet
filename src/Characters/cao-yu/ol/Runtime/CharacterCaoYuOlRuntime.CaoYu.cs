@@ -288,7 +288,7 @@ internal sealed partial class CharacterCaoYuOlRuntime
         }
 
         if (target is { } seat)
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(seat), new(reason), (stage == CaoYuStage.XiangzuGiftChildren ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, seat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Paid) : Paid));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(seat), new(reason), (stage == CaoYuStage.XiangzuGiftChildren ? _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, seat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Paid) : Paid));
         else
             _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, ids, new(reason), Paid);
         RecordCaoYuMovement(f.Id);

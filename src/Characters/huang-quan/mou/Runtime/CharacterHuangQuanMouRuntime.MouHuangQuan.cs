@@ -36,6 +36,6 @@ internal sealed partial class CharacterHuangQuanMouRuntime
             return c.OwnerSeat == f.OwnerSeat && c.SkillId == f.SkillId && c.TriggerId == f.TriggerId && c.SkillInstanceId == f.SkillInstanceId && c.GameplayHash == f.GameplayHash;
         }
 
-        return f.SkillId == MouHqTuicheng && _resolutionStackOperations._resolutionStack[at - 1] is CardsMovedTriggerWindowFrame moved && moved.CandidateIndex >= 0 && moved.CandidateIndex < moved.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, moved.Candidates[moved.CandidateIndex]) && context.MouHqGift is { } g && MouHqGiftsForBatch(moved.Batch, f.OwnerSeat).Any(x => x.Id == g.Id);
+        return f.SkillId == MouHqTuicheng && _resolutionStackOperations._resolutionStack[at - 1] is CardsMovedTriggerWindowFrame moved && moved.CandidateIndex >= 0 && moved.CandidateIndex < moved.Candidates.Count && CoreGameEngineDamageTargetMountObserverRuntime.MountObserverCandidateMatches(f, moved.Candidates[moved.CandidateIndex]) && context.MouHqGift is { } g && _givenCards.GiftsForBatch(moved.Batch, f.OwnerSeat).Any(x => x.Id == g.Id);
     }
 }

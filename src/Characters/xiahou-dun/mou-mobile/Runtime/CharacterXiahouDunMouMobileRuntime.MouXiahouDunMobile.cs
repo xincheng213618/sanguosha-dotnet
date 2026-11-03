@@ -144,7 +144,7 @@ internal sealed partial class CharacterXiahouDunMouMobileRuntime
         if (_cardZonesOperations._cardZones.GetLocation(id) != r.Pile!.Location)
             throw new InvalidOperationException("Qingjian distribution lost its current exact pile entity.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouXiahouDunMobile = r with { Stage = MouXiahouDunMobileStage.MovementChildren, RecipientSeat = recipient, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), r.Pile.Location, CardLocation.Hand(recipient), new(MouXiahouDunGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, f.OwnerSeat, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null), disclosure: CardMovementDisclosure.FaceUp);
+        _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), r.Pile.Location, CardLocation.Hand(recipient), new(MouXiahouDunGiftReason), _nativeGivenCards.Completion(f.Id, f.OwnerSeat, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null), disclosure: CardMovementDisclosure.FaceUp);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouXiahouDunMobileGiftEvent(f.Id, r.Index, id, recipient, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         SealMouXiahouDunMovements(f.Id, before);
         ContinueMouXiahouDunMovement(f.Id);

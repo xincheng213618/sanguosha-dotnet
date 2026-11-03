@@ -143,7 +143,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
             return;
         }
 
-        _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(r.VictimSeat), CardLocation.Hand(f.OwnerSeat), new(ZhaohuoGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, r.VictimSeat, f.OwnerSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, movement => RecordZhaohuoGift(f.Id, movement)));
+        _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(r.VictimSeat), CardLocation.Hand(f.OwnerSeat), new(ZhaohuoGiftReason), _nativeGivenCards.Completion(f.Id, r.VictimSeat, f.OwnerSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, movement => RecordZhaohuoGift(f.Id, movement)));
         ContinueZhaohuo(f.Id);
     }
 

@@ -21,7 +21,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
     IEnumerable<T> IMouHuangQuanFacts.History<T>() => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<T>();
     bool IMouHuangQuanFacts.ParentMatches(ProgramSkillFrame f) => MouHqParent(f);
     MouHqOriginalUse? IMouHuangQuanFacts.OriginalUse(int owner, ProgramSkillWindowContext? context) => TryMouHqOriginalUse(owner, context, out var u, out _) ? new(u.Id, u.Action!.ActionId, u.SourceSeat == owner) : null;
-    IReadOnlyList<MouHqGift> IMouHuangQuanFacts.Gifts(int giver) => _coreMatchParticipantsPlayersAccess._players[giver].MouHqActualGifts ?? [];
+    IReadOnlyList<NativeGiveFact> IMouHuangQuanFacts.Gifts(int giver, int turn, int turnOwner) => _givenCards.GiftsForCurrentScope(giver, turn, turnOwner);
     IReadOnlyList<MouHqEntity> IMouHuangQuanFacts.TransferEntities(ProgramSkillFrame f, int actor) => Array.AsReadOnly(_coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, actor, actor, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Transfer, destination: SkillProgramCardDestination.OwnerHand).Select(c => new MouHqEntity(c.Cards.Single(), _cardZonesOperations._cardZones.GetLocation(c.Cards.Single()))).ToArray());
     double IMouHuangQuanFacts.HelpValue(int actor, int target) => _coreAiBrainsAiBrainsAccess._aiBrains[actor].ScoreProgramTarget(_corePlayerViewProjectionOperations.CreateSnapshot(actor), target, new(0, 0, 0, 0, 1, 0, true, false));
     int IMouHuangQuanFacts.KeepValue(int actor, int card) => CoreNativeAiDecisionsRuntime.GetKeepValue(_coreAdvancedLifecycleOperations.GetAdvancedCard(card), _coreMatchParticipantsPlayersAccess._players[actor]);
@@ -54,7 +54,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         {
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(current with { MouHuangQuan = current.MouHuangQuan!with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-            RecordNativeGivenCards(f.Id, giver, recipient, ids, before);
+            _nativeGivenCards.Record(f.Id, giver, recipient, ids, before);
         }, disclosure: CardMovementDisclosure.FaceDown);
     }
 

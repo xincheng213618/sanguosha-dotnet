@@ -167,7 +167,7 @@ internal sealed partial class CharacterMaChengOlRuntime
             var card = _cardZonesOperations._cardZones.CardsAt(from)[slot];
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Chenglie = r with { GiftId = card.Id, GiftFrom = from } });
             StartChenglieMovement(ref f, ChenglieStage.GiftChildren, expected);
-            _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Hand(f.OwnerSeat), new(ChenglieGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, expected, f.OwnerSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, m => RecordChenglieMove(f.Id, m)));
+            _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Hand(f.OwnerSeat), new(ChenglieGiftReason), _nativeGivenCards.Completion(f.Id, expected, f.OwnerSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, m => RecordChenglieMove(f.Id, m)));
             FinishChenglieMovement(f.Id);
             return;
         }

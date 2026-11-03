@@ -238,7 +238,7 @@ internal sealed partial class CharacterZhangLiaoOlSpRuntime
         if (destination == CardLocation.DiscardPile && reason == "skill-program.ol:mubing.DiscardSelected")
             _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, cards, new(reason));
         else
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, destination, new(reason), (f.SpZhangLiao!.Stage is SpZhangLiaoStage.HighestChildren or SpZhangLiaoStage.GiftChildren ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.SpZhangLiao!.Stage == SpZhangLiaoStage.HighestChildren ? f.SpZhangLiao.VictimSeat!.Value : f.OwnerSeat, destination.OwnerSeat!.Value, cards, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, destination, new(reason), (f.SpZhangLiao!.Stage is SpZhangLiaoStage.HighestChildren or SpZhangLiaoStage.GiftChildren ? _nativeGivenCards.CompletionRecords(f.Id, f.SpZhangLiao!.Stage == SpZhangLiaoStage.HighestChildren ? f.SpZhangLiao.VictimSeat!.Value : f.OwnerSeat, destination.OwnerSeat!.Value, cards, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { SpZhangLiao = f.SpZhangLiao!with { SequenceAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
     }

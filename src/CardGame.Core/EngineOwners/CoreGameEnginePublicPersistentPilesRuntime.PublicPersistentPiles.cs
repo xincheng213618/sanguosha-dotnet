@@ -206,7 +206,7 @@ internal sealed partial class CoreGameEnginePublicPersistentPilesRuntime
                 var card = _corePublicPileSourcesOperations.PublicPileDraftCards(draft).Single(card => card.Id == id);
                 _coreNativePromptBoundaryOperations.ClearPendingDecision();
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame with { PublicPileDraft = draft with { RemainingIds = draft.RemainingIds.Where(cardId => cardId != id).ToArray() }, PendingMovementContinuation = new(draft.OwnerSeat, 0, null) });
-                _corePhysicalMovementFacadesOperations.MoveCard(card, location, CardLocation.Hand(selected.Targets.Single()), new("skill-program.public-pile.distribute"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, draft.OwnerSeat, selected.Targets.Single(), [id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+                _corePhysicalMovementFacadesOperations.MoveCard(card, location, CardLocation.Hand(selected.Targets.Single()), new("skill-program.public-pile.distribute"), _nativeGivenCards.Completion(frame.Id, draft.OwnerSeat, selected.Targets.Single(), [id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
                 if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
                     _coreRuntimeOperations.ReturnRuntimeProgramMovement(frame.Id);
                 return;

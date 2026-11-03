@@ -360,8 +360,8 @@ internal sealed partial class ProgramPaidCardRuntime
             ownerSeat, beforeCoverage, frozenMovedSuit)) return;
         var disclosure = effect.RevealBeforeMove || destination.Zone is CardZoneKind.DiscardPile or CardZoneKind.Equipment or CardZoneKind.Judgment
             ? CardMovementDisclosure.FaceUp : CardMovementDisclosure.FaceDown;
-        if (destination.Zone == CardZoneKind.Hand && NativeGiveSemantics.Selected(frame, effect))
-            _operations.Give(frame, ownerSeat, card, source, destination, reason, effect.Destination == SkillProgramCardDestination.SelectedTargetHand, disclosure, recordMovement);
+        if (ProgramCardGiving.Giver(frame, effect.GiveBy, [source]) is { } giver)
+            _operations.Give(frame, giver, card, source, destination, reason, effect.Destination == SkillProgramCardDestination.SelectedTargetHand, disclosure, recordMovement);
         else if (effect.Destination == SkillProgramCardDestination.SelectedTargetHand)
         {
             if (_operations.MoveToProcessing(frame, card, source, reason, disclosure, recordMovement))
@@ -532,8 +532,8 @@ internal sealed partial class ProgramPaidCardRuntime
         if(effect.AwaitMovementTriggers)_frames.ReplaceTop(frame=frame with{PendingMovementContinuation=new(ownerSeat,beforeCoverage,effect.CoverageResultBind)});
         var disclosure = effect.RevealBeforeMove || destination.Zone is CardZoneKind.DiscardPile or CardZoneKind.Equipment or CardZoneKind.Judgment
             ? CardMovementDisclosure.FaceUp : CardMovementDisclosure.FaceDown;
-        if (destination.Zone == CardZoneKind.Hand && NativeGiveSemantics.Selected(frame, effect))
-            _operations.Give(frame, ownerSeat, card, source, destination, reason, effect.Destination == SkillProgramCardDestination.SelectedTargetHand, disclosure);
+        if (ProgramCardGiving.Giver(frame, effect.GiveBy, [source]) is { } giver)
+            _operations.Give(frame, giver, card, source, destination, reason, effect.Destination == SkillProgramCardDestination.SelectedTargetHand, disclosure);
         else if (effect.Destination == SkillProgramCardDestination.SelectedTargetHand)
         {
             if (_operations.MoveToProcessing(frame, card, source, reason, disclosure))

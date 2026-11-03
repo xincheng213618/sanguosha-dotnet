@@ -66,7 +66,7 @@ internal sealed partial class CoreGameEngineActionCategoryGiftsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramActionCategoryGiftResolvedEvent(frame.Id, frame.SkillId, frame.OwnerSeat, provider, use.EffectiveKind, card?.Id));
         if (card is not null)
         {
-            _corePhysicalMovementFacadesOperations.MoveCard(card, location!.Value, CardLocation.Hand(frame.OwnerSeat), new CardMoveReason($"skill-program.{(frame.SkillId)}.{(effect.Op)}"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, provider, frame.OwnerSeat, [card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+            _corePhysicalMovementFacadesOperations.MoveCard(card, location!.Value, CardLocation.Hand(frame.OwnerSeat), new CardMoveReason($"skill-program.{(frame.SkillId)}.{(effect.Op)}"), _nativeGivenCards.Completion(frame.Id, provider, frame.OwnerSeat, [card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
             if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.AwaitChild)
                 return;
         }

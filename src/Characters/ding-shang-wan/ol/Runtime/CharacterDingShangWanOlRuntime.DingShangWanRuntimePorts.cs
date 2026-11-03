@@ -21,5 +21,5 @@ internal sealed partial class CharacterDingShangWanOlRuntime
     bool IDingShangWanNativeFacts.MovementObserverEdge(int child) => _coreObserverSubtreesOperations.IsMovementObserverEdge(child);
     bool IDingShangWanNativeFacts.DyingExitEdge(int child) => _characterYanPuOlOperations.IsYanPuDyingExitEdge(child);
     bool IDingShangWanNativeFacts.SuspendedOrPaidRescueSuffix(int child, DyingFrame dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(child, dying);
-    void IDingShangWanNativeOperations.Give(long frameId, int giver, int recipient, IReadOnlyList<int> cards, CardMoveReason reason) => _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, CardLocation.Hand(recipient), reason, _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frameId, giver, recipient, cards, _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+    void IDingShangWanNativeOperations.Give(long frameId, int giver, int recipient, IReadOnlyList<int> cards, CardMoveReason reason) => _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, CardLocation.Hand(recipient), reason, _nativeGivenCards.CompletionRecords(frameId, giver, recipient, cards, _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
 }

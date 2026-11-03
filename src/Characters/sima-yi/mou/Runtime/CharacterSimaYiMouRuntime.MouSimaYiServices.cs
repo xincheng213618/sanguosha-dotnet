@@ -78,7 +78,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
             var own = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, own with { MouSimaYi = own.MouSimaYi!with { After = m.Sequence } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouSmGivePaidEvent(f.Id, r.Target, c.Id, m.Sequence));
-            _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, r.Target, f.OwnerSeat, [c.Id], r.Before);
+            _nativeGivenCards.Record(f.Id, r.Target, f.OwnerSeat, [c.Id], r.Before);
         });
     }
 

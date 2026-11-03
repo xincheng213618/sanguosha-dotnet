@@ -124,7 +124,7 @@ internal sealed partial class CharacterDongBaiMobileRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileLianzhuSegmentPaidEvent(f.Id, stage, actor, card, from, recipient, paid.Before, paid.After, paid.ActualTo));
         }
 
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card], CardLocation.Hand(recipient), reason, stage == MobileLianzhuStage.RecoverChildren ? Paid : _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.Holder, recipient, [card], r.Before, Paid));
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card], CardLocation.Hand(recipient), reason, stage == MobileLianzhuStage.RecoverChildren ? Paid : _nativeGivenCards.CompletionRecords(f.Id, r.Holder, recipient, [card], r.Before, Paid));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 

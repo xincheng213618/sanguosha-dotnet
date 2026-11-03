@@ -15,6 +15,7 @@
           "condition": { "kind": "not", "children": [{ "kind": "activationCardCountAtLeast", "value": 2 }] }
         },
         {
+          "giveBy": "materialOwner",
           "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "selectedTarget" },
           "cardOwnerRef": { "kind": "selectedTarget" }, "zones": ["hand", "equipment"],
           "count": 1, "destination": "ownerHand", "skipIfNoCards": true, "awaitMovementTriggers": true,

@@ -30,7 +30,7 @@
           { "op": "selectOwnedCards", "target": "selectedTarget", "amount": 2,
             "zones": ["hand", "equipment"], "resultBind": "given-cards",
             "condition": { "kind": "choiceIs", "sourceBind": "slash-result", "optionId": "declined" } },
-          { "op": "moveBoundCards", "target": "owner", "sourceBind": "given-cards", "destination": "ownerHand",
+          { "giveBy": "materialOwner", "op": "moveBoundCards", "target": "owner", "sourceBind": "given-cards", "destination": "ownerHand",
             "awaitMovementTriggers": true,
             "condition": { "kind": "choiceIs", "sourceBind": "slash-result", "optionId": "declined" } }
         ]

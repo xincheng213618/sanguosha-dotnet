@@ -59,6 +59,7 @@
               "targetKind": "eventSource"
             },
             {
+              "giveBy": "owner",
               "op": "moveBoundCards",
               "target": "owner",
               "sourceBind": "gift",
@@ -100,6 +101,7 @@
               "targetKind": "eventTarget"
             },
             {
+              "giveBy": "owner",
               "op": "moveBoundCards",
               "target": "owner",
               "sourceBind": "gift",

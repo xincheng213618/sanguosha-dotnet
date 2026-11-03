@@ -1,22 +1,23 @@
 namespace CardGame.Core;
 
-internal interface INativeGivenCardQueries : IProgramSelectionQuery
+[ProgramRuntimeModule, ProgramCapability]
+internal sealed class NativeGivenCardQueries(IProgramEventHistoryQueries history,
+    IAdvancingRuleFacts advancing, INativeGiveScopeQueries scopes) : INativeGivenCardQueries
 {
-    IReadOnlyList<MouHqGift> GiftsForBatch(CardMovementBatchContext batch, int giver);
-}
+    // A Before observer can reenter before the issued fact reaches the journal.
+    public IReadOnlyList<NativeGiveFact> Read() => Array.AsReadOnly(
+        history.Read<NativeCardsGivenEvent>().Concat(advancing.Facts.OfType<NativeCardsGivenEvent>().Reverse())
+            .Select(fact => fact.Receipt).OfType<NativeGiveFact>().DistinctBy(fact => fact.Id).ToArray());
 
-// A cross-owner read of issued Give receipts and their physical movement proof.
-// CharacterState remains the receipt owner; the movement and event journals are
-// read live, without another ledger or mutation of the original receipts.
-internal sealed class NativeGivenCardQueries(IReadOnlyList<CharacterState> players,
-    IReadOnlyList<CardMovementRecord> movements, IProgramEventHistoryQueries history) : INativeGivenCardQueries
-{
-    public IReadOnlyList<MouHqGift> GiftsForBatch(CardMovementBatchContext batch, int giver) =>
-        Array.AsReadOnly((players[giver].MouHqActualGifts ?? []).Where(gift =>
-            gift.Turn == batch.TurnNumber &&
-            batch.Movements.Any(movement => movement.Sequence == gift.CompletionSequence) &&
-            gift.Movements.All(movement => movements.Contains(movement)) &&
-            history.Read<NativeCardsGivenEvent>().Count(fact => fact.Id == gift.Id &&
-                fact.Giver == gift.Giver && fact.Recipient == gift.Recipient &&
-                fact.Count == gift.Movements.Count && fact.CompletionSequence == gift.CompletionSequence) == 1).ToArray());
+    public IReadOnlyList<NativeGiveFact> GiftsForCurrentScope(int giver, int turn, int turnOwner)
+    {
+        var cutoff = scopes.CurrentCutoff(turn, turnOwner);
+        return Array.AsReadOnly(Read().Where(gift => gift.Giver == giver && gift.Turn == turn &&
+            gift.TurnOwner == turnOwner && gift.ScopeCutoffAtIssue == cutoff).ToArray());
+    }
+
+    public IReadOnlyList<NativeGiveFact> GiftsForBatch(CardMovementBatchContext batch, int giver) =>
+        Array.AsReadOnly(Read().Where(gift => gift.Giver == giver && gift.Turn == batch.TurnNumber &&
+            gift.ScopeCutoffAtIssue == scopes.CurrentCutoff(gift.Turn, gift.TurnOwner) &&
+            batch.Movements.Any(movement => movement.Sequence == gift.CompletionSequence)).ToArray());
 }

@@ -57,7 +57,7 @@ internal sealed partial class CharacterChenGongMouMobileRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouChenGongGift = r with { Stage = MouChenGongGiftStage.GiftChildren, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Hand(r.RecipientSeat), new(MouChenGongGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, f.OwnerSeat, r.RecipientSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, m =>
+        _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Hand(r.RecipientSeat), new(MouChenGongGiftReason), _nativeGivenCards.Completion(f.Id, f.OwnerSeat, r.RecipientSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, m =>
         {
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             if (!MouChenGongGiftRoot(current) || current.MouChenGongGift!.Gift is not null || m.CardId != card.Id || m.From != from)

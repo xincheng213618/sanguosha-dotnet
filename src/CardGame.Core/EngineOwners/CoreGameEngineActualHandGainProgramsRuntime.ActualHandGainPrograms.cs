@@ -210,7 +210,7 @@ internal sealed partial class CoreGameEngineActualHandGainProgramsRuntime
             if (ids.Length == 0)
                 Paid();
             else
-                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, r.Operation == SkillProgramEffectOp.DiscardForeignTurnHandGains ? CardLocation.DiscardPile : CardLocation.Hand(r.RecipientSeat), new(r.Operation == SkillProgramEffectOp.DiscardForeignTurnHandGains ? ForeignHandCleanupReason : SameCategoryDeckGiftReason), (r.Operation == SkillProgramEffectOp.GiveSameCategoryFromDeck ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, r.RecipientSeat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, _) => Paid()) : (_, _) => Paid()));
+                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, r.Operation == SkillProgramEffectOp.DiscardForeignTurnHandGains ? CardLocation.DiscardPile : CardLocation.Hand(r.RecipientSeat), new(r.Operation == SkillProgramEffectOp.DiscardForeignTurnHandGains ? ForeignHandCleanupReason : SameCategoryDeckGiftReason), (r.Operation == SkillProgramEffectOp.GiveSameCategoryFromDeck ? _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, r.RecipientSeat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, _) => Paid()) : (_, _) => Paid()));
             _coreNativeLogicalDiscardsOperations.CompleteNativeLogicalDiscardInvocation(logicalDiscard);
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         }

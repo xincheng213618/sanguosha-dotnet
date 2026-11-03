@@ -179,7 +179,7 @@ internal sealed partial class CharacterXiahouHuiAnniversaryRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiahouHuiMovedEvent(f.Id, recipient, donor, moves.Count, batch, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         }
 
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), r.Operation == SkillProgramEffectOp.GiveAnniversaryXiahouHuiDujunDrawnCards ? XiahouHuiGiveReason : XiahouHuiObtainReason, r.Operation == SkillProgramEffectOp.GiveAnniversaryXiahouHuiDujunDrawnCards ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, ids, before, Paid) : Paid, disclosure: CardMovementDisclosure.FaceDown);
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), r.Operation == SkillProgramEffectOp.GiveAnniversaryXiahouHuiDujunDrawnCards ? XiahouHuiGiveReason : XiahouHuiObtainReason, r.Operation == SkillProgramEffectOp.GiveAnniversaryXiahouHuiDujunDrawnCards ? _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, ids, before, Paid) : Paid, disclosure: CardMovementDisclosure.FaceDown);
         ContinueXiahouHui(f.Id);
     }
 

@@ -255,38 +255,130 @@ internal static class ProgramRuntimeModuleChecks
         var otherQueries = otherCapabilities.Get<INativeGivenCardQueries>();
         Require(ReferenceEquals(queries, capabilities.Get<INativeGivenCardQueries>()) && !ReferenceEquals(queries, otherQueries),
             "Each match shares one Give query over its own receipt and movement owners.");
-        var players = (IReadOnlyList<CharacterState>)Field("_players");
         var movements = (List<CardMovementRecord>)Field("_cardMovements");
         var pending = (List<IGameEvent>)Field("_pendingEvents");
         var committed = (List<EventEnvelope>)Field("_events");
         var history = (ProgramEventHistoryIndex)capabilities.Get<IProgramEventHistoryQueries>();
         var pendingCount = pending.Count;
         var committedCount = committed.Count;
+        var movementCount = movements.Count;
+        var resolutionOwner = (ResolutionScheduler)typeof(GameEngine).GetField("_resolutionScheduler", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var resolutionSequence = resolutionOwner.Identities.Value;
         var movement = new CardMovementRecord(901, 3, 1, CardKind.Slash,
             CardLocation.Hand(0), CardLocation.Hand(1), new("fixture.native-give-query"));
-        var gift = new MouHqGift(902, 903, 0, 1, 3, 0, movement.Sequence) { Movements = [movement] };
+        var material = new List<CardMovementRecord> { movement };
+        var gift = new NativeGiveFact(902, 903, 0, 1, 3, 0, movement.Sequence) { Movements = material };
+        material.Clear();
+        var replacementMaterial = new List<CardMovementRecord> { movement };
+        var replacementGift = gift with { Id = 905, Movements = replacementMaterial };
+        replacementMaterial.Clear();
         var batch = new CardMovementBatchContext(904, null, null, 3, [movement], []);
         var fact = new NativeCardsGivenEvent(gift.Id, gift.ProducerId, 0, 1, 1, 3, 0, movement.Sequence);
-        players[0].MouHqActualGifts = [gift];
-        Require(queries.GiftsForBatch(batch, 0).Count == 0, "A newly issued receipt still needs its original movement proof.");
-        movements.Add(movement);
-        Require(queries.GiftsForBatch(batch, 0).Count == 0, "An original movement alone cannot forge the issued Give fact.");
-        history.Append(fact);
-        var issued = queries.GiftsForBatch(batch, 0);
-        Require(issued.Count == 1 && ReferenceEquals(issued[0], gift) &&
-                issued is System.Collections.IList { IsReadOnly: true } && otherQueries.GiftsForBatch(batch, 0).Count == 0,
-            "Reads observe the existing owners' new pending proof, preserve receipt identity, freeze results and stay match-local.");
-        history.Append(fact);
-        Require(queries.GiftsForBatch(batch, 0).Count == 0, "A duplicated Give fact cannot authorize the same receipt twice.");
-        pending.RemoveRange(pendingCount, pending.Count - pendingCount);
-        committed.Add(new(new EventId(committedCount + 1), null, committedCount + 1, 1, "fixture.native-give-query", fact));
-        Require(ReferenceEquals(queries.GiftsForBatch(batch, 0).Single(), gift),
-            "Moving the proof from pending to committed keeps the same exact receipt visible once.");
-        players[0].MouHqActualGifts = [gift with { Turn = 4 }];
-        Require(queries.GiftsForBatch(batch, 0).Count == 0 && ReferenceEquals(issued[0], gift),
-            "A replaced turn receipt is read live without rewriting an already exposed result.");
-        players[0].MouHqActualGifts = null;
-        Require(queries.GiftsForBatch(batch, 0).Count == 0, "Owner expiry removes the receipt from subsequent Give queries.");
+        try
+        {
+            Require(gift.Movements.SequenceEqual([movement]) && replacementGift.Movements.SequenceEqual([movement]) &&
+                    gift.Movements is System.Collections.IList { IsReadOnly: true },
+                "Native Give facts detach material collections on construction and with-initialization.");
+            try { ((IList<CardMovementRecord>)gift.Movements)[0] = movement with { CardId = 99 }; }
+            catch (NotSupportedException) { }
+            Require(gift.Movements[0].CardId == movement.CardId, "An exposed Give material collection cannot be rewritten by its observer.");
+            movements.Add(movement);
+            Require(queries.GiftsForBatch(batch, 0).Count == 0, "A real ordinary movement alone cannot forge native Give intent.");
+            history.Append(fact);
+            Require(queries.GiftsForBatch(batch, 0).Count == 0,
+                "A public scalar lookalike without the shared internal receipt cannot invent a native Give.");
+            pending[pendingCount] = fact with { Receipt = gift };
+            var issued = queries.GiftsForBatch(batch, 0);
+            Require(issued.Count == 1 && ReferenceEquals(issued[0], gift) &&
+                    issued is System.Collections.IList { IsReadOnly: true } && otherQueries.GiftsForBatch(batch, 0).Count == 0 &&
+                    ReferenceEquals(queries.GiftsForCurrentScope(0, 3, 0).Single(), gift) &&
+                    queries.GiftsForCurrentScope(1, 3, 0).Count == 0,
+                "One match-local shared receipt answers batch and turn-scope Give reads without a separate character ledger.");
+            var publicJson = System.Text.Json.JsonSerializer.Serialize(pending[pendingCount], typeof(NativeCardsGivenEvent));
+            Require(!publicJson.Contains("Receipt", StringComparison.OrdinalIgnoreCase) &&
+                    !publicJson.Contains("CardId", StringComparison.OrdinalIgnoreCase) &&
+                    !publicJson.Contains("Movements", StringComparison.OrdinalIgnoreCase),
+                "The unchanged public Give event exposes scalar counts and attribution without private material identities.");
+            pending[pendingCount] = fact with { Receipt = gift with { Turn = 4 } };
+            Require(queries.GiftsForBatch(batch, 0).Count == 0 && queries.GiftsForCurrentScope(0, 3, 0).Count == 0 &&
+                    ReferenceEquals(issued[0], gift),
+                "A same-count pending replacement refreshes current queries without mutating an already exposed result.");
+            pending[pendingCount] = fact with { Receipt = gift };
+            Require(ReferenceEquals(queries.GiftsForBatch(batch, 0).Single(), gift),
+                "Rolling a pending slot back restores its original immutable receipt instead of reusing a stale cache.");
+            pending.RemoveRange(pendingCount, pending.Count - pendingCount);
+            committed.Add(new(new EventId(committedCount + 1), null, committedCount + 1, 1, "fixture.native-give-query", fact with { Receipt = gift }));
+            Require(ReferenceEquals(queries.GiftsForBatch(batch, 0).Single(), gift),
+                "Moving the one authoritative Give event from pending to committed preserves the exact original receipt.");
+            history.Append(new TurnEndedEvent(3, 0));
+            Require(queries.GiftsForCurrentScope(0, 3, 0).Count == 0 &&
+                    queries.GiftsForBatch(batch, 0).Count == 0 && ReferenceEquals(queries.Read().Single(), gift),
+                "The actual TurnEnded boundary closes old turn and unaccepted batch qualification while the original fact remains readable as history.");
+            replacementGift = replacementGift with { ScopeCutoffAtIssue = capabilities.Get<INativeGiveScopeQueries>().CurrentCutoff(3, 0) };
+            history.Append(fact with { Id = replacementGift.Id, Receipt = replacementGift });
+            Require(queries.GiftsForCurrentScope(0, 3, 0).SequenceEqual([replacementGift]),
+                "A later Give in the same numeric turn opens a new scope segment without resurrecting pre-End cards.");
+            pending.RemoveAt(pending.Count - 1);
+            pending[pendingCount] = new TurnStartedEvent(4, 1);
+            Require(queries.GiftsForCurrentScope(0, 3, 0).SequenceEqual([gift]),
+                "Replacing the pending End at the same count removes its scope cut; stale boundary cursors cannot expire a restored receipt.");
+
+            var reason = new CardMoveReason("fixture.native-give-mixed");
+            var source = new CardConversionSource("happy:gujing", "bone-path", 0, "fixture-gain-source");
+            HappyWeiYanGainDestinationPlan Plan(int id, CardLocation actual, long before) => new(id, CardKind.Crossbow,
+                CardLocation.Hand(0), CardLocation.Hand(1), actual, reason, EquipmentSlot.Weapon, true, 0,
+                1900, source, "fixture-hash", 0, 0, before);
+            var deliveredMove = new CardMovementRecord(1901, 0, 11, CardKind.Crossbow,
+                CardLocation.Hand(0), CardLocation.Hand(1), reason);
+            var redirectedMove = new CardMovementRecord(1902, 0, 12, CardKind.Crossbow,
+                CardLocation.Hand(0), CardLocation.Hand(2), reason) { HappyWeiYanGainDestination = Plan(12, CardLocation.Hand(2), 1900) };
+            var destroyedMove = new CardMovementRecord(1904, 0, 13, CardKind.Crossbow,
+                CardLocation.Hand(0), CardLocation.OutsideGame, reason);
+            var actual = new List<CardMovementRecord> { deliveredMove, redirectedMove, destroyedMove };
+            var retained = new HappyWeiYanRetainedGainSettlement(1900, ResolutionFrameKind.ProgramSkill,
+                1, "fixture:give", "give", "fixture-instance", "fixture-hash", 0, Plan(14, CardLocation.Hand(0), 1900));
+            var request = new HappyWeiYanGainRequestSettlement(1900, 1906, 1900, reason)
+                { Movements = actual, RetainedGains = [retained] };
+            var operations = new NativeGivenCardRuntime(new MatchNativeFactDemand(ProgramTrackedFact.NativeGive),
+                capabilities.Get<IProgramRuntimeFrames>(), new NativeGiveJournalEvents(history),
+                capabilities.Get<IProgramTurnQueries>(), capabilities.Get<ISelectionParticipantQueries>(),
+                new CardMovementHistoryQueries(actual), queries, capabilities.Get<INativeGiveScopeQueries>());
+            var originalCalls = 0;
+            operations.RequestCompletion(1900, 0, 1, [11, 12, 13, 14], 1900, settled =>
+            {
+                originalCalls++;
+                Require(ReferenceEquals(settled, request) && !history.Read<NativeCardsGivenEvent>().Any(item => item.ProducerId == 1900),
+                    "Typed request completion runs its original callback before publishing native Give intent.");
+            })(request);
+            var mixed = history.Read<NativeCardsGivenEvent>().Single(item => item.ProducerId == 1900);
+            Require(originalCalls == 1 && mixed.Count == 1 && mixed.CompletionSequence == destroyedMove.Sequence &&
+                    mixed.Receipt is { Movements: [var onlyDelivered] } && onlyDelivered == deliveredMove &&
+                    queries.GiftsForBatch(new(1906, null, null, mixed.Turn, actual, []), 0).Single(item => item.ProducerId == 1900) == mixed.Receipt &&
+                    queries.GiftsForBatch(new(1907, null, null, mixed.Turn, [deliveredMove], []), 0).All(item => item.ProducerId != 1900),
+                "A mixed typed request counts only actual Hand delivery, excludes redirected/destroyed/retained cards, and completes at the last physical terminal outcome.");
+            operations.Record(1900, 0, 1, [11, 12, 13, 14], 1900, request);
+            Require(history.Read<NativeCardsGivenEvent>().Count(item => item.ProducerId == 1900) == 1,
+                "Revisiting an already recorded native outcome cannot issue the same Give twice.");
+            var noMove = new HappyWeiYanGainRequestSettlement(1910, null, 1904, reason)
+            {
+                RetainedGains = [retained with { ProducerFrameId = 1910, Plan = Plan(14, CardLocation.Hand(0), 1904) }]
+            };
+            operations.RequestCompletion(1910, 0, 1, [14], 1904, _ => originalCalls++)(noMove);
+            Require(originalCalls == 2 && !history.Read<NativeCardsGivenEvent>().Any(item => item.ProducerId == 1910),
+                "A typed retained-only completion invokes its producer once without fabricating a movement, Give count or material fact.");
+            var rejected = false;
+            try { operations.RequestCompletion(1910, 0, 1, [14], 1904, _ => originalCalls++)(noMove with { ProducerFrameId = 1911 }); }
+            catch (InvalidOperationException) { rejected = true; }
+            Require(rejected && originalCalls == 2,
+                "A mismatched typed request is rejected at the shared boundary before its original callback can run.");
+        }
+        finally
+        {
+            pending.RemoveRange(pendingCount, pending.Count - pendingCount);
+            committed.RemoveRange(committedCount, committed.Count - committedCount);
+            movements.RemoveRange(movementCount, movements.Count - movementCount);
+            resolutionOwner.Identities.Value = resolutionSequence;
+        }
     }
 
     private static void CheckNativeMovementBatchOwnership(GameEngine game, GameEngine otherGame,

@@ -109,7 +109,7 @@ internal sealed partial class CoreParticipantHandProgramsRuntime
         if (give)
         {
             var card = _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[repayment.SourceSeat]).Single(c => c.Id == selected.Cards.Single());
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(repayment.SourceSeat), CardLocation.Hand(frame.OwnerSeat), new($"skill-program.{(frame.SkillId)}.hand-repayment"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, repayment.SourceSeat, frame.OwnerSeat, [card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence));
+            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(repayment.SourceSeat), CardLocation.Hand(frame.OwnerSeat), new($"skill-program.{(frame.SkillId)}.hand-repayment"), _nativeGivenCards.Completion(frame.Id, repayment.SourceSeat, frame.OwnerSeat, [card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence));
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         }
         else
@@ -141,9 +141,9 @@ internal sealed partial class CoreParticipantHandProgramsRuntime
             };
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { BoundParticipantGift = gift });
         if (gift.RankSum is null)
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, target, reason, _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, target.OwnerSeat!.Value, ids, _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, target, reason, _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, target.OwnerSeat!.Value, ids, _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         else
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, target, reason, _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, target.OwnerSeat!.Value, ids, _coreCardMovementJournalMovementSequenceAccess._movementSequence, (batchId, records) => _coreOwnedHandRankSumGiftOperations.SealOwnedHandRankSumGift(frame.Id, batchId, records)));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, target, reason, _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, target.OwnerSeat!.Value, ids, _coreCardMovementJournalMovementSequenceAccess._movementSequence, (batchId, records) => _coreOwnedHandRankSumGiftOperations.SealOwnedHandRankSumGift(frame.Id, batchId, records)));
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }

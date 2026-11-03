@@ -10,7 +10,7 @@ internal sealed class SelectAndMoveOwnedCardProgramOperationDescriptor : Program
 
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "chooserRef", "cardOwnerRef", "zones", "count", "destination", "targetRef", "resultBind", "cardCategories", "cardKinds", "suits", "suitFrom", "skipIfNoCards", "allowSameOwnerHandReturn", "coverageResultBind", "awaitMovementTriggers", "revealBeforeMove", "freezeMovedCardSuit", "prohibitReplacingEquipment", "allowDecline", "condition", "slashRedirectPostCostRange");
+        r.AllowOnly("op", "target", "chooserRef", "cardOwnerRef", "zones", "count", "destination", "targetRef", "resultBind", "cardCategories", "cardKinds", "suits", "suitFrom", "skipIfNoCards", "allowSameOwnerHandReturn", "coverageResultBind", "awaitMovementTriggers", "revealBeforeMove", "freezeMovedCardSuit", "prohibitReplacingEquipment", "allowDecline", "condition", "slashRedirectPostCostRange", "giveBy");
         var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
         if (target != SkillProgramEffectTarget.Owner)
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.target: must be owner.");
@@ -122,7 +122,8 @@ internal sealed class SelectAndMoveOwnedCardProgramOperationDescriptor : Program
             prohibitReplacingEquipment: prohibitReplacingEquipment, allowDecline: allowDecline,
             freezeMovedCardSuit: r.Has("freezeMovedCardSuit") && r.RequiredBool("freezeMovedCardSuit"),
             suitFrom: suitFrom)
-        { SlashRedirectPostCostRange = r.Has("slashRedirectPostCostRange") ? r.RequiredBool("slashRedirectPostCostRange") : null };
+        { SlashRedirectPostCostRange = r.Has("slashRedirectPostCostRange") ? r.RequiredBool("slashRedirectPostCostRange") : null,
+          GiveBy = ProgramCardGiving.Parse(r, destination) };
         var optionalEquipmentDiscard = effect.FreezeMovedCardSuit && effect.AwaitMovementTriggers &&
             effect.Destination == SkillProgramCardDestination.DiscardPile && effect.CardCategories is [SkillProgramCardCategory.Equipment] &&
             effect.ChooserRef?.Kind == ProgramParticipantRef.SelectedTarget && effect.CardOwnerRef?.Kind == ProgramParticipantRef.SelectedTarget;
@@ -144,6 +145,7 @@ internal sealed class SelectAndMoveOwnedCardProgramOperationDescriptor : Program
 
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         ParticipantResources(effect.ChooserRef, effect.CardOwnerRef, effect.TargetReference)
+            .Concat(effect.GiveBy == ProgramGiveActor.SelectedTarget ? new ProgramResourceOperation[] { new ReadSelectedTarget() } : [])
             .Concat(effect.SlashRedirectPostCostRange == true ? new ProgramResourceOperation[] { new ReadSelectedTarget() } : [])
             .Concat(effect.CoverageResultBind is { } coverage
                 ? new ProgramResourceOperation[] { new CreateCoverageResult(coverage) }

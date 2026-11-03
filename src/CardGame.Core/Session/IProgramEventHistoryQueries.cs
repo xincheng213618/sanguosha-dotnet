@@ -15,6 +15,7 @@ internal interface IProgramEventBoundaryQueries : IProgramSelectionQuery
 // Callers choose their own snapshot boundary; this service keeps no second log.
 internal interface IProgramEventJournalQueries : IProgramSelectionQuery
 {
+    long Cursor => Complete().LongCount();
     IEnumerable<IGameEvent> Complete();
     IGameEvent? LastMatching(Func<IGameEvent, bool> predicate);
 }

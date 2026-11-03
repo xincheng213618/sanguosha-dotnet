@@ -45,7 +45,7 @@ internal sealed partial class CoreGameEngineGiftedSlashUseRewardsRuntime
         var material = new CardActionCost(id, card.Kind, from, _coreActionDiscardColorsOperations.CapturePhysicalCardColor(frame.OwnerSeat, card));
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { GiftedSlashGiftReceipt = new(frame.InstructionIndex, policy, material, before, before), PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GiftedSlashGiftStartedEvent(frame.Id, policy, material, before));
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), new(GiftedSlashGiftReason(frame.SkillId)), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batchId, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), new(GiftedSlashGiftReason(frame.SkillId)), _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batchId, records) =>
         {
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);
             var movement = records.Single();

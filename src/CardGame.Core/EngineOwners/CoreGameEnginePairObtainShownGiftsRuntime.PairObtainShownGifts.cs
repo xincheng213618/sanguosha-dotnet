@@ -251,7 +251,7 @@ internal sealed partial class CoreGameEnginePairObtainShownGiftsRuntime
             return;
         }
 
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([r.CardId], CardLocation.Hand(target), new(PairBenefitMoveReason(f, true)), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, target, [r.CardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([r.CardId], CardLocation.Hand(target), new(PairBenefitMoveReason(f, true)), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, target, [r.CardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
         {
             var after = records.Max(m => m.Sequence);
             var delivered = records.Count(m => m.CardId == r.CardId && m.From == CardLocation.Hand(f.OwnerSeat) && m.To == CardLocation.Hand(target)) == 1;

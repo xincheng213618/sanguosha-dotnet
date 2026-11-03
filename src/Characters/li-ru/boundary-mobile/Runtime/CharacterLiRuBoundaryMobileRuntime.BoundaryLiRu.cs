@@ -150,7 +150,7 @@ internal sealed partial class CharacterLiRuBoundaryMobileRuntime
         }
 
         if (r.Gift)
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Cards, CardLocation.Hand(f.OwnerSeat), reason, _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.TargetSeat, f.OwnerSeat, r.Cards, r.Before, Paid));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Cards, CardLocation.Hand(f.OwnerSeat), reason, _nativeGivenCards.CompletionRecords(f.Id, r.TargetSeat, f.OwnerSeat, r.Cards, r.Before, Paid));
         else
             _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, r.TargetSeat, r.Cards, reason, Paid);
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(f.Id, f.OwnerSeat) == SkillProgramStepOutcome.Continue)

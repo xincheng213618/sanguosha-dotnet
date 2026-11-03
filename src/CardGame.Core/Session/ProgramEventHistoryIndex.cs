@@ -4,6 +4,7 @@ namespace CardGame.Core;
 internal sealed partial class ProgramEventHistoryIndex(IReadOnlyList<EventEnvelope> events, List<IGameEvent> pendingEvents)
     : IProgramEventHistoryQueries, IProgramEventBoundaryQueries, IProgramEventJournalQueries, IActualCardUseHistoryQueries, IActualPhaseHistoryQueries
 {
+    public long Cursor => events.Count + (long)pendingEvents.Count;
     public IEnumerable<IGameEvent> Complete() => events.Select(item => item.Payload).Concat(pendingEvents);
 
     public IGameEvent? LastMatching(Func<IGameEvent, bool> predicate)

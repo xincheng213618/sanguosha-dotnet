@@ -44,6 +44,7 @@
             { "op": "selectTarget", "target": "owner", "targetKind": "eventTarget" },
             { "op": "draw", "target": "owner", "amount": 1 },
             {
+              "giveBy": "materialOwner",
               "op": "selectAndMoveOwnedCard", "target": "owner",
               "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" },
               "zones": ["hand"], "count": 1,

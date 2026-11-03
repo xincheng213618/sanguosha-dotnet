@@ -51,7 +51,7 @@ internal sealed partial class CharacterWangCanOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangCan = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
         if (ids.Count > 0)
         {
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, new(WangCanReason(stage)), (stage == WangCanStage.QiaiGift ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.Seats[r.Cursor], destination.OwnerSeat ?? f.OwnerSeat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, new(WangCanReason(stage)), (stage == WangCanStage.QiaiGift ? _nativeGivenCards.CompletionRecords(f.Id, r.Seats[r.Cursor], destination.OwnerSeat ?? f.OwnerSeat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
         }
 
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);

@@ -205,7 +205,7 @@ internal sealed partial class CoreGameEngineSameTypeActualUseAidRuntime
         if (card.IsGeneralWeapon || !CharacterFuHuangHouClassicRuntime.IsSameTypeAidPaymentKind(f.SkillId, card.Kind, r.Use.EffectiveKind))
             throw new InvalidOperationException("Aid payment changed its exact type or card name.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SameTypeAid = r with { Stage = SameTypeAidStage.GiftChildren }, PendingMovementContinuation = new(donor, 0, null) });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(f.OwnerSeat), new(SameTypeAidGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, donor, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(f.OwnerSeat), new(SameTypeAidGiftReason), _nativeGivenCards.CompletionRecords(f.Id, donor, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
         {
             if (records is not [var moved] || moved.From != from || moved.To != CardLocation.Hand(f.OwnerSeat) || moved.CardId != id)
                 throw new InvalidOperationException("Aid cannot claim payment without its real HE delivery.");

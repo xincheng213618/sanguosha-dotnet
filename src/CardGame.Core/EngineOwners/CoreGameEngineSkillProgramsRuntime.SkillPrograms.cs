@@ -341,7 +341,7 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
         var actionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var reason = new CardMoveReason($"skill-program.{(program.Id)}.{(contribution.Id)}.contribute");
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(provider.Seat), CardLocation.Processing, reason, movement => _characterBianFuRenOlOperations.RecordBianFuRenOwnedTransferProducer(movement, skillOwner.Seat, actionId));
-        _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.Hand(skillOwner.Seat), reason, _characterHuangQuanMouOperations.NativeGiveCompletion(actionId, provider.Seat, skillOwner.Seat, [card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+        _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.Hand(skillOwner.Seat), reason, _nativeGivenCards.Completion(actionId, provider.Seat, skillOwner.Seat, [card.Id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramSkillContributionResolvedEvent(actionId, provider.Seat, skillOwner.Seat, program.Id, contribution.Id, card.Id, card.Kind, card.Suit, projectedInstanceId));
         _coreMatchLogOperations.AddLog("ActiveSkill", $"{(provider.Name)} 响应【{(_contentRegistryOperations._contentRegistry!.Skills[program.Id].Name)}】，将【{(card.DisplayName)}】交给 {(skillOwner.Name)}。", provider.Seat, skillOwner.Seat);
     }

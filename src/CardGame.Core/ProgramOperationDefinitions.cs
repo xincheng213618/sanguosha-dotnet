@@ -839,7 +839,7 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
         ProgramAcceptedCardMovements.MayExecuteWhileDraining(context.Frame, context.Effect);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "sourceBind", "exceptBind", "destination", "destinationZone", "condition", "awaitMovementTriggers", "resultBind");
+        r.AllowOnly("op", "target", "sourceBind", "exceptBind", "destination", "destinationZone", "condition", "awaitMovementTriggers", "resultBind", "giveBy");
         var target = FilterBoundCardsProgramOperationDescriptor.Owner(r);
         var source = r.RequiredIdentifier("sourceBind"); var except = r.OptionalIdentifier("exceptBind");
         if (source == except) throw new InvalidOperationException($"Invalid skill program at {r.Path}: exceptBind must differ.");
@@ -864,7 +864,7 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
             throw new InvalidOperationException($"Invalid skill program at {r.Path}: awaited bound movement supports discardPile, drawPileTop, ownerHand, selectedTargetHand or a persistent owner zone.");
         var effect = new SkillProgramEffect(Op, target, 0, r.Condition(), sourceBind: source,
             exceptBind: except, destination: destination, destinationZone: destinationZone, awaitMovementTriggers: awaitMovementTriggers,
-            resultBind: result);
+            resultBind: result) { GiveBy = ProgramCardGiving.Parse(r, destination) };
         if (result is not null) RequireAlways(effect, r.Path);
         // A named-choice branch may gate a discard, a gain into the owner's own
         // hand (Pindian winnings, or Guzheng's optional claim of the remaining
@@ -882,6 +882,10 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
         return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
+        [.. MovementResources(effect),
+         .. (effect.GiveBy == ProgramGiveActor.SelectedTarget ? new ProgramResourceOperation[] { new ReadSelectedTarget() } : [])];
+
+    private static IReadOnlyList<ProgramResourceOperation> MovementResources(SkillProgramEffect effect) =>
         effect is { Destination: SkillProgramCardDestination.SelectedTargetHand, AwaitMovementTriggers: true }
             ? [new RequireBoundParticipantGiftEntry(effect.SourceBind!), new ReadSelectedTarget(),
                 new RequireOwnedCardSet(effect.SourceBind!, SkillProgramEffectTarget.Owner, null, [CardZoneKind.Hand, CardZoneKind.Equipment]),

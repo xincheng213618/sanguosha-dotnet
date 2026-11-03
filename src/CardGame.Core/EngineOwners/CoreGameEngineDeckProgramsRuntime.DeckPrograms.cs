@@ -81,7 +81,7 @@ internal sealed partial class CoreGameEngineDeckProgramsRuntime
                 var d = frame.DeckEndExchange;
                 var card = _cardZonesOperations._cardZones.CardsAt(d.OriginalLocation).Single(c => c.Id == d.CardId);
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame with { DeckEndExchange = d with { Stage = "choice" } });
-                _corePhysicalMovementFacadesOperations.MoveCard(card, d.OriginalLocation, CardLocation.Hand(frame.OwnerSeat), new("program.deck-end.gift"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, d.OriginalLocation.OwnerSeat!.Value, frame.OwnerSeat, [d.CardId], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+                _corePhysicalMovementFacadesOperations.MoveCard(card, d.OriginalLocation, CardLocation.Hand(frame.OwnerSeat), new("program.deck-end.gift"), _nativeGivenCards.Completion(frame.Id, d.OriginalLocation.OwnerSeat!.Value, frame.OwnerSeat, [d.CardId], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
                 AwaitDeckProgramMovement(frame.Id);
                 return SkillProgramStepOutcome.AwaitChild;
             }

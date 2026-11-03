@@ -216,7 +216,7 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
                     throw new InvalidOperationException("Nigu changed its committed giver's original physical source.");
                 _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, current with { ShiSunChen = current.ShiSunChen!with { After = move.Sequence, Given = move.To == CardLocation.Hand(f.OwnerSeat) } });
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiScGiftPaidEvent(f.Id, r.Cursor, payer, id, from, move.To, move.Sequence));
-                _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, payer, f.OwnerSeat, [id], before);
+                _nativeGivenCards.Record(f.Id, payer, f.OwnerSeat, [id], before);
             });
             ContinueShiSc(f.Id);
             return;

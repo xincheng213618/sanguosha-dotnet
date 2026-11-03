@@ -197,7 +197,7 @@ internal sealed partial class CharacterLiFengOlRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LiFeng = r with { Stage = LiFengStage.DistributionChildren, ActiveCardId = card, ActiveRecipient = target, ActiveFrom = from, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(card), from, CardLocation.Hand(target), new(ShuliangGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, f.OwnerSeat, target, [card], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, movement =>
+        _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(card), from, CardLocation.Hand(target), new(ShuliangGiftReason), _nativeGivenCards.Completion(f.Id, f.OwnerSeat, target, [card], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, movement =>
         {
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(current with { LiFeng = current.LiFeng!with { After = movement.Sequence, DistributedIds = current.LiFeng.DistributedIds.Append(card).ToArray() } });

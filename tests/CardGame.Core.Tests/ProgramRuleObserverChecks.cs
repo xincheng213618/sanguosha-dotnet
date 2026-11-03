@@ -1,7 +1,7 @@
 using System.Reflection;
 using CardGame.Core;
 
-internal static class ProgramRuleObserverChecks
+internal static partial class ProgramRuleObserverChecks
 {
     public static void RegistrationPreservesOrderReentrancyAndIsolation()
     {
@@ -40,6 +40,7 @@ internal static class ProgramRuleObserverChecks
         // Discover the actual built-ins too: a dropped phase or duplicate order
         // must fail at construction, before a command mutates match state.
         _ = ProgramRuleObserverCatalog.Discover(ProgramRuntimeModuleCatalog.Default.Methods);
+        NativeGiveScopeUsesTheOriginalReentrantBoundary();
     }
 
     private static MethodInfo[] Methods(Type type) => type.GetMethods(

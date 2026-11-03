@@ -14,7 +14,7 @@
             "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } },
           { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving",
             "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } },
-          { "op": "moveBoundCards", "target": "owner", "sourceBind": "miji-cards", "destination": "selectedTargetHand",
+          { "giveBy": "owner", "op": "moveBoundCards", "target": "owner", "sourceBind": "miji-cards", "destination": "selectedTargetHand",
             "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } }
         ] },
       { "id": "ending-black-top-gift", "window": "turnEnding", "subject": "owner", "optional": true, "priority": 180,
@@ -26,7 +26,7 @@
             "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } },
           { "op": "selectTarget", "target": "owner", "targetKind": "anyLiving",
             "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } },
-          { "op": "moveBoundCards", "target": "owner", "sourceBind": "miji-cards", "destination": "selectedTargetHand",
+          { "giveBy": "owner", "op": "moveBoundCards", "target": "owner", "sourceBind": "miji-cards", "destination": "selectedTargetHand",
             "condition": { "kind": "judgmentOutcomeMatchesSuits", "sourceBind": "judgment-outcome", "suits": ["spade", "club"] } }
         ] }
     ] }

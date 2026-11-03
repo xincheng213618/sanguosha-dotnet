@@ -7,7 +7,7 @@ internal interface IMouHuangQuanFacts:IProgramSelectionQuery
     IReadOnlyList<int> Living{get;}ContentSkillDefinition Skill(string id);
     IEnumerable<T> History<T>()where T:IGameEvent;
     bool ParentMatches(ProgramSkillFrame f);MouHqOriginalUse? OriginalUse(int owner,ProgramSkillWindowContext? context);
-    IReadOnlyList<MouHqGift> Gifts(int giver);IReadOnlyList<MouHqEntity> TransferEntities(ProgramSkillFrame f,int actor);
+    IReadOnlyList<NativeGiveFact> Gifts(int giver,int turn,int turnOwner);IReadOnlyList<MouHqEntity> TransferEntities(ProgramSkillFrame f,int actor);
     double HelpValue(int actor,int target);int KeepValue(int actor,int card);bool MovementRecoveryChild(ProgramSkillFrame f,ResolutionFrame child);
 }
 internal interface IMouHuangQuanNative:IProgramRuntimeOperations

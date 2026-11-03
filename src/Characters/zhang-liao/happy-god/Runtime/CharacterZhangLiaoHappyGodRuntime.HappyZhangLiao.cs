@@ -235,7 +235,7 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
         {
             var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[r.Target], card));
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { HappyZhangLiao = r with { Stage = HappyZlStage.GainChildren, Card = card.Id, Color = color }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(f.OwnerSeat), new(HappyZlTake), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.Target, f.OwnerSeat, [card.Id], before, (_, _) =>
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(f.OwnerSeat), new(HappyZlTake), _nativeGivenCards.CompletionRecords(f.Id, r.Target, f.OwnerSeat, [card.Id], before, (_, _) =>
             {
                 SaveHappyZlPayment(f.Id, before);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyZlColorEvent(f.Id, r.Source, r.Turn, r.Target, color));

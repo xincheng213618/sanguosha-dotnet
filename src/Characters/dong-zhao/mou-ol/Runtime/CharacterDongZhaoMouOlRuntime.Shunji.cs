@@ -109,7 +109,7 @@ internal sealed partial class CharacterDongZhaoMouOlRuntime
             MutateMouDongZhao(f, MouDongZhaoStage.GiftChildren, () =>
             {
                 if (moving.Length > 0)
-                    _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(moving, CardLocation.Hand(r.TargetSeat), new("skill-program.mou-ol:shunji.gift"), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, r.TargetSeat, moving, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, moves) =>
+                    _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(moving, CardLocation.Hand(r.TargetSeat), new("skill-program.mou-ol:shunji.gift"), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, r.TargetSeat, moving, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, moves) =>
                     {
                         foreach (var m in moves)
                             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDongZhaoGiftSignedEvent(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Sequence));

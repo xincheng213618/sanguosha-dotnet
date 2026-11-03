@@ -34,7 +34,7 @@ internal sealed partial class MouHuangQuanRuntime(IMouHuangQuanFacts facts,IMouH
         facts.History<MouHqStartedEvent>().Count(e=>e.FrameId==f.Id&&e.Source==r.Source&&e.GameplayHash==r.GameplayHash&&e.WindowId==r.WindowId&&e.UseId==r.UseId&&e.ActionId==r.ActionId)==1;
     private IReadOnlyList<MouHqEntity> MouHqCards(ProgramSkillFrame f,int actor)
     {
-        var r=f.MouHuangQuan!;var forbidden=r.Stage==MouHqStage.Reply?(facts.Gifts(f.OwnerSeat)).Where(g=>g.Turn==r.Turn&&g.TurnOwner==r.TurnOwner&&g.Recipient==actor).SelectMany(g=>g.Movements).Select(m=>m.CardId).ToHashSet():[];
+        var r=f.MouHuangQuan!;var forbidden=r.Stage==MouHqStage.Reply?(facts.Gifts(f.OwnerSeat,r.Turn,r.TurnOwner)).Where(g=>g.Recipient==actor).SelectMany(g=>g.Movements).Select(m=>m.CardId).ToHashSet():[];
         return Array.AsReadOnly(facts.TransferEntities(f,actor).Where(x=>!forbidden.Contains(x.CardId)).ToArray());
     }
     private IReadOnlyList<PromptChoice> MouHqChoices(ProgramSkillFrame f)

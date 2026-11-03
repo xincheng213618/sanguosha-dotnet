@@ -365,7 +365,9 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
         }
 
         var nativeBoundGiveBefore = _movement.Sequence;
-        var nativeBoundGiver = NativeGiveSemantics.BoundGiver(frame, sourceBind, selected.Select(x => x.Location).ToArray(), target);
+        var moveEffect = ProgramInstructionResolver.Default.Resolve(frame, _instructions.Skill(frame.SkillId).Program!)
+            .GetPausedInstruction(frame.InstructionIndex).Effect;
+        var nativeBoundGiver = ProgramCardGiving.Giver(frame, moveEffect.GiveBy, selected.Select(x => x.Location).ToArray());
         foreach (var group in selected.GroupBy(item => item.Location))
         {
             if (group.Key == target)

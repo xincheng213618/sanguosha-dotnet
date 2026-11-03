@@ -85,7 +85,7 @@ internal sealed partial class CoreGameEngineHalfHandPhaseDebtProgramsRuntime
         var reason = new CardMoveReason($"skill-program.{(frame.SkillId)}.{(effect.Op)}");
         var payment = new ProgramHalfHandGiftPayment(2, drawn.ProgramFrameId, HalfHandDebtSource(frame), frame.GameplayHash, effect.StateId!, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, frame.OwnerSeat, recipient, handCount, binding.CardIds, HalfHandDebtSequence, HalfHandDebtSequence);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { HalfHandGift = payment, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(binding.CardIds, CardLocation.Hand(recipient), reason, _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, recipient, binding.CardIds, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(binding.CardIds, CardLocation.Hand(recipient), reason, _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, recipient, binding.CardIds, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
         {
             if (records.Count != payment.CardIds.Count || records.Any(m => m.From != CardLocation.Hand(frame.OwnerSeat) || m.To != CardLocation.Hand(recipient)))
                 throw new InvalidOperationException("Only a full actual half-hand payment may issue its recipient qualification.");

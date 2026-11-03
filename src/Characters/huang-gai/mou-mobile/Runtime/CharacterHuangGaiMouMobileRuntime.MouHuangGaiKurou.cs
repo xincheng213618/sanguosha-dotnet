@@ -74,7 +74,7 @@ internal sealed partial class CharacterHuangGaiMouMobileRuntime
         var kind = MouKurouGiftKind(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card, from);
         var loss = MouKurouGiftLoss(kind);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { MouHuangGaiKurou = frame.MouHuangGaiKurou!with { Stage = MouHuangGaiKurouStage.GiftChildren }, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
-        _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Hand(recipient), new(MouKurouGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, frame.OwnerSeat, recipient, [cardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, movement =>
+        _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Hand(recipient), new(MouKurouGiftReason), _nativeGivenCards.Completion(frame.Id, frame.OwnerSeat, recipient, [cardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, movement =>
         {
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             var paid = new MouHuangGaiKurouGift(cardId, card.Kind, kind, from, movement.To, recipient, movement.Sequence, loss);

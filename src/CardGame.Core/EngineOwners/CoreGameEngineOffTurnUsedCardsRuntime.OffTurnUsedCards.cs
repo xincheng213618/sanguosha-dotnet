@@ -179,7 +179,7 @@ internal sealed partial class CoreGameEngineOffTurnUsedCardsRuntime
 
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null), OffTurnUsedCardGift = r with { Stage = OffTurnUsedCardGiftStage.GiftChildren, RecipientSeat = recipient, PaidCardIds = selected.Cards, Before = before } });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(selected.Cards, CardLocation.Hand(recipient), new($"skill-program.{(f.SkillId)}.off-turn-used-card-gift"), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, selected.Cards, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batchId, moves) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(selected.Cards, CardLocation.Hand(recipient), new($"skill-program.{(f.SkillId)}.off-turn-used-card-gift"), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, selected.Cards, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batchId, moves) =>
         {
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(active with { OffTurnUsedCardGift = active.OffTurnUsedCardGift!with { GiftBatchId = batchId, After = moves.Last().Sequence } });

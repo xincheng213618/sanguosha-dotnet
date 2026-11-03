@@ -367,7 +367,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
 
         var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(c => c.Id == cardId);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { DeckCriterion = d with { Stage = "gift", RecipientSeat = recipient } });
-        _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.Hand(recipient), new("program.declared-deck.give"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, frame.OwnerSeat, recipient, [cardId], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+        _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.Hand(recipient), new("program.declared-deck.give"), _nativeGivenCards.Completion(frame.Id, frame.OwnerSeat, recipient, [cardId], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         _coreDeckProgramsOperations.AwaitDeckProgramMovement(frame.Id);
     }
 

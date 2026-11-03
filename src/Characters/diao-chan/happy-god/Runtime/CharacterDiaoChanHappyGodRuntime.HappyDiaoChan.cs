@@ -211,7 +211,7 @@ internal sealed partial class CharacterDiaoChanHappyGodRuntime
             return;
         }
 
-        var nativeGive = take ? null : _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, giver, f.OwnerSeat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null);
+        var nativeGive = take ? null : _nativeGivenCards.CompletionRecords(f.Id, giver, f.OwnerSeat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null);
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(f.OwnerSeat), new(take ? HappyDcTake : HappyDcGive), (batch, moves) =>
         {
             nativeGive?.Invoke(batch, moves);

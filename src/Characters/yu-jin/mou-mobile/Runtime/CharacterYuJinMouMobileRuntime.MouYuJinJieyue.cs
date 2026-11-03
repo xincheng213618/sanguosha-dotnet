@@ -100,7 +100,7 @@ internal sealed partial class CharacterYuJinMouMobileRuntime
         var cards = _cardZonesOperations._cardZones.CardsAt(from);
         if (slot < 0 || slot >= cards.Count || selected.Cards is not [var id] || cards[slot].Id != id)
             throw new InvalidOperationException("Jieyue's published physical gift has changed.");
-        _corePhysicalMovementFacadesOperations.MoveCard(cards[slot], from, CardLocation.Hand(f.OwnerSeat), new(MouJieyueGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, r.RecipientSeat, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, movement =>
+        _corePhysicalMovementFacadesOperations.MoveCard(cards[slot], from, CardLocation.Hand(f.OwnerSeat), new(MouJieyueGiftReason), _nativeGivenCards.Completion(f.Id, r.RecipientSeat, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, movement =>
         {
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var old = current.MouYuJinJieyue!;

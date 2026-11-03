@@ -91,6 +91,6 @@ internal sealed partial class CoreHappyWeiYanGainDestinationsRuntime
     internal void MoveNativeGivenCards(long producerFrameId, int giver, int recipient, IReadOnlyList<int> cardIds, CardMoveReason reason, Action<HappyWeiYanGainRequestSettlement>? afterRequestSettled = null, CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified)
     {
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cardIds, CardLocation.Hand(recipient), reason, disclosure: disclosure, afterRequestSettled: _characterHuangQuanMouOperations.NativeGiveRequestCompletion(producerFrameId, giver, recipient, cardIds, before, afterRequestSettled), producerFrameId: producerFrameId);
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cardIds, CardLocation.Hand(recipient), reason, disclosure: disclosure, afterRequestSettled: _nativeGivenCards.RequestCompletion(producerFrameId, giver, recipient, cardIds, before, afterRequestSettled), producerFrameId: producerFrameId);
     }
 }

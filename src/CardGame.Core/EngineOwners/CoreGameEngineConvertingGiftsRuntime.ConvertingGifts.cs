@@ -71,7 +71,7 @@ internal sealed partial class CoreGameEngineConvertingGiftsRuntime
         var draft = f.ConvertingGift!;
         var from = _cardZonesOperations._cardZones.GetLocation(cardId);
         var card = _cardZonesOperations._cardZones.CardsAt(from).Single(c => c.Id == cardId);
-        _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Hand(draft.RecipientSeat), new("skill-program.converting-gift.give"), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, from.OwnerSeat!.Value, draft.RecipientSeat, [cardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
+        _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Hand(draft.RecipientSeat), new("skill-program.converting-gift.give"), _nativeGivenCards.Completion(f.Id, from.OwnerSeat!.Value, draft.RecipientSeat, [cardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
         var ordinal = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == cardId && m.From == from && m.To == CardLocation.Hand(draft.RecipientSeat) && m.Reason.Value == "skill-program.converting-gift.give")?.Sequence;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ConvertingGift = f.ConvertingGift!with { GiftCardId = cardId, GiftOrdinal = ordinal } });

@@ -47,7 +47,7 @@ public sealed record TurnStartedEvent(int TurnNumber, int ActorSeat) : IGameEven
 
 public sealed record RoundStartedEvent(int RoundNumber, int ActorSeat) : IGameEvent;
 
-public sealed record TurnEndedEvent(int TurnNumber, int ActorSeat) : IGameEvent;
+public sealed partial record TurnEndedEvent(int TurnNumber, int ActorSeat) : IGameEvent;
 
 public sealed record PhaseChangedEvent(TurnPhase Phase, int ActorSeat) : IGameEvent;
 

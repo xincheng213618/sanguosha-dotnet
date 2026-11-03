@@ -47,7 +47,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Pijing = r with { Stage = PijingStage.GiftChildren, Gift = selected, Before = before, After = before, Count = 1 }, PendingMovementContinuation = new(donor, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(selected);
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(f.OwnerSeat), new(PijingGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, donor, f.OwnerSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(f.OwnerSeat), new(PijingGiftReason), _nativeGivenCards.CompletionRecords(f.Id, donor, f.OwnerSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) =>
         {
             if (moves is not [var m] || m.CardId != card.Id || m.From != from || m.To != CardLocation.Hand(f.OwnerSeat))
                 throw new InvalidOperationException("Pijing lost its one actual random transferable HE entity.");

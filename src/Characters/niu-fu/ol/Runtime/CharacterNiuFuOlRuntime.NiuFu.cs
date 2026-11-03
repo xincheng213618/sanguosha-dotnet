@@ -158,7 +158,7 @@ internal sealed partial class CharacterNiuFuOlRuntime
         if (branch == "recast")
             f = _coreNativeRecastInvocationsOperations.BeginFrameNativeRecastInvocation(f, f.OwnerSeat, [id]);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { NiuFu = r with { Stage = stagePaid, Recast = branch == "recast" ? new(id, card.Kind, from, card.IsGeneralWeapon) : r.Recast }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _corePhysicalMovementFacadesOperations.MoveCard(card, from, destination, reason, (branch == "gift" ? _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, from.OwnerSeat!.Value, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
+        _corePhysicalMovementFacadesOperations.MoveCard(card, from, destination, reason, (branch == "gift" ? _nativeGivenCards.Completion(f.Id, from.OwnerSeat!.Value, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
         var move = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence > before && m.CardId == id && m.Reason == reason);
         AddNiuFuStep(f.Id, stagePaid, reason.Value, before, 1, card, from, move.To);
         ContinueNiuFu(f.Id);

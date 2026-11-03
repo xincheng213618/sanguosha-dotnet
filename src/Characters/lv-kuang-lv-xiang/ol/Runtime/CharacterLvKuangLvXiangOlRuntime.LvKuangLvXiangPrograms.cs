@@ -150,7 +150,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
             throw new InvalidOperationException("Liehou may transfer only the selected actual giver's hand card.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LvKuangLvXiang = r with { Stage = r.Stage == "receive" ? "receive-children" : "give-children" }, PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), new(LiehouReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, giver, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(recipient), new(LiehouReason), _nativeGivenCards.CompletionRecords(f.Id, giver, recipient, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) =>
         {
             if (moves is not [var m] || m.CardId != id || m.From != CardLocation.Hand(giver) || m.To != CardLocation.Hand(recipient))
                 throw new InvalidOperationException("Liehou failed its exact actual Hand-to-Hand payment.");

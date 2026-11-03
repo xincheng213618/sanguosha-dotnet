@@ -125,8 +125,8 @@
 - 存储复用来源明确的 `CharacterSkillSet`；限制与获得来源一同随 revision 失效缓存，不新增 pending 或独立状态机。
 - `SkillAvailability` 区分 **持有** 与 **有效**；`MatchSkillBindingIndex` 缓存回答并构建绑定。调用是否允许仍由实际触发窗口、次数、支付和目标资格回答，不能用持有代替。
 - `skillState` 的动作是 `suppress`（仍持有但失效）、`lose`（失去当前来源）、`transfer`（借出方失效、施术方获得独立来源）。后者不表示永久夺走；实际失去并获得应分别表达两个动作。
-- 范围为 `all / nonLocked / named / chosenFromTarget / expression`，可限定 `printedOnly`、`excludeLocked`；`characterOnly` 默认 true，显式 false 才覆盖装备来源，模式规则始终保护。
-- 期限为本回合、本轮、指定角色最近一次回合结束、永久。`untilTurnEndOf` 默认包含当前回合；`afterCurrentTurn:true` 才排除发出时的回合。`expireOnDeath:true` 另以受影响目标（借出方）死亡为结束条件，不与回合结束座位混用。
+- 范围由 `match.skillIds` 与 `match.filter` 声明；人物、印刷来源和锁定技使用共享技能元数据过滤，选择一个技能使用 `chooseOne`。模式规则始终保护，不再接受旧范围枚举或并列过滤开关。
+- 期限统一声明在 `until`：按实际回合、轮次、指定角色的最近一次或严格下次边界结束，永久状态使用空集合。死亡是独立结束条件，受影响目标与回合结束主体不能混用。
 - 失效覆盖匹配的现在和未来来源；暂时失去只限制当时的 grant，结束时移除限制，不能恢复永久失去的 grant 或删除后来独立获得的来源。永久失去直接禁用当前来源，不保留将来一切同名技能都失去的通配限制。
 - 借用复用已持有的实例、boolean 状态和次数，不重复发获得事件；到期只移除本来源。
 - 本回合期限沿用实际回合清理位置，在归还扣押牌可能打开移动子结算之前解除。指定角色回合末/死亡期限走各自事件边界；不能只因期限名字相同就改变 BeforeEvent/AfterEvent 顺序。
@@ -153,7 +153,7 @@
 | 多版夺锐、传武、解阵、忘魂 | 冻结来源集合、候选范围、印刷顺序、双解除条件或完整 grant 恢复不同；不得只凭夺取关键词强套 transfer |
 | 刻铭 | 一次伤害触发窗口的调用授权，目标仍持有技能；调用权限归原窗口，不创建虚假的普通 grant |
 | `OwnedPrintedSkills` 等旧名称 | 旧 UI/被动接口混合资格与可见性，现委托共享状态限制解释，保持现有显隐；不能当纯 Owned 使用 |
-| 旧 qualification callback | 其他人物族仍经原资格链进入有效性查询；不能宣称人物分支已消失，也不能只因检查通过标完整 |
+| 正向来源资格 | 主公投影、私库和官渡持续资格仍待收口；不能把负状态统一解释误写成所有来源关系都已完成 |
 
 ### 七条自检
 
@@ -173,20 +173,20 @@
 
 | 消费者 | 统一状态与保留的差异 |
 | --- | --- |
-| 移动神马超霆威、势张任伏暗 | NonLocked、含装备、目标严格下次回合末（afterCurrentTurn）；霆威在目标死亡时解除，伏暗不提前解除 |
+| 移动神马超霆威、势张任伏暗 | 非锁定、含装备、目标严格下次回合末；霆威在目标死亡时解除，伏暗不提前解除 |
 | 周年崔烈迟币 | Named、本回合；已支付拼点后人物死亡仍可签发状态，复活不能抹掉本回合失效。共享 mutation 不擅加存活资格，普通 JSON 活目标 admission 保留 |
 | 周年夏侯杰壮胆 | Named、拥有者最近一次回合末；不误改成严格下一回合 |
 | 暗器飞刃 | Named、目标最近一次回合末；保留原随机选择和真正的每目标实际回合限次。次数读通用状态变更事实的 IssuedTurn，不读可能已经到期的当前 lease |
 
 这些消费者的旧 Suppressed/Disabled/Expired 事件、资格/到期方法、无用转发已退役；迟币和壮胆的专属资格缓存与 contract 一并删除。迟币仅校验失效步骤执行过的历史条件直接删除，没有改成再扫描通用事件证明一次。
 
-旧 `IsCurrentTurnSkillGrantQualified` 仍有投影、HP 条件、归命、昀政等直接消费者，现统一委托 `SkillAvailability` 解释普通状态；没有让这些入口绕过新 lease，也没有增加另一份匹配算法。其余不同规则的旧 callback 仍待收口。
+旧 `IsCurrentTurnSkillGrantQualified` 及其转发已退役，普通状态统一由 `SkillAvailability` 解释；主公投影、私库和官渡等正向来源关系仍有独立缺口，不能因此恢复第二份有效性答案。
 
 ### 回合结束事实前后的端点
 
-增加 `endTiming:beforeTurnEnded / afterTurnEnded`（默认后者），仅适用于 `untilTurnEndOf`。共享算法在声明的事件边界解除，所有匹配来源先一起移除，再发到期事实，观察者不会看到同一借用只有一边结束的中间状态。默认值不进入 canonical JSON，不因未指定该字段改变已有内容指纹。
+回合结束期限使用 `until` 的 `event:turnEnded` 与 `timing:before / after`（默认 after），明确在原事件哪一侧解除。所有匹配来源先一起移除，再发到期事实，观察者不会看到同一借用只有一边结束的中间状态。
 
-谋曹丕放逐的技能失效分支现用 All、排装备、严格目标下次回合末、beforeTurnEnded；原资格、选择、四种手牌/响应限制及其 BeforeEvent 处理保留。旧技能有效性 callback/转发已删除；原 `MouCaoPiControls` 公开诊断中的 SkillsInvalid 从 lease 投影，不在旧列表中再存一份，WPF payload 保持不变。
+谋曹丕放逐的技能失效分支匹配全部人物技能、不含装备，在目标严格下次回合结束前解除；原资格、选择、四种手牌/响应限制及其 BeforeEvent 处理保留。旧技能有效性 callback/转发已删除；原 `MouCaoPiControls` 公开诊断中的 SkillsInvalid 从共享限制投影，不在旧列表中再存一份，WPF payload 保持不变。
 
 持续条件、实际阶段与调用授权的不同维度仍按下文逐项收口，技能状态整体不能只凭普通期限迁移标为完成。
 
@@ -200,7 +200,7 @@ OL 王观谬焰失败后改为 Named、本轮、包含全部非模式来源且�
 
 ## 技能有效性、限制存储与统一匹配
 
-用户要求的终点是删除资格回调和全局技能查询中的人物分支，不是把回调换成注册表、接口列表或新回调。以下盘点先于该批源代码修改；在途雅士期限归入统一期限批次，不再单独增加一种执行模型。
+技能有效性的目标是由声明数据给出唯一答案，不用注册表或接口列表包装人物资格回调。以下按模式准入、来源归属、已施加状态与窗口授权区分职责；期限统一使用同一个结束边界结构。
 
 ### 每个判断的类别
 
@@ -225,7 +225,7 @@ OL 王观谬焰失败后改为 Named、本轮、包含全部非模式来源且�
 | 移动神夺锐 | 有限期和借入来源 | 借出者回合末/死亡、具名限制、借入实例的真实租期 |
 | 刻铭三条 fallback | 本窗口调用授权 | 原伤害窗口、当前 candidate、binding/instance/hash、原结算及已支付子返回；不是技能持有/有效 |
 
-当前化身参与时的 HP 抑制源采用 base 来源筛选，默认路径采用 effective grants；主公投影也有本地 base/HP 筛选。必须把问题和事实口径明确下来，不能用一个新的 HasEffective 回调掩盖差异。
+化身库与普通来源使用同一个受体限制答案，已施加状态不因原 grant 失效而撤销；主公投影和私库的正向来源关系仍须区分存在、持有与有效，不能用新的 HasEffective 回调掩盖差异。
 
 ### 限制混入真实授予的实证
 
@@ -243,11 +243,11 @@ OL 王观谬焰失败后改为 Named、本轮、包含全部非模式来源且�
 
 有效性缓存必须感知限制变化；持有变更观察只反映真实授予集合变化，不能继续产生伪 SkillsChanged。
 
-### 三处匹配的重复与缺陷
+### 统一匹配与真实来源身份
 
-Issue、Candidates、Matches 重复 Mode/人物来源/印刷来源/Locked。Filter 目前只在候选端执行，随后按 SkillId 去重，Issue 再捞全部同名 grant：`skill.printed` 过滤掉的 acquired 来源可能被捞回。必须保留真实 GrantId/SkillInstanceId/SourceId，不在展示去重时丢掉规则范围。
+Issue、Candidates 与 Availability 的状态匹配统一使用 `SkillStateMatcher`。选择后冻结真实 GrantId/SkillInstanceId/SourceId，不能按 SkillId 展示去重后又捞回全部同名 grant；否则 `skill.printed` 已排除的 acquired 来源会重新进入规则范围。
 
-统一纯数据匹配函数只接 selector、真实 grant、定义和只读来源上下文。Mode 保护无条件；可见性只在选择外层处理，不进入有效性或 while。NonLocked、ExcludeLocked 归一为同一种过滤表达式；不能在三处各保留分支。
+统一匹配函数只接 selector、真实 grant、定义和只读来源上下文。Mode 保护无条件；可见性只在选择外层处理，不进入有效性或 while。非锁定技统一由 `skill.locked` 过滤表达式声明，不保留并列范围开关或第二份匹配分支。
 
 ### 持续条件与调用授权边界
 
@@ -364,22 +364,22 @@ checkpoint 保存配置、内容签名及接受命令前缀；Restore 重放命�
 | 状态与原生执行统一 | 回合/濒死 before 声明在普通观察者之前施加，after 期限在该事件观察者完成后处理；濒死沿权威 ActiveDying 暂停/恢复，原始窗口精确到期。没有额外 pending 或事件账本。 |
 | 旧路径真实删除 | 移动夺锐的正/负资格证明方法删除：真实借入 grant 由原租约创建/删除；具名负限制用共享签发，并在原 AfterEvent39950 显式按 origin 撤销，保留真实租约限次、截止、死亡和付款续接。 |
 
-原始 enabled/选择/明置准入已由 Availability 的同一实现复用到查询、私库和主公来源读取；Alive 仍由原规则调用者处理，Owned/Effective 的形成阶段没有换序。印刷主公权利尚不能宣称收口：官渡指挥官实际是 TeamA/TeamB，CorePrintedLord 包含该模式例外，但 Availability 的额外资格目前只有山河。保留这项真实差异，未加 bool override 隐藏，也未擅自改变答案；正向主公、私库、HP、装备花色、落雁与官渡派生关系继续审计。
+原始 enabled/选择/明置准入由 Availability 的同一实现复用到查询、私库和主公来源读取；Alive 仍由原规则调用者处理，Owned/Effective 的形成阶段没有换序。印刷主公资格已归实际 grant 的类型化数据，官渡与山河的答案一致，具体归属见下节；正向主公投影、私库和官渡持续资格仍待迁移。
 
-当时**未完成**的负条件只剩当前资格链中的韵筝，已由下节接续完成。物理牌标记、失效状态及仅给技能持有者的手牌上限豁免分别处理；不能把私有 UI 标记文本当共享事实，或顺带把手牌豁免扩给所有持标记者。
+物理牌标记、失效状态及仅给技能持有者的手牌上限豁免分别处理；不能把私有 UI 标记文本当共享事实，或顺带把手牌豁免扩给所有持标记者。
 
 ### 物理牌标记、韵筝与印刷主公资格
 
 共享标记动作与读取统一七组永久物理实体标记：筝、胡笳、笛、箜篌、激鼓、琴及炁。`CardEntityMarkRuntime` 读取同一种 `CardEntityMarkedEvent` 事实，不另立人物账本；标记不依赖当前持有者、牌区或源技能。初始牌从真实开局母帧在所有开局子结算之前冻结，保留实体、原座位和入区序号。
 
-六份初始标记 JSON 已改用以下共享节点，旧专属枚举、捕获方法、钩子和转发删除；炁仍在其实际全桌标记与额外出牌流程中调用同一共享事实，原主人读取统一，未把额外出牌流程伪装成普通标记节点。
+初始标记 JSON 使用以下共享节点，旧专属枚举、捕获方法、钩子和转发已退役；炁仍在其实际全桌标记与额外出牌流程中调用同一共享事实，原主人读取统一，未把额外出牌流程伪装成普通标记节点。
 
 ```json
 {"op":"markInitialHand","target":"owner","mark":"zheng"}
 {"op":"markCards","bind":"shown-cards","mark":"zheng"}
 ```
 
-`["cardMarkCount","target","zheng","hand"]` 同时用于普通效果和 skillState 条件，也可指定 equipment。胡笳保留手牌加装备、距离上限及有效持有人条件；琴保留判定槽派生的动态标签；炁保留原主人及真实使用规则。展示文件的 `cardMarks` 冻结为全局 mark→label 字典，冲突在加载器拒绝；六个常量人物投影钩子及对应转发删除。共享标记按 ID 排序，保留旧普通标签前缀和凤尾尾缀，琴只覆盖自己的标记；未知标签不显示，私有牌仍先经原可见性投影。
+`["cardMarkCount","target","zheng","hand"]` 同时用于普通效果和 skillState 条件，也可指定 equipment。胡笳保留手牌加装备、距离上限及有效持有人条件；琴保留判定槽派生的动态标签；炁保留原主人及真实使用规则。展示文件的 `cardMarks` 冻结为全局 mark→label 字典，冲突在加载器拒绝；旧常量人物投影钩子及转发已退役。共享标记按 ID 排序，保留旧普通标签前缀和凤尾尾缀，琴只覆盖自己的标记；未知标签不显示，私有牌仍先经原可见性投影。
 
 韵筝永久 All 限制只对其他人匹配非锁定技，while 读取受体当前带筝手牌，状态施加后不回查原技能；自己的手牌上限豁免仍要求有效韵筝。旧韵筝资格缓存、state/contracts、谓词、私有标记事件和投影删除。旧 `IsCurrentTurnSkillGrantQualified` 及其转发完全退役，来源读取统一问现有 `IsSkillGrantStateEffective`；原 CurrentTurn 对象只保留来源缓存戳，不再提供第二份有效性答案。
 
@@ -387,14 +387,14 @@ checkpoint 保存配置、内容签名及接受命令前缀；Restore 重放命�
 
 一次用牌内的惑心限次改用现有 Event scope 的原生窗口额度。共享计数只留在原 `ProgramCardTriggerWindowFrame`，按 owner/skill/binding 计，不按 grant instance 计；拒绝发动不扣次，接受后跨目标、跨实例共享当前窗口一次，下一原生窗口重新计。只支持当前可证明的静态窗口额度，未改变 `singleActionInstance`，未建立 ActionId sidecar 或第二个 pending。原生回程、冷恢复及已接受帧都携带同一冻结额度。
 
-印刷主公资格的真实答案分裂也已修正：官渡 TeamA/TeamB 指挥官原模板/UI 承认主公技，旧 Owned/Effective 却否认。共同身份现在附在实际 grant 上，来源为 `SetupDeclared` / `ProgramIssued` 类型数据：官渡和山河通过真实模式设置与模板绑定签发，原程序签发沿用真实帧回执。所有查询用同一个 `PrintedLordSkillQualifications.Matches`，旧模式实时资格分支及其四个文件删除，没有模式回调、布尔 override、假 grant 或假 ProgramFrameId；换将沿原模板替换路径清除不匹配资格并推进 GrantRevision。
+印刷主公资格附在实际 grant 上，来源为 `SetupDeclared` / `ProgramIssued` 类型数据：官渡和山河通过真实模式设置与模板绑定签发，原程序签发沿用真实帧回执。所有查询使用同一个 `PrintedLordSkillQualifications.Matches`，不再出现官渡 TeamA/TeamB 指挥官模板/UI 承认主公技、Owned/Effective 却否认的答案分裂。旧模式实时资格分支已退役，没有模式回调、布尔 override、假 grant 或假 ProgramFrameId；换将沿原模板替换路径清除不匹配资格并推进 GrantRevision。
 
 | 七项判断 | 状态与保留范围 |
 | --- | --- |
 | 一个概念，一个归属 | 永久物理标记归共享实体事实；负限制归受体 Restrictions；印刷主公资格归实际 grant。展示文字不作规则依据。 |
 | 依赖方向单一 | 标记、标签解析、状态有效性和印刷资格匹配不含武将分支，没有新注册表或人物回调。 |
 | 概念可组合 | JSON 节点可单独标记原始手牌或已有绑定，表达式读当前牌区；状态、持有人收益和 UI 各守原层次。 |
-| 等价消费者一起迁移 | 七组永久标记的初始化/查询/后续加标统一，六份初始化专属操作及旧事件删除；炁额外流程保留。 |
+| 等价消费者一起迁移 | 七组永久标记的初始化/查询/后续加标统一，初始化专属操作及旧事件已退役；炁额外流程保留。 |
 | 原生执行与恢复 | 开局快照、原生窗口限次、惑心已支付选择均在原帧；子移动沿既有类型化返回，没有旁路 pending。 |
 | 旧路径退役 | 韵筝最后一个负资格分支、旧 CurrentTurn 谓词、惑心自证事件及旧场景印刷资格路径删除。 |
 
@@ -621,23 +621,15 @@ Entries 与 DeferredRuntime 的互换不消除真实反向调用；这些调用�
 
 测试规则字符串统一使用 `SkillProgramTestJson.CurrentSchema`，Core/WPF 共用同一辅助方法。它只替换当前版本占位，不提前解析畸形 JSON；旧格式拒绝用的 Replace 片段也引用同一来源。原常量场景改用不依赖初始化先后的静态表达式属性，展示、checkpoint 及故意错误版本保持各自边界。
 
-`SkillPrograms.cs` 规则根版本只用于加载入口等值校验；技能 GameplayHash 来自 RuntimeVersion 与单个 skill 的 canonical JSON，不包含根版本。`ContentRegistry` 指纹由已解析内容构成；`Replay` 保存命令、配置、包签名和 ContentHash，没有持久化规则根或 RulesSchemaVersion。展示、checkpoint 与外层 save 的格式各有独立来源，不随本方案变更。
+对外规则根版本用于加载入口等值校验；技能 GameplayHash 来自 RuntimeVersion 与单个 skill 的 canonical JSON，不包含根版本。`ContentRegistry` 指纹由已解析内容构成；`Replay` 保存命令、配置、包签名和 ContentHash，没有持久化规则根或 RulesSchemaVersion。展示、checkpoint、外层 save 与包版本各有独立来源，不随规则格式调整。
 
-**内置格式边界（已实施）**：随代码编译的内置规则删除根 schemaVersion，由 `EmbeddedSkillProgramCatalog` 的唯一资源加载点显式选择当前源格式；只区分根门禁，后续技能解析、未知字段/指令拒绝和指纹函数共用同一路径。对外 `SkillProgramCatalog.Load` 及 Inspect 工具仍要求显式版本，避免把“字段仍合法但含义已变”的旧外部文档默认为当前格式。已引用常量的生产 C# 规则生成路径保留原加载方式。
+**内置格式边界**：嵌入程序集的 `*.rules.json` 不包含根 `schemaVersion`，`EmbeddedSkillProgramCatalog` 在唯一资源加载点使用 `SkillProgramCatalog.LoadCurrent`，显式选择当前实现的源格式。
 
-这是内置内容源格式变化，无须增加存档字段、RulesVersion、包版本或玩法 epoch。纯删除根字段可保持所有 GameplayHash 与 registry ContentHash；真正修改技能步骤导致的指纹变化仍照常生效。格式兼容性必须区分根元数据变化与技能步骤变化，不能把玩法修改一起算成“格式迁移保持兼容”。未知字段校验能拒绝旧拼写，不能独自识别合法字段的语义变化，因此外部文档的格式标识仍有意义。
+`LoadCurrent` 要求无版本根，出现 `schemaVersion` 按未知字段拒绝，不猜测版本或兼容旧外部文档。对外 `SkillProgramCatalog.Load` 与 Inspector 的外部文档入口仍要求显式支持的版本，缺失或错误均拒绝；未知字段检查不能独自识别合法字段的语义变化，因此外部格式标识仍有意义。
 
-## 内置规则格式：显式选择当前格式
+两个入口只在规则根门禁处区别，后续技能解析、字段/操作校验、重复键拒绝、展示配对与集合冻结共用原路径。Inspector 内置示例和直接读取资源的夹具显式选用当前格式入口；包括 `bundle + suffix + ".json"` 在内的资源读取复用统一 catalog。需要改写资源后交给严格外部入口的夹具须显式补当前规则版本，生产 C# 中已引用版本常量的规则生成路径保留原加载方式。
 
-嵌入程序集的 `*.rules.json` 不包含根 `schemaVersion`；`EmbeddedSkillProgramCatalog` 在唯一资源加载点改用 `SkillProgramCatalog.LoadCurrent`，明确选择当前实现的源格式。根元数据变更与技能步骤、玩法规则、RuntimeVersion 及外观事实需求分别处理。
-
-`LoadCurrent` 要求无版本根，出现 `schemaVersion` 会按未知字段拒绝；它不是猜测版本或兼容旧外部文件的入口。对外 `SkillProgramCatalog.Load` 保持严格版本要求，缺失、错误的规则版本仍拒绝。Inspector 内置示例与直接读取这些资源的夹具显式选用当前格式入口；用户提供的外部规则仍走严格入口。生产 C# 中已引用版本常量的规则生成代码保持原加载方式。两个入口只在规则根门禁处区别，后续技能解析、字段与操作校验、重复键拒绝、展示配对和集合冻结共用原路径。展示、checkpoint、外层存档和包版本均保持各自的既有边界，不增加玩法 epoch 或存档 RulesVersion。
-
-删除内置规则根格式版本不改变技能程序 GameplayHash 与目录 ContentHash；技能步骤或其他内容真正改变时，指纹仍须改变。内联生成程序继续参与目录指纹，保持其原加载与版本边界。
-
-直接读取内置资源的入口复用统一 catalog；需要改写 JSON 的夹具显式补当前规则版本后仍走严格外部入口，不增加兼容回退。
-
-RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均保持各自边界；内置根元数据迁移不新增 RulesVersion 或玩法 epoch。
+纯删除内置根元数据不改变 GameplayHash 与目录 ContentHash；技能步骤、RuntimeVersion 或其他内容真正改变时，指纹仍须相应改变。内联生成程序继续参与目录指纹，不能把玩法修改冒充保持兼容的根元数据迁移；不新增存档字段、RulesVersion、包版本或玩法 epoch。
 
 ## 动作外观需求：声明收口与依赖收缩（使用／响应仍部分完成）
 
@@ -648,8 +640,6 @@ RuntimeVersion、外部规则版本、展示、checkpoint、save 与包版本均
 仅为外观需求存在的构造反向依赖已退役；颜色捕获与角色改写的其他人物业务仍未收口，不能据此外观需求声明宣称整模块已解耦。
 
 这三个共享模块均未达到人物依赖归零，不能宣称使用／响应合法性概念完成。构造参数的减少来自真实消费者退役；未把参数组合为上下文，也未单独整理长构造函数。剩余付款身份、转换提供者和专用捕获按其所属概念继续收口。
-
-`bundle + suffix + ".json"` 形式的资源读取同样复用内置 catalog；改写资源后交给严格外部加载器时，必须显式补当前规则版本，不在外部入口增加兼容回退。
 
 外观需求迁移不改变规则 JSON、版本号、支付帧或恢复存储。
 
@@ -856,15 +846,15 @@ Accepted 与 Finalizations 是同一 journal 的共同视图，不另存 Pair �
 
 ### 退役路径、信任边界与剩余缺口
 
-苏飞 LastUse／RecordedEvent、郭汜 Uses／UseStamp／PairQualifiedEvent、活动私有历史事件、花鬘 HuaManUses／DirectionalUse 和急袭专属记录事件、指令及 pipeline hook 已退役；核心不再调用这些人物历史记录器。`PreviousFinalizedUse` 与 `AcceptedPairAtCompletionFor` 两个专用顺序查询由共同 finalizations／accepted 视图替代；薮影专属 ordinal 查询及重复序号证明、急袭专属 ever 查询、窃听 UsedOnAnotherAt 与人物上下文历史布尔也由共同事实组合替代，不保第二条兼容账本。
+人物 LastUse／UseStamp／PairQualifiedEvent、方向序号及 ever 私有账本已退役，核心不再调用人物历史记录器。`PreviousFinalizedUse` 与 `AcceptedPairAtCompletionFor` 两个专用顺序查询由共同 finalizations／accepted 视图替代，不保留第二条兼容路径。
 
 `FinalizedDirectedTargetOrdinal`、`EverDesignatedTargets`、`UsedOnAnotherAt` 均已退役。共同入口是 `ReadCardUseFacts(point, view)`：point 声明实际回合与 journal 截点，view 声明事实阶段；规则在表达式中组合计数、存在性和目标集合。三者的 finalized 窗口、ever 观察与候选入场截点仍有不同含义，不能为了统一读取抹去这些规则区别。现有阶段定位方法仍服务真实 capture 与原生返回，不属于单人物资格谓词。
 
-真实的薮影弃牌／取消／处理中实体领取、急袭成本／RNG／无距离多目标顺手牵羊、窃听选项／装备移动／查看手牌／摸牌、魅魂花色声明／给牌／私看及 paid／mutation／子返回继续保留原协议。条件和目标集合已移入 JSON；联翩的后续奖励已用普通节点组合，伺盗等相关专属复合 effect 仍有 C#，尚未达到只需组合共享 JSON 节点的目标。
+历史条件与目标集合已由 JSON 组合；两版联翩的资格、奖励和后续选择也已使用普通节点。真实薮影弃牌／取消／处理中实体领取、急袭成本／RNG／无距离多目标顺手牵羊、伺盗材料／顺手牵羊、窃听选项／装备移动／查看手牌／摸牌、魅魂花色声明／给牌／私看及 paid／mutation／子返回仍属各自原生协议。界移动窃听的实际伤害资格不是用牌关系，不与其他窃听历史条件合并。
 
-苏飞／活动联翩的 finalized 前一张关系、郭汜完成截点的 accepted 尾部关系及其目标集已由 JSON 组合，不再留 C# 历史答案。联翩奖励与后续选择已用普通 JSON 节点组合；仍未收口的是伺盗材料／顺手牵羊、OL／界移动窃听选项与移动等实际复合效果；界移动版的实际伤害资格也不是用牌历史条件。共同历史组合已迁移，不代表这些完整技能已能只写 JSON。
+屯江已使用共同 confirmations、实际阶段事实与普通摸牌；问计无懈关系及其他复合 effect 仍未组合，刘琦整个 Runtime 尚未退役。CardActions、原生用牌和合法动作模块仍有其他反向依赖，整体使用／响应合法性尚未完成依赖验收。
 
-共同确认读取及 accepted／finalizations 顺序组合，按原架构标准分别判断；不扩张为整个用牌模块或所有消费者已成为纯 JSON 技能：
+共同确认读取及 accepted／finalizations 顺序组合已收口，完成范围与剩余复合效果边界如下：
 
 | 标准 | 状态与剩余范围 |
 |---|---|
@@ -878,9 +868,7 @@ Accepted 与 Finalizations 是同一 journal 的共同视图，不另存 Pair �
 
 新增接受、更新与目标事实复用原谋司马懿的隐藏目标投影，不能泄露隐藏目标。事实与只读结果冻结嵌套集合，`CardActionContext` 冻结目标、实体与转换来源，提交投影保持覆盖。命令、加载、内容指纹、回放、隐私、真实付款及移动义务没有因删除人物自证而放宽。
 
-旧专属记账指令退役按唯一规则格式源统一处理，外部 Load／Inspector 明确拒绝旧格式，不保兼容别名；内置资源继续显式加载当前格式。规则 JSON 的实际组合变化参与内容指纹；已迁移复合效果必需的 `targetSetExpr` 和旧专属语法退役并入同一尚未发布的格式清理，不逐人物、指令或字段另升版本，也不引入 gameplay epoch、checkpoint RulesVersion 或包发布。旧局无法载入／回放时，沿已有桌面规则开新局并保留源存档，不自动覆盖。
-
-OL 刘琦的私有外部目标记录与魅魂首次目标扫描已由共同 confirmations 和表达式组合替代，界 current 窃听也不再用另一份初始目标关系扫描。屯江已使用共享阶段事实与普通摸牌，问计无懈关系及其他人物专属复合 effect 仍未收口；不能据屯江纯 JSON 化宣称刘琦整个 Runtime 已退役。CardActions、原生用牌和合法动作模块仍有其他反向依赖，整体使用／响应尚未完成依赖验收。
+旧专属语法退役复用唯一规则格式源，外部 Load／Inspector 明确拒绝旧格式，不保兼容别名；内置资源显式加载当前格式。规则 JSON 的实际组合变化参与内容指纹，不兼容格式调整按开发批次合并，不逐人物、指令或字段另升版本，不引入 gameplay epoch、checkpoint RulesVersion 或包发布。旧局无法载入／回放时，沿既有桌面规则开新局并保留源存档，不自动覆盖。
 
 阶段次数上限尚缺按存活身份人数计算的共享数量读取与通用动态上限组合；OL 定叛的 `PhaseLimit` 仍在人物 C#，不能用固定一次取代“存活反贼数”。该规则不属于历史读取，不以新增定叛专属操作绕过。
 
@@ -1214,11 +1202,39 @@ AfterTurnEnded 的 `invocation.source: afterTurnEnded` 在真正接受、原费�
 | 七项判断 | 完成边界与剩余缺口 |
 |---|---|
 | 一个概念，一个归属 | 原窗口接受权限归 ProgramInvocations；可选绑定给牌的目标、提示、命令与原帧交付归 ProgramBoundCardRuntime，不再有苏飞副本。 |
-| 依赖方向 | 新权限、目标表达式、给牌续接与交付读取只依赖共享能力；苏飞对谋黄权的直接依赖退役。原生给予捕获的移动端口仍调用谋黄权的旧事实记录，整个给予概念尚未完成方向验收。 |
+| 依赖方向 | 新权限、目标表达式、给牌续接与交付读取只依赖共享能力；苏飞对谋黄权的直接依赖退役。原生给予捕获及读取已由下述共同事实替代，逻辑给予窗口与各规则的复合效果仍有独立缺口。 |
 | 层次分明 | 接受资格、原共同目标、实时存活、实体位置、实际交付与后续权限分开，source loss 不冒充 owner death 权限。 |
 | JSON 对应规则 | 两版联翩各用普通选择、Draw 和可选给牌表达；没有联翩专属动作或查询。 |
 | 改动局部 | 扩现有给牌节点的目标表达式及 awaited 返回，复用原授权、游标和交付收据，无解释器、旁路 pending 或人物回调列表。 |
 | 只有一条路径 | 苏飞旧完整复合操作及活动联翩旧分支退役；点虎／屯江的共享旧收据仍有真实消费者，不能整组删除。 |
 | 信任边界 | 不放宽原命令、目标域、材料、隐私、内容指纹与冷恢复；已交付步骤不重复，未支付后缀不从回执获取授权。 |
 
-原生给予的旧捕获仍以谋黄权／遗计需求驱动，并存储人物命名记录；这个事实概念需要与所有实际给予消费者共同收口，不能仅把旧方法包装为通用接口就宣称完成。活动模块对黄权 OL、刘琦 OL 的依赖分别属于谏计和问计，不因联翩分支退役而消失。
+原生给予捕获和人物账本已退役为下述共享 journal 事实。活动模块对黄权 OL、刘琦 OL 的依赖分别属于谏计和问计，不因联翩分支或给予事实迁移而消失。
+
+## 原生给予事实、逻辑给予者与结束断面
+
+`NativeGivenCardRuntime` 是已完成给予事实的唯一写端，`NativeGivenCardQueries` 从同一 journal 的 `NativeCardsGivenEvent` 内部不可变收据读取；`NativeGiveScopeRuntime` 只解释原回合结束断面。`CharacterState.MouHqActualGifts`、人物事件再证明、旧记录入口和 Closed 查询桥已退役。公开事件继续只有原标量归属与数量，实际实体及物理记录留在内部收据，提交投影冻结材料；内部元数据不改变原公开事件的值相等性。
+
+“给予”必须由原操作明确声明，不能从手牌到手牌、失牌、获得、移动原因或材料持有人反推。内建给予节点已经声明此语义；通用 `selectAndMoveOwnedCard`／`moveBoundCards` 用可选 `giveBy` 声明逻辑给予者。`owner` 是原技能所有者，`selectedTarget` 是本次已选角色，`materialOwner` 是原材料共同持有人。缺省仍是普通移动；来自牌堆的集解等给予不冒充材料有手牌持有人。旧人物／binding 白名单已删除，普通获得、交换和放置不会顺带触发给予收益。
+
+共同捕获接受实际 producer、giver、recipient、预期实体与原移动起点；完整请求结算后，只有实际进入原接收者手牌的实体属于已给予集合。销毁、重定向到他人和留在原区域的结果不计入给予数量；混合请求可以部分交付。完成序号仍取整个请求全部物理终点的最大序号，不能改成最后一张实际收到牌的序号。全部 retained 且没有物理移动的 typed request settlement 不伪造移动或给予。
+
+替代发放与真实 gain-request 校验继续由原生替代生产者负责。共同给予边界消费其类型化返回及冻结的请求／实际目的地，只核对自己这次请求的实体分区和真实终点，不重新扫描固境事件、来源技能或内容指纹证明替代已经发放，也不借 Deferred 隐藏构造循环。
+
+原 `TurnEnded.BeforeEvent` 的结束断面在原事件上内部捕获原 journal cursor，提交后封存；不是另一条边界事件、人物表或 pending。Give 收据冻结签发时已见的同回合／回合者结束断面，故结束前后的 Give 即使共用数值回合号也分段。`NativeCardsGivenEvent.Before` 内插入回合结束时，Give 的源断面不会被稍后才入 journal 的公开事件位置改写；结束断面后的新给予也不会重新带回旧段牌。实际模式的中断／转阶段事实参与同一 journal 游标。
+
+`Read()` 保留完整真实历史并包含当前正在推进的原给予收据，供重入去重；跨结束断面也不重复签发同一实际交付。`GiftsForCurrentScope` 选择明确的实际回合、回合者与当前结束段，`GiftsForBatch` 再选择原完成序号所属批次并保留既有当前段资格。它们只筛共同事实时点及归属，不计算推诚可否回礼或机援是否发动。未知发放与普通标量事件不能拼出私有收据；pending 替换、回滚及转 committed 均读取原 journal，不保留另一套人物缓存。
+
+推诚以同段真实给予实体排除原牌回礼，机援仍从一次真实给予的原逻辑 giver／recipient 生成独立收益；集解的牌堆来源同样保留。需求在能力自身声明并汇入 `ProgramTrackedFact.NativeGive`，共同捕获不枚举武将。所有旧给予调用方依赖共享能力；谋黄权剩余巧对原生采样、无效与效果轮推进不是给予事实，不能随事实迁移删除。
+
+| 七项判断 | 完成边界与剩余缺口 |
+|---|---|
+| 一个概念，一个归属 | 实际给予由一个捕获 owner 写同一事实，公共数量与内部材料不再靠双账本互证；结束段由共享原事件断面解释。 |
+| 依赖方向 | 捕获、读取、scope、原生移动调用均依赖共享能力，旧共享／人物到谋黄权的给予接线退役；原巧对业务依赖仍属于其未迁概念。 |
+| 层次分明 | Give 语义、逻辑给予者、真实移动、替代结果、完成时点、当前段与发动资格分开。 |
+| JSON 对应规则 | 通用移动的给予归属由 `giveBy` 数据声明；推诚和机援的逻辑给予窗口收集尚未完全声明化，不能称完整收益技能都只需 JSON。 |
+| 改动局部 | 复用原物理请求、typed settlement、事件推进、journal 与能力需求，没有新解释器、人物查询器或旁路 pending。 |
+| 只有一条路径 | 原人物给予表、写端、到期清理和 Closed 读桥全部退役；历史和当前段来自同一事实，不回查人物发行证明。 |
+| 信任边界 | 实体及嵌套材料冻结，公开事件不暴露牌 ID；原命令、支付、真实替代、原帧返回和冷恢复边界保留。 |
+
+剩余缺口是逻辑给予的通用触发 occurrence／上下文声明：推诚与机援还分别在人物 collector 选择共同事实并构造原窗口；推诚回礼及巧对的复合原生流程也尚未组合。真实替代目的地的旧命名与发行语法属于该替代概念，不以给予捕获中删除重复证明冒充已经全部声明化。

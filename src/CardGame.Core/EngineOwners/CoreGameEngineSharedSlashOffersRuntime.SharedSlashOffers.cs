@@ -45,7 +45,7 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
 
         var receipt = new SharedSlashOfferReceipt(f.InstructionIndex, bind, SharedSlashSource(f), actorSeat, new(card.Id, card.Kind, cards.SourceLocations[0], _coreActionDiscardColorsOperations.CapturePhysicalCardColor(f.OwnerSeat, card)));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { SharedSlashOffer = receipt });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(actorSeat), new(SharedSlashGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, actorSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, movements) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(actorSeat), new(SharedSlashGiftReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, actorSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, movements) =>
         {
             var moved = movements.Single();
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);

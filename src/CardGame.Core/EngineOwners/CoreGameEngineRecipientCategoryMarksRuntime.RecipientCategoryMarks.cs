@@ -387,7 +387,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
         var e = _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects.Single();
         var before = RecipientMarkSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { RecipientCategoryMark = r with { Stage = RecipientCategoryMarkStage.GiftChildren, SelectedCardIds = [id], SequenceBefore = before, SequenceAfter = before }, PendingMovementContinuation = new(r.HolderSeat, 0, null) });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(f.OwnerSeat), new(RecipientMarkReason(f, "gift")), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.HolderSeat, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(f.OwnerSeat), new(RecipientMarkReason(f, "gift")), _nativeGivenCards.CompletionRecords(f.Id, r.HolderSeat, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, records) =>
         {
             var token = new RecipientCategoryMarkToken(f.Id, r.HolderSeat, r.SourceSkillId, r.StateId, kind, e.SkillIds[(int)kind], r.Source, r.GameplayHash, records.Single().Sequence);
             _coreGameEngineRecipientCategoryMarksRecipientCategoryMarkLedgerStartedRecipientCategoryMarksAccess._recipientCategoryMarks.Add(new(r.HolderSeat, r.SourceSkillId, r.StateId), token);

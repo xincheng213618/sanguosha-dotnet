@@ -21,7 +21,7 @@ internal sealed partial class CharacterKanZeOlRuntime
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var invoice = new XiashuInvoice(KanZeSource(f), f.GameplayHash, w.ParentFrameId, f.InstructionIndex, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, recipient, before, before, ids.Length);
         _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { XiashuPaid = new(invoice, XiashuStage.GiftChildren, before, before, ids.Length), PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(XiashuGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(XiashuGiftReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
         {
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var paid = invoice with

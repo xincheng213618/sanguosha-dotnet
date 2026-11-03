@@ -77,7 +77,7 @@ internal sealed partial class CharacterBaoXinOlRuntime
         PrepareBaoXinMove(ref f, entities, stage);
         var step = f.BaoXin!.Step;
         if (entities.Count > 0)
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(entities.Select(c => c.CardId).ToArray(), destination, new(reason), (stage is BaoXinStage.GiftChildren or BaoXinStage.YimouGiftChildren ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.BaoXin!.Holder, destination.OwnerSeat ?? f.OwnerSeat, entities.Select(c => c.CardId).ToArray(), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, records) =>
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(entities.Select(c => c.CardId).ToArray(), destination, new(reason), (stage is BaoXinStage.GiftChildren or BaoXinStage.YimouGiftChildren ? _nativeGivenCards.CompletionRecords(f.Id, f.BaoXin!.Holder, destination.OwnerSeat ?? f.OwnerSeat, entities.Select(c => c.CardId).ToArray(), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, records) =>
             {
                 foreach (var m in records)
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BaoXinEntityMovedEvent(f.Id, step, batch, m.CardId, m.CardKind, m.From, m.To, m.Sequence));

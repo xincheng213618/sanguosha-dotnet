@@ -18,7 +18,7 @@
             { "id": "become-user", "condition": { "kind": "any", "children": [{ "kind": "handCountAtLeast", "value": 1 }, { "kind": "hasOwnedCardCategory", "zones": ["equipment"], "cardCategories": ["equipment"] }] } },
             { "id": "extra-target" }
           ] },
-          { "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "selectedTarget" }, "cardOwnerRef": { "kind": "selectedTarget" }, "zones": ["hand", "equipment"], "count": 1, "destination": "ownerHand", "awaitMovementTriggers": true,
+          { "giveBy": "materialOwner", "op": "selectAndMoveOwnedCard", "target": "owner", "chooserRef": { "kind": "selectedTarget" }, "cardOwnerRef": { "kind": "selectedTarget" }, "zones": ["hand", "equipment"], "count": 1, "destination": "ownerHand", "awaitMovementTriggers": true,
             "condition": { "kind": "choiceIs", "sourceBind": "role-choice", "optionId": "become-user" } },
           { "op": "replaceCurrentCardUseActor", "target": "selectedTarget", "condition": { "kind": "choiceIs", "sourceBind": "role-choice", "optionId": "become-user" } },
           { "op": "addCurrentCardUseTarget", "target": "selectedTarget", "condition": { "kind": "choiceIs", "sourceBind": "role-choice", "optionId": "extra-target" } }

@@ -274,7 +274,7 @@ internal sealed partial class CoreGameEnginePhaseHandSeizureRuntime
         if (moving.Length == 0)
             SettlePhaseHandDebt(due, frame.Id, "same-hand", receipt.RequiredCount, 0, before, before);
         else
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(moving, CardLocation.Hand(receipt.TargetSeat), new(PhaseHandDebtReturnReason(frame)), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, receipt.TargetSeat, moving, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(moving, CardLocation.Hand(receipt.TargetSeat), new(PhaseHandDebtReturnReason(frame)), _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, receipt.TargetSeat, moving, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
             {
                 var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
                 var after = records.Max(m => m.Sequence);

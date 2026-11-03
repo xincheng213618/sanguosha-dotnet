@@ -243,7 +243,7 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
         else if (discard)
             _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, executor, ids, HeYanMoveReason(kind), Paid);
         else if (kind == "yachai-give")
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, HeYanMoveReason(kind), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, executor, f.OwnerSeat, ids, before, Paid), disclosure: CardMovementDisclosure.FaceUp);
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, HeYanMoveReason(kind), _nativeGivenCards.CompletionRecords(f.Id, executor, f.OwnerSeat, ids, before, Paid), disclosure: CardMovementDisclosure.FaceUp);
         else
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, HeYanMoveReason(kind), Paid, disclosure: CardMovementDisclosure.FaceUp);
         ContinueHeYan(f.Id);

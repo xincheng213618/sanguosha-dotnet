@@ -37,7 +37,7 @@ internal sealed partial class CharacterZhouFeiLeRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { LeZhouFeiXianshu = receipt, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XianshuGiftStartedEvent(frame.Id, receipt.Source, receipt.GameplayHash, phase, receipt.ActualTurn, receipt.TurnOwner, card.Id, card.Kind, receipt.GiftSuit, targetSeat, before));
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(targetSeat), new(LeZhouFeiXianshuGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, targetSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batchId, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(targetSeat), new(LeZhouFeiXianshuGiftReason), _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, targetSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batchId, records) =>
         {
             var paid = records.Single();
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);

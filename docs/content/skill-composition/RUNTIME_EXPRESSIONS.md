@@ -404,3 +404,11 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 可选的 `awaitMovementTriggers: true` 在真实给牌后排空原帧的移动子窗，复用既有 instruction delivery，不增加私有已付事件。回执保留已交付返回，不能授权未支付后缀。
 
 真实用牌／响应触发可声明 `"invocation":{"source":"cardAction"}`。它在原窗口真正接受时绑定原父、候选索引和原程序；失源可完成本次，死亡缺省停止新步骤。它不是技能获得或持续有效性，也不授权后续候选。只需最终 Draw 的交付保留时，无须额外声明整次调用权限。
+
+## 通用移牌的给予语义
+
+`selectAndMoveOwnedCard` 和 `moveBoundCards` 可以声明 `"giveBy":"owner"`、`"giveBy":"selectedTarget"` 或 `"giveBy":"materialOwner"`，表示原技能所有者、已选角色或原材料共同持有人是逻辑给予者。只支持手牌目的地；省略时仍是普通移动。显式给予可以有非手牌来源，不能把普通获得／交换按同一物理路线自动提升为给予。
+
+所选角色按既有参与者绑定校验；materialOwner 必须能从原材料得到唯一实际持有人，没有持有人的牌堆材料应明确声明真正的 giver。内建 `giveBoundCard` 等给予节点保留自己的逻辑给予者，不重复填写声明。
+
+共享事实只记录完整请求中真正进入原收牌者手牌的实体，合法替代和销毁不会被数量表达式误算成给予。原生给予的通用 JSON 触发 occurrence 尚未声明化；当前两个消费者仍按原窗口读取共同事实，不新增人物专属读取语法。

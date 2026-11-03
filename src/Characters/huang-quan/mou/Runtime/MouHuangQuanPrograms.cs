@@ -3,11 +3,6 @@ namespace CardGame.Core;
 
 public enum MouHqStage { Cards, Recipient, GiveChildren, Reply, ReplyChildren, Drawing, DrawChildren, Effect }
 public sealed record MouHqEntity(int CardId,CardLocation From);
-public sealed record MouHqGift(long Id,long ProducerId,int Giver,int Recipient,int Turn,int TurnOwner,long CompletionSequence)
-{
-    private IReadOnlyList<CardMovementRecord> _moves=[];
-    public IReadOnlyList<CardMovementRecord> Movements{get=>_moves;init=>_moves=Array.AsReadOnly(value.ToArray());}
-}
 public sealed record MouHqReceipt(CardConversionSource Source,string GameplayHash,int Turn,int TurnOwner,long WindowId)
 {
     public MouHqStage Stage{get;init;}
@@ -19,7 +14,7 @@ public sealed record MouHqReceipt(CardConversionSource Source,string GameplayHas
     public int Count{get;init;}
     public long Before{get;init;}
     public long After{get;init;}
-    public MouHqGift? Gift{get;init;}
+    public NativeGiveFact? Gift{get;init;}
     public NativeDrawOutcome? Draw{get;init;}
     private IReadOnlyList<MouHqEntity> _selected=[];
     public IReadOnlyList<MouHqEntity> Selected{get=>_selected;init=>_selected=Array.AsReadOnly(value.ToArray());}
@@ -48,10 +43,6 @@ public sealed partial record CardUseFrame
     [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouHqEffectRounds? MouHqRounds{get;init;}
     [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouHqEffectGrant? MouHqIneffective{get;init;}
 }
-public sealed partial class CharacterState
-{internal IReadOnlyList<MouHqGift>? MouHqActualGifts{get;set;}}
-// Private transferred entity ids remain on trusted movement batches and owning frames.
-public sealed record NativeCardsGivenEvent(long Id,long ProducerId,int Giver,int Recipient,int Count,int Turn,int TurnOwner,long CompletionSequence):IGameEvent;
 public sealed record MouHqStartedEvent(long FrameId,CardConversionSource Source,string GameplayHash,int Turn,int TurnOwner,long WindowId,long UseId,long ActionId):IGameEvent;
 public sealed record MouHqCommittedEvent(long FrameId,int OwnerSeat,int Recipient,int Count,int Turn,int TurnOwner):IGameEvent;
 public sealed record MouHqReplyEvent(long FrameId,int Recipient,int RequiredCount,bool Gave):IGameEvent;
@@ -76,4 +67,8 @@ internal abstract class MouHuangQuanDescriptor:ProgramOperationDescriptorBase
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext c)=>c.State.CanContinueAfterOwnerDeath(c.Frame);
 }
 internal sealed class ResolveMouHuangQuanQiaoduiDescriptor:MouHuangQuanDescriptor{public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveMouHuangQuanQiaodui;}
-internal sealed class ResolveMouHuangQuanTuichengDescriptor:MouHuangQuanDescriptor{public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveMouHuangQuanTuicheng;}
+internal sealed class ResolveMouHuangQuanTuichengDescriptor:MouHuangQuanDescriptor
+{
+    public override SkillProgramEffectOp Op=>SkillProgramEffectOp.ResolveMouHuangQuanTuicheng;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeGive);
+}

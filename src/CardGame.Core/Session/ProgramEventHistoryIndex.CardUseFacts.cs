@@ -21,7 +21,7 @@ internal sealed partial class ProgramEventHistoryIndex
     private readonly Dictionary<(int Turn, int Owner), long> _actualTurnStartCursors = [];
     private readonly Dictionary<(int Turn, int Owner), CardUseHistoryPoint> _actualTurnEndPoints = [];
 
-    public long CardUseHistoryCursor => events.Count + (long)pendingEvents.Count;
+    public long CardUseHistoryCursor => Cursor;
 
     public CardUseHistoryPoint? FindTurnEndPoint(int actualTurn, int turnOwnerSeat)
     {

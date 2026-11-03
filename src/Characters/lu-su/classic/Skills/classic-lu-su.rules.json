@@ -70,6 +70,7 @@
               "resultBind": "haoshi-gift"
             },
             {
+              "giveBy": "owner",
               "op": "moveBoundCards",
               "target": "owner",
               "sourceBind": "haoshi-gift",

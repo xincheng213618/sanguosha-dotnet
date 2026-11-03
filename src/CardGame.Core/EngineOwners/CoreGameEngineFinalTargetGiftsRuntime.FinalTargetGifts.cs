@@ -63,7 +63,7 @@ internal sealed partial class CoreGameEngineFinalTargetGiftsRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { FinalTargetGift = draft with { Stage = "gift-movement", RecipientSeat = recipient, CardId = card.Id, Reward = reward } });
         var beforeOrdinal = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-        _corePhysicalMovementFacadesOperations.MoveCard(card, from, to, new("skill-program.final-target-gift.give"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, frame.OwnerSeat, recipient, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
+        _corePhysicalMovementFacadesOperations.MoveCard(card, from, to, new("skill-program.final-target-gift.give"), _nativeGivenCards.Completion(frame.Id, frame.OwnerSeat, recipient, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
         var ordinal = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.Sequence > beforeOrdinal && m.CardId == card.Id && m.From == from && m.To == to && m.Reason.Value == "skill-program.final-target-gift.give")?.Sequence;
         frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { FinalTargetGift = frame.FinalTargetGift!with { ReceiptOrdinal = ordinal } });

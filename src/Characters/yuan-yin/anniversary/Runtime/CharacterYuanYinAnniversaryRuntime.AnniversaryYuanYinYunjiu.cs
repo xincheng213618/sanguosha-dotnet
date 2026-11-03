@@ -113,7 +113,7 @@ internal sealed partial class CharacterYuanYinAnniversaryRuntime
                 Delivered = settlement.Movements.Any(m => m.CardId == id && m.From == from && m.To == CardLocation.Hand(r.Recipient))
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(live with { AnniversaryYuanYin = paid });
-            _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, r.Victim, r.Recipient, [id], before, settlement);
+            _nativeGivenCards.Record(f.Id, r.Victim, r.Recipient, [id], before, settlement);
         }, producerFrameId: f.Id);
         var settled = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(settled = settled with { AnniversaryYuanYin = settled.AnniversaryYuanYin!with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

@@ -1,14 +1,14 @@
 namespace CardGame.Core;
 
 [ProgramRuntimeModule]
+[ProgramPassiveFactRequirements("boundary:jiyuan-mobile", ProgramTrackedFact.NativeGive)]
 internal sealed class BoundaryYiJiRuntime(IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts,
-    ISelectionParticipantQueries participants, IProgramTriggerQueries triggers, IProgramContentQueries content,
+    ISelectionParticipantQueries participants, IProgramTriggerQueries triggers,
     ICardZoneQueries cards, IProgramCardSnapshotQueries snapshots, INativeGivenCardQueries givenCards)
 {
     private const string Jijie = "boundary:jijie-mobile";
     private const string Jiyuan = "boundary:jiyuan-mobile";
 
-    internal bool Enabled => content.HasSkill(Jiyuan);
     internal static bool IsGiveCandidate(ProgramTriggerCandidate candidate) =>
         candidate.SkillId == Jiyuan && candidate.BindingId == "native-give-draw";
 

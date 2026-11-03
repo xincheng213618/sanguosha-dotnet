@@ -112,7 +112,7 @@ internal sealed partial class CharacterYanPuOlRuntime
             var from = _cardZonesOperations._cardZones.GetLocation(id);
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { YanPu = r with { Stage = YanPuStage.GiftChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(r.Target), new(YanPuGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, r.Target, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, movements) =>
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([id], CardLocation.Hand(r.Target), new(YanPuGiftReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, r.Target, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, movements) =>
             {
                 var root = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
                 var move = movements.Single();
@@ -161,7 +161,7 @@ internal sealed partial class CharacterYanPuOlRuntime
 
         var sequence = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { YanPu = f.YanPu!with { Stage = YanPuStage.EndingGiftChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(selected, CardLocation.Hand(r.Target), new("skill-program.yan-pu.huantu.ending-gift"), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, r.Target, selected, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, movements) => CommitYanPuMovement(f.Id, new(r.Movements.Count, f.OwnerSeat, "skill-program.yan-pu.huantu.ending-gift", sequence, movements.Max(m => m.Sequence), movements.Count))));
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(selected, CardLocation.Hand(r.Target), new("skill-program.yan-pu.huantu.ending-gift"), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, r.Target, selected, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, movements) => CommitYanPuMovement(f.Id, new(r.Movements.Count, f.OwnerSeat, "skill-program.yan-pu.huantu.ending-gift", sequence, movements.Max(m => m.Sequence), movements.Count))));
         ContinueYanPu(f.Id);
     }
 

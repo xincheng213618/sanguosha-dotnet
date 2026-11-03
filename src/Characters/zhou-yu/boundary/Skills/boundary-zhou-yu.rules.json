@@ -24,7 +24,7 @@
           "condition": { "kind": "handCountAtLeast", "value": 1 },
           "effects": [
             { "op": "selectTarget", "target": "owner", "targetKind": "otherLiving" },
-            { "op": "selectAndMoveOwnedCard", "target": "owner",
+            { "giveBy": "materialOwner", "op": "selectAndMoveOwnedCard", "target": "owner",
               "chooserRef": { "kind": "owner" }, "cardOwnerRef": { "kind": "owner" },
               "zones": ["hand"], "count": 1, "destination": "selectedTargetHand",
               "targetRef": { "kind": "selectedTarget" }, "resultBind": "gift",

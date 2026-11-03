@@ -119,7 +119,7 @@ internal sealed partial class CharacterCaoHongMouRuntime
             foreach (var m in moves)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouCaoHongMovementPaidEvent(f.Id, r.Cursor, m.CardId, m.From, m.To, m.Sequence));
             if (give)
-                _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, f.OwnerSeat, r.Target, ids, r.Before);
+                _nativeGivenCards.Record(f.Id, f.OwnerSeat, r.Target, ids, r.Before);
         }
 
         if (discard)

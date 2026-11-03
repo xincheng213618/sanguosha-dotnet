@@ -11,7 +11,7 @@ internal sealed partial class CharacterLiuBaOlRuntime
         if (r.Recipient == f.OwnerSeat)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TongduGiftIssuedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, r.Recipient, card.CardId, card.Kind, entry, null));
         else
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.CardId], CardLocation.Hand(f.OwnerSeat), new(TongduGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.Recipient, f.OwnerSeat, [card.CardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, records) =>
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.CardId], CardLocation.Hand(f.OwnerSeat), new(TongduGiftReason), _nativeGivenCards.CompletionRecords(f.Id, r.Recipient, f.OwnerSeat, [card.CardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, records) =>
             {
                 RecordLiuBaMovement(f, batch, records);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TongduGiftIssuedEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.TurnOwner, r.Recipient, card.CardId, card.Kind, entry, records.Single().Sequence));

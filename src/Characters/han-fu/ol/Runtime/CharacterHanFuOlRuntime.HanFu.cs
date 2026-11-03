@@ -82,7 +82,7 @@ internal sealed partial class CharacterHanFuOlRuntime
             if (stage == HanFuStage.DiscardChildren)
                 _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, ids, new(reason));
             else
-                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, new(reason), (stage is HanFuStage.GiftChildren or HanFuStage.ReturnChildren ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, stage == HanFuStage.ReturnChildren ? f.HanFu!.TargetSeat : f.OwnerSeat, destination.OwnerSeat!.Value, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
+                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, new(reason), (stage is HanFuStage.GiftChildren or HanFuStage.ReturnChildren ? _nativeGivenCards.CompletionRecords(f.Id, stage == HanFuStage.ReturnChildren ? f.HanFu!.TargetSeat : f.OwnerSeat, destination.OwnerSeat!.Value, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
         }
 
         for (var i = 0; i < cards.Count; i++)

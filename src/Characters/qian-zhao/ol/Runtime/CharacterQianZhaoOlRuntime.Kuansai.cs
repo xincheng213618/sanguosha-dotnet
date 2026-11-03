@@ -76,7 +76,7 @@ internal sealed partial class CharacterQianZhaoOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Kuansai = r with { Stage = KuansaiStage.Children, Gift = gift, CardId = card?.Id, From = from, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         if (card is not null)
-            _corePhysicalMovementFacadesOperations.MoveCard(card, from!.Value, CardLocation.Hand(f.OwnerSeat), new(KuansaiGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, from!.Value.OwnerSeat!.Value, f.OwnerSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
+            _corePhysicalMovementFacadesOperations.MoveCard(card, from!.Value, CardLocation.Hand(f.OwnerSeat), new(KuansaiGiftReason), _nativeGivenCards.Completion(f.Id, from!.Value.OwnerSeat!.Value, f.OwnerSeat, [card.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
         else if (CanKuansaiRecover(f.OwnerSeat))
         {
             if (!_coreRecoveryReplacementOperations.TryQueueRecoveryReplacement(f.Id, f.OwnerSeat, f.OwnerSeat, 1, new(RecoveryAttemptProducer.Program, f.InstructionIndex)))

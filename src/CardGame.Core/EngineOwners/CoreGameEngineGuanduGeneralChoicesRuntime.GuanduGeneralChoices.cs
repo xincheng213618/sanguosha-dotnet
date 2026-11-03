@@ -245,6 +245,6 @@ internal sealed partial class CoreGameEngineGuanduGeneralChoicesRuntime
         var from = _cardZonesOperations._cardZones.GetLocation(id);
         if (from == CardLocation.Hand(target))
             return;
-        _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), from, CardLocation.Hand(target), new("activity.guandu." + f.SkillId + ".gift"), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, owner, target, [id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null), disclosure: from.Zone == CardZoneKind.Equipment ? CardMovementDisclosure.FaceUp : CardMovementDisclosure.FaceDown);
+        _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), from, CardLocation.Hand(target), new("activity.guandu." + f.SkillId + ".gift"), _nativeGivenCards.Completion(f.Id, owner, target, [id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null), disclosure: from.Zone == CardZoneKind.Equipment ? CardMovementDisclosure.FaceUp : CardMovementDisclosure.FaceDown);
     }
 }

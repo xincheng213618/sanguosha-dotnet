@@ -121,7 +121,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
                 throw new InvalidOperationException("Shipo can receive one actual Hand entity only from its current living participant.");
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouXuHuangShipo = r with { Stage = MouXuHuangShipoStage.GiftChildren, Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-            _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), CardLocation.Hand(chooser), CardLocation.Hand(f.OwnerSeat), new(MouXuHuangGiveReason), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, chooser, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, m =>
+            _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), CardLocation.Hand(chooser), CardLocation.Hand(f.OwnerSeat), new(MouXuHuangGiveReason), _nativeGivenCards.Completion(f.Id, chooser, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, m =>
             {
                 var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
                 var receipt = new MouXuHuangGiftReceipt(r.Cursor, chooser, m.CardId, m.From, m.To, m.Sequence);
@@ -155,7 +155,7 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
             throw new InvalidOperationException("Shipo can redistribute only its still-owned original received subset to one living other.");
         var transferBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouXuHuangShipo = r with { Stage = MouXuHuangShipoStage.TransferChildren, TransferRecipient = target, Before = transferBefore, After = transferBefore }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.SelectedCardIds, CardLocation.Hand(target), new(MouXuHuangTransferReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, target, r.SelectedCardIds, transferBefore, (batch, actual) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.SelectedCardIds, CardLocation.Hand(target), new(MouXuHuangTransferReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, target, r.SelectedCardIds, transferBefore, (batch, actual) =>
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouXuHuangShipoTransferPaidEvent(f.Id, target, batch, actual.Count, transferBefore, actual.Max(m => m.Sequence)));
         }));

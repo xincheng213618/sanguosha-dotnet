@@ -114,7 +114,7 @@ internal sealed partial class CharacterDuFuRenOlRuntime
         var recipient = choice.Targets.Single();
         var from = _cardZonesOperations._cardZones.GetLocation(cardId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { DuFuRen = r with { Stage = DuFuRenStage.GiftChildren, RecipientSeat = recipient, CardId = cardId, From = from, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([cardId], CardLocation.Hand(recipient), new(DuFuRenGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, [cardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([cardId], CardLocation.Hand(recipient), new(DuFuRenGiftReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, [cardId], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, records) =>
         {
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var paid = current.DuFuRen!;

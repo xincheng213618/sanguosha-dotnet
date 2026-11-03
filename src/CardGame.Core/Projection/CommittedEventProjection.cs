@@ -75,6 +75,9 @@ internal static class CommittedEventProjection
     // Rules see the original fact first; only the committed projection is copied.
     public static IGameEvent Freeze(IGameEvent payload) => payload switch
     {
+        TurnEndedEvent value => value.FreezeNativeGiveHistory(),
+        NativeCardsGivenEvent value => value with { Receipt = value.Receipt is { } receipt
+            ? receipt with { Movements = FreezeList(receipt.Movements) } : null },
         // This fact freezes both constructor and with-assignment collection input.
         ActualCardUseTargetsFinalizedEvent value => value,
         ActualCardUseTargetsCompletedEvent value => value,

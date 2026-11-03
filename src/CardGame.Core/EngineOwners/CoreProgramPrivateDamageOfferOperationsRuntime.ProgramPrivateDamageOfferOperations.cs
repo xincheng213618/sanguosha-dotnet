@@ -167,7 +167,7 @@ internal sealed partial class CoreProgramPrivateDamageOfferOperationsRuntime
             var card = _cardZonesOperations._cardZones.CardsAt(from).Single(c => c.Id == id);
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreRuntimeOperations.ReplaceRuntimeTop(frame with { DamageCardOffer = null });
-            _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Hand(draft.SourceSeat), new CardMoveReason($"skill-program.{(frame.SkillId)}.GiveSelected"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, frame.OwnerSeat, draft.SourceSeat, [id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+            _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Hand(draft.SourceSeat), new CardMoveReason($"skill-program.{(frame.SkillId)}.GiveSelected"), _nativeGivenCards.Completion(frame.Id, frame.OwnerSeat, draft.SourceSeat, [id], _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
             if (_cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(draft.SourceSeat))
                 throw new InvalidOperationException("Private offer gain was not committed.");
             _coreDamagePreventionProgramsOperations.PreventProgramCurrentDamage(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));

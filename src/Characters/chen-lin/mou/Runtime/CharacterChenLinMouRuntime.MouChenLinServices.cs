@@ -76,7 +76,7 @@ internal sealed partial class CharacterChenLinMouRuntime
                 _cardZonesOperations._cardZones.PlaceDrawPileCardsAtTop(moves.Where(m => m.To == CardLocation.DrawPile).Select(m => m.CardId).ToArray());
             MouChenLinRules.MovesPaid(f.Id, moves);
             if (give && r.Target != f.OwnerSeat)
-                _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, f.OwnerSeat, r.Target, ids, r.Before);
+                _nativeGivenCards.Record(f.Id, f.OwnerSeat, r.Target, ids, r.Before);
         }, disclosure: CardMovementDisclosure.FaceUp);
     }
 
@@ -93,7 +93,7 @@ internal sealed partial class CharacterChenLinMouRuntime
             _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, parent with { MouChenLinInvitation = parent.MouChenLinInvitation!with { After = m.Sequence } });
             if (m.To == CardLocation.Hand(f.OwnerSeat))
                 RecordMouChenLinGift(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), r.PendingGiver, card.Id, r.Before, moves);
-            _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, r.PendingGiver, f.OwnerSeat, [card.Id], r.Before);
+            _nativeGivenCards.Record(f.Id, r.PendingGiver, f.OwnerSeat, [card.Id], r.Before);
         });
     }
 

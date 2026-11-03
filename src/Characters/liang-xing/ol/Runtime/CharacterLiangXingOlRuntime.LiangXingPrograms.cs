@@ -13,7 +13,7 @@ internal sealed partial class CharacterLiangXingOlRuntime
         if (cards.Count == 0)
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
-        _corePhysicalMovementFacadesOperations.MoveCards(cards.ToArray(), location, CardLocation.Hand(frame.OwnerSeat), new CardMoveReason($"skill-program.{(frame.SkillId)}.luelve-gift"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, location.OwnerSeat!.Value, frame.OwnerSeat, cards.Select(c => c.Id).ToArray(), _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
+        _corePhysicalMovementFacadesOperations.MoveCards(cards.ToArray(), location, CardLocation.Hand(frame.OwnerSeat), new CardMoveReason($"skill-program.{(frame.SkillId)}.luelve-gift"), _nativeGivenCards.Completion(frame.Id, location.OwnerSeat!.Value, frame.OwnerSeat, cards.Select(c => c.Id).ToArray(), _coreCardMovementJournalMovementSequenceAccess._movementSequence, null));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.ReturnRuntimeProgramMovement(frame.Id);
         return SkillProgramStepOutcome.AwaitChild;

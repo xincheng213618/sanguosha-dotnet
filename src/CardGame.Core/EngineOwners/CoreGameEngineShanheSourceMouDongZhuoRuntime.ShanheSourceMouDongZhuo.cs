@@ -216,7 +216,7 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ShanheSourceMou = r with { Stage = ShanheSourceMouStage.GiftChildren, Paid = true, Recipient = recipient, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         var ids = r.Cards.Select(card => card.Id).ToArray();
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(SourceMouGift), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, recipient, ids, before, null), disclosure: CardMovementDisclosure.FaceUp);
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(recipient), new(SourceMouGift), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, ids, before, null), disclosure: CardMovementDisclosure.FaceUp);
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { ShanheSourceMou = active.ShanheSourceMou!with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceMouAllocationEvent(f.Id, f.OwnerSeat, recipient, ids.Length, r.Suit, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber));

@@ -112,7 +112,7 @@ internal sealed partial class CharacterSunXiuBoundaryMobileRuntime
         var recipient = branch == "give" ? answer.Targets.Single() : -1;
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { BoundarySunXiu = receipt with { Stage = BoundarySunXiuStage.MoveChildren, CardId = cardId, From = from, Recipient = recipient, Before = before, After = before }, PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
-        var native = recipient < 0 ? null : _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, actor, recipient, [cardId], before, null);
+        var native = recipient < 0 ? null : _nativeGivenCards.CompletionRecords(frame.Id, actor, recipient, [cardId], before, null);
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([cardId], recipient < 0 ? CardLocation.DrawPile : CardLocation.Hand(recipient), new(recipient < 0 ? BoundaryXingxueTop : BoundaryXingxueGive), (batch, moves) =>
         {
             native?.Invoke(batch, moves);

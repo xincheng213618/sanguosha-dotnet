@@ -7,11 +7,6 @@ internal interface ICharacterHuangQuanMouCorePlayerViewProjectionOperations : IP
     GameSnapshot CreateSnapshot(int viewerSeat, bool revealAll = false);
 }
 
-internal interface ICharacterHuangQuanMouBoundaryYiJiOperations : IProgramRuntimeOperations
-{
-    BoundaryYiJiRuntime Get();
-}
-
 internal interface ICharacterHuangQuanMouMouHuangQuanOperations : IProgramRuntimeOperations
 {
     MouHuangQuanRuntime Get();

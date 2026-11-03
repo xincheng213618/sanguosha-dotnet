@@ -75,7 +75,7 @@ internal sealed partial class CharacterZhugeJinMouRuntime
     {
         if (!MouZhugeJin.Valid(f) || f.MouZhugeJin is not { Stage: MouZhugeJinStage.GiveChildren, Committed: true } r || r.Cards.Count == 0 || r.Cards.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Hand(r.Target)))
             throw new InvalidOperationException("Taozhou requires the giver's committed current Hand entities.");
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Cards, CardLocation.Hand(f.OwnerSeat), new(MouZhugeJinRuntime.GiveReason), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.Target, f.OwnerSeat, r.Cards, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, moves) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Cards, CardLocation.Hand(f.OwnerSeat), new(MouZhugeJinRuntime.GiveReason), _nativeGivenCards.CompletionRecords(f.Id, r.Target, f.OwnerSeat, r.Cards, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, moves) =>
         {
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var paid = current.MouZhugeJin!;

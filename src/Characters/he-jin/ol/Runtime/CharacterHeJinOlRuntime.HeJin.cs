@@ -72,7 +72,7 @@ internal sealed partial class CharacterHeJinOlRuntime
                 throw new InvalidOperationException("Mouzhu's original donor card moved before payment.");
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HeJinMouzhu = r with { Stage = HeJinMouzhuStage.GiftChildren, GiftId = id, Before = before, After = before } });
-            _corePhysicalMovementFacadesOperations.MoveCard(_coreCardAttackStateOperations.GetAttackCard(id), CardLocation.Hand(r.ActorSeat), CardLocation.Hand(f.OwnerSeat), new(HeJinGiftReason), _characterHuangQuanMouOperations.NativeGiveCompletion(f.Id, r.ActorSeat, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
+            _corePhysicalMovementFacadesOperations.MoveCard(_coreCardAttackStateOperations.GetAttackCard(id), CardLocation.Hand(r.ActorSeat), CardLocation.Hand(f.OwnerSeat), new(HeJinGiftReason), _nativeGivenCards.Completion(f.Id, r.ActorSeat, f.OwnerSeat, [id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HeJinMouzhu = f.HeJinMouzhu!with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HeJinMouzhuGiftPaidEvent(f.Id, r.ActorSeat, f.OwnerSeat, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));

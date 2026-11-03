@@ -73,7 +73,7 @@ internal sealed partial class CharacterGuoJiaMouRuntime
             _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, parent with { MouGuoJia = paid with { Actual = moves.Count(m => m.To == to), After = moves.Max(m => m.Sequence) } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouGjMovementPaidEvent(f.Id, r.Cursor, moves.Count(m => m.To == to), r.Before, moves.Max(m => m.Sequence)));
             if (yiji)
-                _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, f.OwnerSeat, r.Target, r.Selected, r.Before);
+                _nativeGivenCards.Record(f.Id, f.OwnerSeat, r.Target, r.Selected, r.Before);
         }
 
         if (r.Yin)

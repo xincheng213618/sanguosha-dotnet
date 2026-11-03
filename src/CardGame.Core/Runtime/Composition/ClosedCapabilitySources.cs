@@ -21,16 +21,6 @@ internal sealed class ClosedMouYangshiRangeRuntimeSource(Func<MouYangshiRangeRun
     public MouYangshiRangeRuntime Get() => resolve();
 }
 
-internal interface IClosedNativeGivenCardQueriesSource : IProgramRuntimeOperations
-{
-    INativeGivenCardQueries Get();
-}
-
-internal sealed class ClosedNativeGivenCardQueriesSource(Func<INativeGivenCardQueries> resolve) : IClosedNativeGivenCardQueriesSource
-{
-    public INativeGivenCardQueries Get() => resolve();
-}
-
 internal interface IClosedOwnedCardMoveQueriesSource : IProgramRuntimeOperations
 {
     IOwnedCardMoveQueries Get();
@@ -106,14 +96,12 @@ internal sealed class ClosedZhuitaoDistanceRuntimeSource(Func<ZhuitaoDistanceRun
 
 internal static class ClosedCapabilityComposition
 {
-    internal static IEnumerable<ProgramNativeCapabilityBinding> Append(IEnumerable<ProgramNativeCapabilityBinding>? existing, ProgramRuntimeModuleCatalog modules, Func<IHandCardViewQueries> resolve0, Func<INativeGivenCardQueries> resolve1, Func<IOwnedCardMoveQueries> resolve2, Func<IProgramOperationDraws> resolve3, Func<IProgramPhaseFrameQueries> resolve4, Func<ISelectionParticipantQueries> resolve5)
+    internal static IEnumerable<ProgramNativeCapabilityBinding> Append(IEnumerable<ProgramNativeCapabilityBinding>? existing, ProgramRuntimeModuleCatalog modules, Func<IHandCardViewQueries> resolve0, Func<IOwnedCardMoveQueries> resolve2, Func<IProgramOperationDraws> resolve3, Func<IProgramPhaseFrameQueries> resolve4, Func<ISelectionParticipantQueries> resolve5)
     {
         foreach (var binding in existing ?? [])
             yield return binding;
         if (Enumerable.Any(modules.Registrations, registration => Enumerable.Contains(registration.Dependencies, typeof(IClosedHandCardViewQueriesSource))))
             yield return new(typeof(IClosedHandCardViewQueriesSource), new ClosedHandCardViewQueriesSource(resolve0));
-        if (Enumerable.Any(modules.Registrations, registration => Enumerable.Contains(registration.Dependencies, typeof(IClosedNativeGivenCardQueriesSource))))
-            yield return new(typeof(IClosedNativeGivenCardQueriesSource), new ClosedNativeGivenCardQueriesSource(resolve1));
         if (Enumerable.Any(modules.Registrations, registration => Enumerable.Contains(registration.Dependencies, typeof(IClosedOwnedCardMoveQueriesSource))))
             yield return new(typeof(IClosedOwnedCardMoveQueriesSource), new ClosedOwnedCardMoveQueriesSource(resolve2));
         if (Enumerable.Any(modules.Registrations, registration => Enumerable.Contains(registration.Dependencies, typeof(IClosedProgramOperationDrawsSource))))

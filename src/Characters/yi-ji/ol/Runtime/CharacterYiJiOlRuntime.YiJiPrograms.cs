@@ -15,7 +15,7 @@ internal sealed partial class CharacterYiJiOlRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         _coreMatchLogOperations.AddLog("SkillEffect", $"{(owner.Name)} 观看牌堆底的一张牌并将其交给 {(_coreMatchParticipantsPlayersAccess._players[recipient].Name)}。", owner.Seat, recipient);
         _coreRuntimeOperations.ReplaceRuntimeTop(active with { PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
-        _corePhysicalMovementFacadesOperations.MoveCards([bottom], CardLocation.DrawPile, CardLocation.Hand(recipient), new CardMoveReason($"skill-program.{(frame.SkillId)}.jijie-give"), _characterHuangQuanMouOperations.NativeGiveCompletion(frame.Id, frame.OwnerSeat, recipient, [bottom.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
+        _corePhysicalMovementFacadesOperations.MoveCards([bottom], CardLocation.DrawPile, CardLocation.Hand(recipient), new CardMoveReason($"skill-program.{(frame.SkillId)}.jijie-give"), _nativeGivenCards.Completion(frame.Id, frame.OwnerSeat, recipient, [bottom.Id], _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null));
         if (!_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow())
             _coreRuntimeOperations.ReturnRuntimeProgramMovement(frame.Id);
         return SkillProgramStepOutcome.AwaitChild;

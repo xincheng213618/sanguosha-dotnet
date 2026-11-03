@@ -174,7 +174,7 @@ internal sealed partial class CharacterHouChengAnniversaryRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryHouChengMovementEvent(f.Id, r.Source, r.Hash, r.Round, r.Turn, r.TurnOwner, giving, cardOwner, recipient, count, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, batch));
         }
 
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Selected, CardLocation.Hand(recipient), reason, giving ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, cardOwner, recipient, r.Selected, before, Paid) : Paid, disclosure: CardMovementDisclosure.FaceDown);
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Selected, CardLocation.Hand(recipient), reason, giving ? _nativeGivenCards.CompletionRecords(f.Id, cardOwner, recipient, r.Selected, before, Paid) : Paid, disclosure: CardMovementDisclosure.FaceDown);
         ContinueHouCheng(f.Id);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     }

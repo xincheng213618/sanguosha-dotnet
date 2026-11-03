@@ -142,7 +142,7 @@ internal sealed partial class CharacterJiangJiMouRuntime
             _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, parent with { MouJiangJi = paid with { Delivered = m.To == CardLocation.Hand(f.OwnerSeat), After = m.Sequence } });
             if (m.To == CardLocation.Hand(f.OwnerSeat))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiangJiGivenEvent(f.Id, r.Giver, f.OwnerSeat, card.Id, m.Sequence));
-            _characterHuangQuanMouOperations.RecordNativeGivenCards(f.Id, r.Giver, f.OwnerSeat, [card.Id], r.Before);
+            _nativeGivenCards.Record(f.Id, r.Giver, f.OwnerSeat, [card.Id], r.Before);
         });
     }
 

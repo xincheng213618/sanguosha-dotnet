@@ -170,7 +170,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
             throw new InvalidOperationException("Zijue lost its exact dynamically transferable HE payment.");
         f = CuiLieChildren(f, AnniversaryCuiLieStage.GiveChildren);
         r = f.AnniversaryCuiLie!;
-        var native = _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, f.OwnerSeat, r.Actor, r.Cards, r.Before, null);
+        var native = _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, r.Actor, r.Cards, r.Before, null);
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Cards, CardLocation.Hand(r.Actor), new(CuiLieGive), (batch, moves) =>
         {
             native?.Invoke(batch, moves);

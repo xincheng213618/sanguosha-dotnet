@@ -155,7 +155,7 @@ internal sealed partial class CoreGameEngineShanheYingxiangRuntime
             case "recipient":
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ShanheYingxiang = receipt with { Stage = ShanheYingxiangStage.EffectChildren } });
                 var cards = receipt.Cards.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(move => move.CardId == id)?.Reason.Value == ShanheQingjueDiscardReason).ToArray();
-                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, CardLocation.Hand(value), new("skill-program.shanhe-yingxiang.qingjue-give"), _characterHuangQuanMouOperations.NativeGiveCompletionRecords(frame.Id, frame.OwnerSeat, value, cards, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, moves) =>
+                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards, CardLocation.Hand(value), new("skill-program.shanhe-yingxiang.qingjue-give"), _nativeGivenCards.CompletionRecords(frame.Id, frame.OwnerSeat, value, cards, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (_, moves) =>
                 {
                     foreach (var move in moves.Where(move => move.To == CardLocation.Hand(value)))
                         TagShanheYingxiang(frame.OwnerSeat, move);
