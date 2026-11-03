@@ -17,7 +17,8 @@ internal interface IProgramTargetQueries : IProgramSelectionQuery
 internal sealed partial class ProgramTargetSelectionRuntime(IProgramRuntimeFrames frames, ICardZoneQueries zones,
     IMatchParticipantStateAccess state, IProgramContentQueries content,
     IProgramTurnQueries turn, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events,
-    IProgramPindianPolicyQueries pindianPolicies,
+    IProgramPindianPolicyQueries pindianPolicies, ISlashRedirectTargetQueries slashRedirectTargets,
+    IProgramTargetPaymentQueries payments,
     IProgramTargetFacts facts, IProgramTargetResolvers resolvers, IProgramTargetSelectionProtocols protocols,
     IKernelCreateProgramExpressionWorldOperations expressions) : IProgramTargetQueries
 {
@@ -176,7 +177,7 @@ internal sealed partial class ProgramTargetSelectionRuntime(IProgramRuntimeFrame
                 SkillProgramTargetKind.OtherLivingSlashable =>
                     facts.CanUseProvidedSlashTarget(Player(ownerSeat), target),
                 SkillProgramTargetKind.SlashRedirectable =>
-                    facts.IsSlashRedirectTarget(ownerSeat, target.Seat),
+                    slashRedirectTargets.IsEligible(ownerSeat, target.Seat, windowContext),
                 SkillProgramTargetKind.OtherLivingVirtualSlashTarget =>
                     target.Seat != ownerSeat &&
                     (windowContext?.Window != SkillProgramTriggerWindow.RoundStarting ||

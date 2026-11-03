@@ -32,7 +32,6 @@ internal interface IProgramPaidCardFacts : IProgramSelectionQuery
     SkillProgramEffect OwnedSelectionEffect(ProgramSkillFrame frame);
     bool ForeignDiscardPrevented(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent);
     bool SelfDiscardForbidden(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent);
-    bool AllowsOwnedCardPayment(ProgramSkillFrame frame, CardLocation source, Card card);
     bool IsActiveSourceEquipment(int owner, string skillId, string instanceId, Card card);
     CardKind? JudgmentAttachmentSlot(int cardId);
     bool HasCardPolicy(int seat, SkillProgramCardPolicyKind policy);
@@ -68,8 +67,8 @@ internal interface IProgramPaidCardOperations : IProgramRuntimeOperations
     void Log(string type, string message, int? actor = null);
 }
 
-[ProgramRuntimeModule]
-internal sealed partial class ProgramPaidCardRuntime
+[ProgramRuntimeModule, ProgramCapability]
+internal sealed partial class ProgramPaidCardRuntime : IProgramTargetPaymentQueries
 {
     private readonly IProgramPaidCardFacts _facts;
     private readonly IProgramPaidCardOperations _operations;
@@ -78,10 +77,12 @@ internal sealed partial class ProgramPaidCardRuntime
     private readonly IProgramRuntimeEvents _events;
     private readonly IProgramCardSnapshotQueries _snapshots;
     private readonly INativeLogicalDiscardOperations _logicalDiscards;
+    private readonly ISlashRedirectTargetQueries _slashRedirectTargets;
 
     internal ProgramPaidCardRuntime(IProgramPaidCardFacts facts, IProgramPaidCardOperations operations,
         IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events,
-        IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards)
+        IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards,
+        ISlashRedirectTargetQueries slashRedirectTargets)
     {
         _facts = facts;
         _operations = operations;
@@ -90,6 +91,7 @@ internal sealed partial class ProgramPaidCardRuntime
         _events = events;
         _snapshots = snapshots;
         _logicalDiscards = logicalDiscards;
+        _slashRedirectTargets = slashRedirectTargets;
     }
 
     private static ProgramSkillCardSetBinding CardSet(ProgramSkillFrame frame, string bind) =>

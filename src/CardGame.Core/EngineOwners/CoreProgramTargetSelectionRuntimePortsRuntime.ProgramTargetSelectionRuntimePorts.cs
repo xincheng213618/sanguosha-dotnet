@@ -25,7 +25,6 @@ internal sealed partial class CoreProgramTargetSelectionRuntimePortsRuntime
     bool IProgramTargetFacts.IsShanheS5JixianTarget(int ownerSeat, CharacterState target) => _coreShanheS5ZhulingOperations.Value.IsShanheS5JixianTarget(ownerSeat, target);
     bool IProgramTargetFacts.HasWeaponAbility(CharacterState target, CardKind kind) => _coreAdvancedWeaponsOperations.HasWeaponAbility(target, kind);
     bool IProgramTargetFacts.CanUseProvidedSlashTarget(CharacterState owner, CharacterState target) => _coreNativeEquipmentAndFactionQueriesOperations.CanUseProvidedSlashTarget(owner, target);
-    bool IProgramTargetFacts.IsSlashRedirectTarget(int ownerSeat, int targetSeat) => _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } attack && attack.TargetSeat == ownerSeat && _coreProgramAttackEffectsOperations.Value.IsProgramSlashRedirectTarget(attack, ownerSeat, targetSeat);
     bool IProgramTargetFacts.IsCardUseForbidden(int ownerSeat, CardKind kind, CardActionType type) => _coreCardUseModulesOperations.IsCardUseForbidden(ownerSeat, kind, type);
     bool IProgramTargetFacts.HasTurnCardTargetRestriction(int ownerSeat, SkillProgramCardTargetRestriction restriction) => _coreCardUseModulesOperations.HasTurnCardTargetRestriction(ownerSeat, restriction);
     bool IProgramTargetFacts.IsDirectedCardTargetProhibited(int ownerSeat, int targetSeat, CardKind kind) => _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(ownerSeat, targetSeat, kind);

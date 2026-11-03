@@ -83,6 +83,7 @@
               "count": 1,
               "destination": "discardPile",
               "awaitMovementTriggers": true,
+              "slashRedirectPostCostRange": true,
               "freezeMovedCardSuit": true,
               "resultBind": "liuli-cost"
             },

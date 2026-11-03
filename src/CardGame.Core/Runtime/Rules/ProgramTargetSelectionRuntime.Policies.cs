@@ -20,6 +20,9 @@ internal sealed partial class ProgramTargetSelectionRuntime
     {
         var plan = ProgramInstructionResolver.Default.Resolve(frame, content.Skill(frame.SkillId).Program!);
         var index = frame.InstructionIndex - 1;
+        if (plan.Features.TargetPayments.ForSelection(index) is not null)
+            return Players.Where(player => player.IsAlive && payments.HasSlashRedirectPayment(frame, player.Seat))
+                .Select(player => player.Seat).ToArray();
         return facts.IsPindianSourceSelectionInstruction(plan.Instructions, index) && selectedZones.Count == 0 &&
             plan.Instructions[index].TargetKind == kind && plan.Instructions[index].Marker == marker &&
             plan.Instructions[index].ActorReference == actor
@@ -29,8 +32,11 @@ internal sealed partial class ProgramTargetSelectionRuntime
 
     internal bool SelectionTargetEligible(ProgramSkillFrame frame, SkillProgramTargetKind kind,
         IReadOnlyList<CardZoneKind> selectedZones, int seat, PlayerMarkerKind? marker, ProgramParticipantReference? actor) =>
-        IsProgramTargetEligible(frame.OwnerSeat, kind, selectedZones, seat, marker, frame.WindowContext, actor) ||
-        selectedZones.Count == 0 && SelectionSeats(frame, kind, selectedZones, marker, actor).Contains(seat);
+        ProgramInstructionResolver.Default.Resolve(frame, content.Skill(frame.SkillId).Program!).Features
+            .TargetPayments.ForSelection(frame.InstructionIndex - 1) is not null
+            ? payments.HasSlashRedirectPayment(frame, seat)
+            : IsProgramTargetEligible(frame.OwnerSeat, kind, selectedZones, seat, marker, frame.WindowContext, actor) ||
+                selectedZones.Count == 0 && SelectionSeats(frame, kind, selectedZones, marker, actor).Contains(seat);
 
     internal bool CanSelectPindianOpponent(ProgramSkillFrame frame, int targetSeat)
     {

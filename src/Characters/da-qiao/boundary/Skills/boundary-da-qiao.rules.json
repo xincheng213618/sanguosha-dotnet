@@ -65,7 +65,8 @@
               ],
               "count": 1,
               "destination": "discardPile",
-              "awaitMovementTriggers": true
+              "awaitMovementTriggers": true,
+              "slashRedirectPostCostRange": true
             },
             {
               "op": "redirectCurrentAttack",

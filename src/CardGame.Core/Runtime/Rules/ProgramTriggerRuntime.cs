@@ -4,7 +4,7 @@ namespace CardGame.Core;
 
 /// <summary>Owns candidate preparation, ordered trigger admission, prerequisites and usage accounting.</summary>
 [ProgramRuntimeModule]
-internal sealed class ProgramTriggerRuntime(IKernelCreateProgramExpressionWorldOperations expressions)
+internal sealed class ProgramTriggerRuntime(IKernelCreateProgramExpressionWorldOperations expressions, IProgramTargetPaymentQueries payments)
 {
     internal IReadOnlyList<ProgramTriggerCandidate> CollectProgramTriggerCandidates<TQuery>(TQuery query,
         CharacterState owner,
@@ -204,10 +204,17 @@ internal sealed class ProgramTriggerRuntime(IKernelCreateProgramExpressionWorldO
              query.SkillTags(candidate.SkillId).HasFlag(SkillTag.Lord)) &&
             !query.HasSkillRoleQualification(owner, candidate.SkillId, candidate.SkillInstanceId, Role.Lord)) return false;
         if (!query.CanTrigger(ProgramTriggerLegalityPhase.AfterInitialPayments, legality)) return false;
-        if (features.ForOperation(SkillProgramEffectOp.SelectTarget).Any(effect =>
-            effect.Condition.Kind != SkillProgramConditionKind.ChoiceIs &&
-            effect.TargetKind is { } kind && !query.WuLuKangProgramSelectionSeats(owner.Seat, effect, plan.Instructions, context).Any(seat =>
-                effect.Zones.Count == 0 || effect.Zones.Any(zone => zone switch
+        IEnumerable<int> SelectionTargets(SkillProgramEffect selection, int index) =>
+            features.TargetPayments.ForSelection(index) is { } payment
+                ? query.Players.Where(player => payments.HasSlashRedirectPayment(owner.Seat,
+                        candidate.SkillId, candidate.SkillInstanceId, context, payment, player.Seat))
+                    .Select(player => player.Seat)
+                : query.WuLuKangProgramSelectionSeats(owner.Seat, selection, plan.Instructions, context);
+        if (plan.Instructions.Select((effect, index) => (effect, index)).Any(item =>
+            item.effect.Op == SkillProgramEffectOp.SelectTarget &&
+            item.effect.Condition.Kind != SkillProgramConditionKind.ChoiceIs &&
+            item.effect.TargetKind is not null && !SelectionTargets(item.effect, item.index).Any(seat =>
+                item.effect.Zones.Count == 0 || item.effect.Zones.Any(zone => zone switch
                 {
                     CardZoneKind.Hand => query.GetHand(query.Players[seat]).Count > 0,
                     CardZoneKind.Equipment => query.GetEquipment(query.Players[seat]).Count > 0,

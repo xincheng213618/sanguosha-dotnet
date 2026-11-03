@@ -1,3 +1,4 @@
+using System.Text.Json;
 using CardGame.Core;
 
 internal static class ProgramExecutionPlanChecks
@@ -33,6 +34,7 @@ internal static class ProgramExecutionPlanChecks
                 ProgramInstructionSourceKind.Trigger, trigger.Id));
         Require(nullIdError.ParamName == "bindingId",
             "A null trigger ID must retain the execution plan's original argument boundary.");
+        RedirectPaymentPlansFollowOriginalInstructionIndices();
 
         SkillProgram WithTriggers(params SkillProgramTrigger[] triggers) => new(loaded.Id, loaded.Revision,
             loaded.GameplayHash, loaded.RuntimeVersion, loaded.MinimumRulesVersion, loaded.Modifiers,
@@ -43,6 +45,39 @@ internal static class ProgramExecutionPlanChecks
             trigger.MinimumRank, trigger.MaximumRank, trigger.ExcludedReasons, trigger.JudgmentReasons,
             trigger.JudgmentSource, trigger.CardKinds, trigger.SourceZones, trigger.MovementOccurrence,
             trigger.DamageOccurrence, trigger.DrawPhaseMode, trigger.Optional, trigger.Condition, instructions);
+    }
+
+    private static void RedirectPaymentPlansFollowOriginalInstructionIndices()
+    {
+        const string select = """{"op":"selectTarget","target":"owner","targetKind":"slashRedirectable"}""";
+        const string pay = """{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"zones":["hand","equipment"],"count":1,"destination":"discardPile","awaitMovementTriggers":true,"slashRedirectPostCostRange":true}""";
+        const string redirect = """{"op":"redirectCurrentAttack","target":"selectedTarget"}""";
+        const string draw = """{"op":"draw","target":"owner","amount":1}""";
+        SkillProgram Parse(string effects, string window = "slashTargetRedirecting") => SkillProgramCatalog.Load($$"""
+            {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"fixture:redirect-plan","revision":1,
+              "triggers":[{"id":"redirect","window":"{{window}}","ownerRelation":"target","cardKinds":["slash"],
+                "optional":true,"effects":[{{effects}}]}]}]}
+            """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                skills = new Dictionary<string, object> { ["fixture:redirect-plan"] = new { name = "Redirect", description = "Shared target/payment relation" } } }))
+            .Programs["fixture:redirect-plan"];
+        var program = Parse(string.Join(',', select, pay, draw, redirect, draw));
+        var plan = new ProgramInstructionResolver().Resolve(program, ProgramInstructionSourceKind.Trigger, "redirect");
+        var relation = plan.Features.TargetPayments.ForSelection(0);
+        Require(relation is { SelectionIndex: 0, PaymentIndex: 1, RedirectIndex: 3 } &&
+                ReferenceEquals(relation, plan.Features.TargetPayments.ForPayment(1)) &&
+                ReferenceEquals(relation, plan.Features.TargetPayments.ForRedirect(3)) &&
+                plan.Features.TargetPayments.ForPayment(2) is null,
+            "A shared relation compiles the original zero-based instructions once, preserving independent effects between payment and redirect and after it.");
+        foreach (var invalid in new[]
+        {
+            string.Join(',', pay, redirect), string.Join(',', select, pay, draw),
+            string.Join(',', draw, select, pay, redirect),
+            string.Join(',', select.Replace("\"targetKind\":\"slashRedirectable\"", "\"targetKind\":\"slashRedirectable\",\"zones\":[\"hand\"]", StringComparison.Ordinal), pay, redirect),
+            string.Join(',', select, pay, select, redirect), string.Join(',', select, pay, pay, redirect),
+            string.Join(',', select, pay.Replace("\"awaitMovementTriggers\":true", "\"awaitMovementTriggers\":false", StringComparison.Ordinal), redirect),
+            string.Join(',', select, pay.Replace("\"count\":1", "\"count\":2", StringComparison.Ordinal), redirect)
+        }) RequireThrows<InvalidOperationException>(() => Parse(invalid));
+        RequireThrows<InvalidOperationException>(() => Parse(string.Join(',', select, pay, redirect), "cardUseTargetsFinalized"));
     }
 
     private static SkillProgram Load() => SkillProgramCatalog.Load(

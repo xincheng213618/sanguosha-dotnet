@@ -92,6 +92,39 @@ internal sealed partial class ProgramPaidCardRuntime
     {
         var frame = _frames.ActiveProgram(frameId);
         var result = new List<PromptChoice>();
+        var targetPayment = TargetPaymentFor(frame);
+        foreach (var (card, zone, slot) in OwnedCardPaymentCandidates(frame.OwnerSeat, frame.SkillId,
+            frame.SkillInstanceId, chooserSeat, cardOwnerSeat, zones, intent, cardCategories, cardKinds,
+            suits, canSelect, destination, destinationSeat, prohibitReplacingEquipment,
+            correspondingZoneSeat, targetPayment))
+        {
+            var hidden = zone == CardZoneKind.Hand && chooserSeat != cardOwnerSeat;
+            var parameters = new Dictionary<string, string>
+            {
+                ["program-action"] = "select-and-move-owned-card",
+                ["frame-id"] = frameId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                ["card-owner-seat"] = cardOwnerSeat.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                ["source-zone"] = zone.ToString(),
+                ["slot-index"] = slot.ToString(System.Globalization.CultureInfo.InvariantCulture)
+            };
+            result.Add(new PromptChoice(
+                new ChoiceId($"program-owned-card.frame-{frameId}.zone-{zone}.slot-{slot}"),
+                hidden ? $"选择第 {slot + 1} 张手牌" : $"选择【{_snapshots.Snapshot(card).DisplayName}】",
+                hidden ? [] : [card.Id], [], parameters));
+        }
+        return Array.AsReadOnly(result.ToArray());
+    }
+
+    private IEnumerable<(Card Card, CardZoneKind Zone, int Slot)> OwnedCardPaymentCandidates(
+        int programOwnerSeat, string skillId, string skillInstanceId, int chooserSeat, int cardOwnerSeat,
+        IReadOnlyList<CardZoneKind> zones, OwnedCardMoveIntent intent,
+        IReadOnlyList<SkillProgramCardCategory>? cardCategories = null,
+        IReadOnlyList<CardKind>? cardKinds = null, IReadOnlyList<Suit>? suits = null,
+        Func<CardZoneKind, Card, bool>? canSelect = null,
+        SkillProgramCardDestination destination = SkillProgramCardDestination.DiscardPile,
+        int? destinationSeat = null, bool prohibitReplacingEquipment = false,
+        int? correspondingZoneSeat = null, TargetPayment? targetPayment = null)
+    {
         foreach (var zone in zones)
         {
             var cards = zone switch
@@ -103,46 +136,31 @@ internal sealed partial class ProgramPaidCardRuntime
             };
             for (var slot = 0; slot < cards.Count; slot++)
             {
-                if (_facts.ForeignDiscardPrevented(chooserSeat, cards[slot],
-                        new CardLocation(zone, cardOwnerSeat), intent)) continue;
-                if (!_facts.AllowsOwnedCardPayment(frame, new CardLocation(zone, cardOwnerSeat), cards[slot])) continue;
-                if (cardCategories is { Count: > 0 } && !MatchesProgramCardCategory(cards[slot].Kind, cardCategories))
+                var card = cards[slot];
+                var source = new CardLocation(zone, cardOwnerSeat);
+                if (_facts.ForeignDiscardPrevented(chooserSeat, card, source, intent)) continue;
+                if (targetPayment is { } pair && !AllowsTargetPayment(programOwnerSeat, pair, source, card)) continue;
+                if (cardCategories is { Count: > 0 } && !MatchesProgramCardCategory(card.Kind, cardCategories))
                     continue;
-                if (cardKinds is { Count: > 0 } && !ProgramCardKindMatch.Contains(cardKinds, cards[slot].Kind))
+                if (cardKinds is { Count: > 0 } && !ProgramCardKindMatch.Contains(cardKinds, card.Kind))
                     continue;
-                if (suits is { Count: > 0 } && !suits.Contains(cards[slot].Suit))
+                if (suits is { Count: > 0 } && !suits.Contains(card.Suit))
                     continue;
-                if (canSelect is not null && !canSelect(zone, cards[slot]))
+                if (canSelect is not null && !canSelect(zone, card))
                     continue;
                 if (destination == SkillProgramCardDestination.SelectedTargetEquipment &&
-                    (destinationSeat is not { } recipient ||
-                        !CanEnterEquipmentSlot(recipient, cards[slot])))
+                    (destinationSeat is not { } recipient || !CanEnterEquipmentSlot(recipient, card)))
                     continue;
-                if (zone == CardZoneKind.Equipment && cardOwnerSeat == frame.OwnerSeat &&
-                    _facts.IsActiveSourceEquipment(cardOwnerSeat, frame.SkillId,
-                        frame.SkillInstanceId, cards[slot]))
+                if (zone == CardZoneKind.Equipment && cardOwnerSeat == programOwnerSeat &&
+                    _facts.IsActiveSourceEquipment(cardOwnerSeat, skillId, skillInstanceId, card))
                     continue;
                 if (prohibitReplacingEquipment && correspondingZoneSeat is { } recipientSeat &&
-                    EquipmentCatalog.IsEquipment(cards[slot].Kind) &&
-                    _facts.Equipment(recipientSeat).Any(item =>
-                        _facts.FieldEquipmentSlot(item) == _facts.FieldEquipmentSlot(cards[slot])))
+                    EquipmentCatalog.IsEquipment(card.Kind) && _facts.Equipment(recipientSeat).Any(item =>
+                        _facts.FieldEquipmentSlot(item) == _facts.FieldEquipmentSlot(card)))
                     continue;
-                var hidden = zone == CardZoneKind.Hand && chooserSeat != cardOwnerSeat;
-                var parameters = new Dictionary<string, string>
-                {
-                    ["program-action"] = "select-and-move-owned-card",
-                    ["frame-id"] = frameId.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                    ["card-owner-seat"] = cardOwnerSeat.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                    ["source-zone"] = zone.ToString(),
-                    ["slot-index"] = slot.ToString(System.Globalization.CultureInfo.InvariantCulture)
-                };
-                result.Add(new PromptChoice(
-                    new ChoiceId($"program-owned-card.frame-{frameId}.zone-{zone}.slot-{slot}"),
-                    hidden ? $"选择第 {slot + 1} 张手牌" : $"选择【{_snapshots.Snapshot(cards[slot]).DisplayName}】",
-                    hidden ? [] : [cards[slot].Id], [], parameters));
+                yield return (card, zone, slot);
             }
         }
-        return Array.AsReadOnly(result.ToArray());
     }
 
     internal void ResolveSelectAndMoveOwnedCardChoice(
@@ -178,10 +196,10 @@ internal sealed partial class ProgramPaidCardRuntime
             return;
         }
         var card = cards[slot];
-        if (!_facts.AllowsOwnedCardPayment(frame, new CardLocation(zone, ownerSeat), card))
+        if (!AllowsTargetPayment(frame, new CardLocation(zone, ownerSeat), card))
         {
             _prompts.Clear();
-            _operations.Cancel(frame, "所选弃牌已不能维持原流离目标的实际攻击范围，技能结算取消。");
+            _operations.Cancel(frame, "所选弃牌与原目标已不能组成合法付款，技能结算取消。");
             return;
         }
         if (effect.Destination == SkillProgramCardDestination.DiscardPile &&

@@ -299,7 +299,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterDaQiaoLeEntries DaQiaoLeEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDaQiaoLeEntries, EngineOwners.CharacterDaQiaoLeRuntime>(Core.RuntimeEntries.CharacterDaQiaoLeEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterDaQiaoMobileEntries DaQiaoMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterDaQiaoMobileEntries, EngineOwners.CharacterDaQiaoMobileRuntime>(Core.RuntimeEntries.CharacterDaQiaoMobileEntries.Create);
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterDaQiaoMouMobileRuntime> DaQiaoMouMobileEntries => GetDeferredModule<EngineOwners.CharacterDaQiaoMouMobileRuntime>();
 

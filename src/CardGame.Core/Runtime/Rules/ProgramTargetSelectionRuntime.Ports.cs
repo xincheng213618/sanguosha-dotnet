@@ -27,7 +27,6 @@ internal interface IProgramTargetFacts : IProgramSelectionQuery
     bool IsShanheS5JixianTarget(int ownerSeat, CharacterState target);
     bool HasWeaponAbility(CharacterState target, CardKind kind);
     bool CanUseProvidedSlashTarget(CharacterState owner, CharacterState target);
-    bool IsSlashRedirectTarget(int ownerSeat, int targetSeat);
     bool IsCardUseForbidden(int ownerSeat, CardKind kind, CardActionType type);
     bool HasTurnCardTargetRestriction(int ownerSeat, SkillProgramCardTargetRestriction restriction);
     bool IsDirectedCardTargetProhibited(int ownerSeat, int targetSeat, CardKind kind);

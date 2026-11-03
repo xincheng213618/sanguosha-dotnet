@@ -34,7 +34,6 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     SkillProgramEffect IProgramPaidCardFacts.OwnedSelectionEffect(ProgramSkillFrame frame) => _coreProgramOwnedCardsOperations.GetOwnedSelectionEffect(frame);
     bool IProgramPaidCardFacts.ForeignDiscardPrevented(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) => _coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(chooser, card, source, intent);
     bool IProgramPaidCardFacts.SelfDiscardForbidden(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) => _coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(chooser, card, source, intent);
-    bool IProgramPaidCardFacts.AllowsOwnedCardPayment(ProgramSkillFrame frame, CardLocation source, Card card) => _characterDaQiaoMobileOperations.AllowsPostCostSlashRedirectPayment(frame, source, card);
     bool IProgramPaidCardFacts.IsActiveSourceEquipment(int owner, string skillId, string instanceId, Card card) => _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, skillId, instanceId, card);
     CardKind? IProgramPaidCardFacts.JudgmentAttachmentSlot(int cardId) => _judgmentAttachments.Slot(cardId);
     bool IProgramPaidCardFacts.HasCardPolicy(int seat, SkillProgramCardPolicyKind policy) => _coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[seat], policy);

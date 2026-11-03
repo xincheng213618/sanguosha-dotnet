@@ -16,6 +16,7 @@ internal sealed class ProgramInstructionFeatures
     internal ProgramInstructionFeatures(IReadOnlyList<SkillProgramEffect> effects,
         SkillProgramTriggerCondition? triggerCondition = null)
     {
+        TargetPayments = ProgramTargetPaymentPlans.Compile(effects);
         _operations = effects.GroupBy(effect => effect.Op).ToFrozenDictionary(
             group => group.Key, group => (IReadOnlyList<SkillProgramEffect>)Array.AsReadOnly(group.ToArray()));
         UsesConversionPolarity = effects.Any(effect => ProgramOperationCatalog.Default.Resolve(effect.Op).UsesConversionPolarity);
@@ -63,6 +64,7 @@ internal sealed class ProgramInstructionFeatures
         _valueKinds = valueKinds.ToFrozenSet();
     }
 
+    internal ProgramTargetPaymentPlans TargetPayments { get; }
     internal bool UsesConversionPolarity { get; }
     internal ProgramFactRequirements FactRequirements { get; }
     internal bool RequiresHandLimitContext { get; }

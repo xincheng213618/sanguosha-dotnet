@@ -468,3 +468,22 @@ CardsMoved／CardsGained 绑定可声明 `"invocation":{"source":"movement"}`，
 ```
 
 关系表达式中的 `owner` 是来源，`eventSource` 是范围使用者，`eventTarget` 是待判断角色；这是只读关系上下文，不创建事件或结算帧。`ownerRole` 使用现有实际技能来源资格；来源需存活且有效。`while` 只读持久座位事实，不能读取帧绑定、窗口历史、手牌上限或技能递归事实。unknown 不授予关系；AI 没有对应事实时仍保持 unknown。
+
+## 原杀转移的付款范围声明
+
+`selectAndMoveOwnedCard` 的 `slashRedirectPostCostRange: true` 声明这次本人手牌／装备弃置与原杀转移目标的范围约束。它用于 `slashTargetRedirecting` 窗口；绑定以 `selectTarget` 的 `slashRedirectable` 目标选择开始，下一步就是该付款，后面由 `redirectCurrentAttack` 消费同一选中目标：
+
+```json
+[
+  {"op":"selectTarget","target":"owner","targetKind":"slashRedirectable"},
+  {"op":"selectAndMoveOwnedCard","target":"owner",
+   "chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},
+   "zones":["hand","equipment"],"count":1,"destination":"discardPile",
+   "awaitMovementTriggers":true,"slashRedirectPostCostRange":true},
+  {"op":"redirectCurrentAttack","target":"selectedTarget"}
+]
+```
+
+加载器编译三项指令的关联，不要求整段程序恰好三步。付款可保留原有的 `resultBind`／`freezeMovedCardSuit`；付款与转移之间可放不改变选中目标、不插入独立阶段的真实效果，转移后也可继续其他效果。关联中的选择、付款和转移必须无条件，付款固定为一张本人手牌或装备并等待移动子结算；静态牌种、类别、花色过滤可复用，动态 `countExpr`、`exceptBind` 和 `suitFrom` 尚不支持；初始选择不附带区域、标记、actorRef 或 targetSetExpr 筛选，加载器明确拒绝这些未组合的形状。
+
+目标资格先要求至少存在一张配对材料，菜单与提交使用同一材料枚举。装备材料按移去该实体后的转移者攻击范围判断，手牌材料保留装备；不能继承来杀者的距离豁免。真实付款及其子结算都留在原帧，返回后原目标不再合法则取消转移并恢复原杀，已付款不退款或重选。该声明不产生额外失源或死亡续接权限，附加效果保留自己的规则和生命周期。

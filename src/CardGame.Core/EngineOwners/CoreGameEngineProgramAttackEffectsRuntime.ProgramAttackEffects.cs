@@ -3,24 +3,6 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramAttackEffectsRuntime
 {
-    internal bool IsProgramSlashRedirectBaseTarget(NativeOwners.CardAttackHandle attack, int redirectorSeat, int targetSeat)
-    {
-        if (attack.TargetSeat != redirectorSeat || !_coreMatchParticipantsPlayersAccess._players[redirectorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || targetSeat == redirectorSeat || targetSeat == attack.SourceSeat)
-            return false;
-        var kind = attack.EffectiveCardKind ?? CardKind.Slash;
-        return (_coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd is null || !_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == attack.ResolutionId).TargetSeats.Contains(targetSeat)) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(attack.SourceSeat, targetSeat, kind, attack.ResolutionId) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(_coreMatchParticipantsPlayersAccess._players[targetSeat]);
-    }
-
-    internal bool IsProgramSlashRedirectTarget(NativeOwners.CardAttackHandle attack, int redirectorSeat, int targetSeat, bool paymentCompleted = false)
-    {
-        if (_characterDaQiaoMobileOperations.PostCostSlashRedirectFrame(attack, redirectorSeat)is { } frame)
-            return paymentCompleted ? _characterDaQiaoMobileOperations.IsPostCostSlashRedirectTarget(attack, redirectorSeat, targetSeat, null) : _characterDaQiaoMobileOperations.HasPostCostSlashRedirectPayment(frame, attack, targetSeat);
-        if (attack.TargetSeat != redirectorSeat || !_coreMatchParticipantsPlayersAccess._players[redirectorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || targetSeat == redirectorSeat || targetSeat == attack.SourceSeat)
-            return false;
-        var kind = attack.EffectiveCardKind ?? CardKind.Slash;
-        return (_coreNativeCardContinuationCursorsOperations.ActiveFangtianHalberd is null || !_resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == attack.ResolutionId).TargetSeats.Contains(targetSeat)) && (_coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(_coreMatchParticipantsPlayersAccess._players[attack.SourceSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat], kind, attack.ResolutionId) || _attackRanges.IsWithinAttackRange(redirectorSeat, targetSeat)) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(attack.SourceSeat, targetSeat, kind, attack.ResolutionId) && !_coreNativeDamagePoliciesOperations.IsSlashProhibited(_coreMatchParticipantsPlayersAccess._players[targetSeat]);
-    }
-
     internal void ProhibitCurrentProgramResponse(ProgramSkillFrame frame)
     {
         if (frame.WindowContext is { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } context, TargetSeat: { } target })
@@ -58,9 +40,9 @@ internal sealed partial class CoreGameEngineProgramAttackEffectsRuntime
         var attack = _coreCardActionsOperations.ProgramCardAttack ?? throw new InvalidOperationException("Attack redirection requires the active Slash.");
         if (frame.WindowContext?.Window != SkillProgramTriggerWindow.SlashTargetRedirecting || !CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, attack) || frame.OwnerSeat != attack.TargetSeat)
             throw new InvalidOperationException("Attack redirection lost its frozen legal target.");
-        if (!IsProgramSlashRedirectTarget(attack, frame.OwnerSeat, targetSeat, paymentCompleted: true))
+        if (!_slashRedirectTargets.IsEligible(frame.OwnerSeat, targetSeat, frame.WindowContext))
         {
-            if (_characterDaQiaoMobileOperations.PostCostSlashRedirectFrame(attack, frame.OwnerSeat)?.Id != frame.Id)
+            if (ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).Features.TargetPayments.ForRedirect(frame.InstructionIndex - 1) is null)
                 throw new InvalidOperationException("Attack redirection lost its frozen legal target.");
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "已付弃牌的原流离目标不再合法，取消转移并返回原杀。");
             return;
