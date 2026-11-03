@@ -377,8 +377,9 @@ internal sealed partial class ProgramPaidCardRuntime
         if (!_facts.IsValidSeat(destinationSeat) || !_facts.IsAlive(destinationSeat))
             return false;
         var recipient = destinationSeat;
-        if (sourceZone == CardZoneKind.Judgment && _facts.IsZixiJudgment(card.Id))
-            return _facts.CanTransferZixiJudgment(card, destinationSeat);
+        if (sourceZone == CardZoneKind.Judgment && _facts.JudgmentAttachmentSlot(card.Id) is { } slot)
+            return _facts.Location(card.Id).OwnerSeat != recipient && !_facts.JudgmentAreaAbolished(recipient) &&
+                !_facts.HasJudgmentEffectiveCard(recipient, slot);
         if (sourceZone == CardZoneKind.Judgment)
             return !_facts.JudgmentAreaAbolished(recipient) && !_facts.HasCardPolicy(recipient, SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget) &&
                 _facts.IsDelayedCard(_facts.JudgmentKind(card)) &&

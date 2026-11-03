@@ -6,42 +6,14 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterDaQiaoLeRuntime
 {
     internal const string ZixiPlacementReason = "skill-program.le-da-qiao.zixi.place";
-    internal bool HasZixiPlacementCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveZixiQinJudgmentPlacement);
+
 
     internal static CardConversionSource ZixiPlacementSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_da_qiao_le_LeDaQiaoZixiPlacement.ZixiPlacementSource(f);
     internal static string ZixiSlotName(CardKind kind) => RuntimeSkills.RuntimeRules_da_qiao_le_LeDaQiaoZixiPlacement.ZixiSlotName(kind);
-    internal CardKind? ZixiQinJudgmentSlot(int id)
-    {
-        if (!HasZixiPlacementCapability || id <= 0)
-            return null;
-        var placed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZixiQinPlacedEvent>().LastOrDefault(e => e.CardId == id);
-        // Host-only projections have no physical zone or placement entitlement.
-        if (placed is null || _cardZonesOperations._cardZones.GetLocation(id).Zone != CardZoneKind.Judgment || placed.Source.SkillId != "le:zixi" || placed.Source.BindingId is not ("start-place-qin" or "end-place-qin") || _contentRegistryOperations._contentRegistry.GetSkill(placed.Source.SkillId).Program?.GameplayHash != placed.GameplayHash || !CharacterDaQiaoLeDefinitions.ZixiSlots.Contains(placed.SlotKind) || !_characterXiaoQiaoLeOperations.HasQiqinEntityMark(id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZixiPlacementCommittedEvent>().Count(e => e.FrameId == placed.FrameId && e.Source == placed.Source && e.GameplayHash == placed.GameplayHash && e.TargetSeat == placed.TargetSeat && e.EntityCount > placed.Index && e.EntityCount <= 2) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZixiPlacementPaidEvent>().Count(e => e.FrameId == placed.FrameId && e.BatchId == placed.BatchId && e.EntityCount > placed.Index && placed.MovementSequence > e.SequenceBefore && placed.MovementSequence <= e.PrimaryAfter) != 1 || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == placed.MovementSequence && m.CardId == id && m.CardKind == placed.PrintedKind && m.From == placed.From && m.To == CardLocation.Judgment(placed.TargetSeat) && m.Reason.Value == ZixiPlacementReason) != 1)
-            return null;
-        var location = CardLocation.Judgment(placed.TargetSeat);
-        foreach (var move in _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.CardId == id && m.Sequence > placed.MovementSequence))
-        {
-            if (move.From != location || move.To.Zone != CardZoneKind.Judgment)
-                return null;
-            location = move.To;
-        }
-
-        return location == _cardZonesOperations._cardZones.GetLocation(id) ? placed.SlotKind : null;
-    }
-
-    internal bool IsZixiQinJudgmentCard(int id) => ZixiQinJudgmentSlot(id)is not null;
-    internal string? ZixiQinJudgmentSlotLabel(int id) => ZixiQinJudgmentSlot(id) switch
-    {
-        CardKind.Indulgence => "琴（乐槽）",
-        CardKind.SupplyShortage => "琴（兵槽）",
-        CardKind.Lightning => "琴（闪槽）",
-        _ => null
-    };
-    internal bool CanTransferZixiQinJudgmentCard(Card card, int target) => ZixiQinJudgmentSlot(card.Id)is { } slot && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _cardZonesOperations._cardZones.GetLocation(card.Id).OwnerSeat != target && _coreMatchParticipantsPlayersAccess._players[target] is { IsAlive: true, JudgmentAreaAbolished: false } && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(_coreMatchParticipantsPlayersAccess._players[target], slot);
     internal bool CanPlaceZixiQin(int owner, Card card)
     {
         var from = _cardZonesOperations._cardZones.GetLocation(card.Id);
-        return !card.IsGeneralWeapon && from.OwnerSeat == owner && from.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _characterXiaoQiaoLeOperations.HasQiqinEntityMark(card.Id) && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, card, from, OwnedCardMoveIntent.Transfer);
+        return !card.IsGeneralWeapon && from.OwnerSeat == owner && from.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && _cardEntityMarks.Has(card.Id, "qiqin") && !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(owner, card, from, OwnedCardMoveIntent.Transfer);
     }
 
     internal bool ZixiPlacementMother(ProgramSkillFrame f)
@@ -153,15 +125,6 @@ internal sealed partial class CharacterDaQiaoLeRuntime
             Grains = grains
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ZixiPlacement = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZixiPlacementCommittedEvent(f.Id, r.Source, r.GameplayHash, target, r.Entities.Count, r.SequenceBefore));
-        for (var i = 0; i < r.Entities.Count; i++)
-        {
-            var e = r.Entities[i];
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZixiPlacementEntityFrozenEvent(f.Id, i, e.CardId, e.PrintedKind, e.From, e.SlotKind));
-        }
-
-        for (var i = 0; i < grains.Length; i++)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZixiPlacementGrainFrozenEvent(f.Id, i, grains[i].CardId, grains[i].PrintedKind, grains[i].From));
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Entities.Select(e => e.CardId).ToArray(), CardLocation.Judgment(target), new(ZixiPlacementReason), (batch, moves) =>
         {
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
@@ -170,8 +133,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
                 throw new InvalidOperationException("Zixi lost its one whole original Qin placement batch.");
             _coreRuntimeOperations.ReplaceRuntimeTop(active with { ZixiPlacement = paid with { BatchId = batch, PrimaryAfter = moves[^1].Sequence, SequenceAfter = moves[^1].Sequence } });
             for (var i = 0; i < moves.Count; i++)
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZixiQinPlacedEvent(f.Id, i, paid.Source, paid.GameplayHash, target, moves[i].CardId, moves[i].CardKind, moves[i].From, paid.Entities[i].SlotKind, moves[i].Sequence, batch));
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZixiPlacementPaidEvent(f.Id, batch, moves.Count, paid.SequenceBefore, moves[^1].Sequence));
+                _judgmentAttachments.Attach(f.Id, paid.Source, paid.Entities[i].SlotKind, moves[i]);
         }, disclosure: CardMovementDisclosure.FaceUp);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         r = f.ZixiPlacement!with

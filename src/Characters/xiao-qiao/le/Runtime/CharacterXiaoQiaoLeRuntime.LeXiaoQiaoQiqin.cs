@@ -9,7 +9,14 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 220)]
     internal void ProjectQiqinJudgmentSlotMark(int cardId, ref CardSkillMarkProjection projection)
     {
-        if (_characterDaQiaoLeOperations.ZixiQinJudgmentSlotLabel(cardId) is { } label)
+        var label = _judgmentAttachments.Slot(cardId) switch
+        {
+            CardKind.Indulgence => "琴（乐槽）",
+            CardKind.SupplyShortage => "琴（兵槽）",
+            CardKind.Lightning => "琴（闪槽）",
+            _ => null
+        };
+        if (label is not null)
             projection.OverrideMarkLabel("qiqin", label);
     }
 

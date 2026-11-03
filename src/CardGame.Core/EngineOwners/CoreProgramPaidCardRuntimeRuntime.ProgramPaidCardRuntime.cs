@@ -36,8 +36,7 @@ internal sealed partial class CoreProgramPaidCardRuntimeRuntime
     bool IProgramPaidCardFacts.SelfDiscardForbidden(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent) => _coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(chooser, card, source, intent);
     bool IProgramPaidCardFacts.AllowsOwnedCardPayment(ProgramSkillFrame frame, CardLocation source, Card card) => _characterDaQiaoMobileOperations.AllowsPostCostSlashRedirectPayment(frame, source, card);
     bool IProgramPaidCardFacts.IsActiveSourceEquipment(int owner, string skillId, string instanceId, Card card) => _coreEquipmentSkillsOperations.IsActiveProgramSourceEquipmentCard(owner, skillId, instanceId, card);
-    bool IProgramPaidCardFacts.IsZixiJudgment(int cardId) => _characterDaQiaoLeOperations.IsZixiQinJudgmentCard(cardId);
-    bool IProgramPaidCardFacts.CanTransferZixiJudgment(Card card, int destinationSeat) => _characterDaQiaoLeOperations.CanTransferZixiQinJudgmentCard(card, destinationSeat);
+    CardKind? IProgramPaidCardFacts.JudgmentAttachmentSlot(int cardId) => _judgmentAttachments.Slot(cardId);
     bool IProgramPaidCardFacts.HasCardPolicy(int seat, SkillProgramCardPolicyKind policy) => _coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[seat], policy);
     CardKind IProgramPaidCardFacts.JudgmentKind(Card card) => _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(card);
     bool IProgramPaidCardFacts.IsDelayedCard(CardKind kind) => CoreNativeCardClassificationsRuntime.IsDelayedCard(kind);

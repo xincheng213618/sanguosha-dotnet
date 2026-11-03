@@ -7,8 +7,7 @@ internal sealed partial class CoreGameEngineCardSnapshotFactsRuntime
     int? ICardSnapshotFacts.BoneOwnerSeat(int cardId) => _characterWeiYanHappyGodOperations.HappyBoneRecord(cardId)?.Source.OwnerSeat;
     bool ICardSnapshotFacts.IsCarrier(int cardId) => _characterDiaoChanLeOperations.IsDiouCarrier(cardId);
     string? ICardSnapshotFacts.VisibleSkillMark(int cardId) => _cardSkillMarkProjectorOperations.Get().Label(cardId);
-    CardKind? ICardSnapshotFacts.QinJudgmentSlot(int cardId) => _characterDaQiaoLeOperations.ZixiQinJudgmentSlot(cardId);
-    bool ICardSnapshotFacts.IsQinJudgmentCard(int cardId) => _characterDaQiaoLeOperations.IsZixiQinJudgmentCard(cardId);
+    CardKind? ICardSnapshotFacts.JudgmentAttachmentSlot(int cardId) => _judgmentAttachments.Slot(cardId);
     CardKind ICardSnapshotFacts.JudgmentEffectiveKind(Card card) => _coreActualTurnsOperations.GetJudgmentEffectiveCardKind(card);
     void ICardSkillMarkSources.Project(int cardId, ref CardSkillMarkProjection projection) => _programPipelineHooksOperations._programPipelineHooks.ProjectCardSkillMarks(cardId, ref projection);
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 70)]

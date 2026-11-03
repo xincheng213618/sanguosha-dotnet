@@ -27,14 +27,6 @@ public sealed partial record ProgramSkillFrame
 }
 public sealed record ZixiPlacementOpenedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
     long WindowId, ActualDiscardRecoveryPhaseKey Phase) : IGameEvent;
-public sealed record ZixiPlacementCommittedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
-    int TargetSeat, int EntityCount, long SequenceBefore) : IGameEvent;
-public sealed record ZixiPlacementEntityFrozenEvent(long FrameId, int Index, int CardId, CardKind PrintedKind,
-    CardLocation From, CardKind SlotKind) : IGameEvent;
-public sealed record ZixiPlacementGrainFrozenEvent(long FrameId, int Index, int CardId, CardKind PrintedKind, CardLocation From) : IGameEvent;
-public sealed record ZixiQinPlacedEvent(long FrameId, int Index, CardConversionSource Source, string GameplayHash,
-    int TargetSeat, int CardId, CardKind PrintedKind, CardLocation From, CardKind SlotKind, long MovementSequence, long BatchId) : IGameEvent;
-public sealed record ZixiPlacementPaidEvent(long FrameId, long BatchId, int EntityCount, long SequenceBefore, long PrimaryAfter) : IGameEvent;
 public sealed record ZixiPlacementTailSealedEvent(long FrameId, long BatchId, int GrainCount, long SequenceBefore, long SequenceAfter) : IGameEvent;
 public sealed record ZixiPlacementCompletedEvent(long FrameId, bool Paid, int EntityCount) : IGameEvent;
 

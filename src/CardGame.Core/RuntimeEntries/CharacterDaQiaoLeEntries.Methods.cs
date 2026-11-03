@@ -9,7 +9,6 @@ internal sealed partial class CharacterDaQiaoLeEntries
     internal SkillProgramStepOutcome BeginZixiPlacement(ProgramSkillFrame supplied) => _resolve().BeginZixiPlacement(supplied);
     internal bool CanOfferZixiEffects(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().CanOfferZixiEffects(candidate, trigger, context);
     internal bool CanPlaceZixiQin(int owner, Card card) => _resolve().CanPlaceZixiQin(owner, card);
-    internal bool CanTransferZixiQinJudgmentCard(Card card, int target) => _resolve().CanTransferZixiQinJudgmentCard(card, target);
     internal void CaptureZixiEffectsObtain(long id, long batch, IReadOnlyList<CardMovementRecord> moves) => _resolve().CaptureZixiEffectsObtain(id, batch, moves);
     internal void CaptureZixiExtraEffectAttack(NativeOwners.CardAttackHandle attack) => _resolve().CaptureZixiExtraEffectAttack(attack);
     internal PromptChoice ChooseAiZixiPlacement(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseAiZixiPlacement(p, f);
@@ -27,7 +26,6 @@ internal sealed partial class CharacterDaQiaoLeEntries
     internal bool IsZixiEffectsRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsZixiEffectsRecoveryParent(f, recovery);
     internal bool IsZixiExtraEffectRound(long id) => _resolve().IsZixiExtraEffectRound(id);
     internal bool IsZixiPlacementRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsZixiPlacementRecoveryParent(f, recovery);
-    internal bool IsZixiQinJudgmentCard(int id) => _resolve().IsZixiQinJudgmentCard(id);
     internal void IssueZixiExtraEffect(ProgramSkillFrame f, CardUseFrame use, ProgramCardTriggerWindowFrame window) => _resolve().IssueZixiExtraEffect(f, use, window);
     internal bool PermitPaidZixiPlacement(ProgramSkillFrame f) => _resolve().PermitPaidZixiPlacement(f);
     internal void PublishZixiPlacement(ProgramSkillFrame f) => _resolve().PublishZixiPlacement(f);
@@ -56,8 +54,5 @@ internal sealed partial class CharacterDaQiaoLeEntries
     internal ProgramSkillFrame? ZixiPlacementObserverRoot() => _resolve().ZixiPlacementObserverRoot();
     internal bool ZixiPlacementObserverSuffix(int index) => _resolve().ZixiPlacementObserverSuffix(index);
     internal bool ZixiPlacementRoot(ProgramSkillFrame f) => _resolve().ZixiPlacementRoot(f);
-    internal CardKind? ZixiQinJudgmentSlot(int id) => _resolve().ZixiQinJudgmentSlot(id);
-    internal string? ZixiQinJudgmentSlotLabel(int id) => _resolve().ZixiQinJudgmentSlotLabel(id);
     internal bool HasZixiEffectsCapability { get => _resolve().HasZixiEffectsCapability; }
-    internal bool HasZixiPlacementCapability { get => _resolve().HasZixiPlacementCapability; }
 }

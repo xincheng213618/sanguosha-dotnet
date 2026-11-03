@@ -6,8 +6,7 @@ internal interface ICardSnapshotFacts : IProgramSelectionQuery
     int? BoneOwnerSeat(int cardId);
     bool IsCarrier(int cardId);
     string? VisibleSkillMark(int cardId);
-    CardKind? QinJudgmentSlot(int cardId);
-    bool IsQinJudgmentCard(int cardId);
+    CardKind? JudgmentAttachmentSlot(int cardId);
     CardKind JudgmentEffectiveKind(Card card);
 }
 
@@ -15,7 +14,9 @@ internal interface ICardSnapshotFacts : IProgramSelectionQuery
 internal sealed class CardSnapshotProjector(ICardSnapshotFacts facts, ICardSnapshotCache cache)
     : IProgramCardSnapshotQueries
 {
-    public CardSnapshot Snapshot(Card card)
+    public CardSnapshot Snapshot(Card card) => Snapshot(card, facts.JudgmentAttachmentSlot(card.Id));
+
+    private CardSnapshot Snapshot(Card card, CardKind? qinJudgmentSlot)
     {
         var bone = facts.BoneSlot(card);
         var kind = bone is not null ? CardSnapshot.UndisclosedKind : card.Kind;
@@ -23,7 +24,6 @@ internal sealed class CardSnapshotProjector(ICardSnapshotFacts facts, ICardSnaps
         var equipmentSlot = bone;
         var rankText = facts.IsCarrier(card.Id) ? "—" : card.RankText;
         var skillMarkLabel = facts.VisibleSkillMark(card.Id);
-        var qinJudgmentSlot = facts.QinJudgmentSlot(card.Id);
         if (card.Id > 0 && cache.TryGet(card.Id, out var existing) &&
             existing.Id == card.Id && existing.Kind == kind && existing.Suit == card.Suit &&
             existing.Rank == card.Rank && existing.DisplayName == displayName && existing.RankText == rankText && existing.SkillMarkLabel == skillMarkLabel && existing.QinJudgmentSlot == qinJudgmentSlot && existing.OccupiedEquipmentSlot == equipmentSlot && existing.IsBone == (bone is not null))
@@ -45,7 +45,8 @@ internal sealed class CardSnapshotProjector(ICardSnapshotFacts facts, ICardSnaps
 
     public CardSnapshot JudgmentSnapshot(Card card)
     {
-        if (facts.IsQinJudgmentCard(card.Id)) return Snapshot(card);
+        var slot = facts.JudgmentAttachmentSlot(card.Id);
+        if (slot is not null) return Snapshot(card, slot);
         var effectiveKind = facts.JudgmentEffectiveKind(card);
         return new CardSnapshot(
             card.Id,

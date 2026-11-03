@@ -180,7 +180,7 @@ internal sealed partial class CoreGameEngineProgramTopReorderRuntime
         var state = frame.TopReorder ?? throw new InvalidOperationException("AI top ordering has no cards.");
         var decision = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("AI top ordering has no prompt.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
-        var delayed = _corePhysicalOwnedCardQueriesOperations.GetJudgment(owner).Count(card => !_characterDaQiaoLeOperations.IsZixiQinJudgmentCard(card.Id) && CoreNativeCardClassificationsRuntime.IsDelayedCard(_coreActualTurnsOperations.GetJudgmentEffectiveCardKind(card)));
+        var delayed = _corePhysicalOwnedCardQueriesOperations.GetJudgment(owner).Count(card => _judgmentAttachments.Slot(card.Id) is null && CoreNativeCardClassificationsRuntime.IsDelayedCard(_coreActualTurnsOperations.GetJudgmentEffectiveCardKind(card)));
         var desiredTop = state.RequiredTopCount ?? Math.Min(state.ViewedCardIds.Count, delayed + Math.Max(0, _coreActualTurnsOperations.GetTurnDrawCount(owner)));
         var selected = !state.ChoosingBottom && state.TopCardIds.Count >= desiredTop ? decision.Choices.Single(choice => choice.Parameters.GetValueOrDefault("action") == "finish-top") : decision.Choices.First(choice => choice.Cards.Count == 1);
         ResolveProgramTopReorderChoice(selected);

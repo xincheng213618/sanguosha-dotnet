@@ -34,8 +34,7 @@ internal interface IProgramPaidCardFacts : IProgramSelectionQuery
     bool SelfDiscardForbidden(int chooser, Card card, CardLocation source, OwnedCardMoveIntent intent);
     bool AllowsOwnedCardPayment(ProgramSkillFrame frame, CardLocation source, Card card);
     bool IsActiveSourceEquipment(int owner, string skillId, string instanceId, Card card);
-    bool IsZixiJudgment(int cardId);
-    bool CanTransferZixiJudgment(Card card, int destinationSeat);
+    CardKind? JudgmentAttachmentSlot(int cardId);
     bool HasCardPolicy(int seat, SkillProgramCardPolicyKind policy);
     CardKind JudgmentKind(Card card);
     bool IsDelayedCard(CardKind kind);

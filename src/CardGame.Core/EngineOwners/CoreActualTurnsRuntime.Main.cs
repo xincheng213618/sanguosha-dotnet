@@ -171,7 +171,7 @@ internal sealed partial class CoreActualTurnsRuntime
     {
         if (_coreOriginalUseLightningOperations.TryBeginHeldOriginalUseLightning(current, excludedCardId))
             return;
-        var delayedCard = _corePhysicalOwnedCardQueriesOperations.GetJudgment(current).FirstOrDefault(card => !_characterDaQiaoLeOperations.IsZixiQinJudgmentCard(card.Id) && CoreNativeCardClassificationsRuntime.IsDelayedCard(GetJudgmentEffectiveCardKind(card)) && card.Id != excludedCardId);
+        var delayedCard = _corePhysicalOwnedCardQueriesOperations.GetJudgment(current).FirstOrDefault(card => _judgmentAttachments.Slot(card.Id) is null && CoreNativeCardClassificationsRuntime.IsDelayedCard(GetJudgmentEffectiveCardKind(card)) && card.Id != excludedCardId);
         if (delayedCard is not null)
         {
             var effectiveKind = GetJudgmentEffectiveCardKind(delayedCard);
@@ -301,7 +301,7 @@ internal sealed partial class CoreActualTurnsRuntime
     }
 
     internal CardKind GetJudgmentEffectiveCardKind(Card card) => _coreJudgmentEffectiveCardsJudgmentEffectiveCardKindsAccess._judgmentEffectiveCardKinds.GetValueOrDefault(card.Id, card.Kind);
-    internal bool HasJudgmentEffectiveCard(CharacterState player, CardKind kind) => _corePhysicalOwnedCardQueriesOperations.GetJudgment(player).Any(card => _characterDaQiaoLeOperations.ZixiQinJudgmentSlot(card.Id)is { } slot ? slot == kind : GetJudgmentEffectiveCardKind(card) == kind) || kind == CardKind.Lightning && _coreOriginalUseLightningOperations.HasHeldOriginalUseLightning(player);
+    internal bool HasJudgmentEffectiveCard(CharacterState player, CardKind kind) => _corePhysicalOwnedCardQueriesOperations.GetJudgment(player).Any(card => _judgmentAttachments.Slot(card.Id)is { } slot ? slot == kind : GetJudgmentEffectiveCardKind(card) == kind) || kind == CardKind.Lightning && _coreOriginalUseLightningOperations.HasHeldOriginalUseLightning(player);
     internal static bool IsDelayedJudgmentContinuation(JudgmentContinuationKind continuation) => RuntimeSkills.RuntimeRules_Core_CommonRules.IsDelayedJudgmentContinuation(continuation);
     internal static (string Reason, JudgmentContinuationKind Continuation) GetDelayedJudgmentInfo(CardKind kind) => RuntimeSkills.RuntimeRules_Core_CommonRules.GetDelayedJudgmentInfo(kind);
     internal static GameEngine.DelayedTurnEffects GetDelayedTurnEffects(CardKind kind) => kind switch

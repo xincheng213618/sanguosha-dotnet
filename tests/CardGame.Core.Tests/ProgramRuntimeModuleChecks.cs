@@ -238,8 +238,7 @@ internal static class ProgramRuntimeModuleChecks
         public int? BoneOwnerSeat(int cardId) { BoneOwnerReads++; return BoneOwner; }
         public bool IsCarrier(int cardId) => Carrier;
         public string? VisibleSkillMark(int cardId) => Mark;
-        public CardKind? QinJudgmentSlot(int cardId) => QinSlot;
-        public bool IsQinJudgmentCard(int cardId) => QinSlot is not null;
+        public CardKind? JudgmentAttachmentSlot(int cardId) => QinSlot;
         public CardKind JudgmentEffectiveKind(Card card) => CardKind.Indulgence;
     }
 

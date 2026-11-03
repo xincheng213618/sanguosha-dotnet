@@ -8,7 +8,7 @@ using CardGame.Core;
 
 namespace CardGame.Core.Tests;
 
-internal static class LeDaQiaoZixiChecks
+internal static partial class LeDaQiaoZixiChecks
 {
     private const string ZdSkill = "le:zixi", ZdQin = "le:qiqin", ZdOwner = "fixture:ldz-owner", ZdMode = "identity:classic-le-da-qiao-zixi";
     private const string ZdDriver = "fixture:ldz-driver", ZdWatch = "fixture:ldz-watch", ZdQuiet = "fixture:ldz-quiet", ZdGrant = "fixture:ldz-grant", ZdInsert = "fixture:ldz-insert";
@@ -17,6 +17,7 @@ internal static class LeDaQiaoZixiChecks
 
     public static void ZixiFinalTargetsResponsesSourceRightsAndInputPrivacyCold()
     {
+        JudgmentAttachmentsFollowActualEntityResidency();
         var s = ZdScenario.Start("multi"); s.PlaceStart(1, 1); s.Gather();
         var chain = s.Actions().First(a => a.Kind == LegalActionKind.IronChain && a.TargetSeats.SequenceEqual([1, 2])); s.Native(chain); s.Play();
         s.Use("damage", targets: [1]); s.Play(); s.Need(!s.E<ZixiEffectsStartedEvent>().Any() && !s.E<ZixiExtraEffectIssuedEvent>().Any(), "Two final designated characters and a child skill's naked damage cannot become a fictitious sole-target card Use.");
@@ -34,6 +35,7 @@ internal static class LeDaQiaoZixiChecks
         foreach (var scene in new[] { "paid-loss", "paid-death" })
         {
             s = ZdScenario.Start(scene); s.PlaceStart(2, 1); s.Gather(); s.Top(2); s.Native(s.Actions().First(a => a.Kind == LegalActionKind.Slash && a.TargetSeats.SequenceEqual([1]))); s.Effect(); s.Reach(() => s.Hold("draw"));
+            var attachments = s.E<JudgmentCardAttachedEvent>().Where(e => e.Source.SkillId == ZdSkill).ToArray();
             var started = s.E<ZixiEffectsStartedEvent>().Single(); s.Private(); s.RejectPrompt(); s.Cold(); var old = s.P!; s.Continue(); s.RejectOld(old);
             s.Reach(() => s.E<ZixiEffectsCompletedEvent>().Any(e => e.FrameId == started.FrameId)); s.PlayOrDead();
             s.Need(s.E<ZixiEffectsDrawReturnedEvent>().Single(e => e.FrameId == started.FrameId) is { RequestedCount: 2, ActualCount: 2 } &&
@@ -42,6 +44,10 @@ internal static class LeDaQiaoZixiChecks
                 (scene == "paid-death" ? !s.V().IsAlive : s.V().Skills?.Any(k => k.ContentId == ZdSkill) != true) &&
                 s.G.CardMovements.Count(m => m.Reason.Value == ZdDraw && m.To == CardLocation.Hand(0)) == 2,
                 "Once accepted, native Draw2 and its exact finalized-Use child return once after genuine source loss or death, without reoffering, redrawing or substituting another source."); s.Cold();
+            s.Need(attachments.Length == 2 && attachments.All(e =>
+                    s.G.GetRuntimeModule<JudgmentAttachmentRuntime>().Slot(e.CardId) == e.Slot &&
+                    s.V(1).Judgment.Any(c => c.Id == e.CardId && c.QinJudgmentSlot == e.Slot)),
+                "The two already attached real entities retain their occupied slots after genuine source loss or caster death and command replay.");
         }
 
         s = ZdScenario.Start("counterspell"); s.PlaceStart(1, 0); s.Gather(); s.Top(4); var card = s.Actions().First(a => a.Kind == LegalActionKind.DrawTwo); var before = s.G.CardMovements.Max(m => m.Sequence);
@@ -230,7 +236,7 @@ internal static class LeDaQiaoZixiChecks
         public void Need(bool valid, string why) { if (!valid) throw new InvalidOperationException(why + " " + Diagnostic()); }
         public void Accept(GameCommand c) { var r = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single()); Need(r.Accepted, "Rejected " + c.GetType().Name + " " + JsonSerializer.Serialize(r.Error)); }
         private string State() => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, 4).Select(i => SnapshotJson.Serialize(G.CreateSnapshot(i))), Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())), G.CardMovements, Events = G.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())), Commands = CommandJson.Serialize(G.AcceptedCommands) });
-        public string Diagnostic() => JsonSerializer.Serialize(new { scene, P, Hp = V().Hp, PeerHp = V(1).Hp, Frames = G.ResolutionStack, Placed = E<ZixiQinPlacedEvent>(), Started = E<ZixiEffectsStartedEvent>(), Draws = E<ZixiEffectsDrawReturnedEvent>(), Obtain = E<ZixiEffectsObtainPaidEvent>(), Damage = E<ZixiEffectsDamageIssuedEvent>(), Completed = E<ZixiEffectsCompletedEvent>(), Flood = E<WumiaoFloodEffectStartedEvent>(), FloodDiscards = E<WumiaoFloodDiscardPaidEvent>(), Juewu = E<JuewuUseIssuedEvent>(), ExtraRounds = E<ZixiExtraEffectRoundStartedEvent>(), ExtraRedirects = E<ZixiExtraEffectRedirectedEvent>(), SoleReplaced = E<SoleTargetReplacedEvent>(), ProtectedRedirects = E<SoleTargetAfterProtectionRedirectedEvent>(), ProtectionPaid = E<SoleTargetProtectionPaidEvent>(), Liuli = E<LiuliRedirectedEvent>(), FinishedUses = E<CardUseFinishedEvent>(), AppliedDamage = E<DamageAppliedEvent>() });
+        public string Diagnostic() => JsonSerializer.Serialize(new { scene, P, Hp = V().Hp, PeerHp = V(1).Hp, Frames = G.ResolutionStack, Placed = E<JudgmentCardAttachedEvent>(), Started = E<ZixiEffectsStartedEvent>(), Draws = E<ZixiEffectsDrawReturnedEvent>(), Obtain = E<ZixiEffectsObtainPaidEvent>(), Damage = E<ZixiEffectsDamageIssuedEvent>(), Completed = E<ZixiEffectsCompletedEvent>(), Flood = E<WumiaoFloodEffectStartedEvent>(), FloodDiscards = E<WumiaoFloodDiscardPaidEvent>(), Juewu = E<JuewuUseIssuedEvent>(), ExtraRounds = E<ZixiExtraEffectRoundStartedEvent>(), ExtraRedirects = E<ZixiExtraEffectRedirectedEvent>(), SoleReplaced = E<SoleTargetReplacedEvent>(), ProtectedRedirects = E<SoleTargetAfterProtectionRedirectedEvent>(), ProtectionPaid = E<SoleTargetProtectionPaidEvent>(), Liuli = E<LiuliRedirectedEvent>(), FinishedUses = E<CardUseFinishedEvent>(), AppliedDamage = E<DamageAppliedEvent>() });
         public void Cold() { var before = State(); G = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry); Need(State() == before, "Cold replay retains original Qin identities, occupied subslots, private selections, accepted card cost and exact native child/extra-effect cursors."); }
         public void Reject(GameCommand c) { var before = State(); Need(!G.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single()).Accepted && before == State(), "A foreign, unpublished or retired input cannot move a Qin, repeat payment or issue another native effect round."); }
         public void RejectPrompt() { var p = P!; Reject(new AnswerPromptCommand(1, p.PromptId, p.Choices[0].Id, G.Revision)); Reject(new AnswerPromptCommand(0, p.PromptId, new("forged-zixi-choice"), G.Revision)); }
