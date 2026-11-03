@@ -15,14 +15,14 @@ internal sealed partial class CoreGameEngineCardUseDebitsRuntime
         _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdCardUseDebitsRefundedCardUseDebitsAccess._refundedCardUseDebits.Clear();
     }
 
-    internal void RecordSlashUseDebit(long cardUseFrameId, int actorSeat)
+    internal bool RecordSlashUseDebit(long cardUseFrameId, int actorSeat)
     {
         if (_coreProgramCardUsePaymentsOperations.CardUsePayments.ExemptsSlashDebit(ProgramCardUsePaymentStage.BeforeSlashDebit, cardUseFrameId, actorSeat))
-            return;
+            return false;
         var action = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == cardUseFrameId).Action ?? throw new InvalidOperationException("A counted Slash has no frozen card-action identity.");
         var identity = new CardUseDebitIdentity(action.ActionId, actorSeat, SkillRuleQuery.SlashLimit, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdCardUseDebitsRefundedCardUseDebitsAccess._cardUseDebitPhaseInstanceId);
         if (_coreProgramCardUsePaymentsOperations.CardUsePayments.ExemptsSlashDebit(ProgramCardUsePaymentStage.AfterSlashDebitIdentity, cardUseFrameId, actorSeat))
-            return;
+            return false;
         var suit = action.EffectiveSuit;
         if (suit is null && action.PhysicalCards.Count == 1)
         {
@@ -32,13 +32,14 @@ internal sealed partial class CoreGameEngineCardUseDebitsRuntime
         }
 
         if (_coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance2(actorSeat, suit) || _coreBoundDiscardSlashBenefitsOperations.HasTurnSlashSuitAllowance(actorSeat, suit))
-            return;
+            return false;
         if (suit is { } usedSuit && _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[actorSeat], SkillProgramCardPolicyKind.BypassSlashLimitBySuit, action.EffectiveKind).Any(item => item.Policy.InputSuit == usedSuit))
-            return;
+            return false;
         if (!_coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdCardUseDebitsRefundedCardUseDebitsAccess._cardUseDebits.TryAdd(action.ActionId, identity))
             throw new InvalidOperationException("A card action cannot debit its Slash quota twice.");
         _coreCurrentTurnStatisticsSlashCountThisTurnAccess._slashCountThisTurn++;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDebitRecordedEvent(identity));
+        return true;
     }
 
     internal bool TryRefundCardUseDebit(CardUseDebitIdentity identity)

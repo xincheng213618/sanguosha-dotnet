@@ -277,7 +277,7 @@ var r = f.YangFu!; var choices = BingzhongChoices(f);
             throw new InvalidOperationException("Suyi cannot replace its exact zero-entity ordinary Slash invoice.");
         IssueSuyiNative(f, use, action);
         if (facts.Phase == TurnPhase.Play && f.OwnerSeat == facts.CurrentSeat && !adjacency.IgnoresSlashLimit(f.OwnerSeat, r.Source) &&
-            !(facts.CardUse(id)?.UnlimitedUse == true) && !adjacency.HasIssuedJudgedRankSlashQuota(id, f.OwnerSeat) && !adjacency.HasIssuedWuLuKangDixianUse(id, f.OwnerSeat) && !adjacency.HasIssuedRoundGainedBasicBonus(id, f.OwnerSeat))
+            !(facts.CardUse(id)?.UnlimitedUse == true))
         {
             operations.RecordSlashDebit(id, f.OwnerSeat);
             if (facts.HasUseDebit(action.ActionId)) events.AdvanceFact(new SuyiSlashQuotaPaidEvent(f.Id, id, f.OwnerSeat));
@@ -309,19 +309,6 @@ var r = f.YangFu!; var choices = BingzhongChoices(f);
             r.Stage == YangFuStage.SlashUse && o.ActorSeat == f.OwnerSeat && o.CardId == 0 && o.Kind == CardKind.Slash && use.PhysicalCardIds is { Count: 0 } && issued.PhysicalCards.Count == 0;
     }
     internal bool IsSuyiSlashUse(long id) => facts.CardUse(id) is { SuyiOrigin.Kind: CardKind.Slash } use && IsIssuedSuyiUse(use);
-    internal bool TryGetSuyiVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, out IReadOnlyList<int> targets)
-    {
-        targets = [];
-        if (use.SuyiOrigin is not { Kind: CardKind.Slash, CardId: 0 } origin || !IsSuyiSlashUse(use.Id) || origin.ProgramFrameId != parent.Id ||
-            parent.YangFu is not { Stage: YangFuStage.SlashUse, NativeCompleted: false } r || r.NativeOrigin != origin ||
-            parent.SelectedTargetSeats is not [var selected] || selected != r.TargetSeat ||
-            use.CardAttack is not { CardId: null, PhysicalCardIds.Count: 0 } attack || attack.ProgramSkillCardUseFrameId != parent.Id ||
-            !((HasBingzhongTargetTail(use) || adjacency.HasPijingTargetTail(use)) || adjacency.HasWeifuTargetTail(use) || adjacency.HasDesignatedExtraTargetTail(use) || adjacency.HasRecipientCategorySlashTargetTail(use) || adjacency.HasZhangYanLangdaoTargetTail(use)) || use.TargetSeats.Count == 0 ||
-            facts.History<TargetsConfirmedEvent>().SingleOrDefault(e => e.ResolutionId == use.Id) is not { TargetSeats: [var original] } || original != r.TargetSeat ||
-            facts.History<CardUseDeclaredEvent>().SingleOrDefault(e => e.ResolutionId == use.Id) is not { CardId: 0, CardKind: CardKind.Slash } declared || declared.SourceSeat != parent.OwnerSeat)
-            return false;
-        targets = Array.AsReadOnly(new[] { use.TargetSeats[0] }); return true;
-    }
     internal bool IsSuyiEquipmentRide(ResolutionFrame ride, ResolutionFrame beneath) => ride is CardUseFrame { SuyiOrigin: { } o } use &&
         beneath is ProgramSkillFrame { YangFu.Stage: YangFuStage.EquipmentUse } f && o.ProgramFrameId == f.Id && facts.IsEquipment(o.Kind) && IsIssuedSuyiUse(use);
     [NativeUseValidation(27310)] private void ValidateSuyiNative(CardUseFrame use)

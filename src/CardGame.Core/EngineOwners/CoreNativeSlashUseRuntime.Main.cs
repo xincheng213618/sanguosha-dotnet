@@ -34,7 +34,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
         var countedTowardSlashLimit = !(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.UnlimitedUse == true) && !_coreProgramCardUsePaymentsOperations.CardUsePayments.ExemptsSlashDebit(ProgramCardUsePaymentStage.SlashCountExemption, resolutionId, source.Seat) && !nuzhan.IgnoresSlashLimit && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(source, conversionSource) && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && source.Seat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat;
         if (countedTowardSlashLimit)
         {
-            _coreCardUseDebitsOperations.RecordSlashUseDebit(resolutionId, source.Seat);
+            countedTowardSlashLimit = _coreCardUseDebitsOperations.RecordSlashUseDebit(resolutionId, source.Seat);
         }
 
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(source.Seat, playedCardKind);
@@ -162,7 +162,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
         var countedTowardSlashLimit = countsTowardSlashLimit && !(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.UnlimitedUse == true) && !_coreProgramCardUsePaymentsOperations.CardUsePayments.ExemptsSlashDebit(ProgramCardUsePaymentStage.SlashCountExemption, resolutionId, source.Seat) && !nuzhan.IgnoresSlashLimit && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(source, conversionSource) && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && source.Seat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat;
         if (countedTowardSlashLimit)
         {
-            _coreCardUseDebitsOperations.RecordSlashUseDebit(resolutionId, source.Seat);
+            countedTowardSlashLimit = _coreCardUseDebitsOperations.RecordSlashUseDebit(resolutionId, source.Seat);
         }
 
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(source.Seat, playedCardKind);

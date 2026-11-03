@@ -73,6 +73,7 @@ internal static partial class SkillProgramTargetOrderChecks
             .GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         var frames = capabilities.Get<IProgramRuntimeFrames>();
         var native = game.GetRuntimeModule<CoreNativeCardUseFramesRuntime>();
+        var debits = game.GetRuntimeModule<CoreGameEngineCardUseDebitsRuntime>();
         var priorTop = frames.Top;
         var action = new CardActionContext(90001, null, CardActionType.Use, 0, 0, null, null, null,
             CardKind.Slash, [1, 3], [], [], designatedTargetSeats: [1, 3]);
@@ -109,8 +110,32 @@ internal static partial class SkillProgramTargetOrderChecks
                 Require(rejected && ReferenceEquals(frames.Find(owner.Id), changed),
                     "The shared native boundary rejects an unrelated cursor, stale old seat and out-of-range slot before changing any execution target.");
             }
+            Require(debits.RecordSlashUseDebit(changed.Id, action.ActorSeat),
+                "The shared debit boundary reports a real ordinary Slash payment.");
+            var debit = debits.GetCardUseDebit(action.ActionId) ??
+                throw new InvalidOperationException("A successful native debit must retain its original Action identity.");
+            Require(debit.CardActionId == action.ActionId && debit.ActorSeat == action.ActorSeat &&
+                    debit.Query == SkillRuleQuery.SlashLimit && debits.IsCardUseDebitActive(action.ActionId),
+                "The actual debit receipt belongs to its original actor and Action, independently of target allowance queries.");
+            Require(debits.TryRefundCardUseDebit(debit) && !debits.TryRefundCardUseDebit(debit) &&
+                    debits.GetCardUseDebit(action.ActionId) == debit && !debits.IsCardUseDebitActive(action.ActionId),
+                "Refund retires the active payment once while preserving the fact that this Action was debited.");
+            var doubleDebitRejected = false;
+            try { _ = debits.RecordSlashUseDebit(changed.Id, action.ActorSeat); }
+            catch (InvalidOperationException) { doubleDebitRejected = true; }
+            var journal = game.GetRuntimeModule<CoreGameEngineProgramEventHistoryRuntime>();
+            var recordedCount = journal.ProgramEventHistory<CardUseDebitRecordedEvent>().Count(e => e.Debit == debit);
+            var refundedCount = journal.ProgramEventHistory<CardUseDebitRefundedEvent>().Count(e => e.Debit == debit);
+            Require(doubleDebitRejected && !debits.IsCardUseDebitActive(action.ActionId) &&
+                    recordedCount == 1 && refundedCount == 1,
+                $"A refunded Action cannot debit again; the original shared journal retains precisely one payment and one refund fact, including uncommitted native calls: blocked={doubleDebitRejected}, recorded={recordedCount}, refunded={refundedCount}.");
         }
-        finally { frames.Pop(owner.Id, owner.Kind); }
+        finally
+        {
+            if (debits.GetCardUseDebit(action.ActionId) is { } debit && debits.IsCardUseDebitActive(action.ActionId))
+                _ = debits.TryRefundCardUseDebit(debit);
+            frames.Pop(owner.Id, owner.Kind);
+        }
         Require(ReferenceEquals(frames.Top, priorTop), "The controlled native-slot check restores its original owning stack.");
     }
 

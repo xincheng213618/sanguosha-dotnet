@@ -31,9 +31,9 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NativeMaterialSlashExtraTargetsIssuedEvent(extra));
         }
 
-        var counted = _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true && !_coreJudgedRankSlashPoliciesOperations.HasIssuedJudgedRankSlashQuota(id, owner.Seat) && !_characterHuangfuSongWumiaoOperations.HasWuHfOrDixianIssuedUse(id, owner.Seat) && !nuzhan.IgnoresSlashLimit && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(owner, conversion) && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && owner.Seat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat;
-        if (counted)
+        var counted = _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true && !nuzhan.IgnoresSlashLimit && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(owner, conversion) && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && owner.Seat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat &&
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, owner.Seat);
+
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(owner.Seat, kind);
         var damage = (1 + owner.AlcoholDamageBonus) + nuzhan.DamageBonus;
         _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, owner);

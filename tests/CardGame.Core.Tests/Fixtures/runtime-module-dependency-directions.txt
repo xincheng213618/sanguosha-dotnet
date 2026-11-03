@@ -1651,7 +1651,6 @@ shared	CardGame.Core.EngineOwners.CoreNativeLegalActionsRuntime	CardGame.Core.Ru
 shared	CardGame.Core.EngineOwners.CoreNativeLegalActionsRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterSunHuanAnniversaryRuntime>	sun-huan/anniversary	CardGame.Core.EngineOwners.CharacterSunHuanAnniversaryRuntime
 shared	CardGame.Core.EngineOwners.CoreNativeLegalActionsRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterSunJunMobileShiRuntime>	sun-jun/mobile-shi	CardGame.Core.EngineOwners.CharacterSunJunMobileShiRuntime
 shared	CardGame.Core.EngineOwners.CoreNativeLogicalDiscardRuntimePortsRuntime	CardGame.Core.RuntimeEntries.CharacterZhangFeiWumiaoEntries	zhang-fei/wumiao	CardGame.Core.EngineOwners.CharacterZhangFeiWumiaoRuntime
-shared	CardGame.Core.EngineOwners.CoreNativeMaterialSlashRuntime	CardGame.Core.RuntimeEntries.CharacterHuangfuSongWumiaoEntries	huangfu-song/wumiao	CardGame.Core.EngineOwners.CharacterHuangfuSongWumiaoRuntime
 shared	CardGame.Core.EngineOwners.CoreNativeMaterialSlashRuntime	CardGame.Core.RuntimeEntries.CharacterSunQuanOlMagicEntries	sun-quan/ol-magic	CardGame.Core.EngineOwners.CharacterSunQuanOlMagicRuntime
 shared	CardGame.Core.EngineOwners.CoreNativeMultiTargetActionsRuntime	CardGame.Core.RuntimeEntries.CharacterWuJingOlEntries	wu-jing/ol	CardGame.Core.EngineOwners.CharacterWuJingOlRuntime
 shared	CardGame.Core.EngineOwners.CoreNativeNullificationRuntime	CardGame.Core.RuntimeEntries.CharacterCaoXiOlEntries	cao-xi/ol	CardGame.Core.EngineOwners.CharacterCaoXiOlRuntime
@@ -2026,9 +2025,6 @@ yang-biao/anniversary	CardGame.Core.EngineOwners.CharacterYangBiaoAnniversaryRun
 yang-biao/anniversary	CardGame.Core.EngineOwners.CharacterYangBiaoAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterLuMengMouEntries	lu-meng/mou	CardGame.Core.EngineOwners.CharacterLuMengMouRuntime
 yang-fu/ol	CardGame.Core.EngineOwners.CharacterYangFuOlRuntime	CardGame.Core.RuntimeEntries.CharacterFuRongOlEntries	fu-rong/ol	CardGame.Core.EngineOwners.CharacterFuRongOlRuntime
 yang-fu/ol	CardGame.Core.EngineOwners.CharacterYangFuOlRuntime	CardGame.Core.RuntimeEntries.CharacterGuanYuRuntimeEntries	guan-yu/Runtime	CardGame.Core.EngineOwners.CharacterGuanYuRuntimeRuntime
-yang-fu/ol	CardGame.Core.EngineOwners.CharacterYangFuOlRuntime	CardGame.Core.RuntimeEntries.CharacterLiuPanOlEntries	liu-pan/ol	CardGame.Core.EngineOwners.CharacterLiuPanOlRuntime
-yang-fu/ol	CardGame.Core.EngineOwners.CharacterYangFuOlRuntime	CardGame.Core.RuntimeEntries.CharacterLuKangWumiaoEntries	lu-kang/wumiao	CardGame.Core.EngineOwners.CharacterLuKangWumiaoRuntime
-yang-fu/ol	CardGame.Core.EngineOwners.CharacterYangFuOlRuntime	CardGame.Core.RuntimeEntries.CharacterQianZhaoOlEntries	qian-zhao/ol	CardGame.Core.EngineOwners.CharacterQianZhaoOlRuntime
 yang-fu/ol	CardGame.Core.EngineOwners.CharacterYangFuOlRuntime	CardGame.Core.RuntimeEntries.CharacterWuJingOlEntries	wu-jing/ol	CardGame.Core.EngineOwners.CharacterWuJingOlRuntime
 yang-fu/ol	CardGame.Core.EngineOwners.CharacterYangFuOlRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 yang-fu/ol	CardGame.Core.EngineOwners.CharacterYangFuOlRuntime	CardGame.Core.RuntimeEntries.CharacterZhangYanOlEntries	zhang-yan/ol	CardGame.Core.EngineOwners.CharacterZhangYanOlRuntime

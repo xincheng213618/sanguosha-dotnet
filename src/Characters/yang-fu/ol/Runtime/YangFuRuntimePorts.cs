@@ -62,15 +62,7 @@ internal interface IYangFuTargetFacts : IProgramSelectionQuery
 internal interface IYangFuAdjacencyFacts : IProgramSelectionQuery
 {
     bool IgnoresSlashLimit(int owner, CardConversionSource source);
-    bool HasIssuedJudgedRankSlashQuota(long useId, int actor);
-    bool HasIssuedWuLuKangDixianUse(long useId, int actor);
-    bool HasIssuedRoundGainedBasicBonus(long useId, int actor);
     void AssertCurrentSlashFirePolicy(CardUseFrame use);
-    bool HasPijingTargetTail(CardUseFrame use);
-    bool HasWeifuTargetTail(CardUseFrame use);
-    bool HasDesignatedExtraTargetTail(CardUseFrame use);
-    bool HasRecipientCategorySlashTargetTail(CardUseFrame use);
-    bool HasZhangYanLangdaoTargetTail(CardUseFrame use);
     DyingFrame? ActiveDying { get; }
     bool MovementObserverEdge(long childId);
     bool DyingExitEdge(long childId);

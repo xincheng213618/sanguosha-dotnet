@@ -9,5 +9,4 @@ internal sealed partial class CharacterYangFuOlEntries
     internal bool IsSuyiSlashUse(long id) => _resolve().IsSuyiSlashUse(id);
     internal void IssueSuyiSlashUse(long id, ProgramSkillFrame supplied, CardActionContext action) => _resolve().IssueSuyiSlashUse(id, supplied, action);
     internal bool ReturnSuyiAttack(GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnSuyiAttack(completion);
-    internal bool TryGetSuyiVirtualPrimaryReturn(CardUseFrame use, ProgramSkillFrame parent, scoped out IReadOnlyList<int> targets) => _resolve().TryGetSuyiVirtualPrimaryReturn(use, parent, out targets);
 }
