@@ -1536,6 +1536,9 @@ public sealed class SkillProgramExecutor
             // Commit the cursor before any primitive can suspend into a child.
             frame = frame with { InstructionIndex = frame.InstructionIndex + 1 };
             state.UpdateFrame(frame);
+            if (!actor.IsAlive && ProgramAcceptedCardMovements.DrainsOwnerDeath(frame) &&
+                !ProgramAcceptedCardMovements.MayExecuteWhileDraining(frame, effect))
+                continue;
             if (state.TryStartInstructionHealthQuery(frame, effect)) return;
             frame = state.GetActiveFrame(frameId) ?? throw new InvalidOperationException("The instruction health query lost its original program frame.");
             if (!state.EvaluateCondition(frame, effect.Condition, actor.Context))

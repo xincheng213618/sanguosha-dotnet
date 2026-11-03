@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.Campaigns;
 
 internal static class ProgramAmountExpressionChecks
 {
@@ -10,6 +11,10 @@ internal static class ProgramAmountExpressionChecks
         Mode = "fixture:amount-mode";
     private const string DrawReason = "skill-program." + Skill + ".Draw";
     private const string ColdDrawReason = "skill-program." + ColdSkill + ".Draw";
+    private const string AcceptedSkill = "fixture:accepted-material", AcceptedDriver = "fixture:accepted-driver",
+        AcceptedWatch = "fixture:accepted-watch", AcceptedQuiet = "fixture:accepted-quiet",
+        AcceptedOwner = "fixture:accepted-owner", AcceptedPeer = "fixture:accepted-peer";
+
 
     public static void LoaderHashAndTypedEvaluation()
     {
@@ -155,6 +160,33 @@ internal static class ProgramAmountExpressionChecks
             {"op":"draw","target":"owner","amountExpr":["boundCount","actual"]}
             """).Activations.Single().Effects, new PlayerSkillContext(0, 4, 4, 2, TurnPhase.Play));
         Need(movementEstimate.Hint.OwnerDraw == 2, "The movement result is available to subsequent AI quantity reads without an extra cost or a live hidden-card query.");
+        const string captureAcceptedSource = """{"op":"captureCards","target":"owner","resultBind":"candidate","cardsExpr":["gainCards","owner","incoming"]},""";
+        const string acceptSource = """{"op":"acceptBoundCardMovement","target":"owner","sourceBind":"candidate","resultBind":"accepted","destination":"discardPile"}""";
+        var acceptance = Load(captureAcceptedSource + acceptSource + """
+            ,{"op":"moveBoundCards","target":"owner","sourceBind":"accepted","destination":"discardPile","resultBind":"actual"},
+             {"op":"draw","target":"owner","amountExpr":["boundCount","actual"]}
+            """);
+        Need(acceptance.Activations.Single().Effects[1].Op == SkillProgramEffectOp.AcceptBoundCardMovement,
+            "Accepted material is a distinct producer before a single compatible movement consumes its original binding.");
+        Need(acceptance.Activations.Single().Effects[1].AcceptedMovementContinuation is
+            { SourceLoss: ProgramAcceptedMovementSourceLoss.Stop, OwnerDeath: ProgramAcceptedMovementOwnerDeath.Stop },
+            "Accepting materials grants neither source-loss nor owner-death continuation unless the recipe declares it.");
+        Reject(captureAcceptedSource + acceptSource);
+        Reject(captureAcceptedSource + acceptSource + """
+            ,{"op":"moveBoundCards","target":"owner","sourceBind":"accepted","destination":"discardPile",
+              "condition":{"kind":"expression","expr":true}}
+            """);
+        Reject(captureAcceptedSource + acceptSource.Replace("\"discardPile\"", "\"ownerHand\""));
+        Reject(captureAcceptedSource + acceptSource.Replace("\"accepted\"", "\"candidate\""));
+        Reject(captureAcceptedSource + acceptSource + """
+            ,{"op":"moveBoundCards","target":"owner","sourceBind":"accepted","destination":"drawPileTop"}
+            """);
+        Reject(captureAcceptedSource + acceptSource + """
+            ,{"op":"moveBoundCards","target":"owner","sourceBind":"accepted","destination":"discardPile"},
+             {"op":"moveBoundCards","target":"owner","sourceBind":"accepted","destination":"discardPile"}
+            """);
+        Reject(captureAcceptedSource + acceptSource.Replace("\"destination\":\"discardPile\"", "\"destination\":\"discardPile\",\"continuation\":{\"sourceLoss\":\"unknown\"}"));
+        Reject(captureAcceptedSource + acceptSource.Replace("\"destination\":\"discardPile\"", "\"destination\":\"discardPile\",\"continuation\":{\"ownerDeath\":\"unknown\"}"));
         foreach (var window in new[] { "dyingEntered", "dyingExited" })
         {
             var transition = $$"""
@@ -329,6 +361,126 @@ internal static class ProgramAmountExpressionChecks
         _ = Cold(game, registry);
         CapturedGainCardsSurviveRealDrawChildrenCold();
         ActualBoundMovementResultsSurviveChildrenCold();
+        AcceptedMaterialsKeepTheirOriginalCommitmentCold();
+    }
+
+    private static void AcceptedMaterialsKeepTheirOriginalCommitmentCold()
+    {
+        foreach (var scenario in new[] { "changed", "lost", "death-after-discard", "stop-after-discard" })
+        {
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new AcceptedMaterialFixture(scenario));
+            Need(registry.ProgramDependencies.RequiresFact(ProgramTrackedFact.ActualRound) && registry.ProgramDependencies.UsesRoundTracking,
+                "The standalone first-suit capability declares its own native round demand without needing an unrelated skill in the catalog.");
+            var setup = new ShanheBattleSetup(7, 1, "accepted-material-core", AcceptedOwner, 4, 0, 0, 0, 0, [],
+                [new(CardKind.Dodge, Suit.Heart, 2), new(CardKind.Slash, Suit.Spade, 7)], [],
+                [new(AcceptedPeer, Hp: 8) { StartingHand = [] }, new(AcceptedPeer, Hp: 8) { StartingHand = [] }],
+                [new(AcceptedPeer, Hp: 8) { StartingHand = [] }], new string('e', 64));
+            var game = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4,
+                HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId,
+                ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,
+                UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false }, registry);
+            Accept(game, new StartGameCommand()); Play(game);
+            var witness = View(game, 0).Hand.Single(card => card.Kind == CardKind.Dodge).Id;
+            Use(game, "begin", skill: AcceptedDriver);
+            ReachAccepted(game, () => game.PendingDecision?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate" &&
+                choice.Parameters.GetValueOrDefault("skill-id") == AcceptedSkill) == true);
+            var offer = game.PendingDecision!;
+            var aiProbe = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+            var aiChoice = aiProbe.GetRuntimeModule<CardGame.Core.EngineOwners.CoreGameEngineProgramLifecycleRuntime>()
+                .SelectAiProgramActivation(aiProbe.PendingDecision!);
+            Need(aiChoice.Parameters.GetValueOrDefault("program-action") == "activate",
+                "The real optional-trigger AI can price its owner's authorized frozen acquisition and accepted-card bindings without guessing another player's hand.");
+            Accept(game, new AnswerPromptCommand(0, offer.PromptId, offer.Choices.Single(choice =>
+                choice.Parameters.GetValueOrDefault("program-action") == "activate").Id, game.Revision));
+            ReachAccepted(game, () => game.PendingDecision?.SkillPrompt?.SkillId == AcceptedWatch);
+            var parent = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == AcceptedSkill);
+            var accepted = parent.CardSetBindings.Single(binding => binding.Name == "accepted");
+            var incoming = accepted.CardIds.ToArray();
+            Need(incoming.Length == 2 && accepted.AcceptedMovement is not null &&
+                accepted.SourceLocations.All(location => location == CardLocation.Hand(0)) &&
+                game.ResolutionStack.OfType<PublicHandRevealWindowFrame>().Any() &&
+                game.CreateSnapshot(1).Players[0].Hand.All(card => !incoming.Contains(card.Id)),
+                "Acceptance freezes the two original private hand materials before the real first-suit public-reveal child.");
+            AnswerAccepted(game, "reveal-start");
+            if (scenario is "changed" or "lost")
+            {
+                ReachAccepted(game, () => game.PendingDecision?.Choices.Any(choice => choice.Cards.SequenceEqual([witness])) == true);
+                AnswerAcceptedCard(game, witness);
+                ReachAccepted(game, () => game.PendingDecision?.Choices.Any(choice => choice.Cards.SequenceEqual([incoming[0]])) == true);
+                AnswerAcceptedCard(game, incoming[0]);
+            }
+            ReachAccepted(game, () => game.PendingDecision?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "reveal-return") == true);
+            Need(View(game, 0).IsAlive && (scenario != "lost" || View(game, 0).Skills?.Any(skill => skill.Id == AcceptedSkill) != true),
+                "The shared reveal child actually applies its requested source-loss branch before returning to the accepted recipe.");
+            if (scenario is "changed" or "lost")
+                Need(game.CardMovements.Any(move => move.CardId == witness && move.To == CardLocation.DiscardPile) &&
+                    game.CardMovements.Any(move => move.CardId == incoming[0] && move.To == CardLocation.DiscardPile),
+                    "A real reveal child moves the old witness and one original incoming entity after acceptance.");
+            game = Cold(game, registry);
+            AnswerAccepted(game, "reveal-return");
+            ReachAccepted(game, () => game.PendingDecision?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("option-id") == "discard-return") == true);
+            var afterMove = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+            var actual = afterMove.CardSetBindings.Single(binding => binding.Name == "actual");
+            var expected = scenario is "death-after-discard" or "stop-after-discard" ? incoming : incoming.Skip(1).ToArray();
+            Need(actual.CardIds.SequenceEqual(expected) && actual.SourceLocations.All(location => location == CardLocation.DiscardPile) &&
+                actual.IsReadOnlySnapshot && afterMove.CardSetBindings.Single(binding => binding.Name == "accepted").CardIds.SequenceEqual(incoming),
+                "Accepted execution drops only materials that left their original hand; witness loss and source loss do not requalify the frozen commitment.");
+            var restored = Cold(game, registry);
+            foreach (var branch in new[] { game, restored })
+            {
+                AnswerAccepted(branch, "discard-return");
+                var expectedCompleted = scenario != "stop-after-discard";
+                ReachAccepted(branch, () => Events<ProgramBindingResolvedEvent>(branch).Any(done =>
+                    done.FrameId == parent.Id && done.SkillId == AcceptedSkill && done.Completed == expectedCompleted));
+                Need(Events<ProgramBindingResolvedEvent>(branch).Count(done => done.FrameId == parent.Id) == 1 &&
+                    branch.CardMovements.Count(move => expected.Contains(move.CardId) && move.From == CardLocation.Hand(0) &&
+                        move.Reason.Value == "skill-program." + AcceptedSkill + ".MoveBoundCards") == expected.Length,
+                    "The original accepted program returns once after its paid movement child without repeating the cost.");
+                var draws = Events<NativeDrawAttemptStartedEvent>(branch).Where(fact =>
+                    fact.Context.Reason.Value == "skill-program." + AcceptedSkill + ".Draw").ToArray();
+                Need(scenario switch
+                    {
+                        "death-after-discard" => !View(branch, 0).IsAlive && draws.Length == 0 && branch.State.Winner == Winner.None,
+                        "stop-after-discard" => View(branch, 0).IsAlive && draws.Length == 0 &&
+                            View(branch, 0).Skills?.Any(skill => skill.Id == AcceptedSkill) != true,
+                        _ => draws is [{ Context.RequestedCount: var requested }] && requested == expected.Length * 2
+                    },
+                    "The benefit uses actual payment; death drains without a future draw, while source-loss stop independently cancels the unissued suffix.");
+            }
+            Need(State(game) == State(restored), "Both cold boundaries retain the original accepted materials, actual result and terminal outcome.");
+        }
+    }
+
+    private static void ReachAccepted(GameEngine game, Func<bool> done)
+    {
+        for (var step = 0; step < 260; step++)
+        {
+            if (done()) return;
+            if (game.PendingDecision is { } prompt)
+            {
+                // A dead owner's ordinary rescue window may still request its
+                // one real pass response while the paid parent remains issued.
+                var pass = prompt.Choices.FirstOrDefault(choice => choice.Cards.Count == 0 &&
+                    choice.Parameters.GetValueOrDefault("program-action") is not ("activate" or "choose-option"));
+                Need(prompt.Kind == DecisionKind.RescueDying && pass is not null,
+                    "Unexpected accepted-material child prompt: " + JsonSerializer.Serialize(prompt));
+                Accept(game, new AnswerPromptCommand(prompt.PlayerSeat, prompt.PromptId, pass!.Id, game.Revision));
+            }
+            else Accept(game, new AdvanceOneStepCommand(game.Revision));
+        }
+        throw new InvalidOperationException("The accepted-material recipe exceeded its bounded native-child budget.");
+    }
+    private static void AnswerAccepted(GameEngine game, string option)
+    {
+        var prompt = game.PendingDecision ?? throw new InvalidOperationException("Missing accepted-material child prompt.");
+        var choice = prompt.Choices.Single(item => item.Parameters.GetValueOrDefault("option-id") == option);
+        Accept(game, new AnswerPromptCommand(prompt.PlayerSeat, prompt.PromptId, choice.Id, game.Revision));
+    }
+    private static void AnswerAcceptedCard(GameEngine game, int cardId)
+    {
+        var prompt = game.PendingDecision ?? throw new InvalidOperationException("Missing accepted-material card selection.");
+        Accept(game, new AnswerPromptCommand(prompt.PlayerSeat, prompt.PromptId,
+            prompt.Choices.Single(item => item.Cards.SequenceEqual([cardId])).Id, game.Revision));
     }
 
     private static void ActualBoundMovementResultsSurviveChildrenCold()
@@ -576,6 +728,86 @@ internal static class ProgramAmountExpressionChecks
         Accept(game, new StartGameCommand()); Play(game); return (game, registry);
     }
     private static void Need(bool ok, string message) { if (!ok) throw new InvalidOperationException(message); }
+
+    private sealed class AcceptedMaterialFixture(string scenario) : IGameContentPackage
+    {
+        public PackageManifest Manifest { get; } = new("fixture-accepted-material", new(1, 0, 0));
+        public void Register(IContentRegistryBuilder builder)
+        {
+            var jueyan = CharacterFixtureContent.EmbeddedProgramBundle("mou-xiao-qiao-ol");
+            var native = jueyan.Programs["mou-ol:jueyan"];
+            builder.AddSkill(new(native.Id, jueyan.Presentations[native.Id].Name, jueyan.Presentations[native.Id].Description)
+                { Program = native, ProgramPresentation = jueyan.Presentations[native.Id] });
+            const string candidates = """
+                ["filter",["gainCards","owner","incoming"],"newCard",
+                  ["and",["cardAt","newCard","owner","hand"],["cardCanDiscard","owner","newCard"],
+                    ["any",["gainCards","owner","previousHand"],"oldCard",
+                      ["and",["cardAt","oldCard","owner","hand"],["sameCardName","newCard","oldCard"]]]]]
+                """;
+            var alteration = scenario is "changed" or "lost" ? """
+                ,{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"zones":["hand"],"count":1,"destination":"discardPile","awaitMovementTriggers":true},
+                 {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},"zones":["hand"],"count":1,"destination":"discardPile","awaitMovementTriggers":true}
+                """ : "";
+            if (scenario == "lost") alteration += """
+                ,{"op":"skillState","target":"owner","action":"lose","match":{"skillIds":["fixture:accepted-material"]}}
+                """;
+            var death = scenario switch
+            {
+                "death-after-discard" => ",{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":10}",
+                "stop-after-discard" => ",{\"op\":\"skillState\",\"target\":\"owner\",\"action\":\"lose\",\"match\":{\"skillIds\":[\"fixture:accepted-material\"]}}",
+                _ => ""
+            };
+            var sourceLoss = scenario == "stop-after-discard" ? "stop" : "retain";
+            var catalog = SkillProgramCatalog.Load($$$"""
+                {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[
+                  {"id":"{{{AcceptedSkill}}}","revision":1,"triggers":[{"id":"gain-commitment","window":"cardsGained","subject":"owner","optional":true,
+                    "usageScope":"turn","usageLimit":1,"movementOccurrence":"perBatch","destinationZones":["hand"],
+                    "condition":{"kind":"expression","expr":["and",["gainRecipientAlive","owner"],[">",["gainActualTurn","owner"],0],
+                      ["gainHasSource","owner","completion"],["any",{{{candidates}}},true]]},"effects":[
+                      {"op":"captureCards","target":"owner","resultBind":"candidates","cardsExpr":{{{candidates}}} },
+                      {"op":"acceptBoundCardMovement","target":"owner","sourceBind":"candidates","resultBind":"accepted","destination":"discardPile",
+                        "continuation":{"sourceLoss":"{{{sourceLoss}}}","ownerDeath":"drain"}},
+                      {"op":"captureCards","target":"owner","resultBind":"witnesses","cardsExpr":
+                        ["filter",["gainCards","owner","previousHand"],"oldCard",
+                          ["any",["gainCards","owner","incoming"],"newCard",
+                            ["and",["cardInBinding","newCard","accepted"],["sameCardName","newCard","oldCard"]]]]},
+                      {"op":"revealBoundCards","target":"owner","sourceBind":"witnesses"},
+                      {"op":"moveBoundCards","target":"owner","sourceBind":"accepted","destination":"discardPile","resultBind":"actual","awaitMovementTriggers":true},
+                      {"op":"draw","target":"owner","amountExpr":["+",["boundCount","actual"],["boundCount","actual"]]}]}]},
+                  {"id":"{{{AcceptedDriver}}}","revision":1,"activations":[{"id":"begin","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,
+                    "targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"grantSkills","target":"owner","skillIds":["{{{AcceptedSkill}}}"]},
+                      {"op":"draw","target":"owner","amount":2,"awaitMovementTriggers":true}]}]},
+                  {"id":"{{{AcceptedWatch}}}","revision":1,"triggers":[
+                    {"id":"reveal-child","window":"cardsGained","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,
+                      "movementOccurrence":"perBatch","destinationZones":["hand"],"movementReasons":["skill-program.mou-ol:jueyan.draw"],"effects":[
+                        {"op":"chooseOption","target":"owner","resultBind":"start","options":[{"id":"reveal-start"}]}{{{alteration}}},
+                        {"op":"chooseOption","target":"owner","resultBind":"returned","options":[{"id":"reveal-return"}]}]},
+                    {"id":"discard-child","window":"cardsMoved","subject":"owner","optional":false,"usageScope":"game","usageLimit":1,
+                      "movementOccurrence":"perBatch","sourceZones":["hand"],"movementReasons":["skill-program.{{{AcceptedSkill}}}.MoveBoundCards"],"effects":[
+                        {"op":"chooseOption","target":"owner","resultBind":"discarded","options":[{"id":"discard-return"}]}{{{death}}}]}]},
+                  {"id":"{{{AcceptedQuiet}}}","revision":1,"triggers":[{"id":"no-normal-draw","window":"drawPhaseStarting","subject":"owner","optional":false,
+                    "effects":[{"op":"adjustNormalDraw","target":"owner","amount":-2}]}]},
+                  {"id":"{{{NativeGate}}}","revision":1,"triggers":[{"id":"native-query","window":"nativeDrawStarting","subject":"owner","optional":false,
+                    "effects":[{"op":"setChainedState","target":"owner","chained":false}]}]}]}
+                """, JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                    skills = new Dictionary<string, object> { [AcceptedSkill] = new { name = "接受材料", description = "共享接受与真实子返回" },
+                        [AcceptedDriver] = new { name = "原生获得", description = "真实获得两张" },
+                        [AcceptedWatch] = new { name = "实际子结算", description = "展示与移牌的真实暂停", optionLabels =
+                            new Dictionary<string,string> { ["reveal-start"] = "开始", ["reveal-return"] = "返回展示", ["discard-return"] = "返回弃置" } },
+                        [AcceptedQuiet] = new { name = "固定阶段", description = "不额外改变测试材料" },
+                        [NativeGate] = new { name = "原生摸牌请求", description = "真实原生请求订阅" } } }));
+            foreach (var (id, program) in catalog.Programs)
+                builder.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description)
+                    { Program = program, ProgramPresentation = catalog.Presentations[id] });
+            builder.AddGeneral(new(AcceptedOwner, "共享接受者", "", AcceptedDriver, "wu", 4, [AcceptedWatch, AcceptedQuiet, NativeGate, "mou-ol:jueyan"]));
+            builder.AddGeneral(new(AcceptedPeer, "共享同行", "", AcceptedQuiet, "qun", 8));
+            builder.AddDeck(new("fixture:accepted-deck", "固定共享材料", 0, 2, []) { PhysicalCards = Enumerable.Range(0, 80)
+                .Select(_ => new ContentDeckPhysicalCard("standard:dodge", Suit.Club, 9)).ToArray() });
+            builder.AddMode(new(ShanheBattleSetup.BattleModeId, "共享材料承诺", 4, 4, new Dictionary<string,int>(), "fixture:accepted-deck",
+                GeneralPoolIds: [AcceptedOwner, AcceptedPeer], ModeKind: ContentModeKind.Team,
+                TeamCounts: new Dictionary<string,int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));
+        }
+    }
 
     private sealed class Fixture(bool nativeDraw, bool fatalRescue, bool cardCapture) : IGameContentPackage
     {

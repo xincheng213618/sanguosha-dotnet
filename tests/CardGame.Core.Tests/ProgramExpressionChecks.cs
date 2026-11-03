@@ -99,6 +99,16 @@ internal static class ProgramExpressionChecks
         Need(Eval("""["and",["gainInitiallyAlive","owner"],["gainFirstOutsideDraw","owner"],["gainPhaseIs","owner","draw","selectedTarget"],["not",["gainPhaseIs","owner","draw","owner"]]]""", world) == true,
             "Initial admission and the sampled phase actor remain independent of completion-time life and the actual turn owner.");
 
+        Need(Eval("""["and",["==",["gainActualTurn","owner"],2],["not",["gainRecipientAlive","owner"]],["gainHasSource","owner","initial"],["not",["gainHasSource","owner","completion"]]]""", world) == true &&
+            Cards("""["filter",["gainCards","owner","incoming"],["and",["cardAt","card","owner","hand"],["cardCanDiscard","owner","card"],["cardInBinding","card","accepted"]]]""", world)!.Select(card => card.CardId).SequenceEqual([11]),
+            "Source-time admission, current card location, discard legality and accepted membership remain independent shared reads.");
+        Need(Eval("""["all",["filter",["gainCards","owner","incoming"],["cardKindIs","card",["slash","fireSlash","thunderSlash"]]],"newCard",["any",["gainCards","owner","previousHand"],"oldCard",["sameCardName","newCard","oldCard"]]]""", world) == true,
+            "Basic card-name identity unifies elemental Slashes while exact effective-kind comparison remains available separately.");
+        world.Displaced = true;
+        Need(Eval("""["any",["gainCards","owner","incoming"],["and",["cardAt","card","owner","hand"],["cardCanDiscard","owner","card"]]]""", world) == false &&
+            Cards(allIncoming, world)!.Select(card => card.CardId).SequenceEqual([11, 12, 13]),
+            "Live eligibility may change without refreshing the frozen acquisition's entities or faces.");
+        world.Displaced = false;
         incoming[0] = incoming[0] with { EffectiveKind = CardKind.Peach, EffectiveSuit = Suit.Diamond };
         incoming.Clear(); previous.Clear();
         Need(Cards(matchingWitness, world)!.Select(card => card.CardId).SequenceEqual([11, 12]) &&
@@ -110,6 +120,8 @@ internal static class ProgramExpressionChecks
         Need(Cards(allIncoming, unknown) is null && Cards(actualIncoming, unknown) is null &&
             Eval("""["not",["any",["gainCards","owner","incoming"],true]]""", unknown) is null &&
             Eval("""["not",["gainInitiallyAlive","owner"]]""", unknown) is null &&
+            Eval("""["gainHasSource","owner","completion"]""", unknown) is null &&
+            Eval("""["any",["gainCards","owner","incoming"],["cardInBinding","card","missing"]]""", world) is null &&
             Eval("""["gainFirstOutsideDraw","selectedTarget"]""", world) is null &&
             Eval("""["gainPhaseIs","owner","draw","owner"]""", empty) is null,
             "Absent acquisitions, recipients and sampled timing remain unknown, including through negation and filtering.");
@@ -120,6 +132,13 @@ internal static class ProgramExpressionChecks
         foreach (var invalid in new[]
         {
             """["gainInitiallyAlive",1]""",
+            """["gainHasSource","owner","now"]""",
+            """["cardAt","owner","owner","hand"]""",
+            """["any",["gainCards","owner","incoming"],["cardAt","card","owner","missingZone"]]""",
+            """["any",["gainCards","owner","incoming"],["cardAt","card","owner","discardPile"]]""",
+            """["any",["gainCards","owner","incoming"],["cardCanDiscard","card","owner"]]""",
+            """["any",["gainCards","owner","incoming"],["cardInBinding","card",0]]""",
+
             """["cardActualGain","card"]""",
             """["any",["gainCards","owner","incoming"],["alive","card"]]""",
             """["any","living",["cardActualGain","it"]]""",
@@ -148,6 +167,12 @@ internal static class ProgramExpressionChecks
         public int? Stat(string stat, int seat) => null;
         public bool? Flag(string flag, int seat) => null;
         public HandGainOccurrence? HandGain(int recipient) => gain?.RecipientSeat == recipient ? gain : null;
+        public bool Displaced { get; set; }
+        public bool? GainHasSource(int recipient, string moment) => HandGain(recipient) is null ? null : moment == "initial";
+        public bool? CardAt(int cardId, int seat, CardZoneKind zone) => gain is null ? null : !Displaced && seat == 0 && zone == CardZoneKind.Hand && cardId is 11 or 21;
+        public bool? CardCanDiscard(int seat, int cardId) => gain is null ? null : !Displaced && seat == 0 && cardId == 11;
+        public bool? CardInBinding(int cardId, string name) => name == "accepted" ? cardId == 11 : null;
+
     }
 
     private static void ConditionalGrantFactsUseSharedReadsAndOrderedSuitRewrites()

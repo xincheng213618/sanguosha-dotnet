@@ -146,7 +146,7 @@ internal static class PhysicalCardDrawRuntimeChecks
             .Select(CharacterFixtureContent.EmbeddedProgramBundle).ToArray();
         var registry = ContentRegistry.Build(new StandardContentPackage(), new GainProjectionPackage(catalogs));
         var game = GameEngine.CreateStandard(new GameOptions { Seed = 7 }, registry);
-        var sanwen = game.GetRuntimeModule<CharacterWangCanOlRuntime>();
+        var sanwen = catalogs[0].Programs["ol:sanwen"];
         foreach (var hasOldWitness in new[] { false, true })
         {
             var f = new HandGainDrawPorts();
@@ -166,14 +166,17 @@ internal static class PhysicalCardDrawRuntimeChecks
             var completed = f.Batches.PendingBatches[^1];
             var tang = CharacterTangTangOlRuntime.ProjectTangTangGains(completed);
             Require(tang.Select(gain => gain.CardId).SequenceEqual(hasOldWitness ? drawn : []) &&
-                    sanwen.SanwenContextFor(completed, 0) is null,
+                    ProgramExpressions.EvaluateBool(sanwen.Triggers.Single().Condition.Expression!, new GainRuleWorld(f, sanwen, completed.HandGains!.Single())) == false,
                 "TangTang projects exactly the two acquisitions with an old same-color witness; Sanwen rejects the completion-time lost source.");
             var active = new HandGainDrawPorts(catalogs[0].Programs["ol:sanwen"]);
             active.Zones.Move(11, CardLocation.DrawPile, hasOldWitness ? CardLocation.Hand(0) : CardLocation.OutsideGame);
             active.Draw.DrawCards(active.Owner, 2, log: false);
-            var qualification = sanwen.SanwenContextFor(active.Batches.PendingBatches[^1], 0);
-            Require(hasOldWitness ? qualification is { Incoming.Count: 2, Witnesses: [{ CardId: 11 }] } &&
-                        qualification.Incoming.Select(c => c.CardId).SequenceEqual(drawn) : qualification is null,
+            var ruleWorld = new GainRuleWorld(active, sanwen, active.Batches.PendingBatches[^1].HandGains!.Single());
+            var candidates = ProgramExpressions.EvaluateCardSet(sanwen.Triggers.Single().Effects[0].CardSetExpression!, ruleWorld)!;
+            ruleWorld.Accepted = candidates.Select(card => card.CardId).ToArray();
+            var witnesses = ProgramExpressions.EvaluateCardSet(sanwen.Triggers.Single().Effects[2].CardSetExpression!, ruleWorld)!;
+            Require(ProgramExpressions.EvaluateBool(sanwen.Triggers.Single().Condition.Expression!, ruleWorld) == hasOldWitness &&
+                    (hasOldWitness ? candidates.Select(card => card.CardId).SequenceEqual(drawn) && witnesses.Select(card => card.CardId).SequenceEqual([11]) : candidates.Count == 0),
                 "The real Sanwen projection normalizes effective Slash names and requires a pre-acquisition witness, not another new card.");
             if (hasOldWitness) f.Zones.Move(11, CardLocation.Hand(0), CardLocation.DiscardPile);
             f.Face = CardKind.Dodge;
@@ -317,7 +320,8 @@ internal static class PhysicalCardDrawRuntimeChecks
         var runtime = new ProgramBoundCardRuntime(Port<IProgramBoundCardFacts>(), Port<IProgramBoundInstructionFacts>(),
             Port<IProgramBoundCardMovementOperations>(), Port<IProgramBoundCardPaymentOperations>(),
             new SubsetReturnFrames(frames), Port<IProgramRuntimePrompts>(), Port<IProgramRuntimeEvents>(),
-            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>(), Port<ICardMovementHistoryQueries>());
+            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>(), Port<ICardMovementHistoryQueries>(),
+            Port<CardGame.Core.RuntimeAccess.IClosedOwnedCardMoveQueriesSource>());
         var pindian = game.GetRuntimeModule<ProgramPindianRuntime>();
         var hasPending = typeof(ProgramPindianRuntime).GetMethod("HasPendingBoundCards", BindingFlags.Instance | BindingFlags.NonPublic)!;
         bool Pending() => (bool)hasPending.Invoke(pindian, null)!;
@@ -373,7 +377,8 @@ internal static class PhysicalCardDrawRuntimeChecks
         var runtime = new ProgramBoundCardRuntime(new BlockedDiscardFacts(Port<IProgramBoundCardFacts>(), material[1].Id),
             Port<IProgramBoundInstructionFacts>(), new NestedMovementAfterFirst(Port<IProgramBoundCardMovementOperations>(), zones, material[0].Id),
             Port<IProgramBoundCardPaymentOperations>(), frames, Port<IProgramRuntimePrompts>(), Port<IProgramRuntimeEvents>(),
-            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>(), history);
+            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>(), history,
+            Port<CardGame.Core.RuntimeAccess.IClosedOwnedCardMoveQueriesSource>());
         var program = registry.GetSkill("classic:xunxun").Program!;
         var trigger = program.Triggers.Single();
         var originalTop = frames.Top;
@@ -488,6 +493,22 @@ internal static class PhysicalCardDrawRuntimeChecks
     {
         try { ((IList<T>)items).Add(item); throw new InvalidOperationException("A gain collection remained writable."); }
         catch (NotSupportedException) { }
+    }
+
+    private sealed class GainRuleWorld(HandGainDrawPorts ports, SkillProgram program, HandGainOccurrence gain) : IProgramExpressionWorld
+    {
+        public IReadOnlyList<int> Accepted { get; set; } = [];
+        public int? Participant(string name) => name == "owner" ? gain.RecipientSeat : null;
+        public IReadOnlyList<int>? ParticipantSet(string name) => null;
+        public int? Stat(string stat, int seat) => null;
+        public bool? Flag(string flag, int seat) => null;
+        public HandGainOccurrence? HandGain(int recipient) => recipient == gain.RecipientSeat ? gain : null;
+        public bool? GainHasSource(int recipient, string moment) => HandGain(recipient) is null ? null :
+            (moment == "initial" ? gain.InitialSources : gain.Sources).Any(source => source.SkillId == program.Id &&
+                source.BindingId == program.Triggers.Single().Id && source.SkillInstanceId == "gain-instance" && source.GameplayHash == program.GameplayHash);
+        public bool? CardAt(int id, int seat, CardZoneKind zone) => ports.Zones.GetLocation(id) == new CardLocation(zone, seat);
+        public bool? CardCanDiscard(int seat, int id) => ports.Zones.GetLocation(id) == CardLocation.Hand(seat);
+        public bool? CardInBinding(int id, string name) => name == "sanwen-accepted" ? Accepted.Contains(id) : null;
     }
 
     private sealed class HandGainDrawPorts : IPhysicalCardDrawPolicies, IPhysicalCardDrawMovement,

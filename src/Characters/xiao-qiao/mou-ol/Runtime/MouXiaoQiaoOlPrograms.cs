@@ -101,8 +101,8 @@ internal abstract class MouXiaoQiaoOlDescriptor : ProgramOperationDescriptorBase
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ISkillProgramEffectHandler Handler => new MouXiaoQiaoOlHandler(Op);
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext c) => c.State.CanContinueAfterOwnerDeath(c.Frame);
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance,
-        Activated: ProgramTrackedFact.NativeActionAppearance);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeActionAppearance | ProgramTrackedFact.ActualRound,
+        Activated: ProgramTrackedFact.NativeActionAppearance | ProgramTrackedFact.ActualRound);
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, c) => c.PublicControlValue(2));
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect e) => Op switch
     {

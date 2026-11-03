@@ -1,5 +1,10 @@
 namespace CardGame.Core;
 
+internal interface IProgramAcceptedCardMovementHost : IProgramRuntimeOperations
+{
+    void Accept(ProgramSkillFrame frame, SkillProgramEffect effect);
+}
+
 internal interface IProgramBoundCardFacts : IProgramSelectionQuery
 {
     bool IsValidSeat(int seat);

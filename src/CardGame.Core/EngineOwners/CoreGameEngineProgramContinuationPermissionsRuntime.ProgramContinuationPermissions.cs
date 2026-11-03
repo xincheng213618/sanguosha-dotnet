@@ -4,9 +4,11 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramContinuationPermissionsRuntime
 {
     internal bool CanContinueProgramAfterOwnerDeath(ProgramSkillFrame frame) =>
+        ProgramAcceptedCardMovements.DrainsOwnerDeath(frame) ||
         frame.InvocationAuthorization?.RetainOwnerDeath == true && HasInvocationAuthorization(frame) ||
         _coreProgramRuntimeHooksOperations.RuntimeHooks.CanContinue(ProgramRuntimePhase.AfterOwnerDeath, frame);
-    internal bool CanContinueProgramAfterSkillLoss(ProgramSkillFrame frame) => HasInvocationAuthorization(frame) ||
+    internal bool CanContinueProgramAfterSkillLoss(ProgramSkillFrame frame) => ProgramAcceptedCardMovements.RetainsSourceLoss(frame) ||
+        HasInvocationAuthorization(frame) ||
         _coreProgramRuntimeHooksOperations.RuntimeHooks.CanContinue(ProgramRuntimePhase.AfterSkillLoss, frame);
 
     private bool HasInvocationAuthorization(ProgramSkillFrame frame) => ProgramInvocations.Allows(frame,

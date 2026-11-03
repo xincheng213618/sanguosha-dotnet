@@ -3,12 +3,34 @@ using CardGame.Core.RuntimeSkills;
 namespace CardGame.Core;
 /// <summary>Owns immutable bound-card selection, movement, cleanup and command answers on the original program frame.</summary>
 [ProgramRuntimeModule, ProgramCapability]
-internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IProgramBoundInstructionFacts instructions, IProgramBoundCardMovementOperations movement, IProgramBoundCardPaymentOperations payments, IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events, IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards, ICardMovementHistoryQueries history) : IProgramCardSetBindings, IProgramBoundCardCleanup, IProgramBoundCardMovementResults
+internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IProgramBoundInstructionFacts instructions, IProgramBoundCardMovementOperations movement, IProgramBoundCardPaymentOperations payments, IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events, IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards, ICardMovementHistoryQueries history, RuntimeAccess.IClosedOwnedCardMoveQueriesSource moveQueries) : IProgramCardSetBindings, IProgramBoundCardCleanup, IProgramBoundCardMovementResults, IProgramAcceptedCardMovementHost
 {
     void IProgramBoundCardCleanup.Cleanup(ProgramSkillFrame frame, bool completed) => CleanupProgramBoundCards(frame, completed);
     SkillProgramStepOutcome IProgramBoundCardMovementResults.Execute(ProgramSkillFrame frame, SkillProgramEffect effect, CardMoveReason reason) =>
         MoveProgramBoundCards(frame.Id, frame.OwnerSeat, effect.SourceBind!, effect.ExceptBind,
             effect.Destination!.Value, effect.DestinationZone, reason, resultBind: effect.ResultBind);
+    void IProgramAcceptedCardMovementHost.Accept(ProgramSkillFrame supplied, SkillProgramEffect effect)
+    {
+        var frame = _frames.ActiveProgram(supplied.Id);
+        var source = GetProgramCardSet(frame, effect.SourceBind!);
+        var legality = moveQueries.Get();
+        var accepted = source.CardIds.Select((id, index) => (Id: id, From: source.SourceLocations[index]))
+            .Where(item => item.From.OwnerSeat == frame.OwnerSeat && (item.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment) &&
+                _facts.Location(item.Id) == item.From && !legality.IsSelfHandCategoryDiscardForbidden(frame.OwnerSeat,
+                    _facts.CardsAt(item.From).Single(card => card.Id == item.Id), item.From, OwnedCardMoveIntent.Discard))
+            .ToArray();
+        if (accepted.Length == 0)
+        {
+            _payments.Cancel(frame, "没有可接受的材料，技能剩余步骤取消。");
+            return;
+        }
+        SetProgramCardSet(frame.Id, effect.ResultBind!, accepted.Select(item => item.Id).ToArray(),
+            SkillProgramCardSetVisibility.Private, accepted.Select(item => item.From).ToArray(), isReadOnlySnapshot: true);
+        var bound = _frames.ActiveProgram(frame.Id);
+        _frames.ReplaceTop(bound with { CardSetBindings = Array.AsReadOnly(bound.CardSetBindings.Select(binding =>
+            binding.Name == effect.ResultBind ? binding with { AcceptedMovement = new(frame.InstructionIndex,
+                effect.Destination!.Value, effect.AcceptedMovementContinuation ?? new()) } : binding).ToArray()) });
+    }
     private readonly IProgramBoundCardFacts _facts = facts;
     private readonly IProgramBoundInstructionFacts _instructions = instructions;
     private readonly IProgramBoundCardMovementOperations _movement = movement;
@@ -265,9 +287,13 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
         }
 
         var selected = source.CardIds.Select((cardId, index) => (CardId: cardId, Location: source.SourceLocations[index])).Where(item => ids.Contains(item.CardId)).ToArray();
-        if (selected.Any(item => _facts.Location(item.CardId) != item.Location))
+        if (source.AcceptedMovement is { } acceptedMovement && acceptedMovement.Destination != destination)
+            throw new InvalidOperationException("Accepted materials require their declared movement destination.");
+        if (source.AcceptedMovement is not null)
+            selected = selected.Where(item => _facts.Location(item.CardId) == item.Location).ToArray();
+        else if (selected.Any(item => _facts.Location(item.CardId) != item.Location))
             throw new InvalidOperationException("A bound card left its frozen source before its configured move.");
-        if (destination == SkillProgramCardDestination.DiscardPile)
+        if (destination == SkillProgramCardDestination.DiscardPile && source.AcceptedMovement is null)
             selected = selected.Where(item => !_facts.ForeignDiscardPrevented(source.SelectionActorSeat ?? ownerSeat, _facts.CardsAt(item.Location).Single(card => card.Id == item.CardId), item.Location, OwnedCardMoveIntent.Discard)).ToArray();
         var pindianAcquisitionBefore = _payments.BeginWholeHandAcquisition(frame, sourceBind, destination);
         if (selected.Length == 0)

@@ -12,7 +12,6 @@ internal sealed partial class CharacterWangCanOlEntries
     internal void ContinueDenglou(ProgramSkillFrame f) => _resolve().ContinueDenglou(f);
     internal void ContinueDenglouNativePayment(long id) => _resolve().ContinueDenglouNativePayment(id);
     internal void ContinueQiai(ProgramSkillFrame f) => _resolve().ContinueQiai(f);
-    internal void ContinueSanwenAfterPublicReveal(ProgramSkillFrame f) => _resolve().ContinueSanwenAfterPublicReveal(f);
     internal bool DenglouNativePaymentEdge(int index) => _resolve().DenglouNativePaymentEdge(index);
     internal bool DenglouNativeRidesOn(ProgramSkillFrame parent, CardUseFrame use) => _resolve().DenglouNativeRidesOn(parent, use);
     internal CardSnapshot[] DenglouPrivateCards(int viewer) => _resolve().DenglouPrivateCards(viewer);
@@ -23,7 +22,6 @@ internal sealed partial class CharacterWangCanOlEntries
     internal bool IsDenglouNativeUse(CardUseFrame use) => _resolve().IsDenglouNativeUse(use);
     internal void IssueDenglouNativeUse(ProgramSkillFrame f, LegalAction action) => _resolve().IssueDenglouNativeUse(f, action);
     internal void IssueWangCanSegment(ProgramSkillFrame f) => _resolve().IssueWangCanSegment(f);
-    internal void PaySanwenDraw(ProgramSkillFrame f) => _resolve().PaySanwenDraw(f);
     internal void PayWangCanMove(ProgramSkillFrame f, IReadOnlyList<int> ids, CardLocation destination, WangCanStage stage) => _resolve().PayWangCanMove(f, ids, destination, stage);
     internal void PublishWangCan(ProgramSkillFrame f, int seat, IReadOnlyList<PromptChoice> choices, string text) => _resolve().PublishWangCan(f, seat, choices, text);
     internal IReadOnlyList<PromptChoice> QiaiChoices(ProgramSkillFrame f) => _resolve().QiaiChoices(f);

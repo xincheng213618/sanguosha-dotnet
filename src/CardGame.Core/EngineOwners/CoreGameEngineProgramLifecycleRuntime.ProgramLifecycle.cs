@@ -376,8 +376,9 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         var skip = decision.Choices.SingleOrDefault(choice => choice.Parameters.GetValueOrDefault("program-action") == "skip");
         if (activateChoices.Length > 1)
             return SelectAiProgramChoiceGroup(decision, activateChoices, skip);
-        var pendingContext = GetPendingProgramTriggerCandidate().Context;
-        if (GetProgramTrigger(GetPendingProgramTriggerCandidate().Candidate).Effects is [{ Op: SkillProgramEffectOp.OfferRiceAfterDamagePoint }])
+        var pendingTrigger = GetPendingProgramTriggerCandidate();
+        var pendingContext = pendingTrigger.Context;
+        if (GetProgramTrigger(pendingTrigger.Candidate).Effects is [{ Op: SkillProgramEffectOp.OfferRiceAfterDamagePoint }])
             return activateChoices.Single();
         if (pendingContext.OptionalChooserSeat is not null)
         {
@@ -396,7 +397,8 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         var trigger = ProgramInstructionResolver.Default.Resolve(skill.Program!, ProgramInstructionSourceKind.Trigger, bindingId).Trigger!;
         var owner = _coreMatchParticipantsPlayersAccess._players[decision.PlayerSeat];
         var publicContext = CoreGameEnginePhaseHandExtraTurnAiRuntime.WithPhaseHandExtraTurnTargetPricing(WithProgramConditionFacts(CreateProgramAiPublicContext(trigger, owner, decision.PlayerSeat), owner, skillId, skillInstanceId), skill.Program!, trigger);
-        var estimate = EstimateCompositionForAi(owner, trigger.Effects, publicContext, windowContext: pendingContext).Estimate;
+        var estimate = EstimateCompositionForAi(owner, trigger.Effects, publicContext, windowContext: pendingContext,
+            ownerWindowFacts: _expressionWorlds.CreateTriggerExpressionWorld(pendingTrigger.Candidate, pendingContext, pendingContext.Facts)).Estimate;
         estimate = _corePhaseHandExtraTurnAiOperations.IncludePhaseHandExtraTurnDeclarationForAi(estimate, owner, skillId, skillInstanceId, skill.Program!, trigger, publicContext, pendingContext);
         var shouldActivate = !estimate.IsSelfLethal && estimate.Score > 0d;
         var activateAction = new LegalAction(LegalActionKind.UseProgramSkill, null, null, $"发动【{(skill.Name)}】");
@@ -426,9 +428,13 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         {
             var skill = _contentRegistryOperations._contentRegistry!.GetSkill(choice.Parameters["skill-id"]);
             var trigger = ProgramInstructionResolver.Default.Resolve(skill.Program!, ProgramInstructionSourceKind.Trigger, choice.Parameters["binding-id"]).Trigger!;
-            var candidateContext = GetPendingProgramTriggerCandidate().Context;
+            var pendingTrigger = GetPendingProgramTriggerCandidate();
+            var candidateContext = pendingTrigger.Context;
+            var candidate = pendingTrigger.Candidate with { SkillId = skill.Id, BindingId = trigger.Id,
+                SkillInstanceId = choice.Parameters["skill-instance-id"], GameplayHash = skill.Program!.GameplayHash, Priority = trigger.Priority };
             var publicContext = CoreGameEnginePhaseHandExtraTurnAiRuntime.WithPhaseHandExtraTurnTargetPricing(WithProgramConditionFacts(CreateProgramAiPublicContext(trigger, owner, decision.PlayerSeat), owner, choice.Parameters["skill-id"], choice.Parameters["skill-instance-id"]), skill.Program!, trigger);
-            var estimate = EstimateCompositionForAi(owner, trigger.Effects, publicContext, windowContext: candidateContext).Estimate;
+            var estimate = EstimateCompositionForAi(owner, trigger.Effects, publicContext, windowContext: candidateContext,
+                ownerWindowFacts: _expressionWorlds.CreateTriggerExpressionWorld(candidate, candidateContext, candidateContext.Facts)).Estimate;
             estimate = _corePhaseHandExtraTurnAiOperations.IncludePhaseHandExtraTurnDeclarationForAi(estimate, owner, choice.Parameters["skill-id"], choice.Parameters["skill-instance-id"], skill.Program!, trigger, publicContext, candidateContext);
             var action = new LegalAction(LegalActionKind.UseProgramSkill, null, null, $"发动【{(skill.Name)}】");
             return (Choice: choice, Action: action, Estimate: estimate);
@@ -553,7 +559,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         };
     }
 
-    internal (ProgramAiEstimate Estimate, int? TargetSeat) EstimateCompositionForAi(CharacterState owner, IEnumerable<SkillProgramEffect> sourceEffects, ProgramAiPublicContext publicContext, IReadOnlyList<int>? publishedTargets = null, ProgramSkillWindowContext? windowContext = null)
+    internal (ProgramAiEstimate Estimate, int? TargetSeat) EstimateCompositionForAi(CharacterState owner, IEnumerable<SkillProgramEffect> sourceEffects, ProgramAiPublicContext publicContext, IReadOnlyList<int>? publishedTargets = null, ProgramSkillWindowContext? windowContext = null, IProgramExpressionWorld? ownerWindowFacts = null)
     {
         var effects = sourceEffects.ToArray();
         if (effects is [{ Op: SkillProgramEffectOp.ResolveWushuangZengou }])
@@ -618,11 +624,11 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
         var targets = publishedTargets ?? (selection?.TargetKind is { } kind ? GetProgramTargetSeats(owner.Seat, kind, windowContext, selection.Marker) : Array.Empty<int>());
         var context = _coreNativeSkillContextQueriesOperations.CreateSkillContext(owner);
         if (targets.Count == 0)
-            return (ProgramCompositionAi.Estimate(effects, context, owner.IsFaceDown, publicContext), null);
+            return (ProgramCompositionAi.Estimate(effects, context, owner.IsFaceDown, publicContext, ownerWindowFacts), null);
         var snapshot = targetSnapshot ?? _corePlayerViewProjectionOperations.CreateSnapshot(owner.Seat);
         return targets.Select(targetSeat =>
         {
-            var estimate = ProgramCompositionAi.Estimate(effects, context, owner.IsFaceDown, publicContext with { SelectedTarget = _corePublicDamagePredictionOperations.CreateAiSkillContext(_coreMatchParticipantsPlayersAccess._players[targetSeat], owner.Seat, snapshot), HasOwnedCardCategory = (zones, categories, kinds) => zones.Contains(CardZoneKind.Equipment) && _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Any(card => CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardFilter(card.Kind, categories, kinds)), AttackRangeCoverageDecreased = _ => _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Any(card => _coreProgramCardPaymentsOperations.WouldEquipmentRemovalReduceCoverage(targetSeat, card.Id)) });
+            var estimate = ProgramCompositionAi.Estimate(effects, context, owner.IsFaceDown, publicContext with { SelectedTarget = _corePublicDamagePredictionOperations.CreateAiSkillContext(_coreMatchParticipantsPlayersAccess._players[targetSeat], owner.Seat, snapshot), HasOwnedCardCategory = (zones, categories, kinds) => zones.Contains(CardZoneKind.Equipment) && _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Any(card => CoreGameEngineProgramCardPaymentsRuntime.MatchesProgramCardFilter(card.Kind, categories, kinds)), AttackRangeCoverageDecreased = _ => _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[targetSeat]).Any(card => _coreProgramCardPaymentsOperations.WouldEquipmentRemovalReduceCoverage(targetSeat, card.Id)) }, ownerWindowFacts);
             var targetValue = _coreAiBrainsAiBrainsAccess._aiBrains[owner.Seat].ScoreProgramTarget(snapshot, targetSeat, estimate.Hint);
             return (Estimate: estimate with { Score = estimate.Score + targetValue }, TargetSeat: (int? )targetSeat);
         }).OrderByDescending(candidate => candidate.Estimate.Score).ThenBy(candidate => candidate.TargetSeat).First();

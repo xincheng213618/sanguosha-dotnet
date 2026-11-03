@@ -14,33 +14,16 @@ internal sealed partial class CharacterWangCanOlRuntime
             throw new InvalidOperationException("Wang Can requires its actual unpaid native source and window.");
         var initial = op switch
         {
-            SkillProgramEffectOp.ResolveSanwenActualGainDuplicates => WangCanStage.SanwenDiscard,
             SkillProgramEffectOp.CollectQiaiLivingContributions => WangCanStage.QiaiChoose,
             _ => WangCanStage.DenglouViewChildren
         };
-        var r = new WangCanReceipt(source, f.GameplayHash, 1, w.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, initial, Sanwen: w.Sanwen);
-        if (op == SkillProgramEffectOp.ResolveSanwenActualGainDuplicates && (w.Sanwen is not { } q || SanwenPayable(q).Count == 0))
-            throw new InvalidOperationException("Sanwen lost the frozen real gain batch or its original hand witnesses.");
+        var r = new WangCanReceipt(source, f.GameplayHash, 1, w.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, initial);
         if (op == SkillProgramEffectOp.CollectQiaiLivingContributions && (w.Window != SkillProgramTriggerWindow.DyingEntering || _coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } dying || dying.VictimSeat != f.OwnerSeat || _resolutionStackOperations._resolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().SingleOrDefault(entry => entry.Id == w.ParentFrameId)?.ResumeDyingFrameId != dying.Id))
             throw new InvalidOperationException("Qiai requires its actual own entering-dying frame.");
         if (op == SkillProgramEffectOp.ViewDenglouTopAndUseBasics && (w.Window != SkillProgramTriggerWindow.TurnEnding || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Count != 0))
             throw new InvalidOperationException("Denglou requires an actual own Ending with no hand.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangCan = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WangCanStartedEvent(f.Id, source, f.GameplayHash, w.ParentFrameId, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, op));
-        if (op == SkillProgramEffectOp.ResolveSanwenActualGainDuplicates)
-        {
-            var ids = SanwenPayable(r.Sanwen!);
-            var names = r.Sanwen!.Incoming.Where(i => ids.Contains(i.CardId)).Select(i => i.Name).ToHashSet();
-            var witnesses = r.Sanwen.Witnesses.Where(i => names.Contains(i.Name) && _cardZonesOperations._cardZones.GetLocation(i.CardId) == CardLocation.Hand(f.OwnerSeat)).Select(i => i.CardId).ToArray();
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangCan = r with { Entities = ids } });
-            _coreProgramLifecycleOperations.SetProgramCardSet(f.Id, "sanwen-witness", witnesses, SkillProgramCardSetVisibility.Public);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "sanwen-witness", Array.AsReadOnly(witnesses.Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_coreAdvancedLifecycleOperations.GetAdvancedCard(id))).ToArray())));
-            if (_characterXiaoQiaoMouOlOperations.TryBeginPublicHandRevealWindow2(f.Id, "sanwen-witness-hand"))
-                return SkillProgramStepOutcome.AwaitChild;
-            ContinueSanwenAfterPublicReveal(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
-            return SkillProgramStepOutcome.AwaitChild;
-        }
-
         if (op == SkillProgramEffectOp.CollectQiaiLivingContributions)
         {
             var seats = Enumerable.Range(1, _coreMatchParticipantsPlayersAccess._players.Count - 1).Select(i => _coreTableOrderOperations.TableStepSeat(f.OwnerSeat, i)).Where(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive).ToArray();
@@ -51,14 +34,6 @@ internal sealed partial class CharacterWangCanOlRuntime
 
         BeginDenglouLease(f);
         return SkillProgramStepOutcome.AwaitChild;
-    }
-
-    [PublicHandRevealReturn("sanwen-witness-hand")]
-    internal void ContinueSanwenAfterPublicReveal(ProgramSkillFrame f)
-    {
-        var r = f.WangCan ?? throw new InvalidOperationException("Sanwen lost its original duplicate gain receipt.");
-        var ids = r.Entities.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(f.OwnerSeat)).ToArray();
-        PayWangCanMove(f, ids, CardLocation.DiscardPile, WangCanStage.SanwenDiscard);
     }
 
     internal void PayWangCanMove(ProgramSkillFrame f, IReadOnlyList<int> ids, CardLocation destination, WangCanStage stage)
@@ -76,10 +51,7 @@ internal sealed partial class CharacterWangCanOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangCan = r, PendingMovementContinuation = new(f.OwnerSeat, 0, null), Step = ResolutionFrameStep.ResolvingEffect });
         if (ids.Count > 0)
         {
-            if (stage == WangCanStage.SanwenDiscard)
-                _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, ids, new(WangCanReason(stage)));
-            else
-                _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, new(WangCanReason(stage)), (stage == WangCanStage.QiaiGift ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.Seats[r.Cursor], destination.OwnerSeat ?? f.OwnerSeat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, destination, new(WangCanReason(stage)), (stage == WangCanStage.QiaiGift ? _characterHuangQuanMouOperations.NativeGiveCompletionRecords(f.Id, r.Seats[r.Cursor], destination.OwnerSeat ?? f.OwnerSeat, ids, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, null) : null));
         }
 
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
@@ -167,12 +139,6 @@ internal sealed partial class CharacterWangCanOlRuntime
         RequireIssuedWangCan(f);
         if (DrainWangCan(f))
             return true;
-        if (r.Stage == WangCanStage.SanwenDiscard)
-        {
-            PaySanwenDraw(f);
-            return true;
-        }
-
         if (r.Stage == WangCanStage.QiaiGift)
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WangCan = r with { Cursor = r.Cursor + 1, Stage = WangCanStage.QiaiChoose }, PendingMovementContinuation = null });

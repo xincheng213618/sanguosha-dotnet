@@ -53,6 +53,7 @@ internal sealed record CaptureSourceCard(string Name, int MaximumCount = 1, bool
     SkillProgramEffectTarget? CardOwner = null) : ProgramResourceOperation;
 internal sealed record CaptureActivationCards(string Name) : ProgramResourceOperation;
 internal sealed record CaptureMovementResult(string Source, string Result) : ProgramResourceOperation;
+internal sealed record AcceptMovement(string Source, string Result, SkillProgramCardDestination Destination) : ProgramResourceOperation;
 internal sealed record ReadSingleCardSet(string Name) : ProgramResourceOperation;
 internal sealed record ReadFrozenSingleCardSet(string Name) : ProgramResourceOperation;
 internal sealed record SelectTargetSet(int Minimum, int Maximum) : ProgramResourceOperation;
@@ -834,6 +835,8 @@ internal sealed class MoveBoundCardsProgramOperationDescriptor : ProgramOperatio
     public override ISkillProgramEffectHandler Handler { get; } = new MoveBoundCardsSkillProgramEffectHandler();
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.Move,
         static (effect, context) => context.Move(effect));
+    public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) =>
+        ProgramAcceptedCardMovements.MayExecuteWhileDraining(context.Frame, context.Effect);
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
         r.AllowOnly("op", "target", "sourceBind", "exceptBind", "destination", "destinationZone", "condition", "awaitMovementTriggers", "resultBind");

@@ -1420,7 +1420,7 @@ public enum SkillProgramEffectOp
     DrawAndRequestShanjiaSlash = 24501,
     PayShanjiaHandUseDebt = 24502,
     RequestShanjiaEndingSlash = 24503,
-    ResolveSanwenActualGainDuplicates = 24600,
+
     CollectQiaiLivingContributions = 24601,
     ViewDenglouTopAndUseBasics = 24602,
     ResolveGuolunRevealOptionalAtomicExchange = 24700,
@@ -1891,6 +1891,7 @@ public enum SkillProgramEffectOp
     DistributeBoundCards = 900002,
     CaptureNumber = 900003,
     CaptureCards = 900007,
+    AcceptBoundCardMovement = 900008,
     SkillState = 900004,
     MarkInitialHand = 900005,
     MarkCards = 900006

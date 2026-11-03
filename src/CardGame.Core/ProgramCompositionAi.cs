@@ -56,7 +56,8 @@ internal static class ProgramCompositionAi
         IEnumerable<SkillProgramEffect> effects,
         PlayerSkillContext player,
         bool faceDown = false,
-        ProgramAiPublicContext? publicContext = null)
+        ProgramAiPublicContext? publicContext = null,
+        IProgramExpressionWorld? ownerWindowFacts = null)
     {
         ArgumentNullException.ThrowIfNull(effects);
         ArgumentNullException.ThrowIfNull(player);
@@ -68,8 +69,8 @@ internal static class ProgramCompositionAi
         {
             // Opponent faces and deck order are private; retain an even contest
             // prior, and simulate the two coherent branches rather than half moves.
-            var won = Estimate(instructions, player, faceDown, supplied with { PindianWon = _ => true, PindianOutcome = _ => true });
-            var lost = Estimate(instructions, player, faceDown, supplied with { PindianWon = _ => false, PindianOutcome = _ => false });
+            var won = Estimate(instructions, player, faceDown, supplied with { PindianWon = _ => true, PindianOutcome = _ => true }, ownerWindowFacts);
+            var lost = Estimate(instructions, player, faceDown, supplied with { PindianWon = _ => false, PindianOutcome = _ => false }, ownerWindowFacts);
             var hint = new SkillProgramAiHint((int)Math.Round((won.Hint.OwnerDraw + lost.Hint.OwnerDraw) / 2d), 0, 0,
                 (int)Math.Round((won.Hint.TargetDraw + lost.Hint.TargetDraw) / 2d), 0, 0, false, false)
             { ValueAdjustment = (won.Hint.ValueAdjustment + lost.Hint.ValueAdjustment) / 2d,
@@ -77,7 +78,7 @@ internal static class ProgramCompositionAi
             return new(hint, (won.Score + lost.Score) / 2d, false, "公开手牌数量与未知拼点胜负各半；赠回在完整获牌后按半手估计。");
         }
         var facts = supplied with { ChoiceResult = name => choices.GetValueOrDefault(name) ?? supplied.ChoiceResult?.Invoke(name) };
-        var context = new ProgramAiEstimateContext(player, faceDown, facts);
+        var context = new ProgramAiEstimateContext(player, faceDown, facts, ownerWindowFacts);
         if (handReturn) context.PricePindianHandReturnInputs();
         for (var index = 0; index < instructions.Length; index++)
         {
@@ -184,15 +185,17 @@ internal sealed partial class ProgramAiEstimateContext
     {
         if (ProgramExpressions.EvaluateCardSet(effect.CardSetExpression!, CurrentExpressionWorld()) is { } cards)
             _bindings[effect.ResultBind!] = new(cards.Count,
-                EstimatedSuits.Select(suit => (double)cards.Count(card => card.EffectiveSuit == suit)).ToArray(), false);
+                EstimatedSuits.Select(suit => (double)cards.Count(card => card.EffectiveSuit == suit)).ToArray(), false,
+                CardIds: Array.AsReadOnly(cards.Select(card => card.CardId).ToArray()));
         else PathCancelled = true;
     }
     private static readonly Suit[] EstimatedSuits = Enum.GetValues<Suit>();
     private sealed record CardSetEstimate(double Count, double[] Suits, bool OwnerHeld, bool TargetHeld = false,
-        bool ActivationInput = false);
+        bool ActivationInput = false, IReadOnlyList<int>? CardIds = null);
 
     private readonly PlayerSkillContext _player;
     private readonly ProgramAiPublicContext _publicContext;
+    private readonly IProgramExpressionWorld? _ownerWindowFacts;
     private readonly Dictionary<string, CardSetEstimate> _bindings = new(StringComparer.Ordinal);
     private double _ownerDraw;
     private double _ownerRecovery;
@@ -224,10 +227,12 @@ internal sealed partial class ProgramAiEstimateContext
     internal ProgramAiEstimateContext(
         PlayerSkillContext player,
         bool faceDown,
-        ProgramAiPublicContext? publicContext = null)
+        ProgramAiPublicContext? publicContext = null,
+        IProgramExpressionWorld? ownerWindowFacts = null)
     {
         _player = player;
         _publicContext = publicContext ?? new ProgramAiPublicContext(0);
+        _ownerWindowFacts = ownerWindowFacts;
         _canUseSlashOnOther = _publicContext.CanUseSlashOnOther;
         _estimatedHp = player.Hp;
         _estimatedArmor = player.Armor;
@@ -481,7 +486,9 @@ internal sealed partial class ProgramAiEstimateContext
             HandCount = Rounded(_estimatedHandCount), HpValueProvider = null
         }, _publicContext.SelectedTarget, _publicContext.EquipmentCardCount,
             (stat, name) => stat == "boundCount" && _bindings.TryGetValue(name, out var cards) ? Rounded(cards.Count) : null,
-            name => _expressionNumbers.TryGetValue(name, out var value) ? value : null, _publicContext.FinalTargetFacts);
+            name => _expressionNumbers.TryGetValue(name, out var value) ? value : null, _publicContext.FinalTargetFacts,
+            _ownerWindowFacts, (cardId, name) => _bindings.TryGetValue(name, out var binding) && binding.CardIds is { } ids
+                ? ids.Contains(cardId) : null);
     private int? EvaluateAmount(ProgramExpression expression, SkillProgramUnknownAmountBehavior onUnknown)
     {
         if (ProgramExpressions.EvaluateInt(expression, CurrentExpressionWorld()) is { } amount)
@@ -536,8 +543,10 @@ internal sealed partial class ProgramAiEstimateContext
         var source = Binding(effect.SourceBind);
         var except = effect.ExceptBind is null ? null : Binding(effect.ExceptBind);
         var count = Math.Max(0, source.Count - (except?.Count ?? 0));
+        var ids = source.CardIds is { } sourceIds && (except is null || except.CardIds is not null)
+            ? Array.AsReadOnly(sourceIds.Except(except?.CardIds ?? []).ToArray()) : null;
         if (effect.ResultBind is { } result)
-            _bindings[result] = source with { Count = count, OwnerHeld = false, TargetHeld = false, ActivationInput = false };
+            _bindings[result] = source with { Count = count, OwnerHeld = false, TargetHeld = false, ActivationInput = false, CardIds = ids };
         if (effect.Destination == SkillProgramCardDestination.OwnerHand && !source.OwnerHeld)
         {
             _ownerDraw += count;
@@ -567,6 +576,12 @@ internal sealed partial class ProgramAiEstimateContext
             _targetDraw -= count;
         // Bindings retain their original location. A move can consume only
         // part of a source through exceptBind; its remaining cards did not move.
+    }
+    internal void AcceptBoundMovement(SkillProgramEffect effect)
+    {
+        var source = Binding(effect.SourceBind);
+        if (source.Count <= 0) { PathCancelled = true; return; }
+        _bindings[effect.ResultBind!] = source with { OwnerHeld = true, TargetHeld = false, ActivationInput = false };
     }
 
     internal void ShownBoundGift(SkillProgramEffect effect)

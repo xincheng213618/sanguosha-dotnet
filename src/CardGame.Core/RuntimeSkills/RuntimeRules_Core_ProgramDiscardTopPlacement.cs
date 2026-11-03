@@ -39,7 +39,7 @@ internal static class RuntimeRules_Core_ProgramDiscardTopPlacement
             "skill-program.sun-hao.canshi.discard" or
             "skill-program.wen-yang.qingjiao.hand-discard" or "skill-program.wen-yang.qingjiao.ending-discard" or
             "skill-program.da-qiao-xiao-qiao.xingwu.hand-discard" or "skill-program.da-qiao-xiao-qiao.xingwu.equipment-discard" or
-            "skill-program.sanwen.discard" or "skill-program.denglou.unusable-discard" or
+            "skill-program.denglou.unusable-discard" or
             "skill-program.shanjia.discard" or "skill-program.neifa.discard" or "skill-program.huaman.discard") return true;
         if (value is "card.effect.dismantlement" or "card.effect.dismantlement-judgment" or
             "mode.identity.lord-killed-loyalist" or "skill.gongqi.cost" or

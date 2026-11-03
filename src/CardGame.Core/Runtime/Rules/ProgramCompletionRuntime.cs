@@ -107,9 +107,12 @@ internal sealed class ProgramCompletionRuntime(IProgramRuntimeFrames frames, IPr
         var pending = frame.PendingMovementContinuation ??
             throw new InvalidOperationException("The movement continuation is missing.");
         frames.ReplaceTop(frame with { PendingMovementContinuation = null });
-        if (!facts.Alive(frame.OwnerSeat) || !facts.Alive(pending.SubjectSeat) ||
+        var acceptedDrain = !facts.Alive(frame.OwnerSeat) && pending.SubjectSeat == frame.OwnerSeat &&
+            ProgramAcceptedCardMovements.DrainsOwnerDeath(frame);
+        if ((!facts.Alive(frame.OwnerSeat) || !facts.Alive(pending.SubjectSeat)) && !acceptedDrain ||
             !facts.CanInvokeProgramSkill(frame) &&
-            !facts.CanContinueConditionalGrant(frame) && !facts.CanContinuePhaseAlcohol(frame))
+            !facts.CanContinueConditionalGrant(frame) && !facts.CanContinuePhaseAlcohol(frame) &&
+            !ProgramAcceptedCardMovements.RetainsSourceLoss(frame) && !acceptedDrain)
         {
             protocols.CancelBindingAndCleanup(frames.ActiveProgram(frameId),
                 "移动响应后技能持有人、装备持有人或技能实例已失效。");

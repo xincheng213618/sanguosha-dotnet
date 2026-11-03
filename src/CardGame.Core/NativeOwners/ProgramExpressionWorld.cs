@@ -4,12 +4,37 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     int? triggerOwner = null, ProgramSkillWindowContext? triggerContext = null,
     SkillProgramTriggerFacts? triggerFacts = null, IActualCardUseHistoryQueries? history = null,
     Func<CardUseHistoryPoint>? currentHistoryPoint = null,
-    IActualPhaseHistoryQueries? phaseHistory = null) : IProgramExpressionWorld
+    IActualPhaseHistoryQueries? phaseHistory = null, IOwnedCardMoveQueries? ownedMoves = null,
+    ProgramTriggerCandidate? triggerCandidate = null) : IProgramExpressionWorld
 {
     private int Owner => frame?.OwnerSeat ?? triggerOwner!.Value;
     private ProgramSkillWindowContext? Context => frame?.WindowContext ?? triggerContext;
     public HandGainOccurrence? HandGain(int recipient) => recipient == Owner
         ? Context?.MovementBatch?.HandGains?.SingleOrDefault(gain => gain.RecipientSeat == recipient) : null;
+    public bool? GainHasSource(int recipient, string moment)
+    {
+        if (HandGain(recipient) is not { } gain) return null;
+        var skill = frame?.SkillId ?? triggerCandidate?.SkillId;
+        var binding = frame?.TriggerId ?? triggerCandidate?.BindingId;
+        var instance = frame?.SkillInstanceId ?? triggerCandidate?.SkillInstanceId;
+        var hash = frame?.GameplayHash ?? triggerCandidate?.GameplayHash;
+        if (skill is null || binding is null || instance is null || hash is null) return null;
+        return (moment == "initial" ? gain.InitialSources : gain.Sources).Any(source =>
+            source.OwnerSeat == recipient && source.SkillId == skill && source.BindingId == binding &&
+            source.SkillInstanceId == instance && source.GameplayHash == hash);
+    }
+    public bool? CardAt(int cardId, int seat, CardZoneKind zone) =>
+        getCardZoneStore().GetLocation(cardId) == new CardLocation(zone, seat);
+    public bool? CardCanDiscard(int seat, int cardId)
+    {
+        if (seat != Owner || ownedMoves is null) return null;
+        var location = getCardZoneStore().GetLocation(cardId);
+        return location.OwnerSeat == seat && location.Zone is CardZoneKind.Hand or CardZoneKind.Equipment &&
+            !ownedMoves.IsSelfHandCategoryDiscardForbidden(seat,
+                getCardZoneStore().CardsAt(location).Single(card => card.Id == cardId), location, OwnedCardMoveIntent.Discard);
+    }
+    public bool? CardInBinding(int cardId, string name) =>
+        frame?.CardSetBindings.SingleOrDefault(binding => binding.Name == name)?.CardIds.Contains(cardId);
     private CardUseHistoryPoint? WindowPoint => Context?.HistoryPoint ?? Context?.Facts?.HistoryPoint ?? triggerFacts?.HistoryPoint;
     public int? Number(string name) => frame is null ? null : getCoreGameEngineProgramExpressionsRuntime().ReadProgramExpressionNumber(frame, name);
     public int? WindowStat(string stat, string participant) =>

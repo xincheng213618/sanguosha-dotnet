@@ -46,6 +46,10 @@ internal interface IProgramExpressionWorld
     IReadOnlyList<CardUseHistoryFact>? CardUses(string moment, string view) => null;
     CardUseHistoryFact? CurrentUse() => null;
     HandGainOccurrence? HandGain(int recipient) => null;
+    bool? GainHasSource(int recipient, string moment) => null;
+    bool? CardAt(int cardId, int seat, CardZoneKind zone) => null;
+    bool? CardCanDiscard(int seat, int cardId) => null;
+    bool? CardInBinding(int cardId, string name) => null;
     bool? SameTeam(int first, int second) => null;
     int? PhaseCount(string moment, int actor, ActualDiscardRecoveryPhaseKind? kind, ActualPhaseHistoryOutcome outcome) => null;
 }
@@ -153,10 +157,37 @@ internal static class ProgramExpressions
                 Fail(path, "gainCards requires incoming or previousHand");
             return new(op, ProgramExpressionType.CardSet, [Arg(0, ProgramExpressionType.Participant)], name: args[1].GetString());
         }
-        if (op is "gainInitiallyAlive" or "gainFirstOutsideDraw")
+        if (op is "gainInitiallyAlive" or "gainFirstOutsideDraw" or "gainRecipientAlive" or "gainActualTurn")
         {
             Arity(1, 1);
-            return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant));
+            return new(op, op == "gainActualTurn" ? ProgramExpressionType.Int : ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant));
+        }
+        if (op == "gainHasSource")
+        {
+            Arity(2, 2);
+            if (args[1].ValueKind != JsonValueKind.String || args[1].GetString() is not ("initial" or "completion"))
+                Fail(path, "gainHasSource requires initial or completion");
+            return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.Participant)], name: args[1].GetString());
+        }
+        if (op == "cardAt")
+        {
+            Arity(3, 3);
+            var zone = ParseFactEnum<CardZoneKind>(args[2], path + "[3]");
+            if (zone is not (CardZoneKind.Hand or CardZoneKind.Equipment)) Fail(path, "cardAt requires hand or equipment");
+            return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.Card), Arg(1, ProgramExpressionType.Participant)],
+                literal: (int)zone);
+        }
+        if (op == "cardCanDiscard")
+        {
+            Arity(2, 2);
+            return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.Participant), Arg(1, ProgramExpressionType.Card)]);
+        }
+        if (op == "cardInBinding")
+        {
+            Arity(2, 2);
+            if (args[1].ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(args[1].GetString()) || args[1].GetString()!.Length > 128)
+                Fail(path, "cardInBinding requires a binding identifier");
+            return new(op, ProgramExpressionType.Bool, [Arg(0, ProgramExpressionType.Card)], name: args[1].GetString());
         }
         if (op == "gainPhaseIs")
         {
@@ -170,7 +201,7 @@ internal static class ProgramExpressions
             Arity(1, 1);
             return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Card));
         }
-        if (op is "sameCardKind" or "sameCardSuit")
+        if (op is "sameCardKind" or "sameCardSuit" or "sameCardName")
         {
             Arity(2, 2);
             return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Card));
@@ -366,10 +397,21 @@ internal static class ProgramExpressions
         switch (e.Op)
         {
             case "bool": return e.Literal != 0;
-            case "gainInitiallyAlive" or "gainFirstOutsideDraw":
+            case "gainInitiallyAlive" or "gainFirstOutsideDraw" or "gainRecipientAlive":
                 return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } recipient &&
                     world.HandGain(recipient) is { } gain
-                    ? e.Op == "gainInitiallyAlive" ? gain.InitiallyAlive : gain.FirstOutsideDraw : null;
+                    ? e.Op == "gainInitiallyAlive" ? gain.InitiallyAlive : e.Op == "gainRecipientAlive" ? gain.RecipientAlive : gain.FirstOutsideDraw : null;
+            case "gainHasSource":
+                return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } sourceRecipient
+                    ? world.GainHasSource(sourceRecipient, e.Name!) : null;
+            case "cardAt":
+                return EvaluateCard(e.Args[0], cards) is { } located && EvaluateParticipant(e.Args[1], world, it, use, cards) is { } holder
+                    ? world.CardAt(located.CardId, holder, (CardZoneKind)e.Literal) : null;
+            case "cardCanDiscard":
+                return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } discarder && EvaluateCard(e.Args[1], cards) is { } discardCard
+                    ? world.CardCanDiscard(discarder, discardCard.CardId) : null;
+            case "cardInBinding":
+                return EvaluateCard(e.Args[0], cards) is { } boundCard ? world.CardInBinding(boundCard.CardId, e.Name!) : null;
             case "gainPhaseIs":
                 return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } gainRecipient &&
                     world.HandGain(gainRecipient)?.Timing is { } timing &&
@@ -382,9 +424,11 @@ internal static class ProgramExpressions
             case "cardSuitIs":
                 return EvaluateCard(e.Args[0], cards) is { } suitCard
                     ? e.Args.Skip(1).Any(arg => (Suit)arg.Literal == suitCard.EffectiveSuit) : null;
-            case "sameCardKind" or "sameCardSuit":
+            case "sameCardKind" or "sameCardSuit" or "sameCardName":
                 return EvaluateCard(e.Args[0], cards) is { } firstCard && EvaluateCard(e.Args[1], cards) is { } secondCard
                     ? e.Op == "sameCardKind" ? firstCard.EffectiveKind == secondCard.EffectiveKind :
+                        e.Op == "sameCardName" ? RuntimeSkills.RuntimeRules_Core_AlternativeViewAsCosts.ProgramBasicCardName(firstCard.EffectiveKind) ==
+                            RuntimeSkills.RuntimeRules_Core_AlternativeViewAsCosts.ProgramBasicCardName(secondCard.EffectiveKind) :
                         firstCard.EffectiveSuit == secondCard.EffectiveSuit : null;
             case "not": return !EvaluateBool(e.Args[0], world, it, use, cards);
             case "and":
@@ -484,6 +528,7 @@ internal static class ProgramExpressions
             case "int": return e.Literal;
             case "when": return EvaluateBool(e.Args[0], world, it, use, cards) == true ? EvaluateInt(e.Args[1], world, it, use, cards) : null;
             case "number": return world.Number(e.Name!);
+            case "gainActualTurn": return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } gainOwner ? world.HandGain(gainOwner)?.ActualTurn : null;
             case "phaseCount": return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } phaseActor
                 ? world.PhaseCount(e.Name!, phaseActor, e.Literal < 0 ? null : (ActualDiscardRecoveryPhaseKind)e.Literal,
                     (ActualPhaseHistoryOutcome)e.Args[1].Literal) : null;
@@ -663,11 +708,17 @@ internal static class ProgramExpressions
 /// </summary>
 internal sealed class SkillContextExpressionWorld(PlayerSkillContext owner, PlayerSkillContext? selectedTarget,
     int? ownerEquipmentCount = null, Func<string, string, int?>? bindingStat = null,
-    Func<string, int?>? number = null, SkillProgramTriggerFacts? windowFacts = null) : IProgramExpressionWorld
+    Func<string, int?>? number = null, SkillProgramTriggerFacts? windowFacts = null,
+    IProgramExpressionWorld? ownerWindowFacts = null, Func<int, string, bool?>? bindingContains = null) : IProgramExpressionWorld
 {
     public int? WindowStat(string stat, string participant) => ProgramExpressions.ReadWindowStat(windowFacts, stat, participant, selectedTarget is not null);
     public int? BindingStat(string stat, string name) => bindingStat?.Invoke(stat, name);
     public int? Number(string name) => number?.Invoke(name);
+    public HandGainOccurrence? HandGain(int recipient) => recipient == owner.Seat ? ownerWindowFacts?.HandGain(recipient) : null;
+    public bool? GainHasSource(int recipient, string moment) => recipient == owner.Seat ? ownerWindowFacts?.GainHasSource(recipient, moment) : null;
+    public bool? CardAt(int cardId, int seat, CardZoneKind zone) => ownerWindowFacts?.CardAt(cardId, seat, zone);
+    public bool? CardCanDiscard(int seat, int cardId) => seat == owner.Seat ? ownerWindowFacts?.CardCanDiscard(seat, cardId) : null;
+    public bool? CardInBinding(int cardId, string name) => bindingContains?.Invoke(cardId, name);
     private PlayerSkillContext? Context(int seat) =>
         seat == owner.Seat ? owner : selectedTarget?.Seat == seat ? selectedTarget : null;
 

@@ -192,7 +192,7 @@ internal static class ProgramCompositionValidator
             var expressions = Conditions(effect.Condition).Select(condition => condition.Expression)
                 .Append(effect.AmountExpression).Append(effect.ValueExpression).Append(effect.TargetSetExpression).Append(effect.CardSetExpression).Where(expression => expression is not null)
                 .SelectMany(expression => expression!.Nodes()).ToArray();
-            var expressionReads = expressions.Where(expression => expression.Op.StartsWith("bound", StringComparison.Ordinal))
+            var expressionReads = expressions.Where(expression => expression.Op.StartsWith("bound", StringComparison.Ordinal) || expression.Op == "cardInBinding")
                 .Select(expression => (ProgramResourceOperation)new ReadCardSet(expression.Name!))
                 .Concat(expressions.Where(expression => expression.Op == "number" && !GeneratedEquipmentRuntime.IsNumberFact(expression.Name))
                     .Select(expression => (ProgramResourceOperation)new ReadNumberBinding(expression.Name!)))
@@ -271,6 +271,18 @@ internal static class ProgramCompositionValidator
                         Add(moved.Result, new(root, root.Atoms.Keys.ToHashSet(), source.MaximumCount));
                         break;
                     }
+                    case AcceptMovement accepted:
+                    {
+                        var source = Get(accepted.Source);
+                        if (source.Root.AcceptedDestination is not null || source.Atoms.Overlaps(source.Root.Consumed) || source.Atoms.Overlaps(source.Root.PossiblyGifted))
+                            Fail("acceptance requires unconsumed materials");
+                        source.Root.Consumed.UnionWith(source.Atoms);
+                        var root = new Root(accepted.Result, false, true, typedCardAtoms, expandedCardDomain)
+                            { AcceptedDestination = accepted.Destination };
+                        roots.Add(root);
+                        Add(accepted.Result, new(root, root.Atoms.Keys.ToHashSet(), source.MaximumCount, SkillProgramEffectTarget.Owner));
+                        break;
+                    }
                     case ReadCompletedActivationDiscard paid:
                     {
                         var source = Get(paid.Name);
@@ -295,7 +307,7 @@ internal static class ProgramCompositionValidator
                     case ReadSingleCardSet single:
                     {
                         var source = Get(single.Name);
-                        if (source.MaximumCount > 1 || source.Atoms.Overlaps(source.Root.Consumed) ||
+                        if (source.Root.AcceptedDestination is not null || source.MaximumCount > 1 || source.Atoms.Overlaps(source.Root.Consumed) ||
                             source.Atoms.Overlaps(source.Root.PossiblyGifted))
                             Fail("the operation requires a stable single-card binding before movement");
                         break;
@@ -312,6 +324,7 @@ internal static class ProgramCompositionValidator
                         if (derive.MatchSuitOfBind is { } frozen && !frozenSuitBindings.Contains(frozen))
                             Fail($"unknown public frozen suit binding '{frozen}'");
                         var source = Get(derive.Source);
+                        if (source.Root.AcceptedDestination is not null) Fail("accepted materials cannot be reselected or filtered");
                         derivedPlacementRoots.Add(source.Root);
                         if (source.Atoms.Overlaps(source.Root.Consumed) || source.Atoms.Overlaps(source.Root.PossiblyGifted))
                             Fail("a derived set reads cards that may already have moved");
@@ -364,6 +377,7 @@ internal static class ProgramCompositionValidator
                     case RequireOwnedCardSet owned:
                     {
                         var source = Get(owned.Name);
+                        if (source.Root.AcceptedDestination is not null) Fail("accepted materials cannot be used by another payment");
                         var producer = effects.Take(index).SingleOrDefault(prior => prior.ResultBind == owned.Name &&
                             prior.Op is SkillProgramEffectOp.SelectOwnedCards or SkillProgramEffectOp.SelectOwnedHandRankSum);
                         var exactPindianHalfReturn = pindianHandReturn && index == 4 &&
@@ -390,6 +404,7 @@ internal static class ProgramCompositionValidator
                     case RetainOwnedCardSet retained:
                     {
                         var source = Get(retained.Name);
+                        if (source.Root.AcceptedDestination is not null) Fail("accepted materials cannot be retained instead of their promised movement");
                         if (!source.Root.OwnerHeld || source.MaximumCount != 1 || source.Root.Consumed.Overlaps(source.Atoms) || source.Root.PossiblyGifted.Overlaps(source.Atoms))
                             Fail("retention requires one stable owner-held entity");
                         source.Root.Consumed.UnionWith(source.Atoms);
@@ -401,6 +416,7 @@ internal static class ProgramCompositionValidator
                     case PartitionCardSet partition:
                     {
                         var source = Get(partition.Source);
+                        if (source.Root.AcceptedDestination is not null) Fail("accepted materials cannot be partitioned");
                         if (source.Root.OwnerHeld || source.Root.AlreadyMoved ||
                             source.Atoms.Overlaps(source.Root.Consumed) ||
                             source.Atoms.Overlaps(source.Root.PossiblyGifted))
@@ -445,6 +461,9 @@ internal static class ProgramCompositionValidator
                     case MoveCardSet move:
                     {
                         var source = Get(move.Source);
+                        if (source.Root.AcceptedDestination is { } destination &&
+                            (move.Destination != destination || move.Except is not null || effect.Condition.Kind != SkillProgramConditionKind.Always))
+                            Fail("accepted materials require their original destination and complete accepted set");
                         if (move.Destination == SkillProgramCardDestination.DrawPileBottom &&
                             (window != SkillProgramTriggerWindow.DrawPhaseStarting ||
                              source.Root.OwnerHeld || !source.Root.NeedsCleanup ||
@@ -500,6 +519,7 @@ internal static class ProgramCompositionValidator
                     case GiftCardSet gift:
                     {
                         var source = Get(gift.Source);
+                        if (source.Root.AcceptedDestination is not null) Fail("accepted materials cannot be given instead of their promised movement");
                         if (!source.Root.OwnerHeld && !source.Root.NeedsCleanup)
                             Fail("optional gifts require cards already held in hand or a temporary reveal binding");
                         if (source.Atoms.Overlaps(source.Root.Consumed))
@@ -804,6 +824,9 @@ internal static class ProgramCompositionValidator
             }
             void Fail(string message) => throw Error(nodePath, message);
         }
+        foreach (var root in roots.Where(root => root.AcceptedDestination is not null))
+            if (!root.Consumed.SetEquals(root.Atoms.Keys))
+                throw Error(path, "accepted materials require one unconditional movement to their promised destination");
         foreach (var root in roots.Where(root => root.NeedsCleanup))
         {
             if (choiceGuardedBindings.TryGetValue(root.Name, out var guard) &&
@@ -854,6 +877,7 @@ internal static class ProgramCompositionValidator
         internal bool NeedsCleanup { get; } = needsCleanup;
         internal bool OwnerHeld { get; } = ownerHeld;
         internal bool AlreadyMoved { get; } = alreadyMoved;
+        internal SkillProgramCardDestination? AcceptedDestination { get; init; }
         internal Dictionary<int, (CardKind Kind, Suit Suit)> Atoms { get; } =
             (typedCardAtoms
                 ? (expandedCardDomain ? Enum.GetValues<CardKind>() : OrdinaryKinds)

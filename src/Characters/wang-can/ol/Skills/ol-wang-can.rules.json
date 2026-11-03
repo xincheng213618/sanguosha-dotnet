@@ -11,15 +11,16 @@
           "optional": true,
           "usageScope": "turn",
           "usageLimit": 1,
+          "condition": {"kind":"expression","expr":["and",[">",["gainActualTurn","owner"],0],["gainRecipientAlive","owner"],["gainHasSource","owner","completion"],["any",["filter",["gainCards","owner","incoming"],"incoming",["and",["cardAt","incoming","owner","hand"],["cardCanDiscard","owner","incoming"],["any",["gainCards","owner","previousHand"],"old",["and",["cardAt","old","owner","hand"],["sameCardName","incoming","old"]]]]],true]]},
           "effects": [
-            {
-              "op": "resolveSanwenActualGainDuplicates",
-              "target": "owner"
-            }
+            {"op":"captureCards","target":"owner","resultBind":"sanwen-candidates","cardsExpr":["filter",["gainCards","owner","incoming"],"incoming",["and",["cardAt","incoming","owner","hand"],["cardCanDiscard","owner","incoming"],["any",["gainCards","owner","previousHand"],"old",["and",["cardAt","old","owner","hand"],["sameCardName","incoming","old"]]]]]},
+            {"op":"acceptBoundCardMovement","target":"owner","sourceBind":"sanwen-candidates","resultBind":"sanwen-accepted","destination":"discardPile","continuation":{"sourceLoss":"retain","ownerDeath":"drain"}},
+            {"op":"captureCards","target":"owner","resultBind":"sanwen-witnesses","cardsExpr":["filter",["gainCards","owner","previousHand"],"old",["and",["cardAt","old","owner","hand"],["any",["gainCards","owner","incoming"],"incoming",["and",["cardInBinding","incoming","sanwen-accepted"],["sameCardName","incoming","old"]]]]]},
+            {"op":"revealBoundCards","target":"owner","sourceBind":"sanwen-witnesses"},
+            {"op":"moveBoundCards","target":"owner","sourceBind":"sanwen-accepted","destination":"discardPile","resultBind":"sanwen-actual","awaitMovementTriggers":true},
+            {"op":"draw","target":"owner","amountExpr":["+",["boundCount","sanwen-actual"],["boundCount","sanwen-actual"]],"awaitMovementTriggers":true,"condition":{"kind":"expression","expr":["alive","owner"]}}
           ],
-          "destinationZones": [
-            "hand"
-          ],
+          "destinationZones": ["hand"],
           "movementOccurrence": "perBatch"
         }
       ]

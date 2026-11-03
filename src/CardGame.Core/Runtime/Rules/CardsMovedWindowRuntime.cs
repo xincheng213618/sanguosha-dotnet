@@ -337,7 +337,8 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
                         var matching = MatchingOwnerBatchMovementIndexes(batch, candidate, trigger);
                         var ownerBatchFacts = CaptureCardsMovedTriggerFacts(ownerSeat, matching.Length, new CardMovementSourceCount(count.Location, _facts.ProgramMovementSourceCounts(batch, window).Where(item => (!item.DiscardOriginOnly || trigger.MovementDiscardOnly) && item.Count.Location.OwnerSeat == ownerSeat && trigger.SourceZones.Contains(item.Count.Location.Zone)).Sum(item => item.Count.CountBefore), _facts.ProgramMovementSourceCounts(batch, window).Where(item => (!item.DiscardOriginOnly || trigger.MovementDiscardOnly) && item.Count.Location.OwnerSeat == ownerSeat && trigger.SourceZones.Contains(item.Count.Location.Zone)).Sum(item => item.Count.CountAfter)), window);
                         ownerBatchFacts = RuntimeSkills.RuntimeRules_Core_OwnerBatchEquipmentLoss.CaptureOwnerBatchEquipmentLoss(ownerBatchFacts, batch, candidate, trigger, matching);
-                        if (matching.Length > 0 && trigger.Condition.Evaluate(ownerBatchFacts, candidate.SkillId, candidate.SkillInstanceId))
+                        if (matching.Length > 0 && (ProgramInstructionResolver.Default.Features(trigger).UsesCondition(SkillProgramTriggerConditionKind.Expression) ||
+                            trigger.Condition.Evaluate(ownerBatchFacts, candidate.SkillId, candidate.SkillInstanceId)))
                             candidates.Add(candidate);
                         continue;
                     }
@@ -352,7 +353,10 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
                     if (indexes.Length == 0)
                         continue;
                     var facts = CaptureCardsMovedTriggerFacts(ownerSeat, _selection.FriendManjuanMovedCount(batch, ownerSeat, trigger, indexes.Length), count, window, batch.MovementTiming, RuntimeSkills.RuntimeRules_Core_NativeDrawOrdinals.UsesNativeDrawOrdinal(trigger) ? batch : null);
-                    if (!trigger.Condition.Evaluate(facts, candidate.SkillId, candidate.SkillInstanceId))
+                    // Expressions require the owning window's world. CanRun evaluates
+                    // them before offering this candidate, with its frozen context.
+                    if (!ProgramInstructionResolver.Default.Features(trigger).UsesCondition(SkillProgramTriggerConditionKind.Expression) &&
+                        !trigger.Condition.Evaluate(facts, candidate.SkillId, candidate.SkillInstanceId))
                         continue;
                     // A judgment still in flight (for example while another skill replaces its
                     // card) owns its judgment zone churn; starting a second judgment from that

@@ -7,5 +7,5 @@ internal static class RuntimeRules_wang_can_ol_WangCanPrograms
 
     internal static CardLocation WangCanLease(int owner)=>new(CardZoneKind.PrivateReserve,owner);
 
-    internal static string WangCanReason(WangCanStage stage)=>stage switch{WangCanStage.SanwenDiscard=>"skill-program.sanwen.discard",WangCanStage.SanwenDraw=>"skill-program.sanwen.draw",WangCanStage.QiaiGift=>"skill-program.qiai.give",WangCanStage.DenglouViewChildren=>"skill-program.denglou.private-lease",WangCanStage.DenglouGain=>"skill-program.denglou.obtain",WangCanStage.DenglouDiscard=>"skill-program.denglou.unusable-discard",WangCanStage.DenglouCancel=>"skill-program.denglou.cancel-cleanup",_=>"skill-program.wangcan.no-movement"};
+    internal static string WangCanReason(WangCanStage stage)=>stage switch{WangCanStage.QiaiGift=>"skill-program.qiai.give",WangCanStage.DenglouViewChildren=>"skill-program.denglou.private-lease",WangCanStage.DenglouGain=>"skill-program.denglou.obtain",WangCanStage.DenglouDiscard=>"skill-program.denglou.unusable-discard",WangCanStage.DenglouCancel=>"skill-program.denglou.cancel-cleanup",_=>"skill-program.wangcan.no-movement"};
 }

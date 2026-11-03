@@ -6,8 +6,6 @@ internal sealed partial class CharacterWangCanOlRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 500)]
     internal bool CanOfferWangCan(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {
-        if (t.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveSanwenActualGainDuplicates))
-            return _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && w.Sanwen is { } q && SanwenPayable(q).Count > 0;
         if (t.Effects.Any(e => e.Op == SkillProgramEffectOp.ViewDenglouTopAndUseBasics))
             return c.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive && _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat]).Count == 0;
         return true;
@@ -20,17 +18,13 @@ internal sealed partial class CharacterWangCanOlRuntime
             return;
         if (r.Source != WangCanSource(f) || r.GameplayHash != f.GameplayHash || r.Instruction != f.InstructionIndex || r.WindowId != f.WindowContext?.ParentFrameId || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.Before > r.After || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WangCanStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.WindowId == r.WindowId && e.ActualTurn == r.ActualTurn && e.Operation == _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op) != 1 || r.Entities.Distinct().Count() != r.Entities.Count || r.Remaining.Distinct().Count() != r.Remaining.Count)
             throw new InvalidOperationException("Wang Can lost its exact original source, window, instruction or physical receipt.");
-        if (r.Stage is WangCanStage.SanwenDiscard or WangCanStage.SanwenDraw or WangCanStage.QiaiGift or WangCanStage.DenglouViewChildren or WangCanStage.DenglouGain or WangCanStage.DenglouDiscard or WangCanStage.DenglouCancel)
+        if (r.Stage is WangCanStage.QiaiGift or WangCanStage.DenglouViewChildren or WangCanStage.DenglouGain or WangCanStage.DenglouDiscard or WangCanStage.DenglouCancel)
         {
             if (!WangCanSegmentMatches(f, r) || f.PendingMovementContinuation is not { BeforeCount: 0, CoverageResultBind: null })
                 throw new InvalidOperationException("Wang Can cannot borrow another instruction's paid native movement.");
             var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After && m.Reason.Value == WangCanReason(r.Stage)).ToArray();
-            if (moves.Length != r.ActualCount || moves.Select(m => m.CardId).Distinct().Count() != moves.Length || r.Stage != WangCanStage.SanwenDraw && moves.Any(m => !r.Entities.Contains(m.CardId)))
+            if (moves.Length != r.ActualCount || moves.Select(m => m.CardId).Distinct().Count() != moves.Length || moves.Any(m => !r.Entities.Contains(m.CardId)))
                 throw new InvalidOperationException("Wang Can native payment differs from its exact entity and movement invoice.");
-            if (r.Stage == WangCanStage.SanwenDiscard && (r.Sanwen is not { } gain || moves.Any(m => m.From != CardLocation.Hand(f.OwnerSeat) || m.To != CardLocation.DiscardPile || !gain.Incoming.Any(i => i.CardId == m.CardId))))
-                throw new InvalidOperationException("Sanwen may discard only its actual matching newly gained hand entities.");
-            if (r.Stage == WangCanStage.SanwenDraw && (moves.Any(m => m.From != CardLocation.DrawPile || m.To != CardLocation.Hand(f.OwnerSeat)) || r.ActualCount > r.Cursor || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<WangCanSegmentPaidEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.Stage == WangCanStage.SanwenDiscard && e.ActualCount * 2 == r.Cursor) != 1))
-                throw new InvalidOperationException("Sanwen draw request must derive from exactly twice its own actual discard count.");
             if (r.Stage == WangCanStage.QiaiGift && (r.Cursor < 0 || r.Cursor >= r.Seats.Count || moves.Any(m => m.From.OwnerSeat != r.Seats[r.Cursor] || m.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || m.To != CardLocation.Hand(f.OwnerSeat)) || r.ActualCount != 1))
                 throw new InvalidOperationException("Qiai payment lost its exact living payer's chosen HE entity.");
             if (r.Stage == WangCanStage.DenglouGain && moves.Any(m => m.From != r.Lease || m.To != CardLocation.Hand(f.OwnerSeat) || CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).Kind) == SkillProgramCardCategory.Basic))

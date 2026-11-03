@@ -9,7 +9,7 @@ internal sealed partial class CoreGameEngineMouLuMengRuntime
 
     internal void BeginRoundForTurn(CharacterState current)
     {
-        if ((!_modeRulesOperations._modeRules.RequiresRoundTracking && !UsesFormalMouLuMeng && !_contentRegistryOperations._contentRegistry.ProgramDependencies.UsesRoundTracking && !_coreShanheSourceDifficultyOperations.Value.RequiresShanheSourceArmorTracking) || _coreActualTurnProgressTurnProgressionAccess._turnProgression.Kind == ActualTurnKind.Extra)
+        if ((!_nativeFacts.RequiresFact(ProgramTrackedFact.ActualRound) && !_modeRulesOperations._modeRules.RequiresRoundTracking && !UsesFormalMouLuMeng && !_contentRegistryOperations._contentRegistry.ProgramDependencies.UsesRoundTracking && !_coreShanheSourceDifficultyOperations.Value.RequiresShanheSourceArmorTracking) || _coreActualTurnProgressTurnProgressionAccess._turnProgression.Kind == ActualTurnKind.Extra)
             return;
         if (_coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundNumber == 0 || _coreActualRoundProgressRoundNumberRoundTurnSeatsAccess._roundTurnSeats.Contains(current.Seat))
         {
