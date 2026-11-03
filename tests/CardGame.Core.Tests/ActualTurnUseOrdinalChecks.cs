@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Reflection;
 using CardGame.Content.Standard;
 using CardGame.Core;
 
@@ -39,6 +40,7 @@ internal static class ActualTurnUseOrdinalChecks
         VerifyResponseAndActualTurnIsolation(game, registry);
         VerifyOwnSlashDefenseDodge();
         VerifyGroupDodgeIsOnlyAResponse();
+        VerifyAppliedNextUseSuitResponses();
 
         var (legacy, legacyRegistry) = Start(legacyPair: true);
         PrepareLegacyPair(legacy);
@@ -219,7 +221,7 @@ internal static class ActualTurnUseOrdinalChecks
 
     private static void VerifyGroupDodgeIsOnlyAResponse()
     {
-        var (game, registry) = Start(groupResponse: true);
+        var (game, registry) = Start(groupResponse: true, suitRestriction: true);
         ReachPlay(game);
         Accept(game, new EndPlayPhaseCommand(0, game.Revision, Prompt(game)!.PromptId));
         Reach(game, () => Prompt(game) is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge });
@@ -239,6 +241,7 @@ internal static class ActualTurnUseOrdinalChecks
                 item.Action.EffectiveKind == CardKind.Dodge && item.Action.PhysicalCards.Any(card => card.CardId == cost)).Action;
             var completed = Window(branch, "foreign-first");
             Require(response is { ActorSeat: 0, ProviderSeat: 0, ResponderSeat: 0, RequesterSeat: null } &&
+                History(branch).FindAction(response.ActionId) is { IsSelfNativeResponseUse: false } &&
                 response.ParentActionId == arrow.Action!.ActionId && completed.Action.ActionId == arrow.Action.ActionId &&
                 completed.CompletedResponseReturn is null &&
                 Facts<CurrentTurnCardUseKindsRecordedEvent>(branch).Count(item => item.ActorSeat == 0) == before &&
@@ -267,6 +270,76 @@ internal static class ActualTurnUseOrdinalChecks
         Require(game.ResolutionStack.OfType<CardUseFrame>().Any(frame => frame.CardKind == CardKind.Slash && frame.Action is null),
             "The small phase-starting driver must issue the real legacy second use before advancing its attack.");
     }
+
+    private static void VerifyAppliedNextUseSuitResponses()
+    {
+        foreach (var kind in new[] { "dodge", "nullification", "duel" })
+        {
+            var dodge = kind == "dodge"; var played = kind == "duel";
+            var (game, registry) = Start(ordinal: false, defense: dodge, suitRestriction: true);
+            ReachPlay(game);
+            var hand = game.CreateSnapshot(0).Players[0].Hand;
+            var first = game.GetHumanLegalActions().FirstOrDefault(action => action.CardId is { } id &&
+                (dodge || played ? action.Kind == LegalActionKind.Equip : action.ConversionSource?.BindingId == "draw") &&
+                hand.Count(card => card.Suit == hand.Single(card => card.Id == id).Suit) > 1 &&
+                hand.Any(card => card.Suit != hand.Single(card => card.Id == id).Suit));
+            Require(first is not null, "The fixed suit fixture needs one actual material and both matching and different-suit response costs: " +
+                JsonSerializer.Serialize(new { kind, Hand = hand, Actions = game.GetHumanLegalActions() }));
+            var banned = hand.Single(card => card.Id == first!.CardId).Suit;
+            Accept(game, new PlayCardCommand(0, first!.CardId!.Value, first.TargetSeats, game.Revision,
+                Prompt(game)!.PromptId, first.PlayedCardKind, first.TargetCardId) { ConversionSource = first.ConversionSource });
+            if (dodge || played)
+            {
+                ReachPlay(game);
+                Require(Restrictions(game).IsMaterialUseForbidden(0, [first.CardId.Value], banned),
+                    "The production Shutong applies its next-use restriction after a real self-targeted equipment use.");
+                Accept(game, new UseProgramSkillCommand(0, Driver, played ? "foreign-duel" : "poke", [], [1], game.Revision, Prompt(game)!.PromptId));
+            }
+            Reach(game, () => Prompt(game) is { PlayerSeat: 0 } prompt &&
+                prompt.Kind == (dodge ? DecisionKind.RespondDodge : played ? DecisionKind.RespondSlash : DecisionKind.Nullification));
+            var pending = Prompt(game)!;
+            hand = game.CreateSnapshot(0).Players[0].Hand;
+            var same = hand.Where(card => card.Suit == banned).Select(card => card.Id).ToArray();
+            var binding = dodge ? "dodge-response" : played ? "slash-response" : "counter";
+            var choices = pending.Choices.Where(choice => choice.Parameters.GetValueOrDefault("conversion-binding-id") == binding).ToArray();
+            Require(same.Length > 0 && choices.Length > 0 &&
+                (played ? choices.Any(choice => choice.Cards.Any(same.Contains)) : choices.All(choice => !choice.Cards.Any(same.Contains))) &&
+                Restrictions(game).IsMaterialUseForbidden(0, [same[0]], banned),
+                "Real self response Uses exclude the applied suit, while a Duel's ordinary played response still accepts that suit without consuming the state.");
+            var choice = played ? choices.First(choice => choice.Cards.Any(same.Contains)) : choices.First();
+            var cost = choice.Cards.Single();
+            var parent = dodge || played ? game.ResolutionStack.OfType<CardUseFrame>().Last() :
+                game.ResolutionStack.OfType<CardUseFrame>().Single(use =>
+                    use.Id == game.ResolutionStack.OfType<NullificationWindowFrame>().Last().ParentFrameId);
+            var opponent = dodge || played ? parent.SourceSeat : game.ResolutionStack.OfType<NullificationWindowFrame>().Last().SourceSeat;
+            var before = Facts<CardActionAcceptedEvent>(game).Count();
+            var copy = Cold(game, registry);
+            foreach (var branch in new[] { game, copy })
+            {
+                Answer(branch, Prompt(branch)!.Choices.Single(item => item.Id == choice.Id));
+                ReachPlay(branch);
+                var response = Facts<CardActionAcceptedEvent>(branch).Skip(before).Single(item =>
+                    item.Action.Type == CardActionType.Response && item.Action.PhysicalCards.Any(card => card.CardId == cost)).Action;
+                Require(response is { ActorSeat: 0, ProviderSeat: 0, ResponderSeat: 0, RequesterSeat: null } &&
+                    response.EffectiveKind == (dodge ? CardKind.Dodge : played ? CardKind.Slash : CardKind.Nullification) &&
+                    response.ParentActionId == parent.Action!.ActionId && response.OpponentSeat == opponent &&
+                    History(branch).FindAction(response.ActionId) is { } recorded && recorded.IsSelfNativeResponseUse == !played &&
+                    Restrictions(branch).IsMaterialUseForbidden(0, [same[0]], banned) == played &&
+                    branch.CardMovements.Count(move => move.CardId == cost && move.From == CardLocation.Hand(0) &&
+                        move.To == CardLocation.Processing) == 1,
+                    "The original response's shared history preserves its exact native identity: self response Uses consume once, while an ordinary played response pays once and retains the state.");
+            }
+            Require(State(game) == State(copy), "The active suit restriction and its real self response consume identically after cold replay.");
+        }
+    }
+
+    private static IAppliedCardActionRestrictions Restrictions(GameEngine game) =>
+        ((ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .GetValue(game)!).Get<IAppliedCardActionRestrictions>();
+
+    private static IActualCardUseHistoryQueries History(GameEngine game) =>
+        ((ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .GetValue(game)!).Get<IActualCardUseHistoryQueries>();
 
     private static int SelectEquipment(GameEngine game, string binding)
     {
@@ -348,9 +421,10 @@ internal static class ActualTurnUseOrdinalChecks
         Require(State(game) == State(copy), "Ordinal facts, all private views, typed children and real movements must cold-restore exactly.");
         return copy;
     }
-    private static (GameEngine, ContentRegistry) Start(bool ordinal = true, bool legacyPair = false, bool groupResponse = false, bool defense = false)
+    private static (GameEngine, ContentRegistry) Start(bool ordinal = true, bool legacyPair = false, bool groupResponse = false, bool defense = false,
+        bool suitRestriction = false)
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(ordinal, legacyPair, groupResponse, defense));
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(ordinal, legacyPair, groupResponse, defense, suitRestriction));
         var game = GameEngine.CreateStandard(new GameOptions
         {
             Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord, ModeId = Mode,
@@ -445,7 +519,7 @@ internal static class ActualTurnUseOrdinalChecks
         if (!legacyPair) presentation["skills"]![Driver]!.AsObject().Remove("optionLabels");
         return presentation.ToJsonString();
     }
-    private sealed class Fixture(bool ordinal, bool legacyPair, bool groupResponse, bool defense) : IGameContentPackage
+    private sealed class Fixture(bool ordinal, bool legacyPair, bool groupResponse, bool defense, bool suitRestriction) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("actual-turn-ordinal-fixture", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder builder)
@@ -456,11 +530,17 @@ internal static class ActualTurnUseOrdinalChecks
             foreach (var (id, program) in catalog.Programs)
                 builder.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description)
                     { Program = program, ProgramPresentation = catalog.Presentations[id] });
-            builder.AddGeneral(new(Owner, "实际回合序号", "supporter", Driver, "wei", 12, [Witness]));
+            if (suitRestriction) CharacterFixtureContent.Register(builder, "ol:cui-yan");
+            builder.AddGeneral(new(Owner, "实际回合序号", "supporter", Driver, "wei", 12,
+                suitRestriction ? [Witness, "ol:shutong"] : [Witness]));
             var others = Enumerable.Range(1, 3).Select(index => $"fixture:actual-turn-ordinal-other-{index}").ToArray();
             foreach (var id in others) builder.AddGeneral(new(id, "真实参与者", "supporter", groupResponse ? "standard:none" : Peer, "shu", 12));
-            builder.AddDeck(new("fixture:actual-turn-ordinal-deck", "同质真实牌堆", 4, 2,
-                [new(groupResponse ? "standard:arrow_barrage" : "standard:crossbow", 80)]));
+            var deck = new ContentDeckRecipe("fixture:actual-turn-ordinal-deck", "同质真实牌堆", 4, 2,
+                suitRestriction ? [] : [new(groupResponse ? "standard:arrow_barrage" : "standard:crossbow", 80)]);
+            if (suitRestriction) deck = deck with { PhysicalCards = Enumerable.Range(0, 80).Select(index =>
+                new ContentDeckPhysicalCard(groupResponse ? "standard:arrow_barrage" : "standard:crossbow",
+                    new[] { Suit.Spade, Suit.Heart, Suit.Club, Suit.Diamond }[index % 4], 7)).ToArray() };
+            builder.AddDeck(deck);
             builder.AddMode(new(Mode, "实际回合序号共享检查", 4, 4,
                 new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Renegade)] = 3 },
                 "fixture:actual-turn-ordinal-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, .. others]));

@@ -14,7 +14,7 @@ internal sealed partial class CharacterDongChengMouRuntime
 
     internal IReadOnlyList<int> MouDcTargets(ProgramSkillFrame f, CardKind kind)
     {
-        if (f.MouDongCheng is not { } r || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !MouDcDamageKind(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(f.OwnerSeat, kind, CardActionType.Use) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(f.OwnerSeat, kind, [], r.Source)) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(f.OwnerSeat, [], null))
+        if (f.MouDongCheng is not { } r || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !MouDcDamageKind(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(f.OwnerSeat, kind, CardActionType.Use) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(f.OwnerSeat, kind, [], r.Source)) || _appliedCardActionRestrictions.IsMaterialUseForbidden(f.OwnerSeat, [], null))
             return[];
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var represented = new Card(0, kind, Suit.None, 0);

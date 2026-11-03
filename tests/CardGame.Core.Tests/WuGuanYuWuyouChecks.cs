@@ -123,6 +123,47 @@ internal static class WuGuanYuWuyouChecks
         scenario.Need(!payments.CanUse(pending, CardKind.Slash, []) &&
             !payments.CanSupply(pending, CardKind.Slash, []),
             "A determined empty payment cannot borrow a potential named entity's range privilege.");
+        var copy = scenario.CopyForMechanismCheck();
+        var copiedRequest = copy.G.GetRuntimeModule<CoreNativeCardContinuationCursorsRuntime>().ActiveFactionCardRequest!;
+        var copiedPayments = copy.G.GetRuntimeModule<ProvidedSlashPaymentTargetsRuntime>();
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine)
+            .GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(copy.G)!;
+        var turn = capabilities.Get<IProgramTurnQueries>();
+        var journal = capabilities.Get<IProgramEventJournalQueries>();
+        var copiedPlayers = capabilities.Get<IMatchParticipantStateAccess>().Players;
+        var nativeUses = copy.G.GetRuntimeModule<CoreNativeFactionSlashRuntime>();
+        var suppliedChoice = copy.P!.Choices.Single(choice => choice.Cards.SequenceEqual([namedCardId]));
+        copy.Need(CoreGameEngineCardConversionsRuntime.TryReadConversionSource(suppliedChoice.Parameters, out var source) &&
+            source?.SkillId == WySkill, "The restriction check retains this actual supplied material's original Wuyou conversion.");
+        IReadOnlyList<CardKind> PermittedKinds() => nativeUses.GetPermittedFactionSlashUseKinds(
+            copiedRequest, copiedPlayers[0], CardKind.Slash, [named], source);
+        bool CanUseNamed() => PermittedKinds().Contains(CardKind.Slash) &&
+            copiedPayments.CanUse(copiedRequest, CardKind.Slash, [named]);
+        bool CanSupplyNamed() => PermittedKinds().Any(kind => copiedPayments.CanUse(copiedRequest, kind, [named]));
+        var store = (TurnCardUseEffectStore)typeof(GameEngine)
+            .GetField("_turnCardUseEffects", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(copy.G)!;
+        var finalSuit = copy.G.GetRuntimeModule<CoreNativeCardAppearanceRuntime>().EffectiveSuit(copiedPlayers[actorSeat], named);
+        TurnCardActionProhibition Issue(int recipient)
+        {
+            var lifetime = capabilities.Get<IProgramRuleLifetimes>().CreateApplicationLifetime(0, recipient,
+                [new(SkillStateBoundaryEvent.ActualUse, SkillStateSubject.Target, SkillStateBoundaryTiming.Before, SkipIssued: true),
+                 new(SkillStateBoundaryEvent.ActualTurnReturned, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before)],
+                new(0, recipient, IssuedTurnNumber: turn.TurnNumber));
+            return store.GrantActionProhibition(turn.TurnNumber, turn.TurnOwnerSeat, -2747001, 0,
+                new("fixture:provider-restriction", "read", 0, "fixture-instance"), [], [CardActionType.Use], [finalSuit],
+                recipient, 1, lifetime);
+        }
+        var providerPolicy = Issue(0);
+        copy.Need(CanUseNamed() && CanSupplyNamed(),
+            "An applied suit restriction on the real provider does not forbid the requester's distinct actual Use.");
+        var actorPolicy = Issue(actorSeat);
+        copy.Need(!CanUseNamed() && !CanSupplyNamed(),
+            "The same original supplied material is forbidden when its actual actor has that effective-suit restriction, including alternative Slash outputs.");
+        store.ExpireActionProhibitions(new(SkillStateBoundaryEvent.ActualUse, actorSeat, SkillStateBoundaryTiming.Before, journal.Cursor + 1));
+        copy.Need(store.ActionProhibitions.Any(policy => policy.GrantSequence == providerPolicy.GrantSequence) &&
+            store.ActionProhibitions.All(policy => policy.GrantSequence != actorPolicy.GrantSequence) &&
+            CanUseNamed() && CanSupplyNamed(),
+            "Consuming the actual actor's state retains the provider's independent restriction and restores this original payment's eligibility.");
         scenario.Need(game.Revision == revision && game.Events.Count == events &&
             JsonSerializer.Serialize(game.CreateCardZoneDiagnostics()) == zones,
             "Payment-target queries do not pay cards, publish facts or advance the real request.");
@@ -135,6 +176,8 @@ internal static class WuGuanYuWuyouChecks
         public PlayerSnapshot V(int seat = 0) => G.CreateSnapshot(seat).Players[seat];
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
         public LegalAction[] Contributions() => G.GetHumanLegalActions().Where(a => a.ProgramSkillId == WySkill).ToArray();
+        public WyScenario CopyForMechanismCheck() => new(scene,
+            GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry), registry);
         public LegalAction Contribution(int owner) => Contributions().Single(a => a.ProgramSkillOwnerSeat == owner);
         public bool Hold(string option) => P?.SkillPrompt?.SkillId == WyWatch && P.Choices.Any(c => c.Parameters.GetValueOrDefault("option-id") == option);
         public void Contribute(LegalAction action, int id) => Accept(new UseProgramSkillCommand(0, action.ProgramSkillId!, action.ProgramActivationId!, [id], action.SelectableTargetSeats, G.Revision, P!.PromptId) { SkillOwnerSeat = action.ProgramSkillOwnerSeat });

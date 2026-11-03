@@ -36,6 +36,7 @@ internal static class ProgramExecutionPlanChecks
             "A null trigger ID must retain the execution plan's original argument boundary.");
         RedirectPaymentPlansFollowOriginalInstructionIndices();
         NativeUseResultBindingsAreTypedAndReadAfterTheirProducer();
+        DeclaredUseLifetimesDemandTheirNativeBoundaries();
 
         SkillProgram WithTriggers(params SkillProgramTrigger[] triggers) => new(loaded.Id, loaded.Revision,
             loaded.GameplayHash, loaded.RuntimeVersion, loaded.MinimumRulesVersion, loaded.Modifiers,
@@ -46,6 +47,32 @@ internal static class ProgramExecutionPlanChecks
             trigger.MinimumRank, trigger.MaximumRank, trigger.ExcludedReasons, trigger.JudgmentReasons,
             trigger.JudgmentSource, trigger.CardKinds, trigger.SourceZones, trigger.MovementOccurrence,
             trigger.DamageOccurrence, trigger.DrawPhaseMode, trigger.Optional, trigger.Condition, instructions);
+    }
+
+    private static void DeclaredUseLifetimesDemandTheirNativeBoundaries()
+    {
+        const string until = """[{"event":"actualUse","participant":{"kind":"owner"},"skipIssued":true},{"event":"actualTurnReturned","participant":{"kind":"turnOwner"}}]""";
+        const string state = """{"op":"skillState","target":"owner","action":"suppress","match":{"skillIds":["fixture:leaf"]},"until":UNTIL}""";
+        const string ban = """{"op":"grantTurnCardActionProhibition","target":"owner","actionTypes":["use"],"suits":["heart"],"physicalMaterialCount":1,"until":UNTIL}""";
+        foreach (var body in new[]
+        {
+            "\"triggers\":[{\"id\":\"run\",\"window\":\"turnStartBeforeNormalFlow\",\"subject\":\"owner\",\"optional\":false,\"effects\":[" + state.Replace("UNTIL", until) + "]}]",
+            "\"triggers\":[{\"id\":\"run\",\"window\":\"turnStartBeforeNormalFlow\",\"subject\":\"owner\",\"optional\":false,\"effects\":[" + ban.Replace("UNTIL", until) + "]}]",
+            """ "skillStates":[{"target":"owner","action":"suppress","match":{"skillIds":["fixture:leaf"]},"on":{"event":"turnStarted","participant":{"kind":"owner"},"timing":"before"},"until":[{"event":"turnEnded","participant":{"kind":"owner"}},{"event":"actualUse","participant":{"kind":"owner"}},{"event":"actualTurnReturned","participant":{"kind":"turnOwner"}}]}] """
+        })
+        {
+            using var definition = JsonDocument.Parse("{\"id\":\"fixture:use-lifetime\",\"revision\":1," + body + "}");
+            var program = SkillProgramCatalog.Load(JsonSerializer.Serialize(new
+                { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = new[] { definition.RootElement } }),
+                JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                    skills = new Dictionary<string, object> { ["fixture:use-lifetime"] =
+                        new { name = "Lifetime", description = "Declared native boundaries" } } }))
+                .Programs["fixture:use-lifetime"];
+            var demand = new SkillProgramDependencies([new ContentSkillDefinition(program.Id, "Lifetime", "") { Program = program }]);
+            Require(demand.RequiresFact(ProgramTrackedFact.ActualCardUseHistory) &&
+                    demand.RequiresFact(ProgramTrackedFact.ActualTurnReturn),
+                "Effect, action-prohibition and declaration lifetimes demand their actual native use and turn-return facts independently of character capabilities.");
+        }
     }
 
     private static void NativeUseResultBindingsAreTypedAndReadAfterTheirProducer()

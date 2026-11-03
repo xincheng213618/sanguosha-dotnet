@@ -73,7 +73,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 
     internal bool HuanpeiNativeLegal(HuanpeiNativeRequest n, CardKind kind, int? target)
     {
-        if (!HuanpeiRequestParentCurrent(n) || !CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Contains(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, kind, CardActionType.Use) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(n.ActorSeat, [], null) || !_coreMatchParticipantsPlayersAccess._players[n.ActorSeat].IsAlive)
+        if (!HuanpeiRequestParentCurrent(n) || !CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Contains(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, kind, CardActionType.Use) || _appliedCardActionRestrictions.IsMaterialUseForbidden(n.ActorSeat, [], null) || !_coreMatchParticipantsPlayersAccess._players[n.ActorSeat].IsAlive)
             return false;
         var actor = _coreMatchParticipantsPlayersAccess._players[n.ActorSeat];
         if (n.Intent == HuanpeiIntent.WenyiPeach)
@@ -91,7 +91,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 
     internal IReadOnlyList<LegalAction> HuanpeiNativePlayActions(CharacterState actor, CardConversionSource source, bool requested = false)
     {
-        if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !requested && (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(actor.Seat, [], null))
+        if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !requested && (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) || _appliedCardActionRestrictions.IsMaterialUseForbidden(actor.Seat, [], null))
             return[];
         var result = new List<LegalAction>();
         foreach (var kind in CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Where(k => k != CardKind.Dodge && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, k, CardActionType.Use)))
@@ -315,7 +315,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         return c is not null && TryResolveHuanpeiResponse(c, false);
     }
 
-    internal bool HasHuanpeiRequiredBasic(CharacterState actor, CardKind kind) => HuanpeiSources(actor).Any() && CanAdjustHuanpeiHand(actor) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) && !_characterCuiYanOlOperations.IsCuiYanNextUseForbidden(actor.Seat, [], null) && (kind != CardKind.Dodge || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind));
+    internal bool HasHuanpeiRequiredBasic(CharacterState actor, CardKind kind) => HuanpeiSources(actor).Any() && CanAdjustHuanpeiHand(actor) && !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) && !_appliedCardActionRestrictions.IsMaterialUseForbidden(actor.Seat, [], null) && (kind != CardKind.Dodge || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is null && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind));
     internal bool HasHuanpeiDyingResponse(CharacterState actor) => _coreDyingCursorRuntimeOperations.Value.ActiveDying is { } d && HuanpeiSources(actor).Any() && CanAdjustHuanpeiHand(actor) && new[]
     {
         CardKind.Peach,

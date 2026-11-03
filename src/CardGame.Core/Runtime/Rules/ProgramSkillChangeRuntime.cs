@@ -11,7 +11,7 @@ internal enum ProgramSkillSourceRemoval
 /// children and expiry qualification remain with their original callers.
 /// </summary>
 [ProgramRuntimeModule, ProgramCapability]
-internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, IProgramSkillChangeOperations operations, ISkillGrantRevisionObservations observations, IMatchParticipantStateAccess participants, IProgramTurnQueries turn, IActualDiscardRecoveryPhaseQueries phases, IProgramHealthChildQueries healthChildren, IProgramEventJournalQueries journal, EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess directed) : IProgramSkillAcquisitions, IProgramRuleLifetimes
+internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, IProgramSkillChangeOperations operations, ISkillGrantRevisionObservations observations, IMatchParticipantStateAccess participants, IProgramTurnQueries turn, IActualDiscardRecoveryPhaseQueries phases, IProgramHealthChildQueries healthChildren, IProgramEventJournalQueries journal, EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess directed, EngineOwners.IKernelTurnCardUseEffectsAccess turnEffects) : IProgramSkillAcquisitions, IProgramRuleLifetimes, IProgramRuleBoundaries
 {
     void IProgramSkillAcquisitions.Grant(ProgramSkillFrame frame, int recipientSeat, IReadOnlyList<string> skillIds) => Grant(frame, recipientSeat, skillIds);
     SkillGrant IProgramSkillAcquisitions.GrantOwnedSource(ProgramSkillFrame frame, string sourceId, string skillId) => GrantOwnedSource(frame, sourceId, skillId);
@@ -119,6 +119,7 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
             var occurrence = current is { } active && active.Event == boundary.Event &&
                 (any || active.Seat == seat) && active.Phase == boundary.Phase ? active.Occurrence : boundary.Event switch
                 {
+                    SkillStateBoundaryEvent.ActualUse => journal.Cursor,
                     SkillStateBoundaryEvent.RoundAdvanced => facts.RoundNumber,
                     SkillStateBoundaryEvent.PhaseStarted or SkillStateBoundaryEvent.PhaseEnded => phases.Current()?.Token ?? 0,
                     SkillStateBoundaryEvent.DyingStarted or SkillStateBoundaryEvent.DyingEnded =>
@@ -160,25 +161,21 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
         return null;
     }
 
-    internal void ProcessSkillStateBoundary(SkillStateBoundary boundary)
+    public void ProcessSkillStateBoundary(SkillStateBoundary boundary)
     {
         var previous = _processingBoundary;
         _processingBoundary = boundary;
         try
         {
-            directed._directedTurnCardPolicies.RemoveAll(policy => policy.Until.Any(end => MatchesBoundary(end, boundary)));
-            ExpireSkillStates(lifetime => lifetime.Until.Any(end => MatchesBoundary(end, boundary)));
+            directed._directedTurnCardPolicies.RemoveAll(policy => policy.Until.Any(end => ProgramRuleLifetimeBoundaries.Matches(end, boundary)));
+            var expiredProhibitions = turnEffects is null ? Array.Empty<long>() :
+                turnEffects._turnCardUseEffects.ExpireActionProhibitions(boundary);
+            ExpireSkillStates(lifetime => lifetime.Until.Any(end => ProgramRuleLifetimeBoundaries.Matches(end, boundary)));
+            foreach (var sequence in expiredProhibitions)
+                operations.AdvanceFact(new CardActionProhibitionExpiredEvent(sequence, boundary));
         }
         finally { _processingBoundary = previous; }
     }
-
-    private static bool MatchesBoundary(SkillStateBoundaryEnd end, SkillStateBoundary boundary) =>
-        end.Event == boundary.Event &&
-        (end.Seat == boundary.Seat || end.Seat is null && end.Event is SkillStateBoundaryEvent.TurnStarted or SkillStateBoundaryEvent.TurnEnded) &&
-        end.Timing == boundary.Timing && end.Phase == boundary.Phase &&
-        (end.Event == SkillStateBoundaryEvent.DyingEnded && !end.SkipIssued
-            ? boundary.Occurrence == end.IssuedOccurrence
-            : end.SkipIssued ? boundary.Occurrence > end.IssuedOccurrence : boundary.Occurrence >= end.IssuedOccurrence);
 
     internal void RevokeSkillStateOrigin(SkillStateOrigin origin) => ExpireSkillStates(lifetime =>
         lifetime.Origin is { } issued && issued.FrameId == origin.FrameId && issued.EffectIndex == origin.EffectIndex &&

@@ -69,7 +69,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal bool CanWuLuKangKegouSlash(ProgramSkillFrame f) => f.WuLuKangKegou is { OpponentSeat: { } other } && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[other].IsAlive && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[other], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], CardKind.Slash, Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: [], conversionSource: f.WuLuKangKegou.Source) && !_characterCuiYanOlOperations.IsCuiYanNextUseForbidden(other, [], Suit.None);
+    internal bool CanWuLuKangKegouSlash(ProgramSkillFrame f) => f.WuLuKangKegou is { OpponentSeat: { } other } && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[other].IsAlive && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[other], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], CardKind.Slash, Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: [], conversionSource: f.WuLuKangKegou.Source) && !_appliedCardActionRestrictions.IsMaterialUseForbidden(other, [], Suit.None);
     internal IReadOnlyList<LegalAction> WuLuKangKegouSlashPlans(ProgramSkillFrame f)
     {
         if (!CanWuLuKangKegouSlash(f))

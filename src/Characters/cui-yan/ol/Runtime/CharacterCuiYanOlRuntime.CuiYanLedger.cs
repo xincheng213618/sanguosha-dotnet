@@ -25,35 +25,11 @@ internal sealed partial class CharacterCuiYanOlRuntime
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CuiYanEverTargetedEvent(use.Id, next.ActualTurn, next.TurnOwner, target));
     }
 
-    internal bool CuiYanTrueResponse(CardActionContext a, out long parentId)
-    {
-        parentId = 0;
-        if (a.Type != CardActionType.Response || a.ActorSeat != a.ProviderSeat || a.RequesterSeat is not null || a.ResponderSeat != a.ActorSeat)
-            return false;
-        if (a.EffectiveKind == CardKind.Nullification && _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault()is { } n && a.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(n) && a.OpponentSeat == n.SourceSeat)
-        {
-            parentId = n.Id;
-            return true;
-        }
-
-        if (a.EffectiveKind == CardKind.Dodge && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(u => u.Action?.ActionId == a.ParentActionId)is { CardAttack: { } attack } use && attack.TargetSeat == a.ActorSeat && a.OpponentSeat == attack.SourceSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(attack.EffectiveCardKind ?? use.CardKind))
-        {
-            parentId = use.Id;
-            return true;
-        }
-
-        return false;
-    }
-
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27470)]
     internal void ObserveCuiYanCardHistory(IGameEvent payload)
     {
-        if (!HasCuiYanCapability || !CuiYanActualTurnOpen || payload is CuiYanActualUseActorEvent or CuiYanEverTargetedEvent or CuiYanRespondedEvent or CuiYanEndQualifiedEvent or ShutongNextUseConsumedEvent)
+        if (!HasCuiYanCapability || !CuiYanActualTurnOpen || payload is CuiYanActualUseActorEvent or CuiYanEverTargetedEvent or CuiYanRespondedEvent or CuiYanEndQualifiedEvent)
             return;
-        if (payload is CardUseDeclaredEvent d && _coreCardUseLifecycleOperations.LifecycleCardUse(d.ResolutionId)is { } use && use.SourceSeat == d.SourceSeat && use.CardId == d.CardId && use.CardKind == d.CardKind)
-            ConsumeShutongForActualUse(use.Id, use.Action, use.SourceSeat, false);
-        if (payload is CardActionAcceptedEvent { Action: { } a } && CuiYanTrueResponse(a, out var native))
-            ConsumeShutongForActualUse(native, a, a.ActorSeat, true);
         if (payload is CardRespondedEvent response && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<CuiYanRespondedEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.ResponderSeat == response.ResponderSeat))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CuiYanRespondedEvent(_coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, response.ResponderSeat));
         if (payload is TurnEndedEvent)
@@ -67,7 +43,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 27470)]
     internal void CaptureCuiYanNativeHistory(IGameEvent payload)
     {
-        if (!HasCuiYanCapability || payload is CuiYanActualUseActorEvent or CuiYanEverTargetedEvent or CuiYanRespondedEvent or CuiYanEndQualifiedEvent or ShutongNextUseConsumedEvent)
+        if (!HasCuiYanCapability || payload is CuiYanActualUseActorEvent or CuiYanEverTargetedEvent or CuiYanRespondedEvent or CuiYanEndQualifiedEvent)
             return;
         foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().ToArray())
             CaptureCuiYanUseTargets(use);

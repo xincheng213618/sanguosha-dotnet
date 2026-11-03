@@ -43,7 +43,7 @@ internal sealed partial class CoreGameEngineSourceDingxiRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[owner];
         var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, card);
         var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
-        if (!SourceDingxiDamageCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(owner, kind, CardActionType.Use) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner, [id]) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(owner, kind, [id], null)) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(owner, [id], suit))
+        if (!SourceDingxiDamageCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(owner, kind, CardActionType.Use) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner, [id]) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(owner, kind, [id], null)) || _appliedCardActionRestrictions.IsMaterialUseForbidden(owner, [id], suit))
             return null;
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], card, effectiveKind: kind, physicalCardIds: [id]) ? new(id, kind, LegalActionKind.Slash, null) : null;

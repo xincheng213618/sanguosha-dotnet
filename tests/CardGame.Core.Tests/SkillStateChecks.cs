@@ -584,7 +584,8 @@ internal static class SkillStateChecks
             capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
             capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(),
             capabilities.Get<IProgramHealthChildQueries>(), capabilities.Get<IProgramEventJournalQueries>(),
-            capabilities.Get<CardGame.Core.EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess>());
+            capabilities.Get<CardGame.Core.EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess>(),
+            capabilities.Get<CardGame.Core.EngineOwners.IKernelTurnCardUseEffectsAccess>());
         var token = s.E<ActualDiscardRecoveryPhaseStartedEvent>().Last().Phase.Token;
         var source = s.RealGrants(0).Single(grant => grant.SkillId == Driver);
         var permanent = s.CounterGrants(0).Single().GrantId;
@@ -666,7 +667,8 @@ internal static class SkillStateChecks
             capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
             capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(),
             capabilities.Get<IProgramHealthChildQueries>(), capabilities.Get<IProgramEventJournalQueries>(),
-            capabilities.Get<CardGame.Core.EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess>());
+            capabilities.Get<CardGame.Core.EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess>(),
+            capabilities.Get<CardGame.Core.EngineOwners.IKernelTurnCardUseEffectsAccess>());
         var source = s.RealGrants(0).Single(grant => grant.SkillId == Driver);
         var nested = new NestedPhaseIssuer { Runtime = runtime,
             Origin = new(900200, 0, new(Driver, "transfer", 0, source.SkillInstanceId)),
@@ -711,7 +713,8 @@ internal static class SkillStateChecks
         var runtime = new ProgramSkillChangeRuntime(capabilities.Get<IProgramSkillChangeFacts>(), capabilities.Get<IProgramSkillChangeOperations>(),
             capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
             capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(), capabilities.Get<IProgramHealthChildQueries>(),
-            capabilities.Get<IProgramEventJournalQueries>(), directed);
+            capabilities.Get<IProgramEventJournalQueries>(), directed,
+            capabilities.Get<CardGame.Core.EngineOwners.IKernelTurnCardUseEffectsAccess>());
         var turn = s.G.State.TurnNumber;
         var source = s.RealGrants(0).Single(grant => grant.SkillId == Driver);
         var old = new DirectedTurnCardPolicy(900301, turn, 0, 900301, 0, new(Driver, "boundary-unit", 0, source.SkillInstanceId), 0, 1, [], DirectedTurnCardPolicyEffect.IgnoreDistance)

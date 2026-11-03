@@ -15,10 +15,10 @@ internal sealed partial class CoreGameEngineAssistedFactionSlashRuntime
             {
                 if (!CanSupplyAssistedFactionSlash(pending, kind, [card]))
                     continue;
-                if (!hasIdentity && !_coreLastZoneConversionsOperations.IsLastZoneJudgmentCard(provider, card) && !_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(provider, card) && card.Kind == kind && _coreCuiYanNativeQueriesOperations.CanSupplyCuiYanFactionSlashVariant(pending, provider, kind, [card]))
+                if (!hasIdentity && !_coreLastZoneConversionsOperations.IsLastZoneJudgmentCard(provider, card) && !_coreOwnPublicPileConversionsOperations.IsOwnPublicPileCard(provider, card) && card.Kind == kind && _coreNativeFactionSlashOperations.GetPermittedFactionSlashUseKinds(pending, provider, kind, [card]).Count != 0)
                     variants.Add(new(card, kind, null));
                 var sources = hasIdentity ? _coreCardConversionsOperations.GetProgramCardIdentitySources(provider, card, kind, forResponse: false) : _coreActionQueriesOperations.GetProgramViewAsConversions(provider, card, kind, forResponse: false);
-                variants.AddRange(sources.Where(source => _coreCuiYanNativeQueriesOperations.CanSupplyCuiYanFactionSlashVariant(pending, provider, kind, [card], source)).Select(source => new GameEngine.AssistedFactionSlashCard(card, kind, source)));
+                variants.AddRange(sources.Where(source => _coreNativeFactionSlashOperations.GetPermittedFactionSlashUseKinds(pending, provider, kind, [card], source).Count != 0).Select(source => new GameEngine.AssistedFactionSlashCard(card, kind, source)));
             }
         }
 
@@ -107,7 +107,7 @@ internal sealed partial class CoreGameEngineAssistedFactionSlashRuntime
             }
 
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
-            if (_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, kind, cards, conversion))
+            if (!_coreNativeFactionSlashOperations.GetPermittedFactionSlashUseKinds(pending, provider, kind, cards, conversion).Contains(kind))
                 throw new InvalidOperationException("The supplied Slash violates its actual user's current next-use suit restriction.");
             _coreNativeFactionSlashOperations.BeginProvidedFactionSlashSlash(pending, provider, cards, kind, usesZhuqueFan: false, conversionSource: conversion);
         }
@@ -121,7 +121,7 @@ internal sealed partial class CoreGameEngineAssistedFactionSlashRuntime
         (!CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(pending) || !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(pending.OwnerSeat, cards.Select(c => c.Id).ToArray())) &&
         _providedSlashPaymentTargets.CanSupply(pending, kind, cards, isTrueZhangba);
     internal IReadOnlyList<IReadOnlyList<Card>> GetFactionRequestZhangbaPairs(NativeOwners.FactionCardRequestHandle pending, CharacterState provider) => _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(provider).Where(pair => CanSupplyAssistedFactionSlash(pending, CardKind.Slash, pair, isTrueZhangba: true)).ToArray();
-    internal IReadOnlyList<ProgramMultiCardViewAsSelection> GetFactionRequestMultiCardSelections(NativeOwners.FactionCardRequestHandle pending, CharacterState provider) => (pending.IsAssistedProgramUse ? CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.SelectMany(kind => _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(provider, kind, false, ignoreSuitUseProhibition: true).Where(item => _corePlayCardHistoryOperations.ViewAsRule(item.Source)is { RoundDistinctBasicUse: null, LeiluanBasicUse: null } || item.OutputKind == kind)) : _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(provider, pending.RequiredKind, !CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(pending), ignoreSuitUseProhibition: true)).Where(selection => _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.RoundDistinctBasicUse is null && _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.LeiluanBasicUse is null && CanSupplyAssistedFactionSlash(pending, selection.OutputKind, selection.Cards) && !_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, selection.OutputKind, selection.Cards, selection.Source)).ToArray();
+    internal IReadOnlyList<ProgramMultiCardViewAsSelection> GetFactionRequestMultiCardSelections(NativeOwners.FactionCardRequestHandle pending, CharacterState provider) => (pending.IsAssistedProgramUse ? CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.SelectMany(kind => _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(provider, kind, false, ignoreSuitUseProhibition: true).Where(item => _corePlayCardHistoryOperations.ViewAsRule(item.Source)is { RoundDistinctBasicUse: null, LeiluanBasicUse: null } || item.OutputKind == kind)) : _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(provider, pending.RequiredKind, !CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(pending), ignoreSuitUseProhibition: true)).Where(selection => _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.RoundDistinctBasicUse is null && _corePlayCardHistoryOperations.ViewAsRule(selection.Source)?.LeiluanBasicUse is null && CanSupplyAssistedFactionSlash(pending, selection.OutputKind, selection.Cards) && _coreNativeFactionSlashOperations.GetPermittedFactionSlashUseKinds(pending, provider, selection.OutputKind, selection.Cards, selection.Source).Contains(selection.OutputKind)).ToArray();
     internal bool CanRequestAssistedProgramFactionSlash(int actorSeat, int targetSeat, bool ignoreDistance = false, int? rangeOwnerSeat = null) =>
         _coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(targetSeat) &&
         _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[actorSeat], CardKind.Slash) is not null &&

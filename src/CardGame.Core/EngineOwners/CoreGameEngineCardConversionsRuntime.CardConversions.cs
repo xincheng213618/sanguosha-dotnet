@@ -181,7 +181,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
                         selections.Add(new(cards, source, rule.RoundDistinctBasicUse is null ? outputKind : rule.OutputKind));
             }
 
-        return selections.Concat(leiluan).Concat(jinzhi).Where(item => _coreProgramCardLegalityOperations.IsProgramViewAsAllowed(owner, outputKind, item.Cards.Select(c => c.Id).ToArray(), item.Source, forResponse, dyingUse, requestedUseTarget)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || !forResponse || _coreRecordedSuitSlashOperations.IsRecordedSuitResponseAllowed(owner, item.Cards, outputKind)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || !_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(owner.Seat, outputKind, item.Cards.Select(c => c.Id), forResponse && !dyingUse)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || !forResponse || !_characterCuiYanOlOperations.IsCuiYanNativeResponseForbidden(owner, outputKind, item.Cards)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || forResponse || ignoreSuitUseProhibition || !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, item.Cards.Select(c => c.Id).ToArray())).OrderBy(item => item.Source.SkillId, StringComparer.Ordinal).ThenBy(item => item.Source.BindingId, StringComparer.Ordinal).ThenBy(item => string.Join(',', item.Cards.Select(card => card.Id)), StringComparer.Ordinal).ToArray();
+        return selections.Concat(leiluan).Concat(jinzhi).Where(item => _coreProgramCardLegalityOperations.IsProgramViewAsAllowed(owner, outputKind, item.Cards.Select(c => c.Id).ToArray(), item.Source, forResponse, dyingUse, requestedUseTarget)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || !forResponse || _coreRecordedSuitSlashOperations.IsRecordedSuitResponseAllowed(owner, item.Cards, outputKind)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || !_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(owner.Seat, outputKind, item.Cards.Select(c => c.Id), forResponse && !dyingUse)).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || !forResponse || !((outputKind == CardKind.Nullification || outputKind == CardKind.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, outputKind)) && _appliedCardActionRestrictions.IsMaterialUseForbidden(owner.Seat, item.Cards.Select(card => card.Id).ToArray(), item.Cards.Count == 1 ? _coreNativeCardAppearanceOperations.EffectiveSuit(owner, item.Cards[0]) : null))).Where(item => _coreWushuangJinzhiOperations.IsWushuangJinzhiSelection(item) || forResponse || ignoreSuitUseProhibition || !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, item.Cards.Select(c => c.Id).ToArray())).OrderBy(item => item.Source.SkillId, StringComparer.Ordinal).ThenBy(item => item.Source.BindingId, StringComparer.Ordinal).ThenBy(item => string.Join(',', item.Cards.Select(card => card.Id)), StringComparer.Ordinal).ToArray();
     }
 
     internal static IReadOnlyList<IReadOnlyList<Card>> EnumerateCardCombinations(IReadOnlyList<Card> cards, int count) => RuntimeSkills.RuntimeRules_Core_CardConversions.EnumerateCardCombinations(cards, count);
@@ -218,7 +218,7 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
             cards.Add(card);
         }
 
-        if (forResponse ? _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbiddenByExistingPolicies(owner.Seat, orderedCardIds) || _characterCuiYanOlOperations.IsCuiYanNativeResponseForbidden(owner, outputKind, cards) : _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, orderedCardIds))
+        if (forResponse ? _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbiddenByExistingPolicies(owner.Seat, orderedCardIds) || ((outputKind == CardKind.Nullification || outputKind == CardKind.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, outputKind)) && _appliedCardActionRestrictions.IsMaterialUseForbidden(owner.Seat, orderedCardIds, cards.Count == 1 ? _coreNativeCardAppearanceOperations.EffectiveSuit(owner, cards[0]) : null)) : _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, orderedCardIds))
             return null;
         if (_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(owner.Seat, outputKind, orderedCardIds, forResponse) || !_coreProgramCardLegalityOperations.IsProgramViewAsAllowed(owner, outputKind, orderedCardIds, source, forResponse, forResponse && outputKind is CardKind.Peach or CardKind.Alcohol && _coreDyingCursorRuntimeOperations.Value.ActiveDying?.ResponderSeat == owner.Seat))
             return null;
@@ -344,9 +344,21 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
     internal IReadOnlyList<Card> GetFactionSlashSlashCards(NativeOwners.FactionCardRequestHandle pending, CharacterState provider)
     {
         var cards = (pending.IsAssistedProgramUse ? _coreAssistedFactionSlashOperations.GetAssistedFactionSlashCards(pending, provider).Select(variant => variant.Card).DistinctBy(card => card.Id).ToArray() : IsFactionSlashUse(pending) ? _coreActionQueriesOperations.GetSlashUseCards(provider, ignoreSuitUseProhibition: true) : _coreNativeResponseMaterialQueriesOperations.GetResponseCards(provider, CardKind.Slash)).Where(card => (!IsFactionSlashUse(pending) || !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(pending.OwnerSeat, [card.Id])) && (pending.IsAssistedProgramUse || _providedSlashPaymentTargets.CanSupply(pending, GetFactionSlashEffectiveSlashKind(pending, provider, card), [card]))).ToArray();
-        if (!_characterCuiYanOlOperations.HasCuiYanCapability || !IsFactionSlashUse(pending) || pending.IsAssistedProgramUse)
+        if (!IsFactionSlashUse(pending) || pending.IsAssistedProgramUse)
             return cards;
-        return cards.Where(card => _coreCuiYanNativeQueriesOperations.HasCuiYanAllowedFactionSlashVariant(pending, provider, card)).ToArray();
+        return cards.Where(card =>
+        {
+            var kind = GetFactionSlashEffectiveSlashKind(pending, provider, card);
+            return CreateConversionChoiceVariants(provider, card, kind, false, "faction-suit-query", "", [card.Id], [],
+                new Dictionary<string, string> { ["response-card-kind"] = kind.ToString() }).Any(choice =>
+                {
+                    if (choice.Cards.Count != 1) return true;
+                    TryReadConversionSource(choice.Parameters, out var source);
+                    var variantKind = CoreNativeCardClassificationsRuntime.ReadResponseCardKind(choice) ?? CardKind.Slash;
+                    return _coreNativeFactionSlashOperations.GetPermittedFactionSlashUseKinds(pending, provider,
+                        variantKind, [card], source).Count != 0;
+                });
+        }).ToArray();
     }
 
     internal CardKind GetFactionSlashEffectiveSlashKind(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, Card card)

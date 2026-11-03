@@ -163,7 +163,14 @@ internal sealed partial class CoreNativeFactionSlashRuntime
             var effectiveKind = _coreCardConversionsOperations.GetFactionSlashEffectiveSlashKind(pending, provider, card);
             var description = CoreNativeCardClassificationsRuntime.IsNativeResponseCard(card, CardKind.Slash) ? $"打出【{(CardCatalog.Get(effectiveKind).DisplayName)}】" : $"将【{(card.DisplayName)}】当作【杀】";
             return _coreCardConversionsOperations.CreateConversionChoiceVariants(provider, card, effectiveKind, isResponse, $"faction-slash.slash.card-{(card.Id)}", $"{(description)}，替 {(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat].Name)} 响应【{(GetFactionRequestDisplayName(pending))}】。", [card.Id], responseTargets, new Dictionary<string, string> { ["response"] = "faction-slash-slash", ["response-card-kind"] = effectiveKind.ToString(), ["skill"] = GetFactionRequestSkillId(pending) });
-        }).Where(choice => !_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashChoiceForbidden(pending, choice)).ToList();
+        }).Where(choice =>
+        {
+            if (choice.Cards is not [var id]) return true;
+            CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source);
+            var kind = CoreNativeCardClassificationsRuntime.ReadResponseCardKind(choice) ?? CardKind.Slash;
+            return GetPermittedFactionSlashUseKinds(pending, provider, kind,
+                [_coreAdvancedLifecycleOperations.GetAdvancedCard(id)], source).Count != 0;
+        }).ToList();
         foreach (var pair in _coreAssistedFactionSlashOperations.GetFactionRequestZhangbaPairs(pending, provider))
         {
             choices.Add(new PromptChoice(new ChoiceId($"faction-slash.zhangba-slash.cards-{(pair[0].Id)}-{(pair[1].Id)}"), $"发动【丈八蛇矛】，将两张手牌当【杀】替 {(_coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat].Name)} 响应【{(GetFactionRequestDisplayName(pending))}】。", [pair[0].Id, pair[1].Id], responseTargets, new Dictionary<string, string> { ["response"] = "zhangba-slash", ["response-card-kind"] = CardKind.Slash.ToString(), ["skill"] = GetFactionRequestSkillId(pending), ["equipment"] = CardKind.ZhangbaSerpentSpear.ToString() }));
@@ -529,7 +536,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
     internal void BeginProvidedFactionSlashSlash(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind effectiveKind, bool usesZhuqueFan, CardConversionSource? conversionSource = null)
     {
         var actualConversion = conversionSource ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion;
-        if (_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, effectiveKind, physicalCards, actualConversion))
+        if (!GetPermittedFactionSlashUseKinds(pending, provider, effectiveKind, physicalCards, actualConversion).Contains(effectiveKind))
             throw new InvalidOperationException("The supplied Slash violates its actual user's current next-use suit restriction.");
         if (physicalCards.Count == 1 && _coreCardDeclarationsOperations.TryBeginCardDeclaration(provider, physicalCards[0], effectiveKind, _coreCardDeclarationsOperations.PeekDeclarationConversion(provider, physicalCards[0], effectiveKind, true, conversionSource), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.ProvidedSlash, pending.OwnerSeat, fan: usesZhuqueFan, finalKind: effectiveKind), [pending.TargetSeat!.Value]))
             return;
@@ -565,7 +572,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         }
 
         _coreMatchLogOperations.AddLog("CardUsed", $"{(provider.Name)} 响应【{(GetFactionRequestDisplayName(pending))}】，由 {(owner.Name)} 对 {(target.Name)} 使用【{(CardCatalog.Get(effectiveKind).DisplayName)}】。", owner.Seat, target.Seat);
-        _coreNativeSlashUseOperations.ResolveSlashCore(owner, target, _characterCuiYanOlOperations.HasCuiYanCapability && physicalCards.Count == 1 ? _corePlayCardHistoryOperations.ApplyProgramUseAppearance(owner, selectedSlash, actualConversion) : selectedSlash, effectiveKind, provider.Seat, pending, physicalCards: physicalCards, countsTowardSlashLimit: !pending.IsAssistedProgramUse, usesZhuqueFan: usesZhuqueFan, conversionSource: conversionSource);
+        _coreNativeSlashUseOperations.ResolveSlashCore(owner, target, physicalCards.Count == 1 ? _corePlayCardHistoryOperations.ApplyProgramUseAppearance(owner, selectedSlash, actualConversion) : selectedSlash, effectiveKind, provider.Seat, pending, physicalCards: physicalCards, countsTowardSlashLimit: !pending.IsAssistedProgramUse, usesZhuqueFan: usesZhuqueFan, conversionSource: conversionSource);
         _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(providerReward, provider.Seat);
     }
 
@@ -584,7 +591,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
 
         if (physicalCards.Count == 1 && _coreCardDeclarationsOperations.TryBeginCardDeclaration(provider, selectedSlash, effectiveKind, _coreCardDeclarationsOperations.PeekDeclarationConversion(provider, selectedSlash, effectiveKind, true, conversionSource ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.BorrowedSwordProvidedSlash, pending.OwnerSeat, fan: usesZhuqueFan, finalKind: effectiveKind), [target.Seat]))
             return;
-        if (_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, effectiveKind, physicalCards, actualConversion))
+        if (!GetPermittedFactionSlashUseKinds(pending, provider, effectiveKind, physicalCards, actualConversion).Contains(effectiveKind))
             throw new InvalidOperationException("The supplied Borrowed Sword Slash violates its actual user's current next-use suit restriction.");
         _coreNativePublicPileOriginalCardsOperations.PrepareNativePublicPileProvidedSlash(pending, provider, physicalCards, actualConversion);
         pending.AwaitingProviders = false;
@@ -595,7 +602,7 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         _coreNativeCardUseFramesOperations.SetCardUseStep(borrowedSword.ResolutionId, ResolutionFrameStep.ResolvingEffect);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashResolvedEvent(borrowedSword.ResolutionId, owner.Seat, Succeeded: true, provider.Seat, selectedSlash.Id, effectiveKind, IsActiveUse: true, target.Seat));
         _coreMatchLogOperations.AddLog("CardUsed", $"{(provider.Name)} 响应【激将】，由 {(owner.Name)} 按【借刀杀人】要求对 {(target.Name)} 使用【{(CardCatalog.Get(effectiveKind).DisplayName)}】。", owner.Seat, target.Seat);
-        _coreNativeSlashUseOperations.ResolveSlashCore(owner, target, _characterCuiYanOlOperations.HasCuiYanCapability && physicalCards.Count == 1 ? _corePlayCardHistoryOperations.ApplyProgramUseAppearance(owner, selectedSlash, actualConversion) : selectedSlash, effectiveKind, provider.Seat, factionRequest: pending, borrowedSword: borrowedSword, physicalCards: physicalCards, usesZhuqueFan: usesZhuqueFan, conversionSource: conversionSource);
+        _coreNativeSlashUseOperations.ResolveSlashCore(owner, target, physicalCards.Count == 1 ? _corePlayCardHistoryOperations.ApplyProgramUseAppearance(owner, selectedSlash, actualConversion) : selectedSlash, effectiveKind, provider.Seat, factionRequest: pending, borrowedSword: borrowedSword, physicalCards: physicalCards, usesZhuqueFan: usesZhuqueFan, conversionSource: conversionSource);
         _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(providerReward, provider.Seat);
     }
 
@@ -619,14 +626,14 @@ internal sealed partial class CoreNativeFactionSlashRuntime
 
         if (physicalCards.Count == 1 && _coreCardDeclarationsOperations.TryBeginCardDeclaration(provider, selectedSlash, effectiveKind, _coreCardDeclarationsOperations.PeekDeclarationConversion(provider, selectedSlash, effectiveKind, true, conversionSource ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.QinglongProvidedSlash, pending.OwnerSeat, fan: usesZhuqueFan, finalKind: effectiveKind), [target.Seat]))
             return;
-        if (_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, effectiveKind, physicalCards, actualConversion))
+        if (!GetPermittedFactionSlashUseKinds(pending, provider, effectiveKind, physicalCards, actualConversion).Contains(effectiveKind))
             throw new InvalidOperationException("The supplied Qinglong Slash violates its actual user's current next-use suit restriction.");
         _coreNativePublicPileOriginalCardsOperations.PrepareNativePublicPileProvidedSlash(pending, provider, physicalCards, actualConversion);
         pending.AwaitingProviders = false;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashResolvedEvent(pending.ResolutionId, owner.Seat, Succeeded: true, provider.Seat, selectedSlash.Id, effectiveKind, IsActiveUse: true, target.Seat));
         _coreMatchLogOperations.AddLog("CardUsed", $"{(provider.Name)} 响应【激将】，由 {(owner.Name)} 发动【青龙偃月刀】对 {(target.Name)} 使用【{(CardCatalog.Get(effectiveKind).DisplayName)}】。", owner.Seat, target.Seat);
         var deferEquipmentReward = _characterHuaTuoAnniversaryGodOperations.HasSkillInvocationObservers;
-        _coreNativeQinglongOperations.BeginQinglongCrescentBladeFollowup(qinglong, _characterCuiYanOlOperations.HasCuiYanCapability && physicalCards.Count == 1 ? _corePlayCardHistoryOperations.ApplyProgramUseAppearance(owner, selectedSlash, actualConversion) : selectedSlash, effectiveKind, provider.Seat, physicalCards, pending, conversionSource);
+        _coreNativeQinglongOperations.BeginQinglongCrescentBladeFollowup(qinglong, physicalCards.Count == 1 ? _corePlayCardHistoryOperations.ApplyProgramUseAppearance(owner, selectedSlash, actualConversion) : selectedSlash, effectiveKind, provider.Seat, physicalCards, pending, conversionSource);
         if (deferEquipmentReward)
             return;
         _coreFactionRequestPaymentsOperations.RewardFactionRequestProvider(providerReward, provider.Seat);
@@ -638,6 +645,29 @@ internal sealed partial class CoreNativeFactionSlashRuntime
         return !((!pending.IsProgramSkillUse && !pending.IsBorrowedSwordUse) || baseEffectiveKind != CardKind.Slash || (physicalCards.Count == 1 && physicalCards[0].Kind != CardKind.Slash && !_characterGuanYuWumiaoOperations.IsWuyouIdentityKind(provider, physicalCards[0], CardKind.Slash) && !_coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(provider, physicalCards[0])) || !_coreNativeTargetLegalityOperations.HasZhuqueFan(owner));
     }
 
+    internal IReadOnlyList<CardKind> GetPermittedFactionSlashUseKinds(NativeOwners.FactionCardRequestHandle request,
+        CharacterState provider, CardKind baseKind, IReadOnlyList<Card> materials,
+        CardConversionSource? source = null, IReadOnlyList<CardConversionSource>? additionalConversions = null)
+    {
+        if (!CoreGameEngineCardConversionsRuntime.IsFactionSlashUse(request))
+            return [baseKind];
+        var actor = _coreMatchParticipantsPlayersAccess._players[request.OwnerSeat];
+        var ids = materials.Select(card => card.Id).ToArray();
+        var appearance = materials.Count == 1
+            ? _corePlayCardHistoryOperations.ApplyProgramUseAppearance(actor, materials[0], source) : null;
+        var conversions = (source is null ? Array.Empty<CardConversionSource>() : [source])
+            .Concat(additionalConversions ?? []).ToArray();
+        IReadOnlyList<CardKind> kinds = materials.Count > 0 && CanConvertFactionSlashToFire(request, provider, materials, baseKind)
+            ? [baseKind, CardKind.FireSlash] : [baseKind];
+        return Array.AsReadOnly(kinds.Where(kind =>
+        {
+            var suit = appearance is null ? null : _characterWuJingOlOperations.WuJingLiubingUsedSuit(
+                actor.Seat, appearance, kind, ids, conversions,
+                _corePlayCardHistoryOperations.CaptureUsedCardSuit(actor.Seat, ids, appearance));
+            return !_appliedCardActionRestrictions.IsMaterialUseForbidden(actor.Seat, ids, suit);
+        }).ToArray());
+    }
+
     internal bool TryBeginFactionSlashZhuqueFanChoice(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind baseEffectiveKind)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[pending.OwnerSeat];
@@ -645,10 +675,11 @@ internal sealed partial class CoreNativeFactionSlashRuntime
             return false;
 
         var conversion = _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedUseConversion ?? _coreGameEngineCardConversionsSelectedResponseConversionSelectedUseConversionAccess._selectedResponseConversion;
-        var normalAllowed = _providedSlashPaymentTargets.CanUse(pending, CardKind.Slash, physicalCards, physicalCards.Count == 2) &&
-            !_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, CardKind.Slash, physicalCards, conversion);
-        var fireAllowed = _providedSlashPaymentTargets.CanUse(pending, CardKind.FireSlash, physicalCards, physicalCards.Count == 2) &&
-            !_coreCuiYanNativeQueriesOperations.IsCuiYanFactionSlashUseForbidden(pending, CardKind.FireSlash, physicalCards, conversion);
+        var permittedKinds = GetPermittedFactionSlashUseKinds(pending, provider, CardKind.Slash, physicalCards, conversion);
+        var normalAllowed = permittedKinds.Contains(CardKind.Slash) &&
+            _providedSlashPaymentTargets.CanUse(pending, CardKind.Slash, physicalCards, physicalCards.Count == 2);
+        var fireAllowed = permittedKinds.Contains(CardKind.FireSlash) &&
+            _providedSlashPaymentTargets.CanUse(pending, CardKind.FireSlash, physicalCards, physicalCards.Count == 2);
         if (!normalAllowed || !fireAllowed)
         {
             if (!normalAllowed && !fireAllowed)

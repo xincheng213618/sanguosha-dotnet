@@ -26,7 +26,8 @@ internal sealed class SkillProgramDependencies
         var triggers = programs.SelectMany(program => program.Triggers).ToArray();
         var skillStateBoundaries = triggers.SelectMany(trigger => trigger.Effects)
             .Concat(programs.SelectMany(program => program.Activations).SelectMany(activation => activation.Effects))
-            .SelectMany(effect => effect.SkillState?.Until ?? [])
+            .SelectMany(effect => (effect.SkillState?.Until ?? [])
+                .Concat(effect.CardActionProhibition?.Until ?? []))
             .Concat(programs.SelectMany(program => program.SkillStates).SelectMany(declaration => declaration.State.Until)).ToArray();
         UsesSkillStatePhaseEnds = skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseEnded);
         UsesConsumedAlcoholSlash = triggers.Any(trigger => trigger.RequiresConsumedAlcoholSlash);
@@ -64,6 +65,10 @@ internal sealed class SkillProgramDependencies
             (programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).SelectMany(expression => expression.Nodes())
                 .Any(expression => expression.Op is "gainCards" or "gainInitiallyAlive" or "gainFirstOutsideDraw" or "gainPhaseIs" or "gainActualTurn" or "gainRecipientAlive" or "gainHasSource")
                 ? ProgramTrackedFact.HandGainOccurrence : ProgramTrackedFact.None) |
+            (skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.ActualUse)
+                ? ProgramTrackedFact.ActualCardUseHistory : ProgramTrackedFact.None) |
+            (skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.ActualTurnReturned)
+                ? ProgramTrackedFact.ActualTurnReturn : ProgramTrackedFact.None) |
             (programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).Any(expression =>
                 expression.Reads("gainFirstOutsideDraw") || expression.Reads("gainPhaseIs"))
                 ? ProgramTrackedFact.MovementTiming : ProgramTrackedFact.None) |

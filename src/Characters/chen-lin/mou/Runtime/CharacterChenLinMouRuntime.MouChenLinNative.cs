@@ -12,7 +12,7 @@ internal sealed partial class CharacterChenLinMouRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, card);
         var color = CoreGameEnginePublicPileColorsRuntime.SuitColor(suit);
-        if (!MouChenLinRuntime.DamageCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, [id]) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(actor.Seat, kind, [id], r.Source)) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(actor.Seat, [id], suit))
+        if (!MouChenLinRuntime.DamageCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, [id]) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(actor.Seat, kind, [id], r.Source)) || _appliedCardActionRestrictions.IsMaterialUseForbidden(actor.Seat, [id], suit))
             return null;
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], card, effectiveKind: kind, physicalCardIds: [id], conversionSource: r.Source) ? new(id, kind, LegalActionKind.Slash, null)

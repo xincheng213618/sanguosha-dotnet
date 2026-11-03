@@ -5,7 +5,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 {
     internal IReadOnlyList<DiouUsePlan> DiouNativePlans(CharacterState actor, CardKind kind, CardConversionSource source)
     {
-        if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(actor.Seat, kind, [], source)) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(actor.Seat, [], null))
+        if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(actor.Seat, kind, [], source)) || _appliedCardActionRestrictions.IsMaterialUseForbidden(actor.Seat, [], null))
             return[];
         var result = new List<DiouUsePlan>();
         void Add(LegalActionKind action, IReadOnlyList<int> targets, string text, int? card = null, CardKind? required = null, bool adjusted = false) => result.Add(new(kind, action, card, required, text, adjusted) { Targets = targets });

@@ -1065,7 +1065,10 @@ public sealed class GrantTurnCardActionProhibitionSkillProgramEffectHandler : IS
         int targetSeat,
         ISkillProgramEffectHost host)
     {
-        host.GrantTurnCardActionProhibition(frame, effect.CardKinds, effect.ActionTypes);
+        if (effect.CardActionProhibition is null)
+            host.GrantTurnCardActionProhibition(frame, effect.CardKinds, effect.ActionTypes);
+        else
+            host.GetCapability<IAppliedCardActionRestrictions>().Grant(frame, targetSeat, effect);
         return SkillProgramStepOutcome.Continue;
     }
 }

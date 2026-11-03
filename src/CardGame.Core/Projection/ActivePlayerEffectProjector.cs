@@ -87,9 +87,15 @@ internal sealed class ActivePlayerEffectProjector(IActivePlayerTurnEffectQueries
             if (item.Source.OwnerSeat == player.Seat && Current(item.TurnNumber, item.TurnSeat))
                 Add(item.Source.SkillId, item.Source.OwnerSeat, $"不能使用{EffectCategoryNames(item.Categories)}。打出牌不受此项限制。");
         foreach (var item in turnEffects.ActionProhibitions)
-            if (item.Source.OwnerSeat == player.Seat && Current(item.TurnNumber, item.TurnSeat))
+            if (item.AffectedSeat == player.Seat && (item.Lifetime is not null || Current(item.TurnNumber, item.TurnSeat)))
                 Add(item.Source.SkillId, item.Source.OwnerSeat,
-                    $"不能{string.Join("或", item.ActionTypes.Select(action => action == CardActionType.Use ? "使用" : "打出"))}{(item.Suits is { Count: > 0 } ? string.Join("、", item.Suits.Select(EffectSuitName)) : "")}{EffectCardNames(item.CardKinds)}。");
+                    $"不能{string.Join("或", item.ActionTypes.Select(action => action == CardActionType.Use ? "使用" : "打出"))}{(item.Suits is { Count: > 0 } ? string.Join("、", item.Suits.Select(EffectSuitName)) : "")}{EffectCardNames(item.CardKinds)}。",
+                    item.Lifetime is not { } lifetime ? ActivePlayerEffectExpiry.CurrentTurnEnd :
+                        lifetime.Until.Any(end => end.Event is SkillStateBoundaryEvent.TurnCleanup or
+                            SkillStateBoundaryEvent.TurnEnded or SkillStateBoundaryEvent.ActualTurnReturned)
+                            ? lifetime.Until.Any(end => end.Event == SkillStateBoundaryEvent.ActualUse)
+                                ? ActivePlayerEffectExpiry.ConsumedOrTurnEnd : ActivePlayerEffectExpiry.CurrentTurnEnd
+                            : ActivePlayerEffectExpiry.RuleCleared);
         foreach (var item in turnEffects.HandColorRestrictions)
             if (item.AffectedSeat == player.Seat && Current(item.TurnNumber, item.TurnSeat))
                 Add(item.Source.SkillId, item.Source.OwnerSeat, $"不能使用或打出{(item.IsRed ? "红色" : "黑色")}手牌。");

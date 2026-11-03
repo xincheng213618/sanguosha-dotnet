@@ -70,7 +70,7 @@ internal sealed partial class CharacterKongShuOlRuntime
                 foreach (var cards in CoreGameEngineCardConversionsRuntime.EnumerateCardCombinations(candidates, x))
                 {
                     var ids = cards.Select(c => c.Id).ToArray();
-                    if (forResponse ? !_coreRecordedSuitSlashOperations.IsRecordedSuitResponseAllowed(owner, cards, kind) || _characterCuiYanOlOperations.IsCuiYanNativeResponseForbidden(owner, kind, cards) : !ignoreSuitUseProhibition && (_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, ids) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(owner.Seat, ids, cards.Count == 1 ? _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards) : Suit.None)))
+                    if (forResponse ? !_coreRecordedSuitSlashOperations.IsRecordedSuitResponseAllowed(owner, cards, kind) || ((kind == CardKind.Nullification || kind == CardKind.Dodge && _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, kind)) && _appliedCardActionRestrictions.IsMaterialUseForbidden(owner.Seat, ids, cards.Count == 1 ? _coreNativeCardAppearanceOperations.EffectiveSuit(owner, cards[0]) : null)) : !ignoreSuitUseProhibition && (_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, ids) || _appliedCardActionRestrictions.IsMaterialUseForbidden(owner.Seat, ids, cards.Count == 1 ? _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards) : Suit.None)))
                         continue;
                     result.Add(new(Array.AsReadOnly(cards.ToArray()), source, rule.OutputKind));
                 }

@@ -423,7 +423,7 @@ internal sealed partial class CoreNativeLegalActionsRuntime
 
             if (action.Kind != LegalActionKind.Recast && action.MaxCardCount <= 1 && declaredSuit is { } useSuit && _coreProgramParticipantPhaseOperationsOperations.IsTurnSuitUseForbidden(actor.Seat, useSuit))
                 return false;
-            if (action.Kind != LegalActionKind.Recast && action.MaxCardCount <= 1 && _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(actor.Seat, action.CardId is { } cuiCardId ? [cuiCardId] : [], action.ConversionSource is { } cuiConversion && _corePlayCardHistoryOperations.ViewAsRule(cuiConversion)?.InheritPreviousPlaySuit == true ? _corePlayCardHistoryOperations.PreviousPlaySuitForInheritance(actor.Seat) ?? declaredSuit : declaredSuit))
+            if (action.Kind != LegalActionKind.Recast && action.MaxCardCount <= 1 && _appliedCardActionRestrictions.IsMaterialUseForbidden(actor.Seat, action.CardId is { } cuiCardId ? [cuiCardId] : [], action.ConversionSource is { } cuiConversion && _corePlayCardHistoryOperations.ViewAsRule(cuiConversion)?.InheritPreviousPlaySuit == true ? _corePlayCardHistoryOperations.PreviousPlaySuitForInheritance(actor.Seat) ?? declaredSuit : declaredSuit))
                 return false;
             // Global tricks drop individually shielded targets instead of the whole
             // use: a black Nanman still resolves against everyone a Curtain bearer

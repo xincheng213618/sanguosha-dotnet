@@ -446,16 +446,37 @@ internal sealed class GrantTurnCardActionProhibitionProgramOperationDescriptor :
         static (effect, context) => context.GrantTurnCardActionProhibition(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "cardKinds", "actionTypes", "condition");
-        var kinds = r.RequiredEnumArray<CardKind>("cardKinds");
+        r.AllowOnly("op", "target", "cardKinds", "actionTypes", "suits", "physicalMaterialCount", "until", "condition");
+        var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
+        if (target is not (SkillProgramEffectTarget.Owner or SkillProgramEffectTarget.SelectedTarget))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}.target: requires owner or selectedTarget.");
+        var kinds = r.Has("cardKinds") ? r.RequiredEnumArray<CardKind>("cardKinds") : [];
         var actions = r.RequiredEnumArray<CardActionType>("actionTypes");
-        if (kinds.Count == 0)
-            throw new InvalidOperationException($"Invalid skill program at {r.Path}.cardKinds: must not be empty.");
+        var suits = r.Has("suits") ? r.RequiredEnumArray<Suit>("suits") : [];
+        if (kinds.Count == 0 && suits.Count == 0)
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: requires nonempty cardKinds or suits.");
+        if (suits.Distinct().Count() != suits.Count || suits.Any(suit => suit == Suit.None))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}.suits: requires distinct chromatic suits.");
         if (actions.Count == 0 || actions.Any(action => action is not (CardActionType.Use or CardActionType.Response)))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.actionTypes: requires use and/or response.");
-        return new(Op, Owner(r), 0, r.Condition(), cardKinds: kinds, actionTypes: actions);
+        if (suits.Count > 0 && (kinds.Count != 0 || !actions.SequenceEqual([CardActionType.Use])))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}: suit restrictions require all card kinds and actual use only.");
+        int? materialCount = r.Has("physicalMaterialCount") ? r.RequiredInt("physicalMaterialCount") : null;
+        if (materialCount is not null && (materialCount != 1 || suits.Count == 0 || !actions.SequenceEqual([CardActionType.Use])))
+            throw new InvalidOperationException($"Invalid skill program at {r.Path}.physicalMaterialCount: supports one physical material of a declared actual-use suit.");
+        CardActionProhibitionOptions? options = null;
+        if (r.Has("until") || r.Has("suits") || materialCount is not null || target != SkillProgramEffectTarget.Owner)
+        {
+            var until = r.Has("until")
+                ? SkillStateDescriptor.ParseUntil(SkillStateDescriptor.Required(r.Node, "until", System.Text.Json.JsonValueKind.Array, r.Path), r.Path + ".until")
+                : new[] { new SkillStateBoundarySpec(SkillStateBoundaryEvent.TurnCleanup, SkillStateSubject.TurnOwner, SkillStateBoundaryTiming.Before) };
+            if (until.Count == 0) throw new InvalidOperationException($"Invalid skill program at {r.Path}.until: requires a boundary.");
+            options = new(until, materialCount);
+        }
+        return new(Op, target, 0, r.Condition(), cardKinds: kinds, actionTypes: actions, suits: suits)
+            { CardActionProhibition = options };
     }
-    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [];
+    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => WithSelectedTarget(effect);
 }
 
 internal sealed class GrantTurnHandColorRestrictionProgramOperationDescriptor : TurnEffectProgramOperationDescriptorBase

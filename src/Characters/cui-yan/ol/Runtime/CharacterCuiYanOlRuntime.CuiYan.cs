@@ -70,7 +70,7 @@ internal sealed partial class CharacterCuiYanOlRuntime
 
         if (r.Suit != Suit.None)
             foreach (var seat in r.Targets.Append(f.OwnerSeat).Distinct().Where(s => _coreMatchParticipantsPlayersAccess._players[s].IsAlive))
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShutongNextUseGrantedEvent(f.Id, r.Source, r.GameplayHash, r.UseId, r.ActionId, r.ActualTurn, r.TurnOwner, seat, r.Suit));
+                _appliedCardActionRestrictions.GrantNextActualUseSuit(f, seat, r.Suit);
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CuiYan = r with { Before = before, After = before }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         var count = r.DrawQualified && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], 1, true, new(CuiYanDrawReason)).Count : 0;

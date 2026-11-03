@@ -1,4 +1,7 @@
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using CardGame.Content.Standard;
 using CardGame.Core;
 
 internal static class ProgramCardLegalityChecks
@@ -129,12 +132,145 @@ internal static class ProgramCardLegalityChecks
         var production = ProgramCardLegalityCatalog.Discover(ProgramRuntimeModuleCatalog.Default.Methods);
         Need(catalog.Registrations.Where(pair => pair.Value.Count > 0).All(pair => production.Registrations[pair.Key].Count > 0),
             "Every exercised production native stage retains its module-owned policies; unregistered stages remain valid.");
+        AppliedSuitRestrictionsKeepTheirRecipientAndOriginalBoundary();
 
         static void Reject(Type type, string expected)
         {
             try { _ = ProgramCardLegalityCatalog.Discover(Methods(typeof(Fixture)).Concat(Methods(type))); }
             catch (InvalidOperationException error) when (error.Message.Contains(expected, StringComparison.Ordinal)) { return; }
             throw new InvalidOperationException($"Did not reject {type.Name}: {expected}");
+        }
+    }
+
+    private static void AppliedSuitRestrictionsKeepTheirRecipientAndOriginalBoundary()
+    {
+        var game = GameEngine.CreateStandard(new GameOptions { Seed = 7, UseInteractiveSetup = false,
+            AdvanceAfterHumanCommands = false }, StandardContentRegistry.Create());
+        Need(game.Submit(new StartGameCommand()).Accepted, "The shared restriction fixture must start through its command boundary.");
+        for (var step = 0; step < 20 && game.State.TurnNumber == 0; step++)
+            Need(game.Submit(new AdvanceOneStepCommand(game.Revision)).Accepted, "The shared restriction fixture must enter an actual turn.");
+        Need(game.State.TurnNumber > 0, "Applied restrictions require a real current turn.");
+        var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine)
+            .GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var frames = capabilities.Get<IProgramRuntimeFrames>();
+        var journal = capabilities.Get<IProgramEventJournalQueries>();
+        var events = capabilities.Get<IProgramRuntimeEvents>();
+        var restrictions = capabilities.Get<IAppliedCardActionRestrictions>();
+        var lifetimes = game.GetRuntimeModule<ProgramSkillChangeRuntime>();
+        var turn = capabilities.Get<IProgramTurnQueries>();
+        var store = (TurnCardUseEffectStore)typeof(GameEngine)
+            .GetField("_turnCardUseEffects", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
+        var issuer = capabilities.Get<IMatchParticipantStateAccess>().At(0);
+        var source = issuer.SkillGrants.Grants.First();
+        var program = capabilities.Get<IProgramContentQueries>().Skill(source.SkillId).Program!;
+        var activation = program.Activations.FirstOrDefault(binding => binding.Effects.Count > 0);
+        var trigger = activation is null ? program.Triggers.First(binding => binding.Effects.Count > 0) : null;
+        var bindingId = activation?.Id ?? trigger!.Id!;
+        ProgramSkillFrame IssuedFrame() => new(frames.NextId(), 0, source.SkillId, bindingId, program.GameplayHash, 1, [], [])
+            { SkillInstanceId = source.SkillInstanceId, TriggerId = trigger?.Id };
+        var alive = issuer.IsAlive;
+        var frame = IssuedFrame();
+        frames.Push(frame);
+        try
+        {
+            var cutoff = journal.Cursor;
+            var spade = restrictions.GrantNextActualUseSuit(frame, 1, Suit.Spade);
+            Need(spade.AffectedSeat == 1 && spade.Source.OwnerSeat == 0 && spade.PhysicalMaterialCount == 1 &&
+                spade.Lifetime!.Until.Single(end => end.Event == SkillStateBoundaryEvent.ActualUse).IssuedOccurrence == cutoff,
+                "A shared next-use restriction freezes the actual recipient, one-material rule and original journal cutoff independently of its issuer.");
+            Need(ReferenceEquals(spade, restrictions.GrantNextActualUseSuit(frame, 1, Suit.Spade)),
+                "The same original instruction reuses its applied state after publishing facts without refreshing the boundary cutoff.");
+            frames.Pop(frame.Id, frame.Kind);
+            frames.Push(frame = IssuedFrame());
+            var heart = restrictions.GrantNextActualUseSuit(frame, 1, Suit.Heart);
+            var provider = restrictions.GrantNextActualUseSuit(frame, 0, Suit.Heart);
+            var beforeQueries = journal.Cursor;
+            Need(restrictions.IsMaterialUseForbidden(1, [1], Suit.Spade) && restrictions.IsMaterialUseForbidden(1, [1], Suit.Heart) &&
+                !restrictions.IsMaterialUseForbidden(1, [1], Suit.Club) && !restrictions.IsMaterialUseForbidden(2, [1], Suit.Spade) &&
+                !restrictions.IsMaterialUseForbidden(1, [], Suit.Spade) && !restrictions.IsMaterialUseForbidden(1, [1, 2], Suit.Spade) &&
+                !restrictions.IsMaterialUseForbidden(1, [1], null) && !restrictions.IsMaterialUseForbidden(1, [1], Suit.None) &&
+                restrictions.IsMaterialUseForbidden(0, [1], Suit.Heart) && journal.Cursor == beforeQueries,
+                "Only the actual recipient's final effective suit with one physical material is forbidden; zero/multi-material, unknown and suitless uses stay distinct, and queries emit no facts.");
+            Need(!store.IsCardUseForbidden(turn.TurnNumber, turn.TurnOwnerSeat, 1, CardKind.Slash, CardActionType.Use),
+                "A suit-specific material restriction cannot become an unconditional card-kind prohibition.");
+            store.GrantActionProhibition(turn.TurnNumber, turn.TurnOwnerSeat, frame.Id, 99, spade.Source,
+                [CardKind.Slash], [CardActionType.Use], affectedSeat: 1);
+            Need(store.IsCardUseForbidden(turn.TurnNumber, turn.TurnOwnerSeat, 1, CardKind.Slash, CardActionType.Use) &&
+                !store.IsCardUseForbidden(turn.TurnNumber, turn.TurnOwnerSeat, 1, CardKind.Peach, CardActionType.Use),
+                "The existing kind-only prohibition still answers its original kind query independently of applied suit state.");
+
+            issuer.SkillGrants.RemoveGrant(source.GrantId); issuer.IsAlive = false;
+            lifetimes.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.Death, 0, SkillStateBoundaryTiming.Before, 1));
+            Need(restrictions.IsMaterialUseForbidden(1, [1], Suit.Spade),
+                "Source loss and death cannot withdraw an already applied recipient restriction.");
+            events.AdvanceFact(new CardActionAcceptedEvent(new(900001, null, CardActionType.Use, 1, 2, null, null, null,
+                CardKind.Slash, [2], [], [], effectiveSuit: Suit.Club)));
+            Need(restrictions.IsMaterialUseForbidden(1, [1], Suit.Spade),
+                "An accepted-only ordinary card attempt does not consume its actor's next actual-use state.");
+            lifetimes.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.ActualUse, 1, SkillStateBoundaryTiming.Before, cutoff));
+            lifetimes.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.ActualUse, 1, SkillStateBoundaryTiming.After, journal.Cursor + 1));
+            lifetimes.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.ActualUse, 2, SkillStateBoundaryTiming.Before, journal.Cursor + 1));
+            Need(restrictions.IsMaterialUseForbidden(1, [1], Suit.Spade) && restrictions.IsMaterialUseForbidden(1, [1], Suit.Heart),
+                "The issuing occurrence, wrong event side and another actor's use do not consume recipient states.");
+            var occurrence = journal.Cursor + 1;
+            lifetimes.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.ActualUse, 1, SkillStateBoundaryTiming.Before, occurrence));
+            lifetimes.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.ActualUse, 1, SkillStateBoundaryTiming.Before, occurrence));
+            Need(!restrictions.IsMaterialUseForbidden(1, [1], Suit.Spade) && !restrictions.IsMaterialUseForbidden(1, [1], Suit.Heart) &&
+                restrictions.IsMaterialUseForbidden(0, [1], Suit.Heart) &&
+                journal.Complete().OfType<CardActionProhibitionExpiredEvent>().Count(fact => fact.GrantSequence == spade.GrantSequence) == 1 &&
+                journal.Complete().OfType<CardActionProhibitionExpiredEvent>().Count(fact => fact.GrantSequence == heart.GrantSequence) == 1,
+                "One actual use removes every outstanding recipient restriction once while leaving the material provider's independent state intact.");
+            lifetimes.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.TurnEnded, game.State.CurrentSeat,
+                SkillStateBoundaryTiming.After, game.State.TurnNumber));
+            Need(restrictions.IsMaterialUseForbidden(0, [1], Suit.Heart),
+                "The actual turn's ending window still retains its issued state until the declared turn-return boundary.");
+            store.ExpireTurn(turn.TurnNumber, turn.TurnOwnerSeat);
+            Need(restrictions.IsMaterialUseForbidden(0, [1], Suit.Heart) &&
+                !store.IsCardUseForbidden(turn.TurnNumber, turn.TurnOwnerSeat, 1, CardKind.Slash, CardActionType.Use),
+                "Legacy turn cleanup removes the old kind ban while the applied state waits for actual turn return.");
+            var end = provider.Lifetime!.Until.Single(boundary => boundary.Event == SkillStateBoundaryEvent.ActualTurnReturned);
+            Need(end.Timing == SkillStateBoundaryTiming.After,
+                "The production next-use state remains issued until the actual turn-return fact has entered the shared journal.");
+            lifetimes.ProcessSkillStateBoundary(new(end.Event, end.Seat, SkillStateBoundaryTiming.Before, end.IssuedOccurrence));
+            Need(restrictions.IsMaterialUseForbidden(0, [1], Suit.Heart),
+                "Before actual turn return, the original recipient restriction still applies to any nested real use.");
+            lifetimes.ProcessSkillStateBoundary(new(end.Event, end.Seat, SkillStateBoundaryTiming.After, end.IssuedOccurrence));
+            Need(!restrictions.IsMaterialUseForbidden(0, [1], Suit.Heart) &&
+                journal.Complete().OfType<CardActionProhibitionExpiredEvent>().Count(fact => fact.GrantSequence == provider.GrantSequence) == 1,
+                "The shared actual-turn-return lifetime expires an unused state without depending on its source or a character history ledger.");
+        }
+        finally
+        {
+            issuer.IsAlive = alive;
+            if (issuer.SkillGrants.Grants.All(grant => grant.GrantId != source.GrantId)) issuer.SkillGrants.Grant(source);
+            frames.Pop(frame.Id, frame.Kind);
+        }
+        AppliedSuitRestrictionDefinitionsRejectAmbiguousShapes();
+    }
+
+    private static void AppliedSuitRestrictionDefinitionsRejectAmbiguousShapes()
+    {
+        const string id = "fixture:applied-suit-shape";
+        var effect = JsonNode.Parse("""
+            {"op":"grantTurnCardActionProhibition","target":"selectedTarget","actionTypes":["use"],"suits":["heart"],"physicalMaterialCount":1,
+             "until":[{"event":"actualUse","participant":{"kind":"target"},"timing":"before","skipIssued":true},
+                      {"event":"actualTurnReturned","participant":{"kind":"turnOwner"},"timing":"before"}]}
+            """)!;
+        var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+            skills = new Dictionary<string, object> { [id] = new { name = id, description = "共享下一次实际使用花色限制" } } });
+        string Rules(JsonNode node) => JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion,
+            skills = new[] { new { id, revision = 1, activations = new[] { new { id = "apply", minCards = 0, maxCards = 0,
+                minTargets = 1, maxTargets = 1, targetKind = "anyLiving", usesPerTurn = (int?)null, effects = new[] { node } } } } } });
+        _ = SkillProgramCatalog.Load(Rules(effect), presentation);
+        foreach (var mixedKinds in new[] { true, false })
+        {
+            var invalid = effect.DeepClone();
+            if (mixedKinds) invalid["cardKinds"] = new JsonArray("slash");
+            else invalid["actionTypes"] = new JsonArray("response");
+            var rejected = false;
+            try { _ = SkillProgramCatalog.Load(Rules(invalid), presentation); }
+            catch (InvalidOperationException) { rejected = true; }
+            Need(rejected, "The shared loader rejects mixed kind/suit restrictions and response-only action restrictions with a next-use lifetime.");
         }
     }
 

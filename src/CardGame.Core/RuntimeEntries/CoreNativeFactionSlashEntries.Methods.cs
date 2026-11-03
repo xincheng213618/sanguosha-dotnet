@@ -2,6 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreNativeFactionSlashEntries
 {
+    internal IReadOnlyList<CardKind> GetPermittedFactionSlashUseKinds(NativeOwners.FactionCardRequestHandle request, CharacterState provider, CardKind baseKind, IReadOnlyList<Card> materials, CardConversionSource? source = null, IReadOnlyList<CardConversionSource>? additionalConversions = null) => _resolve().GetPermittedFactionSlashUseKinds(request, provider, baseKind, materials, source, additionalConversions);
     internal void AdvanceFactionSlashCandidate(bool keepCurrentRequest = false) => _resolve().AdvanceFactionSlashCandidate(keepCurrentRequest);
     internal void BeginBorrowedSwordFactionSlashRequest(NativeOwners.BorrowedSwordHandle borrowedSword) => _resolve().BeginBorrowedSwordFactionSlashRequest(borrowedSword);
     internal void BeginBorrowedSwordFactionSlashSlash(NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> physicalCards, CardKind effectiveKind, bool usesZhuqueFan, CardConversionSource? conversionSource = default) => _resolve().BeginBorrowedSwordFactionSlashSlash(pending, provider, physicalCards, effectiveKind, usesZhuqueFan, conversionSource);

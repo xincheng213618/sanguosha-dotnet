@@ -77,6 +77,9 @@ public sealed record TurnCardActionProhibition(
 {
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<Suit>? Suits { get; init; }
+    public int AffectedSeat { get; init; } = Source.OwnerSeat;
+    public int? PhysicalMaterialCount { get; init; }
+    public SkillStateLifetime? Lifetime { get; init; }
 }
 
 public sealed record TurnHandCardColorRestriction(
@@ -344,25 +347,34 @@ internal sealed partial class TurnCardUseEffectStore
         int effectIndex,
         CardUseEffectSource source,
         IReadOnlyList<CardKind> cardKinds,
-        IReadOnlyList<CardActionType> actionTypes, IReadOnlyList<Suit>? suits = null)
+        IReadOnlyList<CardActionType> actionTypes, IReadOnlyList<Suit>? suits = null,
+        int? affectedSeat = null, int? physicalMaterialCount = null, SkillStateLifetime? lifetime = null)
     {
         IReadOnlyList<Suit>? frozenSuits = suits is null ? null : Array.AsReadOnly(suits.Distinct().Order().ToArray());
         var frozenKinds = Array.AsReadOnly(cardKinds.Distinct().Order().ToArray());
         var frozenActions = Array.AsReadOnly(actionTypes.Distinct().Order().ToArray());
+        if (frozenSuits is { Count: > 0 } && (frozenKinds.Count != 0 || !frozenActions.SequenceEqual([CardActionType.Use])))
+            throw new InvalidOperationException("A material-suit action restriction requires all card kinds and actual use only.");
+        if (physicalMaterialCount is not null && (physicalMaterialCount != 1 || frozenSuits is not { Count: > 0 }))
+            throw new InvalidOperationException("A physical-material restriction requires one material and a declared suit.");
+        var recipient = affectedSeat ?? source.OwnerSeat;
         var existing = _actionProhibitions.SingleOrDefault(item =>
-            item.ParentFrameId == parentFrameId && item.EffectIndex == effectIndex);
+            item.ParentFrameId == parentFrameId && item.EffectIndex == effectIndex && item.AffectedSeat == recipient);
         if (existing is not null)
         {
             if (existing.TurnNumber != turnNumber || existing.TurnSeat != turnSeat ||
                 existing.Source != source || !existing.CardKinds.SequenceEqual(frozenKinds) ||
-                !existing.ActionTypes.SequenceEqual(frozenActions) || !(existing.Suits ?? []).SequenceEqual(frozenSuits ?? []))
+                !existing.ActionTypes.SequenceEqual(frozenActions) || !(existing.Suits ?? []).SequenceEqual(frozenSuits ?? []) ||
+                existing.PhysicalMaterialCount != physicalMaterialCount ||
+                !(existing.Lifetime?.Until ?? []).SequenceEqual(lifetime?.Until ?? []))
                 throw new InvalidOperationException("A card-action prohibition grant key changed its meaning.");
             return existing;
         }
 
         var granted = new TurnCardActionProhibition(
             ++_grantSequence, turnNumber, turnSeat, parentFrameId, effectIndex, source,
-            frozenKinds, frozenActions) { Suits = frozenSuits };
+            frozenKinds, frozenActions) { Suits = frozenSuits, AffectedSeat = recipient,
+                PhysicalMaterialCount = physicalMaterialCount, Lifetime = lifetime };
         _actionProhibitions.Add(granted);
         return granted;
     }
@@ -501,9 +513,8 @@ internal sealed partial class TurnCardUseEffectStore
             item.Source.OwnerSeat == actorSeat &&
             (item.Categories & category) != 0) ||
             _actionProhibitions.Any(item =>
-                item.TurnNumber == turnNumber &&
-                item.TurnSeat == turnSeat &&
-                item.Source.OwnerSeat == actorSeat &&
+                (item.Lifetime is not null || item.TurnNumber == turnNumber && item.TurnSeat == turnSeat) &&
+                item.AffectedSeat == actorSeat && item.Suits is null &&
                 ProgramCardKindMatch.Contains(item.CardKinds, effectiveKind) &&
                 item.ActionTypes.Contains(actionType));
     }
@@ -597,6 +608,19 @@ internal sealed partial class TurnCardUseEffectStore
             .ToArray();
     }
 
+    internal IReadOnlyList<long> ExpireActionProhibitions(SkillStateBoundary boundary)
+    {
+        var expired = _actionProhibitions.Where(item => item.Lifetime is { } lifetime &&
+                lifetime.Until.Any(end => ProgramRuleLifetimeBoundaries.Matches(end, boundary)))
+            .Select(item => item.GrantSequence).ToArray();
+        if (expired.Length > 0)
+        {
+            var ids = expired.ToHashSet();
+            _actionProhibitions.RemoveAll(item => ids.Contains(item.GrantSequence));
+        }
+        return Array.AsReadOnly(expired);
+    }
+
     internal bool ConsumeTargetAdjustment(long grantSequence)
     {
         var index = _targetAdjustments.FindIndex(item => item.GrantSequence == grantSequence);
@@ -618,7 +642,7 @@ internal sealed partial class TurnCardUseEffectStore
                                item.TurnNumber == turnNumber && item.TurnSeat == turnSeat)
                 .Select(item => item.GrantSequence))
             .Concat(_actionProhibitions
-                .Where(item => item.TurnNumber == turnNumber && item.TurnSeat == turnSeat)
+                .Where(item => item.Lifetime is null && item.TurnNumber == turnNumber && item.TurnSeat == turnSeat)
                 .Select(item => item.GrantSequence))
             .Concat(_handColorRestrictions
                 .Where(item => item.TurnNumber == turnNumber && item.TurnSeat == turnSeat)

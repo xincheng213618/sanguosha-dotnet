@@ -5,7 +5,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
 {
     internal IReadOnlyList<MouXiaoQiaoOlUsePlan> MouXqNativePlans(CharacterState actor, CardKind kind, CardConversionSource source)
     {
-        if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(actor.Seat, kind, [], source)) || _characterCuiYanOlOperations.IsCuiYanNextUseForbidden(actor.Seat, [], null))
+        if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(actor.Seat, kind, [], source)) || _appliedCardActionRestrictions.IsMaterialUseForbidden(actor.Seat, [], null))
             return[];
         var actions = new List<LegalAction>();
         var required = new Dictionary<(LegalActionKind, int? ), CardKind?>();

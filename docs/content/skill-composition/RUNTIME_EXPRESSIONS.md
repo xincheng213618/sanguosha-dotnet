@@ -500,3 +500,11 @@ CardsMoved／CardsGained 绑定可声明 `"invocation":{"source":"movement"}`，
 后续条件可用 `["count",["useResultTargets","attack"],true]` 判断目标数，或用 `filter`、`intersect` 与存活角色集合组合。结果不隐式替换父 `selectedTarget`。需要后续选择实际目标时，由 JSON 显式 `selectTargets`／`targetSetExpr`／`replaceSelection` 表达；`anyLiving` 配合 `allTargets` 可自动消费已经由表达式限定的存活目标集合，`minimumTargets:1` / `maximumTargets:1` 保留单目标资源契约，超限不会任取第一名。
 
 同一原生 use 的结果只交付一次，额外结算与重复完成不重采样；循环进入同一发行指令的新 occurrence 时清除旧绑定，拒绝可选出杀或条件未满足不会读取上一轮结果。提示续接与原生子返回不清除已经交付的本次结果。结果保留原生真实身份，无 Action 的合法路径仍为无 Action。
+
+## 已施加的动作限制与真实使用期限
+
+`grantTurnCardActionProhibition` 可指定 `selectedTarget` 受体、`suits`、`physicalMaterialCount:1` 与统一 `until`。受体默认本人；旧纯 `cardKinds` 节点仍使用原默认回合期限。按花色的声明不混合 `cardKinds`，只限制实际使用；静态加载会拒绝不支持的维度组合。
+
+`until` 的 `actualUse` 以原生真实声明或严格自身用牌响应的首次历史位置为 occurrence，`skipIssued:true` 避开已发生的本次使用；`actualTurnReturned` 使用实际回合返回边界。二者可与其他既有 Until 边界按 OR 组合，Before／After 与主体语义不变。普通打出、群攻响应及提供给其他使用者的材料不作为本人另一次实际使用。定义里的所有 Until 都编译对应事实需求。
+
+最终材料花色来自原生外观，材料数独立读取；多材料即使同花色也不满足单材料限定。受体列表、状态期限和来源身份相互独立，来源消失不撤销已经施加的限制。状态没有到期时跨回合仍按声明生效，避免被旧回合字段提前裁掉。

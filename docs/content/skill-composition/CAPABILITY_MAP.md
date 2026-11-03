@@ -1443,3 +1443,36 @@ InitialHandGain 与装备离区是在原事实边界提前冻结来源的权限�
 | 信任边界 | 原物理交付在共享写边界校验，读结果不重扫发动、伤害或人物领取事件；命令与恢复保持原边界。 |
 
 完成范围只包括原生伤害牌领取跨额外结算的事实所有权。其他定向实体领取、保留／销毁材料、不同区域的实际退休及八组额外结算的来源、次数和调度仍有真实独立规则，整个材料退休／额外效果尚未组合完成。
+
+## 已施加的用牌限制：受体、材料花色与下一次真实使用
+
+`TurnCardActionProhibition` 继续是共享存储，`AppliedCardActionRestrictionsRuntime` 解释已施加的受体、真实材料数量、最终花色与 `Lifetime.Until`。来源用于归因，施加后不因施加者死亡、失去技能或禁用而撤销。人物不再通过 Granted／Consumed 自定义事件回答禁令是否存在；牌种限制与材料花色限制分别按所需事实回答，无材料的牌种查询不会把一条花色限制误判成全牌禁止。
+
+束统的禁令仅匹配恰好一个实体材料的最终有效花色；零实体、多实体（即使印刷花色相同）不满足这项材料数条件。发行时把冻结花色施加给本人和当次目标，下一次真实使用无论花色或材料数如何，都同时消耗该角色已有的这些限制。原使用者与供牌者分别保留：供杀的限制约束实际用牌者，候选转换和物理付款仍使用提供者的真实材料；吴景、继承前次花色、朱雀转换等最终外观由原生候选与实际用牌 owner 提供，禁令 owner 不重算人物规则。
+
+期限沿用一个 `until` 结构：`actualUse` 用共享真实使用序列的首次声明位置，`actualTurnReturned` 表示当前实际回合整体返回。它晚于普通 `turnCleanup`；移除旧账本不把这个时机提前。纯牌种的旧节点仍用原回合期限，显式 Lifetime 以实际到期边界为准，不能跨回合未到期却因旧 TurnNumber 字段提前失效。
+
+真实使用边界来自已有 `NativeCardUseHistoryRecordedEvent` 与严格自身响应的 `ActualCardActionRecordedEvent`，由 `ActualUseRuleBoundaries` 在原声明／接受事件的前后分别读取冻结事实，派发给同一 `ProgramSkillChangeRuntime.ProcessSkillStateBoundary`；限制、定向策略与技能状态共用一个比较函数和到期入口。一般牌在真实原生声明时消耗，接受但尚未声明不算；自身无懈与应对杀的闪在真正接受响应时消耗。普通打出、群攻响应和替人提供的响应不因其牌名相同而算使用。后续确认／角色／目标更新保留第一次 `DeclarationCursor`，不会消耗后来才施加的状态；无 Action 的真实原生使用不补造身份。
+
+JSON 复用 `grantTurnCardActionProhibition`，例如：
+
+```json
+{"op":"grantTurnCardActionProhibition","target":"selectedTarget","actionTypes":["use"],
+ "suits":["heart"],"physicalMaterialCount":1,
+ "until":[{"event":"actualUse","participant":{"kind":"target"},"timing":"before","skipIssued":true},
+          {"event":"actualTurnReturned","participant":{"kind":"turnOwner"},"timing":"after"}]}
+```
+
+按花色的此形状用于所有牌种的实际使用；需要牌种的形状用 `cardKinds`，加载器拒绝未提供足够查询事实的牌种＋花色混合形状。节点自身、普通 skillState 的 Until 与声明 State.Until 都编译自己的原生事实需求；共享捕获不枚举人物。格式为新增可选写法，不为这项普通扩展提升全局规则版本；存档继续沿已有配置、内容指纹和命令前缀恢复边界，不覆盖源存档。
+
+| 七项判断 | 完成边界与剩余缺口 |
+| --- | --- |
+| 单一归属 | 同一共享 prohibition store 保存已施加限制，应用／材料查询与统一 lifetime 到期各有明确 owner。 |
+| 依赖方向 | 新 owner 只读共享状态、原帧与期限能力；人物和原生调用者提供事实，不把人物方法包装进新查询。 |
+| 层次分明 | 来源发动资格、原生最终外观、实际使用身份、受体禁令和后续消耗分开。 |
+| JSON 对应规则 | 固定花色、受体、材料数量和 Until 可由已有节点声明，不新增束统操作。 |
+| 局部变化 | 新施加者复用数据与节点，查询者不认识施加者；原生供牌继续保留实际使用者和提供者。 |
+| 旧路退役 | 束统 Granted／Consumed 事件、历史扫描及禁令包装与外部人物依赖退役；真实旧酒返回保留。 |
+| 信任边界 | 加载器校验静态组合，执行器和共享边界校验发行；读取既有状态与真实原生事实，不重扫人物自证。 |
+
+完成范围为已施加的下一次实际使用花色禁令及其受体、期限与材料查询。束统原技能的其他资格与摸牌、直节私有历史、吴景外观来源、旧酒生产者，以及其他使用／响应限制仍有独立未组合路径；整体使用／响应合法性与三个监控模块仍未完成依赖验收。

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
 public enum SkillStateAction { Suppress, Lose, Transfer }
-public enum SkillStateBoundaryEvent { TurnCleanup, TurnStarted, TurnEnded, RoundAdvanced, PhaseStarted, PhaseEnded, Death, DyingStarted, DyingEnded }
+public enum SkillStateBoundaryEvent { TurnCleanup, TurnStarted, TurnEnded, RoundAdvanced, PhaseStarted, PhaseEnded, Death, DyingStarted, DyingEnded, ActualUse, ActualTurnReturned }
 public enum SkillStateBoundaryTiming { Before, After }
 public enum SkillStateSubject { Owner, Target, TurnOwner, Any }
 
@@ -42,6 +42,17 @@ public sealed record SkillStateOrigin(long FrameId, int EffectIndex, CardUseEffe
     public int IssuedTurn { get; init; }
 }
 
+internal static class ProgramRuleLifetimeBoundaries
+{
+    internal static bool Matches(SkillStateBoundaryEnd end, SkillStateBoundary boundary) =>
+        end.Event == boundary.Event &&
+        (end.Seat == boundary.Seat || end.Seat is null && end.Event is SkillStateBoundaryEvent.TurnStarted or SkillStateBoundaryEvent.TurnEnded) &&
+        end.Timing == boundary.Timing && end.Phase == boundary.Phase &&
+        (end.Event == SkillStateBoundaryEvent.DyingEnded && !end.SkipIssued
+            ? boundary.Occurrence == end.IssuedOccurrence
+            : end.SkipIssued ? boundary.Occurrence > end.IssuedOccurrence : boundary.Occurrence >= end.IssuedOccurrence);
+}
+
 public sealed class SkillStateLifetime(SkillStateOrigin? origin, IReadOnlyList<SkillStateBoundaryEnd> until)
 {
     public SkillStateOrigin? Origin { get; } = origin;
@@ -52,6 +63,11 @@ internal interface IProgramRuleLifetimes : IProgramSelectionQuery
 {
     SkillStateLifetime? CreateApplicationLifetime(int owner, int target,
         IReadOnlyList<SkillStateBoundarySpec> until, SkillStateConditionContext context);
+}
+
+internal interface IProgramRuleBoundaries : IProgramRuntimeOperations
+{
+    void ProcessSkillStateBoundary(SkillStateBoundary boundary);
 }
 
 public sealed record SkillStateConditionContext(int OwnerSeat, int TargetSeat, ActualDiscardRecoveryPhaseKey? IssuedPhase = null,
