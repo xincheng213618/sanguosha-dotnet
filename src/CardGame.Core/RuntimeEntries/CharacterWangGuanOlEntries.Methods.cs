@@ -14,13 +14,9 @@ internal sealed partial class CharacterWangGuanOlEntries
     internal bool? DecideIssuedTrigger630(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger630(candidate, context);
     internal void FinishWangGuan(ProgramSkillFrame f) => _resolve().FinishWangGuan(f);
     internal bool IsIssuedMiuyanCandidate(ProgramTriggerCandidate c) => _resolve().IsIssuedMiuyanCandidate(c);
-    internal bool IsMiuyanCategoryGiftMovementReveal(IGameEvent fact) => _resolve().IsMiuyanCategoryGiftMovementReveal(fact);
-    internal bool IsMiuyanShandaoMovementReveal(IGameEvent fact) => _resolve().IsMiuyanShandaoMovementReveal(fact);
     internal void IssueMiuyanUse(long useId, CardActionContext? action) => _resolve().IssueMiuyanUse(useId, action);
     internal CardUseFrame? MiuyanCandidateUse(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().MiuyanCandidateUse(c, context);
-    internal IReadOnlyList<WangGuanHandEntity> MiuyanClaimEntities(MiuyanUseInvoice use, int owner) => _resolve().MiuyanClaimEntities(use, owner);
     internal bool MiuyanUseProof(CardUseFrame use) => _resolve().MiuyanUseProof(use);
-    internal void ObserveMiuyanPhaseHandReveal(IGameEvent fact) => _resolve().ObserveMiuyanPhaseHandReveal(fact);
     internal void PublishWangGuan(ProgramSkillFrame f) => _resolve().PublishWangGuan(f);
     internal bool QualifyWangGuan(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext context) => _resolve().QualifyWangGuan(c, t, context);
     internal void RecordWangGuanMovement(long id, long before, int count) => _resolve().RecordWangGuanMovement(id, before, count);

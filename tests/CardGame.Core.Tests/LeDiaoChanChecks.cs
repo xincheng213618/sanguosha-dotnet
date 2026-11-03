@@ -119,21 +119,53 @@ internal static class LeDiaoChanChecks
         static MatchRuntime Runtime(Scene scene) => (MatchRuntime)typeof(GameEngine)
             .GetProperty("MatchRuntime", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(scene.G)!;
         long? Entry(int owner, int card) => Runtime(s).Capabilities.Get<ICurrentHandEntryQueries>().CurrentHandEntry(owner, card);
+        IReadOnlyList<PublicCardRevealHistoryFact> History() => Runtime(s).Capabilities.Get<IPublicCardRevealHistoryQueries>().Read();
         var reveals = Runtime(s).Capabilities.Get<IPublicCardRevealQueries>();
         var card = s.V().Hand.First(c => !Marked(c));
         var entry = Entry(0, card.Id);
-        s.Need(entry is not null, "The shared residency query reads the real opening Hand entry without a character reveal ledger.");
-        s.Show(card.Id);
+        var originalTurn = s.G.State.TurnNumber;
+        var originalTurnOwner = s.G.State.CurrentSeat;
+        var originalPhase = Runtime(s).Capabilities.Get<IActualDiscardRecoveryPhaseQueries>().Current();
+        var movementCutoff = s.G.CardMovements.Last().Sequence;
+        s.Need(entry is not null && originalPhase is { ActorSeat: 0, Kind: ActualDiscardRecoveryPhaseKind.Play } &&
+            Runtime(s).Capabilities.Get<INativeFactDemand>().RequiresFact(ProgramTrackedFact.PublicCardRevealHistory),
+            "The declared Diou rule requests shared public Hand history, while residency reads the real opening entry without a character ledger.");
+        s.Use("show");
+        s.Reach(() => s.P?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "select-owned-cards") == true);
+        s.Answer(choice => choice.Cards.SequenceEqual([card.Id]));
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Watch &&
+            s.P.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "select-owned-cards"));
+        var firstPending = s.E<ProgramCardsRevealedEvent>().Last(e => e.SkillId == Driver && e.BindingId == "show");
+        var beforeNested = History();
+        var sampled = beforeNested.Single(fact => fact.RevealFrameId == firstPending.FrameId && fact.CardId == card.Id);
+        s.Need(sampled is { Purpose: PublicCardRevealPurpose.Explicit, OwnerSeat: 0 } &&
+            sampled.ActualTurn == originalTurn && sampled.TurnOwnerSeat == originalTurnOwner && sampled.ActualPhase == originalPhase &&
+            sampled.HandEntryMovementSequence == entry && sampled.MovementSequence == movementCutoff &&
+            s.G.ResolutionStack.OfType<PublicHandRevealWindowFrame>().Any(),
+            "The Before-event physical witness is recorded on the original frame and phase before its real nested observer selects another public show.");
+        s.Cold();
+        s.Need(History().Single(fact => fact.RevealFrameId == firstPending.FrameId && fact.CardId == card.Id) == sampled,
+            "Actual command-prefix recovery retains the original public Hand witness before the nested show executes.");
+        s.Answer(choice => choice.Cards.SequenceEqual([card.Id])); s.Play();
         var first = s.E<ProgramCardsRevealedEvent>().Last(e => e.SkillId == Driver && e.BindingId == "show");
         var firstDescription = reveals.Describe(first);
         s.Need(firstDescription.FrameId == first.FrameId && firstDescription.CardIds.SequenceEqual([card.Id]) &&
             first is { OwnerSeat: 0, Bind: "selected" } && Entry(0, card.Id) == entry &&
             s.E<ProgramSkillResolvedEvent>().Any(e => e.FrameId == first.FrameId && e.SkillId == Driver && e.ActivationId == "show"),
             "A real JSON Hand show describes its original program frame, binding and exact entity without moving the card.");
+        var nested = s.E<ProgramCardsRevealedEvent>().Single(e => e.SkillId == Watch && e.Bind == "nested-public-show");
+        s.Need(nested.FrameId != first.FrameId && beforeNested.Count(fact => fact.CardId == card.Id) == 1 &&
+            History().Where(fact => fact.CardId == card.Id).Select(fact => fact.RevealFrameId).ToHashSet().SetEquals([first.FrameId, nested.FrameId]) &&
+            History().Where(fact => fact.CardId == card.Id).All(fact => fact.ActualTurn == originalTurn &&
+                fact.TurnOwnerSeat == originalTurnOwner && fact.ActualPhase == originalPhase && fact.HandEntryMovementSequence == entry) &&
+            !s.Has(Diou),
+            "A genuinely nested show has its own occurrence; the original frozen view and both original scopes survive observer reentry and real source loss.");
         s.Show(card.Id);
         var repeated = s.E<ProgramCardsRevealedEvent>().Last(e => e.SkillId == Driver && e.BindingId == "show");
         s.Need(repeated.FrameId != first.FrameId && reveals.Describe(repeated).CardIds.SequenceEqual([card.Id]) && Entry(0, card.Id) == entry,
             "Repeated explicit shows remain separate source facts and do not create a new physical Hand entry.");
+        s.Need(History().Count(fact => fact.RevealFrameId == repeated.FrameId && fact.CardId == card.Id) == 1 && !s.Has(Diou),
+            "Shared Hand history still captures a real show while its former consumer skill is absent.");
         s.Use("give", [card.Id], [1]); s.Play();
         var peerEntry = Entry(1, card.Id);
         s.Need(Entry(0, card.Id) is null && peerEntry is not null && peerEntry != entry &&
@@ -145,9 +177,18 @@ internal static class LeDiaoChanChecks
             s.G.CardMovements.Any(m => m.Sequence == returnedEntry && m.CardId == card.Id && m.From == CardLocation.Hand(1) && m.To == CardLocation.Hand(0)) &&
             firstDescription.CardIds.SequenceEqual([card.Id]),
             "Leaving and returning creates a new Hand residency while the earlier immutable public fact still names its original card.");
+        s.Show(card.Id);
+        var returnedShow = s.E<ProgramCardsRevealedEvent>().Last(e => e.SkillId == Driver && e.BindingId == "show");
+        var returnedSample = History().Single(fact => fact.RevealFrameId == returnedShow.FrameId && fact.CardId == card.Id);
+        s.Need(returnedSample.HandEntryMovementSequence == returnedEntry && returnedSample.OwnerSeat == 0 &&
+            returnedSample.ActualTurn == originalTurn && returnedSample.ActualPhase == originalPhase &&
+            History().Single(fact => fact.RevealFrameId == first.FrameId && fact.CardId == card.Id) == sampled,
+            "A new residency changes the new witness only; the same-turn history preserves the earlier owner's original Hand entry and phase.");
+        AssertFrozenPublicRevealFacts(s, History(), sampled);
         s.Cold();
-        s.Need(Entry(0, card.Id) == returnedEntry && Entry(1, card.Id) is null,
-            "Command-prefix recovery preserves the shared journal-derived entry after the actual give and take.");
+        s.Need(Entry(0, card.Id) == returnedEntry && Entry(1, card.Id) is null &&
+            History().Single(fact => fact.RevealFrameId == returnedShow.FrameId && fact.CardId == card.Id) == returnedSample,
+            "Command-prefix recovery preserves both the journal-derived entry and the shared show witness after actual give and take.");
 
         var mutableCards = new List<CardSnapshot> { card, card };
         IGameEvent[] explicitSources =
@@ -178,6 +219,32 @@ internal static class LeDiaoChanChecks
         s.Need(nativeUse.OfType<CardUseDeclaredEvent>().Any() && nativeUse.OfType<CardUseFinishedEvent>().Any() &&
             nativeUse.All(e => reveals.Describe(e).CardIds.Count == 0),
             "A real ordinary native Use exposes its own card-use facts without becoming an explicit public Hand show.");
+        s.Use("grant-diou"); s.Play();
+        _ = s.Study(); s.ReachDiou(); s.ShowDiou(card.Id); s.Reach(() => s.DiouBranch("use")); s.UseDiou(); s.Play();
+        s.Need(s.E<DiouShownEvent>().Single() is { FirstShow: false, SameName: false } remembered && remembered.CardId == card.Id &&
+            s.E<DiouNativeReturnedEvent>().Length == 1 && s.E<DiouDrawReturnedEvent>().Length == 0 && s.V().Hand.Any(c => c.Id == card.Id),
+            "Regaining Diou reads the original actual-turn show even after the entity left and reentered Hand; a new residency is not a new first-show reward.");
+    }
+
+    private static void AssertFrozenPublicRevealFacts(Scene s, IReadOnlyList<PublicCardRevealHistoryFact> read,
+        PublicCardRevealHistoryFact sample)
+    {
+        var inputs = new List<PublicCardRevealHistoryFact> { sample };
+        var created = new PublicCardRevealHistoryRecordedEvent(inputs);
+        inputs.Clear();
+        var replacement = new List<PublicCardRevealHistoryFact> { sample with { CardId = sample.CardId + 1 } };
+        var changed = created with { Facts = replacement };
+        replacement.Clear();
+        s.Need(created.Facts.SequenceEqual([sample]) && changed.Facts is [{ CardId: var changedId }] && changedId == sample.CardId + 1 &&
+            new[] { read, created.Facts, changed.Facts }.All(facts => facts is IList<PublicCardRevealHistoryFact> { IsReadOnly: true }) &&
+            s.E<PublicCardRevealHistoryRecordedEvent>().All(fact => fact.Facts is IList<PublicCardRevealHistoryFact> { IsReadOnly: true }),
+            "The shared read, committed event, constructor and with assignment expose detached readonly witness collections.");
+        foreach (var facts in new[] { read, created.Facts, changed.Facts })
+        {
+            try { ((IList<PublicCardRevealHistoryFact>)facts).Add(sample); }
+            catch (NotSupportedException) { continue; }
+            throw new InvalidOperationException("A public Hand history collection accepted mutation.");
+        }
     }
 
     // Fixed small real games; no mutation of engine state, seed searches or complete-match simulation.
@@ -206,6 +273,7 @@ internal static class LeDiaoChanChecks
                 A("take", "{\"op\":\"selectAndMoveOwnedCard\",\"target\":\"owner\",\"chooserRef\":{\"kind\":\"owner\"},\"cardOwnerRef\":{\"kind\":\"selectedTarget\"},\"zones\":[\"hand\"],\"count\":1,\"destination\":\"ownerHand\",\"awaitMovementTriggers\":true}", targets: 1),
                 A("lose-tanban", "{\"op\":\"loseOwnerSkillsAndGrant\",\"target\":\"owner\",\"skillIds\":[\"" + Tb + "\"],\"sourceBind\":\"" + Neutral + "\"}"),
                 A("grant-tanban", "{\"op\":\"grantSkills\",\"target\":\"owner\",\"skillIds\":[\"" + Tb + "\"]}"),
+                A("grant-diou", "{\"op\":\"grantSkills\",\"target\":\"owner\",\"skillIds\":[\"" + Diou + "\"]}"),
                 A("wound", "{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":1}"), A("near-dying", "{\"op\":\"loseHp\",\"target\":\"owner\",\"amount\":12}"),
                 A("incoming", "{\"op\":\"offerVirtualSlashOrDraw\",\"target\":\"selectedTarget\"}", targets: 1),
                 A("arm-peer", "{\"op\":\"useRandomDeckEquipment\",\"target\":\"owner\",\"resultBind\":\"real-weapon\"}", targets: 1),
@@ -227,6 +295,7 @@ internal static class LeDiaoChanChecks
             { defs.Add(N("{\"id\":\"" + Conditional + "\",\"revision\":1,\"skillGrants\":[{\"id\":\"exact-health-diou\",\"skillId\":\"" + Diou + "\"," + (scene == "equipment-lion" ? "\"while\":[\"<=\",[\"hp\",\"owner\"],12],\"onSourceLoss\":\"finishInvocation\"" : "\"while\":[\">=\",[\"hp\",\"owner\"],13],\"onSourceLoss\":\"finishInvocation\"") + "}]}")); own.Add(Conditional); }
             else if (scene is not ("opening" or "swap")) own.Add(Diou);
             var watch = new JsonArray();
+            if (scene == "shared-reveal") watch.Add(N("{\"id\":\"real-nested-public-show\",\"window\":\"publicHandRevealed\",\"subject\":\"owner\",\"optional\":false,\"usageScope\":\"game\",\"usageLimit\":1,\"invocation\":{\"source\":\"publicHandReveal\"},\"effects\":[{\"op\":\"selectOwnedCards\",\"target\":\"owner\",\"zones\":[\"hand\"],\"minimumCards\":1,\"maximumCards\":1,\"resultBind\":\"nested-public-show\"},{\"op\":\"revealBoundCards\",\"target\":\"owner\",\"sourceBind\":\"nested-public-show\"},{\"op\":\"skillState\",\"target\":\"owner\",\"action\":\"lose\",\"match\":{\"skillIds\":[\"" + Diou + "\"]}}]}"));
             if (scene.StartsWith("family-", StringComparison.Ordinal)) watch.Add(N("{\"id\":\"inspect-real-completed-use\",\"window\":\"cardUseCompleted\",\"ownerRelation\":\"actor\",\"includeResponseUses\":true,\"optional\":false,\"effects\":[" + Pause("inspect-use") + "]}"));
             if (scene == "adjusted-duel") watch.Add(N("{\"id\":\"real-completed-study-grant\",\"window\":\"cardUseCompleted\",\"ownerRelation\":\"actor\",\"cardKinds\":[\"drawTwo\"],\"priority\":1000,\"usageScope\":\"game\",\"usageLimit\":1,\"optional\":false,\"effects\":[{\"op\":\"grantNextCardTargetAdjustment\",\"target\":\"owner\"}]}"));
             if (scene == "opening") watch.Add(N("{\"id\":\"before-initial-mark\",\"window\":\"gameStarting\",\"subject\":\"owner\",\"optional\":false,\"priority\":1000,\"effects\":[" + Pause("opening") + "]}"));

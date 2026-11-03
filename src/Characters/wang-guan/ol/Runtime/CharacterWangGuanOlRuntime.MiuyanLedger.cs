@@ -48,32 +48,13 @@ internal sealed partial class CharacterWangGuanOlRuntime
         result.Add(new(r.Source.OwnerSeat, r.Source.OwnerSeat, r.Source.SkillId, t.Id, r.GameplayHash, r.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, r.Source.OwnerSeat, r.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], action))));
     }
 
-    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 27210)]
-    internal void ObserveMiuyanPhaseHandReveal(IGameEvent fact)
-    {
-        if (!HasMiuyanCapability || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { } phase || IsMiuyanShandaoMovementReveal(fact) || IsMiuyanCategoryGiftMovementReveal(fact))
-            return;
-        var (frame, ids) = _publicCardReveals.Describe(fact);
-        foreach (var id in ids.Distinct().ToArray())
-            if (_cardZonesOperations._cardZones.GetLocation(id)is { Zone: CardZoneKind.Hand, OwnerSeat: { } holder } && _currentHandEntries.CurrentHandEntry(holder, id)is { } entry && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MiuyanPhaseHandRevealedEvent>().Any(e => e.Phase == phase && e.CardId == id))
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MiuyanPhaseHandRevealedEvent(phase, frame, id, holder, entry, fact.GetType().Name));
-    }
-
-    internal bool IsMiuyanShandaoMovementReveal(IGameEvent fact)
-    {
-        if (fact is not CardsRevealedEvent { Cards: [var card] } e || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.ResolutionId)is not { SkillId: "ol:shandao", ActivationId: "top-and-two-tricks", TriggerId: null, InstructionIndex: 1, TianChouShandao: { Stage: TianChouShandaoStage.TopChildren, TargetsFrozen: true } r } f || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != SkillProgramEffectOp.ResolveShandaoTopAndGlobalTricks || r.Source != CharacterTianChouOlRuntime.TianChouSource(f) || r.Cursor < 0 || r.Cursor >= r.Targets.Count)
-            return false;
-        return _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Hand(r.Targets[r.Cursor]);
-    }
-
-    internal bool IsMiuyanCategoryGiftMovementReveal(IGameEvent fact)
-    {
-        if (fact is not ProgramCardsRevealedEvent { SkillId: "ol:zhaosong", BindingId: "give-hand-category-mark", Bind: "category-mark-gift", Cards: [var card] } e || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == e.FrameId)is not { SkillId: "ol:zhaosong", TriggerId: "give-hand-category-mark", InstructionIndex: 1, RecipientCategoryMark: { Operation: SkillProgramEffectOp.GiveHandAndGrantCategoryMark, Stage: RecipientCategoryMarkStage.ChoosingGift } r } f || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op != r.Operation || r.Source != CoreGameEngineRecipientCategoryMarksRuntime.RecipientMarkSource(f) || r.HolderSeat != e.OwnerSeat)
-            return false;
-        return r.Materials.Any(m => m.CardId == card.Id && m.From == CardLocation.Hand(r.HolderSeat)) && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Hand(r.HolderSeat);
-    }
-
-    internal IReadOnlyList<WangGuanHandEntity> MiuyanClaimEntities(MiuyanUseInvoice use, int owner) => Array.AsReadOnly(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MiuyanPhaseHandRevealedEvent>().Where(e => e.Phase == use.Phase).Select(e => e.CardId).Distinct().Order().Select(id => (Id: id, From: _cardZonesOperations._cardZones.GetLocation(id))).Where(x => x.From is { Zone: CardZoneKind.Hand, OwnerSeat: { } holder } && holder != owner && _coreMatchParticipantsPlayersAccess._players[holder].IsAlive).Select(x => new WangGuanHandEntity(x.Id, _coreAdvancedLifecycleOperations.GetAdvancedCard(x.Id).Kind, x.From.OwnerSeat!.Value, _cardZonesOperations._cardZones.CardsAt(x.From).ToList().FindIndex(c => c.Id == x.Id), _currentHandEntries.CurrentHandEntry(x.From.OwnerSeat!.Value, x.Id)!.Value)).ToArray());
+    internal IReadOnlyList<WangGuanHandEntity> MiuyanClaimEntities(MiuyanUseInvoice use, int owner) => Array.AsReadOnly(_publicHandRevealHistory.Read()
+        .Where(fact => fact.ActualPhase == use.Phase && fact.Purpose != PublicCardRevealPurpose.MaterialDisclosure)
+        .Select(fact => fact.CardId).Distinct().Order().Select(id => (Id: id, From: _cardZonesOperations._cardZones.GetLocation(id)))
+        .Where(x => x.From is { Zone: CardZoneKind.Hand, OwnerSeat: { } holder } && holder != owner && _coreMatchParticipantsPlayersAccess._players[holder].IsAlive)
+        .Select(x => new WangGuanHandEntity(x.Id, _coreAdvancedLifecycleOperations.GetAdvancedCard(x.Id).Kind, x.From.OwnerSeat!.Value,
+            _cardZonesOperations._cardZones.CardsAt(x.From).ToList().FindIndex(c => c.Id == x.Id),
+            _currentHandEntries.CurrentHandEntry(x.From.OwnerSeat!.Value, x.Id)!.Value)).ToArray());
     [ProgramIssuedTrigger(630, ProgramIssuedTriggerMatch.Decision)]
     internal bool? DecideIssuedTrigger630(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => IsIssuedMiuyanCandidate(candidate) ? CanRunIssuedMiuyanCandidate(candidate, context) : null;
 }

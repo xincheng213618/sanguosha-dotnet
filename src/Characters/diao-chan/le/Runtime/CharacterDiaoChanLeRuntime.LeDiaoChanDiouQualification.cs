@@ -143,17 +143,9 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 
     [ProgramPipelineHook(ProgramPipelinePhase.ObservesResponseUseCompletion, 2)]
     internal bool HasIssuedDiouResponse(CardActionContext action) => HasDiouCapability && _resolutionStackOperations._resolutionStack.Any(f => f.DiouClaims?.Any(q => q.NativeParentId == f.Id && q.ActionId == action.ActionId && _coreMatchParticipantsPlayersAccess._players[q.Source.OwnerSeat].IsAlive && ValidDiouClaim(q, action)) == true);
-    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 29041)]
-    internal void ObserveDiouPublicHandReveals(IGameEvent payload)
-    {
-        if (!HasDiouCapability || !_coreMatchSetupSetupCompleteAccess._setupComplete || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber <= 0)
-            return;
-        var (frame, ids) = _publicCardReveals.Describe(payload);
-        foreach (var p in _coreMatchParticipantsPlayersAccess._players)
-            foreach (var card in _corePhysicalOwnedCardQueriesOperations.GetHand(p).Where(c => ids.Contains(c.Id)))
-                if (!DiouWasShownThisTurn(card.Id))
-                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouPublicHandShownEvent(_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, frame, p.Seat, card.Id, card.Kind, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
-    }
-
-    internal bool DiouWasShownThisTurn(int id) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouPublicHandShownEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.CardId == id);
+    internal bool DiouWasShownThisTurn(int id) =>
+        _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && _publicHandRevealHistory
+        .Read()
+        .Any(fact => fact.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber &&
+            fact.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && fact.CardId == id);
 }

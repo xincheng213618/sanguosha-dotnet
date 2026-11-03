@@ -8,7 +8,8 @@ public sealed record PublicHandRevealSelection(string ReturnKey, int Instruction
     long ActionId, int CardId, CardKind PrintedKind, CardLocation From, CardLocation To,
     int ActorSeat, int ChooserSeat, string? ResultBind = null, Suit? FrozenSuit = null,
     int BeforeCoverage = 0, NativeLogicalDiscardInvocationDraft? DiscardInvocation = null,
-    CardKind? EffectiveKind = null);
+    CardKind? EffectiveKind = null,
+    PublicCardRevealPurpose Purpose = PublicCardRevealPurpose.Explicit);
 
 public abstract partial record ResolutionFrame
 {

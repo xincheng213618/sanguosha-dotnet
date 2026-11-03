@@ -110,7 +110,7 @@ internal sealed partial class CharacterTianChouOlRuntime
         var grain = card.Kind == CardKind.WoodenOx && zone == CardZoneKind.Equipment ? _corePhysicalOwnedCardQueriesOperations.GetWoodenOxGrain(_coreMatchParticipantsPlayersAccess._players[owner]).Select(c => c.Id).ToArray() : [];
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { TianChouShandao = r with { Stage = TianChouShandaoStage.TopChildren } });
         // A selected foreign hand remains hidden until this real card is revealed and moved.
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PublicHandRevealSelection = new("shandao-hand-top", f.InstructionIndex, 0, card.Id, card.Kind, from, CardLocation.DrawPile, f.OwnerSeat, f.OwnerSeat) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PublicHandRevealSelection = new("shandao-hand-top", f.InstructionIndex, 0, card.Id, card.Kind, from, CardLocation.DrawPile, f.OwnerSeat, f.OwnerSeat, Purpose: PublicCardRevealPurpose.MaterialDisclosure) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardsRevealedEvent(f.Id, Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
         if (_publicHandRevealWindows.Begin(f.Id, "shandao-hand-top"))
             return;

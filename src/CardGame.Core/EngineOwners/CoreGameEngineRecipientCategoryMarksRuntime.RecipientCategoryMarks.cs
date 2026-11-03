@@ -276,7 +276,7 @@ internal sealed partial class CoreGameEngineRecipientCategoryMarksRuntime
         };
         var e = _coreProgramLifecycleOperations.GetProgramTrigger(f).Effects.Single();
         var before = RecipientMarkSequence;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PublicHandRevealSelection = new("recipient-category-hand-gift", f.InstructionIndex, 0, id, card.Kind, CardLocation.Hand(r.HolderSeat), CardLocation.Hand(f.OwnerSeat), f.OwnerSeat, r.HolderSeat, EffectiveKind: card.Kind) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PublicHandRevealSelection = new("recipient-category-hand-gift", f.InstructionIndex, 0, id, card.Kind, CardLocation.Hand(r.HolderSeat), CardLocation.Hand(f.OwnerSeat), f.OwnerSeat, r.HolderSeat, EffectiveKind: card.Kind, Purpose: PublicCardRevealPurpose.MaterialDisclosure) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), r.HolderSeat, "category-mark-gift", Array.AsReadOnly(new[] { _coreSnapshotValueProjectionOperations.ToSnapshot(card) })));
         if (_publicHandRevealWindows.Begin(f.Id, "recipient-category-hand-gift"))
             return;

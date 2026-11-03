@@ -58,8 +58,6 @@ public sealed record DiouQualificationAcceptedEvent(long NativeParentId, long Ac
 public sealed record DiouUseClaimedEvent(DiouUseClaim Claim) : IGameEvent;
 public sealed record DiouMaterialQualifiedEvent(long NativeParentId, long ActionId, CardConversionSource Source,
     int Index, int CardId, CardKind PrintedKind, CardLocation From, bool Tanban) : IGameEvent;
-public sealed record DiouPublicHandShownEvent(int ActualTurn, int TurnOwner, long RevealFrameId,
-    int HandOwnerSeat, int CardId, CardKind PrintedKind, long MovementSequence) : IGameEvent;
 public sealed record DiouStartedEvent(long FrameId, DiouUseClaim Claim, long WindowId) : IGameEvent;
 public sealed record DiouShownEvent(long FrameId, int OwnerSeat, int CardId, CardKind PrintedKind,
     CardKind OutputKind, int ActualTurn, int TurnOwner, long MovementSequence, bool FirstShow, bool SameName) : IGameEvent;
@@ -87,6 +85,7 @@ public sealed record DiouCompletedEvent(long FrameId, long OriginalActionId, boo
 internal interface ILeDiaoChanDiouHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame); }
 internal sealed class ResolveDiouTanbanUseDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.PublicCardRevealHistory);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveDiouTanbanUse;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>

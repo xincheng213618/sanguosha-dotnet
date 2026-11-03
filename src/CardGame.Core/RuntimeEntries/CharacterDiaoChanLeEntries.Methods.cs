@@ -29,7 +29,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal bool DiouRootMatches(ProgramSkillFrame f) => _resolve().DiouRootMatches(f);
     internal IReadOnlyList<Card> DiouShowableCards(int owner, CardConversionSource source) => _resolve().DiouShowableCards(owner, source);
     internal bool DiouSuspendsRescue(ProgramSkillFrame f, DyingFrame dying) => _resolve().DiouSuspendsRescue(f, dying);
-    internal bool DiouWasShownThisTurn(int id) => _resolve().DiouWasShownThisTurn(id);
     internal void DispatchDiou(ProgramSkillFrame f, DiouUsePlan p) => _resolve().DispatchDiou(f, p);
     internal bool DrainDiouChildren(ProgramSkillFrame f) => _resolve().DrainDiouChildren(f);
     internal bool ExactTanbanDrawEndFrame(ProgramSkillFrame frame) => _resolve().ExactTanbanDrawEndFrame(frame);
@@ -57,7 +56,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal void IssueDiouUse(CardUseFrame use) => _resolve().IssueDiouUse(use);
     internal CardLocation NormalizeDiouCarrierDestination(Card card, CardLocation from, CardLocation to) => _resolve().NormalizeDiouCarrierDestination(card, from, to);
     internal void ObserveDiouNativeAcceptance(IGameEvent payload) => _resolve().ObserveDiouNativeAcceptance(payload);
-    internal void ObserveDiouPublicHandReveals(IGameEvent payload) => _resolve().ObserveDiouPublicHandReveals(payload);
     internal bool PermitCompletedTanbanSwap(ProgramSkillFrame frame) => _resolve().PermitCompletedTanbanSwap(frame);
     internal bool PermitIssuedTanbanInitial(ProgramSkillFrame frame) => _resolve().PermitIssuedTanbanInitial(frame);
     internal bool PermitPaidDiou(ProgramSkillFrame f) => _resolve().PermitPaidDiou(f);

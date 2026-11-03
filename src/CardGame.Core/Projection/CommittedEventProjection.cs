@@ -80,6 +80,7 @@ internal static class CommittedEventProjection
         ActualCardUseTargetsCompletedEvent value => value,
         ActualCardUseActionUpdatedEvent value => value,
         NativeCardUseHistoryRecordedEvent value => value,
+        PublicCardRevealHistoryRecordedEvent value => value,
         ActualPhaseSkippedEvent value => value,
         TangTangStartedEvent value => value with { Gains = FreezeList(value.Gains) },
         SourceKeshouPaidBranchEvent value => value with

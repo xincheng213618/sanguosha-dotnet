@@ -2,8 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
-public sealed record PublicHandEntityRevealedEvent(long RevealFrameId, int OwnerSeat, long HandEntryMovementSequence,
-    CardSnapshot Card) : IGameEvent;
 public sealed record DailiTurnEndReceipt(CardConversionSource Source, string GameplayHash, long ParentFrameId,
     int ActualTurn, int TurnOwnerSeat, int InstructionIndex, int ShownHandCount, bool WasFaceDown);
 public sealed record DailiTurnEndIssuedEvent(long FrameId, DailiTurnEndReceipt Receipt) : IGameEvent;
@@ -22,6 +20,7 @@ internal interface ILuoXianProgramHost
 { SkillProgramStepOutcome ResolveDailiTurnEnd(ProgramSkillFrame frame); }
 internal sealed class ResolveDailiTurnEndDescriptor : ProgramOperationDescriptorBase
 {
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.PublicCardRevealHistory);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveDailiTurnEnd;
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
     public override ISkillProgramEffectHandler Handler { get; } = new ResolveDailiTurnEndHandler();
