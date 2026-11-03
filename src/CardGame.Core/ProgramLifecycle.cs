@@ -162,6 +162,14 @@ public sealed record ProgramSkillCardSetBinding(
     /// <summary>Observes frozen entities without owning their Processing cleanup.</summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsReadOnlySnapshot { get; init; }
+    private readonly IReadOnlyList<long?>? _sourceEntrySequences;
+    /// <summary>The original physical residency, aligned with the bound source locations.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<long?>? SourceEntrySequences
+    {
+        get => _sourceEntrySequences;
+        init => _sourceEntrySequences = value is null ? null : Array.AsReadOnly(value.ToArray());
+    }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public ProgramAcceptedCardMovement? AcceptedMovement { get; init; }
     /// <summary>Public suit frozen before a single-card transfer; remains readable if the card moves again.</summary>

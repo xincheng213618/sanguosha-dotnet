@@ -144,8 +144,9 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.ObservesResponseUseCompletion, 2)]
     internal bool HasIssuedDiouResponse(CardActionContext action) => HasDiouCapability && _resolutionStackOperations._resolutionStack.Any(f => f.DiouClaims?.Any(q => q.NativeParentId == f.Id && q.ActionId == action.ActionId && _coreMatchParticipantsPlayersAccess._players[q.Source.OwnerSeat].IsAlive && ValidDiouClaim(q, action)) == true);
     internal bool DiouWasShownThisTurn(int id) =>
-        _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && _publicHandRevealHistory
-        .Read()
-        .Any(fact => fact.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber &&
-            fact.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && fact.CardId == id);
+        _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 &&
+        ProgramPublicRevealCards.Read(_publicHandRevealHistory.Read(), "actualTurn", "all",
+            _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber,
+            _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, null)
+            ?.Any(card => card.CardId == id) == true;
 }

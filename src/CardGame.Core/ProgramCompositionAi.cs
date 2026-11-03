@@ -186,17 +186,21 @@ internal sealed partial class ProgramAiEstimateContext
         if (ProgramExpressions.EvaluateCardSet(effect.CardSetExpression!, CurrentExpressionWorld()) is { } cards)
             _bindings[effect.ResultBind!] = new(cards.Count,
                 EstimatedSuits.Select(suit => (double)cards.Count(card => card.EffectiveSuit == suit)).ToArray(), false,
-                CardIds: Array.AsReadOnly(cards.Select(card => card.CardId).ToArray()));
+                CardIds: Array.AsReadOnly(cards.Select(card => card.CardId).ToArray()), CardFacts: cards);
         else PathCancelled = true;
     }
     private static readonly Suit[] EstimatedSuits = Enum.GetValues<Suit>();
     private sealed record CardSetEstimate(double Count, double[] Suits, bool OwnerHeld, bool TargetHeld = false,
-        bool ActivationInput = false, IReadOnlyList<int>? CardIds = null);
+        bool ActivationInput = false, IReadOnlyList<int>? CardIds = null,
+        IReadOnlyList<ProgramExpressionCardFact>? CardFacts = null);
 
     private readonly PlayerSkillContext _player;
     private readonly ProgramAiPublicContext _publicContext;
     private readonly IProgramExpressionWorld? _ownerWindowFacts;
     private readonly Dictionary<string, CardSetEstimate> _bindings = new(StringComparer.Ordinal);
+    // True means a known departure; false means a move whose source/destination
+    // is unknown. Neither may be replaced by the live pre-simulation location.
+    private readonly Dictionary<int, bool> _expressionCardRelocations = [];
     private double _ownerDraw;
     private double _ownerRecovery;
     private double _ownerHpLoss;
@@ -488,7 +492,11 @@ internal sealed partial class ProgramAiEstimateContext
             (stat, name) => stat == "boundCount" && _bindings.TryGetValue(name, out var cards) ? Rounded(cards.Count) : null,
             name => _expressionNumbers.TryGetValue(name, out var value) ? value : null, _publicContext.FinalTargetFacts,
             _ownerWindowFacts, (cardId, name) => _bindings.TryGetValue(name, out var binding) && binding.CardIds is { } ids
-                ? ids.Contains(cardId) : null);
+                ? ids.Contains(cardId) : null,
+            name => _bindings.TryGetValue(name, out var binding) ? binding.CardFacts : _ownerWindowFacts?.BoundCards(name),
+            card => card.SourceEntrySequence is null ? null :
+                _expressionCardRelocations.TryGetValue(card.CardId, out var departed) ? departed ? false : null :
+                _ownerWindowFacts?.CardStillAtSource(card));
     private int? EvaluateAmount(ProgramExpression expression, SkillProgramUnknownAmountBehavior onUnknown)
     {
         if (ProgramExpressions.EvaluateInt(expression, CurrentExpressionWorld()) is { } amount)
@@ -545,8 +553,26 @@ internal sealed partial class ProgramAiEstimateContext
         var count = Math.Max(0, source.Count - (except?.Count ?? 0));
         var ids = source.CardIds is { } sourceIds && (except is null || except.CardIds is not null)
             ? Array.AsReadOnly(sourceIds.Except(except?.CardIds ?? []).ToArray()) : null;
+        if (ids is not null)
+            foreach (var id in ids)
+            {
+                var card = source.CardFacts?.SingleOrDefault(fact => fact.CardId == id);
+                var destination = ExpressionMoveDestination(effect, card);
+                if (destination is { } target && card?.CapturedLocation is { } origin)
+                {
+                    if (target != origin) _expressionCardRelocations[id] = true;
+                }
+                else _expressionCardRelocations.TryAdd(id, false);
+            }
         if (effect.ResultBind is { } result)
-            _bindings[result] = source with { Count = count, OwnerHeld = false, TargetHeld = false, ActivationInput = false, CardIds = ids };
+            _bindings[result] = source with
+            {
+                Count = count, OwnerHeld = false, TargetHeld = false, ActivationInput = false, CardIds = ids,
+                CardFacts = ids is not null && source.CardFacts is { } facts
+                    ? Array.AsReadOnly(facts.Where(card => ids.Contains(card.CardId))
+                        .Select(card => ExpressionMoveDestination(effect, card) is { } destination && card.CapturedLocation == destination
+                            ? card : card with { CapturedLocation = ExpressionMoveDestination(effect, card), SourceEntrySequence = null }).ToArray()) : null
+            };
         if (effect.Destination == SkillProgramCardDestination.OwnerHand && !source.OwnerHeld)
         {
             _ownerDraw += count;
@@ -577,6 +603,19 @@ internal sealed partial class ProgramAiEstimateContext
         // Bindings retain their original location. A move can consume only
         // part of a source through exceptBind; its remaining cards did not move.
     }
+
+    private CardLocation? ExpressionMoveDestination(SkillProgramEffect effect, ProgramExpressionCardFact? card) => effect.Destination switch
+    {
+        SkillProgramCardDestination.OwnerHand => CardLocation.Hand(_player.Seat),
+        SkillProgramCardDestination.DiscardPile => CardLocation.DiscardPile,
+        SkillProgramCardDestination.DrawPileTop or SkillProgramCardDestination.DrawPileBottom => CardLocation.DrawPile,
+        SkillProgramCardDestination.OwnerPersistentZone when effect.DestinationZone is { } zone => new(zone, _player.Seat),
+        SkillProgramCardDestination.SelectedTargetHand when _publicContext.SelectedTarget is { } target => CardLocation.Hand(target.Seat),
+        SkillProgramCardDestination.SelectedTargetEquipment when _publicContext.SelectedTarget is { } target => CardLocation.Equipment(target.Seat),
+        SkillProgramCardDestination.SelectedTargetCorrespondingZone when _publicContext.SelectedTarget is { } target &&
+            card?.CapturedLocation is { Zone: CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment } source => new(source.Zone, target.Seat),
+        _ => null
+    };
     internal void AcceptBoundMovement(SkillProgramEffect effect)
     {
         var source = Binding(effect.SourceBind);

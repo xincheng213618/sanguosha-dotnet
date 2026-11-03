@@ -357,3 +357,30 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 沿用 `suits` 的实际有效花色筛选与现有次数组，无须人物专属表达式。具名次数在原展示时占用，不含技能实例；开始已签发调用时不会再占用。失去再获得技能不清空本轮额度，真正的轮次边界才重置。未声明次数限制时不制造预留。
 
 `ownerDeath` 与来源失效后的调用权限独立，默认 stop；retain 也不会启动已死者尚未开始的奖励。资格事实私存原帧，后续窗口数量读取仍来自原展示时点；它们不进入公共 claim 事件。此来源当前要求 mandatory owner，不支持 marker 付款、Event scope 预留或 `evaluateConditionAtResolution:true`，避免将已签发资格改为以后重新判断。
+
+## 公开展示集合与原来源驻留
+
+`["publicRevealCards","all"]` 返回每个已公开实体最后一份匹配的历史身份；scope 也可选 `actualTurn` 或 `actualPhase`，第三个参数缺省 `all`，可用 `explicit` 排除声明为材料披露的来源。先筛 scope／purpose，再去重实体。缺少实际阶段时读 actualPhase 为 unknown，不冒充空集合。集合只提供公开身份及原 Hand 驻留，不推测后来私区的牌面。
+
+`["boundCards","drawn"]` 返回原程序绑定的只读实体与来源见证，加载器仍校验引用已经存在。`["cardStillAtSource","card"]` 要求实体还在原位置且原物理驻留未结束；`cardAt` 只判断当前位置，不能替代它。未捕获驻留时为 unknown，过滤、子集和再次捕获不得重新赋予一个当前 token。
+
+```json
+["==",["mod",["count",["publicRevealCards","all"],"shown",
+  ["and",["cardAt","shown","owner","hand"],["cardStillAtSource","shown"]]],2],0]
+```
+
+`mod` 沿用整数余数语义，符号随被除数；零除数或未知操作数返回 unknown。零张已展示手牌的计数是零，因此上述偶数条件成立。真实摸牌结果可接：
+
+```json
+[
+  {"op":"draw","target":"owner","amount":3,"resultBind":"drawn","awaitMovementTriggers":true},
+  {"op":"captureCards","target":"owner","resultBind":"still-drawn",
+   "cardsExpr":["filter",["boundCards","drawn"],["cardStillAtSource","card"]]},
+  {"op":"revealBoundCards","target":"owner","sourceBind":"still-drawn",
+   "condition":{"kind":"expression","expr":[">",["boundCount","still-drawn"],0]}}
+]
+```
+
+结果绑定在真实生产时捕获原来源，排除后续子结算移走或离手重入的材料，也不包含后来另摸的牌。替代获得不作为 DrawPile 摸牌结果。历史集合和绑定集合缺少牌面时，cardKindIs、cardSuitIs、sameCardKind、sameCardSuit 等读取保持 unknown；AI 不借实体历史身份读取他人后来暗手里的具体位置或驻留。
+
+实际回合后程序可声明 `"invocation":{"source":"afterTurnEnded"}`。它只在真实接受时保留原父候选的调用权限；失去来源可继续本次程序，死亡仍缺省停止新后缀。只曝光提示不取得授权，也不会给没有该声明的普通程序放宽续接。

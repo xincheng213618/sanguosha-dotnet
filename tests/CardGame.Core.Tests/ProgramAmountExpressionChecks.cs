@@ -3,7 +3,7 @@ using CardGame.Content.Standard;
 using CardGame.Core;
 using CardGame.Core.Campaigns;
 
-internal static class ProgramAmountExpressionChecks
+internal static partial class ProgramAmountExpressionChecks
 {
     private const string Skill = "fixture:amount-expression", ColdSkill = "fixture:amount-cold",
         Watch = "fixture:amount-watch", HealthSkill = "fixture:amount-health", HealthWatch = "fixture:amount-health-watch",
@@ -362,6 +362,7 @@ internal static class ProgramAmountExpressionChecks
         CapturedGainCardsSurviveRealDrawChildrenCold();
         ActualBoundMovementResultsSurviveChildrenCold();
         AcceptedMaterialsKeepTheirOriginalCommitmentCold();
+        DailiUsesSharedHistoryAndOriginalDrawBindingsCold();
     }
 
     private static void AcceptedMaterialsKeepTheirOriginalCommitmentCold()

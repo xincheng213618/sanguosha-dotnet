@@ -71,6 +71,8 @@ internal sealed class SkillProgramDependencies
             (programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).Any(expression =>
                 expression.Reads("cardUses") || expression.Reads("currentUse"))
                 ? ProgramTrackedFact.ActualCardUseHistory : ProgramTrackedFact.None) |
+            (programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).Any(expression => expression.Reads("publicRevealCards"))
+                ? ProgramTrackedFact.PublicCardRevealHistory : ProgramTrackedFact.None) |
             (UsesSkillStatePhaseEnds || triggers.Any(trigger => trigger.Window == SkillProgramTriggerWindow.ActualPhaseEnded)
                 ? ProgramTrackedFact.ActualPhaseEnd : ProgramTrackedFact.None) |
             (skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseStarted) || UsesDrawPhaseDrawCountHandLimit ||

@@ -1,10 +1,38 @@
 {
   "skills": [
-    { "id": "ol:daili", "revision": 1, "triggers": [
-      { "id": "own-actual-turn-end", "window": "afterTurnEnded", "subject": "owner", "turnOwnerScope": "own", "optional": true,
-        "effects": [ { "op": "resolveDailiTurnEnd", "target": "owner" } ] },
-      { "id": "other-actual-turn-end", "window": "afterTurnEnded", "subject": "owner", "turnOwnerScope": "otherLiving", "optional": true,
-        "effects": [ { "op": "resolveDailiTurnEnd", "target": "owner" } ] }
-    ] }
+    {
+      "id": "ol:daili",
+      "revision": 1,
+      "triggers": [
+        {
+          "id": "actual-turn-end",
+          "window": "afterTurnEnded",
+          "subject": "owner",
+          "turnOwnerScope": "anyLiving",
+          "optional": true,
+          "invocation": { "source": "afterTurnEnded" },
+          "condition": {
+            "kind": "expression",
+            "expr": ["==", ["mod", ["count", ["publicRevealCards", "all", "all"], "shown",
+              ["and", ["cardAt", "shown", "owner", "hand"], ["cardStillAtSource", "shown"]]], 2], 0]
+          },
+          "effects": [
+            { "op": "turnOver", "target": "owner" },
+            {
+              "op": "draw", "target": "owner", "amount": 3,
+              "resultBind": "daili-drawn", "awaitMovementTriggers": true
+            },
+            {
+              "op": "captureCards", "target": "owner", "resultBind": "daili-shown",
+              "cardsExpr": ["filter", ["boundCards", "daili-drawn"], "drawn", ["cardStillAtSource", "drawn"]]
+            },
+            {
+              "op": "revealBoundCards", "target": "owner", "sourceBind": "daili-shown",
+              "condition": { "kind": "expression", "expr": [">", ["boundCount", "daili-shown"], 0] }
+            }
+          ]
+        }
+      ]
+    }
   ]
 }

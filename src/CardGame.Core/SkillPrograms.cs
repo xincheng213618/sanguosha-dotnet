@@ -1481,7 +1481,6 @@ public enum SkillProgramEffectOp
     GiveCardSkipDrawForEnding = 26410,
     ResolveHuantuEnding = 26411,
     DrawDyingExitRoundDistance = 26412,
-    ResolveDailiTurnEnd = 26420,
     ResolveZhenyingSimultaneousHands = 26500,
     ResolveHunjiangSimultaneousChoices = 26510,
     OfferHunjiangPhaseSlashTargets = 26511,
@@ -5216,7 +5215,6 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
         CaoChunComposition.Activation(path, activation);
         WangCanContract.Activation(path, activation);
         WangFuZhaoLeiContract.Activation(path, activation);
-        LuoXianContract.Activation(path, activation);
         HaoPuContract.Activation(path, activation);
         SpPangTongComposition.ValidateActivation(path, activation);
         NeifaComposition.Activation(path, activation);
@@ -6510,10 +6508,15 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                     movementOccurrence != SkillProgramMovementOccurrence.PerBatch || !destinationZones.SequenceEqual([CardZoneKind.Hand]))
                     Fail(invocationPath, "initialHandGain requires an owner cardsGained perBatch hand trigger");
             }
-            else if (window != SkillProgramTriggerWindow.PublicHandRevealed || subject != SkillProgramTriggerSubject.Owner ||
-                optional || node.TryGetProperty("markerCost", out _) || usageScope == SkillUsageScope.Event ||
-                node.TryGetProperty("evaluateConditionAtResolution", out var lateQualification) && lateQualification.ValueKind == JsonValueKind.True)
-                Fail(invocationPath, "publicHandReveal requires mandatory owner issuance without marker payment, Event usage or late qualification");
+            else if (invocation.Source == SkillProgramInvocationSource.PublicHandReveal)
+            {
+                if (window != SkillProgramTriggerWindow.PublicHandRevealed || subject != SkillProgramTriggerSubject.Owner ||
+                    optional || node.TryGetProperty("markerCost", out _) || usageScope == SkillUsageScope.Event ||
+                    node.TryGetProperty("evaluateConditionAtResolution", out var lateQualification) && lateQualification.ValueKind == JsonValueKind.True)
+                    Fail(invocationPath, "publicHandReveal requires mandatory owner issuance without marker payment, Event usage or late qualification");
+            }
+            else if (window != SkillProgramTriggerWindow.AfterTurnEnded || subject != SkillProgramTriggerSubject.Owner)
+                Fail(invocationPath, "afterTurnEnded requires an owner actual-turn-ended trigger");
         }
         var parsedTrigger = new SkillProgramTrigger(id, window, sourceSkillId, sourceViewAsId, subject, suits,
             minimumRank, maximumRank, excludedReasons, judgmentReasons, judgmentSource,
@@ -6689,7 +6692,6 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
         CaoChunComposition.Trigger(path, parsedTrigger);
         WangCanContract.Trigger(path, parsedTrigger);
         WangFuZhaoLeiContract.Trigger(path, parsedTrigger);
-        LuoXianContract.Trigger(path, parsedTrigger);
         HaoPuContract.Trigger(path, parsedTrigger);
         SpPangTongComposition.ValidateTrigger(path, parsedTrigger);
         NeifaComposition.Trigger(path, parsedTrigger);

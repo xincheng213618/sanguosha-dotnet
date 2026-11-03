@@ -12,7 +12,10 @@ internal sealed partial class CoreProgramExpressionBindingsRuntime
             return;
         }
         bindings.SetProgramCardSet(active.Id, name, cards.Select(card => card.CardId).ToArray(),
-            SkillProgramCardSetVisibility.Private, isReadOnlySnapshot: true);
+            SkillProgramCardSetVisibility.Private,
+            cards.Select(card => card.CapturedLocation ?? zones.GetLocation(card.CardId)).ToArray(),
+            isReadOnlySnapshot: true,
+            sourceEntrySequences: cards.Select(card => card.SourceEntrySequence).ToArray());
     }
 
     void IProgramExpressionCaptureHost.Capture(ProgramSkillFrame frame, string name, ProgramExpression expression)

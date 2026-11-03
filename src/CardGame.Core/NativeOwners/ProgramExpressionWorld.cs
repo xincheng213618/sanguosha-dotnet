@@ -5,7 +5,9 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     SkillProgramTriggerFacts? triggerFacts = null, IActualCardUseHistoryQueries? history = null,
     Func<CardUseHistoryPoint>? currentHistoryPoint = null,
     IActualPhaseHistoryQueries? phaseHistory = null, IOwnedCardMoveQueries? ownedMoves = null,
-    ProgramTriggerCandidate? triggerCandidate = null) : IProgramExpressionWorld
+    ProgramTriggerCandidate? triggerCandidate = null,
+    IPublicCardRevealHistoryQueries? publicReveals = null, ICardZoneEntryQueries? zoneEntries = null,
+    IProgramTurnQueries? revealTurn = null, IActualDiscardRecoveryPhaseQueries? revealPhases = null) : IProgramExpressionWorld
 {
     private int Owner => frame?.OwnerSeat ?? triggerOwner!.Value;
     private ProgramSkillWindowContext? Context => frame?.WindowContext ?? triggerContext;
@@ -35,6 +37,17 @@ internal sealed class ProgramExpressionWorld(Func<RuntimeEntries.CoreGameEngineP
     }
     public bool? CardInBinding(int cardId, string name) =>
         frame?.CardSetBindings.SingleOrDefault(binding => binding.Name == name)?.CardIds.Contains(cardId);
+    public IReadOnlyList<ProgramExpressionCardFact>? PublicRevealCards(string scope, string purpose) =>
+        publicReveals is null ? null : ProgramPublicRevealCards.Read(publicReveals.Read(), scope, purpose,
+            revealTurn?.TurnNumber, revealTurn?.TurnOwnerSeat, revealPhases?.Current());
+    public IReadOnlyList<ProgramExpressionCardFact>? BoundCards(string name) =>
+        frame?.CardSetBindings.SingleOrDefault(binding => binding.Name == name) is { } binding
+            ? Array.AsReadOnly(binding.CardIds.Select((id, index) => new ProgramExpressionCardFact(id,
+                CapturedLocation: binding.SourceLocations[index],
+                SourceEntrySequence: binding.SourceEntrySequences?[index])).ToArray()) : null;
+    public bool? CardStillAtSource(ProgramExpressionCardFact card) =>
+        card.CapturedLocation is { } location && card.SourceEntrySequence is { } entry && zoneEntries is not null
+            ? zoneEntries.CurrentEntry(location, card.CardId) == entry : null;
     private CardUseHistoryPoint? WindowPoint => Context?.HistoryPoint ?? Context?.Facts?.HistoryPoint ?? triggerFacts?.HistoryPoint;
     public int? Number(string name) => frame is null ? null : getCoreGameEngineProgramExpressionsRuntime().ReadProgramExpressionNumber(frame, name);
     public int? WindowStat(string stat, string participant) =>

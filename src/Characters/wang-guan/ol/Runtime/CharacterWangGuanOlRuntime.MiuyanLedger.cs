@@ -48,9 +48,10 @@ internal sealed partial class CharacterWangGuanOlRuntime
         result.Add(new(r.Source.OwnerSeat, r.Source.OwnerSeat, r.Source.SkillId, t.Id, r.GameplayHash, r.Source.SkillInstanceId, t.Priority, _coreCardActionsOperations.CreateCardActionProgramContext(action, window, 0, r.Source.OwnerSeat, r.Source.OwnerSeat, _coreProgramLifecycleOperations.CaptureProgramTriggerFacts2(_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat], action))));
     }
 
-    internal IReadOnlyList<WangGuanHandEntity> MiuyanClaimEntities(MiuyanUseInvoice use, int owner) => Array.AsReadOnly(_publicHandRevealHistory.Read()
-        .Where(fact => fact.ActualPhase == use.Phase && fact.Purpose != PublicCardRevealPurpose.MaterialDisclosure)
-        .Select(fact => fact.CardId).Distinct().Order().Select(id => (Id: id, From: _cardZonesOperations._cardZones.GetLocation(id)))
+    internal IReadOnlyList<WangGuanHandEntity> MiuyanClaimEntities(MiuyanUseInvoice use, int owner) => Array.AsReadOnly(
+        (ProgramPublicRevealCards.Read(_publicHandRevealHistory.Read(), "actualPhase", "explicit",
+            use.ActualTurn, use.TurnOwner, use.Phase) ?? [])
+        .Select(card => card.CardId).Order().Select(id => (Id: id, From: _cardZonesOperations._cardZones.GetLocation(id)))
         .Where(x => x.From is { Zone: CardZoneKind.Hand, OwnerSeat: { } holder } && holder != owner && _coreMatchParticipantsPlayersAccess._players[holder].IsAlive)
         .Select(x => new WangGuanHandEntity(x.Id, _coreAdvancedLifecycleOperations.GetAdvancedCard(x.Id).Kind, x.From.OwnerSeat!.Value,
             _cardZonesOperations._cardZones.CardsAt(x.From).ToList().FindIndex(c => c.Id == x.Id),

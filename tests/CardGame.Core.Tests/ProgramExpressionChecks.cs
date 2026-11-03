@@ -55,6 +55,84 @@ internal static class ProgramExpressionChecks
         ConditionalGrantFactsUseSharedReadsAndOrderedSuitRewrites();
         CardUseFactsComposeThroughExistingExpressions();
         HandGainCardFactsComposeWithoutRefreshingTheirSnapshots();
+        PublicRevealCardsKeepScopesAndUnknownFaces();
+    }
+
+    private static void PublicRevealCardsKeepScopesAndUnknownFaces()
+    {
+        var phase = new ActualDiscardRecoveryPhaseKey(101, 2, 0, 0, ActualDiscardRecoveryPhaseKind.Play);
+        var other = new ActualDiscardRecoveryPhaseKey(102, 2, 0, 1, ActualDiscardRecoveryPhaseKind.Play);
+        PublicCardRevealHistoryFact[] facts =
+        [
+            new(1, 1, 1, null, 5, 21, 0, 1, PublicCardRevealPurpose.Explicit),
+            new(2, 2, 0, phase, 10, 11, 0, 10, PublicCardRevealPurpose.Explicit),
+            new(3, 2, 0, phase, 11, 11, 1, 11, PublicCardRevealPurpose.MaterialDisclosure),
+            new(4, 2, 0, phase, 12, 12, 0, 12, PublicCardRevealPurpose.Explicit),
+            new(5, 2, 0, other, 13, 13, 1, 13, PublicCardRevealPurpose.Explicit)
+        ];
+        var world = new PublicRevealFactsWorld(facts, phase);
+        Need(world.PublicRevealCards("all", "all") is { Count: 4 } all &&
+            all.Single(card => card.CardId == 11) is { CapturedLocation.OwnerSeat: 1, SourceEntrySequence: 11 } &&
+            world.PublicRevealCards("actualTurn", "all")!.Select(card => card.CardId).ToHashSet().SetEquals([11, 12, 13]) &&
+            world.PublicRevealCards("actualPhase", "explicit") is { Count: 2 } explicitPhase &&
+            explicitPhase.Single(card => card.CardId == 11) is { CapturedLocation.OwnerSeat: 0, SourceEntrySequence: 10 },
+            "Scopes retain actual turn/phase identity; purpose is filtered before selecting the latest public residency for each physical entity.");
+        Need(Eval("""["==",["mod",7,2],1]""", world) == true &&
+            Eval("""["==",["mod",-7,2],-1]""", world) == true &&
+            Eval("""["==",["mod",7,0],0]""", world) is null &&
+            Eval("""["any",["publicRevealCards","all"],["cardKindIs","card",["slash"]]]""", world) is null &&
+            Eval("""["not",["any",["publicRevealCards","all"],["cardSuitIs","card",["heart"]]]]""", world) is null &&
+            Eval("""["all",["publicRevealCards","all"],["cardActualGain","card"]]""", world) is null &&
+            Eval("""["==",["count",["publicRevealCards","actualPhase"],true],0]""", new PublicRevealFactsWorld(facts, null)) is null,
+            "Public identities do not invent later private faces or gain status; absent phases and zero divisors remain unknown through expressions.");
+        var owner = new PlayerSkillContext(0, 4, 4, 1, TurnPhase.Play);
+        var ai = new SkillContextExpressionWorld(owner, null, ownerWindowFacts: world, bindingCards: _ => null);
+        Need(ai.CardAt(11, 1, CardZoneKind.Hand) is null && ai.CardAt(12, 0, CardZoneKind.Hand) == true &&
+            ai.CardStillAtSource(new(11, CapturedLocation: CardLocation.Hand(1), SourceEntrySequence: 11)) is null &&
+            ai.CardStillAtSource(new(12, CapturedLocation: CardLocation.Hand(0), SourceEntrySequence: 12)) == true &&
+            ai.CardStillAtSource(new(90, CapturedLocation: CardLocation.Equipment(1), SourceEntrySequence: 1)) == true &&
+            ai.BoundCards("unknown-simulated-result") is null,
+            "An AI's unknown simulated result does not fall back to live bindings, and public identities cannot query a foreign hidden Hand residency.");
+        var estimate = new ProgramAiEstimateContext(owner, false, ownerWindowFacts: new PublicRevealFactsWorld([facts[1]], phase));
+        SkillProgramEffect Capture(string result, string expression)
+        {
+            using var document = JsonDocument.Parse(expression);
+            return new(SkillProgramEffectOp.CaptureCards, SkillProgramEffectTarget.Owner, 0,
+                new(SkillProgramConditionKind.Always, 0, []), resultBind: result)
+                { CardSetExpression = ProgramExpressions.ParseCardSet(document.RootElement, "cards") };
+        }
+        bool Still(string binding) => estimate.EvaluateExpressionCondition(new(SkillProgramConditionKind.Expression, 0, [],
+            expression: Bool("[\"any\",[\"boundCards\",\"" + binding + "\"],[\"cardStillAtSource\",\"card\"]]")));
+        estimate.CaptureExpressionCards(Capture("origin", """["publicRevealCards","all"]"""));
+        estimate.Move(new(SkillProgramEffectOp.MoveBoundCards, SkillProgramEffectTarget.Owner, 0,
+            new(SkillProgramConditionKind.Always, 0, []), sourceBind: "origin", resultBind: "same", destination: SkillProgramCardDestination.OwnerHand));
+        Need(Still("origin") && Still("same"), "A simulated same-zone no-op preserves both original and derived physical residency.");
+        estimate.Move(new(SkillProgramEffectOp.MoveBoundCards, SkillProgramEffectTarget.Owner, 0,
+            new(SkillProgramConditionKind.Always, 0, []), sourceBind: "same", resultBind: "moved", destination: SkillProgramCardDestination.DiscardPile));
+        Need(!Still("origin"), "A real simulated departure invalidates the old source even if the live source world still knows it there.");
+        estimate.CaptureExpressionCards(Capture("unknown-origin", """["filter",["boundCards","moved"],["cardStillAtSource","card"]]"""));
+        Need(estimate.PathCancelled, "A simulated new result without an actual entry token stays unknown rather than adopting a live token.");
+        foreach (var expression in new[] { """["publicRevealCards","round"]""", """["publicRevealCards","all","private"]""", """["boundCards",0]""" })
+        {
+            using var document = JsonDocument.Parse(expression);
+            try { ProgramExpressions.ParseCardSet(document.RootElement, "cards"); }
+            catch (InvalidOperationException) { continue; }
+            throw new InvalidOperationException("Invalid public-card collection was accepted: " + expression);
+        }
+    }
+
+    private sealed class PublicRevealFactsWorld(IReadOnlyList<PublicCardRevealHistoryFact> facts,
+        ActualDiscardRecoveryPhaseKey? phase) : IProgramExpressionWorld
+    {
+        public int? Participant(string name) => name == "owner" ? 0 : null;
+        public IReadOnlyList<int>? ParticipantSet(string name) => null;
+        public int? Stat(string name, int seat) => null;
+        public bool? Flag(string name, int seat) => null;
+        public IReadOnlyList<ProgramExpressionCardFact>? PublicRevealCards(string scope, string purpose) =>
+            ProgramPublicRevealCards.Read(facts, scope, purpose, 2, 0, phase);
+        public bool? CardAt(int cardId, int seat, CardZoneKind zone) => true;
+        public bool? CardStillAtSource(ProgramExpressionCardFact card) => true;
+        public IReadOnlyList<ProgramExpressionCardFact>? BoundCards(string name) => PublicRevealCards("all", "all");
     }
 
     private static void HandGainCardFactsComposeWithoutRefreshingTheirSnapshots()
@@ -73,7 +151,7 @@ internal static class ProgramExpressionChecks
         var gain = new HandGainOccurrence(10, 0, 2, new(2, TurnPhase.Draw, 1), false, true)
         { Incoming = incoming, PreviousHand = previous, InitiallyAlive = true };
         var world = new HandGainFactsWorld(gain);
-        IReadOnlyList<HandGainCardSnapshot>? Cards(string expression, IProgramExpressionWorld facts)
+        IReadOnlyList<ProgramExpressionCardFact>? Cards(string expression, IProgramExpressionWorld facts)
         {
             using var document = JsonDocument.Parse(expression);
             var parsed = ProgramExpressions.ParseCardSet(document.RootElement, "cards");

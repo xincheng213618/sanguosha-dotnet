@@ -3,7 +3,7 @@ using CardGame.Core.RuntimeSkills;
 namespace CardGame.Core;
 /// <summary>Owns immutable bound-card selection, movement, cleanup and command answers on the original program frame.</summary>
 [ProgramRuntimeModule, ProgramCapability]
-internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IProgramBoundInstructionFacts instructions, IProgramBoundCardMovementOperations movement, IProgramBoundCardPaymentOperations payments, IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events, IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards, ICardMovementHistoryQueries history, RuntimeAccess.IClosedOwnedCardMoveQueriesSource moveQueries) : IProgramCardSetBindings, IProgramBoundCardCleanup, IProgramBoundCardMovementResults, IProgramAcceptedCardMovementHost
+internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IProgramBoundInstructionFacts instructions, IProgramBoundCardMovementOperations movement, IProgramBoundCardPaymentOperations payments, IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events, IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards, ICardMovementHistoryQueries history, ICardZoneEntryQueries entries, RuntimeAccess.IClosedOwnedCardMoveQueriesSource moveQueries) : IProgramCardSetBindings, IProgramBoundCardCleanup, IProgramBoundCardMovementResults, IProgramAcceptedCardMovementHost
 {
     void IProgramBoundCardCleanup.Cleanup(ProgramSkillFrame frame, bool completed) => CleanupProgramBoundCards(frame, completed);
     SkillProgramStepOutcome IProgramBoundCardMovementResults.Execute(ProgramSkillFrame frame, SkillProgramEffect effect, CardMoveReason reason) =>
@@ -43,19 +43,23 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
     internal static ProgramSkillCardSetBinding GetProgramCardSet(ProgramSkillFrame frame, string bind) => frame.CardSetBindings.SingleOrDefault(binding => binding.Name == bind) ?? throw new InvalidOperationException($"Program card-set binding '{bind}' is unavailable.");
     private int CountAvailableBoundCards(ProgramSkillCardSetBinding source) => source.CardIds.Select((id, index) => (Id: id, Index: index)).Count(item => _facts.Location(item.Id) == source.SourceLocations[item.Index]);
     private int CountAvailableBoundSuits(ProgramSkillCardSetBinding source) => source.CardIds.Select((id, index) => (Id: id, Index: index)).Where(item => _facts.Location(item.Id) == source.SourceLocations[item.Index]).Select(item => _facts.CardsAt(source.SourceLocations[item.Index]).Single(card => card.Id == item.Id).Suit).Distinct().Count();
-    public void SetProgramCardSet(long frameId, string bind, IReadOnlyList<int> cardIds, SkillProgramCardSetVisibility visibility, IReadOnlyList<CardLocation>? sourceLocations = null, Suit? frozenRevealedSuit = null, int? selectionActorSeat = null, bool isReadOnlySnapshot = false)
+    public void SetProgramCardSet(long frameId, string bind, IReadOnlyList<int> cardIds, SkillProgramCardSetVisibility visibility, IReadOnlyList<CardLocation>? sourceLocations = null, Suit? frozenRevealedSuit = null, int? selectionActorSeat = null, bool isReadOnlySnapshot = false, IReadOnlyList<long?>? sourceEntrySequences = null)
     {
         var frame = _frames.ActiveProgram(frameId);
         if (frame.CardSetBindings.Any(binding => binding.Name == bind))
             throw new InvalidOperationException($"Program card-set binding '{bind}' already exists.");
         var ids = cardIds.ToArray();
         var locations = (sourceLocations ?? ids.Select(cardId => _facts.Location(cardId)).ToArray()).ToArray();
-        if (ids.Distinct().Count() != ids.Length || ids.Length != locations.Length)
-            throw new InvalidOperationException("A program card-set binding requires unique cards and aligned source locations.");
+        if (ids.Distinct().Count() != ids.Length || ids.Length != locations.Length ||
+            sourceEntrySequences is not null && sourceEntrySequences.Count != ids.Length)
+            throw new InvalidOperationException("A program card-set binding requires unique cards and aligned source witnesses.");
+        if (sourceEntrySequences is null && ProgramInstructionFeatures.ExpressionRoots(_instructions.Skill(frame.SkillId).Program!)
+                .Any(expression => expression.Reads("cardStillAtSource")))
+            sourceEntrySequences = ids.Select((id, index) => entries.CurrentEntry(locations[index], id)).ToArray();
         selectionActorSeat ??= _instructions.SelectionActor(frame, bind, ids, locations);
         if (selectionActorSeat is { } actor && !_facts.IsValidSeat(actor))
             throw new InvalidOperationException("The selection producer has an invalid actual actor.");
-        _frames.ReplaceTop(frame with { CardSetBindings = Array.AsReadOnly(frame.CardSetBindings.Append(new ProgramSkillCardSetBinding(bind, Array.AsReadOnly(ids), visibility, Array.AsReadOnly(locations)) { FrozenRevealedSuit = frozenRevealedSuit, SelectionActorSeat = _instructions.HasForeignDiscardCapability || _logicalDiscards.TracksInvocations ? selectionActorSeat : null, IsReadOnlySnapshot = isReadOnlySnapshot }).ToArray()) });
+        _frames.ReplaceTop(frame with { CardSetBindings = Array.AsReadOnly(frame.CardSetBindings.Append(new ProgramSkillCardSetBinding(bind, Array.AsReadOnly(ids), visibility, Array.AsReadOnly(locations)) { FrozenRevealedSuit = frozenRevealedSuit, SelectionActorSeat = _instructions.HasForeignDiscardCapability || _logicalDiscards.TracksInvocations ? selectionActorSeat : null, IsReadOnlySnapshot = isReadOnlySnapshot, SourceEntrySequences = sourceEntrySequences }).ToArray()) });
     }
 
     internal void RevealProgramTopCards(long frameId, int ownerSeat, int amount, SkillProgramNumberExpression? numberExpression, string resultBind, SkillProgramCardSetVisibility visibility)
@@ -101,13 +105,14 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
             if (_facts.Location(item.CardId) != location)
                 throw new InvalidOperationException("A bound card left its frozen source before its configured filter.");
             var card = _facts.CardsAt(location).Single(current => current.Id == item.CardId);
-            return (Card: card, Location: location);
+            return (Card: card, Location: location, Index: item.Index);
         }).Where(item =>
         {
             var suit = effectiveSuitSeat is { } seat ? _facts.EffectiveSuit(seat, item.Card) : item.Card.Suit;
             return matchedSuit is { } required ? suit == required : ProgramCardSetFilter.Matches(item.Card.Kind, suit, suits, categories, equipmentSlots, cardKinds);
         }).ToArray();
-        SetProgramCardSet(frameId, resultBind, selected.Select(item => item.Card.Id).ToArray(), source.Visibility, selected.Select(item => item.Location).ToArray(), selectionActorSeat: source.SelectionActorSeat, isReadOnlySnapshot: source.IsReadOnlySnapshot);
+        SetProgramCardSet(frameId, resultBind, selected.Select(item => item.Card.Id).ToArray(), source.Visibility, selected.Select(item => item.Location).ToArray(), selectionActorSeat: source.SelectionActorSeat, isReadOnlySnapshot: source.IsReadOnlySnapshot,
+            sourceEntrySequences: selected.Select(item => source.SourceEntrySequences?[item.Index]).ToArray());
     }
 
     internal SkillProgramStepOutcome SelectProgramSourceCard(long frameId, int ownerSeat, SkillProgramCardSource cardSource, IReadOnlyList<CardZoneKind> zones, string resultBind, IReadOnlyList<EquipmentSlot> equipmentSlots, bool skipIfNoCards, bool allowSameSource)
@@ -448,7 +453,10 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
         if (effect.OnePerSuit ? cards.Length != (effect.AvailableAtSourceOnly == true ? CountAvailableBoundSuits(source) : source.CardIds.Select((cardId, index) => _facts.CardsAt(source.SourceLocations[index]).Single(card => card.Id == cardId).Suit).Distinct().Count()) || cards.Select(card => card.Suit).Distinct().Count() != cards.Length : selected.Cards.Distinct().Count() != selected.Cards.Count || selected.Cards.Any(cardId => !source.CardIds.Contains(cardId)) || selected.Cards.Count < (effect.AllowFewerWhenInsufficient ? Math.Min(effect.MinimumCards, effect.AvailableAtSourceOnly == true ? CountAvailableBoundCards(source) : source.CardIds.Count) : effect.MinimumCards) || selected.Cards.Count > (effect.AllowFewerWhenInsufficient ? Math.Min(effect.MaximumCards, effect.AvailableAtSourceOnly == true ? CountAvailableBoundCards(source) : source.CardIds.Count) : effect.MaximumCards))
             throw new InvalidOperationException("The selected subset is no longer legal.");
         _prompts.Clear();
-        SetProgramCardSet(frame.Id, effect.ResultBind!, selected.Cards, SkillProgramCardSetVisibility.Private, selectionActorSeat: source.SelectionActorSeat, isReadOnlySnapshot: source.IsReadOnlySnapshot);
+        SetProgramCardSet(frame.Id, effect.ResultBind!, selected.Cards, SkillProgramCardSetVisibility.Private,
+            selected.Cards.Select(id => source.SourceLocations[sourceIndexes[id]]).ToArray(),
+            selectionActorSeat: source.SelectionActorSeat, isReadOnlySnapshot: source.IsReadOnlySnapshot,
+            sourceEntrySequences: selected.Cards.Select(id => source.SourceEntrySequences?[sourceIndexes[id]]).ToArray());
         _events.AdvanceFact(new ProgramCardSubsetSelectedEvent(frame.Id, frame.SkillId, RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame), effect.SourceBind!, effect.ResultBind!, Array.AsReadOnly(selected.Cards.ToArray()), rankSum));
         _frames.AdvanceProgram(frame.Id);
     }

@@ -50,6 +50,9 @@ internal interface IProgramExpressionWorld
     bool? CardAt(int cardId, int seat, CardZoneKind zone) => null;
     bool? CardCanDiscard(int seat, int cardId) => null;
     bool? CardInBinding(int cardId, string name) => null;
+    IReadOnlyList<ProgramExpressionCardFact>? PublicRevealCards(string scope, string purpose) => null;
+    IReadOnlyList<ProgramExpressionCardFact>? BoundCards(string name) => null;
+    bool? CardStillAtSource(ProgramExpressionCardFact card) => null;
     bool? SameTeam(int first, int second) => null;
     int? PhaseCount(string moment, int actor, ActualDiscardRecoveryPhaseKind? kind, ActualPhaseHistoryOutcome outcome) => null;
 }
@@ -150,6 +153,23 @@ internal static class ProgramExpressions
         if (op == "sameTeam") { Arity(2, 2); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Flags.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Participant)); }
         if (Stats.Contains(op)) { Arity(1, 1); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Participant)); }
+        if (op == "publicRevealCards")
+        {
+            Arity(1, 2);
+            var scope = args[0].ValueKind == JsonValueKind.String ? args[0].GetString() : null;
+            var purpose = args.Length == 1 ? "all" : args[1].ValueKind == JsonValueKind.String ? args[1].GetString() : null;
+            if (scope is not ("all" or "actualTurn" or "actualPhase")) Fail(path, "publicRevealCards requires all, actualTurn or actualPhase");
+            if (purpose is not ("all" or "explicit")) Fail(path, "publicRevealCards purpose requires all or explicit");
+            return new(op, ProgramExpressionType.CardSet, [], name: scope, literal: purpose == "explicit" ? 1 : 0);
+        }
+        if (op == "boundCards")
+        {
+            Arity(1, 1);
+            if (args[0].ValueKind != JsonValueKind.String || string.IsNullOrWhiteSpace(args[0].GetString()) || args[0].GetString()!.Length > 128)
+                Fail(path, "boundCards requires a binding identifier");
+            return new(op, ProgramExpressionType.CardSet, [], name: args[0].GetString());
+        }
+        if (op == "cardStillAtSource") { Arity(1, 1); return new(op, ProgramExpressionType.Bool, Each(ProgramExpressionType.Card)); }
         if (op == "gainCards")
         {
             Arity(2, 2);
@@ -251,6 +271,7 @@ internal static class ProgramExpressions
             return new(op, ProgramExpressionType.Int, [Arg(0, ProgramExpressionType.Participant)],
                 literal: (int)Enum.Parse<Suit>(args[1].GetString()!, ignoreCase: true));
         }
+        if (op == "mod") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op is "+" or "min" or "max") { Arity(2, 8); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op == "-") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
         if (op == "floorDiv") { Arity(2, 2); return new(op, ProgramExpressionType.Int, Each(ProgramExpressionType.Int)); }
@@ -391,7 +412,7 @@ internal static class ProgramExpressions
 
     /// <summary>Three-valued result: null when a read fact is unknown or undefined.</summary>
     public static bool? EvaluateBool(ProgramExpression e, IProgramExpressionWorld world, int? it = null, CardUseHistoryFact? use = null,
-        IReadOnlyDictionary<string, HandGainCardSnapshot>? cards = null)
+        IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards = null)
     {
         if (e.Op == "boundIsEquipment") return world.BindingStat(e.Op, e.Name!) is { } value ? value != 0 : null;
         switch (e.Op)
@@ -412,6 +433,8 @@ internal static class ProgramExpressions
                     ? world.CardCanDiscard(discarder, discardCard.CardId) : null;
             case "cardInBinding":
                 return EvaluateCard(e.Args[0], cards) is { } boundCard ? world.CardInBinding(boundCard.CardId, e.Name!) : null;
+            case "cardStillAtSource":
+                return EvaluateCard(e.Args[0], cards) is { } capturedCard ? world.CardStillAtSource(capturedCard) : null;
             case "gainPhaseIs":
                 return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } gainRecipient &&
                     world.HandGain(gainRecipient)?.Timing is { } timing &&
@@ -419,17 +442,22 @@ internal static class ProgramExpressions
                     ? (int)timing.Phase == e.Literal && timing.PhaseActorSeat == phaseActor : null;
             case "cardActualGain": return EvaluateCard(e.Args[0], cards)?.IsActualGain;
             case "cardKindIs":
-                return EvaluateCard(e.Args[0], cards) is { } kindCard
-                    ? ProgramCardKindMatch.Contains(e.Args.Skip(1).Select(arg => (CardKind)arg.Literal).ToArray(), kindCard.EffectiveKind) : null;
+                return EvaluateCard(e.Args[0], cards)?.EffectiveKind is { } knownKind
+                    ? ProgramCardKindMatch.Contains(e.Args.Skip(1).Select(arg => (CardKind)arg.Literal).ToArray(), knownKind) : null;
             case "cardSuitIs":
-                return EvaluateCard(e.Args[0], cards) is { } suitCard
-                    ? e.Args.Skip(1).Any(arg => (Suit)arg.Literal == suitCard.EffectiveSuit) : null;
+                return EvaluateCard(e.Args[0], cards)?.EffectiveSuit is { } knownSuit
+                    ? e.Args.Skip(1).Any(arg => (Suit)arg.Literal == knownSuit) : null;
             case "sameCardKind" or "sameCardSuit" or "sameCardName":
-                return EvaluateCard(e.Args[0], cards) is { } firstCard && EvaluateCard(e.Args[1], cards) is { } secondCard
-                    ? e.Op == "sameCardKind" ? firstCard.EffectiveKind == secondCard.EffectiveKind :
-                        e.Op == "sameCardName" ? RuntimeSkills.RuntimeRules_Core_AlternativeViewAsCosts.ProgramBasicCardName(firstCard.EffectiveKind) ==
-                            RuntimeSkills.RuntimeRules_Core_AlternativeViewAsCosts.ProgramBasicCardName(secondCard.EffectiveKind) :
-                        firstCard.EffectiveSuit == secondCard.EffectiveSuit : null;
+            {
+                var firstCard = EvaluateCard(e.Args[0], cards);
+                var secondCard = EvaluateCard(e.Args[1], cards);
+                if (e.Op == "sameCardSuit") return firstCard?.EffectiveSuit is { } firstSuit && secondCard?.EffectiveSuit is { } secondSuit
+                    ? firstSuit == secondSuit : null;
+                if (firstCard?.EffectiveKind is not { } firstKind || secondCard?.EffectiveKind is not { } secondKind) return null;
+                return e.Op == "sameCardKind" ? firstKind == secondKind :
+                    RuntimeSkills.RuntimeRules_Core_AlternativeViewAsCosts.ProgramBasicCardName(firstKind) ==
+                    RuntimeSkills.RuntimeRules_Core_AlternativeViewAsCosts.ProgramBasicCardName(secondKind);
+            }
             case "not": return !EvaluateBool(e.Args[0], world, it, use, cards);
             case "and":
             {
@@ -521,7 +549,7 @@ internal static class ProgramExpressions
     }
 
     public static int? EvaluateInt(ProgramExpression e, IProgramExpressionWorld world, int? it = null, CardUseHistoryFact? use = null,
-        IReadOnlyDictionary<string, HandGainCardSnapshot>? cards = null)
+        IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards = null)
     {
         switch (e.Op)
         {
@@ -542,6 +570,10 @@ internal static class ProgramExpressions
             case "choiceNumber" or "boundCount" or "boundSuitCount" or "boundDistinctSuitCount" or "boundRank": return world.BindingStat(e.Op, e.Name!);
             case "-":
                 return EvaluateInt(e.Args[0], world, it, use, cards) is { } left && EvaluateInt(e.Args[1], world, it, use, cards) is { } right ? left - right : null;
+            case "mod":
+                return EvaluateInt(e.Args[0], world, it, use, cards) is { } numerator &&
+                    EvaluateInt(e.Args[1], world, it, use, cards) is { } denominator && denominator != 0
+                    ? (int)(numerator % (long)denominator) : null;
             case "floorDiv":
             {
                 if (EvaluateInt(e.Args[0], world, it, use, cards) is not { } dividend ||
@@ -577,7 +609,7 @@ internal static class ProgramExpressions
 
     public static IReadOnlyList<int>? EvaluateParticipantSet(ProgramExpression e, IProgramExpressionWorld world,
         int? it = null, CardUseHistoryFact? use = null,
-        IReadOnlyDictionary<string, HandGainCardSnapshot>? cards = null)
+        IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards = null)
     {
         switch (e.Op)
         {
@@ -605,16 +637,19 @@ internal static class ProgramExpressions
         }
     }
 
-    public static IReadOnlyList<HandGainCardSnapshot>? EvaluateCardSet(ProgramExpression e, IProgramExpressionWorld world,
+    public static IReadOnlyList<ProgramExpressionCardFact>? EvaluateCardSet(ProgramExpression e, IProgramExpressionWorld world,
         int? it = null, CardUseHistoryFact? use = null,
-        IReadOnlyDictionary<string, HandGainCardSnapshot>? cards = null)
+        IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards = null)
     {
+        if (e.Op == "publicRevealCards") return world.PublicRevealCards(e.Name!, e.Literal == 1 ? "explicit" : "all");
+        if (e.Op == "boundCards") return world.BoundCards(e.Name!);
         if (e.Op == "gainCards")
             return EvaluateParticipant(e.Args[0], world, it, use, cards) is { } recipient && world.HandGain(recipient) is { } gain
-                ? e.Name == "incoming" ? gain.Incoming : gain.PreviousHand : null;
+                ? Array.AsReadOnly((e.Name == "incoming" ? gain.Incoming : gain.PreviousHand)
+                    .Select(card => ProgramExpressionCardFact.FromHandGain(card, recipient)).ToArray()) : null;
         if (e.Op != "filter") throw new InvalidOperationException($"Expression operator '{e.Op}' is not a card set.");
         if (EvaluateCardSet(e.Args[0], world, it, use, cards) is not { } source) return null;
-        var result = new List<HandGainCardSnapshot>();
+        var result = new List<ProgramExpressionCardFact>();
         foreach (var card in source)
         {
             var accepted = EvaluateBool(e.Args[1], world, it, use, BindCard(cards, e.Name!, card));
@@ -625,7 +660,7 @@ internal static class ProgramExpressions
     }
 
     private static IReadOnlyList<CardUseHistoryFact>? EvaluateFactSet(ProgramExpression e, IProgramExpressionWorld world,
-        int? it, CardUseHistoryFact? use, IReadOnlyDictionary<string, HandGainCardSnapshot>? cards)
+        int? it, CardUseHistoryFact? use, IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards)
     {
         if (e.Op == "cardUses") return world.CardUses(e.Literal == 0 ? "window" : "now", e.Name!);
         if (e.Op == "takeLast") return EvaluateFactSet(e.Args[0], world, it, use, cards) is { } source &&
@@ -644,7 +679,7 @@ internal static class ProgramExpressions
     }
 
     private static IEnumerable<bool?>? EvaluatePredicates(ProgramExpression e, IProgramExpressionWorld world,
-        int? it, CardUseHistoryFact? use, IReadOnlyDictionary<string, HandGainCardSnapshot>? cards) => e.Args[0].Type switch
+        int? it, CardUseHistoryFact? use, IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards) => e.Args[0].Type switch
     {
         ProgramExpressionType.FactSet => EvaluateFactSet(e.Args[0], world, it, use, cards)
             ?.Select(fact => EvaluateBool(e.Args[1], world, it, fact, cards)),
@@ -654,25 +689,25 @@ internal static class ProgramExpressions
             ?.Select(seat => EvaluateBool(e.Args[1], world, seat, use, cards))
     };
 
-    private static HandGainCardSnapshot? EvaluateCard(ProgramExpression e,
-        IReadOnlyDictionary<string, HandGainCardSnapshot>? cards) =>
+    private static ProgramExpressionCardFact? EvaluateCard(ProgramExpression e,
+        IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards) =>
         cards is not null && cards.TryGetValue(e.Name!, out var card) ? card : null;
 
-    private static IReadOnlyDictionary<string, HandGainCardSnapshot> BindCard(
-        IReadOnlyDictionary<string, HandGainCardSnapshot>? cards, string name, HandGainCardSnapshot card)
+    private static IReadOnlyDictionary<string, ProgramExpressionCardFact> BindCard(
+        IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards, string name, ProgramExpressionCardFact card)
     {
-        var scope = cards is null ? new Dictionary<string, HandGainCardSnapshot>(StringComparer.Ordinal) :
-            new Dictionary<string, HandGainCardSnapshot>(cards, StringComparer.Ordinal);
+        var scope = cards is null ? new Dictionary<string, ProgramExpressionCardFact>(StringComparer.Ordinal) :
+            new Dictionary<string, ProgramExpressionCardFact>(cards, StringComparer.Ordinal);
         scope.Add(name, card);
         return scope;
     }
 
     private static CardUseHistoryFact? EvaluateFact(ProgramExpression e, IProgramExpressionWorld world,
-        int? it, CardUseHistoryFact? use, IReadOnlyDictionary<string, HandGainCardSnapshot>? cards) => e.Op is "first" or "last"
+        int? it, CardUseHistoryFact? use, IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards) => e.Op is "first" or "last"
         ? EvaluateFactSet(e.Args[0], world, it, use, cards) is { } facts ? e.Op == "first" ? facts.FirstOrDefault() : facts.LastOrDefault() : null
         : e.Name == FactIterator ? use : world.CurrentUse();
 
-    private static int? EvaluateParticipant(ProgramExpression e, IProgramExpressionWorld world, int? it, CardUseHistoryFact? use, IReadOnlyDictionary<string, HandGainCardSnapshot>? cards) =>
+    private static int? EvaluateParticipant(ProgramExpression e, IProgramExpressionWorld world, int? it, CardUseHistoryFact? use, IReadOnlyDictionary<string, ProgramExpressionCardFact>? cards) =>
         e.Op is "useActor" or "useDeclarer" ? EvaluateFact(e.Args[0], world, it, use, cards) is { } fact
             ? e.Op == "useActor" ? fact.ActorSeat : fact.DeclarerSeat : null :
         e.Name == Iterator ? it : world.Participant(e.Name!);
@@ -709,16 +744,31 @@ internal static class ProgramExpressions
 internal sealed class SkillContextExpressionWorld(PlayerSkillContext owner, PlayerSkillContext? selectedTarget,
     int? ownerEquipmentCount = null, Func<string, string, int?>? bindingStat = null,
     Func<string, int?>? number = null, SkillProgramTriggerFacts? windowFacts = null,
-    IProgramExpressionWorld? ownerWindowFacts = null, Func<int, string, bool?>? bindingContains = null) : IProgramExpressionWorld
+    IProgramExpressionWorld? ownerWindowFacts = null, Func<int, string, bool?>? bindingContains = null,
+    Func<string, IReadOnlyList<ProgramExpressionCardFact>?>? bindingCards = null,
+    Func<ProgramExpressionCardFact, bool?>? stillAtSource = null) : IProgramExpressionWorld
 {
     public int? WindowStat(string stat, string participant) => ProgramExpressions.ReadWindowStat(windowFacts, stat, participant, selectedTarget is not null);
     public int? BindingStat(string stat, string name) => bindingStat?.Invoke(stat, name);
     public int? Number(string name) => number?.Invoke(name);
     public HandGainOccurrence? HandGain(int recipient) => recipient == owner.Seat ? ownerWindowFacts?.HandGain(recipient) : null;
     public bool? GainHasSource(int recipient, string moment) => recipient == owner.Seat ? ownerWindowFacts?.GainHasSource(recipient, moment) : null;
-    public bool? CardAt(int cardId, int seat, CardZoneKind zone) => ownerWindowFacts?.CardAt(cardId, seat, zone);
+    public bool? CardAt(int cardId, int seat, CardZoneKind zone) =>
+        seat == owner.Seat || zone == CardZoneKind.Equipment ? ownerWindowFacts?.CardAt(cardId, seat, zone) : null;
     public bool? CardCanDiscard(int seat, int cardId) => seat == owner.Seat ? ownerWindowFacts?.CardCanDiscard(seat, cardId) : null;
     public bool? CardInBinding(int cardId, string name) => bindingContains?.Invoke(cardId, name);
+    public IReadOnlyList<ProgramExpressionCardFact>? PublicRevealCards(string scope, string purpose) => ownerWindowFacts?.PublicRevealCards(scope, purpose);
+    public IReadOnlyList<ProgramExpressionCardFact>? BoundCards(string name) =>
+        bindingCards is null ? ownerWindowFacts?.BoundCards(name) : bindingCards(name);
+    public bool? CardStillAtSource(ProgramExpressionCardFact card)
+    {
+        // A formerly public identity does not reveal a foreign Hand's later
+        // private departures. The native rules world retains its full read.
+        if (card.CapturedLocation is not { } location ||
+            location.OwnerSeat != owner.Seat && location.Zone is not (CardZoneKind.Equipment or CardZoneKind.DiscardPile))
+            return null;
+        return stillAtSource is null ? ownerWindowFacts?.CardStillAtSource(card) : stillAtSource(card);
+    }
     private PlayerSkillContext? Context(int seat) =>
         seat == owner.Seat ? owner : selectedTarget?.Seat == seat ? selectedTarget : null;
 

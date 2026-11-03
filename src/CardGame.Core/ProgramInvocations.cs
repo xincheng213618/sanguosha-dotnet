@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
-public enum SkillProgramInvocationSource { InitialHandGain, PublicHandReveal }
+public enum SkillProgramInvocationSource { InitialHandGain, PublicHandReveal, AfterTurnEnded }
 public enum SkillProgramInvocationOwnerDeath { Stop, Retain }
 public sealed record SkillProgramTriggerInvocation(SkillProgramInvocationSource Source,
     SkillProgramInvocationOwnerDeath OwnerDeath = SkillProgramInvocationOwnerDeath.Stop);
@@ -37,9 +37,37 @@ public sealed partial record ProgramSkillFrame
 
 internal static class ProgramInvocations
 {
+    internal static ProgramInvocationAuthorization AcceptAfterTurnEnded(ResolutionFrame? parent,
+        ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, long programFrameId,
+        bool retainOwnerDeath)
+    {
+        if (parent is not DeferredTurnEndFrame ending ||
+            !MatchesAfterTurnEnded(ending, candidate, context) ||
+            ending.AfterTurnEnded!.CurrentChild!.FrameId != programFrameId)
+            throw new InvalidOperationException("An accepted ending invocation requires its original candidate and child.");
+        return new(ending.Id, ending.Id, SkillProgramTriggerWindow.AfterTurnEnded, candidate,
+            RetainOwnerDeath: retainOwnerDeath);
+    }
+
+    private static bool MatchesAfterTurnEnded(DeferredTurnEndFrame parent,
+        ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) =>
+        parent.Id == context.ParentFrameId && context.Window == SkillProgramTriggerWindow.AfterTurnEnded &&
+        parent.AfterTurnEnded is { CurrentChild: { } child } window && child.Candidate == candidate &&
+        window.ItemIndex >= 0 && window.ItemIndex < window.Items.Count &&
+        window.Items[window.ItemIndex] is { Kind: TurnEndingBoundaryItemKind.Program } item &&
+        item.Candidate == candidate && item.Facts == context.Facts &&
+        candidate.OwnerSeat == context.OwnerSeat && candidate.OccurrenceIndex == context.OccurrenceIndex &&
+        context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat;
+
     internal static ProgramInvocationAuthorization? Find(ResolutionFrame? parent,
         ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
     {
+        if (parent is DeferredTurnEndFrame ending)
+            return MatchesAfterTurnEnded(ending, candidate, context)
+                ? ending.InvocationAuthorizations?.SingleOrDefault(authorization => authorization.ProgramFrameId == 0 &&
+                    authorization.WindowId == ending.Id && authorization.NativeFrameId == ending.Id &&
+                    authorization.Window == context.Window && authorization.Candidate == candidate)
+                : null;
         if (parent is PublicHandRevealWindowFrame reveal)
         {
             if (reveal.Id != context.ParentFrameId || context.Window != SkillProgramTriggerWindow.PublicHandRevealed ||
@@ -82,5 +110,6 @@ internal static class ProgramInvocations
         frame.TriggerId == authorization.Candidate.BindingId && frame.ActivationId == authorization.Candidate.BindingId &&
         frame.SkillInstanceId == authorization.Candidate.SkillInstanceId &&
         frame.GameplayHash == authorization.Candidate.GameplayHash && frame.WindowContext is { } context &&
+        (parent is not DeferredTurnEndFrame ending || ending.AfterTurnEnded?.CurrentChild?.FrameId == frame.Id) &&
         Find(parent, authorization.Candidate, context) == (authorization with { ProgramFrameId = 0 });
 }

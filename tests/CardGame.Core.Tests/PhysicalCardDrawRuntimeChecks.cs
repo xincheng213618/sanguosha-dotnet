@@ -320,7 +320,7 @@ internal static class PhysicalCardDrawRuntimeChecks
         var runtime = new ProgramBoundCardRuntime(Port<IProgramBoundCardFacts>(), Port<IProgramBoundInstructionFacts>(),
             Port<IProgramBoundCardMovementOperations>(), Port<IProgramBoundCardPaymentOperations>(),
             new SubsetReturnFrames(frames), Port<IProgramRuntimePrompts>(), Port<IProgramRuntimeEvents>(),
-            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>(), Port<ICardMovementHistoryQueries>(),
+            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>(), Port<ICardMovementHistoryQueries>(), Port<ICardZoneEntryQueries>(),
             Port<CardGame.Core.RuntimeAccess.IClosedOwnedCardMoveQueriesSource>());
         var pindian = game.GetRuntimeModule<ProgramPindianRuntime>();
         var hasPending = typeof(ProgramPindianRuntime).GetMethod("HasPendingBoundCards", BindingFlags.Instance | BindingFlags.NonPublic)!;
@@ -377,7 +377,7 @@ internal static class PhysicalCardDrawRuntimeChecks
         var runtime = new ProgramBoundCardRuntime(new BlockedDiscardFacts(Port<IProgramBoundCardFacts>(), material[1].Id),
             Port<IProgramBoundInstructionFacts>(), new NestedMovementAfterFirst(Port<IProgramBoundCardMovementOperations>(), zones, material[0].Id),
             Port<IProgramBoundCardPaymentOperations>(), frames, Port<IProgramRuntimePrompts>(), Port<IProgramRuntimeEvents>(),
-            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>(), history,
+            Port<IProgramCardSnapshotQueries>(), Port<INativeLogicalDiscardOperations>(), history, Port<ICardZoneEntryQueries>(),
             Port<CardGame.Core.RuntimeAccess.IClosedOwnedCardMoveQueriesSource>());
         var program = registry.GetSkill("classic:xunxun").Program!;
         var trigger = program.Triggers.Single();
