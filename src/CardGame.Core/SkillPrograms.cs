@@ -6528,6 +6528,11 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                 if (!ProgramInvocations.IsCardActionWindow(window))
                     Fail(invocationPath, "cardAction requires an original native card-action trigger window");
             }
+            else if (invocation.Source == SkillProgramInvocationSource.Movement)
+            {
+                if (!ProgramInvocations.IsMovementWindow(window))
+                    Fail(invocationPath, "movement requires an original cardsMoved or cardsGained trigger window");
+            }
             else if (window != SkillProgramTriggerWindow.AfterTurnEnded || subject != SkillProgramTriggerSubject.Owner)
                 Fail(invocationPath, "afterTurnEnded requires an owner actual-turn-ended trigger");
         }

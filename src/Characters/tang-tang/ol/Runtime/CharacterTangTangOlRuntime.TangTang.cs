@@ -357,7 +357,6 @@ internal sealed partial class CharacterTangTangOlRuntime
         return true;
     }
 
-    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27530)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27530)]
     internal bool ContinuePaidTangTang(ProgramSkillFrame f)
     {
@@ -365,6 +364,10 @@ internal sealed partial class CharacterTangTangOlRuntime
             return false;
         return true;
     }
+
+    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27530)]
+    internal bool ContinuePaidZexing(ProgramSkillFrame f) =>
+        f.TangTang is { Paid: true, Op: SkillProgramEffectOp.ResolveZexingShownCardChain };
 
     [ProgramAiChoice(SkillProgramEffectOp.ResolveZexingShownCardChain, SkillProgramEffectOp.ResolveZhiyiGainColorBenefit)]
     internal PromptChoice TangTangAi(PendingDecision p, ProgramSkillFrame f) => f.TangTang?.Stage == TangTangStage.PeerOption ? p.Choices.First() : p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("branch")is not ("decline" or "unpick")) ?? p.Choices.Last();

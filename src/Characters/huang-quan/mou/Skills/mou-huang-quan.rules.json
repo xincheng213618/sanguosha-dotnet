@@ -28,6 +28,7 @@
           "subject": "owner",
           "optional": false,
           "movementOccurrence": "perNativeGive",
+          "invocation": { "source": "movement" },
           "effects": [
             {
               "op": "resolveMouHuangQuanTuicheng",

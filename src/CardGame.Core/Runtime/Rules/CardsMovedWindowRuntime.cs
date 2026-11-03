@@ -324,7 +324,7 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
                     var trigger = _facts.GetProgramTrigger(candidate);
                     if (trigger.MovementOccurrence == SkillProgramMovementOccurrence.PerNativeGive)
                         continue;
-                    if (trigger.Invocation is not null)
+                    if (trigger.Invocation?.Source == SkillProgramInvocationSource.InitialHandGain)
                         continue;
                     if (_pipeline.ExcludeOrdinaryMovementCandidate(candidate, trigger))
                         continue;

@@ -38,5 +38,20 @@ internal static partial class ProgramAmountExpressionChecks
         Need(!new SkillProgramDependencies([new ContentSkillDefinition(Skill, Skill, Skill) { Program = physicalProgram }])
                 .RequiredFacts.HasFlag(ProgramTrackedFact.NativeGive),
             "The physical card occurrence remains independent of logical Give history demand.");
+        var ordinary = JsonNode.Parse("""
+            {"id":"accepted","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementOccurrence":"perBatch","optional":false,
+              "invocation":{"source":"movement"},"effects":[{"op":"draw","target":"owner","amount":1}]}
+            """)!;
+        var accepted = Parse(ordinary);
+        var undeclared = ordinary.DeepClone(); undeclared.AsObject().Remove("invocation");
+        Need(accepted.Triggers.Single().Invocation is
+                { Source: SkillProgramInvocationSource.Movement, OwnerDeath: SkillProgramInvocationOwnerDeath.Stop } &&
+            accepted.GameplayHash != Parse(undeclared).GameplayHash,
+            "Ordinary movement invocation is declared and fingerprinted independently of logical Give, with owner-death permission stopped by default.");
+        ordinary["window"] = "afterDamageApplied";
+        var rejectedWindow = false;
+        try { _ = Parse(ordinary); }
+        catch (InvalidOperationException) { rejectedWindow = true; }
+        Need(rejectedWindow, "A movement invocation cannot be loaded on a non-movement trigger window.");
     }
 }

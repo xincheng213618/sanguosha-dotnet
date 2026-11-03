@@ -40,10 +40,13 @@ internal sealed class ProgramWindowCursorRuntime(IProgramRuntimeFrames frames, I
         if (frames.Top is not CardsMovedTriggerWindowFrame current ||
             current.Id != frame.Id || current.CandidateIndex != frame.CandidateIndex)
             throw new InvalidOperationException("The cards-moved trigger cursor is no longer current.");
+        var authorizations = current.InvocationAuthorizations?.Where(authorization =>
+            authorization.ProgramFrameId == 0 || authorization.CandidateIndex != current.CandidateIndex).ToArray();
         frames.ReplaceTop(current with
         {
             CandidateIndex = current.CandidateIndex + 1,
-            Step = ResolutionFrameStep.ResolvingEffect
+            Step = ResolutionFrameStep.ResolvingEffect,
+            InvocationAuthorizations = authorizations is { Length: > 0 } ? authorizations : null
         });
     }
 

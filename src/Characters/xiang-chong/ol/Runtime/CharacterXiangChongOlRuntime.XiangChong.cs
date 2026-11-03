@@ -349,9 +349,10 @@ internal sealed partial class CharacterXiangChongOlRuntime
         return true;
     }
 
-    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27140)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27140)]
     internal bool ContinuePaidXiang(ProgramSkillFrame f) => f.XiangChong is { Paid: true } && ValidXiang(f);
+    [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27140)]
+    internal bool ContinuePaidXiangAfterSkillLoss(ProgramSkillFrame f) => f.XiangChong is { Paid: true, Branch: not "loss" } && ValidXiang(f);
     [ProgramAiChoice(SkillProgramEffectOp.ResolveGuyingAtomicLossChoice, SkillProgramEffectOp.SettleGuyingPreparationDebt, SkillProgramEffectOp.ResolveMuzhenExchange)]
     internal PromptChoice AiXiang(PendingDecision p, ProgramSkillFrame f)
     {

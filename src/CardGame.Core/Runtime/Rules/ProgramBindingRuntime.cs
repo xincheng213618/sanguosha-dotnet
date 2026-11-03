@@ -34,14 +34,19 @@ internal sealed class ProgramBindingRuntime(IProgramRuntimeFrames frames, IProgr
         frame = conditionalGrants.CaptureSource(frame);
         native.AttachAfterTurnEndedChild(frame, candidate, context);
         if (facts.Trigger(candidate).Invocation is { Source: SkillProgramInvocationSource.AfterTurnEnded or
-                SkillProgramInvocationSource.CardAction } invocation)
+                SkillProgramInvocationSource.CardAction or SkillProgramInvocationSource.Movement } invocation)
         {
             var parent = frames.Find(context.ParentFrameId);
             var retainOwnerDeath = invocation.OwnerDeath == SkillProgramInvocationOwnerDeath.Retain;
-            var accepted = invocation.Source == SkillProgramInvocationSource.CardAction
-                ? ProgramInvocations.AcceptCardAction(parent, candidate, context, frame.Id, retainOwnerDeath)
-                : ProgramInvocations.AcceptAfterTurnEnded(parent, candidate, context, frame.Id, retainOwnerDeath);
-            frames.Replace(parent!.Id, parent with { InvocationAuthorizations = [accepted] });
+            var accepted = invocation.Source switch
+            {
+                SkillProgramInvocationSource.CardAction => ProgramInvocations.AcceptCardAction(parent, candidate, context, frame.Id, retainOwnerDeath),
+                SkillProgramInvocationSource.Movement => ProgramInvocations.AcceptMovement(parent, candidate, context, frame.Id, retainOwnerDeath),
+                _ => ProgramInvocations.AcceptAfterTurnEnded(parent, candidate, context, frame.Id, retainOwnerDeath)
+            };
+            frames.Replace(parent!.Id, parent is CardsMovedTriggerWindowFrame movement
+                ? ProgramInvocations.AttachAcceptedMovement(movement, accepted)
+                : parent with { InvocationAuthorizations = [accepted] });
             frame = frame with { InvocationAuthorization = accepted with { ProgramFrameId = frame.Id } };
         }
         frames.Push(frame);

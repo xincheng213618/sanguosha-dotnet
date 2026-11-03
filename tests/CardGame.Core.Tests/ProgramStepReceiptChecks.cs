@@ -12,6 +12,8 @@ internal static partial class ProgramStepReceiptChecks
     public static void DeliveredStepsRetainPaidReturnsWithoutRepeatingMovement()
     {
         AcceptedCardActionStaysWithItsOriginalCandidate();
+        AcceptedMovementStaysWithItsOriginalCandidate();
+        AcceptedMovementContinuesOnlyItsOriginalOrdinaryProgramCold();
         NativeGiveFeedsTuichengAndJiyuanFromOneOriginalBatchCold();
         foreach (var scenario in new[] { "anxu", "anxu-before-payment-loss", "anxu-source-loss", "anxu-owner-death", "anxu-moved-away", "zhijian", "zhijian-source-loss", "zhijian-owner-death" })
         {

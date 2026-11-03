@@ -426,3 +426,5 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
   ]
 }
 ```
+
+CardsMoved／CardsGained 绑定可声明 `"invocation":{"source":"movement"}`，在实际接受后保留本次调用的来源权限；仅展示可选提示不授予权限。它绑定原移动窗口、候选游标及实际程序帧，不是技能授予，也不提前支付后续步骤。`ownerDeath` 缺省 `stop`；来源丢失和死亡不能互相替代。InitialHandGain 的原事实边界预签语义保持独立。

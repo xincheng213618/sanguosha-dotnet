@@ -11,7 +11,6 @@ internal sealed partial class CharacterXiangChongOlEntries
     internal bool CanIssueXiangChongGuyingEquipment(ProgramSkillFrame frame, int cardId, CardLocation from) => _resolve().CanIssueXiangChongGuyingEquipment(frame, cardId, from);
     internal void CaptureXiangChongEquipmentMaterialEntry(ProgramSkillFrame f) => _resolve().CaptureXiangChongEquipmentMaterialEntry(f);
     internal void CaptureXiangChongEquipmentResult(CardUseFrame use) => _resolve().CaptureXiangChongEquipmentResult(use);
-    internal bool ContinuePaidXiang(ProgramSkillFrame f) => _resolve().ContinuePaidXiang(f);
     internal void ContinueXiang(long id) => _resolve().ContinueXiang(id);
     internal bool DrainXiang(long id) => _resolve().DrainXiang(id);
     internal void FinishXiang(ProgramSkillFrame f, string reason) => _resolve().FinishXiang(f, reason);
