@@ -2074,7 +2074,6 @@ sima-yi/mou	CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime	CardGame.Core.R
 sima-yi/mou	CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime	CardGame.Core.RuntimeEntries.CharacterMiHengLeEntries	mi-heng/le	CardGame.Core.EngineOwners.CharacterMiHengLeRuntime
 sima-yi/mou	CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 sima-yi/mou	CardGame.Core.EngineOwners.CharacterSimaYiMouRuntime	CardGame.Core.RuntimeEntries.CharacterZhangFeiWumiaoEntries	zhang-fei/wumiao	CardGame.Core.EngineOwners.CharacterZhangFeiWumiaoRuntime
-su-fei/ol	CardGame.Core.EngineOwners.CharacterSuFeiOlRuntime	CardGame.Core.RuntimeEntries.CharacterHuangQuanMouEntries	huang-quan/mou	CardGame.Core.EngineOwners.CharacterHuangQuanMouRuntime
 sun-ce/mobile-god	CardGame.Core.EngineOwners.CharacterSunCeMobileGodRuntime	CardGame.Core.RuntimeEntries.CharacterHuangQuanMouEntries	huang-quan/mou	CardGame.Core.EngineOwners.CharacterHuangQuanMouRuntime
 sun-chen/mobile-shi	CardGame.Core.EngineOwners.CharacterSunChenMobileShiRuntime	CardGame.Core.RuntimeEntries.CharacterHuangQuanMouEntries	huang-quan/mou	CardGame.Core.EngineOwners.CharacterHuangQuanMouRuntime
 sun-chen/mobile-shi	CardGame.Core.EngineOwners.CharacterSunChenMobileShiRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime

@@ -22,16 +22,13 @@ internal sealed partial class CoreGameEngineProgramContinuationPermissionsRuntim
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 2)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 2)]
-    internal bool RetainDeliveredDrawStep(ProgramSkillFrame frame)
+    internal bool RetainDeliveredInstruction(ProgramSkillFrame frame)
     {
         if (frame.NativeDraw is { ReturnKind: NativeDrawAttemptReturnKind.ProgramInstruction, RecipientApplied: true } draw &&
             draw.InstructionIndex == frame.InstructionIndex)
             return true;
-        if (frame.NativeDraw is not null || frame.InstructionDelivery is not { Operation: SkillProgramEffectOp.Draw } delivered ||
-            delivered.InstructionIndex != frame.InstructionIndex)
-            return false;
-        var plan = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!);
-        return delivered.InstructionIndex == plan.Instructions.Count && delivered.InstructionIndex > 0 &&
-            plan.Instructions[delivered.InstructionIndex - 1].Op == SkillProgramEffectOp.Draw;
+        return frame.NativeDraw is null &&
+            (frame.PendingMovementContinuation is not null && ProgramInstructionDeliveries.HasDeliveredMovement(frame) ||
+             ProgramInstructionDeliveries.CanFinish(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!));
     }
 }

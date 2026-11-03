@@ -53,7 +53,6 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
             throw new InvalidOperationException("Activity draw must have one exact producer.");
         var expected = operation switch
         {
-            SkillProgramEffectOp.DrawDragonBoatConsecutiveTarget => "dragonboat:lianpian",
             SkillProgramEffectOp.DrawDragonBoatDianhu => "dragonboat:dianhu",
             SkillProgramEffectOp.DrawDragonBoatTunjiang => "dragonboat:tunjiang",
             _ => throw new InvalidOperationException("Unknown activity general operation.")};
@@ -62,9 +61,7 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
         var candidate = new ProgramTriggerCandidate(frame.OwnerSeat, frame.SkillId, frame.TriggerId, frame.SkillInstanceId, frame.GameplayHash, 0);
         if (operation == SkillProgramEffectOp.DrawDragonBoatDianhu && !DragonBoatDianhuQualified(candidate, context) || operation == SkillProgramEffectOp.DrawDragonBoatTunjiang && !DragonBoatTunjiangQualified(frame.OwnerSeat, context))
             throw new InvalidOperationException("The activity draw lost its exact native occurrence.");
-        var lianpianTargets = operation == SkillProgramEffectOp.DrawDragonBoatConsecutiveTarget
-            ? ProgramExpressions.EvaluateParticipantSet(effect.TargetSetExpression!, _expressionWorlds.CreateProgramExpressionWorld(frame)) ?? [] : null;
-        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { DragonBoatGeneral = new(frame.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, DragonBoatGeneralStage.Choosing, LianpianTargets: lianpianTargets) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { DragonBoatGeneral = new(frame.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, DragonBoatGeneralStage.Choosing) });
         if (operation == SkillProgramEffectOp.DrawDragonBoatDianhu)
         {
             IssueDragonBoatGeneralDraw(frame, frame.OwnerSeat, 1);
@@ -77,9 +74,9 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
 
     internal IReadOnlyList<PromptChoice> DragonBoatGeneralChoices(ProgramSkillFrame frame)
     {
-        if (frame.DragonBoatGeneral is not { Stage: DragonBoatGeneralStage.Choosing } receipt || frame.WindowContext is not { } context)
+        if (frame.DragonBoatGeneral is not { Stage: DragonBoatGeneralStage.Choosing } || frame.WindowContext is not { } context)
             return[];
-        var targets = frame.SkillId == "dragonboat:lianpian" ? receipt.LianpianTargets ?? [] : DragonBoatTunjiangQualified(frame.OwnerSeat, context) ? new[]
+        var targets = DragonBoatTunjiangQualified(frame.OwnerSeat, context) ? new[]
         {
             frame.OwnerSeat,
             _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat
@@ -109,7 +106,7 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceRulesAndPublishState();
     }
 
-    [ProgramAiChoice(SkillProgramEffectOp.DrawDragonBoatConsecutiveTarget, SkillProgramEffectOp.DrawDragonBoatTunjiang)]
+    [ProgramAiChoice(SkillProgramEffectOp.DrawDragonBoatTunjiang)]
     internal PromptChoice ChooseDragonBoatGeneral(ProgramSkillFrame frame) => DragonBoatGeneralChoices(frame).OrderByDescending(c => DragonBoatAllies(frame.OwnerSeat, c.Targets.Single())).ThenBy(c => _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[c.Targets.Single()]).Count).First();
     [ProgramAnswer("dragonboat-general")]
     internal void AnswerDragonBoatGeneral(PromptChoice choice)
@@ -129,7 +126,7 @@ internal sealed partial class CoreGameEngineDragonBoatGeneralsRuntime
         _coreProgramNativeDrawOperations.BeginOperationProgramDraw(frame, recipient, count, DragonBoatGeneralDrawReason(frame.SkillId));
     }
 
-    [ProgramNativeDrawReturn(SkillProgramEffectOp.DrawDragonBoatConsecutiveTarget, SkillProgramEffectOp.DrawDragonBoatDianhu, SkillProgramEffectOp.DrawDragonBoatTunjiang)]
+    [ProgramNativeDrawReturn(SkillProgramEffectOp.DrawDragonBoatDianhu, SkillProgramEffectOp.DrawDragonBoatTunjiang)]
     internal void ReturnDragonBoatGeneralDraw(ProgramSkillFrame input, NativeDrawOutcome outcome)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(input.Id);

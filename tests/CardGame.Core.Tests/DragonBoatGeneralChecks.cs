@@ -120,13 +120,14 @@ internal static class DragonBoatGeneralChecks
         Until(g, () => P(g) is { PlayerSeat: 0 } p && p.SkillPrompt?.SkillId == "dragonboat:lianpian" &&
             p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "activate"));
         Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "activate");
-        Until(g, () => P(g) is { PlayerSeat: 0 } p && p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "dragonboat-general"));
+        Until(g, () => P(g) is { PlayerSeat: 0 } p && p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "select-target"));
+        var frameId = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == "dragonboat:lianpian").Id;
         Need(P(g)!.Choices.SelectMany(c => c.Targets).Distinct().SequenceEqual([1]),
             "Real activity Lianpian offers only the common principal target of two consecutive teammate Uses.");
         Cold(g, registry); Answer(g, c => c.Targets.SequenceEqual([1])); Play(g);
-        var paid = Paid(g, "dragonboat:lianpian").Single();
-        Need(paid.RecipientSeat == 1 && paid.ActualCount == 1 &&
-            g.CardMovements.Count(m => m.Sequence > paid.SequenceBefore && m.Sequence <= paid.SequenceAfter && m.To == CardLocation.Hand(1)) == 1,
+        var paid = E<ProgramDrawCompletedEvent>(g).Single(e => e.FrameId == frameId);
+        Need(paid is { RecipientSeat: 1, RequestedCount: 1, ActualDrawCount: 1 } &&
+            g.CardMovements.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(1) && m.Reason.Value == "skill-program.dragonboat:lianpian.Draw") == 1,
             "The activity's real native draw pays exactly once from shared actual-use history.");
         Cold(g, registry);
     }

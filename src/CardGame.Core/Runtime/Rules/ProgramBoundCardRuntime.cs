@@ -1,9 +1,10 @@
 using CardGame.Core.RuntimeSkills;
+using CardGame.Core.EngineOwners;
 
 namespace CardGame.Core;
 /// <summary>Owns immutable bound-card selection, movement, cleanup and command answers on the original program frame.</summary>
 [ProgramRuntimeModule, ProgramCapability]
-internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IProgramBoundInstructionFacts instructions, IProgramBoundCardMovementOperations movement, IProgramBoundCardPaymentOperations payments, IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events, IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards, ICardMovementHistoryQueries history, ICardZoneEntryQueries entries, RuntimeAccess.IClosedOwnedCardMoveQueriesSource moveQueries) : IProgramCardSetBindings, IProgramBoundCardCleanup, IProgramBoundCardMovementResults, IProgramAcceptedCardMovementHost
+internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IProgramBoundInstructionFacts instructions, IProgramBoundCardMovementOperations movement, IProgramBoundCardPaymentOperations payments, IProgramRuntimeFrames frames, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events, IProgramCardSnapshotQueries snapshots, INativeLogicalDiscardOperations logicalDiscards, ICardMovementHistoryQueries history, ICardZoneEntryQueries entries, RuntimeAccess.IClosedOwnedCardMoveQueriesSource moveQueries, IKernelCreateProgramExpressionWorldOperations expressions, IBoundCardMovementContinuationHost movementContinuations) : IProgramCardSetBindings, IProgramBoundCardCleanup, IProgramBoundCardMovementResults, IProgramAcceptedCardMovementHost
 {
     void IProgramBoundCardCleanup.Cleanup(ProgramSkillFrame frame, bool completed) => CleanupProgramBoundCards(frame, completed);
     SkillProgramStepOutcome IProgramBoundCardMovementResults.Execute(ProgramSkillFrame frame, SkillProgramEffect effect, CardMoveReason reason) =>
@@ -189,7 +190,7 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
         if (source.CardIds.Count != source.SourceLocations.Count)
             throw new InvalidOperationException("A program card-set binding lost its source locations.");
         var available = source.CardIds.Select((cardId, index) => (CardId: cardId, Location: source.SourceLocations[index])).Where(item => _facts.Location(item.CardId) == item.Location).ToArray();
-        var targetSeats = _instructions.TargetSeats(ownerSeat, targetKind);
+        var targetSeats = GiftTargets(frame, targetKind);
         if (available.Length == 0 || targetSeats.Count == 0)
             return SkillProgramStepOutcome.Continue;
         var choices = (
@@ -528,7 +529,7 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
         var cardId = selected.Cards.Single();
         var targetSeat = selected.Targets.Single();
         var indexes = binding.CardIds.Select((id, position) => (id, position)).ToDictionary(item => item.id, item => item.position);
-        if (!indexes.TryGetValue(cardId, out var index) || index >= binding.SourceLocations.Count || !_instructions.TargetSeats(frame.OwnerSeat, targetKind).Contains(targetSeat))
+        if (!indexes.TryGetValue(cardId, out var index) || index >= binding.SourceLocations.Count || !GiftTargets(frame, targetKind).Contains(targetSeat))
             throw new InvalidOperationException("The bound-card gift is no longer legal.");
         var from = binding.SourceLocations[index];
         if (_facts.Location(cardId) != from)
@@ -536,8 +537,26 @@ internal sealed class ProgramBoundCardRuntime(IProgramBoundCardFacts facts, IPro
         var card = _facts.CardsAt(from).Single(item => item.Id == cardId);
         _prompts.Clear();
         _movement.Move(card, from, CardLocation.Hand(targetSeat), new CardMoveReason($"skill-program.{frame.SkillId}.{effect.Op}"), new ProgramBoundCardGive(frame.Id, frame.OwnerSeat, targetSeat, [cardId], _movement.Sequence));
+        if (effect.AwaitMovementTriggers)
+            _frames.ReplaceTop(_frames.ActiveProgram(frame.Id) with
+            {
+                InstructionDelivery = new(frame.InstructionIndex, SkillProgramEffectOp.GiveBoundCard)
+            });
         _events.AdvanceFact(new ProgramBoundCardGivenEvent(frame.Id, frame.SkillId, RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(frame), frame.OwnerSeat, targetSeat, cardId));
+        if (effect.AwaitMovementTriggers &&
+            movementContinuations.AwaitBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.AwaitChild)
+            return;
         _frames.AdvanceProgram(frame.Id);
         return;
+    }
+
+    private IReadOnlyList<int> GiftTargets(ProgramSkillFrame frame, SkillProgramTargetKind targetKind)
+    {
+        var domain = _instructions.TargetSeats(frame.OwnerSeat, targetKind, frame.WindowContext);
+        var effect = ProgramInstructionResolver.Default.Resolve(frame, _instructions.Skill(frame.SkillId).Program!)
+            .GetPausedInstruction(frame.InstructionIndex).Effect;
+        if (effect.TargetSetExpression is not { } expression) return domain;
+        var eligible = ProgramExpressions.EvaluateParticipantSet(expression, expressions.CreateProgramExpressionWorld(frame));
+        return eligible is null ? [] : domain.Where(eligible.Contains).ToArray();
     }
 }

@@ -9,15 +9,13 @@
           "window": "cardUseTargetsFinalized",
           "ownerRelation": "actor",
           "optional": true,
+          "invocation": { "source": "cardAction" },
           "usageScope": "turn",
           "usageLimit": 3,
           "condition": { "kind": "expression", "expr": ["and",["same",["useActor","currentUse"],"turnOwner"],["usePhaseIs","currentUse","play","accepted"],[">=",["count",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]],true],2],["any",["intersect",["usePrimaryTargets",["first",["takeLast",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]],2]]],["usePrimaryTargets",["last",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]]]]],true]] },
           "effects": [
-            {
-              "op": "drawThenOfferActualConsecutiveTargetGift",
-              "target": "owner",
-              "targetSetExpr": ["intersect",["usePrimaryTargets",["first",["takeLast",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]],2]]],["usePrimaryTargets",["last",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]]]]]
-            }
+            { "op": "draw", "target": "owner", "amount": 1, "resultBind": "lianpian-drawn", "awaitMovementTriggers": true },
+            { "op": "giveBoundCard", "target": "owner", "sourceBind": "lianpian-drawn", "targetKind": "otherLiving", "targetSetExpr": ["intersect",["usePrimaryTargets",["first",["takeLast",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]],2]]],["usePrimaryTargets",["last",["filter",["cardUses","window","finalizations"],["and",["samePlayPhase","use","currentUse"],["same",["useActor","use"],["useActor","currentUse"]]]]]]], "awaitMovementTriggers": true }
           ]
         }
       ]

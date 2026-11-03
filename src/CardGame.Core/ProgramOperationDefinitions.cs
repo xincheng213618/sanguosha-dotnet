@@ -904,13 +904,15 @@ internal sealed class GiveBoundCardProgramOperationDescriptor : ProgramOperation
         static (effect, context) => context.Gift(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "sourceBind", "targetKind", "condition");
+        r.AllowOnly("op", "target", "sourceBind", "targetKind", "condition", "targetSetExpr", "awaitMovementTriggers");
         var target = FilterBoundCardsProgramOperationDescriptor.Owner(r);
         var kind = r.RequiredEnum<SkillProgramTargetKind>("targetKind");
         if (kind is not (SkillProgramTargetKind.OtherLiving or SkillProgramTargetKind.AnyLiving))
             throw new InvalidOperationException($"Invalid skill program at {r.Path}.targetKind: unsupported gift target.");
         var effect = new SkillProgramEffect(Op, target, 0, r.Condition(),
-            sourceBind: r.RequiredIdentifier("sourceBind"), targetKind: kind);
+            sourceBind: r.RequiredIdentifier("sourceBind"), targetKind: kind,
+            awaitMovementTriggers: r.Has("awaitMovementTriggers") && r.RequiredBool("awaitMovementTriggers"))
+            { TargetSetExpression = r.ParticipantSetExpression("targetSetExpr") };
         if (effect.Condition.Kind != SkillProgramConditionKind.Always &&
             !IsCardActionCategoryBranch(effect.Condition))
             RequireAlways(effect, r.Path);

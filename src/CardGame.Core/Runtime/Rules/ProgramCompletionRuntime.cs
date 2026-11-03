@@ -109,10 +109,11 @@ internal sealed class ProgramCompletionRuntime(IProgramRuntimeFrames frames, IPr
         frames.ReplaceTop(frame with { PendingMovementContinuation = null });
         var acceptedDrain = !facts.Alive(frame.OwnerSeat) && pending.SubjectSeat == frame.OwnerSeat &&
             ProgramAcceptedCardMovements.DrainsOwnerDeath(frame);
-        if ((!facts.Alive(frame.OwnerSeat) || !facts.Alive(pending.SubjectSeat)) && !acceptedDrain ||
+        var deliveredDrain = pending.SubjectSeat == frame.OwnerSeat && ProgramInstructionDeliveries.HasDeliveredMovement(frame);
+        if ((!facts.Alive(frame.OwnerSeat) || !facts.Alive(pending.SubjectSeat)) && !acceptedDrain && !deliveredDrain ||
             !facts.CanInvokeProgramSkill(frame) &&
             !facts.CanContinueConditionalGrant(frame) && !facts.CanContinuePhaseAlcohol(frame) &&
-            !ProgramAcceptedCardMovements.RetainsSourceLoss(frame) && !acceptedDrain)
+            !ProgramAcceptedCardMovements.RetainsSourceLoss(frame) && !acceptedDrain && !deliveredDrain)
         {
             protocols.CancelBindingAndCleanup(frames.ActiveProgram(frameId),
                 "移动响应后技能持有人、装备持有人或技能实例已失效。");

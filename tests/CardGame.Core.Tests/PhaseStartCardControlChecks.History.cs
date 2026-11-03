@@ -53,13 +53,16 @@ internal static partial class PhaseStartCardControlChecks
         var second = HistoryUse(g, CardKind.IronChain, [1]);
         Answer(g, c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         Reach(g, p => Optional(p, "ol:lianpian")); Activate(g);
-        Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "lianpian"));
-        Need(E<LianpianDrawPaidEvent>(g).Single() is { ActualCount: 1 } paid && paid.NativeUseId == second.Id &&
-            P(g)!.Choices.Where(c => c.Parameters.GetValueOrDefault("branch") == "give").SelectMany(c => c.Targets).SequenceEqual([1]),
+        Reach(g, p => p.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "give-bound-card"));
+        var frameId = g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == "ol:lianpian").Id;
+        Need(E<ProgramDrawCompletedEvent>(g).Single(e => e.FrameId == frameId) is { RequestedCount: 1, ActualDrawCount: 1, RecipientSeat: 0 } &&
+            g.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == frameId).WindowContext?.CardUse?.ParentCardUseFrameId == second.Id &&
+            P(g)!.Choices.Where(c => c.Parameters.GetValueOrDefault("program-action") == "give-bound-card").SelectMany(c => c.Targets).SequenceEqual([1]),
             "The real Lianpian consumer pays one draw and offers only the actual shared principal target.");
-        g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("branch") == "keep"); Play(g);
-        Need(E<LianpianDrawPaidEvent>(g).Count() == 1 && History(g).FindFinalizedUse(second.Id) is { Completed: true },
+        g = Cold(g, registry); Answer(g, c => c.Parameters.GetValueOrDefault("program-action") == "keep-bound-cards"); Play(g);
+        Need(E<ProgramDrawCompletedEvent>(g).Count(e => e.FrameId == frameId) == 1 && History(g).FindFinalizedUse(second.Id) is { Completed: true },
             "The actual Lianpian choice cold-restores and returns to the original native use once.");
+        SuFeiGivesOriginalDrawAfterNestedHistoryAndSourceLossCold();
     }
 
     private static void GuoSiResponsesCutAcceptedPairs(bool dodge)
@@ -172,12 +175,13 @@ internal static partial class PhaseStartCardControlChecks
     {
         if (!scenario.StartsWith("history", StringComparison.Ordinal)) return;
         skills.Add(Watch);
-        if (scenario == "history-sufei") skills.Add("ol:lianpian");
+        if (scenario.StartsWith("history-sufei", StringComparison.Ordinal)) skills.Add("ol:lianpian");
         if (scenario is "history-dodge" or "history-nullification" or "history-sidao") skills.Add("ol:sidao");
         rules["skills"]!.AsArray().Add(JsonNode.Parse("""
         {"id":"fixture:phase-control-watch","revision":1,"triggers":[{"id":"history-finalized","window":"cardUseTargetsFinalized","ownerRelation":"actor","priority":100,"optional":false,
           "effects":[{"op":"chooseOption","target":"owner","resultBind":"history-finalized","options":[{"id":"continue"}]}]}]}
         """));
+        ConfigureLianpianGiftFixture(rules, scenario);
         if (scenario is "history-dodge" or "history-meihun")
         {
             rules["skills"]![1]!["activations"]!.AsArray().Add(JsonNode.Parse("""

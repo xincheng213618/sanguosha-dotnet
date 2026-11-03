@@ -33,11 +33,14 @@ internal sealed class ProgramBindingRuntime(IProgramRuntimeFrames frames, IProgr
             frame = frame with { InvocationAuthorization = authorization with { ProgramFrameId = frame.Id } };
         frame = conditionalGrants.CaptureSource(frame);
         native.AttachAfterTurnEndedChild(frame, candidate, context);
-        if (facts.Trigger(candidate).Invocation is { Source: SkillProgramInvocationSource.AfterTurnEnded } invocation)
+        if (facts.Trigger(candidate).Invocation is { Source: SkillProgramInvocationSource.AfterTurnEnded or
+                SkillProgramInvocationSource.CardAction } invocation)
         {
             var parent = frames.Find(context.ParentFrameId);
-            var accepted = ProgramInvocations.AcceptAfterTurnEnded(parent, candidate, context, frame.Id,
-                invocation.OwnerDeath == SkillProgramInvocationOwnerDeath.Retain);
+            var retainOwnerDeath = invocation.OwnerDeath == SkillProgramInvocationOwnerDeath.Retain;
+            var accepted = invocation.Source == SkillProgramInvocationSource.CardAction
+                ? ProgramInvocations.AcceptCardAction(parent, candidate, context, frame.Id, retainOwnerDeath)
+                : ProgramInvocations.AcceptAfterTurnEnded(parent, candidate, context, frame.Id, retainOwnerDeath);
             frames.Replace(parent!.Id, parent with { InvocationAuthorizations = [accepted] });
             frame = frame with { InvocationAuthorization = accepted with { ProgramFrameId = frame.Id } };
         }

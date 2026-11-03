@@ -396,3 +396,11 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 `["takeFirst", factSet, 2]` 返回最前两条共同事实，负数按零处理；takeLast 保持原行为。`["useKindIs","use",["dodge"],"effective"]` 显式读取有效牌种，省略最后参数仍读原 DeclaredKind。对未原生声明的 Response，默认声明牌种仍可为 unknown，应根据实际响应身份选择 effective，而不是造一个声明。
 
 例如按真正使用的前两张基本牌判定时，可先筛原生声明的基本牌和真实自有闪响应，再以 takeFirst 与 count／same 组合。不能把所有 Response 都排除或全部纳入，也不能把 useDeclarer 的 accepted 使用者当作原生声明时 Actor。
+
+## 可选绑定给牌与原用牌窗口调用
+
+`giveBoundCard` 可声明 `targetSetExpr`，在 `anyLiving`／`otherLiving` 的当前目标域内再筛选。提示和回答都使用原程序 world 求值；表达式未知时没有可猜测的收牌人。它只给原绑定中当前仍处于原来源区域的实体，空绑定直接结束，保留选项仍可跳过；实体离开后又回到同一区域依旧可给。需要锁定原驻留的规则应另用 `cardStillAtSource` 过滤。
+
+可选的 `awaitMovementTriggers: true` 在真实给牌后排空原帧的移动子窗，复用既有 instruction delivery，不增加私有已付事件。回执保留已交付返回，不能授权未支付后缀。
+
+真实用牌／响应触发可声明 `"invocation":{"source":"cardAction"}`。它在原窗口真正接受时绑定原父、候选索引和原程序；失源可完成本次，死亡缺省停止新步骤。它不是技能获得或持续有效性，也不授权后续候选。只需最终 Draw 的交付保留时，无须额外声明整次调用权限。

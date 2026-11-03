@@ -877,7 +877,7 @@ public enum SkillProgramEffectOp
     ResolveGuanduFuyuan = 44019,
     ResolveGuanduRepeat = 46000, RewardGuanduDamage = 46002,
     ResolveGuanduArrogance = 46003,
-    DrawDragonBoatConsecutiveTarget = 42000, ArmDragonBoatDianhu = 42001,
+    ArmDragonBoatDianhu = 42001,
     DrawDragonBoatDianhu = 42002, DrawDragonBoatTunjiang = 42003,
     ResolveWenheRoundStart = 41000, ResolveWenheTurnStart = 41001,
     ResolveWenheTurnEnd = 41002, ResolveWenheRoundEnd = 41003,
@@ -1402,7 +1402,6 @@ public enum SkillProgramEffectOp
     PayMaxHpAndObtainActualUsedTrick = 23701,
     ResolveTargetChosenRankJudgment = 23800,
     UseDistinctDeckEquipmentByLueMingHistory = 23801,
-    DrawThenOfferActualConsecutiveTargetGift = 23900,
     ArmDianhuRelation = 24000,
     DrawForDianhuActualOccurrence = 24001,
     DrawAndOfferJianjiExactCard = 24002,
@@ -5207,7 +5206,6 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
         XuRongContract.ValidateActivation(path, activation);
         LiJueComposition.Activation(path, activation);
         ZhangJiComposition.ValidateActivation(path, activation);
-        SuFeiComposition.Activation(path, activation);
         HuangQuanContract.Activation(path, activation);
         FanChouComposition.Activation(path, activation);
         GuoSiContract.Activation(path, activation);
@@ -6515,6 +6513,11 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                     node.TryGetProperty("evaluateConditionAtResolution", out var lateQualification) && lateQualification.ValueKind == JsonValueKind.True)
                     Fail(invocationPath, "publicHandReveal requires mandatory owner issuance without marker payment, Event usage or late qualification");
             }
+            else if (invocation.Source == SkillProgramInvocationSource.CardAction)
+            {
+                if (!ProgramInvocations.IsCardActionWindow(window))
+                    Fail(invocationPath, "cardAction requires an original native card-action trigger window");
+            }
             else if (window != SkillProgramTriggerWindow.AfterTurnEnded || subject != SkillProgramTriggerSubject.Owner)
                 Fail(invocationPath, "afterTurnEnded requires an owner actual-turn-ended trigger");
         }
@@ -6684,7 +6687,6 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
         XuRongContract.ValidateTrigger(path, parsedTrigger);
         LiJueComposition.Trigger(path, parsedTrigger);
         ZhangJiComposition.ValidateTrigger(path, parsedTrigger);
-        SuFeiComposition.Trigger(path, parsedTrigger);
         HuangQuanContract.Trigger(path, parsedTrigger);
         FanChouComposition.Trigger(path, parsedTrigger);
         GuoSiContract.Trigger(path, parsedTrigger);

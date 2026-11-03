@@ -18,6 +18,7 @@ internal static partial class ProgramAmountExpressionChecks
 
     public static void LoaderHashAndTypedEvaluation()
     {
+        GiveBoundCardTargetsAndAwaitAreTypedAndFingerprinted();
         var compact = Load("""{"op":"draw","target":"owner","amountExpr":["-",4,["handCount","owner"]]}""");
         var spaced = Load("""{"op":"draw","target":"owner","amountExpr":[ "-", 4, [ "handCount", "owner" ] ]}""");
         var changed = Load("""{"op":"draw","target":"owner","amountExpr":["-",5,["handCount","owner"]]}""");
@@ -646,6 +647,35 @@ internal static partial class ProgramAmountExpressionChecks
         {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{Skill}}","revision":1,"activations":[
           {"id":"test","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{{effect}}]}]}]}
         """, Presentation(Skill)).Programs[Skill];
+    private static void GiveBoundCardTargetsAndAwaitAreTypedAndFingerprinted()
+    {
+        const string producer = """{"op":"draw","target":"owner","amount":1,"resultBind":"drawn"},""";
+        var gift = Load(producer + """
+            {"op":"giveBoundCard","target":"owner","sourceBind":"drawn","targetKind":"otherLiving",
+              "targetSetExpr":["filter","livingOthers",["alive","it"]],"awaitMovementTriggers":true}
+            """);
+        var spaced = Load(producer + """
+            { "op":"giveBoundCard", "target":"owner", "sourceBind":"drawn", "targetKind":"otherLiving",
+              "targetSetExpr":[ "filter", "livingOthers", [ "alive", "it" ] ], "awaitMovementTriggers":true }
+            """);
+        var otherTargets = Load(producer + """
+            {"op":"giveBoundCard","target":"owner","sourceBind":"drawn","targetKind":"otherLiving",
+              "targetSetExpr":["filter","livingOthers",[">",["handCount","it"],0]],"awaitMovementTriggers":true}
+            """);
+        var synchronous = Load(producer + """
+            {"op":"giveBoundCard","target":"owner","sourceBind":"drawn","targetKind":"otherLiving",
+              "targetSetExpr":["filter","livingOthers",["alive","it"]],"awaitMovementTriggers":false}
+            """);
+        Need(gift.Activations.Single().Effects[1] is
+                { Op: SkillProgramEffectOp.GiveBoundCard, SourceBind: "drawn", AwaitMovementTriggers: true,
+                    TargetSetExpression.Type: ProgramExpressionType.ParticipantSet } &&
+            gift.GameplayHash == spaced.GameplayHash && gift.GameplayHash != otherTargets.GameplayHash &&
+            gift.GameplayHash != synchronous.GameplayHash,
+            "The existing Give accepts a typed recipient-set restriction and explicit child awaiting; both join its canonical gameplay hash.");
+        Reject(producer + """{"op":"giveBoundCard","target":"owner","sourceBind":"drawn","targetKind":"otherLiving","targetSetExpr":true}""");
+        Reject(producer + """{"op":"giveBoundCard","target":"owner","sourceBind":"drawn","targetKind":"otherLiving","targetSetExpr":["handCount","owner"]}""");
+        Reject(producer + """{"op":"giveBoundCard","target":"owner","sourceBind":"drawn","targetKind":"otherLiving","awaitMovementTriggers":1}""");
+    }
     private static SkillProgramEffect Effect(string effect) => Load(effect).Activations.Single().Effects.Single();
     private static void Reject(string effect)
     {

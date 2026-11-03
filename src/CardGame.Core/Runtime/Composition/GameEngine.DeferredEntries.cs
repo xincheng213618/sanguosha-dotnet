@@ -1784,7 +1784,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CoreGameEngineStrategicProgramsEntries StrategicProgramsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineStrategicProgramsEntries, EngineOwners.CoreGameEngineStrategicProgramsRuntime>(Core.RuntimeEntries.CoreGameEngineStrategicProgramsEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterSuFeiOlEntries SuFeiOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterSuFeiOlEntries, EngineOwners.CharacterSuFeiOlRuntime>(Core.RuntimeEntries.CharacterSuFeiOlEntries.Create);
 
     internal Core.RuntimeEntries.CoreGameEngineSuitDamagePreventionBenefitsEntries SuitDamagePreventionBenefitsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineSuitDamagePreventionBenefitsEntries, EngineOwners.CoreGameEngineSuitDamagePreventionBenefitsRuntime>(Core.RuntimeEntries.CoreGameEngineSuitDamagePreventionBenefitsEntries.Create);
 

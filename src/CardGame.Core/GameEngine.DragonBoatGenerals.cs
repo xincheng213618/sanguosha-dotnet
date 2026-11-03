@@ -11,11 +11,7 @@ public enum DragonBoatGeneralStage
     DrawChildren
 }
 
-public sealed record DragonBoatGeneralReceipt(int InstructionIndex, long WindowId, int ActualTurn, DragonBoatGeneralStage Stage, int? RecipientSeat = null, int RequestedCount = 0, NativeDrawOutcome? Draw = null, IReadOnlyList<int>? LianpianTargets = null)
-{
-    private readonly IReadOnlyList<int>? _lianpianTargets = LianpianTargets is null ? null : Array.AsReadOnly(LianpianTargets.ToArray());
-    public IReadOnlyList<int>? LianpianTargets { get => _lianpianTargets; init => _lianpianTargets = value is null ? null : Array.AsReadOnly(value.ToArray()); }
-}
+public sealed record DragonBoatGeneralReceipt(int InstructionIndex, long WindowId, int ActualTurn, DragonBoatGeneralStage Stage, int? RecipientSeat = null, int RequestedCount = 0, NativeDrawOutcome? Draw = null);
 public sealed partial record ProgramSkillFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

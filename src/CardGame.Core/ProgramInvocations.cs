@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
-public enum SkillProgramInvocationSource { InitialHandGain, PublicHandReveal, AfterTurnEnded }
+public enum SkillProgramInvocationSource { InitialHandGain, PublicHandReveal, AfterTurnEnded, CardAction }
 public enum SkillProgramInvocationOwnerDeath { Stop, Retain }
 public sealed record SkillProgramTriggerInvocation(SkillProgramInvocationSource Source,
     SkillProgramInvocationOwnerDeath OwnerDeath = SkillProgramInvocationOwnerDeath.Stop);
@@ -16,7 +16,11 @@ public sealed partial class SkillProgramTrigger
 /// <summary>Permission for one admitted binding in its original native window; never skill ownership.</summary>
 public sealed record ProgramInvocationAuthorization(long WindowId, long NativeFrameId,
     SkillProgramTriggerWindow Window, ProgramTriggerCandidate Candidate, long ProgramFrameId = 0,
-    bool RetainOwnerDeath = false, bool UsageReserved = false);
+    bool RetainOwnerDeath = false, bool UsageReserved = false)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? CandidateIndex { get; init; }
+}
 
 public abstract partial record ResolutionFrame
 {
@@ -37,6 +41,50 @@ public sealed partial record ProgramSkillFrame
 
 internal static class ProgramInvocations
 {
+    internal static bool IsCardActionWindow(SkillProgramTriggerWindow window) => window is
+        SkillProgramTriggerWindow.CardUseCommitted or SkillProgramTriggerWindow.CardUseBeforeTargetEffects or
+        SkillProgramTriggerWindow.CardUseTargetsFinalized or SkillProgramTriggerWindow.CardResponseAccepted or
+        SkillProgramTriggerWindow.CardResponseCompleted or SkillProgramTriggerWindow.CardSupplyCompleted or
+        SkillProgramTriggerWindow.CardUseCompleted or SkillProgramTriggerWindow.SlashTargetRedirecting or
+        SkillProgramTriggerWindow.SlashBeforeResponse or SkillProgramTriggerWindow.SlashFullyDodged;
+
+    internal static ProgramInvocationAuthorization AcceptCardAction(ResolutionFrame? parent,
+        ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, long programFrameId, bool retainOwnerDeath)
+    {
+        if (parent is not ProgramCardTriggerWindowFrame card || !card.Activated || programFrameId <= 0 ||
+            !MatchesCardAction(card, candidate, context))
+            throw new InvalidOperationException("An accepted card-action invocation requires its original candidate and window.");
+        if (card.Candidates[card.CandidateIndex].FrozenContext is null && context.CardUse is { } source &&
+            (context.SourceSeat != card.Action.ActorSeat || source.ActorSeat != card.Action.ActorSeat ||
+             source.EffectiveKind != card.Action.EffectiveKind))
+            throw new InvalidOperationException("An accepted card-action invocation requires its original source context.");
+        return new(card.Id, card.ParentFrameId, context.Window, candidate,
+            ProgramFrameId: programFrameId, RetainOwnerDeath: retainOwnerDeath) { CandidateIndex = card.CandidateIndex };
+    }
+
+    private static bool MatchesCardAction(ProgramCardTriggerWindowFrame parent,
+        ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
+    {
+        if (!IsCardActionWindow(context.Window) || parent.Id != context.ParentFrameId ||
+            context.CardUse is not { } use || use.CardActionId != parent.Action.ActionId ||
+            use.ParentCardUseFrameId != parent.ParentFrameId || candidate.OwnerSeat != context.OwnerSeat ||
+            candidate.OccurrenceIndex != context.OccurrenceIndex || parent.CandidateIndex < 0 ||
+            parent.CandidateIndex >= parent.Candidates.Count)
+            return false;
+        var current = parent.Candidates[parent.CandidateIndex];
+        if (RuntimeSkills.RuntimeRules_Core_CardActions.ToSharedCandidate(current) != candidate ||
+            context.TargetSeat != (current.OpponentSeat >= 0 ? (int?)current.OpponentSeat : null))
+            return false;
+        if (current.FrozenContext is not { } frozen)
+            return RuntimeSkills.RuntimeRules_Core_CardActions.GetCardActionWindow(parent) == context.Window;
+        // Native role/target updates may change the parent's current Action.
+        // An accepted invocation retains its candidate's original source facts.
+        return frozen.Window == context.Window && frozen.SourceSeat == context.SourceSeat &&
+            frozen.TargetSeat == context.TargetSeat && frozen.CardUse is { } original &&
+            original.CardActionId == use.CardActionId && original.ParentCardUseFrameId == use.ParentCardUseFrameId &&
+            original.ActorSeat == use.ActorSeat && original.EffectiveKind == use.EffectiveKind;
+    }
+
     internal static ProgramInvocationAuthorization AcceptAfterTurnEnded(ResolutionFrame? parent,
         ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, long programFrameId,
         bool retainOwnerDeath)
@@ -60,8 +108,15 @@ internal static class ProgramInvocations
         context.SourceSeat == parent.OwnerSeat && context.TargetSeat == parent.OwnerSeat;
 
     internal static ProgramInvocationAuthorization? Find(ResolutionFrame? parent,
-        ProgramTriggerCandidate candidate, ProgramSkillWindowContext context)
+        ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, long? programFrameId = null)
     {
+        if (parent is ProgramCardTriggerWindowFrame card)
+            return programFrameId is > 0 && card.Activated && MatchesCardAction(card, candidate, context)
+                ? card.InvocationAuthorizations?.SingleOrDefault(authorization => authorization.ProgramFrameId == programFrameId &&
+                    authorization.WindowId == card.Id && authorization.NativeFrameId == card.ParentFrameId &&
+                    authorization.Window == context.Window && authorization.Candidate == candidate &&
+                    authorization.CandidateIndex == card.CandidateIndex)
+                : null;
         if (parent is DeferredTurnEndFrame ending)
             return MatchesAfterTurnEnded(ending, candidate, context)
                 ? ending.InvocationAuthorizations?.SingleOrDefault(authorization => authorization.ProgramFrameId == 0 &&
@@ -111,5 +166,6 @@ internal static class ProgramInvocations
         frame.SkillInstanceId == authorization.Candidate.SkillInstanceId &&
         frame.GameplayHash == authorization.Candidate.GameplayHash && frame.WindowContext is { } context &&
         (parent is not DeferredTurnEndFrame ending || ending.AfterTurnEnded?.CurrentChild?.FrameId == frame.Id) &&
-        Find(parent, authorization.Candidate, context) == (authorization with { ProgramFrameId = 0 });
+        Find(parent, authorization.Candidate, context, frame.Id) ==
+            (parent is ProgramCardTriggerWindowFrame ? authorization : authorization with { ProgramFrameId = 0 });
 }

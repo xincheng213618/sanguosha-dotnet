@@ -11,6 +11,7 @@ internal static class ProgramStepReceiptChecks
 
     public static void DeliveredStepsRetainPaidReturnsWithoutRepeatingMovement()
     {
+        AcceptedCardActionStaysWithItsOriginalCandidate();
         foreach (var scenario in new[] { "anxu", "anxu-before-payment-loss", "anxu-source-loss", "anxu-owner-death", "anxu-moved-away", "zhijian", "zhijian-source-loss", "zhijian-owner-death" })
         {
             var skill = scenario.StartsWith("anxu", StringComparison.Ordinal) ? Anxu : Zhijian;
@@ -101,6 +102,42 @@ internal static class ProgramStepReceiptChecks
                     !E<ProgramOptionChosenEvent>(game).Any(e => e.FrameId == root.Id),
                     "Moving the gift away preserves paid completion after source loss, while the later unequal hands correctly skip the benefit choice.");
         }
+    }
+
+    private static void AcceptedCardActionStaysWithItsOriginalCandidate()
+    {
+        const string skill = "fixture:accepted-card-action", binding = "original-window", instance = "original-instance", hash = "original-hash";
+        static CardActionContext Use(long id, int actor) =>
+            new(id, null, CardActionType.Use, actor, 0, null, null, null, CardKind.Slash, [1], [], []);
+        var candidate = new ProgramTriggerCandidate(0, skill, binding, instance, hash, 0);
+        var context = new ProgramSkillWindowContext(SkillProgramTriggerWindow.CardUseTargetsFinalized, 500, 0,
+            SourceSeat: 0, TargetSeat: 1, CardUse: new(700, 100, 0, 1, CardKind.Slash, Suit.None, false, false, null));
+        var native = new ProgramCardTriggerCandidate(0, 1, skill, binding, hash, instance, FrozenContext: context);
+        var parent = new ProgramCardTriggerWindowFrame(500, 100, Use(700, 0), ProgramCardContinuation.Slash,
+            [native, native], Activated: true);
+        var accepted = ProgramInvocations.AcceptCardAction(parent, candidate, context, 900, retainOwnerDeath: false);
+        parent = parent with { InvocationAuthorizations = [accepted] };
+        var frame = new ProgramSkillFrame(900, 0, skill, binding, hash, 0, [], [])
+        {
+            SkillInstanceId = instance, TriggerId = binding, WindowContext = context,
+            InvocationAuthorization = accepted with { ProgramFrameId = 900 }
+        };
+        Need(ProgramInvocations.Allows(frame, parent) && !accepted.RetainOwnerDeath &&
+            !ProgramInvocations.Allows(frame, parent with { CandidateIndex = 1 }),
+            "An accepted card action belongs to its original cursor; even an otherwise identical next candidate cannot inherit it or gain owner-death permission.");
+        Need(!ProgramInvocations.Allows(frame, parent with { Action = Use(701, 0) }) &&
+            !ProgramInvocations.Allows(frame, parent with { ParentFrameId = 101 }) &&
+            ProgramInvocations.Allows(frame, parent with { Action = Use(700, 2) }),
+            "Replacing the action or native parent invalidates an invocation, while a later role change cannot revoke the same action's frozen accepted source.");
+        Need(!ProgramInvocations.Allows(frame with
+            { Id = 901, InvocationAuthorization = accepted with { ProgramFrameId = 901 } }, parent),
+            "Copying a receipt onto a new program frame cannot change the accepted child identity held by the parent.");
+        var unfrozen = parent with { Candidates = [native with { FrozenContext = null }], InvocationAuthorizations = null };
+        var unfrozenReceipt = ProgramInvocations.AcceptCardAction(unfrozen, candidate, context, frame.Id, retainOwnerDeath: false);
+        unfrozen = unfrozen with { InvocationAuthorizations = [unfrozenReceipt] };
+        Need(ProgramInvocations.Allows(frame with { InvocationAuthorization = unfrozenReceipt }, unfrozen) &&
+            ProgramInvocations.Allows(frame with { InvocationAuthorization = unfrozenReceipt }, unfrozen with { Action = Use(700, 2) }),
+            "A window without FrozenContext validates its source at acceptance and retains that same invocation after a later actor change.");
     }
 
     private static IEnumerable<T> E<T>(GameEngine game) => game.Events.Select(e => e.Payload).OfType<T>();

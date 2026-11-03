@@ -12,21 +12,6 @@ internal abstract class DragonBoatGeneralDescriptor : ProgramOperationDescriptor
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards,
         static (_, context) => context.PublicControlValue(2));
 }
-internal sealed class DrawDragonBoatConsecutiveTargetDescriptor : DragonBoatGeneralDescriptor
-{
-    public override SkillProgramEffectOp Op => SkillProgramEffectOp.DrawDragonBoatConsecutiveTarget;
-    public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
-    {
-        reader.AllowOnly("op", "target", "condition", "targetSetExpr");
-        var effect = new SkillProgramEffect(Op, FilterBoundCardsProgramOperationDescriptor.Owner(reader), 0, reader.Condition())
-            { TargetSetExpression = reader.ParticipantSetExpression("targetSetExpr") ?? throw new InvalidOperationException(reader.Path + ".targetSetExpr is required.") };
-        RequireAlways(effect, reader.Path);
-        return effect;
-    }
-    public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
-    public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
-        [new RequireTriggerWindow(SkillProgramTriggerWindow.CardUseTargetsFinalized)];
-}
 internal sealed class ArmDragonBoatDianhuDescriptor : DragonBoatGeneralDescriptor
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ArmDragonBoatDianhu;
