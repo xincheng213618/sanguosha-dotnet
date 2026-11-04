@@ -126,7 +126,7 @@ internal sealed partial class CharacterHuangQuanMouRuntime
         {
             _coreNativeCardContinuationCursorsOperations.ActiveGroupCard = null;
             _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword = null;
-            var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, u.CardId, requireProcessing: true);
+            var card = _nativeCardRepresentations.Get(id, u.CardId, requireProcessing: true);
             _coreNativeNullificationOperations.BeginNullificationWindow(id, card, u.SourceSeat, u.TargetSeats, trick.ActionKind, null, trick.RequiredCardKind, u.CardKind);
             return true;
         }

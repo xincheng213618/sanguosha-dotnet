@@ -10,7 +10,6 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesEntries
     internal bool IsProgramVirtualOrdinaryTrickUse(long frameId) => _resolve().IsProgramVirtualOrdinaryTrickUse(frameId);
     internal void IssueProgramVirtualOrdinaryTrick(ProgramSkillFrame frame, SkillProgramEffect effect, GameEngine.ProgramOrdinaryTrickUseOption option) => _resolve().IssueProgramVirtualOrdinaryTrick(frame, effect, option);
     internal bool MatchesVirtualOrdinaryTrickUseAction(long frameId, CardActionContext action, int cardId) => _resolve().MatchesVirtualOrdinaryTrickUseAction(frameId, action, cardId);
-    internal Card ReadVirtualOrdinaryTrickUseAppearance(long ownerId, CardAppearanceReference appearance) => _resolve().ReadVirtualOrdinaryTrickUseAppearance(ownerId, appearance);
     internal void ResolveProgramVirtualOrdinaryTrickChoice(PromptChoice selected) => _resolve().ResolveProgramVirtualOrdinaryTrickChoice(selected);
     internal bool ResumeProgramVirtualOrdinaryAttack() => _resolve().ResumeProgramVirtualOrdinaryAttack();
     internal void ReturnProgramVirtualOrdinaryTrick(CardUseFrame use) => _resolve().ReturnProgramVirtualOrdinaryTrick(use);

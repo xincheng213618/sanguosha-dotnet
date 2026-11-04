@@ -8,7 +8,6 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeUsesEntries
     internal void IssueRoundOnceCardlessNativeUse(long id, CardConversionSource source) => _resolve().IssueRoundOnceCardlessNativeUse(id, source);
     internal IReadOnlyList<PromptChoice> RoundOnceCardlessForcedSlashChoices(CharacterState actor, CharacterState target, long originalId, bool qinglong) => _resolve().RoundOnceCardlessForcedSlashChoices(actor, target, originalId, qinglong);
     internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule)> RoundOnceCardlessForcedSlashRules(CharacterState actor, CharacterState target, bool qinglong) => _resolve().RoundOnceCardlessForcedSlashRules(actor, target, qinglong);
-    internal Card RoundOnceCardlessNativeRepresentation(long id) => _resolve().RoundOnceCardlessNativeRepresentation(id);
     internal IReadOnlyList<LegalAction> RoundOnceCardlessPlayActions(CharacterState actor) => _resolve().RoundOnceCardlessPlayActions(actor);
     internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule)> RoundOnceCardlessRules(CharacterState actor, CardKind? output = default, bool forResponse = false) => _resolve().RoundOnceCardlessRules(actor, output, forResponse);
     internal bool TryExecuteRoundOnceCardlessPlay(CharacterState actor, LegalAction action) => _resolve().TryExecuteRoundOnceCardlessPlay(actor, action);

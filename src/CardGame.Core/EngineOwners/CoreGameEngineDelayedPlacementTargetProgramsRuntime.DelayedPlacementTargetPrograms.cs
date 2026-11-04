@@ -45,7 +45,7 @@ internal sealed partial class CoreGameEngineDelayedPlacementTargetProgramsRuntim
         // discarding those already isolated physical entities.
         if (_coreSoleTargetQuarantineOperations.TryCompleteSoleTargetQuarantinedUse(use.Id))
             return;
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, continuation.EffectCardId, requireProcessing: true);
+        var card = _nativeCardRepresentations.Get(use.Id, continuation.EffectCardId, requireProcessing: true);
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         var forbidden = _coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget);
         if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreProgramCardUseNullificationOperations.Value.IsProgramUseIneffective(use) || _coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(use) || use.IneffectiveTargetSeats?.Contains(targetSeat) == true || !target.IsAlive || target.JudgmentAreaAbolished || forbidden || _coreActualTurnsOperations.HasJudgmentEffectiveCard(target, use.CardKind) || use.CardKind != CardKind.Lightning && targetSeat == use.SourceSeat && !_characterLiuYanOlOperations.IsLiuYanLimuUse(use.Id))

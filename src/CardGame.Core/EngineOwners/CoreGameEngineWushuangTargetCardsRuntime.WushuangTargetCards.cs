@@ -37,7 +37,7 @@ internal sealed partial class CoreGameEngineWushuangTargetCardsRuntime
         if (use.WushuangTargetCards is not { ExtraSelection: true } receipt || use.Action?.ActionId != receipt.ActionId)
             throw new InvalidOperationException("Additional Dismantlement cannot decline another use's effect.");
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { WushuangTargetCards = null });
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, true);
+        var card = _nativeCardRepresentations.Get(use.Id, use.CardId, true);
         _coreSequentialTrickTargetsOperations.MoveFinishedTrickCard(use.Id, card);
         _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, card, CardKind.Dismantlement);
     }

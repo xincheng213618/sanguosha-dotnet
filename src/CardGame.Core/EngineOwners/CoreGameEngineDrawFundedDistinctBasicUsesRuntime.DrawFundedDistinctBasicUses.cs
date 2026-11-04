@@ -188,14 +188,13 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesRuntime
     }
 
     internal bool IsDrawFundedDistinctBasicUse(long frameId) => _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)is { } use && IsIssuedDrawFundedDistinctBasicUse(use);
-    internal Card DrawFundedDistinctBasicRepresentation(long frameId) => _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)is { } use && IsIssuedDrawFundedDistinctBasicUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("A logical basic card lost its unique paid issuance.");
     internal bool ContinueDrawFundedDistinctBasicSimpleUse(long frameId, ProgramSimpleCardContinuation continuation)
     {
         if (continuation.CardId != 0 || !IsDrawFundedDistinctBasicUse(frameId))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)!;
         var actor = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat];
-        var card = DrawFundedDistinctBasicRepresentation(frameId);
+        var card = _nativeCardRepresentations.Get(frameId, 0);
         _coreNativeCardUseFramesOperations.SetCardUseStep(frameId, ResolutionFrameStep.ResolvingEffect);
         if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
         {

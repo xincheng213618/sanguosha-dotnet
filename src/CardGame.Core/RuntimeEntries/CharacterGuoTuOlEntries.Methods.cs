@@ -95,7 +95,6 @@ internal sealed partial class CharacterGuoTuOlEntries
     internal ProgramSkillFrame? WeijieObserverRoot() => _resolve().WeijieObserverRoot();
     internal IEnumerable<(CardKind Kind, int Target)> WeijieOutputs(WeijieNeed n) => _resolve().WeijieOutputs(n);
     internal bool WeijieParent(ProgramSkillFrame f) => _resolve().WeijieParent(f);
-    internal Card WeijieRepresentation(long id) => _resolve().WeijieRepresentation(id);
     internal ProgramCardContinuation WeijieResponseContinuation(WeijiePaidOrigin p) => _resolve().WeijieResponseContinuation(p);
     internal IEnumerable<(CardConversionSource Source, string Hash)> WeijieSources(CharacterState actor) => _resolve().WeijieSources(actor);
     internal bool WeijieSpent(int seat) => _resolve().WeijieSpent(seat);

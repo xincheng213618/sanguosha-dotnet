@@ -40,7 +40,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     }
 
     internal bool IsHuanpeiUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedHuanpeiUse(use);
-    internal Card HuanpeiRepresentation(long id) => IsHuanpeiUse(id) ? new(0, _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind, Suit.None, 0) : throw new InvalidOperationException("Huanpei's neutral native representation lost its paid Use.");
     internal bool SkipHuanpeiFinishedMovement(long id, Card c) => c.Id == 0 && IsHuanpeiUse(id) && c.Kind == _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind;
 
     internal bool ContinueHuanpeiSimpleUse(long id, ProgramSimpleCardContinuation c)
@@ -49,7 +48,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var owner = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat];
-        var card = HuanpeiRepresentation(id);
+        var card = _nativeCardRepresentations.Get(id, 0);
         _coreNativeCardUseFramesOperations.SetCardUseStep(id, ResolutionFrameStep.ResolvingEffect);
         if (!owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
         {

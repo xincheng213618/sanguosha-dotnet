@@ -74,7 +74,6 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
     }
 
     internal bool IsWuLuKangKegouUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedWuLuKangKegouUse(use);
-    internal Card WuLuKangKegouRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedWuLuKangKegouUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Kegou requires its issued native zero-entity representation.");
     [NativeUseValidation(29700)]
     internal void ValidateWuLuKangKegouNative(CardUseFrame use)
     {

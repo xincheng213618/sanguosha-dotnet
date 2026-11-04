@@ -150,8 +150,6 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsRuntime
     }
 
     internal bool IsChainedStateBasicUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedChainedStateBasicUse(use);
-    internal Card ChainedStateBasicRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedChainedStateBasicUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("A chained-state logical card lost its unique paid receipt.");
-    internal Card ReadChainedStateBasicUseAppearance(long id, CardAppearanceReference appearance) => appearance.Id == 0 && IsChainedStateBasicUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind == appearance.Kind && appearance.Suit == Suit.None && appearance.Rank == 0 ? ChainedStateBasicRepresentation(id) : _coreDrawFundedDistinctBasicReturnsOperations.ReadDrawFundedDistinctBasicUseAppearance(id, appearance);
     internal bool SkipChainedStateBasicFinishedMovement(long id, Card card)
     {
         if (card.Id != 0 || !IsChainedStateBasicUse(id))

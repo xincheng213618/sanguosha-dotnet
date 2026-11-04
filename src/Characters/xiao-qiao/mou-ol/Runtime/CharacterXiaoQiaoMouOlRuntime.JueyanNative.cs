@@ -48,17 +48,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     }
 
     internal bool IsMouXqJueyanUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && MouXiaoQiaoOl.IsIssuedUse(use);
-    internal Card MouXqJueyanRepresentation(long id) => IsMouXqJueyanUse(id) ? new(0, _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind, Suit.None, 0) : throw new InvalidOperationException("Jueyan's zero-material native use lost its actual origin.");
     internal bool SkipMouXqJueyanFinishedMovement(long id, Card c) => c.Id == 0 && IsMouXqJueyanUse(id) && c.Kind == _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind;
-    internal Card ReadMouXqJueyanAppearance(long id, CardAppearanceReference a)
-    {
-        if (!IsMouXqJueyanUse(id))
-            return _characterDiaoChanLeOperations.ReadDiouUseAppearance(id, a);
-        var c = MouXqJueyanRepresentation(id);
-        if (a.Id != 0 || a.Kind != c.Kind || a.Suit != Suit.None || a.Rank != 0)
-            throw new InvalidOperationException("Jueyan cannot inherit appearance from its retained original entity.");
-        return c;
-    }
 
     internal void IssueMouXqNativeUse(ProgramSkillFrame f, MouXiaoQiaoOlUsePlan p)
     {
@@ -122,7 +112,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var actor = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat];
-        var card = MouXqJueyanRepresentation(id);
+        var card = _nativeCardRepresentations.Get(id, 0);
         _coreNativeCardUseFramesOperations.SetCardUseStep(id, ResolutionFrameStep.ResolvingEffect);
         if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
         {

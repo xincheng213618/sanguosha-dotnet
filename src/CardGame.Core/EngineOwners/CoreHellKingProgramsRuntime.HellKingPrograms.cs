@@ -215,7 +215,7 @@ internal sealed partial class CoreHellKingProgramsRuntime
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { VirtualBasicDraft = new(frame.InstructionIndex, id) });
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, null, CardActionType.Use, actor.Seat, frame.OwnerSeat, null, null, null, CardKind.Alcohol, [actor.Seat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, CardKind.Alcohol, [actor.Seat], PhysicalCardIds: []) { Action = action, VirtualBasicReturn = new(frame.Id, frame.InstructionIndex), FirstOwnPlayUseDistanceUnlimited = _coreIssuedPlayUsePoliciesOperations.HasFirstActualPlayUseDistance(actor) });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, CardKind.Alcohol, [actor.Seat], PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.Alcohol, Suit.None, 0), Action = action, VirtualBasicReturn = new(frame.Id, frame.InstructionIndex), FirstOwnPlayUseDistanceUnlimited = _coreIssuedPlayUsePoliciesOperations.HasFirstActualPlayUseDistance(actor) });
         _characterHuangGaiMouMobileOperations.RecordMouZhaJiangAwareAlcoholDebit(id, actor);
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));

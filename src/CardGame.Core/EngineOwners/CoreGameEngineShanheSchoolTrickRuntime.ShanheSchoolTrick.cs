@@ -77,7 +77,7 @@ internal sealed partial class CoreGameEngineShanheSchoolTrickRuntime
 
         _coreNativeCardContinuationCursorsOperations.ActiveGroupCard = null;
         _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword = null;
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, requireProcessing: true);
+        var card = _nativeCardRepresentations.Get(id, use.CardId, requireProcessing: true);
         var trick = native.Trick ?? throw new InvalidOperationException("A school repeat lost its native trick continuation.");
         _coreNativeNullificationOperations.BeginNullificationWindow(id, card, use.SourceSeat, use.TargetSeats, trick.ActionKind, null, trick.RequiredCardKind, use.CardKind);
         return true;

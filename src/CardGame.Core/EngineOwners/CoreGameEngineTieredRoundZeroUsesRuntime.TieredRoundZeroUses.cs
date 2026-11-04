@@ -318,20 +318,13 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
         return _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id && e.SourceSeat == receipt.ActorSeat && e.CardId == use.CardId && e.CardKind == receipt.EffectiveKind) == 1 && _coreActualTurnDamageClaimsOperations.MatchesDeclaredActualDamageUse(use, action.ActorSeat, receipt.ActorSeat);
     }
 
-    internal Card TieredRoundZeroRepresentation(long id)
-    {
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id);
-        if (use is null || !IsIssuedTieredRoundUse(use, true))
-            throw new InvalidOperationException("A logical card has no exact zero-material issuance.");
-        return new(0, use.CardKind, Suit.None, 0);
-    }
 
     internal bool ContinueTieredRoundZeroSimpleUse(long id, ProgramSimpleCardContinuation continuation)
     {
         if (continuation.CardId != 0 || !IsTieredRoundZeroUse(id))
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
-        var card = TieredRoundZeroRepresentation(id);
+        var card = _nativeCardRepresentations.Get(id, 0);
         var actor = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat];
         _coreNativeCardUseFramesOperations.SetCardUseStep(id, ResolutionFrameStep.ResolvingEffect);
         if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)

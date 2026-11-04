@@ -24,7 +24,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal bool DiouNativeWindowEdge(int index) => _resolve().DiouNativeWindowEdge(index);
     internal ProgramSkillFrame? DiouObserverRoot() => _resolve().DiouObserverRoot();
     internal bool DiouObserverSuffix(int index) => _resolve().DiouObserverSuffix(index);
-    internal Card DiouRepresentation(long id) => _resolve().DiouRepresentation(id);
     internal ResolutionFrame? DiouRescueAttackOwner(ProgramSkillFrame f, scoped out DyingFrame? dying) => _resolve().DiouRescueAttackOwner(f, out dying);
     internal bool DiouRootMatches(ProgramSkillFrame f) => _resolve().DiouRootMatches(f);
     internal IReadOnlyList<Card> DiouShowableCards(int owner, CardConversionSource source) => _resolve().DiouShowableCards(owner, source);
@@ -63,7 +62,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal void ProjectDiouCarrierCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectDiouCarrierCardSkillMark(cardId, ref projection);
     internal void ProjectTanbanCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectTanbanCardSkillMark(cardId, ref projection);
     internal void PublishDiou(ProgramSkillFrame f) => _resolve().PublishDiou(f);
-    internal Card ReadDiouUseAppearance(long id, CardAppearanceReference appearance) => _resolve().ReadDiouUseAppearance(id, appearance);
     internal void RecordDiouCarrierDestruction(CardMovementRecord movement) => _resolve().RecordDiouCarrierDestruction(movement);
     internal void RestoreDiouParentAttack(ProgramSkillFrame f) => _resolve().RestoreDiouParentAttack(f);
     internal void RestoreDiouRescueAttack(ProgramSkillFrame f) => _resolve().RestoreDiouRescueAttack(f);

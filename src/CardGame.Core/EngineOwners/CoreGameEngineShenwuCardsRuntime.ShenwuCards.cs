@@ -115,7 +115,7 @@ internal sealed partial class CoreGameEngineShenwuCardsRuntime
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.CardUseFrameId)!;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { ShenwuTransplant = null });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenwuTransplantResolvedEvent(use.Id, use.SourceSeat, receipt.ActorSeat, usedSlash, completed));
-        _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, requireProcessing: true), CardKind.TransplantWood);
+        _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, _nativeCardRepresentations.Get(use.Id, use.CardId, requireProcessing: true), CardKind.TransplantWood);
         return true;
     }
 

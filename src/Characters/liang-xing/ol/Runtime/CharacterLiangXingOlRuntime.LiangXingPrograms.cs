@@ -30,7 +30,7 @@ internal sealed partial class CharacterLiangXingOlRuntime
             return SkillProgramStepOutcome.Continue;
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(resolutionId, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, selected, selected, null, selected, null, CardKind.Slash, [frame.OwnerSeat], [], Array.AsReadOnly(new[] { new CardConversionSource(active.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), selected, active.SkillInstanceId) }), effectiveSuit: Suit.None, effectiveRank: 0));
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, selected, 0, CardKind.Slash, Array.AsReadOnly(new[] { frame.OwnerSeat }), PhysicalCardIds: Array.AsReadOnly(Array.Empty<int>())) { Action = action });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, selected, 0, CardKind.Slash, Array.AsReadOnly(new[] { frame.OwnerSeat }), PhysicalCardIds: Array.AsReadOnly(Array.Empty<int>())) { NativeRepresentation = new(0, CardKind.Slash, Suit.None, 0), Action = action });
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(resolutionId, 0, CardKind.Slash, selected));

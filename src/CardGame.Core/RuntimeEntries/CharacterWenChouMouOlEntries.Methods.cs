@@ -47,7 +47,6 @@ internal sealed partial class CharacterWenChouMouOlEntries
     internal CardActionContext PrepareMouWenChouAction(CardActionContext action) => _resolve().PrepareMouWenChouAction(action);
     internal void PublishMouWenChouOl(ProgramSkillFrame f) => _resolve().PublishMouWenChouOl(f);
     internal bool QualifyMouWenChouUse(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => _resolve().QualifyMouWenChouUse(c, w);
-    internal Card ReadMouWenChouUseAppearance(long id, CardAppearanceReference appearance) => _resolve().ReadMouWenChouUseAppearance(id, appearance);
     internal void RecordMouWenChouTargets(CardActionContext action) => _resolve().RecordMouWenChouTargets(action);
     internal bool ResumeMouWenChouOl(long id) => _resolve().ResumeMouWenChouOl(id);
     internal void ReturnMouWenChouDraw(ProgramSkillFrame f, NativeDrawOutcome draw) => _resolve().ReturnMouWenChouDraw(f, draw);

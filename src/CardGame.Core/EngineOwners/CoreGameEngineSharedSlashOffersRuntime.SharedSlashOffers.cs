@@ -185,7 +185,7 @@ internal sealed partial class CoreGameEngineSharedSlashOffersRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actor.Seat, actor.Seat, null, null, null, CardKind.Slash, [targetSeat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
         var returned = new SharedSlashBenefitReturn(f.Id, f.InstructionIndex, r.Source, actor.Seat, targetSeat, id, action.ActionId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { SharedSlashOffer = r with { Stage = SharedSlashOfferStage.SlashIssued, SlashReturn = returned } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: []) { Action = action, SharedSlashBenefit = returned });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.Slash, Suit.None, 0), Action = action, SharedSlashBenefit = returned });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SharedSlashUseIssuedEvent(returned));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));

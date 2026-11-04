@@ -18,7 +18,7 @@ internal sealed partial class CharacterLuShiOlRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, f.OwnerSeat, f.OwnerSeat, null, null, null, CardKind.ThunderSlash, [targetSeat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
         var origin = new OlLuShiSlashOrigin(f.Id, r.Source, r.Hash, r.SlashCount + 1, id, action.ActionId, targetSeat);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { OlLuShi = f.OlLuShi!with { Stage = OlLuShiStage.NativeUse, UseId = id, ActionId = action.ActionId } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, f.OwnerSeat, 0, CardKind.ThunderSlash, [targetSeat], PhysicalCardIds: []) { Action = action, UnlimitedUse = true, OlLuShiLeijie = origin });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, f.OwnerSeat, 0, CardKind.ThunderSlash, [targetSeat], PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.ThunderSlash, Suit.None, 0), Action = action, UnlimitedUse = true, OlLuShiLeijie = origin });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new OlLuShiSlashIssuedEvent(origin));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));

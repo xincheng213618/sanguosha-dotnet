@@ -172,18 +172,6 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
     }
 
     internal bool IsProgramVirtualOrdinaryTrickUse(long frameId) => _characterDengAiAnniversaryGodOperations.IsShenDaCuixinTrick(frameId) || _characterChengYuMouOlOperations.IsMouDanchiDrawTwo(frameId) || _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)is { } use && ValidProgramVirtualOrdinaryTrickUse(use);
-    internal Card ReadVirtualOrdinaryTrickUseAppearance(long ownerId, CardAppearanceReference appearance)
-    {
-        if (_characterDengAiAnniversaryGodOperations.IsShenDaCuixinUse(ownerId))
-            return _characterDengAiAnniversaryGodOperations.ReadShenDaCuixinAppearance(ownerId, appearance);
-        if (_characterChengYuMouOlOperations.IsMouDanchiDrawTwo(ownerId))
-            return _characterChengYuMouOlOperations.ReadMouDanchiAppearance(ownerId, appearance);
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(ownerId)is not { VirtualOrdinaryTrickOrigin: not null } use)
-            return _characterDongChengMouOperations.ReadMouDcUseAppearance(ownerId, appearance);
-        if (!ValidProgramVirtualOrdinaryTrickUse(use) || appearance.Id != 0 || appearance.Kind != use.CardKind || appearance.Suit != Suit.None || appearance.Rank != 0)
-            throw new InvalidOperationException("A virtual ordinary trick appearance lost its exact issued use.");
-        return new Card(0, use.CardKind, Suit.None, 0);
-    }
     [ProgramDamageHook(ProgramDamagePhase.IssuedAttackCompletion, 160)]
     internal bool FinishProgramVirtualOrdinaryAttack(NativeOwners.CardAttackHandle attack, out bool paused)
     {

@@ -30,7 +30,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodEntries
     internal CardActionContext PrepareShenDaCuixinAction(CardActionContext a) => _resolve().PrepareShenDaCuixinAction(a);
     internal CardSnapshot ProjectShenDengAiHandCard(CharacterState owner, Card card, CardSnapshot snapshot) => _resolve().ProjectShenDengAiHandCard(owner, card, snapshot);
     internal void PublishShenDa(ProgramSkillFrame f) => _resolve().PublishShenDa(f);
-    internal Card ReadShenDaCuixinAppearance(long id, CardAppearanceReference a) => _resolve().ReadShenDaCuixinAppearance(id, a);
     internal void RecordShenDaCarrierDestruction(CardMovementRecord m) => _resolve().RecordShenDaCarrierDestruction(m);
     internal void RestoreShenDaCuixinCursor(ProgramSkillFrame f) => _resolve().RestoreShenDaCuixinCursor(f);
     internal bool ResumeShenDa(long id) => _resolve().ResumeShenDa(id);

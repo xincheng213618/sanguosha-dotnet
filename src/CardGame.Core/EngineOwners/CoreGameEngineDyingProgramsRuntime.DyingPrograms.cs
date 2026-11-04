@@ -84,7 +84,7 @@ internal sealed partial class CoreGameEngineDyingProgramsRuntime
 
         var victim = _coreMatchParticipantsPlayersAccess._players[dying.VictimSeat];
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, victim.Seat, 0, CardKind.Alcohol, Array.AsReadOnly(new[] { victim.Seat }), PhysicalCardIds: Array.AsReadOnly(Array.Empty<int>())));
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, victim.Seat, 0, CardKind.Alcohol, Array.AsReadOnly(new[] { victim.Seat }), PhysicalCardIds: Array.AsReadOnly(Array.Empty<int>())) { NativeRepresentation = new(0, CardKind.Alcohol, Suit.None, 0) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(resolutionId, 0, CardKind.Alcohol, victim.Seat));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TargetsConfirmedEvent(resolutionId, Array.AsReadOnly(new[] { victim.Seat })));
         _coreNativeCardUseFramesOperations.SetCardUseStep(resolutionId, ResolutionFrameStep.ResolvingEffect);

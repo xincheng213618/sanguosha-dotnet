@@ -89,7 +89,6 @@ internal sealed partial class CharacterLiuZhangOlEntries
     internal IEnumerable<(CardKind Kind, int Target)> ZonghuOutputs(ZonghuNeed n) => _resolve().ZonghuOutputs(n);
     internal bool ZonghuParent(ProgramSkillFrame f) => _resolve().ZonghuParent(f);
     internal ZonghuNeed ZonghuPlayNeed(int seat) => _resolve().ZonghuPlayNeed(seat);
-    internal Card ZonghuRepresentation(long id) => _resolve().ZonghuRepresentation(id);
     internal ProgramCardContinuation ZonghuResponseContinuation(ZonghuPaidOrigin p) => _resolve().ZonghuResponseContinuation(p);
     internal IEnumerable<(CardConversionSource Source, string Hash)> ZonghuSources(CharacterState actor) => _resolve().ZonghuSources(actor);
     internal bool ZonghuSpent(int seat) => _resolve().ZonghuSpent(seat);

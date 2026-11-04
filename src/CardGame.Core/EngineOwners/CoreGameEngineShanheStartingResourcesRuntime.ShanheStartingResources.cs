@@ -150,6 +150,9 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesRuntime
             return;
         if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheStartingResourceDestroyedEvent>().Any(e => e.CardId == move.CardId))
             throw new InvalidOperationException("A starting resource exit needs its exact native use/response or continuing field provenance.");
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(parent) is { Action: { } nativeAction } &&
+            nativeAction.ActionId == action && nativeAction.PhysicalCards.Any(material => material.CardId == move.CardId))
+            _nativeCardRepresentations.CaptureDeparture(parent, move.CardId, move.Sequence);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheStartingResourceDestroyedEvent(move.CardId, move.Sequence, entry, parent, action));
     }
 

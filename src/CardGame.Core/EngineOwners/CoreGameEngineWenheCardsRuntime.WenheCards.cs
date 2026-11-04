@@ -187,7 +187,7 @@ internal sealed partial class CoreGameEngineWenheCardsRuntime
         use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         AssertWenheCardReceipt(use);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, f => f with { WenheCardEffect = null });
-        _coreNativeCardUseCompletionOperations.FinishCardUse(id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, requireProcessing: true), CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
+        _coreNativeCardUseCompletionOperations.FinishCardUse(id, _nativeCardRepresentations.Get(id, use.CardId, requireProcessing: true), CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
     }
 
     internal bool IsWenheCardEffectMovement(CardUseFrame use, CardMovementBatchContext batch)

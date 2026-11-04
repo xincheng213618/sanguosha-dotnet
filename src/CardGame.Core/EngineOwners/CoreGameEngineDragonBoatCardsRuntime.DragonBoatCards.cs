@@ -244,7 +244,7 @@ internal sealed partial class CoreGameEngineDragonBoatCardsRuntime
                 }
 
                 _coreRuntimeOperations.ReplaceRuntimeTop(use with { DragonBoatCardEffect = null, NativeDraw = null });
-                _coreNativeCardUseCompletionOperations.FinishCardUse(id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, requireProcessing: true), CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
+                _coreNativeCardUseCompletionOperations.FinishCardUse(id, _nativeCardRepresentations.Get(id, use.CardId, requireProcessing: true), CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
                 return;
             }
 

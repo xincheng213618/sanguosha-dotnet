@@ -11,6 +11,10 @@ internal sealed partial class CoreGameEngineGuanduEquipmentRuntime
         if (payload is not CardMovedEvent { CardKind: CardKind.ThunderChariot, From: { Zone: CardZoneKind.Equipment, OwnerSeat: { } owner }, To: { Zone: CardZoneKind.OutsideGame } } moved)
             return;
         var movement = _coreCardMovementJournalCardMovementsAccess._cardMovements.Last(m => m.CardId == moved.CardId);
+        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
+                     use.Action?.PhysicalCards.Any(material => material.CardId == moved.CardId &&
+                         material.CardKind == CardKind.ThunderChariot && material.From == moved.From) == true).ToArray())
+            _nativeCardRepresentations.CaptureDeparture(use.Id, moved.CardId, movement.Sequence);
         if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<GuanduChariotDestroyedEvent>().Any(e => e.MovementSequence == movement.Sequence))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuanduChariotDestroyedEvent(moved.CardId, movement.Sequence, owner));
     }

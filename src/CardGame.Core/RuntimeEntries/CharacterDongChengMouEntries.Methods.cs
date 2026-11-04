@@ -35,7 +35,6 @@ internal sealed partial class CharacterDongChengMouEntries
     internal bool MouDcUseRidesOn(ProgramSkillFrame f, CardUseFrame u) => _resolve().MouDcUseRidesOn(f, u);
     internal MouDcOccurrence? ObserveMouDcCardDamage() => _resolve().ObserveMouDcCardDamage();
     internal CardActionContext PrepareMouDcAction(CardActionContext action) => _resolve().PrepareMouDcAction(action);
-    internal Card ReadMouDcUseAppearance(long id, CardAppearanceReference appearance) => _resolve().ReadMouDcUseAppearance(id, appearance);
     internal bool ResumeMouDcAttack() => _resolve().ResumeMouDcAttack();
     internal bool ReturnMouDcUse(CardUseFrame u) => _resolve().ReturnMouDcUse(u);
     internal void ValidateMouDcUse(CardUseFrame u) => _resolve().ValidateMouDcUse(u);

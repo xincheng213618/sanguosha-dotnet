@@ -66,7 +66,7 @@ internal sealed partial class CoreGameEngineVirtualBasicOffersRuntime
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { VirtualBasicDraft = draft with { ChildFrameId = id } });
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, null, CardActionType.Use, actor.Seat, actor.Seat, null, null, null, chosen.Kind, [chosen.Target], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, chosen.Kind, [chosen.Target], PhysicalCardIds: []) { Action = action, VirtualBasicReturn = new(frame.Id, draft.InstructionIndex), FirstOwnPlayUseDistanceUnlimited = _coreIssuedPlayUsePoliciesOperations.HasFirstActualPlayUseDistance(actor) });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, chosen.Kind, [chosen.Target], PhysicalCardIds: []) { NativeRepresentation = new(0, chosen.Kind, Suit.None, 0), Action = action, VirtualBasicReturn = new(frame.Id, draft.InstructionIndex), FirstOwnPlayUseDistanceUnlimited = _coreIssuedPlayUsePoliciesOperations.HasFirstActualPlayUseDistance(actor) });
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(id, 0, chosen.Kind, actor.Seat));

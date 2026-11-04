@@ -172,7 +172,7 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actor, actor, null, null, null, CardKind.Slash, [target], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
         var returned = new PindianWinnerSlashReturn(f.Id, 2, r.Source, f.GameplayHash, bind, r.PindianFrameId!.Value, r.RecipientSeat, r.ThirdSeat!.Value, result.SourceRank, result.OpponentRank, actor, target, useId, action.ActionId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { RecipientContest = r with { Stage = RecipientContestStage.SlashIssued, SlashReturn = returned } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(useId, actor, 0, CardKind.Slash, [target], PhysicalCardIds: []) { Action = action, PindianWinnerSlashReturn = returned });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(useId, actor, 0, CardKind.Slash, [target], PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.Slash, Suit.None, 0), Action = action, PindianWinnerSlashReturn = returned });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PindianWinnerSlashIssuedEvent(returned));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));

@@ -43,12 +43,10 @@ internal sealed partial class CharacterLiuChengMouMobileEntries
     internal bool MouLiuChengObserverSuffix(int index) => _resolve().MouLiuChengObserverSuffix(index);
     internal int MouLiuChengPhaseUses(int owner, string skill, ActualDiscardRecoveryPhaseKey phase) => _resolve().MouLiuChengPhaseUses(owner, skill, phase);
     internal IReadOnlyList<int> MouLiuChengPrimaryTargets(CardActionContext action) => _resolve().MouLiuChengPrimaryTargets(action);
-    internal Card MouLiuChengRepresentation(long id) => _resolve().MouLiuChengRepresentation(id);
     internal bool MouLiuChengRootMatches(ProgramSkillFrame f) => _resolve().MouLiuChengRootMatches(f);
     internal bool MouLiuChengTrueUse(CardActionContext a) => _resolve().MouLiuChengTrueUse(a);
     internal bool PermitPaidMouLiuCheng(ProgramSkillFrame f) => _resolve().PermitPaidMouLiuCheng(f);
     internal CardActionContext PrepareMouLiuChengAction(CardActionContext action) => _resolve().PrepareMouLiuChengAction(action);
-    internal Card ReadMouLiuChengUseAppearance(long id, CardAppearanceReference appearance) => _resolve().ReadMouLiuChengUseAppearance(id, appearance);
     internal void RestoreMouLiuChengParentAttack(ProgramSkillFrame f) => _resolve().RestoreMouLiuChengParentAttack(f);
     internal bool ResumeMouLiuCheng(long id) => _resolve().ResumeMouLiuCheng(id);
     internal void ReturnMouLiuChengDraw(ProgramSkillFrame f, NativeDrawOutcome o) => _resolve().ReturnMouLiuChengDraw(f, o);

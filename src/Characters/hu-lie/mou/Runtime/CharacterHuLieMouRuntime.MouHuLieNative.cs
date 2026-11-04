@@ -68,7 +68,6 @@ internal sealed partial class CharacterHuLieMouRuntime
     }
 
     internal bool IsMouHuLieUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouHuLieUse(use);
-    internal Card MouHuLieRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouHuLieUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Chuanyu requires its own native zero-material representation.");
 
     [NativeUseValidation(37500)]
     internal void ValidateMouHuLieNative(CardUseFrame use)

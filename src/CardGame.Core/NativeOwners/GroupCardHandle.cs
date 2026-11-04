@@ -3,30 +3,27 @@ namespace CardGame.Core.NativeOwners;
 internal sealed class GroupCardHandle : GameEngine.ICardContinuationHandle
 {
     private readonly Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime;
-    private readonly Func<RuntimeEntries.CoreGameEngineChainedStateBasicReturnsEntries> getCoreGameEngineChainedStateBasicReturnsRuntime;
-    private readonly Func<RuntimeEntries.CoreGameEngineVirtualOrdinaryTrickUsesEntries> getCoreGameEngineVirtualOrdinaryTrickUsesRuntime;
+    private readonly INativeCardRepresentations representations;
     private readonly Func<RuntimeEntries.CoreNativeNullificationFramesEntries> getCoreNativeNullificationFramesRuntime;
     private readonly CardAttackHandleFactory createCardAttackHandle;
     public long OwnerFrameId { get; }
     private GroupCardState State => getCoreGameEngineCardAttackStateRuntime().GetCardContinuations(OwnerFrameId).GroupCard ?? throw new InvalidOperationException("The GroupCard continuation lost its owner state.");
 
     private void Update(Func<GroupCardState, GroupCardState> update) => getCoreGameEngineCardAttackStateRuntime().UpdateCardContinuations(OwnerFrameId, state => state with { GroupCard = update(state.GroupCard!) });
-    internal GroupCardHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, Func<RuntimeEntries.CoreGameEngineChainedStateBasicReturnsEntries> getCoreGameEngineChainedStateBasicReturnsRuntime, Func<RuntimeEntries.CoreGameEngineVirtualOrdinaryTrickUsesEntries> getCoreGameEngineVirtualOrdinaryTrickUsesRuntime, Func<RuntimeEntries.CoreNativeNullificationFramesEntries> getCoreNativeNullificationFramesRuntime, CardAttackHandleFactory createCardAttackHandle, long resolutionId, int sourceSeat, Card card, IReadOnlyList<int> targetSeats, GroupCardEffect effect, CardKind? requiredCardKind, IReadOnlyList<Card>? physicalCards = null)
+    internal GroupCardHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, INativeCardRepresentations representations, Func<RuntimeEntries.CoreNativeNullificationFramesEntries> getCoreNativeNullificationFramesRuntime, CardAttackHandleFactory createCardAttackHandle, long resolutionId, int sourceSeat, Card card, IReadOnlyList<int> targetSeats, GroupCardEffect effect, CardKind? requiredCardKind, IReadOnlyList<Card>? physicalCards = null)
     {
         this.getCoreGameEngineCardAttackStateRuntime = getCoreGameEngineCardAttackStateRuntime;
-        this.getCoreGameEngineChainedStateBasicReturnsRuntime = getCoreGameEngineChainedStateBasicReturnsRuntime;
-        this.getCoreGameEngineVirtualOrdinaryTrickUsesRuntime = getCoreGameEngineVirtualOrdinaryTrickUsesRuntime;
+        this.representations = representations;
         this.getCoreNativeNullificationFramesRuntime = getCoreNativeNullificationFramesRuntime;
         this.createCardAttackHandle = createCardAttackHandle;
         OwnerFrameId = resolutionId;
         getCoreGameEngineCardAttackStateRuntime().UpdateCardContinuations(OwnerFrameId, state => state with { GroupCard = new GroupCardState { Active = false, SourceSeat = sourceSeat, DamageSourceSeat = sourceSeat, Card = new(card.Id, card.Kind, card.Suit, card.Rank), TargetSeats = Array.AsReadOnly(targetSeats.ToArray()), Effect = effect, RequiredCardKind = requiredCardKind, PhysicalCardIds = Array.AsReadOnly((physicalCards ?? [card]).Select(card => card.Id).ToArray()), DamageClaimedPhysicalCardIds = [], RevealedCardIds = [], } });
     }
 
-    internal GroupCardHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, Func<RuntimeEntries.CoreGameEngineChainedStateBasicReturnsEntries> getCoreGameEngineChainedStateBasicReturnsRuntime, Func<RuntimeEntries.CoreGameEngineVirtualOrdinaryTrickUsesEntries> getCoreGameEngineVirtualOrdinaryTrickUsesRuntime, Func<RuntimeEntries.CoreNativeNullificationFramesEntries> getCoreNativeNullificationFramesRuntime, CardAttackHandleFactory createCardAttackHandle, long ownerId)
+    internal GroupCardHandle(Func<RuntimeEntries.CoreGameEngineCardAttackStateEntries> getCoreGameEngineCardAttackStateRuntime, INativeCardRepresentations representations, Func<RuntimeEntries.CoreNativeNullificationFramesEntries> getCoreNativeNullificationFramesRuntime, CardAttackHandleFactory createCardAttackHandle, long ownerId)
     {
         this.getCoreGameEngineCardAttackStateRuntime = getCoreGameEngineCardAttackStateRuntime;
-        this.getCoreGameEngineChainedStateBasicReturnsRuntime = getCoreGameEngineChainedStateBasicReturnsRuntime;
-        this.getCoreGameEngineVirtualOrdinaryTrickUsesRuntime = getCoreGameEngineVirtualOrdinaryTrickUsesRuntime;
+        this.representations = representations;
         this.getCoreNativeNullificationFramesRuntime = getCoreNativeNullificationFramesRuntime;
         this.createCardAttackHandle = createCardAttackHandle;
         OwnerFrameId = ownerId;
@@ -35,7 +32,7 @@ internal sealed class GroupCardHandle : GameEngine.ICardContinuationHandle
     public long ResolutionId => OwnerFrameId;
     public int SourceSeat { get => State.SourceSeat; }
     public int DamageSourceSeat { get => State.DamageSourceSeat; set => Update(state => state with { DamageSourceSeat = value }); }
-    public Card Card { get => (getCoreGameEngineChainedStateBasicReturnsRuntime().IsChainedStateBasicUse(OwnerFrameId) ? getCoreGameEngineChainedStateBasicReturnsRuntime().ReadChainedStateBasicUseAppearance(OwnerFrameId, State.Card) : getCoreGameEngineVirtualOrdinaryTrickUsesRuntime().ReadVirtualOrdinaryTrickUseAppearance(OwnerFrameId, State.Card)); }
+    public Card Card { get => representations.ReadAppearance(OwnerFrameId, State.Card); }
     public IReadOnlyList<int> TargetSeats { get => State.TargetSeats; }
     public GroupCardEffect Effect { get => State.Effect; }
     public CardKind? RequiredCardKind { get => State.RequiredCardKind; }

@@ -245,7 +245,7 @@ internal sealed partial class CharacterLiuPanOlRuntime
         }
         else
         {
-            var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, requireProcessing: false);
+            var card = _nativeCardRepresentations.Get(use.Id, use.CardId, requireProcessing: false);
             _coreSequentialTrickTargetsOperations.MoveFinishedTrickCard(use.Id, card);
             _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, card, use.CardKind);
         }

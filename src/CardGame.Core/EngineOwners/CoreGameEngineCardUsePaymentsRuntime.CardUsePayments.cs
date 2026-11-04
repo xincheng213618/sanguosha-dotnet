@@ -30,6 +30,8 @@ internal sealed partial class CoreGameEngineCardUsePaymentsRuntime
         if (use.PaymentMovementReceipt is not null)
             throw new InvalidOperationException("One card-use payment cannot issue its physical materials twice.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { PaymentMovementReceipt = new(use.Id, action.ActionId, batch.Movements[0].Sequence - 1, batch.Movements[^1].Sequence) { Batch = batch } });
+        foreach (var movement in batch.Movements.Where(movement => movement.To == CardLocation.OutsideGame))
+            _nativeCardRepresentations.CaptureDeparture(use.Id, movement.CardId, movement.Sequence);
     }
 
     internal bool IsCardUsePaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => _coreProgramCardUsePaymentsOperations.CardUsePayments.MatchesBatch(use, batch) || CardUsePaymentBatchMatchesReceipt(use, batch) && CardUsePaymentMaterialsMatch(use, batch);

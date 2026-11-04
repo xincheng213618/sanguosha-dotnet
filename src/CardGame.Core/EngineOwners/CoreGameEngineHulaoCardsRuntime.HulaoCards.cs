@@ -112,7 +112,7 @@ internal sealed partial class CoreGameEngineHulaoCardsRuntime
     internal void CompleteHulaoAllianceFeastTarget(long useId)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(useId) ?? throw new InvalidOperationException("Alliance feast lost its owner.");
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(useId, use.CardId, requireProcessing: true);
+        var card = _nativeCardRepresentations.Get(useId, use.CardId, requireProcessing: true);
         // FinishCardUse drains native recovery replacements and HP observers before
         // its existing sequential target cursor advances. The physical trick stays
         // in Processing until every surviving target has resolved or nullified.

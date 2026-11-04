@@ -84,7 +84,7 @@ internal sealed partial class CharacterDianWeiMouRuntime
             Targets = targets
         };
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MouDianWei = r with { Slash = ret } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor, 0, CardKind.Slash, ret.Targets, PhysicalCardIds: []) { Action = action, MouDianWei = ret });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor, 0, CardKind.Slash, ret.Targets, PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.Slash, Suit.None, 0), Action = action, MouDianWei = ret });
         foreach (var(target, index)in ret.Targets.Select((target, index) => (target, index)))
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDianWeiSlashIssuedEvent(f.Id, r.Index, r.ContestId, id, action.ActionId, actor, target, index));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)

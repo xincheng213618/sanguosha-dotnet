@@ -61,6 +61,12 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
     {
         if (movement.HappyZuoCiPhantomDestination is { } plan && (!HappyZcPlanProof(plan) || movement.CardId != plan.CardId || movement.CardKind != plan.Face.Kind || movement.From != plan.From || movement.To != plan.ActualTo || movement.Reason != plan.Reason || movement.Sequence <= plan.SequenceBefore || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == movement.Sequence && m == movement) != 1))
             throw new InvalidOperationException("A phantom movement lost its frozen original recipient, physical face or historical issuer.");
+        if (movement.From == CardLocation.Processing && movement.To == CardLocation.OutsideGame &&
+            movement.HappyZuoCiPhantomDestination is not null)
+            foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
+                         use.Action?.PhysicalCards.Any(material => material.CardId == movement.CardId &&
+                             material.CardKind == movement.CardKind) == true).ToArray())
+                _nativeCardRepresentations.CaptureDeparture(use.Id, movement.CardId, movement.Sequence);
     }
 
     internal bool IsHappyZuoCiDestroyedMaterial(CardMovementRecord m) => m.To == CardLocation.OutsideGame && m.HappyZuoCiPhantomDestination is { } plan && HappyZcPlanProof(plan) && m.From == plan.From && m.CardId == plan.CardId && m.CardKind == plan.Face.Kind && m.Reason == plan.Reason && m.Sequence > plan.SequenceBefore && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(actual => actual.Sequence == m.Sequence && actual == m) == 1;

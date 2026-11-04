@@ -9,7 +9,6 @@ internal sealed partial class CoreGameEngineTieredRoundZeroReturnsEntries
     internal bool IsTieredRoundZeroRescueProgramDying() => _resolve().IsTieredRoundZeroRescueProgramDying();
     internal bool MatchesTieredRoundZeroFireAttackAttack(NativeOwners.CardAttackHandle attack) => _resolve().MatchesTieredRoundZeroFireAttackAttack(attack);
     internal bool MatchesTieredRoundZeroUseAction(long id, CardActionContext action, int cardId) => _resolve().MatchesTieredRoundZeroUseAction(id, action, cardId);
-    internal Card ReadTieredRoundUseAppearance(long ownerId, CardAppearanceReference appearance) => _resolve().ReadTieredRoundUseAppearance(ownerId, appearance);
     internal bool SkipTieredRoundZeroFinishedMovement(long id, Card card) => _resolve().SkipTieredRoundZeroFinishedMovement(id, card);
     internal bool TieredRoundZeroDyingRescueRide(int dyingIndex, DyingFrame dying) => _resolve().TieredRoundZeroDyingRescueRide(dyingIndex, dying);
 }

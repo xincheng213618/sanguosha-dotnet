@@ -89,6 +89,7 @@ internal sealed partial class CoreGameEngineProgramVirtualSlashOffersRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actorSeat, actorSeat, null, null, null, CardKind.Slash, [targetSeat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
         _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, actorSeat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: [])
         {
+            NativeRepresentation = new(0, CardKind.Slash, Suit.None, 0),
             Action = action,
             UsesStandardZeroEntityAttackCompletion = standardZeroEntityAttackCompletion,
             ProgramResultSink = resultBind is { } bind

@@ -30,6 +30,8 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
                 continue;
             var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(p => p.Id == o.ProgramFrameId);
             _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { MouLixian = parent.MouLixian!with { MovementSequence = m.Sequence, After = m.Sequence } });
+            if (m.To == CardLocation.OutsideGame)
+                _nativeCardRepresentations.CaptureDeparture(use.Id, m.CardId, m.Sequence);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLixianMaterialPaidEvent(parent.Id, use.Id, m.CardId, m.CardKind, m.From, m.To, m.Sequence));
         }
     }

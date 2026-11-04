@@ -16,7 +16,7 @@ internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, f.OwnerSeat, f.OwnerSeat, null, null, null, CardKind.FireSlash, [targetSeat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
         var origin = new ShenJiangWeiSlashOrigin(f.Id, r.Source, r.GameplayHash, r.SlashCount + 1, id, action.ActionId, targetSeat);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShenJiangWei = f.ShenJiangWei!with { Stage = ShenJiangWeiStage.NativeUse, UseId = id, ActionId = action.ActionId } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, f.OwnerSeat, 0, CardKind.FireSlash, [targetSeat], PhysicalCardIds: []) { Action = action, UnlimitedUse = true, ShenJiangWeiPingxiang = origin });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, f.OwnerSeat, 0, CardKind.FireSlash, [targetSeat], PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.FireSlash, Suit.None, 0), Action = action, UnlimitedUse = true, ShenJiangWeiPingxiang = origin });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenJiangWeiSlashIssuedEvent(origin));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));

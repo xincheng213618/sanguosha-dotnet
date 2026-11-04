@@ -73,7 +73,7 @@ internal sealed partial class CharacterFeiYiOlRuntime
 
         _coreNativeCardContinuationCursorsOperations.ActiveGroupCard = null;
         _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword = null;
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, requireProcessing: true);
+        var card = _nativeCardRepresentations.Get(id, use.CardId, requireProcessing: true);
         _coreNativeNullificationOperations.BeginNullificationWindow(id, card, use.SourceSeat, use.TargetSeats, r.Trick.ActionKind, null, r.Trick.RequiredCardKind, use.CardKind);
         return true;
     }

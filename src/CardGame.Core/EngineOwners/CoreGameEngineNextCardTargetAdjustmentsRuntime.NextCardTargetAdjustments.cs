@@ -27,7 +27,7 @@ internal sealed partial class CoreGameEngineNextCardTargetAdjustmentsRuntime
             return false;
         var frame = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(item => item.Id == frameId);
         _coreNativeNullificationFramesOperations.SetCardUseTargetIndex(frameId, frame.TargetIndex + 2);
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(frameId, frame.CardId, requireProcessing: true);
+        var card = _nativeCardRepresentations.Get(frameId, frame.CardId, requireProcessing: true);
         _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(frameId, card, frame.SourceSeat, frame.TargetSeats.Skip(frame.TargetIndex + 2).Take(2).ToArray(), LegalActionKind.BorrowedSword);
         return true;
     }

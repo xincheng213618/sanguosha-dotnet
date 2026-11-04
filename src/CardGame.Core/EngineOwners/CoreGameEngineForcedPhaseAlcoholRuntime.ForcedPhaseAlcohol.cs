@@ -68,7 +68,7 @@ internal sealed partial class CoreGameEngineForcedPhaseAlcoholRuntime
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { PhaseAlcohol = receipt with { Stage = ProgramPhaseAlcoholStage.WineIssued, WineFrameId = id }, VirtualBasicDraft = new(f.InstructionIndex, id) });
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, null, CardActionType.Use, actor.Seat, f.OwnerSeat, null, null, null, CardKind.Alcohol, [actor.Seat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, CardKind.Alcohol, [actor.Seat], PhysicalCardIds: []) { Action = action, VirtualBasicReturn = new(f.Id, f.InstructionIndex), FirstOwnPlayUseDistanceUnlimited = _coreIssuedPlayUsePoliciesOperations.HasFirstActualPlayUseDistance(actor) });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, CardKind.Alcohol, [actor.Seat], PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.Alcohol, Suit.None, 0), Action = action, VirtualBasicReturn = new(f.Id, f.InstructionIndex), FirstOwnPlayUseDistanceUnlimited = _coreIssuedPlayUsePoliciesOperations.HasFirstActualPlayUseDistance(actor) });
         // The use allowance is spent by the real actor at commitment, even when
         // a card-use trigger later cancels Wine's effect.
         _characterHuangGaiMouMobileOperations.RecordMouZhaJiangAwareAlcoholDebit(id, actor);

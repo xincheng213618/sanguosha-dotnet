@@ -67,14 +67,6 @@ internal sealed partial class CharacterWenChouMouOlRuntime
 
     internal bool IsMouWenChouZeroDuel(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { CardId: 0, PhysicalCardIds.Count: 0 } && IsMouWenChouDuel(id);
     internal long? MouWenChouDuelProgramParent(long id) => IsMouWenChouDuel(id) ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.MouWenChouLunzhan!.ProgramFrameId : null;
-    internal Card ReadMouWenChouUseAppearance(long id, CardAppearanceReference appearance)
-    {
-        if (!IsMouWenChouZeroDuel(id))
-            return _characterXuHuangMouMobileOperations.ReadMouXuHuangUseAppearance(id, appearance);
-        if (appearance.Id != 0 || appearance.Kind != CardKind.Duel || appearance.Suit != Suit.None || appearance.Rank != 0)
-            throw new InvalidOperationException("Lunzhan's empty Duel lost its signed neutral appearance.");
-        return new(0, CardKind.Duel, Suit.None, 0);
-    }
 
     [NativeUseValidation(33100)]
     internal void ValidateMouWenChouDuel(CardUseFrame use)

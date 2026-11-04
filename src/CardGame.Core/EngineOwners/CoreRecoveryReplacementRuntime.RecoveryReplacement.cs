@@ -70,13 +70,13 @@ internal sealed partial class CoreRecoveryReplacementRuntime
             if (_coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } completedAttack && completedAttack.ResolutionId == useId)
                 _coreNativeAttackCompletionOperations.CompleteAttack(completedAttack);
             else
-                _coreNativeCardUseCompletionOperations.FinishCardUse(useId, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(useId, continuation.CardId ?? use.CardId), continuation.PlayedCardKind ?? use.CardKind);
+                _coreNativeCardUseCompletionOperations.FinishCardUse(useId, _nativeCardRepresentations.Get(useId, continuation.CardId ?? use.CardId), continuation.PlayedCardKind ?? use.CardKind);
             return;
         }
 
         if (continuation.Kind is RecoveryPaidCardUseKind.Trick or RecoveryPaidCardUseKind.Simple or RecoveryPaidCardUseKind.EquipmentUse)
         {
-            var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(useId, continuation.CardId!.Value, requireProcessing: continuation.Kind != RecoveryPaidCardUseKind.Simple);
+            var card = _nativeCardRepresentations.Get(useId, continuation.CardId!.Value, requireProcessing: continuation.Kind != RecoveryPaidCardUseKind.Simple);
             if (!_coreMatchParticipantsPlayersAccess._players[continuation.SourceSeat].IsAlive)
             {
                 _coreNativeCardUseCompletionOperations.FinishCardUse(useId, card, continuation.PlayedCardKind ?? use.CardKind);
@@ -420,7 +420,7 @@ internal sealed partial class CoreRecoveryReplacementRuntime
                     _coreRuntimeOperations.ReturnRuntimeProgramMovement(continuation.ResumeFrameId!.Value);
                 break;
             case PostEventContinuation.CardUse:
-                var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(continuation.ResumeFrameId!.Value, continuation.CardId!.Value);
+                var card = _nativeCardRepresentations.Get(continuation.ResumeFrameId!.Value, continuation.CardId!.Value);
                 _coreNativeCardUseCompletionOperations.FinishCardUse(continuation.ResumeFrameId!.Value, card, continuation.CardKind);
                 break;
             case PostEventContinuation.VirtualBasicCardUse:

@@ -90,12 +90,6 @@ internal sealed partial class CharacterChengYuMouOlRuntime
 
     internal bool IsMouDanchiUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouDanchiOrigin: { } o, Action: { } a } use && use.Id == o.UseId && a.ActionId == o.ActionId && use.CardId == 0 && use.CardKind == o.Kind && a.EffectiveKind == o.Kind && use.PhysicalCardIds is { Count: 0 } && a.PhysicalCards.Count == 0 && a.ConversionChain.Count == 0 && a.EffectiveSuit == Suit.None && a.EffectiveRank == 0 && a.ProviderSeat == o.ActorSeat && a.RequesterSeat is null && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.ActorSeat, o.ActorSeat) && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == o.FrameId)is ProgramSkillFrame { MouDanchi: { Stage: MouDanchiStage.NativeUse } r } f && MouDanchi.Valid(f) && r.UseId == use.Id && r.ActionId == a.ActionId && r.Source == o.Source && r.GameplayHash == o.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDanchiNativeIssuedEvent>().Count(e => e.Origin == o) == 1;
     internal bool IsMouDanchiDrawTwo(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.CardKind == CardKind.DrawTwo && IsMouDanchiUse(id);
-    internal Card ReadMouDanchiAppearance(long id, CardAppearanceReference appearance)
-    {
-        if (!IsMouDanchiUse(id) || appearance.Id != 0 || appearance.Kind != _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind || appearance.Suit != Suit.None || appearance.Rank != 0)
-            throw new InvalidOperationException("Danchi lost the frozen neutral native appearance.");
-        return new(0, appearance.Kind, Suit.None, 0);
-    }
 
     internal bool IsMouDanchiSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => f.MouDanchi is { Stage: MouDanchiStage.Children, Returned: true } r && MouDanchi.Valid(f) && r.Batches.Contains(batch.Id) && batch.ParentFrameId == r.UseId && batch.AwaitingProgramFrameId is null && batch.OriginSkillId == f.SkillId && batch.OriginSkillInstanceId == f.SkillInstanceId && batch.OriginOwnerSeat == f.OwnerSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDanchiNativeBatchEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.BatchId == batch.Id) == 1 && batch.Movements.Count > 0 && batch.Movements.All(m => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(m));
     [NativeUseValidation(34101)]

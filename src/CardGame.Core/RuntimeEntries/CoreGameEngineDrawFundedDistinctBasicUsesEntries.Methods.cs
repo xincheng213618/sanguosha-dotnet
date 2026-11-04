@@ -4,7 +4,6 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesEntries
 {
     internal void BeginDrawFundedDistinctBasicSlash(CharacterState actor, IReadOnlyList<int> targets, DrawFundedDistinctBasicPayment p, NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit, long? programParent) => _resolve().BeginDrawFundedDistinctBasicSlash(actor, targets, p, borrowed, countsTowardLimit, programParent);
     internal bool ContinueDrawFundedDistinctBasicSimpleUse(long frameId, ProgramSimpleCardContinuation continuation) => _resolve().ContinueDrawFundedDistinctBasicSimpleUse(frameId, continuation);
-    internal Card DrawFundedDistinctBasicRepresentation(long frameId) => _resolve().DrawFundedDistinctBasicRepresentation(frameId);
     internal void EmitDrawFundedDistinctBasicIssued(DrawFundedDistinctBasicUseReceipt receipt) => _resolve().EmitDrawFundedDistinctBasicIssued(receipt);
     internal void ExecuteDrawFundedDistinctBasicPaid(DrawFundedDistinctBasicFrame frame) => _resolve().ExecuteDrawFundedDistinctBasicPaid(frame);
     internal bool FinishDrawFundedDistinctBasicAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishDrawFundedDistinctBasicAttack(attack, out paused);

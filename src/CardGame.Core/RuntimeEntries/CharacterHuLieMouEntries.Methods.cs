@@ -22,7 +22,6 @@ internal sealed partial class CharacterHuLieMouEntries
     internal bool MouHuLieFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MouHuLieFirstChild(f, child);
     internal bool MouHuLieMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => _resolve().MouHuLieMovement(f, op, p);
     internal bool MouHuLieRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().MouHuLieRecoveryParent(f, recovery);
-    internal Card MouHuLieRepresentation(long id) => _resolve().MouHuLieRepresentation(id);
     internal ProgramSkillFrame? MouHuLieRoot() => _resolve().MouHuLieRoot();
     internal bool MouHuLieSuffix(int n) => _resolve().MouHuLieSuffix(n);
     internal int[]? MouHuLieUsedIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, ProgramInstructionFeatures features) => _resolve().MouHuLieUsedIndexes(batch, candidate, features);

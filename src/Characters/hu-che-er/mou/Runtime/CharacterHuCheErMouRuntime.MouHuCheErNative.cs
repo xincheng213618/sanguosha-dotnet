@@ -68,7 +68,6 @@ internal sealed partial class CharacterHuCheErMouRuntime
     }
 
     internal bool IsMouHuCheErUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouHuCheErUse(use);
-    internal Card MouHuCheErRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouHuCheErUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Kongwu requires its own native zero-material representation.");
 
     [NativeUseValidation(35800)]
     internal void ValidateMouHuCheErNative(CardUseFrame use)

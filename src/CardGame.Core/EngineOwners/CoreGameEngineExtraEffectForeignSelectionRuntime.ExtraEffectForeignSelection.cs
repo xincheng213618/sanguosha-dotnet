@@ -79,7 +79,7 @@ internal sealed partial class CoreGameEngineExtraEffectForeignSelectionRuntime
             from = CardLocation.Hand(target.Seat);
         }
 
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, true);
+        var card = _nativeCardRepresentations.Get(use.Id, use.CardId, true);
         _coreRuntimeOperations.PopResolutionFrame(pending.Id, ResolutionFrameKind.TargetCardSelection);
         _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.ResolvingEffect);
         _coreNativeTrickEffectsOperations.ApplyTargetCardEffect(use.Id, card, CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use), use.SourceSeat, target.Seat, pending.ActionKind, chosen, from);

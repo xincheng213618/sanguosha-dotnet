@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineShanheSourceMouDongZhuoWineRuntime
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, owner.Seat, owner.Seat, null, null, null, CardKind.Alcohol, [owner.Seat], [], [r.Source], effectiveSuit: Suit.None, effectiveRank: 0));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { ShanheSourceMou = r with { WineUseId = id } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, owner.Seat, 0, CardKind.Alcohol, [owner.Seat], PhysicalCardIds: []) { Action = action, ShanheSourceMouWine = new(f.Id, f.InstructionIndex, r.Source, r.Hash, dying) });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, owner.Seat, 0, CardKind.Alcohol, [owner.Seat], PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.Alcohol, Suit.None, 0), Action = action, ShanheSourceMouWine = new(f.Id, f.InstructionIndex, r.Source, r.Hash, dying) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSourceMouWineIssuedEvent(f.Id, id, action.ActionId, dying));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(action));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)

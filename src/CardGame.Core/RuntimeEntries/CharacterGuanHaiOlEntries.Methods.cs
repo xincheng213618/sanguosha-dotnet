@@ -65,7 +65,6 @@ internal sealed partial class CharacterGuanHaiOlEntries
     internal IReadOnlyList<PromptChoice> YouqueBaitChoices(ProgramSkillFrame f) => _resolve().YouqueBaitChoices(f);
     internal IEnumerable<(PublicPersistentPileSource Pile, Card Card)> YouqueBaits(int owner) => _resolve().YouqueBaits(owner);
     internal bool YouquePhaseActive(int owner) => _resolve().YouquePhaseActive(owner);
-    internal Card YouqueRepresentation(long id) => _resolve().YouqueRepresentation(id);
     internal CardUseFrame? YouqueRewardUse(ProgramSkillWindowContext c) => _resolve().YouqueRewardUse(c);
     internal bool HasGuanHaiCapability { get => _resolve().HasGuanHaiCapability; }
 }

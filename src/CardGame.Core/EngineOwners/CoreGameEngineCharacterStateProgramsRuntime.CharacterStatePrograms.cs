@@ -89,7 +89,7 @@ internal sealed partial class CoreGameEngineCharacterStateProgramsRuntime
                 _coreDragonBoatCardsOperations.ContinueDragonBoatCardEffect(frame.ResumeProgramFrameId!.Value);
                 break;
             case CharacterStateContinuation.CardUse:
-                var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(frame.ResumeProgramFrameId!.Value, frame.ResumeCardId!.Value);
+                var card = _nativeCardRepresentations.Get(frame.ResumeProgramFrameId!.Value, frame.ResumeCardId!.Value);
                 _coreNativeCardUseCompletionOperations.FinishCardUse(frame.ResumeProgramFrameId!.Value, card, frame.ResumeCardKind);
                 break;
             case CharacterStateContinuation.VirtualBasicCardUse:

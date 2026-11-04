@@ -116,7 +116,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             return;
         }
 
-        var useId = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: source, standardZeroEntityAttackCompletion: CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) || p.Kind is CardKind.Duel or CardKind.FireAttack);
+        var useId = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: source, standardZeroEntityAttackCompletion: CoreNativeCardClassificationsRuntime.IsSlashCard(p.Kind) || p.Kind is CardKind.Duel or CardKind.FireAttack, representationCarrier: card.Id > 0);
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.DiouOrigin is null)
             throw new InvalidOperationException("Diou must bind its distinct zero-material issuance before native effects.");
         if (card.Id > 0)
@@ -192,15 +192,6 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 
     internal bool IsDiouUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedDiouUse(use);
     internal bool IsDiouZeroUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { CardId: 0 } use && IsIssuedDiouUse(use);
-    internal Card DiouRepresentation(long id) => IsDiouZeroUse(id) ? new(0, _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind, Suit.None, 0) : throw new InvalidOperationException("Diou lost its zero-material native card representation.");
-    internal Card ReadDiouUseAppearance(long id, CardAppearanceReference appearance)
-    {
-        if (!IsDiouZeroUse(id))
-            return _coreDrawFundedDistinctBasicReturnsOperations.ReadDrawFundedDistinctBasicUseAppearance(id, appearance);
-        if (appearance.Id != 0 || appearance.Kind != _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind || appearance.Suit != Suit.None || appearance.Rank != 0)
-            throw new InvalidOperationException("Diou's native continuation changed its exact neutral zero-material appearance.");
-        return DiouRepresentation(id);
-    }
 
     internal bool SkipDiouFinishedMovement(long id, Card c) => c.Id == 0 && IsDiouZeroUse(id) && c.Kind == _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind;
     internal bool ContinueDiouSimpleUse(long id, ProgramSimpleCardContinuation continuation)
@@ -209,7 +200,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             return false;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var actor = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat];
-        var card = DiouRepresentation(id);
+        var card = _nativeCardRepresentations.Get(id, 0);
         _coreNativeCardUseFramesOperations.SetCardUseStep(id, ResolutionFrameStep.ResolvingEffect);
         if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None)
         {

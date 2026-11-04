@@ -189,7 +189,7 @@ internal sealed partial class CoreNativeTrickEffectsRuntime
         }
 
         var targetCard = targetHand[slot];
-        var effectCard = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(pending.ParentFrameId, pending.EffectCardId, requireProcessing: true);
+        var effectCard = _nativeCardRepresentations.Get(pending.ParentFrameId, pending.EffectCardId, requireProcessing: true);
         _coreRuntimeOperations.ReplaceRuntimeTop(pending with { Step = ResolutionFrameStep.Completed });
         _coreRuntimeOperations.PopResolutionFrame(pending.Id, ResolutionFrameKind.TargetCardSelection);
         _coreNativeCardUseFramesOperations.SetCardUseStep(pending.ParentFrameId, ResolutionFrameStep.ResolvingEffect);

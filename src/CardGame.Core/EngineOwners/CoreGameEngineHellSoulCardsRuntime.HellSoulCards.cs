@@ -135,7 +135,7 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(returned.CardUseFrameId)!;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { HellSoul = null });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HellSoulTargetResolvedEvent(use.Id, returned.TargetSeat, restored, completed));
-        _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, requireProcessing: true), CardKind.ReturnSoul);
+        _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, _nativeCardRepresentations.Get(use.Id, use.CardId, requireProcessing: true), CardKind.ReturnSoul);
         return true;
     }
 
@@ -150,7 +150,13 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
         var entered = _coreCardMovementJournalCardMovementsAccess._cardMovements.Last(m => m.CardId == card.Id);
         if (entered.To != to)
             throw new InvalidOperationException("Return soul destruction lost its actual discard entry.");
-        _corePhysicalMovementFacadesOperations.MoveCard(card, to, CardLocation.OutsideGame, new("activity.hell.return-soul-destroyed"));
+        _corePhysicalMovementFacadesOperations.MoveCard(card, to, CardLocation.OutsideGame, new("activity.hell.return-soul-destroyed"), beforeFact: destroyed =>
+        {
+            foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
+                         use.Action?.PhysicalCards.Any(material => material.CardId == card.Id &&
+                             material.CardKind == CardKind.ReturnSoul) == true).ToArray())
+                _nativeCardRepresentations.CaptureDeparture(use.Id, card.Id, destroyed.Sequence);
+        });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HellReturnSoulDestroyedEvent(card.Id, entered.Sequence, _coreCardMovementJournalCardMovementsAccess._cardMovements.Last(m => m.CardId == card.Id).Sequence));
     }
 

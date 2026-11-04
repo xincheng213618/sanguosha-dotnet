@@ -57,7 +57,7 @@ internal sealed partial class CoreNativeCardEffectDrawsRuntime
         // Retire this exact effect before FinishCardUse can repeat the card or
         // advance to its next target. Each genuine later Draw2 gets a new request.
         _coreRuntimeOperations.ReplaceRuntimeTop(use with { NativeCardEffectDraw = null, NativeDraw = null });
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, receipt.EffectCardId);
+        var card = _nativeCardRepresentations.Get(id, receipt.EffectCardId);
         _coreSequentialTrickTargetsOperations.MoveFinishedTrickCard(id, card);
         _coreMatchLogOperations.AddLog("CardEffect", $"{(_coreMatchParticipantsPlayersAccess._players[receipt.RecipientSeat].Name)} 的【无中生有】结算完毕。", receipt.RecipientSeat);
         _coreNativeCardUseCompletionOperations.FinishCardUse(id, card, receipt.EffectCardKind);

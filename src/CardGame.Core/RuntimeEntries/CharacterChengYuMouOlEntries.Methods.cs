@@ -26,7 +26,6 @@ internal sealed partial class CharacterChengYuMouOlEntries
     internal void ObserveMouChengYuUse(IGameEvent fact) => _resolve().ObserveMouChengYuUse(fact);
     internal CardActionContext PrepareMouDanchiAction(CardActionContext action) => _resolve().PrepareMouDanchiAction(action);
     internal bool QualifyMouChengYu(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().QualifyMouChengYu(candidate, trigger, context);
-    internal Card ReadMouDanchiAppearance(long id, CardAppearanceReference appearance) => _resolve().ReadMouDanchiAppearance(id, appearance);
     internal void RestoreMouDanchiAttack(ProgramSkillFrame f) => _resolve().RestoreMouDanchiAttack(f);
     internal bool ReturnMouDanchiAttack(GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnMouDanchiAttack(completion);
     internal void ReturnMouDanchiUse(CardUseFrame use) => _resolve().ReturnMouDanchiUse(use);

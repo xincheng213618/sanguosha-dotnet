@@ -35,6 +35,10 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
             if (moved.To != CardLocation.OutsideGame || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DagongCheDestroyedEvent>().Any(e => e.CardId == moved.CardId))
                 throw new InvalidOperationException("A real Dagong Che must be destroyed exactly once on leaving Equipment.");
             var movement = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == moved.CardId);
+            foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
+                         use.Action?.PhysicalCards.Any(material => material.CardId == moved.CardId &&
+                             material.CardKind == moved.CardKind && material.From == moved.From) == true).ToArray())
+                _nativeCardRepresentations.CaptureDeparture(use.Id, moved.CardId, movement.Sequence);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DagongCheDestroyedEvent(moved.CardId, old, movement.Sequence, _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id ?? 0, movement.Reason, DagongUpgrades(moved.CardId).Length));
         }
 

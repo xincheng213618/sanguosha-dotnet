@@ -185,7 +185,7 @@ internal sealed partial class CharacterChenJiaoMobileShiRuntime
         // Showing is not payment. Keep the real zero-entity Use on its original
         // skill parent so declared-use observers can inspect the actual action.
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ChenJiao = r with { Stage = ChenJiaoStage.Issue, Kind = kind, UseId = useId } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(useId, f.OwnerSeat, 0, kind, [f.OwnerSeat], PhysicalCardIds: []) { Action = action });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(useId, f.OwnerSeat, 0, kind, [f.OwnerSeat], PhysicalCardIds: []) { NativeRepresentation = new(0, kind, Suit.None, 0), Action = action });
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(useId, 0, kind, f.OwnerSeat));
@@ -329,7 +329,7 @@ internal sealed partial class CharacterChenJiaoMobileShiRuntime
         var useId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, actor.Seat, actor.Seat, null, null, null, CardKind.Slash, [targetSeat], [], Array.AsReadOnly(new[] { ChenJiaoSource(f) }), effectiveSuit: Suit.None, effectiveRank: 0));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { ChenJiao = f.ChenJiao!with { UseId = useId } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(useId, actor.Seat, 0, CardKind.Slash, Array.AsReadOnly(new[] { targetSeat }), PhysicalCardIds: Array.AsReadOnly(Array.Empty<int>())) { Action = action });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(useId, actor.Seat, 0, CardKind.Slash, Array.AsReadOnly(new[] { targetSeat }), PhysicalCardIds: Array.AsReadOnly(Array.Empty<int>())) { NativeRepresentation = new(0, CardKind.Slash, Suit.None, 0), Action = action });
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(useId, 0, CardKind.Slash, actor.Seat));

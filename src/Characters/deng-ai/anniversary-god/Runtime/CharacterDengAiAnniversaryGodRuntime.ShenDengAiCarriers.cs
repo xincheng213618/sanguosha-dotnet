@@ -21,6 +21,10 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
             return;
         if (m.From == CardLocation.OutsideGame || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiCarrierDestroyedEvent>().Any(e => e.CardId == m.CardId))
             throw new InvalidOperationException("A Cuixin delayed-card carrier cannot be destroyed twice or re-enter a reusable zone.");
+        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
+                     use.Action?.PhysicalCards.Any(material => material.CardId == m.CardId &&
+                         material.CardKind == m.CardKind && material.From == m.From) == true).ToArray())
+            _nativeCardRepresentations.CaptureDeparture(use.Id, m.CardId, m.Sequence);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenDengAiCarrierDestroyedEvent(m.CardId, m.Sequence, m.From, m.Reason));
     }
 

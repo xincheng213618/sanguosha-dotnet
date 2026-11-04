@@ -22,14 +22,12 @@ internal sealed partial class CharacterXiaoQiaoMouOlEntries
     internal void IssueMouXqNativeUse(ProgramSkillFrame f, MouXiaoQiaoOlUsePlan p) => _resolve().IssueMouXqNativeUse(f, p);
     internal void IssueMouXqRequestedSlash(MouXiaoQiaoJueyanResponseGrant grant) => _resolve().IssueMouXqRequestedSlash(grant);
     internal IReadOnlyList<PromptChoice> MouXqForcedSlashChoices(CharacterState actor, CharacterState target, long parentId, bool qinglong) => _resolve().MouXqForcedSlashChoices(actor, target, parentId, qinglong);
-    internal Card MouXqJueyanRepresentation(long id) => _resolve().MouXqJueyanRepresentation(id);
     internal IReadOnlyList<PromptChoice> MouXqJueyanResponseChoices(CharacterState actor, CardKind kind, bool dying = false) => _resolve().MouXqJueyanResponseChoices(actor, kind, dying);
     internal IReadOnlyList<MouXiaoQiaoOlUsePlan> MouXqNativePlans(CharacterState actor, CardKind kind, CardConversionSource source) => _resolve().MouXqNativePlans(actor, kind, source);
     internal IReadOnlyList<PromptChoice> MouXqProgramSlashChoices(ProgramSkillFrame f, int actorSeat, IReadOnlyList<int> targets, string? resultBind = default) => _resolve().MouXqProgramSlashChoices(f, actorSeat, targets, resultBind);
     internal CardActionContext PrepareMouXqJueyanAction(CardActionContext action) => _resolve().PrepareMouXqJueyanAction(action);
     internal void PrepareMouXqProgramSlash(MouXiaoQiaoJueyanResponseRequest r) => _resolve().PrepareMouXqProgramSlash(r);
     internal bool PreserveMouXqRequestedSlash(ProgramSkillFrame f) => _resolve().PreserveMouXqRequestedSlash(f);
-    internal Card ReadMouXqJueyanAppearance(long id, CardAppearanceReference a) => _resolve().ReadMouXqJueyanAppearance(id, a);
     internal bool ResumeMouXqProgramSlash(long id) => _resolve().ResumeMouXqProgramSlash(id);
     internal void ReturnMouXqJueyanResponse(ProgramSkillFrame f) => _resolve().ReturnMouXqJueyanResponse(f);
     internal void ReturnMouXqProgramSlash(CardUseFrame use) => _resolve().ReturnMouXqProgramSlash(use);

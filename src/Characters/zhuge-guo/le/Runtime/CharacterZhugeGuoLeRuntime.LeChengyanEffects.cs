@@ -43,7 +43,7 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
         _coreNativeNullificationOperations.BeginNullificationWindow(u.Id, LeChengyanOriginalCard(u), u.SourceSeat, p.Targets, action, requiredCardKind: required, playedCardKind: u.CardKind);
     }
 
-    internal Card LeChengyanOriginalCard(CardUseFrame u) => _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(u.Id, u.CardId);
+    internal Card LeChengyanOriginalCard(CardUseFrame u) => _nativeCardRepresentations.Get(u.Id, u.CardId);
     internal bool TryBypassLeChengyanNullification(long id, Card card, IReadOnlyList<int> targets, LegalActionKind action, int? targetCard, CardKind? required)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { LeChengyanEffect.Started: true } u || !CoreNativeCardClassificationsRuntime.IsSlashCard(u.CardKind) || !ValidLeChengyanEffect(u))

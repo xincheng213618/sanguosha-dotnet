@@ -9,7 +9,6 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsEntries
     internal ChainedStateBasicFrame? ChainedStateBasicObserverRoot(long? requestedId = default) => _resolve().ChainedStateBasicObserverRoot(requestedId);
     internal bool ChainedStateBasicPaidSuffix(int rootIndex) => _resolve().ChainedStateBasicPaidSuffix(rootIndex);
     internal bool ChainedStateBasicProgramActor(ProgramSkillFrame parent, ChainedStateBasicPayment p) => _resolve().ChainedStateBasicProgramActor(parent, p);
-    internal Card ChainedStateBasicRepresentation(long id) => _resolve().ChainedStateBasicRepresentation(id);
     internal bool ChainedStateBasicStateChild(ChainedStateBasicFrame paid, ResolutionFrame child) => _resolve().ChainedStateBasicStateChild(paid, child);
     internal bool ChainedStateBasicStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => _resolve().ChainedStateBasicStructuralEdge(parent, child);
     internal void ClearChainedStateBasicDodgeResponse(NativeOwners.CardAttackHandle attack) => _resolve().ClearChainedStateBasicDodgeResponse(attack);
@@ -24,7 +23,6 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsEntries
     internal bool IsIssuedChainedStateBasicUse(CardUseFrame use) => _resolve().IsIssuedChainedStateBasicUse(use);
     internal void IssueChainedStateBasicUse(CardUseFrame use, ChainedStateBasicPayment? payment) => _resolve().IssueChainedStateBasicUse(use, payment);
     internal CardActionContext PrepareChainedStateBasicAction(CardActionContext action, ChainedStateBasicPayment? payment) => _resolve().PrepareChainedStateBasicAction(action, payment);
-    internal Card ReadChainedStateBasicUseAppearance(long id, CardAppearanceReference appearance) => _resolve().ReadChainedStateBasicUseAppearance(id, appearance);
     internal CardActionContext RequireChainedStateBasicResponseAction(CardUseFrame use) => _resolve().RequireChainedStateBasicResponseAction(use);
     internal void ResolveChainedStateBasicDodge(ChainedStateBasicPayment p) => _resolve().ResolveChainedStateBasicDodge(p);
     internal void ReturnChainedStateBasicUse(CardUseFrame completed) => _resolve().ReturnChainedStateBasicUse(completed);

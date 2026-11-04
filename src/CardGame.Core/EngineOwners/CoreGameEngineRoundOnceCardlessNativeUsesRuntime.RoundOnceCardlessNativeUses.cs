@@ -125,13 +125,6 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeUsesRuntime
         return use.SourceSeat == action.ActorSeat && action.ProviderSeat == receipt.ProviderSeat && (use.CardKind == receipt.EffectiveKind || use.CurrentSlashFirePolicy is not null);
     }
 
-    internal Card RoundOnceCardlessNativeRepresentation(long id)
-    {
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id);
-        if (use is null || !IsRoundOnceCardlessBasicUse(id))
-            throw new InvalidOperationException("Logical cardless Slash lacks its exact native accepted source and paid issuance.");
-        return new(0, use.CardKind, Suit.None, 0);
-    }
 
     internal IReadOnlyList<PromptChoice> RoundOnceCardlessForcedSlashChoices(CharacterState actor, CharacterState target, long originalId, bool qinglong)
     {

@@ -48,7 +48,7 @@ internal sealed partial class CharacterJiangJiMouRuntime
 
         _coreNativeCardContinuationCursorsOperations.ActiveGroupCard = null;
         _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword = null;
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, requireProcessing: true);
+        var card = _nativeCardRepresentations.Get(id, use.CardId, requireProcessing: true);
         var trick = state.Native.Trick!;
         IReadOnlyList<int> targets = use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(state.ActiveIndex).Take(2).ToArray() : [state.ActiveTarget];
         _coreNativeNullificationOperations.BeginNullificationWindow(id, card, use.SourceSeat, targets, trick.ActionKind, null, trick.RequiredCardKind, use.CardKind);

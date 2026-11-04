@@ -90,7 +90,7 @@ internal sealed partial class CoreNativeSlashTargetDuelRuntime
     {
         if (IsNativeSlashTargetDuelZeroUse(use.Id))
             return new Card(0, use.CardKind, use.Action!.EffectiveSuit ?? Suit.None, use.Action.EffectiveRank ?? 0);
-        return _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId);
+        return _nativeCardRepresentations.Get(use.Id, use.CardId);
     }
 
     internal CardActionContext NativeSlashTargetDuelEffectAction(CardUseFrame use, NativeSlashTargetDuelSlice slice)

@@ -21,7 +21,6 @@ internal sealed partial class CharacterHuCheErMouEntries
     internal bool MouHuCheErFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MouHuCheErFirstChild(f, child);
     internal bool MouHuCheErMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => _resolve().MouHuCheErMovement(f, op, p);
     internal bool MouHuCheErRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().MouHuCheErRecoveryParent(f, recovery);
-    internal Card MouHuCheErRepresentation(long id) => _resolve().MouHuCheErRepresentation(id);
     internal ProgramSkillFrame? MouHuCheErRoot() => _resolve().MouHuCheErRoot();
     internal bool MouHuCheErSuffix(int n) => _resolve().MouHuCheErSuffix(n);
     internal CardActionContext PrepareMouHuCheErSlashAction(CardActionContext action) => _resolve().PrepareMouHuCheErSlashAction(action);

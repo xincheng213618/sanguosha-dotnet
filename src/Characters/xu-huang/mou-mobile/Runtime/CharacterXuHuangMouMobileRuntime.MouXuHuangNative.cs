@@ -125,15 +125,6 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
 
     internal bool IsMouXuHuangZeroUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { CardId: 0 } && IsMouXuHuangNativeUse(id);
     internal bool MatchesMouXuHuangNativeAction(long id, CardActionContext action, int cardId) => cardId == 0 && IsMouXuHuangZeroUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.Action is { } current && action.ActionId == current.ActionId && action.Type == current.Type && action.ActorSeat == current.ActorSeat && action.ProviderSeat == current.ProviderSeat && action.EffectiveKind == current.EffectiveKind && action.PhysicalCards.Count == 0 && action.ConversionChain.SequenceEqual(current.ConversionChain);
-    internal Card MouXuHuangRepresentation(long id) => IsMouXuHuangZeroUse(id) ? new(0, CardKind.Duel, Suit.None, 0) : throw new InvalidOperationException("Xu Huang lost its signed zero-material Duel.");
-    internal Card ReadMouXuHuangUseAppearance(long id, CardAppearanceReference appearance)
-    {
-        if (!IsMouXuHuangZeroUse(id))
-            return _characterLiuChengMouMobileOperations.ReadMouLiuChengUseAppearance(id, appearance);
-        if (appearance.Id != 0 || appearance.Kind != CardKind.Duel || appearance.Suit != Suit.None || appearance.Rank != 0)
-            throw new InvalidOperationException("Xu Huang's empty native Duel changed its neutral appearance.");
-        return MouXuHuangRepresentation(id);
-    }
 
     internal long? MouXuHuangDuelProgramParent(long id) => IsMouXuHuangZeroUse(id) ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.MouXuHuangNative!.ProgramFrameId : null;
     [NativeUseValidation(29500)]

@@ -5,9 +5,7 @@ internal sealed partial class CoreGameEngineDamageColorDuelProgramsEntries
     internal SkillProgramStepOutcome BeginDamageAppearanceDraw(ProgramSkillFrame input) => _resolve().BeginDamageAppearanceDraw(input);
     internal SkillProgramStepOutcome BeginSelectedActorDuel(ProgramSkillFrame input) => _resolve().BeginSelectedActorDuel(input);
     internal bool CanIssueSelectedActorDuel(int ownerSeat, int actorSeat) => _resolve().CanIssueSelectedActorDuel(ownerSeat, actorSeat);
-    internal Card GetTrickRepresentation(long frameId, int cardId, bool requireProcessing = false) => _resolve().GetTrickRepresentation(frameId, cardId, requireProcessing);
     internal bool IsSelectedActorDuelUse(long id) => _resolve().IsSelectedActorDuelUse(id);
     internal bool MatchesSelectedActorDuelAction(long frameId, CardActionContext action, int cardId) => _resolve().MatchesSelectedActorDuelAction(frameId, action, cardId);
     internal void ReturnSelectedActorDuel(CardUseFrame use) => _resolve().ReturnSelectedActorDuel(use);
-    internal Card UnrepresentedZeroTrick(long frameId) => _resolve().UnrepresentedZeroTrick(frameId);
 }

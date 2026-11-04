@@ -3,7 +3,6 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineDrawFundedDistinctBasicReturnsRuntime
 {
-    internal Card ReadDrawFundedDistinctBasicUseAppearance(long ownerFrameId, CardAppearanceReference appearance) => appearance.Id == 0 && _coreDrawFundedDistinctBasicUsesOperations.IsDrawFundedDistinctBasicUse(ownerFrameId) && _coreCardUseLifecycleOperations.LifecycleCardUse(ownerFrameId)!.CardKind == appearance.Kind && appearance.Suit == Suit.None && appearance.Rank == 0 ? _coreDrawFundedDistinctBasicUsesOperations.DrawFundedDistinctBasicRepresentation(ownerFrameId) : _coreTieredRoundZeroReturnsOperations.ReadTieredRoundUseAppearance(ownerFrameId, appearance);
     internal bool SkipDrawFundedDistinctBasicFinishedMovement(long frameId, Card card)
     {
         if (card.Id != 0 || !_coreDrawFundedDistinctBasicUsesOperations.IsDrawFundedDistinctBasicUse(frameId))

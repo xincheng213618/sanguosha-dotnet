@@ -416,7 +416,7 @@ internal sealed partial class CharacterYangYiOlRuntime
         var owner = _coreMatchParticipantsPlayersAccess._players[ownerSeat];
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, debtorSeat, debtorSeat, null, null, null, CardKind.Slash, [ownerSeat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, debtorSeat, 0, CardKind.Slash, [ownerSeat], PhysicalCardIds: []) { Action = action });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, debtorSeat, 0, CardKind.Slash, [ownerSeat], PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.Slash, Suit.None, 0), Action = action });
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(resolutionId, 0, CardKind.Slash, debtorSeat));

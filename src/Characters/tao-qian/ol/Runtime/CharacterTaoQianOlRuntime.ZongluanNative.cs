@@ -71,7 +71,6 @@ internal sealed partial class CharacterTaoQianOlRuntime
     }
 
     internal bool IsZongluanUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedZongluanUse(use);
-    internal Card ZongluanRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedZongluanUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Zongluan requires its exact issued native zero-entity Slash.");
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 28120)]
     internal void CaptureZongluanDirectDamage(IGameEvent payload)
     {

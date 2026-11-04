@@ -44,7 +44,6 @@ internal sealed partial class CharacterXuHuangMouMobileEntries
     internal IReadOnlyList<PromptChoice> MouXuHuangObtainChoices(ProgramSkillFrame f) => _resolve().MouXuHuangObtainChoices(f);
     internal bool MouXuHuangPhaseSpent(int owner, ActualDiscardRecoveryPhaseKey phase) => _resolve().MouXuHuangPhaseSpent(owner, phase);
     internal int MouXuHuangProjectedPhaseUses(int owner, string skill, int fallback) => _resolve().MouXuHuangProjectedPhaseUses(owner, skill, fallback);
-    internal Card MouXuHuangRepresentation(long id) => _resolve().MouXuHuangRepresentation(id);
     internal IReadOnlyList<PromptChoice> MouXuHuangShipoChoices(ProgramSkillFrame f) => _resolve().MouXuHuangShipoChoices(f);
     internal int[] MouXuHuangShipoEligible(int owner, bool all) => _resolve().MouXuHuangShipoEligible(owner, all);
     internal Dictionary<string, string> MouXuHuangShipoParameters(ProgramSkillFrame f, string branch) => _resolve().MouXuHuangShipoParameters(f, branch);
@@ -54,7 +53,6 @@ internal sealed partial class CharacterXuHuangMouMobileEntries
     internal bool PermitAcceptedMouXuHuang(ProgramSkillFrame f) => _resolve().PermitAcceptedMouXuHuang(f);
     internal CardActionContext PrepareMouXuHuangAction(CardActionContext action) => _resolve().PrepareMouXuHuangAction(action);
     internal void PublishMouXuHuang(ProgramSkillFrame f, int chooser, IReadOnlyList<PromptChoice> choices, string text) => _resolve().PublishMouXuHuang(f, chooser, choices, text);
-    internal Card ReadMouXuHuangUseAppearance(long id, CardAppearanceReference appearance) => _resolve().ReadMouXuHuangUseAppearance(id, appearance);
     internal bool ResumeMouXuHuang(long id) => _resolve().ResumeMouXuHuang(id);
     internal bool ReturnMouXuHuangMovement(ProgramSkillFrame f) => _resolve().ReturnMouXuHuangMovement(f);
     internal void ReturnMouXuHuangNative(CardUseFrame use) => _resolve().ReturnMouXuHuangNative(use);

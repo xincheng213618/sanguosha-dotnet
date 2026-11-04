@@ -115,7 +115,6 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal bool WuLuKangInputsAvailable(ResolutionFrame parent, int? replacing = default) => _resolve().WuLuKangInputsAvailable(parent, replacing);
     internal IReadOnlyList<PromptChoice> WuLuKangKegouChoices(ProgramSkillFrame f) => _resolve().WuLuKangKegouChoices(f);
     internal bool WuLuKangKegouParent(ProgramSkillFrame f) => _resolve().WuLuKangKegouParent(f);
-    internal Card WuLuKangKegouRepresentation(long id) => _resolve().WuLuKangKegouRepresentation(id);
     internal IReadOnlyList<LegalAction> WuLuKangKegouSlashPlans(ProgramSkillFrame f) => _resolve().WuLuKangKegouSlashPlans(f);
     internal Card WuLuKangMinimumDrawMaterial(CharacterState player, CardMoveReason reason, IReadOnlyList<Card> stock, Card ordinary) => _resolve().WuLuKangMinimumDrawMaterial(player, reason, stock, ordinary);
     internal bool WuLuKangObserverEdge(int n) => _resolve().WuLuKangObserverEdge(n);

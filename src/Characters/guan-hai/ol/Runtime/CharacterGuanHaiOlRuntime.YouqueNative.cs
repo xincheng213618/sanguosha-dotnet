@@ -72,7 +72,6 @@ internal sealed partial class CharacterGuanHaiOlRuntime
     }
 
     internal bool IsYouqueUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedYouqueUse(use);
-    internal Card YouqueRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedYouqueUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Youque requires its issued native zero-entity representation.");
 
     [NativeUseValidation(27579)]
     internal void ValidateYouqueNative(CardUseFrame use)

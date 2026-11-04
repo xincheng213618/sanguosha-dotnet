@@ -50,7 +50,6 @@ internal sealed partial class CharacterHuanShuJunOlEntries
     internal GameEngine.DrawFundedBasicNeed HuanpeiNativeNeed(HuanpeiNativeRequest n) => _resolve().HuanpeiNativeNeed(n);
     internal IReadOnlyList<LegalAction> HuanpeiNativePlayActions(CharacterState actor, CardConversionSource source, bool requested = false) => _resolve().HuanpeiNativePlayActions(actor, source, requested);
     internal IReadOnlyList<LegalAction> HuanpeiPaidPlayActions(ProgramSkillFrame f) => _resolve().HuanpeiPaidPlayActions(f);
-    internal Card HuanpeiRepresentation(long id) => _resolve().HuanpeiRepresentation(id);
     internal bool HuanpeiRequestParentCurrent(HuanpeiNativeRequest n) => _resolve().HuanpeiRequestParentCurrent(n);
     internal IReadOnlyList<PromptChoice> HuanpeiResponseChoices(PendingDecision p) => _resolve().HuanpeiResponseChoices(p);
     internal bool HuanpeiRoundSpent(int owner) => _resolve().HuanpeiRoundSpent(owner);

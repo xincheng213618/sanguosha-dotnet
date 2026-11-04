@@ -40,6 +40,10 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         var original = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouCarrierCreatedEvent>().Single(e => e.CardId == movement.CardId);
         if (movement.From == CardLocation.OutsideGame || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouCarrierDestroyedEvent>().Any(e => e.CardId == movement.CardId))
             throw new InvalidOperationException("A Diou carrier cannot be destroyed twice or re-enter after destruction.");
+        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
+                     use.Action?.PhysicalCards.Any(material => material.CardId == movement.CardId &&
+                         material.CardKind == movement.CardKind && material.From == movement.From) == true).ToArray())
+            _nativeCardRepresentations.CaptureDeparture(use.Id, movement.CardId, movement.Sequence);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouCarrierDestroyedEvent(original.FrameId, original.Source, original.GameplayHash, movement.CardId, movement.CardKind, _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id ?? 0, movement.Sequence, movement.From, movement.Reason));
     }
 

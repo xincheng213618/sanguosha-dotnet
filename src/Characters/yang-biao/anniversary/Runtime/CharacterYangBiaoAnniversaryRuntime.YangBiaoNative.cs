@@ -84,7 +84,7 @@ internal sealed partial class CharacterYangBiaoAnniversaryRuntime
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, null, CardActionType.Use, actor.Seat, actor.Seat, null, null, null, p.Kind, p.Targets, [], [], effectiveSuit: Suit.None, effectiveRank: 0));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryYangBiao = r with { Stage = AnniversaryYangBiaoStage.NativeUse, UseId = id, ActionId = action.ActionId }, VirtualBasicDraft = new(f.InstructionIndex, id) });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, p.Kind, p.Targets, PhysicalCardIds: []) { Action = action, VirtualBasicReturn = new(f.Id, f.InstructionIndex), UnlimitedUse = true });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, p.Kind, p.Targets, PhysicalCardIds: []) { NativeRepresentation = new(0, p.Kind, Suit.None, 0), Action = action, VirtualBasicReturn = new(f.Id, f.InstructionIndex), UnlimitedUse = true });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryYangBiaoNativeIssuedEvent(f.Id, r.Cursor, id, action.ActionId, p.Kind, r.Target));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));

@@ -127,7 +127,7 @@ internal sealed partial class CoreGameEngineMantianGuohaiRuntime
         _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].SkillGrants.RemoveGrant(frame.SkillInstanceId);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(receipt.CardUseFrameId, use => use with { MantianGuohaiGift = use.MantianGuohaiGift!with { GiftIndex = receipt.GiftIndex + 1, ProgramFrameId = null } });
         var owner = _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.CardUseFrameId)!;
-        _coreNativeCardUseCompletionOperations.FinishCardUse(owner.Id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(owner.Id, owner.CardId, requireProcessing: true), CardKind.MantianGuohai);
+        _coreNativeCardUseCompletionOperations.FinishCardUse(owner.Id, _nativeCardRepresentations.Get(owner.Id, owner.CardId, requireProcessing: true), CardKind.MantianGuohai);
         return true;
     }
 

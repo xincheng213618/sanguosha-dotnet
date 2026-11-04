@@ -113,15 +113,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
     internal bool MatchesMouLiuChengNativeAction(long id, CardActionContext action, int cardId) => cardId == 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } current } use && IsIssuedMouLiuChengUse(use) && action.ActionId == current.ActionId && action.Type == current.Type && action.ActorSeat == current.ActorSeat && action.ProviderSeat == current.ProviderSeat && action.EffectiveKind == current.EffectiveKind && action.PhysicalCards.Count == 0 && action.ConversionChain.SequenceEqual(current.ConversionChain);
     internal bool IsMouLiuChengUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouLiuChengUse(use);
     internal bool IsMouLiuChengZeroUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { CardId: 0 } use && IsIssuedMouLiuChengUse(use);
-    internal Card MouLiuChengRepresentation(long id) => IsMouLiuChengZeroUse(id) ? new(0, _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind, Suit.None, 0) : throw new InvalidOperationException("MouLiuCheng lost its zero-material native card representation.");
-    internal Card ReadMouLiuChengUseAppearance(long id, CardAppearanceReference appearance)
-    {
-        if (!IsMouLiuChengZeroUse(id))
-            return _characterXiaoQiaoMouOlOperations.ReadMouXqJueyanAppearance(id, appearance);
-        if (appearance.Id != 0 || appearance.Kind != _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind || appearance.Suit != Suit.None || appearance.Rank != 0)
-            throw new InvalidOperationException("MouLiuCheng's native continuation changed its exact neutral zero-material appearance.");
-        return MouLiuChengRepresentation(id);
-    }
 
     internal bool SkipMouLiuChengFinishedMovement(long id, Card c) => c.Id == 0 && IsMouLiuChengZeroUse(id) && c.Kind == _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.CardKind;
 

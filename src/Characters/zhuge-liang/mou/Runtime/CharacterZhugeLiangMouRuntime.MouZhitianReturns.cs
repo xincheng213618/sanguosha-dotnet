@@ -26,7 +26,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
         var allowed = _coreMatchParticipantsPlayersAccess._players[use.SourceSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FireAttackResolvedEvent(id, use.SourceSeat, target, revealedId, receipt.RevealedSuit, receipt.CardId, allowed));
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, current => current with { MouZhitianPayment = null, FireAttackSelection = null });
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, true);
+        var card = _nativeCardRepresentations.Get(id, use.CardId, true);
         if (!allowed)
         {
             _coreSequentialTrickTargetsOperations.MoveFinishedTrickCard(id, card);

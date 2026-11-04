@@ -103,7 +103,7 @@ internal sealed partial class CoreGameEngineForeignPublicPileSlashesRuntime
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
         var context = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, null, CardActionType.Use, actor.Seat, actor.Seat, null, null, null, CardKind.Slash, targets, payments.Select(card => new CardActionCost(card.Id, card.Kind, from, _coreActionDiscardColorsOperations.CapturePhysicalCardColor(actor.Seat, card))).ToArray(), [conversion], effectiveSuit: Suit.None, effectiveRank: 0));
         _corePhysicalMovementFacadesOperations.MoveCards(payments, from, CardLocation.DiscardPile, new CardMoveReason("program.public-pile.slash-payment"));
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, actor.Seat, 0, CardKind.Slash, targets, PhysicalCardIds: []) { Action = context });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, actor.Seat, 0, CardKind.Slash, targets, PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.Slash, Suit.None, 0), Action = context });
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(context));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseDeclaredEvent(resolutionId, 0, CardKind.Slash, actor.Seat));

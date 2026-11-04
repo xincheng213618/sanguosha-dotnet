@@ -33,6 +33,7 @@ internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovemen
                 HappyWeiYanGainDestination = happyWeiYanGainDestination,
                 HappyZuoCiPhantomDestination = happyZuoCiPhantomDestination };
         journal.Append(movement);
+        equipmentLifetime.Value.CaptureNativeMaterialDeparture(movement);
         materials.ValidateHappyWeiYanGainDestinationRecord(movement);
         materials.ValidateHappyZuoCiPhantomMovement(movement);
         materials.RecordDiouCarrierDestruction(movement);

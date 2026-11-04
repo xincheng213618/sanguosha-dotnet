@@ -108,6 +108,7 @@ var tests = new (string Name, Action Body)[]
     ("independent event history tracks pending replacement and committed identities", ProgramEventHistoryIndexChecks.IndependentIndexTracksPendingReplacementAndCommittedIdentities),
     ("independent command sessions isolate execution gates and recovery", CommandSessionChecks.IndependentSessionsIsolateExecutionAndRecovery),
     ("match runtime composition defers bindings and retries failed dependencies", ProgramRuntimeModuleChecks.MatchCompositionDefersBindingsAndRetriesFailedDependencies),
+    ("Native card representation: original faces carriers and exact departures", NativeCardRepresentationChecks.OriginalFacesAndPhysicalDeparturesKeepOwningUseBoundaries),
     ("match execution loop preserves human child and safety boundaries", MatchExecutionBoundaryChecks.IndependentLoopPreservesHumanChildAndSafetyBoundaries),
     ("resolution scheduler preserves issued parents and lifecycle order", MatchExecutionBoundaryChecks.IndependentSchedulerPreservesIssuedParentsAndLifecycleOrder),
     ("Wushuang balance: opening quality and mode exclusions preserve native rules cold", WushuangModeChecks.OpeningQualityAndBalanceExclusionsPreserveNativeRulesCold),

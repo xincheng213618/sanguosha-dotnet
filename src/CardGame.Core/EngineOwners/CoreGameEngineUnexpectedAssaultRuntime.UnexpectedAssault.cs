@@ -56,7 +56,7 @@ internal sealed partial class CoreGameEngineUnexpectedAssaultRuntime
         var sourceSeat = receipt.SourceSeat;
         var targetSeat = receipt.TargetSeat;
         var effectiveCardKind = CardKind.UnexpectedAssault;
-        var effectCard = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, requireProcessing: true);
+        var effectCard = _nativeCardRepresentations.Get(use.Id, use.CardId, requireProcessing: true);
         if (!receipt.CanCauseDamage)
         {
             _coreSequentialTrickTargetsOperations.MoveFinishedTrickCard(use.Id, effectCard);

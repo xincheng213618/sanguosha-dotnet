@@ -133,7 +133,7 @@ internal sealed partial class CoreNativeFireAttackRuntime
     }
 
     internal static int GetFireAttackTargetSeat(CardUseFrame pending) => RuntimeSkills.RuntimeRules_Core_CommonRules.GetFireAttackTargetSeat(pending);
-    internal Card GetFireAttackEffectCard(CardUseFrame pending) => _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(pending.Id, pending.CardId, requireProcessing: true);
+    internal Card GetFireAttackEffectCard(CardUseFrame pending) => _nativeCardRepresentations.Get(pending.Id, pending.CardId, requireProcessing: true);
     internal CardUseFrame SetFireAttackSelection(long frameId, FireAttackSelectionState? selection)
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame cardUse || cardUse.Id != frameId || CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(cardUse) != CardKind.FireAttack || (selection is null && cardUse.FireAttackSelection is null) || (selection is not null && cardUse.TargetIndex >= cardUse.TargetSeats.Count))

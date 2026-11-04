@@ -146,7 +146,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
             var commitment = QizhengCommitment(use.Id, r.NullificationId, ambush, nonce);
             _coreRuntimeOperations.ReplaceRuntimeTop(use = use with { Qizheng = r with { Stage = QizhengStage.Response, Ambush = ambush, Nonce = nonce, Commitment = commitment } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QizhengSecretCommittedEvent(use.Id, r.NullificationId, commitment));
-            var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, requireProcessing: true);
+            var card = _nativeCardRepresentations.Get(use.Id, use.CardId, requireProcessing: true);
             NativeOwners.CardAttackHandle attack = _kernelCoreMainOperations.CreateCardAttackHandle(use.Id, use.SourceSeat, r.Target, card, playedCardKind: CardKind.QizhengXiangsheng, physicalCards: _coreNativeTrickUseOperations.GetCardUsePhysicalCards(use.Id));
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             PublishQizheng(_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)!);
@@ -275,7 +275,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(supplied.Id)!;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = null;
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, f => f with { Qizheng = null });
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, requireProcessing: true);
+        var card = _nativeCardRepresentations.Get(use.Id, use.CardId, requireProcessing: true);
         _coreSequentialTrickTargetsOperations.MoveFinishedTrickCard(use.Id, card);
         _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, card, CardKind.QizhengXiangsheng);
     }

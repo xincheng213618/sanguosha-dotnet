@@ -110,7 +110,7 @@ internal sealed partial class CoreGameEngineGuanduCardsRuntime
         }
 
         _coreNativeCardUseFramesOperations.SetCardUseStep(id, ResolutionFrameStep.ResolvingEffect);
-        _coreNativeCardUseCompletionOperations.FinishCardUse(id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, requireProcessing: true), use.CardKind);
+        _coreNativeCardUseCompletionOperations.FinishCardUse(id, _nativeCardRepresentations.Get(id, use.CardId, requireProcessing: true), use.CardKind);
         return true;
     }
 
@@ -181,7 +181,7 @@ internal sealed partial class CoreGameEngineGuanduCardsRuntime
                 if (_coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.GuanduCardEffect) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.GuanduCardEffect) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.GuanduCardEffect) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id))
                     return;
                 _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, current => current with { GuanduCardEffect = null, NativeDraw = null });
-                _coreNativeCardUseCompletionOperations.FinishCardUse(id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, requireProcessing: true), CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
+                _coreNativeCardUseCompletionOperations.FinishCardUse(id, _nativeCardRepresentations.Get(id, use.CardId, requireProcessing: true), CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use));
                 return;
             }
 

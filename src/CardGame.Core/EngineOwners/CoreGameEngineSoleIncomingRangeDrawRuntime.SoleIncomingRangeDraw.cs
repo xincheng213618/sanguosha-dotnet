@@ -101,7 +101,7 @@ internal sealed partial class CoreGameEngineSoleIncomingRangeDrawRuntime
                 _coreNativeAttackCompletionOperations.CompleteAttackAfterCardResolution(completion);
         }
         else
-            _coreNativeCardUseCompletionOperations.FinishCardUse(id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId), use.CardKind);
+            _coreNativeCardUseCompletionOperations.FinishCardUse(id, _nativeCardRepresentations.Get(id, use.CardId), use.CardKind);
     }
 
     internal bool IsSoleIncomingRangeDrawMovement(CardUseFrame use, CardMovementBatchContext batch) => use.SoleIncomingRangeDraw is { Stage: SoleIncomingRangeDrawStage.Children, Outcome: { } result } receipt && batch.ParentFrameId == use.Id && batch.AwaitingProgramFrameId == receipt.AwaitingProgramFrameId && batch.Movements.Count > 0 && batch.Movements.All(m => m.Sequence > result.SequenceBefore && m.Sequence <= result.SequenceAfter && (result.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(result.RecipientSeat) && m.Reason == SoleIncomingRangeDrawReason(receipt.Grant) || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle));

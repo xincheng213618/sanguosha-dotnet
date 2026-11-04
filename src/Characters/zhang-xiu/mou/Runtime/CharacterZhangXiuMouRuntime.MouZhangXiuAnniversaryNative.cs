@@ -68,7 +68,6 @@ internal sealed partial class CharacterZhangXiuMouRuntime
     }
 
     internal bool IsMouZhangXiuAnniversaryUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouZhangXiuAnniversaryUse(use);
-    internal Card MouZhangXiuAnniversaryRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouZhangXiuAnniversaryUse(use) ? new(0, use.CardKind, Suit.None, 0) : throw new InvalidOperationException("Fuxi requires its own native zero-material representation.");
     [NativeUseValidation(36600)]
     internal void ValidateMouZhangXiuAnniversaryNative(CardUseFrame use)
     {

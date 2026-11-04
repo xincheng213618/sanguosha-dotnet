@@ -16,7 +16,7 @@ internal sealed partial class CoreNativeNullificationFramesRuntime
     }
 
     internal static int? GetNullificationTargetSeat(NullificationWindowFrame frame) => RuntimeSkills.RuntimeRules_Core_CommonRules.GetNullificationTargetSeat(frame);
-    internal Card GetNullificationEffectCard(NullificationWindowFrame frame) => frame.DelayedReturn is { OriginalUseLightning: not null } delayed && _coreOriginalUseLightningOperations.ValidOriginalUseLightningDelayed(delayed) ? new(0, CardKind.Lightning, Suit.None, 0) : _coreNativeSlashTargetDuelOperations.TryGetNativeSlashTargetDuel(frame, out var nativeUse, out _, out _) ? _coreNativeSlashTargetDuelOperations.NativeSlashTargetDuelRepresentation(nativeUse) : _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(frame.ParentFrameId, frame.EffectCardId);
+    internal Card GetNullificationEffectCard(NullificationWindowFrame frame) => frame.DelayedReturn is { OriginalUseLightning: not null } delayed && _coreOriginalUseLightningOperations.ValidOriginalUseLightningDelayed(delayed) ? new(0, CardKind.Lightning, Suit.None, 0) : _coreNativeSlashTargetDuelOperations.TryGetNativeSlashTargetDuel(frame, out var nativeUse, out _, out _) ? _coreNativeSlashTargetDuelOperations.NativeSlashTargetDuelRepresentation(nativeUse) : _nativeCardRepresentations.Get(frame.ParentFrameId, frame.EffectCardId);
     internal void SetCardUseTargetIndex(long frameId, int targetIndex)
     {
         var index = _resolutionStackOperations._resolutionStack.FindLastIndex(frame => frame.Id == frameId);

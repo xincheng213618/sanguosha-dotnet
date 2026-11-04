@@ -131,7 +131,7 @@ internal sealed partial class CoreGameEngineHpChangeProgramsRuntime
                     _coreRuntimeOperations.ReturnRuntimeProgramMovement(frame.ResumeFrameId!.Value);
                 break;
             case PostEventContinuation.CardUse:
-                var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(frame.ResumeFrameId!.Value, frame.CardId!.Value);
+                var card = _nativeCardRepresentations.Get(frame.ResumeFrameId!.Value, frame.CardId!.Value);
                 _coreNativeCardUseCompletionOperations.FinishCardUse(frame.ResumeFrameId!.Value, card, frame.CardKind);
                 break;
             case PostEventContinuation.VirtualBasicCardUse:

@@ -37,7 +37,11 @@ internal sealed partial class CharacterHuBanOlRuntime
             if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuiyunPaymentRecordedEvent>().Any(p => p.UseId == use.Id))
                 continue;
             if (use.HuiyunOrigin is { } origin && origin.Material.CardId == m.CardId && m.Sequence > origin.BeforePayment && m.From == origin.Material.From && m.Reason == CardMoveReasons.Use && m.To == (m.From.Zone == CardZoneKind.Equipment && _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon ? CardLocation.OutsideGame : CardLocation.Processing))
+            {
+                if (m.To == CardLocation.OutsideGame)
+                    _nativeCardRepresentations.CaptureDeparture(use.Id, m.CardId, m.Sequence);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuiyunPaymentRecordedEvent(use.Id, origin.ActionId, m.CardId, m.From, m.To, m.Reason, m.Sequence, false));
+            }
             else if (use.HuiyunFollowup is { } native && native.CardId == m.CardId && m.Sequence > native.BeforePayment && m.From == CardLocation.Hand(native.ActorSeat) && m.To == CardLocation.Processing && m.Reason == HuiyunNativePaymentReason(native))
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuiyunPaymentRecordedEvent(use.Id, native.ActionId, m.CardId, m.From, m.To, m.Reason, m.Sequence, true));
         }

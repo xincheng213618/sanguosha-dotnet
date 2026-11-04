@@ -233,7 +233,7 @@ internal sealed partial class CoreGameEngineDyingSuitsPeachProgramsRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, null, CardActionType.Use, actor, actor, null, null, null, CardKind.Peach, [r.VictimSeat], [], [], effectiveSuit: Suit.None, effectiveRank: 0));
         var ret = new DyingSuitsPeachReturn(f.Id, f.InstructionIndex, r.Source, f.GameplayHash, r.DyingFrameId, r.VictimSeat, actor, useId, action.ActionId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { DyingSuits = r with { Stage = DyingSuitsStage.PeachIssued, PeachReturn = ret } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(useId, actor, 0, CardKind.Peach, [r.VictimSeat], PhysicalCardIds: []) { Action = action, DyingSuitsPeachReturn = ret });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(useId, actor, 0, CardKind.Peach, [r.VictimSeat], PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.Peach, Suit.None, 0), Action = action, DyingSuitsPeachReturn = ret });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DyingSuitsPeachIssuedEvent(ret));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));

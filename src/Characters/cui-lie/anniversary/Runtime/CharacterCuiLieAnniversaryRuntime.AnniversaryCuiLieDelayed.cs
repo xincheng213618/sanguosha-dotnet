@@ -35,7 +35,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         if (window.Continuation != ProgramCardContinuation.FinalizedDelayedPlacement || window.TrickContinuation is not { } continuation || window.Action.ActionId != use.Action!.ActionId || !window.Action.TargetSeats.SequenceEqual(use.TargetSeats) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != use.Id || use.SequentialTrick is not null || use.TargetIndex != 0 || _cardZonesOperations._cardZones.GetLocation(use.CardId) != CardLocation.Processing)
             throw new InvalidOperationException("Chibi delayed placement lost its original paid entity, completed target window or first native cursor.");
         _coreRuntimeOperations.ReplaceRuntimeTop(use = use with { SequentialTrick = new(continuation.ActionKind, continuation.TargetCardId, continuation.RequiredCardKind) });
-        var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, use.CardId, requireProcessing: true);
+        var card = _nativeCardRepresentations.Get(use.Id, use.CardId, requireProcessing: true);
         var target = use.TargetSeats[0];
         if (!CuiLieDelayedTargetLegal(use, target))
         {

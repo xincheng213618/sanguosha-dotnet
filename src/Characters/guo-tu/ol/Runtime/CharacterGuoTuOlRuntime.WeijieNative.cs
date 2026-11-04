@@ -35,7 +35,6 @@ internal sealed partial class CharacterGuoTuOlRuntime
     }
 
     internal bool WeijieIssuedActorMatches(CardUseFrame use, WeijiePaidOrigin p) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseDeclaredEvent>().Any(e => e.ResolutionId == use.Id) ? _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, p.Need.ActorSeat, p.Need.ProviderSeat) : _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == use.Id && use.SourceSeat == p.Need.ActorSeat && use.Action?.ActorSeat == p.Need.ActorSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().Any(e => e.CardUseFrameId == use.Id);
-    internal Card WeijieRepresentation(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } u && IsIssuedWeijieUse(u) ? new(0, u.CardKind, Suit.None, 0) : throw new InvalidOperationException("Weijie representation requires its exact once-paid native zero use.");
     internal void DispatchWeijie(WeijiePaidOrigin p)
     {
         if (!ValidWeijiePayment(p) || !_coreMatchParticipantsPlayersAccess._players[p.Need.ActorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[p.Need.ProviderSeat].IsAlive)
@@ -214,7 +213,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
             return false;
         var u = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var actor = _coreMatchParticipantsPlayersAccess._players[u.SourceSeat];
-        var card = WeijieRepresentation(id);
+        var card = _nativeCardRepresentations.Get(id, 0);
         _coreNativeCardUseFramesOperations.SetCardUseStep(id, ResolutionFrameStep.ResolvingEffect);
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
         {

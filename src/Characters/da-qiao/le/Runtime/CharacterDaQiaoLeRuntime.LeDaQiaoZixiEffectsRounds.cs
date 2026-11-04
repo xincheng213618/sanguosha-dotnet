@@ -128,7 +128,7 @@ internal sealed partial class CharacterDaQiaoLeRuntime
         {
             _coreNativeCardContinuationCursorsOperations.ActiveGroupCard = null;
             _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword = null;
-            var card = _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(id, use.CardId, requireProcessing: true);
+            var card = _nativeCardRepresentations.Get(id, use.CardId, requireProcessing: true);
             IReadOnlyList<int> targets = use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(targetIndex).Take(2).ToArray() : [grant.CurrentTargetSeat];
             _coreNativeNullificationOperations.BeginNullificationWindow(id, card, use.SourceSeat, targets, trick.ActionKind, null, trick.RequiredCardKind, use.CardKind);
             return true;

@@ -17,7 +17,6 @@ internal sealed partial class CharacterZhangXiuMouEntries
     internal bool MouZhangXiuAnniversaryFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().MouZhangXiuAnniversaryFirstChild(f, child);
     internal bool MouZhangXiuAnniversaryMovement(ProgramSkillFrame f, SkillProgramEffect? op, ProgramMovementContinuation p) => _resolve().MouZhangXiuAnniversaryMovement(f, op, p);
     internal bool MouZhangXiuAnniversaryRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().MouZhangXiuAnniversaryRecoveryParent(f, recovery);
-    internal Card MouZhangXiuAnniversaryRepresentation(long id) => _resolve().MouZhangXiuAnniversaryRepresentation(id);
     internal ProgramSkillFrame? MouZhangXiuAnniversaryRoot() => _resolve().MouZhangXiuAnniversaryRoot();
     internal bool MouZhangXiuAnniversarySuffix(int n) => _resolve().MouZhangXiuAnniversarySuffix(n);
     internal void ObserveMouZhangXiuAnniversaryDamage(IGameEvent payload) => _resolve().ObserveMouZhangXiuAnniversaryDamage(payload);

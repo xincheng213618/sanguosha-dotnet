@@ -28,6 +28,7 @@ internal sealed partial class CoreGameEngineTriggeredCardProgramsRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, source.Seat, source.Seat, null, null, null, CardKind.Slash, [targetSeat], [], [provenance], effectiveSuit: Suit.None, effectiveRank: 0));
         _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(resolutionId, source.Seat, 0, CardKind.Slash, [targetSeat], PhysicalCardIds: [])
         {
+            NativeRepresentation = new(0, CardKind.Slash, Suit.None, 0),
             Action = action,
             ProgramResultSink = resultBind is { } bind
                 ? new(active.Id, active.InstructionIndex, bind, source.Seat, source.Seat, [targetSeat]) : null

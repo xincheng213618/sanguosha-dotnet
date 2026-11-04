@@ -31,7 +31,7 @@ internal sealed partial class CoreGameEngineForeignTurnContestsRuntime
         var parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(returned.ProgramFrameId);
         if (parent.ForeignTurnContest is not { Stage: ForeignTurnContestStage.SlashIssued } receipt || receipt.SlashReturn != returned || returned.InstructionIndex != parent.InstructionIndex || action.ActionId != returned.CardActionId || actor.Seat != returned.Origin.Result.OpponentSeat || target.Seat != parent.OwnerSeat || !action.TargetSeats.SequenceEqual([target.Seat]))
             throw new InvalidOperationException("A foreign Slash lost its prepared typed native issuance.");
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, CardKind.Slash, [target.Seat], PhysicalCardIds: []) { Action = action, ForeignTurnContestSlashReturn = returned });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, actor.Seat, 0, CardKind.Slash, [target.Seat], PhysicalCardIds: []) { NativeRepresentation = new(0, CardKind.Slash, Suit.None, 0), Action = action, ForeignTurnContestSlashReturn = returned });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ForeignTurnContestSlashIssuedEvent(returned));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));

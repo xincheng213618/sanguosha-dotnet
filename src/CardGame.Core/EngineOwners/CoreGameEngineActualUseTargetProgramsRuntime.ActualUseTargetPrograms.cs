@@ -156,7 +156,7 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
         {
             var ret = parent.TrickReturn ?? throw new InvalidOperationException("Missing ordinary-trick return.");
             var action = use.Action ?? throw new InvalidOperationException("An ordinary-trick target window requires an actual action.");
-            var pending = new NativeOwners.JizhiResolution(action.ActorSeat, use.Id, _coreDamageColorDuelProgramsOperations.GetTrickRepresentation(use.Id, ret.EffectCardId, true), use.CardKind, use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(use.TargetIndex).Take(2).ToArray() : use.TargetSeats, ret.ActionKind, ret.TargetCardId, ret.RequiredCardKind);
+            var pending = new NativeOwners.JizhiResolution(action.ActorSeat, use.Id, _nativeCardRepresentations.Get(use.Id, ret.EffectCardId, true), use.CardKind, use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(use.TargetIndex).Take(2).ToArray() : use.TargetSeats, ret.ActionKind, ret.TargetCardId, ret.RequiredCardKind);
             if (!_coreCardActionsOperations.TryBeginProgramCardWindow(null, action, SkillProgramTriggerWindow.CardUseBeforeTargetEffects, use.TargetSeats, ProgramCardContinuation.BeforeTrickTargetEffects, trickContinuation: new(ret.EffectCardId, ret.ActionKind, ret.TargetCardId, ret.RequiredCardKind)))
                 _coreNativeNullificationOperations.ContinueJizhiOrNullificationAfterTargetTriggers(pending);
             return;

@@ -58,7 +58,7 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault()?.Action?.ActionId, CardActionType.Use, f.OwnerSeat, f.OwnerSeat, null, null, null, p.Kind, p.Targets, [], [], effectiveSuit: Suit.None, effectiveRank: 0));
         var origin = new AnniversaryLiuYongSlashOrigin(f.Id, r.Source, r.Hash, id, action.ActionId, p.Kind, target.Seat);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryLiuYong = r with { Stage = AnniversaryLiuYongStage.NativeUse, UseId = id, ActionId = action.ActionId } });
-        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, f.OwnerSeat, 0, p.Kind, p.Targets, PhysicalCardIds: []) { UsesStandardZeroEntityAttackCompletion = true, Action = action, UnlimitedUse = true, AnniversaryLiuYongSlash = origin });
+        _coreRuntimeOperations.PushRuntimeFrame(new CardUseFrame(id, f.OwnerSeat, 0, p.Kind, p.Targets, PhysicalCardIds: []) { NativeRepresentation = new(0, p.Kind, Suit.None, 0), UsesStandardZeroEntityAttackCompletion = true, Action = action, UnlimitedUse = true, AnniversaryLiuYongSlash = origin });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuYongNativeIssuedEvent(f.Id, id, action.ActionId, p.Kind));
         if (_corePlayCardHistoryOperations.TracksPlayCardHistory)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUseAppearanceCapturedEvent(action));
