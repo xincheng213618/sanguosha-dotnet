@@ -52,13 +52,19 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
 
     internal (IReadOnlyList<int> LegalTargets, int OrdinaryMaximum, IReadOnlyList<ProgramSlashTargetExpansion> Claims) NativeMaterialSlashExpansion(CharacterState owner, IReadOnlyList<Card> cards)
     {
+        int? ordinaryMaximum = null;
+        return ReadNativeMaterialSlashExpansion(owner, cards, ref ordinaryMaximum);
+    }
+
+    private (IReadOnlyList<int> LegalTargets, int OrdinaryMaximum, IReadOnlyList<ProgramSlashTargetExpansion> Claims) ReadNativeMaterialSlashExpansion(CharacterState owner, IReadOnlyList<Card> cards, ref int? ordinaryMaximum)
+    {
         var ids = cards.Select(c => c.Id).ToArray();
         var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards);
         var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards);
         var rank = _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(owner, cards);
         var legal = Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, target, CardKind.Slash, suit, color, rank, ids)).Select(target => target.Seat).ToArray());
-        var ordinary = Math.Max(1, CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateCardTargetCount(owner, CardKind.Slash)));
-        return (legal, ordinary, _coreProgramTargetRulesOperations.TargetRules.ExtraSlashTargetClaims(new(owner.Seat, CardKind.Slash, suit ?? Suit.None, legal, color)));
+        ordinaryMaximum ??= Math.Max(1, CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateCardTargetCount(owner, CardKind.Slash)));
+        return (legal, ordinaryMaximum.Value, _coreProgramTargetRulesOperations.TargetRules.ExtraSlashTargetClaims(new(owner.Seat, CardKind.Slash, suit ?? Suit.None, legal, color)));
     }
 
     [ProgramCardAction(ProgramCardActionPhase.AfterProgram, 31)]
@@ -68,9 +74,10 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
         if (index < 0)
             return;
         var maximum = actions[index].MaxTargetCount;
+        int? ordinaryMaximum = null;
         foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner))
         {
-            var expansion = NativeMaterialSlashExpansion(owner, pair);
+            var expansion = ReadNativeMaterialSlashExpansion(owner, pair, ref ordinaryMaximum);
             if (expansion.Claims.Count == 0)
                 continue;
             maximum = Math.Max(maximum, Math.Min(expansion.LegalTargets.Count, expansion.OrdinaryMaximum + expansion.Claims.SelectMany(claim => claim.TargetSeats).Distinct().Count()));
