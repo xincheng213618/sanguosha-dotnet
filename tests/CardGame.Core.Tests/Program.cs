@@ -482,6 +482,7 @@ var tests = new (string Name, Action Body)[]
     ("Virtual ordinary trick composition frozen branches and public AI", VirtualOrdinaryTrickCompositionChecks.FrozenBranchesAndParticipantResourcesAreValidated),
     ("Ending Pindian win loss tie actual virtual tricks and cold return", PhaseEndingVirtualTrickChecks.EndingPindianWinLossTieUseExactVirtualTricksAndColdReturn),
     ("Actual turn use ordinal: frozen declaration order and true uses", ActualTurnUseOrdinalChecks.FrozenDeclarationOrderCountsOnlyActualUsesAndColdRestores),
+    ("Slash use prefix: actor identity kind changes and exact journal cutoffs", SlashUsePrefixChecks.DeclarationPrefixesKeepActorAndKindCutoffs),
     ("Actual second use foreign grants share state and expire on end", ActualTurnTemporarySkillChecks.ActualSecondUseForeignGrantsShareStateAndExpireOnEnd),
     ("Actual legacy Wine synchronous HP and completion child return", ActualTurnLegacyAlcoholChecks.SynchronousLegacyWineWaitsForHpAndCompletionChildren),
     ("Actual hand gains and category gifts: ActualHandGainsPreserveBatchIdentityAndExcludeSelfRecursion", ActualHandGainAndCategoryGiftChecks.ActualHandGainsPreserveBatchIdentityAndExcludeSelfRecursion),

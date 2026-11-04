@@ -59,7 +59,7 @@ internal sealed partial class CoreGameEngineSlashUseOrdinalsRuntime
     {
         // Reuse the ledger's exact native actor-replacement contract. Defending
         // Responses share an origin with the attack and must not follow it.
-        var replacements = history.Select((fact, index) => (fact, index)).Where(item => item.index >= start && item.fact is ProgramCardUseActorReplacedEvent change && (item.index < end || current is not null && change.CardUseFrameId == current.OriginFrameId)).Select(item => (ProgramCardUseActorReplacedEvent)item.fact).GroupBy(fact => fact.CardUseFrameId).ToDictionary(group => group.Key, group => group.ToArray());
+        var lookup = new SlashUsePrefixLookup(history);
         var seen = new HashSet<(long? ActionId, long? LegacyUseId, int? InstructionIndex)>();
         var count = 0;
         for (var index = start; index < end; index++)
@@ -71,11 +71,12 @@ internal sealed partial class CoreGameEngineSlashUseOrdinalsRuntime
                 throw new InvalidOperationException("A Slash-use prefix requires unique effective declarations and providers.");
             if (fact.RoundActionType != CardActionType.Use)
                 continue;
-            var kind = SlashUseKindAtPrefix(fact, history, end, current);
+            var kind = SlashUseKindAtPrefix(fact, lookup, end, current, fact.EffectiveCardKind.Value);
             var actor = fact.ActorSeat;
-            if (replacements.TryGetValue(fact.OriginFrameId, out var changes))
-                foreach (var change in changes)
+            foreach (var entry in lookup.ActorChanges(fact.OriginFrameId))
+                if (entry.Index >= start && (entry.Index < end || current is not null && entry.Fact.CardUseFrameId == current.OriginFrameId))
                 {
+                    var change = entry.Fact;
                     if (change.PreviousActorSeat != actor || change.OwnerSeat != actor || change.ProviderSeat != provider || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(change.ActorSeat))
                         throw new InvalidOperationException("A Slash-use prefix lost its native actor-replacement chain.");
                     actor = change.ActorSeat;
@@ -91,22 +92,40 @@ internal sealed partial class CoreGameEngineSlashUseOrdinalsRuntime
     }
 
     internal CardKind SlashUseKindAtPrefix(CurrentTurnCardUseKindsRecordedEvent fact, IReadOnlyList<IGameEvent> history, int end, CurrentTurnCardUseKindsRecordedEvent? current) => SlashUseKindAtPrefix(fact, history, end, current, fact.EffectiveCardKind ?? throw new InvalidOperationException("A Slash-use ordinal requires its frozen declaration kind."));
-    internal CardKind SlashUseKindAtPrefix(CurrentTurnCardUseKindsRecordedEvent fact, IReadOnlyList<IGameEvent> history, int end, CurrentTurnCardUseKindsRecordedEvent? current, CardKind original)
+    internal CardKind SlashUseKindAtPrefix(CurrentTurnCardUseKindsRecordedEvent fact, IReadOnlyList<IGameEvent> history, int end, CurrentTurnCardUseKindsRecordedEvent? current, CardKind original) =>
+        SlashUseKindAtPrefix(fact, new SlashUsePrefixLookup(history), end, current, original);
+
+    private CardKind SlashUseKindAtPrefix(CurrentTurnCardUseKindsRecordedEvent fact, SlashUsePrefixLookup lookup, int end, CurrentTurnCardUseKindsRecordedEvent? current, CardKind original)
     {
         if (fact.EffectiveCardKind is { } recorded && recorded != original)
             throw new InvalidOperationException("A proven declaration kind differs from its native declaration receipt.");
-        var changes = history.Select((payload, index) => (payload, index)).Where(item => item.payload is ProgramCurrentSlashFireChangedEvent changed && changed.CardUseFrameId == fact.OriginFrameId && (item.index < end || fact == current)).ToArray();
-        if (changes.Length == 0)
+        var changes = lookup.FireChanges(fact.OriginFrameId);
+        var changeCount = 0;
+        (int Index, ProgramCurrentSlashFireChangedEvent Fact) entry = default;
+        foreach (var candidate in changes)
+            if (candidate.Index < end || fact == current)
+            {
+                entry = candidate;
+                changeCount++;
+            }
+        if (changeCount == 0)
             return original;
-        var declarationIndexes = history.Select((payload, index) => (payload, index)).Where(item => Equals(item.payload, fact)).Select(item => item.index).ToArray();
-        if (changes is not [var entry] || entry.payload is not ProgramCurrentSlashFireChangedEvent change || declarationIndexes is not [var declarationIndex] || entry.index <= declarationIndex || fact.RoundActionType != CardActionType.Use || fact.CardActionId != change.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(original) || change.OriginalKind != original || change.FinalKind != CardKind.FireSlash || history.OfType<CardUseDeclaredEvent>().Count(e => e.ResolutionId == fact.OriginFrameId && e.SourceSeat == fact.ActorSeat && e.CardKind == original) != 1)
+        var declarationIndexes = lookup.DeclarationPositions(fact);
+        var change = entry.Fact;
+        if (changeCount != 1 || declarationIndexes.Count != 1 || entry.Index <= declarationIndexes[0] || fact.RoundActionType != CardActionType.Use || fact.CardActionId != change.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(original) || change.OriginalKind != original || change.FinalKind != CardKind.FireSlash || lookup.DeclaredCount(fact.OriginFrameId, fact.ActorSeat, original) != 1)
             throw new InvalidOperationException("An effective Slash kind requires one exact native committed conversion.");
-        var starts = history.Select((payload, index) => (payload, index)).Where(item => item.payload is ProgramBindingStartedEvent started && started.FrameId == change.ProgramFrameId).ToArray();
-        if (starts is not [var start] || start.index >= entry.index || start.payload is not ProgramBindingStartedEvent binding || binding.SkillId != change.Source.SkillId || binding.BindingId != change.Source.BindingId || binding.SkillInstanceId != change.Source.SkillInstanceId || binding.OwnerSeat != change.Source.OwnerSeat || binding.Window != SkillProgramTriggerWindow.CardUseCommitted || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(binding.SkillId)?.Program is not { } program || ProgramInstructionResolver.Default.FindTrigger(program, binding.BindingId)is not { } trigger || trigger.Window != binding.Window || trigger.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor || trigger.CardKinds.Count != 0 && !ProgramCardKindMatch.Contains(trigger.CardKinds, original) || !ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.OfferCurrentSlashFireAndExtraTarget))
+        var starts = lookup.BindingStarts(change.ProgramFrameId);
+        if (starts.Count != 1)
+            throw new InvalidOperationException("A converted Slash lost its exact committed binding issuance.");
+        var start = starts[0];
+        var binding = start.Fact;
+        if (start.Index >= entry.Index || binding.SkillId != change.Source.SkillId || binding.BindingId != change.Source.BindingId || binding.SkillInstanceId != change.Source.SkillInstanceId || binding.OwnerSeat != change.Source.OwnerSeat || binding.Window != SkillProgramTriggerWindow.CardUseCommitted || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(binding.SkillId)?.Program is not { } program || ProgramInstructionResolver.Default.FindTrigger(program, binding.BindingId)is not { } trigger || trigger.Window != binding.Window || trigger.OwnerRelation != SkillProgramCardActionOwnerRelation.Actor || trigger.CardKinds.Count != 0 && !ProgramCardKindMatch.Contains(trigger.CardKinds, original) || !ProgramInstructionResolver.Default.Features(trigger).HasOperation(SkillProgramEffectOp.OfferCurrentSlashFireAndExtraTarget))
             throw new InvalidOperationException("A converted Slash lost its exact committed binding issuance.");
         var actor = fact.ActorSeat;
-        foreach (var replacement in history.Take(entry.index).OfType<ProgramCardUseActorReplacedEvent>().Where(e => e.CardUseFrameId == fact.OriginFrameId))
+        foreach (var actorEntry in lookup.ActorChanges(fact.OriginFrameId))
         {
+            if (actorEntry.Index >= entry.Index) break;
+            var replacement = actorEntry.Fact;
             if (replacement.PreviousActorSeat != actor || replacement.OwnerSeat != actor || replacement.ProviderSeat != fact.RoundProviderSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(replacement.ActorSeat))
                 throw new InvalidOperationException("A converted Slash lost its earlier native actor chain.");
             actor = replacement.ActorSeat;
@@ -120,7 +139,7 @@ internal sealed partial class CoreGameEngineSlashUseOrdinalsRuntime
             if (producer.SkillId != binding.SkillId || producer.TriggerId != binding.BindingId || producer.SkillInstanceId != binding.SkillInstanceId || producer.OwnerSeat != binding.OwnerSeat || producer.GameplayHash != program.GameplayHash || producer.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } useContext } || useContext.ParentCardUseFrameId != fact.OriginFrameId || useContext.CardActionId != change.ActionId || producer.InstructionIndex < 1 || producer.InstructionIndex > plan.Instructions.Count || !plan.Instructions.Take(producer.InstructionIndex).Any(effect => effect.Op == SkillProgramEffectOp.OfferCurrentSlashFireAndExtraTarget))
                 throw new InvalidOperationException("A live Slash conversion lost its exact paused committed producer.");
         }
-        else if (history.Skip(entry.index + 1).OfType<ProgramBindingResolvedEvent>().Count(resolved => resolved.FrameId == binding.FrameId && resolved.SkillId == binding.SkillId && resolved.BindingId == binding.BindingId && resolved.SkillInstanceId == binding.SkillInstanceId && resolved.OwnerSeat == binding.OwnerSeat && resolved.Window == binding.Window && resolved.Activated) != 1)
+        else if (lookup.BindingReturns(binding.FrameId).Count(returned => returned.Index > entry.Index && returned.Fact.SkillId == binding.SkillId && returned.Fact.BindingId == binding.BindingId && returned.Fact.SkillInstanceId == binding.SkillInstanceId && returned.Fact.OwnerSeat == binding.OwnerSeat && returned.Fact.Window == binding.Window && returned.Fact.Activated) != 1)
             throw new InvalidOperationException("A historical Slash conversion lost its exact native producer return.");
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(fact.OriginFrameId)is { } use)
         {
@@ -130,5 +149,105 @@ internal sealed partial class CoreGameEngineSlashUseOrdinalsRuntime
         }
 
         return change.FinalKind;
+    }
+
+    // One interpretation query owns these structural indexes. They retain full
+    // journal positions; validation and each caller's cutoff stay above.
+    private sealed class SlashUsePrefixLookup(IReadOnlyList<IGameEvent> history)
+    {
+        private Dictionary<long, List<(int Index, ProgramCardUseActorReplacedEvent Fact)>>? _actors;
+        private Dictionary<long, List<(int Index, ProgramCurrentSlashFireChangedEvent Fact)>>? _fires;
+        private Dictionary<CurrentTurnCardUseKindsRecordedEvent, List<int>>? _declarations;
+        private Dictionary<(long UseId, int Actor, CardKind Kind), int>? _declaredCounts;
+        private Dictionary<long, List<(int Index, ProgramBindingStartedEvent Fact)>>? _starts;
+        private Dictionary<long, List<(int Index, ProgramBindingResolvedEvent Fact)>>? _returns;
+
+        internal IReadOnlyList<(int Index, ProgramCardUseActorReplacedEvent Fact)> ActorChanges(long useId)
+        {
+            if (_actors is null)
+            {
+                _actors = [];
+                for (var index = 0; index < history.Count; index++)
+                    if (history[index] is ProgramCardUseActorReplacedEvent actor)
+                    {
+                        if (!_actors.TryGetValue(actor.CardUseFrameId, out var changes))
+                            _actors.Add(actor.CardUseFrameId, changes = []);
+                        changes.Add((index, actor));
+                    }
+            }
+            return _actors.TryGetValue(useId, out var result) ? result : [];
+        }
+
+        internal IReadOnlyList<(int Index, ProgramCurrentSlashFireChangedEvent Fact)> FireChanges(long useId)
+        {
+            if (_fires is null)
+            {
+                _fires = [];
+                for (var index = 0; index < history.Count; index++)
+                    if (history[index] is ProgramCurrentSlashFireChangedEvent fire)
+                    {
+                        if (!_fires.TryGetValue(fire.CardUseFrameId, out var changes))
+                            _fires.Add(fire.CardUseFrameId, changes = []);
+                        changes.Add((index, fire));
+                    }
+            }
+            return _fires.TryGetValue(useId, out var result) ? result : [];
+        }
+
+        internal IReadOnlyList<int> DeclarationPositions(CurrentTurnCardUseKindsRecordedEvent fact)
+        {
+            IndexProofFacts();
+            return _declarations!.TryGetValue(fact, out var result) ? result : [];
+        }
+
+        internal int DeclaredCount(long useId, int actor, CardKind kind)
+        {
+            IndexProofFacts();
+            return _declaredCounts!.GetValueOrDefault((useId, actor, kind));
+        }
+
+        internal IReadOnlyList<(int Index, ProgramBindingStartedEvent Fact)> BindingStarts(long frameId)
+        {
+            IndexProofFacts();
+            return _starts!.TryGetValue(frameId, out var result) ? result : [];
+        }
+
+        internal IReadOnlyList<(int Index, ProgramBindingResolvedEvent Fact)> BindingReturns(long frameId)
+        {
+            IndexProofFacts();
+            return _returns!.TryGetValue(frameId, out var result) ? result : [];
+        }
+
+        private void IndexProofFacts()
+        {
+            if (_declarations is not null) return;
+            _declarations = [];
+            _declaredCounts = [];
+            _starts = [];
+            _returns = [];
+            for (var index = 0; index < history.Count; index++)
+                switch (history[index])
+                {
+                    case CurrentTurnCardUseKindsRecordedEvent declaration:
+                        if (!_declarations.TryGetValue(declaration, out var positions))
+                            _declarations.Add(declaration, positions = []);
+                        positions.Add(index);
+                        break;
+                    case CardUseDeclaredEvent declared:
+                        var key = (declared.ResolutionId, declared.SourceSeat, declared.CardKind);
+                        _declaredCounts[key] = checked(_declaredCounts.GetValueOrDefault(key) + 1);
+                        break;
+                    case ProgramBindingStartedEvent started:
+                        if (!_starts.TryGetValue(started.FrameId, out var starts))
+                            _starts.Add(started.FrameId, starts = []);
+                        starts.Add((index, started));
+                        break;
+                    case ProgramBindingResolvedEvent returned:
+                        if (!_returns.TryGetValue(returned.FrameId, out var returns))
+                            _returns.Add(returned.FrameId, returns = []);
+                        returns.Add((index, returned));
+                        break;
+                }
+        }
     }
 }
