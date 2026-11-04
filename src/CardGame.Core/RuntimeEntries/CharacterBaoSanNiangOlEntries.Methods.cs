@@ -20,7 +20,6 @@ internal sealed partial class CharacterBaoSanNiangOlEntries
     internal bool HasBaoSilverLionPayment(ProgramSkillFrame f, int seat) => _resolve().HasBaoSilverLionPayment(f, seat);
     internal bool IsChosenAssaultUse(long id) => _resolve().IsChosenAssaultUse(id);
     internal void IssueBaoAssault(ProgramSkillFrame f) => _resolve().IssueBaoAssault(f);
-    internal bool MatchesChosenAssaultUseAction(long id, CardActionContext action, int cardId) => _resolve().MatchesChosenAssaultUseAction(id, action, cardId);
     internal void ObserveChosenAssaultDamage(IGameEvent payload) => _resolve().ObserveChosenAssaultDamage(payload);
     internal void PayBaoAssault(ProgramSkillFrame f) => _resolve().PayBaoAssault(f);
     internal void PayBaoGain(ProgramSkillFrame f, PromptChoice choice) => _resolve().PayBaoGain(f, choice);

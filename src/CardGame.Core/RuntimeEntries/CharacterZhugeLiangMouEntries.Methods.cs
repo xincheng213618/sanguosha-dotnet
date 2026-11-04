@@ -15,7 +15,6 @@ internal sealed partial class CharacterZhugeLiangMouEntries
     internal bool IsMouZhijueZeroUse(long id) => _resolve().IsMouZhijueZeroUse(id);
     internal bool IsZeroEntityUse(long id) => _resolve().IsZeroEntityUse(id);
     internal void IssueMouZhijueUse(ProgramSkillFrame frame, LegalAction action, GameEngine.ProgramOrdinaryTrickUseOption? trick, Card card, IReadOnlyList<int> physicalIds) => _resolve().IssueMouZhijueUse(frame, action, trick, card, physicalIds);
-    internal bool MatchesMouZhijueUseAction(long id, CardActionContext action, int cardId) => _resolve().MatchesMouZhijueUseAction(id, action, cardId);
     internal int[] MatchingMouWujingIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _resolve().MatchingMouWujingIndexes(batch, candidate);
     internal bool MouDiscardNotFromUse(CardMovementRecord move) => _resolve().MouDiscardNotFromUse(move);
     internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> MouYangOptions(CharacterState owner) => _resolve().MouYangOptions(owner);

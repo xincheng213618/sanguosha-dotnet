@@ -94,10 +94,10 @@ internal sealed partial class CoreGameEngineCardUseLifecycleRuntime
 
     internal void ContinueCommittedTrickUse(ProgramCardTriggerWindowFrame frame)
     {
-        var continuation = frame.TrickContinuation ?? throw new InvalidOperationException("The committed trick lost its continuation.");
-        var card = _nativeCardRepresentations.Get(frame.ParentFrameId, continuation.EffectCardId, requireProcessing: true);
-        var action = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(use => use.Id == frame.ParentFrameId).Action!;
-        _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(frame.ParentFrameId, card, action.ActorSeat, action.TargetSeats, continuation.ActionKind, continuation.TargetCardId, continuation.RequiredCardKind, action.EffectiveKind);
+        var resumed = _nativeTrickContinuations.Read(frame);
+        var continuation = resumed.Continuation;
+        var action = resumed.Use.Action!;
+        _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(resumed.Use.Id, resumed.Card, action.ActorSeat, action.TargetSeats, continuation.ActionKind, continuation.TargetCardId, continuation.RequiredCardKind, action.EffectiveKind);
     }
 
     internal void BeginSimpleCardUse(long frameId, ProgramSimpleCardContinuation continuation)

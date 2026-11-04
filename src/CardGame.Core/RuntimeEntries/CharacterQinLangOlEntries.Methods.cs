@@ -22,7 +22,6 @@ internal sealed partial class CharacterQinLangOlEntries
     internal bool IsQinLangXianyingSlashQuery(CharacterState actor) => _resolve().IsQinLangXianyingSlashQuery(actor);
     internal bool IsQinLangXianyingUse(long id) => _resolve().IsQinLangXianyingUse(id);
     internal bool MatchesQinLangXianying(ProgramSkillFrame f, QinLangXianyingUseOrigin o) => _resolve().MatchesQinLangXianying(f, o);
-    internal bool MatchesQinLangXianyingUseAction(long id, CardActionContext a, int cardId) => _resolve().MatchesQinLangXianyingUseAction(id, a, cardId);
     internal IEnumerable<QinLangXianyingGrantedEvent> OutstandingQinLangGrants(int turn) => _resolve().OutstandingQinLangGrants(turn);
     internal void PayQinLang(ProgramSkillFrame f) => _resolve().PayQinLang(f);
     internal void PublishQinLang(ProgramSkillFrame f) => _resolve().PublishQinLang(f);

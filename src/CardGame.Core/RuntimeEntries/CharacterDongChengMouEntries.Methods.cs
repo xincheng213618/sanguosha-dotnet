@@ -10,7 +10,6 @@ internal sealed partial class CharacterDongChengMouEntries
     internal bool IsMouDcClaimedEntity(long useId, int card) => _resolve().IsMouDcClaimedEntity(useId, card);
     internal bool IsMouDcZeroUse(long id) => _resolve().IsMouDcZeroUse(id);
     internal void IssueMouDcUse(ProgramSkillFrame f) => _resolve().IssueMouDcUse(f);
-    internal bool MatchesMouDcNativeAction(long id, CardActionContext a, int card) => _resolve().MatchesMouDcNativeAction(id, a, card);
     internal MouDcOccurrence? MouDcBefore(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => _resolve().MouDcBefore(c, w);
     internal bool MouDcCanActivate(CharacterState owner) => _resolve().MouDcCanActivate(owner);
     internal void MouDcClaim(ProgramSkillFrame f) => _resolve().MouDcClaim(f);

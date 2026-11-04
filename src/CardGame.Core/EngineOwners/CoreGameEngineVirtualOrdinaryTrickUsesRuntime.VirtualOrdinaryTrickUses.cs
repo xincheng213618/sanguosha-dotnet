@@ -191,7 +191,6 @@ internal sealed partial class CoreGameEngineVirtualOrdinaryTrickUsesRuntime
         return true;
     }
 
-    internal bool MatchesVirtualOrdinaryTrickUseAction(long frameId, CardActionContext action, int cardId) => cardId == 0 && IsProgramVirtualOrdinaryTrickUse(frameId) && _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)?.Action?.ActionId == action.ActionId && action.Type == CardActionType.Use && action.EffectiveKind == _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)!.CardKind && action.PhysicalCards.Count == 0 && action.ConversionChain.Count == 0;
     [NativeUseReturn(210)]
     internal void ReturnProgramVirtualOrdinaryTrick(CardUseFrame use)
     {

@@ -30,7 +30,6 @@ internal sealed partial class CharacterTianChouOlRuntime
         return index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramSkillFrame frame && MatchesTianChouShandao(frame, origin);
     }
 
-    internal bool MatchesTianChouShandaoUseAction(long id, CardActionContext action, int cardId) => cardId == 0 && IsTianChouShandaoUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action is { } issued && issued.ActionId == action.ActionId && action.Type == CardActionType.Use && issued.ActorSeat == action.ActorSeat && issued.ProviderSeat == action.ProviderSeat && issued.EffectiveKind == action.EffectiveKind && action.PhysicalCards.Count == 0 && action.ConversionChain.Count == 0 && issued.TargetSeats.SequenceEqual(action.TargetSeats) && action.EffectiveSuit == Suit.None && action.EffectiveRank == 0 && action.EffectiveIsRed == false && action.RequesterSeat is null && action.ResponderSeat is null && action.OpponentSeat is null;
     [NativeUseValidation(27090)]
     internal void ValidateTianChouShandaoUse(CardUseFrame use)
     {

@@ -22,28 +22,36 @@ internal sealed partial class CoreGameEngineOriginalUseLightningRuntime
             throw new InvalidOperationException("Lightning lost its original empty-material native Use.");
     }
 
-    internal bool MatchesOriginalUseLightningAction(long id, CardActionContext action, int cardId) => cardId == 0 && IsOriginalUseLightning(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action is { } issued && action.ActionId == issued.ActionId && action.Type == issued.Type && action.ActorSeat == issued.ActorSeat && action.ProviderSeat == issued.ProviderSeat && action.RequesterSeat == issued.RequesterSeat && action.ResponderSeat == issued.ResponderSeat && action.EffectiveKind == issued.EffectiveKind && action.EffectiveSuit == issued.EffectiveSuit && action.EffectiveRank == issued.EffectiveRank && action.EffectiveIsRed == issued.EffectiveIsRed && action.PhysicalCards.Count == 0 && action.ConversionChain.SequenceEqual(issued.ConversionChain) && action.TargetSeats.SequenceEqual(issued.TargetSeats);
     internal bool BeginOriginalUseLightningFinalized(long id, Card card, LegalActionKind actionKind)
     {
-        if (!IsOriginalUseLightning(id) || card.Id != 0 || actionKind != LegalActionKind.Lightning)
+        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id);
+        if (use is not { OriginalUseLightning: not null, Action: { } action } || card.Id != 0 || actionKind != LegalActionKind.Lightning)
             throw new InvalidOperationException("Lightning finalized targets lost their original zero-material Use.");
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
+        var continuation = new ProgramTrickContinuation(card.Id, actionKind);
         if (use.FinalizedTrickProgramsStarted)
             return false;
         _coreCardUseLifecycleOperations.TryMarkProgramUseAccepted(id);
         if (!_coreCardUseLifecycleOperations.TryMarkFinalizedTrickProgramsStarted(id))
             return false;
+        _nativeTrickContinuations.ValidateIssuance(id, action, ProgramCardContinuation.FinalizedDelayedPlacement, continuation);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(use.Action!));
-        return _coreCardActionsOperations.TryBeginProgramCardWindow(null, use.Action!, SkillProgramTriggerWindow.CardUseTargetsFinalized, use.TargetSeats, ProgramCardContinuation.FinalizedDelayedPlacement, trickContinuation: new(0, LegalActionKind.Lightning));
+        return _coreCardActionsOperations.TryBeginProgramCardWindow(null, use.Action!, SkillProgramTriggerWindow.CardUseTargetsFinalized, use.TargetSeats, ProgramCardContinuation.FinalizedDelayedPlacement, trickContinuation: continuation);
     }
 
-    internal bool IsOriginalUseLightningFinalizedWindow(ProgramCardTriggerWindowFrame window) => window.Continuation == ProgramCardContinuation.FinalizedDelayedPlacement && window.TrickContinuation is { EffectCardId: 0, ActionKind: LegalActionKind.Lightning, TargetCardId: null, RequiredCardKind: null } && window.SimpleContinuation is null && window.CompletedResponseReturn is null && window.AttackOwnerFrameId is null && IsOriginalUseLightning(window.ParentFrameId) && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is { FinalizedTrickProgramsStarted: true, ProgramUseAccepted: true } && MatchesOriginalUseLightningAction(window.ParentFrameId, window.Action, 0);
+    internal bool IsOriginalUseLightningFinalizedWindow(ProgramCardTriggerWindowFrame window) =>
+        window.Continuation == ProgramCardContinuation.FinalizedDelayedPlacement &&
+        window.TrickContinuation is { EffectCardId: 0, ActionKind: LegalActionKind.Lightning, TargetCardId: null, RequiredCardKind: null } &&
+        _nativeTrickContinuations.Matches(window) &&
+        _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId) is
+            { OriginalUseLightning: not null, CardId: 0, CardKind: CardKind.Lightning };
+
     internal void ContinueOriginalUseLightningFinalized(ProgramCardTriggerWindowFrame window)
     {
         if (!IsOriginalUseLightningFinalizedWindow(window) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != window.ParentFrameId)
             throw new InvalidOperationException("Lightning finalized targets lost their typed native parent.");
-        var use = _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)!;
-        _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(use.Id, new(0, CardKind.Lightning, Suit.None, 0), use.SourceSeat, use.TargetSeats, LegalActionKind.Lightning, playedCardKind: CardKind.Lightning);
+        var returned = _nativeTrickContinuations.Read(window);
+        var use = returned.Use;
+        _coreNativeNullificationOperations.BeginJizhiOrNullificationWindow(use.Id, returned.Card, use.SourceSeat, use.TargetSeats, returned.Continuation.ActionKind, playedCardKind: use.CardKind);
     }
 
     internal IReadOnlyList<int> OriginalUseLightningPlacementTargets(NativeOwners.JizhiResolution pending) => IsOriginalUseLightning(pending.ResolutionId) ? _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)!.TargetSeats.Skip(_coreCardUseLifecycleOperations.LifecycleCardUse(pending.ResolutionId)!.TargetIndex).Take(1).ToArray() : pending.TargetSeats;

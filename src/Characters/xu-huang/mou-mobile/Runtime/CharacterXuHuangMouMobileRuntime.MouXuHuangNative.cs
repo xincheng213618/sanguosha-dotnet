@@ -124,7 +124,6 @@ internal sealed partial class CharacterXuHuangMouMobileRuntime
     }
 
     internal bool IsMouXuHuangZeroUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { CardId: 0 } && IsMouXuHuangNativeUse(id);
-    internal bool MatchesMouXuHuangNativeAction(long id, CardActionContext action, int cardId) => cardId == 0 && IsMouXuHuangZeroUse(id) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.Action is { } current && action.ActionId == current.ActionId && action.Type == current.Type && action.ActorSeat == current.ActorSeat && action.ProviderSeat == current.ProviderSeat && action.EffectiveKind == current.EffectiveKind && action.PhysicalCards.Count == 0 && action.ConversionChain.SequenceEqual(current.ConversionChain);
 
     internal long? MouXuHuangDuelProgramParent(long id) => IsMouXuHuangZeroUse(id) ? _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.MouXuHuangNative!.ProgramFrameId : null;
     [NativeUseValidation(29500)]

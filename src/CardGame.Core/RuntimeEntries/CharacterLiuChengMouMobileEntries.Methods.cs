@@ -28,7 +28,6 @@ internal sealed partial class CharacterLiuChengMouMobileEntries
     internal bool IsMouLiuChengSuspendedCounterspell(NullificationWindowFrame window) => _resolve().IsMouLiuChengSuspendedCounterspell(window);
     internal bool IsMouLiuChengUse(long id) => _resolve().IsMouLiuChengUse(id);
     internal bool IsMouLiuChengZeroUse(long id) => _resolve().IsMouLiuChengZeroUse(id);
-    internal bool MatchesMouLiuChengNativeAction(long id, CardActionContext action, int cardId) => _resolve().MatchesMouLiuChengNativeAction(id, action, cardId);
     internal CardUseFrame? MouLiuChengAccrualUse(CardActionContext action) => _resolve().MouLiuChengAccrualUse(action);
     internal bool MouLiuChengCandidateMatches(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, ProgramCardTriggerWindowFrame window) => _resolve().MouLiuChengCandidateMatches(candidate, context, window);
     internal IReadOnlyList<PromptChoice> MouLiuChengChoices(ProgramSkillFrame f) => _resolve().MouLiuChengChoices(f);

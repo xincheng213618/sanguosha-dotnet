@@ -19,7 +19,6 @@ internal sealed partial class CoreGameEngineOriginalUseLightningEntries
     internal bool IsOriginalUseLightning(long id) => _resolve().IsOriginalUseLightning(id);
     internal bool IsOriginalUseLightningFinalizedWindow(ProgramCardTriggerWindowFrame window) => _resolve().IsOriginalUseLightningFinalizedWindow(window);
     internal bool IsOriginalUseLightningJudgment(JudgmentFrame j) => _resolve().IsOriginalUseLightningJudgment(j);
-    internal bool MatchesOriginalUseLightningAction(long id, CardActionContext action, int cardId) => _resolve().MatchesOriginalUseLightningAction(id, action, cardId);
     internal IReadOnlyList<int> OriginalUseLightningPlacementTargets(NativeOwners.JizhiResolution pending) => _resolve().OriginalUseLightningPlacementTargets(pending);
     internal bool PlaceOriginalUseLightning(NullificationWindowFrame pending) => _resolve().PlaceOriginalUseLightning(pending);
     internal void PreserveNativeDelayedAttackCompletion(GameEngine.AttackCompletionReceipt completion) => _resolve().PreserveNativeDelayedAttackCompletion(completion);

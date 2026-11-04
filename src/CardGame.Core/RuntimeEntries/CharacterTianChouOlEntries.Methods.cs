@@ -18,7 +18,6 @@ internal sealed partial class CharacterTianChouOlEntries
     internal bool IsTianChouShandaoUse(long id) => _resolve().IsTianChouShandaoUse(id);
     internal bool IsTianChouTopMovement(TianChouShandaoTop t, CardMovementRecord m) => _resolve().IsTianChouTopMovement(t, m);
     internal bool MatchesTianChouShandao(ProgramSkillFrame f, TianChouShandaoUseOrigin o) => _resolve().MatchesTianChouShandao(f, o);
-    internal bool MatchesTianChouShandaoUseAction(long id, CardActionContext action, int cardId) => _resolve().MatchesTianChouShandaoUseAction(id, action, cardId);
     internal void PublishTianChou(ProgramSkillFrame f) => _resolve().PublishTianChou(f);
     internal bool ResumeTianChou(long id) => _resolve().ResumeTianChou(id);
     internal void ReturnTianChouShandaoUse(CardUseFrame use) => _resolve().ReturnTianChouShandaoUse(use);

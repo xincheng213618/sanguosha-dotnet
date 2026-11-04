@@ -31,7 +31,6 @@ internal sealed partial class CharacterXuHuangMouMobileEntries
     internal bool IsMouXuHuangZeroUse(long id) => _resolve().IsMouXuHuangZeroUse(id);
     internal void IssueMouXuHuangTop(ProgramSkillFrame f) => _resolve().IssueMouXuHuangTop(f);
     internal void IssueMouXuHuangUse(ProgramSkillFrame f, Card card, CardKind kind) => _resolve().IssueMouXuHuangUse(f, card, kind);
-    internal bool MatchesMouXuHuangNativeAction(long id, CardActionContext action, int cardId) => _resolve().MatchesMouXuHuangNativeAction(id, action, cardId);
     internal bool MouXuHuangDuanliangRoot(ProgramSkillFrame f) => _resolve().MouXuHuangDuanliangRoot(f);
     internal IReadOnlyList<PromptChoice> MouXuHuangDuelChoices(ProgramSkillFrame f) => _resolve().MouXuHuangDuelChoices(f);
     internal IReadOnlyList<GameEngine.ProgramOrdinaryTrickUseOption> MouXuHuangDuelOptions(ProgramSkillFrame f) => _resolve().MouXuHuangDuelOptions(f);

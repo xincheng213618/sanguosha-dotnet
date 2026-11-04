@@ -110,7 +110,6 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengNativeIssuedEvent>().Count(e => e == new MouLiuChengNativeIssuedEvent(f.Id, use.Id, a.ActionId, o.ActorSeat, o.Kind)) == 1 && use.CardId == 0;
     }
 
-    internal bool MatchesMouLiuChengNativeAction(long id, CardActionContext action, int cardId) => cardId == 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } current } use && IsIssuedMouLiuChengUse(use) && action.ActionId == current.ActionId && action.Type == current.Type && action.ActorSeat == current.ActorSeat && action.ProviderSeat == current.ProviderSeat && action.EffectiveKind == current.EffectiveKind && action.PhysicalCards.Count == 0 && action.ConversionChain.SequenceEqual(current.ConversionChain);
     internal bool IsMouLiuChengUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && IsIssuedMouLiuChengUse(use);
     internal bool IsMouLiuChengZeroUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { CardId: 0 } use && IsIssuedMouLiuChengUse(use);
 

@@ -30,7 +30,6 @@ internal sealed partial class CoreGameEngineDamageColorDuelProgramsRuntime
     }
 
     internal bool IsSelectedActorDuelUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { SelectedActorDuelOrigin: not null, CardId: 0, CardKind: CardKind.Duel, PhysicalCardIds.Count: 0 };
-    internal bool MatchesSelectedActorDuelAction(long frameId, CardActionContext action, int cardId) => cardId == 0 && _coreDamageTargetObtainProgramsOperations.IsIssuedZeroEntityDuel(frameId) && _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)?.Action?.ActionId == action.ActionId && action.Type == CardActionType.Use && action.EffectiveKind == CardKind.Duel && action.PhysicalCards.Count == 0 && action.ConversionChain.Count == 0;
     [NativeUseReturn(200)]
     internal void ReturnSelectedActorDuel(CardUseFrame use)
     {

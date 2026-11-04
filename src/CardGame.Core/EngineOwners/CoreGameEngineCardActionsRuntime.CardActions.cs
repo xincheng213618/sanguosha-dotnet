@@ -269,6 +269,9 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
             MouLuSuAnniversaryPlayed = _characterLuSuMouOperations.Value.MouLuSuPlayedWindowReturn(action, window),
             MouSimaYiPlayed = _characterSimaYiMouOperations.MouSmPlayedWindowReturn(action, window)
         };
+        if (frame.TrickContinuation is { } issuedTrick)
+            _nativeTrickContinuations.ValidateIssuance(frame.ParentFrameId, frame.Action,
+                frame.Continuation ?? throw new InvalidOperationException("A native trick window needs its return stage."), issuedTrick);
         _coreRuntimeOperations.PushRuntimeFrame(frame);
         _characterSunQuanOlMagicOperations.CaptureMoQuanyuSingleton(frame, window);
         _coreRuntimeOperations.AdvanceRuntimeTop<ProgramCardTriggerWindowFrame>();
@@ -587,13 +590,11 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
 
     internal void ContinueTrickAfterProgramTargetEffects(ProgramCardTriggerWindowFrame frame)
     {
-        var continuation = frame.TrickContinuation ?? throw new InvalidOperationException("A trick program window lost its frozen continuation.");
-        var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(use => use.Id == frame.ParentFrameId);
+        var resumed = _nativeTrickContinuations.Read(frame);
+        var continuation = resumed.Continuation;
+        var use = resumed.Use;
         var action = use.Action!;
-        if (action.Type != CardActionType.Use || CardCatalog.Get(action.EffectiveKind).CategoryName != "锦囊牌" || action.PhysicalCards.All(cost => cost.CardId != continuation.EffectCardId) && !_coreDamageColorDuelProgramsOperations.MatchesSelectedActorDuelAction(frame.ParentFrameId, action, continuation.EffectCardId) && !_characterTianChouOlOperations.MatchesTianChouShandaoUseAction(frame.ParentFrameId, action, continuation.EffectCardId) && !_characterQinLangOlOperations.MatchesQinLangXianyingUseAction(frame.ParentFrameId, action, continuation.EffectCardId) && !_coreVirtualOrdinaryTrickUsesOperations.MatchesVirtualOrdinaryTrickUseAction(frame.ParentFrameId, action, continuation.EffectCardId) && !_coreTieredRoundZeroReturnsOperations.MatchesTieredRoundZeroUseAction(frame.ParentFrameId, action, continuation.EffectCardId) && !_characterDongChengMouOperations.MatchesMouDcNativeAction(frame.ParentFrameId, action, continuation.EffectCardId) && !_characterZhugeLiangMouOperations.MatchesMouZhijueUseAction(frame.ParentFrameId, action, continuation.EffectCardId) && !_characterLiuChengMouMobileOperations.MatchesMouLiuChengNativeAction(frame.ParentFrameId, action, continuation.EffectCardId) && !_characterXuHuangMouMobileOperations.MatchesMouXuHuangNativeAction(frame.ParentFrameId, action, continuation.EffectCardId) && !_coreOriginalUseLightningOperations.MatchesOriginalUseLightningAction(frame.ParentFrameId, action, continuation.EffectCardId) && !_characterBaoSanNiangOlOperations.MatchesChosenAssaultUseAction(frame.ParentFrameId, action, continuation.EffectCardId))
-            throw new InvalidOperationException("The trick trigger continuation does not match its card action.");
-        var card = _nativeCardRepresentations.Get(frame.ParentFrameId, continuation.EffectCardId, requireProcessing: true);
-        var pending = new NativeOwners.JizhiResolution(action.ActorSeat, frame.ParentFrameId, card, action.EffectiveKind, action.EffectiveKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(use.TargetIndex).Take(2).ToArray() : action.TargetSeats, continuation.ActionKind, continuation.TargetCardId, continuation.RequiredCardKind);
+        var pending = new NativeOwners.JizhiResolution(action.ActorSeat, use.Id, resumed.Card, action.EffectiveKind, action.EffectiveKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(use.TargetIndex).Take(2).ToArray() : action.TargetSeats, continuation.ActionKind, continuation.TargetCardId, continuation.RequiredCardKind);
         if (frame.Continuation == ProgramCardContinuation.FinalizedTrick && TryBeginProgramCardUseBeforeTargetEffects(pending))
             return;
         _coreNativeNullificationOperations.ContinueJizhiOrNullificationAfterTargetTriggers(pending);
