@@ -27,10 +27,12 @@ internal static class ProgramRuntimeModuleChecks
         var readHandler = (FixtureTryRead)match.BindHandler(tryRead, typeof(FixtureTryRead));
         Require(attempts == 0 && ReferenceEquals(handler, match.BindHandler(gate, typeof(Func<int>))),
             "Composing and binding a match only records factories and shares each typed callback.");
-        try { match.BindHandler(gate, typeof(Action)); throw new Exception("A mismatched handler signature was accepted."); }
-        catch (ArgumentException) { }
-        try { match.BindHandler(gate, typeof(Func<int, int>)); throw new Exception("A mismatched handler parameter was accepted."); }
-        catch (ArgumentException) { }
+        for (var repeat = 0; repeat < 2; repeat++)
+            foreach (var invalidType in new[] { typeof(Action), typeof(Func<int, int>), typeof(Func<object>), typeof(int) })
+            {
+                try { match.BindHandler(gate, invalidType); throw new Exception("A mismatched handler signature was accepted."); }
+                catch (ArgumentException) { }
+            }
         Require(attempts == 0, "Invalid signatures must fail at binding, before dependency construction.");
         try { handler(); throw new Exception("A dependency failure was swallowed."); }
         catch (InvalidOperationException error)
@@ -43,9 +45,13 @@ internal static class ProgramRuntimeModuleChecks
         Require(handler() == 6 && ReferenceEquals(match.GetModule(typeof(FixtureModule)), match.Capabilities.Get<IFixtureCapability>()) &&
                 ReferenceEquals(facts, match.Capabilities.Get<IFacts>()) && attempts == 2,
             "Explicit resolution, capability contracts and deferred entry points share the same match-owned objects.");
+        var otherAttempts = 0;
         var other = new MatchRuntime(modules, capabilities,
-            new FixtureAdapterFactory(_ => new FixtureFactsAdapter(null!) { Value = 9 }));
-        Require(((Func<int>)other.BindHandler(gate, typeof(Func<int>)))() == 9 && handler() == 6,
+            new FixtureAdapterFactory(_ => { otherAttempts++; return new FixtureFactsAdapter(null!) { Value = 9 }; }));
+        var otherHandler = (Func<int>)other.BindHandler(gate, typeof(Func<int>));
+        Require(otherAttempts == 0 && !ReferenceEquals(handler, otherHandler),
+            "A previously validated signature still binds a new lazy handler for its own match.");
+        Require(otherHandler() == 9 && otherAttempts == 1 && handler() == 6,
             "Match composition never shares adapters, bound handlers or rule instances across matches.");
         var doubleMethod = typeof(StatelessModule).GetMethod(nameof(StatelessModule.Double))!;
         Require(((Func<int, int>)match.BindHandler(doubleMethod, typeof(Func<int, int>)))(4) == 8 && attempts == 2,

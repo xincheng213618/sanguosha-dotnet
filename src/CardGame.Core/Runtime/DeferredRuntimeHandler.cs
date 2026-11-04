@@ -9,10 +9,23 @@ namespace CardGame.Core;
 internal sealed class DeferredRuntimeHandler(Func<Delegate> create)
 {
     private static readonly ConcurrentDictionary<Type, Func<DeferredRuntimeHandler, Delegate>> Factories = new();
+    private static readonly ConcurrentDictionary<(MethodInfo Method, Type DelegateType), byte> SuccessfulValidations = new();
     private Delegate? _handler;
     public Delegate Resolve() => _handler ??= create();
 
     internal static Delegate Create(MethodInfo method, Type delegateType, Func<Delegate> create)
+    {
+        // Only immutable binding metadata is shared. A failed validation never
+        // enters the cache, and every match still gets its own lazy receiver.
+        SuccessfulValidations.GetOrAdd((method, delegateType), static binding =>
+        {
+            ValidateSignature(binding.Method, binding.DelegateType);
+            return 1;
+        });
+        return Factories.GetOrAdd(delegateType, CompileFactory)(new(create));
+    }
+
+    private static void ValidateSignature(MethodInfo method, Type delegateType)
     {
         if (!typeof(Delegate).IsAssignableFrom(delegateType))
             throw new ArgumentException("A runtime handler requires a delegate type.", nameof(delegateType));
@@ -28,7 +41,6 @@ internal sealed class DeferredRuntimeHandler(Func<Delegate> create)
         // receiver. Factories and rules still run only at the original call site.
         var call = Expression.Call(Expression.Default(method.DeclaringType!), method, parameters);
         _ = Expression.Lambda(delegateType, call, parameters);
-        return Factories.GetOrAdd(delegateType, CompileFactory)(new(create));
     }
 
     private static Func<DeferredRuntimeHandler, Delegate> CompileFactory(Type delegateType)

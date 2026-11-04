@@ -33,9 +33,9 @@ internal sealed class ProgramRuntimeModuleCatalog
         var entries = new Dictionary<Type, ProgramRuntimeEntryRegistration>();
         foreach (var type in types.Select(type => type ??
                      throw new InvalidOperationException("A runtime module type cannot be null."))
+                     .Where(IsDeclared)
                      .OrderBy(type => type.FullName, StringComparer.Ordinal))
         {
-            if (!IsDeclared(type)) continue;
             if (!type.IsClass || !type.IsSealed || type.IsGenericType || type.ContainsGenericParameters ||
                 type.IsNested && type.DeclaringType == typeof(GameEngine))
                 throw Invalid(type, "requires an independent, sealed, non-generic type");
@@ -76,10 +76,11 @@ internal sealed class ProgramRuntimeModuleCatalog
 
         bool IsDedicatedDependency(Type dependency)
         {
+            if (entries.ContainsKey(dependency)) return true;
             if (dependency.IsDefined(typeof(ProgramRuntimeEntryAttribute), false) ||
                 dependency.IsConstructedGenericType && dependency.GetGenericTypeDefinition() == typeof(RuntimeEntries.DeferredRuntime<>))
             {
-                if (!entries.ContainsKey(dependency)) entries.Add(dependency, ProgramRuntimeEntryRegistration.For(dependency));
+                entries.Add(dependency, ProgramRuntimeEntryRegistration.For(dependency));
                 return true;
             }
             return dependency.IsInterface && !dependency.ContainsGenericParameters &&
