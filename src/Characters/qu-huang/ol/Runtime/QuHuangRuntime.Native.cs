@@ -29,7 +29,7 @@ internal sealed partial class QuHuangRuntime
     {
         if(p.EffectCardKind!=CardKind.Lightning||!IsQuHuangNishouUse(p.ParentFrameId))return false;var o=native.CardUse(p.ParentFrameId)!.QuHuangNishou!;var target=_players[native.NullificationTarget(p)??o.ActorSeat];
         if(target.IsAlive&&!target.JudgmentAreaAbolished&&!native.HasJudgmentCard(target.Seat,CardKind.Lightning)&&_cardZones.GetLocation(o.CardId)==CardLocation.Processing)return false;
-        if(_cardZones.GetLocation(o.CardId)!=CardLocation.Processing&&!native.IsClaimedUseCard(p.ParentFrameId,o.CardId))throw new InvalidOperationException("Nishou's paid equipment left native Processing without an exact current use claim.");operations.SkipUnavailableTarget(p,target.Seat,CardEffectSkipReason.SkillNullified);return true;
+        if(_cardZones.GetLocation(o.CardId)!=CardLocation.Processing&&!native.CanReadNativeMaterial(p.ParentFrameId,o.CardId))throw new InvalidOperationException("Nishou's paid equipment left native Processing without an exact current use claim.");operations.SkipUnavailableTarget(p,target.Seat,CardEffectSkipReason.SkillNullified);return true;
     }
     [NativeUseValidation(27421)]private void ValidateQuHuangNishou(CardUseFrame use)
     {if(use.QuHuangNishou is not null&&!IsQuHuangNishouUse(use.Id))throw new InvalidOperationException("Nishou changed its exact discarded entity, native action or typed owning return.");}

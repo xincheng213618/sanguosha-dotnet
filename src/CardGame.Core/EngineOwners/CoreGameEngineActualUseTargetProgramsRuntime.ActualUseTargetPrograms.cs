@@ -148,7 +148,7 @@ internal sealed partial class CoreGameEngineActualUseTargetProgramsRuntime
 
             // No new effect/card-response window after a winner. Clean only this use's paid physical entities.
             foreach (var id in use.PhysicalCardIds ?? [use.CardId])
-                if (id != 0 && !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(use.Id, id) && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing)
+                if (id != 0 && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, id) && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing)
                     _corePhysicalMovementFacadesOperations.MoveCard(_cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(c => c.Id == id), CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.UseFinished);
             _coreNativeCardUseCompletionOperations.QueueCardUseFinishedWithoutPop(use.Id, new Card(use.CardId, use.CardKind, Suit.None, 0), use.CardKind);
             _coreNativeCardUseCompletionOperations.PopFinishedCardUse(use.Id);

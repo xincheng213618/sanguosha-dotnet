@@ -54,7 +54,7 @@ internal sealed partial class CoreNativeCardUseCompletionRuntime
         {
             foreach (var physicalCardId in pendingUse.PhysicalCardIds ?? [pendingUse.CardId])
             {
-                if (_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(frameId, physicalCardId))
+                if (_nativeMaterialClaims.PreservesMaterialAtCompletion(frameId, physicalCardId))
                     continue;
                 if (_cardZonesOperations._cardZones.GetLocation(physicalCardId) == CardLocation.Processing)
                 {
@@ -92,6 +92,7 @@ internal sealed partial class CoreNativeCardUseCompletionRuntime
         var completedUse = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == frameId);
         _characterMaChengOlOperations.CompleteChenglieTerminalCleanup(completedUse);
         completedUse = _coreCardUseLifecycleOperations.LifecycleCardUse(frameId)!;
+        _nativeMaterialClaims.CompleteNativeChild(completedUse);
         _coreProgramNativeReturnsOperations.NativeReturns.ValidateUse(ref completedUse);
         var completion = _coreProgramNativeReturnsOperations.NativeReturns.PrepareUse(completedUse, _coreHpLossSlashMaterialsOperations.HasExactHpLossMaterialReturn(completedUse));
         _coreRuntimeOperations.PopResolutionFrame(frameId, ResolutionFrameKind.CardUse);

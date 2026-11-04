@@ -48,7 +48,7 @@ internal sealed partial class CharacterLiuYanOlRuntime
         var target = _coreMatchParticipantsPlayersAccess._players[o.ActorSeat];
         if (target.IsAlive && !target.JudgmentAreaAbolished && !_coreActualTurnsOperations.HasJudgmentEffectiveCard(target, CardKind.Indulgence) && _cardZonesOperations._cardZones.GetLocation(o.CardId) == CardLocation.Processing)
             return false;
-        if (_cardZonesOperations._cardZones.GetLocation(o.CardId) != CardLocation.Processing && !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(p.ParentFrameId, o.CardId))
+        if (_cardZonesOperations._cardZones.GetLocation(o.CardId) != CardLocation.Processing && !_nativeMaterialClaims.HasRelinquishedMaterial(p.ParentFrameId, o.CardId))
             throw new InvalidOperationException("Limu's paid physical material moved without a native entity claim.");
         _coreNativeTrickEffectsOperations.SkipUnavailableTargetCardEffect(p, target, CardEffectSkipReason.SkillNullified);
         return true;

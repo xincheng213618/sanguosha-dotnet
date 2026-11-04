@@ -34,7 +34,7 @@ internal sealed partial class CoreGameEngineSequentialTrickTargetsRuntime
             return;
         if (card.Id == 0 && (_coreOriginalUseLightningOperations.IsOriginalUseLightning(frameId) || _characterZhugeLiangMouOperations.IsZeroEntityUse(frameId) || _coreVirtualOrdinaryTrickUsesOperations.IsProgramVirtualOrdinaryTrickUse(frameId) || _characterFanJiangZhangDaOlOperations.IsJueshengDuelUse(frameId)))
             return;
-        if (_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(frameId, card.Id) || (_coreHellSoulCardsOperations.IsHellDestroyedSoulMaterial(frameId, card.Id) || (_characterHuBanOlOperations.IsHuiyunOutsideGeneralWeaponMaterial(frameId, card.Id) || _characterMiHengLeOperations.IsSiruiOutsideGeneralWeaponMaterial(frameId, card.Id)) || _coreGuanduEquipmentOperations.IsGuanduDestroyedChariotMaterial(frameId, card.Id)) || HasRemainingSequentialTrickTargets(frameId) || _coreNextCardTargetAdjustmentsOperations.HasRemainingAdjustedBorrowedSwordTargets(frameId))
+        if (_nativeMaterialClaims.PreservesMaterialAtCompletion(frameId, card.Id) || (_coreHellSoulCardsOperations.IsHellDestroyedSoulMaterial(frameId, card.Id) || (_characterHuBanOlOperations.IsHuiyunOutsideGeneralWeaponMaterial(frameId, card.Id) || _characterMiHengLeOperations.IsSiruiOutsideGeneralWeaponMaterial(frameId, card.Id)) || _coreGuanduEquipmentOperations.IsGuanduDestroyedChariotMaterial(frameId, card.Id)) || HasRemainingSequentialTrickTargets(frameId) || _coreNextCardTargetAdjustmentsOperations.HasRemainingAdjustedBorrowedSwordTargets(frameId))
             return;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(frameId)is { } use && _characterXunXuAnniversaryOperations.TryFinishAnniversaryXunXuUseMaterials(use))
             return;

@@ -14,9 +14,8 @@ internal static class NativeCardRepresentationChecks
         var zones = (CardZoneStore)capabilities.Get<ICardZoneQueries>();
         var journal = new List<CardMovementRecord>();
         var history = new CardMovementHistoryQueries(journal);
-        var claims = game.GetRuntimeModule<CardGame.Core.EngineOwners.CoreGameEngineCurrentUsePhysicalClaimsRuntime>();
         var runtime = new NativeCardRepresentationRuntime(frames, zones, history,
-            CardGame.Core.RuntimeEntries.CoreGameEngineCurrentUsePhysicalClaimsEntries.Create(() => claims));
+            capabilities.Get<INativeMaterialClaims>());
         var priorTop = frames.Top;
         CheckOriginalFaces(frames, zones, runtime);
         CheckPhysicalDepartures(frames, zones, history, journal, runtime);

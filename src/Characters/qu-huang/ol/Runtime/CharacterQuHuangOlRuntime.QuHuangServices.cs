@@ -39,7 +39,7 @@ internal sealed partial class CharacterQuHuangOlRuntime
     CardUseFrame? IQuHuangNativeQueries.CardUse(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id);
     bool IQuHuangNativeQueries.UseActorMatches(CardUseFrame use, int actor, int provider) => _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, actor, provider);
     int? IQuHuangNativeQueries.NullificationTarget(NullificationWindowFrame window) => CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(window);
-    bool IQuHuangNativeQueries.IsClaimedUseCard(long use, int card) => _coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use, card);
+    bool IQuHuangNativeQueries.CanReadNativeMaterial(long use, int card) => _nativeMaterialClaims.CanReadMaterial(use, card);
     bool IQuHuangNativeQueries.IsAlternativeCost(CardActionContext action, int card) => _coreAlternativeViewAsCostsOperations.IsProgramAlternativeCost(action, card);
     bool IQuHuangNativeQueries.PaymentBatchMatchesReceipt(CardUseFrame use, CardMovementBatchContext batch) => CoreGameEngineCardUsePaymentsRuntime.CardUsePaymentBatchMatchesReceipt(use, batch);
     bool IQuHuangNativeQueries.RecoveryRidesOn(ResolutionFrame child, ResolutionFrame parent) => _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(child, parent);

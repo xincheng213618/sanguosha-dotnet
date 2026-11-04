@@ -728,8 +728,6 @@ public sealed partial record CardUseFrame(
     public bool YingboRepeated { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<ProgramTargetSlashReceipt>? FinalTargetSlashReceipts { get; init; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public IReadOnlyList<ProgramCurrentUsePhysicalClaim>? CurrentUsePhysicalClaims { get; init; }
     public int? ProgramAdjustedSlashBaseDamage { get; init; }
     public int? ForeignPublicPileSlashBaseDamage { get; init; }
     public ProgramSimpleCardContinuation? AdjustedSimpleContinuation { get; init; }

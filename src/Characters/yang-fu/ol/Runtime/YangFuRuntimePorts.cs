@@ -39,7 +39,7 @@ internal interface IYangFuTargetFacts : IProgramSelectionQuery
     bool IsWuJingHejiRemovedMaterial(long useId, int cardId);
     bool IsSelectedForeignCardSlashRemovedMaterial(long useId, int cardId);
     bool IsZhangYanSujiRemovedMaterial(long useId, int cardId);
-    bool IsCurrentUsePhysicalCardClaim(long useId, int cardId);
+    bool HasRelinquishedMaterial(long useId, int cardId);
     bool IsExchangedCardClaim(long actionId, int cardId);
     bool CanUseVirtualSlash(int owner, int target);
     bool DirectedTargetProhibited(int owner, int target, CardKind kind);

@@ -88,7 +88,7 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
             {
                 _corePhysicalMovementFacadesOperations.MoveCard(attackCard, cardLocation, CardLocation.DiscardPile, CardMoveReasons.DelayedCardFinish);
             }
-            else if (cardLocation != CardLocation.DiscardPile && !_coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial2(attackCard.Id, CardLocation.Judgment(attack.DelayedJudgmentSeat ?? attack.SourceSeat), cardLocation) && !_nativeMaterialClaims.CanReadMaterial(attack.ResolutionId, attackCard.Id) && !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(movement => movement.CardId == attackCard.Id && movement.From == CardLocation.Judgment(attack.DelayedJudgmentSeat ?? attack.SourceSeat) && movement.To == CardLocation.DiscardPile && movement.Reason == CardMoveReasons.DeathDiscard))
+            else if (cardLocation != CardLocation.DiscardPile && !_coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial2(attackCard.Id, CardLocation.Judgment(attack.DelayedJudgmentSeat ?? attack.SourceSeat), cardLocation) && !_nativeMaterialClaims.PreservesMaterialAtCompletion(attack.ResolutionId, attackCard.Id) && !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(movement => movement.CardId == attackCard.Id && movement.From == CardLocation.Judgment(attack.DelayedJudgmentSeat ?? attack.SourceSeat) && movement.To == CardLocation.DiscardPile && movement.Reason == CardMoveReasons.DeathDiscard))
             {
                 throw new InvalidOperationException($"A resolved Lightning left its judgment zone through an unsupported destination: {(cardLocation)}.");
             }
@@ -110,7 +110,7 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
             _characterXunXuAnniversaryOperations.TryFinishAnniversaryXunXuUseMaterials(materialUse);
         foreach (var physicalCard in attack.PhysicalCards)
         {
-            if (_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(attack.ResolutionId, physicalCard.Id))
+            if (_nativeMaterialClaims.PreservesMaterialAtCompletion(attack.ResolutionId, physicalCard.Id))
                 continue;
             if ((_coreHellSoulCardsOperations.IsHellDestroyedSoulMaterial(attack.ResolutionId, physicalCard.Id) || (_characterHuBanOlOperations.IsHuiyunOutsideGeneralWeaponMaterial(attack.ResolutionId, physicalCard.Id) || _characterMiHengLeOperations.IsSiruiOutsideGeneralWeaponMaterial(attack.ResolutionId, physicalCard.Id)) || (_coreGuanduEquipmentOperations.IsGuanduDestroyedChariotMaterial(attack.ResolutionId, physicalCard.Id) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial3(attack.ResolutionId, physicalCard.Id))) || (_coreForeignSelectedCardSlashReturnsOperations.IsSelectedForeignCardSlashRemovedMaterial(attack.ResolutionId, physicalCard.Id) || _characterZhangYanOlOperations.IsZhangYanSujiRemovedMaterial(attack.ResolutionId, physicalCard.Id) || ((_coreKenshangPaymentsOperations.IsKenshangRemovedMaterial(attack.ResolutionId, physicalCard.Id) || _characterGuanHaiOlOperations.IsXieweiRemovedMaterial(attack.ResolutionId, physicalCard.Id)) || (_characterWuJingOlOperations.IsWuJingHejiRemovedMaterial(attack.ResolutionId, physicalCard.Id) || _characterSunYuanOlOperations.IsSayingRemovedMaterial(attack.ResolutionId, physicalCard.Id)))))
                 continue;

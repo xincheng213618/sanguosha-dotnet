@@ -42,7 +42,7 @@ internal interface IQuHuangNativeQueries : IProgramSelectionQuery
     CardUseFrame? CardUse(long id);
     bool UseActorMatches(CardUseFrame use, int actor, int provider);
     int? NullificationTarget(NullificationWindowFrame window);
-    bool IsClaimedUseCard(long useId, int cardId);
+    bool CanReadNativeMaterial(long useId, int cardId);
     bool IsAlternativeCost(CardActionContext action, int cardId);
     bool PaymentBatchMatchesReceipt(CardUseFrame use, CardMovementBatchContext batch);
     bool RecoveryRidesOn(ResolutionFrame child, ResolutionFrame parent);

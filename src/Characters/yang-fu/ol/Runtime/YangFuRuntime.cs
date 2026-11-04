@@ -100,7 +100,7 @@ internal sealed class YangFuRuntime(IProgramRuntimeFrames frames, IProgramRuntim
             !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(u.PhysicalCardIds ?? [u.CardId]) ||
             !a.PhysicalCards.Any(c => targets.IsKenshangRemovedMaterial(u.Id, c.CardId) || targets.IsWuJingHejiRemovedMaterial(u.Id, c.CardId) || targets.IsSelectedForeignCardSlashRemovedMaterial(u.Id, c.CardId) || targets.IsZhangYanSujiRemovedMaterial(u.Id, c.CardId)) ||
             a.PhysicalCards.Any(c => facts.Location(c.CardId) != CardLocation.Processing && !targets.IsKenshangRemovedMaterial(u.Id, c.CardId) && !targets.IsWuJingHejiRemovedMaterial(u.Id, c.CardId) &&
-                !targets.IsSelectedForeignCardSlashRemovedMaterial(u.Id, c.CardId) && !targets.IsZhangYanSujiRemovedMaterial(u.Id, c.CardId) && !targets.IsCurrentUsePhysicalCardClaim(u.Id, c.CardId) && !targets.IsExchangedCardClaim(a.ActionId, c.CardId))) return false;
+                !targets.IsSelectedForeignCardSlashRemovedMaterial(u.Id, c.CardId) && !targets.IsZhangYanSujiRemovedMaterial(u.Id, c.CardId) && !targets.HasRelinquishedMaterial(u.Id, c.CardId) && !targets.IsExchangedCardClaim(a.ActionId, c.CardId))) return false;
         if (frames.ParentOf(w.Id)?.Id != u.Id) return false;
         use = u; window = w; return true;
     }

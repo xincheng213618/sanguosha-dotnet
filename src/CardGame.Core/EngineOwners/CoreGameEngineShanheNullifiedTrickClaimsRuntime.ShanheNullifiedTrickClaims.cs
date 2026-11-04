@@ -32,7 +32,7 @@ internal sealed partial class CoreGameEngineShanheNullifiedTrickClaimsRuntime
         var binding = _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[response.ResponderSeat], SkillProgramCardPolicyKind.ClaimNullifiedTrick, CardKind.Nullification).FirstOrDefault();
         if (binding.Source is null)
             return false;
-        var ids = (use.PhysicalCardIds ?? [use.CardId]).Where(id => id > 0 && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, id)).ToArray();
+        var ids = (use.PhysicalCardIds ?? [use.CardId]).Where(id => id > 0 && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, id)).ToArray();
         if (ids.Length == 0)
             return false;
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != window.Id || action.ActorSeat != window.SourceSeat || ids.Distinct().Count() != ids.Length || ids.Any(id => !action.PhysicalCards.Any(cost => cost.CardId == id)))
@@ -40,6 +40,7 @@ internal sealed partial class CoreGameEngineShanheNullifiedTrickClaimsRuntime
         var receipt = new ShanheNullifiedTrickClaim(use.Id, action.ActionId, window.Id, window.ChainDepth, CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(window), response.ResponderSeat, response.NullificationCardId, binding.Source.SkillId, binding.Source.SkillInstanceId, binding.Source.Program.GameplayHash, binding.Policy.Id, Array.AsReadOnly(ids), _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         // The still-resolving use owns the entities before any movement observers
         // can inspect the parent. No later target or completion can claim again.
+        _nativeMaterialClaims.AcceptClaim(use.Id, window.Id, 0, ids);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { ShanheNullifiedTrickClaim = receipt });
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(receipt.RecipientSeat), CoreGameEngineShanheNullifiedTrickClaimsDefinitions.ShanheCounterspellClaimReason);
         receipt = receipt with
@@ -61,7 +62,6 @@ internal sealed partial class CoreGameEngineShanheNullifiedTrickClaimsRuntime
         return TryBeginShanheNullifiedTrickClaim(window);
     }
 
-    internal bool IsShanheNullifiedTrickMaterialClaim(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { } action, ShanheNullifiedTrickClaim: { } receipt } && receipt.CardUseFrameId == useId && receipt.ActionId == action.ActionId && receipt.CardIds.Contains(cardId);
     internal bool IsShanheNullifiedClaimAwaitingMovement(NullificationWindowFrame window) => _coreShanheDelayedNullifiedTrickClaimsOperations.Value.IsShanheDelayedNullifiedClaimAwaitingMovement(window) || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)?.ShanheNullifiedTrickClaim is { MovementDrained: false } receipt && receipt.CardUseFrameId == window.ParentFrameId && receipt.WindowFrameId == window.Id;
     internal bool IsShanheNullifiedClaimMovement(NullificationWindowFrame window, CardMovementBatchContext batch) => _coreShanheDelayedNullifiedTrickClaimsOperations.Value.IsShanheDelayedNullifiedClaimMovement(window, batch) || IsShanheNullifiedClaimAwaitingMovement(window) && batch.ParentFrameId == window.Id && batch.AwaitingProgramFrameId is null && batch.Movements.Count > 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)?.ShanheNullifiedTrickClaim is { } receipt && batch.Movements.All(move => move.Sequence > receipt.MovementBefore && move.Sequence <= receipt.MovementAfter && receipt.CardIds.Contains(move.CardId) && move.From == CardLocation.Processing && move.To == CardLocation.Hand(receipt.RecipientSeat) && move.Reason == CoreGameEngineShanheNullifiedTrickClaimsDefinitions.ShanheCounterspellClaimReason);
     internal static bool HasUnlistedShanheClaimMovementReturn(CardsMovedTriggerWindowFrame child) => child.ResumeColdDamageReplacementFrameId is not null || child.ResumeSkillInvocationFrameId is not null || child.ResumeRoundEndingBoundaryId is not null || child.ResumeMouZhitianFireFrameId is not null || child.QiaoZhouPreparationReturn is not null || child.SoleTargetQuarantineEndReturn is not null || child.WenhePoisonFireAttackReturn is not null;
@@ -73,14 +73,4 @@ internal sealed partial class CoreGameEngineShanheNullifiedTrickClaimsRuntime
         _coreNativeNullificationOperations.FinishNullificationWindow(window);
     }
 
-    [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 80900)]
-    internal void AssertShanheNullifiedTrickClaims()
-    {
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(frame => frame.ShanheNullifiedTrickClaim is not null))
-        {
-            var receipt = use.ShanheNullifiedTrickClaim!;
-            if (_coreMatchDefinitionModeDefinitionOptionsAccess._options.ShanheBattle is null || _coreMatchDefinitionModeDefinitionOptionsAccess._modeDefinition.Id != ShanheBattleSetup.BattleModeId || use.Action is not { Type: CardActionType.Use } action || receipt.CardUseFrameId != use.Id || receipt.ActionId != action.ActionId || receipt.WindowFrameId <= use.Id || receipt.ChainDepth <= 0 || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(receipt.RecipientSeat) || receipt.CardIds.Count == 0 || receipt.CardIds.Distinct().Count() != receipt.CardIds.Count || receipt.CardIds.Any(id => !action.PhysicalCards.Any(cost => cost.CardId == id)) || receipt.MovementAfter <= receipt.MovementBefore || string.IsNullOrWhiteSpace(receipt.SkillInstanceId) || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(receipt.SkillId)?.Program is not { } program || program.GameplayHash != receipt.GameplayHash || !program.CardPolicies.Any(policy => policy.Id == receipt.PolicyId && policy.Kind == SkillProgramCardPolicyKind.ClaimNullifiedTrick) || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<NullificationRespondedEvent>().Any(fact => fact.WindowFrameId == receipt.WindowFrameId && fact.ResolutionId == use.Id && fact.ChainDepth == receipt.ChainDepth && fact.EffectNullified && fact.ResponderSeat == receipt.RecipientSeat && fact.NullificationCardId == receipt.ResponseCardId) || receipt.CardIds.Any(id => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShanheNullifiedTrickMaterialClaimedEvent>().Count(fact => fact.CardUseFrameId == use.Id && fact.ActionId == receipt.ActionId && fact.WindowFrameId == receipt.WindowFrameId && fact.ChainDepth == receipt.ChainDepth && fact.RecipientSeat == receipt.RecipientSeat && fact.CardId == id && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(move => move.Sequence == fact.MovementSequence && move.Sequence > receipt.MovementBefore && move.Sequence <= receipt.MovementAfter && move.CardId == id && move.From == CardLocation.Processing && move.To == CardLocation.Hand(receipt.RecipientSeat) && move.Reason == CoreGameEngineShanheNullifiedTrickClaimsDefinitions.ShanheCounterspellClaimReason)) != 1))
-                throw new InvalidOperationException("A Shanhe material claim lost its original paid use, final counterspell or exact one-time movement proof.");
-        }
-    }
 }

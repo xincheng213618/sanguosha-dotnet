@@ -20,8 +20,10 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
     }
 
     internal bool ResponseExchangeUpgraded(int owner, string skill, string instance, string state) => ResponseExchangeHistory().OfType<ProgramResponseExchangeUpgradedEvent>().Any(e => e.OwnerSeat == owner && e.SkillId == skill && e.SkillInstanceId == instance && e.StateId == state);
-    internal bool IsExchangedCardClaim(long actionId, int cardId) => ResponseExchangeHistory().OfType<ProgramResponseEntityClaimedEvent>().Any(e => e.ClaimedActionId == actionId && e.CardIds.Contains(cardId));
-    internal bool IsExchangedUseCardClaim(long frameId, int cardId) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(f => f.Id == frameId)?.Action is { } action && IsExchangedCardClaim(action.ActionId, cardId);
+    internal bool IsExchangedCardClaim(long actionId, int cardId) =>
+        _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Action?.ActionId == actionId) is { } use
+            ? _nativeMaterialClaims.HasRelinquishedMaterial(use.Id, cardId)
+            : ResponseExchangeHistory().OfType<ProgramResponseEntityClaimedEvent>().Any(e => e.ClaimedActionId == actionId && e.CardIds.Contains(cardId));
     internal bool IsResponseEntityRestricted(int seat, int id)
     {
         foreach (var claim in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramResponseEntityClaimedEvent>())
@@ -86,9 +88,11 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         var draft = frame.ResponseEntityExchange!;
         if (ids.Any(id => IsExchangedCardClaim(action, id) || _cardZonesOperations._cardZones.GetLocation(id).Zone is not (CardZoneKind.Processing or CardZoneKind.DiscardPile)))
             throw new InvalidOperationException("A response entity exchange lost its exact public cost.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramResponseEntityClaimedEvent(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, draft.RespondedActionId, draft.ResponseActionId, action, recipient, ids.ToArray(), _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, restricted));
         var nativeUse = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>()
             .SingleOrDefault(use => use.Action?.ActionId == action);
+        if (nativeUse is not null)
+            _nativeMaterialClaims.AcceptClaim(nativeUse.Id, frame.Id, frame.InstructionIndex, ids);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramResponseEntityClaimedEvent(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, draft.RespondedActionId, draft.ResponseActionId, action, recipient, ids.ToArray(), _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, restricted));
         foreach (var id in ids)
             _corePhysicalMovementFacadesOperations.MoveCard(EntityAtCurrentLocation(id), _cardZonesOperations._cardZones.GetLocation(id), CardLocation.Hand(recipient), new CardMoveReason("skill-program.response-entity-exchange"),
                 beforeFact: move =>

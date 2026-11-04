@@ -4,8 +4,6 @@ namespace CardGame.Core;
 public enum XiangChongStage { Choice, Targets, Cards, PaymentChildren, ClaimChoice, ClaimChildren, EquipmentReady, EquipmentUse, NativeChildren }
 public sealed record XiangChongCard(int CardId, CardKind Kind, CardLocation From);
 public sealed record XiangChongEquipmentOrigin(long ProgramFrameId, long CardUseFrameId, int CardId, CardKind CardKind, int ActorSeat, CardLocation From);
-public sealed record XiangChongEquipmentMaterialClaim(long OriginalUseId,long OriginalActionId,long LossBatchId,long LossSequence,
-    CardLocation OriginalFrom,CardConversionSource Source,string GameplayHash,XiangChongEquipmentOrigin Equipment);
 public sealed record XiangChongEquipmentTermination(long Sequence,string Reason,bool ActorDead);
 public sealed record XiangChongEquipmentResult(XiangChongEquipmentOrigin Origin,int ActorSeat,long? EntrySequence,int? ReplacedCardId)
 { [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public XiangChongEquipmentTermination? Termination { get; init; } }
@@ -25,7 +23,6 @@ public sealed record XiangChongReceipt(CardConversionSource Source, string Gamep
     public long BatchId { get; init; }
     public bool NativeCompleted { get; init; }
     [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public XiangChongEquipmentOrigin? Equipment { get; init; }
-    [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public XiangChongEquipmentMaterialClaim? MaterialClaim { get; init; }
     [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public XiangChongEquipmentResult? NativeResult { get; init; }
     [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public XiangChongCard? Replaced { get; init; }
     private IReadOnlyList<XiangChongCard> _cards=Array.AsReadOnly(Array.Empty<XiangChongCard>()),_selected=Array.AsReadOnly(Array.Empty<XiangChongCard>()),_paid=Array.AsReadOnly(Array.Empty<XiangChongCard>());
@@ -45,8 +42,6 @@ public sealed record XiangChongBranchPaidEvent(long FrameId, int OwnerSeat, int 
 public sealed record XiangChongEntityMovedEvent(long FrameId, string Segment, int CardId, CardKind Kind, CardLocation From, CardLocation To, long Sequence) : IGameEvent;
 public sealed record XiangChongEquipmentIssuedEvent(XiangChongEquipmentOrigin Origin) : IGameEvent;
 public sealed record XiangChongEquipmentReturnedEvent(XiangChongEquipmentOrigin Origin, bool Issued) : IGameEvent;
-public sealed record XiangChongEquipmentMaterialClaimIssuedEvent(XiangChongEquipmentMaterialClaim Claim) : IGameEvent;
-public sealed record XiangChongEquipmentMaterialEnteredEvent(XiangChongEquipmentMaterialClaim Claim,long Sequence,int EquippedSeat) : IGameEvent;
 public sealed record XiangChongEquipmentResultEvent(XiangChongEquipmentResult Result) : IGameEvent;
 public sealed record XiangChongCompletedEvent(long FrameId, string Branch, bool Paid, string Reason) : IGameEvent;
 internal interface IXiangChongHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame, SkillProgramEffect effect); }

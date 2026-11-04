@@ -14,7 +14,6 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeEntries
     internal IReadOnlyList<ProgramResponseExchangeStateSnapshot>? GetResponseExchangeStateSnapshots() => _resolve().GetResponseExchangeStateSnapshots();
     internal bool HasResponseEntityExchangeObservers() => _resolve().HasResponseEntityExchangeObservers();
     internal bool IsExchangedCardClaim(long actionId, int cardId) => _resolve().IsExchangedCardClaim(actionId, cardId);
-    internal bool IsExchangedUseCardClaim(long frameId, int cardId) => _resolve().IsExchangedUseCardClaim(frameId, cardId);
     internal bool IsResponseEntityRestricted(int seat, int id) => _resolve().IsResponseEntityRestricted(seat, id);
     internal void PublishPublicSuitChoice(ProgramSkillFrame frame) => _resolve().PublishPublicSuitChoice(frame);
     internal void PublishPublicSuitDiscard(ProgramSkillFrame frame) => _resolve().PublishPublicSuitDiscard(frame);

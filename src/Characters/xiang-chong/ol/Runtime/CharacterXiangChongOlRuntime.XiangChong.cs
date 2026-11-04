@@ -316,8 +316,6 @@ internal sealed partial class CharacterXiangChongOlRuntime
     {
         if (f.XiangChong?.Equipment is not { } o || !MatchesXiangChongEquipment(f, o))
             throw new InvalidOperationException("Guying equipment lost its original native return.");
-        if (issued)
-            CaptureXiangChongEquipmentMaterialEntry(f);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiangChongEquipmentReturnedEvent(o, issued));
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { XiangChong = f.XiangChong with { Stage = XiangChongStage.NativeChildren, NativeCompleted = true, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         ContinueXiang(f.Id);

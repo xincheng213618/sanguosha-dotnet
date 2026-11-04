@@ -62,7 +62,7 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationRuntime
         int? recipient = originalPrimary is [var unique] && unique != frame.OwnerSeat ? unique : null;
         var beforeAction = use.Action!;
         var retained = OverflowRetainedTargets(use.CardKind, frame.OwnerSeat, use.TargetSeats);
-        var materials = recipient is { } recipientSeat && _coreMatchParticipantsPlayersAccess._players[recipientSeat].IsAlive ? beforeAction.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, id)).ToArray() : [];
+        var materials = recipient is { } recipientSeat && _coreMatchParticipantsPlayersAccess._players[recipientSeat].IsAlive ? beforeAction.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, id)).ToArray() : [];
         var receipt = new OverflowTargetCancellationReceipt(1, new(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId), frame.GameplayHash, window.Id, use.Id, beforeAction.ActionId, beforeAction.ProviderSeat, use.CardKind, beforeAction, hand, limit, recipient, OverflowMovementSequence, OverflowMovementSequence, null)
         {
             OriginalTargetSeats = original.TargetSeats,

@@ -3,11 +3,19 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
 public enum NativeMaterialClaimResidency { HandDrawDiscard, Any }
+public enum NativeMaterialClaimKind { Delivery, AcceptedClaim, NativeUseTransfer, NativeChildReservation, Retained }
+public enum NativeMaterialHandoffMode { Issued, UntilDelivery }
 
-/// <summary>An actual delivery of an original native owner's physical material.</summary>
+/// <summary>An original native owner's accepted material disposition; MovementSequence identifies only actual delivery.</summary>
 public sealed record NativeMaterialClaim(int CardId, int? RecipientSeat, long MovementSequence,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    NativeMaterialClaimResidency Residency = NativeMaterialClaimResidency.HandDrawDiscard);
+    NativeMaterialClaimResidency Residency = NativeMaterialClaimResidency.HandDrawDiscard,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    NativeMaterialClaimKind Kind = NativeMaterialClaimKind.Delivery,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] long? ProducerFrameId = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? InstructionIndex = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] long? ChildUseId = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] long? OriginalEntrySequence = null);
 
 public sealed partial record CardUseFrame
 {
@@ -29,8 +37,13 @@ internal interface INativeMaterialClaims : IProgramRuntimeOperations
 {
     void CaptureDelivery(long ownerId, IReadOnlyList<CardMovementRecord> deliveries,
         NativeMaterialClaimResidency residency = NativeMaterialClaimResidency.Any);
+    bool AcceptClaim(long ownerId, long producerFrameId, int instructionIndex, IReadOnlyList<int> cardIds);
+    void TransferToNativeUse(long ownerId, long childUseId, IReadOnlyList<int> cardIds, NativeMaterialHandoffMode mode);
+    void DeclareRetainedMaterial(long ownerId, int cardId);
+    void CompleteNativeChild(CardUseFrame childUse);
     bool CanReadMaterial(long ownerId, int cardId);
     bool HasRelinquishedMaterial(long ownerId, int cardId);
+    bool PreservesMaterialAtCompletion(long ownerId, int cardId);
 }
 
 internal interface ICardUseMaterialClaims : IProgramRuntimeOperations
@@ -73,15 +86,18 @@ internal sealed class CardUseMaterialClaimRuntime(IProgramRuntimeFrames frames,
         NativeMaterialClaimResidency residency = NativeMaterialClaimResidency.Any)
     {
         if (deliveries.Count == 0) return;
+        var owner = NativeOwner(ownerId);
+        var prepared = PrepareDeliveryClaims(owner, deliveries, residency);
+        if (!ReferenceEquals(prepared, ReadClaims(owner))) ReplaceClaims(owner, prepared);
+    }
+
+    private IReadOnlyList<NativeMaterialClaim> PrepareDeliveryClaims(ResolutionFrame owner,
+        IReadOnlyList<CardMovementRecord> deliveries, NativeMaterialClaimResidency residency)
+    {
+        if (deliveries.Count == 0) return ReadClaims(owner);
         if (!Enum.IsDefined(residency))
             throw new InvalidOperationException("A native material delivery requires a declared residency policy.");
-        var owner = frames.Find(ownerId);
-        IReadOnlyList<int> materials = owner switch
-        {
-            CardUseFrame use => use.PhysicalCardIds ?? (use.CardId > 0 ? [use.CardId] : []),
-            JudgmentFrame { DelayedCardId: > 0 } judgment => [judgment.DelayedCardId.Value],
-            _ => throw new InvalidOperationException("A native material delivery requires its original use or delayed judgment owner.")
-        };
+        var materials = Materials(owner);
         if (deliveries.Select(move => move.CardId).Distinct().Count() != deliveries.Count ||
             deliveries.Select(move => move.Sequence).Distinct().Count() != deliveries.Count ||
             deliveries.Any(move => move.CardId <= 0 || !materials.Contains(move.CardId) ||
@@ -90,48 +106,197 @@ internal sealed class CardUseMaterialClaimRuntime(IProgramRuntimeFrames frames,
                 movements.Read().SingleOrDefault(actual => actual.Sequence == move.Sequence) != move))
             throw new InvalidOperationException("A native material delivery requires distinct original materials and their actual physical movements.");
         var claims = ReadClaims(owner).ToList();
+        var changed = false;
         foreach (var move in deliveries)
         {
             var claim = new NativeMaterialClaim(move.CardId,
                 move.To.Zone == CardZoneKind.Hand ? move.To.OwnerSeat : null, move.Sequence, residency);
-            var previous = claims.SingleOrDefault(item => item.CardId == move.CardId);
+            var previous = claims.SingleOrDefault(item => item.CardId == move.CardId && item.Kind != NativeMaterialClaimKind.Retained);
             if (previous is not null)
             {
-                if (previous != claim)
+                claim = claim with { ProducerFrameId = previous.ProducerFrameId, InstructionIndex = previous.InstructionIndex,
+                    ChildUseId = previous.ChildUseId, OriginalEntrySequence = previous.OriginalEntrySequence };
+                if (previous.MovementSequence > 0)
+                {
+                    if (previous != claim)
+                        throw new InvalidOperationException("A native-use material cannot replace its delivered claim.");
+                    continue;
+                }
+                if (previous.Residency != residency || previous.Kind is not
+                    (NativeMaterialClaimKind.AcceptedClaim or NativeMaterialClaimKind.NativeUseTransfer or NativeMaterialClaimKind.NativeChildReservation))
                     throw new InvalidOperationException("A native-use material cannot replace its delivered claim.");
+                claims[claims.IndexOf(previous)] = claim;
+                changed = true;
                 continue;
             }
             if (claims.Any(item => item.MovementSequence == move.Sequence))
                 throw new InvalidOperationException("A material-claim movement cannot identify another native-use material.");
             claims.Add(claim);
+            changed = true;
         }
-        // Publish the verified batch once; a conflicting batch changes nothing.
-        if (claims.Count != ReadClaims(owner).Count)
-            frames.Replace(ownerId, owner switch
+        return changed ? claims : ReadClaims(owner);
+    }
+
+    public bool AcceptClaim(long ownerId, long producerFrameId, int instructionIndex, IReadOnlyList<int> cardIds)
+    {
+        if (cardIds.Count == 0) return false;
+        var owner = NativeOwner(ownerId);
+        ValidateMaterials(owner, cardIds);
+        if (instructionIndex < 0 || frames.Find(producerFrameId) is null || !IsAncestor(ownerId, producerFrameId))
+            throw new InvalidOperationException("An accepted native-material claim requires its original producer instruction.");
+        var claims = ReadClaims(owner);
+        var issued = claims.Where(claim => claim.ProducerFrameId == producerFrameId && claim.InstructionIndex == instructionIndex).ToArray();
+        if (issued.Length != 0)
+        {
+            if (!issued.Select(claim => claim.CardId).Order().SequenceEqual(cardIds.Order()) ||
+                issued.Any(claim => claim.ChildUseId is not null || claim.Residency != NativeMaterialClaimResidency.Any))
+                throw new InvalidOperationException("An accepted material claim cannot change its original complete material set.");
+            return false;
+        }
+        if (claims.Any(claim => claim.Kind != NativeMaterialClaimKind.Retained && cardIds.Contains(claim.CardId)))
+            throw new InvalidOperationException("An original native material already has a different accepted disposition.");
+        ReplaceClaims(owner, claims.Concat(cardIds.Select(id => new NativeMaterialClaim(id, null, 0,
+            NativeMaterialClaimResidency.Any, NativeMaterialClaimKind.AcceptedClaim, producerFrameId, instructionIndex))).ToArray());
+        return true;
+    }
+
+    public void TransferToNativeUse(long ownerId, long childUseId, IReadOnlyList<int> cardIds, NativeMaterialHandoffMode mode)
+    {
+        if (cardIds.Count == 0) return;
+        var owner = NativeOwner(ownerId);
+        ValidateMaterials(owner, cardIds);
+        if (!Enum.IsDefined(mode) || ownerId == childUseId || !IsAncestor(ownerId, childUseId) ||
+            frames.Find(childUseId) is not CardUseFrame child || child.Step == ResolutionFrameStep.Completed ||
+            cardIds.Any(id => !ChildOwnsMaterial(child, id)))
+            throw new InvalidOperationException("A material handoff requires the actual descendant native use and its committed Processing materials.");
+        var kind = mode == NativeMaterialHandoffMode.Issued ? NativeMaterialClaimKind.NativeUseTransfer : NativeMaterialClaimKind.NativeChildReservation;
+        var claims = ReadClaims(owner);
+        var existing = claims.Where(claim => claim.ChildUseId == childUseId).ToArray();
+        if (existing.Length != 0)
+        {
+            if (!existing.Select(claim => claim.CardId).Order().SequenceEqual(cardIds.Order()) || existing.Any(claim => claim.Kind != kind))
+                throw new InvalidOperationException("A native handoff cannot change its original child or complete material set.");
+            return;
+        }
+        var journal = movements.Read();
+        var transfers = cardIds.Select(id =>
+        {
+            var entry = journal.LastOrDefault(move => move.CardId == id);
+            if (zones.GetLocation(id) != CardLocation.Processing || entry is not { To: var destination } ||
+                destination != CardLocation.Processing || entry.From == entry.To ||
+                entry.Sequence > child.NativeRepresentationIssuedAfterMovementSequence ||
+                claims.Any(claim => claim.CardId == id && claim.Kind != NativeMaterialClaimKind.Retained))
+                throw new InvalidOperationException("A native handoff requires the unchanged actual Processing entry of an unclaimed original material.");
+            return new NativeMaterialClaim(id, null, 0, NativeMaterialClaimResidency.Any, kind,
+                ChildUseId: childUseId, OriginalEntrySequence: entry.Sequence);
+        }).ToArray();
+        ReplaceClaims(owner, claims.Concat(transfers).ToArray());
+    }
+
+    public void DeclareRetainedMaterial(long ownerId, int cardId)
+    {
+        var owner = NativeOwner(ownerId);
+        ValidateMaterials(owner, [cardId]);
+        var claims = ReadClaims(owner);
+        if (claims.Any(claim => claim.CardId == cardId && claim.Kind == NativeMaterialClaimKind.Retained)) return;
+        ReplaceClaims(owner, claims.Append(new(cardId, null, 0, NativeMaterialClaimResidency.Any,
+            NativeMaterialClaimKind.Retained)).ToArray());
+    }
+
+    public void CompleteNativeChild(CardUseFrame childUse)
+    {
+        var owners = frames.OfType<ResolutionFrame>().Select(owner => (Owner: owner, Pending: ReadClaims(owner)
+            .Where(claim => claim.Kind == NativeMaterialClaimKind.NativeChildReservation && claim.ChildUseId == childUse.Id)
+            .ToArray())).Where(item => item.Pending.Length != 0).ToArray();
+        if (owners.Length == 0) return;
+        if (frames.Find(childUse.Id) is not CardUseFrame { Step: ResolutionFrameStep.Completed } live ||
+            childUse.Step != ResolutionFrameStep.Completed)
+            throw new InvalidOperationException("Only the original completed native child can settle its material handoff.");
+        var journal = movements.Read();
+        var settlements = new List<(ResolutionFrame Owner, IReadOnlyList<NativeMaterialClaim> Claims)>();
+        foreach (var (owner, pending) in owners)
+        {
+            var delivered = new List<CardMovementRecord>();
+            foreach (var claim in pending)
             {
-                CardUseFrame use => use with { MaterialClaims = claims },
-                JudgmentFrame judgment => judgment with { MaterialClaims = claims },
-                _ => throw new InvalidOperationException("The native material owner cannot retain its delivery.")
-            });
+                if (!ChildOwnsMaterial(live, claim.CardId) || claim.OriginalEntrySequence is not { } entry)
+                    throw new InvalidOperationException("A completed native child lost its original committed material.");
+                var first = journal.FirstOrDefault(move => move.CardId == claim.CardId && move.Sequence > entry);
+                if (first is null) continue;
+                if (first.From != CardLocation.Processing || first.To == CardLocation.Processing)
+                    throw new InvalidOperationException("A native child's first material departure lost its real Processing delivery.");
+                delivered.Add(first);
+            }
+            var prepared = PrepareDeliveryClaims(owner, delivered, NativeMaterialClaimResidency.Any);
+            settlements.Add((owner, prepared.Where(claim => claim.Kind != NativeMaterialClaimKind.NativeChildReservation ||
+                claim.ChildUseId != childUse.Id).ToArray()));
+        }
+        // Validate every original owner before publishing any of the settlements.
+        foreach (var settlement in settlements)
+            ReplaceClaims(settlement.Owner, settlement.Claims);
     }
 
     public bool WasClaimed(long useId, int cardId) =>
-        frames.Find(useId) is CardUseFrame && HasRelinquishedMaterial(useId, cardId);
+        frames.Find(useId) is CardUseFrame use && use.MaterialClaims.Any(claim => claim.CardId == cardId && claim.MovementSequence > 0);
 
     public bool CanFinishClaimedMaterial(long useId, int cardId) => WasClaimed(useId, cardId) &&
         zones.GetLocation(cardId).Zone is CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile;
 
     public IReadOnlyList<int> ClaimedCardIds(long useId) => frames.Find(useId) is CardUseFrame use
-        ? Array.AsReadOnly(use.MaterialClaims.Select(claim => claim.CardId).ToArray()) : Array.Empty<int>();
+        ? Array.AsReadOnly(use.MaterialClaims.Where(claim => claim.MovementSequence > 0).Select(claim => claim.CardId).Distinct().ToArray()) : Array.Empty<int>();
 
     public bool HasRelinquishedMaterial(long ownerId, int cardId) =>
-        ReadClaims(frames.Find(ownerId)).Any(claim => claim.CardId == cardId);
+        ReadClaims(frames.Find(ownerId)).Any(claim => claim.CardId == cardId &&
+            (claim.MovementSequence > 0 || claim.Kind is NativeMaterialClaimKind.AcceptedClaim or NativeMaterialClaimKind.NativeUseTransfer ||
+             claim.Kind == NativeMaterialClaimKind.NativeChildReservation && LiveChildOwnsMaterial(claim)));
+
+    public bool PreservesMaterialAtCompletion(long ownerId, int cardId) => CanReadMaterial(ownerId, cardId) ||
+        HasRelinquishedMaterial(ownerId, cardId) && zones.GetLocation(cardId) == CardLocation.Processing;
 
     public bool CanReadMaterial(long ownerId, int cardId) =>
         ReadClaims(frames.Find(ownerId)).Any(claim => claim.CardId == cardId &&
-            (claim.Residency == NativeMaterialClaimResidency.Any ||
-             claim.Residency == NativeMaterialClaimResidency.HandDrawDiscard &&
-             zones.GetLocation(cardId).Zone is CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile));
+            (claim.Kind == NativeMaterialClaimKind.Retained ? zones.GetLocation(cardId) != CardLocation.Processing :
+             (claim.MovementSequence > 0 || claim.Kind is NativeMaterialClaimKind.AcceptedClaim or NativeMaterialClaimKind.NativeUseTransfer ||
+              claim.Kind == NativeMaterialClaimKind.NativeChildReservation && LiveChildOwnsMaterial(claim)) &&
+             (claim.Residency == NativeMaterialClaimResidency.Any || claim.Residency == NativeMaterialClaimResidency.HandDrawDiscard &&
+              zones.GetLocation(cardId).Zone is CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile)));
+
+    private bool LiveChildOwnsMaterial(NativeMaterialClaim claim) => claim.ChildUseId is { } id &&
+        frames.Find(id) is CardUseFrame child && ChildOwnsMaterial(child, claim.CardId);
+
+    private static bool ChildOwnsMaterial(CardUseFrame child, int cardId) => Materials(child).Contains(cardId) &&
+        (child.Action is null || child.Action.PhysicalCards.Any(cost => cost.CardId == cardId && cost.From == CardLocation.Processing));
+
+    private bool IsAncestor(long ownerId, long descendantId)
+    {
+        for (var frame = frames.ParentOf(descendantId); frame is not null; frame = frames.ParentOf(frame.Id))
+            if (frame.Id == ownerId) return true;
+        return false;
+    }
+
+    private ResolutionFrame NativeOwner(long ownerId) => frames.Find(ownerId) is CardUseFrame or JudgmentFrame
+        ? frames.Find(ownerId)! : throw new InvalidOperationException("A native material disposition requires its actual use or judgment owner.");
+
+    private static IReadOnlyList<int> Materials(ResolutionFrame? owner) => owner switch
+    {
+        CardUseFrame use => use.PhysicalCardIds ?? (use.CardId > 0 ? [use.CardId] : []),
+        JudgmentFrame { DelayedCardId: > 0 } judgment => [judgment.DelayedCardId.Value],
+        _ => throw new InvalidOperationException("A native material disposition requires its original physical materials.")
+    };
+
+    private static void ValidateMaterials(ResolutionFrame owner, IReadOnlyList<int> cardIds)
+    {
+        var materials = Materials(owner);
+        if (cardIds.Distinct().Count() != cardIds.Count || cardIds.Any(id => id <= 0 || !materials.Contains(id)))
+            throw new InvalidOperationException("A material disposition requires distinct original native materials.");
+    }
+
+    private void ReplaceClaims(ResolutionFrame owner, IReadOnlyList<NativeMaterialClaim> claims) => frames.Replace(owner.Id, owner switch
+    {
+        CardUseFrame use => use with { MaterialClaims = claims },
+        JudgmentFrame judgment => judgment with { MaterialClaims = claims },
+        _ => throw new InvalidOperationException("The native material owner cannot retain its disposition.")
+    });
 
     private static IReadOnlyList<NativeMaterialClaim> ReadClaims(ResolutionFrame? owner) => owner switch
     {

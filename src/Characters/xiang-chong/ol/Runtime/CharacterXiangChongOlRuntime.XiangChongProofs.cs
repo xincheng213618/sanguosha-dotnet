@@ -3,13 +3,6 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterXiangChongOlRuntime
 {
-    internal bool IsXiangChongClaimedUseMaterial(long useId, int cardId)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { Action: { Type: CardActionType.Use } a } u)
-            return false;
-        return IsXiangChongEquipmentMaterialClaim(useId, cardId, a);
-    }
-
     internal bool ValidXiang(ProgramSkillFrame f)
     {
         if (f.XiangChong is not { } r || r.Source != XiangSource(f) || r.GameplayHash != f.GameplayHash || r.InstructionIndex != f.InstructionIndex || f.InstructionIndex != 1 || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || !Enum.IsDefined(r.Stage) || r.Branch is not ("loss" or "debt" or "gift" or "place") || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.Selected.Count > r.Required || r.Selected.Select(c => c.CardId).Distinct().Count() != r.Selected.Count || r.Selected.Any(c => !r.Cards.Contains(c)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiangChongStartedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var started] || started.Source != r.Source || started.GameplayHash != r.GameplayHash || started.ActualTurn != r.ActualTurn || started.TurnOwner != r.TurnOwner || started.Branch != r.Branch || started.PhaseToken != r.PhaseToken || started.Required != r.Required || started.LossBatchId != r.LossBatchId || started.LossSequence != r.LossSequence)
@@ -47,8 +40,6 @@ internal sealed partial class CharacterXiangChongOlRuntime
         }
 
         if (r.Equipment is { } o && (o.ProgramFrameId != f.Id || o.ActorSeat != f.OwnerSeat || o.CardId != r.Lost?.CardId || o.CardKind != r.Lost.Kind || o.From != r.LossDestination || o.CardUseFrameId <= f.Id || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XiangChongEquipmentIssuedEvent>().Count(x => x.Origin == o) != 1))
-            return false;
-        if (r.MaterialClaim is { } claim && (claim.Equipment != r.Equipment || claim.Source != r.Source || claim.GameplayHash != r.GameplayHash || claim.LossBatchId != r.LossBatchId || claim.LossSequence != r.LossSequence || claim.OriginalFrom != r.Lost?.From || !ValidXiangEquipmentMaterialInvoice(claim)))
             return false;
         if (r.NativeResult is { } result && (result.Origin != r.Equipment || !ValidXiangEquipmentResult(result) || r.Replaced?.CardId != result.ReplacedCardId))
             return false;

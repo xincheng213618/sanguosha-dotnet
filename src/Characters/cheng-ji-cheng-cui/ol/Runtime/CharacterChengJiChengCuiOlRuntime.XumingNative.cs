@@ -24,12 +24,15 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
         // Discard entities enter the real Use Processing zone. An entity still
         // retained by its original native Use is claimed there without a fake
         // Processing->Processing movement or an intervening fictitious Hand gain.
+        var original = _coreCardUseLifecycleOperations.LifecycleCardUse(p.DamageOwnerId);
+        IReadOnlyList<int> originalMaterials = original is null ? [] : original.PhysicalCardIds ?? (original.CardId > 0 ? [original.CardId] : []);
+        var handedOff = cards.Where(card => _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Processing && originalMaterials.Contains(card.Id)).Select(card => card.Id).ToArray();
+        if (handedOff.Length > 0)
+            _nativeMaterialClaims.TransferToNativeUse(original!.Id, useId, handedOff, NativeMaterialHandoffMode.Issued);
         foreach (var card in cards)
         {
             var from = _cardZonesOperations._cardZones.GetLocation(card.Id);
-            if (from == CardLocation.Processing)
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XumingProcessingMaterialClaimedEvent(f.Id, p.DamageOwnerId, useId, p.PromiseId, p.Source, card.Id));
-            else
+            if (from != CardLocation.Processing)
                 _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
         }
 
@@ -46,7 +49,6 @@ internal sealed partial class CharacterChengJiChengCuiOlRuntime
         return materials.Length == p.MaterialCount && action.PhysicalCards.Select(c => (c.CardId, c.CardKind)).SequenceEqual(materials.Select(m => (m.CardId, m.PrintedKind))) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingNativeUseIssuedEvent>().Count(e => e == new XumingNativeUseIssuedEvent(f.Id, p.PromiseId, p.Source, use.Id, action.ActionId, p.ActorSeat, p.TargetSeat, plan.Kind, p.MaterialCount)) == 1;
     }
 
-    internal bool IsXumingClaimedProcessingMaterial(long originalUseId, int cardId) => HasChengJiChengCui && cardId > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingProcessingMaterialClaimedEvent>().Any(e => e.OriginalUseId == originalUseId && e.CardId == cardId && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingNativeUseIssuedEvent>().Any(issued => issued.FrameId == e.ProgramFrameId && issued.UseId == e.UseId && issued.PromiseId == e.PromiseId && issued.Source == e.Source) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XumingMaterialFrozenEvent>().Any(m => m.PromiseId == e.PromiseId && m.Source == e.Source && m.CardId == cardId));
     [NativeUseValidation(32202)]
     internal void ValidateXumingNativeUse(CardUseFrame use)
     {

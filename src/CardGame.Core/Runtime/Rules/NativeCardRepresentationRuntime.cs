@@ -3,7 +3,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class NativeCardRepresentationRuntime(IProgramRuntimeFrames frames, ICardZoneQueries cards,
     ICardMovementHistoryQueries movements,
-    RuntimeEntries.CoreGameEngineCurrentUsePhysicalClaimsEntries claims) : INativeCardRepresentations
+    INativeMaterialClaims _nativeMaterialClaims) : INativeCardRepresentations
 {
     public Card Get(long useId, int cardId, bool requireProcessing = false)
     {
@@ -18,7 +18,7 @@ internal sealed class NativeCardRepresentationRuntime(IProgramRuntimeFrames fram
         if (requireProcessing && location != CardLocation.Processing &&
             !(use.NativeRepresentationIsCarrier && use.NativeRepresentation?.Id == cardId) &&
             !use.NativeRepresentationDepartures.Any(departure => departure.CardId == cardId &&
-                departure.Destination == location) && !claims.IsClaimedUseCardEntity(useId, cardId))
+                departure.Destination == location) && !_nativeMaterialClaims.CanReadMaterial(useId, cardId))
             throw new InvalidOperationException("A native-use entity left Processing without an issued representation lifetime.");
         return cards.CardsAt(location).Single(card => card.Id == cardId);
     }

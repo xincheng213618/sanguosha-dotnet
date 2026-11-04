@@ -26,7 +26,12 @@ internal sealed partial class CharacterXiangChongOlRuntime
         var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(origin.CardId);
         var id = _coreNativeCardUseOperations.BeginCardUse(card, origin.ActorSeat, [], physicalCardIds: [card.Id]);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, use => use with { XiangChongGuyingEquipment = origin });
-        RecordXiangChongEquipmentMaterialClaim(frame, origin);
+        if (origin.From == CardLocation.Processing)
+        {
+            var originalId = frame.WindowContext?.MovementBatch?.ParentFrameId ??
+                throw new InvalidOperationException("Guying's reused Processing material lost its original native owner.");
+            _nativeMaterialClaims.TransferToNativeUse(originalId, id, [card.Id], NativeMaterialHandoffMode.UntilDelivery);
+        }
         if (origin.From != CardLocation.Processing)
             _corePhysicalMovementFacadesOperations.MoveCard(card, origin.From, CardLocation.Processing, CardMoveReasons.EquipmentUse);
         if (!_coreFinalizedCardTargetsOperations.TryBeginEquipmentTargetPrograms(_coreMatchParticipantsPlayersAccess._players[origin.ActorSeat], card, id))

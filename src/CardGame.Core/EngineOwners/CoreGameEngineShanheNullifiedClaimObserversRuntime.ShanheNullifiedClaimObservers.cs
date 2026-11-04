@@ -21,7 +21,6 @@ internal sealed partial class CoreGameEngineShanheNullifiedClaimObserversRuntime
         {
             if (_coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)?.ShanheNullifiedTrickClaim is not { } receipt || receipt.WindowFrameId != window.Id || receipt.ChainDepth != window.ChainDepth)
                 return false;
-            _coreShanheNullifiedTrickClaimsOperations.AssertShanheNullifiedTrickClaims();
         }
 
         var rootIndex = index + 1;

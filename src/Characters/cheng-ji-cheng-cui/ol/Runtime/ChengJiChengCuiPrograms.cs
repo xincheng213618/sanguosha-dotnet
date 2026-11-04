@@ -23,8 +23,6 @@ public sealed record XumingPromiseSettledEvent(long FrameId, long PromiseId, Car
 public sealed record XumingNativeUseIssuedEvent(long FrameId, long PromiseId, CardConversionSource Source,
     long UseId, long ActionId, int ActorSeat, int TargetSeat, CardKind Kind, int MaterialCount) : IGameEvent;
 public sealed record XumingNativeUseReturnedEvent(long FrameId, long UseId) : IGameEvent;
-public sealed record XumingProcessingMaterialClaimedEvent(long ProgramFrameId, long OriginalUseId, long UseId,
-    long PromiseId, CardConversionSource Source, int CardId) : IGameEvent;
 public sealed record XumingCompletedEvent(long FrameId) : IGameEvent;
 public sealed record XumingUsePlan(CardKind Kind, LegalActionKind ActionKind, int? TargetCardId,
     CardKind? RequiredKind, string Description)

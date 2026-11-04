@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineAdjacentRedTargetsRuntime
             return false;
         // This is the actual accepted Use, including a Peach/Alcohol rescue Use.
         // A Dodge response has no such finalized card-use continuation.
-        if (a.PhysicalCards.Count > 0 && a.PhysicalCards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.CardId) != CardLocation.Processing && !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(u.Id, c.CardId) && !_coreResponseEntityExchangeOperations.IsExchangedCardClaim(a.ActionId, c.CardId)))
+        if (a.PhysicalCards.Count > 0 && a.PhysicalCards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.CardId) != CardLocation.Processing && !_nativeMaterialClaims.HasRelinquishedMaterial(u.Id, c.CardId) && !_coreResponseEntityExchangeOperations.IsExchangedCardClaim(a.ActionId, c.CardId)))
             return false;
         use = u;
         window = w;

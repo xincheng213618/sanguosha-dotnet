@@ -16,17 +16,15 @@ internal sealed partial class CoreGameEngineCurrentUsePhysicalClaimsRuntime
             ? _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(f => f.Id == use.ParentCardUseFrameId)
             : CurrentFinalTargetSlashOwner(frame);
         var target = recipient?.Kind == ProgramParticipantRef.Owner ? frame.OwnerSeat : frame.WindowContext!.TargetSeat!.Value;
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && !_characterPangDeBoundaryMobileOperations.Value.HasBoundaryPangDePaidDiscard(frame))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
             return SkillProgramStepOutcome.Continue;
         var effectIndex = frame.InstructionIndex - 1;
-        var claims = owner.CurrentUsePhysicalClaims ?? [];
-        if (claims.Any(claim => claim.ProducerFrameId == frame.Id && claim.EffectIndex == effectIndex))
-            throw new InvalidOperationException("An already claimed use entity cannot be paid again.");
-        var ids = owner.Action!.PhysicalCards.Select(cost => cost.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !IsClaimedUseCardEntity(owner.Id, id)).ToArray();
+        var ids = owner.Action!.PhysicalCards.Select(cost => cost.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_nativeMaterialClaims.HasRelinquishedMaterial(owner.Id, id)).ToArray();
         if (ids.Length == 0)
             return SkillProgramStepOutcome.Continue;
+        if (!_nativeMaterialClaims.AcceptClaim(owner.Id, frame.Id, effectIndex, ids))
+            return SkillProgramStepOutcome.Continue;
         var receipt = new ProgramCurrentUsePhysicalClaim(owner.Id, owner.Action.ActionId, frame.Id, effectIndex, frame.OwnerSeat, target, frame.SkillId, frame.SkillInstanceId, frame.GameplayHash, frame.TriggerId!, Array.AsReadOnly(ids));
-        _coreRuntimeOperations.ReplaceRuntimeFrame(owner.Id, owner with { CurrentUsePhysicalClaims = Array.AsReadOnly(claims.Append(receipt).ToArray()) });
         // Issue the owning receipt before movements: a movement observer can
         // inspect or continue the parent use without treating these entities as leaks.
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCurrentUsePhysicalCardsClaimedEvent(receipt));
@@ -38,9 +36,6 @@ internal sealed partial class CoreGameEngineCurrentUsePhysicalClaimsRuntime
         return _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id) ? SkillProgramStepOutcome.AwaitChild : SkillProgramStepOutcome.Continue;
     }
 
-    internal bool IsClaimedUseCardEntity(long frameId, int cardId) => _nativeMaterialClaims.CanReadMaterial(frameId, cardId) || _coreSourceDingxiNativeOperations.IsSourceDingxiRetainedEntity(frameId, cardId) || _characterChengJiChengCuiOlOperations.IsXumingClaimedProcessingMaterial(frameId, cardId) || _coreResponseEntityExchangeOperations.IsExchangedUseCardClaim(frameId, cardId) || HasAcceptedMaterialClaim(frameId, cardId) || _coreShanheNullifiedTrickClaimsOperations.IsShanheNullifiedTrickMaterialClaim(frameId, cardId);
-    internal bool IsCurrentUsePhysicalCardClaim(long frameId, int cardId) => _nativeMaterialClaims.HasRelinquishedMaterial(frameId, cardId) || HasAcceptedMaterialClaim(frameId, cardId);
-    private bool HasAcceptedMaterialClaim(long frameId, int cardId) => _characterXiangChongOlOperations.IsXiangChongClaimedUseMaterial(frameId, cardId) || _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(use => use.Id == frameId)is { Action: { } action, CurrentUsePhysicalClaims: { } claims } && claims.Any(claim => claim.ActionId == action.ActionId && claim.CardUseFrameId == frameId && claim.CardIds.Contains(cardId));
     internal void PreventCurrentTargetSlashCancellationByRule(ProgramSkillFrame frame)
     {
         var owner = CurrentFinalTargetSlashOwner(frame);
