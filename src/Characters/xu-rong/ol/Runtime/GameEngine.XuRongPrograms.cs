@@ -10,16 +10,6 @@ public sealed record XionghuoMarkTransferredEvent(long FrameId,XionghuoGrant Gra
 public sealed record XionghuoPlayDebtPaidEvent(long FrameId,CardConversionSource Source,string GameplayHash,long PlayWindowId,int SubjectSeat,int ActualTurnNumber,int PhaseInstanceId,int RemovedCount,uint RandomBefore,uint RandomAfter,int Branch):IGameEvent;
 public sealed record XuRongCardsPaidEvent(long FrameId,CardConversionSource Source,string Kind,long Before,long After,IReadOnlyList<int> CardIds):IGameEvent;
 public sealed record XuRongCompletedEvent(long FrameId,CardConversionSource Source,string Stage,int SubjectSeat,long? DyingFrameId):IGameEvent;
-public sealed record XuRongCausalClaimReceipt(long ProducerFrameId,CardConversionSource Source,string GameplayHash,long DyingFrameId,long NativeOwnerId,long? NativeActionId,int HpAtEntry,int RescueCardsRequired,IReadOnlyList<int> CardIds);
-public sealed record XuRongCausalClaimIssuedEvent(XuRongCausalClaimReceipt Receipt):IGameEvent;
-public sealed partial record CardUseFrame
-{
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public IReadOnlyList<XuRongCausalClaimReceipt>? XuRongCausalClaims{get;init;}
-}
-public sealed partial record JudgmentFrame
-{
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public IReadOnlyList<XuRongCausalClaimReceipt>? XuRongCausalClaims{get;init;}
-}
 public sealed partial class CharacterState
 {
  private readonly List<XionghuoGrant> _xionghuoGrants=[];

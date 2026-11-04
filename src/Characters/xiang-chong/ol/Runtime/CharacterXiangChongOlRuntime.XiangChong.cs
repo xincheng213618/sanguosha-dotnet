@@ -251,7 +251,7 @@ internal sealed partial class CharacterXiangChongOlRuntime
             {
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiangChongEntityMovedEvent(f.Id, segment, m.CardId, m.CardKind, m.From, m.To, m.Sequence));
                 if (segment == "return" && m.From == CardLocation.Processing && f.WindowContext?.MovementBatch is { ParentFrameId: { } useId } lossBatch && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { Type: CardActionType.Use } action } use && action.PhysicalCards.Any(c => c.CardId == m.CardId && c.From == r.Lost!.From && c.CardKind == m.CardKind) && lossBatch.Movements.Any(x => x.CardId == m.CardId && x.Sequence == r.LossSequence && x.To == CardLocation.Processing))
-                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XiangChongUseMaterialClaimedEvent(use.Id, action.ActionId, f.Id, r.Source, r.GameplayHash, m.CardId, m.CardKind, f.OwnerSeat, r.LossSequence, m.Sequence));
+                    _nativeMaterialClaims.CaptureDelivery(use.Id, [m]);
             }
         });
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);

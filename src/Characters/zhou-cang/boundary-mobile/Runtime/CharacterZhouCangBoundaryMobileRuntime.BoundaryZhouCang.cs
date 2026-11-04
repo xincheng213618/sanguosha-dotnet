@@ -206,6 +206,9 @@ internal sealed partial class CharacterZhouCangBoundaryMobileRuntime
         void Settled(HappyWeiYanGainRequestSettlement settlement)
         {
             _coreHappyWeiYanGainDestinationsOperations.ValidateHappyWeiYanGainRequestSettlement(settlement, f.Id, ids, CardLocation.Hand(recipient), r.Before);
+            if (stage is BoundaryZhongyongStage.AcquireSlashChildren or BoundaryZhongyongStage.GiveSlashChildren)
+                _nativeMaterialClaims.CaptureDelivery(r.UseId, settlement.Movements.Where(move =>
+                    ids.Contains(move.CardId) && move.From.Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile).ToArray());
             var now = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(now with { BoundaryZhongyong = now.BoundaryZhongyong!with { Settlement = settlement, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
             foreach (var m in settlement.Movements)

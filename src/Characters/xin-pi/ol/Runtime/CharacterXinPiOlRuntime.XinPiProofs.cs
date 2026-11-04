@@ -109,13 +109,6 @@ internal sealed partial class CharacterXinPiOlRuntime
     }
 
     internal bool IsXinPiRemainingCardDamageIneffective(GameEngine.IDamageAttempt attack) => attack is NativeOwners.CardAttackHandle c && !c.IsProgramSkillDamage && !c.IsProgramJudgmentDamage && !c.IsDelayedJudgmentDamage && _coreCardUseLifecycleOperations.LifecycleCardUse(c.ResolutionId)is { } use && use.CardKind == c.EffectiveCardKind && _coreCompletedUndamagedTargetRevealOperations.CompletedUndamagedNativeUseActorMatches(use, c) && IsXinPiUseIneffective(use);
-    internal bool IsXinPiPhysicalClaim(long useId, int cardId)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { XinPiClaim: { } p, Action: { } a, XinPiOrigin: { } origin } || p.UseId != useId || p.ActionId != a.ActionId || !p.Entities.Contains(cardId) || p.After is not { } after || p.BatchId is not { } batch || after <= p.Before || batch <= 0 || _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash != p.GameplayHash || !origin.Materials.Any(m => m.CardId == cardId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == p.FrameId && e.OwnerSeat == p.Source.OwnerSeat && e.SkillId == p.Source.SkillId && e.BindingId == p.Source.BindingId && e.SkillInstanceId == p.Source.SkillInstanceId && e.Window == SkillProgramTriggerWindow.CardUseCompleted) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChijieClaimIssuedEvent>().Count(e => e.FrameId == p.FrameId && e.UseId == useId && e.ActionId == a.ActionId && e.Source == p.Source && e.GameplayHash == p.GameplayHash && e.Before == p.Before && e.Count == p.Entities.Count) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChijieClaimPaidEvent>().Count(e => e == new ChijieClaimPaidEvent(p.FrameId, p.Source, useId, a.ActionId, p.Before, after, batch, p.Entities.Count)) != 1)
-            return false;
-        return p.Entities.All(id => origin.Materials.Any(m => m.CardId == id) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == id && m.Sequence > p.Before && m.Sequence <= after && m.From.Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile && m.To == CardLocation.Hand(p.Source.OwnerSeat) && m.Reason.Value == ChijieClaimReason) == 1);
-    }
-
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 550)]
     internal bool CanOfferXinPi(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {

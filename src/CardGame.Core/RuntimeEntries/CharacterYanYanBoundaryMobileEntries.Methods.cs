@@ -11,7 +11,6 @@ internal sealed partial class CharacterYanYanBoundaryMobileEntries
     internal SkillProgramStepOutcome ClaimBoundaryYanYan(ProgramSkillFrame f) => _resolve().ClaimBoundaryYanYan(f);
     internal SkillProgramStepOutcome FinishBoundaryYanYan(ProgramSkillFrame f) => _resolve().FinishBoundaryYanYan(f);
     internal bool HasBoundaryYanYanHe(int seat) => _resolve().HasBoundaryYanYanHe(seat);
-    internal bool IsBoundaryYanYanClaimedEntity(long useId, int card) => _resolve().IsBoundaryYanYanClaimedEntity(useId, card);
     internal bool IssuedBoundaryYanYanClaim(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => _resolve().IssuedBoundaryYanYanClaim(c, w);
     internal bool KeepPaidBoundaryYanYan(ProgramSkillFrame f) => _resolve().KeepPaidBoundaryYanYan(f);
     internal void ObserveBoundaryYanYan(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> candidates) => _resolve().ObserveBoundaryYanYan(action, window, candidates);

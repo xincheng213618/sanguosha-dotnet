@@ -9,7 +9,7 @@ internal sealed partial class CharacterHuaManOlRuntime
         if (r.Stage != HuaManStage.DiscardChildren || !r.Paid || r.Souying is not { } q || r.DiscardedId is not { } discarded || _coreCardUseLifecycleOperations.LifecycleCardUse(q.NativeUseId)is not { Action: { } action } use || use.Action.ActionId != q.ActionId || use.HuaManSouyingMutation is not null)
             throw new InvalidOperationException("Paid Souying lost its native use, unique direction or actual discarded entity.");
         var cancel = f.OwnerSeat == q.TargetSeat;
-        var ids = !cancel && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? action.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, id)).ToArray() : [];
+        var ids = !cancel && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? action.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_nativeMaterialClaims.CanReadMaterial(use.Id, id)).ToArray() : [];
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var mutation = new SouyingNativeMutation(f.Id, r.Source, r.GameplayHash, q, r.Before, r.After, discarded, before, before, cancel)
         {
@@ -27,6 +27,10 @@ internal sealed partial class CharacterHuaManOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HuaMan = r with { Stage = HuaManStage.ClaimChildren, Before = before, After = before, ActualCount = 0 }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         if (ids.Length > 0)
             _corePhysicalMovementFacadesOperations.MoveCards(ids.Select(_coreAdvancedLifecycleOperations.GetAdvancedCard).ToArray(), CardLocation.Processing, CardLocation.Hand(f.OwnerSeat), new(HuaManClaimReason));
+        _nativeMaterialClaims.CaptureDelivery(use.Id,
+            _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move =>
+                move.Sequence > before && ids.Contains(move.CardId) &&
+                move.From == CardLocation.Processing && move.Reason.Value == HuaManClaimReason).ToArray());
         use = _coreCardUseLifecycleOperations.LifecycleCardUse(q.NativeUseId)!;
         mutation = mutation with
         {

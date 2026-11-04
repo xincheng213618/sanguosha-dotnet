@@ -19,7 +19,7 @@ internal sealed partial class CharacterXinPiOlRuntime
     {
         if (use.XinPiOrigin is not { } o || use.Action is not { } a || o.UseId != use.Id || o.Action.ActionId != a.ActionId || !o.Action.PhysicalCards.SequenceEqual(a.PhysicalCards) || !_coreCompletedUndamagedTargetRevealOperations.HasExactAcceptedCompletedUndamagedUse(use, a))
             return[];
-        return Array.AsReadOnly(o.Materials.Where(m => !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, m.CardId) && XinPiMaterialStillOriginal(use, m)).Select(m => m.CardId).Distinct().ToArray());
+        return Array.AsReadOnly(o.Materials.Where(m => !_nativeMaterialClaims.CanReadMaterial(use.Id, m.CardId) && XinPiMaterialStillOriginal(use, m)).Select(m => m.CardId).Distinct().ToArray());
     }
 
     internal bool ChijieUndamagedIncoming(int owner, ProgramSkillWindowContext w, out CardUseFrame use)

@@ -52,7 +52,7 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal int[] HuCheErMaterials(ProgramSkillFrame f) => HuCheErFirstWeapon(f.OwnerSeat, f.WindowContext!)is { Action: { } a } use ? a.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, id)).ToArray() : [];
+    internal int[] HuCheErMaterials(ProgramSkillFrame f) => HuCheErFirstWeapon(f.OwnerSeat, f.WindowContext!)is { Action: { } a } use ? a.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, id)).ToArray() : [];
     internal IReadOnlyList<PromptChoice> HuCheErChoices(ProgramSkillFrame f)
     {
         if (f.AnniversaryHuCheEr is not { Stage: AnniversaryHuCheErStage.Choice } r)
@@ -111,6 +111,10 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(f.OwnerSeat), new(HuCheErClaimReason), afterRequestSettled: settlement =>
         {
             _coreHappyWeiYanGainDestinationsOperations.ValidateHappyWeiYanGainRequestSettlement(settlement, f.Id, ids, CardLocation.Hand(f.OwnerSeat), before);
+            _nativeMaterialClaims.CaptureDelivery(r.UseId, settlement.Movements.Where(move =>
+                move.To == CardLocation.Hand(f.OwnerSeat) ||
+                move.To == CardLocation.OutsideGame && _coreAdvancedLifecycleOperations.GetAdvancedCard(move.CardId).IsGeneralWeapon ||
+                _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(move, CardLocation.Hand(f.OwnerSeat))).ToArray());
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(current with { AnniversaryHuCheEr = current.AnniversaryHuCheEr!with { Gain = settlement, Moves = settlement.Movements, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryHuCheErWeaponClaimedEvent(f.Id, r.UseId, r.ActionId, f.OwnerSeat, ids.Length, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));

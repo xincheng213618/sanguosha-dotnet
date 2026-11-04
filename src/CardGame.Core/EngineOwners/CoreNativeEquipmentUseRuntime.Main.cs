@@ -21,7 +21,7 @@ internal sealed partial class CoreNativeEquipmentUseRuntime
     {
         if (_characterWeiYanHappyGodOperations.TryHappyWeiYanEquipmentCommitted(resolutionId, equipment))
             return;
-        if (_characterXiangChongOlOperations.IsXiangChongClaimedUseMaterial(resolutionId, equipment.Id) || _characterHuCheErAnniversaryOperations.IsAnniversaryHuCheErClaimedUseMaterial(resolutionId, equipment.Id))
+        if (_characterXiangChongOlOperations.IsXiangChongClaimedUseMaterial(resolutionId, equipment.Id) || _nativeMaterialClaims.HasRelinquishedMaterial(resolutionId, equipment.Id))
         {
             _coreCardUseLifecycleOperations.BeginSimpleCardUse(resolutionId, new(equipment.Id, SimpleCardUseEffect.Equipment));
             return;

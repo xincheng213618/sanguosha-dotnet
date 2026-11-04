@@ -47,6 +47,11 @@ internal sealed partial class CoreGameEngineShanheNullifiedTrickClaimsRuntime
             MovementAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
         };
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { ShanheNullifiedTrickClaim = receipt });
+        _nativeMaterialClaims.CaptureDelivery(use.Id, _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(move =>
+            move.Sequence > receipt.MovementBefore && move.Sequence <= receipt.MovementAfter &&
+            ids.Contains(move.CardId) && move.From == CardLocation.Processing &&
+            move.To == CardLocation.Hand(receipt.RecipientSeat) &&
+            move.Reason == CoreGameEngineShanheNullifiedTrickClaimsDefinitions.ShanheCounterspellClaimReason).ToArray());
         foreach (var id in ids)
         {
             var move = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(item => item.CardId == id && item.Sequence > receipt.MovementBefore && item.Sequence <= receipt.MovementAfter && item.From == CardLocation.Processing && item.To == CardLocation.Hand(receipt.RecipientSeat) && item.Reason == CoreGameEngineShanheNullifiedTrickClaimsDefinitions.ShanheCounterspellClaimReason);

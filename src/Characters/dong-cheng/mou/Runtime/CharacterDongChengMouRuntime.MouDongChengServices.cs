@@ -189,20 +189,19 @@ internal sealed partial class CharacterDongChengMouRuntime
         var pending = claims.Where(p => p.Source.OwnerSeat == f.OwnerSeat && p.Source.SkillInstanceId == f.SkillInstanceId && !p.Settled).ToArray();
         if (pending.Length == 0)
             throw new InvalidOperationException("Baojia cannot repeat an already settled whole-use claim.");
-        var ids = a.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, id)).ToArray();
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouDongChengClaims = claims.Select(p => pending.Contains(p) ? p with { Settled = true, Before = r.Before, After = r.Before, Cards = ids } : p).ToArray() });
+        var ids = a.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, id)).ToArray();
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouDongChengClaims = claims.Select(p => pending.Contains(p) ? p with { Settled = true } : p).ToArray() });
         if (ids.Length > 0)
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(f.OwnerSeat), new("skill-program.mou:baojia.claim"), (_, moves) =>
             {
                 if (moves.Count != ids.Length || moves.Any(m => !ids.Contains(m.CardId) || m.Sequence <= r.Before || m.To != CardLocation.Hand(f.OwnerSeat) && m.To != CardLocation.OutsideGame))
                     throw new InvalidOperationException("Baojia's completed original material claim lost its genuine movement.");
+                _nativeMaterialClaims.CaptureDelivery(use.Id, moves.Where(move => move.To == CardLocation.Hand(f.OwnerSeat)).ToArray());
                 var after = moves.Max(m => m.Sequence);
                 var parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
                 _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, parent with { MouDongCheng = parent.MouDongCheng!with { After = after, Actual = moves.Count(m => m.To == CardLocation.Hand(f.OwnerSeat)) } });
-                _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouDongChengClaims = u.MouDongChengClaims!.Select(p => pending.Any(old => old.ProtectionFrameId == p.ProtectionFrameId) ? p with { After = after } : p).ToArray() });
             });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDcClaimSettledEvent(f.Id, use.Id, ids.Length));
     }
 
-    internal bool IsMouDcClaimedEntity(long useId, int card) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { } a, MouDongChengClaims: { } claims } u && claims.Any(p => p.Settled && p.UseId == u.Id && p.ActionId == a.ActionId && p.Cards.Contains(card) && p.After > p.Before && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == card && m.Sequence > p.Before && m.Sequence <= p.After && m.To == CardLocation.Hand(p.Source.OwnerSeat) && m.Reason.Value == "skill-program.mou:baojia.claim") == 1);
 }

@@ -29,7 +29,6 @@ internal sealed partial class CharacterHuCheErAnniversaryEntries
     internal bool HuCheErSlashBan(int actor, CardKind kind) => _resolve().HuCheErSlashBan(actor, kind);
     internal bool HuCheErUseBan(ProgramCardUseQuery q) => _resolve().HuCheErUseBan(q);
     internal int HuCheErZhong(CharacterState p) => _resolve().HuCheErZhong(p);
-    internal bool IsAnniversaryHuCheErClaimedUseMaterial(long useId, int cardId) => _resolve().IsAnniversaryHuCheErClaimedUseMaterial(useId, cardId);
     internal void PublishHuCheEr(ProgramSkillFrame f) => _resolve().PublishHuCheEr(f);
     internal SkillProgramStepOutcome RecordHuCheErGain(ProgramSkillFrame supplied) => _resolve().RecordHuCheErGain(supplied);
     internal bool ResumeHuCheEr(long id) => _resolve().ResumeHuCheEr(id);

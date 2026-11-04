@@ -139,7 +139,7 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
         if (f.BoundaryYanYanClaim is not null || f.WindowContext is not { } w || BoundaryYanYanClaimUse(candidate, w)is not { Action: { } a, BoundaryYanYanClaims: { } claims } use)
             throw new InvalidOperationException("Chengshi obtains only its original fully resolved Slash materials once.");
         var pending = claims.Where(c => c.Source.OwnerSeat == f.OwnerSeat && c.Source.SkillInstanceId == f.SkillInstanceId && !c.Settled).ToArray();
-        var ids = a.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, id)).ToArray();
+        var ids = a.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, id)).ToArray();
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         var draft = new BoundaryYanYanClaimDraft(use.Id, pending[0].ProducerFrameId, before)
         {
@@ -147,7 +147,7 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
             From = ids.Select(id => _cardZonesOperations._cardZones.GetLocation(id)).ToArray(),
             After = before
         };
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { BoundaryYanYanClaims = claims.Select(p => pending.Contains(p) ? p with { Settled = true, Before = before, After = before, Cards = ids } : p).ToArray() });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { BoundaryYanYanClaims = claims.Select(p => pending.Contains(p) ? p with { Settled = true } : p).ToArray() });
         if (ids.Length == 0)
         {
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryYanYanClaimPaidEvent(f.Id, use.Id, f.OwnerSeat, 0, before, before, 0));
@@ -159,10 +159,10 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
         {
             if (moves.Count != ids.Length || moves.Any(m => !ids.Contains(m.CardId) || m.From != draft.From[Array.IndexOf(ids, m.CardId)] || m.Sequence <= before || m.To != CardLocation.Hand(f.OwnerSeat) && m.To != CardLocation.OutsideGame))
                 throw new InvalidOperationException("Chengshi lost its original material movement invoice.");
+            _nativeMaterialClaims.CaptureDelivery(use.Id, moves);
             var after = moves.Max(m => m.Sequence);
             var own = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, own with { BoundaryYanYanClaim = draft with { After = after, Batch = batch } });
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { BoundaryYanYanClaims = u.BoundaryYanYanClaims!.Select(p => pending.Any(old => old.ProducerFrameId == p.ProducerFrameId) ? p with { After = after, Batch = batch } : p).ToArray() });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryYanYanClaimPaidEvent(f.Id, use.Id, f.OwnerSeat, ids.Length, before, after, batch));
         });
         var outcome = _coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(f.Id, f.OwnerSeat);
@@ -172,7 +172,6 @@ internal sealed partial class CharacterYanYanBoundaryMobileRuntime
     }
 
     internal bool BoundaryYanYanIssuedClaimMatches(CardUseFrame use, BoundaryYanYanClaim p) => use.Action is { } a && p.UseId == use.Id && p.ActionId == a.ActionId && p.Source.SkillId == BoundaryYanYanComposition.Skill && p.Source.BindingId is ("yin-designated-use" or "yang-became-target") && p.ProducerFrameId > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryYanYanChengshiGrantedEvent>().Count(e => e.FrameId == p.ProducerFrameId && e.OwnerSeat == p.Source.OwnerSeat && e.SkillInstanceId == p.Source.SkillInstanceId && e.UseId == use.Id && e.ActionId == a.ActionId) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryYanYanPreparedEvent>().Count(e => e.FrameId == p.ProducerFrameId && e.Occurrence is { Ordinal: 3 } o && o.OwnerSeat == p.Source.OwnerSeat && o.SkillInstanceId == p.Source.SkillInstanceId && o.GameplayHash == p.GameplayHash && o.UseId == use.Id && o.ActionId == a.ActionId && (o.Polarity == SkillPolarity.Yin ? o.ActorSeat : o.TargetSeat) == p.Source.OwnerSeat) == 1;
-    internal bool IsBoundaryYanYanClaimedEntity(long useId, int card) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { BoundaryYanYanClaims: { } claims } u && claims.Any(p => p.Settled && BoundaryYanYanIssuedClaimMatches(u, p) && p.Cards.Contains(card) && p.After > p.Before && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == card && m.Sequence > p.Before && m.Sequence <= p.After && (m.To == CardLocation.Hand(p.Source.OwnerSeat) || m.To == CardLocation.OutsideGame) && m.Reason.Value == BoundaryYanYanClaimReason) == 1);
     [ProgramContinuation(ProgramContinuationKind.Movement, 54300)]
     internal bool ReturnBoundaryYanYanClaim(ProgramSkillFrame f)
     {

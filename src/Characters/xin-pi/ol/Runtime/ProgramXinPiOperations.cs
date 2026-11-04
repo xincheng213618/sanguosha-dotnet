@@ -6,11 +6,6 @@ public sealed record XinPiUseOrigin(long UseId,CardActionContext Action,long Bef
  private readonly IReadOnlyList<XinPiMaterialInvoice> _materials=Array.AsReadOnly(Array.Empty<XinPiMaterialInvoice>());
  public IReadOnlyList<XinPiMaterialInvoice> Materials{get=>_materials;init=>_materials=Array.AsReadOnly(value.ToArray());}
 }
-public sealed record XinPiClaimProof(long FrameId,long UseId,long ActionId,CardConversionSource Source,string GameplayHash,long Before,long? After=null,long? BatchId=null)
-{
- private readonly IReadOnlyList<int> _ids=Array.AsReadOnly(Array.Empty<int>());
- public IReadOnlyList<int> Entities{get=>_ids;init=>_ids=Array.AsReadOnly(value.ToArray());}
-}
 public sealed record ChijieClaimIssuedEvent(long FrameId,long UseId,long ActionId,CardConversionSource Source,string GameplayHash,long Before,int Count):IGameEvent;
 public sealed record ChijieInvalidationProof(long ProgramFrameId,CardConversionSource Source,string GameplayHash,int ActualTurn,long UseId,long ActionId,long DamageFrameId,int TargetSeat,int SourceSeat);
 public enum XinPiStage { ClaimChildren, RecoveryChildren, OwnerDrawChildren, RecipientDrawChildren }
@@ -33,7 +28,6 @@ public sealed partial record CardUseFrame
 {
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public XinPiUseOrigin? XinPiOrigin {get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public ChijieInvalidationProof? ChijieInvalidation {get;init;}
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public XinPiClaimProof? XinPiClaim {get;init;}
 }
 public sealed partial record ProgramSkillFrame
 {

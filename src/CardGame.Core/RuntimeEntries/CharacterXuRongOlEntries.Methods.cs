@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterXuRongOlEntries
 {
-    internal void ArmXuRongCausalClaim(ProgramSkillFrame f, XuRongDyingProof proof, IReadOnlyList<int> ids) => _resolve().ArmXuRongCausalClaim(f, proof, ids);
     internal bool CanActivateXuRong(int owner, SkillProgramActivation activation) => _resolve().CanActivateXuRong(owner, activation);
     internal bool CanContinueIssuedXuRong(ProgramSkillFrame f) => _resolve().CanContinueIssuedXuRong(f);
     internal bool CanOfferXuRongLifecycle(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().CanOfferXuRongLifecycle(candidate, context);
@@ -14,7 +13,6 @@ internal sealed partial class CharacterXuRongOlEntries
     internal SkillProgramStepOutcome ExecuteXuRong(SkillProgramEffectOp op, ProgramSkillFrame f) => _resolve().ExecuteXuRong(op, f);
     internal bool HasXuRongDyingQualification(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().HasXuRongDyingQualification(candidate, context);
     internal SkillProgramStepOutcome InitializeXuRong(ProgramSkillFrame f) => _resolve().InitializeXuRong(f);
-    internal bool IsXuRongCausalEntityClaim(long nativeOwnerId, int cardId) => _resolve().IsXuRongCausalEntityClaim(nativeOwnerId, cardId);
     internal bool IsXuRongSlashTargetForbidden(int actor, int target, CardKind kind) => _resolve().IsXuRongSlashTargetForbidden(actor, target, kind);
     internal void IssueXuRongMove(ProgramSkillFrame f, IReadOnlyList<int> ids, string reason) => _resolve().IssueXuRongMove(f, ids, reason);
     internal bool LiveXionghuoSource(XionghuoGrant grant) => _resolve().LiveXionghuoSource(grant);

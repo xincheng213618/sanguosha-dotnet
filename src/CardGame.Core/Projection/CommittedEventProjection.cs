@@ -150,7 +150,6 @@ internal static class CommittedEventProjection
         SimaHuiUnassignedReturnedEvent value => value with { CardIds = FreezeList(value.CardIds) },
         SimaHuiYeyanSealsPaidEvent value => value with { GrantSourceIds = FreezeList(value.GrantSourceIds), MaterialCardIds = FreezeList(value.MaterialCardIds) },
         XuRongCardsPaidEvent value => value with { CardIds = FreezeList(value.CardIds) },
-        XuRongCausalClaimIssuedEvent value => value with { Receipt = value.Receipt with { CardIds = FreezeList(value.Receipt.CardIds) } },
         BeiMiHuChoiceStartedEvent value => value with { Candidates = FreezeList(value.Candidates) },
         BeiMiHuAwakeningCompletedEvent value => value with { MarkedSeats = FreezeList(value.MarkedSeats) },
         BeiMiHuTargetsPaidEvent value => value with { Receipt = value.Receipt with

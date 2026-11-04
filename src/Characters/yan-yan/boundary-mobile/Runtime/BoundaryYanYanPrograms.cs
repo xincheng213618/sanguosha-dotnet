@@ -56,9 +56,6 @@ public sealed record BoundaryYanYanDraft(BoundaryYanYanOccurrence Occurrence,lon
 public sealed record BoundaryYanYanClaim(long ProducerFrameId,CardConversionSource Source,string GameplayHash,long UseId,long ActionId)
 {
     public bool Settled {get;init;}
-    private readonly IReadOnlyList<int> _cards=Array.AsReadOnly(Array.Empty<int>());
-    public IReadOnlyList<int> Cards{get=>_cards;init=>_cards=Array.AsReadOnly(value.ToArray());}
-    public long Before{get;init;}public long After{get;init;}public long Batch{get;init;}
 }
 public sealed record BoundaryYanYanClaimDraft(long UseId,long ProducerFrameId,long Before)
 {

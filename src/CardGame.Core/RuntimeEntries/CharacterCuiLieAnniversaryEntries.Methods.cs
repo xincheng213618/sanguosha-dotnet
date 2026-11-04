@@ -37,7 +37,6 @@ internal sealed partial class CharacterCuiLieAnniversaryEntries
     internal void GiveCuiLie(ProgramSkillFrame f) => _resolve().GiveCuiLie(f);
     internal bool HasAnniversaryCuiLieCancellation(CardUseFrame use) => _resolve().HasAnniversaryCuiLieCancellation(use);
     internal bool HasAnniversaryCuiLieDelayedTail(CardUseFrame use) => _resolve().HasAnniversaryCuiLieDelayedTail(use);
-    internal bool IsAnniversaryCuiLieClaimedUseMaterial(long useId, int cardId) => _resolve().IsAnniversaryCuiLieClaimedUseMaterial(useId, cardId);
     internal bool IsAnniversaryCuiLieDelayedMaterialPlaced(CardUseFrame use) => _resolve().IsAnniversaryCuiLieDelayedMaterialPlaced(use);
     internal bool IsAnniversaryCuiLiePindianSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _resolve().IsAnniversaryCuiLiePindianSettlementBatch(f, batch);
     internal bool IsAnniversaryCuiLieTargetMutationFact(CardUseFrame use, AnniversaryCuiLieUseChangedEvent e, IReadOnlyList<int> original, int? currentProofActor = default) => _resolve().IsAnniversaryCuiLieTargetMutationFact(use, e, original, currentProofActor);

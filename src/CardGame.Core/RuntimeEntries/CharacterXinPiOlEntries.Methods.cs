@@ -18,7 +18,6 @@ internal sealed partial class CharacterXinPiOlEntries
     internal bool ExactYinjuUseCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context, scoped out YinjuTurnRelation relation, scoped out CardUseFrame use) => _resolve().ExactYinjuUseCandidate(c, context, out relation, out use);
     internal void FinishXinPi(ProgramSkillFrame f) => _resolve().FinishXinPi(f);
     internal bool HasIssuedYinjuCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => _resolve().HasIssuedYinjuCandidate(c, w);
-    internal bool IsXinPiPhysicalClaim(long useId, int cardId) => _resolve().IsXinPiPhysicalClaim(useId, cardId);
     internal bool IsXinPiRecoveryCompletion(ProgramSkillFrame f, RecoveryAttempt attempt) => _resolve().IsXinPiRecoveryCompletion(f, attempt);
     internal bool IsXinPiRemainingCardDamageIneffective(GameEngine.IDamageAttempt attack) => _resolve().IsXinPiRemainingCardDamageIneffective(attack);
     internal bool IsXinPiUseIneffective(CardUseFrame use) => _resolve().IsXinPiUseIneffective(use);

@@ -183,7 +183,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
             return false;
         if (use.PhysicalCardIds is not { Count: 3 } ids || !ids.SequenceEqual(action.PhysicalCards.Select(c => c.CardId)) || ids.Any(id => id <= 0) || action.ActorSeat != source.OwnerSeat || action.ProviderSeat != source.OwnerSeat || action.EffectiveKind != use.CardKind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuUseEvent>().Count(e => e.ActionId == action.ActionId && e.Source == source) != 1)
             throw new InvalidOperationException("Boqia lost its exact accepted three-material native Use before final payment cleanup.");
-        var remaining = ids.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_characterXinPiOlOperations.IsXinPiPhysicalClaim(use.Id, id) && !_characterHuaManOlOperations.IsHuaManClaimedEntity(use.Id, id) && !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(use.Id, id) && !_characterXuRongOlOperations.IsXuRongCausalEntityClaim(use.Id, id)).ToArray();
+        var remaining = ids.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, id)).ToArray();
         if (remaining.Length > 0)
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(remaining, CardLocation.DiscardPile, CardMoveReasons.UseFinished, disclosure: CardMovementDisclosure.FaceUp);
         return true;
@@ -208,7 +208,7 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
         if (ids.Length != 3 || ids.Any(id => id <= 0) || ids.Distinct().Count() != 3 || action is null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuUseEvent>().Count(e => e.ActionId == action.ActionId && e.Source == selection.Source) != 1)
             throw new InvalidOperationException("Boqia response cleanup requires its once-accepted genuine three-material response Use.");
         var parent = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(f => f.Action?.ActionId == action.ParentActionId);
-        var remaining = ids.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_coreResponseEntityExchangeOperations.IsExchangedCardClaim(action.ActionId, id) && (parent is null || !_characterXinPiOlOperations.IsXinPiPhysicalClaim(parent.Id, id) && !_characterHuaManOlOperations.IsHuaManClaimedEntity(parent.Id, id) && !_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(parent.Id, id) && !_characterXuRongOlOperations.IsXuRongCausalEntityClaim(parent.Id, id))).ToArray();
+        var remaining = ids.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_coreResponseEntityExchangeOperations.IsExchangedCardClaim(action.ActionId, id) && (parent is null || !_nativeMaterialClaims.HasRelinquishedMaterial(parent.Id, id))).ToArray();
         if (remaining.Length > 0)
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(remaining, CardLocation.DiscardPile, CardMoveReasons.ResponseFinished, disclosure: CardMovementDisclosure.FaceUp);
         return true;

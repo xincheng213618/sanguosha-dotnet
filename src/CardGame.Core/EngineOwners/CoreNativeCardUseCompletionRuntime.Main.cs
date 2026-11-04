@@ -54,7 +54,7 @@ internal sealed partial class CoreNativeCardUseCompletionRuntime
         {
             foreach (var physicalCardId in pendingUse.PhysicalCardIds ?? [pendingUse.CardId])
             {
-                if (_characterXinPiOlOperations.IsXinPiPhysicalClaim(frameId, physicalCardId) || _characterHuaManOlOperations.IsHuaManClaimedEntity(frameId, physicalCardId) || _coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(frameId, physicalCardId))
+                if (_coreCurrentUsePhysicalClaimsOperations.IsCurrentUsePhysicalCardClaim(frameId, physicalCardId))
                     continue;
                 if (_cardZonesOperations._cardZones.GetLocation(physicalCardId) == CardLocation.Processing)
                 {

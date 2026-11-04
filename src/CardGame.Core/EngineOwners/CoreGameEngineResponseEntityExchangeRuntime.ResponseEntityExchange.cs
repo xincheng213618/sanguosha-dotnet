@@ -87,8 +87,15 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         if (ids.Any(id => IsExchangedCardClaim(action, id) || _cardZonesOperations._cardZones.GetLocation(id).Zone is not (CardZoneKind.Processing or CardZoneKind.DiscardPile)))
             throw new InvalidOperationException("A response entity exchange lost its exact public cost.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramResponseEntityClaimedEvent(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, draft.RespondedActionId, draft.ResponseActionId, action, recipient, ids.ToArray(), _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, restricted));
+        var nativeUse = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>()
+            .SingleOrDefault(use => use.Action?.ActionId == action);
         foreach (var id in ids)
-            _corePhysicalMovementFacadesOperations.MoveCard(EntityAtCurrentLocation(id), _cardZonesOperations._cardZones.GetLocation(id), CardLocation.Hand(recipient), new CardMoveReason("skill-program.response-entity-exchange"));
+            _corePhysicalMovementFacadesOperations.MoveCard(EntityAtCurrentLocation(id), _cardZonesOperations._cardZones.GetLocation(id), CardLocation.Hand(recipient), new CardMoveReason("skill-program.response-entity-exchange"),
+                beforeFact: move =>
+                {
+                    if (nativeUse is not null && move.From != move.To)
+                        _nativeMaterialClaims.CaptureDelivery(nativeUse.Id, [move]);
+                });
     }
 
     internal SkillProgramStepOutcome BeginPublicSuitEscalatingDiscard(ProgramSkillFrame frame, SkillProgramEffect effect)

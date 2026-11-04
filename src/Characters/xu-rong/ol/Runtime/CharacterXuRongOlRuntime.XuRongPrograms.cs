@@ -153,49 +153,25 @@ internal sealed partial class CharacterXuRongOlRuntime
         var r = new XuRongPending(source, f.GameplayHash, "claim-native", f.InstructionIndex, w.ParentFrameId, proof.VictimSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, Array.AsReadOnly(Array.Empty<XionghuoGrant>()), 0, 0, -1, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Array.AsReadOnly(Array.Empty<int>()), proof.DyingFrameId, proof.NativeActionId);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { XuRong = r });
         var ids = proof.RescueCardsRequired > 1 ? proof.Entities.Where(e => _cardZonesOperations._cardZones.GetLocation(e.CardId) == e.OriginalLocation).Select(e => e.CardId).ToArray() : [];
-        if (ids.Length > 0)
-            ArmXuRongCausalClaim(f, proof, ids);
         IssueXuRongMove(f, ids, XuRongClaimReason);
         return SkillProgramStepOutcome.AwaitChild;
-    }
-
-    internal void ArmXuRongCausalClaim(ProgramSkillFrame f, XuRongDyingProof proof, IReadOnlyList<int> ids)
-    {
-        if (proof.RescueCardsRequired <= 1 || proof.DamageAttemptResolutionId is not { } nativeId || ids.Any(id => !proof.Entities.Any(e => e.CardId == id && _cardZonesOperations._cardZones.GetLocation(id) == e.OriginalLocation)))
-            throw new InvalidOperationException("ShaJue cannot claim unrelated entities or a later dying requirement.");
-        var receipt = new XuRongCausalClaimReceipt(f.Id, XuRongSource(f), f.GameplayHash, proof.DyingFrameId, nativeId, proof.NativeActionId, proof.HpAtEntry, proof.RescueCardsRequired, Array.AsReadOnly(ids.ToArray()));
-        var native = _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == nativeId) ?? throw new InvalidOperationException("ShaJue causal native owner disappeared before payment.");
-        if (native is CardUseFrame { Action: { } action } use && action.ActionId == proof.NativeActionId && ids.All(id => action.PhysicalCards.Any(c => c.CardId == id)))
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { XuRongCausalClaims = Array.AsReadOnly((current.XuRongCausalClaims ?? []).Append(receipt).ToArray()) });
-        else if (native is JudgmentFrame { Continuation: JudgmentContinuationKind.Lightning, DelayedCardId: { } held } judgment && ids.SequenceEqual(new[] { held }))
-            _coreRuntimeOperations.ReplaceRuntimeFrame(judgment.Id, judgment with { XuRongCausalClaims = Array.AsReadOnly((judgment.XuRongCausalClaims ?? []).Append(receipt).ToArray()) });
-        else
-            throw new InvalidOperationException("ShaJue causal entities do not belong to the exact paid native card or held Lightning.");
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XuRongCausalClaimIssuedEvent(receipt));
-    }
-
-    internal bool IsXuRongCausalEntityClaim(long nativeOwnerId, int cardId)
-    {
-        var native = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == nativeOwnerId);
-        var claims = native switch
-        {
-            CardUseFrame c => c.XuRongCausalClaims,
-            JudgmentFrame j => j.XuRongCausalClaims,
-            _ => null
-        };
-        if (claims is null)
-            return false;
-        return claims.Any(r => r.NativeOwnerId == nativeOwnerId && r.HpAtEntry < 0 && r.RescueCardsRequired == 1 - r.HpAtEntry && r.RescueCardsRequired > 1 && _contentRegistryOperations._contentRegistry.GetSkill(r.Source.SkillId).Program?.GameplayHash == r.GameplayHash && r.CardIds.Contains(cardId) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XuRongCausalClaimIssuedEvent>().Count(e => (e.Receipt with { CardIds = r.CardIds }) == r && e.Receipt.CardIds.SequenceEqual(r.CardIds)) == 1 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XuRongCardsPaidEvent>().Count(e => e.FrameId == r.ProducerFrameId && e.Source == r.Source && e.Kind == XuRongClaimReason && e.CardIds.SequenceEqual(r.CardIds)) == 1 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<XuRongCardsPaidEvent>().Single(e => e.FrameId == r.ProducerFrameId && e.Source == r.Source && e.Kind == XuRongClaimReason && e.CardIds.SequenceEqual(r.CardIds))is { } paid && r.CardIds.All(id => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > paid.Before && m.Sequence <= paid.After && m.CardId == id && m.Reason.Value == XuRongClaimReason && m.To == CardLocation.Hand(r.Source.OwnerSeat)) == 1));
     }
 
     internal void IssueXuRongMove(ProgramSkillFrame f, IReadOnlyList<int> ids, string reason)
     {
         var r = f.XuRong!;
         var paid = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive ? ids.Where(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Processing or CardZoneKind.Judgment or CardZoneKind.DiscardPile).ToArray() : [];
+        var claimOwnerId = reason == XuRongClaimReason ? f.WindowContext?.XuRongDying?.DamageAttemptResolutionId : null;
+        if (paid.Length > 0 && reason == XuRongClaimReason && claimOwnerId is null)
+            throw new InvalidOperationException("ShaJue's delivered entities require their original native damage owner.");
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { XuRong = r with { MovementBefore = before, MovementAfter = before, PaidCardIds = Array.AsReadOnly(paid) }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         if (paid.Length > 0)
-            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(paid, CardLocation.Hand(f.OwnerSeat), new(reason));
+            _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(paid, CardLocation.Hand(f.OwnerSeat), new(reason), (_, deliveries) =>
+            {
+                if (claimOwnerId is { } ownerId)
+                    _nativeMaterialClaims.CaptureDelivery(ownerId, deliveries.Where(move => paid.Contains(move.CardId)).ToArray());
+            });
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { XuRong = f.XuRong!with { MovementAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XuRongCardsPaidEvent(f.Id, r.Source, reason, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Array.AsReadOnly(paid)));

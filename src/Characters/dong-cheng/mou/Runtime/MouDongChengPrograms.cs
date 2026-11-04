@@ -5,8 +5,7 @@ public sealed record MouDcLink(CardConversionSource Source,int Other);
 public sealed record MouDcOccurrence(long Id,int Turn,long AttackId,long UseId,int CardId,int Target,bool First);
 public sealed record MouDcClaim(long ProtectionFrameId,CardConversionSource Source,string GameplayHash,int Turn,long BeforeWindowId,long AttackId,long UseId,long ActionId,int Target,EquipmentSlot Slot)
 {
- public bool Settled {get;init;}public long Before {get;init;}public long After {get;init;}
- private IReadOnlyList<int>_cards=[];public IReadOnlyList<int> Cards {get=>_cards;init=>_cards=Array.AsReadOnly(value.ToArray());}
+ public bool Settled {get;init;}
 }
 public sealed record MouDcNativeUse(long FrameId,CardConversionSource Source,string GameplayHash,int Turn,CardKind Kind,long UseId,long ActionId)
 {

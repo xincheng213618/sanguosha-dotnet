@@ -82,16 +82,15 @@ internal sealed partial class CharacterDongChengMouRuntime
         }
 
         : Array.Empty<int>();
-        _coreRuntimeOperations.ReplaceRuntimeFrame(j.Id, j with { MouDongChengClaims = claims.Select(p => p.ProtectionFrameId == claim.ProtectionFrameId ? p with { Settled = true, Before = r.Before, After = r.Before, Cards = ids } : p).ToArray() });
+        _coreRuntimeOperations.ReplaceRuntimeFrame(j.Id, j with { MouDongChengClaims = claims.Select(p => p.ProtectionFrameId == claim.ProtectionFrameId ? p with { Settled = true } : p).ToArray() });
         if (ids.Length > 0)
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(f.OwnerSeat), new("skill-program.mou:baojia.delayed-claim"), (_, moves) =>
             {
                 if (moves is not [var m] || m.CardId != ids[0] || m.From != CardLocation.DiscardPile || m.Sequence <= r.Before || m.To != CardLocation.Hand(f.OwnerSeat) && m.To != CardLocation.OutsideGame)
                     throw new InvalidOperationException("Baojia's genuine delayed entity claim invoice changed.");
+                _nativeMaterialClaims.CaptureDelivery(j.Id, moves.Where(move => move.To == CardLocation.Hand(f.OwnerSeat)).ToArray());
                 var own = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
                 _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, own with { MouDongCheng = own.MouDongCheng!with { After = m.Sequence, Actual = m.To == CardLocation.Hand(f.OwnerSeat) ? 1 : 0 } });
-                var actual = (JudgmentFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == j.Id);
-                _coreRuntimeOperations.ReplaceRuntimeFrame(j.Id, actual with { MouDongChengClaims = actual.MouDongChengClaims!.Select(p => p.ProtectionFrameId == claim.ProtectionFrameId ? p with { After = m.Sequence } : p).ToArray() });
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouDcDelayedClaimSettledEvent(f.Id, j.Id, claim.ProtectionFrameId, ids[0], m.To == CardLocation.Hand(f.OwnerSeat) ? 1 : 0, r.Before, m.Sequence));
             });
         else

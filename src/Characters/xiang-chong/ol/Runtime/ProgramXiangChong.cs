@@ -45,7 +45,6 @@ public sealed record XiangChongBranchPaidEvent(long FrameId, int OwnerSeat, int 
 public sealed record XiangChongEntityMovedEvent(long FrameId, string Segment, int CardId, CardKind Kind, CardLocation From, CardLocation To, long Sequence) : IGameEvent;
 public sealed record XiangChongEquipmentIssuedEvent(XiangChongEquipmentOrigin Origin) : IGameEvent;
 public sealed record XiangChongEquipmentReturnedEvent(XiangChongEquipmentOrigin Origin, bool Issued) : IGameEvent;
-public sealed record XiangChongUseMaterialClaimedEvent(long UseId,long ActionId,long ProgramFrameId,CardConversionSource Source,string GameplayHash,int CardId,CardKind Kind,int RecipientSeat,long LossSequence,long ClaimSequence) : IGameEvent;
 public sealed record XiangChongEquipmentMaterialClaimIssuedEvent(XiangChongEquipmentMaterialClaim Claim) : IGameEvent;
 public sealed record XiangChongEquipmentMaterialEnteredEvent(XiangChongEquipmentMaterialClaim Claim,long Sequence,int EquippedSeat) : IGameEvent;
 public sealed record XiangChongEquipmentResultEvent(XiangChongEquipmentResult Result) : IGameEvent;

@@ -8,7 +8,6 @@ internal sealed partial class CoreGameEngineOverflowTargetCancellationEntries
     internal bool DrainOverflowTargetChildren(ProgramSkillFrame frame) => _resolve().DrainOverflowTargetChildren(frame);
     internal bool ExactOverflowTargetParent(ProgramSkillFrame frame, scoped out CardUseFrame use, scoped out ProgramCardTriggerWindowFrame window) => _resolve().ExactOverflowTargetParent(frame, out use, out window);
     internal bool HasOverflowTargetCancellation(CardUseFrame use) => _resolve().HasOverflowTargetCancellation(use);
-    internal bool IsOverflowTargetCancellationPhysicalClaim(long useId, int cardId) => _resolve().IsOverflowTargetCancellationPhysicalClaim(useId, cardId);
     internal bool ResumeOverflowTargetCancellation(long id) => _resolve().ResumeOverflowTargetCancellation(id);
     internal bool ReturnOverflowTargetCancellation(ProgramSkillFrame frame) => _resolve().ReturnOverflowTargetCancellation(frame);
     internal bool TryCompleteOverflowCanceledUse(ProgramCardTriggerWindowFrame window) => _resolve().TryCompleteOverflowCanceledUse(window);

@@ -19,7 +19,6 @@ internal sealed partial class CharacterHuaManOlEntries
     internal bool HuaManFirstChild(ProgramSkillFrame root, ResolutionFrame child) => _resolve().HuaManFirstChild(root, child);
     internal bool HuaManLionCost(ProgramSkillFrame f) => _resolve().HuaManLionCost(f);
     internal ProgramSkillFrame? HuaManObserverRoot() => _resolve().HuaManObserverRoot();
-    internal bool IsHuaManClaimedEntity(long useId, int cardId) => _resolve().IsHuaManClaimedEntity(useId, cardId);
     internal bool IsHuaManSouyingMutationFact(CardUseFrame use, SouyingNativeMutationEvent fact, IReadOnlyList<int> original) => _resolve().IsHuaManSouyingMutationFact(use, fact, original);
     internal void PayHuaManDraw(ProgramSkillFrame f, int subject, int amount, HuaManStage stage) => _resolve().PayHuaManDraw(f, subject, amount, stage);
     internal void PaySouyingMutation(ProgramSkillFrame f) => _resolve().PaySouyingMutation(f);

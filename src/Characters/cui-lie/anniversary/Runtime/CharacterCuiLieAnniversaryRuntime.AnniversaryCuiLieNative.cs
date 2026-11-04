@@ -72,7 +72,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
             if (added.Count != 0)
                 throw new InvalidOperationException("A won Chibi cancels its entire native Use.");
             targets = [];
-            materials = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive ? prior.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, id)).ToArray() : [];
+            materials = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive ? prior.PhysicalCards.Select(c => c.CardId).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, id)).ToArray() : [];
         }
         else
         {
@@ -128,6 +128,8 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         if (materials.Length > 0)
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(materials, CardLocation.Hand(f.OwnerSeat), new(CuiLieClaim), (_, moves) =>
             {
+                _nativeMaterialClaims.CaptureDelivery(use.Id, moves.Where(move => move.To == CardLocation.Hand(f.OwnerSeat) ||
+                    _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(move, CardLocation.Hand(f.OwnerSeat))).ToArray());
                 var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
                 _coreRuntimeOperations.ReplaceRuntimeTop(active with { AnniversaryCuiLie = active.AnniversaryCuiLie!with { Moves = moves, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryCuiLieMaterialClaimedEvent(f.Id, use.Id, prior.ActionId, f.OwnerSeat, moves.Count, r.Before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
@@ -150,5 +152,4 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
     }
 
     internal bool HasAnniversaryCuiLieCancellation(CardUseFrame use) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieUseChangedEvent>().Any(e => e.UseId == use.Id && e.Cancelled && IsAnniversaryCuiLieTargetMutationFact(use, e, e.BeforeTargets));
-    internal bool IsAnniversaryCuiLieClaimedUseMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { } use && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieUseChangedEvent>().Any(e => e.UseId == useId && e.Cancelled && e.Materials.Contains(cardId) && IsAnniversaryCuiLieTargetMutationFact(use, e, e.BeforeTargets) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCuiLieMaterialClaimedEvent>().Any(m => m.FrameId == e.FrameId && m.UseId == useId && m.ActionId == e.ActionId && m.Recipient == e.Source.OwnerSeat && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move => move.CardId == cardId && move.Sequence > m.Before && move.Sequence <= m.After && move.From == CardLocation.Processing && (move.To == CardLocation.Hand(m.Recipient) || _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(move, CardLocation.Hand(m.Recipient))) && move.Reason.Value == CuiLieClaim) == 1));
 }

@@ -60,7 +60,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(use = use with { TargetIndex = next, Step = ResolutionFrameStep.ResolvingEffect });
             if (location != CardLocation.Processing)
             {
-                if (!IsAnniversaryCuiLieDelayedMaterialPlaced(use) && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, use.CardId))
+                if (!IsAnniversaryCuiLieDelayedMaterialPlaced(use) && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, use.CardId))
                     throw new InvalidOperationException("Chibi cannot skip a delayed entity that left through an unproven destination.");
                 SkipCuiLieDelayedTarget(use, target, CardEffectSkipReason.PublicTargetMissing);
                 next++;
@@ -95,7 +95,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         var location = _cardZonesOperations._cardZones.GetLocation(use.CardId);
         if (location == CardLocation.Processing && CuiLieDelayedTargetLegal(use, target))
             return false;
-        if (location != CardLocation.Processing && !IsAnniversaryCuiLieDelayedMaterialPlaced(use) && !_coreCurrentUsePhysicalClaimsOperations.IsClaimedUseCardEntity(use.Id, use.CardId))
+        if (location != CardLocation.Processing && !IsAnniversaryCuiLieDelayedMaterialPlaced(use) && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, use.CardId))
             throw new InvalidOperationException("Chibi cannot consume an unproven delayed material return.");
         SkipCuiLieDelayedTarget(use, target, CardEffectSkipReason.PublicTargetMissing);
         _coreNativeCardUseCompletionOperations.FinishCardUse(use.Id, _coreResponseEntityExchangeOperations.EntityAtCurrentLocation(use.CardId), use.CardKind);

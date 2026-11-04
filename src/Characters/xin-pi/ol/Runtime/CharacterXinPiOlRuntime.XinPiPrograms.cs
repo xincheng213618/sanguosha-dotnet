@@ -52,11 +52,6 @@ internal sealed partial class CharacterXinPiOlRuntime
             _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].ChijieUsedActualTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber;
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { XinPi = receipt, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChijieUsedEvent(f.Id, source, f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, "claim", use.Id, use.Action.ActionId));
-            var claim = new XinPiClaimProof(f.Id, use.Id, use.Action.ActionId, source, f.GameplayHash, before)
-            {
-                Entities = ids
-            };
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { XinPiClaim = claim });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChijieClaimIssuedEvent(f.Id, use.Id, use.Action.ActionId, source, f.GameplayHash, before, ids.Count));
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.Hand(f.OwnerSeat), new(ChijieClaimReason), (batch, moves) =>
             {
@@ -67,7 +62,7 @@ internal sealed partial class CharacterXinPiOlRuntime
                     BatchId = batch
                 };
                 _coreRuntimeOperations.ReplaceRuntimeTop(active with { XinPi = r });
-                _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { XinPiClaim = claim with { After = r.After, BatchId = batch } });
+                _nativeMaterialClaims.CaptureDelivery(use.Id, moves.Where(move => ids.Contains(move.CardId)).ToArray());
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChijieClaimPaidEvent(f.Id, r.Source, use.Id, use.Action.ActionId, before, r.After, batch, ids.Count));
             });
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
