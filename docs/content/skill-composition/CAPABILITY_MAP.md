@@ -703,6 +703,14 @@ Entries 与 DeferredRuntime 的互换不消除真实反向调用；这些调用�
 
 原规则 JSON、规则格式、checkpoint 格式及原存档边界保持不变。
 
+## 丈八素材查询：共同资格与消费方式
+
+`CoreNativeResponseMaterialQueriesRuntime.EligibleZhangbaMaterials` 统一当前 playable 素材的资格；原生 `CanUseZhangbaSerpentSpear` 的材料数量条件也经 `HasZhangbaSlashMaterials` 读取同一规则。武器效力、牌名、目标和实际付款合法性仍由各自原生边界回答，查询快照不授予支付权。底层 playable 来源与限制查询尚有具体人物接线，整体使用／响应合法性仍未完成解耦。
+
+`GetZhangbaSlashPairs` 保留完整、同序的物化结果；`EnumerateZhangbaSlashPairs` 在调用时冻结合法素材，再按规范顺序惰性产生素材对，不在首次迭代时刷新资格。`FindZhangbaSlashPair` 接受无序的两个不同实体 ID 并返回规范顺序；原先要求发布顺序的付款点仍须比对原输入序列。`FirstZhangbaSlashPair` 只回答首对，带条件的存在性判断继续遍历到真正匹配的素材对。新查询重新采样动态资格，不跨查询缓存；已取得的枚举保持自己的素材快照。
+
+一对丈八材料的花色、颜色、点数及完整有序原生合法目标由 `CoreGameEngineZhangbaSelectionsRuntime` 回答。菜单与材料额外目标扩展读取同一个答案；仅在实际只读 `ActionQuery` 实例中，按行动者与两个完整 Card 值复用，不能只用实体 ID 合并临时牌面。每个目标仍经完整原生合法性裁定，未知值、所有素材组合和顺序保留。菜单原有的物理用牌禁用仍在读取该答案前生效；扩展不因此新增这条前置条件，其普通目标上限与额外目标来源继续由原 owner 回答。公开动作集合不是付款许可，实际提交不承接菜单答案。
+
 ## 定向用牌权利：来源、期限与已受理快照
 
 现有定向策略与乐小乔媦婉的 2／3 张分支共用 `DirectedTurnCardPolicy` 数据。发行时决定 actor、target、牌名范围与 effects；`requiresEffectiveSource` 表示持续来源资格，`captureOnUse` 表示是否将权利冻结给已受理的用牌。这两个维度独立，施加后独立的权利不因原技能失去或来源死亡而撤销。查询不再到人物实现查 lease 或重放私有事件证明。

@@ -18,12 +18,55 @@ internal sealed partial class CoreNativeTargetLegalityRuntime
 
     internal bool CanUseVirtualSlashTarget(CharacterState source, CharacterState target, CardKind effectiveKind = CardKind.Slash, Suit? physicalSuit = null, bool? effectiveColor = null, int? effectiveRank = null, IReadOnlyList<int>? physicalCardIds = null, bool ignoreDistance = false, CardConversionSource? conversionSource = null, bool actualUnconvertedPhysical = false, bool countsTowardLimit = true)
     {
-        if (!target.IsAlive || target.Seat == source.Seat)
+        if (!IsVirtualSlashCandidate(source, target, effectiveKind, conversionSource, physicalCardIds))
             return false;
-        if (!_coreProgramTargetRulesOperations.TargetRules.AllowsSlash(new(source, target, effectiveKind, conversionSource, physicalCardIds)))
-            return false;
+        var material = EvaluateVirtualSlashMaterials(source, effectiveKind, physicalSuit, effectiveColor,
+            physicalCardIds, ignoreDistance, conversionSource, actualUnconvertedPhysical);
+        return material.Allowed && EvaluateVirtualSlashTargetTail(source, target, effectiveKind,
+            effectiveRank, physicalCardIds, conversionSource, countsTowardLimit, material);
+    }
+
+    internal IReadOnlyList<int> GetVirtualSlashTargetSeats(CharacterState source, IReadOnlyList<CharacterState> candidates, CardKind effectiveKind = CardKind.Slash, Suit? physicalSuit = null, bool? effectiveColor = null, int? effectiveRank = null, IReadOnlyList<int>? physicalCardIds = null, bool ignoreDistance = false, CardConversionSource? conversionSource = null, bool actualUnconvertedPhysical = false, bool countsTowardLimit = true)
+    {
+        var materialInitialized = false;
+        VirtualSlashMaterialEvaluation material = default;
+        var targets = new List<int>();
+        foreach (var target in candidates)
+        {
+            if (!IsVirtualSlashCandidate(source, target, effectiveKind, conversionSource, physicalCardIds))
+                continue;
+            // This target-independent result stays local to one read-only query.
+            if (!materialInitialized)
+            {
+                material = EvaluateVirtualSlashMaterials(source, effectiveKind, physicalSuit, effectiveColor,
+                    physicalCardIds, ignoreDistance, conversionSource, actualUnconvertedPhysical);
+                materialInitialized = true;
+            }
+            if (material.Allowed && EvaluateVirtualSlashTargetTail(source, target, effectiveKind,
+                effectiveRank, physicalCardIds, conversionSource, countsTowardLimit, material))
+                targets.Add(target.Seat);
+        }
+        return targets.AsReadOnly();
+    }
+
+    private readonly record struct VirtualSlashMaterialEvaluation(bool Allowed, Suit? Suit, bool? Color, bool IgnoreDistance);
+
+    private bool IsVirtualSlashCandidate(CharacterState source, CharacterState target, CardKind effectiveKind,
+        CardConversionSource? conversionSource, IReadOnlyList<int>? physicalCardIds) =>
+        target.IsAlive && target.Seat != source.Seat &&
+        _coreProgramTargetRulesOperations.TargetRules.AllowsSlash(new(source, target, effectiveKind, conversionSource, physicalCardIds));
+
+    private bool EvaluateVirtualSlashTargetTail(CharacterState source, CharacterState target, CardKind effectiveKind,
+        int? effectiveRank, IReadOnlyList<int>? physicalCardIds, CardConversionSource? conversionSource,
+        bool countsTowardLimit, VirtualSlashMaterialEvaluation material) =>
+        _coreRuleQueriesOperations.CanSpendSlashUse(source, target, ignoresCount: !countsTowardLimit || _coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance2(source.Seat, material.Suit), effectiveKind, effectiveRank: effectiveRank, physicalCardIds: physicalCardIds, effectiveSuit: material.Suit) && (material.IgnoreDistance || _coreFinalTargetSlashOperations.Value.IsWithinSpecificSlashRange(source, target, effectiveKind, effectiveRank) || _coreProgramDistanceRulesOperations.DistanceRules.AllowsSlashDistance(ProgramDistanceStage.VirtualSlash, new(source, target, effectiveKind, Conversion: conversionSource, PhysicalCardIds: physicalCardIds, PhysicalSuit: material.Suit, EffectiveColor: material.Color, EffectiveRank: effectiveRank))) && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(source.Seat, SkillProgramCardTargetRestriction.SelfOnly) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(source.Seat, target.Seat, effectiveKind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, effectiveKind, material.Suit, material.Color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(source.Seat, target.Seat, material.Suit);
+
+    private VirtualSlashMaterialEvaluation EvaluateVirtualSlashMaterials(CharacterState source, CardKind effectiveKind,
+        Suit? physicalSuit, bool? effectiveColor, IReadOnlyList<int>? physicalCardIds, bool ignoreDistance,
+        CardConversionSource? conversionSource, bool actualUnconvertedPhysical)
+    {
         if (_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(source.Seat, effectiveKind, physicalCardIds ?? []))
-            return false;
+            return default;
         ignoreDistance |= CharacterLuBuOlMagicRuntime.IsMoGangquanSource(conversionSource);
         if (actualUnconvertedPhysical && conversionSource is null && physicalCardIds is [var physicalId])
         {
@@ -36,10 +79,11 @@ internal sealed partial class CoreNativeTargetLegalityRuntime
             }
         }
 
-        return _coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(source.Seat, effectiveKind, physicalCardIds ?? [], conversionSource)) && !_coreCardUseModulesOperations.IsCardUseForbidden(source.Seat, effectiveKind, CardActionType.Use) && _coreRuleQueriesOperations.CanSpendSlashUse(source, target, ignoresCount: !countsTowardLimit || _coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance2(source.Seat, physicalSuit), effectiveKind, effectiveRank: effectiveRank, physicalCardIds: physicalCardIds, effectiveSuit: physicalSuit) && (ignoreDistance || _coreProgramDistanceRulesOperations.DistanceRules.AllowsSlashDistance(ProgramDistanceStage.VirtualSlash, new(source, target, effectiveKind, Conversion: conversionSource, PhysicalCardIds: physicalCardIds, PhysicalSuit: physicalSuit, EffectiveColor: effectiveColor, EffectiveRank: effectiveRank))) && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(source.Seat, SkillProgramCardTargetRestriction.SelfOnly) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(source.Seat, target.Seat, effectiveKind) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, effectiveKind, physicalSuit, effectiveColor) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(source.Seat, target.Seat, physicalSuit);
+        var allowed = _coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(source.Seat, effectiveKind, physicalCardIds ?? [], conversionSource)) && !_coreCardUseModulesOperations.IsCardUseForbidden(source.Seat, effectiveKind, CardActionType.Use);
+        return new(allowed, physicalSuit, effectiveColor, ignoreDistance);
     }
 
-    internal bool CanUseZhangbaSerpentSpear(CharacterState actor) => CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use)) && _coreNativeDamageHandlesOperations.Value.UsesFormalZhangbaSerpentSpear && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.ZhangbaSerpentSpear) && _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Count(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && !_characterZhugeLiangWumiaoOperations.IsWuZglCopyBlocked(actor.Seat, card.Id)) >= 2;
+    internal bool CanUseZhangbaSerpentSpear(CharacterState actor) => CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Any(kind => !_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use)) && _coreNativeDamageHandlesOperations.Value.UsesFormalZhangbaSerpentSpear && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.ZhangbaSerpentSpear) && _zhangbaMaterials.HasZhangbaSlashMaterials(actor);
     internal bool HasZhuqueFan(CharacterState actor) => _coreNativeDamageHandlesOperations.Value.UsesFormalZhuqueFan && _coreAdvancedWeaponsOperations.HasWeaponAbility(actor, CardKind.ZhuqueFan);
     internal IReadOnlyList<CardKind> GetSlashUseKinds(CharacterState actor, CardKind baseEffectiveKind) => _coreProgramCardUseRulesOperations.GetSlashUseVariants2(actor, baseEffectiveKind).Select(variant => variant.EffectiveKind).Distinct().ToArray();
     internal bool IsZhuqueFanConversion(CharacterState actor, CardKind baseEffectiveKind, CardKind requestedEffectiveKind) => baseEffectiveKind == CardKind.Slash && requestedEffectiveKind == CardKind.FireSlash && HasZhuqueFan(actor);

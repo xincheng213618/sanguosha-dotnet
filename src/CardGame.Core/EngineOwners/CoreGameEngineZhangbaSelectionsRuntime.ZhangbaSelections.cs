@@ -3,17 +3,38 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineZhangbaSelectionsRuntime
 {
+    internal ZhangbaSlashPairFacts GetZhangbaSlashPairFacts(CharacterState actor, Card first, Card second)
+    {
+        if (_coreGameEngineActionQueriesActionQueryAccess._actionQuery is not { } query)
+            return CalculateZhangbaSlashPairFacts(actor, first, second);
+        var key = (actor.Seat, first, second);
+        if (!query.ZhangbaSlashPairs.TryGetValue(key, out var result))
+            query.ZhangbaSlashPairs[key] = result = CalculateZhangbaSlashPairFacts(actor, first, second);
+        return result;
+    }
+
+    private ZhangbaSlashPairFacts CalculateZhangbaSlashPairFacts(CharacterState actor, Card first, Card second)
+    {
+        Card[] cards = [first, second];
+        int[] ids = [first.Id, second.Id];
+        var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards);
+        var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, cards);
+        var rank = _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, cards);
+        return new(suit, color, rank, _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor,
+            _coreMatchParticipantsPlayersAccess._players, CardKind.Slash, suit, color, rank, ids));
+    }
+
     internal IReadOnlyList<ActiveSkillCardGroupTarget> GetZhangbaSlashGroupTargets(CharacterState actor)
     {
         var choices = new List<ActiveSkillCardGroupTarget>();
-        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor))
+        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor))
         {
             var ids = Array.AsReadOnly(pair.Select(card => card.Id).ToArray());
             if (_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, ids))
                 continue;
-            foreach (var target in _coreMatchParticipantsPlayersAccess._players)
-                if (_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, target, CardKind.Slash, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, pair), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, pair), _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, pair), ids))
-                    choices.Add(new(ids, target.Seat));
+            var facts = GetZhangbaSlashPairFacts(actor, pair[0], pair[1]);
+            foreach (var target in facts.LegalTargets)
+                choices.Add(new(ids, target));
         }
 
         return choices.AsReadOnly();

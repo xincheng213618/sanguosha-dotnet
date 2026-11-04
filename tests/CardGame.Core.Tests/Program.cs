@@ -513,6 +513,7 @@ var tests = new (string Name, Action Body)[]
     ("internal failure stops the session and preserves its trusted prefix", EngineFaultChecks.InternalFailureStopsTheSessionAndPreservesTheLastPrefix),
     ("commands share prepared projection across result and reentry", PreparedCommandProjectionChecks.PublishedResultAndReentrantRejectionSharePreparedView),
     ("long-hand action queries retain exact Spear materials across growing history", LongHandActionQueryChecks.SpearQueriesIgnoreUnrelatedHistoryAndRefreshMaterials),
+    ("Zhangba materials: ordered pairs freeze at query time and refresh", ZhangbaMaterialQueryChecks.OrderedPairsFreezeMaterialsAtQueryTimeAndRefreshNextRead),
     ("declaration payment lookups preserve exact receipt precedence", DeclarationPaymentLookupChecks.ReverseLookupsPreserveOriginalReceiptPrecedence),
     ("ordinary card snapshot reuse preserves appearance privacy and replay", SnapshotProjectionReuseChecks.OrdinaryCardReusePreservesAppearancePrivacyAndReplay),
     ("program state projection preserves empty and live policy JSON", ProgramStateProjectionChecks.EmptyAndLivePoliciesMatchOriginalSnapshotJson),

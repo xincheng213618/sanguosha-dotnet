@@ -30,7 +30,17 @@ internal sealed partial class CoreNativeResponseMaterialQueriesRuntime
         return cards.Where(card => !_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(responder.Seat, requiredCardKind, [card.Id], true) && _coreProgramCardLegalityOperations.IsProgramNativeResponseAllowed(responder, requiredCardKind, [card.Id])).DistinctBy(card => card.Id).ToArray();
     }
 
-    internal IReadOnlyList<IReadOnlyList<Card>> GetZhangbaSlashPairs(CharacterState responder)
+    // Material availability is independent of weapon and card-use admission.
+    // Both native admission and pair queries consume this one eligibility rule.
+    private IEnumerable<Card> EligibleZhangbaMaterials(CharacterState responder) =>
+        _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(responder).Where(card =>
+            !_coreCardUseModulesOperations.IsTurnHandCardRestricted(responder, card) &&
+            !_characterZhugeLiangWumiaoOperations.IsWuZglCopyBlocked(responder.Seat, card.Id));
+
+    internal bool HasZhangbaSlashMaterials(CharacterState responder) =>
+        EligibleZhangbaMaterials(responder).Take(2).Count() == 2;
+
+    private Card[] CaptureZhangbaMaterials(CharacterState responder)
     {
         if (_characterPangJiOlOperations.IsBiguoCategoryForbidden(responder.Seat, CardKind.Slash))
             return[];
@@ -39,28 +49,79 @@ internal sealed partial class CoreNativeResponseMaterialQueriesRuntime
             return[];
         }
 
-        var hand = _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(responder).Where(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(responder, card) && !_characterZhugeLiangWumiaoOperations.IsWuZglCopyBlocked(responder.Seat, card.Id)).OrderBy(card => card.Id).ToArray();
+        return EligibleZhangbaMaterials(responder).ToArray();
+    }
+
+    private Card[] CaptureOrderedZhangbaMaterials(CharacterState responder)
+    {
+        var materials = CaptureZhangbaMaterials(responder);
+        Array.Sort(materials, static (left, right) => left.Id.CompareTo(right.Id));
+        return materials;
+    }
+
+    internal IReadOnlyList<IReadOnlyList<Card>> GetZhangbaSlashPairs(CharacterState responder)
+    {
+        var hand = CaptureOrderedZhangbaMaterials(responder);
         var pairs = new List<IReadOnlyList<Card>>();
         for (var first = 0; first < hand.Length - 1; first++)
+        for (var second = first + 1; second < hand.Length; second++)
+            pairs.Add(Array.AsReadOnly(new[] { hand[first], hand[second] }));
+        return pairs;
+    }
+
+    internal IEnumerable<IReadOnlyList<Card>> EnumerateZhangbaSlashPairs(CharacterState responder)
+    {
+        // Capture now, before returning the iterator. A pending enumeration owns
+        // this query's materials even if the physical zones change before MoveNext.
+        var materials = CaptureOrderedZhangbaMaterials(responder);
+        return Pairs(materials);
+
+        static IEnumerable<IReadOnlyList<Card>> Pairs(Card[] hand)
         {
+            for (var first = 0; first < hand.Length - 1; first++)
             for (var second = first + 1; second < hand.Length; second++)
             {
-                pairs.Add(Array.AsReadOnly(new[] { hand[first], hand[second] }));
+                yield return Array.AsReadOnly(new[] { hand[first], hand[second] });
             }
         }
-
-        return pairs;
     }
 
     internal IReadOnlyList<Card>? FindZhangbaSlashPair(CharacterState responder, IReadOnlyList<int> requestedCardIds)
     {
-        if (requestedCardIds.Count != 2 || requestedCardIds.Distinct().Count() != 2)
+        if (requestedCardIds.Count != 2)
         {
             return null;
         }
+        var firstId = requestedCardIds[0];
+        var secondId = requestedCardIds[1];
+        if (firstId == secondId) return null;
+        Card? first = null;
+        Card? second = null;
+        foreach (var card in CaptureZhangbaMaterials(responder))
+        {
+            if (card.Id == firstId) first ??= card;
+            if (card.Id == secondId) second ??= card;
+            if (first is not null && second is not null) break;
+        }
+        return first is null || second is null ? null : first.Id < second.Id
+            ? Array.AsReadOnly(new[] { first, second }) : Array.AsReadOnly(new[] { second, first });
+    }
 
-        var requested = requestedCardIds.Order().ToArray();
-        return GetZhangbaSlashPairs(responder).FirstOrDefault(pair => pair.Select(card => card.Id).Order().SequenceEqual(requested));
+    internal IReadOnlyList<Card>? FirstZhangbaSlashPair(CharacterState responder)
+    {
+        Card? first = null;
+        Card? second = null;
+        foreach (var card in CaptureZhangbaMaterials(responder))
+        {
+            if (first is null || card.Id < first.Id)
+            {
+                second = first;
+                first = card;
+            }
+            else if (second is null || card.Id < second.Id)
+                second = card;
+        }
+        return second is null ? null : Array.AsReadOnly(new[] { first!, second });
     }
 
     internal bool CanConvertResponse(CharacterState responder, Card card, CardKind requiredCardKind)

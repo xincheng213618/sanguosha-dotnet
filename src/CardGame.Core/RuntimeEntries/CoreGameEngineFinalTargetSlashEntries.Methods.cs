@@ -5,9 +5,9 @@ internal sealed partial class CoreGameEngineFinalTargetSlashEntries
     internal bool CanOfferFinalTargetSlash(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext window) => _resolve().CanOfferFinalTargetSlash(candidate, trigger, window);
     internal bool DistanceBorrowedPaidWeaponSlash50HasRankSlashRange(ProgramSlashDistanceQuery q) => _resolve().DistanceBorrowedPaidWeaponSlash50HasRankSlashRange(q);
     internal bool DistanceBorrowedPhysicalSlash90IsWithinSpecificSlashRange(ProgramSlashDistanceQuery q) => _resolve().DistanceBorrowedPhysicalSlash90IsWithinSpecificSlashRange(q);
-    internal bool DistancePhysicalSlash260IsWithinSpecificSlashRange(ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash260IsWithinSpecificSlashRange(q);
+    internal bool DistancePhysicalSlash1IsWithinSpecificSlashRange(ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash1IsWithinSpecificSlashRange(q);
     internal bool DistanceProvidedSlash110HasPotentialRankSlashRange(ProgramSlashDistanceQuery q) => _resolve().DistanceProvidedSlash110HasPotentialRankSlashRange(q);
-    internal bool DistanceVirtualSlash120IsWithinSpecificSlashRange(ProgramSlashDistanceQuery q) => _resolve().DistanceVirtualSlash120IsWithinSpecificSlashRange(q);
+    internal bool AllowsRankAwareSlashRange(ProgramSlashDistanceQuery q) => _resolve().AllowsRankAwareSlashRange(q);
     internal int FinalTargetSlashEscalationBonus(GameEngine.IDamageAttempt attack, int damageWithoutEscalation) => _resolve().FinalTargetSlashEscalationBonus(attack, damageWithoutEscalation);
     internal IEnumerable<ProgramTargetSlashReceipt> FinalTargetSlashReceipts(long frameId, int target) => _resolve().FinalTargetSlashReceipts(frameId, target);
     internal bool HasFinalTargetSlashHpDamage(GameEngine.IDamageAttempt attack) => _resolve().HasFinalTargetSlashHpDamage(attack);

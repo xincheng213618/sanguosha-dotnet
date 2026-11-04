@@ -58,13 +58,9 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
 
     private (IReadOnlyList<int> LegalTargets, int OrdinaryMaximum, IReadOnlyList<ProgramSlashTargetExpansion> Claims) ReadNativeMaterialSlashExpansion(CharacterState owner, IReadOnlyList<Card> cards, ref int? ordinaryMaximum)
     {
-        var ids = cards.Select(c => c.Id).ToArray();
-        var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards);
-        var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards);
-        var rank = _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(owner, cards);
-        var legal = Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, target, CardKind.Slash, suit, color, rank, ids)).Select(target => target.Seat).ToArray());
+        var facts = _coreZhangbaSelectionsOperations.Value.GetZhangbaSlashPairFacts(owner, cards[0], cards[1]);
         ordinaryMaximum ??= Math.Max(1, CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateCardTargetCount(owner, CardKind.Slash)));
-        return (legal, ordinaryMaximum.Value, _coreProgramTargetRulesOperations.TargetRules.ExtraSlashTargetClaims(new(owner.Seat, CardKind.Slash, suit ?? Suit.None, legal, color)));
+        return (facts.LegalTargets, ordinaryMaximum.Value, _coreProgramTargetRulesOperations.TargetRules.ExtraSlashTargetClaims(new(owner.Seat, CardKind.Slash, facts.Suit ?? Suit.None, facts.LegalTargets, facts.Color)));
     }
 
     [ProgramCardAction(ProgramCardActionPhase.AfterProgram, 31)]
@@ -75,7 +71,7 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
             return;
         var maximum = actions[index].MaxTargetCount;
         int? ordinaryMaximum = null;
-        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner))
+        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(owner))
         {
             var expansion = ReadNativeMaterialSlashExpansion(owner, pair, ref ordinaryMaximum);
             if (expansion.Claims.Count == 0)
@@ -95,7 +91,7 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
         claims = [];
         if (targets.Count < 2 || targets.Distinct().Count() != targets.Count || !_coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(owner))
             return false;
-        var cards = _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner).FirstOrDefault(pair => pair.Select(c => c.Id).Order().SequenceEqual(ids.Order()));
+        var cards = _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(owner, ids);
         if (cards is null || !_characterSunQuanOlMagicOperations.IsMoQuanyuCompleteZhangbaQuotaLegal(owner, targets, cards))
             return false;
         var expansion = NativeMaterialSlashExpansion(owner, cards);

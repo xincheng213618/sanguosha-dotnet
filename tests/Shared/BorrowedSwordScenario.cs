@@ -4,9 +4,43 @@ using System.Text.Json;
 
 internal static class BorrowedSwordScenario
 {
-    public static ContentRegistry CreateFixtureRegistry() => ContentRegistry.Build(
+    private static readonly Lazy<ContentRegistry> FixedOwnerRegistry = new(CreateFixedOwnerRegistry);
+
+    private static ContentRegistry CreateClassicFixtureRegistry() => ContentRegistry.Build(
         new StandardContentPackage(), new StandardActiveSkillExpansionPackage(includeJijiu: true),
         new StandardRescueSkillExpansionPackage(), new StandardClassicGeneralPackage(), new BorrowedFixtureMode());
+
+    public static ContentRegistry CreateFixtureRegistry() => FixedOwnerRegistry.Value;
+
+    private static ContentRegistry CreateFixedOwnerRegistry()
+    {
+        var cards = Enumerable.Range(0, 64)
+            .Select(_ => new ContentDeckPhysicalCard("standard:slash", Suit.Club, 7)).ToArray();
+        var probe = StartFixedOwnerResponse(ContentRegistry.Build(new StandardContentPackage(), new FixedOwnerResponseFixture(cards)));
+        // The same fixed native shuffle and deal locate the original entities;
+        // the final recipe changes their faces without changing setup or commands.
+        SetHand(0, CardKind.Crossbow, CardKind.Slash);
+        SetHand(1, CardKind.BorrowedSword);
+        SetHand(4, CardKind.Dodge);
+        return ContentRegistry.Build(new StandardContentPackage(), new FixedOwnerResponseFixture(cards));
+
+        void SetHand(int seat, params CardKind[] kinds)
+        {
+            var hand = probe.CreateSnapshot(seat, revealAll: true).Players[seat].Hand;
+            Require(hand.Count >= kinds.Length, "The fixed native deal must contain its prepared entities.");
+            for (var i = 0; i < kinds.Length; i++)
+            {
+                var id = kinds[i] switch
+                {
+                    CardKind.Crossbow => FixedOwnerResponseFixture.Weapon,
+                    CardKind.BorrowedSword => FixedOwnerResponseFixture.Trick,
+                    CardKind.Dodge => "standard:dodge",
+                    _ => "standard:slash"
+                };
+                cards[hand[i].Id - 1] = new(id, Suit.Club, 7);
+            }
+        }
+    }
 
     public static ContentRegistry CreateSourcePlayFixtureRegistry() => ContentRegistry.Build(
         new StandardContentPackage(), new BorrowedSourcePlayFixture());
@@ -50,6 +84,25 @@ internal static class BorrowedSwordScenario
             builder.AddMode(new(Mode, "真实借刀出牌固定局面", 4, 4,
                 new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Renegade)] = 3 },
                 "fixture:borrowed-source-deck", GeneralCandidateCount: 4, GeneralPoolIds: [Owner, ..peers]));
+        }
+    }
+
+    private sealed class FixedOwnerResponseFixture(IReadOnlyList<ContentDeckPhysicalCard> cards) : IGameContentPackage
+    {
+        public const string Mode = "identity:classic-borrowed-fixed-owner";
+        public const string Trick = "fixture:borrowed-owner-trick", Weapon = "fixture:borrowed-owner-weapon";
+        public PackageManifest Manifest { get; } = new("fixture-borrowed-owner-response", new Version(1, 0, 0), []);
+        public void Register(IContentRegistryBuilder builder)
+        {
+            var generals = Enumerable.Range(0, 5).Select(seat => $"fixture:borrowed-fixed-general-{seat}").ToArray();
+            foreach (var general in generals)
+                builder.AddGeneral(new(general, "原生借刀角色", "supporter", "standard:none", "wei", 8));
+            builder.AddCard(new(Trick, "借刀杀人", "锦囊牌", "原生借刀实体", CardKind.BorrowedSword));
+            builder.AddCard(new(Weapon, "诸葛连弩", "装备牌", "原生武器实体", CardKind.Crossbow));
+            builder.AddDeck(new("fixture:borrowed-fixed-deck", "固定原生借刀响应实体", 4, 2, []) { PhysicalCards = cards });
+            builder.AddMode(new(Mode, "原生借刀响应固定局面", 5, 5,
+                new Dictionary<string, int> { [nameof(Role.Lord)] = 1, [nameof(Role.Renegade)] = 4 },
+                "fixture:borrowed-fixed-deck", GeneralCandidateCount: 5, GeneralPoolIds: generals));
         }
     }
 
@@ -280,11 +333,12 @@ internal static class BorrowedSwordScenario
     public static GameEngine FindHumanOwnerResponse(bool requireFactionSlash = false,
         string ownerGeneralId = "classic:liu-bei", int maxSeeds = 65_536)
     {
-        var registry = CreateFixtureRegistry();
-        // The retained ordinary check uses the verified real owner/Slash/Dodge seed.
+        if (!requireFactionSlash && ownerGeneralId == "classic:liu-bei")
+            return FindFixedHumanOwnerResponse(CreateFixtureRegistry());
+
+        var registry = CreateClassicFixtureRegistry();
         // Optional faction/general callers retain their bounded discovery contract.
-        var seeds = !requireFactionSlash && ownerGeneralId == "classic:liu-bei" && maxSeeds >= 14956
-            ? new[] { 14956 } : Enumerable.Range(1, maxSeeds);
+        var seeds = Enumerable.Range(1, maxSeeds);
         foreach (var seed in seeds)
         {
             var game = GameEngine.CreateStandard(new GameOptions
@@ -443,6 +497,87 @@ internal static class BorrowedSwordScenario
             "No bounded classic Borrowed Sword response fixture with a real Slash and Dodge continuation was found.");
     }
 
+    private static GameEngine StartFixedOwnerResponse(ContentRegistry registry)
+    {
+        var game = GameEngine.CreateStandard(new GameOptions
+        {
+            Seed = 7, HumanSeat = 0, HumanSeats = [0, 1, 2, 3, 4], HumanRole = Role.Lord,
+            PlayerCount = 5, ModeId = FixedOwnerResponseFixture.Mode, UseInteractiveSetup = true,
+            UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 3
+        }, registry);
+        Accept(new StartGameCommand());
+        for (var step = 0; step < 64; step++)
+        {
+            var prompt = CurrentPrompt(game);
+            if (prompt is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 }) return game;
+            if (prompt is { Kind: DecisionKind.SelectGeneral })
+                Accept(new SelectGeneralCommand(prompt.PlayerSeat, $"fixture:borrowed-fixed-general-{prompt.PlayerSeat}",
+                    game.Revision, prompt.PromptId));
+            else
+            {
+                Require(prompt is null, "The fixed native opening must reach only its actual general selections before Play.");
+                Accept(new AdvanceOneStepCommand(game.Revision));
+            }
+        }
+        throw new InvalidOperationException("The fixed native Borrowed Sword opening exceeded its bounded setup steps.");
+
+        void Accept(GameCommand command)
+        {
+            var result = game.Submit(command);
+            Require(result.Accepted, result.Error?.Message ?? "The fixed native Borrowed Sword opening command was rejected.");
+        }
+    }
+
+    private static GameEngine FindFixedHumanOwnerResponse(ContentRegistry registry)
+    {
+        var game = StartFixedOwnerResponse(registry);
+        var owner = game.CreateSnapshot(0, revealAll: true).Players[0];
+        var weapon = owner.Hand.Single(card => card.Kind == CardKind.Crossbow);
+        Accept(new PlayCardCommand(0, weapon.Id, [], game.Revision, CurrentPrompt(game)!.PromptId));
+        Reach(prompt => prompt is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
+        Require(game.CreateSnapshot(0, revealAll: true).Players[0].Equipment.Any(card => card.Id == weapon.Id) &&
+                game.CardMovements.Any(move => move.CardId == weapon.Id && move.From == CardLocation.Hand(0) &&
+                    move.To == CardLocation.Processing && move.Reason == CardMoveReasons.EquipmentUse),
+            "The fixed owner must equip its exact original Hand weapon through the native use boundary.");
+        Accept(new EndPlayPhaseCommand(0, game.Revision, CurrentPrompt(game)!.PromptId));
+        Reach(prompt => prompt is { Kind: DecisionKind.PlayCard, PlayerSeat: 1 });
+        var trick = game.CreateSnapshot(1, revealAll: true).Players[1].Hand.Single(card => card.Kind == CardKind.BorrowedSword);
+        Require(game.CreateSnapshot(0, revealAll: true).Players[0].Hand.Any(card => card.Kind == CardKind.Slash) &&
+                game.CreateSnapshot(4, revealAll: true).Players[4].Hand.Any(card => card.Kind == CardKind.Dodge),
+            "The prepared native owner and target must retain real Slash and Dodge entities before the actual trick.");
+        var pairedAction = game.GetLegalActions(1).SingleOrDefault(action =>
+            action.Kind == LegalActionKind.BorrowedSword && action.CardId == trick.Id && action.TargetSeats.SequenceEqual([0, 4]));
+        Require(pairedAction is not null,
+            "The acting source must receive the exact equipped-owner and adjacent Dodge target pair as a published legal action. " +
+            JsonSerializer.Serialize(game.GetLegalActions(1).Where(action => action.Kind == LegalActionKind.BorrowedSword)));
+        Accept(new PlayCardCommand(1, trick.Id, pairedAction!.TargetSeats, game.Revision, CurrentPrompt(game)!.PromptId));
+        Reach(prompt => prompt is { Kind: DecisionKind.RespondSlash, PlayerSeat: 0, IncomingCard: CardKind.BorrowedSword });
+        Require(game.PendingDecision is { SourceSeat: 1, TargetSeat: 4 } response &&
+                response.Choices.Any(choice => choice.Parameters.GetValueOrDefault("response") == "borrowed-sword-give-weapon") &&
+                response.Choices.Any(choice => choice.Parameters.GetValueOrDefault("response") == "borrowed-sword-slash"),
+            "A real source Play command must expose both exact weapon-owner branches for the fixed ordered pair.");
+        return game;
+
+        void Accept(GameCommand command)
+        {
+            var result = game.Submit(command);
+            Require(result.Accepted, result.Error?.Message ?? "The fixed Borrowed Sword native preparation command was rejected.");
+        }
+        void Reach(Func<PendingDecision?, bool> ready)
+        {
+            for (var step = 0; step < 96; step++)
+            {
+                if (ready(CurrentPrompt(game))) return;
+                Step(game);
+            }
+            throw new InvalidOperationException("The fixed Borrowed Sword preparation missed its bounded native boundary.");
+        }
+    }
+
+    private static PendingDecision? CurrentPrompt(GameEngine game) =>
+        game.CreateSnapshot(0).Players.Select(player => game.CreateSnapshot(player.Seat).PendingDecision)
+            .FirstOrDefault(prompt => prompt is not null);
+
     private static bool ProbeFactionSlashResolution(
         GameEngine game,
         PendingDecision response,
@@ -486,16 +621,16 @@ internal static class BorrowedSwordScenario
     public static void Step(GameEngine game)
     {
         GameCommand command;
-        if (game.PendingDecision is { PlayerSeat: 0 } prompt)
+        if (CurrentPrompt(game) is { } prompt)
         {
             if (prompt.Kind == DecisionKind.PlayCard)
             {
-                command = new EndPlayPhaseCommand(0, game.Revision, prompt.PromptId);
+                command = new EndPlayPhaseCommand(prompt.PlayerSeat, game.Revision, prompt.PromptId);
             }
             else if (prompt.Kind == DecisionKind.DiscardCards)
             {
                 command = new DiscardCardsCommand(
-                    0,
+                    prompt.PlayerSeat,
                     prompt.ValidCardIds.Take(prompt.RequiredCardCount).ToArray(),
                     prompt.PromptId,
                     game.Revision);
@@ -510,7 +645,7 @@ internal static class BorrowedSwordScenario
                                      value.StartsWith("skip", StringComparison.Ordinal) ||
                                      value is "take-damage" or "pass" or "no-nullification"))
                              ?? prompt.Choices.Last();
-                command = new AnswerPromptCommand(0, prompt.PromptId, choice.Id, game.Revision);
+                command = new AnswerPromptCommand(prompt.PlayerSeat, prompt.PromptId, choice.Id, game.Revision);
             }
         }
         else

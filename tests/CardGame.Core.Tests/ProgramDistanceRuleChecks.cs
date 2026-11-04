@@ -97,6 +97,18 @@ internal static partial class ProgramDistanceRuleChecks
         Reject(typeof(RefArgument), "invalid handler signature");
         var production = ProgramDistanceCatalog.Discover(ProgramRuntimeModuleCatalog.Default.Methods);
         Need(production.Registrations.All(pair => pair.Value.Count > 0), "Every migrated native distance position retains its declared contributors.");
+        var physicalRange = production.Registrations[ProgramDistanceStage.PhysicalSlash][0].Method;
+        Need(physicalRange.DeclaringType == typeof(CardGame.Core.EngineOwners.CoreGameEngineFinalTargetSlashRuntime) &&
+            physicalRange.Name == nameof(CardGame.Core.EngineOwners.CoreGameEngineFinalTargetSlashRuntime.DistancePhysicalSlash1IsWithinSpecificSlashRange),
+            "Physical Slash tests its complete rank-aware native range before additional distance allowances.");
+        var rankRange = production.Registrations[ProgramDistanceStage.ProvidedSlash].Single(row =>
+            row.Method.DeclaringType == typeof(CardGame.Core.EngineOwners.CoreGameEngineFinalTargetSlashRuntime) &&
+            row.Method.Name == nameof(CardGame.Core.EngineOwners.CoreGameEngineFinalTargetSlashRuntime.AllowsRankAwareSlashRange));
+        Need(production.Registrations[ProgramDistanceStage.VirtualSlash][0].Order == 10 &&
+            production.Registrations[ProgramDistanceStage.VirtualSlash].All(row => row.Method != rankRange.Method) &&
+            rankRange.Order == 100 &&
+            production.Registrations[ProgramDistanceStage.BorrowedSlash].Single(row => row.Method == rankRange.Method).Order == 50,
+            "Virtual Slash extensions retain their original order separately from the typed native range boundary; supplied and Borrowed Slash retain their original range registration.");
         var productionMethods = typeof(GameEngine).Assembly.GetTypes().SelectMany(Methods)
             .Where(method => method.GetCustomAttributes<ProgramDistanceRuleAttribute>().Any()).ToArray();
         Need(productionMethods.All(method => method.DeclaringType == typeof(GameEngine) ||
