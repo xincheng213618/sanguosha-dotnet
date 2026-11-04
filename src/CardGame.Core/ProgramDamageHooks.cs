@@ -49,7 +49,10 @@ internal sealed class ProgramDamageHookCatalog
     {
         var delegateTypes = Enum.GetValues<ProgramDamagePhase>().ToDictionary(phase => phase, delegateType);
         var phases = delegateTypes.Keys.ToDictionary(phase => phase, _ => new SortedDictionary<int, ProgramDamageRegistration>());
-        foreach (var method in methods)
+        foreach (var candidateMethod in methods)
+        {
+            if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(ProgramDamageHookAttribute), inherit: true)) continue;
+            var method = candidateMethod!;
             foreach (var attribute in method.GetCustomAttributes<ProgramDamageHookAttribute>())
             {
                 if (!Enum.IsDefined(attribute.Phase) || attribute.Order <= 0)
@@ -64,6 +67,7 @@ internal sealed class ProgramDamageHookCatalog
                 if (!phase.TryAdd(attribute.Order, new(attribute.Order, method, type)))
                     throw new InvalidOperationException($"Duplicate damage hook order '{attribute.Phase}:{attribute.Order}'.");
             }
+        }
 
         return new(phases, delegateTypes);
     }

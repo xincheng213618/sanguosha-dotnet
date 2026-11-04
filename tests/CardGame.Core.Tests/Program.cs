@@ -559,6 +559,7 @@ var tests = new (string Name, Action Body)[]
     ("character skills reject conflicting grants without partial state", CharacterSkillSetChecks.InvalidGrantsAndConflictsLeaveStateUnchanged),
     ("current turn nonlocked suppression host lifecycle audit", CurrentTurnSkillSuppressionChecks.HostLifecycleQualificationAudit),
     ("program card legality preserves ordered stages and live queries", ProgramCardLegalityChecks.OrderedStagesAndLiveQueries),
+    ("program legality adapters preserve eager validation and match-local invocation", ProgramLegalityAdapterChecks.EagerValidationAndMatchLocalInvocation),
     ("program card-use payments preserve ordered proofs and match isolation", ProgramCardUsePaymentChecks.OrderedPaymentProofsAndMatchIsolation),
     ("program damage hooks preserve actual order side effects and short circuits", ProgramDamageHookChecks.ActualDamagePhasesKeepOrderAndShortCircuit),
     ("module distance rules preserve ordered arithmetic and native query boundaries", ProgramDistanceRuleChecks.OrderedArithmeticAndNativeDistanceQueries),

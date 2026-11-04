@@ -69,7 +69,10 @@ internal sealed class ProgramLegalityCatalog
 {
     internal sealed record Gate<TContext>(
         MethodInfo Method, int Order, IReadOnlyList<SkillProgramEffectOp> Operations,
-        Func<object?, TContext, bool> Invoke);
+        Lazy<Func<object?, TContext, bool>> Compiled)
+    {
+        internal Func<object?, TContext, bool> Invoke => Compiled.Value;
+    }
 
     private readonly IReadOnlyDictionary<ProgramActivationLegalityPhase,
         IReadOnlyList<Gate<ProgramActivationLegalityContext>>> _activations;
@@ -92,8 +95,11 @@ internal sealed class ProgramLegalityCatalog
             SortedDictionary<int, Gate<ProgramActivationLegalityContext>>>();
         var triggers = new Dictionary<ProgramTriggerLegalityPhase,
             SortedDictionary<int, Gate<ProgramTriggerLegalityContext>>>();
-        foreach (var method in methods)
+        foreach (var candidateMethod in methods)
         {
+            if (candidateMethod is not null && !(candidateMethod.IsDefined(typeof(ProgramActivationLegalityAttribute), inherit: true) ||
+                    candidateMethod.IsDefined(typeof(ProgramTriggerLegalityAttribute), inherit: true))) continue;
+            var method = candidateMethod!;
             foreach (var registration in method.GetCustomAttributes<ProgramActivationLegalityAttribute>())
             {
                 ValidateRegistration(registration.Phase, registration.Order, registration.Operations, method);
@@ -136,7 +142,7 @@ internal sealed class ProgramLegalityCatalog
 
     // Supported legacy signatures use only unambiguous capability inputs. A
     // special signature uses a small context adapter beside that capability.
-    private static Func<object?, TContext, bool> Compile<TContext>(MethodInfo method)
+    private static Lazy<Func<object?, TContext, bool>> Compile<TContext>(MethodInfo method)
     {
         if (method.IsGenericMethod || method.ContainsGenericParameters || method.ReturnType != typeof(bool))
             throw InvalidSignature(method);
@@ -154,7 +160,11 @@ internal sealed class ProgramLegalityCatalog
             return property is not null ? Expression.Property(context, property) : throw InvalidSignature(method);
         });
         var call = Expression.Call(method.IsStatic ? null : Expression.Convert(instance, method.DeclaringType!), method, arguments);
-        return Expression.Lambda<Func<object?, TContext, bool>>(call, instance, context).Compile();
+        var expression = Expression.Lambda<Func<object?, TContext, bool>>(call, instance, context);
+        // Validate the complete binding during discovery, but generate code only
+        // when this gate is used. The shared adapter never captures a match.
+        return new Lazy<Func<object?, TContext, bool>>(expression.Compile,
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     private static InvalidOperationException InvalidSignature(MethodInfo method) =>

@@ -8,6 +8,18 @@ internal static class ProgramDamageHookChecks
         var supplied = Methods(typeof(Fixture)).Reverse().ToList();
         var catalog = ProgramDamageHookCatalog.Discover(supplied, DelegateType);
         supplied.Clear();
+        try
+        {
+            _ = ProgramDamageHookCatalog.Discover([null!], DelegateType);
+            throw new Exception("A null damage-hook method was silently ignored.");
+        }
+        catch (ArgumentNullException) { }
+        var baseMethod = Methods(typeof(InheritedDamageBase)).Single();
+        var overrideMethod = Methods(typeof(InheritedDamageFixture)).Single();
+        Need(ProgramDamageHookCatalog.Discover([baseMethod], DelegateType)
+                .Phases[ProgramDamagePhase.AdditiveAmount].Single().Method == baseMethod &&
+            ProgramDamageHookCatalog.Discover([overrideMethod], DelegateType).Phases.Values.All(rows => rows.Count == 0),
+            "A declared base damage hook is retained while its unmarked override does not inherit an attribute whose usage explicitly disables inheritance.");
         Need(catalog.Phases[ProgramDamagePhase.AdditiveAmount].Select(row => row.Order).SequenceEqual([10, 20]) &&
             catalog.Phases[ProgramDamagePhase.AdditiveAmount] is IList<ProgramDamageRegistration> { IsReadOnly: true },
             "Damage metadata freezes explicitly ordered registrations.");
@@ -147,6 +159,15 @@ internal static class ProgramDamageHookChecks
         private void LastPrepare(Attack attack) { Trace.Add("chain:prepare:last"); }
         [ProgramDamageHook(ProgramDamagePhase.AfterChainAdvance, 10)]
         private void ApplyRecipient(Attack attack) { Trace.Add("chain:recipient"); }
+    }
+    private class InheritedDamageBase
+    {
+        [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 70)]
+        public virtual int Amount(Attack attack) => throw new Exception("Metadata discovery must not apply damage.");
+    }
+    private sealed class InheritedDamageFixture : InheritedDamageBase
+    {
+        public override int Amount(Attack attack) => throw new Exception("An unmarked override must not become a damage hook.");
     }
     private sealed class DuplicateOrder
     { [ProgramDamageHook(ProgramDamagePhase.AdditiveAmount, 10)] private int Bad(Attack attack) => 0; }

@@ -10,6 +10,22 @@ internal static class ModeNativePipelineChecks
         var methods = typeof(NativeFixture).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
         var native = new NativeFrameRouteCatalog(methods);
         var automatic = new NativeFrameAutomaticStepCatalog(native, methods);
+        try
+        {
+            _ = new NativeFrameAutomaticStepCatalog(native, [null!]);
+            throw new Exception("A null automatic-step method was silently ignored.");
+        }
+        catch (ArgumentNullException) { }
+        var inheritedMethod = typeof(InheritedNativeFixture).GetMethod(nameof(InheritedNativeBase.Advance),
+            BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)!;
+        var inheritedRoutes = new NativeFrameRouteCatalog([inheritedMethod]);
+        var inheritedSteps = new NativeFrameAutomaticStepCatalog(inheritedRoutes, [inheritedMethod]);
+        var inherited = inheritedSteps.Registrations[NativeFrameAutomaticPhase.AfterOpening].Single();
+        Require(inherited.Route.Method == inheritedMethod && inherited.Route.Order == 70 &&
+                inherited.Step is { Order: 80, Pending: NativeFrameAutomaticPending.Ignore, Publish: NativeFrameAutomaticPublish.None },
+            "An override retains its inherited native route and automatic-step metadata rather than disappearing during presence filtering.");
+        Reject(() => new NativeFrameAutomaticStepCatalog(native,
+            typeof(MissingRoute).GetMethods(BindingFlags.Static | BindingFlags.NonPublic)));
         var continued = new List<long>();
         var mode = ModeNativeFrameRoute.For<ProgramSkillFrame>(20, continued.Add, frame => frame.OwnerSeat == 1,
             new(NativeFrameAutomaticPhase.AfterOpening, 20, NativeFrameAutomaticPending.Ignore, NativeFrameAutomaticPublish.None));
@@ -108,6 +124,23 @@ internal static class ModeNativePipelineChecks
     }
     private sealed class NativeSelected(string name) : Exception
     { internal string Name { get; } = name; }
+    private class InheritedNativeBase
+    {
+        [NativeFrameRoute(typeof(ProgramSkillFrame), 70)]
+        [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.AfterOpening, 80,
+            NativeFrameAutomaticPending.Ignore, NativeFrameAutomaticPublish.None)]
+        public virtual void Advance(long frameId) => throw new Exception("Metadata discovery must not advance a frame.");
+    }
+    [ProgramRuntimeModule]
+    private sealed class InheritedNativeFixture : InheritedNativeBase
+    {
+        public override void Advance(long frameId) => throw new Exception("Metadata discovery must not advance an override.");
+    }
+    private static class MissingRoute
+    {
+        [NativeFrameAutomaticStep(NativeFrameAutomaticPhase.AfterOpening, 90)]
+        private static void Advance(long frameId) => throw new Exception("A missing route must be rejected before invocation.");
+    }
     [ProgramRuntimeModule]
     private static class NativeFixture
     {

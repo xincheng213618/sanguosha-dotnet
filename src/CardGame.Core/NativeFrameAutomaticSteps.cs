@@ -47,8 +47,10 @@ internal sealed class NativeFrameAutomaticStepCatalog
     internal NativeFrameAutomaticStepCatalog(NativeFrameRouteCatalog routes, IEnumerable<MethodInfo> methods)
     {
         var registrations = new List<Registration>();
-        foreach (var method in methods)
+        foreach (var candidateMethod in methods)
         {
+            if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(NativeFrameAutomaticStepAttribute), inherit: true)) continue;
+            var method = candidateMethod!;
             if (method.GetCustomAttribute<NativeFrameAutomaticStepAttribute>() is not { } step) continue;
             var route = routes.Registrations.SingleOrDefault(candidate => candidate.Method == method);
             if (route is null || step.Order < 0 || !Enum.IsDefined(step.Phase) ||
