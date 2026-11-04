@@ -46,6 +46,6 @@ A useful report includes the commit, game mode, expected/actual behavior and a s
 
 Original software and project-authored documentation use MIT. Contribute material you have the right to provide, preserve attribution and existing third-party licenses, and record sources. Artwork, audio and scraped reference text are not covered by the project's software license.
 
-截图、验证日志、恢复档案和临时构建产物放在忽略的 `.artifacts/benchmarks/` 或验证脚本的临时目录，不提交 Git。任务完成后按 [AGENTS.md](AGENTS.md) 的归属、锁和路径边界清理本任务输出。长期规则解释与来源留在对应文档中。
+截图、验证日志、恢复档案和临时构建产物放在忽略的 `.artifacts/benchmarks/` 或验证脚本的临时目录，不提交 Git。任务完成后按[开发门禁的清理流程](docs/DEVELOPMENT_GATES.md#temporary-files-and-cleanup)核实归属、锁和路径边界，清理本任务输出。长期规则解释与来源留在对应文档中。
 
 Keep disposable screenshots, logs, archives and build outputs out of Git. Use the ignored artifact area or the verification runner's temporary directory, clean up task-owned outputs after inspection, and respect other contributors' files and locks.

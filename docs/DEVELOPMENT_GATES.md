@@ -1,60 +1,143 @@
-# 开发门禁边界
+# Development gates
 
-## 格式与内容边界
+These are the detailed development, format, verification and artifact policies
+referenced by [AGENTS.md](../AGENTS.md). Read the sections relevant to the task.
+Setup and entry points are in [the developer quickstart](GETTING_STARTED.md).
 
-| 数据 | 版本来源 | 调整条件 |
+## Formats and content
+
+| Data | Version source | Change when |
 | --- | --- | --- |
-| Checkpoint | [GameCheckpoint.CurrentSchemaVersion](../src/CardGame.Core/Replay.cs) | 持久化结构发生需要区别处理的变化 |
-| 技能规则 JSON | [SkillProgramCatalog.RulesSchemaVersion](../src/CardGame.Core/SkillPrograms.cs) | 不兼容的规则格式变化 |
-| 桌面存档 | [GameSaveFile.CurrentFormatVersion](../src/CardGame.Wpf/Persistence/GameSaveStore.cs) | 存档外层格式变化 |
-| 内容包 | 对应包的 `CurrentVersion` | 明确的内容发布批次 |
-| AI 决策 | [AiDecisionPolicy](../src/CardGame.Core/Replay.cs) | 需要保留回放决策语义的策略变化 |
+| Checkpoint | [GameCheckpoint.CurrentSchemaVersion](../src/CardGame.Core/Replay.cs) | The persisted structure changes in a way that needs versioned handling |
+| Skill rules JSON | [SkillProgramCatalog.RulesSchemaVersion](../src/CardGame.Core/SkillPrograms.cs) | The rules JSON format changes incompatibly |
+| Desktop save | [GameSaveFile.CurrentFormatVersion](../src/CardGame.Wpf/Persistence/GameSaveStore.cs) | The outer save format changes |
+| Content package | The package's `CurrentVersion` | An intentional content release batch |
+| AI decisions | [AiDecisionPolicy](../src/CardGame.Core/Replay.cs) | Replay needs to preserve decision-policy semantics |
 
-开发指南和逐人物测试引用这些来源，避免另写一份容易失效的“当前数值”。Checkpoint 检查结构、内容包签名、内容哈希和逐条命令合法性，再按当前实现回放。技能定义中的 `minimumRulesVersion` 参与既有内容指纹，不作为运行门禁；内容哈希区分开发中的定义变化。
+- Do not add a global gameplay rules epoch or checkpoint `RulesVersion`. Replay saves under the current implementation with the existing schema, content and command validation; if the desktop cannot load or replay a save, initialize a fresh game without immediately overwriting the source save. Legacy skill JSON minimum-rules metadata is retained only for content fingerprint stability, never as a runtime gate. Raise `SkillProgramCatalog.RulesSchemaVersion` only for an incompatible rules JSON format; additive optional nodes can keep the existing schema. Change package versions for an intentional content release batch.
 
-复用已有节点的组合和兼容的可选能力可以沿用技能 schema；普通人物内容改动沿用内容包版本。桌面读取、校验或回放失败时初始化新牌局、停止自动推进，并保护失败的原存档，流程见 [本地存档与恢复](SAVE_AND_RESUME.md)。
+- Keep format version sources in `src/CardGame.Core/Replay.cs`, `src/CardGame.Core/SkillPrograms.cs`, and the relevant package's `CurrentVersion`. Do not copy current numbers into unrelated tests or development guides.
 
-## 内容开发
+- Embedded rules omit the root rules version and load through `EmbeddedSkillProgramCatalog` with `SkillProgramCatalog.LoadCurrent`. External `Load` and Inspector validation still require an explicit supported rules version; do not add an optional-version fallback. Presentation and save formats keep their separate contracts.
 
-人物文件放在 `src/Characters/<character>/<variant>/`：`Content/*.character.json` 声明基础资料与注册，`Skills/` 保存规则及展示，`Runtime/` 保存独立规则能力；共享配置放在 `_shared/Skills/`。运行模块链接编译进 Core，可选 `Wpf/` 只编译进 WPF。注册细节见 [人物模块与注册](CHARACTER_MODULES.md)。
+- Test fixtures derive the current rules format from `SkillProgramCatalog.RulesSchemaVersion` or the shared fixture helper; keep numeric literals only when an intentionally incompatible format is the behavior under test. Batch incompatible rule-format retirements instead of bumping the format for each removed operation.
 
-普通人物优先修改所属目录的内容和技能定义。纯配置由共享加载、注册及已有机制检查覆盖；引入尚未覆盖的行为或修复缺陷时，增加针对性的 Core 检查。UI 行为变化增加 WPF 检查。共享能力需验证节点参数、非法上下文、资源消费和真实规则行为，并按影响补充隐私、牌区守恒、暂停恢复与回放边界。
+Checkpoints validate schema, package signatures, content hashes and individual
+commands before replaying under the current implementation. On desktop load,
+validation or replay failure, start a fresh game, stop automatic advancement and
+protect the original save; see [save and resume](SAVE_AND_RESUME.md).
 
-## 验证方式
+## Content development
 
-[Test-Changed.ps1](../tools/Test-Changed.ps1) 需要 Windows、PowerShell 7 和 PATH 中可用的 Python 3.10 或更新版本；Python 仅使用标准库登记临时输出。脚本在一次调用内构建并复用产物。开发时运行相关名称过滤；批次结束运行 [VerificationScopes.psd1](../tools/VerificationScopes.psd1) 定义的常规范围：
+Character files live in `src/Characters/<character>/<variant>/`:
+`Content/*.character.json` declares identity and registration, `Skills/` holds
+rules and presentation, and `Runtime/` holds independent rule capabilities.
+Shared configuration lives in `_shared/Skills/`. Runtime modules compile into Core;
+optional `Wpf/` code compiles only into WPF. See [character modules](CHARACTER_MODULES.md).
+
+- Ordinary new generals and skills that use existing capabilities change their content and registration. Existing shared loader, registry, and mechanism checks cover pure configuration. Add a focused behavior check only for behavior that is not already covered or for a bug fix; do not require a duplicate definition snapshot for each character. Do not raise the global rules epoch, skill JSON schema, or content package version per character. The content hash already distinguishes content changes during development.
+
+- Optimize expansion for complete generals delivered per wall-clock hour. When parallel work is authorized, assign independent generals to agents and serialize only conflicting shared integration and final verification; do not default to assigning all agents to one general. Prefer existing capabilities and make a minimal implementation compile and exercise its main flow early.
+
+- Do not require a fixed number of checks per general or repeat shared privacy, forged-input, collection-freezing, and replay checks at every character prompt. Keep focused checks for new behavior and actual regressions, with representative recovery coverage for new pending state. Defer speculative cross-skill and boundary combinations to a separate mechanism batch; pure content reuse does not need a new character fixture.
+
+For shared capability changes, cover node parameters, invalid contexts, resource
+consumption and actual behavior, adding relevant privacy, zone conservation,
+continuation and replay checks. Use [the capability method](content/skill-composition/CAPABILITY_MAP.md)
+and the applicable [mechanism contracts](content/skill-composition/contracts/README.md).
+
+## Verification workflow
+
+[tools/Test-Changed.ps1](../tools/Test-Changed.ps1) needs Windows, PowerShell 7,
+the SDK selected by [global.json](../global.json), and Python 3.10+ on PATH.
+Python uses only the standard library to register temporary outputs.
+The runner builds an isolated scope once per invocation and reuses its outputs.
+
+- Add focused Core behavior checks for the new rule. Add WPF checks only for UI behavior, and shared mechanism checks when a shared capability changes. Reuse the existing `--filter=<name>` runners and `tools/Test-Changed.ps1`; do not add character-specific runner switches or a new test framework. Run the relevant focused checks during development and routine verification after a batch.
+
+- Full verification is manual only: run `tools/Test-Changed.ps1 -Full` or any unfiltered test runner only when the user explicitly requests a manual full run. Do not automatically start full verification after a change, batch, development milestone, or routine-check failure. This restriction remains in force throughout the main development cycle and later follow-up cycles until the user explicitly cancels it; completing the main development cycle does not lift it automatically.
+
+- Run `tools/Test-Changed.ps1` without filters for the measured routine scope in `tools/VerificationScopes.psd1` and relevant name filters while developing. Full verification follows the manual-only restriction above. Routine coverage and all registered checks are different scopes; report actual timings and failures. Fix each failing check you see or confirm it already fails on the base commit; only an explicit user request starts full verification.
+
+Run from the repository root:
 
 ```powershell
-pwsh -File .\tools\Test-Changed.ps1
+# Choose filters relevant to the changed behavior.
 pwsh -File .\tools\Test-Changed.ps1 -CoreFilter 'program interaction '
 pwsh -File .\tools\Test-Changed.ps1 -WpfFilter 'selection, target toggle'
+# Run once after integrating a code/content batch.
+pwsh -File .\tools\Test-Changed.ps1
+git diff --check
 ```
 
-常规范围是四项轻量检查：胜负规则、技能定义的规则与展示分离、非法定义拒绝，以及内容注册的重复 ID、引用和指纹。目标为测试进程约一秒，构建、依赖校验和脚本开销单独计时；全新构建或源码变更后的构建不承诺一秒完成。
+For documentation-only changes, check content, links and the intended diff; a
+game build or test run is unnecessary. Do not turn a documentation edit into a
+verification run against unrelated concurrent source changes.
 
-修改命令、存档、隐私、牌区或 UI 时，按名称运行相应回归。相关检查及关键断言保留在原入口，默认不运行整套引擎场景和 WPF 渲染。新增人物复用已有机制时不扩充默认清单；批次结束实测默认范围，并分别报告构建和检查耗时。
+The routine lane is defined by [VerificationScopes.psd1](../tools/VerificationScopes.psd1);
+it covers victory rules, separation of rules and presentation, invalid definitions,
+and registration IDs/references/fingerprints. Read that file for the current list.
+Routine coverage, all registered checks and interactive desktop acceptance are
+different scopes.
 
-同组过滤在一个进程中取并集，每项只执行一次。显式空过滤或零匹配会失败；全部登记检查由 `-Full` 或直接无过滤运行测试程序集触发，仅在用户明确要求手动完整验证时执行。失败后仍保留实际失败计数、进程退出码和构建结果。
+- Keep the default smoke checks near one second of test-process time; report build, dependency validation and runner overhead separately. Run relevant engine, replay, privacy, card movement and WPF regressions by existing name filters when those behaviors change. Prefer a small existing fixture or a verified seed over repeated seed searches and complete-match simulations. Retain integration coverage and all assertions for the behavior under test; measure the default run after a batch instead of assuming fewer checks means less time.
 
-[Inspect-SkillProgram.ps1](../tools/Inspect-SkillProgram.ps1) 可先检查内容装载，加载成功只说明配置通过相应检查。提交前运行 `git diff --check`，并按本次范围检查暂存内容。
+Multiple filters in one group run their union, with each check executed once.
+Explicit empty filters and zero matches fail. Preserve the real failure count,
+process exit code and build result when reporting failures.
+[Inspect-SkillProgram.ps1](../tools/Inspect-SkillProgram.ps1) can check content
+loading first; successful loading establishes only the checks it actually performs.
+Before committing, run `git diff --check` and inspect the staged scope.
 
-## 临时输出与清理
+## Test maintenance
 
-默认验证目录按仓库路径固定为 `%TEMP%\CardGame-TestChanged-<仓库哈希>`，同仓库运行通过锁互斥。优先复用兼容产物；脚本将 `bin`、`obj` 和 `renders` 登记到 [cleanup_queue.json](../tools/cleanup_queue.json)，运行结果保存在该目录的 `summary.json` 与日志中。显式 `-ArtifactsPath` 遵循相同登记流程，登记失败会报告路径并返回失败。
+- Preserve intentional test pruning when merging older branches or worktrees. Carry over only new checks for uncovered behavior or regressions; do not restore an entire historical test suite to match an old test count or branch convention. Resolve test conflicts against the current retained coverage and remove obsolete registrations, methods, and unused fixtures together. Do not prune checks in the same batch as a large refactor.
 
-登记只记录待清理路径。任务完成查看后，代理按 [AGENTS.md](../AGENTS.md) 清理本任务可丢弃产物，保留必要日志和交付物；清理前验证绝对路径、归属、链接和消费者状态，并遵守验证锁。遇到策略阻止或仍占用的目录，保留精确记录与原因，不能绕过拒绝或清理其他任务的历史目录。
+- Preserve checkpoint, replay, content fingerprint, input validation, privacy, and card movement boundaries. Do not delete historical compatibility code or change stored data solely to reduce test count.
 
-用户可双击 [clean.cmd](../clean.cmd) 重试队列，也可先查看或预览：
+When removing obsolete helpers, inspect attribute discovery, reflection, extension
+methods and cross-file partial references as well as ordinary calls.
+
+## Temporary files and cleanup
+
+The default verification directory is stable per repository:
+`%TEMP%\CardGame-TestChanged-<repository-hash>`. Runs from the same repository
+coordinate with a lock. The runner records bulky outputs in
+[cleanup_queue.json](../tools/cleanup_queue.json), while `summary.json` and logs
+stay in that output directory. A registration failure reports its path and fails
+the run.
+
+### Outputs and authorization
+
+- Benchmark logs, verification summaries, screenshots, source snapshots, and recovery archives are temporary outputs. Use the ignored `.artifacts/benchmarks/` directory when they need a repository-local location; do not add them to Git or maintain references to them in documentation or source manifests. Keep lasting rule explanations and source citations in the relevant documentation instead.
+
+- Generate release/publish outputs, installers, and distribution packages only when the user explicitly requests publishing or packaging. Ordinary development and verification must not run release/publish workflows. This restriction does not prohibit temporary archives used to complete the task.
+
+- Temporary archives, repository/asset copies, worktrees, and isolated build/test outputs are allowed when useful; no separate permission is needed just to use them. Track exact paths and ownership. Reuse compatible checkouts and build outputs, respecting locks and concurrent work, instead of creating a new timestamp/GUID directory for each feature.
+
+### Ownership and cleanup
+
+- Automatically clean up this task's disposable temporary files and directories as soon as their purpose is complete, including `%TEMP%` diagnostics, isolated `.artifacts` build/test outputs, temporary archives, and small test fixtures. This standing instruction authorizes ordinary task-owned cleanup without another confirmation. Preserve deliverables, necessary diagnostic evidence, recovery backups, and outputs the user explicitly requested to keep before cleanup.
+
+- Before recursive deletion, resolve and verify the exact absolute target is strictly inside the intended temporary/output root, check ownership, reject linked paths, and stop or wait for this task's own consumers. Respect verification locks and concurrent work. Use PowerShell cmdlets with `-LiteralPath`; never clear all of `%TEMP%`, delete by a broad `Card-*` wildcard, or delete another task's outputs/shared caches.
+
+- Put automatic cleanup in `try/finally` where practical, covering successful and failed runs. Before the final response, verify that disposable outputs were removed. When resuming an interrupted task, inspect its known temporary paths and finish any permitted cleanup. Registering a path does not mean space has been freed.
+
+### Retained outputs and the queue
+
+- If cleanup is rejected as `blocked by policy`, do not retry the same deletion through a script, another tool, or a later task stage to bypass the rejection. If policy, permissions, locks, or necessary diagnostic retention prevent cleanup, register the exact retained directory with `python -B tools/cleanup_temp.py --add <absolute-directory> --root <verified-temporary-or-output-root> --reason <reason>`; include `--lock-root <artifacts-root>` for verification outputs. Report its path and reason in the final response.
+
+- `tools/cleanup_queue.json` is the fallback UTF-8 text database for retained directories. Inspect it with `--list`/`--dry-run`; the user can double-click root `clean.cmd` or run `python tools/cleanup_temp.py` to retry cleanup. Agents must not run the entire historical queue automatically or use it to retry policy-blocked deletion. Remove only the matching records after successful deletion or verified absence, preserve unrelated entries, and retain failures for retry.
+
+- Prefer the stable default directory of `tools/Test-Changed.ps1` and reuse its outputs during the task. The runner currently registers its `bin`, `obj`, and `renders` and retains them; this does not discharge the agent's cleanup responsibility. Once verification and inspection are complete, automatically remove this task's disposable outputs when permitted, preserving necessary summary/logs. Explicit `-ArtifactsPath` follows the same lifecycle; honor explicit user requests to retain outputs.
+
+- Cleanup tests may mock deletion and must not remove real historical queued directories. Automatically clean up their own disposable fixture directories after testing when permitted; register them if cleanup is blocked.
+
+Inspect or preview the queue without executing historical cleanup:
 
 ```powershell
 python -B tools/cleanup_temp.py --list
 python -B tools/cleanup_temp.py --dry-run
 ```
 
-任务内保留目录使用 `--add <绝对目录> --root <已验证的临时根目录> --reason <原因>` 登记；验证产物同时指定 `--lock-root <验证目录>`。清理成功或确认已不存在时只移除相应记录。长久说明保留规则依据与源码入口，截图、基准日志和恢复档案等临时材料需要仓库内位置时放在忽略的 `.artifacts/benchmarks/`，不纳入文档引用或 Git。
-
-## 测试维护
-
-合并旧分支时按当前保留覆盖范围处理测试，只引入未覆盖行为或回归所需的新检查。删除过时检查时同步处理注册、方法和无人使用的辅助代码；保留 checkpoint、回放、指纹、输入、隐私和牌区边界。清理辅助代码需检查特性发现、反射、扩展方法和 partial 跨文件引用。
-
-优先使用小型场景和已验证种子，保留代表性集成场景及关键断言，避免重复搜索种子或完整对局模拟。普通开发与验证使用构建及检查流程；发布、安装器和分发包按明确的打包请求执行。
+The user can double-click [clean.cmd](../clean.cmd) to retry the queue.
