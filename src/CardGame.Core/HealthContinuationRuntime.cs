@@ -323,14 +323,14 @@ internal sealed partial class HealthContinuationRuntime
                 hasRecovery = true;
                 continue;
             }
-            if (protocols.ExactPaidNativeRecoveryUseEdge(parent, child, History())) continue;
+            if (protocols.ExactPaidNativeRecoveryUseEdge(parent, child, History)) continue;
             if (parent is CardUseFrame nativeUse && child is HpChangedTriggerWindowFrame nativeHealth)
             {
-                if (!protocols.NativeCardRecoveryReturnMatches(nativeUse, nativeHealth, History())) return new(null, IsMalformed: true);
+                if (!protocols.NativeCardRecoveryReturnMatches(nativeUse, nativeHealth)) return new(null, IsMalformed: true);
                 hasRecovery = true;
                 continue;
             }
-            if (protocols.ExactPaidNativeRecoveryReplacementEdge(parent, child, History()))
+            if (protocols.ExactPaidNativeRecoveryReplacementEdge(parent, child, History))
             {
                 hasRecovery = true;
                 continue;

@@ -37,9 +37,9 @@ internal interface IHealthContinuationProtocols : IProgramRuntimeOperations
     int SupportedRecoveryAmount(RecoveryReplacementFrame recovery, int baseAmount);
     int SupportedRecoveryHpBefore(RecoveryReplacementFrame recovery, int fallback);
     bool IsRecoveryParent(ProgramRecoveryParentPhase phase, ProgramSkillFrame parent, RecoveryReplacementFrame child);
-    bool NativeCardRecoveryReturnMatches(CardUseFrame use, HpChangedTriggerWindowFrame hp, IReadOnlyList<IGameEvent> history);
-    bool ExactPaidNativeRecoveryUseEdge(ResolutionFrame parent, ResolutionFrame child, IReadOnlyList<IGameEvent> history);
-    bool ExactPaidNativeRecoveryReplacementEdge(ResolutionFrame parent, ResolutionFrame child, IReadOnlyList<IGameEvent> history);
+    bool NativeCardRecoveryReturnMatches(CardUseFrame use, HpChangedTriggerWindowFrame hp);
+    bool ExactPaidNativeRecoveryUseEdge(ResolutionFrame parent, ResolutionFrame child, Func<IReadOnlyList<IGameEvent>> history);
+    bool ExactPaidNativeRecoveryReplacementEdge(ResolutionFrame parent, ResolutionFrame child, Func<IReadOnlyList<IGameEvent>> history);
     bool DamageProgramMatchesWindow(ProgramSkillFrame root, DamageTriggerWindowFrame window);
     bool IsAmountSupportHealthChild(RecoveryReplacementFrame recovery, HpChangedTriggerWindowFrame hp);
 }
