@@ -13,6 +13,8 @@ internal sealed class ActionQuery(int players,(int Seat, Card Card)? printedTarg
         internal readonly Dictionary<(int Seat, int? Excluded), RuleQueryEvaluation> AttackRanges = [];
         internal readonly Dictionary<(int Seat, int? Excluded, EquipmentSlot? Slot), RuleQueryEvaluation> SlashUseLimits = [];
         internal readonly Dictionary<(int Seat, bool IgnoreSuitBan), IReadOnlyList<Card>> SlashCards = [];
+        internal readonly Dictionary<(int ActorSeat, CardKind Kind, CardActionType ActionType,
+            bool IgnoreIssuedPlayBan, long? ExistingUseFrameId), bool> CardUseBans = [];
         internal readonly Dictionary<(int ActorSeat, Card First, Card Second), ZhangbaSlashPairFacts> ZhangbaSlashPairs = [];
         internal bool HasActualDiscardRecoveryPhase;
         internal ActualDiscardRecoveryPhaseKey? ActualDiscardRecoveryPhase;
