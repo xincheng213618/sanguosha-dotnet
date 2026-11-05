@@ -180,6 +180,11 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         var origin = new DiouNativeOrigin(f.Id, DiouSource(f), f.GameplayHash, use.Id, a.ActionId, f.OwnerSeat, r.OutputKind, r.CarrierId);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { DiouOrigin = origin });
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { Diou = r with { Stage = DiouStage.NativeUse, UseId = use.Id, ActionId = a.ActionId } });
+        if (_resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == r.WindowId) is
+                ProgramCardTriggerWindowFrame { CompletedResponseReturn: { Kind: ProgramCompletedResponseKind.Nullification, IsCommitted: false } } mother &&
+            _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == mother.ParentFrameId) is NullificationWindowFrame window &&
+            a.ParentActionId == _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)?.Action?.ActionId)
+            _nativeCursorSuspensions.Suspend(window.Id, f.Id, NativeCursorScope.Nullification);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouNativeIssuedEvent(f.Id, use.Id, a.ActionId, f.OwnerSeat, r.OutputKind, r.CarrierId));
     }
 
@@ -231,6 +236,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             return;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || use.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Diou: { } r } f || f.Id != o.ProgramFrameId || r.UseId != use.Id || r.ActionId != o.ActionId || r.Returned || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Diou can return only once to its original paid native parent.");
+        _nativeCursorSuspensions.Release(f.Id, NativeCursorScope.Nullification);
         var batches = SignDiouNativeBatches(f, use);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Diou = r with { Stage = DiouStage.NativeChildren, Returned = true, NativeBatchIds = batches }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouNativeReturnedEvent(f.Id, use.Id, o.ActionId));

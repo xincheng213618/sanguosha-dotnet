@@ -108,6 +108,7 @@ var tests = new (string Name, Action Body)[]
     ("independent event history tracks pending replacement and committed identities", ProgramEventHistoryIndexChecks.IndependentIndexTracksPendingReplacementAndCommittedIdentities),
     ("independent command sessions isolate execution gates and recovery", CommandSessionChecks.IndependentSessionsIsolateExecutionAndRecovery),
     ("match runtime composition defers bindings and retries failed dependencies", ProgramRuntimeModuleChecks.MatchCompositionDefersBindingsAndRetriesFailedDependencies),
+    ("Native cursor suspension: original owners independent intervals and exact release", NativeCursorSuspensionChecks.OriginalOwnersKeepIndependentIssuedIntervals),
     ("Native card representation: original faces carriers and exact departures", NativeCardRepresentationChecks.OriginalFacesAndPhysicalDeparturesKeepOwningUseBoundaries),
     ("Native trick continuation: owning use identity stages and live roles", NativeTrickContinuationChecks.OriginalUseIdentityAndIssuedStagesSurviveLiveRoleChanges),
     ("Native material claims: actual deliveries owners and retirement rights", NativeMaterialClaimChecks.DeliveriesKeepOriginalOwnersAndRetirementBoundaries),

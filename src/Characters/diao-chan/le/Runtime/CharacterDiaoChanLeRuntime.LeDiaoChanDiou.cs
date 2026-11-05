@@ -87,6 +87,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             var first = !DiouWasShownThisTurn(card.Id);
             var same = CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind) == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.Claim.EffectiveKind);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Diou = r with { Paid = true, ShownCardId = card.Id, ShownPrintedKind = card.Kind, OutputKind = kind, FirstShow = first, SameName = same, ActualTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, TurnOwner = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, ShowSequence = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Stage = DiouStage.UseChoice } });
+            CapturePaidDiouCursorSuspensions(f);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouShownEvent(f.Id, f.OwnerSeat, card.Id, card.Kind, kind, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, first, same));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramCardsRevealedEvent(f.Id, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, "diou-retained-hand", [_coreSnapshotValueProjectionOperations.ToSnapshot(card)]));
             if (_publicHandRevealWindows.Begin(f.Id, "diou-retained-hand"))
@@ -151,6 +152,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         var r = f.Diou!;
         RestoreDiouParentAttack(f);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouCompletedEvent(f.Id, r.Claim.ActionId, r.Paid, r.UseId != 0, r.DrawOutcome is not null));
+        _nativeCursorSuspensions.Release(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Diou = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, r.Paid);
     }

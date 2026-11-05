@@ -9,7 +9,7 @@ internal sealed partial class CoreGameEngineResponseUseCompletionRuntime
         if (window.CompletedResponseReturn?.Kind == ProgramCompletedResponseKind.Nullification)
         {
             var pending = _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow;
-            if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == window.ParentFrameId)is NullificationWindowFrame suspended && _characterLiuChengMouMobileOperations.IsMouLiuChengSuspendedCounterspell(suspended))
+            if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == window.ParentFrameId)is NullificationWindowFrame suspended && _nativeCursorSuspensions.HasIssuedSuspension(suspended.Id, NativeCursorScope.Nullification, window.Id))
                 pending = suspended;
             if (pending is null || window.ParentFrameId != pending.Id || window.Action.OpponentSeat != pending.SourceSeat)
                 return false;

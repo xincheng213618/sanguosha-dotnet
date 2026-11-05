@@ -124,6 +124,7 @@ internal sealed partial class CharacterGuoSiOlRuntime
 
     internal void FinishGuoSi(ProgramSkillFrame f)
     {
+        _nativeCursorSuspensions.Release(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { GuoSi = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }

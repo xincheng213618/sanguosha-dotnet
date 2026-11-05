@@ -23,107 +23,58 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         return f.Diou is null && f.InstructionIndex is 0 or 1 && f.TriggerId == DiouBinding && f.WindowContext is { } c && IsIssuedDiouCandidate(new(f.OwnerSeat, f.SkillId, f.TriggerId, f.SkillInstanceId, f.GameplayHash, 0, c.OccurrenceIndex), c);
     }
     internal bool DiouDrawMovement(ProgramSkillFrame f, CardMovementRecord m) => f.Diou is { Stage: DiouStage.DrawChildren, DrawOutcome: { } o } && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > o.SequenceBefore && m.Sequence <= o.SequenceAfter && (o.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == DiouDrawReason || o.ReplacementGainedIds.Contains(m.CardId) && m.To == CardLocation.Hand(f.OwnerSeat) || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle);
-    internal bool IsDiouSuspendedCompletedAttack(CardUseFrame original, long? requiredWindowId = null)
+    private void CapturePaidDiouCursorSuspensions(ProgramSkillFrame issuer)
     {
-        // Do not query an active-token getter here. In particular an equipment
-        // or recovery clone need not create any attack that could deactivate
-        // this already completed mother, but its paid children still own the
-        // entire interval before the exact native return.
-        if (original.Action is not { } action || original.CardAttack is null)
-            return false;
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
+        var receipt = issuer.Diou!;
+        var mother = _resolutionStackOperations._resolutionStack.Single(frame => frame.Id == receipt.WindowId)
+            as ProgramCardTriggerWindowFrame ?? throw new InvalidOperationException("Diou lost its original completed-use window.");
+        if (mother.AttackOwnerFrameId is { } ownerId && mother.ParentFrameId == ownerId &&
+            _coreCardUseLifecycleOperations.LifecycleCardUse(ownerId) is { Action: { } action, CardAttack: not null } original)
         {
-            if (f.Diou is not { Paid: true } r || requiredWindowId is { } exactWindow && r.WindowId != exactWindow || r.Stage is not (DiouStage.UseChoice or DiouStage.NativeIssuing or DiouStage.NativeUse or DiouStage.NativeChildren or DiouStage.Drawing or DiouStage.DrawChildren) || f.SkillId != DiouSkill || f.TriggerId != DiouBinding || f.ActivationId != DiouBinding || r.Claim.Source != DiouSource(f) || r.Claim.GameplayHash != f.GameplayHash || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not ProgramCardTriggerWindowFrame mother || mother.ParentFrameId != original.Id || mother.AttackOwnerFrameId != original.Id || r.Claim.NativeParentId != original.Id || r.Claim.ActionId != mother.Action.ActionId || original.DiouClaims?.Contains(r.Claim) != true || !ValidDiouClaim(r.Claim, mother.Action) || f.WindowContext?.ParentFrameId != mother.Id || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouStartedEvent>().Count(e => e == new DiouStartedEvent(f.Id, r.Claim, mother.Id)) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouShownEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.CardId == r.ShownCardId && e.OutputKind == r.OutputKind && e.MovementSequence == r.ShowSequence) != 1)
-                continue;
-            var response = mother.CompletedResponseReturn is { Kind: ProgramCompletedResponseKind.Dodge, IsCommitted: false };
-            if (response ? mother.Action.ParentActionId != action.ActionId : mother.Continuation != ProgramCardContinuation.CompletedSlash || mother.Action.ActionId != action.ActionId || original.Step != ResolutionFrameStep.Completed)
-                continue;
-            var fi = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-            if (fi < 1 || _resolutionStackOperations._resolutionStack[fi - 1].Id != mother.Id || _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == original.Id) >= fi - 1)
-                continue;
-            if (r.Stage == DiouStage.NativeUse && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { DiouOrigin: { } origin, Action: { } childAction } child || _resolutionStackOperations._resolutionStack.ElementAtOrDefault(fi + 1)?.Id != child.Id || origin.ProgramFrameId != f.Id || origin.UseId != child.Id || origin.ActionId != childAction.ActionId || origin.Source != r.Claim.Source || origin.GameplayHash != f.GameplayHash || childAction.ParentActionId != action.ActionId || childAction.PhysicalCards.Count != 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == child.Id && e.ActionId == childAction.ActionId && e.ActorSeat == f.OwnerSeat && e.Kind == child.CardKind && e.CarrierId == child.CardId) != 1))
-                continue;
-            if (r.Stage is DiouStage.NativeChildren or DiouStage.Drawing or DiouStage.DrawChildren && (!r.Returned || r.UseId > 0 && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.ActionId == r.ActionId) != 1)))
-                continue;
-            return true;
+            var dodge = mother.CompletedResponseReturn is { Kind: ProgramCompletedResponseKind.Dodge, IsCommitted: false };
+            if (dodge ? mother.Action.ParentActionId == action.ActionId :
+                mother.Continuation == ProgramCardContinuation.CompletedSlash &&
+                mother.Action.ActionId == action.ActionId && original.Step == ResolutionFrameStep.Completed)
+                _nativeCursorSuspensions.Suspend(ownerId, issuer.Id, NativeCursorScope.AttackAndContinuations);
         }
 
-        return false;
+        CapturePaidDiouRescueSuspensions(issuer, mother);
     }
 
-    internal void RestoreDiouParentAttack(ProgramSkillFrame f)
+    private void CapturePaidDiouRescueSuspensions(ProgramSkillFrame issuer, ProgramCardTriggerWindowFrame mother)
     {
-        RestoreDiouRescueAttack(f);
-        if (f.Diou is not { Paid: true, Returned: true, UseId: > 0 } r || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not ProgramCardTriggerWindowFrame w || w.AttackOwnerFrameId is not { } originalId)
+        if (mother.Continuation != ProgramCardContinuation.CompletedCard || mother.CompletedResponseReturn is not null ||
+            _coreCardUseLifecycleOperations.LifecycleCardUse(mother.ParentFrameId) is not
+                { Step: ResolutionFrameStep.Completed, Action: { } action, DyingResponse: { } rescue } original ||
+            _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == rescue.ResolutionId) is not DyingFrame dying ||
+            original.CardKind is not (CardKind.Peach or CardKind.Alcohol) || action.EffectiveKind != original.CardKind ||
+            original.SourceSeat != action.ActorSeat || action.ActorSeat != issuer.Diou!.Claim.ActorSeat ||
+            !original.TargetSeats.SequenceEqual([dying.VictimSeat]) || rescue.ResponderSeat != original.SourceSeat ||
+            (original.CardKind == CardKind.Peach ? !rescue.UsedPeach : !rescue.UsedAlcohol || original.SourceSeat != dying.VictimSeat))
             return;
-        var response = w.CompletedResponseReturn is { Kind: ProgramCompletedResponseKind.Dodge, IsCommitted: false };
-        if (!response && w.Continuation != ProgramCardContinuation.CompletedSlash)
+        var dyingIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == dying.Id);
+        if (dyingIndex < 0 || _resolutionStackOperations._resolutionStack.ElementAtOrDefault(dyingIndex + 1)?.Id != original.Id ||
+            _resolutionStackOperations._resolutionStack.ElementAtOrDefault(dyingIndex + 2)?.Id != mother.Id ||
+            _resolutionStackOperations._resolutionStack.ElementAtOrDefault(dyingIndex + 3)?.Id != issuer.Id)
             return;
-        if (!DiouRootMatches(f) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeReturnedEvent>().Count(e => e == new DiouNativeReturnedEvent(f.Id, r.UseId, r.ActionId)) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId) != 1 || w.ParentFrameId != originalId || _coreCardUseLifecycleOperations.LifecycleCardUse(originalId)is not { Action: { } a, CardAttack: not null } original || (response ? w.Action.ParentActionId != a.ActionId : w.Action.ActionId != a.ActionId || original.Step != ResolutionFrameStep.Completed) || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } active && active.ResolutionId != originalId)
-            throw new InvalidOperationException("Diou cannot restore another attack or return before its exact native child has retired.");
-        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, _kernelCoreMainOperations.CreateCardAttackHandle2(originalId)))
-        {
-            _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = _kernelCoreMainOperations.CreateCardAttackHandle2(originalId);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouParentAttackRestoredEvent(f.Id, r.UseId, originalId, a.ActionId));
-        }
-    }
+        _nativeCursorSuspensions.Suspend(dying.Id, issuer.Id, NativeCursorScope.Dying);
 
-    internal bool IsDiouSuspendedCounterspell(NullificationWindowFrame window)
-    {
-        // A true counterspell completion can itself issue Diou's native trick.
-        // Keep the old response cursor on its exact frame while the separate
-        // child gets the active Nullification window; do not hide any sibling.
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-        {
-            if (f.Diou is not { Paid: true, Stage: DiouStage.NativeUse } r || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not ProgramCardTriggerWindowFrame mother || mother.CompletedResponseReturn is not { Kind: ProgramCompletedResponseKind.Nullification, IsCommitted: false } || mother.ParentFrameId != window.Id || r.Claim.NativeParentId != window.Id || r.Claim.ActionId != mother.Action.ActionId || window.DiouClaims?.Contains(r.Claim) != true || r.Claim.Source != DiouSource(f) || r.Claim.GameplayHash != f.GameplayHash || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { DiouOrigin: { } origin, Action: { } a } child || origin.ProgramFrameId != f.Id || origin.UseId != child.Id || origin.ActionId != a.ActionId || origin.Source != r.Claim.Source || origin.GameplayHash != f.GameplayHash || a.PhysicalCards.Count != 0 || a.ParentActionId != _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)?.Action?.ActionId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouStartedEvent>().Count(e => e.FrameId == f.Id && e.WindowId == mother.Id && e.Claim == r.Claim) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == child.Id && e.ActionId == a.ActionId && e.ActorSeat == f.OwnerSeat && e.Kind == child.CardKind && e.CarrierId == child.CardId) != 1)
-                continue;
-            return true;
-        }
-
-        return false;
-    }
-
-    internal bool IsOriginalDyingSuspendedByDiou(DyingFrame dying) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => DiouSuspendsRescue(f, dying));
-    internal bool DiouSuspendsRescue(ProgramSkillFrame f, DyingFrame dying)
-    {
-        // This filter deliberately never queries ActiveDying or mature
-        // observer helpers: they may themselves query this active-token list.
-        // Only the dying token of the already completed genuine rescue is
-        // suspended. A new dying victim inside Diou keeps the normal flow.
-        if (f.Diou is not { Paid: true } r || r.Stage is not (DiouStage.UseChoice or DiouStage.NativeIssuing or DiouStage.NativeUse or DiouStage.NativeChildren or DiouStage.Drawing or DiouStage.DrawChildren) || f.SkillId != DiouSkill || r.Claim.Source != DiouSource(f) || r.Claim.GameplayHash != f.GameplayHash || _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program?.GameplayHash != f.GameplayHash || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not ProgramCardTriggerWindowFrame mother || mother.Continuation != ProgramCardContinuation.CompletedCard || mother.CompletedResponseReturn is not null || mother.ParentFrameId != r.Claim.NativeParentId || mother.Action.ActionId != r.Claim.ActionId || _coreCardUseLifecycleOperations.LifecycleCardUse(mother.ParentFrameId)is not { Step: ResolutionFrameStep.Completed, Action: { } action, DyingResponse: { } rescue } original || rescue.ResolutionId != dying.Id || original.CardKind is not (CardKind.Peach or CardKind.Alcohol) || action.EffectiveKind != original.CardKind || original.SourceSeat != action.ActorSeat || action.ActorSeat != r.Claim.ActorSeat || !original.TargetSeats.SequenceEqual([dying.VictimSeat]) || rescue.ResponderSeat != original.SourceSeat || (original.CardKind == CardKind.Peach ? !rescue.UsedPeach : !rescue.UsedAlcohol || original.SourceSeat != dying.VictimSeat) || original.DiouClaims?.Contains(r.Claim) != true || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == original.Id && e.CardKind == original.CardKind) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouStartedEvent>().Count(e => e.FrameId == f.Id && e.WindowId == mother.Id && e.Claim == r.Claim) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouShownEvent>().Count(e => e.FrameId == f.Id && e.OwnerSeat == f.OwnerSeat && e.CardId == r.ShownCardId && e.OutputKind == r.OutputKind && e.MovementSequence == r.ShowSequence) != 1)
-            return false;
-        var di = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == dying.Id);
-        var ui = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == original.Id);
-        var wi = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == mother.Id);
-        var fi = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-        if (di < 0 || ui != di + 1 || wi != ui + 1 || fi != wi + 1 || f.WindowContext?.ParentFrameId != mother.Id)
-            return false;
-        if (r.Stage == DiouStage.NativeUse && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { DiouOrigin: { } origin, Action: { } childAction } child || _resolutionStackOperations._resolutionStack.ElementAtOrDefault(fi + 1)?.Id != child.Id || origin.ProgramFrameId != f.Id || origin.UseId != child.Id || origin.ActionId != childAction.ActionId || origin.Source != r.Claim.Source || origin.GameplayHash != f.GameplayHash || childAction.ParentActionId != action.ActionId || childAction.PhysicalCards.Count != 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == child.Id && e.ActionId == childAction.ActionId && e.ActorSeat == f.OwnerSeat && e.Kind == child.CardKind && e.CarrierId == child.CardId) != 1))
-            return false;
-        if (r.Stage is DiouStage.NativeChildren or DiouStage.Drawing or DiouStage.DrawChildren && (!r.Returned || r.UseId > 0 && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.ActionId == r.ActionId) != 1)))
-            return false;
-        return true;
-    }
-
-    internal ResolutionFrame? DiouRescueAttackOwner(ProgramSkillFrame f, out DyingFrame? dying)
-    {
-        dying = null;
-        if (f.Diou is not { } r || _coreCardUseLifecycleOperations.LifecycleCardUse(r.Claim.NativeParentId)?.DyingResponse is not { } rescue || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == rescue.ResolutionId)is not DyingFrame original || !DiouSuspendsRescue(f, original))
-            return null;
-        var di = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == original.Id);
         ResolutionFrame? owner;
         DamageFrame? damage = null;
-        if (original.Continuation == DyingContinuationKind.Damage)
+        if (dying.Continuation == DyingContinuationKind.Damage)
         {
-            if (di < 1 || _resolutionStackOperations._resolutionStack[di - 1] is not DamageFrame d || d.Id != original.ParentFrameId || d.TargetSeat != original.VictimSeat || d.Amount <= 0)
-                return null;
-            damage = d;
-            owner = _resolutionStackOperations._resolutionStack.Take(di - 1).SingleOrDefault(x => x.Id == d.ParentFrameId);
+            if (dyingIndex < 1 || _resolutionStackOperations._resolutionStack[dyingIndex - 1] is not DamageFrame attempt ||
+                attempt.Id != dying.ParentFrameId || attempt.TargetSeat != dying.VictimSeat || attempt.Amount <= 0)
+                return;
+            damage = attempt;
+            owner = _resolutionStackOperations._resolutionStack.Take(dyingIndex - 1)
+                .SingleOrDefault(frame => frame.Id == attempt.ParentFrameId);
         }
-        else if (original.Continuation == DyingContinuationKind.AttackHpLoss)
-            owner = di > 0 && _resolutionStackOperations._resolutionStack[di - 1].Id == original.ParentFrameId ? _resolutionStackOperations._resolutionStack[di - 1] : null;
+        else if (dying.Continuation == DyingContinuationKind.AttackHpLoss)
+            owner = dyingIndex > 0 && _resolutionStackOperations._resolutionStack[dyingIndex - 1].Id == dying.ParentFrameId
+                ? _resolutionStackOperations._resolutionStack[dyingIndex - 1] : null;
         else
-            return null;
+            return;
         var attack = owner switch
         {
             CardUseFrame use => use.CardAttack,
@@ -131,24 +82,51 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             ProgramSkillFrame program => program.CardAttack,
             _ => null
         };
-        if (attack is null || attack.TargetSeat != original.VictimSeat || !attack.IsSourceLess && original.KillerSeat != attack.SourceSeat || damage is not null && (damage.SourceSeat != attack.SourceSeat || damage.Amount != attack.DamageAmount || !attack.DamageWasApplied) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PlayerDyingEvent>().Count(e => e.ResolutionId == original.Id && e.VictimSeat == original.VictimSeat && e.KillerSeat == original.KillerSeat) != 1)
-            return null;
-        dying = original;
-        return owner;
+        if (attack is not null && attack.TargetSeat == dying.VictimSeat &&
+            (attack.IsSourceLess || dying.KillerSeat == attack.SourceSeat) &&
+            (damage is null || damage.SourceSeat == attack.SourceSeat && damage.Amount == attack.DamageAmount && attack.DamageWasApplied))
+            _nativeCursorSuspensions.Suspend(owner!.Id, issuer.Id, NativeCursorScope.AttackAndContinuations);
     }
 
-    internal bool IsDiouSuspendedRescueAttack(ResolutionFrame owner) => _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => DiouRescueAttackOwner(f, out _)?.Id == owner.Id);
+    internal void RestoreDiouParentAttack(ProgramSkillFrame f)
+    {
+        RestoreDiouRescueAttack(f);
+        if (f.Diou is not { Paid: true, Returned: true, UseId: > 0 } receipt ||
+            _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == receipt.WindowId) is not
+                ProgramCardTriggerWindowFrame { AttackOwnerFrameId: { } ownerId } ||
+            !_nativeCursorSuspensions.OwnsSuspension(ownerId, f.Id, NativeCursorScope.AttackAndContinuations))
+            return;
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(receipt.UseId) is not null ||
+            _coreCardUseLifecycleOperations.LifecycleCardUse(ownerId) is not { Action: { } action, CardAttack: not null } ||
+            _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } active && active.ResolutionId != ownerId)
+            throw new InvalidOperationException("Diou cannot restore another attack or return before its exact native child has retired.");
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack,
+                _kernelCoreMainOperations.CreateCardAttackHandle2(ownerId)))
+        {
+            _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = _kernelCoreMainOperations.CreateCardAttackHandle2(ownerId);
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouParentAttackRestoredEvent(
+                f.Id, receipt.UseId, ownerId, action.ActionId));
+        }
+    }
+
+    internal ResolutionFrame? DiouRescueAttackOwner(ProgramSkillFrame issuer, out DyingFrame? dying)
+    {
+        dying = _resolutionStackOperations._resolutionStack.OfType<DyingFrame>().SingleOrDefault(frame =>
+            _nativeCursorSuspensions.OwnsSuspension(frame.Id, issuer.Id, NativeCursorScope.Dying));
+        return dying is null ? null : _resolutionStackOperations._resolutionStack.SingleOrDefault(frame =>
+            _nativeCursorSuspensions.OwnsSuspension(frame.Id, issuer.Id, NativeCursorScope.AttackAndContinuations));
+    }
+
     internal void RestoreDiouRescueAttack(ProgramSkillFrame f)
     {
-        if (f.Diou is not { Paid: true, Returned: true } r || DiouRescueAttackOwner(f, out var dying)is not { } owner)
+        if (f.Diou is not { Paid: true, Returned: true } receipt || DiouRescueAttackOwner(f, out var dying) is not { } owner)
             return;
-        if (!DiouRootMatches(f) || r.UseId > 0 && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DiouNativeReturnedEvent>().Count(e => e == new DiouNativeReturnedEvent(f.Id, r.UseId, r.ActionId)) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId) != 1) || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } active && active.ResolutionId != owner.Id)
+        if (receipt.UseId > 0 && _coreCardUseLifecycleOperations.LifecycleCardUse(receipt.UseId) is not null ||
+            _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } active && active.ResolutionId != owner.Id)
             throw new InvalidOperationException("Diou cannot restore another rescue attack or expose its dying cursor before the exact child returned.");
-        // The active getter hides this exact ancestor throughout the paid
-        // rescue child. Keep its native damage/duel/target cursor unchanged;
-        // clearing Diou below makes the same owning state visible again.
-        _coreCardAttackStateOperations.UpdateCardAttackState(owner.Id, state => state!with { Active = true });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouRescueAttackReturnedEvent(f.Id, r.UseId, dying!.Id, owner.Id, (owner as CardUseFrame)?.Action?.ActionId));
+        _coreCardAttackStateOperations.UpdateCardAttackState(owner.Id, state => state! with { Active = true });
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DiouRescueAttackReturnedEvent(
+            f.Id, receipt.UseId, dying!.Id, owner.Id, (owner as CardUseFrame)?.Action?.ActionId));
     }
 
     internal bool DiouFirstChild(ProgramSkillFrame f, ResolutionFrame child)

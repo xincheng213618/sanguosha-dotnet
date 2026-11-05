@@ -69,6 +69,14 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouLiuChengCompletion = r });
         ChangeMouLiuChengChui(f, -2);
+        if (w.AttackOwnerFrameId is { } originalId &&
+            _coreCardUseLifecycleOperations.LifecycleCardUse(originalId) is { Action: { } originalAction, CardAttack: not null } original &&
+            w.ParentFrameId == originalId &&
+            (w.CompletedResponseReturn is { Kind: ProgramCompletedResponseKind.Dodge, IsCommitted: false }
+                ? w.Action.ParentActionId == originalAction.ActionId
+                : w.Continuation == ProgramCardContinuation.CompletedSlash &&
+                  w.Action.ActionId == originalAction.ActionId && original.Step == ResolutionFrameStep.Completed))
+            _nativeCursorSuspensions.Suspend(originalId, f.Id, NativeCursorScope.AttackAndContinuations);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLiuChengCompletionStartedEvent(f.Id, claim, w.Id, before, before - 2));
         return _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, f.OwnerSeat, 1, new(MouLiuChengDrawReason));
     }
@@ -139,6 +147,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         var r = f.MouLiuChengCompletion!;
         RestoreMouLiuChengParentAttack(f);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLiuChengCompletedEvent(f.Id, r.Claim.ActionId, r.UseId > 0));
+        _nativeCursorSuspensions.Release(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouLiuChengCompletion = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
     }

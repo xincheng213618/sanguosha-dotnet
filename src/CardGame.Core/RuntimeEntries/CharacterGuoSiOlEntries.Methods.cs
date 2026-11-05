@@ -18,7 +18,6 @@ internal sealed partial class CharacterGuoSiOlEntries
     internal ProgramSkillFrame? GuoSiObserverRoot() => _resolve().GuoSiObserverRoot();
     internal bool GuoSiObserverSuffix(int index) => _resolve().GuoSiObserverSuffix(index);
     internal bool IsGuoSiNativeUse(CardUseFrame use) => _resolve().IsGuoSiNativeUse(use);
-    internal bool IsSuspendedGuoSiCompletedParent(CardUseFrame original) => _resolve().IsSuspendedGuoSiCompletedParent(original);
     internal void IssueSidao(ProgramSkillFrame f, LegalAction action) => _resolve().IssueSidao(f, action);
     internal void PublishGuoSiChoice(ProgramSkillFrame f) => _resolve().PublishGuoSiChoice(f);
     internal void RequireIssuedGuoSi(ProgramSkillFrame f) => _resolve().RequireIssuedGuoSi(f);

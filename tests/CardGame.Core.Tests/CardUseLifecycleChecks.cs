@@ -19,6 +19,8 @@ internal static class CardUseLifecycleChecks
             }, registry);
             Require(game.Submit(new StartGameCommand()).Accepted, "The nested rescue fixture must start.");
             ReachPlay(game);
+            Require(game.CreateSnapshot(0, true).Players[0].Hp == 1,
+                "The nested rescue fixture must start its outer Slash from one actual HP.");
             var peach = game.CreateSnapshot(0, true).Players[0].Hand.FirstOrDefault(card => card.Kind == CardKind.Peach);
             var slash = game.GetHumanLegalActions().FirstOrDefault(action => action.Kind == LegalActionKind.Slash);
             if (peach is null || slash is null) continue;
@@ -87,7 +89,10 @@ internal static class CardUseLifecycleChecks
             : new AnswerPromptCommand(prompt.PlayerSeat, prompt.PromptId,
                 (prompt.Choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("program-action") == "skip") ??
                  prompt.Choices.First()).Id, game.Revision);
-        Require(game.Submit(command).Accepted, "An intervening use step must resume.");
+        var result = game.Submit(command);
+        Require(result.Accepted,
+            $"An intervening use step must resume: command={command.GetType().Name}, prompt={prompt?.Kind}, " +
+            $"error={result.Error}, status={result.Status}, ownerHp={result.State.Players[0].Hp}.");
     }
 
     private static string State(GameEngine game) => SnapshotJson.Serialize(game.CreateSnapshot(0, true));
@@ -108,13 +113,16 @@ internal static class CardUseLifecycleChecks
                 {"id":"nested-rescue","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":["slash"],
                  "priority":100,"optional":false,"effects":[{"op":"loseHp","target":"owner","amount":1}]},
                 """ : "";
+            // Sample the mode's actual health so the outer Slash starts from one HP.
+            var woundAmount = nestedRescue ? "\"amountExpr\":[\"-\",[\"hp\",\"owner\"],1]" :
+                "\"amount\":" + (dying ? 7 : 1);
             var rules = SkillProgramTestJson.CurrentSchema($$$$"""
                 {"schemaVersion":__RULES_SCHEMA__,"skills":[{"id":"{{{{SkillId}}}}","revision":1,"minimumRulesVersion":175,
                  "modifiers":[{"id":"extra-target","query":"cardTargetCount","operation":"add","value":1,"priority":0,"cardKinds":["slash"]}],
                  "triggers":[
                   {{{{nestedTrigger}}}}
                   {"id":"wound","window":"playPhaseStarting","subject":"owner","optional":false,
-                   "effects":[{"op":"loseHp","target":"owner","amount":{{{{(nestedRescue ? 6 : dying ? 7 : 1)}}}}}]},
+                   "effects":[{"op":"loseHp","target":"owner",{{{{woundAmount}}}}}]},
                   {"id":"committed","window":"cardUseCommitted","ownerRelation":"actor","cardKinds":[{{{{cardKinds}}}}],"optional":true,
                    "effects":[{"op":"draw","target":"owner","amount":1}]},
                   {"id":"completed","window":"cardUseCompleted","ownerRelation":"actor","cardKinds":[{{{{cardKinds}}}}],"optional":true,

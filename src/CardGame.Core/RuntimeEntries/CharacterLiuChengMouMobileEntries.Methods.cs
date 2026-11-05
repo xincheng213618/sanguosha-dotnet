@@ -24,8 +24,6 @@ internal sealed partial class CharacterLiuChengMouMobileEntries
     internal bool IsIssuedMouLiuChengUse(CardUseFrame use) => _resolve().IsIssuedMouLiuChengUse(use);
     internal bool IsMouLiuChengNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => _resolve().IsMouLiuChengNativeSettlementBatch(f, b);
     internal bool IsMouLiuChengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsMouLiuChengRecoveryParent(f, recovery);
-    internal bool IsMouLiuChengSuspendedCompletedAttack(CardUseFrame original, long? requiredWindowId = default) => _resolve().IsMouLiuChengSuspendedCompletedAttack(original, requiredWindowId);
-    internal bool IsMouLiuChengSuspendedCounterspell(NullificationWindowFrame window) => _resolve().IsMouLiuChengSuspendedCounterspell(window);
     internal bool IsMouLiuChengUse(long id) => _resolve().IsMouLiuChengUse(id);
     internal bool IsMouLiuChengZeroUse(long id) => _resolve().IsMouLiuChengZeroUse(id);
     internal CardUseFrame? MouLiuChengAccrualUse(CardActionContext action) => _resolve().MouLiuChengAccrualUse(action);

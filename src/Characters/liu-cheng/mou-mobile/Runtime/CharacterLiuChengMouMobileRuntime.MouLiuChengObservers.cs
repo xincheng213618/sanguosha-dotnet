@@ -27,62 +27,24 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         return true;
     }
     internal bool MouLiuChengDrawMovement(ProgramSkillFrame f, CardMovementRecord m) => f.MouLiuChengCompletion is { Stage: MouLiuChengStage.DrawChildren, DrawOutcome: { } o } && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > o.SequenceBefore && m.Sequence <= o.SequenceAfter && (o.ActualDrawIds.Contains(m.CardId) && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == MouLiuChengDrawReason || o.ReplacementGainedIds.Contains(m.CardId) && m.To == CardLocation.Hand(f.OwnerSeat) || m.From == CardLocation.DiscardPile && m.To == CardLocation.DrawPile && m.Reason == CardMoveReasons.Reshuffle);
-    internal bool IsMouLiuChengSuspendedCompletedAttack(CardUseFrame original, long? requiredWindowId = null)
-    {
-        // The completed mother owns its exact suspended interval through requested
-        // Draw1, gain children and the separate native followup. This predicate
-        // never queries an active-token getter, preventing recursive cursors.
-        if (original.Action is not { } action || original.CardAttack is null)
-            return false;
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-        {
-            if (f.MouLiuChengCompletion is not { Paid: true } r || requiredWindowId is { } exactWindow && r.WindowId != exactWindow || r.Stage is not (MouLiuChengStage.UseChoice or MouLiuChengStage.NativeIssuing or MouLiuChengStage.NativeUse or MouLiuChengStage.NativeChildren or MouLiuChengStage.Drawing or MouLiuChengStage.DrawChildren) || !MouLiuChengComposition.IsSkill(f.SkillId) || f.TriggerId != "after-use" || f.ActivationId != "after-use" || r.Claim.Source != MouLiuChengSource(f) || r.Claim.GameplayHash != f.GameplayHash || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not ProgramCardTriggerWindowFrame mother || mother.ParentFrameId != original.Id || mother.AttackOwnerFrameId != original.Id || r.Claim.NativeParentId != original.Id || r.Claim.ActionId != mother.Action.ActionId || original.MouLiuChengClaims?.Contains(r.Claim) != true || !ValidMouLiuChengClaim(r.Claim, mother.Action) || f.WindowContext?.ParentFrameId != mother.Id || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengCompletionStartedEvent>().Count(e => e == new MouLiuChengCompletionStartedEvent(f.Id, r.Claim, mother.Id, r.MarkBefore, r.MarkAfter)) != 1)
-                continue;
-            var response = mother.CompletedResponseReturn is { Kind: ProgramCompletedResponseKind.Dodge, IsCommitted: false };
-            if (response ? mother.Action.ParentActionId != action.ActionId : mother.Continuation != ProgramCardContinuation.CompletedSlash || mother.Action.ActionId != action.ActionId || original.Step != ResolutionFrameStep.Completed)
-                continue;
-            var fi = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
-            if (fi < 1 || _resolutionStackOperations._resolutionStack[fi - 1].Id != mother.Id || _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == original.Id) >= fi - 1)
-                continue;
-            if (r.Stage == MouLiuChengStage.NativeUse && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { MouLiuChengOrigin: { } origin, Action: { } childAction } child || _resolutionStackOperations._resolutionStack.ElementAtOrDefault(fi + 1)?.Id != child.Id || origin.ProgramFrameId != f.Id || origin.UseId != child.Id || origin.ActionId != childAction.ActionId || origin.Source != r.Claim.Source || origin.GameplayHash != f.GameplayHash || childAction.ParentActionId != action.ActionId || childAction.PhysicalCards.Count != 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengNativeIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == child.Id && e.ActionId == childAction.ActionId && e.ActorSeat == f.OwnerSeat && e.Kind == child.CardKind) != 1))
-                continue;
-            if (r.Stage == MouLiuChengStage.NativeChildren && (!r.Returned || r.UseId > 0 && (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengNativeReturnedEvent>().Count(e => e.FrameId == f.Id && e.UseId == r.UseId && e.ActionId == r.ActionId) != 1)))
-                continue;
-            return true;
-        }
-
-        return false;
-    }
-
     internal void RestoreMouLiuChengParentAttack(ProgramSkillFrame f)
     {
-        if (f.MouLiuChengCompletion is not { Paid: true, Returned: true, UseId: > 0 } r || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not ProgramCardTriggerWindowFrame w || w.AttackOwnerFrameId is not { } originalId)
+        if (f.MouLiuChengCompletion is not { Paid: true, Returned: true, UseId: > 0 } r ||
+            _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == r.WindowId) is not ProgramCardTriggerWindowFrame window ||
+            window.AttackOwnerFrameId is not { } originalId ||
+            !_nativeCursorSuspensions.OwnsSuspension(originalId, f.Id, NativeCursorScope.AttackAndContinuations))
             return;
-        var response = w.CompletedResponseReturn is { Kind: ProgramCompletedResponseKind.Dodge, IsCommitted: false };
-        if (!response && w.Continuation != ProgramCardContinuation.CompletedSlash)
-            return;
-        if (!MouLiuChengRootMatches(f) || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengNativeReturnedEvent>().Count(e => e == new MouLiuChengNativeReturnedEvent(f.Id, r.UseId, r.ActionId)) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId) != 1 || w.ParentFrameId != originalId || _coreCardUseLifecycleOperations.LifecycleCardUse(originalId)is not { Action: { } a, CardAttack: not null } original || (response ? w.Action.ParentActionId != a.ActionId : w.Action.ActionId != a.ActionId || original.Step != ResolutionFrameStep.Completed) || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } active && active.ResolutionId != originalId)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId) is not null ||
+            _coreCardUseLifecycleOperations.LifecycleCardUse(originalId) is not { Action: { } action, CardAttack: not null } ||
+            _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } active && active.ResolutionId != originalId)
             throw new InvalidOperationException("MouLiuCheng cannot restore another attack or return before its exact native child has retired.");
-        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, _kernelCoreMainOperations.CreateCardAttackHandle2(originalId)))
+        if (!CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack,
+                _kernelCoreMainOperations.CreateCardAttackHandle2(originalId)))
         {
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = _kernelCoreMainOperations.CreateCardAttackHandle2(originalId);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLiuChengParentAttackRestoredEvent(f.Id, r.UseId, originalId, a.ActionId));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(
+                new MouLiuChengParentAttackRestoredEvent(f.Id, r.UseId, originalId, action.ActionId));
         }
-    }
-
-    internal bool IsMouLiuChengSuspendedCounterspell(NullificationWindowFrame window)
-    {
-        // A true counterspell completion can itself issue MouLiuCheng's native trick.
-        // Keep the old response cursor on its exact frame while the separate
-        // child gets the active Nullification window; do not hide any sibling.
-        foreach (var f in _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>())
-        {
-            if (f.MouLiuChengCompletion is not { Paid: true, Stage: MouLiuChengStage.NativeUse } r || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not ProgramCardTriggerWindowFrame mother || mother.CompletedResponseReturn is not { Kind: ProgramCompletedResponseKind.Nullification, IsCommitted: false } || mother.ParentFrameId != window.Id || r.Claim.NativeParentId != window.Id || r.Claim.ActionId != mother.Action.ActionId || window.MouLiuChengClaims?.Contains(r.Claim) != true || r.Claim.Source != MouLiuChengSource(f) || r.Claim.GameplayHash != f.GameplayHash || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { MouLiuChengOrigin: { } origin, Action: { } a } child || origin.ProgramFrameId != f.Id || origin.UseId != child.Id || origin.ActionId != a.ActionId || origin.Source != r.Claim.Source || origin.GameplayHash != f.GameplayHash || a.PhysicalCards.Count != 0 || a.ParentActionId != _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)?.Action?.ActionId || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengCompletionStartedEvent>().Count(e => e.FrameId == f.Id && e.WindowId == mother.Id && e.Claim == r.Claim) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengNativeIssuedEvent>().Count(e => e.FrameId == f.Id && e.UseId == child.Id && e.ActionId == a.ActionId && e.ActorSeat == f.OwnerSeat && e.Kind == child.CardKind) != 1)
-                continue;
-            return true;
-        }
-
-        return false;
     }
 
     internal bool MouLiuChengFirstChild(ProgramSkillFrame f, ResolutionFrame child)

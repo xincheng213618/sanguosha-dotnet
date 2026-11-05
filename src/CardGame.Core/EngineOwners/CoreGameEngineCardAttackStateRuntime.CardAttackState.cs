@@ -58,13 +58,14 @@ internal sealed partial class CoreGameEngineCardAttackStateRuntime
             _ => throw new InvalidOperationException($"Frame {(id)} cannot own a card continuation.")});
     }
 
-    internal long? FindCardContinuationOwner(Func<CardResolutionContinuations, bool> matches) => _resolutionStackOperations._resolutionStack.LastOrDefault(frame => frame switch
-    {
-        CardUseFrame use => matches(use.Continuations) && !_publicHandRevealWindows.Suspends(use.Id) && !_characterGuoSiOlOperations.IsSuspendedGuoSiCompletedParent(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedCompletedAttack(use) && !_characterLiuChengMouMobileOperations.IsMouLiuChengSuspendedCompletedAttack(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(use),
-        ProgramSkillFrame program => matches(program.Continuations) && !_publicHandRevealWindows.Suspends(program.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(program),
-        JudgmentFrame judgment => matches(judgment.Continuations) && !_publicHandRevealWindows.Suspends(judgment.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(judgment),
-        _ => false
-    })?.Id;
+    internal long? FindCardContinuationOwner(Func<CardResolutionContinuations, bool> matches) =>
+        _resolutionStackOperations._resolutionStack.LastOrDefault(frame => (frame switch
+        {
+            CardUseFrame use => matches(use.Continuations),
+            ProgramSkillFrame program => matches(program.Continuations),
+            JudgmentFrame judgment => matches(judgment.Continuations),
+            _ => false
+        }) && !_nativeCursorSuspensions.IsSuspended(frame.Id, NativeCursorScope.AttackAndContinuations))?.Id;
     internal static SuspendedDecisionState CaptureSuspendedDecision(PendingDecision prompt) => RuntimeSkills.RuntimeRules_Core_CardAttackState.CaptureSuspendedDecision(prompt);
     internal static PendingDecision RestoreSuspendedDecision(SuspendedDecisionState state) => RuntimeSkills.RuntimeRules_Core_CardAttackState.RestoreSuspendedDecision(state);
     internal bool GetCardUseCausedDamage(long id) => _resolutionStackOperations._resolutionStack.FirstOrDefault(frame => frame.Id == id) switch

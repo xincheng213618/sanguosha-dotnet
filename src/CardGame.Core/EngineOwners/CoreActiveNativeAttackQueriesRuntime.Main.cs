@@ -5,16 +5,17 @@ internal sealed partial class CoreActiveNativeAttackQueriesRuntime
 {
     internal NativeOwners.CardAttackHandle? ActiveCardAttack
     {
-        get => _resolutionStackOperations._resolutionStack.LastOrDefault(frame => frame switch
+        get => _resolutionStackOperations._resolutionStack.LastOrDefault(frame => (frame switch
         {
-            CardUseFrame use => use.CardAttack?.Active == true && !_publicHandRevealWindows.Suspends(use.Id) && !_characterGuoSiOlOperations.IsSuspendedGuoSiCompletedParent(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(use) && !_characterDiaoChanLeOperations.IsDiouSuspendedCompletedAttack(use) && !_characterLiuChengMouMobileOperations.IsMouLiuChengSuspendedCompletedAttack(use),
-            ProgramSkillFrame program => program.CardAttack?.Active == true && !_publicHandRevealWindows.Suspends(program.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(program),
-            JudgmentFrame judgment => judgment.CardAttack?.Active == true && !_publicHandRevealWindows.Suspends(judgment.Id) && !_characterDiaoChanLeOperations.IsDiouSuspendedRescueAttack(judgment),
+            CardUseFrame use => use.CardAttack?.Active == true,
+            ProgramSkillFrame program => program.CardAttack?.Active == true,
+            JudgmentFrame judgment => judgment.CardAttack?.Active == true,
             _ => false
-        })is { } owner ? _kernelCoreMainOperations.CreateCardAttackHandle(owner.Id) : null;
+        }) && !_nativeCursorSuspensions.IsSuspended(frame.Id, NativeCursorScope.AttackAndContinuations))
+            is { } owner ? _kernelCoreMainOperations.CreateCardAttackHandle(owner.Id) : null;
         set
         {
-            NativeOwners.CardAttackHandle current = ActiveCardAttack;
+            NativeOwners.CardAttackHandle? current = ActiveCardAttack;
             if (current is not null && current.ResolutionId != value?.ResolutionId)
                 _coreCardAttackStateOperations.UpdateCardAttackState(current.ResolutionId, state => state!with { Active = false });
             if (value is not null)

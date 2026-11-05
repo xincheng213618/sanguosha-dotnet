@@ -100,6 +100,13 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         var origin = new MouLiuChengNativeOrigin(f.Id, MouLiuChengSource(f), f.GameplayHash, use.Id, a.ActionId, f.OwnerSeat, r.OutputKind);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouLiuChengOrigin = origin });
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MouLiuChengCompletion = r with { Stage = MouLiuChengStage.NativeUse, UseId = use.Id, ActionId = a.ActionId } });
+        if (_resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == r.WindowId) is
+                ProgramCardTriggerWindowFrame { CompletedResponseReturn: { Kind: ProgramCompletedResponseKind.Nullification, IsCommitted: false } } window)
+        {
+            if (_resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == window.ParentFrameId) is not NullificationWindowFrame)
+                throw new InvalidOperationException("Liu Cheng's completed counterspell must suspend its original response window.");
+            _nativeCursorSuspensions.Suspend(window.ParentFrameId, f.Id, NativeCursorScope.Nullification);
+        }
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLiuChengNativeIssuedEvent(f.Id, use.Id, a.ActionId, f.OwnerSeat, r.OutputKind));
     }
 
@@ -129,6 +136,7 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
             return;
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || use.Step != ResolutionFrameStep.Completed || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouLiuChengCompletion: { } r } f || f.Id != o.ProgramFrameId || r.UseId != use.Id || r.ActionId != o.ActionId || r.Returned || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLiuChengNativeReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("MouLiuCheng can return only once to its original paid native parent.");
+        _nativeCursorSuspensions.Release(f.Id, NativeCursorScope.Nullification);
         var batches = SignMouLiuChengNativeBatches(f, use);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouLiuChengCompletion = r with { Stage = MouLiuChengStage.NativeChildren, Returned = true, NativeBatchIds = batches }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLiuChengNativeReturnedEvent(f.Id, use.Id, o.ActionId));

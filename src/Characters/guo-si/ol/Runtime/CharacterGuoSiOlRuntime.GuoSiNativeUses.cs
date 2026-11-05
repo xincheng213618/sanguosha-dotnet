@@ -20,6 +20,15 @@ internal sealed partial class CharacterGuoSiOlRuntime
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { GuoSiNative = native, GuoSiCostBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, GuoSiCostAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, GuoSiCostDrained = false });
         _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Hand(f.OwnerSeat), CardLocation.Processing, CardMoveReasons.Use);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { GuoSiCostAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence });
+        if (f.WindowContext is not { } context ||
+            _resolutionStackOperations._resolutionStack.SingleOrDefault(item => item.Id == context.ParentFrameId) is not ProgramCardTriggerWindowFrame window ||
+            window.CompletedResponseReturn is not null ||
+            window.Continuation is not (ProgramCardContinuation.CompletedCard or ProgramCardContinuation.CompletedSlash) ||
+            _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId) is not
+                { Step: ResolutionFrameStep.Completed, Action: { Type: CardActionType.Use } originalAction } original ||
+            originalAction.ActionId != native.ParentActionId || window.Action.ActionId != originalAction.ActionId)
+            throw new InvalidOperationException("Sidao must suspend its original completed card-use window.");
+        _nativeCursorSuspensions.Suspend(original.Id, f.Id, NativeCursorScope.AttackAndContinuations);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new GuoSiNativeIssuedEvent(native));
         ContinueGuoSiNativePayment(id);
     }
