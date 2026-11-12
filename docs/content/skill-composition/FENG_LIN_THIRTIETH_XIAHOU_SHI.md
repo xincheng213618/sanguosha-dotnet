@@ -1,33 +1,23 @@
-# 界夏侯氏：当前规则与执行入口
+# 界夏侯氏：版本与工程裁定
 
-当前人物 ID 为 `boundary:xiahou-shi`，势力 `shu`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/xiahou-shi/boundary/Content/boundary-xiahou-shi.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:xiahou-shi` 的注册和可执行定义见[人物资料](../../../src/Characters/xiahou-shi/boundary/Content/boundary-xiahou-shi.character.json)、[技能规则](../../../src/Characters/xiahou-shi/boundary/Skills/boundary-xiahou-shi.rules.json)。规则依据见[来源档案](../sources/fenglin-thirtieth-752-source-2026-10-04.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `boundary:qiaoshi-current` | 樵拾 | 每个结束阶段，你可以与当前回合角色各摸一张牌。然后若其与你手牌数不相等，此技能本轮失效。 |
-| `boundary:yanyu-current` | 燕语 | 出牌阶段，你可以重铸【杀】。出牌阶段结束时，若你本阶段失去过至少两张【杀】，你可以令一名男性角色摸两张牌。 |
+以下不是已核官网 FAQ、移动版或经典口径。官网当前两段全文与蜀3 已单独冻结；经典保持。
 
-## 程序与原生流程
+## 樵拾
 
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `boundary:qiaoshi-current` | `turnEnding / own-ending-pair` | `drawEndingPairThenBlockRoundIfUnequal` |
-| `boundary:qiaoshi-current` | `turnEnding / foreign-ending-pair` | `drawEndingPairThenBlockRoundIfUnequal` |
-| `boundary:yanyu-current` | `active / recast-physical-slash` | `recastSelectedPhysicalSlash` |
-| `boundary:yanyu-current` | `playEnding / lost-two-slashes-support` | `selectTarget`、`draw` |
+- “每个结束阶段”覆盖本人及他人真实正常/额外回合的 Ending。以两个互斥 own/otherLiving trigger 组合完整表达；没有经典的发动前相等限制、没有 Other 限制。
+- 同一 owner/current seat 仍顺序发两次 Draw1，所有第一份孩子回返后才发行第二份，所有第二份孩子回返后才查最终手牌。比较不是激活时、首份摸牌后或摸牌前冻结数。
+- 真正 Round 失效按 owner+skill+state 保存，来源失效/重新获得不同实例仍保持到真实下一轮；extraTurn 不推进轮。额外 Play 不重置 Round，后续真正 Ending 仍受同一块额度限制。跳过阶段没有假 Ending。
+- 已接受 6700 后，source-loss 本身不撤回已签发的两份收益和最终比较；返回靠原定义/hash/实例发行事实，不重查当前 shard。owner/current actor 真死亡或胜负确定时排空已发生孩子、取消未发行份额和最终比较，账单不回滚。空牌堆实际 Draw0 仍保留该真实请求/数量，两份完成后正常比较。
 
-正式规则文件：
+## 燕语
 
-- [boundary-xiahou-shi.rules.json](../../../src/Characters/xiahou-shi/boundary/Skills/boundary-xiahou-shi.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_THIRTIETH_XIAHOU_SHI_DEFAULTS.md)；这些解释与官方原文分别标明。
-
-## 规则来源
-
-- [fenglin-thirtieth-752-source-2026-10-04.json](../sources/fenglin-thirtieth-752-source-2026-10-04.json)
+- 正文没限定重铸牌区，沿成熟本人手牌实体重铸默认。仅 printed Slash/FireSlash/ThunderSlash 可重铸，virtual Slash 或其他实体当杀不制造重铸材料。
+- 失去数默认按真实 Hand/Equipment/Judgment→非本人 owned 区域的 printed Slash 三种移动次数；Use、Response、重铸、Give、真弃置等统一 ledger，不只数重铸。Processing→Discard 的收尾不是本人区域转出，不重复。
+- 本人 Hand→本人 E/J/木牛/公开或私有 pile 等内部移区不算；私有 grain/pile 起始离区暂排除，避免储存→消耗再算两次。printed非Slash的龙胆/丈八/虚拟杀材料不算“实体【杀】”；已存在身份/转换仍保留其用牌行为，不把 effective Use 名称替代材料名。
+- 同一实体真的获得回 Hand 后又真实离区，按两次移动计；没有每实体整阶段去重。actual phase instance 分离额外/下一 Play，按真实阶段 actor/actual turn owner 冻结 stamp。没有回合末重算来源实例或倒推材料。
+- 至少2 在 actual PlayEnded 候选复验时读取该阶段当前可信账单；男性可包含男性技能持有人本身，存活/真实当前性别资格沿成熟 AnyLivingMale。来源已经失效则未发动机会取消；角色死亡则成熟 Draw dead-target 跳过。
+- 重铸成本完成后 source-loss 不撤回 discard、次数和成本孩子；未发奖励按成熟重铸来源资格取消，实际 Draw0/CardRecastEvent保留。最后一节点没有额外授技/状态后继。

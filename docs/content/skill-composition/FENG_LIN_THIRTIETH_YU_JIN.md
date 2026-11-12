@@ -1,28 +1,19 @@
-# 界于禁：当前规则与执行入口
+# 界于禁：版本与工程裁定
 
-当前人物 ID 为 `boundary:yu-jin`，势力 `wei`，基础体力 4。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/yu-jin/boundary/Content/boundary-yu-jin.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:yu-jin` 的注册和可执行定义见[人物资料](../../../src/Characters/yu-jin/boundary/Content/boundary-yu-jin.character.json)、[技能规则](../../../src/Characters/yu-jin/boundary/Skills/boundary-yu-jin.rules.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `boundary:zhenjun-current` | 镇军 | 准备阶段，你可以弃置一名角色X张牌（X为其手牌数减体力值且至少为1)，然后选择一项： 1.你弃置与其中非装备牌数等量张牌； 2.结束阶段，其摸与其中非装备牌数等量张牌。 |
-| `boundary:yizhong-current` | 毅重 | 锁定技，体力值大于等于你的角色的黑色【杀】对你无效；手牌数小于等于你的角色无法响应你的黑色【杀】。 |
+The frozen current page supplies complete 镇军 and 毅重. Source raw SHA256 is `b953813aa986734c25b18b7f30798074c94befa3bd05a120bded2f01e6ad7dd7`. Neither the page nor the API supplies FAQ rulings. The following are implementation choices, not official FAQ claims. Current API gender is absent; Male is retained same-person classic identity evidence. `initial_hp=0` is a placeholder, not starting HP.
 
-## 程序与原生流程
+镇军 selects any living character, including its owner. X freezes at actual Prep target selection as max(1, target current Hand count minus target current HP). The selected zones are Hand/Equipment. Judgment and WoodenOx storage are excluded. If legal eligible HE is fewer than X, all eligible HE is required; otherwise exactly X. Active equipment that grants this binding and equipment protected from this chooser's discard remain protected. Generated GeneralWeapon is excluded because its native Equipment departure destroys it OutsideGame instead of paying a true discard.
 
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `boundary:zhenjun-current` | `turnStartBeforeNormalFlow / actual-preparation-discard` | `resolvePrepDiscardOrEnding` |
-| `boundary:zhenjun-current` | `turnEnding / paid-prep-ending` | `drawPrepDiscardEnding` |
-| `boundary:yizhong-current` | `cardPolicies` | 规则文件中的显式过滤、状态与策略 |
+N counts actual paid entities whose printed category is not Equipment; an equipment card discarded from Hand is still Equipment. Payment is one mature atomic real movement batch; neither a private selection nor a selected card that failed to reach DiscardPile counts. Every child, including SilverLion recovery, replacement recovery, movement observers, HP/Dying and rescue descendants, returns before a second cost or promise is issued. Source loss cancels unpublished later choices; completed payment is retained. Foreign hand choices expose only opaque slots.
 
-正式规则文件：
+The owner may pay exactly N eligible HE entities, or promise the original living target N real draws in the owner's current actual Ending. If fewer than N owner cards remain, only the promise is offered. N=0 allows an empty cost or zero promise; neither branch manufactures CardsMoved, CardsDrawn or PrepDiscardEndingDrawn. A zero promise only consumes its original coordinator item and completes its zero receipt. A positive reward that is no longer requestable because the target died or the winner is set cancels unissued; a real positive Draw request with an empty deck can legitimately emit a requested-positive/actual-zero draw fact. Draw requests respect the mature short-deck/reshuffle behavior; the receipt distinguishes requested N and actual DrawPile→Hand count.
 
-- [boundary-yu-jin.rules.json](../../../src/Characters/yu-jin/boundary/Skills/boundary-yu-jin.rules.json)
+Each promise freezes the original actual turn number/owner, target, paid source instance/hash and exact Ending binding instance/hash. It is consumed once at that actual Ending. Dead target, unavailable original instance, lost/reacquired different source instance, skipped Ending or a later actual turn cancels the unpaid reward; an extra turn does not inherit it. Inserted phases do not create a separate actual turn promise. Already started real draws and their children finish without rollback or re-payment.
 
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
+毅重's comparisons occur at the mature target-response boundary after Cixiong's completed target choice, before armor/response resolution. The current true card user, including mature actor replacement, supplies HP and Hand count; a different provider is never substituted. The original same-use effective suit/color remains frozen. A true all-black multi-material Slash can have Suit.None with EffectiveIsRed=false; mixed red/black is colorless. A zero-entity Suit.None Slash does not become black because an old producer encoded false. Source-less attacks and non-Slash damage are excluded. Incoming HP≥owner HP makes only this actual target ineffective. Outgoing target Hand≤user Hand uses genuine Dodge prohibition, including Bagua and assisted Dodge providers; rescue after damage is separate. Armor behavior and ordinary Slash quota remain unchanged. Issued target conclusions remain frozen through child responses; the next target gets its own comparison.
 
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_THIRTIETH_YU_JIN_DEFAULTS.md)；这些解释与官方原文分别标明。
+All new public facts are scalar-only. Private collection-bearing pending receipts copy/freeze constructor, init, with and JSON restore inputs. No whole collection-bearing Facts record is compared by reference/default Equals.

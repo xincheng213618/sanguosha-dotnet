@@ -1,32 +1,24 @@
-# 界伏皇后：当前规则与执行入口
+# 界伏皇后：版本与工程裁定
 
-当前人物 ID 为 `boundary:fu-huang-hou`，势力 `qun`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/fu-huang-hou/boundary/Content/boundary-fu-huang-hou.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:fu-huang-hou` 的注册和可执行定义见[人物资料](../../../src/Characters/fu-huang-hou/boundary/Content/boundary-fu-huang-hou.character.json)、[技能规则](../../../src/Characters/fu-huang-hou/boundary/Skills/boundary-fu-huang-hou.rules.json)。规则依据见[分类来源](../sources/fenglin-twenty-ninth-671-damage-trick-classification-2026-10-04.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `boundary:zhuikong-current` | 惴恐 | 其他角色的回合开始时，若你已受伤，你可以与其拼点：若你赢，其本回合不能对除其以外的角色使用牌；若你没赢，你获得其拼点牌，然后其视为对你使用一张【杀】。 |
-| `boundary:qiuyuan-current` | 求援 | 当你成为【杀】或伤害锦囊的目标时，你可以令另一名其他角色选择一项：1.交给你一张与此牌同类型不同牌名的牌；2.成为此牌的额外目标。 |
+以下均为未获得当前普通OL官方FAQ补证的工程默认，不能替代当前正文。
 
-## 程序与原生流程
+- 实际回合开始包括额外回合，不包括插入出牌阶段；新外人开始窗口在 TurnStarted 及成熟 Hengye 回合开始回复后、原翻面跳过与本人准备流程前。此排序是未核当前FAQ的工程默认。候选冻结原 turn owner，不随濒死/死亡跳座位重新选择他人。
+- 惴恐双方必须仍存活、本人已受伤且双方有真实手牌、满足现拼点限制。拒绝不消费实体。保留成熟顶牌/随机拼点身份能力；公开结果点数使用已冻结最终有效点数。
+- 平局为“没赢”。原对方拼点实体在成熟拼点领取与cleanup结束后仍弃牌才获得；已被别的合法能力领走不跨 Hand/Processing/OutsideGame 抢回。未取得实体不制造替代牌，之后视为杀仍依原承诺继续。
+- 赢后 self-only 使用现实际回合 restriction，原技能后来丢失不移除已签发限制。未签发结果前来源失效取消尚未执行部分。已支付/已领取不退还或再付。
+- 没赢的零实体杀由原他人作为 Actor 与 Provider，原本人作为目标，独占 typed program return；距离与本回合一般杀额度豁免，保留目标合法性/防具/响应/救援/真实历史。新的实际 Action 是该 producer 真签发，不是伪造 AcceptedAction。
+- 求援的“一张牌”默认 HE 实体，排除 HEJ 中 Judgment、Grain 与生成武器（其成熟离区必销毁，不能伪造交给）。牌类型按印刷基本/锦囊/装备类别，锦囊含延时；Slash/FireSlash/ThunderSlash 在“牌名”比较中按共有杀名处理，属性不是不同牌名。此默认需最终与分类证据及实现一起审查。
+- 同一原用牌/本人/来源实例最多一次求援；后来追加的新受害者可依自己完整技能实例触发自己的机会。原使用者与本人不作为被求援者；已经是原目标者若合法付款可给牌，不能再重复成为额外目标。
+- 未付款状态不展示对方私手牌。被求援者是选牌人，仅其本人看到实际手牌；设备原本公开。额外目标必须完整实际 resolver 支持，保留距离/装备/禁制，不能为降低工程成本扩大牌型或普通杀次数。
+- 交牌未要求展示：新公开付款事实只含来源、原用牌、被求援者、movement序号区间与已交付状态；CardId/PrintedKind/From 仅保留在可信 owning receipt，以真实移牌账验证。已付款实体后来正常移动不会推翻原付款。
+- 追加杀目标使用原实际 Action 冻结花色、颜色、点数和材料；混合材料不重算印刷颜色。只有原精确 producer 的距离豁免继续有效，普通共受赠杀不能因追加目标自动取得距离豁免；一般杀额度不会加减或重复消费。
+- 成熟零实体 Duel 追加目标只在同一用牌具有真实求援追加事实时复用其真实零实体 representation，逐目标回应并返回原 activation 一次。旧神速仍 Action=null：原真实声明、原 TargetsConfirmed、直属暂停 UseVirtualCard 与当前攻击共同证明原/新目标，不增加伪造 Action。
+- 正文“伤害锦囊”在这项新增局部能力中采用 Duel/FireAttack/BarbarianAssault/ArrowBarrage 四种普通直接伤害锦囊。2018 官网刊载的署名社区玩家教程明确列四种，并把闪电另归延时；这是旧官网辅助分类上的工程推断，不是当前671官方FAQ。2025官网公告的两条完整正文与当前source一致，不能由此夸大为当前逐牌FAQ。
+- 被求援人候选资格只读公开手牌数量/装备与合法额外目标，不读私手牌种类。当其已是原目标且自己的私手牌没有匹配实体时，私密答题只有不可执行说明，该次未付款结束；不把隐私牌种条件编码进原拥有者可见的候选席位。
+- AI 公开先验只是工程启发值，不是实测胜率；不得读非自己的手牌身份、随机扫描或消耗RNG估计隐藏牌。
 
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `boundary:zhuikong-current` | `otherActualTurnStarted / foreign-actual-turn-contest` | `selectTarget`、`startPindian`、`resolveForeignTurnPindian` |
-| `boundary:qiuyuan-current` | `cardUseTargetsFinalized / finalized-actual-use-aid` | `offerSameTypeDifferentNameOrExtraTarget` |
-| `boundary:qiuyuan-current` | `otherActualUseTargeted / legacy-virtual-target-aid` | `offerSameTypeDifferentNameOrExtraTarget` |
-
-正式规则文件：
-
-- [boundary-fu-huang-hou.rules.json](../../../src/Characters/fu-huang-hou/boundary/Skills/boundary-fu-huang-hou.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_TWENTY_NINTH_FU_HUANG_HOU_DEFAULTS.md)；这些解释与官方原文分别标明。
-
-## 规则来源
-
-- [fenglin-twenty-ninth-671-damage-trick-classification-2026-10-04.json](../sources/fenglin-twenty-ninth-671-damage-trick-classification-2026-10-04.json)
+求援正文见[官方武将页](https://www.sanguosha.com/hero/671)与[2025 年活动公告](https://www.sanguosha.com/news/20250416_1697_2417)。[2018 年锦囊教程](https://sanguosha.com/news/20180906_8699_5918)由社区玩家署名，提供普通伤害锦囊与延时闪电的辅助分类依据。

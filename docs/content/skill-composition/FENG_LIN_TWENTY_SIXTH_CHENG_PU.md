@@ -1,35 +1,14 @@
-# 界程普：当前规则与执行入口
+# 界程普：版本与工程裁定
 
-当前人物 ID 为 `boundary:cheng-pu`，势力 `wu`，基础体力 4。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/cheng-pu/boundary/Content/boundary-cheng-pu.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:cheng-pu` 的注册和可执行定义见[人物资料](../../../src/Characters/cheng-pu/boundary/Content/boundary-cheng-pu.character.json)、[技能规则](../../../src/Characters/cheng-pu/boundary/Skills/boundary-cheng-pu.rules.json)。规则依据见[来源档案](../sources/fenglin-twenty-sixth-620-source-2026-10-04.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `boundary:lihuo` | 疠火 | 你使用的非火【杀】可以改为火【杀】使用，此牌结算后，若其造成伤害，你弃置一张牌或失去1体力。你使用的火【杀】可以多指定一个目标。 |
-| `boundary:chunlao` | 醇醪 | 你或你相邻角色的【杀】因弃置置入弃牌堆后，将之置于你的武将牌上，称为“醇”。当一名角色处于濒死状态时，你可以移去X张“醇”视为其使用一张【酒】(X为本轮以此法使用【酒】的次数)。 |
-
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `boundary:lihuo` | `viewAs` | 规则文件中的显式过滤、状态与策略 |
-| `boundary:lihuo` | `modifiers` | 规则文件中的显式过滤、状态与策略 |
-| `boundary:lihuo` | `cardUseCommitted / committed-slash-fire-or-extra` | `offerCurrentSlashFireAndExtraTarget` |
-| `boundary:lihuo` | `cardUseCompleted / converted-use-completion-cost` | `payCompletedUseDiscardOrLoseHp` |
-| `boundary:chunlao` | `discardPileReceived / store-own-or-neighbor-discard` | `storeAdjacentDiscardedSlash` |
-| `boundary:chunlao` | `dyingResponse / round-priced-pile-alcohol` | `useRoundPricedPileDyingAlcohol` |
-
-正式规则文件：
-
-- [boundary-cheng-pu.rules.json](../../../src/Characters/cheng-pu/boundary/Skills/boundary-cheng-pu.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_TWENTY_SIXTH_CHENG_PU_DEFAULTS.md)；这些解释与官方原文分别标明。
-
-## 规则来源
-
-- [fenglin-twenty-sixth-620-source-2026-10-04.json](../sources/fenglin-twenty-sixth-620-source-2026-10-04.json)
+1. Neighbor means preceding/following living seat when the actual original discard payment is recorded; dead seats are bypassed, and later deaths do not rewrite that origin. The owner itself always qualifies. Different eligible owners claim in the existing ordered trigger-window order; only an entity still in the discard pile can be stored.
+2. Discard eligibility uses intrinsic effective identity at original owned HEJ payment. Intrinsic Alcohol-as-Slash can qualify; optional red-card view-as does not rewrite ordinary discard identity. Use/response/recast/replacement/death cleanup is excluded unless its earlier actual Processing payment was itself exactly proved genuine discard. Original private receipt is public only at true discard entry; any intervening other movement permanently ends it.
+3. Completion payment applies to the non-fire Slash use converted by this skill. Natural FireSlash gets the additional target but does not incur that conversion payment. Full owning-use applied damage, including sequential additional targets, determines payment once.
+4. Completion discard is one legal owner hand/equipment card. If no such card remains, losing one HP is the sole choice. Payment is irreversible once its movement/HP fact has been committed; later source loss or death cancels only an unpaid continuation.
+5. First actual Wine in a round costs one, then two, then three. Bucket is owner+skillId+stateId+actualRound, intentionally excluding instance so same-skill loss/regrant does not reset “以此法”. Prospective first=1 is engineering interpretation, not FAQ. Issued Wine consumes ordinal even if recovery is replaced or later cannot save victim; unpaid cancellation/refusal/partial choice does not.
+6. The prospective price and dying victim are frozen before selection. All selected materials must still be in the provider's pile; insufficient materials suppress that rescue option. Foreign-turn Alcohol prohibition and exact source legality are checked before payment; a permission already frozen by the existing dying producer gate is honored through payment children.
+7. Pile materials are public when stored; subset selection belongs to their provider. Deck or other players' private hand IDs are never offered. Actual Alcohol action carries every material and its frozen pile location, with the dying victim as actor and the owner as provider.
+8. A committed effective Fire change retains original real costs/ActionId/history and records one new typed fact; already frozen committed-window facts/candidates retain their boundary, following finalized/response/damage/completed read Fire. Targets must follow real initial/add/replace/redirect/finalize facts; an original virtual parent's primary remains its primary, its exact distance grant is reused, and no Slash quota exemption/debit is added.

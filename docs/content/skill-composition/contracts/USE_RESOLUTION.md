@@ -19,6 +19,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Native zero-entity attacks with the standard completion protocol declare that role on their original `CardUseFrame` at issuance; `CoreNativeSlashCompletionRuntime` owns their completion window and existing typed return. Do not add per-character completion hooks for that same protocol. Keep group-card iteration, material retirement and rule-specific post-use progression in their actual owners.
 
+- Native completions with distinct semantics still include Boundary Liu Feng's next-target progression, God Xun Yu's Qizheng, and producers that return an exact ending entity or a fixed kind. Preserve these outcomes when migrating common completion. Delayed placement, producer-specific qualification and paid child returns have their own owners.
+
 - Native card-use returns preserve the parent program's chosen inputs. Declare named use results on the original instruction and read their completed execution targets explicitly; do not rewrite parent selections or reconstruct primary returns through character adapters. Keep declaration, designated and executed targets distinct, and preserve real typed producer returns.
 
 - Native trick continuations use `INativeTrickContinuations` over the original window's parent use, ActionId, stage and typed return. Do not rebuild character Matches/proof chains or add another identity ticket. Committed windows keep their earlier lifecycle position; legitimate actor/target changes read the original use's current state, while material residency, delayed placement and producer-specific returns retain their actual owners.

@@ -1,28 +1,18 @@
-# SP庞德：当前规则与执行入口
+# SP庞德：版本与工程裁定
 
-当前人物 ID 为 `ol:sp-pang-de`，势力 `wei`，基础体力 4。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/pang-de/ol-sp/Content/ol-sp-pang-de.character.json)；主公加成和模式资格由实际模式处理。
+`ol:sp-pang-de` 的注册和可执行定义见[人物资料](../../../src/Characters/pang-de/ol-sp/Content/ol-sp-pang-de.character.json)、[共享规则](../../../src/Characters/_shared/Skills/rule-query-skills.rules.json)、[技能规则](../../../src/Characters/pang-de/ol-sp/Skills/ordinary-sp-pang-de.rules.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `classic:mashu` | 马术 | 锁定技，你计算与其他角色的距离始终 -1。 |
-| `ol:juesi` | 决死 | 出牌阶段，你可以弃置一张【杀】并令攻击范围内一名其他角色弃置一张牌，若弃置牌不为【杀】且其体力值不小于你，你视为对其使用【决斗】。 |
+These are implementation decisions under the complete current ordinary OL text, not a claim of an official ruling:
 
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `classic:mashu` | `modifiers` | 规则文件中的显式过滤、状态与策略 |
-| `ol:juesi` | `active / discard-slash-and-challenge` | `discardSlashThenOtherCardAndUseDuel` |
-
-正式规则文件：
-
-- [rule-query-skills.rules.json](../../../src/Characters/_shared/Skills/rule-query-skills.rules.json)
-- [ordinary-sp-pang-de.rules.json](../../../src/Characters/pang-de/ol-sp/Skills/ordinary-sp-pang-de.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](ORDINARY_OTHER_THIRTY_FIFTH_SP_PANG_DE_ENGINEERING_DEFAULTS.md)；这些解释与官方原文分别标明。
+1. Both owner “弃置一张杀” eligibility and the target's discarded-kind test use the actual entity's frozen **printed Slash/FireSlash/ThunderSlash** kind. An optional/forced view-as that is meaningful only when using or responding does not turn a printed non-Slash into this discarded Slash. This differs from reading its future effective use identity.
+2. HE is the payment region because the current text says 一张牌 / 一张杀 and does not restrict to hand. Judgment, piles and another participant's cards are excluded. The target chooses its own card, with its own private hand identities. No hand identity is read to score an opponent or disclosed in the new public paid event.
+3. The target is frozen at legal activation before costs. Discard-induced range changes do not pick a new target or re-evaluate initial range after payment. Duel retains mature legal target/use prohibitions when issued. If that independent use is illegal, the real paid costs remain and the unissued Duel is cancelled.
+4. No per-phase limit exists in the current text. The activation can repeat as long as actual legal own Slash costs and targets remain. Before the owner's first payment, cancellation has no real payment; after payment, cancellation does not refund cards. The target with no legal payable HE card is skipped and no Duel is issued; no zero-card target payment is invented.
+5. HP is read only after the target's actual discard children finish, including SilverLion recovery and replacement. The two comparison HP values then become scalar issuance facts. Later HP changes do not revoke an already issued Duel.
+6. An unissued continuation whose source/owner/target is invalid drains already paid children and cancels. Reacquiring the skill does not repay the old cost. After genuine issuance, source loss, death and winner handling use mature actual Duel completion/cleanup plus the exact original program return; no new cost or hidden action is manufactured.
+7. Printed own Slash eligibility excludes IsGeneralWeapon (native generated equipment has a different printed kind). A target may select a genuine generated equipment through mature discard eligibility; its exact Equipment→OutsideGame destruction ledger is recognized as that native discard-intent payment, not falsely recorded as DiscardPile. It is never resurrected as Processing/Duel material. Ordinary target entities still require an exact DiscardPile ledger.
+8. Existing self-discard/foreign-equipment prevention is applied both when offering the activation/payment and when submitting. Yang Xiu's opt-in hand-category restriction joins that mature predicate in the shared payment predicate; equipment is not accidentally blocked as self hand.
+9. AI uses only public hand counts/current HP and relationship scoring for activation. It prices one own cost and a public Slash-probability/Duel-risk prior, not measured win rates or opponent hidden kinds. A payer's own private payment can use its own visible identities; the opponent prioritizes its own Slash to prevent the Duel when HP permits. No RNG is consumed by this scoring.
+10. True zero-entity Duel is colorless in gameplay appearance but uses the mature canonical Suit.None/rank0/EffectiveIsRed=false action shape, preserving old producer semantics.

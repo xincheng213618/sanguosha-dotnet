@@ -1,8 +1,7 @@
 """Scan observed public game audio URLs, sync assets, and map official config.
 
-The default --sync-cache workflow reads only matching game-CDN URLs from the
-selected Chrome Cache_Data directory. The initial index rebuild uses the two
-previously verified source indexes under .artifacts/portrait-refresh.
+The sync workflow reads only matching game-CDN URLs from the selected Chrome
+Cache_Data directory and updates the existing catalog.
 """
 
 from __future__ import annotations
@@ -31,8 +30,6 @@ from Crypto.Cipher import AES
 REPO = Path(__file__).resolve().parents[1]
 OUTPUT = REPO / "src/CardGame.Wpf/Assets/Audio/Official"
 CATALOG = REPO / "docs/content/game-audio-catalog.json"
-RESEARCH = REPO / ".artifacts/portrait-refresh/audio-research/source-index.json"
-CACHE = REPO / ".artifacts/portrait-refresh/audio-cache-refresh/2026-09-26-user-listening/source-index.json"
 SYNC = REPO / ".artifacts/portrait-refresh/audio-sync"
 CONFIG_URL = "https://web.sanguosha.com/220/h5_2/res/config/Config.sgs"
 GAME_URL = "https://web.sanguosha.com/220/h5_2/sgsGame_a.sgs"
@@ -122,145 +119,6 @@ def import_file(source: Path, target: Path, source_sha: str) -> tuple[str, dict 
     if source.suffix.lower() == ".ogg" and delivered["codec"] != "pcm_s16le":
         raise ValueError(f"Converted file is not PCM WAV: {target}")
     return target.relative_to(REPO).as_posix(), conversion
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cache-index", type=Path, default=CACHE)
-    parser.add_argument("--research-index", type=Path, default=RESEARCH)
-    args = parser.parse_args()
-    cache = json.loads(args.cache_index.read_text(encoding="utf-8"))
-    research = json.loads(args.research_index.read_text(encoding="utf-8"))
-    assets: list[dict] = []
-    seen_sha: set[str] = set()
-
-    for row in cache["items"]:
-        sha = row["sha256"]
-        if sha in seen_sha:
-            continue
-        seen_sha.add(sha)
-        source = args.cache_index.parent / row["file"]
-        path = urlsplit(row["canonicalUrl"]).path
-        prefix = "/220/h5_2/res/runtime/pc/voice/"
-        if not path.startswith(prefix):
-            raise ValueError(f"Unexpected OL resource path: {path}")
-        relative = Path(*path.removeprefix(prefix).split("/"))
-        if ".." in relative.parts:
-            raise ValueError(f"Unsafe OL path: {path}")
-        target = OUTPUT / "OL" / relative
-        local, conversion = import_file(source, target, sha)
-        delivered_path = REPO / local
-        resource_directory = relative.parts[0] if len(relative.parts) > 1 else "voice-root"
-        asset: dict = {
-            "id": "ol-" + sha,
-            "productLine": "sanguosha-ol-web",
-            "kind": "bgm" if resource_directory == "bgm" else "voice-or-effect",
-            "role": "unmapped",
-            "assignmentStatus": "unmapped",
-            "generalKey": None,
-            "generalName": None,
-            "skinId": None,
-            "skinName": None,
-            "skillId": None,
-            "skillName": None,
-            "lineText": None,
-            "resourceDirectory": resource_directory,
-            "sourceUrl": row["canonicalUrl"],
-            "sourceEvidence": "Chrome game-cache URL observation; see audio-cache-refresh source-index.json",
-            "localPath": local,
-            "sourceSha256": sha,
-            "deliveredSha256": digest(delivered_path),
-            "sourceFormat": Path(path).suffix.lstrip(".").lower(),
-            "deliveredFormat": delivered_path.suffix.lstrip(".").lower(),
-            "sourceBytes": row["bytes"],
-            "deliveredBytes": delivered_path.stat().st_size,
-            "durationSeconds": row["durationSeconds"],
-        }
-        if conversion:
-            asset["conversion"] = conversion
-        if relative.as_posix() == "bgm/BackGroundMusic01.mp3":
-            asset.update(role="lobby", assignmentStatus="verified",
-                         sourceEvidence="sgsGame_a.sgs: JB.MainBgmUrl fallback")
-        elif relative.as_posix() == "bgm/BackGroundMusic02.mp3":
-            asset.update(role="battle", assignmentStatus="verified",
-                         sourceEvidence="sgsGame_a.sgs: JB.GameBgmUrl fallback after SoundSets.BgMusicName lookup")
-        elif relative.as_posix() in ("spell/122caoang/1skill1_1.mp3", "spell/122caoang/1skill1_2.mp3"):
-            line = "典将军，比比看谁杀敌更多！" if relative.name == "1skill1_1.mp3" else "父亲快走，有我殿后！"
-            asset.update(
-                kind="voice", role="skill", assignmentStatus="verified",
-                generalKey="cao-ang", generalName="曹昂", skillName="慷忾", lineText=line,
-                sourcePage="https://x.sanguosha.com/hero/404.html",
-                sourceEvidence="The official hero page identifies Cao Ang/Kangkai and its voice URL; decoded 16 kHz mono PCM matches this OL file at zero lag (correlation >0.999997). OL skin ID is not established.",
-            )
-        assets.append(asset)
-
-    for row in research["items"]:
-        sha = row["sha256"]
-        if sha in seen_sha:
-            continue
-        seen_sha.add(sha)
-        source = REPO / row["file"]
-        url_path = urlsplit(row["url"]).path
-        filename = Path(url_path).name
-        if row.get("generalKey") == "ma-dai":
-            branch = "YJCM/ma-dai/" + row["skinResourceId"]
-        elif row.get("generalKey") == "cao-ang":
-            branch = "YJCM/cao-ang/shared-classic-and-lin-wei-bu-luan"
-        elif row.get("generalKey") == "liu-bei":
-            branch = "OL/verified-samples/liu-bei"
-        else:
-            raise ValueError(f"Unexpected research sample: {row['file']}")
-        target = OUTPUT / branch / filename
-        local, conversion = import_file(source, target, sha)
-        delivered_path = REPO / local
-        official_hero = row.get("generalKey") in ("ma-dai", "cao-ang")
-        asset = {
-            "id": ("yjcm-" if official_hero else "ol-") + sha,
-            "productLine": "yijianchengming-hero-site" if official_hero else "sanguosha-ol-web",
-            "kind": "voice",
-            "role": "skill",
-            "assignmentStatus": "verified" if official_hero else "corroborated",
-            "generalKey": row["generalKey"],
-            "generalName": {"ma-dai": "马岱", "cao-ang": "曹昂", "liu-bei": "刘备"}[row["generalKey"]],
-            "skinId": "240401" if row.get("generalKey") == "cao-ang" else row.get("skinResourceId"),
-            "skillId": None,
-            "skinName": ("经典形象*马岱" if row.get("skinResourceId") == "130101" else "界限突破*马岱") if row.get("generalKey") == "ma-dai" else ("临危不乱*曹昂" if row.get("generalKey") == "cao-ang" else "经典形象*刘备"),
-            "skillName": "潜袭" if row.get("generalKey") == "ma-dai" else ("慷忾" if row.get("generalKey") == "cao-ang" else "仁德"),
-            "lineText": ("喊什么喊，我敢杀你。" if row.get("skinResourceId") == "130101" else "暗隐深处，袭敌斩首！") if row.get("generalKey") == "ma-dai" else (row["lineText"] if row.get("generalKey") == "cao-ang" else "惟贤惟德，能服于人。"),
-            "sourceUrl": row["url"],
-            "sourcePage": row.get("sourcePage") or row.get("mappingSource"),
-            "sourceEvidence": row.get("mappingEvidence") or row.get("mappingConfidence"),
-            "localPath": local,
-            "sourceSha256": sha,
-            "deliveredSha256": digest(delivered_path),
-            "sourceFormat": source.suffix.lstrip(".").lower(),
-            "deliveredFormat": delivered_path.suffix.lstrip(".").lower(),
-            "sourceBytes": row["bytes"],
-            "deliveredBytes": delivered_path.stat().st_size,
-            "durationSeconds": row["durationSeconds"],
-        }
-        if conversion:
-            asset["conversion"] = conversion
-        if row.get("generalKey") == "cao-ang":
-            asset["bindings"] = [
-                {"generalKey": "cao-ang", "skinId": "140401", "skinName": "经典形象*曹昂", "skillName": "慷忾", "lineText": row["lineText"]},
-                {"generalKey": "cao-ang", "skinId": "240401", "skinName": "临危不乱*曹昂", "skillName": "慷忾", "lineText": row["lineText"]},
-            ]
-        assets.append(asset)
-
-    if len(assets) != 206 or len({x["sourceSha256"] for x in assets}) != 206:
-        raise ValueError(f"Expected 206 distinct source SHA-256 values (204 original plus two verified Cao Ang voices); got {len(assets)}")
-    result = {
-        "schemaVersion": 1,
-        "description": "Public game audio; unmapped resources must never be selected as character/skill voice by inference.",
-        "sourceIndexes": [
-            ".artifacts/portrait-refresh/audio-cache-refresh/2026-09-26-user-listening/source-index.json",
-            ".artifacts/portrait-refresh/audio-research/source-index.json",
-        ],
-        "assets": sorted(assets, key=lambda x: x["id"]),
-    }
-    write_json_atomic(CATALOG, result)
-    print(f"Imported {len(assets)} distinct audio files; catalog: {CATALOG}")
 
 
 def read_shared(path: Path) -> bytes:
@@ -522,7 +380,7 @@ def apply_config_mapping(assets: list[dict], music: dict, characters: dict, skin
 
 def sync_cache(cache_dir: Path, refresh_mapping: bool, retry_failures: bool) -> None:
     if not CATALOG.is_file():
-        raise FileNotFoundError(f"First import must supply the verified source indexes: {CATALOG}")
+        raise FileNotFoundError(f"Restore the repository audio catalog before syncing: {CATALOG}")
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
     assets = catalog["assets"]
     observations, changed_files = scan_cache(cache_dir)
@@ -658,15 +516,11 @@ def sync_cache(cache_dir: Path, refresh_mapping: bool, retry_failures: bool) -> 
 
 
 if __name__ == "__main__":
-    if "--rebuild-from-indexes" in os.sys.argv:
-        os.sys.argv.remove("--rebuild-from-indexes")
-        main()
-    else:
-        cli = argparse.ArgumentParser(description="Sync only public web.sanguosha.com audio observed in Chrome game cache")
-        cli.add_argument("--sync-cache", action="store_true", help="Compatibility alias; sync is the default")
-        cli.add_argument("--cache-dir", type=Path,
-                         default=Path(os.environ.get("LOCALAPPDATA", "")) / "Google/Chrome/User Data/Default/Cache/Cache_Data")
-        cli.add_argument("--refresh-mapping", action="store_true")
-        cli.add_argument("--retry-failures", action="store_true")
-        options = cli.parse_args()
-        sync_cache(options.cache_dir, options.refresh_mapping, options.retry_failures)
+    cli = argparse.ArgumentParser(description=__doc__)
+    cli.add_argument("--sync-cache", action="store_true", help="Sync the audio catalog (default)")
+    cli.add_argument("--cache-dir", type=Path,
+                     default=Path(os.environ.get("LOCALAPPDATA", "")) / "Google/Chrome/User Data/Default/Cache/Cache_Data")
+    cli.add_argument("--refresh-mapping", action="store_true")
+    cli.add_argument("--retry-failures", action="store_true")
+    options = cli.parse_args()
+    sync_cache(options.cache_dir, options.refresh_mapping, options.retry_failures)

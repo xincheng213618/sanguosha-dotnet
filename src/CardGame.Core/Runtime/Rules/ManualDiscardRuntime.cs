@@ -3,7 +3,7 @@ namespace CardGame.Core;
 // The scheduler frame retains the frozen quota and all completed payments.
 // This module sequences the existing prompt, movement and command-session owners.
 [ProgramRuntimeModule]
-internal sealed class ManualDiscardRuntime(IProgramRuntimeFrames frames, INativeFrameRoutingFacts nativeFrames,
+internal sealed class ManualDiscardRuntime(IProgramRuntimeFrames frames,
     IMatchParticipantStateAccess participants, IProgramRuntimePrompts prompts, IProgramRuntimeEvents events,
     IProgramTurnQueries turn, IProgramPhaseQueries phase, IProgramBoundCardMovementOperations movement,
     IProgramMovementWindows movementWindows, IManualDiscardFacts facts,

@@ -1,26 +1,20 @@
-# 伏完：当前规则与执行入口
+# 伏完：版本与工程裁定
 
-当前人物 ID 为 `ol:fu-wan`，势力 `qun`，基础体力 4。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/fu-wan/ol/Content/ol-fu-wan.character.json)；主公加成和模式资格由实际模式处理。
+`ol:fu-wan` 的注册和可执行定义见[人物资料](../../../src/Characters/fu-wan/ol/Content/ol-fu-wan.character.json)、[技能规则](../../../src/Characters/fu-wan/ol/Skills/ordinary-fu-wan.rules.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `ol:moukui` | 谋溃 | 当你使用【杀】指定目标后，你可以选择一项：1.摸一张牌；2.弃置其一张牌。然后若此【杀】被【闪】抵消，其弃置你一张牌。 |
+No current official FAQ was supplied for the following timing/region/composition points; these are explicit engineering defaults, not claims of official rulings.
 
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `ol:moukui` | `actualSlashTargetBenefit / actual-slash-target-benefit` | `offerSlashTargetBenefit` |
-| `ol:moukui` | `slashDodgeCancelledBenefit / dodge-cancelled-settlement` | `settleDodgeCancelledSlashBenefit` |
-
-正式规则文件：
-
-- [ordinary-fu-wan.rules.json](../../../src/Characters/fu-wan/ol/Skills/ordinary-fu-wan.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](ORDINARY_OTHER_THIRTY_FOURTH_FU_WAN_ENGINEERING_DEFAULTS.md)；这些解释与官方原文分别标明。
+1. Offer once per actually finalized target of the same use. Capture every initial target before any target effect; later genuinely added targets gain their own opportunity before entering the next effect boundary. Current redirect targets are recognized through the mature typed attack; an original target's issued receipt remains historical after it is removed, but an unpaid removed target does not pay.
+2. Initial and reverse discard both use HE. The original skill owner chooses the initial target entity; the cancelling target chooses the original skill owner's entity. Foreign hands are opaque slots. No judgment-zone or private-pile payment is invented.
+3. Choosing Draw makes one genuine one-card draw attempt. If its deck yields zero actual cards, the chosen benefit still issues a debt if a genuine Jink cancellation later occurs. ActualCount remains zero; no entity or movement is invented.
+4. A generated general weapon selected by the mature HE discard chooser follows the existing global Equipment -> OutsideGame destruction. This exact native movement is accepted as the discard payment and recorded as OutsideGame, never disguised as DiscardPile or resurrected into Processing.
+5. Decline or prepayment source/participant invalidation produces no debt. Actual paid children finish without repeating payment. Paid source loss/regrant does not revoke or duplicate the original same-use obligation. Later source instances do not replace its frozen original receipt.
+6. Full required Jinks qualify only when they actually cancel this target's Slash. Bagua, legal conversions and legal supplied Jinks count. A legal Jink that cannot cancel, prohibited response, armor ineffectiveness without a Jink or incomplete multiple-Jink response does not qualify.
+7. Qualification/settlement is before the mature Qinglong and Stone Axe tail. A later Stone Axe decision may still force damage after a settled genuine Jink cancellation. Qinglong is a new actual use and gets new use-target keys. This local ordering is not presented as a proven current FAQ.
+8. The actual issuer and provider are distinct. A mature actor-replacement chain preserves its real provider and original accepted physical cost; the paid benefit keeps its issuing owner. Action-null legacy virtual uses retain the original paused producer and their real events, without invented AcceptedAction.
+9. Dead original issuer, dead cancelling chooser, winner or no legal current HE cancels/drains an unpaid settlement. Already paid rewards/discards are not rolled back. The original use and its true Processing materials clean up once.
+10. Only this capability's two unconditional standalone windows are supported; it does not compose an outer marker cost, once-per-turn usage, choice group or arbitrary trigger condition around an already issued per-target obligation.
+11. Native AI uses public relation scores and displayed equipment/self-hand values; an opaque foreign hand slot has a fixed prior 5. Initial enemy discard versus free draw uses a public hostility threshold 1.5. These are engineering heuristics, not measured win-rate claims. No hidden foreign identity or RNG is consulted.
+12. The 7000 / 7200 bridge is a joint integration requirement. Each capability maintains its own frozen visited/announced keys on the real owning CardUse frame. Mutual additions only refill missing new-capability targets; old actual-target bindings are not replayed.

@@ -1,31 +1,17 @@
-# 刘协：当前规则与执行入口
+# 刘协：版本与工程裁定
 
-当前人物 ID 为 `ol:liu-xie`，势力 `qun`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/liu-xie/ol/Content/ol-liu-xie.character.json)；主公加成和模式资格由实际模式处理。
+`ol:liu-xie` 的注册和可执行定义见[人物资料](../../../src/Characters/liu-xie/ol/Content/ol-liu-xie.character.json)、[技能规则](../../../src/Characters/liu-xie/ol/Skills/ordinary-liu-xie.rules.json)。规则依据见[来源档案](../sources/ordinary-other-thirty-third-73-source-2026-10-04.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `ol:tianming` | 天命 | 当你成为【杀】的目标后，你可以：弃置两张牌（不足则全弃），摸两张牌。若全场体力值唯一最大的角色不为你，其可以如此做。 |
-| `ol:mizhao` | 密诏 | 出牌阶段限一次，你可以交给一名其他角色所有手牌，然后令其与另一名其他角色拼点：拼点赢的角色视为对没赢的角色使用一张【杀】。 |
+Current full text is primary; the 2016 strategy only supplements distance interpretation. The current article/category is ordinary OL and IDs are ol:, despite the historical SP label.
 
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `ol:tianming` | `otherActualUseTargeted / actual-slash-target` | `discardDrawAndOfferUniqueHpPeer` |
-| `ol:mizhao` | `active / recipient-contest` | `giveAllHandAndStartRecipientPindian`、`usePindianWinnerSlash` |
-
-正式规则文件：
-
-- [ordinary-liu-xie.rules.json](../../../src/Characters/liu-xie/ol/Skills/ordinary-liu-xie.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](ORDINARY_OTHER_THIRTY_FOURTH_LIU_XIE_ENGINEERING_DEFAULTS.md)；这些解释与官方原文分别标明。
-
-## 规则来源
-
-- [ordinary-other-thirty-third-73-source-2026-10-04.json](../sources/ordinary-other-thirty-third-73-source-2026-10-04.json)
+- Tianming's unspecified discard region is HE, excluding Judgment and private piles. Required count is min(2, actual HE count), not min(2, a hand-only or freely discardable subset). Protected/source equipment remains in the actual count; if the full required cost is illegal, the option is not payable rather than silently underpaying. HE0 can really Draw2. Selection freezes card/location and atomic payment does not reselect if a card leaves.
+- Every real Slash kind qualifies; a genuine Use is distinguished from ordinary played responses. The new once-announced target set spans the current owning use, including legitimate target additions and redirected legacy target. Initial multi-target offers precede any first target effect. Dead/ineffective targets at fresh issuance have no playable candidate. Acquiring the skill after the corresponding target was already announced does not retroactively reopen the event.
+- Unique maximum uses living players' current HP after the owner cost, both actual draws and all resulting children. It does not use MaxHP or a frozen pre-draw maximum. The queried peer is frozen once; later HP changes before its answer do not retarget. Peer decline/illegal full cost cancels only that optional continuation, with no recursive search. Owner is never its own peer.
+- Source loss, owner death, selected participant death or winner cancels unissued steps after paid children drain. Paid cost/gift remains. A source dying during an already accepted winner Slash does not revoke that accepted use. There is no unattempted DrawIssued0; actual DrawCards0 is a distinct factual outcome. Fresh private prompts revalidate their original actor and complete legal tuple.
+- Mizhao with Hand0 is absent. All current Hand moves in one real Hand→foreign Hand batch; no temporary Processing or synthetic gain is introduced. Owner chooses the third party after full gift children, and is excluded along with recipient. If none remains legal, the gift and consumed phase quota remain and no contest is fabricated. A living participant with Hand0 cannot be selected for Pindian through the mature query.
+- The winner Slash ignores distance and ordinary-use limit, and does not debit the usual Slash quota. The historical 2016 strategy explicitly supports distance; quota bypass is the engineered forced-use interpretation. Ordinary card-use prohibition, target suit/color policies, ineffective target, armor, redirection and response still apply. Tie issues no Slash. Other target additions stay on the same owning use and preserve original recipient selection and the original typed return.
+- Pindian ranks and revealed cards come from the mature result. The owner never substitutes for recipient as Pindian source or for the actual winner as use actor. Public facts contain no hidden Hand entity IDs; cost IDs become public only via real discard, gift IDs stay only on private owning receipt/normal viewer projection until mature reveal.
+- Same-turn extra Play gets the mature actual-phase quota semantics, with no invented turn-wide usage state. Source instance remains precise for private/paid ownership; the existing activation quota implementation governs reacquisition, rather than a new sidecar or reset. A dropped source cannot recreate an in-flight receipt.
+- All pending list setters/constructors/with/JSON clone. The new public facts contain only scalar or all-scalar immutable records, so no new collection-bearing event projection is necessary. Trusted ResolutionStack diagnostics are not player views. Viewer snapshots and commit preparation remain the only public preparation boundary.

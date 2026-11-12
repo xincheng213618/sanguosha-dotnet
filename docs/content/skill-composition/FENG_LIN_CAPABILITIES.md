@@ -31,5 +31,3 @@ Due仅新配置在真实TurnEnded清理后、换currentSeat前进入可挂起父
 陆绩实际使用1280 `changeParticipantMarker`、1281 `consumeMarkerPreventDamage`、1282 `addMarkerSubjectNormalDraw`，事件subject橘数事实及`ProgramMarkerEventAppliedEvent`真实父事件去重。`PlayerSnapshot.Markers`沿用既有公开Name/Count，来源总量始终一致。父修复既有通用标记付款prompt缺少SkillPrompt的展示问题，使付款选择进入共享WPF控件，不修改实际付款规则。
 
 郝昭实际使用1300 `scheduleDeferredHandAlignment`、1301 `resolveDeferredHandAlignment`及opt-in `deferredTurnEndOnly`，真实TurnEnded之后的typed父续接、冻结单次delta、recipient私有实体选择；`PlayerSnapshot.DeferredHandAlignments`仅投影recipient公开待办，null省略。来源存在与enabled分离，压制不提前取消due。父补OtherLiving选人及owner/own Ending静态契约，保留精确runtime父帧、grant和游标核验。
-
-配置字段、操作和入口能力见[当前技能配置](RUNTIME.md)；程序续接和帧权限见[结算协议](../../RESOLUTION_PROTOCOLS.md)。

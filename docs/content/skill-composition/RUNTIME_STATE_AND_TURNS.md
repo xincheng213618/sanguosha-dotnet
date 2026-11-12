@@ -18,6 +18,14 @@
 
 `changeAttributedMarker` 等归属标记保留拥有者/施加者来源，公开快照可只显示合计。候选选择、到期和清理读取对应来源，多个同名技能不会互相覆盖或清除。
 
+## 派生技能与化身的版本
+
+配置以稳定 ID 绑定派生技能的具体版本。官网 `font` 数字是技能引用，不能用来拼接武将详情页。界关兴张苞获授的武圣和咆哮以实际配置为准，持有、来源及技能实例资格各自保留。[界关兴张苞资料](../../../src/Characters/guan-xing-zhang-bao/boundary/Content/boundary-guan-xing-zhang-bao.character.json) · [派生技能来源](../sources/fenglin-thirty-first-current-grant-followup-2026-10-04.json)
+
+经典于吉和普通 OL 界于吉的蛊惑、同时质疑与缠怨按各自版本核对。2020 年界于吉公告只证明对应版次。[经典于吉资料](../../../src/Characters/yu-ji/classic/Content/classic-yu-ji.character.json) · [界于吉公告](https://www.sanguosha.com/news/20200101_3308_3113)
+
+普通 OL 界左慈的主文支持初始三张化身及至多换两张。2019 年公告明示限定、觉醒和主公技排除，2021 年调整公告记录其当时的范围。实现界版仍需核实当前完整随机池、排除继承、展示替换及回收、重复和耗尽规则。经典版使用自己的池和数量。[经典左慈资料](../../../src/Characters/zuo-ci/classic/Content/classic-zuo-ci.character.json) · [界左慈当前原文](../sources/fenglin-thirty-second-447-source-2026-10-04.json) · [历史范围依据](../sources/fenglin-thirty-second-447-scope-followup-2026-10-04.json)
+
 ## 摸牌计划与选择组
 
 `DrawPhaseStarting` 相关触发可选择加量计划或替代正常摸牌。成功替代终止相应后续候选并跳过普通摸牌，跳过替代继续剩余候选与一次正常摸牌。动态数值、亮牌、私有子集及牌堆顺序都属于原计划帧。

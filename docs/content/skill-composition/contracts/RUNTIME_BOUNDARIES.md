@@ -1,8 +1,7 @@
 # Runtime boundaries
 
 Required when changing these mechanisms or their consumers. See the
-[contract index](README.md) for related topics and the
-[capability map](../CAPABILITY_MAP.md) for completion status and remaining gaps.
+[contract index](README.md) for related topics.
 
 ## Validation and dependency direction
 

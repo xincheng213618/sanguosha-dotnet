@@ -1,33 +1,16 @@
-# 界李儒：当前规则与执行入口
+# 界李儒：版本与工程裁定
 
-当前人物 ID 为 `boundary:li-ru`，势力 `qun`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/li-ru/boundary/Content/boundary-li-ru.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:li-ru` 的注册和可执行定义见[人物资料](../../../src/Characters/li-ru/boundary/Content/boundary-li-ru.character.json)、[技能规则](../../../src/Characters/li-ru/boundary/Skills/boundary-li-ru.rules.json)。规则依据见[来源档案](../sources/fenglin-twenty-seventh-642-source-2026-10-04.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `boundary:mieji-current` | 灭计 | 出牌阶段限一次，你可以将一张锦囊牌置于牌堆顶并令一名有手牌的其他角色选择一项：1.弃置一张锦囊牌；2.依次弃置两张牌。 |
-| `boundary:fencheng-current` | 焚城 | 限定技，出牌阶段，你可以选择一名其他角色开始，令所有其他角色依次选择一项：1.弃置任意张牌（须比上家弃置的牌多）；2.受到你造成的2点火焰伤害。 |
-| `boundary:juece-current` | 绝策 | 结束阶段，你可以对一名手牌数小于等于你的其他角色造成一点伤害。 |
+当前正文没有官方FAQ补充，以下是工程默认，不能写成官网明确裁定：
 
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `boundary:mieji-current` | `active / topdeck-trick` | `captureSelectedCards`、`moveBoundCards`、`chooseCategoryOrSequentialDiscard` |
-| `boundary:fencheng-current` | `active / chosen-start-fire-walk` | `escalatingDiscardOrDamageFromSelected` |
-| `boundary:juece-current` | `turnEnding / damage-not-more-hand` | `selectTarget`、`damage` |
-
-正式规则文件：
-
-- [boundary-li-ru.rules.json](../../../src/Characters/li-ru/boundary/Skills/boundary-li-ru.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_TWENTY_SEVENTH_LI_RU_DEFAULTS.md)；这些解释与官方原文分别标明。
-
-## 规则来源
-
-- [fenglin-twenty-seventh-642-source-2026-10-04.json](../sources/fenglin-twenty-seventh-642-source-2026-10-04.json)
+1. 灭计置顶材料为自己手牌里的真实锦囊实体，类别沿物理牌目录，包括普通和延时锦囊（例如闪电）。不沿经典黑色限制，不从装备/判定区选置顶材料；已付置顶真实ledger保留，付款孩子失技/源死亡或受迫者死亡只取消未付后继。
+2. 灭计弃牌和焚城弃牌区域使用HE，不包含判定区。新可弃查询排除现有受保护实体及当前技能装备来源；只给真正选择者本人私有牌名与ID。
+3. 灭计显式选择两张分支后，第一张可为锦囊。每次弃置各自完整结算，再读取下一次当前HE；第一次孩子后牌不足只停止未完成弃置，既有付款不返还。无牌的锦囊分支不公布；两张分支只要当前有一张合法HE就允许，并可能实际只能弃一张。这是当前正文未详列的不足默认。
+4. 焚城选择的起始必须为存活其他角色；冻结从该席顺座次绕环、排除自己的一整轮座次，每席最多处理一次。轮到已死角色直接跳过，维持上一实际处理角色的阈值；此前死者若在轮到前已复活，则按当时真实状态参与。初始上家实际弃数0。伤害分支（包括伤害被防止）把下一门槛重置为1，而非沿上家的旧弃数。
+5. 焚城弃牌分支只在当前合法HE数足以超过上家时可完成；私有选择期间不移动牌，确认后按同一冻结实体与区域整批提交。下一门槛用该次实际原HE→弃牌目的地的ledger数量；通用武器移出游戏按成熟规则计为真正已弃实体。付款孩子得到或失去牌不重算这次已付数量。
+6. 来源或原实例失效、源死亡、已定胜负均停止未付后续参与者；已付弃牌/伤害子树先返回并保留真实事实。目标死亡只跳过该目标，不转换伤害来源、限定usage或选中起始。限定使用沿原成熟精确Game usage，不退款。
+7. 绝策在当前结束阶段真正选择目标时，按真实公开手牌数比较；Earlier Ending孩子可能改变公开数量。选择提交后二者数量变化不撤销已接受伤害。包括零手牌；不读取他人牌名。额外实际回合有自己的Ending，不按自然轮推测。
+8. 判定为锦囊沿成熟物理牌类别；永久身份转换对这一类别是否另作处理尚无当前FAQ证据。新规则不会把实体置顶解释成使用锦囊，不占锦囊 Use 历史，也不产生无懈响应。

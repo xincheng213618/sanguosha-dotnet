@@ -16,6 +16,8 @@
 
 `ProgramInstructionResolver` 按不可变定义缓存 `ProgramExecutionPlan` 与指令特征。计划不保存对局状态。`SkillProgramExecutor` 从 `ProgramSkillFrame` 的已提交游标执行，结果为继续、等待选择或等待子结算；宿主负责帧写入、原生状态操作与完成返回。
 
+候选由宿主生成并冻结。选择命令按 `PromptId`、revision、决定者及精确 `ChoiceId` 校验，保留牌、目标及其顺序和配对。用牌上下文分别冻结使用者、提供者、响应者、有效牌面和实体原位置，按原生动作判定实际使用与响应。
+
 ## 时机与查询
 
 触发规则使用明确窗口。回合、阶段、移动、伤害、体力变化、用牌、响应、判定、濒死及死亡由所属原生机制提供冻结上下文。`ProgramEntryCapabilities` 声明入口提供的 `Damage`、`CardAction`、`Judgment`、`DrawPlan`、`Pindian` 等能力，加载时据此拒绝无上下文的条件与操作。
@@ -67,7 +69,6 @@
 ## 开发入口
 
 - [人物模块与注册](CHARACTER_MODULES.md)：目录、注册表和各扩展属性。
-- [技能组合定义与执行](SKILL_COMPOSITION_DESIGN.md)：作者需要的加载及运行契约。
 - [当前技能配置](content/skill-composition/RUNTIME.md)：现用配置字段与能力。
 - [运行时状态与调度](RUNTIME_REFACTOR_IMPLEMENTATION.md)：帧、提交及返回边界。
 - [核心控制模块](CORE_CONTROL_DESIGN.md)：命令、牌区、投影和恢复。

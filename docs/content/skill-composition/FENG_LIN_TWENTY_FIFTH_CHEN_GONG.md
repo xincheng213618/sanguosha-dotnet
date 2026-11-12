@@ -21,10 +21,6 @@
 - [boundary-chen-gong.rules.json](../../../src/Characters/chen-gong/boundary/Skills/boundary-chen-gong.rules.json)
 - [classic-chen-gong.rules.json](../../../src/Characters/chen-gong/Skills/classic-chen-gong.rules.json)
 
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
 ## 工程默认
 
 1. The selection uses printed Slash/equipment identity and the already-issued intrinsic hand Alcohol-as-Slash policy. Optional Wusheng or other selectable ViewAs conversions are not intrinsic entity identity. Nontransferable general weapons are excluded only in the new 5100 selection/payment path. Historical classic selection remains unchanged.

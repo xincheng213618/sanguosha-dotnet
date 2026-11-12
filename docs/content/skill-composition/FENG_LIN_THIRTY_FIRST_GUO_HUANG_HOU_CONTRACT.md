@@ -1,27 +1,18 @@
-# 界郭皇后：当前规则与执行入口
+# 界郭皇后：版本与工程裁定
 
-当前人物 ID 为 `boundary:guo-huang-hou`，势力 `wei`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/guo-huang-hou/boundary/Content/boundary-guo-huang-hou.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:guo-huang-hou` 的注册和可执行定义见[人物资料](../../../src/Characters/guo-huang-hou/boundary/Content/boundary-guo-huang-hou.character.json)、[技能规则](../../../src/Characters/guo-huang-hou/boundary/Skills/boundary-guo-huang-hou.rules.json)。规则依据见[官方新品公告](https://www.sanguosha.com/news/20260612_7102_0710)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `boundary:jiaozhao-round-current` | 矫诏 | 出牌阶段限一次，你可将一张牌当本轮未有角色使用过的基本或普通锦囊牌使用。修改一：每轮限一次，你可将一张牌当任意基本牌或普通锦囊牌使用。修改二：每轮限一次，你可视为使用一张基本牌或普通锦囊。 |
-| `boundary:danxin-capped-current` | 殚心 | 当你受到伤害后，你可摸X张牌，然后修改“矫诏”（X为你修改“矫诏”的次数）。 |
+以下为当前普通 OL 实现采用的工程默认，与官方正文和 FAQ 分别标明。
 
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `boundary:jiaozhao-round-current` | `viewAs` | 规则文件中的显式过滤、状态与策略 |
-| `boundary:danxin-capped-current` | `afterDamageApplied / draw-before-modification / perDamage` | `drawBeforeCappedConversionTierUpgrade` |
-
-正式规则文件：
-
-- [boundary-guo-huang-hou.rules.json](../../../src/Characters/guo-huang-hou/boundary/Skills/boundary-guo-huang-hou.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_THIRTY_FIRST_GUO_HUANG_HOU_DEFAULTS.md)；这些解释与官方原文分别标明。
+- 成功修改次数和level封顶2；满级殚心可真实Draw2，不再修改或增次数。不从“两级列表”推导为官方最大次数。
+- X冻结于殚心发行点，以已完成成功修改为准；DrawX所有原孩子返回以后再进行尚未发行且有效的修改。X0没有实际Draw/movement事实，但0→1合法。
+- source失效只取消尚未发行的修改，已真实摸牌/成本/孩子不回滚。owner死/胜负确定排空已发孩子、取消未发动作。已接受矫诏Use冻结资格，不按付款后的shard重新反悔。
+- 初始矫诏本人actualPlay每phase一次，合法HE一实体；牌区正文只说一张牌，HE为明确默认。level1/2共享owner+skill+state Round一次，额外turn不推进Round，额外Play不刷新Round额度。
+- tier依成熟永久owner/skill/独立state继承，来源移除/重获新instance不刷新层级或Round额度。并存来源不叠加相同技能状态/额度。
+- Level0牌名可用性基于本trueRound所有角色真实Use的effectiveKind；查询按成熟ProgramBasicCardName把三种Slash归为同名“杀”，公开事实保留真正effectiveKind。此元素Slash同名口径属于未核FAQ默认。声明/材料printedKind或普通打出不计。Nullification为真实Use，有原窗口/Action/actor/provider/responder证明；本人防御Slash的真正Dodge Use计名，包含原生实体、其他转换及八卦；群体Dodge、供牌和Slash打出不凭裸facts计Use。
+- level2真0材料Use无materialcardId、无伪Hand/Processing移动，原动作普通目标/距离/额度/防具/有效颜色限制照常；不是无限无距虚拟Slash。
+- 满级矫诏的零实体火攻保留实际 `CardUse`。按火攻本身的手牌同花色费用或允许的手牌／装备同颜色费用真实付款，结清移牌子窗口后才造成火焰伤害。伤害句柄的 `Card` 为 `null`，实体费用由原付款记录保存。完成端核对原用牌、来源、额度、目标和付款，待顺序目标、连环和类型化子返回结清后只完成一次。[付款与伤害归属](../../../src/CardGame.Core/EngineOwners/CoreGameEngineTieredRoundZeroReturnsRuntime.TieredRoundZeroReturns.cs) · [原生完成](../../../src/CardGame.Core/EngineOwners/CoreGameEngineTieredRoundZeroUsesRuntime.TieredRoundZeroUses.cs)
+- 修改后动作只在原生合法使用时点发行；Round 份额、零实体使用、失技/死亡和满级行为分别按准确生产入口校验。普通打出响应不自动授权新的使用动作。
+- 所有公共事件集合须显式冻结；所有pending集合构造/init/with/JSON均克隆只读；私有material与opaqueHand不得进入公开usage事实或AI隐藏ID推断。

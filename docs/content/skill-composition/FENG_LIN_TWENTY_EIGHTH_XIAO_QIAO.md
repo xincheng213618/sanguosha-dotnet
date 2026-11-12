@@ -1,29 +1,17 @@
-# 界小乔：当前规则与执行入口
+# 界小乔：版本与工程裁定
 
-当前人物 ID 为 `boundary:xiao-qiao`，势力 `wu`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/xiao-qiao/boundary/Content/boundary-xiao-qiao.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:xiao-qiao` 的注册和可执行定义见[人物资料](../../../src/Characters/xiao-qiao/boundary/Content/boundary-xiao-qiao.character.json)、[技能规则](../../../src/Characters/xiao-qiao/boundary/Skills/boundary-xiao-qiao.rules.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `boundary:hongyan` | 红颜 | 锁定技，你的黑桃牌和黑桃判定牌视为红桃牌。若你的装备区里有红桃牌，你的手牌上限等于体力上限。 |
-| `boundary:tianxiang` | 天香 | 当你受到伤害时，你可以弃置一张红桃牌防止之并选择一项，令一名其他角色：1.受到伤害来源的1点伤害并摸X张牌（X为其已损失体力值且至多为5）；2.失去1点体力并获得你弃置的牌。 |
-| `boundary:piaoling` | 飘零 | 结束阶段，你可以判定，若结果为红桃，你将判定牌置于牌堆顶或交给一名角色，若该角色是你，你弃置一张牌。 |
+- Tianxiang accepts real held Hand/Equipment effective-Heart cards; arbitrary viewAs declarations do not change a gift/payment entity's identity. Its active source equipment and general-weapon placeholder are excluded from discard choices.
+- The original source seat is frozen even if that source subsequently dies. A source-less original damage creates fresh source-less Normal damage. Fresh damage is Normal (the text says a new one-point damage, not transfer of the original nature). It is still subject to recipient prevention, armor and dying rules; reward draw follows actual completion even if that one-point damage was prevented.
+- A paid cost keeps the original damage prevented. If its owner/source instance disappears during payment children, the already chosen live recipient benefit continues from the paid receipt; no second payment or refund occurs. Winner completion suppresses new effects after obligations already issued are drained.
+- Reward draw freezes live lostHP after the fresh damage completes, at most five; a dead recipient gets no draw. Short deck uses actual DrawCards/reshuffle behavior and records actual movement count.
+- The loseHP branch retains its chosen recipient through real Dying/death. A dead recipient gets no gift. An original cost claimed elsewhere during payment observers is never resurrected or replaced with another card.
+- Piaoling selects living recipients, including self. Effective Heart is frozen by the actual finalized judgment. If another judgment observer claims the original card, placement stops; another deck card is not substituted. Decktop placement leaves the original public judgment identity public while the rest of the deck stays hidden.
+- Self-gift waits for its real gain children before prompting actual HE discard. If no legal HE remains, the discard tail completes with zero; the earlier self-gift is not undone. Later loss of the source cannot duplicate either move. On a failed/absent judgment result the usual result cleanup remains responsible.
 
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `boundary:hongyan` | `cardPolicies` | 规则文件中的显式过滤、状态与策略 |
-| `boundary:tianxiang` | `beforeDamageApplied / prevent-and-benefit` | `discardSuitPreventDamageAndBenefit` |
-| `boundary:piaoling` | `turnEnding / ending-heart-placement` | `startJudgment`、`placeMatchedJudgmentCard` |
-
-正式规则文件：
-
-- [boundary-xiao-qiao.rules.json](../../../src/Characters/xiao-qiao/boundary/Skills/boundary-xiao-qiao.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_TWENTY_EIGHTH_XIAO_QIAO_DEFAULTS.md)；这些解释与官方原文分别标明。
+- The exact-equipment hand-limit policy is a final stage after ordinary finite modifier arithmetic, so additional hand-limit bonuses do not turn “equals MaxHP” into “MaxHP plus bonuses.” No matching equipment leaves the old query object/result untouched.
+- A selected foreign equipment protected against discard, an active source equipment and a generated/general-weapon placeholder cannot be offered as an otherwise illegal cost. Ordinary actual HE material retains its existing effective-suit query; no arbitrary viewAs declaration changes cost legality.
+- The private pending cost remains solely in trusted owning-frame diagnostics until the entity is actually discarded; scalar public payment facts are emitted after that public movement. Original source/null-source and chosen recipient remain frozen, while draw count uses the recipient's live HP only after the new damage returns.

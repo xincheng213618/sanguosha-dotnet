@@ -19,6 +19,7 @@ import hashlib
 import json
 import re
 import struct
+import sys
 import time
 from pathlib import Path
 from urllib.parse import urlparse
@@ -30,7 +31,6 @@ from bs4 import BeautifulSoup
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "src/CardGame.Wpf/Assets"
 CATALOG = ROOT / "docs/content/general-art-catalog.json"
-FAILURES = ROOT / "docs/content/general-art-download-failures.json"
 HEROES = ROOT / ".artifacts/portrait-refresh/heroes.json"
 
 # Explicit hero IDs avoid accidentally using an SP, boundary, god, or mou variant.
@@ -438,7 +438,7 @@ def main() -> None:
         if missing:
             parser.error(f"Keys unavailable in {args.phase} phase: {sorted(missing)}")
         targets = {key: gid for key, gid in targets.items() if key in only_keys}
-    def process(target: tuple[str, int]) -> tuple[str, dict, list[dict]]:
+    def process(target: tuple[str, int]) -> tuple[str, dict]:
         key, gid = target
         page_items = (ol_page_skins(gid, CURRENT_HEROES[key][1]) if key in CURRENT_HEROES else
                       ol_page_skins(gid, "界" + OL_HEROES[key][1]) if args.phase == "ol" else page_skins(gid))
@@ -447,7 +447,6 @@ def main() -> None:
                           OL_HEROES[key][1] if args.phase == "ol" else heroes[gid]["name"])
         entry = entries.get(key, {"key": key, "characterName": character_name, "defaultSkinId": canonical["id"], "skins": []})
         known = {skin["id"]: skin for skin in entry["skins"]}
-        errors = []
         selected = [canonical] if args.phase == "classic" else page_items
         for skin in selected:
             existing_default = ASSETS / f"official-{key}.png"
@@ -460,26 +459,23 @@ def main() -> None:
                     record = save_image(path, skin)
                     known[skin["id"]] = record
                 except (requests.RequestException, ValueError, OSError) as exc:
-                    errors.append({"key": key, **skin, "error": str(exc)})
+                    print(f"{key}/{skin['id']}: {exc} ({skin['imageUrl']})", file=sys.stderr, flush=True)
         entry["skins"] = list(known.values())
-        return key, entry, errors
+        return key, entry
 
-    failures = json.loads(FAILURES.read_text(encoding="utf-8")) if FAILURES.exists() else []
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
         futures = {pool.submit(process, target): target[0] for target in targets.items()}
         for future in concurrent.futures.as_completed(futures):
             try:
-                key, entry, errors = future.result()
+                key, entry = future.result()
             except Exception as exc:
-                failures.append({"key": futures[future], "error": str(exc)})
+                print(f"{futures[future]}: {exc}", file=sys.stderr, flush=True)
                 continue
             entries[key] = entry
-            failures.extend(error for error in errors if error not in failures)
             print(f"{key}: {len(entry['skins'])} skin(s)", flush=True)
             catalog["entries"] = [entries[k] for k in sorted(entries)]
             CATALOG.parent.mkdir(parents=True, exist_ok=True)
             CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-            FAILURES.write_text(json.dumps(failures, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

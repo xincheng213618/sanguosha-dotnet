@@ -1,8 +1,7 @@
 # Card-use legality and issued requests
 
 Required when changing these mechanisms or their consumers. See the
-[contract index](README.md) for related topics and the
-[capability map](../CAPABILITY_MAP.md) for completion status and remaining gaps.
+[contract index](README.md) for related topics.
 
 ## Target eligibility and action restrictions
 
@@ -27,6 +26,8 @@ Required when changing these mechanisms or their consumers. See the
 - Slash-request offer permissions and accepted-use permissions declare source loss and owner death independently. `OwnsAcceptance` is a fact read, not permission to create another use. The first actual execution checks its declared permissions, then retains its original accepted actor and target independently of legitimate native role or target changes. Source business reads the exact original parent and the real native action, provider and materials; shared request queries never reconstruct character Prepare or issuance histories.
 
 - Requested Slash rights use the shared permission matcher. Keep prospective distance separate from physical-Slash-only issued distance, request targets separate from broader declared quota audiences, and candidate Slash quota separate from actual debit exemptions. Generic Play suppliers retain the exact accepted request's base count flag; the Play transport does not turn a forced use into ordinary quota consumption, while an independent producer keeps its own explicit count contract. A genuine paid producer that returns without a use records one typed request failure, never a fake CardUse or declaration. The default failure policy cancels the binding; explicit `ResumeOriginalInstruction` returns through the declared ChoiceResult/FixedTarget protocol or the source's actual business owner. Consume a failure once before releasing its attempt for a permitted retry, and keep original costs paid.
+
+- `CoreGameEngineAssistedPhysicalCardsRuntime` still initializes fixed-target requests through 移动姜维 and 复掠. Once issued, `GetOffer` answers continuing eligibility. The cardless request menu still includes 谋 OL 小乔's material entry. Preserve actual material and distance rules as their own boundaries when replacing the remaining producer wiring. Directed rights also retain separate 郭汜 Pact and 移动惴恐 distance contributions.
 
 ## Response materials and action-query snapshots
 

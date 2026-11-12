@@ -70,4 +70,4 @@
 - 势典韦页面未填经典体力，其余 42 名均已核对体力值。
 - 体力为各武将页“经典体力”字段；同名武将的其他版本（谋、神、欢乐等）不属于兵势篇。
 - 名单随官方上新更新；再次核对时可沿用 BWIKI `api.php?action=ask` 的 `[[武将包::兵势篇-*]]` 查询。
-- 2026-10-26 复核：40 名已接入（见 `docs/content/sources/mobile-shi-expansion-roster.md` 与各 `src/Characters/*/mobile-shi/` 目录）；势典韦、势文丑、势颜良页面仍为“仅存在技能名爆料”的占位状态，且官网 `hero-list.html` 的 24 名“势·”武将中无此三人，暂无可实现来源。爆料版武将当前共用 BWIKI 占位立绘（高翔、黄崇、黄权同图），待官方上新后刷新。
+- 已注册版本查 `src/Characters/*/mobile-shi/`。2026-10-26 的核对中，势典韦、势文丑、势颜良仅有技能名爆料，官网列表未出现这三人。高翔、黄崇、黄权的爆料版共用 BWIKI 占位立绘，更新时按具体版本核对。 [历史核对记录](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/mobile-shi-expansion-roster.md)

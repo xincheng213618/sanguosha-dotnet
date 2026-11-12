@@ -45,5 +45,3 @@ red分支获得被展示的那张真实Hand实体，完成gain/loss children后�
 目标自行选择是否弃一张与最终判定花色一致的本人HE牌。必须实际弃置并完成movement children后才解除此当前目标这张杀的Dodge取消限制；没有同suit/拒绝/付款实际失败则不能抵消此杀，不能以选择文本当付费。有效Suit在本人的当前区域查询；真实HE可以包含装备（付掉装备后其能力不再存在），不强限Hand。各target拥有确切typed parent、judgment返回、付款cursor；多目标和恢复只提示/判定/付款一次，不为另一目标解除禁令。
 
 “不能抵消此杀”沿真实Dodge抵消能力实现，保留Renwang免疫等原本不是Dodge抵消的效果；不能把它扩大成任何响应禁令、强行伤害或所有伤害防止失效。成功支付后真实Dodge/八卦判定按余下装备与锁定技资格正常；失败禁止八卦Dodge抵消等同效用途，但不阻止非抵消转移等已有规则。source死亡/失去后已 issued suppression仍到当前回合末，所属真实杀卡返回和支付movement child只结算一次。
-
-配置字段、操作和入口能力见[当前技能配置](RUNTIME.md)；程序续接和帧权限见[结算协议](../../RESOLUTION_PROTOCOLS.md)。

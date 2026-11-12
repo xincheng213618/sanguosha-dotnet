@@ -1,31 +1,17 @@
-# 界张昭张纮：当前规则与执行入口
+# 界张昭张纮：版本与工程裁定
 
-当前人物 ID 为 `boundary:zhang-zhao-zhang-hong`，势力 `wu`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/zhang-zhao-zhang-hong/boundary/Content/boundary-zhang-zhao-zhang-hong.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:zhang-zhao-zhang-hong` 的注册和可执行定义见[人物资料](../../../src/Characters/zhang-zhao-zhang-hong/boundary/Content/boundary-zhang-zhao-zhang-hong.character.json)、[技能规则](../../../src/Characters/zhang-zhao-zhang-hong/boundary/Skills/boundary-zhang-zhao-zhang-hong.rules.json)。规则依据见[来源档案](../sources/fenglin-twenty-ninth-563-source-2026-10-04.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `boundary:zhijian` | 直谏 | 出牌阶段，你可以将一张装备牌置于其他角色的装备区（替换原装备），然后摸一张牌。 |
-| `boundary:guzheng` | 固政 | 每阶段限一次，当其他角色的至少两张牌因弃置置入弃牌堆后，你可以令其获得其中一张牌，然后你可以获得剩余牌。 |
-
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `boundary:zhijian` | `active / place-equipment` | `captureSelectedCards`、`placeCapturedEquipmentAndDraw` |
-| `boundary:guzheng` | `discardPileReceived / restore-actual-discard-batch` | `restoreActualDiscardBatch` |
-
-正式规则文件：
-
-- [boundary-zhang-zhao-zhang-hong.rules.json](../../../src/Characters/zhang-zhao-zhang-hong/boundary/Skills/boundary-zhang-zhao-zhang-hong.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_TWENTY_NINTH_ZHANG_ZHAO_ZHANG_HONG_DEFAULTS.md)；这些解释与官方原文分别标明。
-
-## 规则来源
-
-- [fenglin-twenty-ninth-563-source-2026-10-04.json](../sources/fenglin-twenty-ninth-563-source-2026-10-04.json)
+- Equipment payment uses actual physical HE equipment kind, not an arbitrary view-as offer. Active source equipment and generated general weapons cannot be selected as the cost. Replacing a generated target weapon uses the mature outside-game normalization; ordinary replaced equipment enters DiscardPile with equipment-replace reason and is not a true discard for Guzheng.
+- Placement completes the original replacement and entry before its observers, matching the mature captured-equipment operation. A child does not cause re-selection/re-placement. After payment, source loss does not refund the equipment; live owner may finish Draw1, winner/dead owner suppress unissued draw after existing obligations drain.
+- Guzheng reads a single original owner's distinct actual HEJ true-discard cohort in the same completed batch; physical card-use/response cleanup, recast, equipment replacement, death cleanup and non-discard moves are excluded. This includes genuine Processing-mediated discards only when mature origin classification proves the original owner and reason.
+- At least two original entities qualify the event; there must also still be a legal original entity to return. The optional return is to the original living discard owner. Once returned, the benefit continues despite skill loss while the holder lives; claimed/moved originals are omitted, never substituted or resurrected.
+- Actual phase quota belongs to owner+skill+stateId+phase token, not binding instance. Successful actual return is the consumption point. Each new actual phase, including an extra same-kind phase, has a distinct token. An inserted phase's typed return restores the exact interrupted Preparation or normal Draw token and retains any prior consumption of that token; it does not issue another token. Known fully skipped Judgment/Draw/face-down phases receive no new token. A phase that actually opens its starting window owns its genuine starting costs even when that window subsequently skips the remaining phase. A skipped Play/Discard start therefore differs from a phase never entered.
+- Returning to self is disallowed by current other-character text. Multiple qualifying owners in one batch retain distinct ordered opportunities, subject to the same one-per-phase quota. Remaining originals are claimed as one atomic batch so mature per-source-owner gain counting remains correct.
+- No hand IDs are exposed before discard. Both original discarded cohort and equipment-entry/replacement are public physical entities; private native choices see only the holder's own costs and public discarded cards. Published choices, receipt collections and collection-bearing events require readonly backing plus explicit init cloning and committed event projection.
+- Deck shortage draws the actual count. Death or winner suppresses unissued benefits; completed costs/returns and their already-issued children remain exact and unrepeated.
+- A qualifying offer is tied to its frozen completed batch and actual phase, not to whichever phase/actor a later child happens to expose. Living source and holder plus exact source instance/material/target are rechecked before unissued payment. After return, the already-consumed opportunity is not refunded by source death, source loss or another card's departure; remaining still-discarded entities may be claimed while the holder lives. Recipients cannot be replaced by a different role.
+- Actual damage issued by a paid gain/HP observer is a real native ProgramAttack/Damage/Dying chain. The local typed proof admits its exact Dying entry/self-response and existing Peach/Alcohol tails; it does not convert that damage to loss of HP or allow an unrelated damage parent.
+- These decisions are explicit engineering defaults based on the current ordinary OL text. These details are engineering defaults rather than an official complex FAQ.

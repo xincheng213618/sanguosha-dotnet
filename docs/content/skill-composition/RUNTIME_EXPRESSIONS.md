@@ -53,7 +53,7 @@
 
 `skillGrants[].while` 也使用同一表达式，参与者限 owner、量词 it 及 living/livingOthers，不允许帧绑定、选项、事件参与者或签发窗口事实。条件成立且精确父来源有效时，唯一物化器授予叶技能；条件退出只移除该派生来源，再次成立保留原实例。`ruleWounded` 复用现有规则受伤权威，不能用 Hp<MaxHp 替代；`equipmentSuitCount` 在当前求值已合格的独立改写来源上计算，不回最终技能绑定查询。两者可能依赖技能来源，受体持续限制的 raw while 不接受它们，避免自递归；效果及条件授予可用。公共堆数是 raw 事实，已知空堆返回 0，缺少参与者或读取能力则未知，不按同名技能猜同一实例。
 
-完整来源、调用续接策略和迁移范围见[条件授予的统一实现](CAPABILITY_MAP.md#条件授予的统一实现)。
+条件授予的来源与调用续接见[技能状态契约](contracts/SKILLS_AND_STATES.md#skill-changes-and-availability)。
 
 ## 按回合和时点读取真实用牌
 

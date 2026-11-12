@@ -15,6 +15,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Source-dependent skill grants use declared `skillGrants` conditions, exact `ConditionalSource` relations and `ConditionalSkillGrantRuntime`; `SkillAvailability` interprets their eligibility for both reads and synchronization. Retain independent grants and the original dependent instance across condition exits. Source-loss invocation permission stays on the original frame, separately from ongoing source eligibility; recipient restriction conditions must not recurse through source-dependent skill queries.
 
+- Remaining source migrations include projected lord skills, private skill libraries and Guandu's printed-grant qualification. Guandu retains the printed grant and evaluates the recipient's current effective faction as a separate condition. Awakening and limited skills still include source-specific eligibility and once-only tracking. Reuse shared skill mutations for their effects and preserve their distinct consumption boundaries.
+
 ## Applied state lifetimes
 
 - Applied states outlive their caster and original skill. After application, evaluate the recipient's declared conditions, lifetime and removal rules; do not revoke a state merely because its caster died or lost the skill. Source qualification controls new applications and future windows; it does not requalify an already applied state. Read HP through the existing match health query, including its mode conversions and selected health receipts.
@@ -65,3 +67,5 @@ card generation and some numeric hand-limit contributions.
 - Judgment-area attachments use the shared attachment fact and physical movement lifetime. Slot occupancy is separate from delayed-card identity; direct judgment-area transfers preserve it, leaving ends it, and source loss does not revoke an issued attachment. Character code does not rebuild slot or payment proof ledgers.
 
 - Generated equipment uses `EquipmentCardOrigin` and `EquipmentDestinationPolicy` through `GeneratedEquipmentRuntime`; random pile selection, private generation offers and native placement reuse the equipment composition nodes. Equipment's own entry/departure triggers declare `ownEquipmentOnly`; departing sources freeze before movement and reuse `ProgramInvocationAuthorization` on the owning movement window, never a replacement skill grant or character ledger.
+
+- Use `offerGeneratedEquipment`, `selectRandomPileEquipment` and `placeBoundEquipment` for the Pu Yuan composition. Keep destruction on actual discard entry distinct from shop equipment destruction on leaving Equipment. `equipment.destroyedThisTurn` counts actual destruction batches through the movement journal. Random placement into an empty slot and actual equipment use keep their native qualification. Generic JSON placement for Judgment attachments remains a separate gap.

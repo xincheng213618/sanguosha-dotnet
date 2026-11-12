@@ -1,9 +1,0 @@
-# Engineering defaults, not an official FAQ
-
-The death-benefit operation retains the selected beneficiary and exact original death parent throughout paid child resolutions.
-
-- The original dead owner's Death/Dying and original attack remain in place. Only the already-dead victim's exact proven original Dying is filtered from active resolution while the owning benefit program exists. Its parent window, candidate index, responder cursor, attempted bindings, turn and original attack identity are frozen and attested by one scalar fact hash.
-- Actual Draw3 movement, short-deck actual counts, beneficiary gain observers and actual Recover1/replacement observers drain before the next instruction. Source death is expected in OwnerDied. Original skill instance and issuance are retained; the beneficiary cannot be substituted. A dead beneficiary cancels the remaining unpaid instruction, retaining already-issued cards and facts. Winner cancellation finishes paid descendants and the typed return.
-- A normal configured damage observer may start real nested damage after the exact original benefit's movement/recovery. Damage preserves current source, amount, nature, redirection and chain propagation through the mature producer. The added admission requires the real paid subtree, not any ancestor with a receipt.
-- HP-loss Dying, actual damage Dying, DyingEntering, SelfDyingResponse, physical/multi-material response Peach and existing bound/zero-entity Alcohol use preserve their actual actors, providers, materials and typed return. The original Dying is restored to active visibility when the owning root is popped, without rewriting it.
-- A second live victim's Dying while another live rescue target is still pending remains rejected by the existing engine. The new filter does not hide live victims. The capability does not provide a generalized concurrent-Dying scheduler.

@@ -1,32 +1,14 @@
-# 灵雎：当前规则与执行入口
+# 灵雎：版本与工程裁定
 
-当前人物 ID 为 `ol:ling-ju`，势力 `qun`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/ling-ju/ol/Content/ol-ling-ju.character.json)；主公加成和模式资格由实际模式处理。
+`ol:ling-ju` 的注册和可执行定义见[人物资料](../../../src/Characters/ling-ju/ol/Content/ol-ling-ju.character.json)、[技能规则](../../../src/Characters/ling-ju/ol/Skills/ordinary-ling-ju.rules.json)。规则依据见[来源档案](../sources/ordinary-other-thirty-third-74-source-2026-10-04.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `ol:jieyuan` | 竭缘 | 当你对其他角色造成伤害时，若其体力值不小于你，你可以弃置一张黑色手牌令此伤害+1；当其他角色对你造成伤害时，若其体力值不小于你，你可以弃置一张红色手牌令此伤害-1。 |
-| `ol:fenxin` | 焚心 | 锁定技，若场上有已阵亡的：忠臣，“竭缘”减少伤害无体力值限制；反贼，“竭缘”增加伤害无体力值限制；内奸，“竭缘”弃置牌无颜色限制且可以弃置装备区里的牌。 |
-
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `ol:jieyuan` | `beforeDamageApplied / increase-other-damage` | `discardOwnedCardToAdjustCurrentDamage` |
-| `ol:jieyuan` | `beforeDamageApplied / reduce-other-source-damage` | `discardOwnedCardToAdjustCurrentDamage` |
-| `ol:fenxin` | 共享规则/运行时资格 | 由技能定义与注册能力提供 |
-
-正式规则文件：
-
-- [ordinary-ling-ju.rules.json](../../../src/Characters/ling-ju/ol/Skills/ordinary-ling-ju.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](ORDINARY_OTHER_THIRTY_FOURTH_LING_JU_ENGINEERING_DEFAULTS.md)；这些解释与官方原文分别标明。
-
-## 规则来源
-
-- [ordinary-other-thirty-third-74-source-2026-10-04.json](../sources/ordinary-other-thirty-third-74-source-2026-10-04.json)
+- 当前普通 OL 原文采用 Hand 一牌费用；亡内奸放宽至 Hand/Equipment。WoodenOxGrain、判定及 private pile 不当 Hand。generated weapon、活动 source 装备、现有 discard 禁止不属于合法费用，这是引擎支付边界，不冒称官方灵雎特例。
+- 未付款时明确来源、受伤者和能力 owner 都须存活且为不同角色；source-less、自伤不提供机会。来源在付款后因真实 child 失技/死亡，不撤销已经支付的冻结调整；目标死亡/winner 已定停止新调整，保留一次 cost 与正常父返回。
+- 有效花色由费用实体当前 owner 计算，Hongyan 等成熟政策生效；None 未放宽时不属于红/黑，亡内奸颜色放宽后允许。不是任意 viewAs 可将实体声明成费用颜色。
+- 公布 private 费用前捕获本窗口双方 HP/公开死亡/qualifier instance；回答前任一政策状态改变，取消该未付款绑定而不是使用过期颜色/HP/zone。下次实际窗口重新计算。先死亡后获技生效；获技失技不修改真实亡者状态。
+- 只有公开已阵亡 Identity Loyalist/Rebel/Renegade 命中三类声明集；活人公开身份和国战占位角色都不命中。多名同身份亡者不叠加放宽次数或增伤金额。
+- 每个真正 BeforeDamage recipient 一次独立机会，chain/redirect 仍锁该原 attack 当前 recipient；首个实际传播伤害决定基数，后续本地 ±1 不累加到第三人。原 nature 保持。
+- Female 来自当前官方 biography 的“女子”推断，API gender 字段缺失原样记录；BaseHp3 来自 API，初始满血沿现有规则，initial_hp=0 不用作角色 HP。
+- 原官网未提供复杂交互 FAQ；实际材料、提供者及各类救援的子链许可由精确原生父返回验证，不能用任意帧存在代替已付证明。

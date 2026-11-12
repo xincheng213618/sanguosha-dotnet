@@ -47,6 +47,6 @@
 
 `tools/Import-GameAudio.ps1` 导入音频，立绘与界面素材工具见 [`GENERAL_GALLERY.md`](GENERAL_GALLERY.md)。JSON 目录随程序离线交付，运行时不需要外部资源数据库。新增素材通过目录和绑定表达，不为每个武将增加播放器特判。
 
-`GeneralVoiceProjector` 只消费已提交事件与公开快照，资源配置不触发规则，也不泄漏暗置身份。技能程序和运行模块的关系见 [`CONTENT_MODULE_ARCHITECTURE.md`](CONTENT_MODULE_ARCHITECTURE.md)。
+`GeneralVoiceProjector` 只消费已提交事件与公开快照，资源配置不触发规则，也不泄漏暗置身份。程序集职责见[架构说明](ARCHITECTURE.md#程序边界)。
 
 皮肤、音乐、配音、总声音和动画属于 `PlayerPreferences`。后台、静音和关闭会取消播放，回前台恢复当前场景音乐，不追播旧技能，详见 [`BATTLE_AUDIO.md`](BATTLE_AUDIO.md)。

@@ -21,4 +21,4 @@
 
 已有能力的新人物维护资料、规则和展示。机制变化补共享行为检查，内容只补尚未覆盖的条件和交互；WPF 检查用于界面行为。开发运行相关名称过滤及常规范围，完整验证需用户明确要求。
 
-相关说明：[内容职责](CONTENT_MODULE_ARCHITECTURE.md)、[技能组合](SKILL_COMPOSITION_DESIGN.md)、[运行状态与调度](RUNTIME_REFACTOR_IMPLEMENTATION.md)、[结算返回](RESOLUTION_PROTOCOLS.md)。
+相关说明见[技能组合](COMPOSABLE_RULE_ENGINE.md)、[运行状态与调度](RUNTIME_REFACTOR_IMPLEMENTATION.md)和[结算返回](RESOLUTION_PROTOCOLS.md)。

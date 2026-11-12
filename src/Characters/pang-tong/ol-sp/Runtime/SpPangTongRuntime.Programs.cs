@@ -12,7 +12,7 @@ internal sealed partial class SpPangTongRuntime(IProgramRuntimeFrames frames, IP
  IProgramBoundCardFacts boundCards, IProgramHealthStateFacts skills, IPhysicalCardDrawOperations draws,
  INativeDrawInvoiceQueries drawInvoices, IProgramCardSnapshotQueries snapshots,
  IAtomicCardMovementZones physicalZones, IAtomicCardMovementBatches batches, IAtomicCardMovementEffects effects,
- IProgramHealthChildQueries healthChildren, IProgramHealthChildOperations childOperations,
+ IProgramHealthChildOperations childOperations,
  IProgramSkillCompletion completion, IProgramChildWindows children,
  IProgramSkillAcquisitions acquisitions, ISpPangTongNativeFacts facts, ISpPangTongNativeEntries native) : ISpPangTongProgramHost
 {

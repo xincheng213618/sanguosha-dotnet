@@ -1,32 +1,14 @@
-# 界马岱：当前规则与执行入口
+# 界马岱：版本与工程裁定
 
-当前人物 ID 为 `boundary:ma-dai`，势力 `shu`，基础体力 4。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/ma-dai/boundary/Content/boundary-ma-dai.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:ma-dai` 的注册和可执行定义见[人物资料](../../../src/Characters/ma-dai/boundary/Content/boundary-ma-dai.character.json)、[共享规则](../../../src/Characters/_shared/Skills/rule-query-skills.rules.json)、[技能规则](../../../src/Characters/ma-dai/boundary/Skills/boundary-ma-dai.rules.json)。规则依据见[来源档案](../sources/fenglin-thirtieth-696-source-2026-10-04.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `classic:mashu` | 马术 | 锁定技，你计算与其他角色的距离始终 -1。 |
-| `boundary:qianxi` | 潜袭 | 出牌阶段开始时，你可以展示一张牌。若如此做，距离为1的其他角色本回合不能使用或打出与“潜袭”牌颜色相同的手牌，你本回合使用“潜袭”牌造成的伤害+1。 |
-
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `classic:mashu` | `modifiers` | 规则文件中的显式过滤、状态与策略 |
-| `boundary:qianxi` | `playPhaseStarting / shown-entity-turn-policy` | `selectOwnedCards`、`revealOwnedBoundCardAppearance`、`issueShownEntityTurnPolicy` |
-
-正式规则文件：
-
-- [rule-query-skills.rules.json](../../../src/Characters/_shared/Skills/rule-query-skills.rules.json)
-- [boundary-ma-dai.rules.json](../../../src/Characters/ma-dai/boundary/Skills/boundary-ma-dai.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_THIRTIETH_MA_DAI_DEFAULTS.md)；这些解释与官方原文分别标明。
-
-## 规则来源
-
-- [fenglin-thirtieth-696-source-2026-10-04.json](../sources/fenglin-thirtieth-696-source-2026-10-04.json)
+- Reveal region is owner's Hand only; select is private until the real public reveal. Equipment, Judgment, private piles and deck are not hidden reveal candidates. Choosing/declining moves or pays nothing.
+- Frozen suit/color is the displayed entity's actual effective suit at reveal. Spade/Club are black, Heart/Diamond red, None colorless. Colorless display issues the entity benefit but no same-color ban; colorless hand materials do not match a newly issued black ban.
+- All other living characters at outgoing distance exactly1 at issuance are affected, including public allies. Distance/faction/death-seat changes and source skill loss do not rebuild the frozen cohort. Existing restrictions persist through the actual turn, then expire by the mature turn boundary.
+- Each new actual Play start may reveal again; same skill/method/entity grant does not compound +1 on one Use. Different display colors retain their independent already-issued hand bans; the method contributes at most +1 even if a two-material conversion contains two displayed entities.
+- The exact displayed entity remains that entity through legal transfer/deck/pile paths and reacquisition within the same actual turn. Its genuine full-material Use candidate retains the actual provider and every accepted cost; another provider does not disqualify the original owner's real Use. No new material permission is created and no departure-based new identity is invented. Successful declaration keeps the original physical cost provenance.
+- Only current actual actor/user and damage source being the grant owner produces the damage bonus; the provider may differ. A real typed actor replacement away from the owner removes eligibility for that damage, and a replacement to the owner permits it using the same original Use candidate and exact fact chain. Source-less damage, source different from actual user, ordinary damage without its owning Use, zero-material virtual uses and response-only physical actions receive no bonus. Card identity/kind/nature conversion does not erase the actual material; chain damage inherits the already modified native amount and is not incremented again.
+- Source loss after issue does not remove a public turn restriction or an issued true Use receipt. Dead targets are not replaced. Original accepted/declared facts are never edited. Damage/recovery/Dying/Completed children follow their mature owning Use and typed returns.
+- Deck shortage is irrelevant to the reveal; an empty hand gives no offer. If the selected entity/source/actor becomes invalid before issue, no grant is published. No corresponding official complex FAQ is recorded for these choices.

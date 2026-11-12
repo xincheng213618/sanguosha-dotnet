@@ -1,27 +1,18 @@
-# 诸葛恪：当前规则与执行入口
+# 诸葛恪：版本与工程裁定
 
-当前人物 ID 为 `ol:zhuge-ke`，势力 `wu`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/zhuge-ke/ol/Content/ol-zhuge-ke.character.json)；主公加成和模式资格由实际模式处理。
+`ol:zhuge-ke` 的注册和可执行定义见[人物资料](../../../src/Characters/zhuge-ke/ol/Content/ol-zhuge-ke.character.json)、[技能规则](../../../src/Characters/zhuge-ke/ol/Skills/ordinary-zhuge-ke.rules.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `ol:aocai` | 傲才 | 当你于回合外需要使用或打出基本牌时，若你有/没有手牌，你可以观看牌堆顶两/四张牌，然后可以使用或打出其中的基本牌。 |
-| `ol:duwu` | 黩武 | 出牌阶段，你可以弃置X张牌对你攻击范围内一名其他角色造成1点伤害（X为其体力值）。若其因此进入濒死状态且于濒死结算后存活，你失去1点体力且本回合本技能失效。 |
+These choices are implementation policy, not an official FAQ. The captured current page has complete 傲才/黩武 texts and no unexpanded grant/font reference.
 
-## 程序与原生流程
-
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `ol:aocai` | `cardPolicies` | 规则文件中的显式过滤、状态与策略 |
-| `ol:duwu` | `active / target-hp-cost` | `discardTargetHpCardsAndDamage` |
-
-正式规则文件：
-
-- [ordinary-zhuge-ke.rules.json](../../../src/Characters/zhuge-ke/ol/Skills/ordinary-zhuge-ke.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](ORDINARY_OTHER_THIRTY_SIXTH_ZHUGE_KE_ENGINEERING_DEFAULTS.md)；这些解释与官方原文分别标明。
+- Identity is current `ordinaryOther`, `ol:zhuge-ke`, Wu/3, VariantId ordinary, RulesetId sanguosha-ol. API initial_hp=0 is a placeholder. Male is inferred from biography “诸葛瑾长子”; the API has no gender property.
+- 傲才 requires a genuine existing basic-card need outside the owner's actual turn. This capability is not a free off-turn Play action. In each actual request, viewing is optional and can be refused once; later exact requests/cursors can view again.
+- A viewed native Slash/FireSlash/ThunderSlash satisfies a Slash need; native Dodge, Peach and self-rescue Alcohol retain their ordinary semantics and current prohibitions. Viewing does not grant arbitrary ViewAs of unrelated printed material. Real user/provider/target belong to the original producer, not the viewing skill.
+- At activation, actual hand count determines two/four. Mature EnsureDrawPile runs once; a nonempty short pile shows only available top entities. The real discard pile may supply a mature reshuffle only when DrawPile was empty. Unchosen entities never move or change order.
+- Before viewing, public choices contain skill source only. Top IDs and ordered identities are actor-only prepared views. A selected ID becomes public only after real DrawPile→Processing movement. The frame freezes nested original prompt choices through ctor/init/with/JSON, and the collection event is committed with explicit projection.
+- 黩武 selects an alive other target with HP>0 in the current attack range. Before payment, target HP, distance/range and source instance must still match. HP0/negative targets cannot start a new action. This avoids treating a genuine unresolved Dying target as a free cost.
+- Exactly X eligible own Hand/Equipment materials are discarded once as one real batch. Generated weapons and active-source equipment are excluded. Self-discard restrictions remain active. No generated card or restricted material is silently paid through a new shortcut.
+- After real payment, lost skill/source, removed weapon/mount and SilverLion recovery do not reprice the cost or revoke an already accepted living target. All queued recovery, HP and original movement children settle first. Owner death does not repay or undo a paid cost; the native explicit-source damage path retains that owner. Target death or terminal winner before issuance completes without a new damage.
+- The penalty follows the actual native damage recipient after a legal redirect. Only that direct DamageFrame's own DyingResolved(Survived=true) counts. Child Dying, prevented damage, damage-as-HP-loss and a dead victim do not. A living owner loses one HP; a dead owner cannot lose it again, while the issued turn restriction remains until actual turn reset.
+- A winner determined by a later native damage/HP child completes the root after existing children; an unissued penalty/usage is not newly issued. There are no new broad exemptions for ActiveDying/CurrentDamageAttempt.

@@ -21,5 +21,3 @@
 借刀分类已用官网2016历史FAQ及现行真实调用点进一步核对：持武器者实际子杀走`BeginCardUse`，本人与current ownPlay相符时计一次Use；仅供牌者的响应和前置请求不计为该供牌者Use。立军赠予由真实`action.ActorSeat`控制，精确成本可来自另一个physical provider。当前三人规则仍以当日www hero正文为准，历史FAQ仅支持卡牌协议分类，不冒称当代人物FAQ。
 
 新pending数据随QuotaTop、DiscardBudget和CompletedFactionGift的ProgramSkillFrame保存，CardUseFrame承载issued效果，typed return接续已承诺付款；不恢复旧pending/use-ID侧表。新集合事件在CommittedEventProjection冻结。真实闪accepted事实恰一次，虚拟闪与已支持extended双实体无懈走相同用牌禁令，准确反制节点不向根锦囊传播。
-
-配置字段、操作和入口能力见[当前技能配置](RUNTIME.md)；程序续接和帧权限见[结算协议](../../RESOLUTION_PROTOCOLS.md)。

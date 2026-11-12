@@ -1,32 +1,25 @@
-# 界王异：当前规则与执行入口
+# 界王异：版本与工程裁定
 
-当前人物 ID 为 `boundary:wang-yi`，势力 `wei`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/wang-yi/boundary/Content/boundary-wang-yi.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:wang-yi` 的注册和可执行定义见[人物资料](../../../src/Characters/wang-yi/boundary/Content/boundary-wang-yi.character.json)、[技能规则](../../../src/Characters/wang-yi/boundary/Skills/boundary-wang-yi.rules.json)。规则依据见[来源档案](../sources/fenglin-twenty-seventh-621-source-2026-10-04.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `boundary:zhenlie-current` | 贞烈 | 当你成为其他角色【杀】或普通锦囊牌的目标后，你可以失去1点体力令此牌对你无效，然后你可以选择一项： 1.获得使用者一张牌； 2.本回合结束阶段，发动一次“秘计”。 |
-| `boundary:miji-current` | 秘计 | 结束阶段，你可以摸X张牌（X为你已损失的体力值），然后你可以交给其他角色至多X张牌。 |
+当前普通 OL 的 621 页面与 hero/info API 已冻结在 `docs/content/sources/fenglin-twenty-seventh-621-source-2026-10-04.json`，SHA-256 `d1e82784d133cb26ad50ec8dbcf1e9a0acb4913bb1b06b54fc1f2c84acc932a6`。两技能正文无 font 派生缺口。魏、3 体力与名称来自当前 API；API 无性别字段，女性仅复用同人物经典登记的明确补充信息。未获取新的官方 FAQ。
 
-## 程序与原生流程
+正文要求：贞烈可在成为其他角色杀或普通锦囊目标后实失 1 HP，令同一牌对本人无效；随后可获得使用者一张牌或在本回合结束阶段发动一次秘计。秘计在结束阶段可摸已损失 HP 数 X 的牌，然后可向其他角色交出至多 X 张牌。
 
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `boundary:zhenlie-current` | `otherActualUseTargeted / paid-own-target` | `payHpThenNullifyOwnActualUseTarget`、`chooseOption`、`selectAndMoveOwnedCard`、`scheduleEarnedActualEndingBenefit` |
-| `boundary:miji-current` | `turnEnding / natural-ending` | `drawLostHpThenOfferOwnedCardsUpTo` |
-| `boundary:miji-current` | `turnEnding / earned-ending` | `drawLostHpThenOfferOwnedCardsUpTo` |
+以下是未由采用的官方 FAQ 证实的工程默认，不冒充正文细则：
 
-正式规则文件：
+- 贞烈以实际 Use 的 actor 为“使用者”，provider 保留在真实用牌身份中，但不代替 actor 被取得牌。普通 Slash/Dodge 打出不触发；旧神速 Action=null 的真实虚拟杀按成熟原拥有程序及 TargetsConfirmed 事实证明，不添加旧 Action。无懈没有角色指定目标，因此不创造角色目标机会。
+- 可取得使用者当前 HE；判断区不包含在此“牌”默认中。暗手仍使用原不透明槽位选择。选择收益前可停止；选“获得”后无牌则跳过，不重新选择收益。
+- 1 HP 先实际支付。HP、濒死进入、实体桃、多材料救援、醇醪或九诗等成熟 typed 子链结束后，才对同一用牌本人目标应用无效。实付后失技或非终局死亡仍完成已付无效，取消未付收益；未付前失源则不支付。胜负已定只清理原实体并完成原 typed 返回，不开启新无懈、目标或收益窗口。
+- 每个独立支付并选择结束阶段收益的发动各发一个承诺；同一实际回合可有多个，分别兑现一次，彼此不替代。自然秘计为独立可选机会。
+- 承诺只绑定原 actual-turn number/owner 以及发行时实际秘计 instance/binding/gameplayHash。失去原秘计实例后，后来重获的新实例不能履约。若该实际回合跳过 Ending，承诺于实际回合结束失效；插入阶段沿用原 actual turn，额外回合为新的 actual turn，不延后兑现。
+- 秘计 X 在指令开始、实际摸牌之前冻结。实际摸到数量单独由 DrawPile→Hand ledger 计算，允许短牌堆或零实体摸牌；可赠上限仍为冻结 X。可以交出本次摸到的牌或原有 HE，任意时点停止、向同一个其他存活角色交出多张。判断区不纳入 HE 赠牌默认。
+- 每个已付款实体消耗一个赠牌名额；真实销毁规则导致未到达目标手牌时，已付数量与实际送达数量分别记录，不退已付名额。牌之后被正常移动、目标死亡或牌回到来源，不改变原付款事实，且本次发动不重复赠送原已付实体。
+- 原实例失效仅取消后续赠牌；已经摸到、扣血或移动的实体均不回滚。没有平行 pending 对象、use-ID 字典或侧带付款状态。
+- AI 贞烈估值只读原实际有效牌类和自身公开 HP；秘计分配只读本人 HE 保留值、已有关系评分和目标公开手牌数量。这是工程先验，不是实测胜率。
 
-- [boundary-wang-yi.rules.json](../../../src/Characters/wang-yi/boundary/Skills/boundary-wang-yi.rules.json)
+新公开事件仅含标量和全标量 immutable receipt/source，不内嵌可变实体集合。新拥有帧的 Candidates、Contexts（包括 Facts 集合）与 PaidCardIds 在构造、init/with 和 JSON 参数反序列化时复制为只读集合；PlayerSnapshot 继续使用既有统一视图冻结，不另加人物快照。集合型 Facts 不参与 record 引用相等判断，拥有证明只比合同所需标量、原 candidate、instance/hash 与实际事件/移动 ledger。
 
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_TWENTY_SEVENTH_WANG_YI_DEFAULTS.md)；这些解释与官方原文分别标明。
-
-## 规则来源
-
-- [fenglin-twenty-seventh-621-source-2026-10-04.json](../sources/fenglin-twenty-seventh-621-source-2026-10-04.json)
+移动后从当前 owning frame 合并赠牌 receipt，保留原生白银狮子追加的 recovery queue；局部新 await 使用准确 AwaitedProgramMovement 先排该 root 的 replacement/HP，再 movement，不改经典通用路径。

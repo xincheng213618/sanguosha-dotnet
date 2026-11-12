@@ -1,34 +1,16 @@
-# 界鲁肃：当前规则与执行入口
+# 界鲁肃：版本与工程裁定
 
-当前人物 ID 为 `boundary:lu-su`，势力 `wu`，基础体力 3。人物、技能绑定和将池注册取[人物资料](../../../src/Characters/lu-su/boundary/Content/boundary-lu-su.character.json)；主公加成和模式资格由实际模式处理。
+`boundary:lu-su` 的注册和可执行定义见[人物资料](../../../src/Characters/lu-su/boundary/Content/boundary-lu-su.character.json)、[技能规则](../../../src/Characters/lu-su/boundary/Skills/boundary-lu-su.rules.json)。规则依据见[来源档案](../sources/fenglin-twenty-eighth-485-source-2026-10-04.json)。
 
-## 技能定义
+以下为现行实现的工程裁定。
 
-| 技能 ID | 名称 | 当前说明 |
-| --- | --- | --- |
-| `boundary:haoshi-current` | 好施 | 摸牌阶段，你可以多摸两张牌，然后若你的手牌数大于5，你将一半的手牌（向下取整）交给手牌最少的一名其他角色，然后直到你的下回合开始，当你成为【杀】或普通锦囊牌的目标后，其可以交给你一张手牌。 |
-| `boundary:dimeng-current` | 缔盟 | 出牌阶段限一次，你可以令两名其他角色交换手牌（两者手牌数之差不大于你的牌数量），若如此做，出牌阶段结束时，你弃置X张牌（X为这两名角色手牌数之差）。 |
+以下不是官方额外条件。仅当前完整正文与成熟机制提供实施依据。
 
-## 程序与原生流程
+1. 好施发动的额外Draw2先完整结算；正常摸牌及其孩子完成后在AfterNormalDraw按当前HandCount检查>5。空牌堆实际额外摸0仍记录发动，若当时仍>5照常交半手。半手数量在实际SelectOwned启动冻结，选择least-hand目标时查询当前公开HandCount，之后该pair不因别人获牌重新选取。
+2. 半手必须真正交付至少一张，所有原selected实体的同owner→recipient实际ledger完成后才发行援助资格。目标或来源死亡/源实例失效会取消未付后续；既有真实付款与其孩子仍完成。新source实例不能继承旧资格。援助对象死亡、无Hand或原当前用牌效果无效时不提供援助，不转移资格；多次实际目标窗各自可援助一次，没有另加每回合次数。群体牌/借刀只沿成熟ActualUseTargetWindow的真实作用目标口径，不把副目标当真实受效目标。
+3. 缔盟合法性按接受时两名other当前手牌差≤自己的HE总数量（“牌数量”的HE默认，不含J/私有pile）。接受pair时冻结两手及X，所有原两手真实交换后发行这份X债务，成本延后到同一真实PlayEnding，不按结束时pair手牌差重新算。两名空手仍允许零差交换事实，零成本债务在原Ending完成一次；不声称正文禁止双空。
+4. 结束付款选择当时可合法弃的HE，受保护装备与正在提供该source实例的装备不计入可支付集合。若少于X，则弃尽可合法部分并记录短缺；不逆向撤销交换，也不免费增加第二次债务。付款前源实例失效/owner死亡/winner取消该份未付后续；已付银狮回复、HP/Movement/死亡孩子必须完整排空。此为未核不足FAQ的明确默认。
+5. 原pair中的一人交换后死亡不改变冻结X。交换前任一人已死则拒绝接受/取消未付交换。不同实际PlayPhaseInstance分别形成债务，跳过Play不伪造Ending；援助资格到本人下一次实际TurnStarted立即过期（包括extra turn与翻面自然跳过），不以别人的轮数代替。
+6. 本人真实无中生有的自身作用目标可触发援助。成熟producer保留空显式目标列表；仅6004及当前未过期真实资格据精确Use/actor/material/Declared/TargetsConfirmed证据推导目标，不改原Action/TargetSeats。真正RequestSlashByTarget物理杀沿BeginCardUse冻结Use身份，可以成为另一项援助；普通闪/杀响应不视为Use。
 
-| 技能 | 绑定入口 | 当前效果操作 |
-| --- | --- | --- |
-| `boundary:haoshi-current` | `drawPhaseStarting / extra-draw` | `drawExtraAndArmHalfHandSupport` |
-| `boundary:haoshi-current` | `afterNormalDraw / give-half` | `selectTarget`、`selectOwnedCards`、`giveHalfHandAndIssueTargetSupport` |
-| `boundary:haoshi-current` | `otherActualUseTargeted / targeted-aid` | `offerHalfHandRecipientSupport` |
-| `boundary:dimeng-current` | `active / swap-first` | `exchangeHandsAndArmPhaseDebt` |
-| `boundary:dimeng-current` | `playEnding / pay-phase-debt` | `selectFrozenHandExchangeDebtPayment`、`moveBoundCards`、`awaitBoundCardMovements` |
-
-正式规则文件：
-
-- [boundary-lu-su.rules.json](../../../src/Characters/lu-su/boundary/Skills/boundary-lu-su.rules.json)
-
-原生用牌、材料支付、伤害/回复/濒死、牌区移动及其子窗口在所属帧中保存真实来源和收据，完成后沿类型化父返回继续。动作接受前复验技能、材料和目标；已支付的子树不重新付款，尚未发行的效果按当前资格处理。
-
-玩家和 AI 只消费其有权获得的快照与选择；私有手牌和拥有牌区不进入无权观察者的提示。玩家快照与提交事件的嵌套集合在投影/提交准备时冻结，帧内集合按对应机制合同管理。具体字段与允许组合见[运行时](RUNTIME.md)。
-
-复杂时序与资料未裁定的口径见[工程默认](FENG_LIN_TWENTY_EIGHTH_LU_SU_DEFAULTS.md)；这些解释与官方原文分别标明。
-
-## 规则来源
-
-- [fenglin-twenty-eighth-485-source-2026-10-04.json](../sources/fenglin-twenty-eighth-485-source-2026-10-04.json)
+好施已支付的摸牌与赠牌保留实际移动收据、受益者与原拥有帧。获牌或体力观察者在该子链发出的原生伤害保留来源、最终量、性质及濒死返回。进入该子链的资格取原发行点及精确收据。

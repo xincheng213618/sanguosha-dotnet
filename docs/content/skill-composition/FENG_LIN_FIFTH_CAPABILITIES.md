@@ -13,5 +13,3 @@
 箜声准备可存任意合法HE，0张视为跳过；实际独立source-local任意容量pile，不复用其他堆总数。Ending先获得当时同source非装备并等待完整gain children；选living使用者并由其选择合法剩余装备顺序，逐个真实Use，完整目标/装备替换/禁止槽/支付/children处理，不能直接移动到装备或先假赠Hand。每次真实卡仍在原source，cursor在真实支付前/后按幂等规范推进，子链移走不重复取用；非法或无法用的余牌保留原pile，不新增弃/转赠。当前合同为：**只有实际使用过至少一张装备，结束才 LoseHp1**；初始空pile、取得非装后零装备、所有装备非法或第一张使用前被移走都不扣体力；已真正使用过则余牌循环结束后扣一次，死亡/比赛结束按已有边界停止。LoseHp是真正濒死/死亡可暂停链。该零装备口径是明确采用的工程默认。
 
 张绣注册雄乱与从谏；雄乱使用区域废除、定向政策和手牌限制。真实finalized Trick target集合distinct>1，owner在集合，最终redirect完成后一次候选；赠牌对象须在该最终集合且是真正不同recipient，交给自己的同手牌不作为支付，不制造无移动摸牌。此give语义显式冻结，不暗套任意其他living。选本人HE1，实际赠入对方Hand并完成全部movement children后才摸牌；实体Equipment给2，其他1，判断冻结实体类型而非虚拟输出类型。非法非最终目标/非法HE原子拒绝；decline无cost/reward，owner死亡不继续，真实receipt/child恢复不再支付。同owner同skill多grant对一次action去重，来源保留exactinstance。
-
-配置字段、操作和入口能力见[当前技能配置](RUNTIME.md)；程序续接和帧权限见[结算协议](../../RESOLUTION_PROTOCOLS.md)。
