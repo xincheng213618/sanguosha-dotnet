@@ -50,7 +50,7 @@
       "sha256": "a7dced3b95928e0457487d558a1b5d87010394bec82f3c01be62f3ddd0fef691"
     },
     {
-      "mainPath": "docs/content/sources/evidence/ordinary-other-thirty-seventh-xiahou-ba-116-cover.raw.png",
+      "mainPath": "src/CardGame.Wpf/Assets/official-ol-xiahou-ba.png",
       "stagePath": "source/116-cover.raw.png",
       "sha256": "73cbadf66af2cd09ed66898d7318d64842c4668fa4d362e3b29d407b39b2b80c"
     },

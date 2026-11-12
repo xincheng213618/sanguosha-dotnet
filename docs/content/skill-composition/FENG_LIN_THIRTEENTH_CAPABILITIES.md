@@ -1,6 +1,6 @@
 # 界黄忠、界魏延共享能力
 
-项目选定的普通 OL 正文及补充解释见[来源档案](../sources/fenglin-thirteenth-2026-10-02.json)和[规则口径](FENG_LIN_THIRTEENTH_RULINGS.md)。人物资料绑定 boundary:liegong-current、boundary:qimou-current，并复用 boundary:kuanggu。
+项目选定的普通 OL 正文及补充解释见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-thirteenth-2026-10-02.json)和[规则口径](FENG_LIN_THIRTEENTH_RULINGS.md)。人物资料绑定 boundary:liegong-current、boundary:qimou-current，并复用 boundary:kuanggu。
 
 ## 烈弓
 

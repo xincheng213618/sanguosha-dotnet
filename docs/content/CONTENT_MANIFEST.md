@@ -39,6 +39,10 @@
 
 ## 来源与素材
 
-`docs/content/sources/` 保存选定产品线的规则档案、官方页/API/客户端证据及来源差异。来源合同、裁定与工程默认值见 `generals/` 和 `skill-composition/`。图鉴、资源键与美术目录表共同决定实际显示；素材下载状态不等于已绑定，也不证明技能规则完整。
+核对规则时，从对应版本的 `Content`、`Skills` 或 `Runtime` 定位已有来源，再查 `sources/` 中对应的规则记录。版本差异和工程裁定见 `generals/` 与 `skill-composition/` 中对应主题。素材归属及许可范围见[第三方资料说明](../../THIRD_PARTY_NOTICES.md)。
+
+旧网页、API 抓取和批次快照可按原路径在 [Git 历史快照](https://github.com/xincheng213618/sanguosha-dotnet/tree/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources) 中查阅。源码注释或来源记录里的旧路径可用 `git show 77ab25557:<原路径>` 读取。
+
+程序直接嵌入单骑目录 `wushuang-reference.json` 和 WPF 的桌面背景、牌图、武将图及音频目录。确认其他 JSON 的用途时，沿项目文件和素材工具的引用定位。图鉴、资源键与目录表共同决定实际显示，素材是否已绑定需核对对应的资源键。
 
 [参考数据](BWIKI_REFERENCE_DATA.md)用于发现与版本对照。[来源核对规范](BWIKI_CONTENT_BACKLOG.md)说明证据等级。[牌图](card-artwork.md)、[音频](game-audio-sync.md)和[动态皮肤](DYNAMIC_SKIN_RESEARCH.md)分别维护资源范围。

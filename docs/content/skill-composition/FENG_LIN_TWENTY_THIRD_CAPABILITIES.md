@@ -1,6 +1,6 @@
 # 界卧龙诸葛亮、界曹植、界郭淮共享能力
 
-项目采用的正文与工程默认见[来源档案](../sources/fenglin-twenty-third-preflight-2026-10-04.json)。
+项目采用的正文与工程默认见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-twenty-third-preflight-2026-10-04.json)。
 
 ## 随机展示、有效颜色成本与精确无懈节点
 

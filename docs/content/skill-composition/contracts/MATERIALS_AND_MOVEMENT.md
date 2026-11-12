@@ -1,8 +1,7 @@
 # Native materials and physical movement
 
 Required when changing these mechanisms or their consumers. See the
-[contract index](README.md) for related topics and the
-[capability map](../CAPABILITY_MAP.md) for completion status and remaining gaps.
+[contract index](README.md) for related topics.
 
 ## Representations and registered entities
 
@@ -16,7 +15,18 @@ Required when changing these mechanisms or their consumers. See the
 
 - Actual native material deliveries use `INativeMaterialClaims` and the original use or delayed Judgment frame's `MaterialClaims`. Capture real journal deliveries once; distinguish representation residency from the original owner's retirement right, which is relinquished after delivery even if that entity later reenters Processing. Keep accepted promises, child handoffs and producer retention separate from delivered acquisition; no character proof scan may replace this shared delivery fact.
 
-- Native-use payment and destruction retirements use `INativeMaterialClaims.CaptureRetirement` on the original `CardUseFrame`, with exact journal movements and original payment/Processing-entry identity. Physical lifetime writers submit their exact departure to this owner instead of searching character-marked ancestors. Retirement permanently relinquishes that owner's cleanup right without becoming an acquisition; representation reads retain only the captured destination. Do not rebuild per-character removed-material proofs or apply these use receipts to pure responses or delayed Judgment destruction.
+## Native-use material retirement
+
+- Record actual non-Processing payment or destruction through `INativeMaterialClaims.CaptureRetirement` on the original `CardUseFrame.MaterialClaims`. A `Retirement` has no acquisition recipient and does not contribute to `WasClaimed` or claimed entities. A `Delivery` retains its acquisition and residency semantics. Ordinary payment into Processing issues no retirement receipt.
+- Validate original material, issuance cutoff, payment source and actual journal movements at the shared write boundary. For direct payment into OutsideGame, a deck or a public pile, use that payment as the causal movement. For material in Processing, accept the first departure from the original entry and a real destruction immediately following that departure into DiscardPile. Duplicate records are idempotent. Conflicting or fabricated batches leave all rights unchanged.
+- When a real child use starts with material already in Processing, retain the actual entry sequence from before issuance. A zero-entity use's physical payment remains a resource cost even when it shares the same Action. Physical lifetime writers supply the exact departure. The shared owner selects the nearest real use tied to that entry and issues no receipt when no native material matches. Later discards, responses or reentry into Processing cannot record a new retirement on a prior owner that relinquished the material.
+- `HasRelinquishedMaterial` and `PreservesMaterialAtCompletion` keep the original owner from cleaning up that material again, including after reentry into Processing. For a retirement receipt, `CanReadMaterial` permits representation reads at the captured destination only. Payment, acquisition and movement require their own authorization.
+- Native producers capture the exact outcome for common Slash payments, 吴景's real trick payment, selected foreign cards, 管亥's non-response public-pile payment and actual destruction of general cards, chariots, soul cards and ephemeral entities. The common completion, sequential trick, group, Amazing Grace, delayed-placement and material-eligibility paths read those facts. Issuance qualification, payment child windows and typed business returns stay with their producers.
+
+The shared receipt covers actual CardUse payment and destruction. Pure response
+materials and delayed Judgment destruction keep their own scopes. Rule-specific
+native issuance and business returns remain separate composition work, including
+dependency direction in the rest of native card-use scheduling.
 
 ## Acquisition, Give and exact movement requests
 

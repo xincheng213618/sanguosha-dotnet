@@ -5,8 +5,8 @@ consumers, including Core, characters, activities, modes and tests. Read the
 affected topic before editing; there is no requirement to read every topic.
 
 [AGENTS.md](../../../../AGENTS.md) holds repository-wide working constraints.
-[CAPABILITY_MAP.md](../CAPABILITY_MAP.md) owns the concept method, completion status,
-semantics and remaining gaps. [RUNTIME.md](../RUNTIME.md) and
+[CAPABILITY_MAP.md](../CAPABILITY_MAP.md) describes the capability method and links
+to mechanism topics. [RUNTIME.md](../RUNTIME.md) and
 [RUNTIME_EXPRESSIONS.md](../RUNTIME_EXPRESSIONS.md) describe authoring syntax.
 
 | When changing | Read |
@@ -25,16 +25,14 @@ and material delivery; a public reveal can also require runtime privacy boundari
 
 ## Maintaining the contracts
 
-- Update the existing topic when its owner or contract changes. These are current
-  design constraints, not a chronological migration log.
+- Keep the mechanism's current owner, semantics, exceptions and remaining gaps
+  together in the relevant topic. Update it when any of those change. Use commit
+  history for migration chronology, verification timings and size statistics.
 - Keep exact distinctions that affect behavior: scope, sampling time, physical
   identity, source loss, owner death, payment and typed returns.
-- Link to related topics rather than copying their full rules. Search headings or
-  the named API when locating a particular contract.
-- Record concept completion, exceptions and remaining migration work in the
-  capability map. Keep verification timings and size statistics in commit messages.
-- Add another topic only when a distinct boundary needs its own navigation entry.
-  Do not grow the root `AGENTS.md` for each new concept.
+- Link to related topics and update the capability map when a method or link
+  changes. Search headings or the named API to locate a contract.
+- Add a topic when a distinct boundary needs its own navigation entry.
 
 This organization follows OpenAI's guidance on
 [project instructions](https://learn.chatgpt.com/docs/agent-configuration/agents-md)

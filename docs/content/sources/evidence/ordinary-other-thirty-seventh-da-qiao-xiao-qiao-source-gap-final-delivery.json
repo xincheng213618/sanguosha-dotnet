@@ -46,7 +46,7 @@
       "sha256": "7cf6c9e3a04a7bcd4e7f04ded837a2dd98544cd0ba0542df8d87898d3667a5a2"
     },
     {
-      "mainPath": "docs/content/sources/evidence/ordinary-other-thirty-seventh-da-qiao-xiao-qiao-117-cover.raw.png",
+      "mainPath": "src/CardGame.Wpf/Assets/official-ol-da-qiao-xiao-qiao.png",
       "stagePath": "source/117-cover.raw.png",
       "sha256": "2309eb94fe32c6bffc1886a742ee9ca0857647e69e229dcc461242209dc5a7e2"
     },

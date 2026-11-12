@@ -1,6 +1,6 @@
 # 于吉、左慈共享能力
 
-项目采用普通 OL 于吉、左慈正文，规则、身份与工程默认见[来源档案](../sources/fenglin-sixth-2026-10-02.json)。[普通 OL 公告](https://www.sanguosha.com/news/20140305_6018_5340)补充缠怨禁止质疑和体力恰为一的资格，[普通左慈攻略](https://www.sanguosha.com/news/20140521_8678_1419)补充私有武将库、公开声明、有效属性及可借技能标签范围；这些补充用于项目选定的普通版。
+项目采用普通 OL 于吉、左慈正文，规则、身份与工程默认见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-sixth-2026-10-02.json)。[普通 OL 公告](https://www.sanguosha.com/news/20140305_6018_5340)补充缠怨禁止质疑和体力恰为一的资格，[普通左慈攻略](https://www.sanguosha.com/news/20140521_8678_1419)补充私有武将库、公开声明、有效属性及可借技能标签范围；这些补充用于项目选定的普通版。
 
 ## 回合结束后窗口
 

@@ -27,11 +27,10 @@ pwsh -File .\tools\Import-GameAudio.ps1 -RetryFailures
 ## 文件与恢复
 
 - [game-audio-catalog.json](game-audio-catalog.json) 保存资源路径、原始与交付哈希、格式、来源及 bindings。
-- [game-audio-index.csv](game-audio-index.csv) 是从目录派生的 UTF-8 BOM 表，按本地皮肤绑定展开，也列出未绑定素材。
 - 音频交付到 `src/CardGame.Wpf/Assets/Audio/Official/`，MP3 保留原格式，OGG 转为 PCM WAV。
 - 扫描状态、下载和失败清单属于工具缓存，运行报告用于检查本次新增、别名和失败数，不属于游戏资源或规则依据。
 
-导入前验证公开配置，下载后检查 SHA-256、ffprobe 格式与完整解码。失败不登记空白音轨；已存在目标必须与来源哈希一致，冲突会报错。中断后重新运行可接纳已验证且相同的文件，目录 JSON 与派生 CSV 使用临时文件替换。
+导入前验证公开配置，下载后检查 SHA-256、ffprobe 格式与完整解码。失败不登记空白音轨；已存在目标必须与来源哈希一致，冲突会报错。中断后重新运行可接纳已验证且相同的文件，目录 JSON 使用临时文件替换。
 
 依赖 Python、`requests`、`pycryptodome` 以及 PATH 中的 ffmpeg／ffprobe。Python 依赖可用 `python -m pip install requests pycryptodome` 安装，直接入口为 `python -B .\tools\import_game_audio.py --sync-cache`。本地导入回归入口为 `python -B .\tools\tests\test_game_audio_import.py`。
 

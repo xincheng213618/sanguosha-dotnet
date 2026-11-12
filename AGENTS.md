@@ -16,7 +16,7 @@ Card is a .NET rules engine with a WPF desktop client. Use the SDK selected by
 
 - Skills compose rule concepts; each concept has one owner and one answer point. The goal is to express new skills entirely in JSON. Ordinary generals using existing capabilities change content and registration only.
 - Shared capabilities must not depend on characters, and characters must not depend on other characters. Passing checks prove behavior, not architecture; assess the design using the capability map's criteria. Moving code or adding adapters is not evidence of simplification.
-- A character-specific/compound operation, duplicate rule answer or character branch in a shared query is a gap signal. Follow [the capability method](docs/content/skill-composition/CAPABILITY_MAP.md), complete the concept with all equivalent consumers, and record remaining differences there.
+- A character-specific/compound operation, duplicate rule answer or character branch in a shared query is a gap signal. Follow [the capability method](docs/content/skill-composition/CAPABILITY_MAP.md) and complete the concept with all equivalent consumers.
 - Before adding an operation or condition, check whether existing operations plus an effect-level `{"kind":"expression"}` condition express the rule. Add a missing read-only fact once in the shared owner; see [runtime expressions](docs/content/skill-composition/RUNTIME_EXPRESSIONS.md).
 - Validate at command, loader, restore and executor boundaries. Keep pending state, accepted facts, payments and typed child returns on the original owning frame; do not rebuild them with character proof events, history scans or sidecars.
 - Preserve input validation, seat-specific privacy, card movement, checkpoint, replay and content fingerprints. Keep source loss, owner death, ongoing eligibility and already-issued permission distinct.
@@ -44,19 +44,21 @@ The scope definition and full workflow are in [development gates](docs/DEVELOPME
 
 ## Read when relevant
 
-Read the applicable document before changing its boundary; do not load the entire documentation set for every task.
+Start with the relevant code or configuration and the matching section below. Use source and evidence files for the exact edition when a rule, asset or attribution needs verification.
 
 | Task | Guidance |
 | --- | --- |
-| Add or change a general, skill or shared rule | [Capability map](docs/content/skill-composition/CAPABILITY_MAP.md), [character registration](docs/CHARACTER_MODULES.md), [rule syntax](docs/content/skill-composition/RUNTIME.md) |
+| Add a general or edit skill JSON | [Character registration](docs/CHARACTER_MODULES.md#内容声明), [rule syntax](docs/content/skill-composition/RUNTIME.md) |
+| Design a shared capability or fill a gap | [Capability method](docs/content/skill-composition/CAPABILITY_MAP.md#补齐一个概念的步骤), then the affected contract |
 | Change a rule mechanism or any consumer of it | [Contract index](docs/content/skill-composition/contracts/README.md): select the affected topics and follow their owning-frame and lifetime contracts |
 | Change formats, tests, verification or temporary outputs | [Development gates](docs/DEVELOPMENT_GATES.md) |
 | Change desktop saves or recovery | [Save and resume](docs/SAVE_AND_RESUME.md) |
+| Verify a rule edition or asset source | [Content and source locations](docs/content/CONTENT_MANIFEST.md#来源与素材) |
 | Find UI, mode, content or architecture guidance | [Documentation index](docs/README.md) |
 
 ## Maintaining guidance
 
 - Keep this root file short: repository-wide constraints, useful commands and task-based links.
-- Maintain detailed mechanism contracts in the relevant [contract topic](docs/content/skill-composition/contracts/README.md); keep ownership, completion, semantics and remaining gaps in `CAPABILITY_MAP.md`. Do not append a new root bullet for every completed concept.
+- Record a mechanism's ownership, semantics, exceptions and remaining gaps in its [contract topic](docs/content/skill-composition/contracts/README.md). Update the capability map when its method or navigation changes.
 - Use a nested `AGENTS.md` only for instructions unique to that directory. Cross-cutting mechanisms belong in linked documents so Core, characters, activities and tests share one contract.
-- Update the owning document instead of copying its rules into multiple guides. Put batch timings, size statistics and detailed verification results in commit messages.
+- Update the owning document when its contract, syntax or guidance changes. Implementation changes and reuse of existing capabilities can leave documentation as-is. Put batch timings, size statistics and detailed verification results in commit messages.

@@ -24,20 +24,20 @@
 
 | 主题 | 文档 |
 | --- | --- |
-| 代理协作 | [仓库指令](../AGENTS.md)、[按主题的机制契约](content/skill-composition/contracts/README.md)、[能力方法与地图](content/skill-composition/CAPABILITY_MAP.md) |
+| 按任务定位 | [开发入口](../AGENTS.md#read-when-relevant)、[机制契约](content/skill-composition/contracts/README.md)、[能力设计方法](content/skill-composition/CAPABILITY_MAP.md#补齐一个概念的步骤) |
 | 整体结构 | [架构说明](ARCHITECTURE.md)、[核心控制](CORE_CONTROL_DESIGN.md)、[内容模块](CONTENT_MODULE_ARCHITECTURE.md) |
 | 用牌与结算 | [卡牌生命周期](CARD_LIFECYCLE_CONTRACT.md)、[用牌流程](CARD_USE_LIFECYCLE_DESIGN.md)、[使用中实体材料](CARD_USE_MATERIALS.md)、[结算协议](RESOLUTION_PROTOCOLS.md) |
 | 状态归属 | [区域与状态](REGION_STATE_AUDIT.md)、[运行机制](RUNTIME_REFACTOR_IMPLEMENTATION.md) |
 | 人物与注册 | [人物目录](../src/Characters/README.md)、[人物模块与注册](CHARACTER_MODULES.md)、[技能能力边界](SKILL_BOUNDARY_MIGRATION.md) |
-| 技能配置 | [配置格式与节点](content/skill-composition/RUNTIME.md)、[技能组合](SKILL_COMPOSITION_DESIGN.md)、[可组合规则](COMPOSABLE_RULE_ENGINE.md)、[技能实现范围](SKILL_MIGRATION_PLAN.md) |
+| 技能配置 | [配置格式与节点](content/skill-composition/RUNTIME.md)、[技能组合](SKILL_COMPOSITION_DESIGN.md)、[可组合规则](COMPOSABLE_RULE_ENGINE.md) |
 | 验证与排错 | [开发门禁](DEVELOPMENT_GATES.md)、[异常材料](EXCEPTION_REPORTS.md)、[场景矩阵](content/SCENARIO_MATRIX.md) |
 
 ## 内容与素材资料
 
 | 主题 | 文档 |
 | --- | --- |
-| 内容与能力范围 | [内容清单](CONTENT_BACKLOG.md)、[能力缺口](SANGUOSHA_GAP_PLAN.md)、[共享能力请求](content/CORE_API_REQUESTS.md)、[开发分工](MASTER_PLAN.md)、[内容开发队列](LUNA_CONTENT_BACKLOG.md) |
-| 规则依据 | [参考数据](content/BWIKI_REFERENCE_DATA.md)、[人物参考与范围](content/BWIKI_CONTENT_BACKLOG.md)、[内容清单与来源](content/CONTENT_MANIFEST.md) |
+| 内容与能力范围 | [现行内容与注册入口](content/CONTENT_MANIFEST.md)、[共享能力入口与缺口](content/CORE_API_REQUESTS.md) |
+| 规则依据 | [按版本查规则与素材来源](content/CONTENT_MANIFEST.md#来源与素材)、[参考数据](content/BWIKI_REFERENCE_DATA.md)、[证据等级](content/BWIKI_CONTENT_BACKLOG.md) |
 | 牌区与选将 | [内容移动契约](content/CARD_MOVEMENT_CONTRACT.md)、[身份选将](content/IDENTITY_DRAFT.md) |
 | 素材 | [资源目录](RESOURCE_CATALOG_DESIGN.md)、[卡牌美术](content/card-artwork.md)、[音频同步](content/game-audio-sync.md)、[动态皮肤](content/DYNAMIC_SKIN_RESEARCH.md) |
 

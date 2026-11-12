@@ -1,6 +1,6 @@
 # 界公孙瓒、界华雄规则口径
 
-依据当前普通 OL 官网[界公孙瓒320](https://www.sanguosha.com/hero/320)、[界华雄446](https://www.sanguosha.com/hero/446)完整正文；原文、API、HTTP时间及原画SHA见[来源档案](../sources/fenglin-fourteenth-2026-10-02.json)。API没有结构化性别，Male沿仓库同角色惯例；initial_hp零值不作实际初始体力。当前义从始终向外距离−1，HP不大于2时别人向其距离+1；旧classic版本保留。
+依据当前普通 OL 官网[界公孙瓒320](https://www.sanguosha.com/hero/320)、[界华雄446](https://www.sanguosha.com/hero/446)完整正文；原文、API、HTTP时间及原画SHA见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-fourteenth-2026-10-02.json)。API没有结构化性别，Male沿仓库同角色惯例；initial_hp零值不作实际初始体力。当前义从始终向外距离−1，HP不大于2时别人向其距离+1；旧classic版本保留。
 
 趫猛在造成实际伤害后，对该次最终受伤角色选择区域一张牌弃置，印刷坐骑牌才获得。资格要求本人的真实Use杀来源，保留相同来源的链伤与转移；不把打出或响应杀、无牌伤害作为使用杀。此资格细节为工程解释，当前正文没有完整FAQ。手牌选择沿不透出实体内容的opaque槽，装备及判定牌沿公开槽。
 

@@ -1,6 +1,6 @@
 # 界卧龙诸葛亮、界曹植、界郭淮规则口径
 
-本文件区分当前官网正文与实现中采用的组合解释。三将的原page/API字节、HTTP状态、捕获时间和摘要见[预检](../sources/fenglin-twenty-third-preflight-2026-10-04.json)及[当前来源审计](../sources/fenglin-twenty-third-current-source-audit-2026-10-04.json)。复杂组合没有已核实的独立当前普通OL官方FAQ，以下默认不能当作官方FAQ引用。
+本文件区分当前官网正文与实现中采用的组合解释。三将的原page/API字节、HTTP状态、捕获时间和摘要见[预检](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-twenty-third-preflight-2026-10-04.json)及[当前来源审计](../sources/fenglin-twenty-third-current-source-audit-2026-10-04.json)。复杂组合没有已核实的独立当前普通OL官方FAQ，以下默认不能当作官方FAQ引用。
 
 - 界卧龙454当前四技能正文完整，八阵复用现有classic:bazhen。红色/黑色实体按本人手牌和装备解释，花色转换后的有效颜色参与火攻支付；展示仍公布原实体牌面。政策在已接受实际用牌前冻结，之后失技不重算已付成本。不能响应只结束无懈的准确链节点；原锦囊按真实EffectNullified及ChainDepth续接。
 - 界曹植629落英只处理其他角色因真实弃置或判定进入弃牌堆的梅花实体，逐实体可选领取等价于任意子集，不把use、重铸或死亡清理当弃置。判定以最终有效花色和准确Judgment producer证明。标签在本人HE/木牛流马粮持有轨迹中跨回合保留，离开后再获得不会恢复旧标签；新的真实落英可重新签发。来源实例失效终止未发行政策，新实例不会复活旧标签。多材料必须全部带标签，零实体不借标签。

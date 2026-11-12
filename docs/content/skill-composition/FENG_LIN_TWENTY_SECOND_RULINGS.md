@@ -1,6 +1,6 @@
 # 界典韦、界蔡文姬、界张春华规则口径
 
-项目采用的正文与工程默认见[来源档案](../sources/fenglin-twenty-second-preflight-2026-10-04.json)。
+项目采用的正文与工程默认见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-twenty-second-preflight-2026-10-04.json)。
 
 依据冻结的官方界典韦526、界蔡文姬505、界张春华625完整正文，实现对应当前普通OL。来源捕获与注册状态分别保存；不借经典版或其他产品同名技能替换。
 

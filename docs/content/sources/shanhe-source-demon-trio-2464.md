@@ -12,7 +12,7 @@
 
 三员均无固定装备、隐藏成员或二阶段；护甲、护甲回复、额外出杀和额外伤害字段为0，护甲上限字段5。基础起手4与技能产生的摸牌分别处理。三行 `g` 均缺省为false，`hide=false`、`startChapter=1`、`Generalshow=0`；没有主帅，遇敌介绍保留三员完整卡与技能，不折叠为主帅和小头像随从。
 
-三个PVE皮肤各自指定同号 `generalface_<d>`，已核实的146×172官方PNG原字节保存在 `src/CardGame.Wpf/Assets/Shanhe/Npc/`。每个成员均由自己的 `General` 源行核对；弓骑4862与单人2461的4861、暴徒4863与单人2458的4861虽载体不同，各自明确的 `d` 证明共图。刺客在2457和2464也分别保留独立源行证据。完整源行、像素哈希和15个精确运行时身份见[美术核验记录](shanhe-demon-troops-art-2026-10-29.json)。各内容定义的 `PortraitKey="supporter"`、`VariantId` 不变，桌面美术按精确运行时身份绑定。
+三个PVE皮肤各自指定同号 `generalface_<d>`，已核实的146×172官方PNG原字节保存在 `src/CardGame.Wpf/Assets/Shanhe/Npc/`。每个成员均由自己的 `General` 源行核对；弓骑4862与单人2461的4861、暴徒4863与单人2458的4861虽载体不同，各自明确的 `d` 证明共图。刺客在2457和2464也分别保留独立源行证据。完整源行、像素哈希和15个精确运行时身份见[美术核验记录](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/shanhe-demon-troops-art-2026-10-29.json)。各内容定义的 `PortraitKey="supporter"`、`VariantId` 不变，桌面美术按精确运行时身份绑定。
 
 刺客复用[2457完整身体及技能](shanhe-source-demon-assassin-2457.md)。弓骑、暴徒分别使用[2461](shanhe-source-demon-archer-2461.md)、[2458](shanhe-source-demon-raider-2458.md)包提供的 `GetTrioGeneralId`，独立保留4862和4863身体；技能能力共用，原始人物身份不借韩当、段颎或典韦替代。劫掠只出现在第三员，额外体力也只加给第三员。
 

@@ -10,7 +10,7 @@
 
 该成员为士兵4861，原始体力4/4、基础摸牌2、随机起手4；护甲、每轮护甲回复、额外出杀和额外伤害为0，护甲上限字段为5。没有额外 `att_*`、固定装备、固定随身牌、隐藏随从或第二阶段。PVP字段3189不加入山河技能。
 
-2461第0行 `b=4861` 与2464第1行 `b=4862` 已分别核对，两条独立源行均明确 `d=1000238`。PVE皮肤1000238指定 `seatpic=generalface_1000238`，已核实[官方原卡](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000238.png)，146×172原字节保存在 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000238.png`。完整源行、像素哈希及两种载体各自的精确运行时身份见[美术核验记录](shanhe-demon-troops-art-2026-10-29.json)。内容定义的 `PortraitKey="supporter"`、`VariantId` 与规则不变，桌面按已核实的精确身份绑定原卡，不以士兵载体替代皮肤证据。
+2461第0行 `b=4861` 与2464第1行 `b=4862` 已分别核对，两条独立源行均明确 `d=1000238`。PVE皮肤1000238指定 `seatpic=generalface_1000238`，已核实[官方原卡](https://web.sanguosha.com/220/h5_2/res/runtime/pc/general/seat/static/generalface_1000238.png)，146×172原字节保存在 `src/CardGame.Wpf/Assets/Shanhe/Npc/generalface_1000238.png`。完整源行、像素哈希及两种载体各自的精确运行时身份见[美术核验记录](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/shanhe-demon-troops-art-2026-10-29.json)。内容定义的 `PortraitKey="supporter"`、`VariantId` 与规则不变，桌面按已核实的精确身份绑定原卡，不以士兵载体替代皮肤证据。
 
 两条来源记录的 `g` 均缺省为false，`hide=false`、`startChapter=1`、`Generalshow=0`；弓骑不是主帅。遇敌介绍保留完整卡与技能，三人组也保留三员完整卡。
 

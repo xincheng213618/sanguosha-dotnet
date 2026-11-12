@@ -1,6 +1,6 @@
 # 原创设计2016公共能力批次
 
-规则正文和工程默认见[来源档案](../sources/fame-2016-2026-10-01.json)。
+规则正文和工程默认见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fame-2016-2026-10-01.json)。
 
 | 能力组 | 武将 | 核心边界 |
 | --- | --- | --- |

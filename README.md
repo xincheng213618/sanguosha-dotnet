@@ -6,7 +6,7 @@
 
 **使用 C# / .NET 8 实现的三国杀（Sanguosha）规则引擎与 Windows WPF 单机客户端。** 希望为卡牌规则研究、自定义武将、AI 实验和其他界面实现提供可以运行、阅读和扩展的基础。
 
-本项目为社区独立实现，与三国杀官方无隶属或背书关系。玩法以各模式和武将明确记录的版本为准；实现范围和缺口见[模式与规则](docs/MODES_AND_RULESETS.md)、[活动场清单](docs/ACTIVITY_MODES.md)及[能力缺口](docs/SANGUOSHA_GAP_PLAN.md)。
+本项目为社区独立实现，与三国杀官方无隶属或背书关系。玩法以各模式和武将明确记录的版本为准。实现范围见[模式与规则](docs/MODES_AND_RULESETS.md)、[活动场清单](docs/ACTIVITY_MODES.md)和[国战说明](docs/NATIONAL_WAR_EXPERIENCE.md)。
 
 ## 这个项目能提供什么
 

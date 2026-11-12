@@ -264,9 +264,6 @@ entered 与 skipped 不互斥，也不能用阶段结束次数替代 entered。�
 
 随后可用 `distributeBoundCards`，指定 `sourceBind`、`targetKind:"otherLiving"` 和普通表达式条件。先选定具体来源，再对该绑定判断门槛；不是在多个牌堆之间猜一个集合。来源、实体和花色有精确签发凭据。分配复用原公开牌堆游标与移动原因，条件只在发行分配时检查一次；已付子结算返回后继续剩余实体，不重新判断门槛或再次支付。该操作只消费原始 `selectPublicPile` 输出，不能输入任意手牌、Processing 集合或同一集合重复分配。
 
-数量表达式首批迁移、删除项、指标及保留原因见[数量表达式迁移记录](AMOUNT_EXPRESSIONS_MIGRATION.md)。
-后续公共窗口链、绑定及分配抽象的完成记录见[公共抽象记录](DSL_ABSTRACTION_COMPLETION.md)。
-
 ## 迁移样例
 
 | 技能 | 之前 | 之后 |

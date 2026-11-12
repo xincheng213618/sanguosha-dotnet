@@ -1,6 +1,6 @@
 # 界公孙瓒、界华雄共享能力
 
-采用的普通 OL 文本、身份、原始立绘及工程解释见[来源档案](../sources/fenglin-fourteenth-2026-10-02.json)与[规则口径](FENG_LIN_FOURTEENTH_RULINGS.md)。资料、规则及展示由对应人物的 boundary 目录注册。
+采用的普通 OL 文本、身份、原始立绘及工程解释见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-fourteenth-2026-10-02.json)与[规则口径](FENG_LIN_FOURTEENTH_RULINGS.md)。资料、规则及展示由对应人物的 boundary 目录注册。
 
 ## 义从与趫猛
 

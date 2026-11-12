@@ -1,6 +1,6 @@
 # 原创设计2017公共能力预检
 
-规则正文和工程默认见[来源档案](../sources/fame-2017-2026-10-01.json)。
+规则正文和工程默认见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fame-2017-2026-10-01.json)。
 
 采用 OL 当前英雄页；十周年、移动版和界版本的不同技能不混入。以下是2026-10-01的工程契约。页面技能摘要、立绘准备与可编译草稿不能代替实现验收。
 

@@ -1,6 +1,6 @@
 # 毌丘俭、陆抗、许攸共享能力
 
-规则正文和工程默认见[来源档案](../sources/fenglin-third-2026-10-02.json)。
+规则正文和工程默认见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-third-2026-10-02.json)。
 
 毌丘俭：征荣在真正使用Slash家族或伤害锦囊指定目标后的窗口，从该actual action真实final targets中选一名活目标且其手数>=owner；范围HE（其一张牌），手牌候选匿名、装备公开，转入命名公开荣pile，不从任意非目标取牌。多个真实目标仅一次选择；同一use不重触发。采用当前hero及2020补充，不退回伤害后/手牌严格更多旧规则。鸿举prep荣>=3觉醒，不要求已有死者；等量真hand/pile交换允许0张，完成后maxHP-1并grant清侧。清侧真实获得一张荣→弃置一张自己的手牌→弃置任意角色场上EJ一张牌（场上不是H），逐步等待gain/discard嵌套，不重复付款；获取荣后不能假定其仍在手中，按真实现手牌选费用。死亡/gameover、source失效按已承诺费用与既有cursor边界处理。
 

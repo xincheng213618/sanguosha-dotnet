@@ -17,7 +17,6 @@ work = Path(mkdtemp(prefix='import-fixture-', dir=scratch))
 m.REPO = work
 m.OUTPUT = work/'src/CardGame.Wpf/Assets/Audio/Official'
 m.CATALOG = work/'docs/content/game-audio-catalog.json'
-m.CSV_INDEX = work/'docs/content/game-audio-index.csv'
 m.SYNC = work/'sync'
 cache = work/'cache'
 cache.mkdir()

@@ -1,8 +1,7 @@
 # Card-use history and resolution
 
 Required when changing these mechanisms or their consumers. See the
-[contract index](README.md) for related topics and the
-[capability map](../CAPABILITY_MAP.md) for completion status and remaining gaps.
+[contract index](README.md) for related topics.
 
 ## Actual-use and phase history
 
@@ -28,7 +27,32 @@ Required when changing these mechanisms or their consumers. See the
 
 ## Effect episodes and damage adjustments
 
-- Repeated effects of an accepted native card use use `INativeCardEffectEpisodes` and the original `CardUseFrame.EffectEpisodes`: one original continuation, attack seed set and group damage source, with declared priority, copies and whole-use or exact target-occurrence scope. Producers retain qualification, costs and later business effects; shared scheduling never dispatches by character or re-proves issuance from events. `HasPending` means future unstarted copies, while `IsActive` owns the current copy. Keep original-use death continuation permission separate from an extra copy's permission. Whole-use cancellation settles remaining copies without inventing starts or ordinals; target immunity and an individual counterspell do not cancel the whole queue. Restore each accepted Slash slot from its own seed, preserving repeated seats, original materials and typed returns; do not rebuild later targets from the first target's damage or restart a whole target walker for a target-local episode.
+### Native effect episodes
+
+- `INativeCardEffectEpisodes` schedules repeated effects on the original `CardUseFrame.EffectEpisodes`. The use holds one native `Trick` or `Simple` continuation, attack seeds indexed by actual execution slot, the Fangtian target progression and the group-damage source. Each producer issues its own episode with source, instruction and issuance slots, priority, copy count, scope and continuation kind. The shared scheduler orders by priority and actual issuance, using the accepted frame data without character dispatch or event proofs.
+- Declare whole-use, frozen-target, live target-occurrence and paired-target scopes explicitly. A target-local copy ends its cursor and clears the group continuation at that slot. Whole-use Slash restores each slot from its own captured seed, including repeated seats, and requires a real seed for any later target. Accumulated damage, material and typed returns stay with the original use.
+- `HasPending` reports unstarted, uncancelled copies while the match is ongoing and the use remains effective. `IsActive` reports whether a copy still owns native continuation, including the last copy's material-retirement timing and movement reason. An empty target set or a delayed entity that cannot be placed again can consume a copy and advance the queue. `IsCompleted` supports completed returns and `IsSettled` includes cancellation. Actual damage, recovery and movement results retain their own facts.
+- An issued episode survives the producer's later death or skill loss. Read `ContinueAfterActorDeath` for the active copy. When there is no active copy, use `ContinueOriginalAfterActorDeath` for the original effect only if an actual producer issued that permission. It defaults to off.
+- After the current native child returns, [whole-use invalidation](RESPONSES_AND_VISIBILITY.md#card-action-invalidation) releases the active cursor and settles the remaining queue. Unstarted copies are cancelled without starts or ordinal increments. Target immunity and an individual counterspell affect their own scope.
+
+| Producer | Rule-specific boundary |
+| --- | --- |
+| Same-kind payment, automatic trick repeats, Guandu and mode repeats | Issue whole-use effects. Payment and mode eligibility stay with the producer. Guandu requires current native target legality before starting its copy. |
+| 费祎合众 | Bind the original turn grant and rank match to the actual use before issuing a whole-use episode. A returned grant frame can supply its original source identity. |
+| 乐大乔姊希 | Issue the exact live execution slot after selection and judgment. Borrowed Sword retains its execution pair. Repeated seats are resolved by slot. |
+| 魔孙权权御、谋黄月英秉才 | Issue paid whole-use effects. 秉才's zero-entity self-rescue Alcohol repeats recovery using the original typed producer and Dying return without recording another use or rescue. |
+| Incoming single-target repeat with range-based draw | After all episodes settle, the reward owner evaluates its own survival, source effectiveness and current attack range. Episode permission does not grant reward eligibility. |
+| 谋黄权巧对、谋蒋济应时、school repeats | 巧对 keeps its gift payment and whole-use invalidation separate, and consumes a repeat of a delayed entity without placing it again. 应时 keeps its frozen targets and Borrowed Sword pair. School repeats require the actual damage-trick qualification. |
+
+`issueCurrentCardEffectEpisode` declares scope, copies and continuation policy in
+the original `CardUseCommitted` or `CardUseTargetsFinalized` window, with an
+explicit execution slot where required. Native producers use the same issuance
+boundary. Later first-issuance windows are outside the current contract.
+Remaining composition gaps include native qualification, choice and judgment,
+payment, matching future grants, post-completion rewards and special native
+issuance. Those rules and their receipts stay with their producers.
+
+### Damage adjustments
 
 - Fixed effects already issued for a card use use `CardUseFrame.CardDamageAdjustments` and `CoreGameEngineCardUseLifecycleRuntime`; current-occurrence damage changes stay on the actual damage attempt. Preserve whole-use versus target scope and card-damage versus additional-damage layers. Do not rebuild character boost ledgers or requalify paid effects when their source disappears.
 

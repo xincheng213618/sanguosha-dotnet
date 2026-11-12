@@ -237,11 +237,6 @@
       "sha256": "3c0a26d6e3dce2a8a9e9ee3af453a125f69a01cb28b3d842c95404b11b470fcb"
     },
     {
-      "mainPath": "docs/content/sources/evidence/ordinary-other-thirty-seventh-chen-lin-shared-wiring.patch",
-      "stagePath": "shared-wiring.patch",
-      "sha256": "df8df47a55a273fafd2f084cdb277263ab68fdee524ae62fd68c51e242dd751a"
-    },
-    {
       "mainPath": "docs/content/sources/evidence/ordinary-other-thirty-seventh-chen-lin-production-review-input.json",
       "stagePath": "production-review-input.json",
       "sha256": "7be4296cd7484a68bf24f3fc55e5fdb3f822dc31ce7dbd6268c57490b6c34535"

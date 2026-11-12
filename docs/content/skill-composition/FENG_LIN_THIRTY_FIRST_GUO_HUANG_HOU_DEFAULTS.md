@@ -9,5 +9,6 @@
 - tier依成熟永久owner/skill/独立state继承，来源移除/重获新instance不刷新层级或Round额度。并存来源不叠加相同技能状态/额度。
 - Level0牌名可用性基于本trueRound所有角色真实Use的effectiveKind；查询按成熟ProgramBasicCardName把三种Slash归为同名“杀”，公开事实保留真正effectiveKind。此元素Slash同名口径属于未核FAQ默认。声明/材料printedKind或普通打出不计。Nullification为真实Use，有原窗口/Action/actor/provider/responder证明；本人防御Slash的真正Dodge Use计名，包含原生实体、其他转换及八卦；群体Dodge、供牌和Slash打出不凭裸facts计Use。
 - level2真0材料Use无materialcardId、无伪Hand/Processing移动，原动作普通目标/距离/额度/防具/有效颜色限制照常；不是无限无距虚拟Slash。
+- 满级矫诏的零实体火攻保留实际 `CardUse`。按火攻本身的手牌同花色费用或允许的手牌／装备同颜色费用真实付款，结清移牌子窗口后才造成火焰伤害。伤害句柄的 `Card` 为 `null`，实体费用由原付款记录保存。完成端核对原用牌、来源、额度、目标和付款，待顺序目标、连环和类型化子返回结清后只完成一次。[付款与伤害归属](../../../src/CardGame.Core/EngineOwners/CoreGameEngineTieredRoundZeroReturnsRuntime.TieredRoundZeroReturns.cs) · [原生完成](../../../src/CardGame.Core/EngineOwners/CoreGameEngineTieredRoundZeroUsesRuntime.TieredRoundZeroUses.cs)
 - 修改后动作只在原生合法使用时点发行；Round 份额、零实体使用、失技/死亡和满级行为分别按准确生产入口校验。普通打出响应不自动授权新的使用动作。
 - 所有公共事件集合须显式冻结；所有pending集合构造/init/with/JSON均克隆只读；私有material与opaqueHand不得进入公开usage事实或AI隐藏ID推断。

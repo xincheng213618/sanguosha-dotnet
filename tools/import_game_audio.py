@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import ctypes
-import csv
 import gzip
 import hashlib
 import io
@@ -35,7 +34,6 @@ CATALOG = REPO / "docs/content/game-audio-catalog.json"
 RESEARCH = REPO / ".artifacts/portrait-refresh/audio-research/source-index.json"
 CACHE = REPO / ".artifacts/portrait-refresh/audio-cache-refresh/2026-09-26-user-listening/source-index.json"
 SYNC = REPO / ".artifacts/portrait-refresh/audio-sync"
-CSV_INDEX = REPO / "docs/content/game-audio-index.csv"
 CONFIG_URL = "https://web.sanguosha.com/220/h5_2/res/config/Config.sgs"
 GAME_URL = "https://web.sanguosha.com/220/h5_2/sgsGame_a.sgs"
 AUDIO_URL = re.compile(rb"https://web\.sanguosha\.com/[A-Za-z0-9_.~%/\-]+?\.(?:mp3|ogg|wav)(?:\?[A-Za-z0-9_.~%&=+\-]*)?", re.I)
@@ -64,54 +62,6 @@ def write_json_atomic(path: Path, value: dict) -> None:
             json.dump(value, stream, ensure_ascii=False, indent=2)
             stream.write("\n")
         os.replace(temp_name, path)
-    finally:
-        if temp_name and Path(temp_name).exists():
-            Path(temp_name).unlink()
-
-
-def write_csv_index(assets: list[dict]) -> None:
-    """Human-readable, one row per local binding (or source-only asset)."""
-    CSV_INDEX.parent.mkdir(parents=True, exist_ok=True)
-    columns = ["assetId", "productLine", "assignmentStatus", "generalName", "sourceGeneralClasses",
-               "generalKey", "skinName", "localSkinId", "localSkinMatched", "role", "skillName",
-               "lineText", "sourceGeneralIds", "sourceSkinIds", "sourceSkillIds", "localPath", "sourceUrl"]
-    temp_name = None
-    try:
-        with tempfile.NamedTemporaryFile("w", encoding="utf-8-sig", newline="",
-                                         dir=CSV_INDEX.parent, prefix=".audio-index-", suffix=".tmp",
-                                         delete=False) as stream:
-            temp_name = stream.name
-            writer = csv.DictWriter(stream, fieldnames=columns)
-            writer.writeheader()
-            for asset in sorted(assets, key=lambda item: item["id"]):
-                primary = {key: asset.get(key) for key in ("generalKey", "generalName", "skinId", "skinName",
-                                                            "role", "skillName", "lineText")}
-                bindings = [primary, *(asset.get("bindings") or [])]
-                seen = set()
-                for raw in bindings:
-                    binding = {key: raw.get(key) or primary.get(key) for key in primary}
-                    identity = tuple(binding.get(key) for key in ("generalKey", "skinId", "role", "skillName", "lineText"))
-                    if identity in seen:
-                        continue
-                    seen.add(identity)
-                    row = {
-                        "assetId": asset["id"], "productLine": asset.get("productLine", ""),
-                        "assignmentStatus": asset.get("assignmentStatus", ""),
-                        "generalName": binding.get("generalName") or "",
-                        "sourceGeneralClasses": ";".join(asset.get("sourceGeneralClasses", [])),
-                        "generalKey": binding.get("generalKey") or "",
-                        "skinName": binding.get("skinName") or "",
-                        "localSkinId": binding.get("skinId") or "",
-                        "localSkinMatched": "yes" if binding.get("generalKey") and binding.get("skinId") else "no",
-                        "role": binding.get("role") or "", "skillName": binding.get("skillName") or "",
-                        "lineText": binding.get("lineText") or "",
-                        "sourceGeneralIds": ";".join(asset.get("sourceGeneralIds", [])),
-                        "sourceSkinIds": ";".join(asset.get("sourceSkinIds", [])),
-                        "sourceSkillIds": ";".join(asset.get("sourceSkillIds", [])),
-                        "localPath": asset["localPath"], "sourceUrl": asset.get("sourceUrl", ""),
-                    }
-                    writer.writerow(row)
-        os.replace(temp_name, CSV_INDEX)
     finally:
         if temp_name and Path(temp_name).exists():
             Path(temp_name).unlink()
@@ -310,7 +260,6 @@ def main() -> None:
         "assets": sorted(assets, key=lambda x: x["id"]),
     }
     write_json_atomic(CATALOG, result)
-    write_csv_index(result["assets"])
     print(f"Imported {len(assets)} distinct audio files; catalog: {CATALOG}")
 
 
@@ -590,8 +539,6 @@ def sync_cache(cache_dir: Path, refresh_mapping: bool, retry_failures: bool) -> 
     pending = [(url, rows) for url, rows in sorted(grouped.items())
                if url not in known and (retry_failures or url not in failed_history)]
     if not pending and not refresh_mapping and catalog.get("configSource"):
-        if not CSV_INDEX.exists():
-            write_csv_index(assets)
         print(f"Scanned {changed_files} changed cache files; 0 new downloadable game audio URLs. "
               f"{len(assets)} catalog assets unchanged; {len(failed_history)} known failed URL(s) retained.")
         return
@@ -699,7 +646,6 @@ def sync_cache(cache_dir: Path, refresh_mapping: bool, retry_failures: bool) -> 
     catalog["assets"] = sorted(assets, key=lambda asset: asset["id"])
     catalog["configSource"] = evidence if mapping_stats else catalog.get("configSource")
     write_json_atomic(CATALOG, catalog)
-    write_csv_index(catalog["assets"])
     report = {"changedCacheFiles": changed_files, "observedGameAudioUrls": len(grouped),
               "newUrlCandidates": len(pending), "downloadedValid": len(added) + reused_sha,
               "newDistinctSha256": len(added), "reusedSha256Aliases": reused_sha,

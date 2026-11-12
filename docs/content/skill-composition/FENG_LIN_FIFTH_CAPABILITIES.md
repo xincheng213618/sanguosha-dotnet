@@ -1,6 +1,6 @@
 # 袁术、周妃、张绣共享能力
 
-项目采用的普通 OL 正文及工程解释见[来源档案](../sources/fenglin-fifth-2026-10-02.json)。
+项目采用的普通 OL 正文及工程解释见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-fifth-2026-10-02.json)。
 
 庸肆：当前存活角色的有效势力去重。正常摸牌加X遵守既有正常draw计划/替代/跳过，不另开假Draw。弃牌阶段开始重新冻结X，强制弃自己的合法HE实体min(X,可弃数量)，完整children后进入通常弃牌；不调整手牌上限代替。可弃为空则继续；已承诺数量及已付款留owning frame，不在child恢复重算/重付。现有数字表达式可通用扩展，只新增合法资源能力，不改变已有固定amount语义。
 

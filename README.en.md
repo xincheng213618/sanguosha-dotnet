@@ -6,7 +6,7 @@
 
 **A Sanguosha (三国杀) rules engine and Windows WPF single-player client written in C# / .NET 8.** The project aims to provide runnable source for studying card-game rules, adding custom characters, experimenting with AI, and building other interfaces.
 
-This is an independent community implementation, without affiliation with or endorsement by the official game. Rules follow the editions documented for each mode and character. See [modes and rulesets](docs/MODES_AND_RULESETS.md), [activity coverage](docs/ACTIVITY_MODES.md), and [known capability gaps](docs/SANGUOSHA_GAP_PLAN.md). Much of the detailed game documentation is currently in Chinese.
+This is an independent community implementation, without affiliation with or endorsement by the official game. Rules follow the editions documented for each mode and character. See [modes and rulesets](docs/MODES_AND_RULESETS.md), [activity coverage](docs/ACTIVITY_MODES.md), and [National War variants](docs/NATIONAL_WAR_EXPERIENCE.md). Much of the detailed game documentation is currently in Chinese.
 
 ## What you can build on
 

@@ -1,6 +1,6 @@
 # 界刘备、界大乔、界华佗共享能力
 
-项目采用的普通 OL 界版文本、身份和工程默认见[来源档案](../sources/fenglin-eighth-2026-10-02.json)。人物资料、规则与展示分别位于对应人物的 boundary 目录。
+项目采用的普通 OL 界版文本、身份和工程默认见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-eighth-2026-10-02.json)。人物资料、规则与展示分别位于对应人物的 boundary 目录。
 
 ## 仁德与激将
 

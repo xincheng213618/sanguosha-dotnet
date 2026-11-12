@@ -20,7 +20,7 @@ The software license does not grant rights to third-party artwork, audio, brandi
 | Table backgrounds and gallery UI resources / 桌面背景与图鉴界面素材 | [Table catalog](docs/content/table-art-catalog.json) and [gallery UI catalog](docs/content/gallery-ui-assets.json) |
 | Game audio and official recordings / 游戏音频与官方录音 | [Audio catalog](docs/content/game-audio-catalog.json), [sync notes](docs/content/game-audio-sync.md), and [local audio notes](src/CardGame.Wpf/Assets/Audio/README.md) |
 | Scraped rule references / 抓取规则参考 | [BWIKI reference notes](docs/content/BWIKI_REFERENCE_DATA.md) and [data/reference/bwiki](data/reference/bwiki) |
-| External pages, scripts and client/API evidence / 外部页面、脚本及客户端/API 证据 | [docs/content/sources](docs/content/sources), including preserved HTML, JavaScript, text and JSON responses |
+| External pages, scripts and client/API evidence / 外部页面、脚本及客户端/API 证据 | [Current source records](docs/content/sources) and [historical captures](https://github.com/xincheng213618/sanguosha-dotnet/tree/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources) |
 | Quoted character, card and skill descriptions / 引用的人物、卡牌与技能文字 | Source records linked from [the content manifest](docs/content/CONTENT_MANIFEST.md), character content, presentation JSON and related documentation |
 
 Source URLs, download dates and checksums document provenance; they do not establish redistribution permission. Preserve existing source records, copyright statements and any specific licenses. The resource directories and catalogs are not an exhaustive rights-clearance record, and this notice does not claim that every resource has been licensed for redistribution.

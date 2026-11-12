@@ -332,11 +332,6 @@
       "sha256": "e6716de2d402638a420ae2484774a621a31aea2d65f9452805dadc16d3966c73"
     },
     {
-      "mainPath": "docs/content/sources/ordinary-other-thirty-sixth-guan-yin-ping-shared-wiring.patch",
-      "stagePath": "shared-wiring.patch",
-      "sha256": "454f0215b88611265c4138958bf9d8d6b23f386f6817804a3f01365c68161215"
-    },
-    {
       "mainPath": "docs/content/sources/ordinary-other-thirty-sixth-guan-yin-ping-production-review-input.json",
       "stagePath": "production-review-input.json",
       "sha256": "97d21a3c567f20b265a1cf05201bcca462a4a244850793f3f8b9ef7cf1605ec9"

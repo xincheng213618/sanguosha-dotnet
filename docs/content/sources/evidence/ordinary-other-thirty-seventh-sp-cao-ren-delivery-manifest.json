@@ -325,11 +325,6 @@
       "sha256": "dea89b6381d7e9947972fb516fb3acdf6502e0b55555a49d7d28d54b600cdf1f"
     },
     {
-      "mainPath": "docs/content/sources/evidence/ordinary-other-thirty-seventh-sp-cao-ren-shared-wiring.patch",
-      "stagePath": "shared-wiring.patch",
-      "sha256": "4fd396cd71fb4f72b32b4f33b4976eef8e935b23dafa4580bba64e75b2c93831"
-    },
-    {
       "mainPath": "docs/content/sources/evidence/ordinary-other-thirty-seventh-sp-cao-ren-STATIC-REVIEW.json",
       "stagePath": "STATIC-REVIEW.json",
       "sha256": "748de2a1b860d663e25b6247910799a8a2d10a1929ad40e7c81bf921af7d9aa7"

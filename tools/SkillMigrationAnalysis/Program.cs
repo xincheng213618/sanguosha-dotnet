@@ -9,10 +9,25 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+for (var i = 0; i < args.Length; i++)
+{
+    var option = args[i];
+    if (option is "--history" or "--frame-invocations" or "--syntax-only")
+        continue;
+    if ((option is "--root" or "--out") && i + 1 < args.Length &&
+        !args[i + 1].StartsWith("--", StringComparison.Ordinal))
+    {
+        i++;
+        continue;
+    }
+    Console.Error.WriteLine($"Invalid analysis option or missing path: {option}.");
+    Environment.ExitCode = 2;
+    return;
+}
+
 var root = Path.GetFullPath(Option("--root") ?? FindRoot());
 var historyMode = args.Contains("--history");
-var invariantMode = args.Contains("--invariant-cleanup") || args.Contains("--invariant-metrics");
-var output = Path.GetFullPath(Option("--out") ?? Path.Combine(root, ".artifacts", "benchmarks", invariantMode ? "character-invariants" : historyMode ? "step-receipts" : "skill-patterns"));
+var output = Path.GetFullPath(Option("--out") ?? Path.Combine(root, ".artifacts", "benchmarks", historyMode ? "step-receipts" : "skill-patterns"));
 Directory.CreateDirectory(output);
 var timer = Stopwatch.StartNew();
 var json = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
@@ -21,16 +36,10 @@ var parseOptions = new CSharpParseOptions(LanguageVersion.CSharp12,
 var characterRoot = Path.Combine(root, "src", "Characters");
 var characterPaths = Directory.EnumerateFiles(characterRoot, "*.cs", SearchOption.AllDirectories)
     .Where(p => p.Split(Path.DirectorySeparatorChar).Contains("Runtime") && !IsBuildPath(p)).Order().ToArray();
-var paths = args.Contains("--invariant-metrics") ? characterPaths : Directory.EnumerateFiles(Path.Combine(root, "src", "CardGame.Core"), "*.cs", SearchOption.AllDirectories)
+var paths = Directory.EnumerateFiles(Path.Combine(root, "src", "CardGame.Core"), "*.cs", SearchOption.AllDirectories)
     .Where(p => !IsBuildPath(p)).Concat(characterPaths).Order().ToArray();
 Console.WriteLine($"Parsing {paths.Length} source-context files...");
 var trees = paths.AsParallel().AsOrdered().Select(p => CSharpSyntaxTree.ParseText(File.ReadAllText(p), parseOptions, p, Encoding.UTF8)).ToArray();
-if (args.Contains("--invariant-metrics")) { InvariantCleanupAnalysis.WriteMetrics(root, output, trees, json); return; }
-if (invariantMode)
-{
-    InvariantCleanupAnalysis.Run(root, output, args, trees, CreateCompilation(trees, parseOptions), parseOptions, json);
-    return;
-}
 if (historyMode)
 {
     HistoryQueryAnalysis.Run(root, output, trees, CreateCompilation(trees, parseOptions), json);

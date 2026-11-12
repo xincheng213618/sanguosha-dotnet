@@ -297,7 +297,7 @@
     },
     {
       "stagePath": "source/118-cover.raw.png",
-      "mainPath": "docs/content/sources/ordinary-other-thirty-sixth-zhuge-ke-118-cover.raw.png",
+      "mainPath": "src/CardGame.Wpf/Assets/official-ol-zhuge-ke.png",
       "sha256": "a6fe34d90cc756a235597dfd634ebb575147d5c0dd2f43f7301cedc1805af7a1"
     },
     {

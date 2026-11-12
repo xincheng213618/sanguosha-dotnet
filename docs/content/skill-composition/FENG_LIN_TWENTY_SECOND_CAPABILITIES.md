@@ -1,6 +1,6 @@
 # 界典韦、界蔡文姬、界张春华共享能力
 
-界典韦、界蔡文姬与界张春华采用[来源台账](../sources/fenglin-twenty-second-preflight-2026-10-04.json)选定的普通 OL 正文。
+界典韦、界蔡文姬与界张春华采用[来源台账](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-twenty-second-preflight-2026-10-04.json)选定的普通 OL 正文。
 
 ## 实际回合目标与受伤后收益
 

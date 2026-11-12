@@ -1,6 +1,6 @@
 # 界诸葛亮、界孙尚香规则口径
 
-依据当前普通 OL 官网[界诸葛亮440](https://www.sanguosha.com/hero/440)、[界孙尚香443](https://www.sanguosha.com/hero/443)完整正文；HTTP UTC、原文、结构化体力和原始立绘 SHA见[来源档案](../sources/fenglin-twelfth-2026-10-02.json)。官网 API性别为空，两位 Male/Female沿仓库既有人物元数据，不能说是API明示。
+依据当前普通 OL 官网[界诸葛亮440](https://www.sanguosha.com/hero/440)、[界孙尚香443](https://www.sanguosha.com/hero/443)完整正文；HTTP UTC、原文、结构化体力和原始立绘 SHA见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-twelfth-2026-10-02.json)。官网 API性别为空，两位 Male/Female沿仓库既有人物元数据，不能说是API明示。
 
 观星每次启动实际观看时，存活角色至少四人看五，否则三。短堆只看实际可用牌、零张不授皆置底资格为工程解释；一次观看固定同组实体，继续展示已观看牌面不等于再次观看。准备实际全部置底后，真实结束阶段可以再次发动；结束的第二次完成不会重新武装自身。成熟运行时只有正常/额外实际回合的 TurnEnding，没有单独可插 Ending，不能声称覆盖不存在的调度。
 

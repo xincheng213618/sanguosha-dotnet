@@ -1,6 +1,6 @@
 # 界诸葛亮、界孙尚香共享能力
 
-采用的普通 OL 文本、属性与工程默认见[来源档案](../sources/fenglin-twelfth-2026-10-02.json)及[规则口径](FENG_LIN_TWELFTH_RULINGS.md)。人物资料注册 boundary:zhuge-liang 和 boundary:sun-shangxiang；规则分别使用 boundary:guanxing-current、boundary:jieyin-current，并复用 classic:kongcheng、classic:xiaoji。
+采用的普通 OL 文本、属性与工程默认见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-twelfth-2026-10-02.json)及[规则口径](FENG_LIN_TWELFTH_RULINGS.md)。人物资料注册 boundary:zhuge-liang 和 boundary:sun-shangxiang；规则分别使用 boundary:guanxing-current、boundary:jieyin-current，并复用 classic:kongcheng、classic:xiaoji。
 
 ## 观星
 

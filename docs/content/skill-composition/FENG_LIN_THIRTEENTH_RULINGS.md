@@ -1,6 +1,6 @@
 # 界黄忠、界魏延规则口径
 
-依据当前普通 OL 官网[界黄忠26](https://www.sanguosha.com/hero/26)、[界魏延456](https://www.sanguosha.com/hero/456)完整正文；原文、API元数据、HTTP UTC及原始立绘SHA见[来源档案](../sources/fenglin-thirteenth-2026-10-02.json)。API无gender字段，男性沿仓库已有同角色定义；initial_hp零值不作游戏实际初始体力。
+依据当前普通 OL 官网[界黄忠26](https://www.sanguosha.com/hero/26)、[界魏延456](https://www.sanguosha.com/hero/456)完整正文；原文、API元数据、HTTP UTC及原始立绘SHA见[来源档案](https://github.com/xincheng213618/sanguosha-dotnet/blob/77ab25557053b2e6c1033af6c6f392484c5b71dd/docs/content/sources/fenglin-thirteenth-2026-10-02.json)。API无gender字段，男性沿仓库已有同角色定义；initial_hp零值不作游戏实际初始体力。
 
 烈弓只改变具体杀的范围：正有效点数替代该杀普通范围，既有明确无距离限制资格保留，玩家通用攻击范围不变。2016官网托管[黄忠攻略](https://sanguosha.com/news/20161026_7095_5710)明确标为自编FAQ，其丈八两牌点数和上限13只作为真实丈八转换的有限参考。当前正文未说明其他无点数杀，沿普通范围为工程默认，不从任意多成本牌求和或最大值。当前正文优先，历史攻略的不能响应与当前不能抵消不可互换。
 
