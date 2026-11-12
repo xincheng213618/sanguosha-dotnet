@@ -131,13 +131,13 @@ internal static class ShanheStartingResourceChecks
         s.Until(() => s.At(UseWatch));
         var use = s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.CardId == material);
         var receipt = use.MaterialClaims.Single();
-        Need(use.ExtraCardEffect is { WholeGroupRepeated: true } && receipt.CardId == material && receipt.RecipientSeat == 1 &&
+        Need(use.EffectEpisodes is { StartedOrdinal: > 0 } && receipt.CardId == material && receipt.RecipientSeat == 1 &&
             use.Continuations.GroupCard!.DamageClaimedPhysicalCardIds.SequenceEqual([material]) &&
             s.G.CardMovements.Single(m => m.Sequence == receipt.MovementSequence) is { From.Zone: CardZoneKind.Processing, To: var destination } &&
             destination == CardLocation.Hand(1) && s.Zone(material) == CardLocation.Hand(1) &&
             s.E<ProgramDamageCardsClaimedEvent>().Count(e => e.CardIds.Contains(material)) == 1 &&
             s.E<DamageAppliedEvent>().Count(e => e.SourceSeat == 0 && e.TargetSeat == 1 && e.Amount == 1) == 2 &&
-            s.E<ExtraCardEffectStartedEvent>().Count(e => e.CardUseFrameId == use.Id) == 1 &&
+            s.E<NativeCardEffectEpisodeStartedEvent>().Count(e => e.UseFrameId == use.Id) == 1 &&
             s.E<CardUseDeclaredEvent>().Count(e => e.ResolutionId == use.Id) == 1 &&
             s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) == 1 &&
             s.E<ShanheStartingResourceDestroyedEvent>().All(e => e.CardId != material),

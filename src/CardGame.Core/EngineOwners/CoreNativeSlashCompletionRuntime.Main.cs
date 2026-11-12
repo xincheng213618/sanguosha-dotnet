@@ -112,8 +112,6 @@ internal sealed partial class CoreNativeSlashCompletionRuntime
         {
             if (_nativeMaterialClaims.PreservesMaterialAtCompletion(attack.ResolutionId, physicalCard.Id))
                 continue;
-            if ((_coreHellSoulCardsOperations.IsHellDestroyedSoulMaterial(attack.ResolutionId, physicalCard.Id) || (_characterHuBanOlOperations.IsHuiyunOutsideGeneralWeaponMaterial(attack.ResolutionId, physicalCard.Id) || _characterMiHengLeOperations.IsSiruiOutsideGeneralWeaponMaterial(attack.ResolutionId, physicalCard.Id)) || (_coreGuanduEquipmentOperations.IsGuanduDestroyedChariotMaterial(attack.ResolutionId, physicalCard.Id) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial3(attack.ResolutionId, physicalCard.Id))) || (_coreForeignSelectedCardSlashReturnsOperations.IsSelectedForeignCardSlashRemovedMaterial(attack.ResolutionId, physicalCard.Id) || _characterZhangYanOlOperations.IsZhangYanSujiRemovedMaterial(attack.ResolutionId, physicalCard.Id) || ((_coreKenshangPaymentsOperations.IsKenshangRemovedMaterial(attack.ResolutionId, physicalCard.Id) || _characterGuanHaiOlOperations.IsXieweiRemovedMaterial(attack.ResolutionId, physicalCard.Id)) || (_characterWuJingOlOperations.IsWuJingHejiRemovedMaterial(attack.ResolutionId, physicalCard.Id) || _characterSunYuanOlOperations.IsSayingRemovedMaterial(attack.ResolutionId, physicalCard.Id)))))
-                continue;
             var physicalLocation = _cardZonesOperations._cardZones.GetLocation(physicalCard.Id);
             if (physicalLocation == CardLocation.Processing)
             {

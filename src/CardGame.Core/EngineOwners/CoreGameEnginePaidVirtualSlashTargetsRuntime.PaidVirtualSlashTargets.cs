@@ -5,7 +5,7 @@ internal sealed partial class CoreGameEnginePaidVirtualSlashTargetsRuntime
 {
     internal bool TryContinuePaidVirtualSlashTargets(NativeOwners.CardAttackHandle attack)
     {
-        if (_characterDaQiaoLeOperations.IsTargetScopedZixiEffectRound(attack.ResolutionId))
+        if (_nativeEffectEpisodes.IsTargetScoped(attack.ResolutionId))
             return false;
         if (!_coreForeignPublicPileSlashesOperations.IsForeignPublicPileSlashUse(attack.ResolutionId) || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not { } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || attack.Card is not null)
             return false;

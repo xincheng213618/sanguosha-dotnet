@@ -24,8 +24,13 @@ internal static class MouHuaXiongOlChecks
         using var expression = JsonDocument.Parse("""[">",["handCount","eventTarget"],["handCount","eventSource"]]""");
         var kinds = new List<CardKind> { CardKind.Duel };
         var minimum = new ResponseRule(minimum: 2, actorSeat: 1, opponentSeat: 1, incomingKinds: kinds,
-            requiredKinds: [CardKind.Slash], condition: ProgramExpressions.Parse(expression.RootElement, "fixture.response.while"), skillName: "shared-response");
+            requiredKinds: [CardKind.Slash], @while: ProgramExpressions.Parse(expression.RootElement, "fixture.response.while"), skillName: "shared-response");
         kinds.Clear();
+        var serializedRule = new ResponseRule(forbid: true, audience: ResponseRuleAudience.All)
+            { InstructionIndex = query.InstructionIndex, IsWholeUseNoResponsePolicy = true };
+        var restoredRule = JsonSerializer.Deserialize<ResponseRule>(JsonSerializer.Serialize(serializedRule))!;
+        s.Need(restoredRule.InstructionIndex == query.InstructionIndex && restoredRule.IsWholeUseNoResponsePolicy,
+            "Response-rule JSON restores the original direct instruction and the actual whole-use notification role.");
         lifecycle.IssueResponseRule(original.Id, minimum);
         s.Need(lifecycle.GetResponseDecision(query).Minimum == 2 &&
             lifecycle.GetResponseDecision(query with { ProviderSeat = 2 }).Minimum == 2 &&

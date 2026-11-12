@@ -43,7 +43,6 @@ internal sealed partial class CharacterHuBanOlEntries
     internal bool IsHuBanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => _resolve().IsHuBanMovement(f, e, p);
     internal bool IsHuiyunExactHandQuery(CharacterState actor, int? id) => _resolve().IsHuiyunExactHandQuery(actor, id);
     internal bool IsHuiyunNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _resolve().IsHuiyunNativeSettlementBatch(f, batch);
-    internal bool IsHuiyunOutsideGeneralWeaponMaterial(long useId, int cardId) => _resolve().IsHuiyunOutsideGeneralWeaponMaterial(useId, cardId);
     internal bool IsHuiyunTrickPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => _resolve().IsHuiyunTrickPaymentBatch(use, batch);
     internal bool IsIssuedHuiyunCandidate(ProgramTriggerCandidate c) => _resolve().IsIssuedHuiyunCandidate(c);
     internal void IssueHuiyunDraw(ProgramSkillFrame f, int requested, bool recast) => _resolve().IssueHuiyunDraw(f, requested, recast);

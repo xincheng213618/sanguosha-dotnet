@@ -40,11 +40,9 @@ internal interface IMobileSimaRenjieFacts : IMobileSimaCommonFacts
     MobileSimaAttack? ActiveAttack { get; }
     MobileSimaSword? ActiveSword { get; }
     IReadOnlyList<Card> Equipment(int seat);
-    bool WenjiNullificationForbidden(NullificationWindowFrame frame, int actor);
     bool FuqiNullificationBanned(int actor);
     bool NearbyResponseProhibited(int source, int actor, CardKind kind, IReadOnlyList<int> targets, long incomingFrameId);
     bool UseUnrespondable(long useId);
-    bool WenjiResponseForbidden(long useId, int actor);
     bool LegalBorrowedSwordTarget(int owner, int target);
     int ExtraEffectOrdinal(long useId);
     bool NullificationEffectOwner(NullificationWindowFrame frame);

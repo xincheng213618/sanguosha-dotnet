@@ -7,7 +7,6 @@ internal sealed partial class CoreGameEngineShanheStartingResourcesEntries
     internal CardMovementBatchContext CompleteMovementBatchCaptureShanheStartingResourceUseEntries(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureShanheStartingResourceUseEntries(batch, completed);
     internal bool IsShanheStartingResource(int id) => _resolve().IsShanheStartingResource(id);
     internal bool IsShanheStartingResourceDestroyedMaterial(CardMovementRecord move) => _resolve().IsShanheStartingResourceDestroyedMaterial(move);
-    internal bool IsShanheStartingResourceDestroyedUseMaterial(long useId, int cardId) => _resolve().IsShanheStartingResourceDestroyedUseMaterial(useId, cardId);
     internal bool IsShanheStartingResourceResponseFinish(CardActionContext action, CardActionCost cost, CardMovementRecord finish) => _resolve().IsShanheStartingResourceResponseFinish(action, cost, finish);
     internal CardLocation NormalizeShanheStartingResourceDestination(Card card, CardLocation from, CardLocation to, CardMoveReason? reason) => _resolve().NormalizeShanheStartingResourceDestination(card, from, to, reason);
     internal void PublishShanheStartingResourceOrigins() => _resolve().PublishShanheStartingResourceOrigins();

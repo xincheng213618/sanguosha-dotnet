@@ -107,8 +107,8 @@ internal sealed partial class CoreNativeDodgeRuntime
 
     internal void ResolveDodgeResponse(NativeOwners.CardAttackHandle attack, CharacterState defender, Card responseCard)
     {
-        if (_characterLiuQiOlOperations.IsWenjiResponseForbidden2(attack.ResolutionId, defender.Seat))
-            throw new InvalidOperationException("Wenji forbids this exact Slash Dodge response.");
+        if (_responseRules.IsResponseForbidden(attack.ResolutionId, defender.Seat, CardKind.Dodge, attack.SourceSeat))
+            throw new InvalidOperationException("The incoming Slash forbids this Dodge response.");
         if (_coreCardDeclarationsOperations.TryBeginCardDeclaration(defender, responseCard, CardKind.Dodge, _coreCardDeclarationsOperations.PeekDeclarationConversion(defender, responseCard, CardKind.Dodge, false), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Dodge, defender.Seat), [attack.SourceSeat]))
             return;
         if (!_coreNativeResponseMaterialQueriesOperations.CanUseCardAsResponse(defender, responseCard, CardKind.Dodge) && _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(defender, CardKind.Dodge, true).FirstOrDefault(selection => selection.Cards[0].Id == responseCard.Id)is { } extended)
@@ -179,9 +179,9 @@ internal sealed partial class CoreNativeDodgeRuntime
     {
         if (_characterXunYuMobileGodOperations.TryContinueQizhengResponse(attack, action, continuation))
             return;
-        if (_coreWushuangZengouOperations.ContinueWushuangZengouDodge(attack, action, continuation))
-            return;
-        if (_coreNamedAmbushInvalidationOperations.ContinueNamedAmbushIneffectiveDodge(attack, action, continuation))
+        if (_invalidationExecution.HasIneffectiveDodge(attack, action, continuation))
+            _characterHuanShuJunOlOperations.ClearHuanpeiDodgeResponse(attack);
+        if (_invalidationExecution.ContinueIneffectiveDodge(attack, action, continuation))
             return;
         switch (continuation)
         {

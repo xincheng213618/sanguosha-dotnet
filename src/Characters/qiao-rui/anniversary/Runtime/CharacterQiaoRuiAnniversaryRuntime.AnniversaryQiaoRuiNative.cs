@@ -19,7 +19,8 @@ internal sealed partial class CharacterQiaoRuiAnniversaryRuntime
                 continue;
             var suit = _coreProgramCardPoliciesOperations.GetProgramEffectiveSuit(actor, card);
             var color = _coreActionDiscardColorsOperations.CapturePhysicalCardColor(ownerSeat, card);
-            var targets = originalTargets.Distinct().Where(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && t != ownerSeat && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && _attackRanges.IsWithinAttackRange(ownerSeat, t) && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], CardKind.Slash, suit, color, card.Rank, [id], conversionSource: source)).Select(t => _coreMatchParticipantsPlayersAccess._players[t]).ToArray();
+            var candidates = originalTargets.Distinct().Where(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && t != ownerSeat && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && _attackRanges.IsWithinAttackRange(ownerSeat, t)).Select(t => _coreMatchParticipantsPlayersAccess._players[t]).ToArray();
+            var targets = _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, candidates, CardKind.Slash, suit, color, card.Rank, [id], conversionSource: source).Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).ToArray();
             var actions = targets.Select(t => new LegalAction(LegalActionKind.Slash, id, t.Seat, "扫围", CardKind.Slash, TargetSeats: [t.Seat])).ToList();
             _coreNativeMultiTargetActionsOperations.AddFangtianHalberdSlashActions(actions, actor, card, targets, "扫围", CardKind.Slash, source);
             _coreProgramCardUseRulesOperations.AddProgramTargetCountSlashActions(actions, actor, card, targets, "扫围", CardKind.Slash, source);

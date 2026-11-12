@@ -107,6 +107,7 @@ public sealed class ToggleBooleanStateSkillProgramEffectHandler : ISkillProgramE
 internal sealed class GrantDirectedTurnCardPolicyProgramOperationDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.GrantDirectedTurnCardPolicy;
+    public override IReadOnlyList<SkillStateBoundarySpec> LifetimeBoundaries(SkillProgramEffect effect) => effect.DirectedPolicyOptions?.Until ?? [];
     public override ISkillProgramEffectHandler Handler { get; } = new GrantDirectedTurnCardPolicySkillProgramEffectHandler();
     public override ProgramContextCapability RequiredCapabilities => ProgramContextCapability.TurnEffects;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(

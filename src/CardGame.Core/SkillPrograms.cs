@@ -285,6 +285,9 @@ public enum SkillProgramRandomTransferRevealPolicy { RecipientAfterGain = 0 }
 public enum SkillProgramEffectOp
 {
     IssueCurrentResponseRule = 2103,
+    ApplyResponseRelation = 2104,
+    IssueCurrentCardEffectEpisode = 2105,
+    GrantHandLimitExemption = 2106,
     AddCurrentCardDamage = 2102,
     OfferGeneratedEquipment = 910000,
     SelectRandomPileEquipment = 910001,
@@ -3910,9 +3913,13 @@ public sealed class SkillProgramCatalog
         RequireObject(node, path);
         CheckProperties(node, path, "id", "kind", "cardKinds", "requiredCardKinds", "value",
             "inputSuit", "outputSuit", "condition", "factionId", "ownerRole", "discardCost", "providerDrawCount", "maximumRecoveryOrdinal",
-            "useIncomingResponseDistance", "includeNonTargetResponders", "peachRecoveryScope", "beforePhaseEntry");
+            "useIncomingResponseDistance", "includeNonTargetResponders", "peachRecoveryScope", "beforePhaseEntry", "handLimitMatch");
         var id = Identifier(node, "id", path);
         var kind = EnumValue<SkillProgramCardPolicyKind>(node, "kind", path);
+        var handLimitMatch = node.TryGetProperty("handLimitMatch", out var handLimitNode)
+            ? ParseHandLimitMatch(handLimitNode, path + ".handLimitMatch") : null;
+        if (handLimitMatch is not null && kind != SkillProgramCardPolicyKind.HandLimitCardKindExemption)
+            Fail(path + ".handLimitMatch", "requires handLimitCardKindExemption");
         bool? beforePhaseEntry = node.TryGetProperty("beforePhaseEntry", out _)
             ? RequiredBool(node, "beforePhaseEntry", path) : null;
         if (beforePhaseEntry is not null && kind != SkillProgramCardPolicyKind.OfferSkipDiscard)
@@ -4188,7 +4195,8 @@ public sealed class SkillProgramCatalog
              SkillProgramCardPolicyKind.OtherWuTreatedWoundedDuringOwnTurn or SkillProgramCardPolicyKind.EmptyHandDamageTakenBonus or SkillProgramCardPolicyKind.BlackSlashIgnoresArmorBothDirections or SkillProgramCardPolicyKind.EmptyWeaponStoneAxe)        {
             if (cardKinds.Count != 0) Fail(path + ".cardKinds", "this policy does not accept card kinds");
         }
-        else if (cardKinds.Count == 0 && kind is not (
+        else if (cardKinds.Count == 0 &&
+                 !(kind == SkillProgramCardPolicyKind.HandLimitCardKindExemption && handLimitMatch is not null) && kind is not (
                      SkillProgramCardPolicyKind.HellShiyouIntercept or
                      SkillProgramCardPolicyKind.ShenwuArmedSourceDamageBonus or
                      SkillProgramCardPolicyKind.FactionResponseRequest or
@@ -4255,10 +4263,10 @@ public sealed class SkillProgramCatalog
              OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
             Fail(path, "Additional DrawTwo cards require exactly DrawTwo, a bounded positive amount and no other qualifiers.");
         if (kind == SkillProgramCardPolicyKind.HandLimitCardKindExemption &&
-            (cardKinds.Count == 0 || requiredKinds.Count != 0 || value != 0 ||
+            ((handLimitMatch is null ? cardKinds.Count == 0 : cardKinds.Count != 0) || requiredKinds.Count != 0 || value != 0 ||
              inputSuit is not null || outputSuit is not null || factionId is not null || ownerRole is not null ||
-             OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
-            Fail(path, "Hand-limit exemptions require effective card kinds and no other qualifiers.");
+             handLimitMatch is null && OptionalCondition(node, path).Kind != SkillProgramConditionKind.Always))
+            Fail(path, "Hand-limit exemptions require legacy effective kinds or one declared handLimitMatch, without response or payment qualifiers.");
         if (kind == SkillProgramCardPolicyKind.RoundFirstSlashAdditionalTargets &&
             (!ProgramCardKindMatch.IsFullSlashFamily(cardKinds) || requiredKinds.Count != 0 || value is < 1 or > 20 ||
              inputSuit is not null || outputSuit is not null || factionId is not null || ownerRole is not null ||
@@ -4293,9 +4301,26 @@ public sealed class SkillProgramCatalog
             inputSuit, outputSuit, OptionalCondition(node, path), factionId, ownerRole)
         { DiscardCost = discardCost, ProviderDrawCount = providerDrawCount,
           UseIncomingResponseDistance = useIncomingResponseDistance, IncludeNonTargetResponders = includeNonTargetResponders,
-          PeachRecoveryScope = peachRecoveryScope, BeforePhaseEntry = beforePhaseEntry };
+          PeachRecoveryScope = peachRecoveryScope, BeforePhaseEntry = beforePhaseEntry, HandLimitMatch = handLimitMatch };
 EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBlackSlashPolicy(path,policy);
         return policy;
+    }
+
+    internal static HandLimitMatch ParseHandLimitMatch(JsonElement node, string path)
+    {
+        RequireObject(node, path);
+        CheckProperties(node, path, "mark", "cardKinds", "face", "effectiveSuits", "isRed", "requireLivingHolder", "printedRank");
+        var mark = node.TryGetProperty("mark", out _) ? Identifier(node, "mark", path) : null;
+        var kinds = node.TryGetProperty("cardKinds", out _) ? EnumArray<CardKind>(node, "cardKinds", path) : [];
+        var face = node.TryGetProperty("face", out _) ? EnumValue<HandLimitCardFace>(node, "face", path) : HandLimitCardFace.Printed;
+        if (node.TryGetProperty("face", out _) && kinds.Count == 0)
+            Fail(path + ".face", "requires cardKinds");
+        var suits = node.TryGetProperty("effectiveSuits", out _) ? EnumArray<Suit>(node, "effectiveSuits", path) : [];
+        bool? red = node.TryGetProperty("isRed", out _) ? RequiredBool(node, "isRed", path) : null;
+        var living = node.TryGetProperty("requireLivingHolder", out _) && RequiredBool(node, "requireLivingHolder", path);
+        int? rank = node.TryGetProperty("printedRank", out _) ? PositiveInt(node, "printedRank", path) : null;
+        if (rank > 13) Fail(path + ".printedRank", "must be a printed rank 1..13");
+        return new(mark, kinds, face, suits, red, living, rank);
     }
 
     private static SkillProgramDamageModifier ParseDamageModifier(JsonElement node, string path)
@@ -7315,12 +7340,7 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
     {
         if (node.ValueKind != JsonValueKind.String) Fail(path, "must be a camelCase string");
         var text = node.GetString()!;
-        foreach (var value in Enum.GetValues<T>())
-        {
-            var name = Enum.GetName(value)!;
-            var camel = char.ToLowerInvariant(name[0]) + name[1..];
-            if (text == camel) return value;
-        }
+        if (SkillProgramEnumText.TryParse<T>(text, out var value)) return value;
         Fail(path, $"unsupported {typeof(T).Name} value '{text}'");
         return default;
     }

@@ -33,7 +33,7 @@ internal sealed partial class CharacterHouChengAnniversaryRuntime
         if (child is DyingFrame dying)
             return r.Stage == AnniversaryHouChengStage.HpChildren && r.HpPaid && dying.ParentFrameId == f.Id && dying.VictimSeat == f.OwnerSeat && dying.KillerSeat is null && dying.Continuation == DyingContinuationKind.ProgramSkill;
         if (child is RecoveryReplacementFrame recovery)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && r.Stage == AnniversaryHouChengStage.HpChildren && r.HpPaid && hp.Change.Kind == HpChangeKind.Loss && hp.Change.TargetSeat == f.OwnerSeat && hp.Change.Amount == 1;
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && state.CharacterStateContinuation == CharacterStateContinuation.Program);

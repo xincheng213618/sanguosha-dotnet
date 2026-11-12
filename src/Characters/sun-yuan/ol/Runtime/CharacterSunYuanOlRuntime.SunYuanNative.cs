@@ -3,7 +3,6 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSunYuanOlRuntime
 {
-    internal bool IsSayingFactionOrigin(ProgramSkillFrame f, int actor, int target, string resultBind) => IsSayingSlashRequest(f) && TryGetSayingSlashRequest(f, out var actual, out var targets) && actual == actor && targets.SequenceEqual([target]) && resultBind == "saying-slash" && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[actor], CardKind.Slash)is not null;
     internal void BeginSayingFactionRequest(ProgramSkillFrame f, int actor, int target)
     {
         if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not null || !IsSayingSlashRequest(f) || !TryGetSayingSlashRequest(f, out var actual, out var targets) || actual != actor || !targets.SequenceEqual([target]) || !_coreAssistedFactionSlashOperations.CanRequestAssistedProgramFactionSlash(actor, target) || _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[actor], CardKind.Slash)is not { } policy)
@@ -11,17 +10,16 @@ internal sealed partial class CharacterSunYuanOlRuntime
         var candidates = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actor, policy.FactionId);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SayingFactionRequestedEvent(f.Id, actor, target, policy));
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(f.Id, FactionCardRequestPurpose.AssistedProgramUse, actor, candidates, policy.FactionId, targetSeat: target, programSkillFrameId: f.Id, policySource: policy, assistedResultBind: "saying-slash");
-        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: false, usesChoiceResult: false);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: false, usesChoiceResult: false, requestIdentity: _slashRequests.GetIdentity(f));
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(f.Id, actor, candidates, policy.SkillId, IsActiveUse: true, target));
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateSayingFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f) => TryGetSayingSlashRequest(f, out var actor, out var targets) && pending.IsAssistedProgramUse && pending.OwnerFrameId == f.Id && pending.ProgramSkillFrameId == f.Id && pending.OwnerSeat == actor && targets is [var target] && pending.TargetSeat == target && pending.AssistedResultBind == "saying-slash" && pending.PolicySource is { } policy && pending.ProviderFactionId == policy.FactionId && policy.RequiredKind == CardKind.Slash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SayingFactionRequestedEvent>().Count(e => e.FrameId == f.Id && e.ActorSeat == actor && e.TargetSeat == target && e.Source == policy) == 1;
     internal void PrepareSayingSuppliedSlash(ProgramSkillFrame supplied, int actorSeat, int providerSeat, int targetSeat, CardKind kind, IReadOnlyList<Card> materials, CardConversionSource? conversionSource, IReadOnlyList<CardConversionSource>? additionalConversionSources = null)
     {
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == supplied.Id);
         if (!IsSayingSlashRequest(f) || !TryGetSayingSlashRequest(f, out var actor, out var targets) || actor != actorSeat || !targets.SequenceEqual([targetSeat]) || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(providerSeat) || materials.Select(c => c.Id).Distinct().Count() != materials.Count || materials.Any(c => c.Id <= 0 || !_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Id)).Any(actual => actual.Id == c.Id && actual.Kind == c.Kind)))
             throw new InvalidOperationException("Saying's supplied Slash lost its exact current holder, target or primary group.");
         var r = f.SunYuan!;
@@ -38,9 +36,9 @@ internal sealed partial class CharacterSunYuanOlRuntime
             Materials = materials.Select(c => new SunYuanEntity(c.Id, c.Kind, c.Kind, _cardZonesOperations._cardZones.GetLocation(c.Id), c.IsGeneralWeapon)).ToArray(),
             Sources = sources
         };
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<SayingSlashPreparedEvent>().Any(e => e.FrameId == f.Id))
+        if (r.Selection is not null || r.Native is not null)
             throw new InvalidOperationException("One Saying request cannot issue two native Slashes.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { SunYuan = r with { Stage = SunYuanStage.SlashIssuing, Selection = selection } });
+        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { SunYuan = r with { Stage = SunYuanStage.SlashIssuing, Selection = selection } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SayingSlashPreparedEvent(f.Id, actorSeat, providerSeat, targetSeat, kind, SunYuanHash(selection)));
     }
 
@@ -48,7 +46,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
     {
         if (!IsSayingSlashRequest(supplied))
             return false;
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == supplied.Id);
         if (f.SunYuan!.Native is not null)
             throw new InvalidOperationException("A completed Saying Slash cannot become an unpaid cancellation.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -58,12 +56,29 @@ internal sealed partial class CharacterSunYuanOlRuntime
 
     internal void BindSayingSlashUse(CardUseFrame supplied)
     {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == supplied.Id);
-        var parent = index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramSkillFrame { SunYuan: { Stage: SunYuanStage.SlashIssuing } } direct ? direct : _characterLiuFengBoundaryOperations.BoundaryLiuFengNativeParent(supplied);
+        if (supplied.ProgramSlashRequestExecution is not { } execution ||
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == execution.ProgramFrameId) is not { SunYuan: { } state } parent ||
+            supplied.Action is not { Type: CardActionType.Use } action)
+            return;
+        var acceptance = execution.Acceptance;
+        if (!_slashRequests.OwnsAcceptance(parent, acceptance, acceptance.Identity.ActorSeat, acceptance.TargetSeat))
+            throw new InvalidOperationException("A requested native Slash lost its exact original accepted instruction.");
+        if (state.Native is null && state.Stage is SunYuanStage.Request or SunYuanStage.SlashIssuing)
+        {
+            var preparedSelection = new SayingSelection(acceptance.Identity.ActorSeat, action.ProviderSeat, acceptance.TargetSeat, action.EffectiveKind)
+            {
+                Materials = action.PhysicalCards.Select(cost => new SunYuanEntity(cost.CardId, cost.CardKind, cost.CardKind, cost.From, _coreAdvancedLifecycleOperations.GetAdvancedCard(cost.CardId).IsGeneralWeapon)).ToArray(),
+                Sources = action.ConversionChain
+            };
+            _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { SunYuan = state with { Stage = SunYuanStage.SlashIssuing, Selection = preparedSelection } });
+            if (state.Selection is null)
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SayingSlashPreparedEvent(parent.Id, acceptance.Identity.ActorSeat, action.ProviderSeat, acceptance.TargetSeat, action.EffectiveKind, SunYuanHash(preparedSelection)));
+            parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+        }
         if (parent is not { SunYuan: { Stage: SunYuanStage.SlashIssuing, Selection: { } selection } r })
             return;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(supplied.Id)!;
-        if (use.SayingSlash is not null || r.Native is not null || use.Action is not { Type: CardActionType.Use } a || use.SourceSeat != selection.ActorSeat || a.ActorSeat != selection.ActorSeat || a.ProviderSeat != selection.ProviderSeat || use.CardKind != selection.Kind || a.EffectiveKind != selection.Kind || !use.TargetSeats.SequenceEqual([selection.TargetSeat]) || !a.TargetSeats.SequenceEqual(use.TargetSeats) || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(selection.Materials.Select(c => c.CardId)) || !a.ConversionChain.SequenceEqual(selection.Sources) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SayingSlashPreparedEvent>().Count(e => e.FrameId == parent.Id && e.SelectionHash == SunYuanHash(selection)) != 1)
+        if (use.SayingSlash is not null || r.Native is not null || use.Action is not { Type: CardActionType.Use } a || a.ProviderSeat != selection.ProviderSeat || use.CardKind != selection.Kind || a.EffectiveKind != selection.Kind || !a.TargetSeats.SequenceEqual(use.TargetSeats) || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(selection.Materials.Select(c => c.CardId)) || !a.ConversionChain.SequenceEqual(selection.Sources))
             throw new InvalidOperationException("Saying's native child changed its once-prepared actor, provider, conversion or payment.");
         var origin = new SayingNativeOrigin(parent.Id, r.Source, r.GameplayHash, r.ActualTurn, use.Id, a.ActionId, selection, a, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { SunYuan = r with { Stage = SunYuanStage.NativeUse, Native = origin, NativeReturned = false, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
@@ -90,7 +105,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
 
     internal bool IsIssuedSayingUse(CardUseFrame use)
     {
-        if (use.SayingSlash is not { } o || use.Action is not { Type: CardActionType.Use } a || use.Id != o.UseId || a.ActionId != o.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Selection.ActorSeat, o.Selection.ProviderSeat) || a.ProviderSeat != o.Selection.ProviderSeat || !a.PhysicalCards.SequenceEqual(o.OriginalAction.PhysicalCards) || !use.PhysicalCardIds!.SequenceEqual(o.Selection.Materials.Select(c => c.CardId)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SayingSlashIssuedEvent>().Count(e => e.FrameId == o.ProgramFrameId && e.UseId == use.Id && e.ActionId == o.ActionId && e.OriginalActionHash == SunYuanHash(o.OriginalAction)) != 1)
+        if (use.SayingSlash is not { } o || use.Action is not { Type: CardActionType.Use } a || use.Id != o.UseId || a.ActionId != o.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.OriginalAction.ActorSeat, o.OriginalAction.ProviderSeat) || a.ProviderSeat != o.Selection.ProviderSeat || !a.PhysicalCards.SequenceEqual(o.OriginalAction.PhysicalCards) || !use.PhysicalCardIds!.SequenceEqual(o.Selection.Materials.Select(c => c.CardId)))
             return false;
         var original = a;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -100,26 +115,12 @@ internal sealed partial class CharacterSunYuanOlRuntime
         }
         else if (use.CardKind != o.Selection.Kind)
             return false;
-        if (original.EffectiveKind != o.Selection.Kind || !original.ConversionChain.SequenceEqual(o.Selection.Sources) || original.ActorSeat != o.Selection.ActorSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().All(e => e.CardUseFrameId != use.Id) || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { SunYuan: { } r } parent || r.Native != o || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.NativeReturned || r.Stage != SunYuanStage.NativeUse)
+        if (original.EffectiveKind != o.Selection.Kind || !original.ConversionChain.SequenceEqual(o.Selection.Sources) || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { SunYuan: { } r } parent || r.Native != o || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.NativeReturned || r.Stage != SunYuanStage.NativeUse)
             return false;
-        foreach (var cost in o.OriginalAction.PhysicalCards)
-        {
-            var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SayingSlashMaterialPaidEvent>().Where(e => e.UseId == use.Id && e.CardId == cost.CardId).ToArray();
-            if (paid.Length == 0)
-            {
-                if (_cardZonesOperations._cardZones.GetLocation(cost.CardId) != cost.From)
-                    return false;
-                continue;
-            }
-
-            if (paid is not [var p] || p.ActionId != o.ActionId || p.From != cost.From || p.Sequence <= o.BeforePayment || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == p.Sequence && m.CardId == p.CardId && m.From == p.From && m.To == p.To && m.Reason == CardMoveReasons.Use) != 1)
-                return false;
-        }
-
-        return true;
+        return use.ProgramSlashRequestExecution is { } execution && execution.ProgramFrameId == parent.Id &&
+            _slashRequests.OwnsAcceptance(parent, execution.Acceptance, o.Selection.ActorSeat, o.Selection.TargetSeat);
     }
 
-    internal bool IsSayingRemovedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { SayingSlash: { } r } use && IsIssuedSayingUse(use) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && r.Selection.Materials.Any(c => c.CardId == cardId && c.GeneralWeapon && c.From.Zone == CardZoneKind.Equipment) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SayingSlashMaterialPaidEvent>().Count(e => e.UseId == useId && e.CardId == cardId && e.To == CardLocation.OutsideGame) == 1;
     [NativeUseValidation(27490)]
     internal void ValidateSayingNative(CardUseFrame use)
     {
@@ -133,7 +134,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
         if (use.SayingSlash is not { } o)
             return;
         var deferred = _characterLiuFengBoundaryOperations.BoundaryLiuFengReturnedProgramParent(o.ProgramFrameId, use);
-        var f = deferred ?? _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
+        var f = deferred ?? _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == o.ProgramFrameId);
         var r = f.SunYuan;
         if (r is not { Stage: SunYuanStage.NativeUse, NativeReturned: false } || r.Native != o || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Saying cannot return before or twice after the whole native Use.");
@@ -155,7 +156,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
 
     internal void SettleSayingNative(SayingNativeOrigin o)
     {
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
+        var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == o.ProgramFrameId);
         var r = f.SunYuan!;
         if (r.Native != o || !r.NativeReturned || _coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SayingSlashReturnedEvent>().Any(e => e.FrameId == f.Id))
             throw new InvalidOperationException("Saying lost its unique complete native return.");
@@ -165,7 +166,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
 
     internal bool ResumeSayingSuppliedSlash(ProgramSkillFrame supplied)
     {
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == supplied.Id);
         if (f.SunYuan is not { } r)
             return false;
         if (r.Native is { } o && r.NativeReturned && r.Stage == SunYuanStage.NativeUse)

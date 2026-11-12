@@ -48,7 +48,7 @@ internal sealed partial class CharacterChenLinMouRuntime
     {
         if (!HasMouChenLin)
             return;
-        if (payload is ExtraCardEffectStartedEvent extra && _coreCardUseLifecycleOperations.LifecycleCardUse(extra.CardUseFrameId)is { MouChenLinDamage: not null } restarted && _coreExtraCardEffectRoundsOperations.IsExtraCardEffectRound(restarted.Id))
+        if (payload is NativeCardEffectEpisodeStartedEvent extra && _coreCardUseLifecycleOperations.LifecycleCardUse(extra.UseFrameId)is { MouChenLinDamage: not null } restarted && _coreExtraCardEffectRoundsOperations.IsExtraCardEffectRound(restarted.Id))
             SetMouChenLinDamageState(restarted.Id, null);
         if (payload is ProgramDamageTransferredEvent moved && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } a && MouChenLinDamageState(a.ResolutionId)is { TransferredTarget: null } original && a.DamageRedirected && moved.ResolutionId == a.ResolutionId && moved.SourceSeat == a.SourceSeat && moved.TargetSeat == a.TargetSeat && original.ChainCursor == MouChenLinDamageCursor(a))
             SetMouChenLinDamageState(a.ResolutionId, original with { TransferredTarget = moved.TargetSeat });

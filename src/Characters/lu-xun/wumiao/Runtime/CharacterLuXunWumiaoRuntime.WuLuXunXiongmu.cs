@@ -224,6 +224,9 @@ internal sealed partial class CharacterLuXunWumiaoRuntime
         if (r.Stage != XiongmuStage.ObtainChildren || r.ActualObtained != -1 || moves.Count != r.ObtainMaterials.Count)
             throw new InvalidOperationException("Xiongmu lost its actual rank-eight obtain payment.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { Xiongmu = r with { ObtainBatchId = batchId, ObtainAfter = after, After = after, ObtainMovements = moves, ActualObtained = moves.Count(m => m.To == CardLocation.Hand(f.OwnerSeat)) } });
+        _handLimitExemptions.Grant(f, WuXiongmuSkill, f.OwnerSeat,
+            new(new(PrintedRank: 8), moves.Where(move => move.To == CardLocation.Hand(f.OwnerSeat))
+                .Select(move => move.CardId).ToArray()));
         for (var i = 0; i < moves.Count; i++)
         {
             var m = moves[i];

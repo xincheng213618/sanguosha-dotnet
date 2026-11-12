@@ -17,14 +17,16 @@ internal sealed partial class CharacterKeBiNengOlRuntime
                 result.Add(action);
         }
 
-        foreach (var cards in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor))
+        foreach (var cards in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor))
             foreach (var kind in new[]
             {
                 CardKind.Slash
             }
 
             )
-                foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, target, kind, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, cards), _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, cards), cards.Select(c => c.Id).ToArray())))
+                foreach (var target in _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, _coreMatchParticipantsPlayersAccess._players,
+                    kind, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, cards),
+                    _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, cards), cards.Select(c => c.Id).ToArray()).Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]))
                     result.Add(new LegalAction(LegalActionKind.UseEquipmentEffect, null, target.Seat, $"发动【丈八蛇矛】对 {(target.Name)} 使用【{(CardCatalog.Get(kind).DisplayName)}】", kind, TargetSeats: [target.Seat], MinCardCount: 2, MaxCardCount: 2, MinTargetCount: 1, MaxTargetCount: 1, EquipmentKind: CardKind.ZhangbaSerpentSpear) { SelectableCardIds = cards.Select(c => c.Id).ToArray(), SelectableTargetSeats = [target.Seat] });
         var selections = new List<ProgramMultiCardViewAsSelection>();
         foreach (var kind in new[]
@@ -57,7 +59,19 @@ internal sealed partial class CharacterKeBiNengOlRuntime
             var kind = selection.OutputKind;
             var rule = _corePlayCardHistoryOperations.ViewAsRule(selection.Source)!;
             var cards = selection.Cards;
-            IReadOnlyList<int> targets = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? _coreMatchParticipantsPlayersAccess._players.Where(target => _coreRuleQueriesOperations.CanSpendSlashUse(actor, target, _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, selection.Source), kind, physicalCardIds: cards.Select(c => c.Id).ToArray()) && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, target, kind, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, cards), physicalCardIds: cards.Select(c => c.Id).ToArray(), ignoreDistance: rule.DistanceUnlimited || _coreFriendTrioOperations.FriendXuanjianIgnoresDistance(actor, selection.Source))).Select(t => t.Seat).ToArray() : kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, cards)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards)) ? [actor.Seat] : kind == CardKind.Alcohol && _coreRoundDistinctBasicPlayOperations.CanUseRoundDistinctBasicAlcohol(actor, cards) ? [actor.Seat] : [];
+            IReadOnlyList<int> targets;
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            {
+                var ids = cards.Select(c => c.Id).ToArray();
+                var quotaCandidates = _coreMatchParticipantsPlayersAccess._players.Where(target =>
+                    _coreRuleQueriesOperations.CanSpendSlashUse(actor, target,
+                        _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, selection.Source), kind, physicalCardIds: ids)).ToArray();
+                targets = quotaCandidates.Length == 0 ? [] : _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, quotaCandidates,
+                    kind, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, cards),
+                    physicalCardIds: ids, ignoreDistance: rule.DistanceUnlimited || _coreFriendTrioOperations.FriendXuanjianIgnoresDistance(actor, selection.Source));
+            }
+            else
+                targets = kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, cards)) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards)) ? [actor.Seat] : kind == CardKind.Alcohol && _coreRoundDistinctBasicPlayOperations.CanUseRoundDistinctBasicAlcohol(actor, cards) ? [actor.Seat] : [];
             foreach (var target in targets)
                 result.Add(new LegalAction(CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? LegalActionKind.Slash : kind == CardKind.Peach ? LegalActionKind.Peach : LegalActionKind.Alcohol, cards[0].Id, kind == CardKind.Alcohol ? null : target, _coreCardConversionsOperations.DescribeConversion(selection.Source, $"将所选牌当【{(CardCatalog.Get(kind).DisplayName)}】使用"), kind, TargetSeats: kind == CardKind.Alcohol ? [] : [target], MinCardCount: cards.Count, MaxCardCount: cards.Count) { ConversionSource = selection.Source, SelectableCardIds = cards.Select(c => c.Id).ToArray() });
         }
@@ -87,7 +101,8 @@ internal sealed partial class CharacterKeBiNengOlRuntime
         if (selected.Kind == LegalActionKind.UseEquipmentEffect && selected.EquipmentKind == CardKind.ZhangbaSerpentSpear)
         {
             var cards = selected.SelectableCardIds.Select(_coreCardAttackStateOperations.GetAttackCard).ToArray();
-            _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[selected.TargetSeats.Single()], cards[0], selected.PlayedCardKind!.Value, actor.Seat, physicalCards: cards);
+            var accepted = _slashRequests.Accept(frame, actor.Seat, selected.TargetSeats.Single());
+            _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[selected.TargetSeats.Single()], cards[0], selected.PlayedCardKind!.Value, actor.Seat, physicalCards: cards, programSkillCardUseFrameId: frame.Id, programSlashRequest: accepted);
             return;
         }
 
@@ -96,7 +111,10 @@ internal sealed partial class CharacterKeBiNengOlRuntime
             var kind = selected.PlayedCardKind!.Value;
             var selection = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(actor, selected.SelectableCardIds, kind, false, source) ?? throw new InvalidOperationException("Pingduan multi-card conversion lost its exact native material set.");
             if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
-                _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[selected.TargetSeats.Single()], selection.Cards[0], kind, actor.Seat, physicalCards: selection.Cards, conversionSource: source);
+            {
+                var accepted = _slashRequests.Accept(frame, actor.Seat, selected.TargetSeats.Single());
+                _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[selected.TargetSeats.Single()], selection.Cards[0], kind, actor.Seat, physicalCards: selection.Cards, conversionSource: source, programSkillCardUseFrameId: frame.Id, programSlashRequest: accepted);
+            }
             else if (kind == CardKind.Peach)
                 _coreNativeRecoveryCardsOperations.ResolveRecoveryCard(actor, actor, selection.Cards[0], "桃", kind, 1 + (_corePlayCardHistoryOperations.ViewAsRule(source)?.RecoveryBonus ?? 0), conversionSource: source, physicalCards: selection.Cards);
             else
@@ -116,15 +134,15 @@ internal sealed partial class CharacterKeBiNengOlRuntime
         // the accepted request's prompt identity while that program is issued.
         if (selected.TieredRoundZeroUse is not null && selected.ConversionSource is { } tieredSource && _characterWoLongFengChuOlOperations.IsEquipmentSlotNamedSkill(tieredSource.SkillId))
         {
-            _corePendingDecisionPolicyPipelineOperations._pendingDecision = original;
             // The payment frame owns this future use. Do not publish a global
             // selected conversion while its movement and dying children run.
-            if (_characterWoLongFengChuOlOperations.TryBeginEquipmentSlotNamedPlay(actor, selected))
+            if (_characterWoLongFengChuOlOperations.TryBeginEquipmentSlotNamedPlay(actor, selected, requestIdentity: _slashRequests.GetIdentity(frame), originalDecision: original))
                 return;
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
         }
 
-        _coreNativeActionDispatchOperations.ExecuteAction(actor, selected);
+        _coreNativeActionDispatchOperations.ExecuteAction(actor, selected,
+            programSlashRequestIdentity: selected.Kind == LegalActionKind.Slash ? _slashRequests.GetIdentity(frame) : null, originalDecision: original);
     }
 
     internal bool IsKeBiNengPingduanPaymentFrame(DrawFundedDistinctBasicFrame paid) => paid.Payment.Intent == DrawFundedDistinctBasicIntent.Play && IsKeBiNengPingduanPaymentParent(paid.Id, paid.Payment.ParentFrameId, paid.Payment.RequestFrameId, paid.Payment.Cursor, paid.Payment.Source, paid.Payment.EffectiveKind, paid.TargetSeats);

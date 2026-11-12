@@ -21,16 +21,12 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
             return;
         if (m.From == CardLocation.OutsideGame || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiCarrierDestroyedEvent>().Any(e => e.CardId == m.CardId))
             throw new InvalidOperationException("A Cuixin delayed-card carrier cannot be destroyed twice or re-enter a reusable zone.");
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
-                     use.Action?.PhysicalCards.Any(material => material.CardId == m.CardId &&
-                         material.CardKind == m.CardKind && material.From == m.From) == true).ToArray())
-            _nativeCardRepresentations.CaptureDeparture(use.Id, m.CardId, m.Sequence);
+        _nativeMaterialClaims.CaptureRetirement(m);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShenDengAiCarrierDestroyedEvent(m.CardId, m.Sequence, m.From, m.Reason));
     }
 
     internal bool IsShenDaCarrierDestroyedMaterial(CardMovementRecord m) => m.To == CardLocation.OutsideGame && IsShenDaCarrier(m.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShenDengAiCarrierDestroyedEvent>().Where(e => e.CardId == m.CardId).ToArray()is [var f] && f.MovementSequence == m.Sequence && f.From == m.From && f.Reason == m.Reason;
     internal bool IsShenDaCarrierDestroyedMaterial(int id, CardLocation from, CardLocation to) => to == CardLocation.OutsideGame && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == id && m.From == from && m.To == to && IsShenDaCarrierDestroyedMaterial(m));
-    internal bool IsShenDaCarrierDestroyedMaterial(long use, int id) => _coreCardUseLifecycleOperations.LifecycleCardUse(use)?.Action?.PhysicalCards.SingleOrDefault(c => c.CardId == id)is { } c && IsShenDaCarrierDestroyedMaterial(id, c.From, CardLocation.OutsideGame);
     internal void RetireUnplacedShenDaCarrier(long id)
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ShenDengAiCuixin: { CarrierId: > 0 } o } && IsShenDaCuixinUse(id) && _cardZonesOperations._cardZones.GetLocation(o.CarrierId) == CardLocation.Processing)

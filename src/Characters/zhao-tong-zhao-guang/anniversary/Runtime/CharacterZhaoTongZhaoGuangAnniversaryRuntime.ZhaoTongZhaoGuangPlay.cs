@@ -39,7 +39,7 @@ internal sealed partial class CharacterZhaoTongZhaoGuangAnniversaryRuntime
         var suit = _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(owner, selection);
         var color = _coreGuanHaiBridgesOperations.ProgramMultiCardColor(owner, selection);
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
-            return _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, p, kind, physicalSuit: suit, effectiveColor: color, physicalCardIds: ids, conversionSource: selection.Source)).Select(p => p.Seat).ToArray();
+            return _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(owner, _coreMatchParticipantsPlayersAccess._players, kind, physicalSuit: suit, effectiveColor: color, physicalCardIds: ids, conversionSource: selection.Source);
         return kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(owner) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit) ? [owner.Seat] : [];
     }
 

@@ -4,18 +4,16 @@ namespace CardGame.Core;
 
 [ProgramRuntimeModule]
 [ProgramCapability]
-internal sealed partial class MoSimaYiRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
+internal sealed partial class MoSimaYiRuntime(IHandLimitExemptions handExemptions, IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     IProgramRuntimePrompts prompts, IMoSimaYiFacts facts, IMoSimaYiNative native,
     IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMoSimaYiHost
 {
     internal IReadOnlyList<MoSimaYiRecorded> Records(int owner) => Array.AsReadOnly(facts.History<MoSimaYiRecordAddedEvent>()
         .Where(e => e.OwnerSeat == owner).Select(e => new MoSimaYiRecorded(e.SkillId, e.CardKind)).Distinct().ToArray());
 
-    internal bool IsMarked(int id) => id > 0 && facts.History<MoSimaYiDodgeMarkedEvent>().Any(e => e.CardId == id);
-    internal bool IsOwnMarked(int owner, int id) => id > 0 && facts.History<MoSimaYiDodgeMarkedEvent>().Any(e =>
-        e.OwnerSeat == owner && e.CardId == id && facts.History<MoSimaYiStartedEvent>().Any(s =>
-            s.FrameId == e.FrameId && s.Source.OwnerSeat == owner && s.Source.SkillId == MoSimaYiComposition.Guifu &&
-            s.Operation == SkillProgramEffectOp.AcquireMoSimaYiGuifuDodge));
+    internal bool IsMarked(int id) => handExemptions.HasEntityRelation(MoSimaYiComposition.Guifu, id);
+    internal bool IsOwnMarked(int owner, int id) =>
+        handExemptions.GetMatchingRelations(MoSimaYiComposition.Guifu, owner, id).Count > 0;
     internal bool NameAvailable(int owner, CardKind kind) => Records(owner).Any(e => e.CardKind == kind) &&
         !facts.History<MoSimaYiNameUsedEvent>().Any(e => e.ActorSeat == owner && e.Turn == facts.Turn && e.Kind == kind);
 

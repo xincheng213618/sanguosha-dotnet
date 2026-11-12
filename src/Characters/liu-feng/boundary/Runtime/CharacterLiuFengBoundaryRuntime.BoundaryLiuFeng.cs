@@ -9,9 +9,21 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
     internal static CardConversionSource BoundaryLiuFengSource(ProgramSkillFrame f) => new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId);
     SkillProgramStepOutcome IBoundaryLiuFengHost.Begin(ProgramSkillFrame f, SkillProgramEffectOp op) => BeginBoundaryLiuFeng(f, op);
     internal bool BoundaryLiuFengPaidThisTurn(int owner) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryLiuFengCostPaidEvent>().Any(e => e.Source.OwnerSeat == owner && e.Turn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
-    internal int[] BoundaryLiuFengTargets(int actor) => _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[actor], p, CardKind.Slash, Suit.None, null, 0, [], conversionSource: null)).Select(p => p.Seat).ToArray();
+    internal int[] BoundaryLiuFengTargets(int actor) => _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players, CardKind.Slash, Suit.None, null, 0, [], conversionSource: null).ToArray();
     internal int[] BoundaryLiuFengCurrentTargets(ProgramSkillFrame f) => f.BoundaryLiuFeng?.Need is { } n ? n.Targets.Where(t => BoundaryLiuFengRequestTarget(n, t)).ToArray() : BoundaryLiuFengTargets(f.OwnerSeat);
-    internal bool BoundaryLiuFengCountsSlash(ProgramSkillFrame f) => _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat == f.OwnerSeat && (f.BoundaryLiuFeng?.Need is null || f.BoundaryLiuFeng.Need.Intent == BoundaryLiuFengIntent.BorrowedSword);
+    internal bool BoundaryLiuFengCountsSlash(ProgramSkillFrame f)
+    {
+        if (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != f.OwnerSeat)
+            return false;
+        var receipt = f.BoundaryLiuFeng;
+        if (receipt?.Need is not { } need)
+            return true;
+        if (receipt.RequestAcceptance?.Identity.Spec.CountsTowardSlashLimit == true || need.Intent == BoundaryLiuFengIntent.BorrowedSword)
+            return true;
+        return _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == need.OwnerFrameId) is ProgramSkillFrame parent &&
+            _programSlashRequests.GetIdentity(parent)?.Spec.CountsTowardSlashLimit == true;
+    }
+
     internal void CancelBoundaryLiuFeng(ProgramSkillFrame f)
     {
         if (f.BoundaryLiuFeng is not { Need: not null, OriginalDecision: { } original } r)
@@ -128,7 +140,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         if (n?.Intent == BoundaryLiuFengIntent.BorrowedSword)
             return _coreProgramDistanceRulesOperations.DistanceRules.AllowsSlashDistance(ProgramDistanceStage.BorrowedSlash, new(actor, victim, CardKind.Slash, PhysicalCardIds: [], PhysicalSuit: Suit.None, EffectiveRank: 0, ExcludedEquipmentId: card.Id));
         var parent = n is null ? null : _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(p => p.Id == n.OwnerFrameId);
-        var ignore = n?.Intent is BoundaryLiuFengIntent.ProgramSlash or BoundaryLiuFengIntent.ProgramNearestSlash || parent is not null && (_characterLvKuangLvXiangOlOperations.IsQigongRequest(parent) || _characterWuJingOlOperations.IsWuJingHejiRequest(parent) || n?.Intent == BoundaryLiuFengIntent.FixedSlash && parent.FixedTargetSlash?.IgnoreDistance == true);
+        var ignore = parent is not null && _programSlashRequests.GetIdentity(parent)?.Spec.IgnoreDistance == true;
         return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, victim, new(0, CardKind.Slash, Suit.None, 0), ignoreDistance: ignore, noEffectiveRank: true, physicalCardIds: [], excludedEquipmentId: card.Id) && _coreRuleQueriesOperations.CanSpendSlashUse(actor, victim, ignoresCount: !BoundaryLiuFengCountsSlash(f), effectiveRank: 0, excludedEquipmentId: card.Id, physicalCardIds: []);
     }
 
@@ -198,9 +210,12 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryLiuFeng = r with { Cards = [card.Id], From = [from], Movement = "cost", Before = before, After = before, Stage = BoundaryLiuFengStage.MovementChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, [card.Id], new("skill-program.boundary:qinling.cost"), (_, moves) =>
         {
+            ProgramSlashRequestAcceptance? requestAcceptance = null;
+            if (r.Need is { } need && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == need.RequestFrameId) is ProgramSkillFrame request && _programSlashRequests.GetOffer(request, need.ActorSeat) is not null)
+                requestAcceptance = _programSlashRequests.Accept(request, need.ActorSeat, r.Targets.Single());
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             var m = moves.Single();
-            _coreRuntimeOperations.ReplaceRuntimeTop(current with { BoundaryLiuFeng = current.BoundaryLiuFeng!with { Moves = moves, After = m.Sequence, CostSequence = m.Sequence } });
+            _coreRuntimeOperations.ReplaceRuntimeTop(current with { BoundaryLiuFeng = current.BoundaryLiuFeng!with { Moves = moves, After = m.Sequence, CostSequence = m.Sequence, RequestAcceptance = requestAcceptance } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryLiuFengCostPaidEvent(f.Id, r.Source, r.Hash, r.Turn, r.TurnOwner, card.Id, from, m.Sequence));
         });
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);

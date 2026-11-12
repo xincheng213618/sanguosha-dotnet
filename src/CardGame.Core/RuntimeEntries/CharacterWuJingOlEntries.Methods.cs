@@ -23,17 +23,13 @@ internal sealed partial class CharacterWuJingOlEntries
     internal ProgramSkillWindowContext CreateWuJingLiubingContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate c) => _resolve().CreateWuJingLiubingContext(frame, c);
     internal bool? DecideIssuedTrigger640(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger640(candidate, context);
     internal bool? DecideIssuedTrigger650(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger650(candidate, context);
-    internal bool DistancePhysicalSlash30HasIssuedWuJingHejiDistance(ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash30HasIssuedWuJingHejiDistance(q);
     internal bool DrainWuJing(ProgramSkillFrame f) => _resolve().DrainWuJing(f);
     internal bool ExcludeOrdinaryMovement_ClaimLiubingUndamagingSlash(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger) => _resolve().ExcludeOrdinaryMovement_ClaimLiubingUndamagingSlash(candidate, trigger);
     internal void FinishWuJing(ProgramSkillFrame f, bool applied) => _resolve().FinishWuJing(f, applied);
     internal bool FinishWuJingFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending) => _resolve().FinishWuJingFactionDeclined(id, pending);
-    internal bool FinishWuJingPaidAdapter(ProgramSkillFrame f) => _resolve().FinishWuJingPaidAdapter(f);
-    internal bool HasIssuedWuJingHejiDistance(long? useId, int actor) => _resolve().HasIssuedWuJingHejiDistance(useId, actor);
     internal bool HasWuJingHejiTrickPaymentTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => _resolve().HasWuJingHejiTrickPaymentTail(use, continuation);
     internal bool HasWuJingZeroSupply(ProgramSkillFrame f) => _resolve().HasWuJingZeroSupply(f);
     internal bool IsIssuedWuJingHejiReward(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedWuJingHejiReward(c, context);
-    internal bool IsWuJingHejiRemovedMaterial(long useId, int cardId) => _resolve().IsWuJingHejiRemovedMaterial(useId, cardId);
     internal bool IsWuJingHejiRequest(ProgramSkillFrame f) => _resolve().IsWuJingHejiRequest(f);
     internal bool IsWuJingHejiTrickPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => _resolve().IsWuJingHejiTrickPaymentBatch(use, batch);
     internal bool IsWuJingHejiUse(CardUseFrame use) => _resolve().IsWuJingHejiUse(use);
@@ -41,10 +37,6 @@ internal sealed partial class CharacterWuJingOlEntries
     internal bool IsWuJingLiubingCandidate(ProgramTriggerCandidate c) => _resolve().IsWuJingLiubingCandidate(c);
     internal bool IsWuJingNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _resolve().IsWuJingNativeSettlementBatch(f, batch);
     internal void ObserveWuJingNativeUse(IGameEvent payload) => _resolve().ObserveWuJingNativeUse(payload);
-    internal void PrepareWuJingChainedSlash(ProgramSkillFrame f, ChainedStateBasicPayment p) => _resolve().PrepareWuJingChainedSlash(f, p);
-    internal void PrepareWuJingDrawFundedSlash(ProgramSkillFrame f, DrawFundedDistinctBasicPayment p) => _resolve().PrepareWuJingDrawFundedSlash(f, p);
-    internal bool PrepareWuJingFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind) => _resolve().PrepareWuJingFactionNative(f, pending, provider, cards, kind);
-    internal void PrepareWuJingKenshangNative(ProgramSkillFrame f, ProgramMultiCardViewAsSelection selection) => _resolve().PrepareWuJingKenshangNative(f, selection);
     internal void PublishWuJing(ProgramSkillFrame f, bool keepCurrentRequest = false) => _resolve().PublishWuJing(f, keepCurrentRequest);
     internal bool QualifyWuJing(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().QualifyWuJing(c, trigger, context);
     internal bool ResumeWuJing(long id) => _resolve().ResumeWuJing(id);
@@ -63,7 +55,6 @@ internal sealed partial class CharacterWuJingOlEntries
     internal bool WuJingFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().WuJingFirstChild(f, child);
     internal bool WuJingFirstPhysicalSlash(int actor) => _resolve().WuJingFirstPhysicalSlash(actor);
     internal bool WuJingHasPaidAdapter(ProgramSkillFrame f) => _resolve().WuJingHasPaidAdapter(f);
-    internal bool WuJingHejiAdapterActor(ProgramSkillFrame f, int actor, int? target, int cursor, long? parent, long? request) => _resolve().WuJingHejiAdapterActor(f, actor, target, cursor, parent, request);
     internal bool WuJingHejiIncoming(CardUseFrame use) => _resolve().WuJingHejiIncoming(use);
     internal long? WuJingHejiProgramParent(long id) => _resolve().WuJingHejiProgramParent(id);
     internal bool WuJingHejiTrickMaterialsMatch(CardUseFrame use, CardMovementBatchContext batch) => _resolve().WuJingHejiTrickMaterialsMatch(use, batch);
@@ -75,7 +66,6 @@ internal sealed partial class CharacterWuJingOlEntries
     internal bool WuJingRequestIdentity(ProgramSkillFrame f) => _resolve().WuJingRequestIdentity(f);
     internal bool WuJingSettledMaterial(WuJingUseMaterialEvent fact, CardMovementRecord last) => _resolve().WuJingSettledMaterial(fact, last);
     internal CardConversionSource WuJingSource(ProgramSkillFrame f) => _resolve().WuJingSource(f);
-    internal bool WuJingZeroPaymentProof(ProgramSkillFrame f, WuJingReceipt r, CardUseFrame? use = default) => _resolve().WuJingZeroPaymentProof(f, r, use);
     internal bool HasWuJingHeji { get => _resolve().HasWuJingHeji; }
     internal bool HasWuJingLiubing { get => _resolve().HasWuJingLiubing; }
 }

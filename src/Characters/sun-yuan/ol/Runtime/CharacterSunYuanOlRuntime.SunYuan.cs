@@ -93,6 +93,8 @@ internal sealed partial class CharacterSunYuanOlRuntime
             var(cards, kind, source) = _coreAssistedSlashPaymentOperations.ReadAssistedSlashPayment(_coreMatchParticipantsPlayersAccess._players[r.Holder], choice);
             if (cards.Count == 0 || !_coreAssistedPhysicalCardsOperations.AssistedSlashPaymentHasRange(_coreMatchParticipantsPlayersAccess._players[r.Holder], f.OwnerSeat, cards) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[r.Holder], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], cards[0], source, kind, noEffectiveRank: cards.Count > 1, specificEffectiveRank: choice.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(_coreMatchParticipantsPlayersAccess._players[r.Holder], cards) : null, physicalCardIds: cards.Select(c => c.Id).ToArray()))
                 throw new InvalidOperationException("Saying cannot bypass native Slash range, targets or material legality.");
+            _slashRequests.Accept(f, r.Holder, f.OwnerSeat);
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             PrepareSayingSuppliedSlash(f, r.Holder, r.Holder, f.OwnerSeat, kind, cards, source);
             _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[r.Holder], _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], cards[0], kind, r.Holder, physicalCards: cards, countsTowardSlashLimit: false, usesZhuqueFan: kind == CardKind.FireSlash && (cards[0].Kind == CardKind.Slash || _coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(_coreMatchParticipantsPlayersAccess._players[r.Holder], cards[0])) && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[r.Holder]), conversionSource: source, programSkillCardUseFrameId: f.Id);
             return;
@@ -228,6 +230,10 @@ internal sealed partial class CharacterSunYuanOlRuntime
             }
 
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SunYuan = r with { Stage = SunYuanStage.Request } });
+            _slashRequests.Issue(f, r.Holder,
+                new(ProgramSlashRequestTargetSource.FrozenCandidates, [f.OwnerSeat], "saying-slash",
+                    RetainSourceLoss: true, RetainOwnerDeath: true, RetainAcceptedSourceLoss: true, RetainAcceptedOwnerDeath: true, QuotaTargets: ProgramSlashRequestPermissionTargets.AnyOtherTarget, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction));
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SayingRequestIssuedEvent(id, r.Holder, f.OwnerSeat));
             PublishSaying(f);
             return;
@@ -264,6 +270,8 @@ internal sealed partial class CharacterSunYuanOlRuntime
 
     internal void FinishSunYuan(ProgramSkillFrame f, bool applied)
     {
+        _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         if (f.WeijieReturn is { } wj && f.SunYuan is { Native: { } o } r && (!wj.Returned || !r.NativeReturned || wj.UseId != o.UseId))
             throw new InvalidOperationException("Saying cannot clear a supplied native lease before its whole child returns.");
         if (f.HuanpeiReturn is { } huanpei && (!huanpei.Returned || f.SunYuan is not { NativeReturned: true, Native: { } huanpeiNative } || huanpei.UseId != huanpeiNative.UseId))
@@ -280,6 +288,13 @@ internal sealed partial class CharacterSunYuanOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { SunYuan: not null } f || f.Id != id)
             return false;
+        if (_slashRequests.TakeFailure(f) is not null)
+        {
+            FinishSunYuan(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), true);
+            return true;
+        }
+        if (f.SunYuan is { NativeReturned: true } && ResumeSayingSuppliedSlash(f))
+            return true;
         ContinueSunYuan(id);
         return true;
     }

@@ -34,7 +34,6 @@ internal sealed partial class CharacterCaiYongLeEntries
     internal IReadOnlyList<PromptChoice> FeibaiSampleChoices(ProgramSkillFrame f) => _resolve().FeibaiSampleChoices(f);
     internal CardKind FeibaiSourceBoundEffectiveUseKind(CurrentTurnCardUseKindsRecordedEvent fact, IReadOnlyList<IGameEvent> history, int prefixEnd, CurrentTurnCardUseKindsRecordedEvent current) => _resolve().FeibaiSourceBoundEffectiveUseKind(fact, history, prefixEnd, current);
     internal bool FeibaiWindowMatches(ProgramCardTriggerWindowFrame window, FeibaiQualification q) => _resolve().FeibaiWindowMatches(window, q);
-    internal bool HasXianEntityMark(int cardId) => _resolve().HasXianEntityMark(cardId);
     internal SkillProgramStepOutcome InitializeJiaowei(ProgramSkillFrame supplied) => _resolve().InitializeJiaowei(supplied);
     internal ProgramDamageInterception InterceptJiaoweiProtection(GameEngine.IDamageAttempt attack, int amount, DamageNature nature) => _resolve().InterceptJiaoweiProtection(attack, amount, nature);
     internal bool IsExactFeibaiFallbackDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) => _resolve().IsExactFeibaiFallbackDraw(f, outcome);
@@ -42,12 +41,10 @@ internal sealed partial class CharacterCaiYongLeEntries
     internal bool IsFeibaiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsFeibaiRecoveryParent(f, recovery);
     internal bool IsFeibaiTrueUse(CardActionContext action) => _resolve().IsFeibaiTrueUse(action);
     internal bool IsIssuedJiaoweiInitialCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().IsIssuedJiaoweiInitialCandidate(candidate, context);
-    internal bool IsJiaoweiHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsJiaoweiHandLimitExempt(owner, cardId);
     internal bool JiaoweiActualTurnIsOpen(int turn) => _resolve().JiaoweiActualTurnIsOpen(turn);
     internal void MarkFeibaiActualDrawEntities(ProgramSkillFrame frame, NativeDrawOutcome outcome) => _resolve().MarkFeibaiActualDrawEntities(frame, outcome);
     internal bool PermitIssuedJiaoweiInitial(ProgramSkillFrame frame) => _resolve().PermitIssuedJiaoweiInitial(frame);
     internal bool PermitPaidLeCaiYongFeibai(ProgramSkillFrame f) => _resolve().PermitPaidLeCaiYongFeibai(f);
-    internal void ProjectXianCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectXianCardSkillMark(cardId, ref projection);
     internal bool ResumeLeCaiYongFeibai(long id) => _resolve().ResumeLeCaiYongFeibai(id);
     internal void ReturnLeCaiYongFeibaiDraw(ProgramSkillFrame f, NativeDrawOutcome outcome) => _resolve().ReturnLeCaiYongFeibaiDraw(f, outcome);
     internal bool ReturnLeCaiYongFeibaiMovement(ProgramSkillFrame f) => _resolve().ReturnLeCaiYongFeibaiMovement(f);

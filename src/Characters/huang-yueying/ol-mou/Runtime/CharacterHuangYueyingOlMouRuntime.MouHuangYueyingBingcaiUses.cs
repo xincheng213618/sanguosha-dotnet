@@ -91,9 +91,20 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
 
     internal bool TryReturnMouBingcaiLegacyAlcohol(ProgramCardTriggerWindowFrame window)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)?.MouBingcaiLegacyAlcohol is not { } r)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId) is not { MouBingcaiLegacyAlcohol: { } r } use)
             return false;
-        if (!IsMouBingcaiLegacyAlcoholUse(window.ParentFrameId) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != window.ParentFrameId || window.SimpleContinuation is not null || window.AttackOwnerFrameId is not null || window.CompletedResponseReturn is not null || window.Action.ActionId != r.ActionId || r.Stage == MouBingcaiLegacyAlcoholStage.Recovery || window.Continuation != (r.Stage == MouBingcaiLegacyAlcoholStage.Targets ? ProgramCardContinuation.FinalizedSimpleCard : ProgramCardContinuation.CommittedSimpleCard))
+        if (!IsMouBingcaiLegacyAlcoholUse(window.ParentFrameId) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != window.ParentFrameId || window.SimpleContinuation is not null || window.AttackOwnerFrameId is not null || window.CompletedResponseReturn is not null || window.Action.ActionId != r.ActionId)
+            throw new InvalidOperationException("Bingcai's legacy Alcohol cannot replay a native target or committed window.");
+        // The real completion window belongs to ordinary native completion,
+        // after both recoveries. It must not restart this producer's recovery.
+        if (r.Stage == MouBingcaiLegacyAlcoholStage.Recovery && use.Step == ResolutionFrameStep.Completed &&
+            window.Continuation == ProgramCardContinuation.CompletedCard &&
+            CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) == SkillProgramTriggerWindow.CardUseCompleted &&
+            use.LegacyDyingAlcoholReturn is { } returned && returned.ProgramFrameId == r.ProgramParentId &&
+            returned.InstructionIndex == r.InstructionIndex && returned.ProducerSource == r.ProducerSource)
+            return false;
+        if (r.Stage == MouBingcaiLegacyAlcoholStage.Recovery || window.Continuation !=
+            (r.Stage == MouBingcaiLegacyAlcoholStage.Targets ? ProgramCardContinuation.FinalizedSimpleCard : ProgramCardContinuation.CommittedSimpleCard))
             throw new InvalidOperationException("Bingcai's legacy Alcohol cannot replay a native target or committed window.");
         ContinueMouBingcaiLegacyAlcohol(window.ParentFrameId);
         return true;

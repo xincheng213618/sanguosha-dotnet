@@ -18,7 +18,6 @@ internal sealed partial class CoreGameEngineShenwuExpandedPoliciesRuntime
 
     internal bool ShenwuJuyuanExtraTarget(CharacterState player, CardKind kind) => CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == player.Seat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.ShenwuPreviousEndHealthSlashTarget) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ShenwuTurnEndHealthEvent>().LastOrDefault(fact => fact.OwnerSeat == player.Seat)is { } previous && player.Hp < previous.Hp;
 
-    internal bool IsShenwuHonglianHandExempt(CharacterState owner, Card card) => _contentRegistryOperations._contentRegistry.Skills.ContainsKey("shenwu:honglian") && _coreShenwuNpcProgramsOperations.ShenwuEnabled(owner, "shenwu:honglian") && CoreNativeCardClassificationsRuntime.IsRedSuit(_coreNativeCardAppearanceOperations.EffectiveSuit(owner, card));
     [ProgramCardLegality(ProgramCardLegalityStage.BeforeTurnUseBan, 80)]
     internal bool ShenwuSipuCardUseForbidden(ProgramCardUseQuery query) => ShenwuSipuForbidsAction(query.ActorSeat);
 }

@@ -1,7 +1,11 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
 namespace CardGame.Core;
-public sealed record RoundOnceCardlessProgramRequestReceipt(long ProgramFrameId,CardConversionSource RequestSource,string RequestGameplayHash,int InstructionIndex,SkillProgramEffectOp RequestOp,int ActorSeat,int TargetSeat,string? ResultBind,PromptId OriginalPromptId,long OriginalRevision,long? OriginalWindowId,RoundOnceCardlessBasicPaymentReceipt Payment,long NativeUseId=0,long NativeActionId=0);
+public sealed record RoundOnceCardlessProgramRequestReceipt(long ProgramFrameId,CardConversionSource RequestSource,string RequestGameplayHash,int InstructionIndex,SkillProgramEffectOp RequestOp,int ActorSeat,int TargetSeat,string? ResultBind,PromptId OriginalPromptId,long OriginalRevision,long? OriginalWindowId,RoundOnceCardlessBasicPaymentReceipt Payment,long NativeUseId=0,long NativeActionId=0)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramSlashRequestAcceptance? RequestAcceptance { get; init; }
+}
 public sealed record RoundOnceCardlessProgramRequestPending(RoundOnceCardlessProgramRequestReceipt Receipt,bool NativeReturned=false);
 public sealed record RoundOnceCardlessProgramRequestAcceptedEvent(RoundOnceCardlessProgramRequestReceipt Receipt):IGameEvent;
 public sealed record RoundOnceCardlessProgramRequestBoundEvent(RoundOnceCardlessProgramRequestReceipt Receipt):IGameEvent;

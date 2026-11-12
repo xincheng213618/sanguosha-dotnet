@@ -87,13 +87,10 @@ internal sealed partial class TurnCardUseEffectStore
         var ids = _recoveryModifiers.Where(item => Expires(item.Source, item.TurnNumber, item.Expiration))
             .Select(item => item.GrantSequence)
             .Concat(_ruleModifiers.Where(item => Expires(item.Source, item.TurnNumber, item.Expiration))
-                .Select(item => item.GrantSequence))
-            .Concat(_handLimitKindExemptions.Where(item => Expires(item.Source, item.TurnNumber, item.Expiration))
                 .Select(item => item.GrantSequence)).Order().ToArray();
         var expired = ids.ToHashSet();
         _recoveryModifiers.RemoveAll(item => expired.Contains(item.GrantSequence));
         _ruleModifiers.RemoveAll(item => expired.Contains(item.GrantSequence));
-        _handLimitKindExemptions.RemoveAll(item => expired.Contains(item.GrantSequence));
         return ids;
     }
 }

@@ -24,7 +24,6 @@ internal sealed partial class CharacterLuXunWumiaoEntries
     internal bool DrainWuXiongmu(ProgramSkillFrame f) => _resolve().DrainWuXiongmu(f);
     internal void FinishWuXiongmu(ProgramSkillFrame f) => _resolve().FinishWuXiongmu(f);
     internal bool IsWuLuXunZhangcaiRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsWuLuXunZhangcaiRecoveryParent(f, recovery);
-    internal bool IsWuXiongmuHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsWuXiongmuHandLimitExempt(owner, cardId);
     internal bool IsWuXiongmuRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsWuXiongmuRecoveryParent(f, recovery);
     internal void ObserveWuXiongmuNativeDamage(IGameEvent payload) => _resolve().ObserveWuXiongmuNativeDamage(payload);
     internal bool PermitPaidWuLuXunZhangcai(ProgramSkillFrame f) => _resolve().PermitPaidWuLuXunZhangcai(f);
@@ -44,7 +43,6 @@ internal sealed partial class CharacterLuXunWumiaoEntries
     internal void TransferWuXiongmuDamage(ProgramDamageTransferredEvent transfer) => _resolve().TransferWuXiongmuDamage(transfer);
     internal bool ValidWuXiongmuCangxinReduction(LuYuShengDamageReceipt receipt, scoped out LuYuShengDamageAdjustedEvent adjusted) => _resolve().ValidWuXiongmuCangxinReduction(receipt, out adjusted);
     internal bool ValidWuXiongmuDamage(XiongmuDamageReceipt r) => _resolve().ValidWuXiongmuDamage(r);
-    internal bool ValidWuXiongmuExemption(XiongmuEntityObtainedEvent e) => _resolve().ValidWuXiongmuExemption(e);
     internal bool ValidWuXiongmuStarted(ProgramSkillFrame f) => _resolve().ValidWuXiongmuStarted(f);
     internal void ValidateWuXiongmuCangxinCurrentAttempt(GameEngine.IDamageAttempt attack, LuYuShengDamageReceipt receipt, scoped out LuYuShengDamageAdjustedEvent adjusted) => _resolve().ValidateWuXiongmuCangxinCurrentAttempt(attack, receipt, out adjusted);
     internal void ValidateWuXiongmuCurrentAttempt(GameEngine.IDamageAttempt attack, XiongmuDamageReceipt receipt) => _resolve().ValidateWuXiongmuCurrentAttempt(attack, receipt);

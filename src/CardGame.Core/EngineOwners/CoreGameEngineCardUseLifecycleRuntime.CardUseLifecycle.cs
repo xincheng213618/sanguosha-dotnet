@@ -115,11 +115,7 @@ internal sealed partial class CoreGameEngineCardUseLifecycleRuntime
 
     internal void ContinueSimpleCardUse(long frameId, ProgramSimpleCardContinuation continuation)
     {
-        if (_characterWeiYanHappyGodOperations.ContinueHappyWeiYanIneffectiveSimple(frameId, continuation))
-            return;
-        if (_characterChengYuMouOperations.ContinueMouCyIneffectiveSimple(frameId, continuation))
-            return;
-        if (_characterCaoZhenBoundaryMobileOperations.Value.ContinueBoundarySidiIneffectiveSimple(frameId, continuation))
+        if (_invalidationExecution.TryCompleteSimple(frameId, continuation, NativeSimpleCardCancellationBoundary.EarlySimple))
             return;
         if (_coreFinalizedCardTargetsOperations.TryBeginFinalizedSimpleCardPrograms(frameId, continuation))
             return;
@@ -127,7 +123,7 @@ internal sealed partial class CoreGameEngineCardUseLifecycleRuntime
             return;
         if (_coreProgramCardUseNullificationOperations.Value.TryBeginSimpleBeforeTargetPrograms(frameId, continuation))
             return;
-        if (_characterHuangZhongAnniversaryGodOperations.ContinueAnniversaryHzIneffectiveSimple(frameId, continuation))
+        if (_invalidationExecution.TryCompleteSimple(frameId, continuation, NativeSimpleCardCancellationBoundary.BeforeTargetEffects))
             return;
         var frame = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(item => item.Id == frameId);
         if (_coreGuanduCardsOperations.ContinueGuanduIntoxicationUse(frameId, continuation))
@@ -159,7 +155,7 @@ internal sealed partial class CoreGameEngineCardUseLifecycleRuntime
         var card = _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(continuation.CardId)).Single(item => item.Id == continuation.CardId);
         var source = _coreMatchParticipantsPlayersAccess._players[frame.SourceSeat];
         _coreNativeCardUseFramesOperations.SetCardUseStep(frameId, ResolutionFrameStep.ResolvingEffect);
-        if (!source.IsAlive && frame.ExtraCardEffect is null && !_characterDaQiaoLeOperations.IsZixiExtraEffectRound(frameId) && !_coreSoleIncomingEffectRepeatOperations.Value.IsSoleIncomingExtraRound(frameId))
+        if (!source.IsAlive && !_nativeEffectEpisodes.CanContinueAfterActorDeath(frameId))
         {
             _coreNativeCardUseCompletionOperations.FinishCardUse(frameId, card, frame.CardKind);
             return;

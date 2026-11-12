@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterJiangWeiAnniversaryGodRuntime
 {
-    internal int[] ShenJwSlashTargets(ProgramSkillFrame f) => _coreTableOrderOperations.CurrentTableOrder().Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], p, CardKind.FireSlash, physicalSuit: Suit.None, effectiveRank: 0, countsTowardLimit: false)).Select(p => p.Seat).ToArray();
+    internal int[] ShenJwSlashTargets(ProgramSkillFrame f) => _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreTableOrderOperations.CurrentTableOrder().Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).ToArray(), CardKind.FireSlash, physicalSuit: Suit.None, effectiveRank: 0, countsTowardLimit: false).ToArray();
     internal void IssueShenJwSlash(ProgramSkillFrame f, int targetSeat)
     {
         var r = f.ShenJiangWei!;

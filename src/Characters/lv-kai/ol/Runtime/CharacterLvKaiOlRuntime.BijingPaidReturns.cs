@@ -44,7 +44,7 @@ internal sealed partial class CharacterLvKaiOlRuntime
         if (child is CardsMovedTriggerWindowFrame moved)
             return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(frame, moved) && moved.Batch.Movements.All(m => m.Sequence > state.Before && m.Sequence <= state.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame recovery)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(frame, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(frame, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(frame, hp);
         return child is ProgramLifecycleTriggerWindowFrame lifecycle && lifecycle.ResumeProgramFrameId == frame.Id && (lifecycle.Window == SkillProgramTriggerWindow.SkillsChanged && lifecycle.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || lifecycle.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == lifecycle.Id && e.Change.ParentFrameId == frame.Id));
@@ -57,7 +57,7 @@ internal sealed partial class CharacterLvKaiOlRuntime
     {
         if (frame.BijingPunish is not { Paid: true })
             return false;
-        if (BijingLionChild(frame, recovery) || _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(frame, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray()))
+        if (BijingLionChild(frame, recovery) || _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(frame, recovery))
             return true;
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == frame.Id);
         var child = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == recovery.Id);

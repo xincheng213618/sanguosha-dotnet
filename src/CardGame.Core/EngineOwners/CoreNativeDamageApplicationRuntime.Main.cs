@@ -8,7 +8,7 @@ internal sealed partial class CoreNativeDamageApplicationRuntime
         if (attack is NativeOwners.CardAttackHandle responseAttack && _characterSimaYiMobileGodOperations.TryBeginMobileSimaRenjieFailedAttack(responseAttack))
             return true;
         _characterCaoAngMouOperations.PrepareMouCaDamageSource(attack);
-        if (_characterXinPiOlOperations.IsXinPiRemainingCardDamageIneffective(attack))
+        if (attack is NativeOwners.CardAttackHandle invalidatedAttack && !invalidatedAttack.IsProgramSkillDamage && !invalidatedAttack.IsProgramJudgmentDamage && !invalidatedAttack.IsDelayedJudgmentDamage && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == invalidatedAttack.ResolutionId) is { } invalidatedUse && invalidatedUse.CardKind == invalidatedAttack.EffectiveCardKind && _coreCompletedUndamagedTargetRevealOperations.CompletedUndamagedNativeUseActorMatches(invalidatedUse, invalidatedAttack) && _invalidations.SuppressesRemainingCardDamage(invalidatedUse.Id))
             return false;
         if (_coreRecoveryReplacementOperations.TryPauseRecoveryPaidCardUse(attack.ResolutionId, new(RecoveryPaidCardUseKind.AttackDamage, attack.SourceSeat)))
             return true;

@@ -38,7 +38,12 @@ internal sealed partial class CharacterSimaYiOlMagicRuntime
     {
         if (entity.CardId <= 0 || _cardZonesOperations._cardZones.GetLocation(entity.CardId) != entity.From || _coreAdvancedLifecycleOperations.GetAdvancedCard(entity.CardId).Kind != CardKind.Dodge)
             throw new InvalidOperationException("Guifu needs the actual stock Dodge frozen for this obtain.");
-        _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(entity.CardId), entity.From, CardLocation.Hand(f.OwnerSeat), new("skill-program.ol:mo-guifu.obtain"), m => _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoSimaYiDodgeMarkedEvent(f.Id, f.OwnerSeat, m.CardId, m.From, m.Sequence)), disclosure: entity.From == CardLocation.DrawPile ? CardMovementDisclosure.FaceDown : CardMovementDisclosure.FaceUp);
+        _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(entity.CardId), entity.From, CardLocation.Hand(f.OwnerSeat), new("skill-program.ol:mo-guifu.obtain"), m =>
+        {
+            _handLimitExemptions.Grant(f, MoSimaYiComposition.Guifu, f.OwnerSeat,
+                new(new(RequireLivingHolder: true), [m.CardId]));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoSimaYiDodgeMarkedEvent(f.Id, f.OwnerSeat, m.CardId, m.From, m.Sequence));
+        }, disclosure: entity.From == CardLocation.DrawPile ? CardMovementDisclosure.FaceDown : CardMovementDisclosure.FaceUp);
     }
 
     bool IMoSimaYiNative.DrainChildren(long id) => _coreRecoveryReplacementOperations.TryBeginQueuedRecoveryReplacement(id, PostEventContinuation.AwaitedProgramMovement) || _coreCharacterStateProgramsOperations.TryBeginCharacterStateProgramWindow(id, CharacterStateContinuation.Program) || _coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(id, PostEventContinuation.AwaitedProgramMovement) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(id) || _coreSkillOwnershipWindowsOperations.TryBeginAdvancedSkillsChanged(id);

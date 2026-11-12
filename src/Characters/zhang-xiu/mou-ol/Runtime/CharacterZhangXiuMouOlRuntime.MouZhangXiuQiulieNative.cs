@@ -126,13 +126,6 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal bool IsMouZhangXiuOlQiulieIneffective(CardUseFrame use)
-    {
-        if (use.MouZhangXiuOlQiulie is not { } origin || !IsMouZhangXiuOlSlash(use))
-            return false;
-        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlQiulieNullifiedEvent>().Any(n => n.UseId == use.Id && n.TargetSeat == origin.TargetSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlStartedEvent>().Count(s => s.FrameId == n.FrameId && s.UseId == use.Id && s.Operation == SkillProgramEffectOp.DefendMouZhangXiuQiulieSlash && s.Source.OwnerSeat == origin.Source.OwnerSeat && s.Source.SkillId == origin.Source.SkillId && s.Source.SkillInstanceId == origin.Source.SkillInstanceId && s.Source.BindingId == "defend-hunt" && s.GameplayHash == origin.GameplayHash) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhangXiuOlDiscardPaidEvent>().Count(p => p.FrameId == n.FrameId && p.CardId == n.PaidCardId && p.PayerSeat == origin.TargetSeat && p.Defense && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == p.CardId && m.From.OwnerSeat == p.PayerSeat && m.From.Zone is CardZoneKind.Hand or CardZoneKind.Equipment && m.Sequence > p.Before && m.Sequence <= p.After && m.Reason.Value == MouZhangXiuOlDefenseReason) == 1) == 1);
-    }
-
     [ProgramPipelineHook(ProgramPipelinePhase.CollectIssuedCardTrigger, 33000)]
     internal void CollectIssuedMouZhangXiuOl(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result)
     {

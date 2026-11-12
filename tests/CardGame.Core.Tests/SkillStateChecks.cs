@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Reflection;
 using CardGame.Content.Standard;
 using CardGame.Core;
@@ -580,7 +580,7 @@ internal static class SkillStateChecks
         var operations = DispatchProxy.Create<IProgramSkillChangeOperations, ExpiryOperationsProbe>();
         var probe = (ExpiryOperationsProbe)operations;
         probe.Actual = capabilities.Get<IProgramSkillChangeOperations>();
-        var runtime = new ProgramSkillChangeRuntime(capabilities.Get<IProgramSkillChangeFacts>(), operations,
+        var runtime = new ProgramSkillChangeRuntime(capabilities.Get<IHandLimitExemptionBoundaries>(), capabilities.Get<IAppliedResponseRelationBoundaries>(), capabilities.Get<IProgramSkillChangeFacts>(), operations,
             capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
             capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(),
             capabilities.Get<IProgramHealthChildQueries>(), capabilities.Get<IProgramEventJournalQueries>(),
@@ -663,7 +663,7 @@ internal static class SkillStateChecks
         var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!;
         var facts = DispatchProxy.Create<IProgramSkillChangeFacts, ExpiryOperationsProbe>();
         var probe = (ExpiryOperationsProbe)facts; probe.Actual = capabilities.Get<IProgramSkillChangeFacts>();
-        var runtime = new ProgramSkillChangeRuntime(facts, capabilities.Get<IProgramSkillChangeOperations>(),
+        var runtime = new ProgramSkillChangeRuntime(capabilities.Get<IHandLimitExemptionBoundaries>(), capabilities.Get<IAppliedResponseRelationBoundaries>(), facts, capabilities.Get<IProgramSkillChangeOperations>(),
             capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
             capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(),
             capabilities.Get<IProgramHealthChildQueries>(), capabilities.Get<IProgramEventJournalQueries>(),
@@ -710,7 +710,7 @@ internal static class SkillStateChecks
         var s = Scene.Start();
         var capabilities = (ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(s.G)!;
         var directed = capabilities.Get<CardGame.Core.EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess>();
-        var runtime = new ProgramSkillChangeRuntime(capabilities.Get<IProgramSkillChangeFacts>(), capabilities.Get<IProgramSkillChangeOperations>(),
+        var runtime = new ProgramSkillChangeRuntime(capabilities.Get<IHandLimitExemptionBoundaries>(), capabilities.Get<IAppliedResponseRelationBoundaries>(), capabilities.Get<IProgramSkillChangeFacts>(), capabilities.Get<IProgramSkillChangeOperations>(),
             capabilities.Get<ISkillGrantRevisionObservations>(), capabilities.Get<IMatchParticipantStateAccess>(),
             capabilities.Get<IProgramTurnQueries>(), capabilities.Get<IActualDiscardRecoveryPhaseQueries>(), capabilities.Get<IProgramHealthChildQueries>(),
             capabilities.Get<IProgramEventJournalQueries>(), directed,
@@ -756,6 +756,7 @@ internal static class SkillStateChecks
 
     private sealed class FactSink(Action<IGameEvent>? queue = null) : IRuleProgressionOperations
     {
+        public void CaptureNativeResponseRules(IGameEvent payload) { }
         public void ApplySkillStateDeclarations(IGameEvent payload, SkillStateBoundaryTiming timing) { }
         public void QueueFact(IGameEvent payload) => queue?.Invoke(payload);
         public bool BeginCharacterStateWindow() => false;

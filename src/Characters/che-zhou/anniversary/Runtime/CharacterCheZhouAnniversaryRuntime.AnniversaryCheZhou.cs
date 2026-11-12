@@ -103,6 +103,10 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
         {
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(active with { AnniversaryCheZhou = active.AnniversaryCheZhou!with { BatchId = batch, Moves = moves, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
+            _handLimitExemptions.Grant(active, AnniversaryCheZhouComposition.Pigua, f.OwnerSeat,
+                new(new(), moves.Where(move => move.From == CardLocation.Hand(r.Victim) &&
+                    move.To == CardLocation.Hand(f.OwnerSeat) && move.Reason.Value == CheZhouObtainReason)
+                    .Select(move => move.CardId).ToArray(), HandLimitExemptionExpiry.FrozenTurnCoordinates, new(r.Turn, r.TurnSeat)));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryCheZhouPiguaPaidEvent(f.Id, r.Source, r.Hash, r.Turn, r.TurnSeat, r.Victim, moves.Count, batch, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         }, disclosure: CardMovementDisclosure.FaceDown);
         ContinueCheZhou(f.Id);

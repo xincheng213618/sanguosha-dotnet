@@ -17,6 +17,8 @@ public sealed record RequestedDeckBasicMaterial(
 {
     public long ViewFrameId { get; init; }
     public long? PaidMovementSequence { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramSlashRequestAcceptance? ProgramRequestAcceptance { get; init; }
 }
 
 public sealed record RequestedDeckBasicFrame : ResolutionFrame

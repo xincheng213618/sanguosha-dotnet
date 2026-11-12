@@ -17,7 +17,6 @@ internal sealed partial class CoreGameEngineAlcoholIdentityPoliciesRuntime
         return 13;
     }
 
-    internal bool IsEffectiveHandKindExempt(CharacterState owner, Card card, IReadOnlySet<CardKind> kinds) => card.Kind == CardKind.MantianGuohai || _coreWushuangTacticRulesOperations.IsWushuangHandLimitExempt(owner, card) || kinds.Contains(card.Kind) || card.Kind == CardKind.Alcohol && kinds.Contains(CardKind.Slash) && HasAlcoholKingIdentityPolicy(owner);
     internal int? CaptureAlcoholActionRank(int providerSeat, CardKind kind, IReadOnlyList<int> ids)
     {
         if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || ids.Count != 1)

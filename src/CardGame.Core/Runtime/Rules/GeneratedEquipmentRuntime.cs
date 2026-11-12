@@ -7,8 +7,8 @@ namespace CardGame.Core;
 [ProgramRuntimeModule]
 internal sealed class GeneratedEquipmentRuntime(ICardZoneQueries cards, ICardMovementHistoryQueries history,
     IProgramTurnQueries turn, DeferredRuntime<CoreGameEngineEquipmentContentRuntime> rules,
-    CorePhysicalMovementFacadesEntries movement, IProgramRuntimeFrames frames,
-    INativeCardRepresentations representations)
+    CorePhysicalMovementFacadesEntries movement,
+    INativeMaterialClaims materialClaims)
 {
     internal const string DestroyReason = "equipment.lifetime.destroy";
     internal const string DestroyedThisTurn = "equipment.destroyedThisTurn";
@@ -31,20 +31,7 @@ internal sealed class GeneratedEquipmentRuntime(ICardZoneQueries cards, ICardMov
         {
             if (destroyed.From != CardLocation.DiscardPile || destroyed.To != CardLocation.OutsideGame ||
                 destroyed.Reason.Value != DestroyReason) return;
-            // This exact discard entry caused the destruction. A Processing
-            // entry keeps its original physical payer rather than borrowing a
-            // different active use that happens to mention the same entity.
-            var payment = fact.From == CardLocation.Processing
-                ? history.Last(previous => previous.CardId == fact.CardId && previous.Sequence < fact.Sequence)
-                : fact;
-            if (payment is null || payment.CardKind != fact.CardKind ||
-                fact.From == CardLocation.Processing && payment.To != CardLocation.Processing) return;
-            var use = frames.OfType<CardUseFrame>().LastOrDefault(use =>
-                payment.Sequence > use.NativeRepresentationIssuedAfterMovementSequence &&
-                use.Action?.PhysicalCards.Any(material => material.CardId == fact.CardId &&
-                    material.CardKind == fact.CardKind && material.From == payment.From) == true);
-            if (use is not null)
-                representations.CaptureDeparture(use.Id, card.Id, destroyed.Sequence);
+            materialClaims.CaptureRetirement(destroyed);
         });
     }
 
@@ -54,12 +41,7 @@ internal sealed class GeneratedEquipmentRuntime(ICardZoneQueries cards, ICardMov
             Card(fact.CardId).EquipmentOrigin is not { } origin ||
             !rules.Value.EquipmentRules.DestinationPolicies.TryGetValue(origin.SourceId, out var policy) ||
             !policy.DestroyOnEquipmentExit || fact.From.Zone != CardZoneKind.Equipment) return;
-        var use = frames.OfType<CardUseFrame>().LastOrDefault(use =>
-            fact.Sequence > use.NativeRepresentationIssuedAfterMovementSequence &&
-            use.Action?.PhysicalCards.Any(material => material.CardId == fact.CardId &&
-                material.CardKind == fact.CardKind && material.From == fact.From) == true);
-        if (use is not null)
-            representations.CaptureDeparture(use.Id, fact.CardId, fact.Sequence);
+        materialClaims.CaptureRetirement(fact);
     }
 
     internal bool IsDestroyedMaterial(CardMovementRecord m) => m.To == CardLocation.OutsideGame &&

@@ -52,7 +52,7 @@ internal sealed partial class CharacterSimaYiMouRuntime
             plans.AddRange(_coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(actor, required, true).Where(p => !_characterGuanHaiOlOperations.IsXieweiSelection(p)).Select(p => new MouSmPlayedPlan(p.OutputKind, p.Source, false) { Cards = p.Cards.Select(c => c.Id).ToArray() }));
         }
 
-        plans.AddRange(_coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor).Select(p => new MouSmPlayedPlan(CardKind.Slash, null, true) { Cards = p.Select(c => c.Id).ToArray() }));
+        plans.AddRange(_coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor).Select(p => new MouSmPlayedPlan(CardKind.Slash, null, true) { Cards = p.Select(c => c.Id).ToArray() }));
         return Array.AsReadOnly(plans.Where(p => MouSmPlanIsRed(actor, p)).DistinctBy(p => (p.Kind, p.Source, p.Zhangba, string.Join(",", p.Cards))).ToArray());
     }
 

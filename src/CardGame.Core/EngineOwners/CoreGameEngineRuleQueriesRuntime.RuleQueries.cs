@@ -16,5 +16,24 @@ internal sealed partial class CoreGameEngineRuleQueriesRuntime
     internal static void AddFiniteContribution(ICollection<RuleQueryContribution> contributions, string sourceId, int value) => RuntimeSkills.RuntimeRules_Core_RuleQueries.AddFiniteContribution(contributions, sourceId, value);
     internal static int ConvertRuleValue(RuleQueryEvaluation evaluation) => RuntimeSkills.RuntimeRules_Core_RuleQueries.ConvertRuleValue(evaluation);
     internal int GetSlashUseLimit(CharacterState player, int? excludedEquipmentId = null, EquipmentSlot? excludedEquipmentSlot = null) => ConvertRuleValue(_coreActionQueriesOperations.EvaluateSlashUseLimit(player, excludedEquipmentId, excludedEquipmentSlot));
-    internal bool CanSpendSlashUse(CharacterState player, CharacterState target, bool ignoresCount, CardKind effectiveKind = CardKind.Slash, Card? physicalCard = null, int? effectiveRank = null, int? excludedEquipmentId = null, IReadOnlyList<int>? physicalCardIds = null, EquipmentSlot? excludedEquipmentSlot = null, bool ignoreMoQuanyu = false, Suit? effectiveSuit = null) => !_coreCardUseModulesOperations.IsCardUseForbidden(player.Seat, effectiveKind, CardActionType.Use) && (physicalCard is null || !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(player.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(player, physicalCard))) && !_coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(player.Seat, target.Seat, effectiveKind) && (_coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play || player.Seat != _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat || ignoresCount || _characterDaQiaoXiaoQiaoHappyGodOperations.IsHappyQiaoShutuCardQuery(player, physicalCard?.Id) || _coreProgramTargetRulesOperations.TargetRules.HasSlashQuotaBeforeLimit(new(player, target, effectiveKind, physicalCard, effectiveRank, excludedEquipmentId, physicalCardIds, excludedEquipmentSlot, ignoreMoQuanyu, effectiveSuit)) || _coreCurrentTurnStatisticsSlashCountThisTurnAccess._slashCountThisTurn < GetSlashUseLimit(player, excludedEquipmentId, excludedEquipmentSlot) || _coreProgramTargetRulesOperations.TargetRules.HasSlashQuotaAfterLimit(new(player, target, effectiveKind, physicalCard, effectiveRank, excludedEquipmentId, physicalCardIds, excludedEquipmentSlot, ignoreMoQuanyu, effectiveSuit)));
+    internal bool CanSpendSlashUse(CharacterState player, CharacterState target, bool ignoresCount, CardKind effectiveKind = CardKind.Slash, Card? physicalCard = null, int? effectiveRank = null, int? excludedEquipmentId = null, IReadOnlyList<int>? physicalCardIds = null, EquipmentSlot? excludedEquipmentSlot = null, bool ignoreMoQuanyu = false, Suit? effectiveSuit = null)
+    {
+        if (_coreCardUseModulesOperations.IsCardUseForbidden(player.Seat, effectiveKind, CardActionType.Use) ||
+            physicalCard is not null && _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(player.Seat, target.Seat, _coreNativeCardAppearanceOperations.EffectiveSuit(player, physicalCard)) ||
+            _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(player.Seat, target.Seat, effectiveKind))
+            return false;
+        if (_coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play ||
+            player.Seat != _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat || ignoresCount ||
+            _characterDaQiaoXiaoQiaoHappyGodOperations.IsHappyQiaoShutuCardQuery(player, physicalCard?.Id))
+            return true;
+        // Extra permissions only add allowances. Ordinary remaining quota needs
+        // no material- or frame-specific permission; those reads keep their
+        // original order when the ordinary allowance is exhausted.
+        if (_coreCurrentTurnStatisticsSlashCountThisTurnAccess._slashCountThisTurn < GetSlashUseLimit(player, excludedEquipmentId, excludedEquipmentSlot))
+            return true;
+        var query = new ProgramSlashQuotaQuery(player, target, effectiveKind, physicalCard, effectiveRank,
+            excludedEquipmentId, physicalCardIds, excludedEquipmentSlot, ignoreMoQuanyu, effectiveSuit);
+        return _coreProgramTargetRulesOperations.TargetRules.HasSlashQuotaBeforeLimit(query) ||
+            _coreProgramTargetRulesOperations.TargetRules.HasSlashQuotaAfterLimit(query);
+    }
 }

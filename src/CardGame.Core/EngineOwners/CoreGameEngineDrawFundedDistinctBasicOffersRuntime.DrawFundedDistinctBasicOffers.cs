@@ -31,7 +31,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
 
     internal IReadOnlyList<LegalAction> DrawFundedDistinctBasicPlayActions(CharacterState actor)
     {
-        if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat || _resolutionStackOperations._resolutionStack.Count != 0) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor))
+        if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat || _resolutionStackOperations._resolutionStack.Count != 0) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _slashRequestPermissions.Declaration(actor.Seat) is not null) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor))
             return[];
         var actions = new List<LegalAction>();
         foreach (var(source, rule, _)in DrawFundedDistinctBasicRules(actor))
@@ -42,7 +42,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
     internal IReadOnlyList<LegalAction> DrawFundedDistinctBasicNativePlayActions(CharacterState actor, CardConversionSource source, CardKind kind)
     {
         var result = new List<LegalAction>();
-        if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
+        if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat != actor.Seat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _slashRequestPermissions.Declaration(actor.Seat) is not null) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor) || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
             return result;
         var card = new Card(0, kind, Suit.None, 0);
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
@@ -84,13 +84,26 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
         return true;
     }
 
-    internal bool TryExecuteDrawFundedDistinctBasicPlay(CharacterState actor, LegalAction action)
+    internal bool TryExecuteDrawFundedDistinctBasicPlay(CharacterState actor, LegalAction action, ProgramSlashRequestAcceptance? programSlashRequest = null, ProgramSlashRequestIdentity? programSlashRequestIdentity = null, PendingDecision? originalDecision = null)
     {
         if (action.CardId != 0 || action.ConversionSource is not { } source || _corePlayCardHistoryOperations.ViewAsRule(source)?.DrawFundedDistinctBasic is null)
             return false;
-        if (!DrawFundedDistinctBasicPlayActions(actor).Any(a => a.Kind == action.Kind && a.ConversionSource == source && a.PlayedCardKind == action.PlayedCardKind && a.TargetSeats.SequenceEqual(action.TargetSeats)))
+        if (programSlashRequest is { } accepted &&
+            (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == accepted.Identity.FrameId) is not ProgramSkillFrame parent ||
+             !_programSlashRequests.OwnsAcceptance(parent, accepted, actor.Seat) || !action.TargetSeats.Contains(accepted.TargetSeat) ||
+             action.PlayedCardKind is not { } requestedKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(requestedKind)))
+            throw new InvalidOperationException("A native Play action lost its original accepted Slash request.");
+        if (programSlashRequest is null && programSlashRequestIdentity is { } identity &&
+            (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == identity.FrameId) is not ProgramSkillFrame offeredParent ||
+             !_programSlashRequests.OwnsIssuedIdentity(offeredParent, identity, actor.Seat) ||
+             !_programSlashRequests.OwnsOffer(offeredParent, actor.Seat, action.TargetSeat ?? action.TargetSeats.FirstOrDefault(-1)) ||
+             action.PlayedCardKind is not { } offeredKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(offeredKind)))
+            throw new InvalidOperationException("A native Play action lost its original unpaid Slash request.");
+        if (programSlashRequest is null && programSlashRequestIdentity is null && !DrawFundedDistinctBasicPlayActions(actor).Any(a => a.Kind == action.Kind && a.ConversionSource == source && a.PlayedCardKind == action.PlayedCardKind && a.TargetSeats.SequenceEqual(action.TargetSeats)))
             throw new InvalidOperationException("An AI draw-funded use changed its published action before acceptance.");
-        var original = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? new PendingDecision(DecisionKind.PlayCard, actor.Seat, "已发布合法出牌动作", [], [])
+        if (originalDecision is null && (programSlashRequest is not null || programSlashRequestIdentity is not null))
+            throw new InvalidOperationException("A requested native Play cost requires its actual original decision.");
+        var original = originalDecision ?? _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? new PendingDecision(DecisionKind.PlayCard, actor.Seat, "已发布合法出牌动作", [], [])
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             Revision = _coreCommandSessionQueriesOperations.Revision
@@ -98,7 +111,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
         // The exact selection belongs to the payment frame; a draw child must
         // not borrow the outer use's temporary target selection.
         _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats = null;
-        _coreDrawFundedDistinctBasicPaymentOperations.BeginDrawFundedDistinctBasic(actor, source, action.PlayedCardKind!.Value, action.TargetSeats, original, new(DrawFundedDistinctBasicIntent.Play, null, null, null, 0, action.TargetSeat));
+        _coreDrawFundedDistinctBasicPaymentOperations.BeginDrawFundedDistinctBasic(actor, source, action.PlayedCardKind!.Value, action.TargetSeats, original, new(DrawFundedDistinctBasicIntent.Play, null, null, null, 0, action.TargetSeat), programSlashRequest, programSlashRequestIdentity);
         return true;
     }
 
@@ -121,29 +134,22 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
             return null;
         if (_characterHuanShuJunOlOperations.TryGetWenyiPeachRequest(program, out var wenyiActor, out var wenyiTarget) && prompt.PlayerSeat == wenyiActor && program.HuanShuJun is { Stage: HuanShuJunStage.WenyiPeachRequest or HuanShuJunStage.NativeIssuing })
             return new(DrawFundedDistinctBasicIntent.WenyiPeach, program.Id, program.Id, null, program.InstructionIndex, wenyiTarget);
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(program) && _characterSunYuanOlOperations.TryGetSayingSlashRequest(program, out var sayingActor, out var sayingTargets) && prompt.PlayerSeat == sayingActor)
-            return new(DrawFundedDistinctBasicIntent.AssistedSlash, program.Id, program.Id, null, program.InstructionIndex, sayingTargets.Single());
-        if (_characterLiYiOlOperations.IsChanshuangSlashRequest(program) && _characterLiYiOlOperations.TryGetChanshuangSlashRequest(program, out var requestedActor, out var requestedTargets) && prompt.PlayerSeat == requestedActor)
-            return new(DrawFundedDistinctBasicIntent.AssistedSlash, program.Id, program.Id, null, program.InstructionIndex, requestedTargets.Single());
-        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(program) && prompt.PlayerSeat == program.LvKuangLvXiang!.Actor)
-            return new(DrawFundedDistinctBasicIntent.AssistedSlash, program.Id, program.Id, null, program.InstructionIndex, program.LvKuangLvXiang.Target);
-        if (_characterWuJingOlOperations.IsWuJingHejiRequest(program) && prompt.PlayerSeat == program.OwnerSeat)
-            return new(DrawFundedDistinctBasicIntent.AssistedSlash, program.Id, program.Id, null, program.InstructionIndex, program.WuJing!.TargetSeat);
-        if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(program) && prompt.PlayerSeat == program.OwnerSeat)
-            return new(DrawFundedDistinctBasicIntent.AssistedSlash, program.Id, program.Id, null, program.InstructionIndex, null);
+        if (_programSlashRequests.GetOffer(program, prompt.PlayerSeat) is not { } request)
+            return null;
         var paused = ProgramInstructionResolver.Default.Resolve(program, _contentRegistryOperations._contentRegistry.GetSkill(program.SkillId).Program!).GetPausedInstruction(program.InstructionIndex).Effect;
-        if (paused.Op == SkillProgramEffectOp.RequestSlashByTarget && program.SelectedTargetSeats.SequenceEqual([prompt.PlayerSeat]) && prompt.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "request-slash-decline"))
-            return new(DrawFundedDistinctBasicIntent.ProgramSlash, program.Id, program.Id, null, program.InstructionIndex, program.OwnerSeat);
-        if (paused.Op == SkillProgramEffectOp.RequestSlashByNearest && prompt.Choices.Any(c => c.Parameters.GetValueOrDefault("program-action") == "request-slash-nearest-decline"))
-            return new(DrawFundedDistinctBasicIntent.ProgramNearestSlash, program.Id, program.Id, null, program.InstructionIndex, null);
-        if (paused.Op == SkillProgramEffectOp.RequestSlashAgainstChosenTarget && program.AssistedSlashRequest is { TargetSeat: { } target } assisted && assisted.ActorSeat == prompt.PlayerSeat)
-            return new(DrawFundedDistinctBasicIntent.AssistedSlash, program.Id, program.Id, null, program.InstructionIndex, target);
-        if (paused.Op == SkillProgramEffectOp.RequestLegalSlashByNearest && program.NearestLegalSlashRequest is { AwaitingFaction: false } nearest && nearest.ActorSeat == prompt.PlayerSeat)
-            return new(DrawFundedDistinctBasicIntent.NearestLegalSlash, program.Id, program.Id, null, program.InstructionIndex, null);
-        return null;
+        var intent = paused.Op switch
+        {
+            SkillProgramEffectOp.RequestSlashByTarget => DrawFundedDistinctBasicIntent.ProgramSlash,
+            SkillProgramEffectOp.RequestSlashByNearest => DrawFundedDistinctBasicIntent.ProgramNearestSlash,
+            SkillProgramEffectOp.RequestLegalSlashByNearest => DrawFundedDistinctBasicIntent.NearestLegalSlash,
+            _ => DrawFundedDistinctBasicIntent.AssistedSlash
+        };
+        var targets = _programSlashRequests.GetTargets(program, prompt.PlayerSeat);
+        return new(intent, program.Id, program.Id, null, program.InstructionIndex,
+            request.Spec.TargetSource == ProgramSlashRequestTargetSource.FrozenCandidates && targets.Count == 1 ? targets[0] : null);
     }
 
-    internal bool DrawFundedDistinctBasicNativeResponseLegal(CharacterState actor, GameEngine.DrawFundedBasicNeed need, CardKind kind, int? targetSeat)
+    internal bool DrawFundedDistinctBasicNativeResponseLegal(CharacterState actor, GameEngine.DrawFundedBasicNeed need, CardKind kind, int? targetSeat, CardConversionSource? source = null)
     {
         if (!actor.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
             return false;
@@ -163,19 +169,15 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
             return _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.ResolutionId == need.ParentFrameId && q.Attack.SourceSeat == actor.Seat && q.Attack.TargetSeat == seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(_coreActiveNativeAttackQueriesOperations.ActiveCardAttack, q.Attack) && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], kind, null, false, Suit.None, 0);
         if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == need.ParentFrameId)is not ProgramSkillFrame program || program.InstructionIndex != need.Cursor)
             return false;
-        if (_characterSunYuanOlOperations.TryGetSayingSlashRequest(program, out var sayingActor, out var sayingTargets))
-            return need.Intent == DrawFundedDistinctBasicIntent.AssistedSlash && need.RequestFrameId == program.Id && actor.Seat == sayingActor && sayingTargets.Contains(seat) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: []);
-        if (_characterLiYiOlOperations.TryGetChanshuangSlashRequest(program, out var requestedActor, out var requestedTargets))
-            return need.Intent == DrawFundedDistinctBasicIntent.AssistedSlash && need.RequestFrameId == program.Id && actor.Seat == requestedActor && requestedTargets.Contains(seat) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: []);
-        if (_characterWuJingOlOperations.IsWuJingHejiRequest(program))
-            return _characterWuJingOlOperations.WuJingHejiAdapterActor(program, actor.Seat, seat, need.Cursor, need.ParentFrameId, need.RequestFrameId) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: [], ignoreDistance: true);
-        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(program))
-            return _characterLvKuangLvXiangOlOperations.QigongAdapterActor(program, actor.Seat, seat, need.Cursor, need.ParentFrameId, need.RequestFrameId) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: [], ignoreDistance: true);
-        if (!_coreMatchParticipantsPlayersAccess._players[program.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(program) && !_characterCaoChunOlOperations.IsCaoChunInitialRequest(program) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(program))
+        var request = _programSlashRequests.GetIdentity(program);
+        if (request is null || request.ActorSeat != actor.Seat || need.RequestFrameId != program.Id ||
+            !_programSlashRequests.GetTargets(program, actor.Seat).Contains(seat))
             return false;
-        if (need.FixedTargetSeat is { } fixedTarget && fixedTarget != seat || need.Intent is DrawFundedDistinctBasicIntent.ProgramNearestSlash or DrawFundedDistinctBasicIntent.NearestLegalSlash && !_coreProgramSlashRequestOperations.GetNearestLivingCharacterSeats(actor.Seat).Contains(seat))
+        if (program?.SlashRequest?.Acceptance is { } acceptedRequest && !_programSlashRequests.CanExecuteAcceptedUse(program, acceptedRequest))
             return false;
-        return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: []);
+        if (request.Spec.CountsTowardSlashLimit && !_slashQuota.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[seat], _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source), kind, physicalCardIds: []))
+            return false;
+        return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[seat], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: [], ignoreDistance: request.Spec.IgnoreDistance);
     }
 
     internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> DrawFundedDistinctBasicForcedSlashRules(CharacterState actor, CharacterState target, bool qinglong) => DrawFundedDistinctBasicRules(actor).Where(r => CoreNativeCardClassificationsRuntime.IsSlashCard(r.Rule.OutputKind) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, r.Rule.OutputKind, Suit.None) && (qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, r.Rule.OutputKind, null, false, Suit.None, 0) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, r.Rule.OutputKind, Suit.None, false, null, 0, [])));
@@ -192,7 +194,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicOffersRuntime
             }
 
             : prompt.ValidTargetSeats.ToArray();
-            foreach (var seat in targets.Where(seat => DrawFundedDistinctBasicNativeResponseLegal(actor, need, rule.OutputKind, seat)))
+            foreach (var seat in targets.Where(seat => DrawFundedDistinctBasicNativeResponseLegal(actor, need, rule.OutputKind, seat, source)))
             {
                 var p = new Dictionary<string, string>
                 {

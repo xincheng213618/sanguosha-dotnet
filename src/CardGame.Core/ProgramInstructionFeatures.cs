@@ -21,7 +21,7 @@ internal sealed class ProgramInstructionFeatures
             group => group.Key, group => (IReadOnlyList<SkillProgramEffect>)Array.AsReadOnly(group.ToArray()));
         UsesConversionPolarity = effects.Any(effect => ProgramOperationCatalog.Default.Resolve(effect.Op).UsesConversionPolarity);
         FactRequirements = effects.Aggregate(default(ProgramFactRequirements), static (requirements, effect) =>
-            requirements.Union(ProgramOperationCatalog.Default.FactRequirementsFor(effect.Op)));
+            requirements.Union(ProgramOperationCatalog.Default.FactRequirementsFor(effect)));
         RequiresHandLimitContext = effects.Any(effect => effect.Condition.RequiresHandLimitContext ||
                 effect.Options.Any(option => option.Condition.RequiresHandLimitContext)) ||
             effects.SelectMany(ExpressionRoots).Concat(triggerCondition is null ? [] : ExpressionRoots(triggerCondition))

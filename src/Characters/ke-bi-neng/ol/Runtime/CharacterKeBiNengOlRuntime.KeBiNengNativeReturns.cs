@@ -31,33 +31,60 @@ internal sealed partial class CharacterKeBiNengOlRuntime
     internal void BindKeBiNengPingduanNativeUse(CardUseFrame use)
     {
         var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == use.Id);
-        if (index < 1)
-            return;
-        ProgramSkillFrame? parent = _resolutionStackOperations._resolutionStack[index - 1] as ProgramSkillFrame;
-        if (parent?.KeBiNengPingduan is not { Stage: KeBiNengPingduanStage.BasicIssuing })
+        var requested = use.ProgramSlashRequestExecution;
+        ProgramSkillFrame? parent;
+        if (requested is not null)
         {
-            if (index >= 2 && _resolutionStackOperations._resolutionStack[index - 2] is ProgramSkillFrame candidate && KeBiNengPaymentRidesOn(candidate, _resolutionStackOperations._resolutionStack[index - 1]))
-                parent = candidate;
-            else
-                parent = _characterLiuFengBoundaryOperations.BoundaryLiuFengNativeParent(use);
+            parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == requested.ProgramFrameId);
+            if (parent?.KeBiNengPingduan is not { Stage: KeBiNengPingduanStage.BasicChoice or KeBiNengPingduanStage.BasicIssuing } request)
+                return;
+            if (!_slashRequests.OwnsAcceptance(parent, requested.Acceptance, request.ActorSeat) ||
+                !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
+                throw new InvalidOperationException("Pingduan lost its exact accepted native Slash request.");
         }
-
-        if (parent?.KeBiNengPingduan is not { Stage: KeBiNengPingduanStage.BasicIssuing })
-            return;
+        else
+        {
+            if (index < 1)
+                return;
+            parent = _resolutionStackOperations._resolutionStack[index - 1] as ProgramSkillFrame;
+            if (parent?.KeBiNengPingduan is not { Stage: KeBiNengPingduanStage.BasicIssuing })
+            {
+                if (index >= 2 && _resolutionStackOperations._resolutionStack[index - 2] is ProgramSkillFrame candidate && KeBiNengPaymentRidesOn(candidate, _resolutionStackOperations._resolutionStack[index - 1]))
+                    parent = candidate;
+                else
+                    parent = _characterLiuFengBoundaryOperations.BoundaryLiuFengNativeParent(use);
+            }
+            if (parent?.KeBiNengPingduan is not { Stage: KeBiNengPingduanStage.BasicIssuing })
+                return;
+        }
         var r = parent.KeBiNengPingduan!;
-        var selected = r.SelectedBasicAction ?? throw new InvalidOperationException("Pingduan lost its accepted basic native action.");
-        var materials = KeBiNengMaterials(selected);
-        var expectedKind = selected.PlayedCardKind ?? (selected.CardId is> 0 ? _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat], _coreCardAttackStateOperations.GetAttackCard(selected.CardId.Value)) : use.CardKind);
-        if (!ValidKeBiNeng(parent) || r.NativeUse is not null || use.SourceSeat != r.ActorSeat || use.Action is not { Type: CardActionType.Use } action || action.ActorSeat != r.ActorSeat || action.ProviderSeat != r.ActorSeat || action.EffectiveKind != use.CardKind || use.CardKind != expectedKind || CardCatalog.Get(use.CardKind).CategoryName != "基本牌" || use.PhysicalCardIds is not { } physical || !physical.SequenceEqual(materials) || !action.PhysicalCards.Select(c => c.CardId).SequenceEqual(materials) || !action.ConversionChain.SequenceEqual((selected.ConversionSource is { } primary ? new[] { primary } : []).Concat(selected.AdditionalConversionSources ?? [])) || !use.TargetSeats.SequenceEqual(_coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(use.CardKind, r.ActorSeat, selected.TargetSeats)))
-            throw new InvalidOperationException("Pingduan changed its privately accepted native basic name, original actor, actual material, conversion source or targets.");
+        if (r.NativeUse is not null || use.Action is not { Type: CardActionType.Use } action ||
+            action.EffectiveKind != use.CardKind || CardCatalog.Get(use.CardKind).CategoryName != "基本牌")
+            throw new InvalidOperationException("Pingduan lost its actual native basic use.");
+        if (requested is null)
+        {
+            var selected = r.SelectedBasicAction ?? throw new InvalidOperationException("Pingduan lost its accepted basic native action.");
+            var materials = KeBiNengMaterials(selected);
+            var expectedKind = selected.PlayedCardKind ?? (selected.CardId is > 0 ? _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat], _coreCardAttackStateOperations.GetAttackCard(selected.CardId.Value)) : use.CardKind);
+            if (!ValidKeBiNeng(parent) || use.SourceSeat != r.ActorSeat || action.ActorSeat != r.ActorSeat || action.ProviderSeat != r.ActorSeat || use.CardKind != expectedKind ||
+                use.PhysicalCardIds is not { } physical || !physical.SequenceEqual(materials) || !action.PhysicalCards.Select(c => c.CardId).SequenceEqual(materials) ||
+                !action.ConversionChain.SequenceEqual((selected.ConversionSource is { } primary ? new[] { primary } : []).Concat(selected.AdditionalConversionSources ?? [])) ||
+                !use.TargetSeats.SequenceEqual(_coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(use.CardKind, r.ActorSeat, selected.TargetSeats)))
+                throw new InvalidOperationException("Pingduan changed its accepted native basic materials or targets.");
+        }
         var origin = new KeBiNengPingduanUseOrigin(parent.Id, parent.InstructionIndex, r.Source, r.GameplayHash, r.ActualTurn, r.PhaseInstance, r.ActorSeat, use.Id, action.ActionId, use.CardKind);
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { KeBiNengPingduan = r with { Stage = KeBiNengPingduanStage.BasicNative, NativeUse = origin } });
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { KeBiNengPingduanUse = origin });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KeBiNengPingduanNativeIssuedEvent(origin));
     }
 
-    [ProgramCardUsePayment(ProgramCardUsePaymentStage.BeforeSlashDebit, 50)]
-    internal bool HasIssuedKeBiNengPingduanUse(long id, int actor) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { KeBiNengPingduanUse: { } origin, Action: { } action } use && origin.CardUseFrameId == id && (origin.ActorSeat == actor || use.SourceSeat == actor) && action.ActionId == origin.ActionId && _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, origin.ActorSeat, origin.ActorSeat) && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == origin.ProgramFrameId)is ProgramSkillFrame { KeBiNengPingduan: { NativeUse: { } stored } } parent && stored == origin && ValidKeBiNeng(parent) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<KeBiNengPingduanNativeIssuedEvent>().Count(e => e.Origin == origin) == 1;
+    internal bool HasIssuedKeBiNengPingduanUse(long id, int actor) =>
+        _coreCardUseLifecycleOperations.LifecycleCardUse(id) is { KeBiNengPingduanUse: { } origin, Action: { } action } use &&
+        origin.CardUseFrameId == id && (origin.ActorSeat == actor || use.SourceSeat == actor) && action.ActionId == origin.ActionId &&
+        _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == origin.ProgramFrameId) is { KeBiNengPingduan: { NativeUse: { } stored } } parent &&
+        stored == origin && (use.ProgramSlashRequestExecution is { } requested
+            ? requested.ProgramFrameId == parent.Id && _slashRequests.OwnsAcceptance(parent, requested.Acceptance, origin.ActorSeat)
+            : _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, origin.ActorSeat, origin.ActorSeat) && ValidKeBiNeng(parent));
     [NativeUseValidation(27040)]
     internal void AssertKeBiNengNativeCompletion(CardUseFrame use)
     {
@@ -70,7 +97,7 @@ internal sealed partial class CharacterKeBiNengOlRuntime
     {
         if (use.KeBiNengPingduanUse is not { } origin)
             return false;
-        if (_resolutionStackOperations._resolutionStack.Any(f => f.Id == use.Id) || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == origin.ProgramFrameId)is not ProgramSkillFrame { KeBiNengPingduan: { Stage: KeBiNengPingduanStage.BasicNative } r } parent || r.NativeUse != origin || use.Action?.ActionId != origin.ActionId || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<KeBiNengPingduanNativeReturnedEvent>().Any(e => e.Origin == origin))
+        if (_resolutionStackOperations._resolutionStack.Any(f => f.Id == use.Id) || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == origin.ProgramFrameId)is not ProgramSkillFrame { KeBiNengPingduan: { Stage: KeBiNengPingduanStage.BasicNative } r } parent || r.NativeUse != origin || use.Action?.ActionId != origin.ActionId)
             throw new InvalidOperationException("Pingduan lost its complete native basic return or returned twice.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { KeBiNengPingduan = r with { Stage = KeBiNengPingduanStage.BasicReturned, CompletedItems = 1 } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KeBiNengPingduanNativeReturnedEvent(origin));

@@ -38,6 +38,12 @@ internal static class SkillProgramChecks
 
     public static void LoaderRejectsMalformedUnsupportedDefinitions()
     {
+        foreach (var invalid in new[] { "Slash", "SLASH", " slash", "slash ", "0", "slash,slash", "sl\u0131sh" })
+            AssertReject(RulesA.Replace("\"outputKind\":\"slash\"", "\"outputKind\":\"" + invalid + "\"", StringComparison.Ordinal),
+                PresentationA, "outputKind");
+        foreach (var invalid in new[] { "Owner", "OWNER", " owner", "owner ", "0", "owner,owner" })
+            AssertReject(RulesA.Replace("\"target\":\"owner\"", "\"target\":\"" + invalid + "\"", StringComparison.Ordinal),
+                PresentationA, "target");
         AssertReject(RulesA.Replace("\"revision\":1", "\"revision\":1,\"mystery\":true", StringComparison.Ordinal),
             PresentationA, "mystery");
         AssertReject(RulesA.Replace("\"operation\":\"add\"", "\"operation\":\"multiply\"", StringComparison.Ordinal),

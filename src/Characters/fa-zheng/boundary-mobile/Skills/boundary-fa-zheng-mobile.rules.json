@@ -135,6 +135,7 @@
             {
               "op": "requestSlashAgainstChosenTarget",
               "target": "selectedTarget",
+              "rangeOwnerRef": { "kind": "selectedTarget" },
               "resultBind": "command-answer"
             },
             {

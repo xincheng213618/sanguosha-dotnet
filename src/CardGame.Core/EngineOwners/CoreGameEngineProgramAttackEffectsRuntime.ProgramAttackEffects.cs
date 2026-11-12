@@ -54,7 +54,6 @@ internal sealed partial class CoreGameEngineProgramAttackEffectsRuntime
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Single(frame => frame.Id == attack.ResolutionId);
         _coreNativeCardUseFramesOperations.RedirectCardUseTarget(attack.ResolutionId, use.TargetIndex, previousSeat, targetSeat);
         _coreCurrentEnhancementSlashRedirectsOperations.RecordCurrentEnhancementSlashRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
-        _characterDaQiaoLeOperations.RecordZixiExtraEffectRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
         _coreSoleTargetRedirectOperations.RecordSoleTargetAfterProtectionRedirect(frame, attack.ResolutionId, previousSeat, targetSeat);
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Name)}】，将【杀】转移给 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)}。", frame.OwnerSeat, targetSeat);
     }

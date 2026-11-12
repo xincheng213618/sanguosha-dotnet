@@ -77,7 +77,7 @@ internal sealed partial class CharacterMiHengLeRuntime
                 throw new InvalidOperationException("Sirui cannot substitute a collateral movement for its native material payment.");
             _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { Sirui = r with { PaymentSequence = movement.Sequence } });
             if (outside && r.NativeKind == SiruiNativeUseKind.CardUse)
-                _nativeCardRepresentations.CaptureDeparture(frame.Id, r.CardId, movement.Sequence);
+                _nativeMaterialClaims.CaptureRetirement(frame.Id, [movement]);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SiruiMaterialPaidEvent(frame.Id, r.CardId, r.From, moved.To, moved.Reason, movement.Sequence));
         }
     }

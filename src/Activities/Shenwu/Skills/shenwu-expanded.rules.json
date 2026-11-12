@@ -218,6 +218,7 @@
     {
       "id": "shenwu:honglian",
       "revision": 1,
+      "cardPolicies": [{ "id": "red-hand-limit", "kind": "handLimitCardKindExemption", "handLimitMatch": { "isRed": true, "requireLivingHolder": true } }],
       "triggers": [
         {
           "id": "red-deck-gain-and-random-fire",

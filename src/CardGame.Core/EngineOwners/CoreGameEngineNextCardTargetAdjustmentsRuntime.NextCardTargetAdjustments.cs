@@ -20,7 +20,7 @@ internal sealed partial class CoreGameEngineNextCardTargetAdjustmentsRuntime
         return true;
     }
 
-    internal bool HasRemainingAdjustedBorrowedSwordTargets(long frameId) => !_characterJiangJiMouOperations.IsTargetScopedMouJjEffect(frameId) && !_characterDaQiaoLeOperations.IsTargetScopedZixiEffectRound(frameId) && _coreMatchOutcomeWinnerAccess._winner == Winner.None && (_coreCardUseLifecycleOperations.LifecycleCardUse(frameId)?.TargetsAdjusted == true) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(frame => frame.Id == frameId && frame.CardKind == CardKind.BorrowedSword && frame.TargetSeats.Count >= 4 && frame.TargetSeats.Count % 2 == 0 && frame.TargetIndex + 2 < frame.TargetSeats.Count);
+    internal bool HasRemainingAdjustedBorrowedSwordTargets(long frameId) => !_nativeEffectEpisodes.IsTargetScoped(frameId) && _coreMatchOutcomeWinnerAccess._winner == Winner.None && (_coreCardUseLifecycleOperations.LifecycleCardUse(frameId)?.TargetsAdjusted == true) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Any(frame => frame.Id == frameId && frame.CardKind == CardKind.BorrowedSword && frame.TargetSeats.Count >= 4 && frame.TargetSeats.Count % 2 == 0 && frame.TargetIndex + 2 < frame.TargetSeats.Count);
     internal bool TryContinueAdjustedBorrowedSwordUse(long frameId)
     {
         if (!HasRemainingAdjustedBorrowedSwordTargets(frameId))

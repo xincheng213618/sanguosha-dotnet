@@ -246,16 +246,14 @@ internal sealed partial class CharacterWeiYanHappyGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(fact);
         if (cancel)
         {
-            var proof = new HappyWeiYanCancellation(frame.Id, receipt.Source, receipt.GameplayHash, receipt.ActualTurn, receipt.ParentId, receipt.NativeParentId, action, bone, receipt.Before, receipt.After)
-            {
-                Draw = receipt.Draw
-            };
             if (action.Type == CardActionType.Use)
-                _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(receipt.NativeParentId, use => use with { HappyWeiYanCancellation = use.HappyWeiYanCancellation ?? proof });
+                _nativeCardActionInvalidations.IssueUse(receipt.NativeParentId, action, new(SimpleCancellation: new(
+                    NativeSimpleCardCancellationBoundary.EarlySimple, Enum.GetValues<SimpleCardUseEffect>(),
+                    new("skill-program.happy:ezhi.cleanup"))));
             else if (action.EffectiveKind == CardKind.Dodge)
-                _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(receipt.NativeParentId, use => use with { HappyWeiYanResponses = (use.HappyWeiYanResponses ?? []).Append(proof).ToArray() });
+                _nativeCardActionInvalidations.IssueDodge(receipt.NativeParentId, action);
             else if (action.EffectiveKind == CardKind.Nullification && _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is { } pending && pending.Id == receipt.NativeParentId && pending.NamedAmbushResponse?.ActionId == action.ActionId)
-                _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { HappyWeiYanCancellation = proof });
+                _nativeCardActionInvalidations.IssueCounterspell(pending.Id, action);
             else
                 throw new InvalidOperationException("Ezhi lost its actual true response Use owner.");
         }

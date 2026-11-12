@@ -21,7 +21,6 @@ internal sealed partial class CharacterZhangYanOlEntries
     internal bool IsZhangYanNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _resolve().IsZhangYanNativeSettlementBatch(f, batch);
     internal bool IsZhangYanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsZhangYanRecoveryParent(f, recovery);
     internal bool IsZhangYanRewardMovement(ProgramSkillFrame f, CardMovementRecord m) => _resolve().IsZhangYanRewardMovement(f, m);
-    internal bool IsZhangYanSujiRemovedMaterial(long useId, int cardId) => _resolve().IsZhangYanSujiRemovedMaterial(useId, cardId);
     internal bool IsZhangYanSujiUse(CardUseFrame use) => _resolve().IsZhangYanSujiUse(use);
     internal void ObserveZhangYanLangdaoOutcome(IGameEvent payload) => _resolve().ObserveZhangYanLangdaoOutcome(payload);
     internal void PublishZhangYan(ProgramSkillFrame f) => _resolve().PublishZhangYan(f);

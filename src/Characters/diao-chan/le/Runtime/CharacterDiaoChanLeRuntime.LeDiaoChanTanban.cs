@@ -6,23 +6,6 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     internal bool HasLeDiaoChanTanbanCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.InitializeTanbanInitialEntities);
 
     internal static CardConversionSource TanbanSource(ProgramSkillFrame frame) => RuntimeSkills.RuntimeRules_diao_chan_le_LeDiaoChanTanban.TanbanSource(frame);
-    // One shared binary mark belongs to each physical entity, not to a holder or
-    // grant. Losing/reacquiring a source never restores an old initial mark.
-    // Registration only; the query still belongs to legacy GameEngine.LeDiaoChanTanban.
-    [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 140)]
-    internal void ProjectTanbanCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
-    {
-        projection.Append(HasTanbanEntityMark(cardId) ? "檀板" : null);
-    }
-
-    internal bool HasTanbanEntityMark(int cardId)
-    {
-        if (!HasLeDiaoChanTanbanCapability || cardId <= 0)
-            return false;
-        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanEntityMarkChangedEvent>().LastOrDefault(e => e.CardId == cardId && (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanInitializedEvent>().Any(done => done.FrameId == e.FrameId) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanHandMarksSwappedEvent>().Any(done => done.FrameId == e.FrameId)))?.Marked == true;
-    }
-
-    internal bool IsTanbanHandLimitExempt(CharacterState owner, int cardId) => HasLeDiaoChanTanbanCapability && owner.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkill(owner, "le:tanban") && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(owner.Seat) && HasTanbanEntityMark(cardId);
     internal ProgramLifecycleTriggerWindowFrame CaptureTanbanInitialEntities(ProgramLifecycleTriggerWindowFrame window)
     {
         if (!HasLeDiaoChanTanbanCapability || window.Window != SkillProgramTriggerWindow.GameStarting || window.Continuation != ProgramLifecycleContinuation.CompleteGameStarting)
@@ -64,15 +47,14 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     internal SkillProgramStepOutcome InitializeTanban(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (frame.InstructionIndex != 1 || !PermitIssuedTanbanInitial(frame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanInitializedEvent>().Any(e => e.Source.OwnerSeat == frame.OwnerSeat) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanEntityMarkChangedEvent>().Any(e => e.FrameId == frame.Id))
+        if (frame.InstructionIndex != 1 || !PermitIssuedTanbanInitial(frame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanInitializedEvent>().Any(e => e.Source.OwnerSeat == frame.OwnerSeat))
             throw new InvalidOperationException("Tanban requires its exact frozen opening mother and initializes once per owner.");
         var parent = (ProgramLifecycleTriggerWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == frame.WindowContext!.ParentFrameId);
         var entities = parent.TanbanInitialEntities!.Where(e => e.OwnerSeat == frame.OwnerSeat).ToArray();
         if (entities.Select(e => e.CardId).Distinct().Count() != entities.Length || entities.Any(e => !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.EntrySequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.To == CardLocation.Hand(e.OwnerSeat))))
             throw new InvalidOperationException("Tanban cannot mark an entity without its exact frozen opening-Hand provenance.");
         var source = TanbanSource(frame);
-        foreach (var entity in entities)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TanbanEntityMarkChangedEvent(frame.Id, source, frame.GameplayHash, entity.OwnerSeat, entity.CardId, entity.PrintedKind, entity.EntrySequence, HasTanbanEntityMark(entity.CardId), true));
+        _cardEntityMarkOperations.Set(frame.Id, entities.Select(entity => new CardEntityMarkChange(entity.CardId, "tanban", true)).ToArray());
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TanbanInitializedEvent(frame.Id, source, frame.GameplayHash, parent.Id, entities.Length));
         return SkillProgramStepOutcome.Continue;
     }

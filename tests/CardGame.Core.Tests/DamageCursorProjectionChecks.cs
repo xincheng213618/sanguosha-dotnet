@@ -33,14 +33,14 @@ internal static class DamageCursorProjectionChecks
         var push = store.GetType().GetMethod("Push")!;
         var replace = store.GetType().GetMethod("Replace")!;
         var project = global::FixtureRuntimeAccess.Engine.GetMethod("TypedDamageProgramObserver", BindingFlags.NonPublic | BindingFlags.Instance)!;
-        var resolve = global::FixtureRuntimeAccess.Engine.GetMethod("ResolveDamageCursor", BindingFlags.NonPublic | BindingFlags.Instance)!;
-        var ownedSubtree = global::FixtureRuntimeAccess.Engine.GetMethod("HasOwnedProgramChildSubtree", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        var adjacency = game.GetRuntimeModule<DamageAdjacencyRuntime>();
+        var children = game.GetRuntimeModule<CardGame.Core.EngineOwners.CoreGameEngineProgramChildResolutionRuntime>();
         ((ICollection<CardMovementRecord>)global::FixtureRuntimeAccess.Engine.GetField("_cardMovements",
             BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(game)!).Add(move);
         foreach (var frame in frames) push.Invoke(store, [frame]);
         Require(Project()?.Id == root.Id, "The registered movement/HP chain projects to its exact owning damage candidate.");
-        Require(ResolvedTop()?.Id == root.Id, "The final cursor resolver accepts the same exact owning candidate.");
-        Require((bool)ownedSubtree.Invoke(game, [root.Id])!,
+        Require(!adjacency.HasMalformedDamagePostEventEdge(window.Id), "The shared boundary accepts the same exact owning candidate.");
+        Require(Enumerable.Range(3, frames.Length - 3).All(children.ProgramChildResolutionEdge),
             "The shared child protocol recognizes the same contiguous movement/health subtree without skill-specific permission.");
 
         Reject(root with { SkillInstanceId = "other-instance" });
@@ -107,7 +107,7 @@ internal static class DamageCursorProjectionChecks
         replace.Invoke(store, [gain with { WindowContext = pendingContext }]);
         try
         {
-            Require(Project()?.Id == root.Id && ResolvedTop()?.Id == root.Id,
+            Require(Project()?.Id == root.Id && !adjacency.HasMalformedDamagePostEventEdge(window.Id),
                 "The producer-owned pending movement is a valid return when payment preceded installing the continuation.");
         }
         finally
@@ -116,7 +116,7 @@ internal static class DamageCursorProjectionChecks
         }
 
         // This marker used to enable the legacy weak observer ride. It cannot
-        // override a rejected frozen context or candidate in the final resolver.
+        // override a rejected frozen context or candidate at the shared boundary.
         replace.Invoke(store, [root with { ConvertingGift = new(true, "gift-movement", 1, 0, []) }]);
         try
         {
@@ -137,17 +137,11 @@ internal static class DamageCursorProjectionChecks
         ProgramSkillFrame Frame(long id, string trigger, string instance, ProgramSkillWindowContext context) =>
             new(id, 0, skillId, trigger, hash, 1, [], []) { TriggerId = trigger, SkillInstanceId = instance, WindowContext = context };
         ProgramSkillFrame? Project() => (ProgramSkillFrame?)project.Invoke(game, [window.Id]);
-        ResolutionFrame? ResolvedTop()
-        {
-            var result = resolve.Invoke(game, [window])!;
-            Require(!(bool)result.GetType().GetProperty("HasPaidObserverSubtree")!.GetValue(result)!,
-                "A malformed ordinary edge cannot gain a receipt-specific exemption.");
-            return (ResolutionFrame?)result.GetType().GetProperty("Top")!.GetValue(result);
-        }
         void RequireRejected(string label)
         {
             Require(Project() is null, $"Malformed {label} must not borrow a damage cursor exemption.");
-            Require(ResolvedTop() is null, $"The final resolver must reject malformed {label} before any legacy fallback.");
+            Require(adjacency.HasMalformedDamagePostEventEdge(window.Id),
+                $"The shared boundary must reject malformed {label} before any receipt-specific fallback.");
         }
         void RejectSynchronizedBatch(CardMovementBatchContext malformedBatch)
         {
@@ -173,7 +167,7 @@ internal static class DamageCursorProjectionChecks
             {
                 RequireRejected(malformed.Kind.ToString());
                 if (Array.IndexOf(frames, original) >= 3)
-                    Require(!(bool)ownedSubtree.Invoke(game, [root.Id])!,
+                    Require(!Enumerable.Range(3, frames.Length - 3).All(children.ProgramChildResolutionEdge),
                         "The shared protocol cannot admit a rejected child edge through a legacy skill-specific fallback.");
             }
             finally { replace.Invoke(store, [original]); }
@@ -194,7 +188,8 @@ internal static class DamageCursorProjectionChecks
         var root = Frame(3, 0, "recover", "recovery-root", new(SkillProgramTriggerWindow.AfterDamageApplied, 2, 0,
             SourceSeat: 1, TargetSeat: 0, DamageFrameId: 1, Amount: 1));
         var replacement = new RecoveryReplacementCandidate(1, skillId, "replacement-instance", policy.Id, policy.Value, policy.ProviderDrawCount);
-        var attempt = new RecoveryAttempt(4, 0, 0, 1, 2, 1, 0, [replacement], new(RecoveryAttemptProducer.Program, 1));
+        var attempt = new RecoveryAttempt(4, 0, 0, 1, 2, 1, 0, [replacement], new(RecoveryAttemptProducer.Program, 1))
+            { ProgramOrigin = new(root.Id, root.InstructionIndex, root.GameplayHash) };
         var recovery = new RecoveryReplacementFrame(4, 3, attempt, new(PostEventContinuation.Program, 3), RecoveryReplacementStage.RecoveryApplied, 0);
         var change = new HpChangeContext(5, 4, 0, 1, HpChangeKind.Recovery, 1, 1, 2);
         var recoveredCandidate = new ProgramTriggerCandidate(1, skillId, "recovered", "recovered-instance", hash, 0);
@@ -209,8 +204,8 @@ internal static class DamageCursorProjectionChecks
         var push = store.GetType().GetMethod("Push")!;
         var replace = store.GetType().GetMethod("Replace")!;
         var complete = store.GetType().GetMethod("CompleteTop")!;
-        var project = global::FixtureRuntimeAccess.Engine.GetMethod("ProjectTypedRecoveryDamageCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        var resolve = global::FixtureRuntimeAccess.Engine.GetMethod("ResolveDamageCursor", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var continuations = game.GetRuntimeModule<HealthContinuationRuntime>();
+        var adjacency = game.GetRuntimeModule<DamageAdjacencyRuntime>();
         var events = (List<IGameEvent>)global::FixtureRuntimeAccess.Engine.GetField("_pendingEvents", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         var pendingHp = (List<HpChangeContext>)global::FixtureRuntimeAccess.Engine.GetField("_pendingHpChanges", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         events.Add(new RecoveryReplacementChosenEvent(4, 0, 1, replacement.SkillId, replacement.SkillInstanceId, replacement.PolicyId, 1, replacement.RecoveryAmount));
@@ -219,7 +214,7 @@ internal static class DamageCursorProjectionChecks
         events.Add(new ProgramBindingStartedEvent(9, skillId, "self", "self-instance", 1, SkillProgramTriggerWindow.SelfDyingResponse));
         pendingHp.Add(new(7, 6, null, 1, HpChangeKind.Loss, 1, 1, 0));
         foreach (var frame in frames) push.Invoke(store, [frame]);
-        Require(ProjectedRoot()?.Id == root.Id && ProjectedDying() == dying.Id && ResolvedRoot()?.Id == root.Id,
+        Require(ProjectedRoot()?.Id == root.Id && ProjectedDying() == dying.Id && !Projection().IsMalformed,
             "A direct recovery's exact HP/LoseHp/Dying/response chain carries its root and owned Dying together.");
         foreach (var marker in new[] { false, true })
         {
@@ -287,7 +282,7 @@ internal static class DamageCursorProjectionChecks
             { ResumeRecoveryReplacementFrameId = 4 };
         var gained = Frame(11, 0, "gain", "reward-instance", gainedContext);
         push.Invoke(store, [movement]); push.Invoke(store, [gained]);
-        Require(ProjectedRoot()?.Id == root.Id && ProjectedDying() is null && ResolvedRoot()?.Id == root.Id,
+        Require(ProjectedRoot()?.Id == root.Id && ProjectedDying() is null && !Projection().IsMalformed,
             "The exact recovery reward and frozen gain observer return without retaining a completed Dying.");
         foreach (var malformed in new[] { movement with { ResumeRecoveryReplacementFrameId = 99 },
             movement with { ResumeProgramFrameId = 3 }, movement with { ResumePaidCardUseFrameId = 99 },
@@ -329,24 +324,14 @@ internal static class DamageCursorProjectionChecks
         Require(unknown.GetType().GetProperty("Root")!.GetValue(unknown) is null &&
             !(bool)unknown.GetType().GetProperty("IsMalformed")!.GetValue(unknown)!,
             "A special compiled macro's recovery remains unknown to the primitive pilot and needs its owning receipt validator.");
-        _ = ResolvedRoot();
 
         ProgramSkillFrame Frame(long id, int owner, string trigger, string instance, ProgramSkillWindowContext context) =>
             new(id, owner, skillId, trigger, hash, 1, [], []) { TriggerId = trigger, SkillInstanceId = instance, WindowContext = context };
-        object Projection() => project.Invoke(game, [window.Id])!;
-        ProgramSkillFrame? ProjectedRoot() => (ProgramSkillFrame?)Projection().GetType().GetProperty("Root")!.GetValue(Projection());
-        long? ProjectedDying() => (long?)Projection().GetType().GetProperty("OwnedDyingId")!.GetValue(Projection());
-        ResolutionFrame? ResolvedRoot()
-        {
-            var result = resolve.Invoke(game, [window])!;
-            return (ResolutionFrame?)result.GetType().GetProperty("Top")!.GetValue(result);
-        }
-        bool ResolverRejects()
-        {
-            try { return ResolvedRoot() is null; }
-            catch (TargetInvocationException exception) when (exception.InnerException is InvalidOperationException) { return true; }
-        }
-        void RequireRejected() => Require(ProjectedRoot() is null && ProjectedDying() is null && ResolverRejects(),
+        TypedRecoveryDamageCursorProjection Projection() => continuations.ProjectTypedRecoveryDamageCursor(window.Id);
+        ProgramSkillFrame? ProjectedRoot() => Projection().Root;
+        long? ProjectedDying() => Projection().OwnedDyingId;
+        void RequireRejected() => Require(ProjectedRoot() is null && ProjectedDying() is null &&
+            (Projection().IsMalformed || adjacency.HasMalformedDamagePostEventEdge(window.Id)),
             "A malformed recovery/producer/Dying return cannot borrow a legacy cursor exemption.");
         void Reject(ResolutionFrame malformed)
         {
@@ -426,7 +411,6 @@ internal static class DamageCursorProjectionChecks
                 Require((bool)legacy.Invoke(game, [])! && unknown.GetType().GetProperty("Root")!.GetValue(unknown) is null &&
                     !(bool)unknown.GetType().GetProperty("IsMalformed")!.GetValue(unknown)!,
                     "An exact issued Dying-suits macro owns its nested Dying; the primitive pilot delegates before requiring its outer Dying to remain active.");
-                _ = ResolvedRoot();
             }
             finally
             {

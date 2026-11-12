@@ -134,13 +134,15 @@ internal static class DamageCardMaterialQueryChecks
                 "Delivering the same material receipt twice is idempotent and keeps the original immutable frame.");
             Reject(() => claims.Capture(use.Id, 1, [cards[0], cards[0]], before, reason));
 
-            var native = new ExtraCardEffectState { Source = new("fixture:repeat", "repeat", 0, "fixture:instance"),
-                ProgramFrameId = 0, ActionId = 0, PaidCardId = 0, WholeGroupRepeated = true };
-            frames.Replace(use.Id, first with { ExtraCardEffect = native, TargetIndex = 0,
+            var episode = new NativeCardEffectEpisode(901, new(902, 0, 0,
+                new("fixture:repeat", "repeat", 0, "fixture:instance"), "fixture-hash", new(0)), 1, 1);
+            var native = new NativeCardEffectEpisodesState(new(null)) { Episodes = [episode], StartedOrdinal = 1 };
+            frames.Replace(use.Id, first with { EffectEpisodes = native, TargetIndex = 0,
                 Continuations = new() { GroupCard = new() { PhysicalCardIds = [1, 2], DamageClaimedPhysicalCardIds = [] } } });
             var round = (CardUseFrame)frames.Find(use.Id)!;
-            frames.Replace(use.Id, round with { ExtraCardEffect = null,
-                SoleIncomingEffects = new(0, native, Started: 1, Active: true),
+            frames.Replace(use.Id, round with { EffectEpisodes = native with { Episodes = [episode,
+                new(903, new(904, 0, 0, new("fixture:incoming", "repeat", 1, "fixture:instance"), "fixture-hash", new(50)), 1)],
+                StartedOrdinal = 2, Current = new(903, 1, 2, 0, [1]) },
                 Continuations = new() { GroupCard = new() { PhysicalCardIds = [1, 2], DamageClaimedPhysicalCardIds = [] } } });
             Need(claims.ClaimedCardIds(use.Id).SequenceEqual([1]) && claims.WasClaimed(use.Id, 1) &&
                 ((CardUseFrame)frames.Find(use.Id)!).MaterialClaims.SequenceEqual(first.MaterialClaims) &&

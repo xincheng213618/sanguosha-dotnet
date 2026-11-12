@@ -16,11 +16,15 @@ public sealed record RecoveryAttemptCompletion(RecoveryAttemptProducer Producer,
 public sealed record RecoveryReplacementCandidate(int OwnerSeat, string SkillId,
     string SkillInstanceId, string PolicyId, int RecoveryAmount, int ProviderDrawCount);
 
+public sealed record ProgramRecoveryOrigin(long ProgramFrameId, int InstructionIndex, string GameplayHash);
+
 /// <summary>A produced recovery belongs to its exact live rules frame, before any HP delta.</summary>
 public sealed partial record RecoveryAttempt(long Id, int SourceSeat, int TargetSeat, int Amount,
     int? HpBefore, int ActualTurnNumber, int ActualTurnOwnerSeat,
     IReadOnlyList<RecoveryReplacementCandidate> Candidates, RecoveryAttemptCompletion Completion)
 {
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramRecoveryOrigin? ProgramOrigin { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public HappyQiaoDualHealth? HappyQiaoBefore { get; init; }
 }

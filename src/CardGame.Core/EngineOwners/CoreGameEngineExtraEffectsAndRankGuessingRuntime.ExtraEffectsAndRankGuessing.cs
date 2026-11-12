@@ -16,7 +16,7 @@ internal sealed partial class CoreGameEngineExtraEffectsAndRankGuessingRuntime
     internal bool TryGetExtraEffectUse(int owner, ProgramSkillWindowContext? context, out CardUseFrame use)
     {
         use = null !;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseCommitted } || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != owner || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.Action is not { Type: CardActionType.Use } action || action.ActorSeat != owner || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { } current || current.Action?.ActionId != action.ActionId || current.SourceSeat != owner || !ExtraEffectCardKind(current.CardKind) || current.CardKind is CardKind.Dodge or CardKind.Nullification || current.ExtraCardEffect is not null)
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseCommitted } || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat != owner || !_coreMatchParticipantsPlayersAccess._players[owner].IsAlive || _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId)is not { } window || window.Action is not { Type: CardActionType.Use } action || action.ActorSeat != owner || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { } current || current.Action?.ActionId != action.ActionId || current.SourceSeat != owner || !ExtraEffectCardKind(current.CardKind) || current.CardKind is CardKind.Dodge or CardKind.Nullification)
             return false;
         use = current;
         return true;
@@ -231,7 +231,7 @@ internal sealed partial class CoreGameEngineExtraEffectsAndRankGuessingRuntime
             if (r.CardUseFrameId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { Action: { } action } use && action.ActionId == r.ActionId)
             {
                 var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w => w.Id == r.WindowFrameId);
-                _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { ExtraCardEffect = new() { Source = r.Source, ProgramFrameId = f.Id, ActionId = action.ActionId, PaidCardId = r.PaidCardId!.Value, Simple = window.SimpleContinuation, Trick = window.TrickContinuation } });
+                _nativeEffectEpisodes.Issue(use.Id, new(f.Id, f.InstructionIndex - 1, 0, r.Source, r.GameplayHash, new(0, ContinueOriginalAfterActorDeath: true)), window.TrickContinuation, window.SimpleContinuation);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ExtraCardEffectIssuedEvent(f.Id, r.Source, use.Id, action.ActionId, r.PaidCardId.Value));
             }
 

@@ -18,45 +18,12 @@ public sealed record ZixiEffectsReceipt(CardConversionSource Source, string Game
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public NativeDrawOutcome? DrawOutcome { get; init; }
 }
-public sealed record ZixiExtraEffectGrant(long FrameId, CardConversionSource Source, string GameplayHash,
-    long WindowId, int TargetSeat, int JudgmentCount)
-{ public int CurrentTargetSeat { get; init; } = TargetSeat; }
-public sealed record ZixiExtraEffectRounds(long ActionId, ExtraCardEffectState Native)
-{
-    private ExtraCardEffectState _native = FreezeNative(Native);
-    public ExtraCardEffectState Native { get => _native; init => _native = FreezeNative(value); }
-    private IReadOnlyList<ZixiExtraEffectGrant> _grants = [];
-    public IReadOnlyList<ZixiExtraEffectGrant> Grants { get => _grants; init => _grants = Array.AsReadOnly(value.ToArray()); }
-    public int Started { get; init; }
-    public bool Active { get; init; }
-    public int ActiveTargetIndex { get; init; } = -1;
-    public int ActiveTargetSeat { get; init; } = -1;
-    private static ExtraCardEffectState FreezeNative(ExtraCardEffectState state) => state with
-    {
-        Simple = state.Simple is { } simple ? simple with { RecoveryPolicySources = simple.RecoveryPolicySources is { } policies
-            ? Array.AsReadOnly(policies.ToArray()) : null } : null,
-        Fangtian = state.Fangtian is { } fang ? fang with { TargetSeats = Array.AsReadOnly(fang.TargetSeats.ToArray()) } : null,
-        OriginalAttacks = state.OriginalAttacks.Select(seed => seed with { Attack = seed.Attack with
-        {
-            PhysicalCardIds = Array.AsReadOnly(seed.Attack.PhysicalCardIds.ToArray()),
-            ChainedTargetSeats = Array.AsReadOnly(seed.Attack.ChainedTargetSeats.ToArray()),
-            ResponseProhibitingSkillNames = Array.AsReadOnly(seed.Attack.ResponseProhibitingSkillNames.ToArray()),
-            RangePreventionVisitedTargets = seed.Attack.RangePreventionVisitedTargets is { } visited ? Array.AsReadOnly(visited.ToArray()) : null
-        } }).ToArray()
-    };
-}
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ZixiEffectsReceipt? ZixiEffects { get; init; } }
-public sealed partial record CardUseFrame
-{ [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ZixiExtraEffectRounds? ZixiEffectRounds { get; init; } }
 public sealed record ZixiEffectsStartedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
     long UseId, long ActionId, long WindowId, int TargetSeat, int JudgmentCount, CardKind CardKind, long SequenceBefore) : IGameEvent;
 public sealed record ZixiExtraEffectIssuedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
     long UseId, long ActionId, int TargetSeat, int JudgmentCount) : IGameEvent;
-public sealed record ZixiExtraEffectRoundStartedEvent(long UseId, long ActionId, long FrameId, int Round, int TargetSeat) : IGameEvent;
-public sealed record ZixiExtraEffectRoundCompletedEvent(long UseId, long ActionId, long FrameId, int Round, int TargetSeat) : IGameEvent;
-public sealed record ZixiExtraEffectRedirectedEvent(long UseId, long ActionId, long FrameId, long RedirectFrameId,
-    CardConversionSource Source, string GameplayHash, int TargetIndex, int PreviousSeat, int TargetSeat) : IGameEvent;
 public sealed record ZixiEffectsDrawReturnedEvent(long FrameId, int RecipientSeat, int RequestedCount,
     int ActualCount, int ReplacementCount, long Before, long After, long? AttemptFrameId) : IGameEvent;
 public sealed record ZixiEffectsEntityObtainedEvent(long FrameId, int Index, int CardId, CardKind PrintedKind,

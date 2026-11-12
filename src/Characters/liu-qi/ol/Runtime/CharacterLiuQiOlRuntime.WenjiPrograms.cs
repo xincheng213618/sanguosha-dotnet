@@ -78,11 +78,17 @@ internal sealed partial class CharacterLiuQiOlRuntime
                 After = records.Single().Sequence
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { LiuQi = paid });
+            _appliedResponseRules.Grant(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), "ol:wenji",
+                f.OwnerSeat, null, new(new(forbid: true, audience: ResponseRuleAudience.All, excludeActor: true),
+                    new(ResponseRelationMatchKind.ExactCardName, ExactNameKind: paid.Name.Value),
+                    AppliedResponseCaptureKind.NativeUse | AppliedResponseCaptureKind.ActionlessNativeUse |
+                    AppliedResponseCaptureKind.Counterspell,
+                    until:
+                    [
+                        new(SkillStateBoundaryEvent.TurnEnded, SkillStateSubject.Owner, SkillStateBoundaryTiming.Before),
+                        new(SkillStateBoundaryEvent.Death, SkillStateSubject.Owner, SkillStateBoundaryTiming.Before)
+                    ], actorMustBeTurnOwner: true, selfProvidedCounterspellOnly: true));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenjiGiftPaidEvent(f.Id, paid.Source, paid.GameplayHash, paid.ActualTurn, paid.RecipientSeat!.Value, id, paid.From!.Value, paid.Name!.Value, paid.Before, paid.After));
-            var grant = new WenjiTurnNameGrant(paid.Source, paid.GameplayHash, paid.ActualTurn, f.Id, paid.RecipientSeat.Value, id, paid.Name.Value, paid.After);
-            _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].WenjiTurnNameGrants = (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].WenjiTurnNameGrants ?? []).Append(grant).ToArray();
-            _characterLiuQiOlHasIssuedLiuQiAccess._hasIssuedLiuQi = true;
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WenjiNameArmedEvent(grant));
         }));
         _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }

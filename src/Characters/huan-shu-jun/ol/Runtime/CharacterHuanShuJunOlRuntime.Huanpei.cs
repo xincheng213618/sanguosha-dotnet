@@ -26,6 +26,13 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         var discard = Math.Max(0, hand - hp);
         if (r.Paid || !HuanpeiSources(owner).Contains(r.Source) || !CanAdjustHuanpeiHand(owner) || r.Selected.Count != discard || r.Selected.Distinct().Count() != discard || r.Selected.Any(id => _coreTurnHandCategoryRestrictionsOperations.GetSelfDiscardableOwnedHand(owner).All(c => c.Id != id)))
             throw new InvalidOperationException("Huanpei changed its exact current Hand adjustment cost or paid round.");
+        if (r.Request is { Intent: not HuanpeiIntent.KeBiNengBasic, RequestIdentity: not null } request &&
+            r.Kind is { } kind && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && r.Targets is [var target])
+        {
+            var parent = _resolutionStackOperations._resolutionStack.SingleOrDefault(frame => frame.Id == request.RequestIdentity!.FrameId) as ProgramSkillFrame
+                ?? throw new InvalidOperationException("Huanpei lost its original issued Slash request while paying the Hand adjustment.");
+            r = r with { RequestAcceptance = _programSlashRequests.Accept(parent, request.ActorSeat, target) };
+        }
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         if (r.Request is { Intent: HuanpeiIntent.WenyiPeach, ParentFrameId: { } wenyiId } && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == wenyiId)is ProgramSkillFrame wenyi && !wenyi.HuanShuJun!.Paid)
             PrepareWenyiSuppliedPeach(wenyi, f.OwnerSeat, [], r.Source);

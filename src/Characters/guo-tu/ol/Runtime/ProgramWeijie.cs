@@ -11,7 +11,11 @@ public sealed record WeijieNeed(WeijieIntent Intent,long OwnerFrameId,long Reque
     public bool Equals(WeijieNeed? other)=>other is not null&&Intent==other.Intent&&OwnerFrameId==other.OwnerFrameId&&RequestFrameId==other.RequestFrameId&&ParentActionId==other.ParentActionId&&ProviderSeat==other.ProviderSeat&&ActorSeat==other.ActorSeat&&RequesterSeat==other.RequesterSeat&&OpponentSeat==other.OpponentSeat&&Cursor==other.Cursor&&TargetIndex==other.TargetIndex&&EffectRound==other.EffectRound&&InstructionIndex==other.InstructionIndex&&RequestOp==other.RequestOp&&Targets.SequenceEqual(other.Targets);
     public override int GetHashCode()=>HashCode.Combine(Intent,OwnerFrameId,RequestFrameId,ProviderSeat,ActorSeat,Cursor,InstructionIndex,Targets.Count);
 }
-public sealed record WeijiePaidOrigin(long AttemptId,CardConversionSource Source,string GameplayHash,int ActualTurn,int ActualTurnOwner,WeijieNeed Need,CardKind OutputKind,int TargetSeat,int VictimSeat,int CardId,CardKind PrintedKind,CardKind EffectiveName,CardLocation From,long PaymentSequence,long PaymentBatchId);
+public sealed record WeijiePaidOrigin(long AttemptId,CardConversionSource Source,string GameplayHash,int ActualTurn,int ActualTurnOwner,WeijieNeed Need,CardKind OutputKind,int TargetSeat,int VictimSeat,int CardId,CardKind PrintedKind,CardKind EffectiveName,CardLocation From,long PaymentSequence,long PaymentBatchId)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramSlashRequestAcceptance? RequestAcceptance { get; init; }
+}
 public sealed record WeijieReceipt(CardConversionSource Source,string GameplayHash,int ActualTurn,int ActualTurnOwner,WeijieNeed Need,PendingDecision OriginalDecision,WeijieStage Stage,
     [property:JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]CardKind? OutputKind=null,
     [property:JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]int? TargetSeat=null,

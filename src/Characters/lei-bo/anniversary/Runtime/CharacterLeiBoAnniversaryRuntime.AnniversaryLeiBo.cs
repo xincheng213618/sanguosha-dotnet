@@ -93,6 +93,10 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
         if (c.SourceSeat is not { } target || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || target == f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive)
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FixedTargetSlash = new(target, false) });
+        _slashRequests.Issue(f, f.OwnerSeat, new(ProgramSlashRequestTargetSource.FrozenCandidates, [target],
+            CoreGameEngineFixedSlashAndDeclaredDeckProgramsRuntime.FixedTargetFactionResultBind, UsesChoiceResult: true,
+            ReturnProtocol: ProgramSlashRequestReturnProtocol.FixedTarget, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction));
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreFixedSlashAndDeclaredDeckProgramsOperations.PublishFixedSlashAndDeclaredDeckPrompt(f, _coreFixedSlashAndDeclaredDeckProgramsOperations.FixedTargetSlashChoices(f), "私掠：对伤害来源使用杀，否则弃置一张手牌。", [target]);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -103,11 +107,13 @@ internal sealed partial class CharacterLeiBoAnniversaryRuntime
     {
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(fact.ResolutionId)is not { Action: { Type: CardActionType.Use } a } use || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind))
             return;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == use.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame { AnniversaryLeiBo: { Stage: AnniversaryLeiBoStage.SlashRequest } r } f || !IsAnniversaryLeiBoFixedSlash(f))
+        if (use.ProgramSlashRequestExecution is not { } execution ||
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == execution.ProgramFrameId) is not { AnniversaryLeiBo: { Stage: AnniversaryLeiBoStage.SlashRequest } r } f)
             return;
-        if (r.UseId != 0 || a.ActorSeat != f.OwnerSeat || r.DamageSource is not { } target || !a.TargetSeats.Contains(target) || fact.SourceSeat != a.ActorSeat || fact.CardKind != a.EffectiveKind)
-            throw new InvalidOperationException("Silue reply substituted its original real Slash actor or damage source.");
+        var acceptance = execution.Acceptance;
+        if (r.UseId != 0 || acceptance.Identity.ActorSeat != f.OwnerSeat || r.DamageSource is not { } target ||
+            acceptance.TargetSeat != target || !_slashRequests.OwnsAcceptance(f, acceptance, f.OwnerSeat, target))
+            throw new InvalidOperationException("Silue reply substituted its original accepted Slash request.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { AnniversaryLeiBo = r with { UseId = use.Id, ActionId = a.ActionId } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLeiBoSlashUsedEvent(f.Id, use.Id, a.ActionId, target));
     }

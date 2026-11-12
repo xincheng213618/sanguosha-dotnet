@@ -63,7 +63,8 @@ internal sealed class ProgramDistanceCatalog
         ArgumentNullException.ThrowIfNull(methods);
         var entries = Enum.GetValues<ProgramDistanceStage>().ToDictionary(stage => stage,
             _ => new SortedDictionary<int, ProgramDistanceRegistration>());
-        foreach (var method in methods)
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramDistanceRuleAttribute), inherit: true)))
         foreach (var attribute in method.GetCustomAttributes<ProgramDistanceRuleAttribute>())
         {
             if (!Enum.IsDefined(attribute.Stage) || attribute.Order <= 0)

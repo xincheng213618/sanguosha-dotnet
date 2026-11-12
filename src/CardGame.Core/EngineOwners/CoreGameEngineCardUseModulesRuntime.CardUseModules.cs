@@ -81,8 +81,9 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
         _coreOriginalTargetAdditionsOperations.ExpireOriginalTargetAdditionGrants(turnNumber, turnSeat);
         _coreFixedDistanceOneDebtOperations.Value.ExpireFixedDistanceOneGrants(turnNumber, turnSeat);
         _coreBoundDiscardSlashBenefitsOperations.ResolveFirstRoundGameUsageRefunds(turnNumber, turnSeat);
-        var expired = _turnCardUseEffectsOperations._turnCardUseEffects.ExpireTurn(turnNumber, turnSeat);
-        if (expired.Count > 0)
+        var expired = _turnCardUseEffectsOperations._turnCardUseEffects.ExpireTurn(turnNumber, turnSeat)
+            .Concat(_handLimitExemptionLifetimes.ExpireTurn(turnNumber, turnSeat)).Order().ToArray();
+        if (expired.Length > 0)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnCardUseEffectsExpiredEvent(turnNumber, turnSeat, expired));
         _stateChanges.ProcessSkillStateBoundary(new(SkillStateBoundaryEvent.TurnCleanup, turnSeat,
             SkillStateBoundaryTiming.After, turnNumber));
@@ -92,7 +93,8 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
     {
         _coreParticipantAndReserveProgramsOperations.ExpireAttributedNatureMarkers(ownerSeat);
         _coreProgramBooleanStateExpirationOperations.ExpireProgramBooleanStateLeasesAtOwnerTurnStart(ownerSeat);
-        var expired = _turnCardUseEffectsOperations._turnCardUseEffects.ExpireDamageModifiersAtOwnerTurnStart(ownerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber).Concat(_turnCardUseEffectsOperations._turnCardUseEffects.ExpireRecoveryAndRuleModifiersAtOwnerTurnStart(ownerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber)).Order().ToArray();
+        var expired = _turnCardUseEffectsOperations._turnCardUseEffects.ExpireDamageModifiersAtOwnerTurnStart(ownerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber).Concat(_turnCardUseEffectsOperations._turnCardUseEffects.ExpireRecoveryAndRuleModifiersAtOwnerTurnStart(ownerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber))
+            .Concat(_handLimitExemptionLifetimes.ExpireOwnerTurnStart(ownerSeat, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber)).Order().ToArray();
         if (expired.Length > 0)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnCardUseEffectsExpiredEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, ownerSeat, expired));
     }
@@ -100,7 +102,8 @@ internal sealed partial class CoreGameEngineCardUseModulesRuntime
     internal void ExpireDeadOwnerDamageModifiers(int ownerSeat)
     {
         _coreProgramBooleanStateExpirationOperations.ExpireProgramBooleanStateLeasesAtOwnerTurnStart(ownerSeat, ownerDied: true);
-        var expired = _turnCardUseEffectsOperations._turnCardUseEffects.ExpireDamageModifiersOnDeath(ownerSeat).Concat(_turnCardUseEffectsOperations._turnCardUseEffects.ExpireRecoveryAndRuleModifiersOnDeath(ownerSeat)).Order().ToArray();
+        var expired = _turnCardUseEffectsOperations._turnCardUseEffects.ExpireDamageModifiersOnDeath(ownerSeat).Concat(_turnCardUseEffectsOperations._turnCardUseEffects.ExpireRecoveryAndRuleModifiersOnDeath(ownerSeat))
+            .Concat(_handLimitExemptionLifetimes.ExpireOwnerDeath(ownerSeat)).Order().ToArray();
         if (expired.Length > 0)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnCardUseEffectsExpiredEvent(_coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat, expired));
     }

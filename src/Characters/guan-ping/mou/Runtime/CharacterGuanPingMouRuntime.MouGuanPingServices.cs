@@ -31,7 +31,9 @@ internal sealed partial class CharacterGuanPingMouRuntime
     {
         var actor = _coreMatchParticipantsPlayersAccess._players[owner];
         var selection = new ProgramMultiCardViewAsSelection(cards, new(MouGuanPingComposition.Skill, MouGuanPingComposition.Binding, owner, _coreNationalSkillsOperations.GetRuntimeSkillInstanceId(actor, MouGuanPingComposition.Skill)), CardKind.Slash);
-        return Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, physicalSuit: _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(actor, selection), effectiveColor: _coreGuanHaiBridgesOperations.ProgramMultiCardColor(actor, selection), physicalCardIds: cards.Select(c => c.Id).ToArray(), ignoreDistance: true, conversionSource: selection.Source, countsTowardLimit: false)).Select(t => t.Seat).ToArray());
+        return _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, _coreMatchParticipantsPlayersAccess._players,
+            physicalSuit: _coreGuanHaiBridgesOperations.ProgramMultiCardSuit(actor, selection), effectiveColor: _coreGuanHaiBridgesOperations.ProgramMultiCardColor(actor, selection),
+            physicalCardIds: cards.Select(c => c.Id).ToArray(), ignoreDistance: true, conversionSource: selection.Source, countsTowardLimit: false);
     }
 
     bool IMouGuanPingFacts.WholeColor(int owner, IReadOnlyList<int> ids)

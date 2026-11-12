@@ -79,6 +79,9 @@ internal static class CommittedEventProjection
         NativeCardsGivenEvent value => value with { Receipt = value.Receipt is { } receipt
             ? receipt with { Movements = FreezeList(receipt.Movements) } : null },
         // This fact freezes both constructor and with-assignment collection input.
+        // Episode cursors detach both constructor and with-assignment targets.
+        NativeCardEffectEpisodeStartedEvent value => value,
+        NativeCardEffectEpisodeCompletedEvent value => value,
         ActualCardUseTargetsFinalizedEvent value => value,
         ActualCardUseTargetsCompletedEvent value => value,
         ActualCardUseActionUpdatedEvent value => value,
@@ -447,6 +450,7 @@ internal static class CommittedEventProjection
         { Modifier = value.Modifier with { CardKinds = FreezeOptionalList(value.Modifier.CardKinds) } },
         TurnHandLimitCardKindExemptionGrantedEvent value => value with
         { Policy = value.Policy with { CardKinds = FreezeList(value.Policy.CardKinds) } },
+        CardEntityMarksChangedEvent value => value with { Changes = FreezeList(value.Changes) },
         DirectedTurnCardPolicyGrantedEvent value => value with
         { Policy = FreezeDirectedPolicy(value.Policy) },
         DeferredPublicPileDepositedEvent value => value with

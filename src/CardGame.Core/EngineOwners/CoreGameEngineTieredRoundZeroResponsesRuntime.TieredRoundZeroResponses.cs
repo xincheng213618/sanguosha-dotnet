@@ -87,18 +87,13 @@ internal sealed partial class CoreGameEngineTieredRoundZeroResponsesRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         // Policy preparation attaches its response admission to the live frame.
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == pending.Id);
-        pending = _characterChengYuMouOperations.HasMouCyMatchingName(actor.Seat, CardKind.Nullification) || _characterHuangZhongAnniversaryGodOperations.HasAnniversaryHzPendingInvalidation(actor.Seat) ? _coreNamedAmbushInvalidationOperations.PrepareNamedAmbushCounterspell(pending, actor.Seat, 0) : _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { EffectNullified = !pending.EffectNullified, ChainDepth = pending.ChainDepth + 1, CandidateSeats = _coreNativeNullificationOperations.BuildNullificationCandidateSeats(actor.Seat), CandidateIndex = 0, Step = ResolutionFrameStep.AwaitingResponse });
+        pending = _counterspellResponses.Prepare(pending, actor.Seat, 0);
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _coreDelayedNullificationOperations.Value.NullificationParentActionId(pending), CardActionType.Response, actor.Seat, actor.Seat, null, actor.Seat, pending.SourceSeat, CardKind.Nullification, [], [], [source], effectiveSuit: Suit.None, effectiveRank: 0));
         IssueTieredRoundResponse(pending, action, source);
-        if (pending.NamedAmbushResponse is not null)
-            _coreNamedAmbushInvalidationOperations.BindNamedAmbushCounterspell(pending.Id, action);
+        pending = _counterspellResponses.Bind(pending.Id, action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(0, actor.Seat, pending.SourceSeat, CardKind.Nullification));
-        if (pending.NamedAmbushResponse is null)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, actor.Seat, 0, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(action));
-        if (pending.NamedAmbushResponse is null)
-            _characterCaoXiOlOperations.CaptureCaoXiNativeCounterspellOffset(pending, action, invalidated: false);
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == pending.Id);
         if (_coreUnrespondableCounterspellsOperations.TryBeginPolicyCounterspellPayment(pending, action, policy, []))
             return;

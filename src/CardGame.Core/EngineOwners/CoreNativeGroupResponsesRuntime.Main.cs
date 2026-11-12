@@ -5,8 +5,8 @@ internal sealed partial class CoreNativeGroupResponsesRuntime
 {
     internal void ResolveGroupResponse(NativeOwners.GroupCardHandle group, CharacterState responder, Card? selectedResponse)
     {
-        if (selectedResponse is not null && _characterLiuQiOlOperations.IsWenjiResponseForbidden2(group.ResolutionId, responder.Seat))
-            throw new InvalidOperationException("Wenji forbids this exact group response.");
+        if (selectedResponse is not null && _responseRules.IsResponseForbidden(group.ResolutionId, responder.Seat, group.RequiredCardKind!.Value, group.SourceSeat))
+            throw new InvalidOperationException("The incoming group card forbids this response.");
         if (selectedResponse is { } declaredResponse && _coreCardDeclarationsOperations.TryBeginCardDeclaration(responder, declaredResponse, group.RequiredCardKind!.Value, _coreCardDeclarationsOperations.PeekDeclarationConversion(responder, declaredResponse, group.RequiredCardKind.Value, false), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Group, responder.Seat), [group.SourceSeat]))
             return;
         if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveGroupCard, group) || group.Effect != GroupCardEffect.ResponseAttack || group.CurrentAttack is not { } attack || responder.Seat != attack.TargetSeat)

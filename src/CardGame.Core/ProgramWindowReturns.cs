@@ -34,8 +34,10 @@ internal sealed class ProgramWindowReturnCatalog
     internal static ProgramWindowReturnCatalog Discover(IEnumerable<MethodInfo> methods)
     {
         var entries = new List<Registration>();
-        foreach (var method in methods)
+        foreach (var candidateMethod in methods)
         {
+            if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(ProgramWindowReturnAttribute), inherit: true)) continue;
+            var method = candidateMethod!;
             if (method.GetCustomAttribute<ProgramWindowReturnAttribute>() is not { } registration) continue;
             if (method.DeclaringType != typeof(GameEngine) && !ProgramRuntimeModuleCatalog.IsDeclared(method.DeclaringType) ||
                 method.DeclaringType == typeof(GameEngine) && method.IsStatic || method.IsGenericMethod ||

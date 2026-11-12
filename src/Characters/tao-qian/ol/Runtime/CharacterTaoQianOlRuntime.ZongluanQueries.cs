@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterTaoQianOlRuntime
 {
-    internal int[] ZongluanTargets(int actor) => !_coreMatchParticipantsPlayersAccess._players[actor].IsAlive ? [] : _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[actor], p, CardKind.Slash, Suit.None, countsTowardLimit: false, effectiveColor: null)).Select(p => p.Seat).ToArray();
+    internal int[] ZongluanTargets(int actor) => !_coreMatchParticipantsPlayersAccess._players[actor].IsAlive ? [] : _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players, CardKind.Slash, Suit.None, countsTowardLimit: false, effectiveColor: null).ToArray();
     internal IReadOnlyList<PromptChoice> ZongluanDiscardCards(ProgramSkillFrame f) => _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard, canSelect: (_, card) => !f.TaoQian!.Selected.Contains(card.Id));
     internal void PayZongluanDiscard(ProgramSkillFrame f)
     {

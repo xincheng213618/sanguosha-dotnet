@@ -13,7 +13,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeUsesRuntime
 
     internal IReadOnlyList<LegalAction> RoundOnceCardlessPlayActions(CharacterState actor)
     {
-        if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor))
+        if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _slashRequestPermissions.Declaration(actor.Seat) is not null) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor))
             return[];
         var result = new List<LegalAction>();
         foreach (var(source, rule)in RoundOnceCardlessRules(actor, CardKind.Slash))
@@ -55,26 +55,45 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeUsesRuntime
         return true;
     }
 
-    internal bool TryExecuteRoundOnceCardlessPlay(CharacterState actor, LegalAction action)
+    internal bool TryExecuteRoundOnceCardlessPlay(CharacterState actor, LegalAction action, ProgramSlashRequestAcceptance? programSlashRequest = null, ProgramSlashRequestIdentity? programSlashRequestIdentity = null, PendingDecision? originalDecision = null)
     {
         if (action.CardId != 0 || action.ConversionSource is not { } source || _corePlayCardHistoryOperations.ViewAsRule(source)?.RoundOnceCardlessBasic is null)
             return false;
-        if (!RoundOnceCardlessPlayActions(actor).Any(a => a.Kind == action.Kind && a.ConversionSource == source && a.PlayedCardKind == action.PlayedCardKind && a.TargetCardId == action.TargetCardId && a.TargetSeats.SequenceEqual(action.TargetSeats)))
+        if (programSlashRequest is { } accepted &&
+            (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == accepted.Identity.FrameId) is not ProgramSkillFrame parent ||
+             !_programSlashRequests.OwnsAcceptance(parent, accepted, actor.Seat) || !action.TargetSeats.Contains(accepted.TargetSeat) ||
+             action.PlayedCardKind is not { } requestedKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(requestedKind)))
+            throw new InvalidOperationException("A native Play action lost its original accepted Slash request.");
+        if (programSlashRequest is null && programSlashRequestIdentity is { } identity &&
+            (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == identity.FrameId) is not ProgramSkillFrame offeredParent ||
+             !_programSlashRequests.OwnsIssuedIdentity(offeredParent, identity, actor.Seat) ||
+             !_programSlashRequests.OwnsOffer(offeredParent, actor.Seat, action.TargetSeat ?? action.TargetSeats.FirstOrDefault(-1)) ||
+             action.PlayedCardKind is not { } offeredKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(offeredKind)))
+            throw new InvalidOperationException("A native Play action lost its original unpaid Slash request.");
+        if (programSlashRequest is null && programSlashRequestIdentity is null && !RoundOnceCardlessPlayActions(actor).Any(a => a.Kind == action.Kind && a.ConversionSource == source && a.PlayedCardKind == action.PlayedCardKind && a.TargetCardId == action.TargetCardId && a.TargetSeats.SequenceEqual(action.TargetSeats)))
             throw new InvalidOperationException("Cardless Slash lost its exact published action before payment.");
-        ExecuteRoundOnceCardlessPlay(actor, action);
+        ExecuteRoundOnceCardlessPlay(actor, action, programSlashRequest, programSlashRequestIdentity, originalDecision);
         return true;
     }
 
-    internal void ExecuteRoundOnceCardlessPlay(CharacterState actor, LegalAction action)
+    internal void ExecuteRoundOnceCardlessPlay(CharacterState actor, LegalAction action, ProgramSlashRequestAcceptance? programSlashRequest = null, ProgramSlashRequestIdentity? programSlashRequestIdentity = null, PendingDecision? originalDecision = null)
     {
         var source = action.ConversionSource!;
         if (action.PlayedCardKind != CardKind.Slash)
             throw new InvalidOperationException("Cardless Play requires ordinary Slash.");
         if (_coreRedAdditionalTargetsOperations.IsTargetAdjustmentAction(actor, action))
             _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats = action.TargetSeats;
+        if (programSlashRequest is null && programSlashRequestIdentity is { } identity)
+        {
+            var originalParent = _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == identity.FrameId) as ProgramSkillFrame
+                ?? throw new InvalidOperationException("A native Play cost lost its original Slash request.");
+            if (!_programSlashRequests.OwnsIssuedIdentity(originalParent, identity, actor.Seat))
+                throw new InvalidOperationException("A native Play cost cannot accept another issued request.");
+            programSlashRequest = _programSlashRequests.Accept(originalParent, actor.Seat, action.TargetSeat ?? action.TargetSeats.First());
+        }
         _coreRoundOnceCardlessBasicOperations.ConsumeRoundOnceCardlessBasic(source, false);
         var card = new Card(0, CardKind.Slash, Suit.None, 0);
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, action.TargetSeats, CardKind.Slash, physicalCardIds: [], conversionSource: source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, action.TargetSeats, CardKind.Slash, physicalCardIds: [], conversionSource: source, programSlashRequest: programSlashRequest);
         IssueRoundOnceCardlessNativeUse(id, source);
         var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
         if (targets.Count == 0)
@@ -84,7 +103,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessNativeUsesRuntime
         actor.HasAlcoholEffect = false;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        if (!_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true)
+        if ((programSlashRequest?.Identity.Spec.CountsTowardSlashLimit ?? true) && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true)
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, targets[0]));

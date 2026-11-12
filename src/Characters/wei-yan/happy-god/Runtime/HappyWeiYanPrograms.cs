@@ -55,8 +55,6 @@ public sealed record HappyWeiYanBone(int CardId, CardKind PrintedKind, int Holde
 public sealed record HappyWeiYanDiscardedBone(int CardId, CardKind PrintedKind, int Holder, EquipmentSlot Slot, int Sequence);
 public sealed record HappyWeiYanGujingIssue(long FrameId, CardConversionSource Source, string GameplayHash);
 public sealed record HappyWeiYanBoneUse(long FrameId, CardConversionSource Source, string GameplayHash, int ActualTurn, int Ordinal, HappyWeiYanDiscardedBone Bone, LegalAction Action, long UseId, long ActionId);
-public sealed record HappyWeiYanCancellation(long FrameId, CardConversionSource Source, string GameplayHash, int ActualTurn, long WindowId, long ParentId, CardActionContext Action, HappyWeiYanBone Bone, int Before, int After)
-{ public NativeDrawOutcome? Draw { get; init; } }
 public sealed partial class CharacterState
 {
     // Private durable rule state, reconstructed by command replay. An entity retains its printed category.
@@ -94,12 +92,7 @@ public sealed partial record ProgramSkillFrame
 public sealed partial record CardUseFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public HappyWeiYanBoneUse? HappyWeiYanReturn { get; init; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public HappyWeiYanCancellation? HappyWeiYanCancellation { get; init; }
-    private readonly IReadOnlyList<HappyWeiYanCancellation>? _happyWeiYanResponses;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<HappyWeiYanCancellation>? HappyWeiYanResponses { get => _happyWeiYanResponses; init => _happyWeiYanResponses = value is null ? null : Array.AsReadOnly(value.ToArray()); }
 }
-public sealed partial record NullificationWindowFrame
-{ [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public HappyWeiYanCancellation? HappyWeiYanCancellation { get; init; } }
 public sealed record HappyWeiYanStartedEvent(long FrameId, CardConversionSource Source, string GameplayHash, SkillProgramEffectOp Operation, long ParentId, int ActualTurn, int Target, long UseId, long ActionId) : IGameEvent;
 public sealed record HappyWeiYanFirstEquipmentEvent(int ActualTurn, int Actor, long UseId, long ActionId) : IGameEvent;
 public sealed record HappyWeiYanBonePlacedEvent(long FrameId, CardConversionSource Source, int Holder, EquipmentSlot Slot, int Before, int After) : IGameEvent;

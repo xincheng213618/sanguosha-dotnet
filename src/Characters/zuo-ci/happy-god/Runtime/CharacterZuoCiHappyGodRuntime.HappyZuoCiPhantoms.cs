@@ -22,7 +22,6 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
     }
 
     internal string? HappyZuoCiPhantomCardLabel(int cardId) => HappyZcEntity(cardId)is null ? null : "幻术";
-    internal bool IsHappyZuoCiHandLimitExempt(CharacterState owner, int cardId) => HappyZcEntity(cardId)is { } found && found.Owner == owner.Seat;
     internal bool HappyZcSourceProof(int owner, HappyZuoCiState state) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && state.Source is { SkillId: HappyZuoCiComposition.Huanshu, BindingId: "initial-phantoms" } && state.Source.OwnerSeat == owner && state.InitialFrameId > 0 && state.Deck == new CardLocation(CardZoneKind.PrivatePersistentPile, owner, $"happy-huanshu:{(state.Source.SkillInstanceId)}") && _contentRegistryOperations._contentRegistry.GetSkill(state.Source.SkillId).Program?.GameplayHash == state.GameplayHash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZuoCiPoolInitializedEvent>().Count(e => e.FrameId == state.InitialFrameId && e.Source == state.Source && e.GameplayHash == state.GameplayHash) == 1;
     internal CardLocation NormalizeHappyZuoCiPhantomDestination(Card card, CardLocation from, CardLocation to)
     {
@@ -63,10 +62,7 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
             throw new InvalidOperationException("A phantom movement lost its frozen original recipient, physical face or historical issuer.");
         if (movement.From == CardLocation.Processing && movement.To == CardLocation.OutsideGame &&
             movement.HappyZuoCiPhantomDestination is not null)
-            foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
-                         use.Action?.PhysicalCards.Any(material => material.CardId == movement.CardId &&
-                             material.CardKind == movement.CardKind) == true).ToArray())
-                _nativeCardRepresentations.CaptureDeparture(use.Id, movement.CardId, movement.Sequence);
+            _nativeMaterialClaims.CaptureRetirement(movement);
     }
 
     internal bool IsHappyZuoCiDestroyedMaterial(CardMovementRecord m) => m.To == CardLocation.OutsideGame && m.HappyZuoCiPhantomDestination is { } plan && HappyZcPlanProof(plan) && m.From == plan.From && m.CardId == plan.CardId && m.CardKind == plan.Face.Kind && m.Reason == plan.Reason && m.Sequence > plan.SequenceBefore && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(actual => actual.Sequence == m.Sequence && actual == m) == 1;
@@ -82,7 +78,6 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
         _ => ProgramCardContinuation.CompletedCard
     }, owner.Id, cost, entry)));
     internal bool IsHappyZuoCiDestroyedMaterial(int cardId, CardLocation from, CardLocation to) => to == CardLocation.OutsideGame && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cardId && m.To == to && IsHappyZuoCiDestroyedMaterial(m) && (m.From == from || m.HappyZuoCiPhantomDestination?.OriginalForeignGainSequence is { } sequence && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(g => g.Sequence == sequence && g.CardId == cardId && g.From == from)));
-    internal bool IsHappyZuoCiDestroyedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { } action } && action.PhysicalCards.SingleOrDefault(c => c.CardId == cardId)is { } material && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cardId && m.CardKind == material.CardKind && m.From == CardLocation.Processing && IsHappyZuoCiDestroyedMaterial(m) && m.HappyZuoCiPhantomDestination!.SequenceBefore >= _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(p => p.CardId == cardId && p.From == material.From && p.To == CardLocation.Processing).Select(p => (long)p.Sequence).DefaultIfEmpty(long.MaxValue).Max());
     internal IEnumerable<ProgramTriggerCandidate> CollectHappyZuoCiPhantomRewardCandidates(CardMovementBatchContext batch)
     {
         for (var i = 0; i < batch.Movements.Count; i++)
@@ -164,6 +159,9 @@ internal sealed partial class CharacterZuoCiHappyGodRuntime
         {
             Entities = entities
         };
+        foreach (var card in cards)
+            _handLimitExemptions.Grant(new HandLimitExemptionIssue(state.InitialFrameId, 0, card.Id,
+                HappyZuoCiComposition.Huanshu, state.Source, state.GameplayHash, ownerSeat, new(new(), [card.Id])));
         if (cards.Count > 0)
         {
             _corePhysicalMovementFacadesOperations.MoveCards(cards, CardLocation.OutsideGame, state.Deck, new("skill-program.happy:huanshu.pool-create"));

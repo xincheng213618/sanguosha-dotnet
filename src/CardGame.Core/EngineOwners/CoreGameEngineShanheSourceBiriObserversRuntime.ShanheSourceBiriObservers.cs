@@ -7,11 +7,10 @@ internal sealed partial class CoreGameEngineShanheSourceBiriObserversRuntime
     {
         if (root.ShanheSourceBiri is not { } receipt)
             return false;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         if (child is RecoveryReplacementFrame recovery)
-            return receipt.Stage == ShanheSourceBiriStage.RecoveryChildren && recovery.Id == receipt.RecoveryAttemptId && recovery.Attempt.Amount == receipt.RecoveryAttemptAmount && recovery.Attempt.SourceSeat == root.OwnerSeat && recovery.Attempt.TargetSeat == root.OwnerSeat && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(root, recovery, history);
+            return receipt.Stage == ShanheSourceBiriStage.RecoveryChildren && recovery.Id == receipt.RecoveryAttemptId && recovery.Attempt.Amount == receipt.RecoveryAttemptAmount && recovery.Attempt.SourceSeat == root.OwnerSeat && recovery.Attempt.TargetSeat == root.OwnerSeat && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(root, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
-            return receipt.Stage == ShanheSourceBiriStage.RecoveryChildren && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReceiptMatches(root, hp, history) && hp.Change.SourceSeat == root.OwnerSeat && hp.Change.TargetSeat == root.OwnerSeat && hp.Change.Amount == receipt.ActualRecovered && root.RecoveryApplications is { } applications && applications.Any(application => application.HpChangeId == hp.Change.Id && application.RecoveryFrameId == receipt.AppliedRecoveryFrameId);
+            return receipt.Stage == ShanheSourceBiriStage.RecoveryChildren && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReceiptMatches(root, hp) && hp.Change.SourceSeat == root.OwnerSeat && hp.Change.TargetSeat == root.OwnerSeat && hp.Change.Amount == receipt.ActualRecovered && root.RecoveryApplications is { } applications && applications.Any(application => application.HpChangeId == hp.Change.Id && application.RecoveryFrameId == receipt.AppliedRecoveryFrameId);
         if (child is CardsMovedTriggerWindowFrame movement)
             return receipt.Stage == ShanheSourceBiriStage.DrawChildren && _coreSuitPreventionBenefitObserversOperations.Value.SuitPlacementMovementRoot(root, movement) && movement.Batch.Movements.All(move => move.Sequence > receipt.MovementSequenceBefore && move.Sequence <= receipt.MovementSequenceAfter && (move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(root.OwnerSeat) && move.Reason.Value == "skill-program.shanhe-source-biri-14039.draw" || move.From == CardLocation.DiscardPile && move.To == CardLocation.DrawPile && move.Reason == CardMoveReasons.Reshuffle));
         // Shared native draw replacement and exact skill/state changes retain
@@ -27,11 +26,10 @@ internal sealed partial class CoreGameEngineShanheSourceBiriObserversRuntime
             return ShanheSourceBiriFirstChild(root, child);
         if (parent is RecoveryReplacementFrame recovery)
         {
-            var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
             if (child is HpChangedTriggerWindowFrame hp)
-                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryHpReturnMatches(recovery, hp, history);
+                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryHpReturnMatches(recovery, hp);
             if (child is CardsMovedTriggerWindowFrame moved)
-                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryRewardReturnMatches(recovery, moved, history);
+                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryRewardReturnMatches(recovery, moved);
         }
 
         return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(index) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);

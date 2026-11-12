@@ -23,7 +23,8 @@ internal sealed class ProgramPhaseUsedProjectionCatalog
     {
         ArgumentNullException.ThrowIfNull(methods);
         var registrations = new SortedDictionary<int, ProgramPhaseUsedProjectionRegistration>();
-        foreach (var method in methods)
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramPhaseUsedProjectionAttribute), inherit: true)))
         {
             var attribute = method.GetCustomAttribute<ProgramPhaseUsedProjectionAttribute>();
             if (attribute is null) continue;

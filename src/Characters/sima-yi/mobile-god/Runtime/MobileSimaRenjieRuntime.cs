@@ -2,7 +2,7 @@ namespace CardGame.Core;
 
 [ProgramRuntimeModule]
 internal sealed class MobileSimaRenjieRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
-    IProgramRuntimePrompts prompts, IMobileSimaRenjieFacts facts, IMobileSimaRenjieOperations operations)
+    IProgramRuntimePrompts prompts, IAppliedResponseRules responseRules, IMobileSimaRenjieFacts facts, IMobileSimaRenjieOperations operations)
 {
     private CardUseFrame? LifecycleCardUse(long id) => frames.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == id);
     private void UpdateLifecycleCardUse(long id, Func<CardUseFrame, CardUseFrame> update)
@@ -49,10 +49,9 @@ internal sealed class MobileSimaRenjieRuntime(IProgramRuntimeFrames frames, IPro
         if (!HasMobileSimaRenjie || frames.Top is not NullificationWindowFrame f || f.Id != supplied.Id ||
             f.CandidateIndex < 0 || f.CandidateIndex >= f.CandidateSeats.Count) return false;
         var actor = f.CandidateSeats[f.CandidateIndex];
-        var source = f.ChainDepth == 0 ? f.SourceSeat : facts.History<NullificationRespondedEvent>()
-            .LastOrDefault(e => e.ResolutionId == f.ParentFrameId && e.ChainDepth == f.ChainDepth)?.ResponderSeat ?? f.SourceSeat;
+        var source = f.ChainDepth == 0 ? f.SourceSeat : f.ResponseRuleNode?.Action.ActorSeat ?? f.SourceSeat;
         if (f.DelayedReturn is null && source == actor || !CanBeginMobileSimaRenjie(actor) ||
-            facts.WenjiNullificationForbidden(f, actor) || facts.FuqiNullificationBanned(actor) ||
+            responseRules.IsCounterspellResponseForbidden(f, actor) || facts.FuqiNullificationBanned(actor) ||
             f.ChainDepth == 0 && facts.NearbyResponseProhibited(f.SourceSeat, actor, f.EffectCardKind, f.TargetSeats, f.ParentFrameId)) return false;
         if (explicitPass && prompts.Current is { } p && (p.Kind != DecisionKind.Nullification || p.PlayerSeat != actor))
             throw new InvalidOperationException("Renjie cannot replace another accepted response decision.");
@@ -65,7 +64,7 @@ internal sealed class MobileSimaRenjieRuntime(IProgramRuntimeFrames frames, IPro
         var owner = facts.Player(pending.WeaponOwnerSeat);
         if (!HasMobileSimaRenjie || !owner.IsAlive || pending.SourceSeat == owner.Seat || !CanBeginMobileSimaRenjie(owner.Seat) ||
             facts.UseUnrespondable(pending.ResolutionId) ||
-            facts.WenjiResponseForbidden(pending.ResolutionId, owner.Seat) ||
+            responseRules.IsResponseForbidden(pending.ResolutionId, owner.Seat, CardKind.Slash, pending.SourceSeat) ||
             !facts.LegalBorrowedSwordTarget(owner.Seat, pending.SlashTargetSeat) ||
             !facts.Equipment(owner.Seat).Any(c => EquipmentCatalog.Get(c.Kind).Slot == EquipmentSlot.Weapon) ||
             LifecycleCardUse(pending.ResolutionId) is not { } use) return false;
@@ -81,7 +80,7 @@ internal sealed class MobileSimaRenjieRuntime(IProgramRuntimeFrames frames, IPro
     internal bool TryBeginMobileSimaRenjieQizheng(CardUseFrame use)
     {
         if (!HasMobileSimaRenjie || use.Qizheng is not { Stage: QizhengStage.Response, ResponseKind: null } q ||
-            use.SourceSeat == q.Target || !CanBeginMobileSimaRenjie(q.Target) || facts.WenjiResponseForbidden(use.Id, q.Target) ||
+            use.SourceSeat == q.Target || !CanBeginMobileSimaRenjie(q.Target) || (responseRules.IsResponseForbidden(use.Id, q.Target, CardKind.Slash, use.SourceSeat) && responseRules.IsResponseForbidden(use.Id, q.Target, CardKind.Dodge, use.SourceSeat)) ||
             facts.UseUnrespondable(use.Id)) return false;
         var key = $"qizheng:{use.Id}:{q.NullificationId}:{q.TargetIndex}:{q.EffectOrdinal}";
         if (facts.History<MobileSimaRenjieStartedEvent>().Any(e => e.OccurrenceKey == key)) return false;

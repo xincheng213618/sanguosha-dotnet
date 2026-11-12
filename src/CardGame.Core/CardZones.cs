@@ -238,6 +238,7 @@ internal interface ICardZoneQueries : IProgramSelectionQuery
 {
     int Count(CardLocation location);
     IReadOnlyList<Card> CardsAt(CardLocation location);
+    bool TryGetLocation(int cardId, out CardLocation location);
     CardLocation GetLocation(int cardId);
 }
 
@@ -349,6 +350,7 @@ internal sealed class CardZoneStore : IAtomicCardMovementZones, ICardZoneQueries
     }
 
     public int Count(CardLocation location) => GetZone(location).Count;
+    public bool TryGetLocation(int cardId, out CardLocation location) => _locations.TryGetValue(cardId, out location);
     public CardLocation GetLocation(int cardId) => _locations.TryGetValue(cardId, out var location) ? location : throw new InvalidOperationException($"Card {cardId} is not registered in any zone.");
     public void LoadInitialDeck(IEnumerable<Card> cards)
     {

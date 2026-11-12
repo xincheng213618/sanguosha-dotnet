@@ -32,6 +32,12 @@ internal sealed partial class MouXiaoQiaoOlRuntime
         var kind = facts.EffectiveKind(f.OwnerSeat, id); var redBasic = !IsOrdinary(kind);
         if (f.MouXiaoQiaoJueyanResponse is not null ? !facts.IsResponseRequest(f) : facts.NativePlans(f.OwnerSeat, kind, Source(f)).Count == 0)
             throw new InvalidOperationException("Jueyan cannot retain an otherwise unusable card.");
+        if (f.MouXiaoQiaoJueyanResponse is { DecisionKind: DecisionKind.ProgramTrigger } request)
+        {
+            var parent = frames.Find(request.ParentFrameId) as ProgramSkillFrame ?? throw new InvalidOperationException("Jueyan lost its original issued Slash request before revelation.");
+            var acceptance = programSlashRequests.Accept(parent, request.ActorSeat, request.TargetSeat);
+            frames.ReplaceTop(f = f with { MouXiaoQiaoJueyanResponse = request with { RequestAcceptance = acceptance } });
+        }
         var r = f.MouXiaoQiaoOl! with { Paid = true, Stage = MouXiaoQiaoOlStage.RevealChildren, SelectedCard = id,
             OutputKind = kind, ShownSuit = facts.EffectiveSuit(f.OwnerSeat, id), RedBasic = redBasic };
         frames.ReplaceTop(f = f with { MouXiaoQiaoOl = r });

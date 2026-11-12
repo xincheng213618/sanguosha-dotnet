@@ -4,7 +4,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterSimaYiOlMagicRuntime
 {
     internal static bool IsMoGuifuSource(CardConversionSource? source) => source?.SkillId == MoSimaYiComposition.Guifu;
-    internal bool IsMoGuifuHandLimitExempt(CharacterState owner, int id) => HasMoSimaYi && owner.IsAlive && id > 0 && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(owner.Seat) && MoSimaYi.IsOwnMarked(owner.Seat, id);
     [ProgramPipelineHook(ProgramPipelinePhase.CardEntitySkillLabel, 33900)]
     internal string? MoGuifuEntityLabel(int id) => HasMoSimaYi && MoSimaYi.IsMarked(id) ? "诡伏" : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 33901, SkillProgramEffectOp.AcquireMoSimaYiGuifuDodge)]

@@ -34,10 +34,7 @@ internal sealed partial class CoreGameEngineWushuangShopCardsRuntime
             return;
         if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangShopEquipmentDestroyedEvent>().Any(e => e.CardId == movement.CardId))
             throw new InvalidOperationException("A purchased equipment card cannot leave the game twice.");
-        foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
-                     use.Action?.PhysicalCards.Any(material => material.CardId == movement.CardId &&
-                         material.CardKind == movement.CardKind && material.From == movement.From) == true).ToArray())
-            _nativeCardRepresentations.CaptureDeparture(use.Id, movement.CardId, movement.Sequence);
+        _nativeMaterialClaims.CaptureRetirement(movement);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WushuangShopEquipmentDestroyedEvent(movement.CardId, movement.Sequence, _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id ?? 0));
     }
 

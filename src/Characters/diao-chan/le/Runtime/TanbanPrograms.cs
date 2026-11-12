@@ -15,11 +15,6 @@ public sealed partial record ProgramLifecycleTriggerWindowFrame
     }
 }
 
-// Entity changes become visible together only when the corresponding scalar
-// initialization/swap commit is published. Observers cannot see half a swap.
-public sealed record TanbanEntityMarkChangedEvent(long FrameId, CardConversionSource Source,
-    string GameplayHash, int HolderSeat, int CardId, CardKind PrintedKind, long EntrySequence,
-    bool Before, bool Marked) : IGameEvent;
 public sealed record TanbanInitializedEvent(long FrameId, CardConversionSource Source,
     string GameplayHash, long WindowId, int EntityCount) : IGameEvent;
 public sealed record TanbanHandMarksSwappedEvent(long FrameId, CardConversionSource Source,
@@ -67,7 +62,7 @@ internal static class TanbanComposition
         if (p.Id != "le:tanban" && !effects.Any(e => e.Op is
             SkillProgramEffectOp.InitializeTanbanInitialEntities or SkillProgramEffectOp.SwapTanbanHandMarks)) return;
         if (p.Id != "le:tanban" || p.Activations.Count != 0 || p.ViewAs.Count != 0 ||
-            p.Modifiers.Count != 0 || p.CardPolicies.Count != 0 || p.CardIdentities.Count != 0 ||
+            p.Modifiers.Count != 0 || p.CardIdentities.Count != 0 ||
             p.SkillGrants.Count != 0 || p.DamageModifiers.Count != 0 || p.BooleanStates.Count != 0 || p.Contributions.Count != 0 ||
             p.LordSkillProjection || p.CannotChallengeDeclarations || p.Triggers.Count != 2 ||
             p.Triggers.SingleOrDefault(t => t.Id == "mark-initial-entities") is not { } initial ||

@@ -68,7 +68,7 @@ internal sealed partial class CoreGameEngineWushuangCombatTacticsRuntime
         if (id is 2245 or 2246 or 2247)
             return _coreActualRoundProgressRoundNumberAccess._roundNumber == (id == 2247 ? 2 : 3);
         if (id == 2337)
-            return c.CardUse is { } original && _coreCardUseLifecycleOperations.LifecycleCardUse(original.ParentCardUseFrameId)is { ExtraCardEffect: null, CardKind: CardKind.Snatch };
+            return c.CardUse is { } original && _coreCardUseLifecycleOperations.LifecycleCardUse(original.ParentCardUseFrameId)is { CardKind: CardKind.Snatch };
         return true;
     }
 

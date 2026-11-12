@@ -35,7 +35,7 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
             return;
         }
 
-        var receipt = new WumiaoFloodReceipt(action.ActionId, pending.Id, target, use.TargetIndex, _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id), WumiaoFloodStage.AwaitingDamage)
+        var receipt = new WumiaoFloodReceipt(action.ActionId, pending.Id, target, use.TargetIndex, _nativeEffectEpisodes.Ordinal(use.Id), WumiaoFloodStage.AwaitingDamage)
         {
             AwaitingProgramFrameId = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()is { } parent && CoreGameEngineSkillProgramsRuntime.IsAwaitingProgramMovement(parent) ? parent.Id : null
         };

@@ -3,8 +3,16 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeCardUseRuntime
 {
-    internal long BeginCardUse(Card card, int sourceSeat, IReadOnlyList<int> targetSeats, CardKind? playedCardKind = null, bool ignoresArmor = false, IReadOnlyList<int>? physicalCardIds = null, CardConversionSource? conversionSource = null, IReadOnlyList<CardConversionSource>? additionalConversionSources = null, IReadOnlyList<int>? designatedTargetSeats = null, bool isTrueZhangbaSlash = false, ProgramSelectedActorDuelOrigin? selectedActorDuelOrigin = null, ProgramDamageTargetDuelOrigin? damageTargetDuelOrigin = null, ProgramDualColorDuelOrigin? dualColorDuelOrigin = null, ConditionalDiscardDuelOrigin? conditionalDiscardDuelOrigin = null, ShiQuanDuelOrigin? shiQuanDuelOrigin = null, ProgramVirtualOrdinaryTrickOrigin? virtualOrdinaryTrickOrigin = null, DrawFundedDistinctBasicPayment? drawFundedPayment = null, ChainedStateBasicPayment? chainedStatePayment = null, FriendRecastDuelOrigin? friendRecastDuel = null, ChosenAssaultReturn? chosenAssault = null, ZhenyingDuelOrigin? zhenyingDuel = null, HeJinMouzhuUseOrigin? heJinMouzhu = null, WuAnGuoLiyongDuelOrigin? wuAnGuoLiyong = null, TianChouShandaoUseOrigin? tianChouShandao = null, QinLangXianyingUseOrigin? qinLangXianying = null, AHuiNanJuemanUseOrigin? aHuiNanJueman = null, LiuYanLimuUseOrigin? liuYanLimu = null, JueshengDuelOrigin? jueshengDuel = null, QuHuangNishouUseOrigin? quHuangNishou = null, WeijiePaidOrigin? weijieOrigin = null, ZonghuPaidOrigin? zonghuOrigin = null, HuanpeiPaidOrigin? huanpeiOrigin = null, bool standardZeroEntityAttackCompletion = false, bool representationCarrier = false)
+    internal long BeginCardUse(Card card, int sourceSeat, IReadOnlyList<int> targetSeats, CardKind? playedCardKind = null, bool ignoresArmor = false, IReadOnlyList<int>? physicalCardIds = null, CardConversionSource? conversionSource = null, IReadOnlyList<CardConversionSource>? additionalConversionSources = null, IReadOnlyList<int>? designatedTargetSeats = null, bool isTrueZhangbaSlash = false, ProgramSelectedActorDuelOrigin? selectedActorDuelOrigin = null, ProgramDamageTargetDuelOrigin? damageTargetDuelOrigin = null, ProgramDualColorDuelOrigin? dualColorDuelOrigin = null, ConditionalDiscardDuelOrigin? conditionalDiscardDuelOrigin = null, ShiQuanDuelOrigin? shiQuanDuelOrigin = null, ProgramVirtualOrdinaryTrickOrigin? virtualOrdinaryTrickOrigin = null, DrawFundedDistinctBasicPayment? drawFundedPayment = null, ChainedStateBasicPayment? chainedStatePayment = null, FriendRecastDuelOrigin? friendRecastDuel = null, ChosenAssaultReturn? chosenAssault = null, ZhenyingDuelOrigin? zhenyingDuel = null, HeJinMouzhuUseOrigin? heJinMouzhu = null, WuAnGuoLiyongDuelOrigin? wuAnGuoLiyong = null, TianChouShandaoUseOrigin? tianChouShandao = null, QinLangXianyingUseOrigin? qinLangXianying = null, AHuiNanJuemanUseOrigin? aHuiNanJueman = null, LiuYanLimuUseOrigin? liuYanLimu = null, JueshengDuelOrigin? jueshengDuel = null, QuHuangNishouUseOrigin? quHuangNishou = null, WeijiePaidOrigin? weijieOrigin = null, ZonghuPaidOrigin? zonghuOrigin = null, HuanpeiPaidOrigin? huanpeiOrigin = null, bool standardZeroEntityAttackCompletion = false, bool representationCarrier = false, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
+        if (programSlashRequest is not null)
+        {
+            // The issuing producer owns the accepted declaration inputs. Native
+            // appearance and target changes may already have changed this use.
+            var requestOwner = _requestFrames.Find(programSlashRequest.Identity.FrameId) as ProgramSkillFrame ??
+                throw new InvalidOperationException("A requested Slash lost its original declaration owner.");
+            _slashRequestExecution.PrepareAcceptedUse(requestOwner, programSlashRequest);
+        }
         var mouSmEventStart = checked(_coreCommandJournalStorageEventSequencePendingEventsAccess._eventSequence + _coreCommandJournalStorageEventSequencePendingEventsAccess._pendingEvents.Count + 1L);
         var mouSmLogStart = _coreGameLogLogSequenceAccess._logSequence;
         var resolutionId = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
@@ -85,6 +93,8 @@ internal sealed partial class CoreNativeCardUseRuntime
         _characterHuLieMouOperations.BindMouHuLieSlashUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _characterTaoQianOlOperations.BindZongluanSlashUse(resolutionId);
         _characterGuanHaiOlOperations.PrepareXieweiNativeUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
+        if (programSlashRequest is not null)
+            _slashRequestExecution.BindExecution(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!, programSlashRequest);
         _coreNativePublicPileOriginalCardsOperations.PrepareNativePublicPileUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         _coreRoundOnceCardlessProgramRequestsOperations.BindRoundOnceCardlessProgramRequestUse(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)!);
         if (colorFireAttack is not null)

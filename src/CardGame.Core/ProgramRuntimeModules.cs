@@ -30,6 +30,7 @@ internal sealed class ProgramRuntimeModuleCatalog
         var registrations = new List<Registration>();
         var methods = new List<MethodInfo>(legacyMethods ?? []);
         var engineContracts = new Dictionary<Type, bool>();
+        var engineTypes = new Dictionary<Type, bool>();
         var entries = new Dictionary<Type, ProgramRuntimeEntryRegistration>();
         foreach (var type in types.Select(type => type ??
                      throw new InvalidOperationException("A runtime module type cannot be null."))
@@ -45,7 +46,7 @@ internal sealed class ProgramRuntimeModuleCatalog
             var declaredMethods = type.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
                 BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
             if (declaredMethods.Any(ExposesEngine) || type.GetFields(BindingFlags.Instance | BindingFlags.Public |
-                    BindingFlags.NonPublic | BindingFlags.DeclaredOnly).Any(field => ContainsEngine(field.FieldType)))
+                    BindingFlags.NonPublic | BindingFlags.DeclaredOnly).Any(field => HasEngineType(field.FieldType)))
                 throw Invalid(type, "must not expose GameEngine through rule fields, methods or callbacks");
             ConstructorInfo? constructor = null;
             Type[] dependencies = [];
@@ -94,20 +95,28 @@ internal sealed class ProgramRuntimeModuleCatalog
         bool ContractExposesEngine(Type contract)
         {
             if (engineContracts.TryGetValue(contract, out var result)) return result;
-            result = ContainsEngine(contract) || contract.GetInterfaces().Append(contract).Any(current => current.GetMethods(
+            result = HasEngineType(contract) || contract.GetInterfaces().Append(contract).Any(current => current.GetMethods(
                 BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic |
                 BindingFlags.DeclaredOnly).Any(ExposesEngine)) ||
                 contract.IsClass && contract.GetFields(BindingFlags.Instance | BindingFlags.Public |
-                    BindingFlags.NonPublic | BindingFlags.DeclaredOnly).Any(field => ContainsEngine(field.FieldType));
+                    BindingFlags.NonPublic | BindingFlags.DeclaredOnly).Any(field => HasEngineType(field.FieldType));
             engineContracts.Add(contract, result);
             return result;
         }
+
+        bool ExposesEngine(MethodInfo method) => HasEngineType(method.ReturnType) ||
+            method.GetParameters().Any(parameter => HasEngineType(parameter.ParameterType));
+
+        bool HasEngineType(Type type)
+        {
+            if (engineTypes.TryGetValue(type, out var result)) return result;
+            // Cache only complete root traversals. A recursive delegate may
+            // revisit a type before another branch reveals an engine reference.
+            result = ContainsEngine(type, new HashSet<Type>());
+            engineTypes.Add(type, result);
+            return result;
+        }
     }
-
-    private static bool ExposesEngine(MethodInfo method) => ContainsEngine(method.ReturnType) ||
-        method.GetParameters().Any(parameter => ContainsEngine(parameter.ParameterType));
-
-    private static bool ContainsEngine(Type type) => ContainsEngine(type, new HashSet<Type>());
 
     private static bool ContainsEngine(Type type, HashSet<Type> visited)
     {

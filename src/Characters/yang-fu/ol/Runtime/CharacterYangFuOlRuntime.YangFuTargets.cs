@@ -7,12 +7,6 @@ internal sealed partial class CharacterYangFuOlRuntime
     bool IYangFuTargetFacts.TryGetDesignatedExtraTargetUse(int owner, ProgramSkillWindowContext context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window) => _coreDesignatedExtraTargetsOperations.TryGetDesignatedExtraTargetUse(owner, context, out use, out window);
     bool IYangFuTargetFacts.DesignatedExtraTargetCandidateMatches(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, ProgramCardTriggerWindowFrame window) => _coreDesignatedExtraTargetsOperations.DesignatedExtraTargetCandidateMatches(candidate, context, window);
     int? IYangFuTargetFacts.CapturedWholeActualTurnActorUseOrdinal(CardActionContext action) => _coreWholeActualTurnUsesOperations.CapturedWholeActualTurnActorUseOrdinal(action);
-    bool IYangFuTargetFacts.IsKenshangRemovedMaterial(long useId, int cardId) => _coreKenshangPaymentsOperations.IsKenshangRemovedMaterial(useId, cardId);
-    bool IYangFuTargetFacts.IsWuJingHejiRemovedMaterial(long useId, int cardId) => _characterWuJingOlOperations.IsWuJingHejiRemovedMaterial(useId, cardId);
-    bool IYangFuTargetFacts.IsSelectedForeignCardSlashRemovedMaterial(long useId, int cardId) => _coreForeignSelectedCardSlashReturnsOperations.IsSelectedForeignCardSlashRemovedMaterial(useId, cardId);
-    bool IYangFuTargetFacts.IsZhangYanSujiRemovedMaterial(long useId, int cardId) => _characterZhangYanOlOperations.IsZhangYanSujiRemovedMaterial(useId, cardId);
-    bool IYangFuTargetFacts.HasRelinquishedMaterial(long useId, int cardId) => _nativeMaterialClaims.HasRelinquishedMaterial(useId, cardId);
-    bool IYangFuTargetFacts.IsExchangedCardClaim(long actionId, int cardId) => _coreResponseEntityExchangeOperations.IsExchangedCardClaim(actionId, cardId);
     bool IYangFuTargetFacts.CanUseVirtualSlash(int owner, int target) => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target]);
     bool IYangFuTargetFacts.DirectedTargetProhibited(int owner, int target, CardKind kind) => _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(owner, target, kind);
     bool IYangFuTargetFacts.TargetProhibited(int target, CardKind kind, Suit? suit, bool? isRed) => _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], kind, suit, isRed);

@@ -150,15 +150,9 @@ internal sealed partial class CoreGameEngineHellSoulCardsRuntime
         var entered = _coreCardMovementJournalCardMovementsAccess._cardMovements.Last(m => m.CardId == card.Id);
         if (entered.To != to)
             throw new InvalidOperationException("Return soul destruction lost its actual discard entry.");
-        _corePhysicalMovementFacadesOperations.MoveCard(card, to, CardLocation.OutsideGame, new("activity.hell.return-soul-destroyed"), beforeFact: destroyed =>
-        {
-            foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
-                         use.Action?.PhysicalCards.Any(material => material.CardId == card.Id &&
-                             material.CardKind == CardKind.ReturnSoul) == true).ToArray())
-                _nativeCardRepresentations.CaptureDeparture(use.Id, card.Id, destroyed.Sequence);
-        });
+        _corePhysicalMovementFacadesOperations.MoveCard(card, to, CardLocation.OutsideGame,
+            new("activity.hell.return-soul-destroyed"), beforeFact: _nativeMaterialClaims.CaptureRetirement);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HellReturnSoulDestroyedEvent(card.Id, entered.Sequence, _coreCardMovementJournalCardMovementsAccess._cardMovements.Last(m => m.CardId == card.Id).Sequence));
     }
 
-    internal bool IsHellDestroyedSoulMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action is { } action && action.PhysicalCards.Any(material => material.CardId == cardId && material.CardKind == CardKind.ReturnSoul) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HellReturnSoulDestroyedEvent>().Any(e => e.CardId == cardId && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence == e.DiscardSequence && m.To == CardLocation.DiscardPile) && _coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.CardId == cardId && m.Sequence == e.DestroySequence && m.From == CardLocation.DiscardPile && m.To == CardLocation.OutsideGame && m.Reason.Value == "activity.hell.return-soul-destroyed"));
 }

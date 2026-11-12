@@ -1,22 +1,5 @@
-using System.Text.Json.Serialization;
-using CardGame.Core.Campaigns;
 
 namespace CardGame.Core;
-
-/// <summary>An extra effect belongs to the original paid use, independently of other extra-effect grants.</summary>
-public sealed record ShanheSchoolTrickRound(long ActionId, long ProgramFrameId, long WindowFrameId,
-    string GameplayHash, ExtraCardEffectState Native, bool Started = false, bool Active = false);
-
-public sealed partial record CardUseFrame
-{
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public ShanheSchoolTrickRound? ShanheSchoolTrick { get; init; }
-}
-
-public sealed record ShanheSchoolTrickIssuedEvent(long UseFrameId, long ActionId, long ProgramFrameId,
-    long WindowFrameId, CardConversionSource Source, string GameplayHash) : IGameEvent;
-public sealed record ShanheSchoolTrickStartedEvent(long UseFrameId, long ActionId, long ProgramFrameId) : IGameEvent;
-public sealed record ShanheSchoolTrickCompletedEvent(long UseFrameId, long ActionId, long ProgramFrameId) : IGameEvent;
 
 internal interface IShanheSchoolTrickHost
 {

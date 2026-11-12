@@ -90,6 +90,7 @@ internal static partial class ProgramRuleObserverChecks
         private void After() { }
         [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 1)]
         private void BeforePublish() { }
+        public void CaptureNativeResponseRules(IGameEvent payload) { }
         public void ApplySkillStateDeclarations(IGameEvent payload, SkillStateBoundaryTiming timing) { }
         public void QueueFact(IGameEvent payload) => _history.Append(payload);
         public bool BeginCharacterStateWindow() => false;

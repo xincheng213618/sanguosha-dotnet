@@ -67,7 +67,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
         if (!HasHappyQiaoHealth(attack.TargetSeat) || attack.DamageWasApplied || attack.DamageAmount <= 0)
             return false;
         var parent = _resolutionStackOperations._resolutionStack.LastOrDefault() ?? throw new InvalidOperationException("Qiao damage has no native host.");
-        return TryBeginHappyQiaoHealthChoice(parent.Id, attack.TargetSeat, HpChangeKind.Damage, attack.DamageAmount, HappyQiaoHealthReturnKind.Damage, $"damage:{(attack.ResolutionId)}:{(attack.TargetSeat)}:{(_characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(attack.ResolutionId))}", attack.IsSourceLess ? null : attack.SourceSeat, attack.ResolutionId);
+        return TryBeginHappyQiaoHealthChoice(parent.Id, attack.TargetSeat, HpChangeKind.Damage, attack.DamageAmount, HappyQiaoHealthReturnKind.Damage, $"damage:{(attack.ResolutionId)}:{(attack.TargetSeat)}:{(_nativeEffectEpisodes.Ordinal(attack.ResolutionId))}", attack.IsSourceLess ? null : attack.SourceSeat, attack.ResolutionId);
     }
 
     internal bool TryBeginHappyQiaoRecoveryRequestChoice(RecoveryReplacementFrame frame)

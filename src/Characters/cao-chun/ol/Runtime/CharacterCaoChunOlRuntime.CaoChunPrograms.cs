@@ -148,7 +148,7 @@ internal sealed partial class CharacterCaoChunOlRuntime
                 result.Add(new(new($"shanjia.{(f.Id)}.faction.{(target.Seat)}"), "请求势力角色提供杀", [], [target.Seat], args));
             }
 
-            foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner))
+            foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(owner))
             {
                 var ids = pair.Select(c => c.Id).ToArray();
                 if (!Legal(pair[0], CardKind.Slash, ids: ids) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, ids))
@@ -178,6 +178,12 @@ internal sealed partial class CharacterCaoChunOlRuntime
 
     internal void PublishCaoChun(ProgramSkillFrame f)
     {
+        if (f.CaoChun is { Stage: CaoChunStage.InitialSlash })
+        {
+            _slashRequests.Issue(f, f.OwnerSeat,
+                new(ProgramSlashRequestTargetSource.AllOtherLiving, ResultBind: CaoChunFactionBind, RetainSourceLoss: true, RetainAcceptedSourceLoss: true, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction));
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        }
         var choices = CaoChunChoices(f);
         if (choices.Count == 0)
         {
@@ -297,6 +303,13 @@ internal sealed partial class CharacterCaoChunOlRuntime
             }
         }
 
+        ProgramSlashRequestAcceptance? requestAcceptance = null;
+        if (!ending)
+        {
+            requestAcceptance = _slashRequests.Accept(f, f.OwnerSeat, choice.Targets.Single());
+            f = _requestExecution.PrepareAcceptedUse(f, requestAcceptance);
+            r = f.CaoChun!;
+        }
         var native = new CaoChunNativeSlash(f.Id, r.Source, r.GameplayHash, r.InstructionIndex, r.ActualTurn, r.PhaseInstance, ending, choice.Targets.Single(), slashKind)
         {
             Materials = cards.Select(c => new CardActionCost(c.Id, c.Kind, _cardZonesOperations._cardZones.GetLocation(c.Id))).ToArray(),
@@ -306,14 +319,14 @@ internal sealed partial class CharacterCaoChunOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CaoChun = r with { Stage = CaoChunStage.NativeSlash, Slash = native }, Step = ResolutionFrameStep.ResolvingEffect });
         if (!ending && cards.Count > 0)
         {
-            _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[native.TargetSeat], cards[0], slashKind, f.OwnerSeat, physicalCards: cards, countsTowardSlashLimit: false, usesZhuqueFan: slashKind == CardKind.FireSlash && cards[0].Kind == CardKind.Slash && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]), conversionSource: conversion, programSkillCardUseFrameId: f.Id);
+            _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[native.TargetSeat], cards[0], slashKind, f.OwnerSeat, physicalCards: cards, countsTowardSlashLimit: false, usesZhuqueFan: slashKind == CardKind.FireSlash && cards[0].Kind == CardKind.Slash && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]), conversionSource: conversion, programSkillCardUseFrameId: f.Id, programSlashRequest: requestAcceptance);
             return;
         }
 
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
         var logical = new Card(0, CardKind.Slash, Suit.None, 0);
         var target = _coreMatchParticipantsPlayersAccess._players[native.TargetSeat];
-        var useId = _coreNativeCardUseOperations.BeginCardUse(logical, actor.Seat, [target.Seat], CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), physicalCardIds: [], conversionSource: conversion);
+        var useId = _coreNativeCardUseOperations.BeginCardUse(logical, actor.Seat, [target.Seat], CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, CardKind.Slash), physicalCardIds: [], conversionSource: conversion, programSlashRequest: requestAcceptance);
         if (independent is not null)
             _coreRoundOnceCardlessNativeUsesOperations.IssueRoundOnceCardlessNativeUse(useId, conversion!);
         BindCaoChunNativeUse(_coreCardUseLifecycleOperations.LifecycleCardUse(useId)!);
@@ -353,6 +366,13 @@ internal sealed partial class CharacterCaoChunOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { CaoChun: { } r } f || f.Id != id)
             return false;
+        if (_slashRequests.TakeFailure(f) is not null)
+        {
+            f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == f.Id);
+            FinishCaoChun(f);
+            return true;
+        }
+
         RequireCaoChun(f);
         if (r.Stage is CaoChunStage.DrawChildren or CaoChunStage.DiscardChildren)
         {

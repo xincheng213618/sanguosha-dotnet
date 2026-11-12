@@ -46,8 +46,10 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
                 }
 
                 if (_coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(actor))
-                    foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor))
-                        foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, p, CardKind.Slash, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, pair), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, pair), _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, pair), pair.Select(c => c.Id).ToArray())))
+                    foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor))
+                        foreach (var target in _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, _coreMatchParticipantsPlayersAccess._players,
+                            CardKind.Slash, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, pair), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, pair),
+                            _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, pair), pair.Select(c => c.Id).ToArray()).Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]))
                         {
                             var ids = pair.Select(c => c.Id).ToArray();
                             var action = new LegalAction(LegalActionKind.UseEquipmentEffect, null, target.Seat, "丈八蛇矛：对" + target.Name + "使用杀", PlayedCardKind: CardKind.Slash, MinCardCount: 2, MaxCardCount: 2, MinTargetCount: 1, MaxTargetCount: 1, EquipmentKind: CardKind.ZhangbaSerpentSpear)
@@ -64,7 +66,7 @@ internal sealed partial class CharacterDaQiaoXiaoQiaoHappyGodRuntime
                         var ids = selection.Cards.Select(c => c.Id).ToArray();
                         var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, selection.Cards);
                         var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(actor, selection.Cards);
-                        IEnumerable<IReadOnlyList<int>> targets = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, p, kind, suit, color, physicalCardIds: ids)).Select(p => (IReadOnlyList<int>)new[] { p.Seat }) : kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, suit) ? new IReadOnlyList<int>[]
+                        IEnumerable<IReadOnlyList<int>> targets = CoreNativeCardClassificationsRuntime.IsSlashCard(kind) ? _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, _coreMatchParticipantsPlayersAccess._players, kind, suit, color, physicalCardIds: ids).Select(seat => (IReadOnlyList<int>)new[] { seat }) : kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, actor.Seat, suit) ? new IReadOnlyList<int>[]
                         {
                             [actor.Seat]
                         }

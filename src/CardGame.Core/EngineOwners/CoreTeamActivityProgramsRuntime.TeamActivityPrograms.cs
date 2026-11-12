@@ -36,7 +36,7 @@ internal sealed partial class CoreTeamActivityProgramsRuntime
             throw new InvalidOperationException("A red-trick repeat requires its original accepted ordinary-trick use.");
         var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w => w.Id == frame.WindowContext.ParentFrameId);
         var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-        _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { ExtraCardEffect = new() { Source = source, ProgramFrameId = frame.Id, ActionId = use.Action!.ActionId, AutomaticGameplayHash = frame.GameplayHash, Simple = window.SimpleContinuation, Trick = window.TrickContinuation } });
+        _nativeEffectEpisodes.Issue(use.Id, new(frame.Id, frame.InstructionIndex - 1, 0, source, frame.GameplayHash, new(0, ContinueOriginalAfterActorDeath: true)), window.TrickContinuation, window.SimpleContinuation);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AutomaticExtraCardEffectIssuedEvent(frame.Id, source, use.Id, use.Action!.ActionId, frame.GameplayHash));
         return SkillProgramStepOutcome.Continue;
     }

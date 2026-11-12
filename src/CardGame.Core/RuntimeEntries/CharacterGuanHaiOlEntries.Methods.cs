@@ -31,7 +31,6 @@ internal sealed partial class CharacterGuanHaiOlEntries
     internal bool IsIssuedYouqueUse(CardUseFrame use) => _resolve().IsIssuedYouqueUse(use);
     internal bool IsXieweiMultiTargetUse(CardUseFrame use) => _resolve().IsXieweiMultiTargetUse(use);
     internal bool IsXieweiPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => _resolve().IsXieweiPaymentBatch(use, batch);
-    internal bool IsXieweiRemovedMaterial(long useId, int cardId) => _resolve().IsXieweiRemovedMaterial(useId, cardId);
     internal bool IsXieweiResponseRemovedMaterial(ProgramMultiCardViewAsSelection selection, int cardId) => _resolve().IsXieweiResponseRemovedMaterial(selection, cardId);
     internal bool IsXieweiSelection(ProgramMultiCardViewAsSelection selection) => _resolve().IsXieweiSelection(selection);
     internal bool IsXieweiSource(CardConversionSource source) => _resolve().IsXieweiSource(source);

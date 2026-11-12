@@ -38,7 +38,7 @@ public interface IWushuangModeFeature : IGameModeFeature
     CommandResult SubmitToggleWushuangShopLock(ToggleWushuangShopLockCommand command);
     void CompleteWushuangShopAction(long frameId);
     bool HasWushuangTactic(int seat, int id);
-    bool IsWushuangHandLimitExempt(int seat, CardKind kind);
+    IReadOnlyList<CardKind> HandLimitExemptCardKinds(int seat);
     IEnumerable<RuleQueryContribution> WushuangNumericRuleContributions(int seat, SkillRuleQuery query);
     RuleQueryEvaluation ApplyWushuangEnemyQuota(int seat, RuleQueryEvaluation ordinary, SkillRuleQuery query);
     int WushuangSourceDamageBonus(WushuangDamageFacts attack);

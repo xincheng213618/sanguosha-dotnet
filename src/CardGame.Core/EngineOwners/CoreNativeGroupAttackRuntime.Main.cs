@@ -76,7 +76,7 @@ internal sealed partial class CoreNativeGroupAttackRuntime
             return;
         }
 
-        if (_coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(group.ResolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(group.ResolutionId, target.Seat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(group.SourceSeat, target.Seat, group.Card.Kind, group.TargetSeats, group.ResolutionId, group.RequiredCardKind))
+        if (_coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(group.ResolutionId) || _responseRules.IsResponseForbidden(group.ResolutionId, target.Seat, group.RequiredCardKind!.Value, group.SourceSeat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(group.SourceSeat, target.Seat, group.Card.Kind, group.TargetSeats, group.ResolutionId, group.RequiredCardKind))
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(group.ResolutionId, ResolutionFrameStep.ResolvingEffect);
             _coreNativeGroupResponsesOperations.ResolveGroupResponse(group, target, selectedResponse: null);

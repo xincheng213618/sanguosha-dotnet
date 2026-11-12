@@ -70,7 +70,12 @@ internal sealed class ProgramInteractionCatalog
         var prefixes = new Dictionary<string, MethodInfo>(StringComparer.Ordinal);
         var ai = new Dictionary<(SkillProgramEffectOp Op, string? SkillId), MethodInfo>();
         var before = new SortedDictionary<int, MethodInfo>();
-        foreach (var method in methods.OrderBy(method => method.DeclaringType?.FullName, StringComparer.Ordinal)
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramAnswerAttribute), inherit: true) ||
+                     method.IsDefined(typeof(ProgramAnswerPrefixAttribute), inherit: true) ||
+                     method.IsDefined(typeof(ProgramAnswerBeforeAttribute), inherit: true) ||
+                     method.IsDefined(typeof(ProgramAiChoiceAttribute), inherit: true))
+                     .OrderBy(method => method.DeclaringType?.FullName, StringComparer.Ordinal)
                      .ThenBy(method => method.Name, StringComparer.Ordinal))
         {
             var answer = method.GetCustomAttribute<ProgramAnswerAttribute>();

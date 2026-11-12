@@ -1,7 +1,7 @@
 using System.Globalization;
 namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
-internal sealed partial class MouJuShouRuntime(IMouJuShouFacts facts,IMouJuShouNative native,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramOperationDraws draws):IMouJuShouRuntime
+internal sealed partial class MouJuShouRuntime(IHandLimitExemptions handExemptions,IMouJuShouFacts facts,IMouJuShouNative native,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramOperationDraws draws):IMouJuShouRuntime
 {
  internal const string ZuoJun="mou:zuojun",Muwang="mou:muwang",Action="mou-ju-shou-anniversary";
  internal static CardConversionSource Source(ProgramSkillFrame f)=>new(f.SkillId,f.TriggerId??f.ActivationId,f.OwnerSeat,f.SkillInstanceId);
@@ -38,7 +38,7 @@ internal sealed partial class MouJuShouRuntime(IMouJuShouFacts facts,IMouJuShouN
    events.AdvanceFact(new MouJsBranchEvent(f.Id,r.Actor,branch=="use"));
    if(branch=="keep")
    {
-    var grants=r.Bound.Where(id=>facts.InHand(r.Actor,id)).Select(id=>new MouJsZuoJunGrant(f.Id,r.Source,r.GameplayHash,r.Actor,id,r.Turn,facts.Sequence)).ToArray();native.SetGrants(r.Actor,facts.Grants(r.Actor).Concat(grants).ToArray());events.AdvanceFact(new MouJsGrantEvent(f.Id,r.Actor,grants.Length,r.Turn));Complete(f);return;
+    var cards=r.Bound.Where(id=>facts.InHand(r.Actor,id)).ToArray();handExemptions.Grant(f,ZuoJun,r.Actor,new(new(),cards,RequireCurrentHandEntry:true,Until:[new(SkillStateBoundaryEvent.TurnEnded,SkillStateSubject.Target,SkillStateBoundaryTiming.Before,SkipIssued:true)]));events.AdvanceFact(new MouJsGrantEvent(f.Id,r.Actor,cards.Length,r.Turn));Complete(f);return;
    }
    frames.ReplaceTop(f=f with{MouJuShou=r with{Stage=MouJuShouStage.HealthChildren,Before=facts.Sequence,After=facts.Sequence}});native.LoseHp(f);Continue(f.Id);return;
   }

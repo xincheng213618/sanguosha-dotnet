@@ -45,5 +45,7 @@ public sealed record WushuangCiweiNullifiedEvent(long FrameId, long UseId, long 
 public sealed partial record CardUseFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    // The original business notification is deduplicated independently of the
+    // native use's shared ineffective state.
     public WushuangCiweiNullifiedEvent? WushuangCiweiNullification { get; init; }
 }

@@ -13,6 +13,5 @@ internal sealed partial class CoreGameEngineAlcoholIdentityPoliciesEntries
     internal bool HasAlcoholKingIdentityPolicy(CharacterState owner) => _resolve().HasAlcoholKingIdentityPolicy(owner);
     internal bool HasFrozenProgramDyingAlcoholPermission(ProgramSkillFrame frame, SkillProgramEffectOp op) => _resolve().HasFrozenProgramDyingAlcoholPermission(frame, op);
     internal bool IsAlcoholIdentityOwnedLocation(CharacterState owner, Card card) => _resolve().IsAlcoholIdentityOwnedLocation(owner, card);
-    internal bool IsEffectiveHandKindExempt(CharacterState owner, Card card, IReadOnlySet<CardKind> kinds) => _resolve().IsEffectiveHandKindExempt(owner, card, kinds);
     internal bool IsForeignTurnAlcoholUseForbidden(int actorSeat, CardKind kind, CardActionType type) => _resolve().IsForeignTurnAlcoholUseForbidden(actorSeat, kind, type);
 }

@@ -148,6 +148,7 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
         if (use.WushuangCiweiNullification is null)
         {
             var proof = new WushuangCiweiNullifiedEvent(f.Id, use.Id, window.ParentFrameId, f.OwnerSeat, action.ActionId, action.ActorSeat, action.EffectiveKind, f.SkillId, f.SkillInstanceId, f.GameplayHash, f.InstructionIndex, card, movement.Sequence);
+            _invalidations.IssueUse(use.Id, action, new());
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, value => value with { WushuangCiweiNullification = proof });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(proof);
         }
@@ -155,12 +156,4 @@ internal sealed partial class CoreGameEngineWushuangOriginalSkillRulesRuntime
         _coreWushuangOriginalSkillsOperations.FinishWushuangOriginal(f);
     }
 
-    internal bool IsWushuangCiweiIneffective(CardUseFrame use)
-    {
-        if (use.WushuangCiweiNullification is not { } proof)
-            return false;
-        if (proof.UseId != use.Id || use.Action is not { } action || action.ActionId != proof.ActionId || action.ActorSeat != proof.Actor || action.EffectiveKind != proof.Kind || proof.SkillId != "wushuang:skill-3284" || _contentRegistryOperations._contentRegistry.GetSkill(proof.SkillId).Program?.GameplayHash != proof.GameplayHash || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangCiweiNullifiedEvent>().Count(e => e == proof) != 1 || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Any(m => m.Sequence == proof.PaidMovement && m.CardId == proof.PaidCard && m.From.OwnerSeat == proof.Owner && m.To == CardLocation.DiscardPile))
-            throw new InvalidOperationException("Ciwei's ineffective use lost its exact issued action and paid entity.");
-        return true;
-    }
 }

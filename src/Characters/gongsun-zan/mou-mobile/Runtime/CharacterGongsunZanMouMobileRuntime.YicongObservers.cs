@@ -40,7 +40,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
         if (MouGszMobileLion(f, child))
             return true;
         if (child is RecoveryReplacementFrame recovery)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -58,7 +58,7 @@ internal sealed partial class CharacterGongsunZanMouMobileRuntime
     {
         if (!ValidMouGszMobile(f))
             return false;
-        if (MouGszMobileLion(f, child) || _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, child, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray()))
+        if (MouGszMobileLion(f, child) || _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, child))
             return true;
         var a = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var b = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == child.Id);

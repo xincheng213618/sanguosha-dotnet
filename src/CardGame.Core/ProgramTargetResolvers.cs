@@ -30,6 +30,7 @@ internal sealed class ProgramTargetResolverCatalog
         var resolvers = new Dictionary<SkillProgramTargetKind, IProgramTargetResolver>();
         var registrations = new List<Registration>();
         foreach (var type in types.Select(type => type ?? throw new InvalidOperationException("A target resolver type cannot be null."))
+                     .Where(type => type.IsDefined(typeof(ProgramTargetResolverAttribute), inherit: false))
                      .OrderBy(type => type.FullName, StringComparer.Ordinal))
         {
             if (type.GetCustomAttribute<ProgramTargetResolverAttribute>() is not { } declaration) continue;

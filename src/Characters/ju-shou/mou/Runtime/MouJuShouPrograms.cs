@@ -27,11 +27,9 @@ public sealed record MouJuShouReceipt(CardConversionSource Source,string Gamepla
  public IReadOnlyList<int> Bound {get=>_bound;init=>_bound=Array.AsReadOnly(value.ToArray());}
  public IReadOnlyList<int> Discard {get=>_discard;init=>_discard=Array.AsReadOnly(value.ToArray());}
 }
-public sealed record MouJsZuoJunGrant(long FrameId,CardConversionSource Source,string GameplayHash,int Recipient,int CardId,int GrantedTurn,long Sequence);
 public sealed record MouJsFirstLoss(CardConversionSource Source,string GameplayHash,int Turn,int CardId,long FirstSequence,bool Returned=false,bool LostAgain=false);
 public sealed partial class CharacterState
 {
- internal IReadOnlyList<MouJsZuoJunGrant>? MouJsZuoJunGrants {get;set;}
  internal IReadOnlyList<MouJsFirstLoss>? MouJsFirstLosses {get;set;}
 }
 public sealed partial record ProgramSkillFrame {[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouJuShouReceipt? MouJuShou {get;init;}}
@@ -50,13 +48,13 @@ internal interface IMouJuShouFacts:IProgramSelectionQuery
 {
  int Turn {get;}long Sequence {get;}bool Finished {get;}bool Alive(int seat);bool Human(int seat);SkillProgram? Program(string id);IEnumerable<T> History<T>()where T:IGameEvent;
  bool Parent(ProgramSkillFrame f);bool InHand(int seat,int id);IReadOnlyList<int> Discardable(int seat);string Label(int id);IReadOnlyList<MouJsPlan> Plans(ProgramSkillFrame f);
- IReadOnlyList<MouJsZuoJunGrant> Grants(int seat);IReadOnlyList<MouJsFirstLoss> Losses(int seat);IReadOnlyList<int> Seats {get;}IReadOnlyList<(CardConversionSource Source,string Hash)> MuwangSources(int seat);bool Eligible(int id);
+ IReadOnlyList<MouJsFirstLoss> Losses(int seat);IReadOnlyList<int> Seats {get;}IReadOnlyList<(CardConversionSource Source,string Hash)> MuwangSources(int seat);bool Eligible(int id);
  bool InDiscard(int id);bool Reclaimable(MouJsFirstLoss loss,CardMovementRecord discarded);bool ReadyToReclaim(MouJsFirstLoss loss);MouJsMuwangQueuedEvent? MuwangOpportunity(ProgramSkillFrame frame);
 }
 internal interface IMouJuShouNative:IProgramRuntimeOperations
 {
  void Finish(ProgramSkillFrame f);void Publish();bool Drain(ProgramSkillFrame f);SkillProgramStepOutcome LoseHp(ProgramSkillFrame f);void Use(ProgramSkillFrame f);void Discard(ProgramSkillFrame f);void Recover(ProgramSkillFrame f);
- void SetGrants(int seat,IReadOnlyList<MouJsZuoJunGrant> grants);void SetLosses(int seat,IReadOnlyList<MouJsFirstLoss> losses);
+ void SetLosses(int seat,IReadOnlyList<MouJsFirstLoss> losses);
 }
 internal abstract class MouJuShouDescriptor:ProgramOperationDescriptorBase
 {

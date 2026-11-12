@@ -24,10 +24,7 @@ internal sealed partial class CharacterSunYuanOlEntries
     internal bool HasIssuedDongxinSlashDebitExemption(long useId, int actorSeat) => _resolve().HasIssuedDongxinSlashDebitExemption(useId, actorSeat);
     internal bool HasSayingWeijiePayment(ProgramSkillFrame f, CardUseFrame? use = default) => _resolve().HasSayingWeijiePayment(f, use);
     internal bool IsIssuedSayingUse(CardUseFrame use) => _resolve().IsIssuedSayingUse(use);
-    internal bool IsSayingFactionOrigin(ProgramSkillFrame f, int actor, int target, string resultBind) => _resolve().IsSayingFactionOrigin(f, actor, target, resultBind);
     internal bool IsSayingNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _resolve().IsSayingNativeSettlementBatch(f, batch);
-    internal bool IsSayingRemovedMaterial(long useId, int cardId) => _resolve().IsSayingRemovedMaterial(useId, cardId);
-    internal bool IsSayingSlashQuery(CharacterState actor) => _resolve().IsSayingSlashQuery(actor);
     internal bool IsSayingSlashRequest(ProgramSkillFrame f) => _resolve().IsSayingSlashRequest(f);
     internal bool IsSunYuanPaidMovement(ProgramSkillFrame f, CardMovementRecord m) => _resolve().IsSunYuanPaidMovement(f, m);
     internal bool IsSunYuanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsSunYuanRecoveryParent(f, recovery);
@@ -44,7 +41,6 @@ internal sealed partial class CharacterSunYuanOlEntries
     internal bool ReturnSayingAttack(GameEngine.AttackCompletionReceipt completion) => _resolve().ReturnSayingAttack(completion);
     internal void ReturnSayingNative(CardUseFrame use) => _resolve().ReturnSayingNative(use);
     internal bool ReturnSunYuanMovement(ProgramSkillFrame f) => _resolve().ReturnSunYuanMovement(f);
-    internal bool SayingSlashQuotaBeforeLimit(ProgramSlashQuotaQuery query) => _resolve().SayingSlashQuotaBeforeLimit(query);
     internal void SettleSayingNative(SayingNativeOrigin o) => _resolve().SettleSayingNative(o);
     internal IReadOnlyList<PromptChoice> SunYuanChoices(ProgramSkillFrame f) => _resolve().SunYuanChoices(f);
     internal IReadOnlyList<Card> SunYuanEligibleCards(int chooser, int holder, bool obtain) => _resolve().SunYuanEligibleCards(chooser, holder, obtain);
@@ -52,7 +48,6 @@ internal sealed partial class CharacterSunYuanOlEntries
     internal ProgramSkillFrame? SunYuanObserverRoot() => _resolve().SunYuanObserverRoot();
     internal bool SunYuanParent(ProgramSkillFrame f) => _resolve().SunYuanParent(f);
     internal bool TryGetSayingSlashRequest(ProgramSkillFrame f, scoped out int actorSeat, scoped out IReadOnlyList<int> targetSeats) => _resolve().TryGetSayingSlashRequest(f, out actorSeat, out targetSeats);
-    internal bool ValidateSayingFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f) => _resolve().ValidateSayingFactionSlashParent(pending, f);
     internal void ValidateSayingNative(CardUseFrame use) => _resolve().ValidateSayingNative(use);
     internal bool WindowSettlement_IsSayingNativeSettlementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => _resolve().WindowSettlement_IsSayingNativeSettlementBatch(frame, batch);
     internal bool HasSunYuanCapability { get => _resolve().HasSunYuanCapability; }

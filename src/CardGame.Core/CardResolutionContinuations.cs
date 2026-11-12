@@ -1,4 +1,6 @@
-﻿namespace CardGame.Core;
+using System.Text.Json.Serialization;
+
+namespace CardGame.Core;
 
 public sealed record CardAppearanceReference(int Id, CardKind Kind, Suit Suit, int Rank);
 
@@ -77,7 +79,13 @@ public sealed record BorrowedSwordState
 }
 
 public sealed record ProgramAssistedSlashAuthorization(int InstructionIndex, bool IgnoreDistance = false,
-    int? RangeOwnerSeat = null, bool UsesChoiceResult = false);
+    int? RangeOwnerSeat = null, bool UsesChoiceResult = false)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramSlashRequestIdentity? RequestIdentity { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? TargetSeat { get; init; }
+}
 
 public sealed record FactionCardRequestState
 {

@@ -59,7 +59,7 @@ internal sealed partial class CoreGameEngineDelayedPlacementTargetProgramsRuntim
         var card = returned.Card;
         var target = _coreMatchParticipantsPlayersAccess._players[targetSeat];
         var forbidden = _coreProgramCardPoliciesOperations.HasCardPolicy(target, SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget);
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || _coreProgramCardUseNullificationOperations.Value.IsProgramUseIneffective(use) || _coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(use) || use.IneffectiveTargetSeats?.Contains(targetSeat) == true || !target.IsAlive || target.JudgmentAreaAbolished || forbidden || _coreActualTurnsOperations.HasJudgmentEffectiveCard(target, use.CardKind) || use.CardKind != CardKind.Lightning && targetSeat == use.SourceSeat && !_characterLiuYanOlOperations.IsLiuYanLimuUse(use.Id))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || _invalidations.IsUseIneffective(use) || use.IneffectiveTargetSeats?.Contains(targetSeat) == true || !target.IsAlive || target.JudgmentAreaAbolished || forbidden || _coreActualTurnsOperations.HasJudgmentEffectiveCard(target, use.CardKind) || use.CardKind != CardKind.Lightning && targetSeat == use.SourceSeat && !_characterLiuYanOlOperations.IsLiuYanLimuUse(use.Id))
         {
             _coreProgramCardTargetEffectsOperations.MarkCardEffectIneffective(use.Id, targetSeat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardEffectSkippedEvent(use.Id, use.SourceSeat, targetSeat, use.CardKind, forbidden || use.IneffectiveTargetSeats?.Contains(targetSeat) == true ? CardEffectSkipReason.SkillNullified : CardEffectSkipReason.PublicTargetMissing));

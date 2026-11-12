@@ -94,7 +94,7 @@ internal static class NativeDrawCardEffectChecks
                 allDrawn.AddRange(actual.Select(m => m.CardId));
                 g = CompleteGainChildren(g, registry, useId, material, actual);
                 if (round + 1 < effects)
-                    Need(Optional(g, Before) && E<ExtraCardEffectStartedEvent>(g).Count(e => e.CardUseFrameId == useId) == 1 &&
+                    Need(Optional(g, Before) && E<NativeCardEffectEpisodeStartedEvent>(g).Count(e => e.UseFrameId == useId) == 1 &&
                         !E<CardUseFinishedEvent>(g).Any(e => e.ResolutionId == useId),
                         "The original Use remains live while its paid extra effect starts the next distinct Draw2.", g);
             }

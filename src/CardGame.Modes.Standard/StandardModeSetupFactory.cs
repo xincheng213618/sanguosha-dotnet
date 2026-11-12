@@ -34,6 +34,8 @@ internal sealed partial class StandardModeSetupFeature(
     private readonly IReadOnlyList<ContentGeneralDefinition> _generalPool = Array.AsReadOnly(
         (mode.GeneralPoolIds ?? registry.Generals.Keys.Where(registry.IsGeneralPlayable)
             .OrderBy(id => id, StringComparer.Ordinal).ToArray()).Select(id => registry.Generals[id]).ToArray());
+    private readonly IReadOnlySet<string>? _selectionPool =
+        mode.GeneralSelectionPoolIds?.ToHashSet(StringComparer.Ordinal);
     private int PlayerCount => _options.PlayerCount;
     private bool Interactive => _options.UseInteractiveSetup;
     private int RelativeSeat(int offset) => (Math.Max(0, _options.HumanSeat) + offset) % PlayerCount;
@@ -52,7 +54,7 @@ internal sealed partial class StandardModeSetupFeature(
         };
     }
     private bool SelectionEligible(ContentGeneralDefinition general) =>
-        _mode.GeneralSelectionPoolIds?.Contains(general.Id, StringComparer.Ordinal) != false;
+        _selectionPool?.Contains(general.Id) != false;
     private bool UsesFamilyDraft => _mode.AiGeneralSwapExcludedIds is not null ||
         _mode.GeneralSelectionWeights is not null || _mode.GeneralSelectionPoolIds is not null;
     private bool UsesGeneralBaseHp => _mode.Id.StartsWith("identity:classic-", StringComparison.Ordinal) ||

@@ -5,6 +5,8 @@ using System.Globalization;
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
 {
+    internal static bool IsProgramSlashIntent(RequestedDeckBasicIntent intent) => intent is RequestedDeckBasicIntent.ProgramSlash or
+        RequestedDeckBasicIntent.ProgramNearestSlash or RequestedDeckBasicIntent.AssistedSlash or RequestedDeckBasicIntent.NearestLegalSlash;
     internal IEnumerable<(CardConversionSource Source, SkillProgramCardPolicy Policy)> RequestedDeckBasicSources(CharacterState actor, CardKind required) => actor.IsAlive && actor.Seat != _coreActualTurnProgressCurrentSeatStartedAccess._currentSeat && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None ? _coreProgramCardPoliciesOperations.CardPolicies(actor, SkillProgramCardPolicyKind.PrivateTopBasicRequest, CoreNativeCardClassificationsRuntime.IsSlashCard(required) ? CardKind.Slash : required).Select(p => (new CardConversionSource(p.Source.SkillId, p.Policy.Id, actor.Seat, p.Source.SkillInstanceId), p.Policy)) : [];
     internal bool HasRequestedDeckBasicSource(CharacterState actor, CardKind required) => RequestedDeckBasicSources(actor, required).Any(p => p.Policy.CardKinds.Contains(required) || CoreNativeCardClassificationsRuntime.IsSlashCard(required) && p.Policy.CardKinds.Contains(CardKind.Slash));
     internal (RequestedDeckBasicIntent Intent, long OwnerId, long RequestId, int Cursor)? RequestedDeckBasicContext(PendingDecision p, ResolutionFrame? suppliedTop = null)
@@ -43,25 +45,16 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
         {
             if (_characterHuanShuJunOlOperations.IsWenyiPeachRequest(program) && _characterHuanShuJunOlOperations.TryGetWenyiPeachRequest(program, out var wenyiActor, out _) && p.PlayerSeat == wenyiActor)
                 return (RequestedDeckBasicIntent.WenyiPeach, program.Id, program.Id, program.InstructionIndex);
-            if (_characterSunYuanOlOperations.IsSayingSlashRequest(program) && _characterSunYuanOlOperations.TryGetSayingSlashRequest(program, out var sayingActor, out _) && p.PlayerSeat == sayingActor)
-                return (RequestedDeckBasicIntent.AssistedSlash, program.Id, program.Id, program.InstructionIndex);
-            if (_characterLiYiOlOperations.IsChanshuangSlashRequest(program) && _characterLiYiOlOperations.TryGetChanshuangSlashRequest(program, out var requestedActor, out _) && p.PlayerSeat == requestedActor)
-                return (RequestedDeckBasicIntent.AssistedSlash, program.Id, program.Id, program.InstructionIndex);
-            if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(program) && p.PlayerSeat == program.LvKuangLvXiang!.Actor)
-                return (RequestedDeckBasicIntent.AssistedSlash, program.Id, program.Id, program.InstructionIndex);
-            if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(program) && p.PlayerSeat == program.OwnerSeat)
-                return (RequestedDeckBasicIntent.AssistedSlash, program.Id, program.Id, program.InstructionIndex);
-            if (_characterMaTieAnniversaryOperations.AnniversaryMaTieRequestActor(program, p.PlayerSeat))
-                return (RequestedDeckBasicIntent.AssistedSlash, program.Id, program.Id, program.InstructionIndex);
+            if (_slashRequests.GetOffer(program, p.PlayerSeat) is null)
+                return null;
             var actions = p.Choices.Select(c => c.Parameters.GetValueOrDefault("program-action")).ToArray();
             if (actions.Contains("request-slash-decline"))
                 return (RequestedDeckBasicIntent.ProgramSlash, program.Id, program.Id, program.InstructionIndex);
             if (actions.Contains("request-slash-nearest-decline"))
                 return (RequestedDeckBasicIntent.ProgramNearestSlash, program.Id, program.Id, program.InstructionIndex);
-            if (program.AssistedSlashRequest is { TargetSeat: not null } assisted && assisted.ActorSeat == p.PlayerSeat)
-                return (RequestedDeckBasicIntent.AssistedSlash, program.Id, program.Id, program.InstructionIndex);
-            if (program.NearestLegalSlashRequest is { AwaitingFaction: false } nearest && nearest.ActorSeat == p.PlayerSeat)
+            if (actions.Contains("nearest-legal-slash"))
                 return (RequestedDeckBasicIntent.NearestLegalSlash, program.Id, program.Id, program.InstructionIndex);
+            return (RequestedDeckBasicIntent.AssistedSlash, program.Id, program.Id, program.InstructionIndex);
         }
 
         return null;
@@ -160,6 +153,13 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
             _coreCardConversionsOperations.CaptureSelectedResponseConversion(c);
         _coreRuntimeOperations.PopResolutionFrame(view.Id, ResolutionFrameKind.RequestedDeckBasic);
         var original = _resolutionStackOperations._resolutionStack.Single(f => f.Id == r.OwnerFrameId);
+        if (original is ProgramSkillFrame program && IsProgramSlashIntent(r.Intent))
+        {
+            var target = c.Targets.Single();
+            _slashRequests.SelectTarget(program, r.ActorSeat, target);
+            r = r with { ProgramRequestAcceptance = _slashRequests.Accept(program, r.ActorSeat, target) };
+            original = _resolutionStackOperations._resolutionStack.Single(f => f.Id == r.OwnerFrameId);
+        }
         _coreRuntimeOperations.ReplaceRuntimeFrame(original.Id, original with { RequestedDeckBasicMaterial = r with { SelectedCardId = card.Id, SelectedKind = card.Kind, Claiming = true } });
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = CoreGameEngineRequestedDeckBasicOwnershipRuntime.RequestedDeckBasicNativeDecision(view.OriginalDecision);
         DispatchRequestedDeckBasicMaterial(r.Intent, card, c.Targets);
@@ -206,17 +206,13 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
             {
                 _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade!.Attack.TargetSeat
             },
-            RequestedDeckBasicIntent.ProgramSlash => new[]
-            {
-                ((ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == r.OwnerFrameId)).OwnerSeat
-            },
-            RequestedDeckBasicIntent.AssistedSlash => _resolutionStackOperations._resolutionStack.Single(f => f.Id == r.OwnerFrameId)is ProgramSkillFrame cao && (_characterCaoChunOlOperations.IsCaoChunInitialRequest(cao) || _characterLvKuangLvXiangOlOperations.IsQigongRequest(cao) || _characterLiYiOlOperations.IsChanshuangSlashRequest(cao) || _characterSunYuanOlOperations.IsSayingSlashRequest(cao) || _characterMaTieAnniversaryOperations.AnniversaryMaTieRequestActor(cao, r.ActorSeat)) ? view.OriginalDecision.ValidTargetSeats.ToArray() : new[]
-            {
-                ((ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == r.OwnerFrameId)).AssistedSlashRequest!.TargetSeat!.Value
-            },
-            RequestedDeckBasicIntent.ProgramNearestSlash or RequestedDeckBasicIntent.NearestLegalSlash => view.OriginalDecision.ValidTargetSeats.ToArray(),
+            RequestedDeckBasicIntent.ProgramSlash or RequestedDeckBasicIntent.AssistedSlash or
+                RequestedDeckBasicIntent.ProgramNearestSlash or RequestedDeckBasicIntent.NearestLegalSlash =>
+                _slashRequests.GetTargets((ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == r.OwnerFrameId), r.ActorSeat).ToArray(),
             _ => Array.Empty<int>()};
-        return targets.Where(t => _coreMatchParticipantsPlayersAccess._players[t].IsAlive && (r.Intent == RequestedDeckBasicIntent.Qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], card.Kind, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)), false, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), _coreFinalTargetSlashOperations.SpecificSlashRank(actor, card, card.Kind)) : _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], card, null, card.Kind, physicalCardIds: [card.Id], ignoreDistance: r.Intent == RequestedDeckBasicIntent.AssistedSlash && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.OwnerFrameId)is ProgramSkillFrame request && _characterLvKuangLvXiangOlOperations.QigongAdapterActor(request, actor.Seat, t, r.Cursor, r.OwnerFrameId, r.RequestFrameId)))).ToArray();
+        var permission = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.OwnerFrameId) is ProgramSkillFrame request
+            ? _slashRequests.GetIdentity(request)?.Spec : null;
+        return targets.Where(t => _coreMatchParticipantsPlayersAccess._players[t].IsAlive && (r.Intent == RequestedDeckBasicIntent.Qinglong ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], card.Kind, CoreGameEnginePublicPileColorsRuntime.SuitColor(_coreNativeCardAppearanceOperations.EffectiveSuit(actor, card)), false, _coreNativeCardAppearanceOperations.EffectiveSuit(actor, card), _coreFinalTargetSlashOperations.SpecificSlashRank(actor, card, card.Kind)) : _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], card, null, card.Kind, physicalCardIds: [card.Id], ignoreDistance: permission?.IgnoreDistance == true || permission?.RangeOwnerSeat is not null))).ToArray();
     }
 
     internal bool RequestedDeckBasicCardMatches(RequestedDeckBasicFrame view, Card card)
@@ -360,64 +356,17 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicsRuntime
     internal void DispatchRequestedDeckProgramSlash(RequestedDeckBasicIntent intent, Card card, IReadOnlyList<int> targets)
     {
         var f = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A deck basic program request lost its original owner.");
-        if (_characterMaTieAnniversaryOperations.TryDispatchAnniversaryMaTieDeckSlash(f, card, targets))
-            return;
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(f) && _characterSunYuanOlOperations.TryGetSayingSlashRequest(f, out var sayingActor, out var sayingAllowed) && targets is [var sayingTarget] && sayingAllowed.Contains(sayingTarget))
-        {
-            _coreNativePromptBoundaryOperations.ClearPendingDecision();
-            _characterSunYuanOlOperations.PrepareSayingSuppliedSlash(f, sayingActor, sayingActor, sayingTarget, card.Kind, [card], null);
-            _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[sayingActor], _coreMatchParticipantsPlayersAccess._players[sayingTarget], card, card.Kind, sayingActor, physicalCards: [card], countsTowardSlashLimit: false, programSkillCardUseFrameId: f.Id);
-            return;
-        }
-
-        if (_characterLiYiOlOperations.IsChanshuangSlashRequest(f) && _characterLiYiOlOperations.TryGetChanshuangSlashRequest(f, out var actor, out var allowed) && targets is [var target] && allowed.Contains(target))
-        {
-            _coreNativePromptBoundaryOperations.ClearPendingDecision();
-            _characterLiYiOlOperations.PrepareChanshuangSuppliedSlash(f, actor, actor, target, card.Kind, [card], null);
-            _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[target], card, card.Kind, actor, physicalCards: [card], countsTowardSlashLimit: false, programSkillCardUseFrameId: f.Id);
-            return;
-        }
-
-        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(f))
-        {
-            _characterLvKuangLvXiangOlOperations.DispatchQigongRequestedDeckSlash(f, card, targets);
-            return;
-        }
-
-        if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(f))
-        {
-            _characterCaoChunOlOperations.DispatchCaoChunRequestedDeckSlash(f, card, targets);
-            return;
-        }
-
-        var e = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        var p = new Dictionary<string, string>
-        {
-            ["frame-id"] = f.Id.ToString(CultureInfo.InvariantCulture),
-            ["card-id"] = card.Id.ToString(CultureInfo.InvariantCulture)
-        };
-        if (intent == RequestedDeckBasicIntent.ProgramSlash)
-        {
-            p["program-action"] = "request-slash";
-            p["result-bind"] = e.ResultBind!;
-            _coreProgramSlashRequestOperations.ResolveProgramRequestSlashChoice(new(new("deck-basic.request"), "使用杀", [card.Id], targets, p));
-        }
-        else if (intent == RequestedDeckBasicIntent.ProgramNearestSlash)
-        {
-            p["program-action"] = "request-slash-nearest";
-            p["seat"] = _corePendingDecisionPolicyPipelineOperations._pendingDecision!.PlayerSeat.ToString(CultureInfo.InvariantCulture);
-            p["target-seat"] = targets.Single().ToString(CultureInfo.InvariantCulture);
-            _coreProgramSlashRequestOperations.ResolveProgramRequestSlashByNearestChoice(new(new("deck-basic.nearest"), "使用杀", [card.Id], targets, p));
-        }
-        else
-        {
-            var choices = intent == RequestedDeckBasicIntent.AssistedSlash ? _coreAssistedPhysicalCardsOperations.AssistedPhysicalSlashChoices(f) : _coreNearestLegalSlashRequestsOperations.NearestLegalSlashChoices(f);
-            var selected = choices.Single(c => c.Cards.SequenceEqual(new[] { card.Id }) && c.Targets.SequenceEqual(targets) && !c.Parameters.ContainsKey("conversion-skill-id") && c.Parameters.GetValueOrDefault("effective-kind") == card.Kind.ToString());
-            if (intent == RequestedDeckBasicIntent.AssistedSlash)
-                _coreAssistedPhysicalCardsOperations.ResolveAssistedPhysicalSlashChoice(selected);
-            else
-                _coreNearestLegalSlashRequestsOperations.ResolveNearestLegalSlashChoice(selected);
-        }
+        if (!IsProgramSlashIntent(intent) || targets is not [var target] ||
+            f.RequestedDeckBasicMaterial is not { Claiming: true, ProgramRequestAcceptance: { } acceptance } material ||
+            material.SelectedCardId != card.Id || material.SelectedKind != card.Kind ||
+            !_slashRequests.OwnsAcceptance(f, acceptance, material.ActorSeat, target))
+            throw new InvalidOperationException("A selected top-deck Slash lost its real accepted request and material.");
+        f = _slashExecution.PrepareAcceptedUse(f, acceptance);
+        _coreNativePromptBoundaryOperations.ClearPendingDecision();
+        _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[material.ActorSeat],
+            _coreMatchParticipantsPlayersAccess._players[target], card, card.Kind, material.ActorSeat, physicalCards: [card],
+            countsTowardSlashLimit: acceptance.Identity.Spec.CountsTowardSlashLimit,
+            programSkillCardUseFrameId: f.Id, programSlashRequest: acceptance);
     }
 
     internal IEnumerable<Card> SelectedRequestedDeckBasicCards(CharacterState actor) => _resolutionStackOperations._resolutionStack.Where(f => f.RequestedDeckBasicMaterial is { Claiming: true, SelectedCardId: not null } r && r.OwnerFrameId == f.Id && r.ActorSeat == actor.Seat).Where(_coreRequestedDeckBasicOwnershipOperations.HasValidRequestedDeckBasicMaterial).Select(f => f.RequestedDeckBasicMaterial!).Where(r => _cardZonesOperations._cardZones.GetLocation(r.SelectedCardId!.Value) == CardLocation.DrawPile).Select(r => _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Single(c => c.Id == r.SelectedCardId && c.Kind == r.SelectedKind));

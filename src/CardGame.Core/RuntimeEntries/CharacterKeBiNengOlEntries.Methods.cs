@@ -15,7 +15,6 @@ internal sealed partial class CharacterKeBiNengOlEntries
     internal bool DrainKeBiNeng(long id) => _resolve().DrainKeBiNeng(id);
     internal void ExpireKeBiNengPingduanAlcohol(int actualTurn, int turnOwner) => _resolve().ExpireKeBiNengPingduanAlcohol(actualTurn, turnOwner);
     internal void FinishKeBiNeng(ProgramSkillFrame f, string reason) => _resolve().FinishKeBiNeng(f, reason);
-    internal bool HasIssuedKeBiNengPingduanUse(long id, int actor) => _resolve().HasIssuedKeBiNengPingduanUse(id, actor);
     internal bool IsKeBiNengPingduanBasicQuery(CharacterState actor) => _resolve().IsKeBiNengPingduanBasicQuery(actor);
     internal bool IsKeBiNengPingduanPaymentFrame(ChainedStateBasicFrame paid) => _resolve().IsKeBiNengPingduanPaymentFrame(paid);
     internal bool IsKeBiNengPingduanPaymentFrame2(DrawFundedDistinctBasicFrame paid) => _resolve().IsKeBiNengPingduanPaymentFrame(paid);

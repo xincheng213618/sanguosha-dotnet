@@ -40,7 +40,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
     {
         if (!HasMoQuanyuSlash || !TryGetMoQuanyuSource(actor.Seat, out _, out _) || action is not { Kind: LegalActionKind.UseEquipmentEffect, EquipmentKind: CardKind.ZhangbaSerpentSpear, MaxTargetCount: > 1 } || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat)
             return action;
-        var maximum = _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor).Select(cards =>
+        var maximum = _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor).Select(cards =>
         {
             var ids = cards.Select(c => c.Id).ToArray();
             var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(actor, cards);

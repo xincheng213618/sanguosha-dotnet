@@ -44,7 +44,6 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashReturnsRunti
     }
 
     internal bool HasIssuedSelectedForeignCardSlashDistance(long? useId, int actor) => useId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { } use && use.ForeignSelectedCardSlashReturn?.ActorSeat == actor && IsSelectedForeignCardSlashUse(use);
-    internal bool IsSelectedForeignCardSlashRemovedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { } use && use.ForeignSelectedCardSlashReturn is { GeneralWeapon: true } r && r.CardId == cardId && IsSelectedForeignCardSlashUse(use) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame;
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 600)]
     internal void ObserveSelectedForeignCardSlashAppliedDamage(IGameEvent payload)
     {

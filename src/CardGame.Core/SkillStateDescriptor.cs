@@ -8,6 +8,7 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
     public override ISkillProgramEffectHandler Handler { get; } = new SkillStateHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GrantSkills, static (_, _) => { });
+    public override IReadOnlyList<SkillStateBoundarySpec> LifetimeBoundaries(SkillProgramEffect effect) => effect.SkillState?.Until ?? [];
 
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
     {
@@ -135,11 +136,7 @@ internal sealed class SkillStateDescriptor : ProgramOperationDescriptorBase
     private static T EnumValue<T>(JsonElement node, string path) where T : struct, Enum
     {
         if (node.ValueKind != JsonValueKind.String) Fail(path, "must be a camelCase string");
-        foreach (var value in Enum.GetValues<T>())
-        {
-            var name = Enum.GetName(value)!;
-            if (node.GetString() == char.ToLowerInvariant(name[0]) + name[1..]) return value;
-        }
+        if (SkillProgramEnumText.TryParse<T>(node.GetString(), out var value)) return value;
         throw Failure(path, "unsupported " + typeof(T).Name);
     }
 

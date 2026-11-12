@@ -2,11 +2,11 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterWoLongFengChuOlEntries
 {
-    internal void BeginEquipmentSlotNamedUse(CharacterState actor, CardConversionSource source, CardKind kind, EquipmentSlotNamedUseIntent intent, PendingDecision original, LegalAction? action, PromptChoice? choice) => _resolve().BeginEquipmentSlotNamedUse(actor, source, kind, intent, original, action, choice);
+    internal void BeginEquipmentSlotNamedUse(CharacterState actor, CardConversionSource source, CardKind kind, EquipmentSlotNamedUseIntent intent, PendingDecision original, LegalAction? action, PromptChoice? choice, ProgramSlashRequestIdentity? requestIdentity = null) => _resolve().BeginEquipmentSlotNamedUse(actor, source, kind, intent, original, action, choice, requestIdentity);
     internal bool CanOfferLuanfeng(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().CanOfferLuanfeng(candidate, trigger, context);
     internal bool ContinuePaidWoLongFengChu(ProgramSkillFrame frame) => _resolve().ContinuePaidWoLongFengChu(frame);
     internal bool DrainEquipmentSlotNamedChildren(long id) => _resolve().DrainEquipmentSlotNamedChildren(id);
-    internal bool EquipmentSlotNamedChoiceIsPayable(CharacterState actor, CardConversionSource source, CardKind kind, EquipmentSlotNamedUseIntent intent, IReadOnlyList<int> targets, EquipmentSlot slot) => _resolve().EquipmentSlotNamedChoiceIsPayable(actor, source, kind, intent, targets, slot);
+    internal bool EquipmentSlotNamedChoiceIsPayable(CharacterState actor, CardConversionSource source, CardKind kind, EquipmentSlotNamedUseIntent intent, IReadOnlyList<int> targets, EquipmentSlot slot, ProgramSlashRequestIdentity? requestIdentity = null, int? requestTargetSeat = null) => _resolve().EquipmentSlotNamedChoiceIsPayable(actor, source, kind, intent, targets, slot, requestIdentity, requestTargetSeat);
     internal bool EquipmentSlotNamedNameUsed(int seat, CardKind kind) => _resolve().EquipmentSlotNamedNameUsed(seat, kind);
     internal bool EquipmentSlotNamedPlayStillLegal(CharacterState actor, EquipmentSlotNamedUseDraft draft) => _resolve().EquipmentSlotNamedPlayStillLegal(actor, draft);
     internal bool EquipmentSlotNamedYin(int seat, string skill, string instance) => _resolve().EquipmentSlotNamedYin(seat, skill, instance);
@@ -28,7 +28,7 @@ internal sealed partial class CharacterWoLongFengChuOlEntries
     internal PromptChoice SelectAiEquipmentSlotNamedUse(PendingDecision prompt, ProgramSkillFrame frame) => _resolve().SelectAiEquipmentSlotNamedUse(prompt, frame);
     internal bool TryAdvanceWoLongFengChuSubtree() => _resolve().TryAdvanceWoLongFengChuSubtree();
     internal bool TryBeginEquipmentSlotNamedForcedSlash(CharacterState actor, CardConversionSource source, CardKind kind, PromptChoice choice, bool qinglong) => _resolve().TryBeginEquipmentSlotNamedForcedSlash(actor, source, kind, choice, qinglong);
-    internal bool TryBeginEquipmentSlotNamedPlay(CharacterState actor, LegalAction action) => _resolve().TryBeginEquipmentSlotNamedPlay(actor, action);
+    internal bool TryBeginEquipmentSlotNamedPlay(CharacterState actor, LegalAction action, ProgramSlashRequestIdentity? requestIdentity = null, PendingDecision? originalDecision = null) => _resolve().TryBeginEquipmentSlotNamedPlay(actor, action, requestIdentity, originalDecision);
     internal bool TryBeginEquipmentSlotNamedResponse(CharacterState actor, CardConversionSource source, PromptChoice choice, bool dyingUse) => _resolve().TryBeginEquipmentSlotNamedResponse(actor, source, choice, dyingUse);
     internal bool TryConsumePaidEquipmentSlotNamedConversion(CardConversionSource source) => _resolve().TryConsumePaidEquipmentSlotNamedConversion(source);
     internal bool TryGetEquipmentSlotNamedConversionAvailability(CharacterState actor, IndexedSkillProgramInstance instance, SkillProgramViewAs rule, bool responseUse, bool dyingUse, scoped out bool available) => _resolve().TryGetEquipmentSlotNamedConversionAvailability(actor, instance, rule, responseUse, dyingUse, out available);

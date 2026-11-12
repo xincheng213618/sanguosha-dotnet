@@ -110,7 +110,7 @@ public enum SkillProgramCardPolicyKind
 
 public enum SkillProgramPeachRecoveryScope { NativePeach = 0 }
 
-public sealed record SkillProgramCardPolicy(
+public sealed partial record SkillProgramCardPolicy(
     string Id,
     SkillProgramCardPolicyKind Kind,
     IReadOnlyList<CardKind> CardKinds,

@@ -17,7 +17,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         else if (p.Kind == DecisionKind.RespondSlash && _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { AwaitingSlashChoice: true } b)
             choices = MouXqForcedSlashChoices(actor, _coreMatchParticipantsPlayersAccess._players[b.SlashTargetSeat], b.ResolutionId, false);
         else if (p.Kind == DecisionKind.ProgramTrigger && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame f && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)is { } effect)
-            choices = MouXqProgramSlashChoices(f, p.PlayerSeat, _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramTargets(f, p.PlayerSeat, effect.Op), effect.ResultBind);
+            choices = MouXqProgramSlashChoices(f, p.PlayerSeat, _programSlashRequests.GetTargets(f, p.PlayerSeat), effect.ResultBind);
         return choices.Count == 0 ? p : p with
         {
             Choices = Array.AsReadOnly(p.Choices.Concat(choices).DistinctBy(c => c.Id).ToArray())
@@ -85,6 +85,13 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         var r = grant.Request;
         var actor = _coreMatchParticipantsPlayersAccess._players[r.ActorSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[r.TargetSeat];
+        if (r.DecisionKind == DecisionKind.ProgramTrigger && r.RequestAcceptance is { } acceptance &&
+            _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.ParentFrameId) is ProgramSkillFrame parent &&
+            !_programSlashRequests.CanExecuteAcceptedUse(parent, acceptance))
+        {
+            _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(parent, "原请求不再允许发行已接受的用牌；已支付展示不撤回。");
+            return;
+        }
         NativeOwners.BorrowedSwordHandle? borrowed = null;
         if (r.DecisionKind == DecisionKind.RespondSlash)
         {
@@ -106,13 +113,13 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         else
             PrepareMouXqProgramSlash(r);
         var card = new Card(0, r.OutputKind, Suit.None, 0);
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [target.Seat], r.OutputKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, r.OutputKind), physicalCardIds: [], conversionSource: grant.Source, standardZeroEntityAttackCompletion: true);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [target.Seat], r.OutputKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, r.OutputKind), physicalCardIds: [], conversionSource: grant.Source, standardZeroEntityAttackCompletion: true, programSlashRequest: r.RequestAcceptance);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, target.Seat, card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: r.OutputKind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, r.OutputKind), programSkillCardUseFrameId: r.DecisionKind == DecisionKind.ProgramTrigger ? r.ParentFrameId : null);
         if (borrowed is not null)
             borrowed.ActiveAttack = attack;
         _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-        if (r.DecisionKind == DecisionKind.RespondSlash && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && actor.Seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, grant.Source))
+        if ((r.DecisionKind == DecisionKind.RespondSlash || r.RequestAcceptance?.Identity.Spec.CountsTowardSlashLimit == true) && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && actor.Seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, grant.Source))
             _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, r.OutputKind);
         _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);

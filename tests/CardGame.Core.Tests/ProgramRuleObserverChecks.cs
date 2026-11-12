@@ -40,6 +40,10 @@ internal static partial class ProgramRuleObserverChecks
         // Discover the actual built-ins too: a dropped phase or duplicate order
         // must fail at construction, before a command mutates match state.
         _ = ProgramRuleObserverCatalog.Discover(ProgramRuntimeModuleCatalog.Default.Methods);
+        var overridden = typeof(InheritedObserverOverride).GetMethod(nameof(InheritedObserverOverride.Observe))!;
+        var inherited = ProgramRuleObserverCatalog.Discover([overridden]);
+        Require(inherited.Phases.Values.All(rows => rows.Single().Method == overridden),
+            "An unannotated override retains inherited observer declarations and its actual method identity.");
         NativeGiveScopeUsesTheOriginalReentrantBoundary();
     }
 
@@ -87,5 +91,18 @@ internal static partial class ProgramRuleObserverChecks
 
         [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 10)]
         private void After(TurnStartedEvent ended) => Trace.Add($"after:{ended.TurnNumber}");
+    }
+
+    private class InheritedObserver
+    {
+        [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 10)]
+        [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 10)]
+        [ProgramRuleObserver(ProgramRulePhase.BeforeStatePublish, 10)]
+        public virtual void Observe() { }
+    }
+
+    private sealed class InheritedObserverOverride : InheritedObserver
+    {
+        public override void Observe() { }
     }
 }

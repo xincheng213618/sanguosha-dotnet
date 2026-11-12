@@ -14,7 +14,11 @@ public sealed record DrawFundedDistinctBasicPayment(long PaymentFrameId, CardCon
     string GameplayHash, string MethodLedgerId, int ActualTurnNumber, int ActualTurnOwnerSeat,
     DrawFundedDistinctBasicIntent Intent, CardKind EffectiveKind, CardKind NormalizedName,
     long? ParentFrameId, long? RequestFrameId, long? ParentActionId, int? TargetSeat, int Cursor,
-    PromptId OriginalPromptId, long OriginalRevision, long SequenceBefore, long SequenceAfter, int ActualDrawCount);
+    PromptId OriginalPromptId, long OriginalRevision, long SequenceBefore, long SequenceAfter, int ActualDrawCount)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramSlashRequestAcceptance? RequestAcceptance { get; init; }
+}
 
 public sealed record DrawFundedDistinctBasicUseReceipt(DrawFundedDistinctBasicPayment Payment, long OwnerFrameId, long CardActionId);
 

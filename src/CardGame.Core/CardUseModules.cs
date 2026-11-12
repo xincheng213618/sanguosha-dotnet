@@ -631,7 +631,7 @@ internal sealed partial class TurnCardUseEffectStore
 
     internal IReadOnlyList<long> ExpireTurn(int turnNumber, int turnSeat)
     {
-        var expired = ExpiringJudgedRankSlashPolicies(turnNumber, turnSeat).Concat(ExpiringInspectedHandDistances(turnNumber, turnSeat)).Concat(ExpiringHandCategoryRestrictions(turnNumber, turnSeat)).Concat(ExpiringBoundSlashBenefits(turnNumber, turnSeat)).Concat(ExpiringHandLimitKindExemptions(turnNumber, turnSeat)).Concat(ExpiringHandLimitExemptCards(turnNumber, turnSeat)).Concat(ExpiringRedSlashPolicies(turnNumber, turnSeat)).Concat(_targetAdjustments
+        var expired = ExpiringJudgedRankSlashPolicies(turnNumber, turnSeat).Concat(ExpiringInspectedHandDistances(turnNumber, turnSeat)).Concat(ExpiringHandCategoryRestrictions(turnNumber, turnSeat)).Concat(ExpiringBoundSlashBenefits(turnNumber, turnSeat)).Concat(ExpiringRedSlashPolicies(turnNumber, turnSeat)).Concat(_targetAdjustments
             .Where(item => item.TurnNumber == turnNumber && item.TurnSeat == turnSeat)
             .Select(item => item.GrantSequence))
             .Concat(_prohibitions
@@ -675,8 +675,6 @@ internal sealed partial class TurnCardUseEffectStore
         _targetRestrictions.RemoveAll(item => expiredSet.Contains(item.GrantSequence));
         _conversions.RemoveAll(item => expiredSet.Contains(item.GrantSequence));
         ExpireRedSlashPolicies(expiredSet);
-        ExpireHandLimitExemptCards(expiredSet);
-        ExpireHandLimitKindExemptions(expiredSet);
         ExpireBoundSlashBenefits(expiredSet);
         ExpireHandCategoryRestrictions(expiredSet);
         ExpireInspectedHandDistances(expiredSet);

@@ -36,30 +36,10 @@ public sealed record ExtraEffectsAndRankGuessPaidEvent(long ProgramFrameId, Extr
 public sealed record RankGuessComparedEvent(long ProgramFrameId, int PreviousRank, int NewRank, bool GuessedGreater, bool Correct, int GuessIndex) : IGameEvent;
 public sealed record RankGuessNormalDrawResetEvent(long ProgramFrameId, long WindowFrameId, int FrozenBaseDrawCount, int PreviousPlannedCount) : IGameEvent;
 public sealed record ExtraCardEffectIssuedEvent(long ProgramFrameId, CardConversionSource Source, long CardUseFrameId, long ActionId, int PaidCardId) : IGameEvent;
-public sealed record ExtraCardEffectStartedEvent(long CardUseFrameId, long ActionId, int TargetIndex, int TargetSeat, CardKind EffectiveKind) : IGameEvent;
 public sealed record DeathRecipientSkillChosenEvent(long ProgramFrameId, CardConversionSource Source, int RecipientSeat, string SkillId) : IGameEvent;
 public sealed record DeathRecipientSelectedEvent(long ProgramFrameId, CardConversionSource Source, int RecipientSeat, int OwnerMaxHp, int RecipientMaxHp) : IGameEvent;
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ExtraEffectsAndRankGuessReceipt? ExtraEffectsAndRankGuess { get; init; } }
-public sealed record ExtraCardEffectState
-{
-    public CardConversionSource Source { get; init; } = null!;
-    public long ProgramFrameId { get; init; }
-    public long ActionId { get; init; }
-    public int PaidCardId { get; init; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? AutomaticGameplayHash { get; init; }
-    public ProgramSimpleCardContinuation? Simple { get; init; }
-    public ProgramTrickContinuation? Trick { get; init; }
-    public bool WholeGroupRepeated { get; init; }
-    private IReadOnlyList<ExtraEffectAttackSeed> _attacks = [];
-    public IReadOnlyList<ExtraEffectAttackSeed> OriginalAttacks { get => _attacks; init => _attacks = Array.AsReadOnly(value.ToArray()); }
-    public FangtianHalberdState? Fangtian { get; init; }
-    public int? FrozenGroupDamageSourceSeat { get; init; }
-}
-public sealed record ExtraEffectAttackSeed(int TargetIndex, CardAttackState Attack);
-public sealed partial record CardUseFrame
-{ [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ExtraCardEffectState? ExtraCardEffect { get; init; } }
 public sealed record ExtraForeignCardSlot(int Slot, int? PublicCardId, CardLocation? PublicLocation);
 public sealed record ExtraForeignCardSelection(long ActionId, int HandCount, IReadOnlyList<ExtraForeignCardSlot> Slots)
 {

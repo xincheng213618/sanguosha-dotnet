@@ -42,7 +42,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         if (MouJwLionChild(f, child))
             return true;
         if (child is RecoveryReplacementFrame recovery)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -69,7 +69,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     {
         if (!ValidMouJw(f))
             return false;
-        if (MouJwLionChild(f, child) || _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, child, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray()))
+        if (MouJwLionChild(f, child) || _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, child))
             return true;
         var a = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var b = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == child.Id);
@@ -84,6 +84,19 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouJiangWei: not null } f || f.Id != id)
             return false;
+        if (_slashRequests.TakeFailure(f) is { } failed)
+        {
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+            _slashRequests.ReleaseAcceptance(f, failed.Acceptance);
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouJiangWei = f.MouJiangWei! with
+            {
+                Stage = MouJiangWeiStage.Responding, NativeAction = null, Materials = [], ProviderSeat = -1,
+                UseId = 0, ActionId = 0, FactionPolicy = null
+            } });
+            ContinueMouJw(id);
+            return true;
+        }
         ContinueMouJw(id);
         return true;
     }

@@ -21,7 +21,6 @@ internal sealed partial class CharacterXieLingYuOlEntries
     internal bool IsIssuedYuandiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedYuandiCandidate(c, context);
     internal bool IsXieLingYuPaidMovement(ProgramSkillFrame f, CardMovementRecord m) => _resolve().IsXieLingYuPaidMovement(f, m);
     internal bool IsXieLingYuRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsXieLingYuRecoveryParent(f, recovery);
-    internal bool IsXinyouHandLimitExempt(int ownerSeat, int cardId) => _resolve().IsXinyouHandLimitExempt(ownerSeat, cardId);
     internal bool PermitIssuedXieLingYu(ProgramSkillFrame f) => _resolve().PermitIssuedXieLingYu(f);
     internal void ProjectXinyouCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectXinyouCardSkillMark(cardId, ref projection);
     internal void PublishXieLingYu(ProgramSkillFrame f) => _resolve().PublishXieLingYu(f);

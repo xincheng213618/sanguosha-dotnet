@@ -12,7 +12,6 @@ internal sealed partial class CharacterLiYiOlEntries
     internal IGameEvent[] ChanshuangActualTurnHistory() => _resolve().ChanshuangActualTurnHistory();
     internal IReadOnlyList<PromptChoice> ChanshuangChoices(ProgramSkillFrame f) => _resolve().ChanshuangChoices(f);
     internal int ChanshuangChooser(ProgramSkillFrame f) => _resolve().ChanshuangChooser(f);
-    internal bool ChanshuangSlashQuotaBeforeLimit(ProgramSlashQuotaQuery query) => _resolve().ChanshuangSlashQuotaBeforeLimit(query);
     internal CardConversionSource ChanshuangSource(ProgramSkillFrame f) => _resolve().ChanshuangSource(f);
     internal PromptChoice ChooseChanshuangActiveAi(PendingDecision p) => _resolve().ChooseChanshuangActiveAi(p);
     internal PromptChoice ChooseChanshuangAi(PendingDecision p) => _resolve().ChooseChanshuangAi(p);
@@ -25,12 +24,8 @@ internal sealed partial class CharacterLiYiOlEntries
     internal void FinishChanshuang(ProgramSkillFrame f) => _resolve().FinishChanshuang(f);
     internal bool FinishChanshuangSuppliedSlashFailure(ProgramSkillFrame f) => _resolve().FinishChanshuangSuppliedSlashFailure(f);
     internal bool HasIssuedChanshuangSlash(long? useId, int actor) => _resolve().HasIssuedChanshuangSlash(useId, actor);
-    internal bool HasIssuedChanshuangSlashDebitExemption(long useId, int actorSeat) => _resolve().HasIssuedChanshuangSlashDebitExemption(useId, actorSeat);
     internal bool HasLiYiVirtualStoneAxe(CharacterState player, int? excludedEquipmentId = default, EquipmentSlot? excludedEquipmentSlot = default) => _resolve().HasLiYiVirtualStoneAxe(player, excludedEquipmentId, excludedEquipmentSlot);
-    internal bool IsChanshuangFactionOrigin(ProgramSkillFrame f, int actor, int target, string resultBind) => _resolve().IsChanshuangFactionOrigin(f, actor, target, resultBind);
     internal bool IsChanshuangNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => _resolve().IsChanshuangNativeSettlementBatch(f, batch);
-    internal bool IsChanshuangRemovedMaterial(long useId, int cardId) => _resolve().IsChanshuangRemovedMaterial(useId, cardId);
-    internal bool IsChanshuangSlashQuery(CharacterState actor) => _resolve().IsChanshuangSlashQuery(actor);
     internal bool IsChanshuangSlashRequest(ProgramSkillFrame f) => _resolve().IsChanshuangSlashRequest(f);
     internal bool IsIssuedChanshuangUse(CardUseFrame use) => _resolve().IsIssuedChanshuangUse(use);
     internal bool IsLiYiPaidMovement(ProgramSkillFrame f, CardMovementRecord m) => _resolve().IsLiYiPaidMovement(f, m);
@@ -48,7 +43,6 @@ internal sealed partial class CharacterLiYiOlEntries
     internal bool ReturnLiYiMovement(ProgramSkillFrame f) => _resolve().ReturnLiYiMovement(f);
     internal void SettleChanshuangNative(ChanshuangNativeOrigin o) => _resolve().SettleChanshuangNative(o);
     internal bool TryGetChanshuangSlashRequest(ProgramSkillFrame f, scoped out int actorSeat, scoped out IReadOnlyList<int> targets) => _resolve().TryGetChanshuangSlashRequest(f, out actorSeat, out targets);
-    internal bool ValidateChanshuangFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f) => _resolve().ValidateChanshuangFactionSlashParent(pending, f);
     internal void ValidateChanshuangNative(CardUseFrame use) => _resolve().ValidateChanshuangNative(use);
     internal bool WindowSettlement_IsChanshuangNativeSettlementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => _resolve().WindowSettlement_IsChanshuangNativeSettlementBatch(frame, batch);
     internal bool HasLiYiCapability { get => _resolve().HasLiYiCapability; }

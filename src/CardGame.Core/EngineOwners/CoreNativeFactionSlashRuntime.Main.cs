@@ -561,13 +561,8 @@ internal sealed partial class CoreNativeFactionSlashRuntime
             throw new InvalidOperationException("A faction-card request lost its program-skill parent.");
         if (pending.IsAssistedProgramUse)
         {
-            _coreAssistedFactionSlashOperations.ValidateAssistedFactionSlashParent(pending, frame);
-            if (_characterSunYuanOlOperations.IsSayingSlashRequest(frame))
-                _characterSunYuanOlOperations.PrepareSayingSuppliedSlash(frame, owner.Seat, provider.Seat, target.Seat, effectiveKind, physicalCards, actualConversion);
-            else if (_characterLiYiOlOperations.IsChanshuangSlashRequest(frame))
-                _characterLiYiOlOperations.PrepareChanshuangSuppliedSlash(frame, owner.Seat, provider.Seat, target.Seat, effectiveKind, physicalCards, conversionSource);
-            else if (!_characterJiangWeiMouMobileOperations.PrepareMouJwFactionNative(frame, pending, provider, physicalCards, effectiveKind, actualConversion) && !_characterMaTieAnniversaryOperations.PrepareAnniversaryMaTieFactionNative(frame, pending, provider, physicalCards, effectiveKind, actualConversion) && !_characterLvKuangLvXiangOlOperations.PrepareQigongFactionNative(frame, pending, provider, physicalCards, effectiveKind) && !_characterCaoChunOlOperations.PrepareCaoChunFactionNative(frame, pending, provider, physicalCards, effectiveKind) && !_characterWuJingOlOperations.PrepareWuJingFactionNative(frame, pending, provider, physicalCards, effectiveKind))
-                _coreProgramSlashRequestOperations.CommitProgramChoiceResult(frameId, pending.AssistedResultBind!, "used-slash", owner.Seat, "通过势力响应使用【杀】。");
+            _coreAssistedFactionSlashOperations.AcceptAssistedFactionSlashRequest(pending, frame);
+            frame = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(parent => parent.Id == frameId);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashResolvedEvent(pending.ResolutionId, owner.Seat, Succeeded: true, provider.Seat, selectedSlash.Id, effectiveKind, IsActiveUse: true, target.Seat));
         }
 

@@ -3,7 +3,7 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineHpLossSlashMaterialsEntries
 {
     internal void AddHpLossSlashEquipmentActions(List<LegalAction> actions, CharacterState owner) => _resolve().AddHpLossSlashEquipmentActions(actions, owner);
-    internal void BeginHpLossMaterialSlash(CharacterState owner, IReadOnlyList<Card> cards, CardKind kind, IReadOnlyList<int> seats, CardConversionSource? conversion, ProgramSkillFrame? parent) => _resolve().BeginHpLossMaterialSlash(owner, cards, kind, seats, conversion, parent);
+    internal void BeginHpLossMaterialSlash(CharacterState owner, IReadOnlyList<Card> cards, CardKind kind, IReadOnlyList<int> seats, CardConversionSource? conversion, ProgramSkillFrame? parent, ProgramSlashRequestAcceptance? programSlashRequest = null) => _resolve().BeginHpLossMaterialSlash(owner, cards, kind, seats, conversion, parent, programSlashRequest);
     internal SkillProgramStepOutcome BeginHpLossSelectedSlash(ProgramSkillFrame f, ProgramMultiCardViewAsSelection selection) => _resolve().BeginHpLossSelectedSlash(f, selection);
     internal HpLossSlashSelection? FreezeHpLossSlashSelection(CharacterState owner, ProgramExecutionPlan plan, IReadOnlyList<int> targets) => _resolve().FreezeHpLossSlashSelection(owner, plan, targets);
     internal bool HasExactHpLossMaterialReturn(CardUseFrame use) => _resolve().HasExactHpLossMaterialReturn(use);
@@ -13,6 +13,6 @@ internal sealed partial class CoreGameEngineHpLossSlashMaterialsEntries
     internal int HpLossSlashMaximum(CharacterState owner, CardKind kind, int original = 1) => _resolve().HpLossSlashMaximum(owner, kind, original);
     internal (CardConversionSource Source, string Hash)? HpLossSlashTargetSource(CharacterState owner) => _resolve().HpLossSlashTargetSource(owner);
     internal bool MatchesHpLossMaterialSlash(CardUseFrame use) => _resolve().MatchesHpLossMaterialSlash(use);
-    internal void ResolveHpLossSlashZhangba(CharacterState owner, IReadOnlyList<int> targets, IReadOnlyList<Card> cards) => _resolve().ResolveHpLossSlashZhangba(owner, targets, cards);
+    internal void ResolveHpLossSlashZhangba(CharacterState owner, IReadOnlyList<int> targets, IReadOnlyList<Card> cards, ProgramSlashRequestAcceptance? programSlashRequest = null) => _resolve().ResolveHpLossSlashZhangba(owner, targets, cards, programSlashRequest);
     internal CommandError? ValidateHpLossSlashZhangba(CharacterState owner, IReadOnlyList<int> ids, IReadOnlyList<int> targets) => _resolve().ValidateHpLossSlashZhangba(owner, ids, targets);
 }

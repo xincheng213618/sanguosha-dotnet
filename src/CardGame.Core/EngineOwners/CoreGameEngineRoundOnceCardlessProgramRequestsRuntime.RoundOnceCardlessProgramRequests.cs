@@ -6,73 +6,26 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRuntime
 {
     internal const string RoundOnceCardlessProgramMarker = "round-once-cardless-request";
-    internal bool RoundOnceCardlessProgramActor(ProgramSkillFrame f, SkillProgramEffectOp op, int actor)
-    {
-        if (f.InstructionIndex < 1 || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(f.SkillId)?.Program is not { } program || program.GameplayHash != f.GameplayHash)
-            return false;
-        var plan = ProgramInstructionResolver.Default.Resolve(f, program);
-        if (f.InstructionIndex > plan.Instructions.Count || plan.GetPausedInstruction(f.InstructionIndex).Effect.Op != op)
-            return false;
-        if (op == SkillProgramEffectOp.ResolveAnniversaryMaTieQuxian)
-            return _characterMaTieAnniversaryOperations.AnniversaryMaTieRequestActor(f, actor);
-        if (op == SkillProgramEffectOp.RequestAnniversaryLeiBoSileiSlash)
-            return actor == f.OwnerSeat && _characterLeiBoAnniversaryOperations.Value.IsAnniversaryLeiBoFixedSlash(f);
-        if (op == SkillProgramEffectOp.ResolveSayingPlayStartObtainAndReply)
-            return _characterSunYuanOlOperations.TryGetSayingSlashRequest(f, out var sayingActor, out _) && actor == sayingActor;
-        if (op is SkillProgramEffectOp.ResolveChanshuangSimultaneousChoices or SkillProgramEffectOp.ResolveChanshuangEnding)
-            return _characterLiYiOlOperations.TryGetChanshuangSlashRequest(f, out var requested, out _) && actor == requested;
-        if (op == SkillProgramEffectOp.UseHejiAtCompletedSingleTarget)
-            return actor == f.OwnerSeat && _characterWuJingOlOperations.IsWuJingHejiRequest(f);
-        if (op == SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner)
-            return actor == f.OwnerSeat && f.WindowContext?.Window == SkillProgramTriggerWindow.TurnEnding && f.WindowContext.TargetSeat == _coreActualTurnProgressCurrentSeatAccess._currentSeat && f.FixedTargetSlash is { } fixedDraft && fixedDraft.TargetSeat == _coreActualTurnProgressCurrentSeatAccess._currentSeat && fixedDraft.TargetSeat != actor;
-        if (op == SkillProgramEffectOp.RequestSlashByNearest)
-        {
-            var cursors = f.NumberBindings.Where(b => b.Name == "participant-cursor-" + (f.InstructionIndex - 1)).ToArray();
-            return f.ReexecuteParticipantInstruction && cursors is [var cursor] && cursor.Value >= 1 && cursor.Value < _coreMatchDefinitionPlayerCountAccess._playerCount && actor == _coreTableOrderOperations.TableStepSeat(f.OwnerSeat, cursor.Value);
-        }
-
-        return (op is SkillProgramEffectOp.RequestSlashByTarget or SkillProgramEffectOp.RequestSlashAgainstChosenTarget or SkillProgramEffectOp.RequestLegalSlashByNearest) && f.SelectedTargetSeats.SequenceEqual(new[] { actor });
-    }
-
-    internal int[] RoundOnceCardlessProgramTargets(ProgramSkillFrame f, int actor, SkillProgramEffectOp op)
-    {
-        if (!RoundOnceCardlessProgramActor(f, op, actor))
-            return[];
-        if (op == SkillProgramEffectOp.ResolveAnniversaryMaTieQuxian)
-            return _characterMaTieAnniversaryOperations.AnniversaryMaTieRequestTargets(f, actor);
-        if (op == SkillProgramEffectOp.RequestAnniversaryLeiBoSileiSlash)
-            return[f.FixedTargetSlash!.TargetSeat];
-        if (op == SkillProgramEffectOp.ResolveSayingPlayStartObtainAndReply)
-            return _characterSunYuanOlOperations.TryGetSayingSlashRequest(f, out _, out var sayingTargets) ? sayingTargets.ToArray() : [];
-        if (op is SkillProgramEffectOp.ResolveChanshuangSimultaneousChoices or SkillProgramEffectOp.ResolveChanshuangEnding)
-            return _characterLiYiOlOperations.TryGetChanshuangSlashRequest(f, out _, out var targets) ? targets.ToArray() : [];
-        return op switch
-        {
-            SkillProgramEffectOp.UseHejiAtCompletedSingleTarget => [f.WuJing!.TargetSeat],
-            SkillProgramEffectOp.RequestSlashByTarget => [f.OwnerSeat],
-            SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner when f.FixedTargetSlash is { } fixedDraft => [fixedDraft.TargetSeat],
-            SkillProgramEffectOp.RequestSlashByNearest => _coreProgramSlashRequestOperations.GetNearestLivingCharacterSeats(actor),
-            SkillProgramEffectOp.RequestSlashAgainstChosenTarget when f.AssistedSlashRequest is { TargetSeat: { } target } draft && draft.ActorSeat == actor => [target],
-            SkillProgramEffectOp.RequestLegalSlashByNearest when f.NearestLegalSlashRequest is { AwaitingFaction: false } nearest && nearest.ActorSeat == actor && nearest.NearestSeats.SequenceEqual(_coreProgramSlashRequestOperations.GetNearestLivingCharacterSeats(actor)) => nearest.NearestSeats.ToArray(),
-            _ => []
-        };
-    }
-
     internal bool HasRoundOnceCardlessProgramSlash(CharacterState actor, IEnumerable<int> targets) => _characterXiaoQiaoMouOlOperations.HasMouXqProgramSlash(actor, targets) || targets.Any(target => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreRoundOnceCardlessNativeUsesOperations.RoundOnceCardlessRules(actor, CardKind.Slash).Any(entry => RoundOnceCardlessProgramTargetLegal(actor, target, entry.Source)));
-    internal bool RoundOnceCardlessProgramTargetLegal(CharacterState actor, int target, CardConversionSource source, bool ignoreDistance = false) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && actor.Seat != target && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target, Suit.None) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None) && _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], new(0, CardKind.Slash, Suit.None, 0), source, CardKind.Slash, ignoreDistance: ignoreDistance, noEffectiveRank: true, physicalCardIds: []);
+    internal bool RoundOnceCardlessProgramTargetLegal(CharacterState actor, int target, CardConversionSource source,
+        bool ignoreDistance = false, bool countsTowardLimit = false) =>
+        _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) &&
+        _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target],
+            CardKind.Slash, physicalSuit: Suit.None, physicalCardIds: [], ignoreDistance: ignoreDistance,
+            conversionSource: source, countsTowardLimit: countsTowardLimit);
     internal IReadOnlyList<PromptChoice> RoundOnceCardlessProgramSlashChoices(ProgramSkillFrame frame, int actorSeat, IReadOnlyList<int> targets, string? resultBind = null)
     {
-        if (frame.RoundOnceCardlessProgramRequest is not null || (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(frame)) && !_characterLiYiOlOperations.IsChanshuangSlashRequest(frame) && !_characterSunYuanOlOperations.IsSayingSlashRequest(frame) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat))
+        if (frame.RoundOnceCardlessProgramRequest is not null || _slashRequests.GetOffer(frame, actorSeat) is not { } request)
             return[];
         var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame);
         if (effect is null)
             return[];
-        var allowed = RoundOnceCardlessProgramTargets(frame, actorSeat, effect.Op);
-        if (allowed.Length == 0 || targets.Any(t => !allowed.Contains(t)) || resultBind is not null && resultBind != effect.ResultBind)
+        var allowed = _slashRequests.GetTargets(frame, actorSeat);
+        if (allowed.Count == 0 || targets.Any(t => !allowed.Contains(t)) || resultBind is not null && resultBind != request.Spec.ResultBind)
             return[];
         var result = new List<PromptChoice>();
         foreach (var(source, _)in _coreRoundOnceCardlessNativeUsesOperations.RoundOnceCardlessRules(_coreMatchParticipantsPlayersAccess._players[actorSeat], CardKind.Slash))
-            foreach (var target in targets.Distinct().Where(t => RoundOnceCardlessProgramTargetLegal(_coreMatchParticipantsPlayersAccess._players[actorSeat], t, source, frame.FixedTargetSlash?.IgnoreDistance == true)))
+            foreach (var target in targets.Distinct().Where(t => RoundOnceCardlessProgramTargetLegal(_coreMatchParticipantsPlayersAccess._players[actorSeat], t, source, request.Spec.IgnoreDistance, request.Spec.CountsTowardSlashLimit)))
             {
                 var parameters = new Dictionary<string, string>
                 {
@@ -97,33 +50,23 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
             throw new InvalidOperationException("Cardless requested Slash changed its exact native prompt, actor, target or owning instruction.");
         var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f) ?? throw new InvalidOperationException("Cardless Slash lost its paused request effect.");
         var actor = _coreMatchParticipantsPlayersAccess._players[prompt.PlayerSeat];
-        var targets = RoundOnceCardlessProgramTargets(f, actor.Seat, effect.Op);
+        var targets = _slashRequests.GetTargets(f, actor.Seat);
         if (!RoundOnceCardlessProgramSlashChoices(f, actor.Seat, targets, effect.ResultBind).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([c], [choice])))
             throw new InvalidOperationException("Cardless Slash request lost its source qualification or current native allowed targets.");
         var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice);
+        var acceptance = _slashRequests.Accept(f, actor.Seat, target);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         var payment = _coreRoundOnceCardlessBasicOperations.ConsumeRoundOnceCardlessBasic(source, false);
-        var receipt = new RoundOnceCardlessProgramRequestReceipt(f.Id, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, f.InstructionIndex, effect.Op, actor.Seat, target, effect.ResultBind, prompt.PromptId, prompt.Revision, f.WindowContext?.ParentFrameId, payment);
+        var receipt = new RoundOnceCardlessProgramRequestReceipt(f.Id, acceptance.Identity.Source,
+            acceptance.Identity.GameplayHash, f.InstructionIndex, effect.Op, actor.Seat, target,
+            acceptance.Identity.Spec.ResultBind, prompt.PromptId, prompt.Revision, f.WindowContext?.ParentFrameId, payment)
+        { RequestAcceptance = acceptance };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { RoundOnceCardlessProgramRequest = new(receipt) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoundOnceCardlessProgramRequestAcceptedEvent(receipt));
-        _characterMaTieAnniversaryOperations.PrepareAnniversaryMaTieSuppliedSlash(f, actor.Seat, actor.Seat, target, CardKind.Slash, [], source);
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(f))
-            _characterSunYuanOlOperations.PrepareSayingSuppliedSlash(f, actor.Seat, actor.Seat, target, CardKind.Slash, [], source);
-        if (_characterLiYiOlOperations.IsChanshuangSlashRequest(f))
-            _characterLiYiOlOperations.PrepareChanshuangSuppliedSlash(f, actor.Seat, actor.Seat, target, CardKind.Slash, [], source);
-        if (effect.Op == SkillProgramEffectOp.RequestSlashByTarget)
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(f.Id, effect.ResultBind!, RequestSlashByTargetProgramOperationDescriptor.UsedSlashOption, actor.Seat, "卫境：视为使用【杀】。");
-        else if (effect.Op == SkillProgramEffectOp.RequestSlashAgainstChosenTarget)
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { AssistedSlashRequest = null });
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(f.Id, effect.ResultBind!, "used-slash", actor.Seat, "卫境：视为使用【杀】。");
-        }
-        else if (effect.Op is SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner or SkillProgramEffectOp.RequestAnniversaryLeiBoSileiSlash)
-            _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { FixedTargetSlash = f.FixedTargetSlash!with { Issued = true } });
-        else if (effect.Op == SkillProgramEffectOp.RequestLegalSlashByNearest)
-            _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { NearestLegalSlashRequest = null });
+        _slashRequestExecution.PrepareAcceptedUse(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), acceptance);
         var card = new Card(0, CardKind.Slash, Suit.None, 0);
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [target], CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash), physicalCardIds: [], conversionSource: source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, [target], CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash), physicalCardIds: [], conversionSource: source, programSlashRequest: acceptance);
         BindRoundOnceCardlessProgramRequestUse(_coreCardUseLifecycleOperations.LifecycleCardUse(id)!);
         _coreRoundOnceCardlessNativeUsesOperations.IssueRoundOnceCardlessNativeUse(id, source);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: CardKind.Slash, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash), programSkillCardUseFrameId: f.Id);
@@ -131,6 +74,11 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
         _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
         _coreAlcoholSlashSuppressionsOperations.Value.CaptureProgramAlcoholConsumption(id, actor);
         actor.HasAlcoholEffect = false;
+        if (acceptance.Identity.Spec.CountsTowardSlashLimit &&
+            _turnScope._phase == TurnPhase.Play && actor.Seat == _turnScope._currentSeat &&
+            _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true &&
+            !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source))
+            _slashDebits.RecordSlashUseDebit(id, actor.Seat);
         _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, CardKind.Slash);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, target, IgnoresArmor: attack.IgnoresArmor));
         _coreNativeAiDecisionsOperations.NotifyAiOfSlash(actor, _coreMatchParticipantsPlayersAccess._players[target]);
@@ -155,7 +103,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
             return;
         }
 
-        if (r.NativeUseId != 0 || r.ProgramFrameId != parent.Id || !RoundOnceCardlessProgramActor(parent, r.RequestOp, r.ActorSeat) || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use } action || action.ActorSeat != r.ActorSeat || action.ProviderSeat != r.ActorSeat || action.RequesterSeat is not null || action.ConversionChain is not [var source] || source != r.Payment.Source || action.PhysicalCards.Count != 0 || !use.TargetSeats.SequenceEqual(new[] { r.TargetSeat }) || !ValidRoundOnceCardlessProgramReceipt(parent, r, false))
+        if (r.NativeUseId != 0 || r.ProgramFrameId != parent.Id || use.CardId != 0 || use.CardKind != CardKind.Slash || use.PhysicalCardIds is not { Count: 0 } || use.Action is not { Type: CardActionType.Use } action || action.ActorSeat != r.ActorSeat || action.ProviderSeat != r.ActorSeat || action.RequesterSeat is not null || action.ConversionChain is not [var source] || source != r.Payment.Source || action.PhysicalCards.Count != 0 || !use.TargetSeats.SequenceEqual(new[] { r.TargetSeat }) || !ValidRoundOnceCardlessProgramReceipt(parent, r, false))
             throw new InvalidOperationException("Cardless requested Slash changed its actual self-use, paid source, parent request or allowed target.");
         var final = r with
         {
@@ -167,26 +115,25 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoundOnceCardlessProgramRequestBoundEvent(final));
     }
 
-    internal bool ValidRoundOnceCardlessProgramReceipt(ProgramSkillFrame parent, RoundOnceCardlessProgramRequestReceipt r, bool requireBound = true)
+    internal bool ValidRoundOnceCardlessProgramReceipt(ProgramSkillFrame parent, RoundOnceCardlessProgramRequestReceipt receipt, bool requireBound = true)
     {
-        if (parent.Id != r.ProgramFrameId || parent.InstructionIndex != r.InstructionIndex || r.RequestSource != new CardConversionSource(parent.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(parent), parent.OwnerSeat, parent.SkillInstanceId) || parent.GameplayHash != r.RequestGameplayHash || parent.WindowContext?.ParentFrameId != r.OriginalWindowId || r.Payment.Source.OwnerSeat != r.ActorSeat || !RoundOnceCardlessProgramActor(parent, r.RequestOp, r.ActorSeat) || r.OriginalPromptId.Value <= 0 || r.OriginalRevision < 0 || r.Payment.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(r.Payment.Source.SkillId).Program!.GameplayHash || _corePlayCardHistoryOperations.ViewAsRule(r.Payment.Source)is not { OutputKind: CardKind.Slash, ForPlay: true, ForResponse: false, RoundOnceCardlessBasic: { } } || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessBasicQuotaPaidEvent>().Count(e => e.Receipt == r.Payment) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessProgramRequestAcceptedEvent>().Count(e => e.Receipt == (r with { NativeUseId = 0, NativeActionId = 0 })) != 1)
+        if (receipt.RequestAcceptance is not { } acceptance ||
+            !_slashRequests.OwnsAcceptance(parent, acceptance, receipt.ActorSeat, receipt.TargetSeat) ||
+            parent.RoundOnceCardlessProgramRequest is not { } pending || pending.Receipt != receipt ||
+            parent.Id != receipt.ProgramFrameId || receipt.InstructionIndex != acceptance.Identity.InstructionIndex ||
+            receipt.RequestSource != acceptance.Identity.Source || receipt.RequestGameplayHash != acceptance.Identity.GameplayHash ||
+            parent.WindowContext?.ParentFrameId != receipt.OriginalWindowId ||
+            receipt.Payment.Source.OwnerSeat != receipt.ActorSeat || receipt.ResultBind != acceptance.Identity.Spec.ResultBind ||
+            receipt.OriginalPromptId.Value <= 0 || receipt.OriginalRevision < 0)
             return false;
-        var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(parent);
-        if (effect?.ResultBind != r.ResultBind)
-            return false;
-        if (r.RequestOp is SkillProgramEffectOp.RequestSlashByTarget or SkillProgramEffectOp.RequestSlashAgainstChosenTarget)
-        {
-            if (parent.ChoiceBindings.Count(b => b.Name == r.ResultBind && b.ChooserSeat == r.ActorSeat && b.OptionId == "used-slash") != 1)
-                return false;
-        }
-
-        return !requireBound || r.NativeUseId > 0 && r.NativeActionId > 0 && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessProgramRequestBoundEvent>().Count(e => e.Receipt == r) == 1;
+        // The original owner stores the result of the real quota payment and
+        // native binding. Public notifications are not execution proofs.
+        return !requireBound || receipt.NativeUseId > 0 && receipt.NativeActionId > 0;
     }
-
     internal bool RoundOnceCardlessProgramRequestRidesOn(CardUseFrame use, ProgramSkillFrame parent) => use.RoundOnceCardlessProgramRequest is { } r && parent.RoundOnceCardlessProgramRequest is { NativeReturned: false } p && p.Receipt == r && ValidRoundOnceCardlessProgramReceipt(parent, r) && _coreRoundOnceCardlessNativeUsesOperations.IsRoundOnceCardlessBasicUse(use.Id) && use.CardAttack?.ProgramSkillCardUseFrameId == parent.Id && use.RoundOnceCardlessBasicUse?.CardActionId == r.NativeActionId;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 360)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 360)]
-    internal bool CanContinueIssuedRoundOnceCardlessProgramRequest(ProgramSkillFrame parent) => parent.RoundOnceCardlessProgramRequest is { } p && ValidRoundOnceCardlessProgramReceipt(parent, p.Receipt) && (!p.NativeReturned || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessProgramRequestReturnedEvent>().Count(e => e.Receipt == p.Receipt) == 1);
+    internal bool CanContinueIssuedRoundOnceCardlessProgramRequest(ProgramSkillFrame parent) => parent.RoundOnceCardlessProgramRequest is { } p && ValidRoundOnceCardlessProgramReceipt(parent, p.Receipt);
 
     [NativeUseValidation(40)]
     internal void AssertRoundOnceCardlessProgramRequestCompletion(CardUseFrame use)
@@ -202,7 +149,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
     {
         if (completed.RoundOnceCardlessProgramRequest is not { } r)
             return;
-        if (_resolutionStackOperations._resolutionStack.Any(f => f.Id == completed.Id) || completed.Step != ResolutionFrameStep.Completed || completed.RoundOnceCardlessBasicUse?.CardActionId != r.NativeActionId || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.ProgramFrameId)is not ProgramSkillFrame parent || parent.RoundOnceCardlessProgramRequest is not { NativeReturned: false } p || p.Receipt != r || !ValidRoundOnceCardlessProgramReceipt(parent, r) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessProgramRequestReturnedEvent>().Any(e => e.Receipt == r))
+        if (_resolutionStackOperations._resolutionStack.Any(f => f.Id == completed.Id) || completed.Step != ResolutionFrameStep.Completed || completed.RoundOnceCardlessBasicUse?.CardActionId != r.NativeActionId || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.ProgramFrameId)is not ProgramSkillFrame parent || parent.RoundOnceCardlessProgramRequest is not { NativeReturned: false } p || p.Receipt != r || !ValidRoundOnceCardlessProgramReceipt(parent, r))
             throw new InvalidOperationException("Cardless request can return only once after its own actual native child completed.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { RoundOnceCardlessProgramRequest = p with { NativeReturned = true } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RoundOnceCardlessProgramRequestReturnedEvent(r));
@@ -216,16 +163,7 @@ internal sealed partial class CoreGameEngineRoundOnceCardlessProgramRequestsRunt
         if (!CanContinueIssuedRoundOnceCardlessProgramRequest(parent))
             throw new InvalidOperationException("Cardless request lost its once completed paid native return.");
         _coreRuntimeOperations.ReplaceRuntimeTop(parent = parent with { RoundOnceCardlessProgramRequest = null });
-        if (_characterSunYuanOlOperations.ResumeSayingSuppliedSlash(parent))
-            return true;
-        if (_characterLiYiOlOperations.ResumeChanshuangSuppliedSlash(parent))
-            return true;
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || _coreMatchOutcomeStatusWinnerAccess._status == EngineStatus.Completed || !_coreMatchParticipantsPlayersAccess._players[parent.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(parent) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(parent))
-            _coreSkillProgramsOperations.FinishProgramSkill(parent, true);
-        else if (parent.FixedTargetSlash is { Issued: true })
-            _coreFixedSlashAndDeclaredDeckProgramsOperations.TryResumeFixedSlashAndDeclaredDeck(id);
-        else
-            _coreRuntimeOperations.AdvanceRuntimeProgram(id);
+        _coreRuntimeOperations.AdvanceRuntimeProgram(id);
         return true;
     }
 }

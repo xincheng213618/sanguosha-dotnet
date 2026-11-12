@@ -157,9 +157,16 @@ internal sealed partial class CharacterZhenJiMouMobileRuntime
             if (m is not null)
             {
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhenJiLuoshenMovedEvent(f.Id, r.Cursor, card.Id, from, m.To, m.Sequence, red == false));
-                if (red == false && m.To == CardLocation.Hand(f.OwnerSeat) && !_turnCardUseEffectsOperations._turnCardUseEffects.GetHandLimitExemptCardIds(r.TurnNumber, r.TurnOwnerSeat, f.OwnerSeat).Contains(card.Id))
+                if (red == false && m.To == CardLocation.Hand(f.OwnerSeat) &&
+                    !_handLimitExemptions.GetMatchingRelations(NativeHandLimitExemptionRelations.JudgmentEntities, f.OwnerSeat, card.Id)
+                        .Any(grant => grant.IssuedTurn == new HandLimitTurnCoordinates(r.TurnNumber, r.TurnOwnerSeat)))
                 {
-                    var grant = _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandLimitExemptCard(r.TurnNumber, r.TurnOwnerSeat, f.Id, f.InstructionIndex - 1, 0, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f), f.OwnerSeat, card.Id, m.Sequence);
+                    var issued = _handLimitExemptions.Grant(f, NativeHandLimitExemptionRelations.JudgmentEntities, f.OwnerSeat,
+                        new(new(), [card.Id], HandLimitExemptionExpiry.FrozenTurnCoordinates, new(r.TurnNumber, r.TurnOwnerSeat),
+                            NativeExpiration: SkillProgramDamageModifierExpiration.CurrentTurnEnd), r.Cursor);
+                    var grant = new TurnHandLimitExemptCardGrant(issued.Sequence, r.TurnNumber, r.TurnOwnerSeat,
+                        f.Id, f.InstructionIndex - 1, 0, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(f),
+                        f.OwnerSeat, card.Id, m.Sequence);
                     _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TurnHandLimitExemptCardGrantedEvent(grant));
                 }
             }

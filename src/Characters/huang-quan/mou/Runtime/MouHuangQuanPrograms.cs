@@ -20,32 +20,9 @@ public sealed record MouHqReceipt(CardConversionSource Source,string GameplayHas
 public sealed partial record ProgramSkillFrame
 {[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouHqReceipt? MouHuangQuan{get;init;}}
 public sealed record MouHqEffectGrant(long FrameId,CardConversionSource Source,string GameplayHash,long WindowId,long UseId,long ActionId,int Recipient,int GivenCount);
-public sealed record MouHqEffectRounds(long ActionId,ExtraCardEffectState Native)
-{
-    private ExtraCardEffectState _native=Freeze(Native);
-    public ExtraCardEffectState Native{get=>_native;init=>_native=Freeze(value);}
-    private IReadOnlyList<MouHqEffectGrant> _grants=[];
-    public IReadOnlyList<MouHqEffectGrant> Grants{get=>_grants;init=>_grants=Array.AsReadOnly(value.ToArray());}
-    public int Started{get;init;}
-    public bool Active{get;init;}
-    private static ExtraCardEffectState Freeze(ExtraCardEffectState x)=>x with{
-        Simple=x.Simple is{}s?s with{RecoveryPolicySources=s.RecoveryPolicySources is{}policies?Array.AsReadOnly(policies.ToArray()):null}:null,
-        Fangtian=x.Fangtian is{}f?f with{TargetSeats=Array.AsReadOnly(f.TargetSeats.ToArray())}:null,
-        OriginalAttacks=x.OriginalAttacks.Select(s=>s with{Attack=s.Attack with{
-            PhysicalCardIds=Array.AsReadOnly(s.Attack.PhysicalCardIds.ToArray()),ChainedTargetSeats=Array.AsReadOnly(s.Attack.ChainedTargetSeats.ToArray()),
-            ResponseProhibitingSkillNames=Array.AsReadOnly(s.Attack.ResponseProhibitingSkillNames.ToArray()),
-            RangePreventionVisitedTargets=s.Attack.RangePreventionVisitedTargets is{}v?Array.AsReadOnly(v.ToArray()):null}}).ToArray()};
-}
-public sealed partial record CardUseFrame
-{
-    [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouHqEffectRounds? MouHqRounds{get;init;}
-    [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouHqEffectGrant? MouHqIneffective{get;init;}
-}
 public sealed record MouHqStartedEvent(long FrameId,CardConversionSource Source,string GameplayHash,int Turn,int TurnOwner,long WindowId,long UseId,long ActionId):IGameEvent;
 public sealed record MouHqCommittedEvent(long FrameId,int OwnerSeat,int Recipient,int Count,int Turn,int TurnOwner):IGameEvent;
 public sealed record MouHqEffectIssuedEvent(MouHqEffectGrant Grant,bool Repeats):IGameEvent;
-public sealed record MouHqEffectRoundStartedEvent(long UseId,long ActionId,long FrameId,int Round):IGameEvent;
-public sealed record MouHqEffectRoundCompletedEvent(long UseId,long ActionId,long FrameId,int Round):IGameEvent;
 public sealed record MouHqCompletedEvent(long FrameId):IGameEvent;
 internal interface IMouHuangQuanHost{SkillProgramStepOutcome Resolve(ProgramSkillFrame f,SkillProgramEffectOp op);}
 internal sealed class MouHuangQuanHandler(SkillProgramEffectOp op):ISkillProgramEffectHandler

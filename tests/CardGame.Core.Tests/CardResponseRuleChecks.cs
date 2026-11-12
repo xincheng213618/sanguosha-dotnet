@@ -115,6 +115,28 @@ internal static class CardResponseRuleChecks
             s.G.CardMovements.Count(m => m.CardId == material && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
             !s.G.ResolutionStack.OfType<CardUseFrame>().Any(),
             "Cold return completes the paid armor conversion once, preserving its one public issuance and one physical material payment.");
+
+        var applied = Scene.Start(poxi: false, yingbo: true);
+        var duel = applied.V(0).Hand.Single(c => c.Kind == CardKind.Duel).Id;
+        var legal = applied.G.GetHumanLegalActions().Single(a => a.CardId == duel && a.TargetSeats.SequenceEqual([1]));
+        applied.Accept(new PlayCardCommand(0, duel, [1], applied.G.Revision, applied.P!.PromptId, legal.PlayedCardKind));
+        applied.Reach(() => applied.P?.SkillPrompt?.SkillId == Watch);
+        var incoming = applied.G.ResolutionStack.OfType<CardUseFrame>().Single();
+        var lifecycle = applied.G.GetRuntimeModule<CoreGameEngineCardUseLifecycleRuntime>();
+        var history = ((ProgramCapabilityRegistry)typeof(GameEngine).GetProperty("ProgramCapabilities",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(applied.G)!)
+            .Get<IProgramEventHistoryQueries>();
+        var source = new CardConversionSource("mou:yingbo", "whole-use-notification", 0, "fixture-notification");
+        lifecycle.IssueResponseRule(incoming.Id, new(forbid: true, audience: ResponseRuleAudience.All, source: source));
+        var policy = new IssuedCardNoResponse(incoming.Action!.ActionId, incoming.Id, source, 1, 0);
+        applied.Need(!history.Read<IssuedCardNoResponseEvent>().Any(e => e.Effect.ParentFrameId == incoming.Id),
+            "A source-attributed applied all-audience row has not issued the independent whole-use notification.");
+        lifecycle.IssueNoResponsePolicy(policy);
+        lifecycle.IssueNoResponsePolicy(policy);
+        applied.Need(history.Read<IssuedCardNoResponseEvent>().Count(e => e.Effect.ParentFrameId == incoming.Id) == 1 &&
+            applied.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Id == incoming.Id).ResponseRules!
+                .Any(rule => rule.IsWholeUseNoResponsePolicy),
+            "An applied row cannot swallow the real whole-use issuance, and reissuing that protocol notifies once.");
     }
 
     private sealed class Scene(GameEngine game, ContentRegistry registry)

@@ -54,12 +54,7 @@ internal sealed partial class CharacterTaoQianOlRuntime
     internal bool AdvanceZhaohuoChildren() => _corePendingDecisionPolicyPipelineOperations._pendingDecision is null && ZhaohuoObserverRoot()is not null && _coreObserverSubtreesOperations.TryAdvanceObserverSubtree(true);
     [ProgramCardLegality(ProgramCardLegalityStage.HandPhysicalBan, 20)]
     [ProgramCardLegality(ProgramCardLegalityStage.EntityPhysicalBan, 10)]
-    internal bool IsZhaohuoPhysicalRestricted(int actorSeat, int cardId)
-    {
-        if (!HasZhaohuoCapability || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) || !ZhaohuoActualTurnOpen)
-            return false;
-        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhaohuoGiftPaidEvent>().Any(e => e.Source.OwnerSeat == actorSeat && e.CardId == cardId && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && ValidZhaohuoPhysicalGift(e)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ZhaohuoSelfGiftCommittedEvent>().Any(e => e.Source.OwnerSeat == actorSeat && e.CardId == cardId && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && ValidZhaohuoSelfGift(e));
-    }
+    internal bool IsZhaohuoPhysicalRestricted(int actorSeat, int cardId) =>
+        _handLimitExemptions.GetMatchingRelations("ol:zhaohuo", actorSeat, cardId).Count > 0;
 
-    internal bool IsZhaohuoHandLimitExempt(int ownerSeat, int cardId) => IsZhaohuoPhysicalRestricted(ownerSeat, cardId) && _cardZonesOperations._cardZones.Contains(CardLocation.Hand(ownerSeat), cardId);
 }

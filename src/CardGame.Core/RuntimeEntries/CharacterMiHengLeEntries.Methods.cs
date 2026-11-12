@@ -22,9 +22,7 @@ internal sealed partial class CharacterMiHengLeEntries
     internal bool HasJiguEntityMark2(int ownerSeat, int cardId) => _resolve().HasJiguEntityMark(ownerSeat, cardId);
     internal bool HasSiruiForcedSlash(CharacterState actor, CharacterState target, NativeOwners.QinglongCrescentBladeHandle pending) => _resolve().HasSiruiForcedSlash(actor, target, pending);
     internal bool HasSiruiSlashDistance(CharacterState actor, CardKind kind, IReadOnlyList<int>? materialIds = default, CardConversionSource? conversionSource = default, long? existingUseFrameId = default) => _resolve().HasSiruiSlashDistance(actor, kind, materialIds, conversionSource, existingUseFrameId);
-    internal bool IsJiguHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsJiguHandLimitExempt(owner, cardId);
     internal bool IsLeMiHengRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsLeMiHengRecoveryParent(f, recovery);
-    internal bool IsSiruiOutsideGeneralWeaponMaterial(long useId, int cardId) => _resolve().IsSiruiOutsideGeneralWeaponMaterial(useId, cardId);
     internal bool IsSiruiOutsideResponseMaterial(long parentId, int cardId) => _resolve().IsSiruiOutsideResponseMaterial(parentId, cardId);
     internal bool IsSiruiPhysicalSlashKind(CharacterState actor, Card card, CardKind kind) => _resolve().IsSiruiPhysicalSlashKind(actor, card, kind);
     internal bool IsSiruiSource(CardConversionSource? source) => _resolve().IsSiruiSource(source);

@@ -3,6 +3,7 @@
     {
       "id": "le:lingkong",
       "revision": 1,
+      "cardPolicies": [{"id":"marked-hand-exemption","kind":"handLimitCardKindExemption","handLimitMatch":{"mark":"lingkong"}}],
       "triggers": [
         {
           "id": "mark-initial-entities",

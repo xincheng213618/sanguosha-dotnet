@@ -3,6 +3,7 @@
     {
       "id": "le:tanban",
       "revision": 1,
+      "cardPolicies": [{"id":"marked-hand-exemption","kind":"handLimitCardKindExemption","handLimitMatch":{"mark":"tanban","requireLivingHolder":true}}],
       "triggers": [
         {
           "id": "mark-initial-entities",

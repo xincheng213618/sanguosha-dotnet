@@ -3,31 +3,6 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangLiaoHappyGodRuntime
 {
-    internal bool HappyZlCannotRespond(CardActionContext action, int responderSeat) => HasHappyZl && (action.Type == CardActionType.Use || action.Type == CardActionType.Response && action.EffectiveKind == CardKind.Nullification) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(action.ActorSeat) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(responderSeat) && _coreMatchParticipantsPlayersAccess._players[action.ActorSeat].IsAlive && _coreMatchParticipantsPlayersAccess._players[responderSeat].IsAlive && HappyZlColor(action.ActorSeat, responderSeat, action.EffectiveIsRed ?? CoreGameEnginePublicPileColorsRuntime.SuitColor(action.EffectiveSuit))is not null;
-    internal bool HappyZlCannotRespond(long useId, int responderSeat) => HasHappyZl && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { } action } use && action.Type == CardActionType.Use && action.ActorSeat == use.SourceSeat && action.EffectiveKind == use.CardKind && HappyZlCannotRespond(action, responderSeat);
-    internal bool HappyZlNullificationForbidden(NullificationWindowFrame window, int responderSeat)
-    {
-        if (!HasHappyZl || !_coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(window))
-            return false;
-        if (window.ChainDepth == 0)
-            return window.DelayedReturn is null && HappyZlCannotRespond(window.ParentFrameId, responderSeat);
-        if (window.HappyZhangLiao is not { } r || r.Window != window.Id || r.Parent != window.ParentFrameId || r.Depth != window.ChainDepth || HappyZlColor(r.Actor, r.Target, r.Color)is not { } grant || grant.FrameId != r.GrantFrame)
-            return false;
-        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZlCounterspellEvent>().Count(e => e.Receipt == r) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == r.ActionId && e.Action.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(window) && e.Action.ActorSeat == r.Actor && e.Action.Type == CardActionType.Response && e.Action.EffectiveKind == CardKind.Nullification && HappyZlCannotRespond(e.Action, responderSeat));
-    }
-
-    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 40980)]
-    internal void ObserveHappyZlCounterspell(IGameEvent payload)
-    {
-        if (!HasHappyZl || payload is not CardActionAcceptedEvent { Action: { Type: CardActionType.Response, EffectiveKind: CardKind.Nullification } a } || _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } w || w.ChainDepth < 1 || !_coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(w) || a.ParentActionId != _coreDelayedNullificationOperations.Value.NullificationParentActionId(w) || a.ResponderSeat != a.ActorSeat || a.RequesterSeat is not null || a.OpponentSeat != w.SourceSeat)
-            return;
-        var grant = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZlColorEvent>().LastOrDefault(e => e.Source.OwnerSeat == a.ActorSeat && HappyZlCannotRespond(a, e.Target));
-        if (grant?.Color is not { } color)
-            return;
-        var receipt = new HappyZlCounterspell(w.Id, w.ParentFrameId, w.ChainDepth, a.ActionId, a.ActorSeat, grant.Target, color, grant.FrameId);
-        _coreRuntimeOperations.ReplaceRuntimeFrame(w.Id, w with { HappyZhangLiao = receipt });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyZlCounterspellEvent(receipt));
-    }
     internal bool HappyZlMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p)
     {
         if (f.HappyZhangLiao is not { } r || e?.Op != r.Op || p != f.PendingMovementContinuation || p.SubjectSeat != f.OwnerSeat || p.BeforeCount != 0 || p.CoverageResultBind is not null || r.Stage is not (HappyZlStage.GainChildren or HappyZlStage.SlotChildren or HappyZlStage.RestoreChildren or HappyZlStage.DrawChildren or HappyZlStage.DiscardChildren))

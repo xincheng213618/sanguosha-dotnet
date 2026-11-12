@@ -268,6 +268,8 @@ internal sealed partial class CoreGameEngineCardConversionsRuntime
             _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         _characterKongShuOlOperations.BindLeiluanResponsePayment(resolutionId, action);
         _characterGuanHaiOlOperations.BindXieweiResponsePayment(resolutionId, action);
+        if (action.EffectiveKind == CardKind.Nullification && _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault() is { } counterspell)
+            _counterspellResponses.Bind(counterspell.Id, action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(action));
         _coreOffTurnUsedCardsOperations.CaptureOffTurnResponseUseOrigin(resolutionId, action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramViewAsConvertedEvent(resolutionId, selection.Source.SkillId, selection.Source.BindingId, responder.Seat, Array.AsReadOnly(current.Cards.Select(card => card.Id).ToArray()), selection.OutputKind, IsUse: false, [responseTargetSeat]));

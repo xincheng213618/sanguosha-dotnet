@@ -24,7 +24,7 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
 
         foreach (var physicalCard in group.PhysicalCards)
         {
-            if (_nativeMaterialClaims.PreservesMaterialAtCompletion(group.ResolutionId, physicalCard.Id) || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial3(group.ResolutionId, physicalCard.Id))
+            if (_nativeMaterialClaims.PreservesMaterialAtCompletion(group.ResolutionId, physicalCard.Id))
                 continue;
             var cardLocation = _cardZonesOperations._cardZones.GetLocation(physicalCard.Id);
             if (cardLocation == CardLocation.Processing)
@@ -75,7 +75,7 @@ internal sealed partial class CoreNativeGroupCompletionRuntime
 
         if (_coreExtraCardEffectRoundsOperations.TryBeginExtraCardEffectRound(group.ResolutionId))
             return;
-        if (!_characterTianChouOlOperations.IsTianChouShandaoUse(group.ResolutionId) && !_coreTieredRoundZeroReturnsOperations.SkipTieredRoundZeroFinishedMovement(group.ResolutionId, group.Card) && !_characterDiaoChanLeOperations.SkipDiouFinishedMovement(group.ResolutionId, group.Card) && !_characterXiaoQiaoMouOlOperations.SkipMouXqJueyanFinishedMovement(group.ResolutionId, group.Card) && !_coreVirtualOrdinaryTrickUsesOperations.IsProgramVirtualOrdinaryTrickUse(group.ResolutionId) && !_nativeMaterialClaims.PreservesMaterialAtCompletion(group.ResolutionId, group.Card.Id) && !_characterMiHengLeOperations.IsSiruiOutsideGeneralWeaponMaterial(group.ResolutionId, group.Card.Id) && !_coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial3(group.ResolutionId, group.Card.Id) && !(_coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)is { } completedMaterialUse && _characterXunXuAnniversaryOperations.TryFinishAnniversaryXunXuUseMaterials(completedMaterialUse)))
+        if (!_characterTianChouOlOperations.IsTianChouShandaoUse(group.ResolutionId) && !_coreTieredRoundZeroReturnsOperations.SkipTieredRoundZeroFinishedMovement(group.ResolutionId, group.Card) && !_characterDiaoChanLeOperations.SkipDiouFinishedMovement(group.ResolutionId, group.Card) && !_characterXiaoQiaoMouOlOperations.SkipMouXqJueyanFinishedMovement(group.ResolutionId, group.Card) && !_coreVirtualOrdinaryTrickUsesOperations.IsProgramVirtualOrdinaryTrickUse(group.ResolutionId) && !_nativeMaterialClaims.PreservesMaterialAtCompletion(group.ResolutionId, group.Card.Id) && !(_coreCardUseLifecycleOperations.LifecycleCardUse(group.ResolutionId)is { } completedMaterialUse && _characterXunXuAnniversaryOperations.TryFinishAnniversaryXunXuUseMaterials(completedMaterialUse)))
         {
             var cardLocation = _cardZonesOperations._cardZones.GetLocation(group.Card.Id);
             if (cardLocation == CardLocation.Processing)

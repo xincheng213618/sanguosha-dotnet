@@ -14,77 +14,23 @@ internal sealed partial class CharacterChengYuMouRuntime
     }
 
     internal static bool MouCySameAction(CardActionContext a, CardActionContext b) => (a.ActionId, a.ParentActionId, a.Type, a.ActorSeat, a.ProviderSeat, a.RequesterSeat, a.ResponderSeat, a.OpponentSeat, a.EffectiveKind, a.EffectiveSuit, a.EffectiveRank) == (b.ActionId, b.ParentActionId, b.Type, b.ActorSeat, b.ProviderSeat, b.RequesterSeat, b.ResponderSeat, b.OpponentSeat, b.EffectiveKind, b.EffectiveSuit, b.EffectiveRank) && a.PhysicalCards.SequenceEqual(b.PhysicalCards) && a.ConversionChain.SequenceEqual(b.ConversionChain);
-    internal bool ValidMouCyInvalidation(MouCyUseInvalidatedEvent proof, CardActionContext action, long parent)
+    internal void ApplyMouCyInvalidation(ProgramSkillFrame f)
     {
-        var record = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouCyNameRecordedEvent>().SingleOrDefault(r => r.FrameId == proof.RecordFrameId);
-        var started = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouCyStartedEvent>().SingleOrDefault(s => s.FrameId == proof.FrameId);
-        return record is not null && started is not null && proof.Source.SkillId == MouChengYuAnniversaryRuntime.Shizha && proof.Source.BindingId == "consume-name" && record.Source.OwnerSeat == proof.Source.OwnerSeat && record.Source.SkillInstanceId == proof.Source.SkillInstanceId && record.GameplayHash == proof.GameplayHash && record.Name == CoreGameEngineNamedAmbushRuntime.AmbushCardName(proof.Use.Action.EffectiveKind) && proof.GameplayHash == _contentRegistryOperations._contentRegistry.GetSkill(proof.Source.SkillId).Program?.GameplayHash && started.Source == proof.Source && started.GameplayHash == proof.GameplayHash && started.Operation == SkillProgramEffectOp.ConsumeMouChengYuAnniversaryShizha && started.ParentId == proof.Use.WindowId && record.Round == started.Round && proof.Use.ParentId == parent && MouCySameAction(proof.Use.Action, action) && proof.Use.Response == (action.Type == CardActionType.Response) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouCyNameConsumedEvent>().Count(e => e.FrameId == proof.FrameId && e.RecordFrameId == record.FrameId && e.ActionId == action.ActionId) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouCyUseInvalidatedEvent>().Count(e => e.FrameId == proof.FrameId && e.RecordFrameId == proof.RecordFrameId && e.Source == proof.Source && e.GameplayHash == proof.GameplayHash && e.Use.WindowId == proof.Use.WindowId && e.Use.ParentId == proof.Use.ParentId && e.Use.Response == proof.Use.Response && MouCySameAction(e.Use.Action, proof.Use.Action)) == 1;
-    }
-
-    internal void ApplyMouCyInvalidation(ProgramSkillFrame f, MouCyUseInvalidatedEvent proof)
-    {
-        if (!MouChengYuAnniversary.Valid(f) || f.MouChengYuAnniversary is not { Stage: MouCyStage.Invalidate, Use: { } u } || MouCyUse(f.WindowContext!)is not { } live || live.WindowId != u.WindowId || live.ParentId != u.ParentId || !MouCySameAction(live.Action, u.Action) || !ValidMouCyInvalidation(proof, u.Action, u.ParentId))
+        if (!MouChengYuAnniversary.Valid(f) || f.MouChengYuAnniversary is not { Stage: MouCyStage.Invalidate, Use: { } u } || MouCyUse(f.WindowContext!)is not { } live || live.WindowId != u.WindowId || live.ParentId != u.ParentId || !MouCySameAction(live.Action, u.Action))
             throw new InvalidOperationException("Shizha cannot invalidate a different committed native use.");
         if (!u.Response)
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(u.ParentId, p => p with { MouCyInvalidation = proof });
+            _nativeCardActionInvalidations.IssueUse(u.ParentId, u.Action, new(SimpleCancellation: new(
+                NativeSimpleCardCancellationBoundary.EarlySimple, [SimpleCardUseEffect.EquipmentPlacement],
+                new("skill-program.mou:shizha.ineffective"), Priority: 10)));
         else if (u.Action.EffectiveKind == CardKind.Dodge)
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(u.ParentId, p => p with { MouCyResponseInvalidations = (p.MouCyResponseInvalidations ?? []).Append(proof).ToArray() });
+            _nativeCardActionInvalidations.IssueDodge(u.ParentId, u.Action);
         else if (u.Action.EffectiveKind == CardKind.Nullification && _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().SingleOrDefault(p => p.Id == u.ParentId)is { NamedAmbushResponse: { } r } counter && r.ActionId == u.Action.ActionId)
-            _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(counter with { MouCyResponseInvalidation = proof });
+            _nativeCardActionInvalidations.IssueCounterspell(counter.Id, u.Action);
         else
             throw new InvalidOperationException("Shizha response lost its original typed native owner.");
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Name)} 发动【识诈】，令【{(CardCatalog.Get(u.Action.EffectiveKind).DisplayName)}】无效。", f.OwnerSeat, u.Action.ActorSeat);
     }
 
-    internal bool IsMouCyUseIneffective(CardUseFrame use)
-    {
-        if (use.MouCyInvalidation is not { } p)
-            return false;
-        if (use.Action is not { } a || !ValidMouCyInvalidation(p, a, use.Id))
-            throw new InvalidOperationException("Shizha lost its exact consumed-name provenance.");
-        return true;
-    }
-
-    internal bool ContinueMouCyIneffectiveDodge(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation)
-    {
-        if (continuation != ProgramCardContinuation.Dodge || _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.MouCyResponseInvalidations is not { } proofs)
-            return false;
-        var matches = proofs.Where(p => p.Use.Action.ActionId == action.ActionId).ToArray();
-        if (matches.Length == 0)
-            return false;
-        if (action.ParentActionId != _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.Action?.ActionId || attack.TargetSeat != action.ActorSeat || action.EffectiveKind != CardKind.Dodge || matches.Any(p => !ValidMouCyInvalidation(p, action, attack.ResolutionId)))
-            throw new InvalidOperationException("Shizha's ineffective Dodge changed its original Slash or real response identity.");
-        _coreRoundOnceCardlessNativeResponsesOperations.ClearRoundOnceCardlessDodgeResponse(attack);
-        _coreTieredRoundZeroResponsesOperations.ClearTieredRoundDodgeResponse(attack);
-        _coreChainedStateBasicReturnsOperations.ClearChainedStateBasicDodgeResponse(attack);
-        _coreDrawFundedDistinctBasicResponsesOperations.Value.ClearDrawFundedDistinctBasicDodgeResponse(attack);
-        _coreNativeCardUseFramesOperations.SetCardUseStep(attack.ResolutionId, ResolutionFrameStep.ResolvingEffect);
-        if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))
-            _coreNativeAttackCompletionOperations.CompleteAttack(attack);
-        return true;
-    }
-
     internal bool HasMouCyMatchingName(int actor, CardKind kind) => HasMouChengYuAnniversary && _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive).Any(owner => _coreNationalSkillsOperations.GetSkillBindingShard(owner).GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCommitted).Any(b => b.SkillId == MouChengYuAnniversaryRuntime.Shizha && b.Trigger.Id == "consume-name" && MouChengYuAnniversary.Names(owner.Seat, b.SkillInstanceId).Any(n => n.Name == CoreGameEngineNamedAmbushRuntime.AmbushCardName(kind))));
-    internal bool MouCyCounterspellInvalidated(NullificationWindowFrame pending, CardActionContext action)
-    {
-        if (pending.MouCyResponseInvalidation is not { } p)
-            return false;
-        if (pending.NamedAmbushResponse is not { } r || r.ActionId != action.ActionId || !ValidMouCyInvalidation(p, action, pending.Id))
-            throw new InvalidOperationException("Shizha's counterspell lost its typed deferred native response.");
-        return true;
-    }
-
     internal bool TryMouCyEquipmentCommitted(long id, Card equipment) => HasMouCyMatchingName(_coreCardUseLifecycleOperations.LifecycleCardUse(id)!.SourceSeat, equipment.Kind) && _coreCardUseLifecycleOperations.TryBeginCommittedCardUse(id, ProgramCardContinuation.CommittedSimpleCard, simple: new(equipment.Id, SimpleCardUseEffect.EquipmentPlacement));
-    internal bool ContinueMouCyIneffectiveSimple(long id, ProgramSimpleCardContinuation continuation)
-    {
-        if (continuation.Effect != SimpleCardUseEffect.EquipmentPlacement || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { } u || !IsMouCyUseIneffective(u))
-            return false;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != id || u.Action is not { Type: CardActionType.Use })
-            throw new InvalidOperationException("Shizha lost its exact native simple Use return.");
-        foreach (var c in _coreNativeTrickUseOperations.GetCardUsePhysicalCards(id).Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.Processing))
-            _corePhysicalMovementFacadesOperations.MoveCard(c, CardLocation.Processing, CardLocation.DiscardPile, new("skill-program.mou:shizha.ineffective"));
-        var card = u.CardId == 0 ? new Card(0, u.CardKind, Suit.None, 0) : _coreAdvancedLifecycleOperations.GetAdvancedCard(u.CardId);
-        _coreNativeCardUseCompletionOperations.FinishCardUse(id, card, u.CardKind);
-        return true;
-    }
 }

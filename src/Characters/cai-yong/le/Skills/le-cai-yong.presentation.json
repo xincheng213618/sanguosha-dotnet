@@ -2,6 +2,7 @@
   "schemaVersion": 3,
   "skills": {
     "le:jiaowei": {
+      "cardMarks": { "xian": "弦" },
       "name": "焦尾",
       "description": "锁定技，游戏开始时，你的初始手牌增加“弦”标记且不计入手牌上限。当你失去“弦”后，防止你本回合下次受到的伤害。"
     },

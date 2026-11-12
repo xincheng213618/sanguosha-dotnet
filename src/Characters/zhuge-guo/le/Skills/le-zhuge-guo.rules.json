@@ -2,6 +2,7 @@
   "skills": [
     {
       "id": "le:xidi", "revision": 1,
+      "cardPolicies": [{"id":"marked-hand-exemption","kind":"handLimitCardKindExemption","handLimitMatch":{"mark":"xidi"}}],
       "triggers": [
         { "id": "mark-initial-flutes", "window": "gameStarting", "subject": "owner", "optional": false,
           "effects": [{ "op": "markInitialHand", "mark": "xidi", "target": "owner" }] },

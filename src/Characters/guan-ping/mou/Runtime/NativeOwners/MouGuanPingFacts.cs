@@ -37,7 +37,9 @@ internal sealed class MouGuanPingFacts(EngineStates.CoreActualTurnProgressState 
     {
         var actor = matchParticipantsState.ReferenceToPlayers[owner];
         var selection = new ProgramMultiCardViewAsSelection(cards, new(MouGuanPingComposition.Skill, MouGuanPingComposition.Binding, owner, getCoreGameEngineNationalSkillsRuntime().GetRuntimeSkillInstanceId(actor, MouGuanPingComposition.Skill)), CardKind.Slash);
-        return Array.AsReadOnly(matchParticipantsState.ReferenceToPlayers.Where(t => getCoreNativeTargetLegalityRuntime().CanUseVirtualSlashTarget(actor, t, physicalSuit: getCoreGameEngineGuanHaiBridgesRuntime().ProgramMultiCardSuit(actor, selection), effectiveColor: getCoreGameEngineGuanHaiBridgesRuntime().ProgramMultiCardColor(actor, selection), physicalCardIds: cards.Select(c => c.Id).ToArray(), ignoreDistance: true, conversionSource: selection.Source, countsTowardLimit: false)).Select(t => t.Seat).ToArray());
+        return getCoreNativeTargetLegalityRuntime().GetVirtualSlashTargetSeats(actor, matchParticipantsState.ReferenceToPlayers,
+            physicalSuit: getCoreGameEngineGuanHaiBridgesRuntime().ProgramMultiCardSuit(actor, selection), effectiveColor: getCoreGameEngineGuanHaiBridgesRuntime().ProgramMultiCardColor(actor, selection),
+            physicalCardIds: cards.Select(c => c.Id).ToArray(), ignoreDistance: true, conversionSource: selection.Source, countsTowardLimit: false);
     }
 
     public CardUseFrame? Use(long id) => getCoreGameEngineCardUseLifecycleRuntime().LifecycleCardUse(id);

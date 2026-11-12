@@ -2,7 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentEntries
 {
-    internal void BeginDrawFundedDistinctBasic(CharacterState actor, CardConversionSource source, CardKind kind, IReadOnlyList<int> targets, PendingDecision original, GameEngine.DrawFundedBasicNeed need) => _resolve().BeginDrawFundedDistinctBasic(actor, source, kind, targets, original, need);
+    internal void BeginDrawFundedDistinctBasic(CharacterState actor, CardConversionSource source, CardKind kind, IReadOnlyList<int> targets, PendingDecision original, GameEngine.DrawFundedBasicNeed need, ProgramSlashRequestAcceptance? programSlashRequest = default, ProgramSlashRequestIdentity? programSlashRequestIdentity = default) => _resolve().BeginDrawFundedDistinctBasic(actor, source, kind, targets, original, need, programSlashRequest, programSlashRequestIdentity);
     internal void BeginDrawFundedDistinctBasicChild(long ownerFrameId, long childFrameId) => _resolve().BeginDrawFundedDistinctBasicChild(ownerFrameId, childFrameId);
     internal void CancelDrawFundedDistinctBasicAttempt(DrawFundedDistinctBasicFrame frame) => _resolve().CancelDrawFundedDistinctBasicAttempt(frame);
     internal void ContinueDrawFundedDistinctBasic(long frameId) => _resolve().ContinueDrawFundedDistinctBasic(frameId);

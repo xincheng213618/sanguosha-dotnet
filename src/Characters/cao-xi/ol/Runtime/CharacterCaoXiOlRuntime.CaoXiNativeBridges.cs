@@ -15,6 +15,6 @@ internal sealed partial class CharacterCaoXiOlRuntime
     {
         if (!HasCaoXiGangshuCapability || continuation != ProgramCardContinuation.NullificationResponse || _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { NamedAmbushResponse: { } response } pending)
             return;
-        _coreNamedAmbushInvalidationOperations.CompleteNamedAmbushCounterspell(pending);
+        _coreNativeNullificationOperations.CompleteCounterspellResponse(pending);
     }
 }

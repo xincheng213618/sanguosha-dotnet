@@ -68,7 +68,11 @@ internal sealed class ProgramNativeReturnCatalog
         var preparations = new SortedDictionary<int, (Preparation Entry, NativeUsePreparationAttribute Attribute)>();
         var useReturns = new SortedDictionary<int, UseReturn>();
         var attackReturns = new SortedDictionary<(NativeAttackReturnPhase, int), AttackReturn>();
-        foreach (var method in methods)
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(NativeUseValidationAttribute), inherit: true) ||
+                     method.IsDefined(typeof(NativeUsePreparationAttribute), inherit: true) ||
+                     method.IsDefined(typeof(NativeUseReturnAttribute), inherit: true) ||
+                     method.IsDefined(typeof(NativeAttackReturnAttribute), inherit: true)))
         {
             if (method.GetCustomAttribute<NativeUseValidationAttribute>() is { } validation)
             {

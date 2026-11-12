@@ -40,6 +40,28 @@ internal static class ShanheDamageReplacementChecks
         s.Cold();
     }
 
+    public static void IssuedNativePeachRecoveryReturnsBloodBladeToOriginalUseCold()
+    {
+        var s = Scenario.Start(shenqu: true);
+        var peach = s.V().Hand.Single(c => c.Kind == CardKind.Peach).Id;
+        var enemyHp = s.G.CreateSnapshot(0).Players.Skip(1).Sum(p => p.Hp);
+        s.Use("hurt-one");
+        s.Need(s.ColdNativePeachAttack,
+            "Cold replay must preserve the real issued Peach, its HP application and the nested recovery counter.");
+        var issued = s.Events<HulaoPeachIssuedEvent>().Single();
+        var applied = s.Events<NativeCardRecoveryAppliedEvent>().Single();
+        s.Need(s.V().Hp == 12 && s.G.CreateSnapshot(0).Players.Skip(1).Sum(p => p.Hp) == enemyHp - 1 &&
+            applied.CardUseFrameId == issued.Origin.Issuance.CardUseFrameId &&
+            applied.Receipt is { HpBefore: 11, HpAfter: 12, CardKind: CardKind.Peach } &&
+            s.Events<HulaoPeachReturnedEvent>().Single().Origin == issued.Origin &&
+            s.Events<ProgramBindingStartedEvent>().Count(e => e.SkillId == "shanhe:xueren") == 1,
+            "A real issued Peach returns once to its original program after the recovery counter's native attack.");
+        s.Need(s.G.CardMovements.Count(m => m.CardId == peach && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
+            s.G.CardMovements.Count(m => m.CardId == peach && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile) == 1,
+            "The accepted Peach's actual physical payment and retirement each occur once across nested recovery and replay.");
+        s.Cold();
+    }
+
     private sealed class Scenario(GameEngine game, ContentRegistry registry)
     {
         private bool _traceRecoveredDyingAttack;

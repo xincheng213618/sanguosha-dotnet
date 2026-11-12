@@ -20,7 +20,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         else if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var card = new Card(0, kind, Suit.None, 0);
-            var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, physicalSuit: Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: [], conversionSource: source)).ToArray();
+            var targets = _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, _coreMatchParticipantsPlayersAccess._players, kind, physicalSuit: Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: [], conversionSource: source).Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).ToArray();
             actions.AddRange(targets.Select(t => new LegalAction(LegalActionKind.Slash, 0, t.Seat, $"绝颜：对{(t.Name)}使用【{(card.DisplayName)}】", kind) { ConversionSource = source }));
             _coreProgramCardUseRulesOperations.AddProgramTargetCountSlashActions(actions, actor, card, targets, card.DisplayName, kind, source, null);
         }

@@ -7,7 +7,7 @@ internal sealed partial class CoreGameEngineShanheDoubleStealRuntime
     {
         use = null !;
         window = null !;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } identity } || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.Action is not { Type: CardActionType.Use } action || action.ActorSeat != owner || w.TrickContinuation is not { ActionKind: LegalActionKind.Snatch } || w.CompletedResponseReturn is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { } actual, ShanheSchoolTrick: null } current || current.SourceSeat != owner || actual.ActionId != action.ActionId || identity.CardActionId != actual.ActionId || identity.ParentCardUseFrameId != current.Id || current.CardKind != CardKind.Snatch || actual.EffectiveKind != CardKind.Snatch)
+        if (context is not { Window: SkillProgramTriggerWindow.CardUseCommitted, CardUse: { } identity } || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == context.ParentFrameId)is not ProgramCardTriggerWindowFrame w || w.Action is not { Type: CardActionType.Use } action || action.ActorSeat != owner || w.TrickContinuation is not { ActionKind: LegalActionKind.Snatch } || w.CompletedResponseReturn is not null || _coreCardUseLifecycleOperations.LifecycleCardUse(w.ParentFrameId)is not { Action: { } actual } current || current.SourceSeat != owner || actual.ActionId != action.ActionId || identity.CardActionId != actual.ActionId || identity.ParentCardUseFrameId != current.Id || current.CardKind != CardKind.Snatch || actual.EffectiveKind != CardKind.Snatch || current.EffectEpisodes?.Episodes.Any(e => e.Issue.Source.SkillId == ShanheDoubleStealPrograms.SkillId) == true)
             return false;
         use = current;
         window = w;
@@ -23,15 +23,7 @@ internal sealed partial class CoreGameEngineShanheDoubleStealRuntime
         if (frame.SkillId != ShanheDoubleStealPrograms.SkillId || frame.InstructionIndex != 1 || !TryGetShanheDoubleStealUse(frame.OwnerSeat, frame.WindowContext, out var use, out var window))
             throw new InvalidOperationException("Double Steal requires its exact accepted original Snatch use.");
         var source = new CardConversionSource(frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-        var native = new ExtraCardEffectState
-        {
-            Source = source,
-            ProgramFrameId = frame.Id,
-            ActionId = use.Action!.ActionId,
-            AutomaticGameplayHash = frame.GameplayHash,
-            Trick = window.TrickContinuation
-        };
-        _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { ShanheSchoolTrick = new(use.Action.ActionId, frame.Id, window.Id, frame.GameplayHash, native) });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShanheSchoolTrickIssuedEvent(use.Id, use.Action.ActionId, frame.Id, window.Id, source, frame.GameplayHash));
+        _effectEpisodes.Issue(use.Id, new(frame.Id, frame.InstructionIndex - 1, 0, source, frame.GameplayHash,
+            new(80)), window.TrickContinuation);
     }
 }

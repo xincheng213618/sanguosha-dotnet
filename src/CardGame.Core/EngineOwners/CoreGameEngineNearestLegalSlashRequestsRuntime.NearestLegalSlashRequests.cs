@@ -51,9 +51,17 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
             NearestLegalSlashRequest = new(actorSeat, Array.AsReadOnly(nearest), $"nearest-{(active.InstructionIndex)}-{(actorSeat)}")
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(active);
+        var ordinal = active.NumberBindings.Single(binding => binding.Name == "participant-cursor-" + (active.InstructionIndex - 1)).Value;
+        var chaos = _coreWenheChaosOperations.Value.IsExactWenheChaos(active);
+        _slashRequests.Issue(active, actorSeat,
+            new(ProgramSlashRequestTargetSource.NearestLiving, nearest, active.NearestLegalSlashRequest!.ResultBind,
+                RetainSourceLoss: chaos, RetainOwnerDeath: chaos, NearestStrictSnapshot: true), ordinal);
+        active = _coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id);
         var choices = NearestLegalSlashChoices(active);
         if (choices.All(choice => choice.Parameters.GetValueOrDefault("request-option") == "decline") && !_coreChainedStateBasicConversionsOperations.HasChainedStateBasicProgramSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat], nearest) && !_coreDrawFundedDistinctBasicOffersOperations.HasDrawFundedDistinctBasicProgramSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat], nearest) && !_coreRoundOnceCardlessProgramRequestsOperations.HasRoundOnceCardlessProgramSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat], nearest) && !_characterMaXiuMaTieOlOperations.HasKenshangProgramSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat], nearest) && !_characterChengJiChengCuiOlOperations.HasTousuiProgramSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat], nearest) && !_characterGuoTuOlOperations.HasWeijieProgramSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat], nearest) && !_characterLiuFengBoundaryOperations.HasBoundaryLiuFengProgramSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat], nearest) && !(_characterLiuZhangOlOperations.HasZonghuProgramSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat], nearest) || _characterHuanShuJunOlOperations.HasHuanpeiProgramSlash(_coreMatchParticipantsPlayersAccess._players[actorSeat], nearest)))
         {
+            _slashRequests.Close(active);
+            active = _coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(active with { NearestLegalSlashRequest = null });
             return _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(active.Id, active.SkillId, actorSeat, hpAmount);
         }
@@ -165,6 +173,8 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
 
         if (canonical.Parameters["request-option"] == "decline")
         {
+            _slashRequests.Close(frame);
+            frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(frame with { NearestLegalSlashRequest = null });
             if (_kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(frame.Id, frame.SkillId, draft.ActorSeat, effect.Amount) == SkillProgramStepOutcome.Continue)
                 _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
@@ -183,6 +193,8 @@ internal sealed partial class CoreGameEngineNearestLegalSlashRequestsRuntime
         var(cards, kind, conversion) = _coreAssistedSlashPaymentOperations.ReadAssistedSlashPayment(actor, canonical);
         if (!draft.NearestSeats.Contains(target) || !NearestSlashPaymentHasRange(actor, target, cards, conversion, kind) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], cards[0], conversion, kind, noEffectiveRank: cards.Count > 1, specificEffectiveRank: canonical.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, cards) : null, physicalCardIds: cards.Select(c => c.Id).ToArray()))
             throw new InvalidOperationException("Nearest legal Slash target or material became illegal.");
+        _slashRequests.Accept(frame, actor.Seat, target);
+        frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { NearestLegalSlashRequest = null });
         _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[target], cards[0], kind, actor.Seat, physicalCards: cards, countsTowardSlashLimit: false, usesZhuqueFan: kind == CardKind.FireSlash && (cards[0].Kind == CardKind.Slash || _coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(actor, cards[0])) && _coreNativeTargetLegalityOperations.HasZhuqueFan(actor), conversionSource: conversion, programSkillCardUseFrameId: frame.Id);
     }

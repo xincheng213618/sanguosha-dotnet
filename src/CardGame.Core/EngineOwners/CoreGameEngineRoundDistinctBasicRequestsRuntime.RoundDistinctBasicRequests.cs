@@ -6,8 +6,12 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicRequestsRuntime
     internal const string RoundDistinctBasicRequestMarker = "round-distinct-basic-request";
     internal IReadOnlyList<PromptChoice> RoundDistinctBasicRequestedSlashChoices(ProgramSkillFrame frame, int actorSeat, IReadOnlyList<int> targetSeats, string? resultBind = null)
     {
-        if (!(_contentRegistryOperations._contentRegistry.ProgramDependencies.UsesRoundDistinctBasicUse || _characterKongShuOlOperations.HasLeiluanCapability) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive)
+        if (!(_contentRegistryOperations._contentRegistry.ProgramDependencies.UsesRoundDistinctBasicUse || _characterKongShuOlOperations.HasLeiluanCapability) ||
+            _slashRequests.GetOffer(frame, actorSeat) is not { } request ||
+            resultBind != request.Spec.ResultBind)
             return[];
+        var allowedTargets = _slashRequests.GetTargets(frame, actorSeat);
+        if (targetSeats.Any(target => !allowedTargets.Contains(target))) return [];
         var actor = _coreMatchParticipantsPlayersAccess._players[actorSeat];
         var choices = new List<PromptChoice>();
         var nearest = resultBind is null;
@@ -52,6 +56,7 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicRequestsRuntime
         var source = CoreGameEngineCardConversionsRuntime.RequireConversionSource(selected);
         if (_corePlayCardHistoryOperations.ViewAsRule(source)is not ({ RoundDistinctBasicUse: not null } or { LeiluanBasicUse: not null }) || !_characterKongShuOlOperations.IsLeiluanSource(source) && selected.Cards.Count != 2 || _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(_coreMatchParticipantsPlayersAccess._players[actorSeat], selected.Cards, kind, false, source)is not { } selection || selection.OutputKind != kind || !RoundDistinctBasicRequestedSlashTarget(_coreMatchParticipantsPlayersAccess._players[actorSeat], selection, selected.Targets[0]))
             throw new InvalidOperationException("A requested pair Slash lost its exact currently legal conversion payment.");
+        _slashRequests.Accept(frame, actorSeat, selected.Targets[0]);
         return selection;
     }
 }

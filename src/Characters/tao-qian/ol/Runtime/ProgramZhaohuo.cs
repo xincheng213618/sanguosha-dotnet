@@ -50,7 +50,7 @@ internal interface IZhaohuoHost
 
 internal sealed class ResolveZhaohuoFirstVictimGiftDescriptor : ProgramOperationDescriptorBase
 {
-    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation);
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeDrawInvocation | ProgramTrackedFact.ActualTurnReturn);
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveZhaohuoFirstVictimGift;
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } =

@@ -41,15 +41,15 @@ internal sealed partial class CoreGameEngineHpLossSlashMaterialsRuntime
     {
         if (targets.Count <= 1)
             return null;
-        var cards = _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner).FirstOrDefault(p => p.Select(c => c.Id).Order().SequenceEqual(ids.Order()));
+        var cards = _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(owner, ids);
         return HasHpLossSlashTargets(owner) && cards is not null && _coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(owner) && _characterSunQuanOlMagicOperations.IsMoQuanyuCompleteZhangbaQuotaLegal(owner, targets, cards) && targets.Count <= HpLossSlashMaximum(owner, CardKind.Slash) && targets.Distinct().Count() == targets.Count && targets.All(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, _coreMatchParticipantsPlayersAccess._players[t], CardKind.Slash, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards), _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(owner, cards), ids)) ? null : new(CommandErrorCode.InvalidTarget, "The HP-based spear use lost its two real materials and legal targets.");
     }
 
-    internal void ResolveHpLossSlashZhangba(CharacterState owner, IReadOnlyList<int> targets, IReadOnlyList<Card> cards)
+    internal void ResolveHpLossSlashZhangba(CharacterState owner, IReadOnlyList<int> targets, IReadOnlyList<Card> cards, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
         if (ValidateHpLossSlashZhangba(owner, cards.Select(c => c.Id).ToArray(), targets)is { } error)
             throw new InvalidOperationException(error.Message);
-        BeginHpLossMaterialSlash(owner, cards, CardKind.Slash, targets, null, null);
+        BeginHpLossMaterialSlash(owner, cards, CardKind.Slash, targets, null, null, programSlashRequest);
     }
 
     internal SkillProgramStepOutcome BeginHpLossSelectedSlash(ProgramSkillFrame f, ProgramMultiCardViewAsSelection selection)
@@ -62,14 +62,14 @@ internal sealed partial class CoreGameEngineHpLossSlashMaterialsRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal void BeginHpLossMaterialSlash(CharacterState owner, IReadOnlyList<Card> cards, CardKind kind, IReadOnlyList<int> seats, CardConversionSource? conversion, ProgramSkillFrame? parent)
+    internal void BeginHpLossMaterialSlash(CharacterState owner, IReadOnlyList<Card> cards, CardKind kind, IReadOnlyList<int> seats, CardConversionSource? conversion, ProgramSkillFrame? parent, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
         var policy = HpLossSlashTargetSource(owner) ?? throw new InvalidOperationException("The target-count source expired before payment.");
         // BeginCardUse emits the true declaration and can consume an existing
         // next-use adjustment. Freeze this maximum before that producer runs.
         var frozenMaximum = parent?.HpLossSlashSelection?.FrozenMaximum ?? HpLossSlashMaximum(owner, kind);
         var armor = _coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(owner);
-        var id = _coreNativeCardUseOperations.BeginCardUse(cards[0], owner.Seat, seats, kind, ignoresArmor: armor, physicalCardIds: cards.Select(c => c.Id).ToArray(), conversionSource: conversion, isTrueZhangbaSlash: parent is null);
+        var id = _coreNativeCardUseOperations.BeginCardUse(cards[0], owner.Seat, seats, kind, ignoresArmor: armor, physicalCardIds: cards.Select(c => c.Id).ToArray(), conversionSource: conversion, isTrueZhangbaSlash: parent is null, programSlashRequest: programSlashRequest);
         var action = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action ?? throw new InvalidOperationException("A material Slash must keep its true accepted action.");
         var receipt = new HpLossMaterialSlashReturn(id, action.ActionId, policy.Source, policy.Hash, frozenMaximum, parent?.Id, parent?.GameplayHash, parent?.SkillInstanceId, parent?.InstructionIndex ?? 0, parent is null, _coreSlashTargetPenaltyPaymentsOperations.SlashTargetPenaltySequence + 1);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, use => use with { HpLossMaterialSlashReturn = receipt, TargetsAdjusted = true });

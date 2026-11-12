@@ -86,36 +86,18 @@ internal sealed class YangFuRuntime(IProgramRuntimeFrames frames, IProgramRuntim
         facts.HasTriggerOperation(SkillProgramEffectOp.ResolveBingzhongExtraTargets);
 
 
-    private bool TryGetBingzhongUse(int owner, ProgramSkillWindowContext context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window)
-    {
-        if (targets.TryGetDesignatedExtraTargetUse(owner, context, out use, out window)) return true;
-        use = null!; window = null!;
-        if (context is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, CardUse: { } identity } ||
-            !facts.ValidSeat(owner) || !facts.Player(owner).IsAlive || facts.Winner != Winner.None ||
-            frames.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == context.ParentFrameId) is not { Continuation: ProgramCardContinuation.Slash, CompletedResponseReturn: null } w ||
-            facts.CardUse(identity.ParentCardUseFrameId) is not { Action: { Type: CardActionType.Use } a } u || u.SourceSeat != owner || a.ActorSeat != owner ||
-            !RuntimeSkills.RuntimeRules_Core_CommonRules.IsSlashCard(u.CardKind) || a.ActionId != identity.CardActionId || w.ParentFrameId != u.Id || w.Action.ActionId != a.ActionId || w.Action.ActorSeat != owner ||
-            !w.Action.TargetSeats.SequenceEqual(u.TargetSeats) || !a.TargetSeats.SequenceEqual(u.TargetSeats) || u.DyingResponse is not null ||
-            a.ResponderSeat is not null || a.RequesterSeat is not null || a.OpponentSeat is not null || a.PhysicalCards.Count == 0 ||
-            !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(u.PhysicalCardIds ?? [u.CardId]) ||
-            !a.PhysicalCards.Any(c => targets.IsKenshangRemovedMaterial(u.Id, c.CardId) || targets.IsWuJingHejiRemovedMaterial(u.Id, c.CardId) || targets.IsSelectedForeignCardSlashRemovedMaterial(u.Id, c.CardId) || targets.IsZhangYanSujiRemovedMaterial(u.Id, c.CardId)) ||
-            a.PhysicalCards.Any(c => facts.Location(c.CardId) != CardLocation.Processing && !targets.IsKenshangRemovedMaterial(u.Id, c.CardId) && !targets.IsWuJingHejiRemovedMaterial(u.Id, c.CardId) &&
-                !targets.IsSelectedForeignCardSlashRemovedMaterial(u.Id, c.CardId) && !targets.IsZhangYanSujiRemovedMaterial(u.Id, c.CardId) && !targets.HasRelinquishedMaterial(u.Id, c.CardId) && !targets.IsExchangedCardClaim(a.ActionId, c.CardId))) return false;
-        if (frames.ParentOf(w.Id)?.Id != u.Id) return false;
-        use = u; window = w; return true;
-    }
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 27310)]
     private bool QualifyBingzhongTargets(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
         if (!trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.ResolveBingzhongExtraTargets)) return true;
-        return candidate.SkillId == "ol:bingzhong" && TryGetBingzhongUse(candidate.OwnerSeat, context, out var use, out var window) &&
+        return candidate.SkillId == "ol:bingzhong" && targets.TryGetDesignatedExtraTargetUse(candidate.OwnerSeat, context, out var use, out var window) &&
             targets.DesignatedExtraTargetCandidateMatches(candidate, context, window) && use.BingzhongTail is null &&
             targets.CapturedWholeActualTurnActorUseOrdinal(use.Action!) is { } ordinal && ordinal <= BingzhongCurrentX();
     }
     private CardUseFrame RequireBingzhongUse(ProgramSkillFrame f, out ProgramCardTriggerWindowFrame window)
     {
         if (f.SkillId != "ol:bingzhong" || f.TriggerId != "first-dynamic-x-targets" || f.SelectedTargetSeats.Count != 0 || f.WindowContext is not { } context ||
-            !TryGetBingzhongUse(f.OwnerSeat, context, out var use, out window) ||
+            !targets.TryGetDesignatedExtraTargetUse(f.OwnerSeat, context, out var use, out window) ||
             !targets.DesignatedExtraTargetCandidateMatches(new(f.OwnerSeat, f.SkillId, RuntimeSkills.RuntimeRules_Core_ProgramLifecycle.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, 0), context, window))
             throw new InvalidOperationException("Bingzhong lost its exact finalized actual actor use.");
         if (frames.ParentOf(f.Id)?.Id != window.Id || frames.ParentOf(window.Id)?.Id != use.Id)

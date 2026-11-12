@@ -29,18 +29,13 @@ internal sealed partial class CharacterLiJueOlRuntime
             var native = _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().LastOrDefault();
             if (native is null || native.ParentFrameId != responded.ResolutionId || native.ChainDepth != responded.ChainDepth)
                 return;
-            var recentAction = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.Type == CardActionType.Response && a.EffectiveKind == CardKind.Nullification && a.ActorSeat == responded.ResponderSeat && a.PhysicalCards.Any(c => c.CardId == responded.NullificationCardId) && a.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(native));
-            if (recentAction is not null)
+            var recentAction = native.ResponseRuleNode is { } node && node.ChainDepth == native.ChainDepth
+                ? node.Action : null;
+            if (recentAction is { Type: CardActionType.Response, EffectiveKind: CardKind.Nullification } &&
+                recentAction.ActorSeat == responded.ResponderSeat && recentAction.PhysicalCards.Any(c => c.CardId == responded.NullificationCardId) &&
+                recentAction.ParentActionId == _coreDelayedNullificationOperations.Value.NullificationParentActionId(native))
                 CaptureLiJueNullificationInvoice(native, recentAction, false, responded);
         }
-    }
-
-    internal void CaptureLiJueCompletedNullificationUse(long windowId, CardActionContext action)
-    {
-        if (!HasYisuanCapability || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase != TurnPhase.Play || _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber < 1)
-            return;
-        if (_resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == windowId)is NullificationWindowFrame window)
-            CaptureLiJueNullificationInvoice(window, action, false, null);
     }
 
     internal void CaptureLiJueNullificationInvoice(NullificationWindowFrame window, CardActionContext action, bool incomingAccepted, NullificationRespondedEvent? incomingResponse)

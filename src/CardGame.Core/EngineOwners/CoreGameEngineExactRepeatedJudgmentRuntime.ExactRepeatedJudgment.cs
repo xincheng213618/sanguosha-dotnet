@@ -71,7 +71,16 @@ internal sealed partial class CoreGameEngineExactRepeatedJudgmentRuntime
             var turn = next.ClaimTurn!;
             if (actual.TurnNumber != turn.TurnNumber || turn.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnNumber || turn.TurnOwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat)
                 throw new InvalidOperationException("An exact judgment receipt changed its actual turn.");
-            var grant = next.ClaimHandLimitExemption == SkillProgramClaimHandLimitExemption.ActualTurn ? _turnCardUseEffectsOperations._turnCardUseEffects.GrantHandLimitExemptCard(turn.TurnNumber, turn.TurnOwnerSeat, frame.Id, frame.InstructionIndex - 1, judgment.Id, CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), frame.OwnerSeat, card.Id, actual.Sequence) : null;
+            var issued = next.ClaimHandLimitExemption == SkillProgramClaimHandLimitExemption.ActualTurn
+                ? _handLimitExemptions.Grant(frame, NativeHandLimitExemptionRelations.JudgmentEntities, frame.OwnerSeat,
+                    new(new(), [card.Id], HandLimitExemptionExpiry.FrozenTurnCoordinates,
+                        new(turn.TurnNumber, turn.TurnOwnerSeat),
+                        NativeExpiration: SkillProgramDamageModifierExpiration.CurrentTurnEnd),
+                    next.CompletedCount)
+                : null;
+            var grant = issued is null ? null : new TurnHandLimitExemptCardGrant(issued.Sequence,
+                turn.TurnNumber, turn.TurnOwnerSeat, frame.Id, frame.InstructionIndex - 1, judgment.Id,
+                CoreGameEngineCardUseModulesRuntime.CreateProgramTurnEffectSource(frame), frame.OwnerSeat, card.Id, actual.Sequence);
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(active with { RepeatedJudgment = active.RepeatedJudgment!with { LastClaimReceipt = new(frame.InstructionIndex - 1, judgment.Id, card.Id, actual.Sequence, actual.From, actual.To, turn.TurnNumber, turn.TurnOwnerSeat, grant?.GrantSequence) } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramJudgmentCardClaimedEvent(judgment.Id, frame.SkillId, frame.OwnerSeat, card.Id, card.Kind));

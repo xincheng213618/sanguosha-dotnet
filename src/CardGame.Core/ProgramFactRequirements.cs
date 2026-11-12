@@ -47,3 +47,25 @@ internal readonly record struct ProgramFactRequirements(
           ProgramTrackedFact.PublicCardRevealHistory | ProgramTrackedFact.NativeGive |
           ProgramTrackedFact.ActualTurnReturn)) == ProgramTrackedFact.None;
 }
+
+// Boundary consumers declare their own immutable lifetime data. Capture demand
+// is derived once at definition compilation, independently of operation or source names.
+internal static class ProgramRuleLifetimeFacts
+{
+    internal static ProgramFactRequirements ForBoundaries(IReadOnlyList<SkillStateBoundarySpec> boundaries)
+    {
+        var facts = ProgramTrackedFact.None;
+        foreach (var boundary in boundaries)
+            facts |= boundary.Event switch
+            {
+                SkillStateBoundaryEvent.PhaseStarted => ProgramTrackedFact.ActualDiscardRecoveryPhase,
+                SkillStateBoundaryEvent.PhaseEnded => ProgramTrackedFact.ActualPhaseEnd,
+                SkillStateBoundaryEvent.RoundAdvanced => ProgramTrackedFact.ActualRound,
+                SkillStateBoundaryEvent.ActualUse => ProgramTrackedFact.ActualCardUseHistory,
+                SkillStateBoundaryEvent.ActualTurnReturned => ProgramTrackedFact.ActualTurnReturn,
+                _ => ProgramTrackedFact.None
+            };
+        // Dying, death and turn-start/end facts already belong to unconditional native boundaries.
+        return new(facts, facts);
+    }
+}

@@ -20,7 +20,6 @@ internal sealed partial class CharacterDengAiAnniversaryGodEntries
     internal bool IsShenDaCarrier(int id) => _resolve().IsShenDaCarrier(id);
     internal bool IsShenDaCarrierDestroyedMaterial(CardMovementRecord m) => _resolve().IsShenDaCarrierDestroyedMaterial(m);
     internal bool IsShenDaCarrierDestroyedMaterial2(int id, CardLocation from, CardLocation to) => _resolve().IsShenDaCarrierDestroyedMaterial(id, from, to);
-    internal bool IsShenDaCarrierDestroyedMaterial3(long use, int id) => _resolve().IsShenDaCarrierDestroyedMaterial(use, id);
     internal bool IsShenDaCuixinSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => _resolve().IsShenDaCuixinSettlementBatch(f, b);
     internal bool IsShenDaCuixinTrick(long id) => _resolve().IsShenDaCuixinTrick(id);
     internal bool IsShenDaCuixinUse(long id) => _resolve().IsShenDaCuixinUse(id);

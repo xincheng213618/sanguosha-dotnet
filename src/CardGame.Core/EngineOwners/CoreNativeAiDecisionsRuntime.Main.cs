@@ -241,7 +241,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
             _coreCardConversionsOperations.CaptureAiCardResponseChoice(decision, selectedSlash, _coreProgramCardLegalityOperations.CardLegality.SelectAiNativeSlashKind(new(decision, selectedSlash, _characterCaoZhiLeOperations.FuleForcedAiSlashKind(decision, selectedSlash, _coreOwnPublicPileConversionsOperations.PhysicalSlashUseBaseKind(owner, selectedSlash)))));
             _coreNativeBorrowedSwordOperations.ResolveBorrowedSwordSlashChoice(pending, selectedSlash);
         }
-        else if (useSlash && _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner).FirstOrDefault()is { } pair)
+        else if (useSlash && _coreNativeResponseMaterialQueriesOperations.FirstZhangbaSlashPair(owner)is { } pair)
         {
             _coreNativeBorrowedSwordOperations.ResolveBorrowedSwordZhangbaSlashChoice(pending, pair);
         }
@@ -474,7 +474,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
         }
 
         var slashes = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(responder, CardKind.Slash);
-        var zhangbaPair = _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(responder).FirstOrDefault();
+        var zhangbaPair = _coreNativeResponseMaterialQueriesOperations.FirstZhangbaSlashPair(responder);
         var programSelection = _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(responder, CardKind.Slash, forResponse: true).FirstOrDefault();
         var responseDecision = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("The AI Duel response has no published choice.");
         if (_coreFriendDuelResponsesOperations.FriendDuelResponseChoices(duel, responder).FirstOrDefault()is { } friendResponse && slashes.Count == 0 && zhangbaPair is null && programSelection is null)
@@ -539,7 +539,7 @@ internal sealed partial class CoreNativeAiDecisionsRuntime
 
         var requiredCardKind = group.RequiredCardKind ?? throw new InvalidOperationException("A group response attack must declare a required card kind.");
         var responseCards = _coreNativeResponseMaterialQueriesOperations.GetResponseCards(responder, requiredCardKind);
-        var zhangbaPair = requiredCardKind == CardKind.Slash ? _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(responder).FirstOrDefault() : null;
+        var zhangbaPair = requiredCardKind == CardKind.Slash ? _coreNativeResponseMaterialQueriesOperations.FirstZhangbaSlashPair(responder) : null;
         var programSelection = requiredCardKind == CardKind.Slash ? _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(responder, CardKind.Slash, forResponse: true).FirstOrDefault() : null;
         var hasBagua = requiredCardKind == CardKind.Dodge && !attack.IgnoresArmor && _coreNativeEquipmentAndFactionQueriesOperations.HasBagua(responder) && _corePendingDecisionPolicyPipelineOperations._pendingDecision!.Choices.Any(choice => choice.Parameters.GetValueOrDefault("response") == "bagua");
         var responseDecision = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? throw new InvalidOperationException("The AI group response has no published choice.");

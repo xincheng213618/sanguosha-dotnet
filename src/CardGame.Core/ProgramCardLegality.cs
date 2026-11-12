@@ -83,7 +83,8 @@ internal sealed class ProgramCardLegalityCatalog
         ArgumentNullException.ThrowIfNull(methods);
         var entries = Enum.GetValues<ProgramCardLegalityStage>().ToDictionary(stage => stage,
             _ => new SortedDictionary<int, ProgramCardLegalityRegistration>());
-        foreach (var method in methods)
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramCardLegalityAttribute), inherit: true)))
         foreach (var attribute in method.GetCustomAttributes<ProgramCardLegalityAttribute>())
         {
             if (!Enum.IsDefined(attribute.Stage) || attribute.Order <= 0)

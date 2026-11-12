@@ -82,11 +82,10 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
         if (!ValidDamageCardColorHealth(root))
             return false;
         var r = root.DamageCardColorHealth!;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
         if (child is RecoveryReplacementFrame recovery)
-            return !r.IsRed && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(root, recovery, history) && recovery.Attempt.SourceSeat == root.OwnerSeat && recovery.Attempt.TargetSeat == root.OwnerSeat && recovery.Attempt.Amount == (_coreRecoveryAmountBonusesOperations.Value.TracksRecoveryAmountBonuses ? r.Amount : Math.Min(r.Amount, r.MaxHpBefore - r.HpBefore));
+            return !r.IsRed && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(root, recovery) && recovery.Attempt.SourceSeat == root.OwnerSeat && recovery.Attempt.TargetSeat == root.OwnerSeat && recovery.Attempt.Amount == (_coreRecoveryAmountBonusesOperations.Value.TracksRecoveryAmountBonuses ? r.Amount : Math.Min(r.Amount, r.MaxHpBefore - r.HpBefore));
         if (child is HpChangedTriggerWindowFrame hp)
-            return !r.IsRed && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReceiptMatches(root, hp, history) && hp.Change.SourceSeat == root.OwnerSeat && hp.Change.TargetSeat == root.OwnerSeat && hp.Change.HpBefore == r.HpBefore && hp.Change.Amount == Math.Min(r.Amount, r.MaxHpBefore - r.HpBefore);
+            return !r.IsRed && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReceiptMatches(root, hp) && hp.Change.SourceSeat == root.OwnerSeat && hp.Change.TargetSeat == root.OwnerSeat && hp.Change.HpBefore == r.HpBefore && hp.Change.Amount == Math.Min(r.Amount, r.MaxHpBefore - r.HpBefore);
         return _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(root, child);
     }
 
@@ -98,11 +97,10 @@ internal sealed partial class CoreGameEngineDamageCardColorHealthRuntime
             return DamageCardColorHealthFirstChild(root, child);
         if (parent is RecoveryReplacementFrame recovery)
         {
-            var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
             if (child is HpChangedTriggerWindowFrame hp)
-                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryHpReturnMatches(recovery, hp, history);
+                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryHpReturnMatches(recovery, hp);
             if (child is CardsMovedTriggerWindowFrame moved)
-                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryRewardReturnMatches(recovery, moved, history);
+                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryRewardReturnMatches(recovery, moved);
         }
 
         return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(index) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);

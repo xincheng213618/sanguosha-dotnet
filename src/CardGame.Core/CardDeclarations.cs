@@ -10,7 +10,11 @@ public sealed record CardDeclarationParentReturn(CardDeclarationPurpose Purpose,
     LegalAction? UseAction = null, int? TargetSeat = null, int RecoveryAmount = 1,
     IReadOnlyList<ProgramRecoveryPolicySource>? RecoveryPolicies = null,
     DyingResponseEvent? DyingResponse = null, bool UsesZhuqueFan = false,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] CardKind? FinalEffectiveKind = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] CardKind? FinalEffectiveKind = null)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramSlashRequestAcceptance? ProgramSlashRequest { get; init; }
+}
 
 /// <summary>Trusted paid-cost receipt owned by the actual continuation frame.</summary>
 public sealed partial record DeclaredCardPayment(long DeclarationId, long OwnerFrameId, int ProviderSeat,

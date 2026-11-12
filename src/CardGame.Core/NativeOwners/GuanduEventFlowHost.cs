@@ -1,6 +1,6 @@
 #nullable enable
 namespace CardGame.Core.NativeOwners;
-internal sealed class GuanduEventFlowHost(Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, Func<RuntimeEntries.CoreGuanduEventProgramsEntries> getCoreGuanduEventProgramsRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineRuntimeEntries> getCoreGameEngineRuntimeRuntime, KernelAdvanceEventRulesAndQueueFactCall advanceEventRulesAndQueueFact, EngineStates.CoreActualTurnProgressState actualTurnProgressState, Func<RuntimeEntries.CoreGameEngineProgramNativeDrawEntries> getCoreGameEngineProgramNativeDrawRuntime, ProgramSkillHostFactory createProgramSkillHost, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineActivityBattleRulesRuntime>> getCoreGameEngineActivityBattleRulesRuntime) : IGuanduEventFlowHost
+internal sealed class GuanduEventFlowHost(Func<INativeCardEffectEpisodes> getEffectEpisodes, Func<RuntimeEntries.CoreGameEngineProgramLifecycleEntries> getCoreGameEngineProgramLifecycleRuntime, Func<RuntimeEntries.CoreGuanduEventProgramsEntries> getCoreGuanduEventProgramsRuntime, Func<FrameStore> getFrameStore, Func<RuntimeEntries.CoreGameEngineRuntimeEntries> getCoreGameEngineRuntimeRuntime, KernelAdvanceEventRulesAndQueueFactCall advanceEventRulesAndQueueFact, EngineStates.CoreActualTurnProgressState actualTurnProgressState, Func<RuntimeEntries.CoreGameEngineProgramNativeDrawEntries> getCoreGameEngineProgramNativeDrawRuntime, ProgramSkillHostFactory createProgramSkillHost, Func<RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineActivityBattleRulesRuntime>> getCoreGameEngineActivityBattleRulesRuntime) : IGuanduEventFlowHost
 {
     public long? DamageRewardUse(long frameId)
     {
@@ -15,7 +15,7 @@ internal sealed class GuanduEventFlowHost(Func<RuntimeEntries.CoreGameEngineProg
         var use = getCoreGuanduEventProgramsRuntime().GuanduTenthUse(frame.OwnerSeat, context) ?? throw new InvalidOperationException("The tenth-card event lost its actual use.");
         var window = getFrameStore().OfType<ProgramCardTriggerWindowFrame>().Single(item => item.Id == context.ParentFrameId);
         var source = new CardConversionSource(frame.SkillId, EngineOwners.CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, frame.SkillInstanceId);
-        getCoreGameEngineRuntimeRuntime().ReplaceRuntimeFrame(use.Id, use with { ExtraCardEffect = new() { Source = source, ProgramFrameId = frame.Id, ActionId = use.Action!.ActionId, AutomaticGameplayHash = frame.GameplayHash, Simple = window.SimpleContinuation, Trick = window.TrickContinuation } });
+        getEffectEpisodes().Issue(use.Id, new(frame.Id, frame.InstructionIndex - 1, 0, source, frame.GameplayHash, new(0, TargetAdmission: NativeCardEffectEpisodeTargetAdmission.RequireCurrentTargetsLegal, ContinueOriginalAfterActorDeath: true)), window.TrickContinuation, window.SimpleContinuation);
         advanceEventRulesAndQueueFact(new AutomaticExtraCardEffectIssuedEvent(frame.Id, source, use.Id, use.Action!.ActionId, frame.GameplayHash));
     }
 

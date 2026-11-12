@@ -37,7 +37,11 @@ public sealed record ChainedStateBasicPayment(long PaymentFrameId, CardConversio
     bool WasChained, bool DesiredChained, int ActualTurnNumber, int ActualTurnOwnerSeat,
     ChainedStateBasicIntent Intent, CardKind EffectiveKind, long? ParentFrameId, long? RequestFrameId,
     long? ParentActionId, int? TargetSeat, int Cursor, PromptId OriginalPromptId, long OriginalRevision,
-    long? CharacterStateChangeId = null);
+    long? CharacterStateChangeId = null)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramSlashRequestAcceptance? RequestAcceptance { get; init; }
+}
 public sealed record ChainedStateBasicUseReceipt(ChainedStateBasicPayment Payment, long OwnerFrameId, long CardActionId);
 
 public sealed partial record CardUseFrame

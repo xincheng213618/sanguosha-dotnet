@@ -252,7 +252,7 @@ internal sealed partial class CoreGameEngineCurrentCardEnhancementsRuntime
     }
 
     internal bool HasCurrentCardEnhancement(long frameId, CurrentCardEnhancement flag) => _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { } use && (use.Enhancements & flag) != 0;
-    internal bool HasRemainingEnhancedSlashTargets(long frameId) => !_characterDaQiaoLeOperations.IsTargetScopedZixiEffectRound(frameId) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { } use && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Count > 1 && use.TargetSeats.Skip(use.TargetIndex + 1).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive);
+    internal bool HasRemainingEnhancedSlashTargets(long frameId) => !_nativeEffectEpisodes.IsActive(frameId) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SingleOrDefault(frame => frame.Id == frameId)is { } use && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Count > 1 && use.TargetSeats.Skip(use.TargetIndex + 1).Any(seat => _coreMatchParticipantsPlayersAccess._players[seat].IsAlive);
 
     SkillProgramStepOutcome ICurrentCardEnhancementProgramHost.ApplyCurrentCardEnhancements(ProgramSkillFrame frame, int maximum) => ApplyProgramCurrentCardEnhancements(frame, maximum);
 }

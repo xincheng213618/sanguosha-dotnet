@@ -55,6 +55,7 @@ public sealed record BoundaryLiuFengReceipt(CardConversionSource Source, string 
     public bool ConsequencePaid { get; init; }
     public NativeDrawOutcome? RewardDraw { get; init; }
     public int BaseDamage { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ProgramSlashRequestAcceptance? RequestAcceptance { get; init; }
     public BoundaryLiuFengNeed? Need { get; init; }
     private PendingDecision? _originalDecision;
     public PendingDecision? OriginalDecision { get => _originalDecision; init => _originalDecision = value is null ? null : RequestedDeckBasicFrame.FreezeDecision(value); }

@@ -15,6 +15,10 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         if (!_coreDeckProgramsOperations.DeckProgramSourceValid(frame) || !_coreMatchParticipantsPlayersAccess._players[seat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { FixedTargetSlash = new(seat, ignoreDistance) });
+        _slashRequests.Issue(frame, frame.OwnerSeat,
+            new(ProgramSlashRequestTargetSource.FrozenCandidates, [seat], FixedTargetFactionResultBind,
+                IgnoreDistance: ignoreDistance, UsesChoiceResult: true, ReturnProtocol: ProgramSlashRequestReturnProtocol.FixedTarget));
+        frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         PublishFixedSlashAndDeclaredDeckPrompt(frame, FixedTargetSlashChoices(frame), "选择一张【杀】对本回合角色使用。", [seat]);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -65,7 +69,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
                     choices.Add(new(new($"fixed-slash.{(frame.Id)}.typed.{(kind)}.{(conversion.SkillId)}.{(conversion.BindingId)}.{(card.Id)}"), $"将牌当【{(CardCatalog.Get(kind).DisplayName)}】使用", [card.Id], [target.Seat], p));
                 }
 
-        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor))
+        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor))
         {
             if (!Legal(pair[0], CardKind.Slash, noRank: true, rank: _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, pair), materials: pair.Select(c => c.Id).ToArray()))
                 continue;
@@ -106,6 +110,8 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         var draft = frame.FixedTargetSlash!;
         if (draft.Issued || selected.Parameters.GetValueOrDefault("request-option") == "decline")
         {
+            _slashRequests.Close(frame);
+            frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(frame with { FixedTargetSlash = null });
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
             return;
@@ -126,7 +132,10 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         {
             if (selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString())
             {
-                cards = _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor).Single(pair => pair.Select(card => card.Id).SequenceEqual(selected.Cards));
+                var pair = _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(actor, selected.Cards);
+                if (pair is null || !pair.Select(card => card.Id).SequenceEqual(selected.Cards))
+                    throw new InvalidOperationException("Sequence contains no matching element");
+                cards = pair;
                 conversion = null;
             }
             else
@@ -153,6 +162,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
 
         if (!_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[draft.TargetSeat], cards[0], conversion, kind, ignoreDistance: draft.IgnoreDistance, noEffectiveRank: cards.Count > 1, specificEffectiveRank: selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, cards) : null, physicalCardIds: cards.Select(c => c.Id).ToArray()))
             throw new InvalidOperationException("The fixed Slash target became illegal.");
+        _slashRequests.Accept(frame, actor.Seat, draft.TargetSeat);
         _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[draft.TargetSeat], cards[0], kind, actor.Seat, physicalCards: cards, countsTowardSlashLimit: false, usesZhuqueFan: kind == CardKind.FireSlash && (cards[0].Kind == CardKind.Slash || _coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(actor, cards[0])) && _coreNativeTargetLegalityOperations.HasZhuqueFan(actor), conversionSource: conversion, programSkillCardUseFrameId: frame.Id);
     }
 
@@ -167,7 +177,7 @@ internal sealed partial class CoreGameEngineFixedSlashAndDeclaredDeckProgramsRun
         var policy = _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], CardKind.Slash) ?? throw new InvalidOperationException("The fixed Slash lost its faction policy.");
         var candidates = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(frame.OwnerSeat, policy.FactionId);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(frame.Id, FactionCardRequestPurpose.AssistedProgramUse, frame.OwnerSeat, candidates, policy.FactionId, targetSeat: draft.TargetSeat, programSkillFrameId: frame.Id, policySource: policy, assistedResultBind: FixedTargetFactionResultBind);
-        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.AuthorizeProgramRequest(frame.InstructionIndex, ignoreDistance: draft.IgnoreDistance, usesChoiceResult: true);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.AuthorizeProgramRequest(frame.InstructionIndex, ignoreDistance: draft.IgnoreDistance, usesChoiceResult: true, requestIdentity: _slashRequests.GetIdentity(frame));
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(frame.Id, frame.OwnerSeat, candidates, policy.SkillId, IsActiveUse: true, draft.TargetSeat));
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();

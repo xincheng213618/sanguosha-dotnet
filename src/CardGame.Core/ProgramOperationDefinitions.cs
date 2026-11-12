@@ -124,6 +124,9 @@ internal interface IProgramOperationDescriptor
     bool UsesConversionPolarity => false;
     ProgramOperationLegalityPolicy LegalityPolicy => ProgramOperationLegalityPolicy.None;
     ProgramFactRequirements FactRequirements => default;
+    IReadOnlyList<SkillStateBoundarySpec> LifetimeBoundaries(SkillProgramEffect effect) => [];
+    ProgramFactRequirements FactRequirementsFor(SkillProgramEffect effect) =>
+        FactRequirements.Union(ProgramRuleLifetimeFacts.ForBoundaries(LifetimeBoundaries(effect)));
     bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => false;
     /// <summary>Declares that emitting ActualTurnCursorReturnedEvent is required whenever this operation is referenced.</summary>
     ProgramDependencyKinds TracksActualTurnCursorReturn => ProgramDependencyKinds.None;
@@ -183,6 +186,14 @@ internal sealed class ProgramOperationCatalog
 
     internal ProgramFactRequirements FactRequirementsFor(SkillProgramEffectOp op) =>
         _descriptors.TryGetValue(op, out var descriptor) ? descriptor.FactRequirements : default;
+    internal ProgramFactRequirements FactRequirementsFor(SkillProgramEffect effect)
+    {
+        var requirements = _descriptors.TryGetValue(effect.Op, out var descriptor) ? descriptor.FactRequirementsFor(effect) : default;
+        if (!requirements.IsValid) throw new InvalidOperationException("An operation declaration requested unknown native facts.");
+        return requirements;
+    }
+    internal IReadOnlyList<SkillStateBoundarySpec> LifetimeBoundariesFor(SkillProgramEffect effect) =>
+        _descriptors.TryGetValue(effect.Op, out var descriptor) ? descriptor.LifetimeBoundaries(effect) : [];
 
     internal bool AllowsDeadTarget(in ProgramEffectContinuationContext context) =>
         _descriptors.TryGetValue(context.Effect.Op, out var descriptor) && descriptor.AllowsDeadTarget(context);
@@ -394,11 +405,7 @@ internal sealed class ProgramOperationNodeReader
     {
         if (node.ValueKind != JsonValueKind.String) Fail(path, "must be a camelCase string");
         var text = node.GetString();
-        foreach (var value in Enum.GetValues<T>())
-        {
-            var name = Enum.GetName(value)!;
-            if (text == char.ToLowerInvariant(name[0]) + name[1..]) return value;
-        }
+        if (SkillProgramEnumText.TryParse<T>(text, out var value)) return value;
         Fail(path, $"unsupported {typeof(T).Name} value '{text}'");
         return default;
     }
@@ -434,6 +441,9 @@ internal abstract class ProgramOperationDescriptorBase : IProgramOperationDescri
     public virtual bool UsesConversionPolarity => false;
     public virtual ProgramOperationLegalityPolicy LegalityPolicy => ProgramOperationLegalityPolicy.None;
     public virtual ProgramFactRequirements FactRequirements => default;
+    public virtual IReadOnlyList<SkillStateBoundarySpec> LifetimeBoundaries(SkillProgramEffect effect) => [];
+    public virtual ProgramFactRequirements FactRequirementsFor(SkillProgramEffect effect) =>
+        FactRequirements.Union(ProgramRuleLifetimeFacts.ForBoundaries(LifetimeBoundaries(effect)));
     public virtual ProgramDependencyKinds TracksActualTurnCursorReturn => ProgramDependencyKinds.None;
     public virtual bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => false;
     public abstract SkillProgramEffect Parse(ProgramOperationNodeReader reader);

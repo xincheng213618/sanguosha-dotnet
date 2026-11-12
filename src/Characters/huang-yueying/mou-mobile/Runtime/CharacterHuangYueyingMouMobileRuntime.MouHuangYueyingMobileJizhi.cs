@@ -35,6 +35,11 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
     {
         if (f.MouHuangYueyingMobile is not { Operation: SkillProgramEffectOp.ResolveMouHuangYueyingJizhi, Stage: MouHuangYueyingMobileStage.Drawing } r || outcome.RequestedCount != 1 || outcome.RecipientSeat != f.OwnerSeat)
             throw new InvalidOperationException("Jizhi lost its exact native Draw1 return.");
+        _handLimitExemptions.Grant(f, MouHuangYueyingMobileComposition.Jizhi, f.OwnerSeat,
+            new(new(RequireLivingHolder: true), outcome.ActualDrawIds, HandLimitExemptionExpiry.ActualTurnOpen,
+                new(r.ActualTurn, r.TurnOwnerSeat), AllowBeforeFirstTurn: true,
+                TurnRequirements: HandLimitTurnRequirements.ProgressionTurnMatches |
+                    HandLimitTurnRequirements.OwnerAtCurrentCursor | HandLimitTurnRequirements.NoTurnReturned));
         foreach (var id in outcome.ActualDrawIds)
         {
             var movement = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.CardId == id && m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == "skill-program.mou-mobile:jizhi.draw");
@@ -46,7 +51,6 @@ internal sealed partial class CharacterHuangYueyingMouMobileRuntime
         ContinueMouHy(f.Id);
     }
 
-    internal bool IsMouHyJizhiHandLimitExempt(CharacterState owner, int cardId) => HasMouHuangYueyingMobile && owner.IsAlive && cardId > 0 && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(owner.Seat) && (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber == 0 || _coreWholeActualTurnUsesOperations.HasOngoingWholeActualUseTurn) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouHuangYueyingJizhiExemptEvent>().Any(e => e.Source.OwnerSeat == owner.Seat && e.CardId == cardId && e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwnerSeat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat);
     internal bool DrainMouHy(ProgramSkillFrame f) => _coreProgramContinuationsOperations.TryBeginProgramChildWindows(f.Id, PostEventContinuation.AwaitedProgramMovement);
     internal void ContinueMouHy(long id)
     {

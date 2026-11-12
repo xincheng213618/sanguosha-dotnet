@@ -22,7 +22,7 @@ internal sealed class IssueCurrentResponseRuleDescriptor : ProgramOperationDescr
             "matchUseKind", "actorRef", "opponentRef", "responderRef", "condition");
         var rule = new ResponseRule(minimum: r.Has("minimum") ? r.RequiredInt("minimum") : 1,
             forbid: r.Has("forbid") && r.RequiredBool("forbid"), incomingKinds: r.OptionalEnumArray<CardKind>("incomingKinds"),
-            requiredKinds: r.OptionalEnumArray<CardKind>("requiredKinds"), condition: r.Has("while") ? r.RequiredBoolExpression("while") : null,
+            requiredKinds: r.OptionalEnumArray<CardKind>("requiredKinds"), @while: r.Has("while") ? r.RequiredBoolExpression("while") : null,
             matchUseKind: r.Has("matchUseKind") && r.RequiredBool("matchUseKind"),
             audience: r.Has("audience") ? r.RequiredEnum<ResponseRuleAudience>("audience") : ResponseRuleAudience.Targets);
         if (rule.Minimum == 1 && !rule.Forbid)

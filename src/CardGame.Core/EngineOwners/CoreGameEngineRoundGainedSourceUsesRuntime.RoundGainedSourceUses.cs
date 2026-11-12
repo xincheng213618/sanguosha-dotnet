@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEngineRoundGainedSourceUsesRuntime
     {
         if (!TracksRoundGainedSourceUses || !InRoundGainedOwnPlay(owner) || !_coreProgramCardPoliciesOperations.HasCardPolicy(owner, SkillProgramCardPolicyKind.RoundGainedOtherSourceUse))
             return false;
-        return _coreActionQueriesOperations.GetSlashUseCards(owner).Any(card => HasRoundGainedBasicBonus(owner, kind, [card.Id])) || _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner).Any(cards => HasRoundGainedBasicBonus(owner, kind, cards.Select(c => c.Id).ToArray())) || _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(owner, kind, forResponse: false).Any(selection => HasRoundGainedBasicBonus(owner, selection.OutputKind, selection.Cards.Select(c => c.Id).ToArray()));
+        return _coreActionQueriesOperations.GetSlashUseCards(owner).Any(card => HasRoundGainedBasicBonus(owner, kind, [card.Id])) || _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(owner).Any(cards => HasRoundGainedBasicBonus(owner, kind, cards.Select(c => c.Id).ToArray())) || _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(owner, kind, forResponse: false).Any(selection => HasRoundGainedBasicBonus(owner, selection.OutputKind, selection.Cards.Select(c => c.Id).ToArray()));
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.AfterSlashDebitIdentity, 20)]

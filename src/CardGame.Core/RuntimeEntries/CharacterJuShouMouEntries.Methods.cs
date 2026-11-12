@@ -13,7 +13,6 @@ internal sealed partial class CharacterJuShouMouEntries
     internal bool HasMouJsEntityMark(int card) => _resolve().HasMouJsEntityMark(card);
     internal bool IsIssuedMouJsMovementCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => _resolve().IsIssuedMouJsMovementCandidate(c, w);
     internal bool IsMouJsExactCardQuery(CharacterState actor, int? selected) => _resolve().IsMouJsExactCardQuery(actor, selected);
-    internal bool IsMouJsHandLimitExempt(int actor, int card) => _resolve().IsMouJsHandLimitExempt(actor, card);
     internal void IssueMouJsUse(ProgramSkillFrame f) => _resolve().IssueMouJsUse(f);
     internal bool MatchesMouJsDeclaration(ProgramSkillFrame f, CardDeclarationFrame d) => _resolve().MatchesMouJsDeclaration(f, d);
     internal bool MouJsActionBan(ProgramLegalActionQuery q) => _resolve().MouJsActionBan(q);
@@ -41,7 +40,6 @@ internal sealed partial class CharacterJuShouMouEntries
     internal bool MouJsUsePurpose(int actor, CardKind kind, bool response, bool dying = false) => _resolve().MouJsUsePurpose(actor, kind, response, dying);
     internal ProgramSkillFrame? MouJsUseQuery(CharacterState actor, int? selected = default) => _resolve().MouJsUseQuery(actor, selected);
     internal bool MouJsViewAsBan(ProgramViewAsLegalityQuery q) => _resolve().MouJsViewAsBan(q);
-    internal void ObserveMouJsMovement(CardMovementRecord movement) => _resolve().ObserveMouJsMovement(movement);
     internal void ObserveMouJsUse(IGameEvent payload) => _resolve().ObserveMouJsUse(payload);
     internal void ProjectMouJuShouCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectMouJuShouCardSkillMark(cardId, ref projection);
     internal bool ResumeMouJsUse() => _resolve().ResumeMouJsUse();

@@ -14,8 +14,6 @@ internal sealed partial class CharacterWeiYanHappyGodEntries
     internal bool ContinueHappyEzhi(ProgramSkillFrame initial) => _resolve().ContinueHappyEzhi(initial);
     internal bool ContinueHappyGujingPayment(ProgramSkillFrame frame) => _resolve().ContinueHappyGujingPayment(frame);
     internal bool ContinueHappyWeiYan(long id) => _resolve().ContinueHappyWeiYan(id);
-    internal bool ContinueHappyWeiYanIneffectiveDodge(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation) => _resolve().ContinueHappyWeiYanIneffectiveDodge(attack, action, continuation);
-    internal bool ContinueHappyWeiYanIneffectiveSimple(long id, ProgramSimpleCardContinuation continuation) => _resolve().ContinueHappyWeiYanIneffectiveSimple(id, continuation);
     internal HappyWeiYanBone? CurrentHappyBone(int cardId) => _resolve().CurrentHappyBone(cardId);
     internal IReadOnlyList<HappyWeiYanDiscardedBone> DiscardedHappyBones(int actualTurn) => _resolve().DiscardedHappyBones(actualTurn);
     internal bool DrainHappyWeiYan(ProgramSkillFrame frame) => _resolve().DrainHappyWeiYan(frame);
@@ -40,7 +38,6 @@ internal sealed partial class CharacterWeiYanHappyGodEntries
     internal IReadOnlyList<PromptChoice> HappyWeiYanAdditionalChoices(ProgramSkillFrame frame) => _resolve().HappyWeiYanAdditionalChoices(frame);
     internal Card? HappyWeiYanBoneReturnCard(CharacterState actor, int? id) => _resolve().HappyWeiYanBoneReturnCard(actor, id);
     internal IReadOnlyList<PromptChoice> HappyWeiYanChoices(ProgramSkillFrame frame) => _resolve().HappyWeiYanChoices(frame);
-    internal bool HappyWeiYanCounterspellInvalidated(NullificationWindowFrame pending, CardActionContext action) => _resolve().HappyWeiYanCounterspellInvalidated(pending, action);
     internal bool HappyWeiYanDying() => _resolve().HappyWeiYanDying();
     internal bool HappyWeiYanFirstChild(ProgramSkillFrame frame, ResolutionFrame child) => _resolve().HappyWeiYanFirstChild(frame, child);
     internal bool HappyWeiYanMovement(ProgramSkillFrame frame, SkillProgramEffect? effect, ProgramMovementContinuation pending) => _resolve().HappyWeiYanMovement(frame, effect, pending);
@@ -50,10 +47,8 @@ internal sealed partial class CharacterWeiYanHappyGodEntries
     internal bool HappyZiguEligible(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().HappyZiguEligible(candidate, trigger, context);
     internal CardUseFrame? HappyZiguFirstEquipment(int owner, ProgramSkillWindowContext context) => _resolve().HappyZiguFirstEquipment(owner, context);
     internal bool HasExactHappyBonePlacement(Card card, int holder) => _resolve().HasExactHappyBonePlacement(card, holder);
-    internal bool HasHappyWeiYanIneffectiveResponse(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation) => _resolve().HasHappyWeiYanIneffectiveResponse(attack, action, continuation);
     internal bool IsHappyWeiYanBone(int id) => _resolve().IsHappyWeiYanBone(id);
     internal bool IsHappyWeiYanBoneReturnQuery(CharacterState actor, int? id) => _resolve().IsHappyWeiYanBoneReturnQuery(actor, id);
-    internal bool IsHappyWeiYanUseIneffective(CardUseFrame use) => _resolve().IsHappyWeiYanUseIneffective(use);
     internal void IssueNextHappyGujingPayment(ProgramSkillFrame initial) => _resolve().IssueNextHappyGujingPayment(initial);
     internal CardLocation NormalizeHappyWeiYanGainDestination(Card card, CardLocation from, CardLocation to, CardMoveReason reason) => _resolve().NormalizeHappyWeiYanGainDestination(card, from, to, reason);
     internal void ObserveHappyWeiYanFirstEquipment(IGameEvent fact) => _resolve().ObserveHappyWeiYanFirstEquipment(fact);
@@ -69,7 +64,6 @@ internal sealed partial class CharacterWeiYanHappyGodEntries
     internal void SaveHappyWeiYanMove(long id, HappyWeiYanStage stage, int before) => _resolve().SaveHappyWeiYanMove(id, stage, before);
     internal bool TryHappyEzhiAction(ProgramSkillWindowContext context, scoped out CardActionContext action, scoped out long parent) => _resolve().TryHappyEzhiAction(context, out action, out parent);
     internal bool TryHappyWeiYanEquipmentCommitted(long id, Card equipment) => _resolve().TryHappyWeiYanEquipmentCommitted(id, equipment);
-    internal bool ValidHappyWeiYanCancellation(HappyWeiYanCancellation proof, CardActionContext action, long parent) => _resolve().ValidHappyWeiYanCancellation(proof, action, parent);
     internal bool ValidHappyWeiYanDraw(NativeDrawOutcome draw, int owner, long frameId) => _resolve().ValidHappyWeiYanDraw(draw, owner, frameId);
     internal void ValidateHappyBoneUse(CardUseFrame use) => _resolve().ValidateHappyBoneUse(use);
     internal bool HasHappyWeiYanEzhiCapability { get => _resolve().HasHappyWeiYanEzhiCapability; }

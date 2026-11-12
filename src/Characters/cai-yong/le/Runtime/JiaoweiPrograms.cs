@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace CardGame.Core;
 
-public enum XianMarkOrigin { OpeningHand, FeibaiFallbackDraw }
 public sealed record JiaoweiInitialEntity(int OwnerSeat, int CardId, CardKind PrintedKind, long EntrySequence);
 public sealed partial record ProgramLifecycleTriggerWindowFrame
 {
@@ -11,9 +10,6 @@ public sealed partial record ProgramLifecycleTriggerWindowFrame
     public IReadOnlyList<JiaoweiInitialEntity>? JiaoweiInitialEntities
     { get => _jiaoweiInitialEntities; init => _jiaoweiInitialEntities = value is null ? null : Array.AsReadOnly(value.ToArray()); }
 }
-public sealed record XianEntityMarkedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
-    int OriginalOwnerSeat, int CardId, CardKind PrintedKind, long EntrySequence, XianMarkOrigin Origin) : IGameEvent;
-public sealed record XianMarkingCompletedEvent(long FrameId, XianMarkOrigin Origin, int Count) : IGameEvent;
 public sealed record JiaoweiInitializedEvent(long FrameId, CardConversionSource Source, string GameplayHash,
     long WindowId, int EntityCount) : IGameEvent;
 public sealed record JiaoweiOwnedXianEntity(int CardId, CardKind PrintedKind, CardLocation From);

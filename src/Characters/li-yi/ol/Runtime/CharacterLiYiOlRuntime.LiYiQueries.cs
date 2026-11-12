@@ -62,15 +62,15 @@ internal sealed partial class CharacterLiYiOlRuntime
     {
         actorSeat = -1;
         targets = [];
-        if (f.Chanshuang is not { SlashTarget: { } target } r || r.Stage is not (ChanshuangStage.SlashChoice or ChanshuangStage.SlashIssuing or ChanshuangStage.NativeUse or ChanshuangStage.NativeChildren) || r.Cursor >= ChanshuangItemCount(r) || ChanshuangItem(f)is not { Option: ChanshuangOption.Slash } item || r.Source != ChanshuangSource(f) || r.GameplayHash != f.GameplayHash || f.InstructionIndex != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.Operation == r.Operation && e.ActualTurn == r.ActualTurn && e.ActualTurnOwner == r.ActualTurnOwner && e.PeerSeat == r.PeerSeat && e.FrozenMask == r.FrozenMask) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangSlashSelectedEvent>().Count(e => e.FrameId == f.Id && e.Cursor == r.Cursor && e.ActorSeat == item.Seat && e.TargetSeat == target) != 1)
+        if (f.Chanshuang is not { } state || _slashRequests.GetIdentity(f) is not { } identity ||
+            identity.IssuanceSlot != state.Cursor)
             return false;
-        actorSeat = item.Seat;
-        targets = Array.AsReadOnly(new[] { target });
+        actorSeat = identity.ActorSeat;
+        targets = _slashRequests.GetTargets(f, actorSeat);
         return true;
     }
 
     internal bool IsChanshuangSlashRequest(ProgramSkillFrame f) => f.Chanshuang?.Stage == ChanshuangStage.SlashChoice && TryGetChanshuangSlashRequest(f, out _, out _);
-    internal bool IsChanshuangSlashQuery(CharacterState actor) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { Chanshuang: { } r } f && r.Stage is ChanshuangStage.SlashTarget or ChanshuangStage.SlashChoice or ChanshuangStage.SlashIssuing && r.Cursor < ChanshuangItemCount(r) && ChanshuangItem(f)is { Option: ChanshuangOption.Slash } item && item.Seat == actor.Seat && r.Source == ChanshuangSource(f) && r.GameplayHash == f.GameplayHash;
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeBaseTerms, 10)]
     internal void AddLiYiAttackRangeBaseTerms(ProgramAttackRangeQuery query, List<RuleQueryBaseTerm> terms)
     {
@@ -78,6 +78,4 @@ internal sealed partial class CharacterLiYiOlRuntime
             terms[0] = new RuleQueryBaseTerm($"skill:{(query.Player.Seat)}:zhanjin:attack-range", 3);
     }
 
-    [ProgramTargetRule(ProgramTargetRulePoint.SlashQuotaBeforeLimit, 60)]
-    internal bool ChanshuangSlashQuotaBeforeLimit(ProgramSlashQuotaQuery query) => IsChanshuangSlashQuery(query.Actor);
 }

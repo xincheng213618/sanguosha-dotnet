@@ -17,7 +17,6 @@ internal sealed partial class CharacterZouShiLeEntries
     internal bool HuoxinObserverSuffix(int index) => _resolve().HuoxinObserverSuffix(index);
     internal bool IsHuoxinMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => _resolve().IsHuoxinMovement(f, effect, p);
     internal bool IsHuoxinRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsHuoxinRecoveryParent(f, recovery);
-    internal bool IsYunzhengHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsYunzhengHandLimitExempt(owner, cardId);
     internal bool PermitPaidHuoxin(ProgramSkillFrame f) => _resolve().PermitPaidHuoxin(f);
     internal void PublishHuoxin(ProgramSkillFrame f) => _resolve().PublishHuoxin(f);
     internal bool ResumeHuoxin(long id) => _resolve().ResumeHuoxin(id);

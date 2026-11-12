@@ -5,6 +5,6 @@
         "targetKind": "otherLiving", "usesPerTurn": null, "usesPerPhase": 1,
         "effects": [{ "op": "revealHandGiftAndResolveRecipientChoice", "target": "selectedTarget" }] }
     ] },
-    { "id": "ol:xiahui", "revision": 1, "cardPolicies": [{ "id": "black-hand-gained-entities", "kind": "xiaHuiBlackHandAndGainedEntityRestrictions" }] }
+    { "id": "ol:xiahui", "revision": 1, "cardPolicies": [{ "id": "black-hand-gained-entities", "kind": "xiaHuiBlackHandAndGainedEntityRestrictions" }, { "id": "black-hand-limit", "kind": "handLimitCardKindExemption", "handLimitMatch": { "isRed": false, "requireLivingHolder": true } }] }
   ]
 }

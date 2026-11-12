@@ -159,7 +159,7 @@ internal sealed partial class CoreGameEngineCardActionsRuntime
             return true;
         if (TryBeginProgramCardWindow(attack, action, SkillProgramTriggerWindow.CardResponseAccepted, [opponentSeat], continuation))
             return true;
-        if (!_coreResponseUseCompletionOperations.HasResponseUseCompletionObserver(action, continuation) && !_coreResponseCompletionOperations.HasCardResponseCompletedObserver(action, continuation) && !_characterHuangZhongAnniversaryGodOperations.HasAnniversaryHzIneffectiveResponse(attack, action, continuation) && !_characterWeiYanHappyGodOperations.HasHappyWeiYanIneffectiveResponse(attack, action, continuation))
+        if (!_coreResponseUseCompletionOperations.HasResponseUseCompletionObserver(action, continuation) && !_coreResponseCompletionOperations.HasCardResponseCompletedObserver(action, continuation) && !_invalidationExecution.HasIneffectiveDodge(attack, action, continuation))
             return false;
         _coreNativeDodgeOperations.ContinueAcceptedCardResponse(attack, action, continuation);
         return true;

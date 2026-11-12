@@ -16,7 +16,6 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
     internal IEnumerable<RuleQueryContribution> HappyZlNumericContributions(CharacterState player, SkillRuleQuery query) => query == SkillRuleQuery.SlashLimit && player.IsAlive && _coreNativeSkillContextQueriesOperations.HasProgramSkill(player, "happy:zhiti") && HappyZlScore() > 2 ? [new FiniteRuleQueryContribution("happy:zhiti", SkillRuleOperation.Add, 1)] : [];
     internal IEnumerable<HappyZlLeaseEvent> ActiveHappyZlLeases(int owner, int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZlLeaseEvent>().Where(e => e.Source.OwnerSeat == owner && e.Target == target && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZlLeaseExpiredEvent>().Any(x => x.LeaseFrameId == e.FrameId));
     internal bool HasHappyZlSourceRestoration(int source, int target) => HasHappyZl && _coreTableSeatQueriesOperations.IsValidPlayerSeat(source) && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && _coreNativeSkillContextQueriesOperations.HasProgramSkill(_coreMatchParticipantsPlayersAccess._players[target], "happy:duorui") && ActiveHappyZlLeases(target, source).Any();
-    internal HappyZlColorEvent? HappyZlColor(int owner, int target, bool? color) => color is null || owner == target ? null : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZlColorEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner && e.Target == target && e.Turn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && e.Color == color && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZlStartedEvent>().Any(s => s.FrameId == e.FrameId && s.Source == e.Source && s.Turn == e.Turn && s.Op == SkillProgramEffectOp.ResolveHappyZhangLiaoDuorui));
     internal CardUseFrame? HappyZlDamageUse(int owner, ProgramSkillWindowContext w)
     {
         if (w is not { Window: SkillProgramTriggerWindow.AfterDamageApplied, Amount: > 0, SourceSeat: { } source, TargetSeat: { } target } || source != owner || _coreDamageCursorRuntimeOperations.Value.ActiveDamageTrigger is not { } damage || damage.Id != w.ParentFrameId || damage.ParentFrameId != w.DamageFrameId)
@@ -24,7 +23,10 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
         var attack = _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(damage);
         if (attack.IsSourceLess || !attack.DamageWasApplied || attack.SourceSeat != owner || attack.TargetSeat != target || attack.CardUserSeat != owner)
             return null;
-        return _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { Action: { } a } use && a.ActorSeat == owner && HappyZlColor(owner, target, a.EffectiveIsRed ?? CoreGameEnginePublicPileColorsRuntime.SuitColor(a.EffectiveSuit))is not null ? use : null;
+        return _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is { Action: { } a } use &&
+            a.ActorSeat == owner && _appliedResponseRules.GetMatchingRelation("happy:duorui", owner, target,
+                a.EffectiveKind, a.EffectiveIsRed ?? CoreGameEnginePublicPileColorsRuntime.SuitColor(a.EffectiveSuit)) is not null
+            ? use : null;
     }
 
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 40980, SkillProgramEffectOp.ResolveHappyZhangLiaoDuorui, SkillProgramEffectOp.ResolveHappyZhangLiaoDuoruiDamage, SkillProgramEffectOp.ResolveHappyZhangLiaoZhiti)]
@@ -237,8 +239,18 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { HappyZhangLiao = r with { Stage = HappyZlStage.GainChildren, Card = card.Id, Color = color }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([card.Id], CardLocation.Hand(f.OwnerSeat), new(HappyZlTake), _nativeGivenCards.CompletionRecords(f.Id, r.Target, f.OwnerSeat, [card.Id], before, (_, _) =>
             {
-                SaveHappyZlPayment(f.Id, before);
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyZlColorEvent(f.Id, r.Source, r.Turn, r.Target, color));
+                SaveHappyZlPayment(f.Id, before, notify: false);
+                var paid = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+                if (color is { } knownColor)
+                    _appliedResponseRules.Grant(paid, "happy:duorui",
+                        f.OwnerSeat, r.Target, new(new(forbid: true, targetSeat: r.Target, audience: ResponseRuleAudience.All),
+                            new(ResponseRelationMatchKind.EffectiveColor, IsRed: knownColor),
+                            AppliedResponseCaptureKind.NativeUse | AppliedResponseCaptureKind.Counterspell,
+                            remainingExpiry: AppliedResponseRemainingExpiry.IssuedTurnNumberChanges,
+                            requireLivingParticipantsAtCapture: true));
+                var payment = paid.HappyZhangLiao!.Payments[^1];
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(
+                    new HappyZlPaidEvent(f.Id, payment.Ordinal, payment.Before, payment.After));
             }));
         }
         else
@@ -250,14 +262,15 @@ internal sealed partial class CharacterZhangLiaoHappyGodRuntime
         ResumeHappyZl(f.Id);
     }
 
-    internal void SaveHappyZlPayment(long id, long before)
+    internal void SaveHappyZlPayment(long id, long before, bool notify = true)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         var r = f.HappyZhangLiao!;
         var ordinal = r.Payments.Count + 1;
         var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > before && m.Sequence <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { HappyZhangLiao = r with { Payments = r.Payments.Append(new(ordinal, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence) { Moves = moves }).ToArray() } });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyZlPaidEvent(id, ordinal, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
+        if (notify)
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyZlPaidEvent(id, ordinal, before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
     }
 
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveHappyZhangLiaoDuoruiDamage)]

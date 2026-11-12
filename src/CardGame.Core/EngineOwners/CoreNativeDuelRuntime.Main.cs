@@ -25,7 +25,7 @@ internal sealed partial class CoreNativeDuelRuntime
 
         var responder = _coreMatchParticipantsPlayersAccess._players[duel.ResponderSeat];
         var opponent = _coreMatchParticipantsPlayersAccess._players[duel.OpponentSeat];
-        if (_coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(duel.ResolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(duel.ResolutionId, responder.Seat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(duel.Attack.CardUserSeat, responder.Seat, CardKind.Duel, [duel.TargetSeat], duel.ResolutionId, CardKind.Slash))
+        if (_coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(duel.ResolutionId) || _responseRules.IsResponseForbidden(duel.ResolutionId, responder.Seat, CardKind.Slash, duel.OpponentSeat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(duel.Attack.CardUserSeat, responder.Seat, CardKind.Duel, [duel.TargetSeat], duel.ResolutionId, CardKind.Slash))
         {
             _coreNativeResponseWindowsOperations.SetResponseParentStep(duel.ResolutionId, ResolutionFrameStep.ResolvingEffect);
             _corePendingDecisionPolicyPipelineOperations._pendingDecision = null;
@@ -67,8 +67,8 @@ internal sealed partial class CoreNativeDuelRuntime
 
     internal void ResolveDuelResponse(NativeOwners.DuelHandle duel, CharacterState responder, Card? selectedSlash)
     {
-        if (selectedSlash is not null && _characterLiuQiOlOperations.IsWenjiResponseForbidden2(duel.ResolutionId, responder.Seat))
-            throw new InvalidOperationException("Wenji forbids this exact Duel response.");
+        if (selectedSlash is not null && _responseRules.IsResponseForbidden(duel.ResolutionId, responder.Seat, CardKind.Slash, duel.OpponentSeat))
+            throw new InvalidOperationException("The incoming Duel forbids this response.");
         if (selectedSlash is { } declaredSlash && _coreCardDeclarationsOperations.TryBeginCardDeclaration(responder, declaredSlash, CardKind.Slash, _coreCardDeclarationsOperations.PeekDeclarationConversion(responder, declaredSlash, CardKind.Slash, false), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Duel, responder.Seat), [duel.OpponentSeat]))
             return;
         if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveDuel, duel) || responder.Seat != duel.ResponderSeat)

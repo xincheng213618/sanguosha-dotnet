@@ -22,11 +22,16 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
             return SkillProgramStepOutcome.Continue;
         }
 
+        _slashRequests.Issue(active, user.Seat,
+            new(ProgramSlashRequestTargetSource.FrozenCandidates, [frame.OwnerSeat], resultBind,
+                IgnoreDistance: true, UsesChoiceResult: true));
+        active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         var slashes = _corePhysicalOwnedCardQueriesOperations.GetHand(user).Concat(_coreRequestedDeckBasicsOperations.SelectedRequestedDeckBasicCards(user)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(user)).Where(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind) && !_coreTurnHandCategoryRestrictionsOperations.IsTurnHandCategoryRestricted(user, card) && !_coreProgramCardLegalityOperations.IsProgramEntityPhysicalRestricted(user.Seat, card.Id)).ToArray();
         var pairChoices = _coreRoundDistinctBasicRequestsOperations.RoundDistinctBasicRequestedSlashChoices(active, user.Seat, [frame.OwnerSeat], resultBind);
         var cardlessChoices = _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramSlashChoices(active, user.Seat, [frame.OwnerSeat], resultBind).Concat(_characterMaXiuMaTieOlOperations.KenshangProgramSlashChoices(active, user.Seat, [frame.OwnerSeat], resultBind)).Concat(_characterChengJiChengCuiOlOperations.TousuiProgramSlashChoices(active, user.Seat, [frame.OwnerSeat], resultBind)).ToList();
         if (!keepCurrentRequest && slashes.Length == 0 && pairChoices.Count == 0 && !_coreRequestedDeckBasicsOperations.HasRequestedDeckBasicSource(user, CardKind.Slash) && !_coreChainedStateBasicConversionsOperations.HasChainedStateBasicProgramSlash(user, [frame.OwnerSeat]) && !_coreDrawFundedDistinctBasicOffersOperations.HasDrawFundedDistinctBasicProgramSlash(user, [frame.OwnerSeat]) && !_coreRoundOnceCardlessProgramRequestsOperations.HasRoundOnceCardlessProgramSlash(user, [frame.OwnerSeat]) && !_characterMaXiuMaTieOlOperations.HasKenshangProgramSlash(user, [frame.OwnerSeat]) && !_characterChengJiChengCuiOlOperations.HasTousuiProgramSlash(user, [frame.OwnerSeat]) && !_characterGuoTuOlOperations.HasWeijieProgramSlash(user, [frame.OwnerSeat]) && !_characterLiuFengBoundaryOperations.HasBoundaryLiuFengProgramSlash(user, [frame.OwnerSeat]) && !(_characterLiuZhangOlOperations.HasZonghuProgramSlash(user, [frame.OwnerSeat]) || _characterHuanShuJunOlOperations.HasHuanpeiProgramSlash(user, [frame.OwnerSeat])))
         {
+            _slashRequests.Close(active);
             CommitProgramChoiceResult(frame.Id, resultBind, RequestSlashByTargetProgramOperationDescriptor.DeclinedOption, user.Seat, "没有可用的【杀】。");
             return SkillProgramStepOutcome.Continue;
         }
@@ -79,6 +84,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (action == "request-slash-decline")
         {
+            _slashRequests.Close(frame);
             if (selected.Cards.Count != 0 || selected.Targets.Count != 0)
                 throw new InvalidOperationException("The decline branch must not name a card or target.");
             CommitProgramChoiceResult(frame.Id, resultBind, RequestSlashByTargetProgramOperationDescriptor.DeclinedOption, userSeat, "不使用【杀】。");
@@ -96,6 +102,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
             return;
         }
 
+        _slashRequests.Accept(frame, userSeat, frame.OwnerSeat);
         CommitProgramChoiceResult(frame.Id, resultBind, RequestSlashByTargetProgramOperationDescriptor.UsedSlashOption, userSeat, $"使用【{(card.DisplayName)}】。");
         _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[userSeat], _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], card, card.Kind, userSeat, physicalCards: [card], countsTowardSlashLimit: false, programSkillCardUseFrameId: frame.Id);
     }
@@ -108,14 +115,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
         return decision.Choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("program-action")is "request-slash" or "round-once-cardless-request") ?? decision.Choices.First();
     }
 
-    internal int[] GetNearestLivingCharacterSeats(int seat)
-    {
-        var candidates = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != seat).Select(player => (Seat: player.Seat, Distance: _coreNativeRuleQueriesOperations.GetCombatDistance(seat, player.Seat))).ToArray();
-        if (candidates.Length == 0)
-            return[];
-        var minimum = candidates.Min(candidate => candidate.Distance);
-        return candidates.Where(candidate => candidate.Distance == minimum).Select(candidate => candidate.Seat).Order().ToArray();
-    }
+    internal int[] GetNearestLivingCharacterSeats(int seat) => _slashRequests.GetNearestLivingSeats(seat).ToArray();
 
     internal SkillProgramStepOutcome RequestProgramSlashByNearest(ProgramSkillFrame frame, int participantSeat, int hpAmount, bool keepCurrentRequest = false)
     {
@@ -127,14 +127,23 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
         }
 
         var participant = _coreMatchParticipantsPlayersAccess._players[participantSeat];
+        var ordinal = active.NumberBindings.Single(binding => binding.Name == "participant-cursor-" + (active.InstructionIndex - 1)).Value;
+        _slashRequests.Issue(active, participantSeat, new(ProgramSlashRequestTargetSource.NearestLiving), ordinal);
+        active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (_characterPangJiOlOperations.IsBiguoCategoryForbidden(participantSeat, CardKind.Slash))
+        {
+            _slashRequests.Close(active);
             return _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(active.Id, active.SkillId, participantSeat, hpAmount);
+        }
         var nearest = GetNearestLivingCharacterSeats(participantSeat);
         var slashes = _corePhysicalOwnedCardQueriesOperations.GetHand(participant).Concat(_coreRequestedDeckBasicsOperations.SelectedRequestedDeckBasicCards(participant)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileSlashUseCards(participant)).Where(card => CoreNativeCardClassificationsRuntime.IsSlashCard(card.Kind)).OrderBy(card => card.Id).ToArray();
         var pairChoices = _coreRoundDistinctBasicRequestsOperations.RoundDistinctBasicRequestedSlashChoices(active, participantSeat, nearest);
         var cardlessChoices = _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramSlashChoices(active, participantSeat, nearest).Concat(_characterMaXiuMaTieOlOperations.KenshangProgramSlashChoices(active, participantSeat, nearest)).Concat(_characterChengJiChengCuiOlOperations.TousuiProgramSlashChoices(active, participantSeat, nearest)).ToList();
         if (nearest.Length == 0 || !keepCurrentRequest && slashes.Length == 0 && pairChoices.Count == 0 && !_coreRequestedDeckBasicsOperations.HasRequestedDeckBasicSource(participant, CardKind.Slash) && !_coreChainedStateBasicConversionsOperations.HasChainedStateBasicProgramSlash(participant, nearest) && !_coreDrawFundedDistinctBasicOffersOperations.HasDrawFundedDistinctBasicProgramSlash(participant, nearest) && !_coreRoundOnceCardlessProgramRequestsOperations.HasRoundOnceCardlessProgramSlash(participant, nearest) && !_characterMaXiuMaTieOlOperations.HasKenshangProgramSlash(participant, nearest) && !_characterChengJiChengCuiOlOperations.HasTousuiProgramSlash(participant, nearest) && !_characterGuoTuOlOperations.HasWeijieProgramSlash(participant, nearest) && !_characterLiuFengBoundaryOperations.HasBoundaryLiuFengProgramSlash(participant, nearest) && !(_characterLiuZhangOlOperations.HasZonghuProgramSlash(participant, nearest) || _characterHuanShuJunOlOperations.HasHuanpeiProgramSlash(participant, nearest)))
+        {
+            _slashRequests.Close(active);
             return _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(active.Id, active.SkillId, participantSeat, hpAmount);
+        }
         var skill = _contentRegistryOperations._contentRegistry!.GetSkill(frame.SkillId);
         var choices = new List<PromptChoice>();
         foreach (var card in slashes)
@@ -185,6 +194,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         if (action == "request-slash-nearest-decline")
         {
+            _slashRequests.Close(frame);
             if (selected.Cards.Count != 0 || selected.Targets.Count != 0)
                 throw new InvalidOperationException("The decline branch must not name a card or target.");
             if (_kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().LoseHp(frame.Id, frame.SkillId, participantSeat, effect.Amount) == SkillProgramStepOutcome.Continue)
@@ -202,6 +212,7 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
             return;
         }
 
+        _slashRequests.Accept(frame, participantSeat, targetSeat);
         _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[participantSeat], _coreMatchParticipantsPlayersAccess._players[targetSeat], card, card.Kind, participantSeat, physicalCards: [card], countsTowardSlashLimit: false, programSkillCardUseFrameId: frame.Id);
     }
 
@@ -209,8 +220,8 @@ internal sealed partial class CoreGameEngineProgramSlashRequestRuntime
     internal PromptChoice SelectAiProgramRequestSlashByNearest(PendingDecision decision) => decision.Choices.FirstOrDefault(choice => choice.Parameters.GetValueOrDefault("program-action")is "request-slash-nearest" or "round-once-cardless-request") ?? decision.Choices.First();
     internal void CommitProgramChoiceResult(long frameId, string bind, string optionId, int chooserSeat, string label)
     {
-        var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frameId);
-        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { ChoiceBindings = Array.AsReadOnly(frame.ChoiceBindings.Append(new ProgramChoiceResultBinding(bind, optionId, chooserSeat)).ToArray()) });
+        var frame = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(owner => owner.Id == frameId);
+        _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { ChoiceBindings = Array.AsReadOnly(frame.ChoiceBindings.Append(new ProgramChoiceResultBinding(bind, optionId, chooserSeat)).ToArray()) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramOptionChosenEvent(frameId, frame.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(frame), frame.OwnerSeat, bind, optionId, chooserSeat, label));
     }
 }

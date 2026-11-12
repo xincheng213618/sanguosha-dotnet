@@ -14,7 +14,6 @@ internal sealed partial class CharacterLiuLiAnniversaryEntries
     internal bool DrainLiuLi(ProgramSkillFrame f) => _resolve().DrainLiuLi(f);
     internal void EnsureLiuLiDamagePool(int owner) => _resolve().EnsureLiuLiDamagePool(owner);
     internal void FinishLiuLi(ProgramSkillFrame f) => _resolve().FinishLiuLi(f);
-    internal bool IsAnniversaryLiuLiHandLimitExempt(int seat, Card card) => _resolve().IsAnniversaryLiuLiHandLimitExempt(seat, card);
     internal bool IsAnniversaryLiuLiVirtualUse(CardUseFrame use) => _resolve().IsAnniversaryLiuLiVirtualUse(use);
     internal void IssueLiuLiSlash(ProgramSkillFrame f) => _resolve().IssueLiuLiSlash(f);
     internal void IssueLiuLiUse(ProgramSkillFrame f) => _resolve().IssueLiuLiUse(f);

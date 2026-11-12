@@ -14,7 +14,6 @@ internal sealed partial class CoreGameEngineHellSoulCardsEntries
     internal string HellSoulGrantSource(long id) => _resolve().HellSoulGrantSource(id);
     internal HellWanghunGrantLostEvent[] HellSoulOutstandingLosses(int seat) => _resolve().HellSoulOutstandingLosses(seat);
     internal bool IsExactHellSoulProgram(ProgramSkillFrame frame) => _resolve().IsExactHellSoulProgram(frame);
-    internal bool IsHellDestroyedSoulMaterial(long useId, int cardId) => _resolve().IsHellDestroyedSoulMaterial(useId, cardId);
     internal void ResolveHellReturnSoul(CharacterState actor, Card card) => _resolve().ResolveHellReturnSoul(actor, card);
     internal void ResolveHellReturnSoulEffect(NullificationWindowFrame pending) => _resolve().ResolveHellReturnSoulEffect(pending);
     internal bool ResumeHellSoulRestoration(long id) => _resolve().ResumeHellSoulRestoration(id);

@@ -4,6 +4,12 @@ public sealed record ProgramAssistedSlashRequest(int ActorSeat, int? TargetSeat 
 public sealed record ProgramOtherCardSlot(CardZoneKind Zone, int SlotIndex);
 public sealed record ProgramOtherCardSelection(int SourceSeat, int RequiredCount, IReadOnlyList<ProgramOtherCardSlot> SelectedSlots);
 
+public sealed partial class SkillProgramEffect
+{
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public ProgramParticipantReference? SlashRequestRangeOwner { get; internal init; }
+}
+
 internal sealed class RequestSlashAgainstChosenTargetProgramOperationDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.RequestSlashAgainstChosenTarget;
@@ -12,12 +18,16 @@ internal sealed class RequestSlashAgainstChosenTargetProgramOperationDescriptor 
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.RequestSlashByTarget, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r)
     {
-        r.AllowOnly("op", "target", "resultBind", "chooserRef", "condition");
+        r.AllowOnly("op", "target", "resultBind", "chooserRef", "rangeOwnerRef", "condition");
         var target = r.RequiredEnum<SkillProgramEffectTarget>("target");
         if (target != SkillProgramEffectTarget.SelectedTarget) throw new InvalidOperationException("An assisted Slash requires a selected actor.");
         var chooser = r.Has("chooserRef") ? r.RequiredParticipantReference("chooserRef") : null;
         if (chooser is not null && chooser.Kind != ProgramParticipantRef.SelectedTarget) throw new InvalidOperationException("An assisted Slash chooser must be its selected actor.");
-        var effect = new SkillProgramEffect(Op, target, 0, r.Condition(), resultBind: r.RequiredIdentifier("resultBind"), chooserRef: chooser);
+        var rangeOwner = r.Has("rangeOwnerRef") ? r.RequiredParticipantReference("rangeOwnerRef") : null;
+        if (rangeOwner is not null && rangeOwner.Kind is not (ProgramParticipantRef.Owner or ProgramParticipantRef.SelectedTarget))
+            throw new InvalidOperationException("An assisted Slash range owner must be its owner or selected actor.");
+        var effect = new SkillProgramEffect(Op, target, 0, r.Condition(), resultBind: r.RequiredIdentifier("resultBind"), chooserRef: chooser)
+        { SlashRequestRangeOwner = rangeOwner };
         RequireAlways(effect, r.Path);
         return effect;
     }

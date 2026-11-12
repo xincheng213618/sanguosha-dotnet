@@ -97,6 +97,7 @@ internal sealed class ProgramSelectionCatalog
         ArgumentNullException.ThrowIfNull(types);
         var registrations = new SortedDictionary<(ProgramSelectionStage, int), Registration>();
         foreach (var type in types.Select(type => type ?? throw new InvalidOperationException("A selection module type is null."))
+                     .Where(type => type.IsDefined(typeof(ProgramSelectionModuleAttribute), inherit: false))
                      .OrderBy(type => type.FullName, StringComparer.Ordinal))
         {
             var attributes = type.GetCustomAttributes<ProgramSelectionModuleAttribute>().ToArray();

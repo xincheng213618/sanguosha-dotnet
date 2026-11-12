@@ -129,6 +129,7 @@ internal static class CommandSessionChecks
         var conversion = new CardConversionSource("fixture", "binding", 0, "instance");
         var colorGains = new[] { new TangTangGain(51, 0, 0, 7, false, Suit.Heart,
             1, 1, CardLocation.DrawPile, 8, Suit.Diamond, 52) };
+        var markChanges = new[] { new CardEntityMarkChange(1, "fixture:mark", true), new CardEntityMarkChange(2, "fixture:mark", false) };
         var naturalPlan = new LegalAction(LegalActionKind.Slash, 1, 1, "fixture")
         {
             TargetSeats = ids, SelectableCardIds = ids, SelectableTargetSeats = choiceTargets,
@@ -137,6 +138,7 @@ internal static class CommandSessionChecks
         var naturalInvoice = new HuiyunNativeInvoice(1, 0, conversion, "fixture", 0, 1, CardKind.Slash, naturalPlan, 0);
         IGameEvent[] nested =
         [
+            new CardEntityMarksChangedEvent(1, markChanges),
             new CardActionProhibitionGrantedEvent(new TurnCardActionProhibition(1, 1, 0, 1, 0,
                 new CardUseEffectSource("fixture", "binding", 0, "instance"), kinds, actions) { Suits = suits }),
             new DeferredPublicPileDepositedEvent(new DeferredPublicPileDeposit(1, 0, 1, "fixture", "instance", ids, 1)),
@@ -156,12 +158,17 @@ internal static class CommandSessionChecks
                 new(conversion, "fixture", "fixture", 1, 0, 2, 3, 0, CardKind.Duel), ids, choices),
             new TangTangStartedEvent(50, conversion, "fixture", SkillProgramEffectOp.ResolveZhiyiGainColorBenefit,
                 0, 0, 49, 0) { Gains = colorGains },
+            new NativeCardEffectEpisodeStartedEvent(1, 2,
+                new(3, new(4, 0, 0, conversion, "fixture", new(0))), new(3, 1, 1, 0, ids)),
+            new NativeCardEffectEpisodeCompletedEvent(1, 2,
+                new(3, new(4, 0, 0, conversion, "fixture", new(0)), 1, 1), new(3, 1, 1, 0, ids), true),
             new HuiyunNativeIssuedEvent(naturalInvoice),
             new HuiyunNativeReturnedEvent(naturalInvoice, 1)
         ];
         var bytes = nested.Select(item => JsonSerializer.Serialize(item, item.GetType())).ToArray();
         var frozen = nested.Select(CommittedEventProjection.Freeze).ToArray();
         kinds[0] = CardKind.Dodge;
+        markChanges[0] = new(99, "fixture:changed", false);
         actions[0] = CardActionType.Response;
         suits[0] = Suit.Club;
         ids[0] = -1;

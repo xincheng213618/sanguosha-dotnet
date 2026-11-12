@@ -39,7 +39,7 @@ internal sealed partial class CharacterHuBanOlRuntime
             if (use.HuiyunOrigin is { } origin && origin.Material.CardId == m.CardId && m.Sequence > origin.BeforePayment && m.From == origin.Material.From && m.Reason == CardMoveReasons.Use && m.To == (m.From.Zone == CardZoneKind.Equipment && _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon ? CardLocation.OutsideGame : CardLocation.Processing))
             {
                 if (m.To == CardLocation.OutsideGame)
-                    _nativeCardRepresentations.CaptureDeparture(use.Id, m.CardId, m.Sequence);
+                    _nativeMaterialClaims.CaptureRetirement(use.Id, [m]);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuiyunPaymentRecordedEvent(use.Id, origin.ActionId, m.CardId, m.From, m.To, m.Reason, m.Sequence, false));
             }
             else if (use.HuiyunFollowup is { } native && native.CardId == m.CardId && m.Sequence > native.BeforePayment && m.From == CardLocation.Hand(native.ActorSeat) && m.To == CardLocation.Processing && m.Reason == HuiyunNativePaymentReason(native))
@@ -61,7 +61,7 @@ internal sealed partial class CharacterHuBanOlRuntime
         };
         if (id == 0 || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { HuiyunOrigin: not null } use || !HuiyunUseProof(use) || use.TargetIndex < 0 || use.TargetIndex >= use.TargetSeats.Count)
             return;
-        var round = _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(id);
+        var round = _nativeEffectEpisodes.Ordinal(id);
         var target = use.TargetSeats[use.TargetIndex];
         if (fact is NullificationResolvedEvent)
         {

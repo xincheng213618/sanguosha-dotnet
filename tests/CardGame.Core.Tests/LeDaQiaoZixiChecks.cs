@@ -29,7 +29,7 @@ internal static partial class LeDaQiaoZixiChecks
         var rescueGrant = s.E<ZixiExtraEffectIssuedEvent>().Single();
         s.Need(s.V().Hp == 2 && s.E<RecoveryAppliedEvent>().Count(e => e.SourceSeat == 0 && e.TargetSeat == 0 && e.Amount == 1) == 2 &&
             s.E<DyingResponseEvent>().Count(e => e.ResolutionId == dying && e.ResponderSeat == 0 && e.UsedPeach) == 1 && s.E<DyingResolvedEvent>().Count(e => e.ResolutionId == dying && e.Survived) == 1 &&
-            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == rescueGrant.UseId) == 1 && s.E<ZixiExtraEffectRoundStartedEvent>().Count(e => e.UseId == rescueGrant.UseId) == 1,
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == rescueGrant.UseId) == 1 && s.RoundsStarted().Count(e => e.UseFrameId == rescueGrant.UseId) == 1,
             "A real self-Peach rescue has one actual character target and completes two native recoveries before returning its single Dying response."); s.Cold();
 
         foreach (var scene in new[] { "paid-loss", "paid-death" })
@@ -53,7 +53,7 @@ internal static partial class LeDaQiaoZixiChecks
         s = ZdScenario.Start("counterspell"); s.PlaceStart(1, 0); s.Gather(); s.Top(4); var card = s.Actions().First(a => a.Kind == LegalActionKind.DrawTwo); var before = s.G.CardMovements.Max(m => m.Sequence);
         s.Native(card); s.Effect(); s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.Nullification }); s.Private(); s.Cold(); s.Answer(c => c.Cards.Count == 1); s.Play();
         var grant = s.E<ZixiExtraEffectIssuedEvent>().Single();
-        s.Need(s.E<NullificationResolvedEvent>().Any(e => e.EffectCardId == card.CardId && e.EffectNullified) && s.E<ZixiExtraEffectRoundStartedEvent>().Count(e => e.UseId == grant.UseId) == 1 &&
+        s.Need(s.E<NullificationResolvedEvent>().Any(e => e.EffectCardId == card.CardId && e.EffectNullified) && s.RoundsStarted().Count(e => e.UseFrameId == grant.UseId) == 1 &&
             s.G.CardMovements.Count(m => m.Sequence > before && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0)) == 2 &&
             s.G.CardMovements.Count(m => m.CardId == card.CardId && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
             s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == grant.UseId) == 1,
@@ -65,7 +65,7 @@ internal static partial class LeDaQiaoZixiChecks
         for (var i = 0; i < 2; i++) { s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.RespondDodge }); s.Private(); s.Cold(); s.Answer(c => c.Cards.Count == 1); }
         s.Play();
         s.Need(s.E<ZixiEffectsStartedEvent>().Single() is { TargetSeat: 1, JudgmentCount: 1, CardKind: CardKind.BorrowedSword } &&
-            s.E<ZixiExtraEffectRoundStartedEvent>().Length == 1,
+            s.RoundsStarted().Length == 1,
             "A real Borrowed Sword's designated character is its one weapon owner; the separate following Slash-request seat does not falsely turn it into two card targets."); s.Cold();
 
         s = ZdScenario.Start("redirect"); s.PlaceStart(1, 0); s.Gather(); var hp0 = s.V().Hp; var hp3 = s.V(3).Hp; s.Use("offer", targets: [1]);
@@ -92,7 +92,7 @@ internal static partial class LeDaQiaoZixiChecks
                 e.SkillInstanceId == liuli.SkillInstanceId && e.OwnerSeat == 0 && e.Window == liuli.Window && e.Activated && e.Completed) == 1 &&
             s.G.CardMovements.Count(m => m.CardId == liuliCost && m.From == CardLocation.Hand(0) && m.To == CardLocation.DiscardPile && m.Reason.Value == "skill-program.classic:liuli.SelectAndMoveOwnedCard") == 1 &&
             !s.E<ZixiEffectsStartedEvent>().Any() && !s.E<ZixiExtraEffectIssuedEvent>().Any() &&
-            !s.E<ZixiExtraEffectRoundStartedEvent>().Any() && !s.E<ZixiExtraEffectRoundCompletedEvent>().Any() &&
+            !s.RoundsStarted().Any() && !s.RoundsCompleted().Any() &&
             s.V().Hp == hp0 && s.V(3).Hp == hp3 - 1 && s.E<DamageAppliedEvent>().Count(e => e.SourceSeat == 1 && e.TargetSeat == 3 && e.Amount == 1) == 1 &&
             s.E<CardUseDeclaredEvent>().Count(e => e.ResolutionId == redirectedUse.ResolutionId && e.SourceSeat == 1) == 1 &&
             s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == redirectedUse.ResolutionId && e.CardId == redirectedUse.CardId && e.CardKind == CardKind.Slash) == 1,
@@ -118,8 +118,8 @@ internal static partial class LeDaQiaoZixiChecks
         s.Reach(() => s.OptionalSkill("ol:zhenwei"));
         var issued = s.E<ZixiExtraEffectIssuedEvent>().Where(e => e.Source.OwnerSeat == 1).ToArray();
         s.Need(issued is [{ TargetSeat: 2, JudgmentCount: 1 }] &&
-            s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Id == issued[0].UseId) is { ZixiEffectRounds: { Started: 0 } original } use &&
-            use.SourceSeat == 1 && use.TargetSeats.SequenceEqual([2]) && original.Grants is [{ TargetSeat: 2, CurrentTargetSeat: 2 }] &&
+            s.G.ResolutionStack.OfType<CardUseFrame>().Single(u => u.Id == issued[0].UseId) is { EffectEpisodes: { Episodes: [var original] } } use &&
+            use.SourceSeat == 1 && use.TargetSeats.SequenceEqual([2]) && original is { Started: 0, Issue.Spec: { Scope: NativeCardEffectEpisodeScope.ExecutionOccurrence, TargetSeat: 2, TargetIndex: 0 } } &&
             s.E<ZixiEffectsStartedEvent>().Count(e => e.UseId == issued[0].UseId && e.Source.OwnerSeat == 1) == 1,
             "The source's real optional one-Judgment grant is issued on target two before the lower-priority Zhenwei observer starts.");
         var grant = issued[0];
@@ -143,7 +143,7 @@ internal static partial class LeDaQiaoZixiChecks
         s.Need(replacement is [{ PreviousTargetSeat: 2, NewTargetSeat: 0 }] && replacement[0].ActionId == grant.ActionId &&
             replacement[0].BeforeTargets.SequenceEqual([2]) && replacement[0].AfterTargets.SequenceEqual([0]) &&
             redirected.SoleTargetRedirectReturn!.FinalizedCursor.CandidateIndex > 0 &&
-            parent.TargetSeats.SequenceEqual([0]) && parent.ZixiEffectRounds is { Started: 0, Grants: [{ TargetSeat: 2, CurrentTargetSeat: 0 }] } &&
+            parent.TargetSeats.SequenceEqual([0]) && parent.EffectEpisodes is { Episodes: [{ Started: 0, Issue.Spec: { TargetSeat: 2, TargetIndex: 0 } }] } &&
             s.G.CardMovements.Count(m => m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(0) &&
                 m.Reason.Value == "skill-program.sole-target-protection.draw") == 1 &&
             s.E<ZixiExtraEffectIssuedEvent>().Count(e => e.UseId == grant.UseId) == 1,
@@ -160,10 +160,10 @@ internal static partial class LeDaQiaoZixiChecks
             liuli is [var binding] && after[0].ProgramFrameId == binding.FrameId &&
             s.E<ProgramBindingResolvedEvent>().Count(e => e.FrameId == binding.FrameId && e.SkillInstanceId == binding.SkillInstanceId &&
                 e.SkillId == binding.SkillId && e.BindingId == binding.BindingId && e.Window == binding.Window && e.Activated && e.Completed) == 1 &&
-            s.E<ZixiExtraEffectRedirectedEvent>().Where(e => e.UseId == grant.UseId && e.FrameId == grant.FrameId).ToArray() is
-                [{ PreviousSeat: 0, TargetSeat: 3 }] &&
-            s.E<ZixiExtraEffectRoundStartedEvent>().Count(e => e.UseId == grant.UseId && e.TargetSeat == 3) == 1 &&
-            s.E<ZixiExtraEffectRoundCompletedEvent>().Count(e => e.UseId == grant.UseId && e.TargetSeat == 3) == 1 &&
+            s.RoundsStarted().Where(e => e.UseFrameId == grant.UseId && e.Episode.Issue.IssuerFrameId == grant.FrameId).ToArray() is
+                [{ Episode.Issue.Spec: { TargetSeat: 2, TargetIndex: 0 }, Cursor: { TargetIndex: 0, TargetSeats: [3] } }] &&
+            s.RoundsStarted().Count(e => e.UseFrameId == grant.UseId && e.Cursor.TargetSeats.SequenceEqual([3])) == 1 &&
+            s.RoundsCompleted().Count(e => e.UseFrameId == grant.UseId && e.Cursor.TargetSeats.SequenceEqual([3])) == 1 &&
             s.E<ZixiExtraEffectIssuedEvent>().Count(e => e.UseId == grant.UseId) == 1 &&
             s.E<ZixiEffectsStartedEvent>().Count(e => e.UseId == grant.UseId) == 1 &&
             s.E<SoleTargetProtectionPaidEvent>().Count(e => e.Receipt.CardUseFrameId == grant.UseId) == 1 &&
@@ -188,8 +188,8 @@ internal static partial class LeDaQiaoZixiChecks
             "The genuine one-target grant is already issued before the lower-priority native target-addition instruction chooses anybody else.");
         s.Private(); s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "select-target" && c.Targets.SequenceEqual([3])); s.Play();
         s.Need(s.V(1).Hp == hp1 - 2 && s.V(3).Hp == hp3 - 1 &&
-            s.E<ZixiExtraEffectRoundStartedEvent>().Where(e => e.UseId == grant.UseId).ToArray() is [var round] && round.TargetSeat == 1 &&
-            s.E<ZixiExtraEffectRoundCompletedEvent>().Count(e => e.UseId == grant.UseId && e.TargetSeat == 1) == 1 &&
+            s.RoundsStarted().Where(e => e.UseFrameId == grant.UseId).ToArray() is [var round] && round.Cursor.TargetSeats.SequenceEqual([1]) &&
+            s.RoundsCompleted().Count(e => e.UseFrameId == grant.UseId && e.Cursor.TargetSeats.SequenceEqual([1])) == 1 &&
             s.E<CardUseDeclaredEvent>().Count(e => e.ResolutionId == grant.UseId && e.CardId == slash.CardId) == 1 &&
             s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == grant.UseId && e.CardId == slash.CardId) == 1 &&
             s.G.CardMovements.Count(m => m.CardId == slash.CardId && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
@@ -203,6 +203,8 @@ internal static partial class LeDaQiaoZixiChecks
         public PlayerSnapshot V(int seat = 0) => G.CreateSnapshot(seat).Players[seat];
         public IReadOnlyList<CardSnapshot> Hand() => V().Hand;
         public T[] E<T>() => G.Events.Select(e => e.Payload).OfType<T>().ToArray();
+        public NativeCardEffectEpisodeStartedEvent[] RoundsStarted() => E<NativeCardEffectEpisodeStartedEvent>().Where(e => e.Episode.Issue.Source.SkillId == ZdSkill).ToArray();
+        public NativeCardEffectEpisodeCompletedEvent[] RoundsCompleted() => E<NativeCardEffectEpisodeCompletedEvent>().Where(e => e.Episode.Issue.Source.SkillId == ZdSkill).ToArray();
         public int[] Marks() => E<CardEntityMarkedEvent>().Where(e => e.Mark == "qiqin" && e.InitialOwnerSeat == 0).Select(e => e.CardId).ToArray();
         public ProgramSkillFrame Frame(long id) => G.ResolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == id);
         public LegalAction[] Actions() => G.GetHumanLegalActions().Where(a => a.CardId is not null && a.ConversionSource is null && a.ProgramSkillId is null).ToArray();
@@ -246,7 +248,7 @@ internal static partial class LeDaQiaoZixiChecks
         public void Need(bool valid, string why) { if (!valid) throw new InvalidOperationException(why + " " + Diagnostic()); }
         public void Accept(GameCommand c) { var r = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single()); Need(r.Accepted, "Rejected " + c.GetType().Name + " " + JsonSerializer.Serialize(r.Error)); }
         private string State() => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, 4).Select(i => SnapshotJson.Serialize(G.CreateSnapshot(i))), Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())), G.CardMovements, Events = G.Events.Select(e => JsonSerializer.Serialize(e.Payload, e.Payload.GetType())), Commands = CommandJson.Serialize(G.AcceptedCommands) });
-        public string Diagnostic() => JsonSerializer.Serialize(new { scene, P, Hp = V().Hp, PeerHp = V(1).Hp, Frames = G.ResolutionStack, Placed = E<JudgmentCardAttachedEvent>(), Started = E<ZixiEffectsStartedEvent>(), Draws = E<ZixiEffectsDrawReturnedEvent>(), Obtain = E<ZixiEffectsObtainPaidEvent>(), Damage = E<ZixiEffectsDamageIssuedEvent>(), Completed = E<ZixiEffectsCompletedEvent>(), Flood = E<WumiaoFloodEffectStartedEvent>(), FloodDiscards = E<WumiaoFloodDiscardPaidEvent>(), Juewu = E<JuewuUseIssuedEvent>(), ExtraRounds = E<ZixiExtraEffectRoundStartedEvent>(), ExtraRedirects = E<ZixiExtraEffectRedirectedEvent>(), SoleReplaced = E<SoleTargetReplacedEvent>(), ProtectedRedirects = E<SoleTargetAfterProtectionRedirectedEvent>(), ProtectionPaid = E<SoleTargetProtectionPaidEvent>(), FinishedUses = E<CardUseFinishedEvent>(), AppliedDamage = E<DamageAppliedEvent>() });
+        public string Diagnostic() => JsonSerializer.Serialize(new { scene, P, Hp = V().Hp, PeerHp = V(1).Hp, Frames = G.ResolutionStack, Placed = E<JudgmentCardAttachedEvent>(), Started = E<ZixiEffectsStartedEvent>(), Draws = E<ZixiEffectsDrawReturnedEvent>(), Obtain = E<ZixiEffectsObtainPaidEvent>(), Damage = E<ZixiEffectsDamageIssuedEvent>(), Completed = E<ZixiEffectsCompletedEvent>(), Flood = E<WumiaoFloodEffectStartedEvent>(), FloodDiscards = E<WumiaoFloodDiscardPaidEvent>(), Juewu = E<JuewuUseIssuedEvent>(), ExtraRounds = RoundsStarted(), ExtraCompleted = RoundsCompleted(), SoleReplaced = E<SoleTargetReplacedEvent>(), ProtectedRedirects = E<SoleTargetAfterProtectionRedirectedEvent>(), ProtectionPaid = E<SoleTargetProtectionPaidEvent>(), FinishedUses = E<CardUseFinishedEvent>(), AppliedDamage = E<DamageAppliedEvent>() });
         public void Cold() { var before = State(); G = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry); Need(State() == before, "Cold replay retains original Qin identities, occupied subslots, private selections, accepted card cost and exact native child/extra-effect cursors."); }
         public void Reject(GameCommand c) { var before = State(); Need(!G.Submit(CommandJson.Deserialize(CommandJson.Serialize([c])).Single()).Accepted && before == State(), "A foreign, unpublished or retired input cannot move a Qin, repeat payment or issue another native effect round."); }
         public void RejectPrompt() { var p = P!; Reject(new AnswerPromptCommand(1, p.PromptId, p.Choices[0].Id, G.Revision)); Reject(new AnswerPromptCommand(0, p.PromptId, new("forged-zixi-choice"), G.Revision)); }

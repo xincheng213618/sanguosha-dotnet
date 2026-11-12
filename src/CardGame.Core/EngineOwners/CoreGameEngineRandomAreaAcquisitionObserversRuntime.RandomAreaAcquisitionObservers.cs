@@ -28,7 +28,7 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionObserversRuntim
         if (lion.Length != 1)
             return false;
         if (child is RecoveryReplacementFrame recovery)
-            return _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.SourceSeat == step.TargetSeat && recovery.Attempt.TargetSeat == step.TargetSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason == CoreGameEngineRandomAreaAcquisitionRuntime.RandomAreaReason(root, step.SeatIndex) && _coreTypedRecoveryDamageCursorOperations.TypedRecoveryApplicationBoundsMatch(recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, root) && recovery.Return.Continuation == PostEventContinuation.AwaitedProgramMovement && recovery.Attempt.SourceSeat == step.TargetSeat && recovery.Attempt.TargetSeat == step.TargetSeat && recovery.Attempt.Amount == 1 && recovery.Attempt.Completion.Producer == RecoveryAttemptProducer.SilverLion && recovery.Attempt.Completion.MoveReason == CoreGameEngineRandomAreaAcquisitionRuntime.RandomAreaReason(root, step.SeatIndex) && _coreTypedRecoveryDamageCursorOperations.TypedRecoveryApplicationBoundsMatch(recovery);
         return child is HpChangedTriggerWindowFrame hp && hp.Change.ParentFrameId == root.Id && hp.ResumeFrameId == root.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.SourceSeat == step.TargetSeat && hp.Change.TargetSeat == step.TargetSeat && hp.Change.Amount == 1;
     }
 
@@ -40,11 +40,10 @@ internal sealed partial class CoreGameEngineRandomAreaAcquisitionObserversRuntim
             return RandomAreaFirstChild(root, child);
         if (parent is RecoveryReplacementFrame recovery)
         {
-            var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
             if (child is HpChangedTriggerWindowFrame hp)
-                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryHpReturnMatches(recovery, hp, history);
+                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryHpReturnMatches(recovery, hp);
             if (child is CardsMovedTriggerWindowFrame moved)
-                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryRewardReturnMatches(recovery, moved, history);
+                return _coreTypedRecoveryDamageCursorOperations.TypedRecoveryRewardReturnMatches(recovery, moved);
         }
 
         return CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, parent) || CoreGameEngineCharacterTurnedOverProgramsRuntime.CharacterTurnedOverFrameRidesOn(child, parent) || _coreOrderedPrintedSkillLossObserversOperations.OrderedPrintedSkillLossSkillsChangedEdge(parent, child) || _coreDamageObserverCursorQueriesOperations.TypedDamagePostEventEdge(parent, child) || _coreHalfHandPhaseDebtDamageObserversOperations.HalfHandPaidDamageObserverEdge(index) || _coreProgramChildResolutionOperations.ProgramChildResolutionEdge(index);

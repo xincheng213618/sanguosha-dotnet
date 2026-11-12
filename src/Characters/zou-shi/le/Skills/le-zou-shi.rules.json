@@ -3,6 +3,7 @@
     {
       "id": "le:yunzheng",
       "revision": 1,
+      "cardPolicies": [{"id":"marked-hand-exemption","kind":"handLimitCardKindExemption","handLimitMatch":{"mark":"zheng","requireLivingHolder":true}}],
       "skillStates": [{
         "action": "suppress", "target": "all",
         "match": { "filter": ["==", ["number", "skill.locked"], 0] },

@@ -6,6 +6,7 @@ public sealed record HuanpeiNativeRequest(HuanpeiIntent Intent, long? ParentFram
     long? ParentActionId, int ActorSeat, int Cursor, CardKind? RequiredKind, int? FixedTargetSeat,
     PromptId OriginalPromptId, long OriginalRevision)
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ProgramSlashRequestIdentity? RequestIdentity { get; init; }
     public string? ParentSkillId { get; init; }
     public string? ParentSkillInstanceId { get; init; }
     public string? ParentGameplayHash { get; init; }
@@ -15,6 +16,7 @@ public sealed record HuanpeiPaidOrigin(long ProgramFrameId, CardConversionSource
     int Round, int ActualTurn, int TurnOwner, HuanpeiNativeRequest Request, int FrozenHandCount,
     int FrozenHp, int AdjustmentCount, long SequenceBefore, long SequenceAfter, CardKind Kind)
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ProgramSlashRequestAcceptance? RequestAcceptance { get; init; }
     private readonly IReadOnlyList<int> _targets = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Targets { get => _targets; init => _targets = Array.AsReadOnly(value.ToArray()); }
 }

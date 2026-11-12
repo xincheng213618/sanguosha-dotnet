@@ -51,7 +51,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesRuntime
                 return;
             }
 
-            BeginDrawFundedDistinctBasicSlash(actor, frame.TargetSeats, p, null, true, null);
+            BeginDrawFundedDistinctBasicSlash(actor, frame.TargetSeats, p, null, p.RequestAcceptance?.Identity.Spec.CountsTowardSlashLimit ?? true, null);
             return;
         }
 
@@ -81,54 +81,10 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesRuntime
         var parent = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A paid program Slash lost its original request.");
         if (parent.Id != p.ParentFrameId || parent.InstructionIndex != p.Cursor)
             throw new InvalidOperationException("A paid program Slash moved its original instruction cursor.");
-        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(parent))
-        {
-            _characterLvKuangLvXiangOlOperations.PrepareQigongDrawFundedSlash(parent, p);
-            BeginDrawFundedDistinctBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
-            return;
-        }
-
-        if (_characterWuJingOlOperations.IsWuJingHejiRequest(parent))
-        {
-            _characterWuJingOlOperations.PrepareWuJingDrawFundedSlash(parent, p);
-            BeginDrawFundedDistinctBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
-            return;
-        }
-
-        if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(parent))
-        {
-            _characterCaoChunOlOperations.PrepareCaoChunDrawFundedSlash(parent, p);
-            BeginDrawFundedDistinctBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
-            return;
-        }
-
-        var effect = ProgramInstructionResolver.Default.Resolve(parent, _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program!).GetPausedInstruction(parent.InstructionIndex).Effect;
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(parent))
-        {
-            _characterSunYuanOlOperations.PrepareSayingSuppliedSlash(parent, actor.Seat, actor.Seat, p.TargetSeat!.Value, kind, [], p.Source);
-            BeginDrawFundedDistinctBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
-            return;
-        }
-
-        if (_characterLiYiOlOperations.IsChanshuangSlashRequest(parent))
-        {
-            _characterLiYiOlOperations.PrepareChanshuangSuppliedSlash(parent, actor.Seat, actor.Seat, p.TargetSeat!.Value, kind, [], p.Source);
-            BeginDrawFundedDistinctBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
-            return;
-        }
-
-        if (p.Intent == DrawFundedDistinctBasicIntent.ProgramSlash)
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(parent.Id, effect.ResultBind!, RequestSlashByTargetProgramOperationDescriptor.UsedSlashOption, actor.Seat, "摸牌后视为使用【杀】。");
-        else if (p.Intent == DrawFundedDistinctBasicIntent.AssistedSlash)
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { AssistedSlashRequest = null });
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(parent.Id, effect.ResultBind!, "used-slash", actor.Seat, "摸牌后视为使用【杀】。");
-        }
-        else if (p.Intent == DrawFundedDistinctBasicIntent.NearestLegalSlash)
-            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { NearestLegalSlashRequest = null });
-        else if (p.Intent != DrawFundedDistinctBasicIntent.ProgramNearestSlash)
-            throw new InvalidOperationException("A paid Slash has an unknown typed native return.");
-        BeginDrawFundedDistinctBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
+        if (p.RequestAcceptance is not { } acceptance)
+            throw new InvalidOperationException("A paid Slash lost its accepted original request.");
+        parent = _requestExecution.PrepareAcceptedUse(parent, acceptance);
+        BeginDrawFundedDistinctBasicSlash(actor, frame.TargetSeats, p, null, acceptance.Identity.Spec.CountsTowardSlashLimit, parent.Id);
     }
 
     internal void BeginDrawFundedDistinctBasicSlash(CharacterState actor, IReadOnlyList<int> targets, DrawFundedDistinctBasicPayment p, NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit, long? programParent)
@@ -137,7 +93,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicUsesRuntime
             throw new InvalidOperationException("A paid zero-material Slash requires its accepted ordered targets.");
         var kind = p.EffectiveKind;
         var card = new Card(0, kind, Suit.None, 0);
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, targets, kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], kind), physicalCardIds: [], conversionSource: p.Source, drawFundedPayment: p);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, targets, kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], kind), physicalCardIds: [], conversionSource: p.Source, drawFundedPayment: p, programSlashRequest: p.RequestAcceptance);
         var actualTargets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, actualTargets[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[actualTargets[0]], kind), programSkillCardUseFrameId: programParent);
         if (borrowed is not null)

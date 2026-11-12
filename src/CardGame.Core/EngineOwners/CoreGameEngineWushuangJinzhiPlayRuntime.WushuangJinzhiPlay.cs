@@ -46,7 +46,8 @@ internal sealed partial class CoreGameEngineWushuangJinzhiPlayRuntime
         var suit = Suit.None;
         bool? color = null;
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
-            return _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, p, kind, suit, effectiveColor: color, physicalCardIds: selection.Cards.Select(c => c.Id).ToArray(), conversionSource: selection.Source)).Select(p => p.Seat).ToArray();
+            return _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(owner, _coreMatchParticipantsPlayersAccess._players,
+                kind, suit, effectiveColor: color, physicalCardIds: selection.Cards.Select(c => c.Id).ToArray(), conversionSource: selection.Source);
         return kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(owner) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit) ? [owner.Seat] : [];
     }
 

@@ -31,7 +31,7 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
             var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(p => p.Id == o.ProgramFrameId);
             _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { MouLixian = parent.MouLixian!with { MovementSequence = m.Sequence, After = m.Sequence } });
             if (m.To == CardLocation.OutsideGame)
-                _nativeCardRepresentations.CaptureDeparture(use.Id, m.CardId, m.Sequence);
+                _nativeMaterialClaims.CaptureRetirement(use.Id, [m]);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouLixianMaterialPaidEvent(parent.Id, use.Id, m.CardId, m.CardKind, m.From, m.To, m.Sequence));
         }
     }
@@ -54,7 +54,6 @@ internal sealed partial class CharacterHuangYueyingOlMouRuntime
         return paid is [var p] && p.FrameId == o.ProgramFrameId && p.CardId == o.CardId && p.PrintedKind == o.PrintedKind && p.From == o.From && p.MovementSequence > o.BeforePayment && (p.To == CardLocation.Processing || p.To == CardLocation.OutsideGame && (_coreAdvancedLifecycleOperations.GetAdvancedCard(p.CardId).IsGeneralWeapon && o.From.Zone == CardZoneKind.Equipment || CoreGameEngineGuanduEquipmentRuntime.IsGuanduThunderChariotDeparture(_coreAdvancedLifecycleOperations.GetAdvancedCard(p.CardId), o.From, p.To))) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == p.MovementSequence && m.CardId == p.CardId && m.CardKind == p.PrintedKind && m.From == p.From && m.To == p.To && m.Reason == CardMoveReasons.Use) == 1;
     }
 
-    internal bool IsMouLixianRemovedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { MouLixianOrigin: { } o } use && o.CardId == cardId && IsIssuedMouLixianUse(use) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouLixianMaterialPaidEvent>().Count(p => p.UseId == useId && p.CardId == cardId && p.To == CardLocation.OutsideGame) == 1;
     [NativeUseValidation(28960)]
     internal void ValidateMouLixianNativeReturn(CardUseFrame use)
     {

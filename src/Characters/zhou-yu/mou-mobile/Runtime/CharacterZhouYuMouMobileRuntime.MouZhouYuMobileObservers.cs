@@ -47,7 +47,7 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && hp.Change.TargetSeat == r.TargetSeat && hp.Change.Kind == HpChangeKind.Loss && r.LossPaid && hp.Change.Amount == 1 && hp.Change.HpBefore == r.LossHpBefore && hp.Change.HpAfter == r.LossHpAfter;
         if (child is RecoveryReplacementFrame recovery)
-            return recovery.ParentFrameId == f.Id && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return recovery.ParentFrameId == f.Id && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery);
         if (child is CardsMovedTriggerWindowFrame moved)
             return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouZhouYuMobileMovementSignedEvent>().Contains(new(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)));
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
@@ -64,7 +64,7 @@ internal sealed partial class CharacterZhouYuMouMobileRuntime
         if (!ValidMouZyMobile(f))
             return false;
         if (recovery.ParentFrameId == f.Id)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery);
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var c = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == recovery.Id);
         return i >= 0 && c > i + 1 && MouZyMobileFirstChild(f, _resolutionStackOperations._resolutionStack[i + 1]) && MouZyMobileObserverSuffix(i) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(recovery, _resolutionStackOperations._resolutionStack[c - 1]);

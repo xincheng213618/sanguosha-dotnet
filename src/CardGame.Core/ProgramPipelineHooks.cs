@@ -201,7 +201,9 @@ internal sealed class ProgramPipelineHookCatalog
     {
         var phases = Enum.GetValues<ProgramPipelinePhase>().ToDictionary(phase => phase,
             _ => new SortedDictionary<int, Registration>());
-        foreach (var method in methods.OrderBy(method => method.DeclaringType?.FullName, StringComparer.Ordinal)
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramPipelineHookAttribute), inherit: true))
+                     .OrderBy(method => method.DeclaringType?.FullName, StringComparer.Ordinal)
                      .ThenBy(method => method.Name, StringComparer.Ordinal))
         {
             foreach (var attribute in method.GetCustomAttributes<ProgramPipelineHookAttribute>())

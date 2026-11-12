@@ -167,6 +167,12 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
 
     internal void PublishHappyPt(ProgramSkillFrame f)
     {
+        if (f.HappyPangTong is { Stage: HappyPangTongStage.UpperTarget or HappyPangTongStage.UpperCard } issued)
+        {
+            _slashRequests.Issue(f, f.OwnerSeat, new(ProgramSlashRequestTargetSource.AllOtherLiving,
+                ResultBind: HappyPtUpperBind(f), RetainAcceptedSourceLoss: true, RetainAcceptedOwnerDeath: true, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction), issued.Cursor);
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        }
         var choices = HappyPtChoices(f);
         if (choices.Count == 0)
         {
@@ -205,6 +211,8 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
 
         if (r.Stage == HappyPangTongStage.UpperTarget)
         {
+            _slashRequests.SelectTarget(f, f.OwnerSeat, choice.Targets.Single());
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HappyPangTong = r with { Stage = HappyPangTongStage.UpperCard, SlashTarget = choice.Targets.Single() } });
             PublishHappyPt(f);
             return;
@@ -223,6 +231,8 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
             var(cards, kind, conversion) = _coreAssistedSlashPaymentOperations.ReadAssistedSlashPayment(actor, choice);
             if (!_coreNearestLegalSlashRequestsOperations.NearestSlashPaymentHasRange(actor, r.SlashTarget, cards, conversion, kind) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[r.SlashTarget], cards[0], conversion, kind, noEffectiveRank: cards.Count > 1, specificEffectiveRank: choice.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, cards) : null, physicalCardIds: cards.Select(c => c.Id).ToArray()))
                 throw new InvalidOperationException("Upper plan Slash lost its real payment or legal target.");
+            _slashRequests.Accept(f, actor.Seat, r.SlashTarget);
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { HappyPangTong = r with { Stage = HappyPangTongStage.UpperUse } });
             _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[r.SlashTarget], cards[0], kind, actor.Seat, physicalCards: cards, countsTowardSlashLimit: false, usesZhuqueFan: kind == CardKind.FireSlash && (cards[0].Kind == CardKind.Slash || _coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(actor, cards[0])) && _coreNativeTargetLegalityOperations.HasZhuqueFan(actor), conversionSource: conversion, programSkillCardUseFrameId: f.Id);
             return;
@@ -350,6 +360,8 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
     internal void SettleHappyPt(ProgramSkillFrame supplied, bool success)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var r = f.HappyPangTong!;
         var plan = HappyPtPlan(r.CurrentPlanId);
         if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongPlanSettledEvent>().Any(e => e.PlanId == plan.PlanId))
@@ -398,6 +410,11 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { HappyPangTong: not null } f || f.Id != id)
             return false;
+        if (_slashRequests.TakeFailure(f) is not null)
+        {
+            SettleHappyPt(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), false);
+            return true;
+        }
         ContinueHappyPt(id);
         return true;
     }

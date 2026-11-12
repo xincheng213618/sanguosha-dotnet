@@ -114,58 +114,18 @@ internal sealed partial class CharacterLiuZhangOlRuntime
 
     internal void PrepareZonghuProgram(ProgramSkillFrame parent, ZonghuPaidOrigin p)
     {
-        var e = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(parent)!;
-        var n = p.Need;
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(parent))
-        {
-            _characterSunYuanOlOperations.PrepareSayingSuppliedSlash(parent, n.ActorSeat, n.ProviderSeat, p.TargetSeat, p.OutputKind, [], p.Source);
-            return;
-        }
-
-        if (_characterLiYiOlOperations.IsChanshuangSlashRequest(parent))
-        {
-            _characterLiYiOlOperations.PrepareChanshuangSuppliedSlash(parent, n.ActorSeat, n.ProviderSeat, p.TargetSeat, p.OutputKind, [], p.Source);
-            return;
-        }
-
-        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(parent))
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { LvKuangLvXiang = parent.LvKuangLvXiang!with { Stage = "issuing", IssuingIds = [], IssuingKind = p.OutputKind, IssuingProvider = p.Need.ProviderSeat } });
-            return;
-        }
-
-        if (_characterWuJingOlOperations.IsWuJingHejiRequest(parent))
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { WuJing = parent.WuJing!with { Stage = WuJingStage.IssuingUse, Selection = new(p.OutputKind, false, false) { Conversions = [p.Source] }, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-            return;
-        }
-
-        if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(parent))
-        {
-            var r = parent.CaoChun!;
-            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { CaoChun = r with { Stage = CaoChunStage.NativeSlash, Slash = new(parent.Id, r.Source, r.GameplayHash, r.InstructionIndex, r.ActualTurn, r.PhaseInstance, false, p.TargetSeat, p.OutputKind) { ProviderSeat = n.ProviderSeat, Materials = [], PaymentBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } } });
-            return;
-        }
-
-        if (n.Intent == ZonghuIntent.ProgramSlash)
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(parent.Id, e.ResultBind!, RequestSlashByTargetProgramOperationDescriptor.UsedSlashOption, n.ActorSeat, "宗护：视为使用杀。");
-        else if (n.Intent == ZonghuIntent.AssistedSlash)
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { AssistedSlashRequest = null });
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(parent.Id, e.ResultBind!, "used-slash", n.ActorSeat, "宗护：视为使用杀。");
-        }
-        else if (n.Intent == ZonghuIntent.FixedSlash)
-            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { FixedTargetSlash = parent.FixedTargetSlash!with { Issued = true } });
-        else if (n.Intent == ZonghuIntent.NearestLegalSlash)
-            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { NearestLegalSlashRequest = null });
+        if (p.RequestAcceptance is not { } acceptance)
+            throw new InvalidOperationException("A paid native Slash lost its original accepted request.");
+        _requestExecution.PrepareAcceptedUse(parent, acceptance);
     }
 
     internal void BeginZonghuSlash(ZonghuPaidOrigin p, NativeOwners.BorrowedSwordHandle? borrowed, bool counts, long? parent, NativeOwners.FactionCardRequestHandle? faction = null)
     {
+        counts |= p.RequestAcceptance?.Identity.Spec.CountsTowardSlashLimit == true;
         var actor = _coreMatchParticipantsPlayersAccess._players[p.Need.ActorSeat];
         var target = _coreMatchParticipantsPlayersAccess._players[p.TargetSeat];
         var kind = p.OutputKind;
-        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, kind, Suit.None, 0), actor.Seat, [target.Seat], kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, kind), physicalCardIds: [], conversionSource: p.Source, zonghuOrigin: p, standardZeroEntityAttackCompletion: true);
+        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, kind, Suit.None, 0), actor.Seat, [target.Seat], kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, kind), physicalCardIds: [], conversionSource: p.Source, zonghuOrigin: p, standardZeroEntityAttackCompletion: true, programSlashRequest: p.RequestAcceptance);
         var actual = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, actual.TargetSeats[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[actual.TargetSeats[0]], kind), programSkillCardUseFrameId: parent);
         if (borrowed is not null)

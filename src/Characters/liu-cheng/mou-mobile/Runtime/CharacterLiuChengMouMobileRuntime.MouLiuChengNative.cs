@@ -27,7 +27,9 @@ internal sealed partial class CharacterLiuChengMouMobileRuntime
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
         {
             var actions = new List<LegalAction>();
-            var targets = _coreMatchParticipantsPlayersAccess._players.Where(t => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, t, kind, physicalCardIds: [], physicalSuit: Suit.None, effectiveColor: null, effectiveRank: 0, conversionSource: source, countsTowardLimit: false)).ToArray();
+            var targets = _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, _coreMatchParticipantsPlayersAccess._players,
+                kind, physicalCardIds: [], physicalSuit: Suit.None, effectiveColor: null, effectiveRank: 0, conversionSource: source, countsTowardLimit: false)
+                .Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).ToArray();
             actions.AddRange(targets.Select(t => new LegalAction(LegalActionKind.Slash, 0, t.Seat, $"视为对{(t.Name)}使用【{(neutral.DisplayName)}】", kind) { ConversionSource = source }));
             _coreProgramCardUseRulesOperations.AddProgramTargetCountSlashActions(actions, actor, neutral, targets, neutral.DisplayName, kind, source, null);
             _coreNextCardTargetAdjustmentsOperations.AddNextCardTargetAdjustmentActions(actions, actor);

@@ -31,7 +31,6 @@ internal sealed partial class CharacterCaiWenJiLeEntries
     internal bool HasShuangjiaEntityMark(int cardId) => _resolve().HasShuangjiaEntityMark(cardId);
     internal bool IsBeifenOwnedLoss(CardMovementRecord m, int owner) => _resolve().IsBeifenOwnedLoss(m, owner);
     internal bool IsIssuedBeifenCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedBeifenCandidate(c, context);
-    internal bool IsShuangjiaHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsShuangjiaHandLimitExempt(owner, cardId);
     internal void IssueBeifenUse(CardUseFrame use) => _resolve().IssueBeifenUse(use);
     internal bool ResumeBeifen(long id) => _resolve().ResumeBeifen(id);
     internal bool ReturnBeifenMovement(ProgramSkillFrame f) => _resolve().ReturnBeifenMovement(f);

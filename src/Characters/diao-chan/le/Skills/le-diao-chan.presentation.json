@@ -2,6 +2,7 @@
   "schemaVersion": 3,
   "skills": {
     "le:tanban": {
+      "cardMarks": { "tanban": "檀板" },
       "name": "檀板",
       "description": "游戏开始时，你的初始手牌增加“檀板”标记且不计入手牌上限。摸牌阶段结束时，你可以交换手中檀板牌与非檀板牌的标记。"
     },

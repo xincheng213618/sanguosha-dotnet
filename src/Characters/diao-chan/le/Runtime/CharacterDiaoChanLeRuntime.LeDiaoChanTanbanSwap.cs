@@ -27,7 +27,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
     internal SkillProgramStepOutcome SwapTanbanHandMarks(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        if (!ExactTanbanDrawEndFrame(frame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanHandMarksSwappedEvent>().Any(e => e.FrameId == frame.Id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanEntityMarkChangedEvent>().Any(e => e.FrameId == frame.Id))
+        if (!ExactTanbanDrawEndFrame(frame) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<TanbanHandMarksSwappedEvent>().Any(e => e.FrameId == frame.Id))
             throw new InvalidOperationException("Tanban inversion requires its once-accepted exact actual draw-end mother.");
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         if (!owner.IsAlive || _coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame))
@@ -40,10 +40,9 @@ internal sealed partial class CharacterDiaoChanLeRuntime
             var entry = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == card.Id && m.To == CardLocation.Hand(owner.Seat));
             if (entry is null || entry.CardKind != card.Kind)
                 throw new InvalidOperationException("Tanban inversion requires a genuine currently owned Hand entity.");
-            return new TanbanEntityMarkChangedEvent(frame.Id, source, frame.GameplayHash, owner.Seat, card.Id, card.Kind, entry.Sequence, HasTanbanEntityMark(card.Id), !HasTanbanEntityMark(card.Id));
+            return new CardEntityMarkChange(card.Id, "tanban", !_cardEntityMarks.Has(card.Id, "tanban"));
         }).ToArray();
-        foreach (var change in hand)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(change);
+        _cardEntityMarkOperations.Set(frame.Id, hand);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TanbanHandMarksSwappedEvent(frame.Id, source, frame.GameplayHash, frame.WindowContext!.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, owner.Seat, hand.Length));
         return SkillProgramStepOutcome.Continue;
     }

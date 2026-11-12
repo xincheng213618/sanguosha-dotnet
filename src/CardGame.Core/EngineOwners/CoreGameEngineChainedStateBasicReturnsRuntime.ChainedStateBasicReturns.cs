@@ -15,7 +15,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsRuntime
 
         if (p.Intent == ChainedStateBasicIntent.Play)
         {
-            BeginChainedStateBasicSlash(actor, frame.TargetSeats, p, null, true, null);
+            BeginChainedStateBasicSlash(actor, frame.TargetSeats, p, null, p.RequestAcceptance?.Identity.Spec.CountsTowardSlashLimit ?? true, null);
             return;
         }
 
@@ -45,54 +45,10 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsRuntime
         var parent = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("A paid chained-state Slash lost its request parent.");
         if (!ChainedStateBasicProgramActor(parent, p))
             throw new InvalidOperationException("A paid chained-state Slash changed its original actor or instruction.");
-        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(parent))
-        {
-            _characterLvKuangLvXiangOlOperations.PrepareQigongChainedSlash(parent, p);
-            BeginChainedStateBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
-            return;
-        }
-
-        if (_characterWuJingOlOperations.IsWuJingHejiRequest(parent))
-        {
-            _characterWuJingOlOperations.PrepareWuJingChainedSlash(parent, p);
-            BeginChainedStateBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
-            return;
-        }
-
-        if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(parent))
-        {
-            _characterCaoChunOlOperations.PrepareCaoChunChainedSlash(parent, p);
-            BeginChainedStateBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
-            return;
-        }
-
-        var effect = ProgramInstructionResolver.Default.Resolve(parent, _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program!).GetPausedInstruction(parent.InstructionIndex).Effect;
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(parent))
-        {
-            _characterSunYuanOlOperations.PrepareSayingSuppliedSlash(parent, actor.Seat, actor.Seat, p.TargetSeat!.Value, p.EffectiveKind, [], p.Source);
-            BeginChainedStateBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
-            return;
-        }
-
-        if (_characterLiYiOlOperations.IsChanshuangSlashRequest(parent))
-        {
-            _characterLiYiOlOperations.PrepareChanshuangSuppliedSlash(parent, actor.Seat, actor.Seat, p.TargetSeat!.Value, p.EffectiveKind, [], p.Source);
-            BeginChainedStateBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
-            return;
-        }
-
-        if (p.Intent == ChainedStateBasicIntent.ProgramSlash)
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(parent.Id, effect.ResultBind!, RequestSlashByTargetProgramOperationDescriptor.UsedSlashOption, actor.Seat, "解除连环后视为使用【杀】。");
-        else if (p.Intent == ChainedStateBasicIntent.AssistedSlash)
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { AssistedSlashRequest = null });
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(parent.Id, effect.ResultBind!, "used-slash", actor.Seat, "解除连环后视为使用【杀】。");
-        }
-        else if (p.Intent == ChainedStateBasicIntent.NearestLegalSlash)
-            _coreRuntimeOperations.ReplaceRuntimeTop(parent with { NearestLegalSlashRequest = null });
-        else if (p.Intent != ChainedStateBasicIntent.ProgramNearestSlash)
-            throw new InvalidOperationException("A paid chained-state Slash has an unknown return.");
-        BeginChainedStateBasicSlash(actor, frame.TargetSeats, p, null, false, parent.Id);
+        if (p.RequestAcceptance is not { } acceptance)
+            throw new InvalidOperationException("A paid Slash lost its accepted original request.");
+        parent = _requestExecution.PrepareAcceptedUse(parent, acceptance);
+        BeginChainedStateBasicSlash(actor, frame.TargetSeats, p, null, acceptance.Identity.Spec.CountsTowardSlashLimit, parent.Id);
     }
 
     internal void BeginChainedStateBasicSlash(CharacterState actor, IReadOnlyList<int> targets, ChainedStateBasicPayment payment, NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit, long? programParent)
@@ -100,7 +56,7 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsRuntime
         if (!CoreNativeCardClassificationsRuntime.IsSlashCard(payment.EffectiveKind) || targets.Count == 0)
             throw new InvalidOperationException("A chained-state Slash requires its accepted actual targets.");
         var kind = payment.EffectiveKind;
-        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, kind, Suit.None, 0), actor.Seat, targets, kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], kind), physicalCardIds: [], conversionSource: payment.Source, chainedStatePayment: payment);
+        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, kind, Suit.None, 0), actor.Seat, targets, kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], kind), physicalCardIds: [], conversionSource: payment.Source, chainedStatePayment: payment, programSlashRequest: payment.RequestAcceptance);
         var actualTargets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, actualTargets[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[actualTargets[0]], kind), programSkillCardUseFrameId: programParent);
         if (borrowed is not null)
@@ -228,35 +184,8 @@ internal sealed partial class CoreGameEngineChainedStateBasicReturnsRuntime
 
     internal bool ChainedStateBasicProgramActor(ProgramSkillFrame parent, ChainedStateBasicPayment p)
     {
-        if (parent.Id != p.ParentFrameId || parent.Id != p.RequestFrameId || parent.InstructionIndex != p.Cursor || parent.InstructionIndex < 1 || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(parent.SkillId)?.Program is not { } definition || definition.GameplayHash != parent.GameplayHash)
-            return false;
-        if (_characterSunYuanOlOperations.TryGetSayingSlashRequest(parent, out var sayingActor, out var sayingTargets))
-            return p.Intent == ChainedStateBasicIntent.AssistedSlash && sayingActor == p.Source.OwnerSeat && p.TargetSeat is { } sayingTarget && sayingTargets.Contains(sayingTarget);
-        if (parent.Chanshuang is not null)
-            return p.Intent == ChainedStateBasicIntent.AssistedSlash && _characterLiYiOlOperations.TryGetChanshuangSlashRequest(parent, out var actor, out var targets) && actor == p.Source.OwnerSeat && p.TargetSeat is { } target && targets.Contains(target);
-        if (parent.LvKuangLvXiang is not null)
-            return p.Intent == ChainedStateBasicIntent.AssistedSlash && _characterLvKuangLvXiangOlOperations.QigongAdapterActor(parent, p.Source.OwnerSeat, p.TargetSeat, p.Cursor, p.ParentFrameId, p.RequestFrameId);
-        if (parent.WuJing is not null)
-            return p.Intent == ChainedStateBasicIntent.AssistedSlash && _characterWuJingOlOperations.WuJingHejiAdapterActor(parent, p.Source.OwnerSeat, p.TargetSeat, p.Cursor, p.ParentFrameId, p.RequestFrameId);
-        if (parent.CaoChun is not null)
-            return p.Intent == ChainedStateBasicIntent.AssistedSlash && _characterCaoChunOlOperations.CaoChunInitialAdapterActor(parent, p.Source.OwnerSeat, p.TargetSeat, p.Cursor, p.ParentFrameId, p.RequestFrameId);
-        var plan = ProgramInstructionResolver.Default.Resolve(parent, definition);
-        if (parent.InstructionIndex > plan.Instructions.Count)
-            return false;
-        var op = plan.GetPausedInstruction(parent.InstructionIndex).Effect.Op;
-        if (p.Intent == ChainedStateBasicIntent.ProgramNearestSlash)
-        {
-            var cursors = parent.NumberBindings.Where(b => b.Name == "participant-cursor-" + (parent.InstructionIndex - 1)).ToArray();
-            return op == SkillProgramEffectOp.RequestSlashByNearest && parent.ReexecuteParticipantInstruction && cursors is [var cursor] && cursor.Value >= 1 && cursor.Value < _coreMatchDefinitionPlayerCountAccess._playerCount && p.Source.OwnerSeat == _coreTableOrderOperations.TableStepSeat(parent.OwnerSeat, cursor.Value);
-        }
-
-        return parent.SelectedTargetSeats.SequenceEqual([p.Source.OwnerSeat]) && (p.Intent switch
-        {
-            ChainedStateBasicIntent.ProgramSlash => op == SkillProgramEffectOp.RequestSlashByTarget,
-            ChainedStateBasicIntent.AssistedSlash => op == SkillProgramEffectOp.RequestSlashAgainstChosenTarget,
-            ChainedStateBasicIntent.NearestLegalSlash => op == SkillProgramEffectOp.RequestLegalSlashByNearest,
-            _ => false
-        });
+        return parent.Id == p.ParentFrameId && parent.Id == p.RequestFrameId && parent.InstructionIndex == p.Cursor &&
+            p.RequestAcceptance is { } acceptance && _programSlashRequests.OwnsAcceptance(parent, acceptance, p.Source.OwnerSeat, p.TargetSeat);
     }
 
     internal bool IsChainedStateBasicProgramSelection(ProgramSkillFrame parent, SkillProgramEffect effect, ChainedStateBasicFrame paid)

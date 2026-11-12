@@ -18,13 +18,11 @@ internal sealed partial class CharacterSimaYiMobileGodRuntime
     MobileSimaSword? IMobileSimaRenjieFacts.ActiveSword => _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { } sword ? ProjectMobileSimaSword(sword) : null;
 
     IReadOnlyList<Card> IMobileSimaRenjieFacts.Equipment(int seat) => _corePhysicalOwnedCardQueriesOperations.GetEquipment2(seat);
-    bool IMobileSimaRenjieFacts.WenjiNullificationForbidden(NullificationWindowFrame frame, int actor) => _characterLiuQiOlOperations.IsWenjiNullificationResponseForbidden(frame, actor);
     bool IMobileSimaRenjieFacts.FuqiNullificationBanned(int actor) => _coreWushuangSkillsBAuditOperations.WushuangFuqiNullificationBanned(actor);
     bool IMobileSimaRenjieFacts.NearbyResponseProhibited(int source, int actor, CardKind kind, IReadOnlyList<int> targets, long incomingFrameId) => _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(source, actor, kind, targets, incomingFrameId, CardKind.Nullification);
     bool IMobileSimaRenjieFacts.UseUnrespondable(long useId) => _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(useId);
-    bool IMobileSimaRenjieFacts.WenjiResponseForbidden(long useId, int actor) => _characterLiuQiOlOperations.IsWenjiResponseForbidden2(useId, actor);
     bool IMobileSimaRenjieFacts.LegalBorrowedSwordTarget(int owner, int target) => _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(_coreMatchParticipantsPlayersAccess._players[owner], _coreMatchParticipantsPlayersAccess._players[target]);
-    int IMobileSimaRenjieFacts.ExtraEffectOrdinal(long useId) => _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(useId);
+    int IMobileSimaRenjieFacts.ExtraEffectOrdinal(long useId) => _nativeEffectEpisodes.Ordinal(useId);
     bool IMobileSimaRenjieFacts.NullificationEffectOwner(NullificationWindowFrame frame) => _coreDelayedNullificationOperations.Value.HasNullificationEffectOwner(frame);
     int IMobileSimaRenjieFacts.MarkerSourceCount(int owner, PlayerMarkerKind marker, int source) => _coreMatchParticipantsPlayersAccess._players[owner].MarkerSourceCounts.GetValueOrDefault((marker, source));
     bool IMobileSimaRenjieFacts.InvocationStructuralEdge(ResolutionFrame parent, ResolutionFrame child) => _characterHuaTuoAnniversaryGodOperations.SkillInvocationStructuralEdge(parent, child);

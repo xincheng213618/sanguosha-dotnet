@@ -113,7 +113,7 @@ internal sealed partial class HealthContinuationRuntime
                 return new(null, IsMalformed: true);
             IReadOnlyList<IGameEvent>? history = null;
             IReadOnlyList<IGameEvent> History() => history ??= facts.CompleteProgramEventHistory().ToArray();
-            if (first is RecoveryReplacementFrame initialRecovery && !TypedResponseCompletionRecoveryMatches(initialRecovery, History()))
+            if (first is RecoveryReplacementFrame initialRecovery && !TypedResponseCompletionRecoveryMatches(initialRecovery))
                 return new(null, IsMalformed: true);
             var suffix = ProjectTypedPaidObserverSuffix(rootIndex + 1, History);
             return suffix.IsMalformed ? new(null, IsMalformed: true) :
@@ -154,7 +154,7 @@ internal sealed partial class HealthContinuationRuntime
             {
                 if (child is HpChangedTriggerWindowFrame hp)
                 {
-                    if (!TypedRecoveryHpReturnMatches(recovery, hp, history())) return new(IsMalformed: true);
+                    if (!TypedRecoveryHpReturnMatches(recovery, hp)) return new(IsMalformed: true);
                     continue;
                 }
                 if (child is CardsMovedTriggerWindowFrame movement)
@@ -162,7 +162,7 @@ internal sealed partial class HealthContinuationRuntime
                     ProgramSkillFrame? origin = null;
                     for (var before = index - 2; before >= 0; before--)
                         if (facts.FrameAt(before) is ProgramSkillFrame program) { origin = program; break; }
-                    if (!TypedRecoveryRewardReturnMatches(recovery, movement, history(), origin)) return new(IsMalformed: true);
+                    if (!TypedRecoveryRewardReturnMatches(recovery, movement, origin)) return new(IsMalformed: true);
                     continue;
                 }
             }
@@ -170,7 +170,7 @@ internal sealed partial class HealthContinuationRuntime
             {
                 if (protocols.IsRecoveryParent(ProgramRecoveryParentPhase.RecoveryCursor, producer, nestedRecovery))
                 {
-                    if (!TypedRecoveryApplicationBoundsMatch(nestedRecovery, history())) return new(IsMalformed: true);
+                    if (!TypedRecoveryApplicationBoundsMatch(nestedRecovery)) return new(IsMalformed: true);
                     continue;
                 }
                 var paused = TypedRecoveryPausedEffect(producer);
@@ -180,7 +180,7 @@ internal sealed partial class HealthContinuationRuntime
                     return UnsupportedTypedRecoveryTargetIsMalformed(producer, instruction, nestedRecovery.Attempt.TargetSeat)
                         ? new(IsMalformed: true) : default;
                 if (!DirectProgramRecoveryReturnMatches(producer, paused, instruction, nestedRecovery) ||
-                    nestedRecovery.CandidateIndex is not null && !TypedRecoveryChosenCandidateMatches(nestedRecovery, history()))
+                    nestedRecovery.CandidateIndex is not null && !TypedRecoveryChosenCandidateMatches(nestedRecovery))
                     return new(IsMalformed: true);
                 continue;
             }
@@ -291,7 +291,7 @@ internal sealed partial class HealthContinuationRuntime
         catch (InvalidOperationException) { return true; }
     }
 
-    internal bool TypedResponseCompletionRecoveryMatches(RecoveryReplacementFrame recovery, IReadOnlyList<IGameEvent> history) =>
+    internal bool TypedResponseCompletionRecoveryMatches(RecoveryReplacementFrame recovery) =>
         recovery.Id == recovery.Attempt.Id && Enum.IsDefined(recovery.Stage) &&
         recovery.Attempt.Completion == new RecoveryAttemptCompletion(RecoveryAttemptProducer.SilverLion,
             MoveReason: recovery.Attempt.Completion.MoveReason) &&
@@ -299,7 +299,7 @@ internal sealed partial class HealthContinuationRuntime
         (recovery.CandidateIndex is not { } index
             ? recovery.Stage != RecoveryReplacementStage.Choosing || recovery.OriginalRecovered == 0
             : recovery.Stage != RecoveryReplacementStage.Choosing && index >= 0 && index < recovery.Attempt.Candidates.Count &&
-              recovery.OriginalRecovered == 0 && TypedRecoveryChosenCandidateMatches(recovery, history));
+              recovery.OriginalRecovered == 0 && TypedRecoveryChosenCandidateMatches(recovery));
 
     // This pilot follows frame-owned returns, never skill/capability names.
     // Special payment producers retain their existing receipt validators.
@@ -319,18 +319,21 @@ internal sealed partial class HealthContinuationRuntime
             if (parent is ProgramSkillFrame receiptOwner && child is HpChangedTriggerWindowFrame programHealth &&
                 programHealth.Change.Kind == HpChangeKind.Recovery)
             {
-                if (!ProgramRecoveryReceiptMatches(receiptOwner, programHealth, History())) return new(null, IsMalformed: true);
+                if (!ProgramRecoveryReceiptMatches(receiptOwner, programHealth)) return new(null, IsMalformed: true);
                 hasRecovery = true;
                 continue;
             }
-            if (protocols.ExactPaidNativeRecoveryUseEdge(parent, child, History)) continue;
+            if (parent is ProgramSkillFrame && child is CardUseFrame { HulaoPeachOrigin: not null } &&
+                protocols.ExactPaidNativeRecoveryUseEdge(parent, child)) continue;
             if (parent is CardUseFrame nativeUse && child is HpChangedTriggerWindowFrame nativeHealth)
             {
-                if (!protocols.NativeCardRecoveryReturnMatches(nativeUse, nativeHealth)) return new(null, IsMalformed: true);
+                if (nativeUse is not { RecoveryApplication: not null, CardKind: CardKind.Peach or CardKind.Alcohol } ||
+                    !protocols.NativeCardRecoveryReturnMatches(nativeUse, nativeHealth)) return new(null, IsMalformed: true);
                 hasRecovery = true;
                 continue;
             }
-            if (protocols.ExactPaidNativeRecoveryReplacementEdge(parent, child, History))
+            if (parent is CardUseFrame { HulaoPeachOrigin: not null } && child is RecoveryReplacementFrame &&
+                protocols.ExactPaidNativeRecoveryReplacementEdge(parent, child))
             {
                 hasRecovery = true;
                 continue;
@@ -338,14 +341,14 @@ internal sealed partial class HealthContinuationRuntime
             if (protocols.TypedDamagePostEventEdge(parent, child)) continue;
             if (parent is ProgramSkillFrame producer && child is RecoveryReplacementFrame recovery)
             {
-                if (ProgramRecoveryReplacementReceiptMatches(producer, recovery, History()))
+                if (ProgramRecoveryReplacementReceiptMatches(producer, recovery))
                 {
                     hasRecovery = true;
                     continue;
                 }
                 if (protocols.IsRecoveryParent(ProgramRecoveryParentPhase.DamageCursor, producer, recovery))
                 {
-                    if (!TypedRecoveryApplicationBoundsMatch(recovery, History())) return new(null, IsMalformed: true);
+                    if (!TypedRecoveryApplicationBoundsMatch(recovery)) return new(null, IsMalformed: true);
                     hasRecovery = true;
                     continue;
                 }
@@ -359,7 +362,7 @@ internal sealed partial class HealthContinuationRuntime
                         ? new(null, IsMalformed: true) : default;
                 if (!DirectProgramRecoveryReturnMatches(producer, paused, instruction, recovery))
                     return new(null, IsMalformed: true);
-                if (recovery.CandidateIndex is not null && !TypedRecoveryChosenCandidateMatches(recovery, History()))
+                if (recovery.CandidateIndex is not null && !TypedRecoveryChosenCandidateMatches(recovery))
                     return new(null, IsMalformed: true);
                 hasRecovery = true;
                 continue;
@@ -368,12 +371,12 @@ internal sealed partial class HealthContinuationRuntime
             {
                 if (child is HpChangedTriggerWindowFrame hp)
                 {
-                    if (!TypedRecoveryHpReturnMatches(recovering, hp, History())) return new(null, IsMalformed: true);
+                    if (!TypedRecoveryHpReturnMatches(recovering, hp)) return new(null, IsMalformed: true);
                     continue;
                 }
                 if (child is CardsMovedTriggerWindowFrame movement)
                 {
-                    if (!TypedRecoveryRewardReturnMatches(recovering, movement, History())) return new(null, IsMalformed: true);
+                    if (!TypedRecoveryRewardReturnMatches(recovering, movement)) return new(null, IsMalformed: true);
                     continue;
                 }
             }
@@ -405,13 +408,13 @@ internal sealed partial class HealthContinuationRuntime
         return new(root, ownedDyingId);
     }
 
-    internal bool TypedRecoveryApplicationBoundsMatch(RecoveryReplacementFrame recovery, IReadOnlyList<IGameEvent> history) =>
+    internal bool TypedRecoveryApplicationBoundsMatch(RecoveryReplacementFrame recovery) =>
         recovery.Id == recovery.Attempt.Id && Enum.IsDefined(recovery.Stage) &&
         recovery.OriginalRecovered >= 0 && recovery.OriginalRecovered <= protocols.SupportedRecoveryAmount(recovery, recovery.Attempt.Amount) &&
         (recovery.CandidateIndex is not { } index
             ? recovery.Stage != RecoveryReplacementStage.Choosing || recovery.OriginalRecovered == 0
             : recovery.Stage != RecoveryReplacementStage.Choosing && index >= 0 && index < recovery.Attempt.Candidates.Count &&
-              recovery.OriginalRecovered == 0 && TypedRecoveryChosenCandidateMatches(recovery, history));
+              recovery.OriginalRecovered == 0 && TypedRecoveryChosenCandidateMatches(recovery));
 
     internal static bool IsRecoveryCursorPrimitive(ProgramSkillInstruction? instruction) =>
         RuntimeSkills.RuntimeRules_Core_TypedRecoveryDamageCursor.IsRecoveryCursorPrimitive(instruction);
@@ -430,13 +433,22 @@ internal sealed partial class HealthContinuationRuntime
         var attempt = recovery.Attempt; var completion = attempt.Completion;
         if (recovery.Id != attempt.Id || recovery.ParentFrameId != producer.Id ||
             recovery.Return != new RecoveryReplacementReturn(PostEventContinuation.Program, producer.Id) ||
+            attempt.ProgramOrigin is not { } origin || origin.ProgramFrameId != producer.Id ||
+            origin.InstructionIndex != producer.InstructionIndex || origin.GameplayHash != producer.GameplayHash ||
             completion != new RecoveryAttemptCompletion(RecoveryAttemptProducer.Program, producer.InstructionIndex) ||
-            attempt.SourceSeat != producer.OwnerSeat || attempt.Amount <= 0 || !facts.IsValidPlayerSeat(attempt.TargetSeat) ||
             !Enum.IsDefined(recovery.Stage) || recovery.CandidateIndex is { } selected &&
                 (selected < 0 || selected >= attempt.Candidates.Count) ||
             recovery.Stage == RecoveryReplacementStage.Choosing && (recovery.CandidateIndex is not null || recovery.OriginalRecovered != 0)) return false;
         if (recovery.OriginalRecovered < 0 || recovery.OriginalRecovered > protocols.SupportedRecoveryAmount(recovery, attempt.Amount) ||
             recovery.CandidateIndex is not null && recovery.OriginalRecovered != 0) return false;
+        return PrimitiveProgramRecoveryRequestMatches(producer, effect, instruction, attempt);
+    }
+
+    private bool PrimitiveProgramRecoveryRequestMatches(ProgramSkillFrame producer, SkillProgramEffect effect,
+        RecoverProgramInstruction instruction, RecoveryAttempt attempt)
+    {
+        if (attempt.SourceSeat != producer.OwnerSeat || attempt.Amount <= 0 || !facts.IsValidPlayerSeat(attempt.TargetSeat))
+            return false;
         var requested = instruction.Amount switch
         {
             FixedProgramAmount fixedAmount => fixedAmount.Value,
@@ -455,8 +467,7 @@ internal sealed partial class HealthContinuationRuntime
         return target == attempt.TargetSeat;
     }
 
-    internal bool TypedRecoveryHpReturnMatches(RecoveryReplacementFrame recovery, HpChangedTriggerWindowFrame hp,
-        IReadOnlyList<IGameEvent> history)
+    internal bool TypedRecoveryHpReturnMatches(RecoveryReplacementFrame recovery, HpChangedTriggerWindowFrame hp)
     {
         var attempt = recovery.Attempt; var change = hp.Change;
         if (hp.Continuation == PostEventContinuation.AmountSupport)
@@ -470,41 +481,39 @@ internal sealed partial class HealthContinuationRuntime
             return change.SourceSeat == attempt.SourceSeat && change.TargetSeat == attempt.TargetSeat &&
                 change.HpBefore == protocols.SupportedRecoveryHpBefore(recovery, HappyQiaoRecoveryProof.HpBefore(recovery)) && change.Amount == recovery.OriginalRecovered &&
                 change.Amount <= protocols.SupportedRecoveryAmount(recovery, attempt.Amount);
-        if (!TypedRecoveryChosenCandidateMatches(recovery, history)) return false;
+        if (!TypedRecoveryChosenCandidateMatches(recovery)) return false;
         var candidate = attempt.Candidates[index];
         return recovery.OriginalRecovered == 0 && change.SourceSeat == attempt.TargetSeat &&
             change.TargetSeat == candidate.OwnerSeat && change.Amount <= protocols.SupportedRecoveryAmount(recovery, candidate.RecoveryAmount);
     }
 
-    internal bool TypedRecoveryChosenCandidateMatches(RecoveryReplacementFrame recovery, IReadOnlyList<IGameEvent> history)
+    internal bool TypedRecoveryChosenCandidateMatches(RecoveryReplacementFrame recovery)
     {
-        if (recovery.CandidateIndex is not { } index || index < 0 || index >= recovery.Attempt.Candidates.Count) return false;
+        if (recovery.Stage is not (RecoveryReplacementStage.RecoveryApplied or RecoveryReplacementStage.RewardApplied) ||
+            recovery.PendingApplication is not null || recovery.CandidateIndex is not { } index ||
+            index < 0 || index >= recovery.Attempt.Candidates.Count || recovery.OriginalRecovered != 0) return false;
         var c = recovery.Attempt.Candidates[index];
         if (!facts.IsValidPlayerSeat(c.OwnerSeat) || c.RecoveryAmount <= 0 || c.ProviderDrawCount < 0 ||
             string.IsNullOrWhiteSpace(c.SkillInstanceId) || facts.Program(c.SkillId)?.CardPolicies.SingleOrDefault(p => p.Id == c.PolicyId) is not
                 { Kind: SkillProgramCardPolicyKind.RedirectOwnTurnFactionRecovery } policy ||
             policy.Value != c.RecoveryAmount || policy.ProviderDrawCount != c.ProviderDrawCount) return false;
-        // Paid candidates retain their issued identity after source loss. Do not
-        // enumerate current skills or recompute the original faction/eligibility.
-        return history.OfType<RecoveryReplacementChosenEvent>().Count(e => e.RecoveryFrameId == recovery.Id &&
-            e.RecoveringSeat == recovery.Attempt.TargetSeat && e.BeneficiarySeat == c.OwnerSeat && e.SkillId == c.SkillId &&
-            e.SkillInstanceId == c.SkillInstanceId && e.PolicyId == c.PolicyId && e.ReplacedAmount == recovery.Attempt.Amount &&
-            e.RecoveryAmount == c.RecoveryAmount) == 1;
+        // The actual application owns this accepted candidate index. Paid
+        // sources remain frozen instead of being requalified from live skills.
+        return true;
     }
 
-    internal bool TypedRecoveryRewardReturnMatches(RecoveryReplacementFrame recovery, CardsMovedTriggerWindowFrame movement,
-        IReadOnlyList<IGameEvent> history)
+    internal bool TypedRecoveryRewardReturnMatches(RecoveryReplacementFrame recovery, CardsMovedTriggerWindowFrame movement)
     {
         var parentIndex = facts.FrameIndex(recovery.Id);
         return parentIndex >= 1 && facts.FrameAt(parentIndex - 1) is ProgramSkillFrame producer && producer.Id == recovery.ParentFrameId &&
-            TypedRecoveryRewardReturnMatches(recovery, movement, history, producer);
+            TypedRecoveryRewardReturnMatches(recovery, movement, producer);
     }
 
     internal bool TypedRecoveryRewardReturnMatches(RecoveryReplacementFrame recovery, CardsMovedTriggerWindowFrame movement,
-        IReadOnlyList<IGameEvent> history, ProgramSkillFrame? origin)
+        ProgramSkillFrame? origin)
     {
         var batch = movement.Batch;
-        if (recovery.Stage != RecoveryReplacementStage.RewardApplied || !TypedRecoveryChosenCandidateMatches(recovery, history) ||
+        if (recovery.Stage != RecoveryReplacementStage.RewardApplied || !TypedRecoveryChosenCandidateMatches(recovery) ||
             !TypedRecoveryRewardBatchMatchesReceipt(recovery, batch) ||
             movement.Id != batch.Id || batch.ParentFrameId != recovery.Id || batch.AwaitingProgramFrameId is not null ||
             movement.ResumeRecoveryReplacementFrameId != recovery.Id || movement.ResumeProgramFrameId is not null ||

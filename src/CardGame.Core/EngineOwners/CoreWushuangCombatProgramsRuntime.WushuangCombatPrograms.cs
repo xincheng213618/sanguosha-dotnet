@@ -123,11 +123,11 @@ internal sealed partial class CoreWushuangCombatProgramsRuntime
             _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, id == 2246 ? 3 : 2, null, null);
         if (id == 2337)
         {
-            if (f.WindowContext is not { CardUse: { } context } || _coreCardUseLifecycleOperations.LifecycleCardUse(context.ParentCardUseFrameId)is not { Action: { } action, ExtraCardEffect: null } use || action.ActionId != context.CardActionId || use.SourceSeat != f.OwnerSeat || use.CardKind != CardKind.Snatch)
+            if (f.WindowContext is not { CardUse: { } context } || _coreCardUseLifecycleOperations.LifecycleCardUse(context.ParentCardUseFrameId)is not { Action: { } action } use || action.ActionId != context.CardActionId || use.SourceSeat != f.OwnerSeat || use.CardKind != CardKind.Snatch)
                 throw new InvalidOperationException("Repeated Snatch requires its exact accepted original effect.");
             var window = _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w => w.Id == f.WindowContext.ParentFrameId);
             var source = new CardConversionSource(f.SkillId, f.TriggerId!, f.OwnerSeat, f.SkillInstanceId);
-            _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { ExtraCardEffect = new() { Source = source, ProgramFrameId = f.Id, ActionId = action.ActionId, AutomaticGameplayHash = f.GameplayHash, Trick = window.TrickContinuation } });
+            _nativeEffectEpisodes.Issue(use.Id, new(f.Id, f.InstructionIndex - 1, 0, source, f.GameplayHash, new(0, ContinueOriginalAfterActorDeath: true)), window.TrickContinuation);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AutomaticExtraCardEffectIssuedEvent(f.Id, source, use.Id, action.ActionId, f.GameplayHash));
         }
 

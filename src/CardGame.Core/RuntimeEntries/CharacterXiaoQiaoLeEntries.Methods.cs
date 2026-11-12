@@ -17,7 +17,6 @@ internal sealed partial class CharacterXiaoQiaoLeEntries
     internal void FinishWeiwanObtain(long id, long batch, IReadOnlyList<CardMovementRecord> moves) => _resolve().FinishWeiwanObtain(id, batch, moves);
     internal bool HasPaidWeiwanSelection(ProgramSkillFrame f) => _resolve().HasPaidWeiwanSelection(f);
     internal bool HasQiqinHandEntityMark(int owner, int id) => _resolve().HasQiqinHandEntityMark(owner, id);
-    internal bool IsQiqinHandLimitExempt(CharacterState owner, int id) => _resolve().IsQiqinHandLimitExempt(owner, id);
     internal bool IsQiqinRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsQiqinRecoveryParent(f, recovery);
     internal bool IsWeiwanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsWeiwanRecoveryParent(f, recovery);
     internal void ObserveWeiwanHpLoss(IGameEvent payload) => _resolve().ObserveWeiwanHpLoss(payload);

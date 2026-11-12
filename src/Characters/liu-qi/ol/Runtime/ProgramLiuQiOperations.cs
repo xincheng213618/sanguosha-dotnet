@@ -28,12 +28,3 @@ public sealed partial record ProgramSkillFrame
 {
  [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] public LiuQiReceipt? LiuQi {get;init;}
 }
-public sealed partial class CharacterState
-{
- private IReadOnlyList<WenjiTurnNameGrant>? _wenjiTurnNameGrants;
- internal IReadOnlyList<WenjiTurnNameGrant>? WenjiTurnNameGrants {get=>_wenjiTurnNameGrants;set=>_wenjiTurnNameGrants=value is null?null:Array.AsReadOnly(value.ToArray());}
-}
-public sealed partial record NullificationWindowFrame
-{
- [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] public WenjiCounterspellQualification? WenjiCounterspell {get;init;}
-}

@@ -66,28 +66,20 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
     }
 
     internal string HappyPtUpperBind(ProgramSkillFrame f) => "happy-upper-" + f.HappyPangTong!.CurrentPlanId.ToString(System.Globalization.CultureInfo.InvariantCulture);
-    internal bool IsHappyPangTongFactionOrigin(ProgramSkillFrame frame, int actor, int target, string? bind) => frame.HappyPangTong is { Stage: HappyPangTongStage.UpperUse, FactionPending: true } r && frame.OwnerSeat == actor && r.SlashTarget == target && bind == HappyPtUpperBind(frame) && ValidHappyPt(frame) && _coreAssistedPhysicalCardsOperations.AssistedPhysicalSlashTargets(actor).Contains(target) && _coreAssistedFactionSlashOperations.CanRequestAssistedProgramFactionSlash(actor, target);
-    internal bool ValidateHappyPangTongFactionParent(NativeOwners.FactionCardRequestHandle request, ProgramSkillFrame frame)
-    {
-        if (frame.HappyPangTong is not { FactionPending: true })
-            return false;
-        if (request.TargetSeat is not { } target || !IsHappyPangTongFactionOrigin(frame, request.OwnerSeat, target, request.AssistedResultBind) || request.PolicySource is null || (request.ActiveAttack is null ? frame.ChoiceBindings.Any(b => b.Name == request.AssistedResultBind) : frame.ChoiceBindings.SingleOrDefault(b => b.Name == request.AssistedResultBind)is not { OptionId: "used-slash" }))
-            throw new InvalidOperationException("Upper-plan faction Slash lost its exact native request and once-only result.");
-        return true;
-    }
 
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 42181)]
     internal void BindHappyPtUpper(IGameEvent payload)
     {
         if (payload is not CardUseDeclaredEvent declared || _coreCardUseLifecycleOperations.LifecycleCardUse(declared.ResolutionId)is not { Action: { Type: CardActionType.Use } action } use)
             return;
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(p => p.Id == use.Id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index - 1] is not ProgramSkillFrame { HappyPangTong: { Stage: HappyPangTongStage.UpperUse, NativeUseId: 0 } r } root)
+        if (use.ProgramSlashRequestExecution is not { } execution ||
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == execution.ProgramFrameId) is not { HappyPangTong: { Stage: HappyPangTongStage.UpperCard or HappyPangTongStage.UpperUse, NativeUseId: 0 } r } root)
             return;
-        if (root.OwnerSeat != use.SourceSeat || action.ActorSeat != root.OwnerSeat || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !use.TargetSeats.Contains(r.SlashTarget) || !ValidHappyPt(root))
-            throw new InvalidOperationException("Upper plan must bind its actual owner's native Slash exactly once.");
+        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) ||
+            !_slashRequests.OwnsAcceptance(root, execution.Acceptance, root.OwnerSeat, r.SlashTarget))
+            throw new InvalidOperationException("Upper plan must bind its exact original accepted native Slash once.");
         var ret = new HappyPangTongUpperReturn(root.Id, r.CurrentPlanId, use.Id, action.ActionId);
-        _coreRuntimeOperations.ReplaceRuntimeFrame(root.Id, root with { HappyPangTong = r with { NativeUseId = use.Id, NativeActionId = action.ActionId } });
+        _coreRuntimeOperations.ReplaceRuntimeFrame(root.Id, root with { HappyPangTong = r with { Stage = HappyPangTongStage.UpperUse, NativeUseId = use.Id, NativeActionId = action.ActionId } });
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { HappyPangTongUpper = ret });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyPangTongUpperBoundEvent(root.Id, r.CurrentPlanId, use.Id, action.ActionId));
     }
@@ -112,5 +104,10 @@ internal sealed partial class CharacterPangTongHappyGodRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HappyPangTongUpperReturnedEvent(root.Id, r.CurrentPlanId, completed.Id, ret.ActionId));
     }
 
-    internal bool HappyPtUpperRidesOn(CardUseFrame use, ProgramSkillFrame root) => use.HappyPangTongUpper is { } ret && root.HappyPangTong is { } r && ret.RootId == root.Id && ret.PlanId == r.CurrentPlanId && ret.UseId == use.Id && ret.ActionId == use.Action?.ActionId && r.NativeUseId == use.Id && r.NativeActionId == ret.ActionId && use.SourceSeat == root.OwnerSeat && use.Action is { Type: CardActionType.Use } action && action.ActorSeat == root.OwnerSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.TargetSeats.Contains(r.SlashTarget) && use.CardAttack?.ProgramSkillCardUseFrameId == root.Id && ValidHappyPt(root) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyPangTongUpperBoundEvent>().Count(e => e == new HappyPangTongUpperBoundEvent(root.Id, r.CurrentPlanId, use.Id, ret.ActionId)) == 1;
+    internal bool HappyPtUpperRidesOn(CardUseFrame use, ProgramSkillFrame root) =>
+        use.HappyPangTongUpper is { } ret && root.HappyPangTong is { } r && ret.RootId == root.Id &&
+        ret.PlanId == r.CurrentPlanId && ret.UseId == use.Id && ret.ActionId == use.Action?.ActionId &&
+        r.NativeUseId == use.Id && r.NativeActionId == ret.ActionId && use.Action is { Type: CardActionType.Use } &&
+        CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) && use.ProgramSlashRequestExecution is { } execution &&
+        execution.ProgramFrameId == root.Id && _slashRequests.OwnsAcceptance(root, execution.Acceptance, root.OwnerSeat, r.SlashTarget);
 }

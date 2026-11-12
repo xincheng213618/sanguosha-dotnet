@@ -3,6 +3,7 @@
     {
       "id": "le:jiaowei",
       "revision": 1,
+      "cardPolicies": [{"id":"marked-hand-exemption","kind":"handLimitCardKindExemption","handLimitMatch":{"mark":"xian","requireLivingHolder":true}}],
       "triggers": [
         {
           "id": "mark-initial-entities",

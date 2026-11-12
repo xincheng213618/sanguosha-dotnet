@@ -3,8 +3,30 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeActionDispatchRuntime
 {
-    internal void ExecuteAction(CharacterState actor, LegalAction action, IReadOnlyList<int>? activeSkillCardIds = null, IReadOnlyList<int>? activeSkillTargetSeats = null)
+    internal void ExecuteAction(CharacterState actor, LegalAction action, IReadOnlyList<int>? activeSkillCardIds = null, IReadOnlyList<int>? activeSkillTargetSeats = null, ProgramSlashRequestAcceptance? programSlashRequest = null, ProgramSlashRequestIdentity? programSlashRequestIdentity = null, PendingDecision? originalDecision = null)
     {
+        var requestIdentity = programSlashRequest?.Identity ?? programSlashRequestIdentity;
+        var requestedTargets = action.Kind == LegalActionKind.UseEquipmentEffect ? activeSkillTargetSeats ?? [] : action.TargetSeats;
+        var requestTarget = programSlashRequest?.TargetSeat ?? action.TargetSeat ?? requestedTargets.FirstOrDefault(-1);
+        if (requestIdentity is not null)
+        {
+            if (action.Kind != LegalActionKind.Slash &&
+                    (action.Kind != LegalActionKind.UseEquipmentEffect || action.EquipmentKind != CardKind.ZhangbaSerpentSpear) ||
+                requestIdentity.ActorSeat != actor.Seat || !requestedTargets.Contains(requestTarget) ||
+                _requestFrames.Find(requestIdentity.FrameId) is not ProgramSkillFrame original)
+                throw new InvalidOperationException("A requested native action must retain its accepted Slash actor, target and original instruction.");
+            if (programSlashRequest is not null
+                ? _slashRequestExecution.GetAcceptance(original, actor.Seat, requestTarget) != programSlashRequest
+                : !_slashRequests.OwnsIssuedIdentity(original, requestIdentity, actor.Seat) ||
+                    !_slashRequests.OwnsOffer(original, actor.Seat, requestTarget))
+                throw new InvalidOperationException("A requested native action requires its exact accepted attempt.");
+        }
+        ProgramSlashRequestAcceptance? AcceptRequestedAction()
+        {
+            if (programSlashRequest is null && requestIdentity is not null)
+                programSlashRequest = _slashRequests.Accept((ProgramSkillFrame)_requestFrames.Find(requestIdentity.FrameId)!, actor.Seat, requestTarget);
+            return programSlashRequest;
+        }
         _coreGameEngineNextCardTargetAdjustmentsSelectedNextCardTargetSeatsAccess._selectedNextCardTargetSeats = _coreRedAdditionalTargetsOperations.IsTargetAdjustmentAction(actor, action) ? action.TargetSeats : null;
         _coreGameEngineRedAdditionalTargetsRedAdditionalTargetGrantsSelectedRedAdditionalTargetSourceAccess._selectedRedAdditionalTargetSource = action.ProgramActivationId == "red-additional-targets" && _coreGameEngineRedAdditionalTargetsRedAdditionalTargetGrantsSelectedRedAdditionalTargetSourceAccess._redAdditionalTargetGrants.TryGetValue(actor.Seat, out var redGrant) ? redGrant.Source : null;
         if (_coreHuxinMirrorOperations.TryPlaceHandHuxinMirror(actor, action))
@@ -37,6 +59,7 @@ internal sealed partial class CoreNativeActionDispatchRuntime
 
             if (!CoreGameEngineZhangbaSelectionsRuntime.MatchesPublishedCardGroupTarget(action, cardIds, targets))
                 throw new InvalidOperationException("The equipment-effect materials have no published compatible target.");
+            AcceptRequestedAction();
             if (action.EquipmentKind == CardKind.WoodenOx)
             {
                 _coreNativeWoodenOxOperations.ResolveWoodenOx(actor, cardIds[0], targets.SingleOrDefault(-1));
@@ -45,24 +68,25 @@ internal sealed partial class CoreNativeActionDispatchRuntime
             {
                 var cards = cardIds.Select(cardId => _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Single(card => card.Id == cardId)).ToArray();
                 if (targets.Length > 1)
-                    _coreNextActualUseTargetAdjustmentsOperations.ResolveNextActualUseZhangba(actor, targets, cards);
+                    _coreNextActualUseTargetAdjustmentsOperations.ResolveNextActualUseZhangba(actor, targets, cards, programSlashRequest);
                 else
-                    _coreNativeSlashUseOperations.ResolveZhangbaSlash(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], cards);
+                    _coreNativeSlashUseOperations.ResolveZhangbaSlash(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], cards, programSlashRequest);
             }
 
             return;
         }
 
-        if (_coreChainedStateBasicConversionsOperations.TryExecuteChainedStateBasicPlay(actor, action))
+        if (_coreChainedStateBasicConversionsOperations.TryExecuteChainedStateBasicPlay(actor, action, programSlashRequest, requestIdentity, originalDecision))
             return;
-        if (_coreDrawFundedDistinctBasicOffersOperations.TryExecuteDrawFundedDistinctBasicPlay(actor, action))
+        if (_coreDrawFundedDistinctBasicOffersOperations.TryExecuteDrawFundedDistinctBasicPlay(actor, action, programSlashRequest, requestIdentity, originalDecision))
             return;
-        if (_coreRoundOnceCardlessNativeUsesOperations.TryExecuteRoundOnceCardlessPlay(actor, action))
+        if (_coreRoundOnceCardlessNativeUsesOperations.TryExecuteRoundOnceCardlessPlay(actor, action, programSlashRequest, requestIdentity, originalDecision))
             return;
-        if (_coreTieredRoundZeroUsesOperations.TryExecuteTieredRoundZeroPlay(actor, action))
+        if (_coreTieredRoundZeroUsesOperations.TryExecuteTieredRoundZeroPlay(actor, action, programSlashRequest, requestIdentity, originalDecision))
             return;
+        AcceptRequestedAction();
         var card = _coreNativeOwnedCardQueriesOperations.FindOwnedPlayableCard(actor, action.CardId) ?? throw new InvalidOperationException("The chosen card is no longer in the actor's playable zones.");
-        if (_coreCardDeclarationsOperations.TryBeginCardDeclaration(actor, card, action.PlayedCardKind ?? card.Kind, action.ConversionSource, _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Use, actor.Seat, action), action.TargetSeats.Count > 0 ? action.TargetSeats : action.TargetSeat is { } declaredTarget ? [declaredTarget] : []))
+        if (_coreCardDeclarationsOperations.TryBeginCardDeclaration(actor, card, action.PlayedCardKind ?? card.Kind, action.ConversionSource, _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Use, actor.Seat, action, programSlashRequest: programSlashRequest), action.TargetSeats.Count > 0 ? action.TargetSeats : action.TargetSeat is { } declaredTarget ? [declaredTarget] : []))
             return;
         if (_characterGuanYuWumiaoOperations.TryExecuteWumiaoFloodNaturalUse(actor, card, action))
             return;
@@ -88,11 +112,11 @@ internal sealed partial class CoreNativeActionDispatchRuntime
 
                 if (action.TargetSeats.Count > 1)
                 {
-                    _coreNativeSlashUseOperations.ResolveFangtianHalberdSlash(actor, action.TargetSeats.Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).ToArray(), card, action.PlayedCardKind ?? card.Kind, action.ConversionSource, action.AdditionalConversionSources);
+                    _coreNativeSlashUseOperations.ResolveFangtianHalberdSlash(actor, action.TargetSeats.Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).ToArray(), card, action.PlayedCardKind ?? card.Kind, action.ConversionSource, action.AdditionalConversionSources, programSlashRequest);
                 }
                 else
                 {
-                    _coreNativeSlashUseOperations.ResolveSlash(actor, _coreMatchParticipantsPlayersAccess._players[action.TargetSeat.Value], card, action.PlayedCardKind ?? card.Kind, action.ConversionSource, action.AdditionalConversionSources);
+                    _coreNativeSlashUseOperations.ResolveSlash(actor, _coreMatchParticipantsPlayersAccess._players[action.TargetSeat.Value], card, action.PlayedCardKind ?? card.Kind, action.ConversionSource, action.AdditionalConversionSources, programSlashRequest);
                 }
 
                 break;

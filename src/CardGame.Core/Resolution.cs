@@ -939,6 +939,8 @@ public sealed partial record NullificationWindowFrame(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DelayedEffectContinuation? DelayedReturn { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public NativeCounterspellResponseNode? ResponseRuleNode { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IssuedCounterspellNode? IssuedNoResponseNode { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public UnrespondableCounterspellReceipt? UnrespondableCounterspell { get; init; }

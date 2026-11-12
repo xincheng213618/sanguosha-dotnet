@@ -24,11 +24,12 @@ internal sealed class SkillProgramDependencies
         var definitions = skills.ToArray();
         var programs = definitions.Select(skill => skill.Program).OfType<SkillProgram>().ToArray();
         var triggers = programs.SelectMany(program => program.Triggers).ToArray();
+        var declarationBoundaries = programs.SelectMany(program => program.SkillStates)
+            .SelectMany(declaration => declaration.State.Until).ToArray();
         var skillStateBoundaries = triggers.SelectMany(trigger => trigger.Effects)
             .Concat(programs.SelectMany(program => program.Activations).SelectMany(activation => activation.Effects))
-            .SelectMany(effect => (effect.SkillState?.Until ?? [])
-                .Concat(effect.CardActionProhibition?.Until ?? []))
-            .Concat(programs.SelectMany(program => program.SkillStates).SelectMany(declaration => declaration.State.Until)).ToArray();
+            .SelectMany(effect => ProgramOperationCatalog.Default.LifetimeBoundariesFor(effect))
+            .Concat(declarationBoundaries).ToArray();
         UsesSkillStatePhaseEnds = skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseEnded);
         UsesConsumedAlcoholSlash = triggers.Any(trigger => trigger.RequiresConsumedAlcoholSlash);
         HpSensitiveSkillIds = definitions.Where(skill => skill.Program?.SkillGrants.Any(rule =>
@@ -65,10 +66,7 @@ internal sealed class SkillProgramDependencies
             (programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).SelectMany(expression => expression.Nodes())
                 .Any(expression => expression.Op is "gainCards" or "gainInitiallyAlive" or "gainFirstOutsideDraw" or "gainPhaseIs" or "gainActualTurn" or "gainRecipientAlive" or "gainHasSource")
                 ? ProgramTrackedFact.HandGainOccurrence : ProgramTrackedFact.None) |
-            (skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.ActualUse)
-                ? ProgramTrackedFact.ActualCardUseHistory : ProgramTrackedFact.None) |
-            (skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.ActualTurnReturned)
-                ? ProgramTrackedFact.ActualTurnReturn : ProgramTrackedFact.None) |
+            ProgramRuleLifetimeFacts.ForBoundaries(declarationBoundaries).Triggered |
             (programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).Any(expression =>
                 expression.Reads("gainFirstOutsideDraw") || expression.Reads("gainPhaseIs"))
                 ? ProgramTrackedFact.MovementTiming : ProgramTrackedFact.None) |
@@ -83,9 +81,9 @@ internal sealed class SkillProgramDependencies
                 ? ProgramTrackedFact.PublicCardRevealHistory : ProgramTrackedFact.None) |
             (programs.SelectMany(ProgramInstructionFeatures.ExpressionRoots).Any(expression => expression.Reads("givenCards"))
                 ? ProgramTrackedFact.NativeGive : ProgramTrackedFact.None) |
-            (UsesSkillStatePhaseEnds || triggers.Any(trigger => trigger.Window == SkillProgramTriggerWindow.ActualPhaseEnded)
+            (triggers.Any(trigger => trigger.Window == SkillProgramTriggerWindow.ActualPhaseEnded)
                 ? ProgramTrackedFact.ActualPhaseEnd : ProgramTrackedFact.None) |
-            (skillStateBoundaries.Any(end => end.Event == SkillStateBoundaryEvent.PhaseStarted) || UsesDrawPhaseDrawCountHandLimit ||
+            (UsesDrawPhaseDrawCountHandLimit ||
                 programs.Any(program => program.ViewAs.Any(rule => rule.EqualNameLengthUse) ||
                     program.CardPolicies.Any(policy => policy.Kind == SkillProgramCardPolicyKind.HellShiyouIntercept)) ||
                 triggers.Any(trigger => trigger.Window == SkillProgramTriggerWindow.NativeDrawStarting)

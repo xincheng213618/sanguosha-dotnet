@@ -89,6 +89,12 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
             return;
         }
 
+        if (r.Stage == "slash" && r.OriginalUseId is not null)
+        {
+            _slashRequests.Issue(f, r.Actor,
+                new(ProgramSlashRequestTargetSource.FrozenCandidates, [r.Target], QigongFactionBind, IgnoreDistance: true, RetainAcceptedSourceLoss: true, RetainAcceptedOwnerDeath: true, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction));
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        }
         var choices = LvKuangLvXiangChoices(f);
         if (choices.Count == 0)
         {
@@ -168,6 +174,13 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LvKuangLvXiang: { } r } f || f.Id != id)
             return false;
+        if (_slashRequests.TakeFailure(f) is not null)
+        {
+            f = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == f.Id);
+            FinishLvKuangLvXiang(f);
+            return true;
+        }
+
         if (r.Stage == "native" && !r.Returned)
             return false;
         if (r.Stage is "receive-children" or "give-children" or "native")

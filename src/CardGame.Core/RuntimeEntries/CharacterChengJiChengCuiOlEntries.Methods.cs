@@ -23,7 +23,6 @@ internal sealed partial class CharacterChengJiChengCuiOlEntries
     internal bool IsTousuiVariableSource(CharacterState actor, SkillProgramViewAs rule, Card card, CardLocation from) => _resolve().IsTousuiVariableSource(actor, rule, card, from);
     internal void OpenTousuiProgramRequest(PromptChoice selected) => _resolve().OpenTousuiProgramRequest(selected);
     internal IReadOnlyList<XumingPromiseIssuedEvent> PendingXumingPromises(int owner) => _resolve().PendingXumingPromises(owner);
-    internal void PrepareTousuiWuJingNative(ProgramSkillFrame f, ProgramMultiCardViewAsSelection selection) => _resolve().PrepareTousuiWuJingNative(f, selection);
     internal void PublishTousuiRequest(TousuiRequestReceipt r) => _resolve().PublishTousuiRequest(r);
     internal SkillProgramStepOutcome ResolveTousuiRequirement(ProgramSkillFrame f) => _resolve().ResolveTousuiRequirement(f);
     internal SkillProgramStepOutcome ResolveXumingDamage(ProgramSkillFrame supplied) => _resolve().ResolveXumingDamage(supplied);

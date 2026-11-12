@@ -212,10 +212,10 @@ internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntim
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal void BeginNextActualUseMaterialSlash(CharacterState owner, IReadOnlyList<Card> cards, CardKind kind, IReadOnlyList<int> seats, CardConversionSource? source, NextActualUseTargetAdjustmentGrantedEvent grant, ProgramSkillFrame? frame)
+    internal void BeginNextActualUseMaterialSlash(CharacterState owner, IReadOnlyList<Card> cards, CardKind kind, IReadOnlyList<int> seats, CardConversionSource? source, NextActualUseTargetAdjustmentGrantedEvent grant, ProgramSkillFrame? frame, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
         var armor = _coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(owner);
-        var id = _coreNativeCardUseOperations.BeginCardUse(cards[0], owner.Seat, seats, kind, ignoresArmor: armor, physicalCardIds: cards.Select(c => c.Id).ToArray(), conversionSource: source, isTrueZhangbaSlash: frame is null);
+        var id = _coreNativeCardUseOperations.BeginCardUse(cards[0], owner.Seat, seats, kind, ignoresArmor: armor, physicalCardIds: cards.Select(c => c.Id).ToArray(), conversionSource: source, isTrueZhangbaSlash: frame is null, programSlashRequest: programSlashRequest);
         var typedReturn = new ProgramAdjustedSlashReturn(frame?.Id, grant.ProgramFrameId, id, frame?.GameplayHash, frame?.SkillInstanceId, frame is null, _coreTrustedMovementDiagnosticsOperations.CardMovements.Count == 0 ? 1 : _coreTrustedMovementDiagnosticsOperations.CardMovements[^1].Sequence + 1);
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, use => use with { AdjustedSlashReturn = typedReturn, TargetsAdjusted = true });
         if (frame?.NextActualUseAdjustment is { } receipt)
@@ -231,35 +231,35 @@ internal sealed partial class CoreGameEngineNextActualUseTargetAdjustmentsRuntim
             return null;
         if (_coreNativeMaterialSlashOperations.TryGetNativeMaterialSlashExpansion(owner, ids, targets, out _, out _))
             return null;
-        var cards = _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(owner).FirstOrDefault(pair => pair.Select(c => c.Id).Order().SequenceEqual(ids.Order()));
+        var cards = _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(owner, ids);
         if (targets.Count != 2 || CurrentNextActualUseAdjustment(owner.Seat)is null || !_coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(owner) || cards is null || !_characterSunQuanOlMagicOperations.IsMoQuanyuCompleteZhangbaQuotaLegal(owner, targets, cards) || targets.Distinct().Count() != targets.Count || targets.Any(t => !_coreTableSeatQueriesOperations.IsValidPlayerSeat(t) || !_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, _coreMatchParticipantsPlayersAccess._players[t], CardKind.Slash, _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, cards), _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, cards), _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(owner, cards), ids)))
             return new(CommandErrorCode.InvalidTarget, "The adjusted Zhangba Slash lost its exact two materials and legal targets.");
         return null;
     }
 
-    internal void ResolveNextActualUseZhangba(CharacterState owner, IReadOnlyList<int> targets, IReadOnlyList<Card> cards)
+    internal void ResolveNextActualUseZhangba(CharacterState owner, IReadOnlyList<int> targets, IReadOnlyList<Card> cards, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
         if (ValidateNextActualUseZhangba(owner, cards.Select(c => c.Id).ToArray(), targets)is { } error)
             throw new InvalidOperationException(error.Message);
         if (_coreHpLossSlashMaterialsOperations.HasHpLossSlashTargets(owner) && _coreHpLossSlashMaterialsOperations.ValidateHpLossSlashZhangba(owner, cards.Select(c => c.Id).ToArray(), targets)is null)
         {
-            _coreHpLossSlashMaterialsOperations.ResolveHpLossSlashZhangba(owner, targets, cards);
+            _coreHpLossSlashMaterialsOperations.ResolveHpLossSlashZhangba(owner, targets, cards, programSlashRequest);
             return;
         }
 
         if (targets.Count == 2 && CurrentNextActualUseAdjustment(owner.Seat)is { } grant)
         {
-            BeginNextActualUseMaterialSlash(owner, cards, CardKind.Slash, targets, null, grant, null);
+            BeginNextActualUseMaterialSlash(owner, cards, CardKind.Slash, targets, null, grant, null, programSlashRequest);
             return;
         }
 
         if (_coreNativeMaterialSlashOperations.TryGetNativeMaterialSlashExpansion(owner, cards.Select(c => c.Id).ToArray(), targets, out _, out _))
         {
-            _coreNativeMaterialSlashOperations.BeginNativeMaterialSlashExpansion(owner, cards, targets);
+            _coreNativeMaterialSlashOperations.BeginNativeMaterialSlashExpansion(owner, cards, targets, programSlashRequest);
             return;
         }
 
-        BeginNextActualUseMaterialSlash(owner, cards, CardKind.Slash, targets, null, CurrentNextActualUseAdjustment(owner.Seat) ?? throw new InvalidOperationException("Adjusted spear source expired before payment."), null);
+        BeginNextActualUseMaterialSlash(owner, cards, CardKind.Slash, targets, null, CurrentNextActualUseAdjustment(owner.Seat) ?? throw new InvalidOperationException("Adjusted spear source expired before payment."), null, programSlashRequest);
     }
 
     internal void PrepareNextActualUseSelectedRecovery(ProgramSkillFrame frame, ProgramMultiCardViewAsSelection selection)

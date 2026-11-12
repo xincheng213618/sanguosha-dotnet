@@ -10,7 +10,7 @@ internal sealed partial class CharacterHanDangBoundaryMobileRuntime
         if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, frame))
             return payment.Stage == ProgramAttackRangeAidPaymentStage.Drawing && frame.NativeDraw is not null;
         if (child is RecoveryReplacementFrame recovery)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(frame, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(frame, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(frame, hp);
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -28,7 +28,7 @@ internal sealed partial class CharacterHanDangBoundaryMobileRuntime
     {
         if (!ValidProgramAttackRangeAid(frame))
             return false;
-        if (_coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(frame, child, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray()))
+        if (_coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(frame, child))
             return true;
         var a = _resolutionStackOperations._resolutionStack.FindIndex(candidate => candidate.Id == frame.Id);
         var b = _resolutionStackOperations._resolutionStack.FindIndex(candidate => candidate.Id == child.Id);

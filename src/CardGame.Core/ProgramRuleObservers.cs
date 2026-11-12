@@ -40,7 +40,9 @@ internal sealed class ProgramRuleObserverCatalog
     {
         var phases = Enum.GetValues<ProgramRulePhase>().ToDictionary(phase => phase,
             _ => new SortedDictionary<int, ProgramRuleObserverRegistration>());
-        foreach (var method in methods.OrderBy(method => method.DeclaringType?.FullName, StringComparer.Ordinal)
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramRuleObserverAttribute), inherit: true))
+                     .OrderBy(method => method.DeclaringType?.FullName, StringComparer.Ordinal)
                      .ThenBy(method => method.Name, StringComparer.Ordinal))
         {
             var attributes = method.GetCustomAttributes<ProgramRuleObserverAttribute>().ToArray();

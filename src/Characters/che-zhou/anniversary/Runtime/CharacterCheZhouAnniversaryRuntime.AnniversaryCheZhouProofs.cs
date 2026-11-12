@@ -13,20 +13,6 @@ internal sealed partial class CharacterCheZhouAnniversaryRuntime
         return r.Selected.Count > 0 && r.BatchId > 0 && r.Moves.Count == r.Selected.Count && r.Moves.Select(m => m.CardId).Order().SequenceEqual(r.Selected.Order()) && paid is [var invoice] && invoice == new AnniversaryCheZhouPiguaPaidEvent(f.Id, r.Source, r.Hash, r.Turn, r.TurnSeat, r.Victim, r.Moves.Count, r.BatchId, r.Before, r.After) && r.Moves.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.TurnNumber == r.Turn && m.From == CardLocation.Hand(r.Victim) && m.Reason.Value == CheZhouObtainReason && (m.To == CardLocation.Hand(f.OwnerSeat) || _coreHappyWeiYanGainDestinationsOperations.IsHappyWeiYanRedirectedGain(m, CardLocation.Hand(f.OwnerSeat))));
     }
 
-    internal bool IsAnniversaryCheZhouHandExempt(CharacterState owner, Card card)
-    {
-        if (!HasAnniversaryCheZhouContent || _cardZonesOperations._cardZones.GetLocation(card.Id) != CardLocation.Hand(owner.Seat))
-            return false;
-        foreach (var e in _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCheZhouPiguaPaidEvent>().Where(e => e.Source.OwnerSeat == owner.Seat && e.Turn == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber && e.TurnSeat == _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat && e.Source.SkillId == AnniversaryCheZhouComposition.Pigua && e.Source.BindingId == AnniversaryCheZhouComposition.Binding && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.Hash))
-        {
-            if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryCheZhouPiguaStartedEvent>().Count(s => s.FrameId == e.FrameId && s.Source == e.Source && s.Hash == e.Hash && s.Turn == e.Turn && s.TurnSeat == e.TurnSeat && s.Victim == e.Victim) != 1)
-                continue;
-            if (_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == card.Id && m.Sequence > e.Before && m.Sequence <= e.After && m.TurnNumber == e.Turn && m.From == CardLocation.Hand(e.Victim) && m.To == CardLocation.Hand(owner.Seat) && m.Reason.Value == CheZhouObtainReason))
-                return true;
-        }
-
-        return false;
-    }
     internal bool CheZhouFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.AnniversaryCheZhou is not { Stage: AnniversaryCheZhouStage.MovementChildren } r || !ValidCheZhou(f))

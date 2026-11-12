@@ -42,7 +42,7 @@ internal sealed partial class CharacterSunChenMobileShiRuntime
     [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 49100)]
     internal void ConsumeShiScDamage(IGameEvent payload)
     {
-        if (payload is ExtraCardEffectStartedEvent extra && _coreCardUseLifecycleOperations.LifecycleCardUse(extra.CardUseFrameId)is { ShiSunChenDamage: not null } repeated && _coreExtraCardEffectRoundsOperations.IsExtraCardEffectRound(repeated.Id))
+        if (payload is NativeCardEffectEpisodeStartedEvent extra && _coreCardUseLifecycleOperations.LifecycleCardUse(extra.UseFrameId)is { ShiSunChenDamage: not null } repeated && _coreExtraCardEffectRoundsOperations.IsExtraCardEffectRound(repeated.Id))
             SetShiScDamageState(repeated.Id, null);
         if (payload is ProgramDamageTransferredEvent moved && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } a && ShiScDamageState(a.ResolutionId)is { TransferredTarget: null } original && a.DamageRedirected && moved.ResolutionId == a.ResolutionId && moved.SourceSeat == a.SourceSeat && moved.TargetSeat == a.TargetSeat && original.ChainCursor == ShiScDamageCursor(a))
             SetShiScDamageState(a.ResolutionId, original with { TransferredTarget = moved.TargetSeat });

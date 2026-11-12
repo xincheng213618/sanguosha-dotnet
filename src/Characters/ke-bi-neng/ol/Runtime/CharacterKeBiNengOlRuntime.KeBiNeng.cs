@@ -44,6 +44,9 @@ internal sealed partial class CharacterKeBiNengOlRuntime
 
     internal void PrepareKeBiNengBasic(ProgramSkillFrame f)
     {
+        _slashRequests.Issue(f, f.KeBiNengPingduan!.ActorSeat, new(ProgramSlashRequestTargetSource.AllOtherLiving,
+            RetainSourceLoss: true, RetainOwnerDeath: true, CountsTowardSlashLimit: true, RetainAcceptedSourceLoss: true, RetainAcceptedOwnerDeath: true, ExemptIssuedSlashDebit: true, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction));
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var actions = BuildKeBiNengPingduanBasicActions(f);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { KeBiNengPingduan = f.KeBiNengPingduan!with { BasicActions = actions } });
         var actor = f.KeBiNengPingduan!.ActorSeat;
@@ -118,6 +121,11 @@ internal sealed partial class CharacterKeBiNengOlRuntime
             var selected = r.BasicActions[index];
             if (!BuildKeBiNengPingduanBasicActions(f).Any(a => SameKeBiNengAction(a, selected)))
                 throw new InvalidOperationException("Pingduan basic use is no longer natively legal.");
+            if (selected.Kind == LegalActionKind.Slash || selected.Kind == LegalActionKind.UseEquipmentEffect && selected.EquipmentKind == CardKind.ZhangbaSerpentSpear)
+                _slashRequests.SelectTarget(f, r.ActorSeat, selected.TargetSeats.First());
+            else
+                _slashRequests.Close(f);
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect, KeBiNengPingduan = r with { Stage = KeBiNengPingduanStage.BasicIssuing, SelectedBasicAction = selected } });
             BeginKeBiNengPingduanBasicUse(f, selected);
             return;
@@ -245,6 +253,8 @@ internal sealed partial class CharacterKeBiNengOlRuntime
 
     internal void FinishKeBiNeng(ProgramSkillFrame f, string reason)
     {
+        _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new KeBiNengPingduanCompletedEvent(f.Id, f.KeBiNengPingduan!.CompletedItems, reason));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { KeBiNengPingduan = null });
         _coreSkillProgramsOperations.FinishProgramSkill(f, true);
@@ -255,6 +265,11 @@ internal sealed partial class CharacterKeBiNengOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { KeBiNengPingduan: not null } f || f.Id != id)
             return false;
+        if (_slashRequests.TakeFailure(f) is not null)
+        {
+            FinishKeBiNeng(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), "accepted-basic-payment-cancelled-before-use");
+            return true;
+        }
         ContinueKeBiNeng(id);
         return true;
     }

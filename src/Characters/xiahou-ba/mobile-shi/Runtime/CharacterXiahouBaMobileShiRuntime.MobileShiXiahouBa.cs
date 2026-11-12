@@ -236,7 +236,7 @@ internal sealed partial class CharacterXiahouBaMobileShiRuntime
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(useId, u => u with { ShiXiahouBaPoxi = origin, UnlimitedUse = true });
         _coreCardUseLifecycleOperations.IssueResponseRule(useId, new(forbid: true, actorSeat: owner.Seat,
             incomingKinds: CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds,
-            condition: new("<=", ProgramExpressionType.Bool,
+            @while: new("<=", ProgramExpressionType.Bool,
                 [new("handCount", ProgramExpressionType.Int, [new("eventTarget", ProgramExpressionType.Participant, [], name: "eventTarget")]),
                  new("handCount", ProgramExpressionType.Int, [new("eventSource", ProgramExpressionType.Participant, [], name: "eventSource")])]),
             skillName: _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Name));

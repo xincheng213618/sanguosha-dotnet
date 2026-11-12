@@ -46,7 +46,7 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileRuntime
         if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
             return r.Stage == BoundaryXiahouDunStage.Drawing && f.NativeDraw is not null;
         if (child is RecoveryReplacementFrame recovery)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -64,7 +64,7 @@ internal sealed partial class CharacterXiahouDunBoundaryMobileRuntime
     {
         if (!ValidBoundaryXiahouDun(f))
             return false;
-        if (_coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, child, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray()))
+        if (_coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, child))
             return true;
         var a = _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == f.Id);
         var b = _resolutionStackOperations._resolutionStack.FindIndex(c => c.Id == child.Id);

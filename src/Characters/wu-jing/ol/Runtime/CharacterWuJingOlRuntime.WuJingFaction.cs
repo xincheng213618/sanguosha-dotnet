@@ -14,30 +14,17 @@ internal sealed partial class CharacterWuJingOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuJing = r with { Stage = WuJingStage.FactionRequest, FactionPolicy = policy } });
         var seats = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(f.OwnerSeat, policy.FactionId);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(f.Id, FactionCardRequestPurpose.AssistedProgramUse, f.OwnerSeat, seats, policy.FactionId, targetSeat: r.TargetSeat, programSkillFrameId: f.Id, policySource: policy, assistedResultBind: WuJingFactionBind);
-        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: true);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: true, requestIdentity: _slashRequests.GetIdentity(f));
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(f.Id, f.OwnerSeat, seats, policy.SkillId, IsActiveUse: true, r.TargetSeat));
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateWuJingFactionParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
-    {
-        if (f.WuJing is not { FactionPolicy: { } policy } r)
-            return false;
-        if (r.Operation != SkillProgramEffectOp.UseHejiAtCompletedSingleTarget || r.Stage is not (WuJingStage.FactionRequest or WuJingStage.IssuingUse or WuJingStage.NativeUse) || r.Source != WuJingSource(f) || r.GameplayHash != f.GameplayHash || r.ActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber || pending.ProgramSkillFrameId != f.Id || pending.ResolutionId != f.Id || pending.OwnerSeat != f.OwnerSeat || pending.TargetSeat != r.TargetSeat || pending.PolicySource != policy || pending.AssistedResultBind != WuJingFactionBind || !pending.IsAssistedProgramUse || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FactionSlashRequestedEvent>().Count(e => e.ResolutionId == f.Id && e.OwnerSeat == f.OwnerSeat && e.TargetSeat == r.TargetSeat && e.SkillId == policy.SkillId) != 1)
-            throw new InvalidOperationException("Heji faction Slash lost its exact original policy, target or requested return.");
-        return true;
-    }
+    internal bool ValidateWuJingFactionParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f) =>
+        f.WuJing is { FactionPolicy: { } policy } r && pending.AssistedAuthorization?.RequestIdentity is { } identity &&
+        _slashRequests.OwnsIssuedIdentity(f, identity, f.OwnerSeat) && pending.TargetSeat == r.TargetSeat &&
+        pending.ProgramSkillFrameId == f.Id && pending.PolicySource == policy && pending.AssistedResultBind == WuJingFactionBind;
 
-    internal bool PrepareWuJingFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind)
-    {
-        if (!ValidateWuJingFactionParent(pending, f))
-            return false;
-        if (f.WuJing!.Stage != WuJingStage.FactionRequest || cards.Count == 0 || provider.Seat == f.OwnerSeat || !pending.CandidateSeats.Contains(provider.Seat) || cards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.Id).OwnerSeat != provider.Seat))
-            throw new InvalidOperationException("Heji faction Slash lost its real provider-owned materials.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { WuJing = f.WuJing with { Stage = WuJingStage.IssuingUse, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, Selection = new(kind, cards.Count == 2 && _coreAdvancedWeaponsOperations.HasWeaponAbility(provider, CardKind.ZhangbaSerpentSpear), false) { CardIds = cards.Select(c => c.Id).ToArray() } } });
-        return true;
-    }
 
     internal bool FinishWuJingFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending)
     {

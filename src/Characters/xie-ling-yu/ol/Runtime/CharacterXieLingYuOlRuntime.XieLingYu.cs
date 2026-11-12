@@ -185,8 +185,13 @@ internal sealed partial class CharacterXieLingYuOlRuntime
         var stop = gains.Length == 0 || r.Requests >= 5 || gains.Any(c => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(c.PrintedKind) == SkillProgramCardCategory.Basic && (XieLingYuNameBit(c.PrintedKind) & r.NamesMask) == 0);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { XieLingYu = r with { Stage = XieLingYuStage.DrawChildren, Before = outcome.SequenceBefore, After = outcome.SequenceAfter, Gains = gains, Outcome = outcome, Stop = stop }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         if (r.Op == SkillProgramEffectOp.ResolveXinyouBasicCycle)
+        {
+            _handLimitExemptions.Grant(f, "ol:xinyou", f.OwnerSeat,
+                new(new(), gains.Select(gain => gain.CardId).ToArray(), HandLimitExemptionExpiry.FrozenTurnCoordinates,
+                    new(r.ActualTurn, r.TurnOwner)), r.Requests);
             for (var i = 0; i < gains.Length; i++)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XinyouGainedEntityEvent(f.Id, r.Requests, i, f.OwnerSeat, r.ActualTurn, r.TurnOwner, gains[i].CardId, gains[i].PrintedKind, gains[i].MovementSequence, gains[i].Replacement));
+        }
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new XieLingYuDrawReturnedEvent(f.Id, r.Requests, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, outcome.SequenceBefore, outcome.SequenceAfter, outcome.AttemptFrameId, stop));
         ContinueXieLingYu(f.Id);
     }

@@ -41,7 +41,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
         if (MouLbLionChild(f, child))
             return true;
         if (child is RecoveryReplacementFrame recovery)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -72,7 +72,7 @@ internal sealed partial class CharacterLuBuMouMobileRuntime
     {
         if (!ValidMouLb(f))
             return false;
-        if (MouLbLionChild(f, recovery) || _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray()))
+        if (MouLbLionChild(f, recovery) || _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery))
             return true;
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var c = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == recovery.Id);

@@ -9,7 +9,6 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashReturnsEntri
     internal bool IsSelectedForeignCardSlashHpChange(long resumeFrameId, HpChangeContext change) => _resolve().IsSelectedForeignCardSlashHpChange(resumeFrameId, change);
     internal bool IsSelectedForeignCardSlashMovementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => _resolve().IsSelectedForeignCardSlashMovementBatch(frame, batch);
     internal bool IsSelectedForeignCardSlashProgramDying() => _resolve().IsSelectedForeignCardSlashProgramDying();
-    internal bool IsSelectedForeignCardSlashRemovedMaterial(long useId, int cardId) => _resolve().IsSelectedForeignCardSlashRemovedMaterial(useId, cardId);
     internal bool IsSelectedForeignCardSlashUse(CardUseFrame use) => _resolve().IsSelectedForeignCardSlashUse(use);
     internal void ObserveSelectedForeignCardSlashAppliedDamage(IGameEvent payload) => _resolve().ObserveSelectedForeignCardSlashAppliedDamage(payload);
     internal bool SelectedForeignCardSlashFirstChild(ProgramSkillFrame frame, ResolutionFrame child) => _resolve().SelectedForeignCardSlashFirstChild(frame, child);

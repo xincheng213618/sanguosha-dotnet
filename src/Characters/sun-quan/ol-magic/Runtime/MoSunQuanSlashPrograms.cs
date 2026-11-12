@@ -24,13 +24,6 @@ public sealed record MoQuanyuSlashReceipt(CardConversionSource Source, string Ga
           ContentIds = Array.AsReadOnly(c.ContentIds.ToArray()) }).ToArray()); }
 }
 
-public sealed record MoQuanyuExtraRound(long ActionId, long ProgramFrameId,
-    CardConversionSource Source, string GameplayHash, ExtraCardEffectState Native)
-{
-    public bool Started { get; init; }
-    public bool Active { get; init; }
-}
-
 public sealed partial record ProgramSkillFrame
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -45,8 +38,6 @@ public sealed partial record CardUseFrame
     public MoQuanyuQuotaReceipt? MoQuanyuQuota { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public MoQuanyuSlashReceipt? MoQuanyuSlashPolicy { get; init; }
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public MoQuanyuExtraRound? MoQuanyuExtraRound { get; init; }
 }
 
 public sealed record MoQuanyuSoleUseCapturedEvent(MoQuanyuSoleUse Original) : IGameEvent;
@@ -59,8 +50,6 @@ public sealed record MoQuanyuTargetAddedEvent(long FrameId, long UseId, long Act
     int TargetIndex, int TargetSeat, CardConversionSource Source, string GameplayHash) : IGameEvent;
 public sealed record MoQuanyuExtraRoundIssuedEvent(long FrameId, long UseId, long ActionId,
     CardConversionSource Source, string GameplayHash) : IGameEvent;
-public sealed record MoQuanyuExtraRoundStartedEvent(long FrameId, long UseId, long ActionId) : IGameEvent;
-public sealed record MoQuanyuExtraRoundCompletedEvent(long FrameId, long UseId, long ActionId) : IGameEvent;
 
 internal interface IMoSunQuanSlashHost
 {

@@ -17,21 +17,10 @@ public sealed record AnniversaryHzStatusExpiredEvent(long Id, int Target, int En
 public sealed record AnniversaryHzZhanjueIssuedEvent(long Id, CardConversionSource Source, ActualDiscardRecoveryPhaseKey Phase, int Mode, int DrawCount) : IGameEvent;
 public sealed record AnniversaryHzZhanjueSpentEvent(long Id, long Origin, int Amount) : IGameEvent;
 public sealed record AnniversaryHzZhanjueRecoveredEvent(long FrameId, long IssueId, long DamageId, int Requested) : IGameEvent;
-public sealed record AnniversaryHzInvalidation(long ParentId, CardActionContext? Action, int Actor = -1, CardKind? LegacyKind = null)
-{
-    private IReadOnlyList<long> _ids = Array.AsReadOnly(Array.Empty<long>());
-    public IReadOnlyList<long> StatusIds { get => _ids; init => _ids = Array.AsReadOnly(value.ToArray()); }
-}
 public sealed partial record CardUseFrame
 {
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public AnniversaryHzInvalidation? AnniversaryHzInvalidation { get; init; }
-    private IReadOnlyList<AnniversaryHzInvalidation>? _anniversaryHzResponses;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<AnniversaryHzInvalidation>? AnniversaryHzResponses
-    { get => _anniversaryHzResponses; init => _anniversaryHzResponses = value is null ? null : Array.AsReadOnly(value.ToArray()); }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public long? AnniversaryHzSlashIssueId { get; init; }
 }
-public sealed partial record NullificationWindowFrame
-{ [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public AnniversaryHzInvalidation? AnniversaryHzInvalidation { get; init; } }
 internal interface IAnniversaryHzHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame f, SkillProgramEffectOp op); }
 internal abstract class AnniversaryHzDescriptor : ProgramOperationDescriptorBase
 {

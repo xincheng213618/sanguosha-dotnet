@@ -13,10 +13,7 @@ public sealed record MouJiangJiReceipt(CardConversionSource Source,string Gamepl
  private IReadOnlyList<int>_targets=[],_selected=[];public IReadOnlyList<int> Targets{get=>_targets;init=>_targets=Array.AsReadOnly(value.ToArray());}public IReadOnlyList<int> Selected{get=>_selected;init=>_selected=Array.AsReadOnly(value.ToArray());}
 }
 public sealed partial record ProgramSkillFrame{[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouJiangJiReceipt? MouJiangJi{get;init;}}
-public sealed partial record CardUseFrame{[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouJiangJiNativeUse? MouJiangJiShiju{get;init;}[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouJiangJiEffectRounds? MouJiangJiRounds{get;init;}}
-public sealed record MouJiangJiEffectGrant(long FrameId,CardConversionSource Source,string GameplayHash,long WindowId,long UseId,long ActionId,int Target);
-public sealed record MouJiangJiEffectRounds(long ActionId,ExtraCardEffectState Native)
-{public int Started{get;init;}public bool Active{get;init;}public int ActiveTarget{get;init;}=-1;public int ActiveIndex{get;init;}=-1;private IReadOnlyList<MouJiangJiEffectGrant>_grants=[];public IReadOnlyList<MouJiangJiEffectGrant> Grants{get=>_grants;init=>_grants=Array.AsReadOnly(value.ToArray());}}
+public sealed partial record CardUseFrame{[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouJiangJiNativeUse? MouJiangJiShiju{get;init;}}
 public sealed record MouJiangJiStartedEvent(long FrameId,CardConversionSource Source,string GameplayHash,SkillProgramEffectOp Operation,int Turn,int Giver,long PhaseId,long WindowId,long UseId,long ActionId):IGameEvent;
 public sealed record MouJiangJiShijuCommittedEvent(long FrameId,int Owner,int Giver,int Turn,long PhaseId,int CardId,bool Equipment):IGameEvent;
 public sealed record MouJiangJiSelfCardCommittedEvent(long FrameId,int CardId):IGameEvent;
@@ -27,9 +24,6 @@ public sealed record MouJiangJiRangeGrantedEvent(long FrameId,CardConversionSour
 public sealed record MouJiangJiDrawReturnedEvent(long FrameId,int Cursor,int Recipient,int Actual,int Replacement,long? AttemptId):IGameEvent;
 public sealed record MouJiangJiDiscardPaidEvent(long FrameId,int Target,int CardId,long Sequence):IGameEvent;
 public sealed record MouJiangJiDisabledEvent(long FrameId,CardConversionSource Source,int Turn):IGameEvent;
-public sealed record MouJiangJiEffectIssuedEvent(MouJiangJiEffectGrant Grant):IGameEvent;
-public sealed record MouJiangJiEffectStartedEvent(long UseId,long ActionId,long FrameId,int Round,int Target):IGameEvent;
-public sealed record MouJiangJiEffectCompletedEvent(long UseId,long ActionId,long FrameId,int Round,int Target):IGameEvent;
 public sealed record MouJiangJiCompletedEvent(long FrameId):IGameEvent;
 internal interface IMouJiangJiRuntime:IProgramRuntimeOperations{SkillProgramStepOutcome Resolve(ProgramSkillFrame f,SkillProgramEffectOp operation);}
 internal interface IMouJiangJiFacts:IProgramSelectionQuery

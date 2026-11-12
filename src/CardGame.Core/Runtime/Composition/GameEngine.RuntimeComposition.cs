@@ -116,8 +116,10 @@ public sealed partial class GameEngine
         internal static ProgramContinuationCatalog Discover(IEnumerable<MethodInfo> methods)
         {
             var entries = new List<Registration>();
-            foreach (var method in methods)
+            foreach (var candidateMethod in methods)
             {
+                if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(ProgramContinuationAttribute), inherit: true)) continue;
+                var method = candidateMethod!;
                 if (method.GetCustomAttribute<ProgramContinuationAttribute>()is not { } registration)
                     continue;
                 var parameters = method.GetParameters();

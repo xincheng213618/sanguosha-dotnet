@@ -62,7 +62,12 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MoTianen = r = r with { Material = material } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoTianenSlashObtainIssuedEvent(f.Id, material?.CardId, material?.PrintedKind, material?.From, r.Before));
         if (card is not null)
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Hand(f.OwnerSeat), new(MoTianenObtainReason), move => _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoTianenSlashExemptionIssuedEvent(f.Id, r.Source, r.GameplayHash, move.CardId, move.CardKind, move.Sequence)));
+            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Hand(f.OwnerSeat), new(MoTianenObtainReason), move =>
+            {
+                if (move.To == CardLocation.Hand(f.OwnerSeat))
+                    _handLimitExemptions.Grant(f, "ol:mo-tianen", f.OwnerSeat, new(new(), [move.CardId]));
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoTianenSlashExemptionIssuedEvent(f.Id, r.Source, r.GameplayHash, move.CardId, move.CardKind, move.Sequence));
+            });
         SealMoTianenPayment(f.Id);
     }
 

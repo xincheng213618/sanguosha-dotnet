@@ -17,10 +17,10 @@ internal sealed partial class NativeHealthRecoveryRuntime
         var frameIndex = facts.FrameLastIndex(frame.Id);
         if (frameIndex < 2 || facts.FrameAt(frameIndex - 1) is not HpChangedTriggerWindowFrame hp ||
             hp.Id != change.Id || hp.Change != change || !protocols.TypedDamagePostEventEdge(hp, frame)) return false;
-        IReadOnlyList<IGameEvent>? history = null;
-        IReadOnlyList<IGameEvent> History() => history ??= facts.CompleteProgramEventHistory().ToArray();
-        var nativeRescue = TryGetNativeRescueRecovery(frameIndex - 1, out var rescuedDying);
-        if ((!nativeRescue && !ExactRecoveryProducerEdge(frameIndex - 1, History)) ||
+        DyingFrame? rescuedDying = null;
+        var nativeRescue = facts.FrameAt(frameIndex - 2) is CardUseFrame { DyingResponse: not null, RecoveryApplication: not null } &&
+            TryGetNativeRescueRecovery(frameIndex - 1, out rescuedDying);
+        if ((!nativeRescue && !ExactRecoveryProducerEdge(frameIndex - 1)) ||
             !PausedRecoveryDamageMatches(frame, target, amount, sourceReference, nature)) return false;
         var windowIndex = frameIndex - 2;
         while (windowIndex >= 0 && facts.FrameAt(windowIndex) is not DamageTriggerWindowFrame) windowIndex--;
@@ -41,13 +41,14 @@ internal sealed partial class NativeHealthRecoveryRuntime
                 var child = facts.FrameAt(index);
                 if (child is HpChangedTriggerWindowFrame)
                 {
-                    if (!ExactRecoveryProducerEdge(index, History)) return false;
+                    if (!ExactRecoveryProducerEdge(index)) return false;
                 }
-                else if (ExactPaidNativeRecoveryUseEdge(parent, child, History) ||
-                    ExactPaidNativeRecoveryReplacementEdge(parent, child, History)) continue;
+                else if (parent is ProgramSkillFrame && child is CardUseFrame { HulaoPeachOrigin: not null } &&
+                    ExactPaidNativeRecoveryUseEdge(parent, child) ||
+                    ExactPaidNativeRecoveryReplacementEdge(parent, child)) continue;
                 else if (parent is ProgramSkillFrame producer && child is RecoveryReplacementFrame recovery)
                 {
-                    if (!protocols.ProgramRecoveryReplacementReceiptMatches(producer, recovery, History())) return false;
+                    if (!protocols.ProgramRecoveryReplacementReceiptMatches(producer, recovery)) return false;
                 }
                 else if (!protocols.TypedDamagePostEventEdge(parent, child)) return false;
             }
@@ -64,15 +65,15 @@ internal sealed partial class NativeHealthRecoveryRuntime
         return true;
     }
 
-    private bool ExactRecoveryProducerEdge(int hpIndex, Func<IReadOnlyList<IGameEvent>> history)
+    internal bool ExactRecoveryProducerEdge(int hpIndex)
     {
         if (hpIndex < 1 || facts.FrameAt(hpIndex) is not HpChangedTriggerWindowFrame hp ||
             hp.Change.Kind != HpChangeKind.Recovery || hp.Change.Amount <= 0) return false;
         var parent = facts.FrameAt(hpIndex - 1);
         if (parent is CardUseFrame use) return NativeCardRecoveryReturnMatches(use, hp);
         if (parent is RecoveryReplacementFrame recovery)
-            return protocols.TypedRecoveryApplicationBoundsMatch(recovery, history()) && protocols.TypedRecoveryHpReturnMatches(recovery, hp, history());
-        return parent is ProgramSkillFrame producer && protocols.ProgramRecoveryReceiptMatches(producer, hp, history());
+            return protocols.TypedRecoveryApplicationBoundsMatch(recovery) && protocols.TypedRecoveryHpReturnMatches(recovery, hp);
+        return parent is ProgramSkillFrame producer && protocols.ProgramRecoveryReceiptMatches(producer, hp);
     }
 
     internal bool PausedRecoveryDamageMatches(ProgramSkillFrame frame, int target, int amount,

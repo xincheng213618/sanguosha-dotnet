@@ -14,7 +14,7 @@ public sealed record ModeBattleRulesFacts(bool SetupComplete, bool StartingProgr
 }
 
 public sealed record ModeBattleCardAction(long ActionId, CardActionType Type, int ActorSeat, CardKind Kind);
-public sealed record ModeBattleNativeUse(long FrameId, ModeBattleCardAction Action, bool HasExtraEffect);
+public sealed record ModeBattleNativeUse(long FrameId, ModeBattleCardAction Action);
 public sealed record ModeBattleDraftFacts(int Seat, bool GeneralSelected, string GeneralId, IReadOnlyList<string> Candidates)
 {
     public IReadOnlyList<string> Candidates { get; } = Array.AsReadOnly(Candidates.ToArray());

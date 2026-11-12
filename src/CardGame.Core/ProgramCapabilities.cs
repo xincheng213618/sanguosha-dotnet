@@ -19,7 +19,7 @@ internal sealed class ProgramCapabilityAttribute(Type? deferredModule = null) : 
 internal sealed class ProgramCapabilityCatalog
 {
     private static readonly Lazy<ProgramCapabilityCatalog> BuiltIn = new(() =>
-        new(typeof(GameEngine).Assembly.GetTypes()), true);
+        new(typeof(GameEngine).Assembly.GetTypes(), ProgramRuntimeModuleCatalog.Default), true);
     internal static ProgramCapabilityCatalog Default => BuiltIn.Value;
 
     internal sealed record Registration(
@@ -57,7 +57,7 @@ internal sealed class ProgramCapabilityCatalog
     private readonly IReadOnlyDictionary<Type, Registration> _byContract;
     internal IReadOnlyList<Registration> Registrations { get; }
 
-    internal ProgramCapabilityCatalog(IEnumerable<Type> types)
+    internal ProgramCapabilityCatalog(IEnumerable<Type> types, ProgramRuntimeModuleCatalog? modules = null)
     {
         ArgumentNullException.ThrowIfNull(types);
         var declaredTypes = types.ToArray();
@@ -65,6 +65,7 @@ internal sealed class ProgramCapabilityCatalog
             throw new InvalidOperationException("A program capability type cannot be null.");
         var registrations = new List<Registration>();
         var byContract = new Dictionary<Type, Registration>();
+        var validatedModules = new Dictionary<Type, ProgramRuntimeModuleCatalog.Registration>();
         foreach (var type in declaredTypes.Where(type => type.IsDefined(typeof(ProgramCapabilityAttribute), false))
                      .OrderBy(type => type.FullName, StringComparer.Ordinal))
         {
@@ -76,11 +77,11 @@ internal sealed class ProgramCapabilityCatalog
             if (independent)
             {
                 if (deferredModule is not null) throw Invalid(type, "a runtime module cannot also be a deferred adapter");
-                _ = new ProgramRuntimeModuleCatalog([type]);
+                _ = ValidateModule(type);
             }
             else if (deferredModule is not null)
             {
-                _ = new ProgramRuntimeModuleCatalog([deferredModule]).Get(deferredModule);
+                _ = ValidateModule(deferredModule);
                 if (deferredModule.IsAbstract || constructors is not [var deferredConstructor] ||
                     !deferredConstructor.GetParameters().Select(parameter => parameter.ParameterType)
                         .SequenceEqual([typeof(Func<>).MakeGenericType(deferredModule)]))
@@ -104,6 +105,17 @@ internal sealed class ProgramCapabilityCatalog
         }
         Registrations = Array.AsReadOnly(registrations.ToArray());
         _byContract = new ReadOnlyDictionary<Type, Registration>(byContract);
+
+        ProgramRuntimeModuleCatalog.Registration ValidateModule(Type type)
+        {
+            // Production already validated these immutable declarations. Adapter
+            // registration must not rescan their shared dependency contracts.
+            if (modules is not null) return modules.Get(type);
+            if (validatedModules.TryGetValue(type, out var registration)) return registration;
+            registration = new ProgramRuntimeModuleCatalog([type]).Get(type);
+            validatedModules.Add(type, registration);
+            return registration;
+        }
     }
 
     internal bool TryResolve(Type contract, [NotNullWhen(true)] out Registration? registration)

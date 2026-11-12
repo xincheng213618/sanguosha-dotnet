@@ -46,7 +46,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
                 foreach (var source in _coreActionQueriesOperations.GetProgramViewAsConversions(actor, card, kind, false))
                     if (_corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is null && !_coreCardUseModulesOperations.IsTurnHandCardRestricted(actor, card) && Legal(card, kind, source))
                         Add($"typed-{(card.Id)}-{(kind)}-{(source.SkillInstanceId)}-{(source.BindingId)}", [card.Id], kind, source);
-        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor))
+        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor))
         {
             var ids = pair.Select(c => c.Id).ToArray();
             if (Legal(pair[0], CardKind.Slash, ids: ids))
@@ -78,28 +78,34 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[r.Actor];
         var target = _coreMatchParticipantsPlayersAccess._players[r.Target];
         var kind = Enum.Parse<CardKind>(choice.Parameters["effective-kind"]);
+        var requestAcceptance = _slashRequests.Accept(f, r.Actor, r.Target);
+        f = _requestExecution.PrepareAcceptedUse(f, requestAcceptance);
+        r = f.LvKuangLvXiang!;
         if (choice.Cards.Count == 0)
         {
             if (choice.Parameters.GetValueOrDefault("round-once-cardless") != "true" || !CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source) || source is null)
                 throw new InvalidOperationException("Qigong cardless use requires its independent true paid native source.");
             var paid = _coreRoundOnceCardlessBasicOperations.ConsumeRoundOnceCardlessBasic(source, false);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LvKuangLvXiang = r with { Stage = "issuing", IssuingIds = [], IssuingKind = CardKind.Slash, RoundOncePayment = paid } });
-            IssueQigongCardless(f, source, CardKind.Slash);
+            IssueQigongCardless(f, source, CardKind.Slash, requestAcceptance);
             return;
         }
 
         var selection = _coreAssistedSlashPaymentOperations.ReadAssistedSlashPayment(actor, choice);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { LvKuangLvXiang = r with { Stage = "issuing", IssuingIds = selection.Cards.Select(c => c.Id).ToArray(), IssuingKind = selection.Kind } });
-        _coreNativeSlashUseOperations.ResolveSlashCore(actor, target, selection.Cards[0], selection.Kind, actor.Seat, physicalCards: selection.Cards, countsTowardSlashLimit: false, usesZhuqueFan: selection.Kind == CardKind.FireSlash && selection.Cards[0].Kind == CardKind.Slash && _coreNativeTargetLegalityOperations.HasZhuqueFan(actor), conversionSource: selection.Conversion, programSkillCardUseFrameId: f.Id);
+        _coreNativeSlashUseOperations.ResolveSlashCore(actor, target, selection.Cards[0], selection.Kind, actor.Seat, physicalCards: selection.Cards, countsTowardSlashLimit: false, usesZhuqueFan: selection.Kind == CardKind.FireSlash && selection.Cards[0].Kind == CardKind.Slash && _coreNativeTargetLegalityOperations.HasZhuqueFan(actor), conversionSource: selection.Conversion, programSkillCardUseFrameId: f.Id, programSlashRequest: requestAcceptance);
     }
 
-    internal void IssueQigongCardless(ProgramSkillFrame f, CardConversionSource source, CardKind kind)
+    internal void IssueQigongCardless(ProgramSkillFrame f, CardConversionSource source, CardKind kind, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
         var r = f.LvKuangLvXiang!;
         var actor = _coreMatchParticipantsPlayersAccess._players[r.Actor];
         var target = _coreMatchParticipantsPlayersAccess._players[r.Target];
+        programSlashRequest ??= _requestExecution.GetAcceptance(f, r.Actor, r.Target);
+        if (programSlashRequest is null)
+            throw new InvalidOperationException("Qigong's paid native use lost its accepted request.");
         var logical = new Card(0, kind, Suit.None, 0);
-        var id = _coreNativeCardUseOperations.BeginCardUse(logical, actor.Seat, [target.Seat], kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, kind), physicalCardIds: [], conversionSource: source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(logical, actor.Seat, [target.Seat], kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, kind), physicalCardIds: [], conversionSource: source, programSlashRequest: programSlashRequest);
         if (r.RoundOncePayment is not null)
             _coreRoundOnceCardlessNativeUsesOperations.IssueRoundOnceCardlessNativeUse(id, source);
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, target.Seat, card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, target, kind), programSkillCardUseFrameId: f.Id);
@@ -117,24 +123,35 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
 
     internal void BindQigongNativeUse(long id)
     {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == id);
-        if (index < 1 || _resolutionStackOperations._resolutionStack[index] is not CardUseFrame { Action: { } a } use)
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id) is not { Action: { Type: CardActionType.Use } action, ProgramSlashRequestExecution: { } execution } use || use.Qigong is not null ||
+            _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == execution.ProgramFrameId) is not ProgramSkillFrame { LvKuangLvXiang: { } r } parent)
             return;
-        var f = _resolutionStackOperations._resolutionStack[index - 1] is ProgramSkillFrame { LvKuangLvXiang: { Stage: "issuing" } } direct ? direct : _characterLiuFengBoundaryOperations.BoundaryLiuFengNativeParent(use);
-        if (f is not { LvKuangLvXiang: { Stage: "issuing" } r })
-            return;
-        if (r.Native is not null || a.Type != CardActionType.Use || a.ActorSeat != r.Actor || a.ProviderSeat != (r.IssuingProvider ?? r.Actor) || a.EffectiveKind != r.IssuingKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(a.EffectiveKind) || !a.TargetSeats.SequenceEqual([r.Target]) || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(r.IssuingIds) || a.PhysicalCards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.CardId) != c.From && (use.AcceptedDeclarationPayment is not { } dp || dp.Cost != c || dp.ProviderSeat != a.ProviderSeat)) || r.OriginalUseId is not { } original || r.OriginalActionId is not { } action)
-            throw new InvalidOperationException("Qigong native issuance lost its exact actor, target, provider or real materials.");
-        var receipt = new QigongNativeReceipt(f.Id, r.Source, r.GameplayHash, r.Instruction, r.Turn, original, action, r.Actor, r.Target, id, a.ActionId, a, r.Declaration?.Before ?? _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, r.Declaration?.Before ?? _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
+        var acceptance = execution.Acceptance;
+        if (!_slashRequests.OwnsAcceptance(parent, acceptance, r.Actor, r.Target) || acceptance.Identity.Source != r.Source ||
+            acceptance.Identity.GameplayHash != r.GameplayHash || r.Native is not null ||
+            r.OriginalUseId is not { } originalUse || r.OriginalActionId is not { } originalAction || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind))
+            throw new InvalidOperationException("Qigong native issuance lost its accepted original request.");
+        var before = r.Declaration?.Before ?? _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
+        if (use.AcceptedDeclarationPayment is { } declaration && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(move =>
+            move.CardId == declaration.Cost.CardId && move.From == declaration.Cost.From && move.To == CardLocation.Processing && move.Reason.Value == "conversion.declaration.pay") is { } declarationDeparture)
+            before = Math.Min(before, declarationDeparture.Sequence - 1);
+        var receipt = new QigongNativeReceipt(parent.Id, r.Source, r.GameplayHash, r.Instruction, r.Turn,
+            originalUse, originalAction, r.Actor, r.Target, use.Id, action.ActionId, action, before, before)
         {
-            RoundOncePayment = r.RoundOncePayment,
-            DrawFundedPayment = r.DrawFundedPayment,
-            ChainedPayment = r.ChainedPayment,
+            RoundOncePayment = r.RoundOncePayment ?? use.RoundOnceCardlessBasicUse?.Payment,
+            DrawFundedPayment = use.DrawFundedDistinctBasicUse?.Payment ?? r.DrawFundedPayment,
+            ChainedPayment = use.ChainedStateBasicUse?.Payment ?? r.ChainedPayment,
             DeclarationPayment = use.AcceptedDeclarationPayment
         };
-        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { LvKuangLvXiang = r with { Stage = "native", Native = receipt } });
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { Qigong = receipt });
+        _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { LvKuangLvXiang = r with
+        {
+            Stage = "native", Native = receipt, IssuingKind = action.EffectiveKind,
+            IssuingProvider = action.ProviderSeat, IssuingIds = action.PhysicalCards.Select(cost => cost.CardId).ToArray()
+        } });
+        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, current => current with { Qigong = receipt });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QigongNativeIssuedEvent(receipt));
+        if (action.PhysicalCards.Count == 0)
+            CompleteQigongNativePayment(id);
     }
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashPaymentCompleted, 30)]
@@ -162,17 +179,31 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
     {
         var action = r.OriginalAction;
         if (action.PhysicalCards.Count == 0)
-            return r.RoundOncePayment is { } round && round.Source.OwnerSeat == r.Actor && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RoundOnceCardlessBasicQuotaPaidEvent>().Count(e => e.Receipt == round) == 1 || r.DrawFundedPayment is { } draw && _coreDrawFundedDistinctBasicPaymentOperations.ValidDrawFundedDistinctBasicPayment(draw) || r.ChainedPayment is { } chain && _coreChainedStateBasicConversionsOperations.ValidChainedStateBasicPayment(chain) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == r.ProgramId)is { } paidParent && (_characterGuoTuOlOperations.HasWeijieSpecializedPayment(paidParent, use) || (_characterLiuZhangOlOperations.HasZonghuSpecializedPayment(paidParent, use) || _characterHuanShuJunOlOperations.HasHuanpeiProgramPayment(paidParent, use)));
-        return action.PhysicalCards.All(c => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.CardId == c.CardId && m.From == c.From && m.Sequence > r.Before && m.Sequence <= r.After && (m.Reason == CardMoveReasons.Use && m.To == _characterCaoChunOlOperations.CaoChunNativeCostDestination(action, c) || r.DeclarationPayment is { } d && d.Cost == c && d.ProviderSeat == action.ProviderSeat && d.DeclaredKind == action.EffectiveKind && action.ConversionChain.Contains(d.Source) && m.To == CardLocation.Processing && m.Reason.Value == "conversion.declaration.pay")) == 1);
+            return use.ProgramSlashRequestExecution is { } execution && execution.ProgramFrameId == r.ProgramId &&
+                execution.UseFrameId == use.Id && execution.CardActionId == action.ActionId &&
+                _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.ProgramId) is ProgramSkillFrame parent &&
+                _slashRequests.OwnsAcceptance(parent, execution.Acceptance, r.Actor, r.Target);
+        return action.PhysicalCards.All(cost => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(move =>
+            move.CardId == cost.CardId && move.From == cost.From && move.Sequence > r.Before && move.Sequence <= r.After &&
+            (move.Reason == CardMoveReasons.Use || r.DeclarationPayment is { } declaration && declaration.Cost == cost &&
+                declaration.ProviderSeat == action.ProviderSeat && declaration.DeclaredKind == action.EffectiveKind &&
+                action.ConversionChain.Contains(declaration.Source) && move.To == CardLocation.Processing && move.Reason.Value == "conversion.declaration.pay")) == 1);
     }
 
     internal bool ValidQigongNativeUse(CardUseFrame use)
     {
-        if (use.Qigong is not { } r || r.UseId != use.Id || r.ActionId != use.Action?.ActionId || r.Turn != _coreActualTurnProgressTurnNumberAccess._turnNumber || r.OriginalAction.Type != CardActionType.Use || r.OriginalAction.ActorSeat != r.Actor || !r.OriginalAction.TargetSeats.SequenceEqual([r.Target]) || !use.Action.PhysicalCards.SequenceEqual(r.OriginalAction.PhysicalCards) || !use.Action.ConversionChain.SequenceEqual(r.OriginalAction.ConversionChain) || use.PhysicalCardIds is null || !use.PhysicalCardIds.SequenceEqual(r.OriginalAction.PhysicalCards.Select(c => c.CardId)) || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.Actor, r.OriginalAction.ProviderSeat) || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == r.ProgramId)is not { LvKuangLvXiang: { } parent } f || !SameQigongNativeReceipt(parent.Native, r) || r.OriginalAction.ProviderSeat != (parent.IssuingProvider ?? r.Actor) || r.Source != LvKuangLvXiangSource(f) || r.GameplayHash != f.GameplayHash || r.Instruction != f.InstructionIndex || r.OriginalUseId != parent.OriginalUseId || r.OriginalActionId != parent.OriginalActionId)
+        if (use.Qigong is not { } receipt || use.Action is not { Type: CardActionType.Use } action ||
+            use.ProgramSlashRequestExecution is not { } execution || execution.ProgramFrameId != receipt.ProgramId ||
+            execution.UseFrameId != use.Id || execution.CardActionId != action.ActionId || receipt.UseId != use.Id || receipt.ActionId != action.ActionId ||
+            _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == receipt.ProgramId) is not ProgramSkillFrame { LvKuangLvXiang: { } parentReceipt } parent ||
+            !_slashRequests.OwnsAcceptance(parent, execution.Acceptance, receipt.Actor, receipt.Target) ||
+            execution.Acceptance.Identity.Source != receipt.Source || receipt.Source != parentReceipt.Source || receipt.GameplayHash != parent.GameplayHash ||
+            receipt.Instruction != parent.InstructionIndex || receipt.OriginalUseId != parentReceipt.OriginalUseId || receipt.OriginalActionId != parentReceipt.OriginalActionId ||
+            !SameQigongNativeReceipt(parentReceipt.Native, receipt) || action.ProviderSeat != receipt.OriginalAction.ProviderSeat ||
+            !action.PhysicalCards.SequenceEqual(receipt.OriginalAction.PhysicalCards) || !action.ConversionChain.SequenceEqual(receipt.OriginalAction.ConversionChain) ||
+            use.PhysicalCardIds is null || !use.PhysicalCardIds.SequenceEqual(action.PhysicalCards.Select(cost => cost.CardId)) || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind))
             return false;
-        if (_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QigongNativeIssuedEvent>().Count(e => SameQigongNativeReceipt(e.Receipt, r with { After = r.Before, Paid = false })) != 1)
-            return false;
-        return r.Paid ? _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QigongNativePaidEvent>().Count(e => SameQigongNativeReceipt(e.Receipt, r)) == 1 && QigongMaterialPaymentMatches(use, r) : r.Before == r.After && !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QigongNativePaidEvent>().Any(e => e.Receipt.UseId == use.Id);
+        return receipt.Paid ? QigongMaterialPaymentMatches(use, receipt) : receipt.Before == receipt.After;
     }
 
     internal bool IsQigongIssuedDistance(long? id, int actor) => id is { } useId && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Qigong: { Paid: true }, Action: { } action } use && action.ActorSeat == actor && ValidQigongNativeUse(use);
@@ -209,7 +240,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
     {
         if (use.Qigong is not { } r)
             return false;
-        if (!ValidQigongNativeUse(use) || !r.Paid || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QigongNativeReturnedEvent>().Any(e => e.UseId == use.Id))
+        if (!ValidQigongNativeUse(use) || !r.Paid || _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == r.ProgramId).LvKuangLvXiang!.Returned)
             throw new InvalidOperationException("Qigong native child cannot return another or twice-paid invoice.");
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == r.ProgramId);
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { LvKuangLvXiang = parent.LvKuangLvXiang!with { Returned = true } });
@@ -228,7 +259,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
 
     internal void CompleteQigongSlash(GameEngine.AttackCompletionReceipt completion)
     {
-        if (completion.Qigong is not { } r || !r.Paid || completion.ResolutionId != r.UseId || completion.ProgramFrameId != r.ProgramId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LvKuangLvXiang: { Returned: true, Native: { } paid } } parent || parent.Id != r.ProgramId || !SameQigongNativeReceipt(paid, r) || _resolutionStackOperations._resolutionStack.Any(f => f.Id == r.UseId) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<QigongNativeReturnedEvent>().Count(e => e.ProgramId == parent.Id && e.UseId == r.UseId && e.ActionId == r.ActionId) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseFinishedEvent>().Count(e => e.ResolutionId == r.UseId) != 1)
+        if (completion.Qigong is not { } r || !r.Paid || completion.ResolutionId != r.UseId || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { LvKuangLvXiang: { Returned: true, Native: { } paid } } parent || parent.Id != r.ProgramId || !SameQigongNativeReceipt(paid, r) || _resolutionStackOperations._resolutionStack.Any(f => f.Id == r.UseId))
             throw new InvalidOperationException("Qigong attack completion lost its once-consumed original native return.");
         RestoreQigongParentAttack(parent);
         _coreRuntimeOperations.AdvanceRuntimeProgram(parent.Id);

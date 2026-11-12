@@ -2,6 +2,7 @@ namespace CardGame.Core;
 
 internal interface IRuleProgressionOperations
 {
+    void CaptureNativeResponseRules(IGameEvent payload);
     void ApplySkillStateDeclarations(IGameEvent payload, SkillStateBoundaryTiming timing);
     void QueueFact(IGameEvent payload);
     bool BeginCharacterStateWindow();
@@ -28,6 +29,7 @@ internal sealed class RuleProgressionRuntime(ProgramRuleObservers observers, IRu
         _advancingFacts.Add(payload);
         try
         {
+            operations.CaptureNativeResponseRules(payload);
             operations.ApplySkillStateDeclarations(payload, SkillStateBoundaryTiming.Before);
             observers.BeforeEvent(payload);
             operations.QueueFact(payload);

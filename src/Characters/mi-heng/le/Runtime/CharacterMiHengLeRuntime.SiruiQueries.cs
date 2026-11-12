@@ -25,12 +25,7 @@ internal sealed partial class CharacterMiHengLeRuntime
         return !forResponse && !dyingUse && requestedUseTarget is null || IsSiruiTrueResponseUse(owner, rule.OutputKind, dyingUse, requestedUseTarget);
     }
 
-    internal bool SiruiPureProviderFrontier(int actor)
-    {
-        var top = _resolutionStackOperations._resolutionStack.LastOrDefault();
-        bool At(long owner) => top?.Id == owner || top is ResponseWindowFrame response && response.ParentFrameId == owner;
-        return _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { AwaitingProviders: true } f && f.CurrentCandidateSeat == actor && At(f.OwnerFrameId) || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } d && d.CurrentCandidateSeat == actor && At(d.Attack.ResolutionId);
-    }
+    internal bool SiruiPureProviderFrontier(int actor) => _nativeSlashQueries.IsNativePureProviderFrontier(actor);
 
     internal bool IsSiruiTrueResponseUse(CharacterState owner, CardKind kind, bool dyingUse = false, int? requestedUseTarget = null)
     {
@@ -44,19 +39,7 @@ internal sealed partial class CharacterMiHengLeRuntime
             return _resolutionStackOperations._resolutionStack.LastOrDefault()is NullificationWindowFrame n && n.CandidateIndex < n.CandidateSeats.Count && n.CandidateSeats[n.CandidateIndex] == owner.Seat;
         if (kind == CardKind.Dodge)
             return _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(owner, kind);
-        if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { AwaitingProviders: true })
-            return false;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { ActiveAttack: null } borrowed && borrowed.WeaponOwnerSeat == owner.Seat)
-            return true;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack))
-            return true;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame f || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)is not { } effect)
-            return false;
-        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(f))
-            return f.LvKuangLvXiang!.Actor == owner.Seat;
-        if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(f) || _characterWuJingOlOperations.IsWuJingHejiRequest(f))
-            return f.OwnerSeat == owner.Seat;
-        return _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(f, effect.Op, owner.Seat);
+        return CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && _nativeSlashQueries.IsNativeForcedSlashUseFrontier(owner);
     }
 
     internal bool SiruiIgnoresSlashDistance(CharacterState actor, CardConversionSource? source) => source is not null && IsSiruiSource(source) && CoreNativeCardClassificationsRuntime.IsSlashCard(_corePlayCardHistoryOperations.ViewAsRule(source)!.OutputKind) && CanUseSiruiPhase(actor, source);

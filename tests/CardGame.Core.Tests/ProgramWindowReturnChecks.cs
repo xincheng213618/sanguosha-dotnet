@@ -44,6 +44,9 @@ internal static class ProgramWindowReturnChecks
         RequireThrows(() => new ReturnCatalog([new(SkillProgramTriggerWindow.GameStarting, "missing", null!)]));
         try { ((IList<ReturnCatalog.Registration>)catalog.Registrations)[0] = catalog.Registrations[0]; throw new Exception("Return metadata was mutable."); }
         catch (NotSupportedException) { }
+        RequireThrows(() => ReturnCatalog.Discover([]));
+        RequireInputFailure<NullReferenceException>(() => ReturnCatalog.Discover(null!));
+        RequireInputFailure<ArgumentNullException>(() => ReturnCatalog.Discover([null!]));
         var methods = ProgramRuntimeModuleCatalog.Default.Methods;
         var forward = ReturnCatalog.Discover(methods);
         var reverse = ReturnCatalog.Discover(methods.Reverse());
@@ -98,6 +101,12 @@ internal static class ProgramWindowReturnChecks
         try { action(); }
         catch (InvalidOperationException) { return; }
         throw new InvalidOperationException("An invalid trigger-window return was accepted.");
+    }
+    private static void RequireInputFailure<TException>(Action action) where TException : Exception
+    {
+        try { action(); }
+        catch (TException) { return; }
+        throw new InvalidOperationException($"Window-return discovery must preserve its original {typeof(TException).Name} input boundary.");
     }
     private static void Require(bool condition, string message)
     { if (!condition) throw new InvalidOperationException(message); }

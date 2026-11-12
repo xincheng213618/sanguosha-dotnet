@@ -109,6 +109,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryMaTie: { } r } f || !ValidMaTie(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == AnniversaryMaTieStage.Target ? f.OwnerSeat : r.Actors[r.Cursor]) || !MaTieChoices(f).Any(c => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([choice], [c])))
             throw new InvalidOperationException("Quxian changed its private original actor, target or native plan.");
+        var originalDecision = _corePendingDecisionPolicyPipelineOperations._pendingDecision!;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         switch (choice.Parameters["branch"])
@@ -123,7 +124,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
                 ContinueMaTie(f.Id);
                 return;
             case "slash":
-                IssueMaTieSlash(f, int.Parse(choice.Parameters["option"], CultureInfo.InvariantCulture));
+                IssueMaTieSlash(f, int.Parse(choice.Parameters["option"], CultureInfo.InvariantCulture), originalDecision);
                 return;
             case "faction":
                 BeginMaTieFaction(f);
@@ -198,6 +199,8 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
 
             if (r.Cursor >= r.Actors.Count || !_coreMatchParticipantsPlayersAccess._players[r.Target].IsAlive)
             {
+                _slashRequests.Close(f);
+                f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryMaTie = r with { Stage = AnniversaryMaTieStage.Penalties } });
                 ContinueMaTie(f.Id);
                 return;
@@ -209,6 +212,12 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
                 return;
             }
 
+            _slashRequests.Issue(f, r.Actors[r.Cursor],
+                new(ProgramSlashRequestTargetSource.FrozenCandidates, [r.Target], RetainSourceLoss: true, RetainOwnerDeath: true,
+                    RetainAcceptedSourceLoss: true, RetainAcceptedOwnerDeath: true,
+                    QuotaTargets: ProgramSlashRequestPermissionTargets.AnyOtherTarget, ExemptIssuedSlashDebit: true,
+                    FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction), r.Cursor);
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             PublishMaTie(f);
             return;
         }
@@ -241,6 +250,8 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
 
     internal void NextMaTieActor(ProgramSkillFrame f)
     {
+        _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var r = f.AnniversaryMaTie!;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect, RoundOnceCardlessProgramRequest = null, AnniversaryMaTie = r with { Stage = AnniversaryMaTieStage.SlashChoice, Cursor = r.Cursor + 1, SelectedAction = null, Materials = [], Provider = -1, UseId = 0, ActionId = 0, FactionPolicy = null, FactionTried = false, OriginalDecision = null } });
         ContinueMaTie(f.Id);
@@ -248,6 +259,8 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
 
     internal void FinishMaTie(ProgramSkillFrame f)
     {
+        _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var r = f.AnniversaryMaTie!;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryMaTieCompletedEvent(f.Id, r.Used.Count, r.TargetDamaged));
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryMaTie = null, PendingMovementContinuation = null });

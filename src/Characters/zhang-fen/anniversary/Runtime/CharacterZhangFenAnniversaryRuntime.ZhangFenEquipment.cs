@@ -35,10 +35,7 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
             if (moved.To != CardLocation.OutsideGame || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DagongCheDestroyedEvent>().Any(e => e.CardId == moved.CardId))
                 throw new InvalidOperationException("A real Dagong Che must be destroyed exactly once on leaving Equipment.");
             var movement = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == moved.CardId);
-            foreach (var use in _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().Where(use =>
-                         use.Action?.PhysicalCards.Any(material => material.CardId == moved.CardId &&
-                             material.CardKind == moved.CardKind && material.From == moved.From) == true).ToArray())
-                _nativeCardRepresentations.CaptureDeparture(use.Id, moved.CardId, movement.Sequence);
+            _nativeMaterialClaims.CaptureRetirement(movement);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DagongCheDestroyedEvent(moved.CardId, old, movement.Sequence, _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id ?? 0, movement.Reason, DagongUpgrades(moved.CardId).Length));
         }
 
@@ -51,5 +48,4 @@ internal sealed partial class CharacterZhangFenAnniversaryRuntime
 
     internal bool IsDagongCheDestroyedMaterial(CardMovementRecord m) => m.To == CardLocation.OutsideGame && m.From.Zone == CardZoneKind.Equipment && IsRealDagongChe(m.CardId) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DagongCheDestroyedEvent>().Where(e => e.CardId == m.CardId).ToArray()is [var e] && e.FormerOwnerSeat == m.From.OwnerSeat && e.MovementSequence == m.Sequence && e.Reason == m.Reason && e.Upgrades == DagongUpgrades(m.CardId).Length;
     internal bool IsDagongCheDestroyedMaterial(int cardId, CardLocation from, CardLocation to) => to == CardLocation.OutsideGame && cardId > 0 && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cardId && m.From == from && m.To == to && IsDagongCheDestroyedMaterial(m));
-    internal bool IsDagongCheDestroyedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.Action is { } action && action.PhysicalCards.SingleOrDefault(c => c.CardId == cardId)is { } cost && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<DagongCheDestroyedEvent>().Any(e => e.CardId == cardId && e.ParentId == useId && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.MovementSequence && m.From == cost.From && m.CardKind == cost.CardKind && IsDagongCheDestroyedMaterial(m)));
 }

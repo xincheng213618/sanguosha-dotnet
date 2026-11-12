@@ -13,7 +13,8 @@ internal interface IActivePlayerEffectProjection : IProgramSelectionQuery
 // projection-scoped legacy cursor. The original rule stores retain ownership.
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class ActivePlayerEffectProjector(IActivePlayerTurnEffectQueries turnEffects,
-    ICardZoneQueries cards, IProgramContentQueries content, IProgramEventHistoryQueries history) : IActivePlayerEffectProjection
+    ICardZoneQueries cards, IProgramContentQueries content, IProgramEventHistoryQueries history,
+    IHandLimitExemptions handLimitExemptions) : IActivePlayerEffectProjection
 {
     // Read the live rule stores, never infer an outstanding effect from past activations.
     public IReadOnlyList<ActivePlayerEffectSnapshot>? Project<TFacts, TMatch>(TFacts facts, TMatch match,
@@ -255,8 +256,10 @@ internal sealed class ActivePlayerEffectProjector(IActivePlayerTurnEffectQueries
             if (obligation.Source.OwnerSeat == player.Seat)
                 Add(obligation.Source.SkillId, obligation.Source.OwnerSeat,
                     $"本回合结束时，若交给{SeatName(obligation.RecipientSeat)}的牌仍满足保留条件，将手牌调整至{obligation.HandLimit}张。");
-        foreach (var group in turnEffects.HandLimitExemptCards.Where(item => item.BeneficiarySeat == player.Seat &&
-                     Current(item.TurnNumber, item.TurnSeat) && cards.GetLocation(item.CardId) == CardLocation.Hand(player.Seat))
+        foreach (var group in handLimitExemptions.ActiveRelations(NativeHandLimitExemptionRelations.JudgmentEntities, player.Seat)
+                     .SelectMany(grant => (grant.Issue.Spec.ExactCardIds ?? []).Where(id =>
+                         cards.GetLocation(id) == CardLocation.Hand(player.Seat) && handLimitExemptions.IsMember(grant.Sequence, player.Seat, id))
+                         .Select(id => (grant.Issue.Source, CardId: id)))
                      .GroupBy(item => item.Source.SkillId))
             Add(group.Key, group.First().Source.OwnerSeat, $"手牌中{group.Select(item => item.CardId).Distinct().Count()}张以此法获得的牌不计入手牌上限。");
         if (content.HasActivationOperation(SkillProgramEffectOp.GrantFixedDistanceOneTurnPolicy))

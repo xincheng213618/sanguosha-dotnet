@@ -3,7 +3,6 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramHandLimitKindExemptionsRuntime
 {
-    internal IReadOnlySet<CardKind> GetCurrentHandLimitExemptKinds(CharacterState owner) => _turnCardUseEffectsOperations._turnCardUseEffects.GetHandLimitExemptCardKinds(_coreActualTurnProgressTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, owner.Seat).Concat(_coreNationalSkillsOperations.GetSkillBindingShard(owner).GetCardPolicies(SkillProgramCardPolicyKind.HandLimitCardKindExemption).SelectMany(binding => binding.Policy.CardKinds).Distinct().Where(kind => _coreProgramCardPoliciesOperations.HasCardPolicy(owner, SkillProgramCardPolicyKind.HandLimitCardKindExemption, kind))).ToHashSet();
     internal ShanheMarketDiscardQuote? CaptureShanheMarketDiscardQuote()
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.DiscardCards, PlayerSeat: 0 } || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ManualDiscardFrame frame)

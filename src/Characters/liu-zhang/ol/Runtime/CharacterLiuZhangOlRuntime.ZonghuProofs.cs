@@ -8,6 +8,8 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         if (r.Need.Intent == ZonghuIntent.Play)
             return r.Need.ActorSeat == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && r.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber && r.ActualTurnOwner == _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat;
         var original = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.Need.RequestFrameId);
+        if (r.Paid?.RequestAcceptance is { } acceptance)
+            return original is ProgramSkillFrame parent && _programSlashRequests.OwnsAcceptance(parent, acceptance, r.Need.ActorSeat, r.TargetSeat);
         if (original is null || CaptureZonghuNeed(r.OriginalDecision, original)is not { } n)
             return false;
         if (SameZonghuNeed(n, r.Need))

@@ -129,10 +129,10 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
         return _coreActionQueriesOperations.GetProgramViewAsConversions(owner, card, kind, !use, _coreDyingCursorRuntimeOperations.Value.ActiveDying is not null).FirstOrDefault(source => _corePlayCardHistoryOperations.ViewAsRule(source)?.DeclarationValidation is not null);
     }
 
-    internal CardDeclarationParentReturn DeclarationReturn(CardDeclarationPurpose purpose, int actor, LegalAction? action = null, int? target = null, int recovery = 1, IReadOnlyList<ProgramRecoveryPolicySource>? policies = null, DyingResponseEvent? dying = null, bool fan = false, CardKind? finalKind = null)
+    internal CardDeclarationParentReturn DeclarationReturn(CardDeclarationPurpose purpose, int actor, LegalAction? action = null, int? target = null, int recovery = 1, IReadOnlyList<ProgramRecoveryPolicySource>? policies = null, DyingResponseEvent? dying = null, bool fan = false, CardKind? finalKind = null, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
         var parent = _resolutionStackOperations._resolutionStack.LastOrDefault();
-        return new(purpose, parent?.Id ?? 0, parent?.Kind, parent?.Step, actor, action, target, recovery, policies is null ? null : Array.AsReadOnly(policies.ToArray()), dying, fan, finalKind);
+        return new(purpose, parent?.Id ?? 0, parent?.Kind, parent?.Step, actor, action, target, recovery, policies is null ? null : Array.AsReadOnly(policies.ToArray()), dying, fan, finalKind) { ProgramSlashRequest = programSlashRequest };
     }
 
     internal bool TryBeginCardDeclaration(CharacterState provider, Card card, CardKind kind, CardConversionSource? source, CardDeclarationParentReturn parent, IReadOnlyList<int> targets)
@@ -325,7 +325,10 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
         var parentExists = parent.ParentFrameId == 0 || _resolutionStackOperations._resolutionStack.Any(candidate => candidate.Id == parent.ParentFrameId && candidate.Kind == parent.ParentKind);
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var card = _cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(frame.Payment.Cost.CardId)).Single(card => card.Id == frame.Payment.Cost.CardId);
-        var cancelled = !parentExists || !owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None;
+        var requestMayExecute = parent.ProgramSlashRequest is not { } request ||
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(candidate => candidate.Id == request.Identity.FrameId) is { } requestOwner &&
+                _slashRequests.CanExecuteAcceptedUse(requestOwner, request);
+        var cancelled = !parentExists || !owner.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !requestMayExecute;
         var success = frame.Succeeded == true && !cancelled && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Processing;
         if (!success && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Processing)
         {
@@ -340,7 +343,7 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { Stage = CardDeclarationStage.Applying });
             if (_characterLvKuangLvXiangOlOperations.TryApplyQigongDeclaration(frame))
                 return;
-            _coreNativeActionDispatchOperations.ExecuteAction(owner, parent.UseAction!);
+            _coreNativeActionDispatchOperations.ExecuteAction(owner, parent.UseAction!, programSlashRequest: parent.ProgramSlashRequest);
             return;
         }
 
@@ -351,7 +354,25 @@ internal sealed partial class CoreGameEngineCardDeclarationsRuntime
             return;
         }
 
+        ProgramSkillFrame? failedRequestOwner = null;
+        if (!success && parent.ProgramSlashRequest is { } failedRequest &&
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(candidate => candidate.Id == failedRequest.Identity.FrameId) is { } original)
+        {
+            _slashRequests.FailAcceptedUse(original, failedRequest, frame.Id);
+            failedRequestOwner = original;
+        }
         _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.CardDeclaration);
+        if (failedRequestOwner is not null)
+        {
+            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+                return;
+            var returnedOwner = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(candidate => candidate.Id == failedRequestOwner.Id);
+            if (parent.ProgramSlashRequest!.Identity.Spec.FailureReturnPolicy == ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction)
+                _coreRuntimeOperations.AdvanceRuntimeProgram(returnedOwner.Id);
+            else
+                _requestLifecycle.CancelProgramBindingAndCleanup(returnedOwner, "原用牌声明失败；已支付费用不撤回。");
+            return;
+        }
         if (_characterLvKuangLvXiangOlOperations.TryReturnQigongDeclaration(frame, success))
             return;
         if (_coreJianjiDeclarationsOperations.Value.TryReturnJianjiDeclaration(frame, success))

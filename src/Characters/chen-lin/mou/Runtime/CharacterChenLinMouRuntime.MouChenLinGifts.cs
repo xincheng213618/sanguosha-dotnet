@@ -9,13 +9,13 @@ internal sealed partial class CharacterChenLinMouRuntime
             throw new InvalidOperationException("Yaozuo requires its own accepted participant's successful actual HE-to-Hand Give invoice.");
         var gift = new MouChenLinGift(giver, cardId, m.From, m.Sequence);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { MouChenLinInvitation = invitation with { FirstGiver = invitation.FirstGiver ?? giver, Answered = invitation.Answered.Append(giver).ToArray(), Gifts = invitation.Gifts.Append(gift).ToArray() } });
+        _handLimitExemptions.Grant(f, MouChenLinRuntime.Yaozuo, f.OwnerSeat, new(new(), [cardId]), giver);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenLinGiftPaidEvent(f.Id, invitation.Source, invitation.GameplayHash, _coreActualTurnProgressTurnNumberAccess._turnNumber, giver, cardId, m.From, m.Sequence));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenLinInvitationAnswerEvent(f.Id, giver, true));
         if (invitation.FirstGiver is null)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouChenLinFirstGiftEvent(f.Id, giver, cardId, m.Sequence));
     }
 
-    internal bool IsMouChenLinHandLimitExempt(CharacterState owner, int cardId) => HasMouChenLin && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(owner.Seat) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouChenLinGiftPaidEvent>().Any(e => e.Source.OwnerSeat == owner.Seat && e.CardId == cardId && e.Source.SkillId == MouChenLinRuntime.Yaozuo && _contentRegistryOperations._contentRegistry.GetSkill(e.Source.SkillId).Program?.GameplayHash == e.GameplayHash && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == e.CardId && m.Sequence == e.Sequence && m.From == e.From && m.From.OwnerSeat == e.Giver && m.To == CardLocation.Hand(owner.Seat)));
     internal void IssueMouChenLinNonHandDonorTickets(ProgramSkillFrame f)
     {
         if (f.MouChenLinInvitation is not { Closed: true } r || r.Phase.TurnNumber != _coreActualTurnProgressTurnNumberAccess._turnNumber || r.Answered.Count != r.Eligible.Count || r.Eligible.Except(r.Answered).Any())

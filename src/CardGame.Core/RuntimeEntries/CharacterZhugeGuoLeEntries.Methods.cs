@@ -20,7 +20,6 @@ internal sealed partial class CharacterZhugeGuoLeEntries
     internal bool IsLeChengyanEffectUse(long id) => _resolve().IsLeChengyanEffectUse(id);
     internal bool IsLeChengyanMovement(ProgramSkillFrame f, SkillProgramEffect? e, ProgramMovementContinuation p) => _resolve().IsLeChengyanMovement(f, e, p);
     internal bool IsLeChengyanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsLeChengyanRecoveryParent(f, recovery);
-    internal bool IsLeXidiHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsLeXidiHandLimitExempt(owner, cardId);
     internal bool KeepLeChengyanBorrowedMaterial(long id) => _resolve().KeepLeChengyanBorrowedMaterial(id);
     internal IReadOnlyList<PromptChoice> LeChengyanBorrowedChoices(CardUseFrame u) => _resolve().LeChengyanBorrowedChoices(u);
     internal bool LeChengyanFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().LeChengyanFirstChild(f, child);

@@ -98,7 +98,7 @@ internal static class GuanduEventChecks
             var use = E<CardUseDeclaredEvent>(g).Single(e => e.CardId == card && e.CardKind == CardKind.IronChain);
             Need(!V(g, 0).IsChained && E<IronChainStateChangedEvent>(g).Where(e => e.ResolutionId == use.ResolutionId && e.TargetSeat == 0)
                 .Select(e => e.IsChained).SequenceEqual([true, false]) &&
-                E<ExtraCardEffectStartedEvent>(g).Count(e => e.CardUseFrameId == use.ResolutionId) == 1 &&
+                E<NativeCardEffectEpisodeStartedEvent>(g).Count(e => e.UseFrameId == use.ResolutionId) == 1 &&
                 E<CardUseFinishedEvent>(g).Count(e => e.ResolutionId == use.ResolutionId) == 1 &&
                 g.CardMovements.Count(m => m.CardId == card && m.To == CardLocation.Processing) == 1 &&
                 g.CardMovements.Count(m => m.CardId == card && m.To == CardLocation.DiscardPile) == 1,
@@ -178,7 +178,7 @@ internal static class GuanduEventChecks
         Cold(g, r); Answer(g, c => c.Parameters.GetValueOrDefault("response") == "take-damage");
         Until(g, () => P(g)?.Kind == DecisionKind.RespondDodge);
         Need(E<BorrowedSwordResolvedEvent>(g).Count(e => e.ResolutionId == use.Id && e.UsedSlash && e.WeaponOwnerSeat == 7 && e.SlashTargetSeat == 0) == 1 &&
-            E<ExtraCardEffectStartedEvent>(g).Count(e => e.CardUseFrameId == use.Id) == 1 &&
+            E<NativeCardEffectEpisodeStartedEvent>(g).Count(e => e.UseFrameId == use.Id) == 1 &&
             V(g, 7).Equipment.Any(c => c.Id == weapon) && V(g, 0).Equipment.Count == 0 &&
             g.CreateCardZoneDiagnostics().Single(c => c.CardId == card).Location == CardLocation.Processing,
             "The second actual Slash starts from the same paid Borrowed Sword after paired-target legality is rechecked, without requiring its victim to own a weapon.");

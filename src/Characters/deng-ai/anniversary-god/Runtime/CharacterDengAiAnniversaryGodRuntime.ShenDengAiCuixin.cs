@@ -20,13 +20,17 @@ internal sealed partial class CharacterDengAiAnniversaryGodRuntime
                 targets.Add(p);
         }
 
+        IEnumerable<int> candidates = targets.Distinct();
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            candidates = _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor,
+                candidates.Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).ToArray(), kind, Suit.None,
+                effectiveColor: null, effectiveRank: 0, physicalCardIds: [], countsTowardLimit: false);
         var result = new List<GameEngine.ShenDaRepeatPlan>();
-        foreach (var target in targets.Distinct())
+        foreach (var target in candidates)
         {
             if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             {
-                if (_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None, effectiveColor: null, effectiveRank: 0, physicalCardIds: [], countsTowardLimit: false))
-                    result.Add(new("slash:" + target, kind, LegalActionKind.Slash, [target], "摧心：视为对“" + _coreMatchParticipantsPlayersAccess._players[target].Name + "”使用【" + CardCatalog.Get(kind).DisplayName + "】"));
+                result.Add(new("slash:" + target, kind, LegalActionKind.Slash, [target], "摧心：视为对“" + _coreMatchParticipantsPlayersAccess._players[target].Name + "”使用【" + CardCatalog.Get(kind).DisplayName + "】"));
             }
             else if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
             {

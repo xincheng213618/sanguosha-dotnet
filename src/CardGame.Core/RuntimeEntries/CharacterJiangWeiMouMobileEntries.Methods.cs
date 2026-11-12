@@ -19,8 +19,7 @@ internal sealed partial class CharacterJiangWeiMouMobileEntries
     internal bool FinishMouJwFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending) => _resolve().FinishMouJwFactionDeclined(id, pending);
     internal void GainMouJwDiscardCharge(NativeLogicalDiscardInvocationRecordedEvent e) => _resolve().GainMouJwDiscardCharge(e);
     internal void GrantMouJwBeifa(ProgramSkillFrame f) => _resolve().GrantMouJwBeifa(f);
-    internal bool IsMouJwSlashQuery(CharacterState actor) => _resolve().IsMouJwSlashQuery(actor);
-    internal void IssueMouJwSlash(ProgramSkillFrame f, int index) => _resolve().IssueMouJwSlash(f, index);
+    internal void IssueMouJwSlash(ProgramSkillFrame f, int index, PendingDecision? originalDecision = default) => _resolve().IssueMouJwSlash(f, index, originalDecision);
     internal bool KeepMouJwPaid(ProgramSkillFrame f) => _resolve().KeepMouJwPaid(f);
     internal int MouJwAvailableCharge(int owner) => _resolve().MouJwAvailableCharge(owner);
     internal bool MouJwBeifaProhibits(ProgramDirectedTargetQuery q) => _resolve().MouJwBeifaProhibits(q);
@@ -33,16 +32,10 @@ internal sealed partial class CharacterJiangWeiMouMobileEntries
     internal bool MouJwNativeEdge(int n) => _resolve().MouJwNativeEdge(n);
     internal ProgramSkillFrame? MouJwObserverRoot() => _resolve().MouJwObserverRoot();
     internal bool MouJwRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame child) => _resolve().MouJwRecoveryParent(f, child);
-    internal ProgramSkillFrame? MouJwRequestFrame(int actor) => _resolve().MouJwRequestFrame(actor);
-    internal bool MouJwRequestedCardDistance(ProgramCardDistanceQuery q) => _resolve().MouJwRequestedCardDistance(q);
-    internal bool MouJwRequestedDistance(ProgramSlashDistanceQuery q) => _resolve().MouJwRequestedDistance(q);
-    internal bool MouJwRequestedNoDebit(long id, int actor) => _resolve().MouJwRequestedNoDebit(id, actor);
-    internal bool MouJwRequestedQuota(ProgramSlashQuotaQuery q) => _resolve().MouJwRequestedQuota(q);
     internal int MouJwSelectedCount(int owner) => _resolve().MouJwSelectedCount(owner);
     internal IReadOnlyList<GameEngine.MouJwSlashPlan> MouJwSlashPlans(ProgramSkillFrame f) => _resolve().MouJwSlashPlans(f);
     internal bool MouJwSuffix(int n) => _resolve().MouJwSuffix(n);
     internal void NextMouJwRecipient(ProgramSkillFrame f) => _resolve().NextMouJwRecipient(f);
-    internal bool PrepareMouJwFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind, CardConversionSource? conversion) => _resolve().PrepareMouJwFactionNative(f, pending, provider, cards, kind, conversion);
     internal LegalAction? ProjectMouJwBeifa(ProgramLegalActionQuery q) => _resolve().ProjectMouJwBeifa(q);
     internal void PublishMouJw(ProgramSkillFrame f) => _resolve().PublishMouJw(f);
     internal bool ResumeMouJw(long id) => _resolve().ResumeMouJw(id);

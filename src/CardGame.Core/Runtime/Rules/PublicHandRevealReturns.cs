@@ -14,8 +14,10 @@ internal sealed class PublicHandRevealReturns
     private PublicHandRevealReturns(IEnumerable<MethodInfo> methods)
     {
         var result = new Dictionary<string, Action<GameEngine, ResolutionFrame>>(StringComparer.Ordinal);
-        foreach (var method in methods)
+        foreach (var candidateMethod in methods)
         {
+            if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(PublicHandRevealReturnAttribute), inherit: true)) continue;
+            var method = candidateMethod!;
             if (method.GetCustomAttribute<PublicHandRevealReturnAttribute>() is not { } a) continue;
             var p = method.GetParameters();
             if (string.IsNullOrWhiteSpace(a.Key) || method.ReturnType != typeof(void) || method.IsGenericMethod || method.IsAbstract ||

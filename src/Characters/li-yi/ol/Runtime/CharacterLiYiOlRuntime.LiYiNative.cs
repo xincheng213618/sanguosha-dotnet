@@ -3,7 +3,6 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiYiOlRuntime
 {
-    internal bool IsChanshuangFactionOrigin(ProgramSkillFrame f, int actor, int target, string resultBind) => IsChanshuangSlashRequest(f) && TryGetChanshuangSlashRequest(f, out var actual, out var targets) && actual == actor && targets.SequenceEqual([target]) && resultBind == $"chanshuang-{(f.Chanshuang!.Cursor)}" && _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[actor], CardKind.Slash)is not null;
     internal void BeginChanshuangFactionRequest(ProgramSkillFrame f, int actor, int target)
     {
         if (_coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is not null || !IsChanshuangSlashRequest(f) || !TryGetChanshuangSlashRequest(f, out var actual, out var targets) || actual != actor || !targets.SequenceEqual([target]) || !_coreAssistedFactionSlashOperations.CanRequestAssistedProgramFactionSlash(actor, target) || _coreProgramFactionPoliciesOperations.GetFactionResponsePolicy(_coreMatchParticipantsPlayersAccess._players[actor], CardKind.Slash)is not { } policy)
@@ -12,17 +11,16 @@ internal sealed partial class CharacterLiYiOlRuntime
         var candidates = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actor, policy.FactionId);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChanshuangFactionRequestedEvent(f.Id, r.Cursor, actor, target, policy));
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(f.Id, FactionCardRequestPurpose.AssistedProgramUse, actor, candidates, policy.FactionId, targetSeat: target, programSkillFrameId: f.Id, policySource: policy, assistedResultBind: $"chanshuang-{(r.Cursor)}");
-        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: false, usesChoiceResult: false);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest!.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: false, usesChoiceResult: false, requestIdentity: _slashRequests.GetIdentity(f));
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(f.Id, actor, candidates, policy.SkillId, IsActiveUse: true, target));
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateChanshuangFactionSlashParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f) => TryGetChanshuangSlashRequest(f, out var actor, out var targets) && f.Chanshuang is { } r && pending.IsAssistedProgramUse && pending.OwnerFrameId == f.Id && pending.ProgramSkillFrameId == f.Id && pending.OwnerSeat == actor && targets is [var target] && pending.TargetSeat == target && pending.AssistedResultBind == $"chanshuang-{(r.Cursor)}" && pending.PolicySource is { } policy && pending.ProviderFactionId == policy.FactionId && policy.RequiredKind == CardKind.Slash && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangFactionRequestedEvent>().Count(e => e.FrameId == f.Id && e.Cursor == r.Cursor && e.ActorSeat == actor && e.TargetSeat == target && e.Source == policy) == 1;
     internal void PrepareChanshuangSuppliedSlash(ProgramSkillFrame supplied, int actorSeat, int providerSeat, int targetSeat, CardKind kind, IReadOnlyList<Card> materials, CardConversionSource? conversionSource, IReadOnlyList<CardConversionSource>? additionalConversionSources = null)
     {
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == supplied.Id);
         if (!IsChanshuangSlashRequest(f) || !TryGetChanshuangSlashRequest(f, out var actor, out var targets) || actor != actorSeat || !targets.SequenceEqual([targetSeat]) || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[targetSeat].IsAlive || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(providerSeat) || materials.Select(c => c.Id).Distinct().Count() != materials.Count || materials.Any(c => c.Id < 0 || !_cardZonesOperations._cardZones.CardsAt(_cardZonesOperations._cardZones.GetLocation(c.Id)).Any(actual => actual.Id == c.Id && actual.Kind == c.Kind)))
             throw new InvalidOperationException("Chanshuang's real supplier lost its exact current actor, target or primary group.");
         var r = f.Chanshuang!;
@@ -39,9 +37,9 @@ internal sealed partial class CharacterLiYiOlRuntime
             Materials = materials.Select(c => new ChanshuangMaterial(c.Id, c.Kind, _cardZonesOperations._cardZones.GetLocation(c.Id), c.IsGeneralWeapon)).ToArray(),
             Sources = sources
         };
-        if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangSlashPreparedEvent>().Any(e => e.FrameId == f.Id && e.Cursor == r.Cursor))
+        if (r.Selection is not null || r.Native is not null)
             throw new InvalidOperationException("One Chanshuang execution cannot issue two native Slashes.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { Chanshuang = r with { Stage = ChanshuangStage.SlashIssuing, Selection = selection } });
+        _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { Chanshuang = r with { Stage = ChanshuangStage.SlashIssuing, Selection = selection } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChanshuangSlashPreparedEvent(f.Id, r.Cursor, actorSeat, providerSeat, targetSeat, kind, ChanshuangHash(selection)));
     }
 
@@ -49,7 +47,7 @@ internal sealed partial class CharacterLiYiOlRuntime
     {
         if (f.Chanshuang is null || !TryGetChanshuangSlashRequest(f, out _, out _))
             return false;
-        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == f.Id);
         if (f.Chanshuang!.Native is not null)
             throw new InvalidOperationException("A completed native Slash cannot be cancelled as an unpaid request.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
@@ -59,12 +57,29 @@ internal sealed partial class CharacterLiYiOlRuntime
 
     internal void BindChanshuangSlashUse(CardUseFrame supplied)
     {
-        var index = _resolutionStackOperations._resolutionStack.FindIndex(f => f.Id == supplied.Id);
-        var parent = index > 0 && _resolutionStackOperations._resolutionStack[index - 1] is ProgramSkillFrame { Chanshuang: { Stage: ChanshuangStage.SlashIssuing } } direct ? direct : _characterLiuFengBoundaryOperations.BoundaryLiuFengNativeParent(supplied);
+        if (supplied.ProgramSlashRequestExecution is not { } execution ||
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == execution.ProgramFrameId) is not { Chanshuang: { } state } parent ||
+            supplied.Action is not { Type: CardActionType.Use } action)
+            return;
+        var acceptance = execution.Acceptance;
+        if (!_slashRequests.OwnsAcceptance(parent, acceptance, acceptance.Identity.ActorSeat, acceptance.TargetSeat))
+            throw new InvalidOperationException("A requested native Slash lost its exact original accepted instruction.");
+        if (state.Native is null && state.Stage is ChanshuangStage.SlashChoice or ChanshuangStage.SlashIssuing)
+        {
+            var preparedSelection = new ChanshuangSelection(acceptance.Identity.ActorSeat, action.ProviderSeat, acceptance.TargetSeat, action.EffectiveKind)
+            {
+                Materials = action.PhysicalCards.Select(cost => new ChanshuangMaterial(cost.CardId, cost.CardKind, cost.From, _coreAdvancedLifecycleOperations.GetAdvancedCard(cost.CardId).IsGeneralWeapon)).ToArray(),
+                Sources = action.ConversionChain
+            };
+            _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { Chanshuang = state with { Stage = ChanshuangStage.SlashIssuing, Selection = preparedSelection } });
+            if (state.Selection is null)
+                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChanshuangSlashPreparedEvent(parent.Id, state.Cursor, acceptance.Identity.ActorSeat, action.ProviderSeat, acceptance.TargetSeat, action.EffectiveKind, ChanshuangHash(preparedSelection)));
+            parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+        }
         if (parent is not { Chanshuang: { Stage: ChanshuangStage.SlashIssuing, Selection: { } selection } r })
             return;
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(supplied.Id)!;
-        if (use.ChanshuangSlash is not null || r.Native is not null || use.Action is not { Type: CardActionType.Use } a || use.SourceSeat != selection.ActorSeat || a.ActorSeat != selection.ActorSeat || a.ProviderSeat != selection.ProviderSeat || use.CardKind != selection.Kind || a.EffectiveKind != selection.Kind || !use.TargetSeats.SequenceEqual([selection.TargetSeat]) || !a.TargetSeats.SequenceEqual(use.TargetSeats) || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(selection.Materials.Select(c => c.CardId)) || !a.ConversionChain.SequenceEqual(selection.Sources) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangSlashPreparedEvent>().Count(e => e.FrameId == parent.Id && e.Cursor == r.Cursor && e.SelectionHash == ChanshuangHash(selection)) != 1)
+        if (use.ChanshuangSlash is not null || r.Native is not null || use.Action is not { Type: CardActionType.Use } a || a.ProviderSeat != selection.ProviderSeat || use.CardKind != selection.Kind || a.EffectiveKind != selection.Kind || !a.TargetSeats.SequenceEqual(use.TargetSeats) || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(selection.Materials.Select(c => c.CardId)) || !a.ConversionChain.SequenceEqual(selection.Sources))
             throw new InvalidOperationException("Chanshuang's native child changed its once-prepared actual supplier, conversion or payment.");
         var origin = new ChanshuangNativeOrigin(parent.Id, r.Cursor, r.Source, r.GameplayHash, r.ActualTurn, use.Id, a.ActionId, selection, a, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence);
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { Chanshuang = r with { Stage = ChanshuangStage.NativeUse, Native = origin, NativeReturned = false, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
@@ -91,7 +106,7 @@ internal sealed partial class CharacterLiYiOlRuntime
 
     internal bool IsIssuedChanshuangUse(CardUseFrame use)
     {
-        if (use.ChanshuangSlash is not { } o || use.Action is not { Type: CardActionType.Use } a || use.Id != o.UseId || a.ActionId != o.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.Selection.ActorSeat, o.Selection.ProviderSeat) || a.ProviderSeat != o.Selection.ProviderSeat || !a.PhysicalCards.SequenceEqual(o.OriginalAction.PhysicalCards) || !use.PhysicalCardIds!.SequenceEqual(o.Selection.Materials.Select(c => c.CardId)) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangSlashIssuedEvent>().Count(e => e.FrameId == o.ProgramFrameId && e.Cursor == o.Cursor && e.UseId == use.Id && e.ActionId == o.ActionId && e.OriginalActionHash == ChanshuangHash(o.OriginalAction)) != 1)
+        if (use.ChanshuangSlash is not { } o || use.Action is not { Type: CardActionType.Use } a || use.Id != o.UseId || a.ActionId != o.ActionId || !CoreNativeCardClassificationsRuntime.IsSlashCard(use.CardKind) || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, o.OriginalAction.ActorSeat, o.OriginalAction.ProviderSeat) || a.ProviderSeat != o.Selection.ProviderSeat || !a.PhysicalCards.SequenceEqual(o.OriginalAction.PhysicalCards) || !use.PhysicalCardIds!.SequenceEqual(o.Selection.Materials.Select(c => c.CardId)))
             return false;
         var original = a;
         if (use.CurrentSlashFirePolicy is { } fire)
@@ -101,27 +116,13 @@ internal sealed partial class CharacterLiYiOlRuntime
         }
         else if (use.CardKind != o.Selection.Kind)
             return false;
-        if (original.EffectiveKind != o.Selection.Kind || !original.ConversionChain.SequenceEqual(o.Selection.Sources) || original.ActorSeat != o.Selection.ActorSeat && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramCardUseActorReplacedEvent>().All(e => e.CardUseFrameId != use.Id) || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { Chanshuang: { } r } parent || r.Native != o || r.Cursor != o.Cursor || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.NativeReturned || r.Stage != ChanshuangStage.NativeUse)
+        if (original.EffectiveKind != o.Selection.Kind || !original.ConversionChain.SequenceEqual(o.Selection.Sources) || _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == o.ProgramFrameId)is not ProgramSkillFrame { Chanshuang: { } r } parent || r.Native != o || r.Cursor != o.Cursor || r.Source != o.Source || r.GameplayHash != o.GameplayHash || r.NativeReturned || r.Stage != ChanshuangStage.NativeUse)
             return false;
-        foreach (var cost in o.OriginalAction.PhysicalCards)
-        {
-            var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangSlashMaterialPaidEvent>().Where(e => e.UseId == use.Id && e.CardId == cost.CardId).ToArray();
-            if (paid.Length == 0)
-            {
-                if (_cardZonesOperations._cardZones.GetLocation(cost.CardId) != cost.From)
-                    return false;
-                continue;
-            }
-
-            if (paid is not [var p] || p.ActionId != o.ActionId || p.From != cost.From || p.Sequence <= o.BeforePayment || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == p.Sequence && m.CardId == p.CardId && m.From == p.From && m.To == p.To && m.Reason == CardMoveReasons.Use) != 1)
-                return false;
-        }
-
-        return true;
+        return use.ProgramSlashRequestExecution is { } execution && execution.ProgramFrameId == parent.Id &&
+            _slashRequests.OwnsAcceptance(parent, execution.Acceptance, o.Selection.ActorSeat, o.Selection.TargetSeat);
     }
 
     internal bool HasIssuedChanshuangSlash(long? useId, int actor) => useId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { ChanshuangSlash: { } origin } use && origin.Selection.ActorSeat == actor && IsIssuedChanshuangUse(use);
-    internal bool IsChanshuangRemovedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { ChanshuangSlash: { } r } use && IsIssuedChanshuangUse(use) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && r.Selection.Materials.Any(c => c.CardId == cardId && c.GeneralWeapon && c.From.Zone == CardZoneKind.Equipment) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangSlashMaterialPaidEvent>().Count(e => e.UseId == useId && e.CardId == cardId && e.To == CardLocation.OutsideGame) == 1;
     [NativeUseValidation(27480)]
     internal void ValidateChanshuangNative(CardUseFrame use)
     {
@@ -135,7 +136,7 @@ internal sealed partial class CharacterLiYiOlRuntime
         if (use.ChanshuangSlash is not { } o)
             return;
         var deferred = _characterLiuFengBoundaryOperations.BoundaryLiuFengReturnedProgramParent(o.ProgramFrameId, use);
-        var f = deferred ?? _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
+        var f = deferred ?? _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == o.ProgramFrameId);
         var r = f.Chanshuang;
         if (r is not { Stage: ChanshuangStage.NativeUse, NativeReturned: false } || r.Native != o || use.Step != ResolutionFrameStep.Completed || _coreCardUseLifecycleOperations.LifecycleCardUse(use.Id)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CardUseFinishedEvent>().Count(e => e.ResolutionId == use.Id) != 1)
             throw new InvalidOperationException("Chanshuang cannot return before or twice after its whole native Use.");
@@ -157,7 +158,7 @@ internal sealed partial class CharacterLiYiOlRuntime
 
     internal void SettleChanshuangNative(ChanshuangNativeOrigin o)
     {
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(o.ProgramFrameId);
+        var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == o.ProgramFrameId);
         var r = f.Chanshuang!;
         if (r.Native != o || !r.NativeReturned || r.Cursor != o.Cursor || _coreCardUseLifecycleOperations.LifecycleCardUse(o.UseId)is not null || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangSlashReturnedEvent>().Any(e => e.FrameId == f.Id && e.Cursor == r.Cursor))
             throw new InvalidOperationException("Chanshuang lost its unique complete native return.");
@@ -167,7 +168,7 @@ internal sealed partial class CharacterLiYiOlRuntime
 
     internal bool ResumeChanshuangSuppliedSlash(ProgramSkillFrame supplied)
     {
-        var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == supplied.Id);
         if (f.Chanshuang is not { } r)
             return false;
         if (r.Native is { } o && r.NativeReturned && r.Stage == ChanshuangStage.NativeUse)
@@ -177,8 +178,6 @@ internal sealed partial class CharacterLiYiOlRuntime
     }
 
     internal bool IsChanshuangNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext batch) => f.Chanshuang is { Stage: ChanshuangStage.NativeChildren, NativeReturned: true, Native: { } o } r && batch.ParentFrameId == o.UseId && batch.AwaitingProgramFrameId is null && batch.Movements.Count > 0 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ChanshuangSlashReturnedEvent>().Count(e => e.FrameId == f.Id && e.Cursor == r.Cursor && e.UseId == o.UseId) == 1 && batch.Movements.All(m => m.Sequence > r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && m.Reason == CardMoveReasons.UseFinished && o.Selection.Materials.Any(c => c.CardId == m.CardId && c.Kind == m.CardKind));
-    [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 60)]
-    internal bool HasIssuedChanshuangSlashDebitExemption(long useId, int actorSeat) => HasIssuedChanshuangSlash(useId, actorSeat);
     [ProgramPipelineHook(ProgramPipelinePhase.IsProgramMovementSettlement, 400)]
     internal bool WindowSettlement_IsChanshuangNativeSettlementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => IsChanshuangNativeSettlementBatch(frame, batch);
 }

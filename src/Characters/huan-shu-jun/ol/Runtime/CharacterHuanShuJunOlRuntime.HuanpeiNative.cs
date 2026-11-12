@@ -7,6 +7,9 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
     {
         if (p.Source.SkillId != "ol:huanpei" || p.Source.BindingId != "adjust-and-use-basic" || p.Source.OwnerSeat != p.Request.ActorSeat || p.GameplayHash != _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash || !CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Contains(p.Kind) || p.SequenceBefore < 0 || p.SequenceAfter < p.SequenceBefore || p.Targets is not System.Collections.IList { IsReadOnly: true })
             return false;
+        if (p.RequestAcceptance is { } acceptance &&
+            (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == p.Request.ParentFrameId) is not ProgramSkillFrame parent || !_programSlashRequests.OwnsAcceptance(parent, acceptance, p.Request.ActorSeat, p.Targets.SingleOrDefault(-1))))
+            return false;
         return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanShuJunStartedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Source == p.Source && e.GameplayHash == p.GameplayHash && e.Op == SkillProgramEffectOp.ResolveHuanpeiHandAdjustmentAndBasicUse) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiAdjustmentAcceptedEvent>().Where(e => e.FrameId == p.ProgramFrameId).ToArray()is [var paid] && paid.OwnerSeat == p.Source.OwnerSeat && paid.Round == p.Round && paid.HandCount == p.FrozenHandCount && paid.Hp == p.FrozenHp && paid.RequestedCount == p.AdjustmentCount && paid.Before == p.SequenceBefore && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiAdjustmentCompletedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Before == p.SequenceBefore && e.After == p.SequenceAfter) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiOutputChosenEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Kind == p.Kind && e.TargetCount == p.Targets.Count) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HuanpeiTargetChosenEvent>().Where(e => e.FrameId == p.ProgramFrameId).OrderBy(e => e.Index).Select(e => e.TargetSeat).SequenceEqual(p.Targets);
     }
 
@@ -106,7 +109,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 
     internal void ExecuteHuanpeiPaid(HuanpeiPaidOrigin p)
     {
-        if (!ValidHuanpeiPayment(p) || !_coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat].IsAlive || !HuanpeiRequestParentCurrent(p.Request))
+        if (!ValidHuanpeiPayment(p) || !_coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat].IsAlive || !HuanpeiRequestParentCurrent(p.Request, paid: true, acceptedRequest: p.RequestAcceptance))
             return;
         PrepareHuanpeiOriginalParent(p);
         var actor = _coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat];
@@ -181,35 +184,16 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             return;
         }
 
-        var parentProgram = _coreProgramLifecycleOperations.GetActiveProgramFrame(p.Request.ParentFrameId!.Value);
-        var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(parentProgram)!;
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(parentProgram))
-            _characterSunYuanOlOperations.PrepareSayingSuppliedSlash(parentProgram, actor.Seat, actor.Seat, p.Targets.Single(), kind, [], p.Source);
-        else if (_characterLiYiOlOperations.IsChanshuangSlashRequest(parentProgram))
-            _characterLiYiOlOperations.PrepareChanshuangSuppliedSlash(parentProgram, actor.Seat, actor.Seat, p.Targets.Single(), kind, [], p.Source);
-        else if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(parentProgram) || _characterWuJingOlOperations.IsWuJingHejiRequest(parentProgram) || parentProgram.CaoChun?.Stage == CaoChunStage.NativeSlash)
-        {
-        }
-        else if (p.Request.Intent == HuanpeiIntent.ProgramSlash)
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(parentProgram.Id, effect.ResultBind!, "used-slash", actor.Seat, "环佩：视为使用杀。");
-        else if (effect.Op == SkillProgramEffectOp.RequestSlashAgainstChosenTarget)
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(parentProgram = parentProgram with { AssistedSlashRequest = null });
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(parentProgram.Id, effect.ResultBind!, "used-slash", actor.Seat, "环佩：视为使用杀。");
-        }
-        else if (effect.Op == SkillProgramEffectOp.RequestLegalSlashByNearest)
-            _coreRuntimeOperations.ReplaceRuntimeTop(parentProgram with { NearestLegalSlashRequest = null });
-        else if (p.Request.Intent == HuanpeiIntent.FixedSlash)
-            _coreRuntimeOperations.ReplaceRuntimeTop(parentProgram with { FixedTargetSlash = parentProgram.FixedTargetSlash!with { Issued = true } });
         BeginHuanpeiSlash(p, false, null);
     }
 
     internal void BeginHuanpeiSlash(HuanpeiPaidOrigin p, bool counts, NativeOwners.BorrowedSwordHandle? borrowed)
     {
+        counts |= p.RequestAcceptance?.Identity.Spec.CountsTowardSlashLimit == true;
         var actor = _coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat];
         var card = new Card(0, p.Kind, Suit.None, 0);
         var program = p.Request.ParentSkillId is null ? (long? )null : p.Request.ParentFrameId;
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: p.Source, huanpeiOrigin: p, standardZeroEntityAttackCompletion: true);
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, p.Targets, p.Kind, physicalCardIds: [], conversionSource: p.Source, huanpeiOrigin: p, standardZeroEntityAttackCompletion: true, programSlashRequest: p.RequestAcceptance);
         var targets = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.TargetSeats;
         var attack = _kernelCoreMainOperations.CreateCardAttackHandle(id, actor.Seat, targets[0], card: null, damageAmount: 1 + actor.AlcoholDamageBonus, playedCardKind: p.Kind, ignoresArmor: _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], p.Kind), programSkillCardUseFrameId: program);
         if (borrowed is not null)

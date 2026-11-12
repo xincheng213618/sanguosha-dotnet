@@ -41,7 +41,6 @@ internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovemen
         materials.RecordWushuangShopEquipmentDestruction(movement);
         materials.RecordShanheStartingResourceDestruction(movement);
         materials.RecordWuZglCopyMovement(movement);
-        observers.ObserveMouJsMovement(movement);
         observers.CaptureBianFuRenForeignDiscardProducer(movement);
         observers.CaptureDuFuRenOwnedOrigin(movement);
         observers.ObserveOriginalHandMovement(movement);

@@ -17,7 +17,6 @@ internal sealed partial class CharacterZhangFenAnniversaryEntries
     internal Card? HeldDagongChe(int owner) => _resolve().HeldDagongChe(owner);
     internal bool IsDagongCheDestroyedMaterial(CardMovementRecord m) => _resolve().IsDagongCheDestroyedMaterial(m);
     internal bool IsDagongCheDestroyedMaterial2(int cardId, CardLocation from, CardLocation to) => _resolve().IsDagongCheDestroyedMaterial(cardId, from, to);
-    internal bool IsDagongCheDestroyedMaterial3(long useId, int cardId) => _resolve().IsDagongCheDestroyedMaterial(useId, cardId);
     internal bool IsIssuedDagongCheDamageCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext w) => _resolve().IsIssuedDagongCheDamageCandidate(c, w);
     internal bool IsRealDagongChe(int id) => _resolve().IsRealDagongChe(id);
     internal bool IsUnbegunIssuedDagongCheDamage(ProgramSkillFrame f) => _resolve().IsUnbegunIssuedDagongCheDamage(f);

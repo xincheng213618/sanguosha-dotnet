@@ -27,7 +27,7 @@ internal sealed partial class CharacterZhangYanOlRuntime
         if (r.Stage != ZhangYanStage.NativeUse || r.NativeReturn != ret || r.BatchId is not null)
             throw new InvalidOperationException("Suji cannot pay the same native entity twice.");
         var paid = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.CardId == ret.CardId && m.From == ret.From && m.Reason == CardMoveReasons.Use).ToArray();
-        if (paid is not [var move] || move.To != (ret.PrintedKind == CardKind.GeneralWeapon && ret.From.Zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : _coreAlternativeViewAsCostsOperations.IsProgramAlternativeCost(use.Action!, ret.CardId) ? CardLocation.DrawPile : CardLocation.Processing) && !(move.To == CardLocation.OutsideGame && IsZhangYanSujiRemovedMaterial(id, ret.CardId)))
+        if (paid is not [var move] || move.To != (ret.PrintedKind == CardKind.GeneralWeapon && ret.From.Zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : _coreAlternativeViewAsCostsOperations.IsProgramAlternativeCost(use.Action!, ret.CardId) ? CardLocation.DrawPile : CardLocation.Processing) && !(move.To == CardLocation.OutsideGame && _nativeMaterialClaims.CanReadMaterial(id, ret.CardId)))
             throw new InvalidOperationException("Suji lost its actual native payment destination.");
         var batch = use.PaymentMovementReceipt?.Batch ?? _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Single(b => b.ParentFrameId == id && b.Movements.Contains(move));
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { ZhangYan = r with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, BatchId = batch.Id } });
@@ -42,7 +42,6 @@ internal sealed partial class CharacterZhangYanOlRuntime
         return at > 0 && _resolutionStackOperations._resolutionStack[at - 1] is ProgramSkillFrame { ZhangYan: { Stage: ZhangYanStage.NativeUse, NativeCompleted: false } p } parent && parent.Id == r.ProgramFrameId && p.NativeReturn == r && p.Source == r.Source && p.GameplayHash == r.GameplayHash;
     }
 
-    internal bool IsZhangYanSujiRemovedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { ZhangYanSuji: { } r } u && r.CardId == cardId && _cardZonesOperations._cardZones.Contains(CardLocation.OutsideGame, cardId) && IsZhangYanSujiUse(u) && (r.PrintedKind == CardKind.GeneralWeapon && r.From.Zone == CardZoneKind.Equipment || _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial3(useId, cardId));
     [NativeUseValidation(27000)]
     internal void ValidateZhangYanSujiUse(CardUseFrame use)
     {

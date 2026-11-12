@@ -21,8 +21,11 @@ internal interface IMatchParticipantSetupState
 /// <summary>Applies mode recipes to the match's existing participants and draft stores.</summary>
 internal sealed class MatchParticipantSetup(IProgramContentQueries content, IReadOnlyList<GeneralDefinition> generals)
 {
+    private readonly IReadOnlyDictionary<string, GeneralDefinition> _generalsById =
+        generals.ToDictionary(general => general.Id, StringComparer.Ordinal);
+
     internal GeneralDefinition ResolveGeneral(string? id) => id is null ? RuntimeSkills.RuntimeRules_Core_CommonRules.CreateHiddenGeneral() :
-        generals.SingleOrDefault(general => general.Id == id) ??
+        _generalsById.TryGetValue(id, out var general) ? general :
             throw new InvalidOperationException($"The mode setup references an unavailable general '{id}'.");
 
     private GeneralDefinition AddModeSetupSkills(GeneralDefinition general, IReadOnlyList<string> skillIds) =>

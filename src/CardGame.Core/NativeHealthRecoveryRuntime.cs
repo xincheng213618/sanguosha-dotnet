@@ -64,19 +64,18 @@ internal sealed partial class NativeHealthRecoveryRuntime(
         return true;
     }
 
-    internal bool ExactPaidNativeRecoveryUseEdge(ResolutionFrame parent, ResolutionFrame child, Func<IReadOnlyList<IGameEvent>> history) =>
-        parent is ProgramSkillFrame && child is CardUseFrame { HulaoPeachOrigin: { } origin } use &&
-        protocols.HulaoActivityFrameRidesOn(use, parent) && history().OfType<HulaoPeachIssuedEvent>().Count(e => e.Origin == origin) == 1;
+    internal bool ExactPaidNativeRecoveryUseEdge(ResolutionFrame parent, ResolutionFrame child) =>
+        parent is ProgramSkillFrame && child is CardUseFrame { HulaoPeachOrigin: not null } use &&
+        protocols.HulaoActivityFrameRidesOn(use, parent);
 
-    internal bool ExactPaidNativeRecoveryReplacementEdge(ResolutionFrame parent, ResolutionFrame child,
-        Func<IReadOnlyList<IGameEvent>> history)
+    internal bool ExactPaidNativeRecoveryReplacementEdge(ResolutionFrame parent, ResolutionFrame child)
     {
         if (parent is not CardUseFrame { HulaoPeachOrigin: not null } use || child is not RecoveryReplacementFrame recovery ||
             !protocols.RecoveryReplacementFrameRidesOn(recovery, use) || recovery.Return != new RecoveryReplacementReturn(PostEventContinuation.CardUse, use.Id) ||
             recovery.Attempt.Completion is not { Producer: RecoveryAttemptProducer.CardUse } completion ||
             completion.CardId != use.CardId || completion.CardKind != use.CardKind || recovery.Attempt.SourceSeat != use.SourceSeat ||
             !use.TargetSeats.Contains(recovery.Attempt.TargetSeat) || recovery.Attempt.Amount <= 0 ||
-            !protocols.TypedRecoveryApplicationBoundsMatch(recovery, history())) return false;
+            !protocols.TypedRecoveryApplicationBoundsMatch(recovery)) return false;
         protocols.ValidateHulaoPeachUse(use);
         return true;
     }

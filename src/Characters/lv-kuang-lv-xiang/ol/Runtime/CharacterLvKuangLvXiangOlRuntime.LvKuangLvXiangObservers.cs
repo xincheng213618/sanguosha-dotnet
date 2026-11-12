@@ -5,8 +5,8 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
 {
     internal bool QigongPaidAdapterChild(ProgramSkillFrame f, ResolutionFrame child) => child switch
     {
-        DrawFundedDistinctBasicFrame draw => QigongAdapterActor(f, draw.Payment.Source.OwnerSeat, draw.Payment.TargetSeat, draw.Payment.Cursor, draw.Payment.ParentFrameId, draw.Payment.RequestFrameId) && _coreDrawFundedDistinctBasicPaymentOperations.ValidDrawFundedDistinctBasicPayment(draw.Payment) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<DrawFundedDistinctBasicPaidEvent>().Count(e => e.PaymentFrameId == draw.Id) == 1,
-        ChainedStateBasicFrame chain => QigongAdapterActor(f, chain.Payment.Source.OwnerSeat, chain.Payment.TargetSeat, chain.Payment.Cursor, chain.Payment.ParentFrameId, chain.Payment.RequestFrameId) && _coreChainedStateBasicConversionsOperations.ValidChainedStateBasicPayment(chain.Payment) && _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChainedStateBasicPaidEvent>().Count(e => e.Payment == chain.Payment) == 1,
+        DrawFundedDistinctBasicFrame draw => draw.Payment.RequestAcceptance is { } acceptance && _slashRequests.OwnsAcceptance(f, acceptance, draw.Payment.Source.OwnerSeat, draw.Payment.TargetSeat) && _coreDrawFundedDistinctBasicPaymentOperations.ValidDrawFundedDistinctBasicPayment(draw.Payment),
+        ChainedStateBasicFrame chain => chain.Payment.RequestAcceptance is { } acceptance && _slashRequests.OwnsAcceptance(f, acceptance, chain.Payment.Source.OwnerSeat, chain.Payment.TargetSeat) && _coreChainedStateBasicConversionsOperations.ValidChainedStateBasicPayment(chain.Payment),
         _ => false
     };
 

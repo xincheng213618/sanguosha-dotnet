@@ -15,7 +15,6 @@ internal sealed partial class CharacterCaoChunOlEntries
     internal ProgramSkillWindowContext CaoChunDebtContext(CaoChunHandUsePayment p, long windowId) => _resolve().CaoChunDebtContext(p, windowId);
     internal bool CaoChunFinalizedAfterCategoryTargetWindow(ProgramTargetCardWindowQuery query) => _resolve().CaoChunFinalizedAfterCategoryTargetWindow(query);
     internal bool CaoChunFirstChild(ProgramSkillFrame root, ResolutionFrame child) => _resolve().CaoChunFirstChild(root, child);
-    internal bool CaoChunInitialAdapterActor(ProgramSkillFrame f, int actor, int? target, int cursor, long? parent, long? request) => _resolve().CaoChunInitialAdapterActor(f, actor, target, cursor, parent, request);
     internal CardLocation CaoChunNativeCostDestination(CardActionContext action, CardActionCost cost) => _resolve().CaoChunNativeCostDestination(action, cost);
     internal bool CaoChunNativeRidesOn(ProgramSkillFrame parent, CardUseFrame use) => _resolve().CaoChunNativeRidesOn(parent, use);
     internal bool CaoChunNormalizeImplicitDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => _resolve().CaoChunNormalizeImplicitDrawTwoTargetWindow(query);
@@ -29,7 +28,6 @@ internal sealed partial class CharacterCaoChunOlEntries
     internal bool CompleteCaoChunSlash(GameEngine.AttackCompletionReceipt receipt) => _resolve().CompleteCaoChunSlash(receipt);
     internal bool CompleteCaoChunUseReturn(CardUseFrame use) => _resolve().CompleteCaoChunUseReturn(use);
     internal CardMovementBatchContext CompleteMovementBatchObserveCaoChunMovement(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _resolve().CompleteMovementBatchObserveCaoChunMovement(batch, completed);
-    internal void DispatchCaoChunRequestedDeckSlash(ProgramSkillFrame f, Card card, IReadOnlyList<int> targets) => _resolve().DispatchCaoChunRequestedDeckSlash(f, card, targets);
     internal bool DrainCaoChun(ProgramSkillFrame f) => _resolve().DrainCaoChun(f);
     internal SkillProgramStepOutcome ExecuteCaoChun(ProgramSkillFrame supplied, SkillProgramEffectOp op) => _resolve().ExecuteCaoChun(supplied, op);
     internal void ExpireCaoChunPlayDebt(int owner, int phaseInstance) => _resolve().ExpireCaoChunPlayDebt(owner, phaseInstance);
@@ -43,9 +41,6 @@ internal sealed partial class CharacterCaoChunOlEntries
     internal void ObserveAcquiredCaoChun(SkillsAcquiredEvent acquired) => _resolve().ObserveAcquiredCaoChun(acquired);
     internal void ObserveCaoChunMovement(CardMovementBatchContext batch) => _resolve().ObserveCaoChunMovement(batch);
     internal void ObservePurchasedCaoChun(WushuangOfferBoughtEvent bought) => _resolve().ObservePurchasedCaoChun(bought);
-    internal void PrepareCaoChunChainedSlash(ProgramSkillFrame f, ChainedStateBasicPayment p) => _resolve().PrepareCaoChunChainedSlash(f, p);
-    internal void PrepareCaoChunDrawFundedSlash(ProgramSkillFrame f, DrawFundedDistinctBasicPayment p) => _resolve().PrepareCaoChunDrawFundedSlash(f, p);
-    internal bool PrepareCaoChunFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind) => _resolve().PrepareCaoChunFactionNative(f, pending, provider, cards, kind);
     internal void PublishCaoChun(ProgramSkillFrame f) => _resolve().PublishCaoChun(f);
     internal void RequireCaoChun(ProgramSkillFrame f) => _resolve().RequireCaoChun(f);
     internal void ResolveCaoChunChoice(PromptChoice choice) => _resolve().ResolveCaoChunChoice(choice);

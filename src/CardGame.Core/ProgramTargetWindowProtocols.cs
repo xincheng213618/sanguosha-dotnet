@@ -41,7 +41,8 @@ internal sealed class ProgramTargetWindowCatalog
         ArgumentNullException.ThrowIfNull(methods);
         var entries = Enum.GetValues<ProgramTargetWindowStage>().ToDictionary(stage => stage,
             _ => new SortedDictionary<int, ProgramTargetWindowRegistration>());
-        foreach (var method in methods)
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramTargetWindowAttribute), inherit: true)))
         foreach (var attribute in method.GetCustomAttributes<ProgramTargetWindowAttribute>())
         {
             if (!Enum.IsDefined(attribute.Stage) || attribute.Order <= 0)

@@ -3,6 +3,7 @@
     {
       "id": "le:qiqin",
       "revision": 1,
+      "cardPolicies": [{"id":"marked-hand-exemption","kind":"handLimitCardKindExemption","handLimitMatch":{"mark":"qiqin"}}],
       "triggers": [
         {
           "id": "mark-initial-entities",

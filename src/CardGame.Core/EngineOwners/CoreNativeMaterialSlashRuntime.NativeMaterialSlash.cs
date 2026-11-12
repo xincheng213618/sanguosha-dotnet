@@ -103,13 +103,13 @@ internal sealed partial class CoreNativeMaterialSlashRuntime
         return true;
     }
 
-    internal void BeginNativeMaterialSlashExpansion(CharacterState owner, IReadOnlyList<Card> cards, IReadOnlyList<int> seats)
+    internal void BeginNativeMaterialSlashExpansion(CharacterState owner, IReadOnlyList<Card> cards, IReadOnlyList<int> seats, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
         var ids = cards.Select(card => card.Id).ToArray();
         if (!TryGetNativeMaterialSlashExpansion(owner, ids, seats, out var ordinary, out var claims))
             throw new InvalidOperationException("The native material Slash lost its exact expanded target authorization.");
         var armor = _coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(owner);
-        var id = _coreNativeCardUseOperations.BeginCardUse(cards[0], owner.Seat, seats, CardKind.Slash, ignoresArmor: armor, physicalCardIds: ids, isTrueZhangbaSlash: true);
+        var id = _coreNativeCardUseOperations.BeginCardUse(cards[0], owner.Seat, seats, CardKind.Slash, ignoresArmor: armor, physicalCardIds: ids, isTrueZhangbaSlash: true, programSlashRequest: programSlashRequest);
         var action = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!.Action!;
         var origin = new NativeMaterialSlashExtraTargetsOrigin(id, action.ActionId, action.ActorSeat, action.ProviderSeat, ordinary, _coreSlashTargetPenaltyPaymentsOperations.SlashTargetPenaltySequence + 1)
         {

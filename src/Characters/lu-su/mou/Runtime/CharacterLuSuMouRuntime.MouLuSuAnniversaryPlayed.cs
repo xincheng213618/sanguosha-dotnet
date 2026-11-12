@@ -20,7 +20,7 @@ internal sealed partial class CharacterLuSuMouRuntime
         }
 
         plans.AddRange(_coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(actor, CardKind.Slash, true).Select(p => new MouLuSuAnniversaryPlayedPlan(p.OutputKind, p.Source, false) { Cards = p.Cards.Select(c => c.Id).ToArray() }));
-        plans.AddRange(_coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor).Select(p => new MouLuSuAnniversaryPlayedPlan(CardKind.Slash, null, true) { Cards = p.Select(c => c.Id).ToArray() }));
+        plans.AddRange(_coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor).Select(p => new MouLuSuAnniversaryPlayedPlan(CardKind.Slash, null, true) { Cards = p.Select(c => c.Id).ToArray() }));
         return Array.AsReadOnly(plans.ToArray());
     }
 

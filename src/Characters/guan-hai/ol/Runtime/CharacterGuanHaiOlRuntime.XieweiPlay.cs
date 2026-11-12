@@ -27,7 +27,7 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         }
     }
 
-    internal int[] XieweiPlayTargets(CharacterState actor, ProgramMultiCardViewAsSelection s) => _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, p, CardKind.Slash, Suit.None, effectiveColor: null, physicalCardIds: s.Cards.Select(c => c.Id).ToArray())).Select(p => p.Seat).ToArray();
+    internal int[] XieweiPlayTargets(CharacterState actor, ProgramMultiCardViewAsSelection s) => _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, _coreMatchParticipantsPlayersAccess._players, CardKind.Slash, Suit.None, effectiveColor: null, physicalCardIds: s.Cards.Select(c => c.Id).ToArray()).ToArray();
     internal int XieweiTargetMaximum(CharacterState actor) => Math.Max(1, CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreRuleQueriesOperations.EvaluateCardTargetCount(actor, CardKind.Slash))) + (_coreNextCardTargetAdjustmentsOperations.HasLegacyNextCardTargetAdjustment(actor) || _coreNextActualUseTargetAdjustmentsOperations.HasNextActualUseAdjustment(actor) ? 1 : 0);
     internal CommandError? ValidateXieweiPlay(CharacterState actor, LegalAction a, IReadOnlyList<int> ids, IReadOnlyList<int> targets)
     {

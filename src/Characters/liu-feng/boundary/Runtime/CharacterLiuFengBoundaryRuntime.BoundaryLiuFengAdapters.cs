@@ -38,23 +38,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
             if (parent.Id != n.RequestFrameId || parent.InstructionIndex != n.InstructionIndex || e.Op != n.RequestOp)
                 throw new InvalidOperationException("Qinling changed the original native request instruction.");
             _coreRuntimeOperations.ReplaceRuntimeTop(parent = parent with { Step = ResolutionFrameStep.ResolvingEffect, BoundaryLiuFengCaller = new(f.Id, r.Source, r.Hash, n, r.Cards.Single(), r.From.Single(), r.CostSequence, target) });
-            if (_characterMaTieAnniversaryOperations.PrepareAnniversaryMaTieSuppliedSlash(parent, n.ActorSeat, n.ActorSeat, target, CardKind.Slash, [], r.Source))
-            {
-            }
-            else if (_characterSunYuanOlOperations.IsSayingSlashRequest(parent))
-                _characterSunYuanOlOperations.PrepareSayingSuppliedSlash(parent, n.ActorSeat, n.ActorSeat, target, CardKind.Slash, [], r.Source);
-            else if (_characterLiYiOlOperations.IsChanshuangSlashRequest(parent))
-                _characterLiYiOlOperations.PrepareChanshuangSuppliedSlash(parent, n.ActorSeat, n.ActorSeat, target, CardKind.Slash, [], r.Source);
-            else if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(parent))
-                _coreRuntimeOperations.ReplaceRuntimeTop(parent with { LvKuangLvXiang = parent.LvKuangLvXiang!with { Stage = "issuing", IssuingIds = [], IssuingKind = CardKind.Slash, IssuingProvider = n.ActorSeat } });
-            else if (_characterWuJingOlOperations.IsWuJingHejiRequest(parent))
-                _coreRuntimeOperations.ReplaceRuntimeTop(parent with { WuJing = parent.WuJing!with { Stage = WuJingStage.IssuingUse, Selection = new(CardKind.Slash, false, false) { Conversions = [r.Source] }, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-            else if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(parent))
-            {
-                var cc = parent.CaoChun!;
-                _coreRuntimeOperations.ReplaceRuntimeTop(parent with { CaoChun = cc with { Stage = CaoChunStage.NativeSlash, Slash = new(parent.Id, cc.Source, cc.GameplayHash, cc.InstructionIndex, cc.ActualTurn, cc.PhaseInstance, false, target, CardKind.Slash) { ProviderSeat = n.ActorSeat, Materials = [], PaymentBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } } });
-            }
-            else if (n.Intent == BoundaryLiuFengIntent.GenericBasic)
+            if (n.Intent == BoundaryLiuFengIntent.GenericBasic)
             {
                 var action = new LegalAction(LegalActionKind.Slash, 0, target, "侵凌：弃置后视为使用杀", CardKind.Slash, TargetSeats: [target])
                 {
@@ -63,17 +47,10 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryLiuFengKeActionEvent(parent.Id, parent.InstructionIndex, f.Id, target));
                 _coreRuntimeOperations.ReplaceRuntimeTop(parent with { KeBiNengPingduan = parent.KeBiNengPingduan!with { BasicActions = parent.KeBiNengPingduan.BasicActions.Append(action).ToArray(), SelectedBasicAction = action, Stage = KeBiNengPingduanStage.BasicIssuing } });
             }
-            else if (n.Intent == BoundaryLiuFengIntent.ProgramSlash)
-                _coreProgramSlashRequestOperations.CommitProgramChoiceResult(parent.Id, e.ResultBind!, RequestSlashByTargetProgramOperationDescriptor.UsedSlashOption, n.ActorSeat, "侵凌：真实弃置后使用杀。");
-            else if (n.Intent == BoundaryLiuFengIntent.AssistedSlash)
-            {
-                _coreRuntimeOperations.ReplaceRuntimeTop(parent with { AssistedSlashRequest = null });
-                _coreProgramSlashRequestOperations.CommitProgramChoiceResult(parent.Id, e.ResultBind!, "used-slash", n.ActorSeat, "侵凌：真实弃置后使用杀。");
-            }
-            else if (n.Intent == BoundaryLiuFengIntent.FixedSlash)
-                _coreRuntimeOperations.ReplaceRuntimeTop(parent with { FixedTargetSlash = parent.FixedTargetSlash!with { Issued = true } });
-            else if (n.Intent == BoundaryLiuFengIntent.NearestLegalSlash)
-                _coreRuntimeOperations.ReplaceRuntimeTop(parent with { NearestLegalSlashRequest = null });
+            if (r.RequestAcceptance is { } acceptance)
+                _requestExecution.PrepareAcceptedUse(_coreProgramLifecycleOperations.GetActiveProgramFrame(parent.Id), acceptance);
+            else if (n.Intent != BoundaryLiuFengIntent.GenericBasic)
+                throw new InvalidOperationException("Qinling lost its paid original Slash request acceptance.");
         }
 
         _coreRuntimeOperations.PushRuntimeFrame(f);
@@ -244,6 +221,18 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
 
         var parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(n.OwnerFrameId);
         var e = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(parent)!;
+        if (_coreMatchParticipantsPlayersAccess._players[n.ActorSeat].IsAlive && r.RequestAcceptance is { } failedAcceptance)
+        {
+            if (!_programSlashRequests.ReleaseAcceptance(parent, failedAcceptance))
+                return;
+            parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(parent.Id);
+            if (_programSlashRequests.GetOffer(parent, n.ActorSeat) is null)
+            {
+                _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(parent, "原用牌请求已不再允许新的响应；已支付费用不撤回。");
+                return;
+            }
+        }
+
         if (_characterSunYuanOlOperations.IsSayingSlashRequest(parent))
         {
             if (!_coreMatchParticipantsPlayersAccess._players[n.ActorSeat].IsAlive)

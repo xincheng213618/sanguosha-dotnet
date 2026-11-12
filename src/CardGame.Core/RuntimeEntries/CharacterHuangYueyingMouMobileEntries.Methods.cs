@@ -22,7 +22,6 @@ internal sealed partial class CharacterHuangYueyingMouMobileEntries
     internal bool DrainMouHy(ProgramSkillFrame f) => _resolve().DrainMouHy(f);
     internal void FinishMouHy(ProgramSkillFrame f) => _resolve().FinishMouHy(f);
     internal bool IsIssuedMouHyQiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedMouHyQiCandidate(c, context);
-    internal bool IsMouHyJizhiHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsMouHyJizhiHandLimitExempt(owner, cardId);
     internal bool IsMouHyQiGainCandidate(ProgramTriggerCandidate candidate, CardMovementBatchContext batch) => _resolve().IsMouHyQiGainCandidate(candidate, batch);
     internal bool MouHyDying() => _resolve().MouHyDying();
     internal IEnumerable<(Card Card, CardLocation From)> MouHyEquipmentChoices(int owner, int target) => _resolve().MouHyEquipmentChoices(owner, target);

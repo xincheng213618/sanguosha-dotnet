@@ -196,8 +196,13 @@ internal sealed partial class CharacterLiuZhangOlRuntime
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(r.Selected, CardLocation.Hand(recipient), new(ZonghuGiftReason), _nativeGivenCards.CompletionRecords(f.Id, f.OwnerSeat, recipient, r.Selected, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, (batch, moves) =>
         {
             var gifts = moves.Select(m => new ZonghuGift(m.CardId, materials.Single(x => x.Card.Id == m.CardId).Card.Kind, m.From, m.Sequence, batch)).OrderBy(g => Array.IndexOf(r.Selected.ToArray(), g.CardId)).ToArray();
+            ProgramSlashRequestAcceptance? requestAcceptance = null;
+            if (CoreNativeCardClassificationsRuntime.IsSlashCard(r.OutputKind!.Value) &&
+                _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.Need.RequestFrameId) is ProgramSkillFrame request &&
+                _programSlashRequests.GetOffer(request, r.Need.ActorSeat) is not null)
+                requestAcceptance = _programSlashRequests.Accept(request, r.Need.ActorSeat, r.TargetSeat!.Value);
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-            var paid = new ZonghuPaidOrigin(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.ActualTurnOwner, r.Need, r.OutputKind!.Value, r.TargetSeat!.Value, recipient, gifts, ZonghuCost, before, moves.Max(m => m.Sequence));
+            var paid = new ZonghuPaidOrigin(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.ActualTurnOwner, r.Need, r.OutputKind!.Value, r.TargetSeat!.Value, recipient, gifts, ZonghuCost, before, moves.Max(m => m.Sequence)) { RequestAcceptance = requestAcceptance };
             _coreRuntimeOperations.ReplaceRuntimeTop(current with { Zonghu = current.Zonghu!with { Paid = paid, After = paid.After } });
             for (var i = 0; i < gifts.Length; i++)
             {

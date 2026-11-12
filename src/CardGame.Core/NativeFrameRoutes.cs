@@ -26,8 +26,10 @@ internal sealed class NativeFrameRouteCatalog
     internal NativeFrameRouteCatalog(IEnumerable<MethodInfo> methods)
     {
         var registrations = new List<Registration>();
-        foreach (var method in methods)
+        foreach (var candidateMethod in methods)
         {
+            if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(NativeFrameRouteAttribute), inherit: true)) continue;
+            var method = candidateMethod!;
             if (method.GetCustomAttribute<NativeFrameRouteAttribute>() is not { } route) continue;
             var parameters = method.GetParameters();
             if (!ValidHost(method) || method.ReturnType != typeof(void) || route.Order < 0 ||

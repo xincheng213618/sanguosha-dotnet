@@ -7,7 +7,7 @@ internal sealed class ActivityBattleRulesHost(EngineStates.CoreMatchSetupState m
         where TEvent : IGameEvent => Array.AsReadOnly(getCoreGameEngineAlternatingBenefitsRuntime().CompleteProgramEventHistory().OfType<TEvent>().ToArray());
     public GuanduBattleConfiguredEvent? InitialGuanduConfiguration => gameEngineGuanduActivitiesState.ReferenceToGuanduInitialConfiguration;
 
-    private static ModeBattleNativeUse? UseFacts(CardUseFrame? use) => use?.Action is { } action ? new(use.Id, new(action.ActionId, action.Type, action.ActorSeat, action.EffectiveKind), use.ExtraCardEffect is not null) : null;
+    private static ModeBattleNativeUse? UseFacts(CardUseFrame? use) => use?.Action is { } action ? new(use.Id, new(action.ActionId, action.Type, action.ActorSeat, action.EffectiveKind)) : null;
     public ModeBattleNativeUse? FindUse(long frameId) => UseFacts(getCoreGameEngineCardUseLifecycleRuntime().LifecycleCardUse(frameId));
     public ModeBattleNativeUse? FindUseByAction(long actionId) => UseFacts(getFrameStore().OfType<CardUseFrame>().SingleOrDefault(frame => frame.Action?.ActionId == actionId));
     public ModeBattleDraftFacts Draft(int seat)

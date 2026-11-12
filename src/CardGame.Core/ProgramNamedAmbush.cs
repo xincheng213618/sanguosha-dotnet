@@ -38,13 +38,6 @@ public sealed record NamedAmbushCounterspellResponse(long ActionId, int Responde
     bool PreviousEffectNullified, int PreviousChainDepth, NamedAmbushUseInvalidatedEvent? Invalidated = null);
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public NamedAmbushReceipt? NamedAmbush { get; init; } }
-public sealed partial record CardUseFrame
-{
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public NamedAmbushUseInvalidatedEvent? NamedAmbushInvalidation { get; init; }
-    private IReadOnlyList<NamedAmbushUseInvalidatedEvent>? _namedAmbushResponseInvalidations;
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<NamedAmbushUseInvalidatedEvent>? NamedAmbushResponseInvalidations
-    { get => _namedAmbushResponseInvalidations; init => _namedAmbushResponseInvalidations = value is null ? null : Array.AsReadOnly(value.ToArray()); }
-}
 public sealed partial record NullificationWindowFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public NamedAmbushCounterspellResponse? NamedAmbushResponse { get; init; } }
 public sealed partial record PlayerSnapshot

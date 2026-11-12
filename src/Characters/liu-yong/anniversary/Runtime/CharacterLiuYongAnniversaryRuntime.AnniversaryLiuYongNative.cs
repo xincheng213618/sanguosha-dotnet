@@ -17,7 +17,9 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
         }
 
         )
-            foreach (var target in _coreTableOrderOperations.CurrentTableOrder().Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, p, kind, physicalSuit: Suit.None, effectiveRank: 0, countsTowardLimit: false)))
+            foreach (var target in _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor,
+                _coreTableOrderOperations.CurrentTableOrder().Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).ToArray(),
+                kind, physicalSuit: Suit.None, effectiveRank: 0, countsTowardLimit: false).Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]))
                 result.Add(new(kind, LegalActionKind.Slash) { Targets = [target.Seat] });
         var options = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, physicalSuit: Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: []);
         result.AddRange(_coreNextActualUseTargetAdjustmentsOperations.NextActualUseOrdinaryTrickOptions(actor, options, Suit.None, null, Suit.None, false).Where(o => CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(o.EffectiveCardKind) && (CoreGameEngineMouLuMengRuntime.IsDamageCardKind(o.EffectiveCardKind) || CoreGameEngineCompletedUndamagedTargetRevealRuntime.IsCompletedUndamagedDamageUse(o.EffectiveCardKind))).Select(o => new AnniversaryLiuYongPlan(o.EffectiveCardKind, o.ActionKind, o.TargetCardId, o.RequiredCardKind, o.NextActualUseAdjusted) { Targets = _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(o.EffectiveCardKind, owner, o.TargetSeats) }));

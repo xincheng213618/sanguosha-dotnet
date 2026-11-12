@@ -45,7 +45,7 @@ internal sealed partial class CharacterKongShuOlRuntime
         var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, selection.Cards);
         var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, selection.Cards);
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
-            return _coreMatchParticipantsPlayersAccess._players.Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, p, kind, suit, effectiveColor: color, physicalCardIds: selection.Cards.Select(c => c.Id).ToArray())).Select(p => p.Seat).ToArray();
+            return _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(owner, _coreMatchParticipantsPlayersAccess._players, kind, suit, effectiveColor: color, physicalCardIds: selection.Cards.Select(c => c.Id).ToArray()).ToArray();
         return kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(owner) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit) ? [owner.Seat] : [];
     }
 

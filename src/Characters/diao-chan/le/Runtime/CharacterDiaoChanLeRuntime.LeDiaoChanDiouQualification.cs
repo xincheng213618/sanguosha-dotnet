@@ -37,7 +37,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
 
         if (action.PhysicalCards.Count == 0)
             return;
-        var material = action.PhysicalCards.Select(c => (Cost: c, Marked: HasTanbanEntityMark(c.CardId))).ToArray();
+        var material = action.PhysicalCards.Select(c => (Cost: c, Marked: _cardEntityMarks.Has(c.CardId, "tanban"))).ToArray();
         if (!material.Any(c => c.Marked))
             return;
         var bindings = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat]).GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCompleted).Where(b => b.SkillId == DiouSkill && b.Trigger.Id == DiouBinding && b.Trigger.Effects is [{ Op: SkillProgramEffectOp.ResolveDiouTanbanUse }]).ToArray();
@@ -75,7 +75,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         if (!HasDiouCapability || !CoreDirectedTurnCardPoliciesRuntime.DeclarationIsTrueUse(parent))
             return paid;
         var claims = new List<DiouUseClaim>();
-        if (HasTanbanEntityMark(paid.Cost.CardId))
+        if (_cardEntityMarks.Has(paid.Cost.CardId, "tanban"))
             foreach (var b in _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[parent.ActorSeat]).GetInstanceTriggers(SkillProgramTriggerWindow.CardUseCompleted).Where(b => b.SkillId == DiouSkill && b.Trigger.Id == DiouBinding && b.Trigger.Effects is [{ Op: SkillProgramEffectOp.ResolveDiouTanbanUse }]))
             {
                 var source = new CardConversionSource(b.SkillId, b.Trigger.Id, parent.ActorSeat, b.SkillInstanceId);

@@ -77,12 +77,7 @@ internal sealed partial class CoreGameEngineAlternativeViewAsCostsRuntime
             return;
         if (_coreDrawFundedDistinctBasicReturnsOperations.SkipDrawFundedDistinctBasicFinishedMovement(use.Id, card))
             return;
-        if (_coreGuanduEquipmentOperations.IsGuanduDestroyedChariotMaterial(use.Id, card.Id))
-            return;
-        // The original native use already paid this generated field material
-        // through its producer's exact destruction receipt. It never reached
-        // Processing and cannot be discarded or resurrected at completion.
-        if (card.Id > 0 && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.OutsideGame && _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial3(use.Id, card.Id))
+        if (_nativeMaterialClaims.PreservesMaterialAtCompletion(use.Id, card.Id))
             return;
         if (_characterHuanShuJunOlOperations.SkipHuanpeiFinishedMovement(use.Id, card) || _characterDiaoChanLeOperations.SkipDiouFinishedMovement(use.Id, card) || _characterXiaoQiaoMouOlOperations.SkipMouXqJueyanFinishedMovement(use.Id, card) || _characterLiuChengMouMobileOperations.SkipMouLiuChengFinishedMovement(use.Id, card))
             return;

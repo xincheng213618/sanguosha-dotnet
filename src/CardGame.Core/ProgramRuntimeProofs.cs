@@ -29,8 +29,10 @@ internal sealed class ProgramRuntimeProofCatalog
     {
         var dying = Enum.GetValues<ProgramDyingProofPhase>().ToDictionary(p => p,
             _ => new SortedDictionary<int, SortedDictionary<int, ProgramRuntimeRegistration>>());
-        foreach (var method in methods)
+        foreach (var candidateMethod in methods)
         {
+            if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(ProgramDyingProofAttribute), inherit: true)) continue;
+            var method = candidateMethod!;
             foreach (var attribute in method.GetCustomAttributes<ProgramDyingProofAttribute>())
             {
                 if (!Enum.IsDefined(attribute.Phase) || attribute.Group <= 0)

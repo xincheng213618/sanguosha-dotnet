@@ -18,6 +18,7 @@ public sealed record HuanShuJunReceipt(CardConversionSource Source, string Gamep
     public int Round { get; init; }
     public CardKind? Kind { get; init; }
     public HuanpeiNativeRequest? Request { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ProgramSlashRequestAcceptance? RequestAcceptance { get; init; }
     public NativeDrawOutcome? DrawOutcome { get; init; }
     public WenyiNativeOrigin? Native { get; init; }
     public bool NativeReturned { get; init; }

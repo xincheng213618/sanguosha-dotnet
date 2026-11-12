@@ -27,7 +27,6 @@ internal sealed partial class CharacterTaoQianOlEntries
     internal bool IsIssuedZhaohuoCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().IsIssuedZhaohuoCandidate(candidate, context);
     internal bool IsIssuedZongluanUse(CardUseFrame use) => _resolve().IsIssuedZongluanUse(use);
     internal bool IsTaoQianRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame child) => _resolve().IsTaoQianRecoveryParent(f, child);
-    internal bool IsZhaohuoHandLimitExempt(int ownerSeat, int cardId) => _resolve().IsZhaohuoHandLimitExempt(ownerSeat, cardId);
     internal bool IsZhaohuoPhysicalRestricted(int actorSeat, int cardId) => _resolve().IsZhaohuoPhysicalRestricted(actorSeat, cardId);
     internal bool IsZhaohuoRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame child) => _resolve().IsZhaohuoRecoveryParent(f, child);
     internal bool IsZongluanUse(long id) => _resolve().IsZongluanUse(id);

@@ -440,6 +440,7 @@ internal sealed class GrantTurnCardDamageModifierProgramOperationDescriptor : Tu
 
 internal sealed class GrantTurnCardActionProhibitionProgramOperationDescriptor : TurnEffectProgramOperationDescriptorBase
 {
+    public override IReadOnlyList<SkillStateBoundarySpec> LifetimeBoundaries(SkillProgramEffect effect) => effect.CardActionProhibition?.Until ?? [];
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.GrantTurnCardActionProhibition;
     public override ISkillProgramEffectHandler Handler { get; } = new GrantTurnCardActionProhibitionSkillProgramEffectHandler();
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GrantTurnCardActionProhibition,

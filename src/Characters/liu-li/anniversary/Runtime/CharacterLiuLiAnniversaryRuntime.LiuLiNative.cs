@@ -36,7 +36,9 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
             }
 
             )
-                foreach (var target in _coreTableOrderOperations.CurrentTableOrder().Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).Where(p => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, p, kind, physicalSuit: Suit.None, effectiveRank: 0, ignoreDistance: true, countsTowardLimit: false)))
+                foreach (var target in _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor,
+                    _coreTableOrderOperations.CurrentTableOrder().Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]).ToArray(),
+                    kind, physicalSuit: Suit.None, effectiveRank: 0, ignoreDistance: true, countsTowardLimit: false).Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]))
                     result.Add(new(kind, LegalActionKind.Slash) { Targets = [target.Seat] });
         var ordinary = _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, physicalSuit: Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: []);
         result.AddRange(_coreNextActualUseTargetAdjustmentsOperations.NextActualUseOrdinaryTrickOptions(actor, ordinary, Suit.None, null, Suit.None, false).Where(o => pool.Contains(o.EffectiveCardKind) && !LiuLiNameChosen(owner, o.EffectiveCardKind)).Select(o => new AnniversaryLiuLiPlan(o.EffectiveCardKind, o.ActionKind, o.TargetCardId, o.RequiredCardKind, o.NextActualUseAdjusted) { Targets = _coreFinalizedCardTargetsOperations.GetImplicitSelfCardUseTargets(o.EffectiveCardKind, owner, o.TargetSeats) }));
@@ -145,6 +147,8 @@ internal sealed partial class CharacterLiuLiAnniversaryRuntime
         if (_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Where(e => e.OwnerSeat == f.OwnerSeat).All(e => LiuLiNameChosen(f.OwnerSeat, e.Name)))
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryLiuLi = r with { Stage = AnniversaryLiuLiStage.SkillChildren } });
+            _handLimitExemptions.Grant(f, AnniversaryLiuLiComposition.Dehua, f.OwnerSeat,
+                new(new(CardKinds: Enum.GetValues<CardKind>().Where(CoreGameEngineMouLuMengRuntime.IsDamageCardKind).ToArray())));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuLiDehuaCompletedEvent(f.Id, f.OwnerSeat, _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuLiPoolNameEvent>().Count(e => e.OwnerSeat == f.OwnerSeat)));
             foreach (var p in _coreMatchParticipantsPlayersAccess._players)
                 _observedSkillGrantRevisionsOperations._observedSkillGrantRevisions.TryAdd(p.Seat, p.SkillGrants.GrantRevision);

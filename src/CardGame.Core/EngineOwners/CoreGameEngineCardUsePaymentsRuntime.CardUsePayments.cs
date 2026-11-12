@@ -22,20 +22,43 @@ internal sealed partial class CoreGameEngineCardUsePaymentsRuntime
         _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(cards.Select(card => card.Id).ToArray(), CardLocation.Processing, CardMoveReasons.Use, destinationForCard: (card, from) => _coreAlternativeViewAsCostsOperations.NormalizeProgramViewAsCostDestination(card, from, CardLocation.Processing, CardMoveReasons.Use), disclosure: CardMovementDisclosure.FaceUp);
     }
 
-    internal void CaptureSlashUsePaymentBatch(CardMovementBatchContext batch)
+    internal void CaptureNativeUsePaymentBatch(CardMovementBatchContext batch)
     {
+        CaptureNativeUsePaymentRetirements(batch);
         _coreProgramCardUsePaymentsOperations.CardUsePayments.CaptureMovement(batch);
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not CardUseFrame use || batch.ParentFrameId != use.Id || use.Action is not { Type: CardActionType.Use } action || !CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind) || !CardUsePaymentMaterialsMatch(use, batch))
             return;
         if (use.PaymentMovementReceipt is not null)
             throw new InvalidOperationException("One card-use payment cannot issue its physical materials twice.");
         _coreRuntimeOperations.ReplaceRuntimeFrame(use.Id, use with { PaymentMovementReceipt = new(use.Id, action.ActionId, batch.Movements[0].Sequence - 1, batch.Movements[^1].Sequence) { Batch = batch } });
-        foreach (var movement in batch.Movements.Where(movement => movement.To == CardLocation.OutsideGame))
-            _nativeCardRepresentations.CaptureDeparture(use.Id, movement.CardId, movement.Sequence);
+    }
+
+    private void CaptureNativeUsePaymentRetirements(CardMovementBatchContext batch)
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault() is not CardUseFrame use ||
+            batch.ParentFrameId != use.Id || use.Action is not { Type: CardActionType.Use } action ||
+            batch.Movements.Count == 0 || batch.Movements.Count != action.PhysicalCards.Count ||
+            batch.Movements.Select(move => move.CardId).Distinct().Count() != batch.Movements.Count)
+            return;
+        foreach (var move in batch.Movements)
+        {
+            var cost = action.PhysicalCards.SingleOrDefault(material => material.CardId == move.CardId);
+            if (cost is null || move.From != cost.From || move.CardKind != cost.CardKind ||
+                move.Reason != CardMoveReasons.Use || move.TurnNumber != batch.TurnNumber ||
+                move.Sequence <= 0 || move.Sequence > _coreCardMovementJournalCardMovementsAccess._cardMovements.Count ||
+                _coreCardMovementJournalCardMovementsAccess._cardMovements[move.Sequence - 1] != move)
+                return;
+        }
+
+        // Payment qualification belongs to its producer. The physical owner
+        // records the actual disposition independently of any trigger or tail.
+        // A use can also pay resources that are not its physical materials.
+        IReadOnlyList<int> materials = use.PhysicalCardIds ?? (use.CardId > 0 ? [use.CardId] : []);
+        _nativeMaterialClaims.CaptureRetirement(use.Id,
+            batch.Movements.Where(move => materials.Contains(move.CardId) && move.To != CardLocation.Processing).ToArray());
     }
 
     internal bool IsCardUsePaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => _coreProgramCardUsePaymentsOperations.CardUsePayments.MatchesBatch(use, batch) || CardUsePaymentBatchMatchesReceipt(use, batch) && CardUsePaymentMaterialsMatch(use, batch);
-    internal bool IsPaidDestroyedGeneralWeaponUseMaterial(long useId, int cardId) => cardId > 0 && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && _coreAdvancedLifecycleOperations.GetAdvancedCard(cardId).IsGeneralWeapon && _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Action: { Type: CardActionType.Use } action, PaymentMovementReceipt: { Batch: { } batch } receipt } use && receipt.OwnerFrameId == useId && receipt.ActionId == action.ActionId && CardUsePaymentBatchMatchesReceipt(use, batch) && CardUsePaymentMaterialsMatch(use, batch) && action.PhysicalCards.SingleOrDefault(c => c.CardId == cardId)is { } material && material.From == CardLocation.Equipment(action.ProviderSeat) && batch.Movements.SingleOrDefault(m => m.CardId == cardId)is { } movement && movement.From == material.From && movement.CardKind == material.CardKind && movement.To == CardLocation.OutsideGame && movement.Reason == CardMoveReasons.Use && movement.Sequence > receipt.SequenceBefore && movement.Sequence <= receipt.SequenceAfter && _coreCardMovementJournalCardMovementsAccess._cardMovements.SingleOrDefault(m => m.Sequence == movement.Sequence) == movement;
     internal static bool CardUsePaymentBatchMatchesReceipt(CardUseFrame use, CardMovementBatchContext batch, CardUsePaymentMovementReceipt? issuedReceipt = null) => RuntimeSkills.RuntimeRules_Core_CardUsePayments.CardUsePaymentBatchMatchesReceipt(use, batch, issuedReceipt);
     internal bool CardUsePaymentMaterialsMatch(CardUseFrame use, CardMovementBatchContext batch)
     {
@@ -60,9 +83,9 @@ internal sealed partial class CoreGameEngineCardUsePaymentsRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.ProcessingAllowance, 10)]
     internal bool HasSharedCardUsePaymentProcessing(IReadOnlyList<Card> processing) => _resolutionStackOperations._resolutionStack.Count == 2 && _resolutionStackOperations._resolutionStack[0] is CardUseFrame { RecoveryPaidContinuation: { } continuation } use && _resolutionStackOperations._resolutionStack[1] is CardsMovedTriggerWindowFrame movement && _coreProgramCardUsePaymentsOperations.CardUsePayments.AllowsTail(ProgramCardUsePaymentStage.SharedProcessingTail, use, continuation) && IsPaidCardUseMovementReturn(use, movement) && processing.All(card => use.PaymentMovementReceipt!.Batch.Movements.Any(cost => cost.CardId == card.Id && cost.To == CardLocation.Processing));
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 700)]
-    internal CardMovementBatchContext CompleteMovementBatchCaptureSlashUsePaymentBatch(CardMovementBatchBuilder batch, CardMovementBatchContext completed)
+    internal CardMovementBatchContext CompleteMovementBatchCaptureNativeUsePaymentBatch(CardMovementBatchBuilder batch, CardMovementBatchContext completed)
     {
-        CaptureSlashUsePaymentBatch(completed);
+        CaptureNativeUsePaymentBatch(completed);
         return completed;
     }
 }

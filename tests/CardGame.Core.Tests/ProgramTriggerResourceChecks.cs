@@ -166,6 +166,54 @@ internal static class ProgramTriggerResourceChecks
         var passive = new SkillProgramDependencies([new ContentSkillDefinition("ol:liangzhu", "Passive", "Passive")]);
         Check(passive.RequiresFact(phase) && !passive.RequiresFact(end), "A passive definition requests phase identity without an instruction or an end consumer.");
 
+        string[] lifetimeConsumers =
+        [
+            """{"op":"skillState","target":"owner","action":"suppress","match":{"skillIds":["fixture:optional-facts"]}}""",
+            """{"op":"grantTurnCardActionProhibition","target":"owner","cardKinds":["slash"],"actionTypes":["use"]}""",
+            """{"op":"applyResponseRelation","target":"owner","relationId":"fixture:response","match":"any","captureKinds":["nativeUse"],"forbid":true,"until":[{"event":"turnEnded","participant":{"kind":"owner"}}]}""",
+            """{"op":"grantDirectedTurnCardPolicy","target":"owner","actorRef":{"kind":"owner"},"targetRef":{"kind":"owner"},"effects":["ignoreDistance"]}""",
+            """{"op":"grantDirectedTurnCardPolicy","target":"owner","actorRef":{"kind":"owner"},"targetRef":{"kind":"owner"},"effects":["inAttackRange"]}""",
+            """{"op":"grantHandLimitExemption","target":"owner","relationId":"fixture:hand","handLimitMatch":{"cardKinds":["slash"]}}"""
+        ];
+        foreach (var fields in lifetimeConsumers)
+        {
+            var effect = JsonNode.Parse(fields)!.AsObject();
+            var unscoped = WithEffect(effect);
+            Check(!Requires(unscoped, phase) && !Requires(unscoped, end), "A rule without a phase lifetime does not capture unrelated phase facts.");
+            effect["until"] = JsonNode.Parse("""[{"event":"phaseEnded","participant":{"kind":"owner"},"phase":"play"}]""");
+            var scoped = WithEffect(effect);
+            var instruction = scoped.Activations.Single().Effects.Single();
+            var requirements = ProgramOperationCatalog.Default.FactRequirementsFor(instruction);
+            Check(Requires(scoped, end) && Requires(scoped, phase) &&
+                (requirements.Triggered & end) != 0 && (requirements.Activated & end) != 0 &&
+                new ProgramInstructionFeatures([instruction]).FactRequirements == requirements,
+                "Each lifetime consumer declares its own boundaries; per-effect compilation and catalog demand share that declaration.");
+        }
+        (SkillStateBoundarySpec Boundary, ProgramTrackedFact Expected)[] boundaryFacts =
+        [
+            (new(SkillStateBoundaryEvent.PhaseStarted, SkillStateSubject.Owner, Phase: ActualDiscardRecoveryPhaseKind.Play), phase),
+            (new(SkillStateBoundaryEvent.PhaseEnded, SkillStateSubject.Owner, Phase: ActualDiscardRecoveryPhaseKind.Play), end),
+            (new(SkillStateBoundaryEvent.RoundAdvanced, null), ProgramTrackedFact.ActualRound),
+            (new(SkillStateBoundaryEvent.ActualUse, SkillStateSubject.Owner), ProgramTrackedFact.ActualCardUseHistory),
+            (new(SkillStateBoundaryEvent.ActualTurnReturned, SkillStateSubject.TurnOwner), ProgramTrackedFact.ActualTurnReturn),
+            (new(SkillStateBoundaryEvent.DyingStarted, null), ProgramTrackedFact.None),
+            (new(SkillStateBoundaryEvent.DyingEnded, null), ProgramTrackedFact.None)
+        ];
+        foreach (var (boundary, expected) in boundaryFacts)
+        {
+            var requirements = ProgramRuleLifetimeFacts.ForBoundaries([boundary]);
+            Check(requirements == new ProgramFactRequirements(expected, expected),
+                "Lifetime fact mapping is independent of the consumer; unconditional dying boundaries request no optional history.");
+        }
+        var openHand = JsonNode.Parse(lifetimeConsumers[^1])!.AsObject();
+        openHand["expiry"] = "actualTurnOpen";
+        openHand["turnRequirements"] = new JsonArray("noTurnReturned");
+        Check(Requires(WithEffect(openHand), ProgramTrackedFact.ActualTurnReturn),
+            "An explicit no-return hand relation declares real turn-return demand without a fabricated Until boundary.");
+        Check((ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.ResolveZhaohuoFirstVictimGift).FactRequirements.Triggered & ProgramTrackedFact.ActualTurnReturn) != 0 &&
+            (ProgramOperationCatalog.Default.Resolve(SkillProgramEffectOp.ResolveMouHuangYueyingJizhi).FactRequirements.Triggered & ProgramTrackedFact.ActualTurnReturn) != 0,
+            "Native issued open-turn relations declare their real return reader at their own capability definition.");
+
         var zones = (CardZoneStore)typeof(GameEngine).GetField("_cardZones", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(game)!;
         var catalog = ContentRegistry.Build(new StandardContentPackage(), new FactsPackage(phaseEnd));
         var plainMode = CardGame.Modes.Standard.StandardModeRuleProfiles.Create(withoutPhaseDemand.Modes["identity:standard-5"], new GameOptions());
@@ -196,6 +244,12 @@ internal static class ProgramTriggerResourceChecks
             content: content, modeRequiredFacts: mode).Bindings.Single(binding => binding.Contract == typeof(INativeFactDemand)).Instance;
         static bool Requires(SkillProgram program, ProgramTrackedFact fact) =>
             new SkillProgramDependencies([new ContentSkillDefinition(program.Id, "Facts", "Facts") { Program = program }]).RequiresFact(fact);
+        static SkillProgram WithEffect(JsonObject effect)
+        {
+            var fields = JsonNode.Parse("""{"activations":[{"id":"rule","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"otherLiving","usesPerTurn":null,"effects":[]}]}""")!.AsObject();
+            fields["activations"]![0]!["effects"]!.AsArray().Add(effect.DeepClone());
+            return Program(fields.ToJsonString());
+        }
         static SkillProgram Program(string fields)
         {
             var skill = JsonNode.Parse(fields)!.AsObject();

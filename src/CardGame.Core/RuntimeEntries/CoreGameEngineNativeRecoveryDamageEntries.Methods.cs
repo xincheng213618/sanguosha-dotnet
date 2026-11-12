@@ -2,8 +2,8 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineNativeRecoveryDamageEntries
 {
-    internal bool ExactPaidNativeRecoveryReplacementEdge(ResolutionFrame parent, ResolutionFrame child, Func<IReadOnlyList<IGameEvent>> history) => _resolve().ExactPaidNativeRecoveryReplacementEdge(parent, child, history);
-    internal bool ExactPaidNativeRecoveryUseEdge(ResolutionFrame parent, ResolutionFrame child, Func<IReadOnlyList<IGameEvent>> history) => _resolve().ExactPaidNativeRecoveryUseEdge(parent, child, history);
+    internal bool ExactPaidNativeRecoveryReplacementEdge(ResolutionFrame parent, ResolutionFrame child) => _resolve().ExactPaidNativeRecoveryReplacementEdge(parent, child);
+    internal bool ExactPaidNativeRecoveryUseEdge(ResolutionFrame parent, ResolutionFrame child) => _resolve().ExactPaidNativeRecoveryUseEdge(parent, child);
     internal bool IsOriginalDyingSuspendedByRecoveryDamage(DyingFrame dying) => _resolve().IsOriginalDyingSuspendedByRecoveryDamage(dying);
     internal bool NativeCardRecoveryReturnMatches(CardUseFrame use, HpChangedTriggerWindowFrame hp) => _resolve().NativeCardRecoveryReturnMatches(use, hp);
     internal void RecordNativeCardRecovery(long useId, long recoveryId, int source, int target, CardKind kind, int requested, int before, int after) => _resolve().RecordNativeCardRecovery(useId, recoveryId, source, target, kind, requested, before, after);

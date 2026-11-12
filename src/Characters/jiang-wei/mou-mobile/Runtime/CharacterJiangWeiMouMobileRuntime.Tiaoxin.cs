@@ -113,6 +113,12 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
             return;
         }
 
+        if (r.Stage == MouJiangWeiStage.Responding && r.Cursor < r.Targets.Count)
+        {
+            _slashRequests.Issue(f, r.Targets[r.Cursor], new(ProgramSlashRequestTargetSource.FrozenCandidates,
+                [f.OwnerSeat], MouJwFactionBind, IgnoreDistance: true, RetainSourceLoss: true, RetainOwnerDeath: true, RetainAcceptedSourceLoss: true, RetainAcceptedOwnerDeath: true, ExemptIssuedSlashDebit: true, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction), r.Cursor);
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        }
         var chooser = r.Stage == MouJiangWeiStage.Responding ? r.Targets[r.Cursor] : f.OwnerSeat;
         var choices = MouJwChoices(f);
         if (choices.Count == 0)
@@ -140,6 +146,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { MouJiangWei: { } r } f || !ValidMouJw(f) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (r.Stage == MouJiangWeiStage.Responding ? r.Targets[r.Cursor] : f.OwnerSeat) || !MouJwChoices(f).Any(x => CoreGameEngineAssistedPhysicalCardsRuntime.AssistedChoicesEqual([x], [c])))
             throw new InvalidOperationException("Jiang Wei's response changed its original private chooser or legal plan.");
+        var originalDecision = _corePendingDecisionPolicyPipelineOperations._pendingDecision!;
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
         var branch = c.Parameters["branch"];
@@ -172,7 +179,7 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
 
         if (branch == "slash")
         {
-            IssueMouJwSlash(f, int.Parse(c.Parameters["option"], CultureInfo.InvariantCulture));
+            IssueMouJwSlash(f, int.Parse(c.Parameters["option"], CultureInfo.InvariantCulture), originalDecision);
             return;
         }
 
@@ -184,6 +191,8 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
 
         if (branch != "give")
             throw new InvalidOperationException("Unknown mobile Jiang Wei choice.");
+        _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var actor = r.Targets[r.Cursor];
         var id = c.Cards.Single();
         var from = _cardZonesOperations._cardZones.GetLocation(id);
@@ -257,6 +266,8 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
 
     internal void NextMouJwRecipient(ProgramSkillFrame f)
     {
+        _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var r = f.MouJiangWei!;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouJiangWei = r with { Cursor = r.Cursor + 1, Stage = MouJiangWeiStage.Responding, Payment = null, UseId = 0, ActionId = 0, NativeAction = null, Materials = [], FactionPolicy = null, FactionTried = false, ProviderSeat = -1, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence }, PendingMovementContinuation = null });
         ContinueMouJw(f.Id);
@@ -264,6 +275,8 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
 
     internal void FinishMouJw(ProgramSkillFrame f)
     {
+        _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var r = f.MouJiangWei!;
         if (r.Op == SkillProgramEffectOp.ResolveMouJiangWeiTiaoxin && r.Accepted)
             ChangeMouJwCharge(f.Id, f.OwnerSeat, -r.Targets.Count);

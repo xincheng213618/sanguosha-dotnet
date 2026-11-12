@@ -78,14 +78,9 @@ public sealed record HappyZlReceipt(CardConversionSource Source,string Hash,Skil
 }
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public HappyZlReceipt? HappyZhangLiao {get;init;} }
-public sealed record HappyZlCounterspell(long Window,long Parent,int Depth,long ActionId,int Actor,int Target,bool Color,long GrantFrame);
-public sealed partial record NullificationWindowFrame
-{ [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public HappyZlCounterspell? HappyZhangLiao {get;init;} }
 public sealed record HappyZlStartedEvent(long FrameId,CardConversionSource Source,string Hash,SkillProgramEffectOp Op,long Parent,int Turn) : IGameEvent;
 public sealed record HappyZlPaidEvent(long FrameId,int Ordinal,long Before,long After) : IGameEvent;
-public sealed record HappyZlColorEvent(long FrameId,CardConversionSource Source,int Turn,int Target,bool? Color) : IGameEvent;
 public sealed record HappyZlLeaseEvent(long FrameId,CardConversionSource Source,int Target,EquipmentSlot Slot,int Capacity) : IGameEvent;
 public sealed record HappyZlLeaseExpiredEvent(long LeaseFrameId,int Target,EquipmentSlot Slot,string Reason) : IGameEvent;
 public sealed record HappyZlRestoredEvent(long FrameId,long LeaseFrameId,int Target,EquipmentSlot Slot) : IGameEvent;
-public sealed record HappyZlCounterspellEvent(HappyZlCounterspell Receipt) : IGameEvent;
 public sealed record HappyZlCompletedEvent(long FrameId) : IGameEvent;

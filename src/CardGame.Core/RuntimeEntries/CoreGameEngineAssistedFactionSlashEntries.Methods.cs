@@ -2,6 +2,7 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineAssistedFactionSlashEntries
 {
+    internal ProgramSlashRequestAcceptance AcceptAssistedFactionSlashRequest(NativeOwners.FactionCardRequestHandle request, ProgramSkillFrame frame) => _resolve().AcceptAssistedFactionSlashRequest(request, frame);
     internal void BeginAssistedProgramFactionSlashRequest(ProgramSkillFrame frame, int actorSeat, int targetSeat, string resultBind, bool ignoreDistance = false, int? rangeOwnerSeat = default) => _resolve().BeginAssistedProgramFactionSlashRequest(frame, actorSeat, targetSeat, resultBind, ignoreDistance, rangeOwnerSeat);
     internal bool CanRequestAssistedProgramFactionSlash(int actorSeat, int targetSeat, bool ignoreDistance = false, int? rangeOwnerSeat = default) => _resolve().CanRequestAssistedProgramFactionSlash(actorSeat, targetSeat, ignoreDistance, rangeOwnerSeat);
     internal bool CanSupplyAssistedFactionSlash(NativeOwners.FactionCardRequestHandle pending, CardKind kind, IReadOnlyList<Card> cards, bool isTrueZhangba = false) => _resolve().CanSupplyAssistedFactionSlash(pending, kind, cards, isTrueZhangba);

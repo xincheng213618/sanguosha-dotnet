@@ -148,6 +148,8 @@ internal sealed partial class CharacterGuanHaiOlRuntime
                 Movements = records.OrderBy(m => m.Sequence).ToArray()
             };
             UpdateXieweiPayment(id, p);
+            if (!p.ResponseUse)
+                _nativeMaterialClaims.CaptureRetirement(id, records);
             for (var i = 0; i < p.Materials.Count; i++)
             {
                 var m = records.Single(m => m.CardId == p.Materials[i].CardId);
@@ -183,7 +185,6 @@ internal sealed partial class CharacterGuanHaiOlRuntime
         return p.Movements.All(m => m.Sequence > p.Before && m.Sequence <= p.After && m.From == CardLocation.Hand(p.OwnerSeat) && m.To == p.Pile.Location && m.Reason.Value == XieweiStoreReason && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && p.Materials.Any(c => c.CardId == m.CardId && c.Kind == m.CardKind) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XieweiBaitStoredEvent>().Count(e => e.PaymentId == p.Id && e.CardId == m.CardId && e.Sequence == m.Sequence && e.Pile == m.To) == 1) && (!p.Paid || p.ActionId == 0 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<XieweiOutputBoundEvent>().Count(e => e == new XieweiOutputBoundEvent(p.Id, p.UseId, p.ActionId, p.ActorSeat, p.OwnerSeat, p.RequesterSeat, p.Kind, p.ResponseUse)) == 1);
     }
 
-    internal bool IsXieweiRemovedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)?.XieweiPayments?.Any(p => !p.ResponseUse && p.Paid && p.ActionId > 0 && p.Materials.Any(c => c.CardId == cardId) && ValidXieweiPayment(p)) == true;
     internal bool IsXieweiResponseRemovedMaterial(ProgramMultiCardViewAsSelection selection, int cardId) => IsXieweiSelection(selection) && _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().SelectMany(u => u.XieweiPayments ?? []).Any(p => p.ResponseUse && p.Paid && p.ActionId > 0 && p.Source == selection.Source && p.Materials.Select(c => c.CardId).Order().SequenceEqual(selection.Cards.Select(c => c.Id).Order()) && p.Materials.Any(c => c.CardId == cardId) && ValidXieweiPayment(p));
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.MatchBatch, 30)]
     internal bool IsXieweiPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => use.XieweiPayments?.Any(p => !p.ResponseUse && p.Paid && p.UseId == use.Id && p.ActionId == use.Action?.ActionId && batch.ParentFrameId == use.Id && batch.Movements.SequenceEqual(p.Movements) && ValidXieweiPayment(p)) == true;

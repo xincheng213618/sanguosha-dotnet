@@ -21,6 +21,57 @@ internal static class MouXiaoQiaoOlChecks
         var frames = FirstSuitStarts(s, owner).Select(e => e.FrameId).ToHashSet();
         return s.E<ProgramDrawCompletedEvent>().Where(e => frames.Contains(e.FrameId)).ToArray();
     }
+    public static void RealRetainedZeroCounterspellKeepsItsHandEntityAndNativeNodeCold()
+    {
+        var s = Scene.Start("zero-counterspell"); s.Play();
+        var retained = s.V().Hand.Single(c => c.Kind == CardKind.Nullification).Id;
+        s.Show([retained]); s.Reach(() => s.P?.SkillPrompt?.SkillId == Hold);
+        s.Need(s.E<ProgramCardsRevealedEvent>().Any(e => e.SkillId == Driver && e.Cards.Select(c => c.Id).SequenceEqual([retained])) &&
+            s.V().Hand.Any(c => c.Id == retained), "The existing real Show instruction publicly reveals the future retained response without moving its entity.");
+        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue"); s.Play();
+        var before = s.V().HandCount;
+        var material = s.V().Hand.Single(c => c.Kind == CardKind.DrawTwo).Id;
+        var play = s.G.GetHumanLegalActions().First(a => a.CardId == material && a.ConversionSource is null);
+        s.Accept(new PlayCardCommand(0, material, play.TargetSeats, s.G.Revision, s.P!.PromptId, play.PlayedCardKind, play.TargetCardId));
+        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.Nullification } && s.P.Choices.Any(c =>
+            c.Parameters.GetValueOrDefault("response") == "mou-xiao-qiao-jueyan" && c.Cards.SequenceEqual([retained])));
+        var original = s.G.ResolutionStack.OfType<CardUseFrame>().Single(f => f.CardId == material);
+        var windowId = s.G.ResolutionStack.OfType<NullificationWindowFrame>().Single().Id;
+        s.Cold();
+        s.Answer(c => c.Parameters.GetValueOrDefault("response") == "mou-xiao-qiao-jueyan" && c.Cards.SequenceEqual([retained]));
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Hold && s.G.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>()
+            .Any(w => w.Action is { Type: CardActionType.Response, EffectiveKind: CardKind.Nullification }));
+        var accepted = s.G.ResolutionStack.OfType<ProgramCardTriggerWindowFrame>().Last().Action;
+        var counter = s.G.ResolutionStack.OfType<NullificationWindowFrame>().Single(f => f.Id == windowId);
+        var issued = s.E<MouXiaoQiaoJueyanResponseIssuedEvent>().Single(e => e.ParentFrameId == windowId);
+        s.Need(accepted is { Type: CardActionType.Response, EffectiveKind: CardKind.Nullification, ActorSeat: 0, ProviderSeat: 0,
+                ResponderSeat: 0, PhysicalCards.Count: 0 } && accepted.ParentActionId == original.Action!.ActionId &&
+            accepted.ConversionChain is [var source] && source.SkillId == Jueyan &&
+            counter is { ChainDepth: 1, EffectNullified: false, ResponseRuleNode.ChainDepth: 1, NamedAmbushResponse.CardId: 0 } &&
+            counter.ResponseRuleNode.Action.ActionId == accepted.ActionId && counter.NamedAmbushResponse.ActionId == accepted.ActionId &&
+            issued.ActionId == accepted.ActionId && issued.ActorSeat == 0 && issued.Kind == CardKind.Nullification &&
+            s.V().Hand.Any(c => c.Id == retained) && s.E<NullificationRespondedEvent>().All(e => e.WindowFrameId != windowId),
+            "The real Jueyan producer binds one zero-material accepted action and depth-one native node before offset, retaining the shown physical Nullification in Hand.");
+        s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+        s.Reach(() => s.P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard or DecisionKind.Nullification });
+        if (s.P!.Kind == DecisionKind.Nullification)
+            s.Answer(c => c.Parameters.GetValueOrDefault("response") == "pass");
+        s.Play();
+        s.Need(s.E<NullificationRespondedEvent>().Where(e => e.WindowFrameId == windowId).ToArray() is
+                [{ ResponderSeat: 0, NullificationCardId: 0, ChainDepth: 1, EffectNullified: true }] &&
+            s.E<CardActionAcceptedEvent>().Count(e => e.Action.ActionId == accepted.ActionId) == 1 &&
+            s.E<CardRespondedEvent>().Count(e => e.CardId == 0 && e.ResponderSeat == 0 && e.EffectiveCardKind == CardKind.Nullification) == 1 &&
+            s.E<MouXiaoQiaoJueyanResponseGrantedEvent>().Count(e => e.Grant.ProgramFrameId == issued.ProgramFrameId) == 1 &&
+            s.E<MouXiaoQiaoJueyanResponseIssuedEvent>().Count(e => e.ProgramFrameId == issued.ProgramFrameId) == 1 &&
+            s.E<MouXiaoQiaoOlCompletedEvent>().Count(e => e.FrameId == issued.ProgramFrameId && e.Operation == SkillProgramEffectOp.ResolveMouXiaoQiaoJueyan) == 1 &&
+            !s.G.ResolutionStack.Any(f => f.Id == issued.ProgramFrameId || f.Id == windowId || f.Id == original.Id) &&
+            s.E<CardUseFinishedEvent>().Count(e => e.ResolutionId == original.Id) == 1 && s.V().HandCount == before - 1 &&
+            s.V().Hand.Any(c => c.Id == retained) && s.G.CardMovements.All(m => m.CardId != retained || m.From != CardLocation.Hand(0)) &&
+            s.G.CardMovements.Count(m => m.CardId == material && m.From == CardLocation.Hand(0) && m.To == CardLocation.Processing) == 1 &&
+            s.G.CardMovements.Count(m => m.CardId == material && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile) == 1,
+            "One retained zero counterspell cancels the original DrawTwo without drawing two, consuming its displayed entity or repeating the producer, native return, response notification or physical trick cleanup.");
+        s.Cold();
+    }
     public static void RealMiluoRetainedUsesAndExternalRevealReturnCold()
     {
         PublicHandRevealSourcesRejectInvalidDeclarations();
@@ -286,7 +337,9 @@ internal static class MouXiaoQiaoOlChecks
         public static Scene Start(string scenario = "default")
         {
             var r=ContentRegistry.Build(new StandardContentPackage(),new Fixture(scenario));
-            var setup=new ShanheBattleSetup(7,1,"mouxq-real",Hero,3,0,0,0,0,[Driver,Hold,PlainReward],[new(CardKind.DrawTwo,Suit.Heart,4),new(CardKind.Dodge,Suit.Heart,2),new(CardKind.FireAttack,Suit.Spade,5),new(CardKind.Slash,Suit.Diamond,6),new(CardKind.Slash,Suit.Spade,8)],[],
+            ShanheStartingCard[] opening = [new(CardKind.DrawTwo,Suit.Heart,4),new(CardKind.Dodge,Suit.Heart,2),new(CardKind.FireAttack,Suit.Spade,5),new(CardKind.Slash,Suit.Diamond,6),new(CardKind.Slash,Suit.Spade,8)];
+            if (scenario == "zero-counterspell") opening = [.. opening, new(CardKind.Nullification, Suit.Spade, 9)];
+            var setup=new ShanheBattleSetup(7,1,"mouxq-real",Hero,3,0,0,0,0,[Driver,Hold,PlainReward],opening,[],
                 [new("fixture:mouxq-enemy-a",Hp:12){StartingHand=[]},new("fixture:mouxq-enemy-b",Hp:12){StartingHand=[]}],[new("fixture:mouxq-ally",Hp:12){StartingHand=[new(CardKind.Dodge,Suit.Spade,6)]}],new string('f',64));
             var g=GameEngine.CreateStandard(new(){Seed=setup.BattleSeed,PlayerCount=4,HumanSeat=0,HumanRole=null,HumanTeamId=ShanheBattleSetup.PlayerTeamId,ModeId=ShanheBattleSetup.BattleModeId,ShanheBattle=setup,UseInteractiveSetup=false,UseInteractiveDiscard=false,AdvanceAfterHumanCommands=false,MaxTurns=8},r);var s=new Scene(g,r);s.Accept(new StartGameCommand());return s;
         }
@@ -297,7 +350,7 @@ internal static class MouXiaoQiaoOlChecks
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b,Hero);
-            foreach(var k in new[]{CardKind.Slash,CardKind.Dodge,CardKind.FireAttack,CardKind.DrawTwo}){var c=CardCatalog.Get(k);b.AddCard(new("fixture:mouxq-"+k,c.DisplayName,c.CategoryName,c.Description,k));}
+            foreach(var k in new[]{CardKind.Slash,CardKind.Dodge,CardKind.FireAttack,CardKind.DrawTwo}.Concat(scenario == "zero-counterspell" ? [CardKind.Nullification] : Array.Empty<CardKind>())){var c=CardCatalog.Get(k);b.AddCard(new("fixture:mouxq-"+k,c.DisplayName,c.CategoryName,c.Description,k));}
             var firstRewardHold = new List<object>
             {
                 new{op="chooseOption",target="owner",resultBind="held",options=new[]{new{id="continue"}}}
@@ -320,7 +373,7 @@ internal static class MouXiaoQiaoOlChecks
                 new{id=Driver,revision=1,modifiers=scenario == "quota" ? new object[]{new{id="keep-real-shown-hand",query="handLimit",operation="add",value=40,priority=0}} : [],activations=new object[]{
                     new{id="strip",minCards=0,maxCards=0,minTargets=1,maxTargets=1,targetKind="otherLiving",usesPerTurn=(int?)null,effects=new[]{new{op="selectAndMoveOwnedCard",target="owner",chooserRef=new{kind="owner"},cardOwnerRef=new{kind="selectedTarget"},zones=new[]{"hand"},count=1,destination="discardPile",awaitMovementTriggers=true}}},
                     new{id="show",minCards=0,maxCards=0,minTargets=0,maxTargets=0,targetKind="anyLiving",usesPerTurn=(int?)null,effects=new object[]{
-                        new{op="selectOwnedCards",target="owner",zones=new[]{"hand"},minimumCards=scenario == "death" ? 2 : 3,maximumCards=scenario == "death" ? 2 : 3,resultBind="shown"},
+                        new{op="selectOwnedCards",target="owner",zones=new[]{"hand"},minimumCards=scenario == "zero-counterspell" ? 1 : scenario == "death" ? 2 : 3,maximumCards=scenario == "zero-counterspell" ? 1 : scenario == "death" ? 2 : 3,resultBind="shown"},
                         new{op="revealBoundCards",target="owner",sourceBind="shown"}}},
                     new{id="regain",minCards=0,maxCards=0,minTargets=0,maxTargets=0,targetKind="anyLiving",usesPerTurn=(int?)null,effects=new[]{new{op="grantSkills",target="owner",skillIds=new[]{Jueyan}}}},
                     new{id="parent",minCards=0,maxCards=0,minTargets=0,maxTargets=0,targetKind="anyLiving",usesPerTurn=(int?)null,effects=new[]{
@@ -332,7 +385,17 @@ internal static class MouXiaoQiaoOlChecks
 
             };
             var labels=new Dictionary<string,object>{[Quiet]=new{name="原生安静同行",description="正常摸牌后跳过出牌阶段。"},[PlainReward]=new{name="普通展示受益",description="共享窗口签发的一次摸牌。"},[Driver]=new{name="实际弃牌夹具",description="执行原生指定角色手牌弃置。",optionLabels=new Dictionary<string,string>{{"parent-start","开始共享展示"},{"parent-return","结束共享展示"}}},[Hold]=new{name="实际展示奖励停点",description="只在第一次真实展示奖励摸牌后暂停。",optionLabels=new Dictionary<string,string>{{"continue","继续真实展示续接"}}}};
-            var catalog=SkillProgramCatalog.Load(JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.RulesSchemaVersion,skills=defs}),JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.PresentationSchemaVersion,skills=labels}));
+            var rules = JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.RulesSchemaVersion,skills=defs});
+            if (scenario == "zero-counterspell")
+            {
+                var json = JsonNode.Parse(rules)!;
+                json["skills"]![1]!["triggers"]!.AsArray().Add(JsonNode.Parse($$"""
+                    {"id":"zero-counterspell-issued","window":"cardResponseAccepted","ownerRelation":"actor","cardKinds":["nullification"],"optional":false,
+                     "effects":[{"op":"chooseOption","target":"owner","resultBind":"zero-counterspell-issued","options":[{"id":"continue"}]}]}
+                    """));
+                rules = json.ToJsonString();
+            }
+            var catalog=SkillProgramCatalog.Load(rules,JsonSerializer.Serialize(new{schemaVersion=SkillProgramCatalog.PresentationSchemaVersion,skills=labels}));
             foreach(var(id,p)in catalog.Programs)b.AddSkill(new(id,catalog.Presentations[id].Name,catalog.Presentations[id].Description){Program=p,ProgramPresentation=catalog.Presentations[id]});
             b.AddGeneral(new("fixture:mouxq-ally","实际展示受益者","","standard:none","wu",12,[Quiet,"mou-ol:jueyan"]));
             foreach(var id in new[]{"fixture:mouxq-enemy-a","fixture:mouxq-enemy-b"})b.AddGeneral(new(id,"实际同行","","standard:none","qun",12,[Quiet]));

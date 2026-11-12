@@ -8,7 +8,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         if (p.Request.ParentSkillId is null || p.Request.Intent == HuanpeiIntent.WenyiPeach)
             return;
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(p.Request.ParentFrameId!.Value);
-        if (!HuanpeiRequestParentCurrent(p.Request) || f.HuanpeiReturn is not null)
+        if (!HuanpeiRequestParentCurrent(p.Request, paid: true, acceptedRequest: p.RequestAcceptance) || f.HuanpeiReturn is not null)
             throw new InvalidOperationException("Huanpei cannot replace another native request lease.");
         f = f with
         {
@@ -32,50 +32,9 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             };
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuanpeiKeActionAcceptedEvent(f.Id, f.InstructionIndex, k.Source, f.GameplayHash, p.ProgramFrameId, p.Kind));
         }
-        else if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(f))
-            f = f with
-            {
-                LvKuangLvXiang = f.LvKuangLvXiang!with
-                {
-                    Stage = "issuing",
-                    IssuingIds = [],
-                    IssuingKind = p.Kind,
-                    IssuingProvider = p.Source.OwnerSeat
-                }
-            };
-        else if (_characterWuJingOlOperations.IsWuJingHejiRequest(f))
-            f = f with
-            {
-                WuJing = f.WuJing!with
-                {
-                    Stage = WuJingStage.IssuingUse,
-                    Selection = new(p.Kind, false, false)
-                    {
-                        Conversions = [p.Source]
-                    },
-                    Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
-                    After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
-                }
-            };
-        else if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(f))
-        {
-            var c = f.CaoChun!;
-            f = f with
-            {
-                CaoChun = c with
-                {
-                    Stage = CaoChunStage.NativeSlash,
-                    Slash = new(f.Id, c.Source, c.GameplayHash, c.InstructionIndex, c.ActualTurn, c.PhaseInstance, false, p.Targets.Single(), p.Kind)
-                    {
-                        ProviderSeat = p.Source.OwnerSeat,
-                        Materials = [],
-                        PaymentBefore = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
-                    }
-                }
-            };
-        }
-
         _coreRuntimeOperations.ReplaceRuntimeTop(f);
+        if (p.RequestAcceptance is { } acceptance)
+            _requestExecution.PrepareAcceptedUse(f, acceptance);
     }
 
     internal bool HasHuanpeiGenericBasic(ProgramSkillFrame f) => f.KeBiNengPingduan is { Stage: KeBiNengPingduanStage.BasicChoice } k && _characterKeBiNengOlOperations.ValidKeBiNeng(f) && HuanpeiSources(_coreMatchParticipantsPlayersAccess._players[k.ActorSeat]).Any(s => CanAdjustHuanpeiHand(_coreMatchParticipantsPlayersAccess._players[k.ActorSeat]) && HuanpeiNativePlayActions(_coreMatchParticipantsPlayersAccess._players[k.ActorSeat], s, true).Count > 0);

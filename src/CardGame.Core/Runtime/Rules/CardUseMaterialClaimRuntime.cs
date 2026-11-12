@@ -3,10 +3,10 @@ using System.Text.Json.Serialization;
 namespace CardGame.Core;
 
 public enum NativeMaterialClaimResidency { HandDrawDiscard, Any }
-public enum NativeMaterialClaimKind { Delivery, AcceptedClaim, NativeUseTransfer, NativeChildReservation, Retained }
+public enum NativeMaterialClaimKind { Delivery, AcceptedClaim, NativeUseTransfer, NativeChildReservation, Retained, Retirement }
 public enum NativeMaterialHandoffMode { Issued, UntilDelivery }
 
-/// <summary>An original native owner's accepted material disposition; MovementSequence identifies only actual delivery.</summary>
+/// <summary>An original native owner's material disposition; MovementSequence identifies an actual physical movement.</summary>
 public sealed record NativeMaterialClaim(int CardId, int? RecipientSeat, long MovementSequence,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     NativeMaterialClaimResidency Residency = NativeMaterialClaimResidency.HandDrawDiscard,
@@ -15,7 +15,8 @@ public sealed record NativeMaterialClaim(int CardId, int? RecipientSeat, long Mo
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] long? ProducerFrameId = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? InstructionIndex = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] long? ChildUseId = null,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] long? OriginalEntrySequence = null);
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] long? OriginalEntrySequence = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] CardLocation? Destination = null);
 
 public sealed partial record CardUseFrame
 {
@@ -37,6 +38,8 @@ internal interface INativeMaterialClaims : IProgramRuntimeOperations
 {
     void CaptureDelivery(long ownerId, IReadOnlyList<CardMovementRecord> deliveries,
         NativeMaterialClaimResidency residency = NativeMaterialClaimResidency.Any);
+    void CaptureRetirement(long ownerId, IReadOnlyList<CardMovementRecord> departures);
+    void CaptureRetirement(CardMovementRecord departure);
     bool AcceptClaim(long ownerId, long producerFrameId, int instructionIndex, IReadOnlyList<int> cardIds);
     void TransferToNativeUse(long ownerId, long childUseId, IReadOnlyList<int> cardIds, NativeMaterialHandoffMode mode);
     void DeclareRetainedMaterial(long ownerId, int cardId);
@@ -91,6 +94,98 @@ internal sealed class CardUseMaterialClaimRuntime(IProgramRuntimeFrames frames,
         if (!ReferenceEquals(prepared, ReadClaims(owner))) ReplaceClaims(owner, prepared);
     }
 
+    public void CaptureRetirement(long ownerId, IReadOnlyList<CardMovementRecord> departures)
+    {
+        if (departures.Count == 0) return;
+        var owner = NativeOwner(ownerId);
+        if (owner is not CardUseFrame original)
+            throw new InvalidOperationException("A native-use retirement requires its actual CardUse owner; delayed judgments retain their own destruction protocol.");
+        ValidateMaterials(owner, departures.Select(move => move.CardId).ToArray());
+        var journal = movements.Read();
+        var issuedAfter = original.NativeRepresentationIssuedAfterMovementSequence;
+        var claims = ReadClaims(owner).ToList();
+        var changed = false;
+        foreach (var departure in departures)
+        {
+            if (departure.Sequence <= issuedAfter || departure.From == departure.To ||
+                departure.To == CardLocation.Processing ||
+                journal.SingleOrDefault(actual => actual.Sequence == departure.Sequence) != departure)
+                throw new InvalidOperationException("A native material retirement requires its original material and actual non-Processing departure.");
+            var entry = RetirementEntry(original, departure, journal) ??
+                throw new InvalidOperationException("A native material retirement must retain its original payment source or Processing entry.");
+            var retirement = new NativeMaterialClaim(departure.CardId, null, departure.Sequence,
+                Kind: NativeMaterialClaimKind.Retirement, OriginalEntrySequence: entry,
+                Destination: departure.To);
+            var previous = claims.SingleOrDefault(claim => claim.CardId == departure.CardId && claim.Kind == NativeMaterialClaimKind.Retirement);
+            if (previous is not null)
+            {
+                if (previous != retirement)
+                    throw new InvalidOperationException("A native material cannot replace its original retirement receipt.");
+                continue;
+            }
+            if (claims.Any(claim => claim.MovementSequence == departure.Sequence))
+                throw new InvalidOperationException("A native movement cannot be both a delivery and a retirement.");
+            claims.Add(retirement);
+            changed = true;
+        }
+        // All source/entry relations are checked before publishing any receipt.
+        if (changed) ReplaceClaims(owner, claims);
+    }
+
+    public void CaptureRetirement(CardMovementRecord departure)
+    {
+        var journal = movements.Read();
+        if (departure.Sequence <= 0 || departure.From == departure.To || departure.To == CardLocation.Processing ||
+            journal.SingleOrDefault(actual => actual.Sequence == departure.Sequence) != departure)
+            throw new InvalidOperationException("A native retirement source requires its actual non-Processing movement.");
+        // A physical lifetime can also run during an ordinary discard or pure
+        // response. Only a real still-owning native use receives this receipt.
+        foreach (var use in frames.OfType<CardUseFrame>().Reverse())
+        {
+            if (!Materials(use).Contains(departure.CardId) || RetirementEntry(use, departure, journal) is null) continue;
+            // Repeated lifetime delivery must stop at the same real owner,
+            // rather than falling through its released right to an ancestor.
+            if (!HasRelinquishedMaterial(use.Id, departure.CardId))
+                CaptureRetirement(use.Id, [departure]);
+            return;
+        }
+    }
+
+    private static long? RetirementEntry(CardUseFrame owner, CardMovementRecord departure,
+        IReadOnlyList<CardMovementRecord> journal)
+    {
+        var issuedAfter = owner.NativeRepresentationIssuedAfterMovementSequence;
+        if (departure.Sequence <= issuedAfter || owner.Action is { Type: not CardActionType.Use }) return null;
+        var first = journal.FirstOrDefault(move => move.CardId == departure.CardId && move.Sequence > issuedAfter);
+        if (first is null || first.Sequence > departure.Sequence ||
+            owner.Action is { } action &&
+            action.PhysicalCards.SingleOrDefault(material => material.CardId == departure.CardId) is { } cost &&
+            first.From != cost.From)
+            return null;
+        // A direct payment leaves native custody immediately. Otherwise only the
+        // first departure of this use's Processing entry can retire its material.
+        // A synchronous discard-to-Outside destruction is one causal departure;
+        // a later acquisition/reentry must not revive the original ownership.
+        var exit = first.To == CardLocation.Processing
+            ? journal.FirstOrDefault(move => move.CardId == departure.CardId && move.Sequence > first.Sequence)
+            : first;
+        var entry = first;
+        if (first.From == CardLocation.Processing)
+        {
+            // A real child may inherit material already in Processing at its
+            // issuance. Retain that actual entry, not the later exit sequence.
+            entry = journal.LastOrDefault(move => move.CardId == departure.CardId && move.Sequence < first.Sequence);
+            if (entry is null || entry.To != CardLocation.Processing || entry.From == entry.To || entry.Sequence > issuedAfter)
+                return null;
+        }
+        if (exit == departure) return entry.Sequence;
+        if (exit is { To.Zone: CardZoneKind.DiscardPile } &&
+            journal.FirstOrDefault(move => move.CardId == departure.CardId && move.Sequence > exit.Sequence) == departure &&
+            departure.From == CardLocation.DiscardPile && departure.To == CardLocation.OutsideGame)
+            return entry.Sequence;
+        return null;
+    }
+
     private IReadOnlyList<NativeMaterialClaim> PrepareDeliveryClaims(ResolutionFrame owner,
         IReadOnlyList<CardMovementRecord> deliveries, NativeMaterialClaimResidency residency)
     {
@@ -111,7 +206,8 @@ internal sealed class CardUseMaterialClaimRuntime(IProgramRuntimeFrames frames,
         {
             var claim = new NativeMaterialClaim(move.CardId,
                 move.To.Zone == CardZoneKind.Hand ? move.To.OwnerSeat : null, move.Sequence, residency);
-            var previous = claims.SingleOrDefault(item => item.CardId == move.CardId && item.Kind != NativeMaterialClaimKind.Retained);
+            var previous = claims.SingleOrDefault(item => item.CardId == move.CardId && item.Kind is not
+                (NativeMaterialClaimKind.Retained or NativeMaterialClaimKind.Retirement));
             if (previous is not null)
             {
                 claim = claim with { ProducerFrameId = previous.ProducerFrameId, InstructionIndex = previous.InstructionIndex,
@@ -237,25 +333,30 @@ internal sealed class CardUseMaterialClaimRuntime(IProgramRuntimeFrames frames,
     }
 
     public bool WasClaimed(long useId, int cardId) =>
-        frames.Find(useId) is CardUseFrame use && use.MaterialClaims.Any(claim => claim.CardId == cardId && claim.MovementSequence > 0);
+        frames.Find(useId) is CardUseFrame use && use.MaterialClaims.Any(claim => claim.CardId == cardId &&
+            claim.Kind == NativeMaterialClaimKind.Delivery && claim.MovementSequence > 0);
 
     public bool CanFinishClaimedMaterial(long useId, int cardId) => WasClaimed(useId, cardId) &&
         zones.GetLocation(cardId).Zone is CardZoneKind.Hand or CardZoneKind.DrawPile or CardZoneKind.DiscardPile;
 
     public IReadOnlyList<int> ClaimedCardIds(long useId) => frames.Find(useId) is CardUseFrame use
-        ? Array.AsReadOnly(use.MaterialClaims.Where(claim => claim.MovementSequence > 0).Select(claim => claim.CardId).Distinct().ToArray()) : Array.Empty<int>();
+        ? Array.AsReadOnly(use.MaterialClaims.Where(claim => claim.Kind == NativeMaterialClaimKind.Delivery &&
+            claim.MovementSequence > 0).Select(claim => claim.CardId).Distinct().ToArray()) : Array.Empty<int>();
 
     public bool HasRelinquishedMaterial(long ownerId, int cardId) =>
         ReadClaims(frames.Find(ownerId)).Any(claim => claim.CardId == cardId &&
             (claim.MovementSequence > 0 || claim.Kind is NativeMaterialClaimKind.AcceptedClaim or NativeMaterialClaimKind.NativeUseTransfer ||
              claim.Kind == NativeMaterialClaimKind.NativeChildReservation && LiveChildOwnsMaterial(claim)));
 
-    public bool PreservesMaterialAtCompletion(long ownerId, int cardId) => CanReadMaterial(ownerId, cardId) ||
+    public bool PreservesMaterialAtCompletion(long ownerId, int cardId) =>
+        ReadClaims(frames.Find(ownerId)).Any(claim => claim.CardId == cardId && claim.Kind == NativeMaterialClaimKind.Retirement) ||
+        CanReadMaterial(ownerId, cardId) ||
         HasRelinquishedMaterial(ownerId, cardId) && zones.GetLocation(cardId) == CardLocation.Processing;
 
     public bool CanReadMaterial(long ownerId, int cardId) =>
         ReadClaims(frames.Find(ownerId)).Any(claim => claim.CardId == cardId &&
-            (claim.Kind == NativeMaterialClaimKind.Retained ? zones.GetLocation(cardId) != CardLocation.Processing :
+            (claim.Kind == NativeMaterialClaimKind.Retirement ? claim.Destination == zones.GetLocation(cardId) :
+             claim.Kind == NativeMaterialClaimKind.Retained ? zones.GetLocation(cardId) != CardLocation.Processing :
              (claim.MovementSequence > 0 || claim.Kind is NativeMaterialClaimKind.AcceptedClaim or NativeMaterialClaimKind.NativeUseTransfer ||
               claim.Kind == NativeMaterialClaimKind.NativeChildReservation && LiveChildOwnsMaterial(claim)) &&
              (claim.Residency == NativeMaterialClaimResidency.Any || claim.Residency == NativeMaterialClaimResidency.HandDrawDiscard &&

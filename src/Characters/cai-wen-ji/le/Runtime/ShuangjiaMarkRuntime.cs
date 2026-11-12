@@ -10,9 +10,6 @@ internal sealed class ShuangjiaMarkRuntime(IDistanceRuleRuntimeQueries queries, 
         participants.IsValidSeat(ownerSeat) && queries.Location(cardId) == CardLocation.Hand(ownerSeat) &&
         HasEntityMark(cardId);
 
-    internal bool IsHandLimitExempt(int ownerSeat, int cardId) =>
-        queries.HasSkill(ownerSeat, "le:shuangjia") && HasHandEntityMark(ownerSeat, cardId);
-
     [ProgramDistanceRule(ProgramDistanceStage.IncomingContributions, 30)]
     private IEnumerable<RuleQueryContribution> ShuangjiaIncomingDistanceContributions(int targetSeat)
     {

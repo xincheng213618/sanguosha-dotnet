@@ -8,7 +8,6 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodEntries
     internal bool AnniversaryHzAlreadyHit(int owner, int target) => _resolve().AnniversaryHzAlreadyHit(owner, target);
     internal PromptChoice AnniversaryHzChoice(ProgramSkillFrame f, string option, string label) => _resolve().AnniversaryHzChoice(f, option, label);
     internal IReadOnlyList<PromptChoice> AnniversaryHzChoices(ProgramSkillFrame f) => _resolve().AnniversaryHzChoices(f);
-    internal bool AnniversaryHzCounterspellInvalidated(NullificationWindowFrame pending, CardActionContext action) => _resolve().AnniversaryHzCounterspellInvalidated(pending, action);
     internal int AnniversaryHzDijiDamage(GameEngine.IDamageAttempt a) => _resolve().AnniversaryHzDijiDamage(a);
     internal bool AnniversaryHzHeartForbidden(int actor, IEnumerable<int> ids) => _resolve().AnniversaryHzHeartForbidden(actor, ids);
     internal bool AnniversaryHzMaterialBan(ProgramCardMaterialQuery q) => _resolve().AnniversaryHzMaterialBan(q);
@@ -27,14 +26,10 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodEntries
     internal PromptChoice ChooseAnniversaryHzBody(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseAnniversaryHzBody(p, f);
     internal PromptChoice ChooseAnniversaryHzDraw(PendingDecision p, ProgramSkillFrame f) => _resolve().ChooseAnniversaryHzDraw(p, f);
     internal void ContinueAnniversaryHz(long id) => _resolve().ContinueAnniversaryHz(id);
-    internal bool ContinueAnniversaryHzIneffectiveDodge(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation) => _resolve().ContinueAnniversaryHzIneffectiveDodge(attack, action, continuation);
-    internal bool ContinueAnniversaryHzIneffectiveSimple(long id, ProgramSimpleCardContinuation continuation) => _resolve().ContinueAnniversaryHzIneffectiveSimple(id, continuation);
     internal bool ContinueIssuedAnniversaryHz(ProgramSkillFrame f) => _resolve().ContinueIssuedAnniversaryHz(f);
     internal bool DrainAnniversaryHz(long id) => _resolve().DrainAnniversaryHz(id);
-    internal bool HasAnniversaryHzIneffectiveResponse(NativeOwners.CardAttackHandle attack, CardActionContext action, ProgramCardContinuation continuation) => _resolve().HasAnniversaryHzIneffectiveResponse(attack, action, continuation);
     internal bool HasAnniversaryHzPendingInvalidation(int actor) => _resolve().HasAnniversaryHzPendingInvalidation(actor);
     internal bool IsAnniversaryHzTianchongDying() => _resolve().IsAnniversaryHzTianchongDying();
-    internal bool IsAnniversaryHzUseIneffective(CardUseFrame use) => _resolve().IsAnniversaryHzUseIneffective(use);
     internal void IssueAnniversaryHzActualUse(CardActionContext a, long parent) => _resolve().IssueAnniversaryHzActualUse(a, parent);
     internal void IssueAnniversaryHzLegacyUse(CardUseFrame use) => _resolve().IssueAnniversaryHzLegacyUse(use);
     internal void ObserveAnniversaryHzActualUse(IGameEvent payload) => _resolve().ObserveAnniversaryHzActualUse(payload);
@@ -46,6 +41,5 @@ internal sealed partial class CharacterHuangZhongAnniversaryGodEntries
     internal void ReturnAnniversaryHzDraw(ProgramSkillFrame supplied, NativeDrawOutcome outcome) => _resolve().ReturnAnniversaryHzDraw(supplied, outcome);
     internal bool ReturnAnniversaryHzMovement(ProgramSkillFrame f) => _resolve().ReturnAnniversaryHzMovement(f);
     internal bool TryAnniversaryHzEquipmentCommitted(long id, Card equipment) => _resolve().TryAnniversaryHzEquipmentCommitted(id, equipment);
-    internal bool ValidAnniversaryHzInvalidation(AnniversaryHzInvalidation proof, CardActionContext? action, long parent) => _resolve().ValidAnniversaryHzInvalidation(proof, action, parent);
     internal bool HasAnniversaryHuangZhongCapability { get => _resolve().HasAnniversaryHuangZhongCapability; }
 }

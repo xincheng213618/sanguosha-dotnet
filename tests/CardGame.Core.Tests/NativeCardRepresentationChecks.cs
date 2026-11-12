@@ -14,11 +14,11 @@ internal static class NativeCardRepresentationChecks
         var zones = (CardZoneStore)capabilities.Get<ICardZoneQueries>();
         var journal = new List<CardMovementRecord>();
         var history = new CardMovementHistoryQueries(journal);
-        var runtime = new NativeCardRepresentationRuntime(frames, zones, history,
-            capabilities.Get<INativeMaterialClaims>());
+        var claims = new CardUseMaterialClaimRuntime(frames, history, zones);
+        var runtime = new NativeCardRepresentationRuntime(frames, zones, claims);
         var priorTop = frames.Top;
         CheckOriginalFaces(frames, zones, runtime);
-        CheckPhysicalDepartures(frames, zones, history, journal, runtime);
+        CheckPhysicalDepartures(frames, zones, journal, runtime, claims);
         Need(ReferenceEquals(priorTop, frames.Top), "Representation checks return to the original scheduler frame.");
     }
 
@@ -63,12 +63,12 @@ internal static class NativeCardRepresentationChecks
         {
             Need(SameFace(runtime.Get(zero.Id, 0, true), zeroCard) && runtime.Get(nested.Id, 0).Kind == CardKind.Duel,
                 "A zero-entity card retains its original suit and rank and cannot borrow the innermost use's representation.");
-            var round = zero with { TargetIndex = 1, ExtraCardEffect = new()
-                { Source = new("fixture:representation", "repeat", 0, "fixture:instance"),
-                  ProgramFrameId = 0, ActionId = 0, PaidCardId = 0, WholeGroupRepeated = true } };
+            var round = zero with { TargetIndex = 1, EffectEpisodes = new(new(null))
+                { StartedOrdinal = 1, Episodes = [new(901, new(902, 0, 0,
+                    new("fixture:representation", "repeat", 0, "fixture:instance"), "fixture-hash", new(0)), 1, 1)] } };
             frames.Replace(zero.Id, JsonSerializer.Deserialize<CardUseFrame>(JsonSerializer.Serialize(round))!);
             Need(SameFace(runtime.ReadAppearance(zero.Id, new(0, zeroCard.Kind, zeroCard.Suit, zeroCard.Rank)), zeroCard) &&
-                    ((CardUseFrame)frames.Find(zero.Id)!).ExtraCardEffect is { WholeGroupRepeated: true },
+                    ((CardUseFrame)frames.Find(zero.Id)!).EffectEpisodes is { StartedOrdinal: 1 },
                 "Frame replacement, an extra effect and JSON recovery retain the originally issued zero-entity face.");
             Reject(() => runtime.ReadAppearance(zero.Id, new(0, CardKind.Duel, zeroCard.Suit, zeroCard.Rank)));
             Reject(() => runtime.ReadAppearance(zero.Id, new(0, zeroCard.Kind, Suit.None, zeroCard.Rank)));
@@ -111,7 +111,7 @@ internal static class NativeCardRepresentationChecks
     }
 
     private static void CheckPhysicalDepartures(IProgramRuntimeFrames frames, CardZoneStore zones,
-        ICardMovementHistoryQueries history, List<CardMovementRecord> journal, INativeCardRepresentations runtime)
+        List<CardMovementRecord> journal, INativeCardRepresentations runtime, CardUseMaterialClaimRuntime claims)
     {
         var cards = zones.CardsAt(CardLocation.DrawPile).Take(3).ToArray();
         foreach (var card in cards) Move(card, CardLocation.Processing);
@@ -127,20 +127,21 @@ internal static class NativeCardRepresentationChecks
         try
         {
             var departure = Move(cards[0], CardLocation.OutsideGame);
+            var moved = journal.Single(move => move.Sequence == departure);
             Reject(() => runtime.Get(use.Id, cards[0].Id, true));
-            Reject(() => runtime.CaptureDeparture(use.Id, cards[0].Id, previousMovement));
-            Reject(() => runtime.CaptureDeparture(use.Id, cards[0].Id, long.MaxValue));
-            Reject(() => runtime.CaptureDeparture(use.Id, cards[2].Id, departure));
-            Reject(() => runtime.CaptureDeparture(foreign.Id, cards[0].Id, departure));
-            runtime.CaptureDeparture(use.Id, cards[0].Id, departure);
+            Reject(() => claims.CaptureRetirement(use.Id, [journal.Single(move => move.Sequence == previousMovement)]));
+            Reject(() => claims.CaptureRetirement(use.Id, [moved with { Sequence = int.MaxValue }]));
+            Reject(() => claims.CaptureRetirement(use.Id, [moved with { CardId = cards[2].Id }]));
+            Reject(() => claims.CaptureRetirement(foreign.Id, [moved]));
+            claims.CaptureRetirement(use.Id, [moved]);
             var captured = (CardUseFrame)frames.Find(use.Id)!;
-            runtime.CaptureDeparture(use.Id, cards[0].Id, departure);
-            Need(ReferenceEquals(captured, frames.Find(use.Id)) && captured.NativeRepresentationDepartures is
-                    [{ CardId: var id, Destination: var destination, MovementSequence: var sequence }] &&
+            claims.CaptureRetirement(use.Id, [moved]);
+            Need(ReferenceEquals(captured, frames.Find(use.Id)) && captured.MaterialClaims is
+                    [{ Kind: NativeMaterialClaimKind.Retirement, CardId: var id, Destination: var destination, MovementSequence: var sequence }] &&
                     id == cards[0].Id && destination == CardLocation.OutsideGame && sequence == departure &&
                     SameFace(runtime.Get(use.Id, cards[0].Id, true), cards[0]),
                 "One actual material departure issues an exact, idempotent destination receipt on its owning use.");
-            Need(captured.NativeRepresentationDepartures is System.Collections.IList { IsReadOnly: true },
+            Need(captured.MaterialClaims is System.Collections.IList { IsReadOnly: true },
                 "Exposed departure receipts are frozen on the original frame.");
             frames.Replace(use.Id, JsonSerializer.Deserialize<CardUseFrame>(JsonSerializer.Serialize(captured with
                 { TargetIndex = 1 }))!);
@@ -154,10 +155,10 @@ internal static class NativeCardRepresentationChecks
             var reason = new CardMoveReason("fixture.representation-claim");
             var before = journal.Count;
             Move(cards[1], CardLocation.Hand(1), reason);
-            new CardUseMaterialClaimRuntime(frames, history, zones).Capture(use.Id, 1, [cards[1]], before, reason);
+            claims.Capture(use.Id, 1, [cards[1]], before, reason);
             Need(SameFace(runtime.Get(use.Id, cards[1].Id, true), cards[1]) &&
-                    ((CardUseFrame)frames.Find(use.Id)!).NativeRepresentationDepartures.Count == 1,
-                "An existing shared material claim permits the original physical entity without creating another departure ledger.");
+                    ((CardUseFrame)frames.Find(use.Id)!).MaterialClaims.Count(claim => claim.Kind == NativeMaterialClaimKind.Retirement) == 1,
+                "An existing shared material claim permits the original physical entity while remaining distinct from the other material's retirement receipt.");
             Move(cards[1], CardLocation.Equipment(1));
             Reject(() => runtime.Get(use.Id, cards[1].Id, true));
         }

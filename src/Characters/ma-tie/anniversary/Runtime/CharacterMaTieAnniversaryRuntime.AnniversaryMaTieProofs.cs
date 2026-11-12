@@ -45,9 +45,9 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         if (child is NativeDrawAttemptFrame draw)
             return r.Stage == AnniversaryMaTieStage.RewardDrawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == 1 && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
         if (child is DrawFundedDistinctBasicFrame paidDraw)
-            return IsAnniversaryMaTiePaymentFrame(paidDraw) && paidDraw.Payment.ParentFrameId == f.Id;
+            return IsAnniversaryMaTiePaymentFrame(paidDraw) && paidDraw.Payment.RequestAcceptance?.Identity.FrameId == f.Id;
         if (child is ChainedStateBasicFrame paidChain)
-            return IsAnniversaryMaTiePaymentFrame(paidChain) && paidChain.Payment.ParentFrameId == f.Id;
+            return IsAnniversaryMaTiePaymentFrame(paidChain) && paidChain.Payment.RequestAcceptance?.Identity.FrameId == f.Id;
         if (child is RequestedDeckBasicFrame requested)
             return _coreRequestedDeckBasicOwnershipOperations.RequestedDeckBasicFrameRidesOn(requested, f) && AnniversaryMaTieRequestActor(f, requested.Receipt.ActorSeat);
         if (child is ProgramSkillFrame { EquipmentSlotNamedUse: { } slot })
@@ -57,7 +57,7 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is not null && MaTieMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), f.PendingMovementContinuation) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
         if (child is RecoveryReplacementFrame recovery)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && (r.Stage != AnniversaryMaTieStage.HpChildren || r.HpPaid && hp.Change.Kind == HpChangeKind.Loss && hp.Change.TargetSeat == r.HpTarget && hp.Change.Amount == r.Used.Count);
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && state.CharacterStateContinuation == CharacterStateContinuation.Program);
@@ -95,6 +95,14 @@ internal sealed partial class CharacterMaTieAnniversaryRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { AnniversaryMaTie: not null } f || f.Id != id || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return false;
+        if (_slashRequests.TakeFailure(f) is not null)
+        {
+            var original = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Single(frame => frame.Id == id);
+            if (original.AnniversaryMaTie is not { Stage: AnniversaryMaTieStage.SlashChoice or AnniversaryMaTieStage.Issuing, UseId: 0 })
+                throw new InvalidOperationException("Quxian no-use payment returned outside its original request occurrence.");
+            NextMaTieActor(original);
+            return true;
+        }
         ContinueMaTie(id);
         return true;
     }

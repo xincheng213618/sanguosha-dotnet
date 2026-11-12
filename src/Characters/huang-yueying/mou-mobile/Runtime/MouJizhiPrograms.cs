@@ -6,4 +6,4 @@ public sealed record MouHuangYueyingJizhiExemptEvent(long FrameId, CardConversio
 public sealed record MouHuangYueyingJizhiDrawReturnedEvent(long FrameId, long? AttemptFrameId, int ActualCount, int ReplacementCount) : IGameEvent;
 internal sealed class ResolveMouHuangYueyingJizhiDescriptor : MouHuangYueyingMobileDescriptor
 { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveMouHuangYueyingJizhi;
-  public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase); }
+  public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase | ProgramTrackedFact.ActualTurnReturn); }

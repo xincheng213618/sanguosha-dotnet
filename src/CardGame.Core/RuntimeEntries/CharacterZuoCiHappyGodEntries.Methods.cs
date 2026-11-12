@@ -40,10 +40,8 @@ internal sealed partial class CharacterZuoCiHappyGodEntries
     internal bool IsHappyZcActualRoundStart(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().IsHappyZcActualRoundStart(candidate, context);
     internal bool IsHappyZuoCiDestroyedMaterial(CardMovementRecord m) => _resolve().IsHappyZuoCiDestroyedMaterial(m);
     internal bool IsHappyZuoCiDestroyedMaterial2(int cardId, CardLocation from, CardLocation to) => _resolve().IsHappyZuoCiDestroyedMaterial(cardId, from, to);
-    internal bool IsHappyZuoCiDestroyedMaterial3(long useId, int cardId) => _resolve().IsHappyZuoCiDestroyedMaterial(useId, cardId);
     internal bool IsHappyZuoCiDestroyedResponseFinish(CardActionContext action, CardActionCost cost, CardMovementRecord finish) => _resolve().IsHappyZuoCiDestroyedResponseFinish(action, cost, finish);
     internal bool IsHappyZuoCiForeignRewardCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().IsHappyZuoCiForeignRewardCandidate(candidate, context);
-    internal bool IsHappyZuoCiHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsHappyZuoCiHandLimitExempt(owner, cardId);
     internal bool KeepPaidHappyZc(ProgramSkillFrame f) => _resolve().KeepPaidHappyZc(f);
     internal CardLocation NormalizeHappyZuoCiPhantomDestination(Card card, CardLocation from, CardLocation to) => _resolve().NormalizeHappyZuoCiPhantomDestination(card, from, to);
     internal HappyZuoCiPhantomDestinationPlan? PlanHappyZuoCiPhantomDestination(Card card, CardLocation from, CardLocation requestedTo, CardMoveReason reason) => _resolve().PlanHappyZuoCiPhantomDestination(card, from, requestedTo, reason);

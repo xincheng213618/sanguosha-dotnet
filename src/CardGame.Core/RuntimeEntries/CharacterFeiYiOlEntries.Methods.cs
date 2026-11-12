@@ -36,12 +36,8 @@ internal sealed partial class CharacterFeiYiOlEntries
     internal bool FeiYiTrickPaymentMaterialsMatch(CardUseFrame use, CardMovementBatchContext batch) => _resolve().FeiYiTrickPaymentMaterialsMatch(use, batch);
     internal bool FeiYiYanruAvailable(CharacterState actor) => _resolve().FeiYiYanruAvailable(actor);
     internal bool HasFeiYiTrickPaymentTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => _resolve().HasFeiYiTrickPaymentTail(use, continuation);
-    internal bool HasUnstartedFeiYiExtraEffect(long id) => _resolve().HasUnstartedFeiYiExtraEffect(id);
-    internal bool IsFeiYiExtraEffectRound(long id) => _resolve().IsFeiYiExtraEffectRound(id);
     internal bool IsFeiYiSingletonTrigger(SkillProgramTrigger t) => _resolve().IsFeiYiSingletonTrigger(t);
     internal bool IsFeiYiTrickPaymentBatch(CardUseFrame use, CardMovementBatchContext batch) => _resolve().IsFeiYiTrickPaymentBatch(use, batch);
-    internal int NativeExtraEffectRoundOrdinal(long id) => _resolve().NativeExtraEffectRoundOrdinal(id);
-    internal ExtraCardEffectState? NativeExtraEffectState(CardUseFrame use) => _resolve().NativeExtraEffectState(use);
     internal void PayFeiYiDiscard(ProgramSkillFrame f) => _resolve().PayFeiYiDiscard(f);
     internal void PayFeiYiYanru(ProgramSkillFrame f) => _resolve().PayFeiYiYanru(f);
     internal bool? ProveFeiYiMovement(SkillProgramTrigger trigger, ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().ProveFeiYiMovement(trigger, candidate, context);
@@ -49,7 +45,5 @@ internal sealed partial class CharacterFeiYiOlEntries
     internal void RecordFeiYiMovement(long id, long before, FeiYiStage stage, int minimum) => _resolve().RecordFeiYiMovement(id, before, stage, minimum);
     internal bool ResumeFeiYi(long id) => _resolve().ResumeFeiYi(id);
     internal bool ReturnFeiYiMovement(ProgramSkillFrame f) => _resolve().ReturnFeiYiMovement(f);
-    internal bool TryBeginFeiYiExtraEffectRound(long id, bool afterAttack) => _resolve().TryBeginFeiYiExtraEffectRound(id, afterAttack);
     internal ProgramSkillWindowContext? TryCreateFeiYiSingletonContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate candidate) => _resolve().TryCreateFeiYiSingletonContext(frame, candidate);
-    internal void UpdateNativeExtraEffectState(long id, Func<ExtraCardEffectState, ExtraCardEffectState> update) => _resolve().UpdateNativeExtraEffectState(id, update);
 }

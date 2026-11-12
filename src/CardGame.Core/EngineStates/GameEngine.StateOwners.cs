@@ -26,7 +26,6 @@ public sealed partial class GameEngine
     private readonly EngineStates.CharacterHuaTuoMobileGodState _characterHuaTuoMobileGod = new();
     private readonly EngineStates.CharacterHuangChengYanOlState _characterHuangChengYanOl = new();
     private readonly EngineStates.CharacterHuangChongMobileShiState _characterHuangChongMobileShi = new();
-    private readonly EngineStates.CharacterLiuQiOlState _characterLiuQiOl = new();
     private readonly EngineStates.CharacterLvKaiOlState _characterLvKaiOl = new();
     private readonly EngineStates.CharacterTaiShiCiMobileShiState _characterTaiShiCiMobileShi = new();
     private readonly EngineStates.CharacterYangWanOlState _characterYangWanOl = new();
@@ -176,7 +175,6 @@ public sealed partial class GameEngine
         new(typeof(EngineStates.Contracts.ICharacterHuaTuoMobileGodMobileWulingCoursesAccess), _characterHuaTuoMobileGod),
         new(typeof(EngineStates.Contracts.ICharacterHuangChengYanOlJiezhenConversionsAccess), _characterHuangChengYanOl),
         new(typeof(EngineStates.Contracts.ICharacterHuangChongMobileShiShiHcLedgerCacheShiHcLedgerCacheCountShiHcLedgerCacheHeadShiHcLedgerCacheTailAccess), _characterHuangChongMobileShi),
-        new(typeof(EngineStates.Contracts.ICharacterLiuQiOlHasIssuedLiuQiAccess), _characterLiuQiOl),
         new(typeof(EngineStates.Contracts.ICharacterLvKaiOlBijingMarkedCardIdsAccess), _characterLvKaiOl),
         new(typeof(EngineStates.Contracts.ICharacterTaiShiCiMobileShiShiTzLieScanSequenceAccess), _characterTaiShiCiMobileShi),
         new(typeof(EngineStates.Contracts.ICharacterYangWanOlZhuihuanArmChoicesAccess), _characterYangWanOl),

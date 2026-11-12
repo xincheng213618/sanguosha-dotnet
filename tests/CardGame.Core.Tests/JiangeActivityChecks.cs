@@ -92,7 +92,7 @@ internal static class JiangeActivityChecks
         Require(game.CreateSnapshot(0).Players[0].HandCount == hand.Count - 1 + 4,
             "Fuyou resolves one red DrawTwo twice without paying or counting another use.");
         Require(game.Events.Count(e => e.Payload is AutomaticExtraCardEffectIssuedEvent) == 1 &&
-                game.Events.Count(e => e.Payload is ExtraCardEffectStartedEvent) == 1,
+                game.Events.Count(e => e.Payload is NativeCardEffectEpisodeStartedEvent) == 1,
             "A single original use must own exactly one extra effect round.");
         Cold(game, registry);
     }

@@ -62,7 +62,10 @@ internal sealed class ProgramRuntimeHookCatalog
             _ => new SortedDictionary<int, ProgramRuntimeRegistration>());
         var recoveryParents = Enum.GetValues<ProgramRecoveryParentPhase>().ToDictionary(p => p,
             _ => new SortedDictionary<int, ProgramRuntimeRegistration>());
-        foreach (var method in methodArray.OrderBy(m => m.DeclaringType?.FullName, StringComparer.Ordinal)
+        foreach (var method in methodArray.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramRuntimeHookAttribute), inherit: true) ||
+                     method.IsDefined(typeof(ProgramRecoveryParentAttribute), inherit: true))
+                     .OrderBy(m => m.DeclaringType?.FullName, StringComparer.Ordinal)
                      .ThenBy(m => m.Name, StringComparer.Ordinal))
         {
             foreach (var attribute in method.GetCustomAttributes<ProgramRuntimeHookAttribute>())

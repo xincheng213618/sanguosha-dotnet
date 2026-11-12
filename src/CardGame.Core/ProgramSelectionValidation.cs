@@ -36,6 +36,7 @@ internal sealed class ProgramSelectionValidationCatalog
         ArgumentNullException.ThrowIfNull(types);
         var registrations = new List<Registration>();
         foreach (var type in types.Select(type => type ?? throw new InvalidOperationException("A selection validator type cannot be null."))
+                     .Where(type => type.IsDefined(typeof(ProgramSelectionValidatorAttribute), inherit: false))
                      .OrderBy(type => type.FullName, StringComparer.Ordinal))
         {
             if (type.GetCustomAttribute<ProgramSelectionValidatorAttribute>() is not { } declaration) continue;

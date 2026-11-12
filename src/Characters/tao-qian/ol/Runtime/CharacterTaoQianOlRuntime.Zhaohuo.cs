@@ -138,6 +138,11 @@ internal sealed partial class CharacterTaoQianOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhaohuoGiftCommittedEvent(f.Id, r.DamageFrameId, r.Source, r.GameplayHash, r.VictimSeat, card.Id, card.Kind, r.ActualTurn, r.TurnOwner));
         if (r.SelfGift)
         {
+            _handLimitExemptions.Grant(f, "ol:zhaohuo", f.OwnerSeat,
+                new(new(), [card.Id], HandLimitExemptionExpiry.ActualTurnOpen, new(r.ActualTurn, r.TurnOwner),
+                    TurnRequirements: HandLimitTurnRequirements.SetupComplete | HandLimitTurnRequirements.PositiveTurn |
+                        HandLimitTurnRequirements.ProgressionTurnMatches | HandLimitTurnRequirements.NoTurnEnded |
+                        HandLimitTurnRequirements.NoTurnReturned));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhaohuoSelfGiftCommittedEvent(f.Id, r.DamageFrameId, r.Source, r.GameplayHash, card.Id, card.Kind, r.ActualTurn, r.TurnOwner, r.SequenceBefore, r.SequenceBefore));
             ContinueZhaohuo(f.Id);
             return;
@@ -154,6 +159,11 @@ internal sealed partial class CharacterTaoQianOlRuntime
         if (!r.Paid || r.SelfGift || r.Stage != ZhaohuoStage.GiftChildren || r.PaymentSequence is not null || movement.CardId != r.CardId || movement.CardKind != r.PrintedKind || movement.From != CardLocation.Hand(r.VictimSeat) || movement.To != CardLocation.Hand(f.OwnerSeat) || movement.Reason.Value != ZhaohuoGiftReason || movement.Sequence <= r.SequenceBefore)
             throw new InvalidOperationException("Zhaohuo lost its one original donor Hand payment.");
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { Zhaohuo = r with { PaymentSequence = movement.Sequence, SequenceAfter = movement.Sequence } });
+        _handLimitExemptions.Grant(f, "ol:zhaohuo", f.OwnerSeat,
+            new(new(), [movement.CardId], HandLimitExemptionExpiry.ActualTurnOpen, new(r.ActualTurn, r.TurnOwner),
+                    TurnRequirements: HandLimitTurnRequirements.SetupComplete | HandLimitTurnRequirements.PositiveTurn |
+                        HandLimitTurnRequirements.ProgressionTurnMatches | HandLimitTurnRequirements.NoTurnEnded |
+                        HandLimitTurnRequirements.NoTurnReturned));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ZhaohuoGiftPaidEvent(f.Id, r.DamageFrameId, r.Source, r.GameplayHash, r.VictimSeat, movement.CardId, movement.CardKind, r.ActualTurn, r.TurnOwner, movement.From, movement.To, movement.Sequence));
     }
 

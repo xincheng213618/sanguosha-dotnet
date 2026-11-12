@@ -6,6 +6,8 @@ internal sealed partial class CharacterGuoTuOlRuntime
     internal bool WeijieNativeNeedCurrent(WeijieReceipt r)
     {
         var original = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == r.Need.RequestFrameId);
+        if (r.Paid?.RequestAcceptance is { } acceptance)
+            return original is ProgramSkillFrame parent && _programSlashRequests.OwnsAcceptance(parent, acceptance, r.Need.ActorSeat, r.TargetSeat);
         return original is not null && CaptureWeijieNeed(r.OriginalDecision, original)is { } n && SameWeijieNeed(n, r.Need);
     }
 

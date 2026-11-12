@@ -9,7 +9,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         if (!ValidBoundaryLiuFeng(f) || r.Stage != BoundaryLiuFengStage.Issuing || r.Targets is not [var target])
             throw new InvalidOperationException("Qinling must issue from its exact once-paid cost frame.");
         var actor = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, [target], CardKind.Slash, physicalCardIds: [], conversionSource: r.Need is null ? null : r.Source);
+        var id = _coreNativeCardUseOperations.BeginCardUse(new(0, CardKind.Slash, Suit.None, 0), actor.Seat, [target], CardKind.Slash, physicalCardIds: [], conversionSource: r.Need is null ? null : r.Source, programSlashRequest: r.RequestAcceptance);
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(id)!;
         if (use.BoundaryLiuFeng is not { FrameId: var producer } || producer != f.Id)
             throw new InvalidOperationException("Qinling lost its original zero-material use origin.");
@@ -90,7 +90,7 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         var next = use.TargetIndex + 1;
         while (next < use.TargetSeats.Count && !_coreMatchParticipantsPlayersAccess._players[use.TargetSeats[next]].IsAlive)
             next++;
-        if (!_characterDaQiaoLeOperations.IsTargetScopedZixiEffectRound(use.Id) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && next < use.TargetSeats.Count)
+        if (!_nativeEffectEpisodes.IsTargetScoped(use.Id) && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && next < use.TargetSeats.Count)
         {
             _coreNativeNullificationFramesOperations.SetCardUseTargetIndex(use.Id, next);
             _coreNativeCardUseFramesOperations.SetCardUseStep(use.Id, ResolutionFrameStep.ResolvingEffect);

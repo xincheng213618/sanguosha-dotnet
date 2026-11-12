@@ -76,16 +76,10 @@ internal sealed partial class CoreGameEngineExtendedViewAsRuntime
             var pending = _coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow ?? throw new InvalidOperationException("Missing counterspell window.");
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             var unrespondableSource = _coreUnrespondableCounterspellsOperations.FreezeUnrespondableCounterspellSource(owner, selection.Cards.Select(card => card.Id).ToArray());
+            pending = _counterspellResponses.Prepare(pending, owner.Seat, selection.Cards[0].Id);
             var action = _coreCardConversionsOperations.MoveProgramMultiCardResponse(owner, selection, pending.ParentFrameId, pending.SourceSeat);
             _coreCardConversionsOperations.FinishProgramMultiCardResponse(selection);
             pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == pending.Id);
-            pending = (action.PhysicalCards.Count > 0 && action.ActorSeat == action.ProviderSeat && action.PhysicalCards.All(c => c.From == CardLocation.Hand(owner.Seat)) && _coreNamedAmbushInvalidationOperations.HasEnabledMatchingNamedAmbush(owner.Seat, CardKind.Nullification)) || _characterChengYuMouOperations.HasMouCyMatchingName(owner.Seat, CardKind.Nullification) || _characterHuangZhongAnniversaryGodOperations.HasAnniversaryHzPendingInvalidation(owner.Seat) || _coreFieldEquipmentOperations.HasHappyWeiYanPotentialCancellation(owner.Seat) ? _coreNamedAmbushInvalidationOperations.PrepareNamedAmbushCounterspell(pending, owner.Seat, selection.Cards[0].Id) : _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { EffectNullified = !pending.EffectNullified, ChainDepth = pending.ChainDepth + 1, CandidateSeats = _coreNativeNullificationOperations.BuildNullificationCandidateSeats(owner.Seat), CandidateIndex = 0, Step = ResolutionFrameStep.AwaitingResponse });
-            if (pending.NamedAmbushResponse is not null)
-                _coreNamedAmbushInvalidationOperations.BindNamedAmbushCounterspell(pending.Id, action);
-            else
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, owner.Seat, selection.Cards[0].Id, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
-            if (pending.NamedAmbushResponse is null)
-                _characterCaoXiOlOperations.CaptureCaoXiNativeCounterspellOffset(pending, action, invalidated: false);
             if (_coreUnrespondableCounterspellsOperations.TryBeginPolicyCounterspellPayment(pending, action, unrespondableSource, selection.Cards.Select(card => card.Id).ToArray()))
                 return;
             if (_coreCommittedResponseUsesOperations.Value.TryBeginCommittedResponseUsePrograms(null, action, ProgramCardContinuation.NullificationResponse))

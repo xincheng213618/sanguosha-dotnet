@@ -10,11 +10,12 @@ internal sealed partial class CoreGameEngineForeignPublicPileSlashesRuntime
     {
         if (!actor.IsAlive || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat || _coreActualTurnProgressCurrentSeatPhaseAccess._phase != TurnPhase.Play)
             yield break;
-        foreach (var owner in _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != actor.Seat))
+        var candidates = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != actor.Seat &&
+            _cardZonesOperations._cardZones.CardsAt(CardLocation.Authority(player.Seat)).Count >= 2).ToArray();
+        foreach (var ownerSeat in _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, candidates))
         {
+            var owner = _coreMatchParticipantsPlayersAccess._players[ownerSeat];
             var pile = _cardZonesOperations._cardZones.CardsAt(CardLocation.Authority(owner.Seat));
-            if (pile.Count < 2 || !_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, owner))
-                continue;
             foreach (var binding in _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.ForeignPublicPileSlash))
             {
                 var baseAction = new LegalAction(LegalActionKind.UseProgramSkill, null, owner.Seat, $"移去 {(owner.Name)} 的两张公开牌堆牌，视为对其使用【杀】", CardKind.Slash, MinCardCount: 2, MaxCardCount: 2, MinTargetCount: 1, MaxTargetCount: 1)

@@ -80,6 +80,11 @@
         {
           "id": "black-and-lianzhu-entities",
           "kind": "xiaHuiBlackHandAndGainedEntityRestrictions"
+        },
+        {
+          "id": "black-hand-limit",
+          "kind": "handLimitCardKindExemption",
+          "handLimitMatch": { "isRed": false, "requireLivingHolder": true }
         }
       ]
     }

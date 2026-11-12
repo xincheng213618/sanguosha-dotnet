@@ -5,53 +5,15 @@ internal sealed partial class CharacterJiangJiMouRuntime
 {
     internal void IssueMouJjRepeat(ProgramSkillFrame f)
     {
-        if (f.MouJiangJi is not { } r || _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId)is not ProgramCardTriggerWindowFrame window || _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is not { } use)
-            throw new InvalidOperationException("Yingshi lost its issued original native window.");
-        var state = MouJiangJi.IssueEffect(f, use, window);
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { MouJiangJiRounds = state });
-    }
-
-    internal bool HasUnstartedMouJjEffect(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouJiangJiRounds: { } r, Action: { } a } u && a.ActionId == r.ActionId && r.Started < r.Grants.Count && !_coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(u) && _coreMatchOutcomeWinnerAccess._winner == Winner.None;
-    internal bool IsMouJjEffectRound(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.MouJiangJiRounds is { Started: > 0 };
-    internal bool IsTargetScopedMouJjEffect(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { MouJiangJiRounds: { Active: true, Started: > 0 } r, Action: { } a } && r.ActionId == a.ActionId;
-    internal void CompleteMouJjEffect(long id)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { MouJiangJiRounds: { Active: true } } use)
-            return;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != id || use.NativeDraw is not null || use.NativeCardEffectDraw is not null || use.WumiaoFlood is not null || use.DragonBoatCardEffect is not null || use.GuanduCardEffect is not null)
-            throw new InvalidOperationException("Yingshi cannot retire its target-local native effect before actual children return.");
-        var state = MouJiangJi.CompleteEffect(use);
-        _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { MouJiangJiRounds = state, TargetIndex = u.TargetSeats.Count, SequentialTrick = null });
-    }
-
-    internal bool TryBeginMouJjEffect(long id, bool afterAttack)
-    {
-        if (!HasUnstartedMouJjEffect(id) || _coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { MouJiangJiRounds: { } r, Action: { } a } use || use.ExtraCardEffect is { WholeGroupRepeated: false } || _characterFeiYiOlOperations.HasUnstartedFeiYiExtraEffect(id) || _characterDaQiaoLeOperations.HasUnstartedZixiExtraEffect(id) || _coreSequentialTrickTargetsOperations.HasRemainingSequentialTrickTargets(id))
-            return false;
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != id)
-            throw new InvalidOperationException("Yingshi cannot pass its original whole native effect.");
-        var state = MouJiangJi.BeginEffect(use, _characterFeiYiOlOperations.NativeExtraEffectState(use));
-        _coreRuntimeOperations.ReplaceRuntimeFrame(id, use with { MouJiangJiRounds = state, TargetIndex = state.ActiveIndex < 0 ? use.TargetSeats.Count : state.ActiveIndex, Step = ResolutionFrameStep.ResolvingEffect, SequentialTrick = null, FireAttackSelection = null, ColorFireAttack = null, UnexpectedAssaultReveal = null, VirtualBasicEffectApplied = false });
-        if (state.ActiveIndex < 0 || !_coreMatchParticipantsPlayersAccess._players[state.ActiveTarget].IsAlive)
-        {
-            CompleteMouJjEffect(id);
-            return false;
-        }
-
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ExtraCardEffectStartedEvent(id, a.ActionId, state.ActiveIndex, state.ActiveTarget, use.CardKind));
-        if (afterAttack)
-        {
-            _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = null;
-            _coreNativeCardContinuationCursorsOperations.ActiveDuel = null;
-            _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        }
-
-        _coreNativeCardContinuationCursorsOperations.ActiveGroupCard = null;
-        _coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword = null;
-        var card = _nativeCardRepresentations.Get(id, use.CardId, requireProcessing: true);
-        var trick = state.Native.Trick!;
-        IReadOnlyList<int> targets = use.CardKind == CardKind.BorrowedSword ? use.TargetSeats.Skip(state.ActiveIndex).Take(2).ToArray() : [state.ActiveTarget];
-        _coreNativeNullificationOperations.BeginNullificationWindow(id, card, use.SourceSeat, targets, trick.ActionKind, null, trick.RequiredCardKind, use.CardKind);
-        return true;
+        if (!MouJiangJi.Valid(f) || f.MouJiangJi is not { Stage: MouJiangJiStage.YingshiChoice, Target: >= 0 } r ||
+            _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.WindowId) is not ProgramCardTriggerWindowFrame window ||
+            _coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId) is not { Action: { Type: CardActionType.Use } action } use ||
+            window.ParentFrameId != use.Id || window.Continuation != ProgramCardContinuation.FinalizedTrick ||
+            window.TrickContinuation is null || action.ActionId != r.ActionId || !r.Targets.Contains(r.Target) ||
+            _effectEpisodes.Ordinal(use.Id) != 0 ||
+            use.EffectEpisodes?.Episodes.Any(e => e.Issue.Source.SkillId == f.SkillId && e.Issue.Source.OwnerSeat == f.OwnerSeat) == true)
+            throw new InvalidOperationException("Yingshi requires its exact accepted ordinary-Trick target and a once-issued native extra effect.");
+        _effectEpisodes.Issue(use.Id, new(f.Id, f.InstructionIndex - 1, 0, r.Source, r.GameplayHash,
+            new(70, NativeCardEffectEpisodeScope.FrozenTarget, TargetSeat: r.Target)), window.TrickContinuation);
     }
 }

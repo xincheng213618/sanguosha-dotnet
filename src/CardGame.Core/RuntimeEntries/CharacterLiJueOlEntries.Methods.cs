@@ -5,7 +5,6 @@ internal sealed partial class CharacterLiJueOlEntries
     internal SkillProgramStepOutcome BeginLiJue(ProgramSkillFrame supplied, SkillProgramEffect effect) => _resolve().BeginLiJue(supplied, effect);
     internal bool CanContinueLiJue(ProgramSkillFrame f) => _resolve().CanContinueLiJue(f);
     internal bool CanOfferLiJue(ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, ProgramSkillWindowContext context) => _resolve().CanOfferLiJue(candidate, trigger, context);
-    internal void CaptureLiJueCompletedNullificationUse(long windowId, CardActionContext action) => _resolve().CaptureLiJueCompletedNullificationUse(windowId, action);
     internal void CaptureLiJueNullificationInvoice(NullificationWindowFrame window, CardActionContext action, bool incomingAccepted, NullificationRespondedEvent? incomingResponse) => _resolve().CaptureLiJueNullificationInvoice(window, action, incomingAccepted, incomingResponse);
     internal LiJueUseDiscardInvoice? CaptureLiJueUseDiscard(CardMovementBatchContext batch) => _resolve().CaptureLiJueUseDiscard(batch);
     internal IReadOnlyList<ProgramTriggerCandidate> CollectLiJueUseDiscardCandidates(CardMovementBatchContext batch) => _resolve().CollectLiJueUseDiscardCandidates(batch);

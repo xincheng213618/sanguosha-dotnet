@@ -10,20 +10,12 @@ internal sealed partial class CharacterCaoZhiLeRuntime
     internal static CardConversionSource FuleSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_cao_zhi_le_LeCaoZhiFule.FuleSource(f);
     internal FuEntityNameSnapshot? CaptureLeCaoZhiFuEntity(int cardId)
     {
+        if (!_cardEntityMarks.Has(cardId, "fu")) return null;
         var completed = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuMarkingCompletedEvent>().Select(e => (e.FrameId, e.Origin)).ToHashSet();
         var mark = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<FuEntityAssignedEvent>().LastOrDefault(e => e.CardId == cardId && completed.Contains((e.FrameId, e.Origin)));
         return mark is null ? null : new(mark.CardId, mark.PrintedKind, mark.AliasKind, mark.Revision);
     }
 
-    internal bool IsFuleHandLimitExempt(CharacterState owner, int cardId) => _coreNationalSkillsOperations.HasRuntimeSkill(owner, LeCaoZhiFuleSkill) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(owner.Seat) && CaptureLeCaoZhiFuEntity(cardId)is not null;
-    // Registration only; the query still belongs to legacy GameEngine.LeCaoZhiFule.
-    [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 190)]
-    internal void ProjectFuleCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
-    {
-        projection.Append(FulePublicLabel(cardId));
-    }
-
-    internal string? FulePublicLabel(int cardId) => CaptureLeCaoZhiFuEntity(cardId)is null ? null : "赋";
     internal string? FuleHandLabel(CharacterState owner, Card card) => CaptureLeCaoZhiFuEntity(card.Id)is { } fu ? fu.AliasKind is { } alias ? $"赋·{(CardCatalog.Get(alias).DisplayName)}" : "赋" : null;
     [ProgramPipelineHook(ProgramPipelinePhase.HandCardProjection, 10)]
     internal CardSnapshot ProjectFuleHandCard(CharacterState owner, Card card, CardSnapshot snapshot)
@@ -100,7 +92,8 @@ internal sealed partial class CharacterCaoZhiLeRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FuEntityAssignedEvent(f.Id, FuleSource(f), f.GameplayHash, origin, index, id, card.Kind, old?.AliasKind, alias, old?.Revision ?? 0, revision, before, _randomOperations._random.State, changed));
         }
 
-        // All scalar updates become observable together after this completion.
+        _cardEntityMarkOperations.Set(f.Id, ids.Select(id => new CardEntityMarkChange(id, "fu", true)).ToArray());
+        // Alias and revision updates become observable together after this completion.
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FuMarkingCompletedEvent(f.Id, origin, ids.Count));
     }
 

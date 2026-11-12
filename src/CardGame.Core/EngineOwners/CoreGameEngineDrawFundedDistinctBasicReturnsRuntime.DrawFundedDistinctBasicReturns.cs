@@ -29,38 +29,8 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicReturnsRuntim
 
     internal bool DrawFundedDistinctBasicProgramActor(ProgramSkillFrame parent, DrawFundedDistinctBasicPayment payment)
     {
-        if (parent.Id != payment.ParentFrameId || parent.Id != payment.RequestFrameId || parent.InstructionIndex != payment.Cursor || parent.InstructionIndex < 1 || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(parent.SkillId)?.Program is not { } definition || definition.GameplayHash != parent.GameplayHash)
-            return false;
-        if (_characterSunYuanOlOperations.TryGetSayingSlashRequest(parent, out var sayingActor, out var sayingTargets))
-            return payment.Intent == DrawFundedDistinctBasicIntent.AssistedSlash && sayingActor == payment.Source.OwnerSeat && payment.TargetSeat is { } sayingTarget && sayingTargets.Contains(sayingTarget);
-        if (parent.Chanshuang is not null)
-            return payment.Intent == DrawFundedDistinctBasicIntent.AssistedSlash && _characterLiYiOlOperations.TryGetChanshuangSlashRequest(parent, out var actor, out var targets) && actor == payment.Source.OwnerSeat && payment.TargetSeat is { } target && targets.Contains(target);
-        if (parent.LvKuangLvXiang is not null)
-            return payment.Intent == DrawFundedDistinctBasicIntent.AssistedSlash && _characterLvKuangLvXiangOlOperations.QigongAdapterActor(parent, payment.Source.OwnerSeat, payment.TargetSeat, payment.Cursor, payment.ParentFrameId, payment.RequestFrameId);
-        if (parent.WuJing is not null)
-            return payment.Intent == DrawFundedDistinctBasicIntent.AssistedSlash && _characterWuJingOlOperations.WuJingHejiAdapterActor(parent, payment.Source.OwnerSeat, payment.TargetSeat, payment.Cursor, payment.ParentFrameId, payment.RequestFrameId);
-        if (parent.CaoChun is not null)
-            return payment.Intent == DrawFundedDistinctBasicIntent.AssistedSlash && _characterCaoChunOlOperations.CaoChunInitialAdapterActor(parent, payment.Source.OwnerSeat, payment.TargetSeat, payment.Cursor, payment.ParentFrameId, payment.RequestFrameId);
-        var plan = ProgramInstructionResolver.Default.Resolve(parent, definition);
-        if (parent.InstructionIndex > plan.Instructions.Count)
-            return false;
-        var op = plan.GetPausedInstruction(parent.InstructionIndex).Effect.Op;
-        if (payment.Intent == DrawFundedDistinctBasicIntent.ProgramNearestSlash)
-        {
-            var key = "participant-cursor-" + (parent.InstructionIndex - 1);
-            var cursors = parent.NumberBindings.Where(binding => binding.Name == key).ToArray();
-            // The native participant walker advances this cursor before publishing
-            // its request. It deliberately retains the activation's original targets.
-            return op == SkillProgramEffectOp.RequestSlashByNearest && parent.ReexecuteParticipantInstruction && cursors is [var cursor] && cursor.Value >= 1 && cursor.Value < _coreMatchDefinitionPlayerCountAccess._playerCount && payment.Source.OwnerSeat == _coreTableOrderOperations.TableStepSeat(parent.OwnerSeat, cursor.Value);
-        }
-
-        return parent.SelectedTargetSeats.SequenceEqual([payment.Source.OwnerSeat]) && (payment.Intent switch
-        {
-            DrawFundedDistinctBasicIntent.ProgramSlash => op == SkillProgramEffectOp.RequestSlashByTarget,
-            DrawFundedDistinctBasicIntent.AssistedSlash => op == SkillProgramEffectOp.RequestSlashAgainstChosenTarget,
-            DrawFundedDistinctBasicIntent.NearestLegalSlash => op == SkillProgramEffectOp.RequestLegalSlashByNearest,
-            _ => false
-        });
+        return parent.Id == payment.ParentFrameId && parent.Id == payment.RequestFrameId && parent.InstructionIndex == payment.Cursor &&
+            payment.RequestAcceptance is { } acceptance && _programSlashRequests.OwnsAcceptance(parent, acceptance, payment.Source.OwnerSeat, payment.TargetSeat);
     }
 
     internal bool IsDrawFundedDistinctBasicProgramSelection(ProgramSkillFrame parent, SkillProgramEffect effect, DrawFundedDistinctBasicFrame paid)

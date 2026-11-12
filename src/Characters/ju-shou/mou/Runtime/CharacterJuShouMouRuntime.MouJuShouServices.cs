@@ -26,7 +26,6 @@ internal sealed partial class CharacterJuShouMouRuntime
     IReadOnlyList<int> IMouJuShouFacts.Discardable(int seat) => !((IMouJuShouFacts)this).Alive(seat) ? [] : Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(z => _cardZonesOperations._cardZones.CardsAt(new(z, seat)).Where(c => !_coreForeignEquipmentDiscardPoliciesOperations.IsForeignEquipmentDiscardPrevented(seat, c, new(z, seat), OwnedCardMoveIntent.Discard) && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, new(z, seat), OwnedCardMoveIntent.Discard))).Select(c => c.Id).ToArray());
     string IMouJuShouFacts.Label(int id) => _coreAdvancedLifecycleOperations.GetAdvancedCard(id).DisplayName;
     IReadOnlyList<MouJsPlan> IMouJuShouFacts.Plans(ProgramSkillFrame f) => MouJsPlans(f);
-    IReadOnlyList<MouJsZuoJunGrant> IMouJuShouFacts.Grants(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsZuoJunGrants ?? [];
     IReadOnlyList<MouJsFirstLoss> IMouJuShouFacts.Losses(int seat) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsFirstLosses ?? [];
     IReadOnlyList<int> IMouJuShouFacts.Seats => Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Select(p => p.Seat).ToArray());
 
@@ -78,10 +77,7 @@ internal sealed partial class CharacterJuShouMouRuntime
         });
     }
 
-    void IMouJuShouNative.SetGrants(int seat, IReadOnlyList<MouJsZuoJunGrant> grants) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsZuoJunGrants = Array.AsReadOnly(grants.ToArray());
     void IMouJuShouNative.SetLosses(int seat, IReadOnlyList<MouJsFirstLoss> losses) => _coreMatchParticipantsPlayersAccess._players[seat].MouJsFirstLosses = Array.AsReadOnly(losses.ToArray());
-    internal void ObserveMouJsMovement(CardMovementRecord movement) => MouJuShou.ObserveMovement(movement);
-    internal bool IsMouJsHandLimitExempt(int actor, int card) => MouJsHasGrant(actor, card);
     // Registration only; the query still belongs to legacy GameEngine.MouJuShouServices.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 50)]
     internal void ProjectMouJuShouCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
@@ -90,7 +86,7 @@ internal sealed partial class CharacterJuShouMouRuntime
     }
 
     internal bool HasMouJsEntityMark(int card) => _coreMatchParticipantsPlayersAccess._players.Any(p => MouJsHasGrant(p.Seat, card));
-    internal bool MouJsHasGrant(int actor, int card) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && _coreMatchParticipantsPlayersAccess._players[actor].MouJsZuoJunGrants?.Any(g => g.Recipient == actor && g.CardId == card && _cardZonesOperations._cardZones.GetLocation(card) == CardLocation.Hand(actor)) == true;
+    internal bool MouJsHasGrant(int actor, int card) => _handLimitExemptions.GetMatchingRelations(MouJuShouRuntime.ZuoJun, actor, card).Count > 0;
     internal bool MouJsUsePurpose(int actor, CardKind kind, bool response, bool dying = false)
     {
         if (!response || dying || kind == CardKind.Nullification)

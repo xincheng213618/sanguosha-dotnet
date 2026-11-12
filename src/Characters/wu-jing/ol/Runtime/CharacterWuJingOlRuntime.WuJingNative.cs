@@ -9,11 +9,42 @@ internal sealed partial class CharacterWuJingOlRuntime
         var at = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == id);
         if (use is null)
             return;
-        var f = at > 0 && _resolutionStackOperations._resolutionStack[at - 1] is ProgramSkillFrame { WuJing: { Stage: WuJingStage.IssuingUse } } direct ? direct : _characterLiuFengBoundaryOperations.BoundaryLiuFengNativeParent(use);
+        ProgramSkillFrame? f;
+        var requested = use.ProgramSlashRequestExecution;
+        if (requested is not null)
+        {
+            f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == requested.ProgramFrameId);
+            if (f?.WuJing is not { NativeOrigin: null, Stage: WuJingStage.UseChoice or WuJingStage.FactionRequest or WuJingStage.IssuingUse } state || use.Action is not { Type: CardActionType.Use } actual)
+                return;
+            if (!_slashRequests.OwnsAcceptance(f, requested.Acceptance, f.OwnerSeat, state.TargetSeat))
+                throw new InvalidOperationException("Heji lost its exact original accepted Slash request.");
+            var prepared = new WuJingUseSelection(actual.EffectiveKind, false, false)
+            {
+                CardIds = actual.PhysicalCards.Select(cost => cost.CardId).ToArray(),
+                Conversions = actual.ConversionChain
+            };
+            _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { WuJing = state with
+            {
+                Stage = WuJingStage.IssuingUse, Selection = prepared,
+                Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
+                After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
+            } });
+            f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == requested.ProgramFrameId);
+        }
+        else
+        {
+            // Duel keeps its actual native continuation and physical payment protocol.
+            if (use.CardKind != CardKind.Duel)
+                return;
+            f = at > 0 && _resolutionStackOperations._resolutionStack[at - 1] is ProgramSkillFrame { WuJing: { Stage: WuJingStage.IssuingUse } } direct ? direct : _characterLiuFengBoundaryOperations.BoundaryLiuFengNativeParent(use);
+        }
         if (f is not { WuJing: { Stage: WuJingStage.IssuingUse } r })
             return;
-        if (r.Operation != SkillProgramEffectOp.UseHejiAtCompletedSingleTarget || r.NativeOrigin is not null || r.Selection is not { } selected || use.Action is not { Type: CardActionType.Use } a || a.ActorSeat != f.OwnerSeat || use.CardKind != selected.Kind || !use.TargetSeats.SequenceEqual([r.TargetSeat]) || !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(selected.CardIds) || r.FactionPolicy is null && !a.ConversionChain.SequenceEqual(selected.Conversions) || a.PhysicalCards.Count == 0 && !WuJingZeroPaymentProof(f, r) || a.ParentActionId != r.ActionId)
-            throw new InvalidOperationException("Heji must bind one exact native Slash/Duel, original target and actually chosen physical conversion.");
+        if (r.Operation != SkillProgramEffectOp.UseHejiAtCompletedSingleTarget || r.NativeOrigin is not null || r.Selection is not { } selected ||
+            use.Action is not { Type: CardActionType.Use } a || use.CardKind != selected.Kind ||
+            !a.PhysicalCards.Select(c => c.CardId).SequenceEqual(selected.CardIds) || !a.ConversionChain.SequenceEqual(selected.Conversions) ||
+            requested is null && (a.ActorSeat != f.OwnerSeat || !use.TargetSeats.SequenceEqual([r.TargetSeat]) || a.ParentActionId != r.ActionId))
+            throw new InvalidOperationException("Heji must bind its actual native Slash/Duel and original instruction.");
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(r.UseId)is { CardKind: CardKind.Duel, Continuations.Duel: { Active: true } } completedDuel)
         {
             var parentIndex = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == f.Id);
@@ -45,9 +76,11 @@ internal sealed partial class CharacterWuJingOlRuntime
             return;
         var f = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(f => f.Id == origin.ProgramFrameId);
         var r = f.WuJing!;
-        if (r.Stage != WuJingStage.NativeUse || r.NativeOrigin != origin || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingHejiPaidEvent>().Any(e => e.UseId == id))
-            throw new InvalidOperationException("Heji cannot pay one accepted native Use twice.");
-        foreach (var entity in origin.Materials)
+        if (r.Stage != WuJingStage.NativeUse || r.NativeOrigin != origin)
+            throw new InvalidOperationException("Heji lost its actual bound native payment.");
+        if (origin.Materials.Count == 0 || r.After > r.Before)
+            return;
+        foreach (var entity in use.ProgramSlashRequestExecution is null ? origin.Materials : [])
         {
             var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.CardId == entity.CardId && m.From == entity.From && m.Reason == CardMoveReasons.Use).ToArray();
             var expected = _coreAdvancedLifecycleOperations.GetAdvancedCard(entity.CardId).IsGeneralWeapon && entity.From.Zone == CardZoneKind.Equipment ? CardLocation.OutsideGame : _coreAlternativeViewAsCostsOperations.IsProgramAlternativeCost(use.Action!, entity.CardId) ? CardLocation.DrawPile : CardLocation.Processing;
@@ -73,16 +106,19 @@ internal sealed partial class CharacterWuJingOlRuntime
         }
         else if (r.Kind != use.CardKind)
             return false;
-        if (r.UseId != use.Id || r.ActionId != a.ActionId || r.Kind != a.EffectiveKind || !_coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.ActorSeat, r.Materials.FirstOrDefault()?.From.OwnerSeat ?? r.ActorSeat) || a.ParentActionId != r.IncomingActionId || !a.ConversionChain.SequenceEqual(r.Conversions) || !a.PhysicalCards.Select(c => new WuJingMaterial(c.CardId, c.CardKind, c.From)).SequenceEqual(r.Materials) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingHejiNativeIssuedEvent>().Count(e => e.ProgramFrameId == r.ProgramFrameId && e.UseId == r.UseId && e.ActionId == r.ActionId && e.IncomingUseId == r.IncomingUseId && e.IncomingActionId == r.IncomingActionId && e.Source == r.Source && e.GameplayHash == r.GameplayHash && e.ActualTurn == r.ActualTurn && e.ActorSeat == r.ActorSeat && e.TargetSeat == r.TargetSeat && e.Kind == r.Kind && e.MaterialCount == r.Materials.Count && e.RewardEligible == r.RewardEligible) != 1 || !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingHejiMaterialIssuedEvent>().Where(e => e.UseId == use.Id).OrderBy(e => e.Index).Select(e => e.Material).SequenceEqual(r.Materials))
+        if (r.UseId != use.Id || r.ActionId != a.ActionId || r.Kind != a.EffectiveKind ||
+            !a.ConversionChain.SequenceEqual(r.Conversions) ||
+            !a.PhysicalCards.Select(c => new WuJingMaterial(c.CardId, c.CardKind, c.From)).SequenceEqual(r.Materials) ||
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == r.ProgramFrameId) is not { WuJing: { Stage: WuJingStage.NativeUse, NativeCompleted: false } parent } f ||
+            parent.NativeOrigin != r || parent.Source != r.Source || parent.GameplayHash != r.GameplayHash)
             return false;
-        var at = _resolutionStackOperations._resolutionStack.FindIndex(frame => frame.Id == use.Id);
-        var f = at > 0 && _resolutionStackOperations._resolutionStack[at - 1] is ProgramSkillFrame { WuJing: { Stage: WuJingStage.NativeUse, NativeCompleted: false } } direct ? direct : _characterLiuFengBoundaryOperations.BoundaryLiuFengNativeParent(use);
-        return f is { WuJing: { Stage: WuJingStage.NativeUse, NativeCompleted: false } parent } && f.Id == r.ProgramFrameId && parent.NativeOrigin == r && parent.Source == r.Source && parent.GameplayHash == r.GameplayHash && (r.Materials.Count > 0 || WuJingZeroPaymentProof(f, parent, use));
+        if (use.ProgramSlashRequestExecution is { } requested)
+            return requested.ProgramFrameId == f.Id && _slashRequests.OwnsAcceptance(f, requested.Acceptance, r.ActorSeat, r.TargetSeat);
+        return r.Kind == CardKind.Duel && a.ParentActionId == r.IncomingActionId &&
+            _coreShownEntityTurnPoliciesOperations.ShownEntityUseActorMatches(use, r.ActorSeat, r.Materials.FirstOrDefault()?.From.OwnerSeat ?? r.ActorSeat);
     }
 
     internal long? WuJingHejiProgramParent(long id) => _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { WuJingHeji: { Origin: { } r } } use && IsWuJingHejiUse(use) ? r.ProgramFrameId : null;
-    internal bool HasIssuedWuJingHejiDistance(long? useId, int actor) => useId is { } id && _coreCardUseLifecycleOperations.LifecycleCardUse(id)is { WuJingHeji: { Origin: { } r } } use && r.ActorSeat == actor && IsWuJingHejiUse(use);
-    internal bool IsWuJingHejiRemovedMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { WuJingHeji: { Origin: { } r } } use && IsWuJingHejiUse(use) && r.Materials.Any(m => m.CardId == cardId && m.From.Zone == CardZoneKind.Equipment && _coreAdvancedLifecycleOperations.GetAdvancedCard(m.CardId).IsGeneralWeapon && _cardZonesOperations._cardZones.Contains(CardLocation.OutsideGame, cardId));
     [NativeUseValidation(27130)]
     internal void ValidateWuJingUse(CardUseFrame use)
     {
@@ -95,7 +131,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     {
         if (use.WuJingHeji is not { Origin: { } origin })
             return;
-        var f = _characterLiuFengBoundaryOperations.BoundaryLiuFengReturnedProgramParent(origin.ProgramFrameId, use) ?? _coreProgramLifecycleOperations.GetActiveProgramFrame(origin.ProgramFrameId);
+        var f = _characterLiuFengBoundaryOperations.BoundaryLiuFengReturnedProgramParent(origin.ProgramFrameId, use) ?? _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == origin.ProgramFrameId);
         var r = f.WuJing;
         if (r is not { Stage: WuJingStage.NativeUse, NativeCompleted: false } || r.NativeOrigin != origin)
             throw new InvalidOperationException("Heji lost its once-only complete-use typed return.");
@@ -153,8 +189,6 @@ internal sealed partial class CharacterWuJingOlRuntime
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.HpObserverTail, 40)]
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SharedProcessingTail, 40)]
     internal bool HasWuJingHejiTrickPaymentTail(CardUseFrame use, RecoveryPaidCardUseContinuation continuation) => continuation is { Kind: RecoveryPaidCardUseKind.Trick, CardId: { } card, ActionKind: LegalActionKind.Duel, TargetSeats: { } targets } && card == use.CardId && continuation.SourceSeat == use.SourceSeat && targets.SequenceEqual(use.TargetSeats) && use.PaymentMovementReceipt is { } receipt && IsWuJingHejiTrickPaymentBatch(use, receipt.Batch);
-    [ProgramDistanceRule(ProgramDistanceStage.PhysicalSlash, 30)]
-    internal bool DistancePhysicalSlash30HasIssuedWuJingHejiDistance(ProgramSlashDistanceQuery q) => HasIssuedWuJingHejiDistance(q.ExistingUseFrameId, q.Actor.Seat);
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 1600)]
     internal CardMovementBatchContext CompleteMovementBatchCaptureWuJingHejiTrickPaymentBatch(CardMovementBatchBuilder batch, CardMovementBatchContext completed)
     {

@@ -161,7 +161,9 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
             if (window.Action.Type != CardActionType.Use || _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId)is not { } use || use.Action?.ActionId != draft.ActionId)
                 throw new InvalidOperationException("A targeted Sidi cancellation must retain its original native Use.");
             var proof = new BoundarySidiCancelledEvent(frame.Id, use.Id, draft.ActionId, frame.OwnerSeat, frame.SkillInstanceId, frame.GameplayHash);
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { BoundarySidiCancellation = proof });
+            _nativeInvalidations.IssueUse(use.Id, use.Action, new(SimpleCancellation: new(
+                NativeSimpleCardCancellationBoundary.EarlySimple, Enum.GetValues<SimpleCardUseEffect>(),
+                new("skill-program.boundary-sidi.cancelled"), 20)));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(proof);
             outcome = _coreDyingCursorRuntimeOperations.Value.ActiveDying is null && !_coreMatchParticipantsPlayersAccess._players.Any(player => player.IsAlive && player.HasHpValue && player.Hp <= 0) ? "cancel-damage" : "cancel-only";
         }
@@ -175,32 +177,14 @@ internal sealed partial class CharacterCaoZhenBoundaryMobileRuntime
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { BoundarySidi = null, ChoiceBindings = Array.AsReadOnly(frame.ChoiceBindings.Append(new ProgramChoiceResultBinding(bind, outcome, frame.OwnerSeat)).ToArray()) });
     }
-    internal bool IsBoundarySidiUseIneffective(CardUseFrame use)
-    {
-        if (use.BoundarySidiCancellation is not { } proof)
-            return false;
-        return true;
-    }
-
     internal bool TryBoundarySidiEquipmentCommitted(long id, Card equipment)
     {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { Type: CardActionType.Use } action } use || action.EffectiveKind != equipment.Kind || use.BoundarySidiCancellation is null && !_coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Any(instance => instance.SkillId == BoundarySidiSkill && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, instance.SkillId, instance.SkillInstanceId) && BoundarySidiRecords(owner.Seat, instance.SkillInstanceId).Any(record => record.HolderSeat == action.ActorSeat))))
+        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { Action: { Type: CardActionType.Use } action } use || action.EffectiveKind != equipment.Kind || !_nativeInvalidations.IsUseIneffective(use) && !_coreMatchParticipantsPlayersAccess._players.Any(owner => owner.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(owner).ProgramInstances.Any(instance => instance.SkillId == BoundarySidiSkill && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, instance.SkillId, instance.SkillInstanceId) && BoundarySidiRecords(owner.Seat, instance.SkillInstanceId).Any(record => record.HolderSeat == action.ActorSeat))))
             return false;
         var continuation = new ProgramSimpleCardContinuation(equipment.Id, SimpleCardUseEffect.EquipmentPlacement);
         if (_coreCardUseLifecycleOperations.TryBeginCommittedCardUse(id, ProgramCardContinuation.CommittedSimpleCard, simple: continuation))
             return true;
-        return ContinueBoundarySidiIneffectiveSimple(id, continuation);
-    }
-
-    internal bool ContinueBoundarySidiIneffectiveSimple(long id, ProgramSimpleCardContinuation continuation)
-    {
-        if (_coreCardUseLifecycleOperations.LifecycleCardUse(id)is not { BoundarySidiCancellation: not null } use || !IsBoundarySidiUseIneffective(use))
-            return false;
-        foreach (var card in _coreNativeTrickUseOperations.GetCardUsePhysicalCards(id).Where(card => _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.Processing))
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, new("skill-program.boundary-sidi.cancelled"));
-        var original = use.CardId == 0 ? new Card(0, use.CardKind, Suit.None, 0) : _coreAdvancedLifecycleOperations.GetAdvancedCard(use.CardId);
-        _coreNativeCardUseCompletionOperations.FinishCardUse(id, original, use.CardKind);
-        return true;
+        return _nativeInvalidationExecution.TryCompleteSimple(id, continuation, NativeSimpleCardCancellationBoundary.EarlySimple);
     }
 
     [ProgramAiChoice(SkillProgramEffectOp.PrepareBoundaryCaoZhenSidi)]

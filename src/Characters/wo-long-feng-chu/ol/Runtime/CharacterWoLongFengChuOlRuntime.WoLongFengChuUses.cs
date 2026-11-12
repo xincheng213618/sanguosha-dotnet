@@ -55,12 +55,17 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeCondition, 26100)]
     internal bool HideInternalEquipmentSlotPayment(CharacterState owner, SkillProgramActivation activation) => !ProgramInstructionResolver.Default.Features(activation).HasOperation(SkillProgramEffectOp.PayEquipmentSlotForNamedUse);
-    internal bool TryBeginEquipmentSlotNamedPlay(CharacterState actor, LegalAction action)
+    internal bool TryBeginEquipmentSlotNamedPlay(CharacterState actor, LegalAction action, ProgramSlashRequestIdentity? requestIdentity = null, PendingDecision? originalDecision = null)
     {
         if (action.ConversionSource is not { } source || !IsEquipmentSlotNamedSkill(source.SkillId) || UnconsumedEquipmentSlotPayment(source)is { } paid && !_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == paid.FrameId))
             return false;
-        var original = _corePendingDecisionPolicyPipelineOperations._pendingDecision ?? new PendingDecision(DecisionKind.PlayCard, actor.Seat, "游龙", [], []);
-        BeginEquipmentSlotNamedUse(actor, source, action.PlayedCardKind!.Value, EquipmentSlotNamedUseIntent.Play, original, action, null);
+        if (requestIdentity is null && _resolutionStackOperations._resolutionStack.LastOrDefault() is ProgramSkillFrame originalOwner)
+            requestIdentity = _slashRequests.GetOffer(originalOwner, actor.Seat);
+        var original = originalDecision ?? _corePendingDecisionPolicyPipelineOperations._pendingDecision;
+        if (original is null && requestIdentity is not null)
+            throw new InvalidOperationException("A requested slot payment requires its original published decision.");
+        original ??= new PendingDecision(DecisionKind.PlayCard, actor.Seat, "游龙", [], []);
+        BeginEquipmentSlotNamedUse(actor, source, action.PlayedCardKind!.Value, EquipmentSlotNamedUseIntent.Play, original, action, null, requestIdentity);
         return true;
     }
 
@@ -84,7 +89,7 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
 
     internal static string EquipmentSlotNamedTargetSignature(LegalAction? action, PromptChoice? choice) => RuntimeSkills.RuntimeRules_wo_long_feng_chu_ol_WoLongFengChuUses.EquipmentSlotNamedTargetSignature(action, choice);
     internal static string EquipmentSlotNamedDecisionSignature(PendingDecision decision) => RuntimeSkills.RuntimeRules_wo_long_feng_chu_ol_WoLongFengChuUses.EquipmentSlotNamedDecisionSignature(decision);
-    internal bool EquipmentSlotNamedChoiceIsPayable(CharacterState actor, CardConversionSource source, CardKind kind, EquipmentSlotNamedUseIntent intent, IReadOnlyList<int> targets, EquipmentSlot slot)
+    internal bool EquipmentSlotNamedChoiceIsPayable(CharacterState actor, CardConversionSource source, CardKind kind, EquipmentSlotNamedUseIntent intent, IReadOnlyList<int> targets, EquipmentSlot slot, ProgramSlashRequestIdentity? requestIdentity = null, int? requestTargetSeat = null)
     {
         if (actor.EquipmentSlotCapacity(slot) <= 0 || intent is EquipmentSlotNamedUseIntent.BorrowedSword or EquipmentSlotNamedUseIntent.Qinglong && slot == EquipmentSlot.Weapon)
             return false;
@@ -92,20 +97,60 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
             return targets.Count == 1 && (_coreAlternatingSuitAndCompletedTopOperations.HasPhaseSuitAllowance2(actor.Seat, Suit.None) || _coreDirectedCardPolicyQueriesOperations.HasCardDistanceExemption(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], kind) || _coreProvenanceCardPoliciesOperations.HasProvenanceUseDistance2(actor, []) || _coreProgramCardPoliciesOperations.HasCardPolicy(actor, SkillProgramCardPolicyKind.IgnoreUseDistance, kind) || CoreGameEngineRuleQueriesRuntime.ConvertRuleValue(_coreActionQueriesOperations.EvaluateDistance(actor, _coreMatchParticipantsPlayersAccess._players[targets[0]], excludedEquipmentSlot: slot)) == 1);
         if (!CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
             return true;
+        if (requestIdentity is not null)
+            return EquipmentSlotRequestedSlashTargetsLegal(actor, source, kind, targets, requestIdentity, requestTargetSeat, slot);
         var logical = new Card(0, kind, Suit.None, 0);
         return targets.Count > 0 && targets.All(target => _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], logical, source, kind, noEffectiveRank: true, physicalCardIds: [], excludedEquipmentSlot: slot) && (intent is EquipmentSlotNamedUseIntent.Qinglong or EquipmentSlotNamedUseIntent.BorrowedSword or EquipmentSlotNamedUseIntent.SayingSlash || _coreRuleQueriesOperations.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[target], false, kind, effectiveRank: 0, excludedEquipmentSlot: slot, physicalCardIds: [])));
     }
 
+    private bool EquipmentSlotRequestedSlashTargetsLegal(CharacterState actor, CardConversionSource source, CardKind kind,
+        IReadOnlyList<int> targets, ProgramSlashRequestIdentity identity, int? requestedTarget, EquipmentSlot? excludedSlot = null)
+    {
+        if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == identity.FrameId) is not { } original ||
+            !_slashRequests.OwnsIssuedIdentity(original, identity, actor.Seat))
+            return false;
+        var candidates = _slashRequests.GetIssuedTargets(original, identity, actor.Seat);
+        if (requestedTarget is not { } required || !targets.Contains(required) || !candidates.Contains(required))
+            return false;
+        var spec = identity.Spec;
+        var logical = new Card(0, kind, Suit.None, 0);
+        return targets.Count > 0 && targets.All(target =>
+            (target != required || spec.RangeOwnerSeat is not { } rangeOwner ||
+                _attackRanges.IsWithinAttackRange(rangeOwner, target, excludedEquipmentSlot: rangeOwner == actor.Seat ? excludedSlot : null)) &&
+            _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], logical, source, kind,
+                ignoreDistance: spec.IgnoreDistance && candidates.Contains(target), noEffectiveRank: true, physicalCardIds: [], excludedEquipmentSlot: excludedSlot) &&
+            _coreRuleQueriesOperations.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[target],
+                !spec.CountsTowardSlashLimit && (spec.QuotaTargets == ProgramSlashRequestPermissionTargets.AnyOtherTarget || candidates.Contains(target)) ||
+                    _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source),
+                kind, effectiveRank: 0, excludedEquipmentSlot: excludedSlot, physicalCardIds: []));
+    }
+
     internal bool IsEquipmentSlotNamedActionPayable(CharacterState actor, LegalAction action) => action.ConversionSource is not { } source || !IsEquipmentSlotNamedSkill(source.SkillId) || Enum.GetValues<EquipmentSlot>().Any(slot => EquipmentSlotNamedChoiceIsPayable(actor, source, action.PlayedCardKind!.Value, EquipmentSlotNamedUseIntent.Play, action.TargetSeats, slot));
     internal bool IsEquipmentSlotNamedForcedSlashPayable(CharacterState actor, CardConversionSource source, CardKind kind, CharacterState target, bool qinglong) => !IsEquipmentSlotNamedSkill(source.SkillId) || UnconsumedEquipmentSlotPayment(source)is { } paid && !_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Any(f => f.Id == paid.FrameId) || Enum.GetValues<EquipmentSlot>().Any(slot => EquipmentSlotNamedChoiceIsPayable(actor, source, kind, qinglong ? EquipmentSlotNamedUseIntent.Qinglong : EquipmentSlotNamedUseIntent.BorrowedSword, [target.Seat], slot));
-    internal void BeginEquipmentSlotNamedUse(CharacterState actor, CardConversionSource source, CardKind kind, EquipmentSlotNamedUseIntent intent, PendingDecision original, LegalAction? action, PromptChoice? choice)
+    internal void BeginEquipmentSlotNamedUse(CharacterState actor, CardConversionSource source, CardKind kind, EquipmentSlotNamedUseIntent intent, PendingDecision original, LegalAction? action, PromptChoice? choice, ProgramSlashRequestIdentity? requestIdentity = null)
     {
         var program = _contentRegistryOperations._contentRegistry.GetSkill(source.SkillId).Program!;
         var rule = _corePlayCardHistoryOperations.ViewAsRule(source)!;
         var instance = _coreNationalSkillsOperations.GetSkillBindingShard(actor).ProgramInstances.Single(i => i.SkillId == source.SkillId && i.SkillInstanceId == source.SkillInstanceId);
         if (!TryGetEquipmentSlotNamedConversionAvailability(actor, instance, rule, intent != EquipmentSlotNamedUseIntent.Play, intent is EquipmentSlotNamedUseIntent.DyingPeach or EquipmentSlotNamedUseIntent.DyingAlcohol, out var available) || !available)
             throw new InvalidOperationException("Youlong lost its actual current face, unused name, round allowance or remaining equipment slot.");
-        var parent = _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id;
+        var originalFrame = _resolutionStackOperations._resolutionStack.LastOrDefault();
+        var parent = originalFrame?.Id;
+        var requestTargets = action?.TargetSeats ?? choice?.Targets ?? [];
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && originalFrame is ProgramSkillFrame requestOwner)
+            requestIdentity ??= _slashRequests.GetOffer(requestOwner, actor.Seat);
+        int? requestTarget = null;
+        if (requestIdentity is not null)
+        {
+            if (originalFrame is not ProgramSkillFrame requestParent || requestParent.Id != requestIdentity.FrameId ||
+                !_slashRequests.OwnsIssuedIdentity(requestParent, requestIdentity, actor.Seat) ||
+                _slashRequests.GetOffer(requestParent, actor.Seat) is null)
+                throw new InvalidOperationException("An unpaid slot choice requires its exact original open Slash offer.");
+            var candidates = _slashRequests.GetIssuedTargets(requestParent, requestIdentity, actor.Seat);
+            requestTarget = requestTargets.Where(candidates.Contains).Select(seat => (int?)seat).FirstOrDefault();
+            if (requestTarget is null)
+                throw new InvalidOperationException("The slot payment changed its original requested Slash target.");
+        }
         var frame = new ProgramSkillFrame(++_coreResolutionIdentityBoundaryOperations._resolutionSequence, actor.Seat, source.SkillId, "equipment-slot-payment", program.GameplayHash, 1, [], [])
         {
             SkillInstanceId = source.SkillInstanceId,
@@ -124,6 +169,8 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
                 PlayAction = action,
                 ResponseChoice = choice,
                 OriginalParentId = parent,
+                RequestIdentity = requestIdentity,
+                RequestTargetSeat = requestTarget,
                 TargetSignature = EquipmentSlotNamedTargetSignature(action, choice),
                 OriginalDecisionSignature = EquipmentSlotNamedDecisionSignature(original)
             }
@@ -139,7 +186,7 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var draft = frame.EquipmentSlotNamedUse!;
         var targets = draft.PlayAction?.TargetSeats ?? draft.ResponseChoice?.Targets ?? [];
-        var choices = Enum.GetValues<EquipmentSlot>().Where(s => EquipmentSlotNamedChoiceIsPayable(actor, draft.Source, draft.EffectiveKind, draft.Intent, targets, s)).Select(slot => new PromptChoice(new($"equipment-slot-use.{(frame.Id)}.{(slot)}"), $"废除{(EquipmentSlotNamedLabel(slot))}栏，视为使用【{(CardCatalog.Get(draft.EffectiveKind).DisplayName)}】", [], [], new Dictionary<string, string> { ["program-action"] = "equipment-slot-named-use", ["frame-id"] = frame.Id.ToString(CultureInfo.InvariantCulture), ["equipment-slot"] = slot.ToString() })).ToArray();
+        var choices = Enum.GetValues<EquipmentSlot>().Where(s => EquipmentSlotNamedChoiceIsPayable(actor, draft.Source, draft.EffectiveKind, draft.Intent, targets, s, draft.RequestIdentity, draft.RequestTargetSeat)).Select(slot => new PromptChoice(new($"equipment-slot-use.{(frame.Id)}.{(slot)}"), $"废除{(EquipmentSlotNamedLabel(slot))}栏，视为使用【{(CardCatalog.Get(draft.EffectiveKind).DisplayName)}】", [], [], new Dictionary<string, string> { ["program-action"] = "equipment-slot-named-use", ["frame-id"] = frame.Id.ToString(CultureInfo.InvariantCulture), ["equipment-slot"] = slot.ToString() })).ToArray();
         if (choices.Length == 0)
             throw new InvalidOperationException("An accepted slot conversion lost every payable equipment slot before payment.");
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = new(DecisionKind.ProgramTrigger, frame.OwnerSeat, "游龙：选择废除的装备栏。", [], [])
@@ -157,7 +204,7 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
     [ProgramAnswer("equipment-slot-named-use")]
     internal void PayEquipmentSlotNamedUse(PromptChoice choice)
     {
-        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { EquipmentSlotNamedUse: { Stage: EquipmentSlotNamedUseStage.ChoosingSlot } draft } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || choice.Cards.Count != 0 || choice.Targets.Count != 0 || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(CultureInfo.InvariantCulture) || !Enum.TryParse<EquipmentSlot>(choice.Parameters.GetValueOrDefault("equipment-slot"), out var slot) || !EquipmentSlotNamedChoiceIsPayable(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], draft.Source, draft.EffectiveKind, draft.Intent, draft.PlayAction?.TargetSeats ?? draft.ResponseChoice?.Targets ?? [], slot))
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { EquipmentSlotNamedUse: { Stage: EquipmentSlotNamedUseStage.ChoosingSlot } draft } frame || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != frame.OwnerSeat || choice.Cards.Count != 0 || choice.Targets.Count != 0 || choice.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(CultureInfo.InvariantCulture) || !Enum.TryParse<EquipmentSlot>(choice.Parameters.GetValueOrDefault("equipment-slot"), out var slot) || !EquipmentSlotNamedChoiceIsPayable(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat], draft.Source, draft.EffectiveKind, draft.Intent, draft.PlayAction?.TargetSeats ?? draft.ResponseChoice?.Targets ?? [], slot, draft.RequestIdentity, draft.RequestTargetSeat))
             throw new InvalidOperationException("Youlong requires its exact remaining slot choice on its original unpaid frame.");
         var actor = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         var policy = _corePlayCardHistoryOperations.ViewAsRule(draft.Source)!.TieredRoundConversion!;
@@ -170,9 +217,17 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { EquipmentSlotNamedUse = draft with { Stage = EquipmentSlotNamedUseStage.MovementChildren, Payment = payment } });
         _coreProgramPersistentStateOperations.SetProgramBooleanState(actor.Seat, draft.Source.SkillId, draft.Source.SkillInstanceId, "yin", !draft.Yin);
         _coreAdvancedLifecycleOperations.SetEquipmentSlotCapacity(actor, slot, 0);
+        ProgramSlashRequestAcceptance? requestAcceptance = null;
+        if (draft.RequestIdentity is { } request && draft.RequestTargetSeat is { } requestedTarget &&
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(candidate => candidate.Id == request.FrameId) is { } requestOwner &&
+            _slashRequests.GetIssuedTargets(requestOwner, request, actor.Seat).Contains(requestedTarget))
+            requestAcceptance = _slashRequests.AcceptIssued(requestOwner, request, actor.Seat, requestedTarget);
         payment = payment with
         {
-            After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
+            After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence,
+            RequestIdentity = draft.RequestIdentity,
+            RequestAcceptance = requestAcceptance,
+            RequestTargetSeat = draft.RequestTargetSeat
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { EquipmentSlotNamedUse = frame.EquipmentSlotNamedUse!with { Payment = payment }, PendingMovementContinuation = payment.After > payment.Before ? new(frame.OwnerSeat, 0, null) : null });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new EquipmentSlotNamedUsePaidEvent(payment));
@@ -222,7 +277,13 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
         var actor = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
         {
+            var failedRequest = CaptureEquipmentSlotRequestFailure(paid);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new EquipmentSlotNamedUseCancelledEvent(paid.FrameId));
+            if (failedRequest is not null)
+            {
+                ReturnEquipmentSlotRequestFailure(failedRequest);
+                return true;
+            }
             if (draft.Intent == EquipmentSlotNamedUseIntent.SayingSlash && draft.OriginalParentId is { } sayingParent && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame saying && saying.Id == sayingParent)
             {
                 _characterSunYuanOlOperations.FinishSayingSuppliedSlashFailure(saying);
@@ -246,7 +307,13 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
 
         if (draft.Intent == EquipmentSlotNamedUseIntent.Play && !EquipmentSlotNamedPlayStillLegal(actor, draft))
         {
+            var failedRequest = CaptureEquipmentSlotRequestFailure(paid);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new EquipmentSlotNamedUseCancelledEvent(paid.FrameId));
+            if (failedRequest is not null)
+            {
+                ReturnEquipmentSlotRequestFailure(failedRequest);
+                return true;
+            }
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
             if (draft.OriginalParentId is { } pingduanParent && _characterKeBiNengOlOperations.TryCancelKeBiNengPingduanBasicPayment(pingduanParent))
@@ -258,9 +325,16 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
             return true;
         }
 
-        if (draft.Intent == EquipmentSlotNamedUseIntent.SayingSlash && !_coreSayingTieredSuppliesOperations.SayingEquipmentSlotUseStillLegal(actor, draft))
+        if (draft.Intent == EquipmentSlotNamedUseIntent.SayingSlash &&
+            !(draft.RequestIdentity is not null ? EquipmentSlotNamedRequestStillLegal(actor, draft) : _coreSayingTieredSuppliesOperations.SayingEquipmentSlotUseStillLegal(actor, draft)))
         {
+            var failedRequest = CaptureEquipmentSlotRequestFailure(paid);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new EquipmentSlotNamedUseCancelledEvent(paid.FrameId));
+            if (failedRequest is not null)
+            {
+                ReturnEquipmentSlotRequestFailure(failedRequest);
+                return true;
+            }
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
             if (draft.OriginalParentId is { } sayingParent && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame saying && saying.Id == sayingParent)
@@ -268,13 +342,22 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
             return true;
         }
 
+        if (paid.RequestAcceptance is { } acceptedRequest)
+        {
+            _coreNativePromptBoundaryOperations.ClearPendingDecision();
+            var action = draft.PlayAction ?? new LegalAction(LegalActionKind.Slash, 0, acceptedRequest.TargetSeat,
+                CardCatalog.Get(draft.EffectiveKind).DisplayName, draft.EffectiveKind, TargetSeats: draft.ResponseChoice!.Targets)
+            { ConversionSource = draft.Source };
+            _coreTieredRoundZeroUsesOperations.ExecuteTieredRoundZeroPlay(actor, action, acceptedRequest, originalDecision: draft.OriginalDecision);
+            return true;
+        }
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = draft.OriginalDecision;
         if (draft.Intent == EquipmentSlotNamedUseIntent.SayingSlash)
             _coreSayingTieredSuppliesOperations.ResolveSayingTieredSlash(draft.ResponseChoice!);
         else if (draft.Intent == EquipmentSlotNamedUseIntent.Play)
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
-            _coreTieredRoundZeroUsesOperations.ExecuteTieredRoundZeroPlay(actor, draft.PlayAction!);
+            _coreTieredRoundZeroUsesOperations.ExecuteTieredRoundZeroPlay(actor, draft.PlayAction!, paid.RequestAcceptance, originalDecision: draft.OriginalDecision);
         }
         else if (draft.Intent == EquipmentSlotNamedUseIntent.Dodge)
             _coreTieredRoundZeroResponsesOperations.ResolveTieredRoundZeroDodge(actor, draft.Source);
@@ -287,11 +370,47 @@ internal sealed partial class CharacterWoLongFengChuOlRuntime
         return true;
     }
 
+    private ProgramSkillFrame? CaptureEquipmentSlotRequestFailure(EquipmentSlotNamedUsePayment payment)
+    {
+        if (payment.RequestIdentity is not { } identity ||
+            (payment.RequestTargetSeat ?? payment.RequestAcceptance?.TargetSeat) is not { } target ||
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == identity.FrameId) is not { } original)
+            return null;
+        if (payment.RequestAcceptance is { } accepted)
+            _slashRequests.FailAcceptedUse(original, accepted, payment.FrameId);
+        else
+            _slashRequests.FailIssuedUse(original, identity, identity.ActorSeat, target, payment.FrameId);
+        return _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == original.Id);
+    }
+
+    private void ReturnEquipmentSlotRequestFailure(ProgramSkillFrame original)
+    {
+        _coreNativePromptBoundaryOperations.ClearPendingDecision();
+        _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+            return;
+        original = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == original.Id);
+        if (original.SlashRequest!.Identity.Spec.FailureReturnPolicy == ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction)
+            _coreRuntimeOperations.AdvanceRuntimeProgram(original.Id);
+        else
+            _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(original, "已付款的用牌请求未产生用牌。");
+    }
+
+    private bool EquipmentSlotNamedRequestStillLegal(CharacterState actor, EquipmentSlotNamedUseDraft draft) =>
+        draft.RequestIdentity is { } request && draft.Payment?.RequestAcceptance is { } accepted &&
+        _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == request.FrameId) is { } original &&
+        _slashRequests.OwnsAcceptance(original, accepted, actor.Seat, draft.RequestTargetSeat) &&
+        _slashRequests.CanExecuteAcceptedUse(original, accepted) &&
+        EquipmentSlotRequestedSlashTargetsLegal(actor, draft.Source, draft.EffectiveKind,
+            draft.PlayAction?.TargetSeats ?? draft.ResponseChoice?.Targets ?? [], request, draft.RequestTargetSeat);
+
     internal bool EquipmentSlotNamedPlayStillLegal(CharacterState actor, EquipmentSlotNamedUseDraft draft)
     {
         if (_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, draft.EffectiveKind, CardActionType.Use) || draft.PlayAction is not { } action)
             return false;
         var kind = draft.EffectiveKind;
+        if (draft.RequestIdentity is not null)
+            return EquipmentSlotNamedRequestStillLegal(actor, draft);
         if (CoreNativeCardClassificationsRuntime.IsOrdinaryTrick(kind))
             return _coreProgramOrdinaryTrickUsesOperations.BuildProgramOrdinaryTrickUseOptions(actor, kind, Suit.None, enforceUsePermission: true, beneficiaryShieldSuit: Suit.None, actualEffectiveColor: null, hasActualColor: true, physicalCardIds: [], includeNextActualUseAdjustment: true).Any(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && o.TargetSeats.SequenceEqual(action.TargetSeats));
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))

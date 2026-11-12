@@ -48,24 +48,28 @@ internal sealed class ProgramViewContributionCatalog
     {
         var phases = Enum.GetValues<ProgramViewContribution>().ToDictionary(p => p,
             _ => new SortedDictionary<int, ProgramViewRegistration>());
-        foreach (var method in methods)
-        foreach (var attribute in method.GetCustomAttributes<ProgramViewContributorAttribute>())
+        foreach (var candidateMethod in methods)
         {
-            if (!Enum.IsDefined(attribute.Contribution) || attribute.Order <= 0)
-                throw new InvalidOperationException($"View contributor '{method.Name}' requires a valid contribution and positive order.");
-            var delegateType = DelegateType(attribute.Contribution);
-            var signature = delegateType.GetMethod("Invoke")!;
-            if (method.IsAbstract || method.IsGenericMethod || method.ContainsGenericParameters ||
-                !signature.ReturnType.IsAssignableFrom(method.ReturnType) ||
-                !method.GetParameters().Select(p => p.ParameterType)
-                    .SequenceEqual(signature.GetParameters().Select(p => p.ParameterType)) ||
-                method.GetParameters().Any(p => p.IsOptional || p.IsOut || p.ParameterType.IsByRef))
-                throw new InvalidOperationException($"View contributor '{method.Name}' has an invalid handler signature.");
-            var phase = phases[attribute.Contribution];
-            if (phase.Values.Any(row => row.Method == method))
-                throw new InvalidOperationException($"Duplicate view contributor '{attribute.Contribution}:{method.Name}'.");
-            if (!phase.TryAdd(attribute.Order, new(method, delegateType)))
-                throw new InvalidOperationException($"Duplicate view contributor order '{attribute.Contribution}:{attribute.Order}'.");
+            if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(ProgramViewContributorAttribute), inherit: true)) continue;
+            var method = candidateMethod!;
+            foreach (var attribute in method.GetCustomAttributes<ProgramViewContributorAttribute>())
+            {
+                if (!Enum.IsDefined(attribute.Contribution) || attribute.Order <= 0)
+                    throw new InvalidOperationException($"View contributor '{method.Name}' requires a valid contribution and positive order.");
+                var delegateType = DelegateType(attribute.Contribution);
+                var signature = delegateType.GetMethod("Invoke")!;
+                if (method.IsAbstract || method.IsGenericMethod || method.ContainsGenericParameters ||
+                    !signature.ReturnType.IsAssignableFrom(method.ReturnType) ||
+                    !method.GetParameters().Select(p => p.ParameterType)
+                        .SequenceEqual(signature.GetParameters().Select(p => p.ParameterType)) ||
+                    method.GetParameters().Any(p => p.IsOptional || p.IsOut || p.ParameterType.IsByRef))
+                    throw new InvalidOperationException($"View contributor '{method.Name}' has an invalid handler signature.");
+                var phase = phases[attribute.Contribution];
+                if (phase.Values.Any(row => row.Method == method))
+                    throw new InvalidOperationException($"Duplicate view contributor '{attribute.Contribution}:{method.Name}'.");
+                if (!phase.TryAdd(attribute.Order, new(method, delegateType)))
+                    throw new InvalidOperationException($"Duplicate view contributor order '{attribute.Contribution}:{attribute.Order}'.");
+            }
         }
         return new(phases);
     }

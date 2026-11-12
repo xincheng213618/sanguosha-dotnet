@@ -160,7 +160,6 @@ public sealed partial class GameEngine
     private ref int _shiHcLedgerCacheCount => ref _characterHuangChongMobileShi.ReferenceToShiHcLedgerCacheCount;
     private ref IGameEvent? _shiHcLedgerCacheHead => ref _characterHuangChongMobileShi.ReferenceToShiHcLedgerCacheHead;
     private ref IGameEvent? _shiHcLedgerCacheTail => ref _characterHuangChongMobileShi.ReferenceToShiHcLedgerCacheTail;
-    private ref bool _hasIssuedLiuQi => ref _characterLiuQiOl.ReferenceToHasIssuedLiuQi;
     // 闭境 marks survive across turns until the owner's next preparation phase
     // recasts them; replay reconstructs the map from the accepted commands.
     private ref readonly Dictionary<int, int> _bijingMarkedCardIds => ref _characterLvKaiOl.ReferenceToBijingMarkedCardIds;

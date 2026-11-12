@@ -26,7 +26,6 @@ internal sealed class MouJuShouFacts(EngineStates.CoreActualTurnProgressState ac
     public IReadOnlyList<int> Discardable(int seat) => !Alive(seat) ? [] : Array.AsReadOnly(new[] { CardZoneKind.Hand, CardZoneKind.Equipment }.SelectMany(z => getCardZoneStore().CardsAt(new(z, seat)).Where(c => !getCoreForeignEquipmentDiscardPoliciesRuntime().IsForeignEquipmentDiscardPrevented(seat, c, new(z, seat), OwnedCardMoveIntent.Discard) && !getCoreGameEngineTurnHandCategoryRestrictionsRuntime().IsSelfHandCategoryDiscardForbidden(seat, c, new(z, seat), OwnedCardMoveIntent.Discard))).Select(c => c.Id).ToArray());
     public string Label(int id) => getCoreGameEngineAdvancedLifecycleRuntime().GetAdvancedCard(id).DisplayName;
     public IReadOnlyList<MouJsPlan> Plans(ProgramSkillFrame f) => getCharacterJuShouMouRuntime().MouJsPlans(f);
-    public IReadOnlyList<MouJsZuoJunGrant> Grants(int seat) => matchParticipantsState.ReferenceToPlayers[seat].MouJsZuoJunGrants ?? [];
     public IReadOnlyList<MouJsFirstLoss> Losses(int seat) => matchParticipantsState.ReferenceToPlayers[seat].MouJsFirstLosses ?? [];
     public IReadOnlyList<int> Seats => Array.AsReadOnly(matchParticipantsState.ReferenceToPlayers.Select(p => p.Seat).ToArray());
 

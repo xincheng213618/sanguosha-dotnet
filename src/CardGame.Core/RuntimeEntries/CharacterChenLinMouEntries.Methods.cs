@@ -8,7 +8,6 @@ internal sealed partial class CharacterChenLinMouEntries
     internal void BindMouChenLinNativeUse(CardUseFrame use) => _resolve().BindMouChenLinNativeUse(use);
     internal bool CanStartMouChenLinInvitation(CharacterState owner) => _resolve().CanStartMouChenLinInvitation(owner);
     internal void ConsumeMouChenLinDamage(IGameEvent payload) => _resolve().ConsumeMouChenLinDamage(payload);
-    internal bool IsMouChenLinHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsMouChenLinHandLimitExempt(owner, cardId);
     internal void IssueMouChenLinNonHandDonorTickets(ProgramSkillFrame f) => _resolve().IssueMouChenLinNonHandDonorTickets(f);
     internal void IssueMouChenLinUse(ProgramSkillFrame f) => _resolve().IssueMouChenLinUse(f);
     internal bool MouChenLinAdvanceChildren() => _resolve().MouChenLinAdvanceChildren();

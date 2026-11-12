@@ -6,6 +6,7 @@ internal sealed partial class CoreGameEngineExtraCardEffectRoundsEntries
     internal void CaptureExtraCardEffectAttack(NativeOwners.CardAttackHandle attack) => _resolve().CaptureExtraCardEffectAttack(attack);
     internal void CaptureExtraGroupDamageSource(NativeOwners.GroupCardHandle group) => _resolve().CaptureExtraGroupDamageSource(group);
     internal bool ContinueExtraCardEffectFangtian(NativeOwners.CardAttackHandle attack) => _resolve().ContinueExtraCardEffectFangtian(attack);
+    internal bool TryContinueExtraSlashTargets(NativeOwners.CardAttackHandle attack) => _resolve().TryContinueExtraSlashTargets(attack);
     internal bool FinishExtraAttackRound(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishExtraAttackRound(attack, out paused);
     internal bool HasUnstartedExtraCardEffect(long id) => _resolve().HasUnstartedExtraCardEffect(id);
     internal bool IsExtraCardEffectRound(long id) => _resolve().IsExtraCardEffectRound(id);

@@ -10,7 +10,6 @@ internal sealed partial class CharacterZhugeGuoLeRuntime
 
     internal static CardConversionSource LeZhugeGuoSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_zhuge_guo_le_LeZhugeGuoXidi.LeZhugeGuoSource(f);
     internal bool HasLeXidiEntityMark(int cardId) => _cardEntityMarks.Has(cardId, "xidi");
-    internal bool IsLeXidiHandLimitExempt(CharacterState owner, int cardId) => _coreNationalSkillsOperations.HasRuntimeSkill(owner, LeXidi) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(owner.Seat) && HasLeXidiEntityMark(cardId);
     internal SkillProgramStepOutcome ReorderLeXidi(ProgramSkillFrame supplied)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);

@@ -15,8 +15,14 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         if (active.AssistedSlashRequest is not null || active.SelectedTargetSeats.Count != 1 || active.SelectedTargetSeats[0] != actorSeat || actorSeat == active.OwnerSeat)
             throw new InvalidOperationException("An assisted Slash requires one distinct selected actor.");
-        if (!_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || _characterFaZhengBoundaryMobileOperations.FaZhengMobileAssistedTargets(active, actorSeat).Length == 0)
+        var rangeOwner = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(active)?.SlashRequestRangeOwner;
+        var rangeOwnerSeat = rangeOwner is null ? (int?)null : _coreProgramCardPaymentsOperations.ResolveProgramParticipant(active, rangeOwner);
+        _slashRequests.Issue(active, actorSeat,
+            new(ProgramSlashRequestTargetSource.AllOtherLiving, ResultBind: bind, RangeOwnerSeat: rangeOwnerSeat, UsesChoiceResult: true));
+        active = _coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id);
+        if (!_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || _slashRequests.GetTargets(active, actorSeat).Count == 0)
         {
+            _slashRequests.Close(active);
             _coreProgramSlashRequestOperations.CommitProgramChoiceResult(active.Id, bind, "declined", actorSeat, "没有合法目标。");
             return SkillProgramStepOutcome.Continue;
         }
@@ -41,7 +47,7 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
             ["request-option"] = option
         };
         if (draft.TargetSeat is null)
-            return _characterFaZhengBoundaryMobileOperations.FaZhengMobileAssistedTargets(frame, actor.Seat).Select(seat => new PromptChoice(new ChoiceId($"assisted-slash.{(frame.Id)}.target-{(seat)}"), $"指定 {(_coreMatchParticipantsPlayersAccess._players[seat].Name)} 为【杀】的目标", [], [seat], Parameters("target"))).ToArray();
+            return _slashRequests.GetTargets(frame, actor.Seat).Where(seat => AssistedPhysicalSlashTargets(actor.Seat).Contains(seat)).Select(seat => new PromptChoice(new ChoiceId($"assisted-slash.{(frame.Id)}.target-{(seat)}"), $"指定 {(_coreMatchParticipantsPlayersAccess._players[seat].Name)} 为【杀】的目标", [], [seat], Parameters("target"))).ToArray();
         var targetSeat = draft.TargetSeat.Value;
         var choices = new List<PromptChoice>();
         foreach (var card in _coreActionQueriesOperations.GetSlashUseCards(actor))
@@ -70,7 +76,7 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
                     choices.Add(new PromptChoice(new ChoiceId($"assisted-slash.{(frame.Id)}.typed.{(kind)}.{(conversion.SkillId)}.{(conversion.BindingId)}.{(card.Id)}"), $"将牌当【{(CardCatalog.Get(kind).DisplayName)}】使用", [card.Id], [targetSeat], parameters));
                 }
 
-        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor))
+        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor))
         {
             if (!_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[targetSeat], pair[0], noEffectiveRank: true, specificEffectiveRank: _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, pair), physicalCardIds: pair.Select(c => c.Id).ToArray()))
                 continue;
@@ -114,7 +120,7 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
         var nativeChoices = AssistedPhysicalSlashChoices(frame);
         var choices = draft.TargetSeat is { } target ? Array.AsReadOnly(nativeChoices.Where(choice => choice.Parameters.GetValueOrDefault("request-option") != "decline").Concat(_coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramSlashChoices(frame, draft.ActorSeat, [target], _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)!.ResultBind).Concat(_characterMaXiuMaTieOlOperations.KenshangProgramSlashChoices(frame, draft.ActorSeat, [target], _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)!.ResultBind)).Concat(_characterChengJiChengCuiOlOperations.TousuiProgramSlashChoices(frame, draft.ActorSeat, [target], _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(frame)!.ResultBind))).Concat(nativeChoices.Where(choice => choice.Parameters.GetValueOrDefault("request-option") == "decline")).ToArray()) : nativeChoices;
         var skill = _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId);
-        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, chooserSeat, draft.TargetSeat is null ? "请选择受令角色攻击范围内的目标。" : "使用一张【杀】，或允许技能拥有者获得你的牌。", choices.SelectMany(c => c.Cards).Distinct().ToArray(), draft.TargetSeat is null ? _characterFaZhengBoundaryMobileOperations.FaZhengMobileAssistedTargets(frame, draft.ActorSeat) : [draft.TargetSeat.Value], frame.OwnerSeat)
+        _corePendingDecisionPolicyPipelineOperations._pendingDecision = new PendingDecision(DecisionKind.ProgramTrigger, chooserSeat, draft.TargetSeat is null ? "请选择受令角色攻击范围内的目标。" : "使用一张【杀】，或允许技能拥有者获得你的牌。", choices.SelectMany(c => c.Cards).Distinct().ToArray(), draft.TargetSeat is null ? _slashRequests.GetTargets(frame, draft.ActorSeat).ToArray() : [draft.TargetSeat.Value], frame.OwnerSeat)
         {
             PromptId = _coreNativePromptBoundaryOperations.CreatePromptId(),
             IsPrivate = true,
@@ -135,7 +141,7 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
         if (effect.Op != SkillProgramEffectOp.RequestSlashAgainstChosenTarget || selected.Parameters.GetValueOrDefault("frame-id") != frame.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) || _corePendingDecisionPolicyPipelineOperations._pendingDecision?.PlayerSeat != (draft.TargetSeat is null && !draft.ActorChoosesTarget ? frame.OwnerSeat : draft.ActorSeat) || !AssistedPhysicalSlashChoices(frame).Any(choice => choice.Id == selected.Id))
             throw new InvalidOperationException("Assisted Slash choice changed its frozen instruction or participants.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[draft.ActorSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(frame))
+        if (_slashRequests.GetOffer(frame, draft.ActorSeat) is null)
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "受令角色或技能实例已失效。");
             return;
@@ -143,6 +149,8 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
 
         if (draft.TargetSeat is null)
         {
+            _slashRequests.SelectTarget(frame, draft.ActorSeat, selected.Targets.Single());
+            frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(frame with { AssistedSlashRequest = draft with { TargetSeat = selected.Targets.Single() } });
             PublishAssistedPhysicalSlashPrompt((ProgramSkillFrame)_resolutionStackOperations._resolutionStack[^1]);
             return;
@@ -151,6 +159,7 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { AssistedSlashRequest = null });
         if (selected.Parameters.GetValueOrDefault("request-option") == "decline")
         {
+            _slashRequests.Close(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));
             _coreProgramSlashRequestOperations.CommitProgramChoiceResult(frame.Id, effect.ResultBind!, "declined", draft.ActorSeat, "不使用【杀】。");
             _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
             return;
@@ -164,8 +173,9 @@ internal sealed partial class CoreGameEngineAssistedPhysicalCardsRuntime
 
         var actor = _coreMatchParticipantsPlayersAccess._players[draft.ActorSeat];
         var(cards, kind, conversion) = _coreAssistedSlashPaymentOperations.ReadAssistedSlashPayment(actor, selected);
-        if (!_characterFaZhengBoundaryMobileOperations.FaZhengMobileAssistedTargets(frame, actor.Seat).Contains(draft.TargetSeat.Value) || !AssistedSlashPaymentHasRange(actor, draft.TargetSeat.Value, cards, conversion) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[draft.TargetSeat.Value], cards[0], conversion, kind, noEffectiveRank: cards.Count > 1, specificEffectiveRank: selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, cards) : null, physicalCardIds: cards.Select(c => c.Id).ToArray()))
+        if (!_slashRequests.GetTargets(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), actor.Seat).Contains(draft.TargetSeat.Value) || !AssistedSlashPaymentHasRange(actor, draft.TargetSeat.Value, cards, conversion) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[draft.TargetSeat.Value], cards[0], conversion, kind, noEffectiveRank: cards.Count > 1, specificEffectiveRank: selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(actor, cards) : null, physicalCardIds: cards.Select(c => c.Id).ToArray()))
             throw new InvalidOperationException("The assisted Slash target became illegal.");
+        _slashRequests.Accept(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id), actor.Seat, draft.TargetSeat.Value);
         _coreProgramSlashRequestOperations.CommitProgramChoiceResult(frame.Id, effect.ResultBind!, "used-slash", actor.Seat, "使用【杀】。");
         _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[draft.TargetSeat.Value], cards[0], kind, actor.Seat, physicalCards: cards, countsTowardSlashLimit: false, usesZhuqueFan: kind == CardKind.FireSlash && (cards[0].Kind == CardKind.Slash || _coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(actor, cards[0])) && _coreNativeTargetLegalityOperations.HasZhuqueFan(actor), conversionSource: conversion, programSkillCardUseFrameId: frame.Id);
     }

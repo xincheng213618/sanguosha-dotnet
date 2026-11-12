@@ -31,40 +31,25 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
             return N(BoundaryLiuFengIntent.Qinglong, [q.Attack.TargetSeat]);
         if (kind != DecisionKind.ProgramTrigger || top is not ProgramSkillFrame p || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(p)is not { } effect)
             return null;
-        int[]? targets = null;
-        var intent = BoundaryLiuFengIntent.AssistedSlash;
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(p) && _characterSunYuanOlOperations.TryGetSayingSlashRequest(p, out var sayingActor, out var sayingTargets) && sayingActor == actor)
-            targets = sayingTargets.ToArray();
-        else if (_characterLiYiOlOperations.IsChanshuangSlashRequest(p) && _characterLiYiOlOperations.TryGetChanshuangSlashRequest(p, out var chanshuangActor, out var chanshuangTargets) && chanshuangActor == actor)
-            targets = chanshuangTargets.ToArray();
-        else if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(p) && p.LvKuangLvXiang!.Actor == actor)
-            targets = [p.LvKuangLvXiang.Target];
-        else if (_characterWuJingOlOperations.IsWuJingHejiRequest(p) && p.OwnerSeat == actor)
-            targets = [p.WuJing!.TargetSeat];
-        else if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(p) && p.OwnerSeat == actor)
-            targets = _coreMatchParticipantsPlayersAccess._players.Where(t => t.IsAlive && t.Seat != actor).Select(t => t.Seat).ToArray();
-        else if (p.KeBiNengPingduan is { Stage: KeBiNengPingduanStage.BasicChoice, ActorSeat: var keActor } && keActor == actor && _characterKeBiNengOlOperations.ValidKeBiNeng(p))
+        if (p.KeBiNengPingduan is { Stage: KeBiNengPingduanStage.BasicChoice, ActorSeat: var keActor } && keActor == actor && _characterKeBiNengOlOperations.ValidKeBiNeng(p))
+            return N(BoundaryLiuFengIntent.GenericBasic, _coreMatchParticipantsPlayersAccess._players.Where(t => t.IsAlive && t.Seat != actor).Select(t => t.Seat).ToArray(), effect.Op, p.InstructionIndex);
+        if (_programSlashRequests.GetOffer(p, actor) is null)
+            return null;
+        var targets = _programSlashRequests.GetTargets(p, actor).ToArray();
+        var intent = effect.Op switch
         {
-            targets = _coreMatchParticipantsPlayersAccess._players.Where(t => t.IsAlive && t.Seat != actor).Select(t => t.Seat).ToArray();
-            intent = BoundaryLiuFengIntent.GenericBasic;
-        }
-        else if (_coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(p, effect.Op, actor))
-        {
-            targets = _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramTargets(p, actor, effect.Op);
-            intent = effect.Op switch
-            {
-                SkillProgramEffectOp.RequestSlashByTarget => BoundaryLiuFengIntent.ProgramSlash,
-                SkillProgramEffectOp.RequestSlashByNearest => BoundaryLiuFengIntent.ProgramNearestSlash,
-                SkillProgramEffectOp.RequestLegalSlashByNearest => BoundaryLiuFengIntent.NearestLegalSlash,
-                SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner or SkillProgramEffectOp.RequestAnniversaryLeiBoSileiSlash => BoundaryLiuFengIntent.FixedSlash,
-                _ => BoundaryLiuFengIntent.AssistedSlash
-            };
-        }
-
-        return targets is { Length: > 0 } ? N(intent, targets, effect.Op, p.InstructionIndex) : null;
+            SkillProgramEffectOp.RequestSlashByTarget => BoundaryLiuFengIntent.ProgramSlash,
+            SkillProgramEffectOp.RequestSlashByNearest => BoundaryLiuFengIntent.ProgramNearestSlash,
+            SkillProgramEffectOp.RequestLegalSlashByNearest => BoundaryLiuFengIntent.NearestLegalSlash,
+            SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner or SkillProgramEffectOp.RequestAnniversaryLeiBoSileiSlash => BoundaryLiuFengIntent.FixedSlash,
+            _ => BoundaryLiuFengIntent.AssistedSlash
+        };
+        return targets.Length > 0 ? N(intent, targets, effect.Op, p.InstructionIndex) : null;
     }
 
-    internal bool BoundaryLiuFengNeedCurrent(BoundaryLiuFengReceipt r) => r.Need is { } need && r.OriginalDecision is { } p && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == need.RequestFrameId)is { } parent && CaptureBoundaryLiuFengNeed(need.ActorSeat, p.Kind, parent) == need;
+    internal bool BoundaryLiuFengNeedCurrent(BoundaryLiuFengReceipt r) => r.RequestAcceptance is { } acceptance
+        ? r.Need is { } paidNeed && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == paidNeed.RequestFrameId) is ProgramSkillFrame paidParent && _programSlashRequests.OwnsAcceptance(paidParent, acceptance, paidNeed.ActorSeat, r.Targets.SingleOrDefault(-1))
+        : r.Need is { } need && r.OriginalDecision is { } p && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == need.RequestFrameId)is { } parent && CaptureBoundaryLiuFengNeed(need.ActorSeat, p.Kind, parent) == need;
     internal bool BoundaryLiuFengRequestTarget(BoundaryLiuFengNeed n, int target)
     {
         if (!_coreMatchParticipantsPlayersAccess._players[n.ActorSeat].IsAlive || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || target == n.ActorSeat || !n.Targets.Contains(target) || !_coreProgramTargetRulesOperations.TargetRules.AllowsNativeUseMaterial(new(n.ActorSeat, CardKind.Slash, [])) || _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, CardKind.Slash, CardActionType.Use) || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(n.ActorSeat, target, Suit.None) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(n.ActorSeat, target, CardKind.Slash) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, Suit.None))
@@ -75,7 +60,12 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
         if (n.Intent == BoundaryLiuFengIntent.Qinglong)
             return _coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } q && q.Attack.ResolutionId == n.OwnerFrameId && _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], CardKind.Slash, null, false, Suit.None, 0, []);
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.OwnerFrameId);
-        var ignore = n.Intent is BoundaryLiuFengIntent.ProgramSlash or BoundaryLiuFengIntent.ProgramNearestSlash || parent is not null && (_characterLvKuangLvXiangOlOperations.IsQigongRequest(parent) || _characterWuJingOlOperations.IsWuJingHejiRequest(parent) || n.Intent == BoundaryLiuFengIntent.FixedSlash && parent.FixedTargetSlash?.IgnoreDistance == true);
+        if (parent?.SlashRequest?.Acceptance is { } acceptedRequest && !_programSlashRequests.CanExecuteAcceptedUse(parent, acceptedRequest))
+            return false;
+        var request = parent is null ? null : _programSlashRequests.GetIdentity(parent);
+        if (request?.Spec.CountsTowardSlashLimit == true && !_coreRuleQueriesOperations.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[target], false, CardKind.Slash, physicalCardIds: []))
+            return false;
+        var ignore = request?.Spec.IgnoreDistance == true;
         return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], new(0, CardKind.Slash, Suit.None, 0), effectiveKind: CardKind.Slash, ignoreDistance: ignore, noEffectiveRank: true, physicalCardIds: []);
     }
 

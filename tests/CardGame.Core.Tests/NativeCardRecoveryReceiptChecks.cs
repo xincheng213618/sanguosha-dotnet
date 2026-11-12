@@ -34,11 +34,6 @@ internal static class NativeCardRecoveryReceiptChecks
                     "A conflicting invoice or foreign child and parent cannot replace the original application or emit another fact.");
             });
             var hp = first.Hp!;
-            var historyReads = 0;
-            IReadOnlyList<IGameEvent> ReadHistory() { historyReads++; return h.Journal; }
-            Need(!h.Runtime.ExactPaidNativeRecoveryUseEdge(first.Use, hp, ReadHistory) &&
-                !h.Runtime.ExactPaidNativeRecoveryReplacementEdge(first.Use, hp, ReadHistory) && historyReads == 0,
-                "A real native use and its positive HP child do not demand unrelated program-issuance or replacement history.");
             Need(h.Runtime.NativeCardRecoveryReturnMatches(first.Use, hp),
                 "A real popped recovery produces the exact positive HP child of its owning native use.");
             h.Journal.RemoveAll(fact => fact is NativeCardRecoveryAppliedEvent);

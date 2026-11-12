@@ -814,7 +814,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterKeBiNengOlEntries KeBiNengOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterKeBiNengOlEntries, EngineOwners.CharacterKeBiNengOlRuntime>(Core.RuntimeEntries.CharacterKeBiNengOlEntries.Create);
 
-    internal Core.RuntimeEntries.CoreGameEngineKenshangPaymentsEntries KenshangPaymentsEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CoreGameEngineKenshangPaymentsEntries, EngineOwners.CoreGameEngineKenshangPaymentsRuntime>(Core.RuntimeEntries.CoreGameEngineKenshangPaymentsEntries.Create);
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterKongRongMouOlRuntime> KongRongMouOlEntries => GetDeferredModule<EngineOwners.CharacterKongRongMouOlRuntime>();
 

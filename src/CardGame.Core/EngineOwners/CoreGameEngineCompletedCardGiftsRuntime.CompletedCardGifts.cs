@@ -81,7 +81,7 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
                         }
 
             foreach (var target in CompletedGiftSlashTargets(frame, actor.Seat))
-                foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor))
+                foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor))
                 {
                     if (!_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], pair[0], effectiveKind: CardKind.Slash, ignoreDistance: true))
                         continue;
@@ -184,6 +184,10 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
                 SelectedTargetSeats = [recipient]
             };
             _coreRuntimeOperations.ReplaceRuntimeTop(frame);
+            _slashRequests.Issue(frame, recipient,
+                new(ProgramSlashRequestTargetSource.AllOtherLiving, ResultBind: CompletedGiftFactionResultBind,
+                    IgnoreDistance: true, RangeOwnerSeat: frame.OwnerSeat, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction));
+            frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
             PublishCompletedCardGiftPrompt(frame);
             return;
         }
@@ -199,16 +203,40 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
 
         var kind = Enum.Parse<CardKind>(selected.Parameters["effective-kind"]);
         CoreGameEngineCardConversionsRuntime.TryReadConversionSource(selected.Parameters, out var conversion);
-        IReadOnlyList<Card> paid = selected.Cards.Count == 1 && !_characterKongShuOlOperations.IsLeiluanSource(conversion) ? [_corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor)).Single(card => card.Id == selected.Cards[0])] : selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor).Single(pair => pair.Select(card => card.Id).SequenceEqual(selected.Cards)) : _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(actor, selected.Cards, kind, false, conversion!)?.Cards ?? throw new InvalidOperationException("Completed gift Slash lost its physical payment.");
+        IReadOnlyList<Card> paid;
+        if (selected.Cards.Count == 1 && !_characterKongShuOlOperations.IsLeiluanSource(conversion))
+            paid = [_corePhysicalOwnedCardQueriesOperations.GetPlayableCards(actor).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(actor)).Concat(_coreOwnPublicPileConversionsOperations.GetOwnPublicPileConversionCards(actor)).Single(card => card.Id == selected.Cards[0])];
+        else if (selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString())
+        {
+            var pair = _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(actor, selected.Cards);
+            if (pair is null || !pair.Select(card => card.Id).SequenceEqual(selected.Cards))
+                throw new InvalidOperationException("Sequence contains no matching element");
+            paid = pair;
+        }
+        else
+            paid = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(actor, selected.Cards, kind, false, conversion!)?.Cards ?? throw new InvalidOperationException("Completed gift Slash lost its physical payment.");
         if (!CompletedGiftSlashTargets(frame, actor.Seat).Contains(target) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], paid[0], conversion, kind, ignoreDistance: true))
             throw new InvalidOperationException("Completed gift Slash target is no longer legal.");
+        _slashRequests.Accept(frame, actor.Seat, target);
         _coreNativeSlashUseOperations.ResolveSlashCore(actor, _coreMatchParticipantsPlayersAccess._players[target], paid[0], kind, actor.Seat, physicalCards: paid, countsTowardSlashLimit: false, usesZhuqueFan: kind == CardKind.FireSlash && (paid[0].Kind == CardKind.Slash || _coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(actor, paid[0])) && _coreNativeTargetLegalityOperations.HasZhuqueFan(actor), conversionSource: conversion, programSkillCardUseFrameId: frame.Id);
     }
 
     internal void CompleteProgramCardGift(ProgramSkillFrame frame)
     {
+        _slashRequests.Close(frame);
+        frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { CompletedCardGiftDraft = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
+    }
+
+    [ProgramContinuation(ProgramContinuationKind.Resume, 825)]
+    internal bool ResumeCompletedGiftSlashFailure(long id)
+    {
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault() is not ProgramSkillFrame { CompletedCardGiftDraft: not null } frame ||
+            frame.Id != id || _slashRequests.TakeFailure(frame) is null)
+            return false;
+        CompleteProgramCardGift(_coreProgramLifecycleOperations.GetActiveProgramFrame(id));
+        return true;
     }
 
     SkillProgramStepOutcome ICompletedCardGiftProgramHost.OfferCompletedCardGift(ProgramSkillFrame frame) => OfferProgramCompletedCardGift(frame);

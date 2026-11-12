@@ -84,7 +84,7 @@ internal sealed partial class CoreNativeNullificationRuntime
 
     internal void ContinueNullificationWindow(NullificationWindowFrame pending)
     {
-        pending = _coreNamedAmbushInvalidationOperations.CompleteNamedAmbushCounterspell(pending);
+        pending = CompleteCounterspellResponse(pending);
         if (_coreUnrespondableCounterspellsOperations.TryFinishUnrespondableCounterspell(pending))
             return;
         if (pending.IssuedNoResponseNode is { } issuedNode)
@@ -102,7 +102,7 @@ internal sealed partial class CoreNativeNullificationRuntime
         while (pending.CandidateIndex < pending.CandidateSeats.Count)
         {
             var responder = _coreMatchParticipantsPlayersAccess._players[pending.CandidateSeats[pending.CandidateIndex]];
-            if (_characterLiuQiOlOperations.IsWenjiNullificationResponseForbidden(pending, responder.Seat) || _coreWushuangSkillsBAuditOperations.WushuangFuqiNullificationBanned(responder.Seat) || _coreShanheS5QuyiOperations.ShanheS5FuqiNullificationBanned(responder.Seat) || _coreShanheTrickResponseOperations.ShanheTrickNullificationBanned(responder.Seat))
+            if (_responseRules.IsCounterspellResponseForbidden(pending, responder.Seat) || _coreWushuangSkillsBAuditOperations.WushuangFuqiNullificationBanned(responder.Seat) || _coreShanheS5QuyiOperations.ShanheS5FuqiNullificationBanned(responder.Seat) || _coreShanheTrickResponseOperations.ShanheTrickNullificationBanned(responder.Seat))
             {
                 pending = _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { CandidateIndex = pending.CandidateIndex + 1, Step = ResolutionFrameStep.AwaitingResponse });
                 continue;
@@ -179,8 +179,8 @@ internal sealed partial class CoreNativeNullificationRuntime
             _coreGameEngineCardConversionsHasSelectedResponseConversionChoiceSelectedResponseConversionAccess._hasSelectedResponseConversionChoice = true;
         }
 
-        if (selectedCard is not null && _characterLiuQiOlOperations.IsWenjiNullificationResponseForbidden(pending, responder.Seat))
-            throw new InvalidOperationException("Wenji forbids this exact actual counterspell responder.");
+        if (selectedCard is not null && _responseRules.IsCounterspellResponseForbidden(pending, responder.Seat))
+            throw new InvalidOperationException("The current incoming card forbids this counterspell responder.");
         if (selectedCard is { } declaredCounter && _coreCardDeclarationsOperations.TryBeginCardDeclaration(responder, declaredCounter, CardKind.Nullification, _coreCardDeclarationsOperations.PeekDeclarationConversion(responder, declaredCounter, CardKind.Nullification, false, selectedConversionSource), _coreCardDeclarationsOperations.DeclarationReturn(CardDeclarationPurpose.Counterspell, responder.Seat), pending.TargetSeats))
             return;
         if (!ReferenceEquals(_resolutionStackOperations._resolutionStack.LastOrDefault(), pending) || pending.CandidateIndex >= pending.CandidateSeats.Count || pending.CandidateSeats[pending.CandidateIndex] != responder.Seat)
@@ -231,26 +231,18 @@ internal sealed partial class CoreNativeNullificationRuntime
         if (!_characterMiHengLeOperations.IsSiruiOutsideResponseMaterial(pending.Id, card.Id) && !_coreWushuangShopCardsOperations.IsWushuangShopDestroyedNullificationPayment2(pending.Id, responder.Seat, new(card.Id, card.Kind, responseFrom, responseCostIsRed), responsePaymentBefore))
             _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.NullificationFinished);
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(frame => frame.Id == pending.Id);
-        pending = (responseFrom == CardLocation.Hand(responder.Seat) && _coreNamedAmbushInvalidationOperations.HasEnabledMatchingNamedAmbush(responder.Seat, CardKind.Nullification)) || _characterChengYuMouOperations.HasMouCyMatchingName(responder.Seat, CardKind.Nullification) || _characterHuangZhongAnniversaryGodOperations.HasAnniversaryHzPendingInvalidation(responder.Seat) || _coreFieldEquipmentOperations.HasHappyWeiYanPotentialCancellation(responder.Seat) ? _coreNamedAmbushInvalidationOperations.PrepareNamedAmbushCounterspell(pending, responder.Seat, card.Id) : _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { EffectNullified = !pending.EffectNullified, ChainDepth = pending.ChainDepth + 1, CandidateSeats = BuildNullificationCandidateSeats(responder.Seat), CandidateIndex = 0, Step = ResolutionFrameStep.AwaitingResponse });
+        pending = _counterspellResponses.Prepare(pending, responder.Seat, card.Id);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(card.Id, responder.Seat, pending.SourceSeat, CardKind.Nullification));
-        if (pending.NamedAmbushResponse is null)
-        {
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, responder.Seat, card.Id, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
-            _coreMatchLogOperations.AddLog("NullificationResponded", pending.EffectNullified ? $"{(responder.Name)} 使用【无懈可击】，使{(_coreGroupTargetNullificationOperations.Value.NullificationEffectDescription(pending))}失效。" : $"{(responder.Name)} 使用【无懈可击】，使{(_coreGroupTargetNullificationOperations.Value.NullificationEffectDescription(pending))}恢复。", responder.Seat, pending.SourceSeat);
-        }
 
         var parentActionId = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(frame => frame.Id == pending.ParentFrameId)?.Action?.ActionId;
         var responseAction = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, parentActionId, CardActionType.Response, responder.Seat, responder.Seat, null, responder.Seat, pending.SourceSeat, CardKind.Nullification, [], [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)], selectedConversionSource is null ? [] : [selectedConversionSource], effectiveSuit: completedResponseUseSuit, effectiveRank: _characterGuanYuWumiaoOperations.CaptureJuewuResponseRank(responder, [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)]) ?? _characterLuXunWumiaoOperations.CaptureWuLuXunResponseRank(responder, CardKind.Nullification, [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)], selectedConversionSource) ?? _characterZhangFeiWumiaoOperations.CaptureWuZhangFeiResponseRank(responder, CardKind.Nullification, [new CardActionCost(card.Id, card.Kind, responseFrom, responseCostIsRed)], selectedConversionSource) ?? (_characterMiHengLeOperations.IsSiruiSource(selectedConversionSource) || _characterLiFengOlOperations.HasLiFengCapability && responseFrom.Zone == CardZoneKind.PublicPersistentPile ? card.Rank : (int? )null), effectiveIsRed: (_characterRuanYuOlOperations.HasRuanYuCapability || _characterMaMiDiOlOperations.HasMaMiDiCapability || _coreActionDiscardColorsOperations.TracksActionDiscardColor || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.OfferPairedColorCardDisposition)) ? CoreGameEnginePublicPileColorsRuntime.SuitColor(completedResponseUseSuit) ?? responseCostIsRed : null));
         _characterZhangFeiWumiaoOperations.BindWuZhangFeiResponseRanks(responseAction);
         _characterMiHengLeOperations.BindSiruiResponseAction(pending, responseAction);
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(f => f.Id == pending.Id);
-        if (pending.NamedAmbushResponse is not null)
-            _coreNamedAmbushInvalidationOperations.BindNamedAmbushCounterspell(pending.Id, responseAction);
+        pending = _counterspellResponses.Bind(pending.Id, responseAction);
         _coreTieredRoundZeroResponsesOperations.TryIssueTieredRoundResponse(pending, responseAction);
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(responseAction);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(responseAction));
-        if (pending.NamedAmbushResponse is null)
-            _characterCaoXiOlOperations.CaptureCaoXiNativeCounterspellOffset(pending, responseAction, invalidated: false);
         _coreFriendEventsOperations.CaptureFriendMinimumHandUse(responseAction);
         _coreOffTurnUsedCardsOperations.CaptureOffTurnResponseUseOrigin(pending.ParentFrameId, responseAction);
         _coreOffTurnUsedCardsOperations.CaptureOffTurnResponseUsedCards(responseAction);
@@ -261,6 +253,23 @@ internal sealed partial class CoreNativeNullificationRuntime
         if (_coreCardActionsOperations.TryBeginProgramCardWindow(null, responseAction, SkillProgramTriggerWindow.CardResponseAccepted, [], ProgramCardContinuation.NullificationResponse))
             return;
         _coreResponseUseCompletionOperations.ContinueNullificationAfterResponseUse(responseAction);
+    }
+
+    internal NullificationWindowFrame CompleteCounterspellResponse(NullificationWindowFrame supplied)
+    {
+        if (_counterspellResponses.Complete(supplied.Id) is not { } completion)
+            return _resolutionStackOperations._resolutionStack.OfType<NullificationWindowFrame>().Single(frame => frame.Id == supplied.Id);
+        var pending = completion.Window;
+        _characterCaoXiOlOperations.CaptureCaoXiNativeCounterspellOffset(pending, completion.Action, invalidated: completion.Invalidated);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, completion.ResponderSeat, completion.CardId, pending.EffectNullified, pending.ChainDepth)
+        { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
+        _coreMatchLogOperations.AddLog("NullificationResponded", completion.Invalidated
+            ? $"{(_coreMatchParticipantsPlayersAccess._players[completion.ResponderSeat].Name)} 使用的【无懈可击】无效。"
+            : pending.EffectNullified
+                ? $"{(_coreMatchParticipantsPlayersAccess._players[completion.ResponderSeat].Name)} 使用【无懈可击】，使{(_coreGroupTargetNullificationOperations.Value.NullificationEffectDescription(pending))}失效。"
+                : $"{(_coreMatchParticipantsPlayersAccess._players[completion.ResponderSeat].Name)} 使用【无懈可击】，使{(_coreGroupTargetNullificationOperations.Value.NullificationEffectDescription(pending))}恢复。",
+            completion.ResponderSeat, pending.SourceSeat);
+        return pending;
     }
 
     internal void FinishNullificationWindow(NullificationWindowFrame pending)
@@ -318,7 +327,7 @@ internal sealed partial class CoreNativeNullificationRuntime
     internal void ResolveNullifiableEffect(NullificationWindowFrame pending)
     {
         var effectUse = _coreCardUseLifecycleOperations.LifecycleCardUse(pending.ParentFrameId) ?? throw new InvalidOperationException("A trick effect lost its owning use.");
-        if (_coreProgramCardUseNullificationOperations.Value.IsProgramUseIneffective(effectUse) || _coreNamedAmbushInvalidationOperations.IsNamedAmbushUseIneffective(effectUse))
+        if (_invalidations.IsUseIneffective(effectUse))
         {
             _coreProgramCardTargetEffectsOperations.CompleteIneffectiveTrickTarget(pending, pending.TargetSeats.FirstOrDefault(pending.SourceSeat));
             return;

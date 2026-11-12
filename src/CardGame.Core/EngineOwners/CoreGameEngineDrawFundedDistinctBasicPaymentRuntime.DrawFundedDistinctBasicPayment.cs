@@ -30,15 +30,25 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
         });
     }
 
-    internal void BeginDrawFundedDistinctBasic(CharacterState actor, CardConversionSource source, CardKind kind, IReadOnlyList<int> targets, PendingDecision original, GameEngine.DrawFundedBasicNeed need)
+    internal void BeginDrawFundedDistinctBasic(CharacterState actor, CardConversionSource source, CardKind kind, IReadOnlyList<int> targets, PendingDecision original, GameEngine.DrawFundedBasicNeed need, ProgramSlashRequestAcceptance? programSlashRequest = null, ProgramSlashRequestIdentity? programSlashRequestIdentity = null)
     {
         var accepted = _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicRules(actor, kind, need.Intent == DrawFundedDistinctBasicIntent.OwnSlashDodge, need.Intent == DrawFundedDistinctBasicIntent.Dying).SingleOrDefault(r => r.Source == source);
         if (accepted.Rule is null || original.PlayerSeat != actor.Seat || _resolutionStackOperations._resolutionStack.OfType<DrawFundedDistinctBasicFrame>().Any(f => f.Payment.OriginalPromptId == original.PromptId))
             throw new InvalidOperationException("A draw-funded use cannot accept an unavailable source or pay the same original prompt twice.");
+        if (programSlashRequest is null && programSlashRequestIdentity is { } identity)
+        {
+            var originalParent = _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == identity.FrameId) as ProgramSkillFrame
+                ?? throw new InvalidOperationException("A native Play cost lost its original Slash request.");
+            if (!_programSlashRequests.OwnsIssuedIdentity(originalParent, identity, actor.Seat))
+                throw new InvalidOperationException("A native Play cost cannot accept another issued request.");
+            programSlashRequest = _programSlashRequests.Accept(originalParent, actor.Seat, need.FixedTargetSeat ?? targets.First());
+        }
         var id = ++_coreResolutionIdentityBoundaryOperations._resolutionSequence;
-        var payment = new DrawFundedDistinctBasicPayment(id, source, accepted.Hash, accepted.Rule.DrawFundedDistinctBasic!.MethodLedgerId, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, need.Intent, kind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind), need.ParentFrameId, need.RequestFrameId, need.ParentActionId, targets.Count == 1 ? targets[0] : need.FixedTargetSeat, need.Cursor, original.PromptId, original.Revision, 0, 0, 0);
+        var payment = new DrawFundedDistinctBasicPayment(id, source, accepted.Hash, accepted.Rule.DrawFundedDistinctBasic!.MethodLedgerId, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat, need.Intent, kind, CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(kind), need.ParentFrameId, need.RequestFrameId, need.ParentActionId, targets.Count == 1 ? targets[0] : need.FixedTargetSeat, need.Cursor, original.PromptId, original.Revision, 0, 0, 0) { RequestAcceptance = programSlashRequest };
         if (need.Intent == DrawFundedDistinctBasicIntent.WenyiPeach)
             _coreWenyiPeachSuppliesOperations.ReserveWenyiDrawFundedPeach(original, need, source, kind);
+        if (need.ParentFrameId is { } requestId && _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == requestId) is ProgramSkillFrame request && payment.TargetSeat is { } target && _programSlashRequests.GetOffer(request, actor.Seat) is not null)
+            payment = payment with { RequestAcceptance = _programSlashRequests.Accept(request, actor.Seat, target) };
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.PushRuntimeFrame(new DrawFundedDistinctBasicFrame(id, payment, original, targets));
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DrawFundedDistinctBasicStartedEvent(id, actor.Seat, source, accepted.Hash, payment.MethodLedgerId, payment.ActualTurnNumber, payment.ActualTurnOwnerSeat, need.Intent, kind, need.ParentFrameId, need.RequestFrameId, need.ParentActionId, payment.TargetSeat, need.Cursor, original.PromptId, original.Revision));
@@ -76,7 +86,6 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
             if (_coreHpChangeProgramsOperations.TryBeginHpChangedProgramWindow(frame.Id, PostEventContinuation.DrawFundedDistinctBasic) || _coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
                 return;
             var legal = DrawFundedDistinctBasicOriginalNeedCurrent(frame);
-            _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.DrawFundedDistinctBasic);
             if (!legal)
             {
                 CancelDrawFundedDistinctBasicAttempt(frame);
@@ -84,6 +93,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
             }
 
             // No new decision after payment: return only to the accepted use and its exact original native parent.
+            _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.DrawFundedDistinctBasic);
             _coreDrawFundedDistinctBasicUsesOperations.ExecuteDrawFundedDistinctBasicPaid(frame);
             return;
         }
@@ -142,8 +152,18 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
         var actor = _coreMatchParticipantsPlayersAccess._players[p.Source.OwnerSeat];
         if (!actor.IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || p.ActualTurnNumber != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnNumber || p.ActualTurnOwnerSeat != _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._turnProgression.OwnerSeat)
             return false;
+        if (p.Intent == DrawFundedDistinctBasicIntent.Play && p.RequestAcceptance is { } acceptedPlay)
+            return _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == acceptedPlay.Identity.FrameId) is ProgramSkillFrame playParent &&
+                _programSlashRequests.OwnsAcceptance(playParent, acceptedPlay, actor.Seat, p.TargetSeat) &&
+                _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicNativeResponseLegal(actor, new(p.Intent, playParent.Id, playParent.Id, null, playParent.InstructionIndex, p.TargetSeat), p.EffectiveKind, p.TargetSeat, p.Source);
         if (p.Intent == DrawFundedDistinctBasicIntent.Play)
-            return (_resolutionStackOperations._resolutionStack.Count == 1 && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat == actor.Seat || _characterKeBiNengOlOperations.IsKeBiNengPingduanPaymentFrame2(frame) || (_characterKongRongMouOlOperations.Value.IsMouKrLiwenPaymentFrame(frame) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTiePaymentFrame2(frame)) || _characterLuSuMouOperations.Value.IsMouLuSuPaymentFrame(frame)) && _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicNativePlayActions(actor, p.Source, p.EffectiveKind).Any(a => a.TargetSeats.SequenceEqual(frame.TargetSeats));
+            return (_resolutionStackOperations._resolutionStack.Count == 1 && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat == actor.Seat || _characterKeBiNengOlOperations.IsKeBiNengPingduanPaymentFrame2(frame) || _characterKongRongMouOlOperations.Value.IsMouKrLiwenPaymentFrame(frame) || _characterLuSuMouOperations.Value.IsMouLuSuPaymentFrame(frame)) && _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicNativePlayActions(actor, p.Source, p.EffectiveKind).Any(a => a.TargetSeats.SequenceEqual(frame.TargetSeats));
+        if (p.RequestAcceptance is { } acceptance)
+            return _resolutionStackOperations._resolutionStack.Count >= 2 &&
+                _resolutionStackOperations._resolutionStack[^2] is ProgramSkillFrame acceptedParent &&
+                acceptedParent.Id == p.ParentFrameId && acceptedParent.Id == p.RequestFrameId &&
+                _programSlashRequests.OwnsAcceptance(acceptedParent, acceptance, actor.Seat, p.TargetSeat) &&
+                _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicNativeResponseLegal(actor, new(p.Intent, p.ParentFrameId, p.RequestFrameId, p.ParentActionId, p.Cursor, p.TargetSeat), p.EffectiveKind, p.TargetSeat, p.Source);
         var request = _resolutionStackOperations._resolutionStack.SingleOrDefault(f => f.Id == p.RequestFrameId);
         if (request is null || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[_resolutionStackOperations._resolutionStack.Count - 2].Id != request.Id || _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicContext(frame.OriginalDecision, request)is not { } current || current.Intent != p.Intent || current.ParentFrameId != p.ParentFrameId || current.RequestFrameId != p.RequestFrameId || current.ParentActionId != p.ParentActionId || current.Cursor != p.Cursor)
             return false;
@@ -156,22 +176,44 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
                 return false;
         }
 
-        return _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicNativeResponseLegal(actor, current, p.EffectiveKind, p.TargetSeat);
+        return _coreDrawFundedDistinctBasicOffersOperations.DrawFundedDistinctBasicNativeResponseLegal(actor, current, p.EffectiveKind, p.TargetSeat, p.Source);
     }
 
     internal void CancelDrawFundedDistinctBasicAttempt(DrawFundedDistinctBasicFrame frame)
     {
         var p = frame.Payment;
+        ProgramSkillFrame? failedOwner = null;
+        if (p.RequestAcceptance is { } failedAcceptance)
+        {
+            failedOwner = _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == failedAcceptance.Identity.FrameId) as ProgramSkillFrame
+                ?? throw new InvalidOperationException("A paid Slash failure lost its original request frame.");
+            _programSlashRequests.FailAcceptedUse(failedOwner, failedAcceptance, frame.Id);
+        }
+        if (_resolutionStackOperations._resolutionStack.LastOrDefault()?.Id == frame.Id)
+            _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.DrawFundedDistinctBasic);
+
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DrawFundedDistinctBasicCancelledEvent(p.PaymentFrameId, p.Source.OwnerSeat, p.Intent, p.EffectiveKind));
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
+        if (failedOwner is not null && p.RequestAcceptance is { } acceptedFailure)
+        {
+            if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+                return;
+            var original = (ProgramSkillFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == failedOwner.Id);
+            if (acceptedFailure.Identity.Spec.FailureReturnPolicy == ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction)
+                _coreRuntimeOperations.AdvanceRuntimeProgram(original.Id);
+            else
+                _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(original, "原用牌请求失败；已支付费用不撤回。");
+            return;
+        }
+
         if (p.Intent == DrawFundedDistinctBasicIntent.WenyiPeach && _coreWenyiPeachSuppliesOperations.TryCancelWenyiPeachSupply(p.ParentFrameId))
             return;
         if (p.ParentFrameId is { } pingduanParent && _characterKeBiNengOlOperations.TryCancelKeBiNengPingduanBasicPayment(pingduanParent))
             return;
         if (p.ParentFrameId is { } luSuParent && _characterLuSuMouOperations.Value.TryCancelMouLuSuPayment(luSuParent))
             return;
-        if (p.ParentFrameId is { } liwenParent && (_characterKongRongMouOlOperations.Value.TryCancelMouKrLiwenPayment(liwenParent) || _characterMaTieAnniversaryOperations.TryCancelAnniversaryMaTiePayment(liwenParent)))
+        if (p.ParentFrameId is { } liwenParent && _characterKongRongMouOlOperations.Value.TryCancelMouKrLiwenPayment(liwenParent))
             return;
         if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
             return;
@@ -204,27 +246,7 @@ internal sealed partial class CoreGameEngineDrawFundedDistinctBasicPaymentRuntim
             return;
         }
 
-        if (p.Intent is DrawFundedDistinctBasicIntent.ProgramSlash or DrawFundedDistinctBasicIntent.ProgramNearestSlash or DrawFundedDistinctBasicIntent.AssistedSlash or DrawFundedDistinctBasicIntent.NearestLegalSlash && _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame program && program.Id == p.ParentFrameId && program.InstructionIndex == p.Cursor)
-        {
-            if (_characterSunYuanOlOperations.FinishSayingSuppliedSlashFailure(program))
-                return;
-            if (_characterLiYiOlOperations.FinishChanshuangSuppliedSlashFailure(program))
-                return;
-            if (_characterWuJingOlOperations.FinishWuJingPaidAdapter(program))
-                return;
-            if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(program))
-            {
-                _characterLvKuangLvXiangOlOperations.FinishLvKuangLvXiang(program);
-                return;
-            }
-
-            if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(program))
-            {
-                _characterCaoChunOlOperations.FinishCaoChun(program);
-                return;
-            }
-
-            _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(program, "原用牌对象或请求已失效，已支付摸牌尝试取消。");
-        }
+        if (p.Intent is DrawFundedDistinctBasicIntent.ProgramSlash or DrawFundedDistinctBasicIntent.ProgramNearestSlash or DrawFundedDistinctBasicIntent.AssistedSlash or DrawFundedDistinctBasicIntent.NearestLegalSlash && _resolutionStackOperations._resolutionStack.LastOrDefault() is ProgramSkillFrame program && program.Id == p.ParentFrameId && program.InstructionIndex == p.Cursor)
+            _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(program, "原用牌请求已失效；已支付费用不撤回。");
     }
 }

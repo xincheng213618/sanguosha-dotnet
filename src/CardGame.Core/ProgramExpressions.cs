@@ -755,8 +755,7 @@ internal static class ProgramExpressions
 
     private static T ParseFactEnum<T>(JsonElement node, string path) where T : struct, Enum
     {
-        if (node.ValueKind == JsonValueKind.String && Enum.TryParse<T>(node.GetString(), true, out var value) &&
-            Enum.GetName(value) is { } name && node.GetString() == char.ToLowerInvariant(name[0]) + name[1..])
+        if (node.ValueKind == JsonValueKind.String && SkillProgramEnumText.TryParse<T>(node.GetString(), out var value))
             return value;
         throw Failure(path, $"must be a supported camelCase {typeof(T).Name}");
     }

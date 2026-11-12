@@ -60,16 +60,20 @@ internal sealed class ProgramTriggerProofCatalog
     internal static ProgramTriggerProofCatalog Discover(IEnumerable<MethodInfo> methods)
     {
         var phases = new Dictionary<ProgramTriggerProofPhase, SortedDictionary<int, Rule>>();
-        foreach (var method in methods)
-        foreach (var registration in method.GetCustomAttributes<ProgramTriggerProofAttribute>())
+        foreach (var candidateMethod in methods)
         {
-            if (!Enum.IsDefined(registration.Phase) || registration.Order <= 0 || !Enum.IsDefined(registration.MatchKind) ||
-                method.IsStatic && !ProgramRuntimeModuleCatalog.IsDeclaredStaticHandler(method) ||
-                registration.Window is { } window && (!Enum.IsDefined(window) || registration.Phase != ProgramTriggerProofPhase.NativeWindow))
-                throw Invalid(method);
-            if (!phases.TryGetValue(registration.Phase, out var rules)) phases.Add(registration.Phase, rules = new());
-            if (!rules.TryAdd(registration.Order, new(method, registration.Order, Compile(method, registration), registration.Window)))
-                throw new InvalidOperationException($"Duplicate trigger proof order '{registration.Phase}:{registration.Order}'.");
+            if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(ProgramTriggerProofAttribute), inherit: true)) continue;
+            var method = candidateMethod!;
+            foreach (var registration in method.GetCustomAttributes<ProgramTriggerProofAttribute>())
+            {
+                if (!Enum.IsDefined(registration.Phase) || registration.Order <= 0 || !Enum.IsDefined(registration.MatchKind) ||
+                    method.IsStatic && !ProgramRuntimeModuleCatalog.IsDeclaredStaticHandler(method) ||
+                    registration.Window is { } window && (!Enum.IsDefined(window) || registration.Phase != ProgramTriggerProofPhase.NativeWindow))
+                    throw Invalid(method);
+                if (!phases.TryGetValue(registration.Phase, out var rules)) phases.Add(registration.Phase, rules = new());
+                if (!rules.TryAdd(registration.Order, new(method, registration.Order, Compile(method, registration), registration.Window)))
+                    throw new InvalidOperationException($"Duplicate trigger proof order '{registration.Phase}:{registration.Order}'.");
+            }
         }
         return new(phases.ToDictionary(pair => pair.Key,
             pair => (IReadOnlyList<Rule>)Array.AsReadOnly(pair.Value.Values.ToArray())));

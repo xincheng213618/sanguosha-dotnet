@@ -25,38 +25,19 @@ internal sealed partial class CharacterJiangWeiMouMobileRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiangWeiFactionRequestedEvent(f.Id, r.Cursor, actor, f.OwnerSeat, policy));
         var candidates = _coreNativeEquipmentAndFactionQueriesOperations.GetFactionProviderSeats(actor, policy.FactionId);
         _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest = _kernelCoreMainOperations.CreateFactionCardRequestHandle(f.Id, FactionCardRequestPurpose.AssistedProgramUse, actor, candidates, policy.FactionId, targetSeat: f.OwnerSeat, programSkillFrameId: f.Id, policySource: policy, assistedResultBind: MouJwFactionBind);
-        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: true);
+        _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest.AuthorizeProgramRequest(f.InstructionIndex, ignoreDistance: true, requestIdentity: _slashRequests.GetIdentity(f));
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreMatchOutcomeStatusWinnerAccess._status = EngineStatus.Running;
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new FactionSlashRequestedEvent(f.Id, actor, candidates, policy.SkillId, IsActiveUse: true, f.OwnerSeat));
         _coreNativeFactionSlashOperations.AdvanceFactionSlashCandidate();
     }
 
-    internal bool ValidateMouJwFactionParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f)
-    {
-        if (f.MouJiangWei is not { FactionPolicy: { } policy } r)
-            return false;
-        if (!ValidMouJw(f) || !r.Accepted || r.Cursor >= r.Targets.Count || r.Stage is not (MouJiangWeiStage.FactionRequest or MouJiangWeiStage.Issuing or MouJiangWeiStage.NativeUse or MouJiangWeiStage.NativeReturned) || !pending.IsAssistedProgramUse || pending.OwnerFrameId != f.Id || pending.ResolutionId != f.Id || pending.ProgramSkillFrameId != f.Id || pending.OwnerSeat != r.Targets[r.Cursor] || pending.TargetSeat != f.OwnerSeat || pending.PolicySource != policy || pending.ProviderFactionId != policy.FactionId || pending.AssistedResultBind != MouJwFactionBind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouJiangWeiFactionRequestedEvent>().Count(e => e.FrameId == f.Id && e.Index == r.Cursor && e.ActorSeat == pending.OwnerSeat && e.TargetSeat == f.OwnerSeat && e.Policy == policy) != 1)
-            throw new InvalidOperationException("Tiaoxin faction use changed its actual requester, original policy or owning target occurrence.");
-        return true;
-    }
+    internal bool ValidateMouJwFactionParent(NativeOwners.FactionCardRequestHandle pending, ProgramSkillFrame f) =>
+        f.MouJiangWei is { FactionPolicy: { } policy } r && r.Cursor < r.Targets.Count &&
+        pending.AssistedAuthorization?.RequestIdentity is { } identity &&
+        _slashRequests.OwnsIssuedIdentity(f, identity, r.Targets[r.Cursor]) && pending.TargetSeat == f.OwnerSeat &&
+        pending.ProgramSkillFrameId == f.Id && pending.PolicySource == policy && pending.AssistedResultBind == MouJwFactionBind;
 
-    internal bool PrepareMouJwFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind, CardConversionSource? conversion)
-    {
-        if (!ValidateMouJwFactionParent(pending, f))
-            return false;
-        var r = f.MouJiangWei!;
-        var actor = r.Targets[r.Cursor];
-        if (r.Stage != MouJiangWeiStage.FactionRequest || cards.Count == 0 || cards.Select(c => c.Id).Distinct().Count() != cards.Count || provider.Seat == actor || !pending.CandidateSeats.Contains(provider.Seat) || cards.Any(c => _cardZonesOperations._cardZones.GetLocation(c.Id).OwnerSeat != provider.Seat) || !CoreNativeCardClassificationsRuntime.IsSlashCard(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(actor, kind, CardActionType.Use) || _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(actor, f.OwnerSeat, kind))
-            throw new InvalidOperationException("Tiaoxin's real faction provider lost its paid material or the actual actor's target legality.");
-        var action = new LegalAction(LegalActionKind.Slash, cards[0].Id, f.OwnerSeat, "通过实际势力响应使用杀", kind)
-        {
-            ConversionSource = conversion
-        };
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { MouJiangWei = r with { Stage = MouJiangWeiStage.Issuing, NativeAction = action, Materials = cards.Select(c => c.Id).ToArray(), ProviderSeat = provider.Seat } });
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouJiangWeiFactionProvidedEvent(f.Id, r.Cursor, actor, provider.Seat, kind, cards.Count));
-        return true;
-    }
 
     internal bool FinishMouJwFactionDeclined(long id, NativeOwners.FactionCardRequestHandle pending)
     {

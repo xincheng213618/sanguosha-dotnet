@@ -19,8 +19,6 @@ public sealed record FeiYiReceipt(CardConversionSource Source,string GameplayHas
 }
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public FeiYiReceipt? FeiYi { get;init; } }
-public sealed partial record CardUseFrame
-{ [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public FeiYiEffectRounds? FeiYiRounds { get;init; } }
 public sealed record FeiYiStartedEvent(long FrameId,CardConversionSource Source,string GameplayHash,SkillProgramEffectOp Operation,
     int Turn,int TurnOwner,long PhaseInstance,bool Odd,long? WindowId,long? BatchId) : IGameEvent;
 public sealed record FeiYiMovementIssuedEvent(long FrameId,FeiYiStage Stage,long Before,long After,int Count,int Minimum) : IGameEvent;

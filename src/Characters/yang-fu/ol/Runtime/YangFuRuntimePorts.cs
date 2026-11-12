@@ -35,12 +35,6 @@ internal interface IYangFuTargetFacts : IProgramSelectionQuery
     bool TryGetDesignatedExtraTargetUse(int owner, ProgramSkillWindowContext context, out CardUseFrame use, out ProgramCardTriggerWindowFrame window);
     bool DesignatedExtraTargetCandidateMatches(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, ProgramCardTriggerWindowFrame window);
     int? CapturedWholeActualTurnActorUseOrdinal(CardActionContext action);
-    bool IsKenshangRemovedMaterial(long useId, int cardId);
-    bool IsWuJingHejiRemovedMaterial(long useId, int cardId);
-    bool IsSelectedForeignCardSlashRemovedMaterial(long useId, int cardId);
-    bool IsZhangYanSujiRemovedMaterial(long useId, int cardId);
-    bool HasRelinquishedMaterial(long useId, int cardId);
-    bool IsExchangedCardClaim(long actionId, int cardId);
     bool CanUseVirtualSlash(int owner, int target);
     bool DirectedTargetProhibited(int owner, int target, CardKind kind);
     bool TargetProhibited(int target, CardKind kind, Suit? suit, bool? isRed);

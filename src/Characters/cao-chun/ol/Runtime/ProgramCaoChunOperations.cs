@@ -18,6 +18,7 @@ public sealed record CaoChunNativeSlash(long ParentFrameId,CardConversionSource 
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public DrawFundedDistinctBasicPayment? DrawFundedPayment {get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public ChainedStateBasicPayment? ChainedPayment {get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public int? ProviderSeat {get;init;}
+ [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public DeclaredCardPayment? DeclarationPayment {get;init;}
  public long PaymentBefore {get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public long? PaymentAfter {get;init;}
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public CardActionContext? Action {get;init;}

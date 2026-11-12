@@ -133,7 +133,7 @@ internal sealed partial class CharacterWuJingOlRuntime
                 }
         }
 
-        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor))
+        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor))
             Add(pair[0], CardKind.Slash, null, pair.Select(c => c.Id).ToArray(), true);
         foreach (var kind in CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds.Append(CardKind.Duel))
             foreach (var selection in _coreCardConversionsOperations.GetProgramMultiCardViewAsSelections(actor, kind, false).Where(s => _corePlayCardHistoryOperations.ViewAsRule(s.Source)is { RoundDistinctBasicUse: null, LeiluanBasicUse: null } || s.OutputKind == kind))
@@ -158,6 +158,12 @@ internal sealed partial class CharacterWuJingOlRuntime
 
     internal void PublishWuJing(ProgramSkillFrame f, bool keepCurrentRequest = false)
     {
+        if (f.WuJing is { Operation: SkillProgramEffectOp.UseHejiAtCompletedSingleTarget, Stage: WuJingStage.UseChoice } request)
+        {
+            _slashRequests.Issue(f, f.OwnerSeat, new(ProgramSlashRequestTargetSource.FrozenCandidates,
+                [request.TargetSeat], WuJingFactionBind, IgnoreDistance: true, RetainAcceptedSourceLoss: true, RetainAcceptedOwnerDeath: true, IssuedPhysicalSlashDistanceTargets: ProgramSlashRequestPermissionTargets.AnyOtherTarget, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction));
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        }
         var choices = WuJingChoices(f);
         if (choices.Count == 0 || !keepCurrentRequest && choices.All(c => c.Cards.Count == 0 && c.Parameters.GetValueOrDefault("kind") == "decline") && !HasWuJingZeroSupply(f))
         {
@@ -207,17 +213,30 @@ internal sealed partial class CharacterWuJingOlRuntime
         var kind = Enum.Parse<CardKind>(choice.Parameters["kind"]);
         CoreGameEngineCardConversionsRuntime.TryReadConversionSource(choice.Parameters, out var source);
         var zhangba = choice.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString();
-        var cards = choice.Cards.Count == 1 ? new[]
+        Card[] cards;
+        if (choice.Cards.Count == 1)
         {
-            _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(f.OwnerSeat)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileOriginalUseCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Single(c => c.Id == choice.Cards[0])
+            cards = [_corePhysicalOwnedCardQueriesOperations.GetPlayableCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment2(f.OwnerSeat)).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileOriginalUseCards(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat])).Single(c => c.Id == choice.Cards[0])];
         }
-
-        : zhangba ? _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]).Single(p => p.Select(c => c.Id).SequenceEqual(choice.Cards)).ToArray() : _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], choice.Cards, kind, false, source!)?.Cards.ToArray() ?? throw new InvalidOperationException("Heji lost its real multi-material conversion.");
+        else if (zhangba)
+        {
+            var pair = _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], choice.Cards);
+            if (pair is null || !pair.Select(card => card.Id).SequenceEqual(choice.Cards))
+                throw new InvalidOperationException("Sequence contains no matching element");
+            cards = pair.ToArray();
+        }
+        else
+            cards = _coreCardConversionsOperations.FindProgramMultiCardViewAsSelection(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], choice.Cards, kind, false, source!)?.Cards.ToArray() ?? throw new InvalidOperationException("Heji lost its real multi-material conversion.");
         var selection = new WuJingUseSelection(kind, zhangba, kind == CardKind.FireSlash && cards[0].Kind == CardKind.Slash && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat]))
         {
             CardIds = choice.Cards,
             Conversions = source is null ? [] : [source]
         };
+        if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+            _slashRequests.Accept(f, f.OwnerSeat, r.TargetSeat);
+        else
+            _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuJing = r with { Stage = WuJingStage.IssuingUse, Selection = selection, Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._selectedUseConversion = source;
         _coreGameEngineCardConversionsHasSelectedUseConversionChoiceSelectedUseConversionAccess._hasSelectedUseConversionChoice = true;
@@ -252,6 +271,8 @@ internal sealed partial class CharacterWuJingOlRuntime
 
     internal void FinishWuJing(ProgramSkillFrame f, bool applied)
     {
+        _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         if (f.HuanpeiReturn is { } huanpei && (f.WuJing is not { Stage: WuJingStage.NativeChildren, NativeCompleted: true, NativeOrigin: { } huanpeiNative } || huanpeiNative.UseId != huanpei.UseId || !huanpei.Returned))
             throw new InvalidOperationException("Heji cannot release Huanpei before all native children returned.");
         if (f.ZonghuReturn is { } zonghu && (f.WuJing is not { Stage: WuJingStage.NativeChildren, NativeCompleted: true, NativeOrigin: { } origin } || origin.UseId != zonghu.UseId || !zonghu.Returned))
@@ -266,6 +287,11 @@ internal sealed partial class CharacterWuJingOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuJing: not null } f || f.Id != id)
             return false;
+        if (_slashRequests.TakeFailure(f) is not null)
+        {
+            FinishWuJing(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), false);
+            return true;
+        }
         ContinueWuJing(id);
         return true;
     }
@@ -281,7 +307,7 @@ internal sealed partial class CharacterWuJingOlRuntime
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 27130)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 27130)]
-    internal bool ContinuePaidWuJing(ProgramSkillFrame f) => f.WuJing is { } r && (r.Stage != WuJingStage.UseChoice || WuJingHasPaidAdapter(f)) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingStartedEvent>().Count(e => e.FrameId == f.Id && e.Source == r.Source && e.GameplayHash == r.GameplayHash) == 1;
+    internal bool ContinuePaidWuJing(ProgramSkillFrame f) => f.WuJing is { } r && (r.Stage != WuJingStage.UseChoice || WuJingHasPaidAdapter(f)) && r.Source == WuJingSource(f) && r.GameplayHash == f.GameplayHash;
     [ProgramAiChoice(SkillProgramEffectOp.UseHejiAtCompletedSingleTarget, SkillProgramEffectOp.ClaimLiubingUndamagingSlash, SkillProgramEffectOp.RewardHejiUnconvertedUse)]
     internal PromptChoice AiWuJing(PendingDecision p, ProgramSkillFrame f) => CoreGameEngineProgramOwnedCardDistributionsRuntime.AreProgramDistributionAllies(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], _coreMatchParticipantsPlayersAccess._players[f.WuJing!.TargetSeat]) ? p.Choices.Single(c => c.Parameters.GetValueOrDefault("kind") == "decline") : p.Choices.FirstOrDefault(c => c.Parameters.GetValueOrDefault("kind") != "decline") ?? p.Choices.First();
 }

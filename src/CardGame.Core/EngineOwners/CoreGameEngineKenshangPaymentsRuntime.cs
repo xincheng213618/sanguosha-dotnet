@@ -1,7 +1,0 @@
-#nullable enable
-
-namespace CardGame.Core.EngineOwners;
-[Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineKenshangPaymentsRuntime(RuntimeEntries.CharacterMaXiuMaTieOlEntries _characterMaXiuMaTieOlOperations, IKernelCardZoneStoreAccess _cardZonesOperations, RuntimeEntries.CoreGameEngineCardUseLifecycleEntries _coreCardUseLifecycleOperations, RuntimeEntries.CoreGameEngineCardUsePaymentsEntries _coreCardUsePaymentsOperations)
-{
-}

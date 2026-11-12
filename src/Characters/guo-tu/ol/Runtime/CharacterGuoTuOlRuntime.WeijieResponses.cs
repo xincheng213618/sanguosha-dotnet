@@ -117,14 +117,14 @@ internal sealed partial class CharacterGuoTuOlRuntime
         else if (parent is { } id)
         {
             var program = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
-            _coreRuntimeOperations.ReplaceRuntimeTop(program = program with { WeijieReturn = new(p, 0, 0), Step = ResolutionFrameStep.ResolvingEffect });
             if (f.IsAssistedProgramUse)
             {
-                if (_characterSunYuanOlOperations.IsSayingSlashRequest(program) || _characterLiYiOlOperations.IsChanshuangSlashRequest(program) || _characterLvKuangLvXiangOlOperations.IsQigongRequest(program) || _characterWuJingOlOperations.IsWuJingHejiRequest(program) || _characterCaoChunOlOperations.IsCaoChunInitialRequest(program))
-                    PrepareWeijieProgram(program, p);
-                else
-                    _coreProgramSlashRequestOperations.CommitProgramChoiceResult(program.Id, f.AssistedResultBind!, "used-slash", n.ActorSeat, "诿解供给真实杀。");
+                var acceptance = _coreAssistedFactionSlashOperations.AcceptAssistedFactionSlashRequest(f, program);
+                p = p with { RequestAcceptance = acceptance };
+                program = _coreProgramLifecycleOperations.GetActiveProgramFrame(program.Id);
+                program = _requestExecution.PrepareAcceptedUse(program, acceptance);
             }
+            _coreRuntimeOperations.ReplaceRuntimeTop(program with { WeijieReturn = new(p, 0, 0), Step = ResolutionFrameStep.ResolvingEffect });
         }
 
         f.AwaitingProviders = false;
@@ -250,6 +250,19 @@ internal sealed partial class CharacterGuoTuOlRuntime
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { NearestLegalSlashRequest = null });
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
             return;
+        }
+
+        if (actor.IsAlive && r.Paid?.RequestAcceptance is { } failedAcceptance)
+        {
+            if (!_programSlashRequests.ReleaseAcceptance(f, failedAcceptance))
+                return;
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+            keepCurrentRequest = _programSlashRequests.GetOffer(f, n.ActorSeat) is not null;
+            if (!keepCurrentRequest)
+            {
+                _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "原用牌请求已不再允许新的响应；已支付费用不撤回。");
+                return;
+            }
         }
 
         if (_characterSunYuanOlOperations.IsSayingSlashRequest(f))

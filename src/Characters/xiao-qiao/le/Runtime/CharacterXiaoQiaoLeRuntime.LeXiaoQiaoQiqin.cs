@@ -22,7 +22,6 @@ internal sealed partial class CharacterXiaoQiaoLeRuntime
 
     internal bool HasQiqinEntityMark(int id) => _cardEntityMarks.Has(id, "qiqin");
     internal bool HasQiqinHandEntityMark(int owner, int id) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(owner) && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Hand(owner) && HasQiqinEntityMark(id);
-    internal bool IsQiqinHandLimitExempt(CharacterState owner, int id) => _coreNationalSkillsOperations.HasRuntimeSkill(owner, "le:qiqin") && HasQiqinHandEntityMark(owner.Seat, id);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 28610, SkillProgramEffectOp.ResolveQiqinDiscardPileQin)]
     internal bool CanOfferQiqin(ProgramTriggerLegalityContext gate) => gate.Trigger.Id == "collect-discard-qin" && gate.Context.Window == SkillProgramTriggerWindow.TurnStartBeforeNormalFlow && gate.Context.OwnerSeat == gate.Candidate.OwnerSeat && gate.Context.SourceSeat == gate.Candidate.OwnerSeat && _coreMatchParticipantsPlayersAccess._players[gate.Candidate.OwnerSeat].IsAlive;
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 28610)]

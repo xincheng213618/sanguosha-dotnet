@@ -9,7 +9,6 @@ internal sealed partial class CharacterDongBaiOlEntries
     internal bool DrainLianZhu(ProgramSkillFrame f) => _resolve().DrainLianZhu(f);
     internal void FinishLianZhu(ProgramSkillFrame f) => _resolve().FinishLianZhu(f);
     internal bool IsXiaHuiDiscardForbidden(int actorSeat, Card card, CardLocation from, OwnedCardMoveIntent intent) => _resolve().IsXiaHuiDiscardForbidden(actorSeat, card, from, intent);
-    internal bool IsXiaHuiHandLimitExempt(int owner, Card card) => _resolve().IsXiaHuiHandLimitExempt(owner, card);
     internal bool IsXiaHuiPhysicalRestricted(int actorSeat, int cardId) => _resolve().IsXiaHuiPhysicalRestricted(actorSeat, cardId);
     internal void IssueLianZhuSegment(long id, LianZhuReceipt r, int actor) => _resolve().IssueLianZhuSegment(id, r, actor);
     internal PromptChoice LianZhuAiChoice(ProgramSkillFrame f) => _resolve().LianZhuAiChoice(f);

@@ -25,9 +25,17 @@ internal sealed partial class WushuangModeFeature
     public bool HasWushuangTactic(int seat, int id) =>
         _players.TryGetValue(seat, out var progress) && progress.Tactics.Contains(id);
 
-    public bool IsWushuangHandLimitExempt(int seat, CardKind kind) =>
-        kind == CardKind.Dodge && HasWushuangTactic(seat, 2002) ||
-        kind == CardKind.Peach && HasWushuangTactic(seat, 2003);
+    private static readonly IReadOnlyList<CardKind> DodgeHandLimitKinds = Array.AsReadOnly(new[] { CardKind.Dodge });
+    private static readonly IReadOnlyList<CardKind> PeachHandLimitKinds = Array.AsReadOnly(new[] { CardKind.Peach });
+    private static readonly IReadOnlyList<CardKind> BothHandLimitKinds = Array.AsReadOnly(new[] { CardKind.Dodge, CardKind.Peach });
+    public IReadOnlyList<CardKind> HandLimitExemptCardKinds(int seat) =>
+        (HasWushuangTactic(seat, 2002), HasWushuangTactic(seat, 2003)) switch
+        {
+            (true, true) => BothHandLimitKinds,
+            (true, false) => DodgeHandLimitKinds,
+            (false, true) => PeachHandLimitKinds,
+            _ => []
+        };
 
     public IEnumerable<RuleQueryContribution> WushuangNumericRuleContributions(int seat, SkillRuleQuery query)
     {

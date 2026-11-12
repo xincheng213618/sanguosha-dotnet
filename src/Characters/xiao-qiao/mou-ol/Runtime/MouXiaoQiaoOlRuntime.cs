@@ -51,7 +51,7 @@ internal interface IMouXiaoQiaoOlOperations : IProgramRuntimeOperations
 }
 
 [ProgramRuntimeModule,ProgramCapability]
-internal sealed partial class MouXiaoQiaoOlRuntime(IMouXiaoQiaoOlFacts facts, IMouXiaoQiaoOlOperations operations,
+internal sealed partial class MouXiaoQiaoOlRuntime(INativeProgramSlashRequests programSlashRequests, IMouXiaoQiaoOlFacts facts, IMouXiaoQiaoOlOperations operations,
     IProgramRuntimeFrames frames, IProgramRuntimeEvents events, IProgramRuntimePrompts prompts,
     IProgramHealthChildQueries health, IProgramHealthChildOperations healthOperations) : IMouXiaoQiaoOlRuntime
 {

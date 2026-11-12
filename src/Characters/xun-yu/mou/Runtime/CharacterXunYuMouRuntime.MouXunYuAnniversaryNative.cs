@@ -45,16 +45,8 @@ internal sealed partial class CharacterXunYuMouRuntime
         MouXyAnniversary.Bound(f, id, use.Action!.ActionId);
         if (r.Repeat)
         {
-            var effect = new ExtraCardEffectState
-            {
-                Source = r.Source,
-                ProgramFrameId = f.Id,
-                ActionId = use.Action.ActionId,
-                PaidCardId = 0,
-                AutomaticGameplayHash = f.GameplayHash,
-                Trick = new(0, plan.ActionKind, plan.TargetCardId, plan.Required)
-            };
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(id, u => u with { ExtraCardEffect = effect });
+            _nativeEffectEpisodes.Issue(id, new(f.Id, f.InstructionIndex - 1, 0, r.Source, f.GameplayHash, new(0, ContinueOriginalAfterActorDeath: true)),
+                new(0, plan.ActionKind, plan.TargetCardId, plan.Required));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AutomaticExtraCardEffectIssuedEvent(f.Id, r.Source, id, use.Action.ActionId, f.GameplayHash));
         }
 

@@ -27,7 +27,6 @@ public sealed partial class CharacterState
 public sealed partial record CardUseFrame
 {
  [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public XinPiUseOrigin? XinPiOrigin {get;init;}
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)] public ChijieInvalidationProof? ChijieInvalidation {get;init;}
 }
 public sealed partial record ProgramSkillFrame
 {

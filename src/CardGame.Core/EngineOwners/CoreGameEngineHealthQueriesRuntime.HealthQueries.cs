@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineHealthQueriesRuntime
         if (amount <= 0)
             return false;
         var parent = _resolutionStackOperations._resolutionStack.Last();
-        return _characterDaQiaoXiaoQiaoHappyGodOperations.TryBeginHappyQiaoHealthChoice(parent.Id, attack.TargetSeat, HpChangeKind.Loss, amount, HappyQiaoHealthReturnKind.Damage, $"damage-loss:{(attack.ResolutionId)}:{(attack.TargetSeat)}:{(_characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(attack.ResolutionId))}", attack.IsSourceLess ? null : attack.SourceSeat, attack.ResolutionId);
+        return _characterDaQiaoXiaoQiaoHappyGodOperations.TryBeginHappyQiaoHealthChoice(parent.Id, attack.TargetSeat, HpChangeKind.Loss, amount, HappyQiaoHealthReturnKind.Damage, $"damage-loss:{(attack.ResolutionId)}:{(attack.TargetSeat)}:{(_nativeEffectEpisodes.Ordinal(attack.ResolutionId))}", attack.IsSourceLess ? null : attack.SourceSeat, attack.ResolutionId);
     }
 
     internal bool TryBeginHappyQiaoInstructionQuery(ProgramSkillFrame frame, SkillProgramEffect effect)

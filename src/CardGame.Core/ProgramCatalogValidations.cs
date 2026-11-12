@@ -17,8 +17,7 @@ internal sealed record ProgramCatalogValidationRegistration(int Order, MethodInf
 internal sealed class ProgramCatalogValidations
 {
     private static readonly Lazy<ProgramCatalogValidations> BuiltIn = new(() => Discover(
-        typeof(ProgramCatalogValidations).Assembly.GetTypes().SelectMany(type => type.GetMethods(
-            BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))), true);
+        ProgramCatalogValidationMethodDiscovery.Find(typeof(ProgramCatalogValidations).Assembly)), true);
 
     internal static ProgramCatalogValidations Default => BuiltIn.Value;
     internal IReadOnlyList<ProgramCatalogValidationRegistration> Registrations { get; }
@@ -29,29 +28,33 @@ internal sealed class ProgramCatalogValidations
     internal static ProgramCatalogValidations Discover(IEnumerable<MethodInfo> methods)
     {
         var registrations = new SortedDictionary<int, ProgramCatalogValidationRegistration>();
-        foreach (var method in methods)
-        foreach (var attribute in method.GetCustomAttributes<ProgramCatalogValidationAttribute>())
+        foreach (var candidateMethod in methods)
         {
-            var parameters = method.GetParameters();
-            if (attribute.Order <= 0 || !method.IsStatic || method.IsGenericMethod || method.ContainsGenericParameters ||
-                method.ReturnType != typeof(void) || parameters.Any(p => p.IsOptional || p.IsOut || p.ParameterType.IsByRef))
-                throw Invalid(method);
-            Action<IReadOnlyDictionary<string, SkillProgram>> validate;
-            if (parameters.Select(p => p.ParameterType).SequenceEqual([typeof(IReadOnlyDictionary<string, SkillProgram>)]))
-                validate = method.CreateDelegate<Action<IReadOnlyDictionary<string, SkillProgram>>>();
-            else if (parameters.Select(p => p.ParameterType).SequenceEqual([typeof(string), typeof(SkillProgram)]))
+            if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(ProgramCatalogValidationAttribute), inherit: true)) continue;
+            var method = candidateMethod!;
+            foreach (var attribute in method.GetCustomAttributes<ProgramCatalogValidationAttribute>())
             {
-                var validateProgram = method.CreateDelegate<Action<string, SkillProgram>>();
-                validate = programs =>
+                var parameters = method.GetParameters();
+                if (attribute.Order <= 0 || !method.IsStatic || method.IsGenericMethod || method.ContainsGenericParameters ||
+                    method.ReturnType != typeof(void) || parameters.Any(p => p.IsOptional || p.IsOut || p.ParameterType.IsByRef))
+                    throw Invalid(method);
+                Action<IReadOnlyDictionary<string, SkillProgram>> validate;
+                if (parameters.Select(p => p.ParameterType).SequenceEqual([typeof(IReadOnlyDictionary<string, SkillProgram>)]))
+                    validate = method.CreateDelegate<Action<IReadOnlyDictionary<string, SkillProgram>>>();
+                else if (parameters.Select(p => p.ParameterType).SequenceEqual([typeof(string), typeof(SkillProgram)]))
                 {
-                    // Retain validator-first ordering and the catalog's original
-                    // enumeration order, including its first reported failure.
-                    foreach (var program in programs.Values) validateProgram(program.Id, program);
-                };
+                    var validateProgram = method.CreateDelegate<Action<string, SkillProgram>>();
+                    validate = programs =>
+                    {
+                        // Retain validator-first ordering and the catalog's original
+                        // enumeration order, including its first reported failure.
+                        foreach (var program in programs.Values) validateProgram(program.Id, program);
+                    };
+                }
+                else throw Invalid(method);
+                if (!registrations.TryAdd(attribute.Order, new(attribute.Order, method, validate)))
+                    throw new InvalidOperationException($"Duplicate program catalog validation order '{attribute.Order}'.");
             }
-            else throw Invalid(method);
-            if (!registrations.TryAdd(attribute.Order, new(attribute.Order, method, validate)))
-                throw new InvalidOperationException($"Duplicate program catalog validation order '{attribute.Order}'.");
         }
         return new(registrations.Values);
     }

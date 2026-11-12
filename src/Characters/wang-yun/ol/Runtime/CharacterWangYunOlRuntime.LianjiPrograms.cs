@@ -109,7 +109,7 @@ internal sealed partial class CharacterWangYunOlRuntime
                         choices.AddRange(_coreCardConversionsOperations.CreateConversionChoiceVariants(actor, card, kind, false, $"wang-yun.{(f.Id)}.slash-{(card.Id)}-{(kind)}", $"对 {(_coreMatchParticipantsPlayersAccess._players[target].Name)} 使用【{(CardCatalog.Get(kind).DisplayName)}】", [card.Id], [target], args));
                     }
 
-                foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor))
+                foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(actor))
                 {
                     var ids = pair.Select(c => c.Id).ToArray();
                     if (!Legal(pair[0], CardKind.Slash, ids: ids) || _coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(actor.Seat, ids))

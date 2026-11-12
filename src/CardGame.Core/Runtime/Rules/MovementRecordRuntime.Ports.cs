@@ -41,7 +41,6 @@ internal interface IMovementRecordMaterials : IProgramRuntimeOperations
 
 internal interface IMovementRecordObservers : IProgramRuntimeOperations
 {
-    void ObserveMouJsMovement(CardMovementRecord movement);
     void CaptureBianFuRenForeignDiscardProducer(CardMovementRecord movement);
     void CaptureDuFuRenOwnedOrigin(CardMovementRecord movement);
     void ObserveOriginalHandMovement(CardMovementRecord movement);

@@ -61,22 +61,12 @@ internal sealed partial class CharacterGuoTuOlRuntime
             return null;
         if (_coreWenyiPeachSuppliesOperations.TryGetWenyiWeijiePeachNeed(p, provider, out var wenyiTarget))
             return N(WeijieIntent.WenyiPeach, provider, [wenyiTarget], op: effect.Op, instruction: p.InstructionIndex);
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(p) && _characterSunYuanOlOperations.TryGetSayingSlashRequest(p, out var sayingActor, out var sayingTargets) && provider == sayingActor)
-            return N(WeijieIntent.AssistedSlash, provider, sayingTargets, op: effect.Op, instruction: p.InstructionIndex);
-        if (_characterLiYiOlOperations.IsChanshuangSlashRequest(p) && _characterLiYiOlOperations.TryGetChanshuangSlashRequest(p, out var requestedActor, out var requestedTargets) && provider == requestedActor)
-            return N(WeijieIntent.AssistedSlash, provider, requestedTargets, op: effect.Op, instruction: p.InstructionIndex);
-        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(p) && p.LvKuangLvXiang!.Actor == provider)
-            return N(WeijieIntent.AssistedSlash, provider, [p.LvKuangLvXiang.Target], op: effect.Op, instruction: p.InstructionIndex);
-        if (_characterWuJingOlOperations.IsWuJingHejiRequest(p) && p.OwnerSeat == provider)
-            return N(WeijieIntent.AssistedSlash, provider, [p.WuJing!.TargetSeat], op: effect.Op, instruction: p.InstructionIndex);
-        if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(p) && p.OwnerSeat == provider)
-            return N(WeijieIntent.AssistedSlash, provider, _coreMatchParticipantsPlayersAccess._players.Where(t => t.IsAlive && t.Seat != provider).Select(t => t.Seat).ToArray(), op: effect.Op, instruction: p.InstructionIndex);
         if (p.KeBiNengPingduan is { Stage: KeBiNengPingduanStage.BasicChoice, ActorSeat: var actor } && actor == provider && _characterKeBiNengOlOperations.ValidKeBiNeng(p))
             return N(WeijieIntent.GenericBasic, provider, _coreMatchParticipantsPlayersAccess._players.Where(t => t.IsAlive).Select(t => t.Seat).ToArray(), op: effect.Op, instruction: p.InstructionIndex);
-        if (!_coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(p, effect.Op, provider))
+        if (_programSlashRequests.GetOffer(p, provider) is null)
             return null;
-        var targets = _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramTargets(p, provider, effect.Op);
-        if (targets.Length == 0)
+        var targets = _programSlashRequests.GetTargets(p, provider);
+        if (targets.Count == 0)
             return null;
         return N(effect.Op switch
         {
@@ -160,7 +150,7 @@ internal sealed partial class CharacterGuoTuOlRuntime
         if (n.Intent is WeijieIntent.Dodge or WeijieIntent.Duel or WeijieIntent.Group or WeijieIntent.FactionDodge or WeijieIntent.FactionSlashPlayed)
         {
             var attack = n.Intent == WeijieIntent.FactionDodge ? _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense?.Attack : n.Intent == WeijieIntent.Duel ? _coreNativeCardContinuationCursorsOperations.ActiveDuel?.Attack : n.Intent is WeijieIntent.Group ? _coreNativeCardContinuationCursorsOperations.ActiveGroupCard?.CurrentAttack : n.Intent == WeijieIntent.FactionSlashPlayed ? _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest?.ResponseAttack : _coreActiveNativeAttackQueriesOperations.ActiveCardAttack;
-            if (attack is null || attack.ResolutionId != n.OwnerFrameId || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(attack.ResolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(attack.ResolutionId, n.ActorSeat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(attack.CardUserSeat, n.ActorSeat, attack.EffectiveCardKind ?? CardKind.Slash, _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.TargetSeats ?? [n.ActorSeat], attack.ResolutionId, CardKind.Dodge))
+            if (attack is null || attack.ResolutionId != n.OwnerFrameId || _coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(attack.ResolutionId) || _responseRules.IsResponseForbidden(attack.ResolutionId, n.ActorSeat, CardKind.Dodge, attack.SourceSeat) || _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(attack.CardUserSeat, n.ActorSeat, attack.EffectiveCardKind ?? CardKind.Slash, _coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)?.TargetSeats ?? [n.ActorSeat], attack.ResolutionId, CardKind.Dodge))
                 return false;
             if (kind == CardKind.Dodge && (_coreConvertedSlashResponseOperations.Value.ConvertedSlashSameColorResponseColor(attack)is not null || !_coreRecordedSuitSlashOperations.IsRecordedSuitResponseAllowed(provider, [], kind)))
                 return false;
@@ -184,7 +174,12 @@ internal sealed partial class CharacterGuoTuOlRuntime
                 fr.CurrentCandidateSeat == n.ProviderSeat && fr.CandidateIndex == n.Cursor &&
                 _providedSlashPaymentTargets.CanUse(fr, kind, []);
         var parent = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(f => f.Id == n.OwnerFrameId);
-        var ignore = n.Intent is WeijieIntent.ProgramSlash or WeijieIntent.ProgramNearestSlash || parent is not null && (_characterLvKuangLvXiangOlOperations.IsQigongRequest(parent) || _characterWuJingOlOperations.IsWuJingHejiRequest(parent) || n.Intent == WeijieIntent.FixedSlash && parent.FixedTargetSlash?.IgnoreDistance == true);
+        if (parent?.SlashRequest?.Acceptance is { } acceptedRequest && !_programSlashRequests.CanExecuteAcceptedUse(parent, acceptedRequest))
+            return false;
+        var request = parent is null ? null : _programSlashRequests.GetIdentity(parent);
+        if (request?.Spec.CountsTowardSlashLimit == true && !_coreRuleQueriesOperations.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[target], false, kind, physicalCardIds: []))
+            return false;
+        var ignore = request?.Spec.IgnoreDistance == true;
         return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], new(0, kind, Suit.None, 0), effectiveKind: kind, ignoreDistance: ignore, noEffectiveRank: true, physicalCardIds: []);
     }
 

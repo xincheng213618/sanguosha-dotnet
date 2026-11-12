@@ -12,6 +12,7 @@ public sealed record ZonghuNeed(ZonghuIntent Intent,long OwnerFrameId,long Reque
 public sealed record ZonghuGift(int CardId,CardKind Kind,CardLocation From,long Sequence,long BatchId);
 public sealed record ZonghuPaidOrigin(long AttemptId,CardConversionSource Source,string GameplayHash,int ActualTurn,int ActualTurnOwner,ZonghuNeed Need,CardKind OutputKind,int TargetSeat,int RecipientSeat,IReadOnlyList<ZonghuGift> Gifts,int RequiredCount,long Before,long After)
 {
+ [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ProgramSlashRequestAcceptance? RequestAcceptance { get; init; }
  private IReadOnlyList<ZonghuGift> _gifts=Array.AsReadOnly(Gifts.ToArray());
  public IReadOnlyList<ZonghuGift> Gifts {get=>_gifts;init=>_gifts=Array.AsReadOnly(value.ToArray());}
 }

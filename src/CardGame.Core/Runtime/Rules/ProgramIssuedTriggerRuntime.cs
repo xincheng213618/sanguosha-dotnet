@@ -37,8 +37,10 @@ internal sealed class ProgramIssuedTriggerCatalog
     internal static ProgramIssuedTriggerCatalog Discover(IEnumerable<MethodInfo> methods)
     {
         var rules = new SortedDictionary<int, Rule>();
-        foreach (var method in methods)
+        foreach (var candidateMethod in methods)
         {
+            if (candidateMethod is not null && !candidateMethod.IsDefined(typeof(ProgramIssuedTriggerAttribute), inherit: true)) continue;
+            var method = candidateMethod!;
             if (method.GetCustomAttribute<ProgramIssuedTriggerAttribute>() is not { } registration) continue;
             if (registration.Order <= 0 || !Enum.IsDefined(registration.MatchKind) ||
                 method.IsStatic && !ProgramRuntimeModuleCatalog.IsDeclaredStaticHandler(method)) throw Invalid(method);

@@ -25,9 +25,9 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
         if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
             return f.WuHuangFuSong!.Stage == WuHuangFuSongStage.Drawing && f.NativeDraw is not null;
         if (child is RecoveryReplacementFrame replacement)
-            return replacement.ParentFrameId == f.Id && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, replacement, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return replacement.ParentFrameId == f.Id && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, replacement);
         if (child is HpChangedTriggerWindowFrame hp)
-            return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && hp.Change.ParentFrameId == f.Id && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReceiptMatches(f, hp, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp) && hp.Change.ParentFrameId == f.Id && _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReceiptMatches(f, hp);
         if (child is CardsMovedTriggerWindowFrame moved)
             return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.Movements.Count > 0 && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuHuangFuSongMovementSignedEvent>().Contains(new(f.Id, m.CardId, m.CardKind, m.From, m.To, m.Reason, m.Sequence)));
         return child is ProgramLifecycleTriggerWindowFrame state && state.ResumeProgramFrameId == f.Id && (state.Window == SkillProgramTriggerWindow.SkillsChanged && state.Continuation == ProgramLifecycleContinuation.ResumeParentProgram || state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<CharacterStateChangedEvent>().Any(e => e.Change.Id == state.Id && e.Change.ParentFrameId == f.Id));
@@ -42,7 +42,7 @@ internal sealed partial class CharacterHuangfuSongWumiaoRuntime
         if (f.WuHuangFuSong is null || !ValidWuHf(f))
             return false;
         if (r.ParentFrameId == f.Id)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, r, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, r);
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var child = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == r.Id);
         return i >= 0 && child > i + 1 && WuHfFirstChild(f, _resolutionStackOperations._resolutionStack[i + 1]) && WuHfObserverSuffix(i) && _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(r, _resolutionStackOperations._resolutionStack[child - 1]);

@@ -160,8 +160,13 @@ internal sealed partial class CharacterGuoTuOlRuntime
         _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, [card.Id], new(WeijieDiscardReason), (batch, moves) =>
         {
             var m = moves.Single();
+            ProgramSlashRequestAcceptance? requestAcceptance = null;
+            if (name == CoreGameEngineAlternativeViewAsCostsRuntime.ProgramBasicCardName(r.OutputKind!.Value) && CoreNativeCardClassificationsRuntime.IsSlashCard(r.OutputKind!.Value) &&
+                _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.Need.RequestFrameId) is ProgramSkillFrame request &&
+                _programSlashRequests.GetOffer(request, r.Need.ActorSeat) is not null)
+                requestAcceptance = _programSlashRequests.Accept(request, r.Need.ActorSeat, r.TargetSeat!.Value);
             var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-            var paid = new WeijiePaidOrigin(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.ActualTurnOwner, r.Need, r.OutputKind!.Value, r.TargetSeat!.Value, victim, card.Id, card.Kind, name, CardLocation.Hand(victim), m.Sequence, batch);
+            var paid = new WeijiePaidOrigin(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.ActualTurnOwner, r.Need, r.OutputKind!.Value, r.TargetSeat!.Value, victim, card.Id, card.Kind, name, CardLocation.Hand(victim), m.Sequence, batch) { RequestAcceptance = requestAcceptance };
             _coreRuntimeOperations.ReplaceRuntimeTop(current with { Weijie = current.Weijie!with { Paid = paid, After = m.Sequence } });
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WeijieCostPaidEvent(f.Id, r.Source, r.GameplayHash, r.ActualTurn, r.ActualTurnOwner, victim, card.Id, card.Kind, name, paid.From, m.Sequence, batch));
         });

@@ -20,12 +20,6 @@ internal sealed partial class CoreProgramNativeSlashQueriesRuntime
             return true;
         if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && At(qinglong.Attack.ResolutionId))
             return true;
-        if (top is not ProgramSkillFrame f || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)is not { } effect)
-            return false;
-        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(f))
-            return f.LvKuangLvXiang!.Actor == owner.Seat;
-        if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(f) || _characterWuJingOlOperations.IsWuJingHejiRequest(f))
-            return f.OwnerSeat == owner.Seat;
-        return _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(f, effect.Op, owner.Seat);
+        return _requestPermissions.Declaration(owner.Seat) is not null;
     }
 }

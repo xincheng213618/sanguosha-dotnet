@@ -45,31 +45,9 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
         return departure is not null && departure.From == cost.From && departure.CardKind == cost.CardKind && departure.To == CardLocation.Processing && (departure.Reason == CardMoveReasons.Respond || departure.Reason == CardMoveReasons.Nullification) && !_coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.CardId == cost.CardId && m.Sequence > departure.Sequence && m.To == CardLocation.Hand(provider.Seat)) && JuewuForeignHandEntry(provider.Seat, cost.CardId, departure.Sequence)is not null ? 2 : null;
     }
 
-    internal bool JuewuPureProviderFrontier(int actorSeat)
-    {
-        var top = _resolutionStackOperations._resolutionStack.LastOrDefault();
-        bool At(long id) => top?.Id == id || top is ResponseWindowFrame response && response.ParentFrameId == id;
-        return _coreNativeCardContinuationCursorsOperations.ActiveFactionCardRequest is { AwaitingProviders: true } slash && slash.CurrentCandidateSeat == actorSeat && At(slash.OwnerFrameId) || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is { } defense && defense.CurrentCandidateSeat == actorSeat && At(defense.Attack.ResolutionId);
-    }
+    internal bool JuewuPureProviderFrontier(int actorSeat) => _nativeSlashQueries.IsNativePureProviderFrontier(actorSeat);
 
-    internal bool IsJuewuTrueSlashUse(CharacterState owner)
-    {
-        if (!owner.IsAlive || JuewuPureProviderFrontier(owner.Seat))
-            return false;
-        var top = _resolutionStackOperations._resolutionStack.LastOrDefault();
-        bool At(long id) => top?.Id == id || top is ResponseWindowFrame response && response.ParentFrameId == id;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword is { ActiveAttack: null, AwaitingSlashChoice: true } borrowed && borrowed.WeaponOwnerSeat == owner.Seat && At(borrowed.ResolutionId))
-            return true;
-        if (_coreNativeCardContinuationCursorsOperations.ActiveQinglongCrescentBlade is { } qinglong && qinglong.Attack.SourceSeat == owner.Seat && CoreNativeDamageHandlesRuntime.SameAttackOwner(qinglong.Attack, _coreActiveNativeAttackQueriesOperations.ActiveCardAttack) && At(qinglong.Attack.ResolutionId))
-            return true;
-        if (top is not ProgramSkillFrame program || _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(program)is not { } effect)
-            return false;
-        if (_characterLvKuangLvXiangOlOperations.IsQigongRequest(program))
-            return program.LvKuangLvXiang!.Actor == owner.Seat;
-        if (_characterCaoChunOlOperations.IsCaoChunInitialRequest(program) || _characterWuJingOlOperations.IsWuJingHejiRequest(program))
-            return program.OwnerSeat == owner.Seat;
-        return _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(program, effect.Op, owner.Seat);
-    }
+    internal bool IsJuewuTrueSlashUse(CharacterState owner) => owner.IsAlive && _nativeSlashQueries.IsNativeForcedSlashUseFrontier(owner);
 
     internal bool CanUseJuewuConversion(CharacterState owner, Card card, IndexedSkillProgramInstance instance, SkillProgramViewAs rule, bool forResponse, bool dyingUse = false, int? requestedUseTarget = null)
     {

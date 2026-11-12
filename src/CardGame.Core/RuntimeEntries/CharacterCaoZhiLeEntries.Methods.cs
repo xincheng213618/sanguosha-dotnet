@@ -30,7 +30,6 @@ internal sealed partial class CharacterCaoZhiLeEntries
     internal CardKind[] FuleModeNames() => _resolve().FuleModeNames();
     internal bool FuleNativeConversionMatchesOutput(CharacterState owner, CardConversionSource source, CardKind kind) => _resolve().FuleNativeConversionMatchesOutput(owner, source, kind);
     internal IReadOnlyList<SlashUseVariant> FulePhysicalSlashVariants(CharacterState owner, Card card) => _resolve().FulePhysicalSlashVariants(owner, card);
-    internal string? FulePublicLabel(int cardId) => _resolve().FulePublicLabel(cardId);
     internal bool FulePureProviderFrontier(int actor) => _resolve().FulePureProviderFrontier(actor);
     internal CardKind FuleSelectedSlashKind(CharacterState owner, Card card, CardKind fallback, CardConversionSource? explicitSource = default) => _resolve().FuleSelectedSlashKind(owner, card, fallback, explicitSource);
     internal bool FuleSlashAliasAllowed(CharacterState owner, bool forResponse) => _resolve().FuleSlashAliasAllowed(owner, forResponse);
@@ -38,7 +37,6 @@ internal sealed partial class CharacterCaoZhiLeEntries
     internal SkillProgramStepOutcome InitializeLeCaoZhiFule(ProgramSkillFrame supplied) => _resolve().InitializeLeCaoZhiFule(supplied);
     internal bool IsExactWenlanFuMarking(ProgramSkillFrame f, IReadOnlyList<int> ids, FuMarkOrigin origin) => _resolve().IsExactWenlanFuMarking(f, ids, origin);
     internal bool IsFuleAliasSource(CardConversionSource? source) => _resolve().IsFuleAliasSource(source);
-    internal bool IsFuleHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsFuleHandLimitExempt(owner, cardId);
     internal bool IsFulePhysicalSlashKind(CharacterState owner, Card card, CardKind kind) => _resolve().IsFulePhysicalSlashKind(owner, card, kind);
     internal bool IsIssuedFuleInitialCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().IsIssuedFuleInitialCandidate(candidate, context);
     internal bool IsWenlanDying() => _resolve().IsWenlanDying();
@@ -55,7 +53,6 @@ internal sealed partial class CharacterCaoZhiLeEntries
     internal bool PermitIssuedFuleInitial(ProgramSkillFrame f) => _resolve().PermitIssuedFuleInitial(f);
     internal bool PermitPaidLeCaoZhiWenlan(ProgramSkillFrame f) => _resolve().PermitPaidLeCaoZhiWenlan(f);
     internal void PrepareLeCaoZhiWenlanResponse(CharacterState provider, CardKind kind, IReadOnlyList<Card> cards) => _resolve().PrepareLeCaoZhiWenlanResponse(provider, kind, cards);
-    internal void ProjectFuleCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectFuleCardSkillMark(cardId, ref projection);
     internal CardSnapshot ProjectFuleHandCard(CharacterState owner, Card card, CardSnapshot snapshot) => _resolve().ProjectFuleHandCard(owner, card, snapshot);
     internal bool? ProveWenlanLegacy(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().ProveWenlanLegacy(candidate, context);
     internal void PublishWenlanHandChoices(ProgramSkillFrame f) => _resolve().PublishWenlanHandChoices(f);

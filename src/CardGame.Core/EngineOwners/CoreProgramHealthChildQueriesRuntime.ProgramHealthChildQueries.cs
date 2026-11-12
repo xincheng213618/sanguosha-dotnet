@@ -8,8 +8,8 @@ internal sealed partial class CoreProgramHealthChildQueriesRuntime
     HpChangeContext? IProgramHealthChildQueries.LastPendingLoss(long parentFrameId, int targetSeat) => _coreGameEngineHpChangeProgramsPendingHpChangesAccess._pendingHpChanges.LastOrDefault(c => c.ParentFrameId == parentFrameId && c.TargetSeat == targetSeat && c.Kind == HpChangeKind.Loss);
     bool IProgramHealthChildQueries.ProgramRecoveryChild(ProgramSkillFrame parent, ResolutionFrame child) => child switch
     {
-        RecoveryReplacementFrame recovery => _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(parent, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray()),
-        HpChangedTriggerWindowFrame hp => _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReceiptMatches(parent, hp, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray()),
+        RecoveryReplacementFrame recovery => _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(parent, recovery),
+        HpChangedTriggerWindowFrame hp => _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReceiptMatches(parent, hp),
         _ => false
     };
     bool IProgramHealthChildQueries.PaidObserverSuffix(long programFrameId)

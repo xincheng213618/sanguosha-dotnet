@@ -17,31 +17,8 @@ internal interface IRepeatedJudgmentClaimPolicyProgramHost
         IReadOnlyList<Suit> suits, SkillProgramClaimHandLimitExemption policy);
 }
 
-internal sealed partial class TurnCardUseEffectStore
+internal static class NativeHandLimitExemptionRelations
 {
-    private readonly List<TurnHandLimitExemptCardGrant> _handLimitExemptCards = [];
-    internal IReadOnlyList<TurnHandLimitExemptCardGrant> HandLimitExemptCards => Array.AsReadOnly(_handLimitExemptCards.ToArray());
-    internal TurnHandLimitExemptCardGrant GrantHandLimitExemptCard(int turn, int turnSeat, long parent, int effect,
-        long judgment, CardUseEffectSource source, int beneficiary, int card, int movement)
-    {
-        var existing = _handLimitExemptCards.SingleOrDefault(g => g.ParentFrameId == parent && g.EffectIndex == effect &&
-            g.JudgmentFrameId == judgment && g.CardId == card);
-        if (existing is not null)
-        {
-            if (existing.TurnNumber != turn || existing.TurnSeat != turnSeat || existing.Source != source ||
-                existing.BeneficiarySeat != beneficiary || existing.MovementSequence != movement)
-                throw new InvalidOperationException("An exact-card exemption grant changed its actual receipt.");
-            return existing;
-        }
-        var grant = new TurnHandLimitExemptCardGrant(++_grantSequence, turn, turnSeat, parent, effect, judgment,
-            source, beneficiary, card, movement);
-        _handLimitExemptCards.Add(grant);
-        return grant;
-    }
-    internal IReadOnlySet<int> GetHandLimitExemptCardIds(int turn, int turnSeat, int beneficiary) =>
-        _handLimitExemptCards.Where(g => g.TurnNumber == turn && g.TurnSeat == turnSeat && g.BeneficiarySeat == beneficiary)
-            .Select(g => g.CardId).ToHashSet();
-    private IEnumerable<long> ExpiringHandLimitExemptCards(int turn, int seat) =>
-        _handLimitExemptCards.Where(g => g.TurnNumber == turn && g.TurnSeat == seat).Select(g => g.GrantSequence);
-    private void ExpireHandLimitExemptCards(HashSet<long> expired) => _handLimitExemptCards.RemoveAll(g => expired.Contains(g.GrantSequence));
+    internal const string JudgmentEntities = "native:turn-hand-entities";
+    internal const string CardKinds = "native:turn-hand-kinds";
 }

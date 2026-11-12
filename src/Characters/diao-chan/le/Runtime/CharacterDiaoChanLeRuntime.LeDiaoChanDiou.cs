@@ -27,7 +27,7 @@ internal sealed partial class CharacterDiaoChanLeRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal IReadOnlyList<Card> DiouShowableCards(int owner, CardConversionSource source) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Where(c => !HasTanbanEntityMark(c.Id)).ToArray());
+    internal IReadOnlyList<Card> DiouShowableCards(int owner, CardConversionSource source) => Array.AsReadOnly(_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Where(c => !_cardEntityMarks.Has(c.Id, "tanban")).ToArray());
     internal IReadOnlyList<PromptChoice> DiouChoices(ProgramSkillFrame f)
     {
         var r = f.Diou!;

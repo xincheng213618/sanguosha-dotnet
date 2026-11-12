@@ -37,7 +37,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
             return;
         }
 
-        var r = new QizhengReceipt(pending.Id, action.ActionId, target, use.TargetIndex, _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id), QizhengStage.Designation);
+        var r = new QizhengReceipt(pending.Id, action.ActionId, target, use.TargetIndex, _nativeEffectEpisodes.Ordinal(use.Id), QizhengStage.Designation);
         _coreRuntimeOperations.ReplaceRuntimeTop(use = use with { Qizheng = r, Step = ResolutionFrameStep.AwaitingResponse });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new QizhengEffectStartedEvent(use.Id, r.NullificationId, r.ActionId, target, r.TargetIndex, r.EffectOrdinal));
         if (!_coreExtraCardEffectRoundsOperations.IsExtraCardEffectRound(use.Id))
@@ -65,7 +65,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
         }
         else if (r.Stage == QizhengStage.Response)
         {
-            if (!_characterLiuQiOlOperations.IsWenjiResponseForbidden2(use.Id, responder.Seat) && !_coreShanheTrickResponseOperations.IsShanheTrickResponseProhibited(use.SourceSeat, responder.Seat, CardKind.QizhengXiangsheng, use.TargetSeats))
+            if (!_coreShanheTrickResponseOperations.IsShanheTrickResponseProhibited(use.SourceSeat, responder.Seat, CardKind.QizhengXiangsheng, use.TargetSeats))
                 foreach (var required in new[]
                 {
                     CardKind.Slash,
@@ -74,6 +74,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
 
                 )
                 {
+                    if (_responseRules.IsResponseForbidden(use.Id, responder.Seat, required, use.SourceSeat)) continue;
                     foreach (var card in _coreNativeResponseMaterialQueriesOperations.GetResponseCards(responder, required).Where(card => _coreNativeResponseMaterialQueriesOperations.CanUseCardAsResponse(responder, card, required)))
                     {
                         var kind = _coreNativeResponseMaterialQueriesOperations.GetEffectiveResponseKind(responder, card, required);
@@ -91,7 +92,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
                     }
 
                     if (required == CardKind.Slash)
-                        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(responder))
+                        foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(responder))
                             choices.Add(new(new(Id($"zhangba.{(string.Join('-', pair.Select(c => c.Id)))}")), "发动丈八蛇矛，将两张手牌当杀打出", pair.Select(c => c.Id).ToArray(), [], QizhengParameters("zhangba", CardKind.Slash.ToString())));
                 }
 
@@ -326,7 +327,7 @@ internal sealed partial class CharacterXunYuMobileGodRuntime
     {
         if (use.Qizheng is not { } r)
             return;
-        if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.QizhengXiangsheng || use.Action?.ActionId != r.ActionId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) || r.TargetIndex != use.TargetIndex || r.EffectOrdinal != _characterFeiYiOlOperations.NativeExtraEffectRoundOrdinal(use.Id) || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != r.Target || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QizhengEffectStartedEvent>().Count(e => e == new QizhengEffectStartedEvent(use.Id, r.NullificationId, r.ActionId, r.Target, r.TargetIndex, r.EffectOrdinal)) != 1)
+        if (CharacterZhugeGuoLeRuntime.LeChengyanNativeEffectKind(use) != CardKind.QizhengXiangsheng || use.Action?.ActionId != r.ActionId || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(r.Target) || r.TargetIndex != use.TargetIndex || r.EffectOrdinal != _nativeEffectEpisodes.Ordinal(use.Id) || CharacterZhugeGuoLeRuntime.LeChengyanNativeTargets(use)[use.TargetIndex] != r.Target || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QizhengEffectStartedEvent>().Count(e => e == new QizhengEffectStartedEvent(use.Id, r.NullificationId, r.ActionId, r.Target, r.TargetIndex, r.EffectOrdinal)) != 1)
             throw new InvalidOperationException("Qizheng lost its original typed native effect receipt.");
         if (r.Stage != QizhengStage.Designation && (r.Nonce.Length != 16 || r.Commitment != QizhengCommitment(use.Id, r.NullificationId, r.Ambush, r.Nonce) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<QizhengSecretCommittedEvent>().Count(e => e.UseId == use.Id && e.NullificationId == r.NullificationId && e.Commitment == r.Commitment) != 1))
             throw new InvalidOperationException("Qizheng's private designation no longer matches its issued commitment.");

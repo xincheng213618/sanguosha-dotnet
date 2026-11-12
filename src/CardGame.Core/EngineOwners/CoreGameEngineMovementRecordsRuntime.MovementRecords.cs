@@ -29,7 +29,6 @@ internal sealed partial class CoreGameEngineMovementRecordsRuntime
     void IMovementRecordMaterials.RecordWushuangShopEquipmentDestruction(CardMovementRecord movement) => _coreWushuangShopCardsOperations.RecordWushuangShopEquipmentDestruction(movement);
     void IMovementRecordMaterials.RecordShanheStartingResourceDestruction(CardMovementRecord movement) => _coreShanheStartingResourcesOperations.RecordShanheStartingResourceDestruction(movement);
     void IMovementRecordMaterials.RecordWuZglCopyMovement(CardMovementRecord movement) => _characterZhugeLiangWumiaoOperations.RecordWuZglCopyMovement(movement);
-    void IMovementRecordObservers.ObserveMouJsMovement(CardMovementRecord movement) => _characterJuShouMouOperations.ObserveMouJsMovement(movement);
     void IMovementRecordObservers.CaptureBianFuRenForeignDiscardProducer(CardMovementRecord movement) => _characterBianFuRenOlOperations.CaptureBianFuRenForeignDiscardProducer(movement);
     void IMovementRecordObservers.CaptureDuFuRenOwnedOrigin(CardMovementRecord movement) => _characterDuFuRenOlOperations.CaptureDuFuRenOwnedOrigin(movement);
     void IMovementRecordObservers.ObserveOriginalHandMovement(CardMovementRecord movement) => _coreOriginalHandEntitiesOperations.ObserveOriginalHandMovement(movement);

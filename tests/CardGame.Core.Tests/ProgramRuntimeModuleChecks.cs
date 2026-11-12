@@ -4,6 +4,27 @@ using CardGame.Core;
 
 internal static class ProgramRuntimeModuleChecks
 {
+    public static void MetadataValidationReusesModulesWithBoundedAllocations()
+    {
+        var types = typeof(GameEngine).Assembly.GetTypes();
+        var allocated = GC.GetAllocatedBytesForCurrentThread();
+        var modules = new ProgramRuntimeModuleCatalog(types);
+        var capabilities = new ProgramCapabilityCatalog(types, modules);
+        allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+        Console.WriteLine($"Runtime metadata validation allocated {allocated:N0} bytes.");
+        Require(allocated < 96_000_000,
+            "Immutable module validation must not be repeated for every capability and shared dependency signature.");
+        Require(capabilities.Registrations.Count == ProgramCapabilityCatalog.Default.Registrations.Count &&
+                capabilities.Registrations.All(registration => !registration.IsRuntimeModule ||
+                    modules.Get(registration.Implementation).Constructor == registration.Constructor),
+            "Capability discovery retains every production registration and its validated constructor.");
+
+        var isolated = new ProgramRuntimeModuleCatalog([typeof(FixtureModule)]);
+        _ = new ProgramCapabilityCatalog([typeof(FixtureModule), typeof(FixtureFactsAdapter)], isolated);
+        Reject(() => new ProgramCapabilityCatalog([typeof(CyclicModule)], isolated));
+        Reject(() => new ProgramRuntimeModuleCatalog([typeof(EngineCallbackModule)]));
+        Reject(() => new ProgramCapabilityCatalog([typeof(EngineCallbackModule)]));
+    }
 
     public static void MatchCompositionDefersBindingsAndRetriesFailedDependencies()
     {
@@ -565,6 +586,21 @@ internal static class ProgramRuntimeModuleChecks
     }
 
     private interface ICyclicFacts : IProgramSelectionQuery { }
+
+    private delegate NestedEngineCallback RecursiveEngineCallback();
+    private delegate GameEngine NestedEngineCallback(RecursiveEngineCallback callback);
+    private interface IEngineCallbackFacts : IProgramSelectionQuery
+    {
+        RecursiveEngineCallback Read();
+    }
+
+    [ProgramCapability, ProgramRuntimeModule]
+    private sealed class EngineCallbackModule : IFixtureCapability
+    {
+        internal EngineCallbackModule(IEngineCallbackFacts facts) { }
+        public int Gate() => 0;
+    }
+
     [ProgramCapability, ProgramRuntimeModule]
     private sealed class CyclicModule(ICyclicFacts facts) : ICyclicFacts
     {

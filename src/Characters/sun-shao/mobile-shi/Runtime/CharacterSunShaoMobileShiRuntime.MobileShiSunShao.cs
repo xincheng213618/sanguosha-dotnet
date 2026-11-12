@@ -45,7 +45,7 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, CardKind.Slash, actor.Seat, targetSeat));
         _coreCardUseLifecycleOperations.IssueResponseRule(useId, new(forbid: true, targetSeat: targetSeat, actorSeat: actor.Seat,
             incomingKinds: CoreGameEngineDirectedCardPolicyQueriesDefinitions.SlashKinds,
-            condition: new("==", ProgramExpressionType.Bool,
+            @while: new("==", ProgramExpressionType.Bool,
                 [new("handPrintedSuitCount", ProgramExpressionType.Int,
                     [new("eventTarget", ProgramExpressionType.Participant, [], name: "eventTarget")], literal: (int)equipment.Suit),
                  new("int", ProgramExpressionType.Int, [], literal: 0)]),

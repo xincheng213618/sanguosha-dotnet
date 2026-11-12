@@ -31,6 +31,8 @@ internal sealed partial class CoreGameEngineSoleIncomingRangeDrawRuntime
         }
 
         AssertSoleIncomingEffectRounds(use);
+        if (_effectEpisodes.HasPending(id) || _effectEpisodes.IsActive(id) ||
+            rounds.Grants.Any(grant => !_effectEpisodes.IsSettled(id, grant.EpisodeId))) return false;
         while (rounds.DrawIndex < rounds.Grants.Count)
         {
             var grant = rounds.Grants[rounds.DrawIndex];
@@ -111,38 +113,42 @@ internal sealed partial class CoreGameEngineSoleIncomingRangeDrawRuntime
     {
         if (use.SoleIncomingEffects is not { } r)
             return;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        if (use.Action is not { Type: CardActionType.Use } action || r.ActionId != action.ActionId || r.Grants.Count == 0 || r.Grants.Select(g => g.ProgramFrameId).Distinct().Count() != r.Grants.Count || r.Started < 0 || r.Started > r.Grants.Count || r.DrawIndex < 0 || r.DrawIndex > r.Grants.Count || r.Active && r.Started == 0 || r.Native.ActionId != action.ActionId || r.Native.WholeGroupRepeated != (r.Started > 0) || !CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(use.CardKind) || r.Native.OriginalAttacks.GroupBy(s => s.TargetIndex).Any(g => g.Count() != 1) || r.Native.OriginalAttacks.Any(s => s.TargetIndex < 0 || s.TargetIndex >= use.TargetSeats.Count) || r.Grants.Any(g => g.UseFrameId != use.Id || g.ActionId != action.ActionId || g.TargetSeat != g.Source.OwnerSeat || g.OriginalActorSeat == g.TargetSeat || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(g.TargetSeat) || g.MaximumDrawCount is < 1 or > 20 || g.WindowFrameId <= use.Id || g.ProgramFrameId <= g.WindowFrameId || !CoreGameEngineExtraEffectsAndRankGuessingRuntime.ExtraEffectCardKind(g.CardKind) || history.OfType<SoleIncomingEffectIssuedEvent>().Count(e => e.Grant == g) != 1 || history.OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == g.ProgramFrameId && e.SkillId == g.Source.SkillId && e.SkillInstanceId == g.Source.SkillInstanceId && e.OwnerSeat == g.Source.OwnerSeat && e.BindingId == g.Source.BindingId && e.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized) != 1 || _contentRegistryOperations._contentRegistry.GetSkill(g.Source.SkillId).Program is not { } p || p.GameplayHash != g.GameplayHash || ProgramInstructionResolver.Default.FindTrigger(p, g.Source.BindingId)?.Effects is not [{ Op: SkillProgramEffectOp.RepeatIncomingSoleCardEffectAndDrawByRange, Amount: var cap }] || cap != g.MaximumDrawCount) || !Enumerable.Range(1, r.Started).SequenceEqual(history.OfType<SoleIncomingEffectRoundStartedEvent>().Where(e => e.UseFrameId == use.Id).Select(e => e.Round)))
-            throw new InvalidOperationException("An incoming extra effect lost its accepted native use, source or ordered issued grants.");
-        for (var index = 0; index < r.Grants.Count; index++)
-        {
-            var grant = r.Grants[index];
-            if (index < r.Started && history.OfType<SoleIncomingEffectRoundStartedEvent>().Count(e => e.UseFrameId == use.Id && e.ActionId == action.ActionId && e.ProgramFrameId == grant.ProgramFrameId && e.Round == index + 1) != 1)
-                throw new InvalidOperationException("An incoming effect round lost its precise ordered source.");
-            if (_resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(w => w.Id == grant.WindowFrameId)is { } window)
-            {
-                if (window.ParentFrameId != use.Id || window.Action.ActionId != action.ActionId || window.Candidates.Count(c => c.OwnerSeat == grant.Source.OwnerSeat && c.SkillId == grant.Source.SkillId && c.TriggerId == grant.Source.BindingId && c.SkillInstanceId == grant.Source.SkillInstanceId && c.GameplayHash == grant.GameplayHash && c.FrozenContext?.CardUse?.ParentCardUseFrameId == use.Id && c.FrozenContext.TargetSeat == grant.TargetSeat) != 1)
-                    throw new InvalidOperationException("An incoming effect changed its accepted target-owner candidate.");
-            }
-            else if (history.OfType<ProgramCardTriggerResolvedEvent>().Count(e => e.FrameId == grant.WindowFrameId && e.SkillId == grant.Source.SkillId && e.TriggerId == grant.Source.BindingId && e.OwnerSeat == grant.Source.OwnerSeat && e.Activated) != 1)
-                throw new InvalidOperationException("An incoming effect lost its original completed native target window.");
-        }
-
+        if (use.Action is not { Type: CardActionType.Use } action || r.ActionId != action.ActionId ||
+            r.Grants.Count == 0 || r.Grants.Select(g => g.ProgramFrameId).Distinct().Count() != r.Grants.Count ||
+            r.DrawIndex < 0 || r.DrawIndex > r.Grants.Count ||
+            r.Grants.Any(g => g.UseFrameId != use.Id || g.ActionId != action.ActionId ||
+                g.TargetSeat != g.Source.OwnerSeat || g.OriginalActorSeat == g.TargetSeat ||
+                !_coreTableSeatQueriesOperations.IsValidPlayerSeat(g.TargetSeat) || g.MaximumDrawCount is < 1 or > 20 ||
+                g.WindowFrameId <= use.Id || g.ProgramFrameId <= g.WindowFrameId ||
+                _effectEpisodes.Get(use.Id, g.EpisodeId) is not { Issue: var issued } ||
+                issued.IssuerFrameId != g.ProgramFrameId || issued.Source != g.Source ||
+                issued.GameplayHash != g.GameplayHash || issued.Spec != new NativeCardEffectEpisodeSpec(50)))
+            throw new InvalidOperationException("An incoming draw lost its original native use or issued episode.");
         if (use.SoleIncomingRangeDraw is not { } draw)
             return;
-        if (draw.GrantIndex != r.DrawIndex || draw.GrantIndex < 0 || draw.GrantIndex >= r.Grants.Count || r.Grants[draw.GrantIndex] != draw.Grant || draw.RequestedCount != Math.Min(draw.Grant.MaximumDrawCount, Math.Max(0, draw.AttackRange)) || history.OfType<SoleIncomingRangeDrawRequestedEvent>().Count(e => e.UseFrameId == use.Id && e.ProgramFrameId == draw.Grant.ProgramFrameId && e.RecipientSeat == draw.Grant.TargetSeat && e.AttackRange == draw.AttackRange && e.RequestedCount == draw.RequestedCount) != 1)
-            throw new InvalidOperationException("A deferred range draw lost its once-frozen amount or issued native-use debt.");
+        if (draw.GrantIndex != r.DrawIndex || draw.GrantIndex < 0 || draw.GrantIndex >= r.Grants.Count ||
+            r.Grants[draw.GrantIndex] != draw.Grant || !_effectEpisodes.IsSettled(use.Id, draw.Grant.EpisodeId) ||
+            _effectEpisodes.HasPending(use.Id) || _effectEpisodes.IsActive(use.Id) ||
+            draw.RequestedCount != Math.Min(draw.Grant.MaximumDrawCount, Math.Max(0, draw.AttackRange)))
+            throw new InvalidOperationException("A deferred range draw lost its frozen amount or original finished native use.");
         if (draw.Stage == SoleIncomingRangeDrawStage.Requesting)
         {
             if (draw.Outcome is not null || use.NativeDraw is not { } paid || paid.ReturnKind != NativeDrawAttemptReturnKind.SoleIncomingRange || paid.InstructionIndex != 0 || paid.RequestedCount != draw.RequestedCount || paid.Recipients is not [var recipient] || recipient != draw.Grant.TargetSeat || paid.Reason != SoleIncomingRangeDrawReason(draw.Grant) || paid.RecipientIndex != 0 || paid.RecipientApplied || paid.Operation is not null || paid.ResultBind is not null || paid.Visibility != SkillProgramCardSetVisibility.Private || paid.ActiveAttemptId is null && paid.AttemptReturned || paid.Replacement is not null && !paid.AttemptReturned)
                 throw new InvalidOperationException("A deferred range draw lost its unpaid native request.");
             return;
         }
-
-        if (draw.Stage != SoleIncomingRangeDrawStage.Children || use.NativeDraw is not null || draw.Outcome is not { } outcome || outcome.RecipientSeat != draw.Grant.TargetSeat || outcome.RequestedCount != draw.RequestedCount || outcome.SequenceBefore > outcome.SequenceAfter || outcome.SequenceAfter > _coreOutsidePhaseDrawDiscardOperations.OutsidePhaseMovementSequence || outcome.ActualDrawIds.Count > draw.RequestedCount || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count || outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore && m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(outcome.RecipientSeat) && m.Reason == SoleIncomingRangeDrawReason(draw.Grant)).OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds) || history.OfType<SoleIncomingRangeDrawPaidEvent>().Count(e => e.UseFrameId == use.Id && e.ProgramFrameId == draw.Grant.ProgramFrameId && e.RecipientSeat == outcome.RecipientSeat && e.ActualCount == outcome.ActualDrawIds.Count && e.SequenceBefore == outcome.SequenceBefore && e.SequenceAfter == outcome.SequenceAfter) != 1 || outcome.AttemptFrameId is { } attempt && history.OfType<NativeDrawAttemptDecidedEvent>().Count(e => e.AttemptFrameId == attempt && e.ParentFrameId == use.Id && e.RecipientSeat == outcome.RecipientSeat && e.RequestedCount == draw.RequestedCount && e.Replaced == (outcome.Replacement is not null)) != 1)
+        if (draw.Stage != SoleIncomingRangeDrawStage.Children || use.NativeDraw is not null ||
+            draw.Outcome is not { } outcome || outcome.RecipientSeat != draw.Grant.TargetSeat ||
+            outcome.RequestedCount != draw.RequestedCount || outcome.SequenceBefore < 0 ||
+            outcome.SequenceBefore > outcome.SequenceAfter || outcome.SequenceAfter > _coreOutsidePhaseDrawDiscardOperations.OutsidePhaseMovementSequence ||
+            outcome.ActualDrawIds.Count > draw.RequestedCount || outcome.ActualDrawIds.Distinct().Count() != outcome.ActualDrawIds.Count ||
+            outcome.Replacement is not null && outcome.ActualDrawIds.Count != 0 ||
+            !_coreCardMovementJournalCardMovementsAccess._cardMovements.Where(m => m.Sequence > outcome.SequenceBefore &&
+                m.Sequence <= outcome.SequenceAfter && m.From == CardLocation.DrawPile &&
+                m.To == CardLocation.Hand(outcome.RecipientSeat) && m.Reason == SoleIncomingRangeDrawReason(draw.Grant))
+                .OrderBy(m => m.Sequence).Select(m => m.CardId).SequenceEqual(outcome.ActualDrawIds))
             throw new InvalidOperationException("A deferred range draw lost its exact paid physical materials.");
     }
-
     [ProgramDamageHook(ProgramDamagePhase.AttackCompletionPrelude, 30)]
     internal bool FinishSoleIncomingAttackRangeDraw(NativeOwners.CardAttackHandle attack, out bool paused)
     {

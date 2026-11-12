@@ -7,7 +7,12 @@ public enum EquipmentSlotNamedUseStage { ChoosingSlot, MovementChildren }
 public sealed record EquipmentSlotNamedUsePayment(long FrameId, CardConversionSource Source, string GameplayHash,
     int RoundNumber, int ActualTurn, int ActualTurnOwner, int PhaseInstance, bool Yin, CardKind EffectiveKind,
     EquipmentSlot Slot, int PreviousCapacity, long Before, long After, EquipmentSlotNamedUseIntent Intent,
-    PromptId OriginalPromptId, long OriginalRevision, long? OriginalParentId, string TargetSignature);
+    PromptId OriginalPromptId, long OriginalRevision, long? OriginalParentId, string TargetSignature)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ProgramSlashRequestIdentity? RequestIdentity { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ProgramSlashRequestAcceptance? RequestAcceptance { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public int? RequestTargetSeat { get; init; }
+}
 public sealed record EquipmentSlotNamedUseDraft
 {
     private PendingDecision _originalDecision = new(DecisionKind.PlayCard, 0, "", [], []);
@@ -25,6 +30,8 @@ public sealed record EquipmentSlotNamedUseDraft
     public required string TargetSignature { get; init; }
     public required string OriginalDecisionSignature { get; init; }
     public long? OriginalParentId { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ProgramSlashRequestIdentity? RequestIdentity { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public int? RequestTargetSeat { get; init; }
     public PendingDecision OriginalDecision { get => _originalDecision; init => _originalDecision = RequestedDeckBasicFrame.FreezeDecision(value); }
     public LegalAction? PlayAction { get => _playAction; init => _playAction = value is null ? null : value with
     {

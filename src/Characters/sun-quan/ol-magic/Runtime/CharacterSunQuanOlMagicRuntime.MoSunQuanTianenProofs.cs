@@ -12,7 +12,6 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         return true;
     }
 
-    internal bool IsMoTianenHandLimitExempt(CharacterState owner, int id) => HasMoTianenCapability && _cardZonesOperations._cardZones.CardsAt(CardLocation.Hand(owner.Seat)).Any(c => c.Id == id) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenSlashExemptionIssuedEvent>().Any(e => e.Source.OwnerSeat == owner.Seat && e.CardId == id && ValidMoTianenExemption(e));
     // Registration only; the query still belongs to legacy GameEngine.MoSunQuanTianen.Proofs.
     [ProgramPipelineHook(ProgramPipelinePhase.CardSkillMarkProjection, 40)]
     internal void ProjectMoTianenCardSkillMark(int cardId, ref CardSkillMarkProjection projection)
@@ -20,8 +19,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         projection.Append(HasMoTianenEntityMark(cardId) ? "天恩" : null);
     }
 
-    internal bool HasMoTianenEntityMark(int id) => HasMoTianenCapability && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenSlashExemptionIssuedEvent>().Any(e => e.CardId == id && ValidMoTianenExemption(e));
-    internal bool ValidMoTianenExemption(MoTianenSlashExemptionIssuedEvent e) => MoTianenHistoryOrigin(e.FrameId, out var issued) && issued.Branch == MoTianenBranch.Same && e.Source == issued.Source && e.GameplayHash == issued.GameplayHash && CoreNativeCardClassificationsRuntime.IsSlashCard(e.PrintedKind) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenSlashExemptionIssuedEvent>().Count(x => x.FrameId == e.FrameId) == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenSlashObtainIssuedEvent>().Where(x => x.FrameId == e.FrameId).ToArray()is [var obtained] && obtained.CardId == e.CardId && obtained.PrintedKind == e.PrintedKind && obtained.From == CardLocation.DrawPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence == e.EntrySequence && m.CardId == e.CardId && m.CardKind == e.PrintedKind && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(e.Source.OwnerSeat) && m.Reason.Value == MoTianenObtainReason) == 1;
+    internal bool HasMoTianenEntityMark(int id) => _handLimitExemptions.HasEntityRelation("ol:mo-tianen", id);
     internal bool ValidMoTianen(ProgramSkillFrame f)
     {
         if (f.MoTianen is not { } r || f.SkillId != "ol:mo-tianen" || f.TriggerId != "unique-target-branches" || f.ActivationId != f.TriggerId || f.InstructionIndex != 1 || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || f.NativeDraw is not null || r.Source != MoTianenSource(f) || r.GameplayHash != f.GameplayHash || !Enum.IsDefined(r.Stage) || f.WindowContext is not { } context || !TryGetMoQuanyuSingletonUse(f.OwnerSeat, context, out var use, out var window, out var target) || r.UseId != use.Id || r.ActionId != use.Action!.ActionId || r.WindowId != window.Id || r.TargetSeat != target || !MoTianenHistoryOrigin(f.Id, out var issued) || issued != new MoTianenBranchIssuedEvent(f.Id, r.Source, r.GameplayHash, r.UseId, r.ActionId, r.WindowId, r.TargetSeat, r.RoundNumber, r.ActualTurn, r.TurnOwner, r.OwnerChoice, r.TargetChoice, r.Branch) || !r.PaymentSealed || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || r.GrainMaterials is not System.Collections.IList { IsReadOnly: true } || r.Movements is not System.Collections.IList { IsReadOnly: true } || r.GrainMaterials.Select(m => m.CardId).Distinct().Count() != r.GrainMaterials.Count || r.Movements.Select(m => m.CardId).Distinct().Count() != r.Movements.Count || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenPaymentSealedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var seal] || seal != new MoTianenPaymentSealedEvent(f.Id, r.Branch, r.Before, r.After, r.Movements.Count, r.Material?.CardId))
@@ -35,15 +33,15 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
                 return false;
             if (r.Material is not { } material)
             {
-                if (r.Movements.Count != 0 || r.Before != r.After || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenSlashExemptionIssuedEvent>().Any(e => e.FrameId == f.Id))
+                if (r.Movements.Count != 0 || r.Before != r.After)
                     return false;
             }
-            else if (material.From != CardLocation.DrawPile || !CoreNativeCardClassificationsRuntime.IsSlashCard(material.PrintedKind) || r.Movements is not [var m] || m.CardId != material.CardId || m.PrintedKind != material.PrintedKind || m.From != material.From || m.To != CardLocation.Hand(f.OwnerSeat) || m.Reason != MoTianenObtainReason || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenSlashExemptionIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var exempt] || exempt.CardId != material.CardId || exempt.EntrySequence != m.Sequence || !ValidMoTianenExemption(exempt))
+            else if (material.From != CardLocation.DrawPile || !CoreNativeCardClassificationsRuntime.IsSlashCard(material.PrintedKind) || r.Movements is not [var m] || m.CardId != material.CardId || m.PrintedKind != material.PrintedKind || m.From != material.From || m.To != CardLocation.Hand(f.OwnerSeat) || m.Reason != MoTianenObtainReason || !_handLimitExemptions.GetMatchingRelations("ol:mo-tianen", f.OwnerSeat, material.CardId).Any(grant => grant.Issue.IssuerFrameId == f.Id))
                 return false;
         }
         else
         {
-            if (r.Stage == MoTianenStage.ObtainChildren || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenSlashObtainIssuedEvent>().Any(e => e.FrameId == f.Id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenSlashExemptionIssuedEvent>().Any(e => e.FrameId == f.Id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenRandomDiscardIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var random] || random != new MoTianenRandomDiscardIssuedEvent(f.Id, r.PoolCount, r.RandomIndex, r.RandomBefore, r.RandomAfter, r.Material?.CardId, r.Material?.PrintedKind, r.Material?.From, r.Before) || r.PoolCount < 0)
+            if (r.Stage == MoTianenStage.ObtainChildren || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenSlashObtainIssuedEvent>().Any(e => e.FrameId == f.Id) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoTianenRandomDiscardIssuedEvent>().Where(e => e.FrameId == f.Id).ToArray()is not [var random] || random != new MoTianenRandomDiscardIssuedEvent(f.Id, r.PoolCount, r.RandomIndex, r.RandomBefore, r.RandomAfter, r.Material?.CardId, r.Material?.PrintedKind, r.Material?.From, r.Before) || r.PoolCount < 0)
                 return false;
             if (r.Material is not { } material)
             {

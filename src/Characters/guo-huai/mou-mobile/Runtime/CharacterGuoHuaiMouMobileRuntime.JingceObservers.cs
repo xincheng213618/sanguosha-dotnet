@@ -44,7 +44,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
         if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
             return r.Stage == MouGuoHuaiStage.Drawing && f.NativeDraw is not null;
         if (child is RecoveryReplacementFrame recovery)
-            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray());
+            return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
             return CoreDamageObserverCursorQueriesRuntime.ProgramHpReturnMatches(f, hp);
         if (child is CardsMovedTriggerWindowFrame moved)
@@ -62,7 +62,7 @@ internal sealed partial class CharacterGuoHuaiMouMobileRuntime
     {
         if (!ValidMouGh(f))
             return false;
-        if (_coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery, _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray()))
+        if (_coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery))
             return true;
         var i = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == f.Id);
         var c = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == recovery.Id);

@@ -53,8 +53,8 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
     }
 
     internal bool HasKenshangProgramSlash(CharacterState actor, IEnumerable<int> targets) => actor.IsAlive && targets.Any(s => _coreTableSeatQueriesOperations.IsValidPlayerSeat(s) && s != actor.Seat && _coreMatchParticipantsPlayersAccess._players[s].IsAlive) && KenshangSources(actor).Any(s => KenshangRequestCards(s).Count >= 2);
-    internal bool KenshangProgramActor(ProgramSkillFrame f, SkillProgramEffectOp op, int actor) => op == SkillProgramEffectOp.ResolvePingduanOrderedBasicRecastEquipment ? f.KeBiNengPingduan is { Stage: KeBiNengPingduanStage.BasicChoice } r && r.ActorSeat == actor && _characterKeBiNengOlOperations.ValidKeBiNeng(f) : _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(f, op, actor);
-    internal int[] KenshangProgramTargets(ProgramSkillFrame f, int actor, SkillProgramEffectOp op) => op == SkillProgramEffectOp.ResolvePingduanOrderedBasicRecastEquipment && KenshangProgramActor(f, op, actor) ? _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != actor).Select(p => p.Seat).ToArray() : _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramTargets(f, actor, op);
+    internal bool KenshangProgramActor(ProgramSkillFrame f, SkillProgramEffectOp op, int actor) => _programSlashRequests.OwnsOffer(f, actor);
+    internal int[] KenshangProgramTargets(ProgramSkillFrame f, int actor, SkillProgramEffectOp op) => _programSlashRequests.GetTargets(f, actor).ToArray();
     internal IReadOnlyList<PromptChoice> KenshangBorrowedSlashChoices(NativeOwners.BorrowedSwordHandle pending)
     {
         if (!CoreNativeDamageHandlesRuntime.SameContinuationOwner(_coreNativeCardContinuationCursorsOperations.ActiveBorrowedSword, pending) || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(pending.WeaponOwnerSeat) || !_coreMatchParticipantsPlayersAccess._players[pending.WeaponOwnerSeat].IsAlive || !_coreMatchParticipantsPlayersAccess._players[pending.SlashTargetSeat].IsAlive)
@@ -208,8 +208,8 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
         if (r.RequestOp is null)
             return r.OriginalDecision.Kind == DecisionKind.QinglongCrescentBlade ? _coreNativeQinglongOperations.CanUseQinglongCrescentBladeTarget(actor, target, CardKind.Slash, color, false, suit, physicalCardIds: r.Selected) : _coreNativeBorrowedSwordOperations.IsLegalBorrowedSwordSlashTarget(actor, target, CardKind.Slash, suit, false, color, physicalCardIds: r.Selected);
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(r.OwnerFrameId);
-        var ignore = r.RequestOp is SkillProgramEffectOp.UseHejiAtCompletedSingleTarget or SkillProgramEffectOp.RequestSlashByTarget or SkillProgramEffectOp.RequestSlashByNearest || r.RequestOp == SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner && f.FixedTargetSlash!.IgnoreDistance;
-        if (r.RequestOp == SkillProgramEffectOp.ResolvePingduanOrderedBasicRecastEquipment && !_coreRuleQueriesOperations.CanSpendSlashUse(actor, target, _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, r.Source), CardKind.Slash, physicalCardIds: r.Selected))
+        var ignore = _programSlashRequests.GetIdentity(f)?.Spec.IgnoreDistance == true;
+        if (_programSlashRequests.GetIdentity(f)?.Spec.CountsTowardSlashLimit == true && !_coreRuleQueriesOperations.CanSpendSlashUse(actor, target, _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, r.Source), CardKind.Slash, physicalCardIds: r.Selected))
             return false;
         return _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, target, cards[0], r.Source, CardKind.Slash, ignoreDistance: ignore, noEffectiveRank: true, physicalCardIds: r.Selected) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actor.Seat, target.Seat, suit) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(target, CardKind.Slash, suit, color) && (ignore || _coreAssistedPhysicalCardsOperations.AssistedSlashPaymentHasRange(actor, target.Seat, cards));
     }
@@ -297,6 +297,8 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
         }
 
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(r.OwnerFrameId);
+        var requestAcceptance = _programSlashRequests.Accept(f, r.ActorSeat, r.TargetSeat);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)!;
         if (r.RequestOp == SkillProgramEffectOp.ResolvePingduanOrderedBasicRecastEquipment)
         {
@@ -313,37 +315,8 @@ internal sealed partial class CharacterMaXiuMaTieOlRuntime
         }
 
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Step = ResolutionFrameStep.ResolvingEffect });
-        if (r.RequestOp == SkillProgramEffectOp.RequestSlashByTarget)
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(f.Id, effect.ResultBind!, RequestSlashByTargetProgramOperationDescriptor.UsedSlashOption, r.ActorSeat, "垦伤：使用【杀】。");
-        else if (r.RequestOp == SkillProgramEffectOp.RequestSlashAgainstChosenTarget)
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AssistedSlashRequest = null });
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(f.Id, effect.ResultBind!, "used-slash", r.ActorSeat, "垦伤：使用【杀】。");
-        }
-        else if (r.RequestOp is SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner or SkillProgramEffectOp.RequestAnniversaryLeiBoSileiSlash)
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { FixedTargetSlash = f.FixedTargetSlash!with { Issued = true } });
-        else if (r.RequestOp == SkillProgramEffectOp.RequestLegalSlashByNearest)
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { NearestLegalSlashRequest = null });
-        if (r.RequestOp == SkillProgramEffectOp.UseHejiAtCompletedSingleTarget)
-        {
-            _characterWuJingOlOperations.PrepareWuJingKenshangNative(f, selection);
-            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-        }
-
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(f))
-        {
-            _characterSunYuanOlOperations.PrepareSayingSuppliedSlash(f, r.ActorSeat, r.ActorSeat, r.TargetSeat, CardKind.Slash, selection.Cards, r.Source);
-            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-        }
-
-        if (_characterLiYiOlOperations.IsChanshuangSlashRequest(f))
-        {
-            _characterLiYiOlOperations.PrepareChanshuangSuppliedSlash(f, r.ActorSeat, r.ActorSeat, r.TargetSeat, CardKind.Slash, selection.Cards, r.Source);
-            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-        }
-
-        _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat], _coreMatchParticipantsPlayersAccess._players[r.TargetSeat], selection.Cards[0], CardKind.Slash, r.ActorSeat, physicalCards: selection.Cards, countsTowardSlashLimit: false, conversionSource: r.Source, programSkillCardUseFrameId: f.Id);
+        f = _requestExecution.PrepareAcceptedUse(f, requestAcceptance);
+        _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[r.ActorSeat], _coreMatchParticipantsPlayersAccess._players[r.TargetSeat], selection.Cards[0], CardKind.Slash, r.ActorSeat, physicalCards: selection.Cards, countsTowardSlashLimit: requestAcceptance.Identity.Spec.CountsTowardSlashLimit, conversionSource: r.Source, programSkillCardUseFrameId: f.Id, programSlashRequest: requestAcceptance);
     }
 
     internal bool HasKenshangRequestPrompt() => CurrentKenshangRequest()is { } r && _corePendingDecisionPolicyPipelineOperations._pendingDecision is { Kind: DecisionKind.ProgramTrigger, IsPrivate: true } p && p.PlayerSeat == r.ActorSeat && p.SkillPrompt?.SkillId == r.Source.SkillId && p.Choices.All(c => c.Parameters.GetValueOrDefault("program-action") == KenshangRequestPick) && ValidKenshangRequest(r);

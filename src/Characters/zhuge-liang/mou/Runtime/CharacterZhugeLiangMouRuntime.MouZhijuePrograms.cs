@@ -21,7 +21,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
             if (_coreCardUseModulesOperations.IsCardUseForbidden(actor.Seat, kind, CardActionType.Use))
                 continue;
             if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
-                foreach (var target in _coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(actor, target, kind, Suit.None, effectiveColor: null, physicalCardIds: [])))
+                foreach (var target in _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(actor, _coreMatchParticipantsPlayersAccess._players, kind, Suit.None, effectiveColor: null, physicalCardIds: []).Select(seat => _coreMatchParticipantsPlayersAccess._players[seat]))
                     result.Add(new(LegalActionKind.Slash, 0, target.Seat, $"视为对 {(target.Name)} 使用【{(CardCatalog.Get(kind).DisplayName)}】", kind, TargetSeats: [target.Seat]));
             else if (kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(actor) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(actor.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(actor, kind, Suit.None))
                 result.Add(new(LegalActionKind.Peach, 0, null, "视为使用【桃】", kind));

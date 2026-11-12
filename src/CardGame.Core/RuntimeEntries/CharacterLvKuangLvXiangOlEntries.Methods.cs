@@ -12,7 +12,6 @@ internal sealed partial class CharacterLvKuangLvXiangOlEntries
     internal void CompleteQigongNativePayment(long id) => _resolve().CompleteQigongNativePayment(id);
     internal void CompleteQigongSlash(GameEngine.AttackCompletionReceipt completion) => _resolve().CompleteQigongSlash(completion);
     internal bool CompleteQigongUseReturn(CardUseFrame use) => _resolve().CompleteQigongUseReturn(use);
-    internal void DispatchQigongRequestedDeckSlash(ProgramSkillFrame f, Card card, IReadOnlyList<int> targets) => _resolve().DispatchQigongRequestedDeckSlash(f, card, targets);
     internal bool DistancePhysicalSlash70IsQigongIssuedDistance(ProgramSlashDistanceQuery q) => _resolve().DistancePhysicalSlash70IsQigongIssuedDistance(q);
     internal bool DrainLvKuangLvXiang(ProgramSkillFrame f) => _resolve().DrainLvKuangLvXiang(f);
     internal SkillProgramStepOutcome ExecuteLvKuangLvXiang(ProgramSkillFrame supplied, SkillProgramEffectOp op) => _resolve().ExecuteLvKuangLvXiang(supplied, op);
@@ -34,11 +33,7 @@ internal sealed partial class CharacterLvKuangLvXiangOlEntries
     internal ProgramSkillFrame? LvKuangLvXiangObserverRoot() => _resolve().LvKuangLvXiangObserverRoot();
     internal bool LvKuangLvXiangObserverSuffix(int index) => _resolve().LvKuangLvXiangObserverSuffix(index);
     internal bool MatchesQigongDeclaration(ProgramSkillFrame f, CardDeclarationFrame d) => _resolve().MatchesQigongDeclaration(f, d);
-    internal void PrepareQigongChainedSlash(ProgramSkillFrame f, ChainedStateBasicPayment p) => _resolve().PrepareQigongChainedSlash(f, p);
-    internal void PrepareQigongDrawFundedSlash(ProgramSkillFrame f, DrawFundedDistinctBasicPayment p) => _resolve().PrepareQigongDrawFundedSlash(f, p);
-    internal bool PrepareQigongFactionNative(ProgramSkillFrame f, NativeOwners.FactionCardRequestHandle pending, CharacterState provider, IReadOnlyList<Card> cards, CardKind kind) => _resolve().PrepareQigongFactionNative(f, pending, provider, cards, kind);
     internal void PublishLvKuangLvXiang(ProgramSkillFrame f) => _resolve().PublishLvKuangLvXiang(f);
-    internal bool QigongAdapterActor(ProgramSkillFrame f, int actor, int? target, int cursor, long? parent, long? request) => _resolve().QigongAdapterActor(f, actor, target, cursor, parent, request);
     internal bool QigongCardUseRidesOn(CardUseFrame use, ProgramSkillFrame parent) => _resolve().QigongCardUseRidesOn(use, parent);
     internal bool QigongDeclarationObserverEdge(int index) => _resolve().QigongDeclarationObserverEdge(index);
     internal bool QigongMaterialPaymentMatches(CardUseFrame use, QigongNativeReceipt r) => _resolve().QigongMaterialPaymentMatches(use, r);

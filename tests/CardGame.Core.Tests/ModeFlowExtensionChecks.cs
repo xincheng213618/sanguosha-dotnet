@@ -46,6 +46,8 @@ internal static class ModeFlowExtensionChecks
     {
         var core = new CoreHooks();
         var catalog = ProgramRuntimeHookCatalog.Discover(Methods(typeof(CoreHooks)));
+        Require(catalog.Proofs.Dying[ProgramDyingProofPhase.Runtime].Single().Single().Method.Name == "Dying",
+            "Hook discovery retains a pure dying-proof declaration for its independently discovered proof catalog.");
         var stop = true;
         var registrations = new HookProvider
         {
@@ -99,6 +101,8 @@ internal static class ModeFlowExtensionChecks
     }
     private sealed class CoreHooks
     {
+        [ProgramDyingProof(ProgramDyingProofPhase.Runtime, 10)]
+        private bool Dying() => false;
         internal List<string> Trace { get; } = [];
         [ProgramRuntimeHook(ProgramRuntimePhase.BeforeDeclaration, 10)]
         [ProgramRuntimeHook(ProgramRuntimePhase.BeforeResponseHealth, 10)]

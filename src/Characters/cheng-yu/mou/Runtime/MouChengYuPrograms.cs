@@ -18,13 +18,6 @@ public sealed record MouCyReceipt(CardConversionSource Source,string GameplayHas
  private IReadOnlyList<MouCyCard> _view=[];public IReadOnlyList<MouCyCard> View{get=>_view;init=>_view=Array.AsReadOnly(value.ToArray());}
 }
 public sealed partial record ProgramSkillFrame{[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouCyReceipt? MouChengYuAnniversary{get;init;}}
-public sealed partial record CardUseFrame
-{
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouCyUseInvalidatedEvent? MouCyInvalidation{get;init;}
- private IReadOnlyList<MouCyUseInvalidatedEvent>? _mouCyResponses;
- [JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public IReadOnlyList<MouCyUseInvalidatedEvent>? MouCyResponseInvalidations{get=>_mouCyResponses;init=>_mouCyResponses=value is null?null:Array.AsReadOnly(value.ToArray());}
-}
-public sealed partial record NullificationWindowFrame{[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public MouCyUseInvalidatedEvent? MouCyResponseInvalidation{get;init;}}
 internal interface IMouChengYuAnniversaryRuntime:IProgramRuntimeOperations{SkillProgramStepOutcome Resolve(ProgramSkillFrame frame,SkillProgramEffectOp op);}
 internal interface IMouChengYuAnniversaryFacts:IProgramSelectionQuery
 {
@@ -33,7 +26,7 @@ internal interface IMouChengYuAnniversaryFacts:IProgramSelectionQuery
 }
 internal interface IMouChengYuAnniversaryNative:IProgramRuntimeOperations
 {
- IReadOnlyList<MouCyCard> Peek(ProgramSkillFrame frame);MouCyCard? Reveal(ProgramSkillFrame frame);void Move(ProgramSkillFrame frame,int id,CardLocation from,CardLocation to);void Invalidate(ProgramSkillFrame frame,MouCyUseInvalidatedEvent proof);void Damage(ProgramSkillFrame frame,int target,int amount);bool Drain(ProgramSkillFrame frame);void Finish(ProgramSkillFrame frame);void Publish();
+ IReadOnlyList<MouCyCard> Peek(ProgramSkillFrame frame);MouCyCard? Reveal(ProgramSkillFrame frame);void Move(ProgramSkillFrame frame,int id,CardLocation from,CardLocation to);void Invalidate(ProgramSkillFrame frame);void Damage(ProgramSkillFrame frame,int target,int amount);bool Drain(ProgramSkillFrame frame);void Finish(ProgramSkillFrame frame);void Publish();
 }
 internal abstract class MouChengYuAnniversaryDescriptor:ProgramOperationDescriptorBase
 {

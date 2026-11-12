@@ -114,6 +114,8 @@ internal sealed partial class CoreGameEngineForeignSelectedCardSlashRuntime
             throw new InvalidOperationException("The selected foreign-card Slash lost its exact actual material payment.");
         var batch = _pendingCardsMovedBatchesOperations._pendingCardsMovedBatches.Single(b => b.ParentFrameId == useId && b.Movements.Contains(movement));
         _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { ForeignSelectedCardSlash = receipt with { PaymentAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, PaymentBatchId = batch.Id } });
+        if (movement.To != CardLocation.Processing)
+            _nativeMaterialClaims.CaptureRetirement(useId, [movement]);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ForeignSelectedCardSlashPaidEvent(frame.Id, useId, returned.CardId, returned.PrintedKind, returned.From, movement.To, receipt.PaymentBefore, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, batch.Id));
     }
 

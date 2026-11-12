@@ -9,11 +9,11 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
     internal IReadOnlyList<PromptChoice> MouXqProgramSlashChoices(ProgramSkillFrame f, int actorSeat, IReadOnlyList<int> targets, string? resultBind = null)
     {
         var effect = _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f);
-        if (effect is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || f.MouXiaoQiaoJueyanResponseGrant is not null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || (!_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(f) && !_characterLiYiOlOperations.IsChanshuangSlashRequest(f) && !_characterSunYuanOlOperations.IsSayingSlashRequest(f)) || !_coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(f, effect.Op, actorSeat) || resultBind is not null && effect.ResultBind != resultBind)
-            return[];
-        var allowed = _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramTargets(f, actorSeat, effect.Op);
-        if (allowed.Length == 0 || targets.Any(t => !allowed.Contains(t)))
-            return[];
+        if (effect is null || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(actorSeat) || !_coreMatchParticipantsPlayersAccess._players[actorSeat].IsAlive || f.MouXiaoQiaoJueyanResponseGrant is not null || _programSlashRequests.GetOffer(f, actorSeat) is not { } request || resultBind is not null && request.Spec.ResultBind != resultBind)
+            return [];
+        var allowed = _programSlashRequests.GetTargets(f, actorSeat);
+        if (allowed.Count == 0 || targets.Any(t => !allowed.Contains(t)))
+            return [];
         var actor = _coreMatchParticipantsPlayersAccess._players[actorSeat];
         var source = MouXqRetainedSources(actor).FirstOrDefault();
         if (source is null)
@@ -23,7 +23,9 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
             foreach (var target in targets.Distinct())
             {
                 var kind = _coreAdvancedLifecycleOperations.AdvancedEffectiveHandKind(actor, card);
-                if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || target == actorSeat || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actorSeat, target, Suit.None) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], new(0, kind, Suit.None, 0), source, kind, ignoreDistance: f.FixedTargetSlash?.IgnoreDistance == true, noEffectiveRank: true, physicalCardIds: []))
+                if (!_coreTableSeatQueriesOperations.IsValidPlayerSeat(target) || !_coreMatchParticipantsPlayersAccess._players[target].IsAlive || target == actorSeat || _coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(actorSeat, target, Suit.None) || _coreNativeDamagePoliciesOperations.IsCardTargetProhibited(_coreMatchParticipantsPlayersAccess._players[target], kind, Suit.None) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[target], new(0, kind, Suit.None, 0), source, kind, ignoreDistance: request.Spec.IgnoreDistance, noEffectiveRank: true, physicalCardIds: []))
+                    continue;
+                if (request.Spec.CountsTowardSlashLimit && !_slashQuota.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[target], _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source), kind, physicalCardIds: []))
                     continue;
                 var p = new Dictionary<string, string>
                 {
@@ -51,27 +53,13 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         StartMouXqRequestedReveal(p, CoreGameEngineCardConversionsRuntime.RequireConversionSource(choice), id, new(f.Id, DecisionKind.ProgramTrigger, kind, p.PlayerSeat, target, f.Id, effect.Op, f.InstructionIndex, new(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId), f.GameplayHash, effect.ResultBind));
     }
 
-    internal bool IsMouXqProgramRequest(ProgramSkillFrame f, MouXiaoQiaoJueyanResponseRequest r) => r.DecisionKind == DecisionKind.ProgramTrigger && r.ParentFrameId == f.Id && r.RequestInstruction == f.InstructionIndex && r.RequestSource == new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && r.RequestHash == f.GameplayHash && r.RequestOperation is { } op && _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!.GameplayHash == f.GameplayHash && _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramActor(f, op, r.ActorSeat) && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.ResultBind == r.ResultBind && _coreRoundOnceCardlessProgramRequestsOperations.RoundOnceCardlessProgramTargets(f, r.ActorSeat, op).Contains(r.TargetSeat);
+    internal bool IsMouXqProgramRequest(ProgramSkillFrame f, MouXiaoQiaoJueyanResponseRequest r) => r.DecisionKind == DecisionKind.ProgramTrigger && r.ParentFrameId == f.Id && r.RequestInstruction == f.InstructionIndex && r.RequestSource == new CardConversionSource(f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.OwnerSeat, f.SkillInstanceId) && r.RequestHash == f.GameplayHash && r.RequestOperation is not null && (r.RequestAcceptance is { } acceptance ? _programSlashRequests.OwnsAcceptance(f, acceptance, r.ActorSeat, r.TargetSeat) : _programSlashRequests.OwnsOffer(f, r.ActorSeat, r.TargetSeat));
     internal void PrepareMouXqProgramSlash(MouXiaoQiaoJueyanResponseRequest r)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(r.ParentFrameId);
-        if (!IsMouXqProgramRequest(f, r))
+        if (!IsMouXqProgramRequest(f, r) || r.RequestAcceptance is not { } acceptance)
             throw new InvalidOperationException("Jueyan's accepted invitation lost its original producer.");
-        if (_characterSunYuanOlOperations.IsSayingSlashRequest(f))
-            _characterSunYuanOlOperations.PrepareSayingSuppliedSlash(f, r.ActorSeat, r.ActorSeat, r.TargetSeat, r.OutputKind, [], f.MouXiaoQiaoJueyanResponseGrant!.Source);
-        if (_characterLiYiOlOperations.IsChanshuangSlashRequest(f))
-            _characterLiYiOlOperations.PrepareChanshuangSuppliedSlash(f, r.ActorSeat, r.ActorSeat, r.TargetSeat, r.OutputKind, [], f.MouXiaoQiaoJueyanResponseGrant!.Source);
-        if (r.RequestOperation == SkillProgramEffectOp.RequestSlashByTarget)
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(f.Id, r.ResultBind!, "used-slash", r.ActorSeat, "绝颜：展示并视为使用原手牌。");
-        else if (r.RequestOperation == SkillProgramEffectOp.RequestSlashAgainstChosenTarget)
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AssistedSlashRequest = null });
-            _coreProgramSlashRequestOperations.CommitProgramChoiceResult(f.Id, r.ResultBind!, "used-slash", r.ActorSeat, "绝颜：展示并视为使用原手牌。");
-        }
-        else if (r.RequestOperation is SkillProgramEffectOp.UseOwnerSlashAgainstTurnOwner or SkillProgramEffectOp.RequestAnniversaryLeiBoSileiSlash)
-            _coreRuntimeOperations.ReplaceRuntimeTop(f with { FixedTargetSlash = f.FixedTargetSlash!with { Issued = true } });
-        else if (r.RequestOperation == SkillProgramEffectOp.RequestLegalSlashByNearest)
-            _coreRuntimeOperations.ReplaceRuntimeTop(f with { NearestLegalSlashRequest = null });
+        _requestExecution.PrepareAcceptedUse(f, acceptance);
     }
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 34001)]
@@ -98,7 +86,7 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MouXiaoQiaoJueyanResponseGrant = null });
         if (_characterSunYuanOlOperations.ResumeSayingSuppliedSlash(f) || _characterLiYiOlOperations.ResumeChanshuangSuppliedSlash(f))
             return true;
-        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) && !_characterPeiYuanShaoOlOperations.HasIssuedFulueRequest(f))
+        if (_coreMatchOutcomeWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !(g.Request.RequestAcceptance is { } acceptance ? _programSlashRequests.CanExecuteAcceptedUse(f, acceptance) : _coreProgramLifecycleOperations.CanInvokeProgramSkill(f)))
             _coreSkillProgramsOperations.FinishProgramSkill(f, true);
         else if (f.FixedTargetSlash is { Issued: true })
             _coreFixedSlashAndDeclaredDeckProgramsOperations.TryResumeFixedSlashAndDeclaredDeck(id);

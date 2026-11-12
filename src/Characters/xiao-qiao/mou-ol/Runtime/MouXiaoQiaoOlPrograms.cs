@@ -37,7 +37,10 @@ public sealed record MouXiaoQiaoOlNativeOrigin(long ProgramFrameId, CardConversi
 public sealed record MouXiaoQiaoJueyanResponseRequest(long ParentFrameId, DecisionKind DecisionKind, CardKind OutputKind,
     int ActorSeat, int TargetSeat, long OriginalResponseFrameId,
     SkillProgramEffectOp? RequestOperation=null,int RequestInstruction=0,CardConversionSource? RequestSource=null,
-    string? RequestHash=null,string? ResultBind=null);
+    string? RequestHash=null,string? ResultBind=null)
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public ProgramSlashRequestAcceptance? RequestAcceptance { get; init; }
+}
 public sealed record MouXiaoQiaoJueyanResponseGrant(long ProgramFrameId, CardConversionSource Source, string GameplayHash,
     int Round, int ShownCardId, MouXiaoQiaoJueyanResponseRequest Request, long ActionId = 0,bool Returned=false);
 public sealed partial record ProgramSkillFrame

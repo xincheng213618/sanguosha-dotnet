@@ -15,11 +15,15 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
 
     internal IReadOnlyList<LegalAction> TieredRoundZeroPlayActions(CharacterState actor)
     {
-        if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _characterMaTieAnniversaryOperations.IsAnniversaryMaTieSlashQuery(actor)) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor))
+        if (!actor.IsAlive || (_coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Play || actor.Seat != _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat) && !_characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) && !(_characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _slashRequestPermissions.Declaration(actor.Seat) is not null) && !_characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor))
             return[];
+        var ordinaryPlay = _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && actor.Seat == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat;
+        var otherCardWindow = _characterKeBiNengOlOperations.IsKeBiNengPingduanBasicQuery(actor) || _characterKongRongMouOlOperations.Value.IsMouKrLiwenUseQuery(actor) || _characterLuSuMouOperations.Value.IsMouLuSuUseQuery(actor);
         var result = new List<LegalAction>();
         foreach (var(source, rule, _)in TieredRoundZeroRules(actor))
         {
+            if (!ordinaryPlay && !otherCardWindow && !CoreNativeCardClassificationsRuntime.IsSlashCard(rule.OutputKind))
+                continue;
             var kind = rule.OutputKind;
             var card = new Card(0, kind, Suit.None, 0);
             if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
@@ -172,19 +176,30 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
             _coreNativeSlashUseOperations.BeginSlashTargetResolution(attack);
     }
 
-    internal bool TryExecuteTieredRoundZeroPlay(CharacterState actor, LegalAction action)
+    internal bool TryExecuteTieredRoundZeroPlay(CharacterState actor, LegalAction action, ProgramSlashRequestAcceptance? programSlashRequest = null, ProgramSlashRequestIdentity? programSlashRequestIdentity = null, PendingDecision? originalDecision = null)
     {
         if (action.CardId != 0 || action.ConversionSource is not { } source || _corePlayCardHistoryOperations.ViewAsRule(source)?.TieredRoundConversion is null)
             return false;
-        if (!TieredRoundZeroPlayActions(actor).Any(a => a.Kind == action.Kind && a.ConversionSource == source && a.PlayedCardKind == action.PlayedCardKind && a.TargetCardId == action.TargetCardId && a.TargetSeats.SequenceEqual(action.TargetSeats)))
+        if (programSlashRequest is { } accepted &&
+            (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == accepted.Identity.FrameId) is not ProgramSkillFrame parent ||
+             !_programSlashRequests.OwnsAcceptance(parent, accepted, actor.Seat) || !action.TargetSeats.Contains(accepted.TargetSeat) ||
+             action.PlayedCardKind is not { } requestedKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(requestedKind)))
+            throw new InvalidOperationException("A native Play action lost its original accepted Slash request.");
+        if (programSlashRequest is null && programSlashRequestIdentity is { } identity &&
+            (_resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == identity.FrameId) is not ProgramSkillFrame offeredParent ||
+             !_programSlashRequests.OwnsIssuedIdentity(offeredParent, identity, actor.Seat) ||
+             !_programSlashRequests.OwnsOffer(offeredParent, actor.Seat, action.TargetSeat ?? action.TargetSeats.FirstOrDefault(-1)) ||
+             action.PlayedCardKind is not { } offeredKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(offeredKind)))
+            throw new InvalidOperationException("A native Play action lost its original unpaid Slash request.");
+        if (programSlashRequest is null && programSlashRequestIdentity is null && !TieredRoundZeroPlayActions(actor).Any(a => a.Kind == action.Kind && a.ConversionSource == source && a.PlayedCardKind == action.PlayedCardKind && a.TargetCardId == action.TargetCardId && a.TargetSeats.SequenceEqual(action.TargetSeats)))
             throw new InvalidOperationException("A zero-material use lost its published legal action before acceptance.");
-        ExecuteTieredRoundZeroPlay(actor, action);
+        ExecuteTieredRoundZeroPlay(actor, action, programSlashRequest, programSlashRequestIdentity, originalDecision);
         return true;
     }
 
-    internal void ExecuteTieredRoundZeroPlay(CharacterState actor, LegalAction action)
+    internal void ExecuteTieredRoundZeroPlay(CharacterState actor, LegalAction action, ProgramSlashRequestAcceptance? programSlashRequest = null, ProgramSlashRequestIdentity? programSlashRequestIdentity = null, PendingDecision? originalDecision = null)
     {
-        if (_characterWoLongFengChuOlOperations.TryBeginEquipmentSlotNamedPlay(actor, action))
+        if (_characterWoLongFengChuOlOperations.TryBeginEquipmentSlotNamedPlay(actor, action, programSlashRequestIdentity, originalDecision))
             return;
         var source = action.ConversionSource!;
         var kind = action.PlayedCardKind!.Value;
@@ -227,7 +242,15 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
                 requiredKind = options.Single(o => o.ActionKind == action.Kind && o.TargetCardId == action.TargetCardId && o.TargetSeats.SequenceEqual(action.TargetSeats)).RequiredCardKind;
         }
 
-        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, action.TargetSeats, kind, physicalCardIds: [], conversionSource: source);
+        if (programSlashRequest is null && programSlashRequestIdentity is { } identity)
+        {
+            var originalParent = _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == identity.FrameId) as ProgramSkillFrame
+                ?? throw new InvalidOperationException("A native Play cost lost its original Slash request.");
+            if (!_programSlashRequests.OwnsIssuedIdentity(originalParent, identity, actor.Seat))
+                throw new InvalidOperationException("A native Play cost cannot accept another issued request.");
+            programSlashRequest = _programSlashRequests.Accept(originalParent, actor.Seat, action.TargetSeat ?? action.TargetSeats.First());
+        }
+        var id = _coreNativeCardUseOperations.BeginCardUse(card, actor.Seat, action.TargetSeats, kind, physicalCardIds: [], conversionSource: source, programSlashRequest: programSlashRequest);
         if (kind == CardKind.Alcohol)
         {
             _characterHuangGaiMouMobileOperations.RecordMouZhaJiangAwareAlcoholDebit(id, actor);
@@ -245,7 +268,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesRuntime
             actor.HasAlcoholEffect = false;
             _coreActiveNativeAttackQueriesOperations.ActiveCardAttack = attack;
             _coreCurrentCardEnhancementsOperations.CaptureProgramAdjustedSlashBaseDamage(attack);
-            if (!_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true)
+            if ((programSlashRequest?.Identity.Spec.CountsTowardSlashLimit ?? true) && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, source) && _coreCardUseLifecycleOperations.LifecycleCardUse(id)?.UnlimitedUse != true)
                 _coreCardUseDebitsOperations.RecordSlashUseDebit(id, actor.Seat);
             _coreNativeOwnedCardQueriesOperations.MarkSlashUsedOrPlayedDuringCurrentPlayPhase(actor.Seat, kind);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardUsedEvent(0, kind, actor.Seat, targets[0]));

@@ -4,7 +4,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesEntries
 {
     internal void BeginTieredRoundForcedZeroSlash(CharacterState actor, CharacterState target, CardKind kind, CardConversionSource source, NativeOwners.BorrowedSwordHandle? borrowed, bool countsTowardLimit) => _resolve().BeginTieredRoundForcedZeroSlash(actor, target, kind, source, borrowed, countsTowardLimit);
     internal bool ContinueTieredRoundZeroSimpleUse(long id, ProgramSimpleCardContinuation continuation) => _resolve().ContinueTieredRoundZeroSimpleUse(id, continuation);
-    internal void ExecuteTieredRoundZeroPlay(CharacterState actor, LegalAction action) => _resolve().ExecuteTieredRoundZeroPlay(actor, action);
+    internal void ExecuteTieredRoundZeroPlay(CharacterState actor, LegalAction action, ProgramSlashRequestAcceptance? programSlashRequest = default, ProgramSlashRequestIdentity? programSlashRequestIdentity = default, PendingDecision? originalDecision = default) => _resolve().ExecuteTieredRoundZeroPlay(actor, action, programSlashRequest, programSlashRequestIdentity, originalDecision);
     internal bool FinishTieredRoundZeroAttack(NativeOwners.CardAttackHandle attack, scoped out bool paused) => _resolve().FinishTieredRoundZeroAttack(attack, out paused);
     internal bool IsIssuedTieredRoundUse(CardUseFrame use, bool zeroOnly = false) => _resolve().IsIssuedTieredRoundUse(use, zeroOnly);
     internal bool IsTieredRoundZeroUse(long id) => _resolve().IsTieredRoundZeroUse(id);
@@ -15,7 +15,7 @@ internal sealed partial class CoreGameEngineTieredRoundZeroUsesEntries
     internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> TieredRoundZeroForcedSlashRules(CharacterState actor, CharacterState target, bool qinglong) => _resolve().TieredRoundZeroForcedSlashRules(actor, target, qinglong);
     internal IReadOnlyList<LegalAction> TieredRoundZeroPlayActions(CharacterState actor) => _resolve().TieredRoundZeroPlayActions(actor);
     internal IEnumerable<(CardConversionSource Source, SkillProgramViewAs Rule, string Hash)> TieredRoundZeroRules(CharacterState owner, CardKind? output = default, bool responseUse = false, bool dyingUse = false) => _resolve().TieredRoundZeroRules(owner, output, responseUse, dyingUse);
-    internal bool TryExecuteTieredRoundZeroPlay(CharacterState actor, LegalAction action) => _resolve().TryExecuteTieredRoundZeroPlay(actor, action);
+    internal bool TryExecuteTieredRoundZeroPlay(CharacterState actor, LegalAction action, ProgramSlashRequestAcceptance? programSlashRequest = default, ProgramSlashRequestIdentity? programSlashRequestIdentity = default, PendingDecision? originalDecision = default) => _resolve().TryExecuteTieredRoundZeroPlay(actor, action, programSlashRequest, programSlashRequestIdentity, originalDecision);
     internal bool TryResolveTieredRoundZeroForcedSlash(PromptChoice selected, bool advance) => _resolve().TryResolveTieredRoundZeroForcedSlash(selected, advance);
     internal bool TrySubmitTieredRoundZeroPlay(PlayCardCommand command, scoped out CommandResult result) => _resolve().TrySubmitTieredRoundZeroPlay(command, out result);
 }

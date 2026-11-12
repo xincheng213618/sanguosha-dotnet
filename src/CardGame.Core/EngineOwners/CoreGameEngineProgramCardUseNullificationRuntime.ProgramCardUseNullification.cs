@@ -13,42 +13,14 @@ internal sealed partial class CoreGameEngineProgramCardUseNullificationRuntime
         // remaining candidates. A second owner may still commit a conversion.
         if (use.ProgramUseNullification is not null)
         {
-            AssertProgramUseNullification(use);
             return;
         }
 
         var proof = new ProgramCardUseNullifiedEvent(active.Id, use.Id, window.Id, action.ActionId, active.SkillId, active.SkillInstanceId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active), active.GameplayHash, active.InstructionIndex, active.OwnerSeat, action.ActorSeat, action.EffectiveKind);
+        _invalidations.IssueUse(use.Id, action, new());
         _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { ProgramUseNullification = proof });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(proof);
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(active.SkillId).Name)}】，" + $"令本次使用的【{(CardCatalog.Get(action.EffectiveKind).DisplayName)}】无效。", active.OwnerSeat, action.ActorSeat);
-    }
-
-    internal bool IsProgramUseIneffective(CardUseFrame use)
-    {
-        if (_characterCaoZhenBoundaryMobileOperations.Value.IsBoundarySidiUseIneffective(use) || _characterHuangQuanMouOperations.IsMouHqUseIneffective(use) || _coreWushuangOriginalSkillRulesOperations.Value.IsWushuangCiweiIneffective(use))
-            return true;
-        if (use.ProgramUseNullification is null)
-            return false;
-        AssertProgramUseNullification(use);
-        return true;
-    }
-
-    internal void AssertProgramUseNullification(CardUseFrame use)
-    {
-        if (use.ProgramUseNullification is not { } proof)
-            return;
-        var history = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().ToArray();
-        if (use.Action is not { Type: CardActionType.Use } action || proof.ParentUseFrameId != use.Id || proof.ActionId != action.ActionId || proof.ActorSeat != action.ActorSeat || proof.EffectiveKind != action.EffectiveKind || !use.TargetSeats.Contains(proof.OwnerSeat) || proof.WindowFrameId <= use.Id || proof.ProgramFrameId <= proof.WindowFrameId || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(proof.SkillId)?.Program is not { } program || program.GameplayHash != proof.GameplayHash || ProgramInstructionResolver.Default.FindTrigger(program, proof.BindingId)is not { Window: SkillProgramTriggerWindow.CardUseBeforeTargetEffects, OwnerRelation: SkillProgramCardActionOwnerRelation.Target } trigger || proof.InstructionIndex < 1 || proof.InstructionIndex > trigger.Effects.Count || trigger.Effects[proof.InstructionIndex - 1].Op != SkillProgramEffectOp.NullifyCurrentCardUse || history.OfType<ProgramCardUseNullifiedEvent>().Count(fact => fact == proof) != 1 || history.OfType<ProgramBindingStartedEvent>().Count(fact => fact.FrameId == proof.ProgramFrameId && fact.SkillId == proof.SkillId && fact.BindingId == proof.BindingId && fact.SkillInstanceId == proof.SkillInstanceId && fact.OwnerSeat == proof.OwnerSeat && fact.Window == SkillProgramTriggerWindow.CardUseBeforeTargetEffects) != 1)
-            throw new InvalidOperationException("A whole-use ineffective state lost its exact issued program proof.");
-        if (_resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == proof.ProgramFrameId)is { } active && (active.WindowContext?.ParentFrameId != proof.WindowFrameId || active.WindowContext.CardUse?.ParentCardUseFrameId != use.Id || active.SkillId != proof.SkillId || active.SkillInstanceId != proof.SkillInstanceId || active.GameplayHash != proof.GameplayHash || CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(active) != proof.BindingId))
-            throw new InvalidOperationException("A whole-use ineffective state changed its active issuing program.");
-        if (_resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(frame => frame.Id == proof.WindowFrameId)is { } window)
-        {
-            if (window.ParentFrameId != use.Id || window.Action.ActionId != action.ActionId || CoreGameEngineCardActionsRuntime.GetCardActionWindow(window) != SkillProgramTriggerWindow.CardUseBeforeTargetEffects || window.Candidates.Count(candidate => candidate.OwnerSeat == proof.OwnerSeat && candidate.SkillId == proof.SkillId && candidate.SkillInstanceId == proof.SkillInstanceId && candidate.TriggerId == proof.BindingId && candidate.GameplayHash == proof.GameplayHash && candidate.FrozenContext is { TargetSeat: { } target, CardUse: { } cardUse } context && target == proof.OwnerSeat && context.ParentFrameId == window.Id && cardUse.ParentCardUseFrameId == use.Id && cardUse.CardActionId == action.ActionId) != 1)
-                throw new InvalidOperationException("A whole-use ineffective state changed its frozen target candidate.");
-        }
-        else if (history.OfType<ProgramCardTriggerResolvedEvent>().Count(fact => fact.FrameId == proof.WindowFrameId && fact.SkillId == proof.SkillId && fact.TriggerId == proof.BindingId && fact.OwnerSeat == proof.OwnerSeat && fact.Activated) != 1)
-            throw new InvalidOperationException("A whole-use ineffective state lost its completed target window.");
     }
 
     internal bool HasBeforeTargetCardProgram(CardKind kind)
@@ -76,7 +48,7 @@ internal sealed partial class CoreGameEngineProgramCardUseNullificationRuntime
     internal double GetWholeCardUseNullificationAiScore(int ownerSeat, ProgramCardTriggerWindowFrame window)
     {
         var use = _coreCardUseLifecycleOperations.LifecycleCardUse(window.ParentFrameId) ?? throw new InvalidOperationException("A use-nullification estimate lost its actual use.");
-        if (IsProgramUseIneffective(use))
+        if (_invalidations.IsUseIneffective(use))
             return 0d;
         var kind = window.Action.EffectiveKind;
         // This is public utility of the card's effects, not an assumption about

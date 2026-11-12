@@ -34,8 +34,11 @@ internal sealed partial class CharacterLvKuangLvXiangOlRuntime
             return false;
         if (declaration.Stage != CardDeclarationStage.Applying || declaration.Succeeded != true || !MatchesQigongDeclaration(root, declaration) || _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id != declaration.Id)
             throw new InvalidOperationException("Qigong declaration lost its actual successful paid native application.");
+        var identity = _slashRequests.GetIdentity(root) ?? throw new InvalidOperationException("Qigong's paid declaration lost its original issued request.");
+        var acceptance = _slashRequests.AcceptIssued(root, identity, p.Actor, p.Target);
+        root = _requestExecution.PrepareAcceptedUse(root, acceptance);
         _coreRuntimeOperations.ReplaceRuntimeFrame(root.Id, root with { LvKuangLvXiang = p with { Stage = "issuing", IssuingIds = [d.CardId], IssuingKind = d.Kind } });
-        _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[p.Actor], _coreMatchParticipantsPlayersAccess._players[p.Target], _coreAdvancedLifecycleOperations.GetAdvancedCard(d.CardId), d.Kind, p.Actor, countsTowardSlashLimit: false, conversionSource: d.Conversion, programSkillCardUseFrameId: root.Id);
+        _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[p.Actor], _coreMatchParticipantsPlayersAccess._players[p.Target], _coreAdvancedLifecycleOperations.GetAdvancedCard(d.CardId), d.Kind, p.Actor, countsTowardSlashLimit: false, conversionSource: d.Conversion, programSkillCardUseFrameId: root.Id, programSlashRequest: acceptance);
         return true;
     }
 

@@ -101,7 +101,7 @@ internal sealed partial class CharacterLiuZhangOlRuntime
     {
         if (!HasFengweiCapability)
             return;
-        if (payload is ExtraCardEffectStartedEvent extra && _coreCardUseLifecycleOperations.LifecycleCardUse(extra.CardUseFrameId)is { FengweiDamage: not null, Action: { } repeatedAction } repeated && repeatedAction.ActionId == extra.ActionId)
+        if (payload is NativeCardEffectEpisodeStartedEvent extra && _coreCardUseLifecycleOperations.LifecycleCardUse(extra.UseFrameId)is { FengweiDamage: not null, Action: { } repeatedAction } repeated && repeatedAction.ActionId == extra.ActionId)
             SetFengweiDamageState(repeated.Id, null);
         if (payload is ProgramDamageTransferredEvent e && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { } attack && FengweiDamageState(attack.ResolutionId)is { TransferredTarget: null } r && _resolutionStackOperations._resolutionStack.Count >= 2 && _resolutionStackOperations._resolutionStack[^1] is ProgramSkillFrame f && _resolutionStackOperations._resolutionStack[^2] is BeforeDamageProgramWindowFrame w && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f)?.Op == SkillProgramEffectOp.RedirectCurrentDamage && f.WindowContext?.ParentFrameId == w.Id && e.ResolutionId == attack.ResolutionId && (w.ContinuationAttackResolutionId ?? w.ParentFrameId) == attack.ResolutionId && r.TargetSeat == w.TargetSeat && w.RedirectedTargetSeat == attack.TargetSeat && e.TargetSeat == attack.TargetSeat && e.SourceSeat == attack.SourceSeat && e.DamageAmount == w.Amount && e.SkillId == f.SkillId && e.OwnerSeat == f.OwnerSeat && attack.DamageRedirected)
         {

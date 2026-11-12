@@ -14,12 +14,12 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         }
         else if (kind == CardKind.Dodge)
         {
-            if (!_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is not null || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } slash && (_characterLiuQiOlOperations.IsWenjiResponseForbidden2(slash.ResolutionId, actor.Seat) || _coreConvertedSlashResponseOperations.Value.ConvertedSlashSameColorResponseColor(slash)is not null))
+            if (!_coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(actor, kind) || _coreNativeCardContinuationCursorsOperations.ActiveGroupCard is not null || _coreNativeCardContinuationCursorsOperations.ActiveFactionDefense is not null || _coreActiveNativeAttackQueriesOperations.ActiveCardAttack is { } slash && (_responseRules.IsResponseForbidden(slash.ResolutionId, actor.Seat, CardKind.Dodge, slash.SourceSeat) || _coreConvertedSlashResponseOperations.Value.ConvertedSlashSameColorResponseColor(slash)is not null))
                 return[];
         }
         else if (kind == CardKind.Nullification)
         {
-            if (_coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } n || n.CandidateIndex >= n.CandidateSeats.Count || n.CandidateSeats[n.CandidateIndex] != actor.Seat || n.ChainDepth == 0 && _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(n.SourceSeat, actor.Seat, n.EffectCardKind, n.TargetSeats, n.ParentFrameId, CardKind.Nullification))
+            if (_coreNativeCardContinuationCursorsOperations.ActiveNullificationWindow is not { } n || n.CandidateIndex >= n.CandidateSeats.Count || n.CandidateSeats[n.CandidateIndex] != actor.Seat || _responseRules.IsCounterspellResponseForbidden(n, actor.Seat) || n.ChainDepth == 0 && _coreProgramCardPoliciesOperations.IsNearbyTargetResponseProhibited(n.SourceSeat, actor.Seat, n.EffectCardKind, n.TargetSeats, n.ParentFrameId, CardKind.Nullification))
                 return[];
         }
         else
@@ -200,14 +200,13 @@ internal sealed partial class CharacterXiaoQiaoMouOlRuntime
         var policy = _coreUnrespondableCounterspellsOperations.FreezeUnrespondableCounterspellSource(actor, []);
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == pending.Id);
-        pending = _coreNativeNullificationFramesOperations.ReplaceNullificationWindowFrame(pending with { EffectNullified = !pending.EffectNullified, ChainDepth = pending.ChainDepth + 1, CandidateSeats = _coreNativeNullificationOperations.BuildNullificationCandidateSeats(actor.Seat), CandidateIndex = 0, Step = ResolutionFrameStep.AwaitingResponse });
+        pending = _counterspellResponses.Prepare(pending, actor.Seat, 0);
         var action = _coreProgramFactionActionRewardOperations.CaptureFactionAction(new CardActionContext(++_coreGameEngineCardActionsCardActionSequenceAccess._cardActionSequence, _coreDelayedNullificationOperations.Value.NullificationParentActionId(pending), CardActionType.Response, actor.Seat, actor.Seat, null, actor.Seat, pending.SourceSeat, CardKind.Nullification, [], [], [grant.Source], effectiveSuit: Suit.None, effectiveRank: 0));
         SignMouXqResponse(pending, grant, action);
+        pending = _counterspellResponses.Bind(pending.Id, action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardRespondedEvent(0, actor.Seat, pending.SourceSeat, CardKind.Nullification));
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new NullificationRespondedEvent(pending.ParentFrameId, pending.EffectCardId, pending.EffectCardKind, actor.Seat, 0, pending.EffectNullified, pending.ChainDepth) { WindowFrameId = pending.Id, TargetSeat = CoreNativeNullificationFramesRuntime.GetNullificationTargetSeat(pending) });
         _coreActualPlayPhaseCardUsesOperations.RecordActualPlayPhaseUse(action);
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CardActionAcceptedEvent(action));
-        _characterCaoXiOlOperations.CaptureCaoXiNativeCounterspellOffset(pending, action, false);
         pending = (NullificationWindowFrame)_resolutionStackOperations._resolutionStack.Single(x => x.Id == pending.Id);
         if (_coreUnrespondableCounterspellsOperations.TryBeginPolicyCounterspellPayment(pending, action, policy, []))
             return;

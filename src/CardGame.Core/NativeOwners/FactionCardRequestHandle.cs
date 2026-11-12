@@ -37,12 +37,15 @@ internal sealed class FactionCardRequestHandle : GameEngine.ICardContinuationHan
     public string? AssistedResultBind { get => State.AssistedResultBind; }
     public ProgramAssistedSlashAuthorization? AssistedAuthorization => State.AssistedAuthorization;
     public void AuthorizeProgramRequest(int instructionIndex, bool ignoreDistance = false, int? rangeOwnerSeat = null,
-        bool usesChoiceResult = false) => Update(state =>
+        bool usesChoiceResult = false, ProgramSlashRequestIdentity? requestIdentity = null) => Update(state =>
     {
         if (state.Purpose != FactionCardRequestPurpose.AssistedProgramUse || state.ProgramSkillFrameId != OwnerFrameId ||
-            state.AssistedAuthorization is not null)
+            state.AssistedAuthorization is not null || requestIdentity is null ||
+            requestIdentity.FrameId != OwnerFrameId || requestIdentity.InstructionIndex != instructionIndex ||
+            requestIdentity.ActorSeat != state.OwnerSeat || state.TargetSeat is null)
             throw new InvalidOperationException("An assisted Slash authorization requires its original program request and may be issued only once.");
-        return state with { AssistedAuthorization = new(instructionIndex, ignoreDistance, rangeOwnerSeat, usesChoiceResult) };
+        return state with { AssistedAuthorization = new(instructionIndex, ignoreDistance, rangeOwnerSeat, usesChoiceResult)
+            { RequestIdentity = requestIdentity, TargetSeat = state.TargetSeat } };
     });
     public long ResolutionId => OwnerFrameId;
     public FactionCardRequestPurpose Purpose { get => State.Purpose; }

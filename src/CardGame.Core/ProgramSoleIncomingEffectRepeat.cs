@@ -4,8 +4,8 @@ namespace CardGame.Core;
 
 public sealed record SoleIncomingEffectGrant(long ProgramFrameId, CardConversionSource Source, string GameplayHash,
     long WindowFrameId, long UseFrameId, long ActionId, int OriginalActorSeat, int TargetSeat,
-    CardKind CardKind, int MaximumDrawCount);
-public sealed record SoleIncomingEffectRounds(long ActionId, ExtraCardEffectState Native, int Started = 0, bool Active = false, int DrawIndex = 0, bool AttackCompletionPending = false)
+    CardKind CardKind, int MaximumDrawCount, long EpisodeId);
+public sealed record SoleIncomingEffectRounds(long ActionId, int DrawIndex = 0, bool AttackCompletionPending = false)
 {
     private readonly IReadOnlyList<SoleIncomingEffectGrant> _grants = [];
     public IReadOnlyList<SoleIncomingEffectGrant> Grants { get => _grants; init => _grants = Array.AsReadOnly(value.ToArray()); }
@@ -20,8 +20,6 @@ public sealed record SoleIncomingRangeDrawReceipt(SoleIncomingEffectGrant Grant,
     public NativeDrawOutcome? Outcome { get; init; }
 }
 public sealed record SoleIncomingEffectIssuedEvent(SoleIncomingEffectGrant Grant) : IGameEvent;
-public sealed record SoleIncomingEffectRoundStartedEvent(long UseFrameId, long ActionId, long ProgramFrameId, int Round) : IGameEvent;
-public sealed record SoleIncomingEffectRoundCompletedEvent(long UseFrameId, long ActionId, long ProgramFrameId, int Round) : IGameEvent;
 public sealed record SoleIncomingRangeDrawRequestedEvent(long UseFrameId, long ProgramFrameId, int RecipientSeat, int AttackRange, int RequestedCount) : IGameEvent;
 public sealed record SoleIncomingRangeDrawPaidEvent(long UseFrameId, long ProgramFrameId, int RecipientSeat, int ActualCount, long SequenceBefore, long SequenceAfter) : IGameEvent;
 public sealed record SoleIncomingRangeDrawCompletedEvent(long UseFrameId, long ProgramFrameId, bool Requested) : IGameEvent;

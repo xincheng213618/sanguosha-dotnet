@@ -44,7 +44,7 @@ internal sealed class MouChengYuAnniversaryRuntime(IMouChengYuAnniversaryFacts f
   switch(choice.Parameters["branch"])
   {
    case"card":var card=r.View.Single(c=>c.Id==value);frames.ReplaceTop(f=f with{MouChengYuAnniversary=r with{Stage=MouCyStage.ObtainChildren,CardId=card.Id,Kind=card.Kind,Before=facts.Sequence,After=facts.Sequence},PendingMovementContinuation=new(f.OwnerSeat,0,null)});native.Move(f,value,CardLocation.DrawPile,CardLocation.Hand(f.OwnerSeat));Continue(f.Id);break;
-   case"invalidate":var proof=new MouCyUseInvalidatedEvent(f.Id,r.Record!.FrameId,r.Source,r.GameplayHash,r.Use!);events.AdvanceFact(proof);native.Invalidate(f,proof);Finish(frames.ActiveProgram(f.Id));break;
+   case"invalidate":events.AdvanceFact(new MouCyUseInvalidatedEvent(f.Id,r.Record!.FrameId,r.Source,r.GameplayHash,r.Use!));native.Invalidate(f);Finish(frames.ActiveProgram(f.Id));break;
    case"decline":Finish(f);break;
    case"target":frames.ReplaceTop(f=f with{MouChengYuAnniversary=r with{Target=value}});Reveal(f);break;
    case"gain":frames.ReplaceTop(f=f with{MouChengYuAnniversary=r with{Stage=MouCyStage.GainChildren,Again=r.RevealCount-1<facts.LivingCount,Before=facts.Sequence,After=facts.Sequence},PendingMovementContinuation=new(r.Target,0,null)});if(facts.At(r.CardId,CardLocation.Processing))native.Move(f,r.CardId,CardLocation.Processing,CardLocation.Hand(r.Target));Continue(f.Id);break;

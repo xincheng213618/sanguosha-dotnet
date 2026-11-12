@@ -47,7 +47,8 @@ internal sealed class ProgramCardUsePaymentCatalog
         ArgumentNullException.ThrowIfNull(methods);
         var stages = Enum.GetValues<ProgramCardUsePaymentStage>().ToDictionary(stage => stage,
             _ => new SortedDictionary<int, ProgramCardUsePaymentRegistration>());
-        foreach (var method in methods)
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramCardUsePaymentAttribute), inherit: true)))
         foreach (var attribute in method.GetCustomAttributes<ProgramCardUsePaymentAttribute>())
         {
             if (!Enum.IsDefined(attribute.Stage) || attribute.Order <= 0)

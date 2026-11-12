@@ -86,7 +86,7 @@ internal sealed partial class CharacterLiFengOlRuntime
             return entry;
         if (use.AcceptedDeclarationPayment is { Claimed: true } paid && paid.Cost == cost && paid.ActorSeat == action.ActorSeat && paid.ProviderSeat == action.ProviderSeat && entry.To == CardLocation.Processing && entry.Reason.Value == "conversion.declaration.pay" && action.ConversionChain.Contains(paid.Source))
             return entry;
-        return _coreKenshangPaymentsOperations.IsKenshangRemovedMaterial(nativeId, lease.CardId) && entry.To == CardLocation.DiscardPile ? entry : null;
+        return null;
     }
 
     internal bool JiyunTerminalEntity(JiyunLeaseIssuedEvent lease, CardActionContext action, long nativeId, ProgramCompletedResponseKind? responseKind)
@@ -99,7 +99,7 @@ internal sealed partial class CharacterLiFengOlRuntime
             return false;
         if (location.Zone == CardZoneKind.Equipment)
             return responseKind is null && last.ParentFrameId == nativeId && last.Reason == CardMoveReasons.EquipmentEnter;
-        return last.ParentFrameId == nativeId && last.TrueUseDiscard || responseKind is null && _coreKenshangPaymentsOperations.IsKenshangRemovedMaterial(nativeId, lease.CardId) && JiyunDeparture(lease.LeaseId)?.MovementSequence == last.MovementSequence;
+        return last.ParentFrameId == nativeId && last.TrueUseDiscard;
     }
 
     internal bool HasJiyunResponseCompletion(CardActionContext action, ProgramCardContinuation continuation)

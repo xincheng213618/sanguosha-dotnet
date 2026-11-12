@@ -26,12 +26,12 @@ internal sealed partial class CharacterXinPiOlRuntime
         var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, binding, f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority);
         if (e.Op == SkillProgramEffectOp.InvalidateRemainingActualDamageCardEffects)
         {
-            if (!XinPiSourceCurrent(f) || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].ChijieUsedActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || ChijieDamageUse(f.OwnerSeat, w, out var damage)is not { Action: { } action } use || IsXinPiUseIneffective(use))
+            if (!XinPiSourceCurrent(f) || _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].ChijieUsedActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber || ChijieDamageUse(f.OwnerSeat, w, out var damage)is not { Action: { } action } use || _nativeInvalidations.SuppressesRemainingCardDamage(use.Id))
                 throw new InvalidOperationException("Chijie requires real already-applied other-source card damage and its shared turn allowance.");
             _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].ChijieUsedActualTurn = _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber;
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChijieUsedEvent(f.Id, source, f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, "invalidate", use.Id, action.ActionId));
             var proof = new ChijieInvalidationProof(f.Id, source, f.GameplayHash, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, use.Id, action.ActionId, damage.DamageFrameId, f.OwnerSeat, damage.SourceSeat);
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { ChijieInvalidation = proof });
+            _nativeInvalidations.IssueUse(use.Id, action, new(SuppressRemainingCardDamage: true));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChijieUseInvalidatedEvent(proof));
             foreach (var seat in XinPiMainTargets(use))
                 _coreProgramCardTargetEffectsOperations.MarkCardEffectIneffective(use.Id, seat);

@@ -12,7 +12,10 @@ internal sealed partial class CoreGameEngineAssistedSlashPaymentRuntime
         {
             if (selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString())
             {
-                cards = _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(actor).Single(pair => pair.Select(card => card.Id).SequenceEqual(selected.Cards));
+                var pair = _coreNativeResponseMaterialQueriesOperations.FindZhangbaSlashPair(actor, selected.Cards);
+                if (pair is null || !pair.Select(card => card.Id).SequenceEqual(selected.Cards))
+                    throw new InvalidOperationException("Sequence contains no matching element");
+                cards = pair;
                 conversion = null;
             }
             else

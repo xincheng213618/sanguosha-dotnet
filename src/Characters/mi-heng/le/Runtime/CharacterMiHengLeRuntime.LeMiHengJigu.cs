@@ -9,7 +9,6 @@ internal sealed partial class CharacterMiHengLeRuntime
     internal static bool IsJiguDamageTrigger(SkillProgramTrigger t) => RuntimeSkills.RuntimeRules_mi_heng_le_LeMiHengJigu.IsJiguDamageTrigger(t);
     internal bool HasJiguEntityMark(int cardId) => _cardEntityMarks.Has(cardId, "jigu");
     internal bool HasJiguEntityMark(int ownerSeat, int cardId) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(ownerSeat) && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.Hand(ownerSeat) && HasJiguEntityMark(cardId);
-    internal bool IsJiguHandLimitExempt(CharacterState owner, int cardId) => _coreNationalSkillsOperations.HasRuntimeSkill(owner, "le:jigu") && HasJiguEntityMark(owner.Seat, cardId);
     internal int JiguMarkedHandCount(int owner) => _cardEntityMarks.CountMarked(owner, "jigu", CardZoneKind.Hand);
     internal int JiguStartedSeatCount => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ActualDiscardRecoveryPhaseStartedEvent>().Where(e => e.Phase.Kind == ActualDiscardRecoveryPhaseKind.Preparation && e.Phase.ActorSeat == e.Phase.ActualTurnOwnerSeat).Select(e => e.Phase.ActorSeat).Distinct().Count();
 

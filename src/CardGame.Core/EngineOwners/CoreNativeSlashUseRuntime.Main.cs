@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreNativeSlashUseRuntime
 {
-    internal void ResolveSlash(CharacterState source, CharacterState target, Card slash, CardKind playedCardKind, CardConversionSource? conversionSource = null, IReadOnlyList<CardConversionSource>? additionalConversionSources = null)
+    internal void ResolveSlash(CharacterState source, CharacterState target, Card slash, CardKind playedCardKind, CardConversionSource? conversionSource = null, IReadOnlyList<CardConversionSource>? additionalConversionSources = null, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
         var stillLegal = _coreNativeLegalActionsOperations.BuildLegalActions(source, selectedPhysicalCardId: slash.Id).Any(action => action.Kind == LegalActionKind.Slash && action.CardId == slash.Id && action.TargetSeat == target.Seat && (action.PlayedCardKind ?? slash.Kind) == playedCardKind && action.ConversionSource == conversionSource && CoreNativeCardClassificationsRuntime.ConversionSourcesEqual(action.AdditionalConversionSources, additionalConversionSources));
         if (!stillLegal)
@@ -11,10 +11,10 @@ internal sealed partial class CoreNativeSlashUseRuntime
             throw new InvalidOperationException("Slash became illegal before resolution.");
         }
 
-        ResolveSlashCore(source, target, slash, playedCardKind, source.Seat, usesZhuqueFan: playedCardKind == CardKind.FireSlash && (additionalConversionSources is null || additionalConversionSources.Count == 0) && !_coreCardConversionsOperations.IsDirectProgramFireSlashConversion(source, slash, conversionSource) && (slash.Kind == CardKind.Slash || _coreActionQueriesOperations.GetProgramCardIdentityMatches(source, slash).Any(match => match.Identity.OutputKind == CardKind.Slash)), conversionSource: conversionSource, additionalConversionSources: additionalConversionSources);
+        ResolveSlashCore(source, target, slash, playedCardKind, source.Seat, usesZhuqueFan: playedCardKind == CardKind.FireSlash && (additionalConversionSources is null || additionalConversionSources.Count == 0) && !_coreCardConversionsOperations.IsDirectProgramFireSlashConversion(source, slash, conversionSource) && (slash.Kind == CardKind.Slash || _coreActionQueriesOperations.GetProgramCardIdentityMatches(source, slash).Any(match => match.Identity.OutputKind == CardKind.Slash)), conversionSource: conversionSource, additionalConversionSources: additionalConversionSources, programSlashRequest: programSlashRequest);
     }
 
-    internal void ResolveFangtianHalberdSlash(CharacterState source, IReadOnlyList<CharacterState> targets, Card slash, CardKind playedCardKind, CardConversionSource? conversionSource = null, IReadOnlyList<CardConversionSource>? additionalConversionSources = null)
+    internal void ResolveFangtianHalberdSlash(CharacterState source, IReadOnlyList<CharacterState> targets, Card slash, CardKind playedCardKind, CardConversionSource? conversionSource = null, IReadOnlyList<CardConversionSource>? additionalConversionSources = null, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
         var targetSeats = targets.Select(target => target.Seat).ToArray();
         // The same current legal-action projection owns the target limit for
@@ -28,7 +28,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
         }
 
         var ignoresArmor = _coreNativeEquipmentAndFactionQueriesOperations.HasArmorBypass(source);
-        var resolutionId = _coreNativeCardUseOperations.BeginCardUse(slash, source.Seat, targetSeats, playedCardKind, ignoresArmor, conversionSource: conversionSource, additionalConversionSources: additionalConversionSources);
+        var resolutionId = _coreNativeCardUseOperations.BeginCardUse(slash, source.Seat, targetSeats, playedCardKind, ignoresArmor, conversionSource: conversionSource, additionalConversionSources: additionalConversionSources, programSlashRequest: programSlashRequest);
         var nuzhan = _coreCardConversionsOperations.GetNuzhanModifiers(resolutionId, source);
         _corePhysicalMovementFacadesOperations.MoveCard(slash, _coreNativeOwnedCardQueriesOperations.FindOwnedCardLocation(source, slash), CardLocation.Processing, CardMoveReasons.Use, disclosure: CardMovementDisclosure.FaceUp);
         var countedTowardSlashLimit = !(_coreCardUseLifecycleOperations.LifecycleCardUse(resolutionId)?.UnlimitedUse == true) && !_coreProgramCardUsePaymentsOperations.CardUsePayments.ExemptsSlashDebit(ProgramCardUsePaymentStage.SlashCountExemption, resolutionId, source.Seat) && !nuzhan.IgnoresSlashLimit && !_coreCardConversionsOperations.IgnoresProgramSlashLimit(source, conversionSource) && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && source.Seat == _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat;
@@ -120,18 +120,31 @@ internal sealed partial class CoreNativeSlashUseRuntime
         BeginSlashTargetResolution(attack);
     }
 
-    internal void ResolveZhangbaSlash(CharacterState source, CharacterState target, IReadOnlyList<Card> physicalCards)
+    internal void ResolveZhangbaSlash(CharacterState source, CharacterState target, IReadOnlyList<Card> physicalCards, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
         if (!_coreNativeTargetLegalityOperations.CanUseZhangbaSerpentSpear(source) || physicalCards.Count != 2 || physicalCards.Select(card => card.Id).Distinct().Count() != 2 || physicalCards.Any(card => !CoreNativeCardClassificationsRuntime.IsOwnedPlayableLocation(source, _cardZonesOperations._cardZones.GetLocation(card.Id)) && !_characterGongsunZanMouMobileOperations.IsMouGszHuCard(source, card.Id) && !_characterLuSuMobileShiOperations.IsShiLsHandAccess2(source.Seat, card.Id)) || !_coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(source, target, physicalSuit: _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(source, physicalCards), effectiveColor: _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(source, physicalCards), effectiveRank: _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(source, physicalCards), physicalCardIds: physicalCards.Select(c => c.Id).ToArray()))
         {
             throw new InvalidOperationException("Zhangba Serpent Spear became illegal before resolution.");
         }
 
-        ResolveSlashCore(source, target, physicalCards[0], CardKind.Slash, source.Seat, physicalCards: physicalCards);
+        ResolveSlashCore(source, target, physicalCards[0], CardKind.Slash, source.Seat, physicalCards: physicalCards, programSkillCardUseFrameId: programSlashRequest?.Identity.FrameId, programSlashRequest: programSlashRequest);
     }
 
-    internal void ResolveSlashCore(CharacterState source, CharacterState target, Card slash, CardKind playedCardKind, int physicalOwnerSeat, NativeOwners.FactionCardRequestHandle? factionRequest = null, NativeOwners.BorrowedSwordHandle? borrowedSword = null, IReadOnlyList<Card>? physicalCards = null, bool countsTowardSlashLimit = true, bool usesZhuqueFan = false, CardConversionSource? conversionSource = null, IReadOnlyList<CardConversionSource>? additionalConversionSources = null, long? programSkillCardUseFrameId = null, CardLocation? physicalSourceLocation = null)
+    internal void ResolveSlashCore(CharacterState source, CharacterState target, Card slash, CardKind playedCardKind, int physicalOwnerSeat, NativeOwners.FactionCardRequestHandle? factionRequest = null, NativeOwners.BorrowedSwordHandle? borrowedSword = null, IReadOnlyList<Card>? physicalCards = null, bool countsTowardSlashLimit = true, bool usesZhuqueFan = false, CardConversionSource? conversionSource = null, IReadOnlyList<CardConversionSource>? additionalConversionSources = null, long? programSkillCardUseFrameId = null, CardLocation? physicalSourceLocation = null, ProgramSlashRequestAcceptance? programSlashRequest = null)
     {
+        var requestParentId = programSlashRequest?.Identity.FrameId ?? factionRequest?.ProgramSkillFrameId ?? programSkillCardUseFrameId;
+        if (requestParentId is { } parentId &&
+            _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == parentId) is { } requestParent)
+        {
+            var accepted = _slashRequestExecution.GetAcceptance(requestParent, source.Seat, target.Seat);
+            if (programSlashRequest is not null && programSlashRequest != accepted)
+                throw new InvalidOperationException("A requested Slash lost its original accepted declaration actor and target.");
+            programSlashRequest ??= accepted;
+            if (programSlashRequest is not null)
+            {
+                countsTowardSlashLimit |= programSlashRequest.Identity.Spec.CountsTowardSlashLimit;
+            }
+        }
         if (physicalSourceLocation is { } deckSource && !_coreForeignSelectedCardSlashOperations.IsSelectedForeignCardSlashSource(programSkillCardUseFrameId, source.Seat, target.Seat, slash, playedCardKind, physicalOwnerSeat, deckSource, physicalCards, countsTowardSlashLimit) && !_characterJiangWeiMobileGodOperations.IsMobileJwXinghunSlashSource(programSkillCardUseFrameId, source.Seat, target.Seat, slash, playedCardKind, physicalOwnerSeat, deckSource, physicalCards, countsTowardSlashLimit) && !_characterDuKuiAnniversaryOperations.IsDuKuiFanyinSlashSource(programSkillCardUseFrameId, source.Seat, target.Seat, slash, playedCardKind, physicalOwnerSeat, deckSource, physicalCards, countsTowardSlashLimit) && !_characterBaiLingYunAnniversaryOperations.IsAnniversaryBaiLingYunSlashSource(programSkillCardUseFrameId, source.Seat, target.Seat, slash, playedCardKind, physicalOwnerSeat, deckSource, physicalCards, countsTowardSlashLimit) && (deckSource != CardLocation.DrawPile || physicalCards is not null || programSkillCardUseFrameId is not { } deckParent || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { DeckSlashSequence: { } sequence } deckFrame || deckFrame.Id != deckParent || deckFrame.OwnerSeat != source.Seat || sequence.TargetSeat != target.Seat || sequence.ActiveCardId != slash.Id || sequence.DeclaredIds.LastOrDefault() != slash.Id || slash.Kind != playedCardKind || !CoreNativeCardClassificationsRuntime.IsSlashCard(playedCardKind) || countsTowardSlashLimit || _cardZonesOperations._cardZones.GetLocation(slash.Id) != deckSource))
             throw new InvalidOperationException("An external Slash source requires its exact active deck sequence.");
         var slashCards = physicalCards?.ToArray() ?? [slash];
@@ -147,7 +160,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
 
         target = _characterLuBuOlMagicOperations.MoGangquanFirstTarget(source, target, slash, playedCardKind, conversionSource);
         var ignoresArmor = _coreDirectedCardPolicyQueriesOperations.HasCardArmorBypass(source, target, playedCardKind);
-        var resolutionId = _coreNativeCardUseOperations.BeginCardUse(slash, source.Seat, [target.Seat], playedCardKind, ignoresArmor, slashCards.Select(card => card.Id).ToArray(), conversionSource, additionalConversionSources, isTrueZhangbaSlash: slashCards.Length == 2 && conversionSource is null && additionalConversionSources is null && _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[physicalOwnerSeat], CardKind.ZhangbaSerpentSpear));
+        var resolutionId = _coreNativeCardUseOperations.BeginCardUse(slash, source.Seat, [target.Seat], playedCardKind, ignoresArmor, slashCards.Select(card => card.Id).ToArray(), conversionSource, additionalConversionSources, isTrueZhangbaSlash: slashCards.Length == 2 && conversionSource is null && additionalConversionSources is null && _coreAdvancedWeaponsOperations.HasWeaponAbility(_coreMatchParticipantsPlayersAccess._players[physicalOwnerSeat], CardKind.ZhangbaSerpentSpear), programSlashRequest: programSlashRequest);
         _coreForeignSelectedCardSlashOperations.BindSelectedForeignCardSlashUse(resolutionId, programSkillCardUseFrameId);
         _characterJiangWeiMobileGodOperations.BindMobileJwXinghunSlashUse(resolutionId, programSkillCardUseFrameId);
         var nuzhan = _coreCardConversionsOperations.GetNuzhanModifiers(resolutionId, source);
@@ -381,7 +394,7 @@ internal sealed partial class CoreNativeSlashUseRuntime
             return;
         }
 
-        if (_coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(resolutionId) || _characterLiuQiOlOperations.IsWenjiResponseForbidden2(resolutionId, target.Seat))
+        if (_coreIssuedPlayUsePoliciesOperations.IsIssuedCardUnrespondable(resolutionId) || _responseRules.IsResponseForbidden(resolutionId, target.Seat, CardKind.Dodge, source.Seat))
         {
             _coreNativeCardUseFramesOperations.SetCardUseStep(resolutionId, ResolutionFrameStep.ResolvingEffect);
             if (!_coreNativeDamageApplicationOperations.ApplyAttackDamage(attack))

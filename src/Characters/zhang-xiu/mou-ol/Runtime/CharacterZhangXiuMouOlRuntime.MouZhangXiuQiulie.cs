@@ -181,6 +181,7 @@ internal sealed partial class CharacterZhangXiuMouOlRuntime
         {
             foreach (var target in use.TargetSeats)
                 _coreProgramCardTargetEffectsOperations.MarkCardEffectIneffective(use.Id, target);
+            _nativeInvalidations.IssueUse(use.Id, use.Action, new());
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouZhangXiuOlQiulieNullifiedEvent(f.Id, use.Id, r.TargetSeat, r.PaidCardId!.Value));
         }
 

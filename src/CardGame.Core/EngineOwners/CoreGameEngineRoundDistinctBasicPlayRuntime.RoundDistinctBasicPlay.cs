@@ -49,7 +49,8 @@ internal sealed partial class CoreGameEngineRoundDistinctBasicPlayRuntime
         var suit = _coreAlternatingSuitAndCompletedTopOperations.PhysicalGroupSuit(owner, selection.Cards);
         var color = _coreTurnRedSlashBenefitsOperations.PhysicalGroupColor(owner, selection.Cards);
         if (CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
-            return _coreMatchParticipantsPlayersAccess._players.Where(target => _coreNativeTargetLegalityOperations.CanUseVirtualSlashTarget(owner, target, kind, suit, effectiveColor: color, physicalCardIds: selection.Cards.Select(c => c.Id).ToArray())).Select(target => target.Seat).Order().ToArray();
+            return _coreNativeTargetLegalityOperations.GetVirtualSlashTargetSeats(owner, _coreMatchParticipantsPlayersAccess._players,
+                kind, suit, effectiveColor: color, physicalCardIds: selection.Cards.Select(c => c.Id).ToArray()).Order().ToArray();
         if (kind == CardKind.Peach && _coreTreatedWoundedOperations.IsRuleWounded(owner) && !_coreHandComparisonOperations.HasSelfCardTargetProhibition(owner.Seat) && !_coreNativeDamagePoliciesOperations.IsCardTargetProhibited(owner, kind, suit, color) && !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(owner.Seat, owner.Seat, suit))
             return[owner.Seat];
         return[];

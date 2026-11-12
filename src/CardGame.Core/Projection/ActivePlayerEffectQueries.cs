@@ -16,7 +16,6 @@ internal interface IActivePlayerTurnEffectQueries : IProgramSelectionQuery
     IReadOnlyList<TurnRedSlashPolicy> RedSlashPolicies { get; }
     IReadOnlyList<TurnSlashSuitAllowance> SlashSuitAllowances { get; }
     IReadOnlyList<TurnJudgedRankSlashPolicy> JudgedRankSlashPolicies { get; }
-    IReadOnlyList<TurnHandLimitExemptCardGrant> HandLimitExemptCards { get; }
 }
 
 internal sealed partial class TurnCardUseEffectStore : IActivePlayerTurnEffectQueries
@@ -33,7 +32,6 @@ internal sealed partial class TurnCardUseEffectStore : IActivePlayerTurnEffectQu
     IReadOnlyList<TurnRedSlashPolicy> IActivePlayerTurnEffectQueries.RedSlashPolicies => RedSlashPolicies;
     IReadOnlyList<TurnSlashSuitAllowance> IActivePlayerTurnEffectQueries.SlashSuitAllowances => SlashSuitAllowances;
     IReadOnlyList<TurnJudgedRankSlashPolicy> IActivePlayerTurnEffectQueries.JudgedRankSlashPolicies => JudgedRankSlashPolicies;
-    IReadOnlyList<TurnHandLimitExemptCardGrant> IActivePlayerTurnEffectQueries.HandLimitExemptCards => HandLimitExemptCards;
 }
 
 // Only private legacy record fields used by this projection cross as scoped

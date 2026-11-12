@@ -81,12 +81,20 @@ internal sealed partial class CoreNativeAttackCompletionRuntime
             return;
         if (_coreSequentialTrickTargetsOperations.TryContinueSequentialTrick(attack.ResolutionId, afterAttack: true))
             return;
-        if (_characterDongChengMouOperations.ContinueMouDcSlash(attack))
-            return;
-        if (_corePaidVirtualSlashTargetsOperations.Value.TryContinuePaidVirtualSlashTargets(attack))
-            return;
-        if (_coreCurrentCardEnhancementsOperations.TryContinueEnhancedSlashTargets(attack))
-            return;
+        if (_nativeEffectEpisodes.IsActive(attack.ResolutionId))
+        {
+            if (_coreExtraCardEffectRoundsOperations.TryContinueExtraSlashTargets(attack))
+                return;
+        }
+        else
+        {
+            if (_characterDongChengMouOperations.ContinueMouDcSlash(attack))
+                return;
+            if (_corePaidVirtualSlashTargetsOperations.Value.TryContinuePaidVirtualSlashTargets(attack))
+                return;
+            if (_coreCurrentCardEnhancementsOperations.TryContinueEnhancedSlashTargets(attack))
+                return;
+        }
         if (_coreCardUseLifecycleOperations.LifecycleCardUse(attack.ResolutionId)is not null)
             _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(attack.ResolutionId, frame => frame with { ProgramAdjustedSlashBaseDamage = null });
         var completion = _coreCardAttackStateOperations.CaptureAttackCompletion(attack);

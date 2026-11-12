@@ -15,7 +15,6 @@ internal sealed partial class CharacterZhouFeiLeEntries
     internal bool HasLingkongHandEntityMark(int ownerSeat, int cardId) => _resolve().HasLingkongHandEntityMark(ownerSeat, cardId);
     internal bool HasPaidLeZhouFeiXianshuSelection(ProgramSkillFrame frame) => _resolve().HasPaidLeZhouFeiXianshuSelection(frame);
     internal bool IsLeZhouFeiXianshuRecoveryParent(ProgramSkillFrame frame, RecoveryReplacementFrame recovery) => _resolve().IsLeZhouFeiXianshuRecoveryParent(frame, recovery);
-    internal bool IsLingkongHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsLingkongHandLimitExempt(owner, cardId);
     internal bool LeZhouFeiXianshuFirstChild(ProgramSkillFrame frame, ResolutionFrame child) => _resolve().LeZhouFeiXianshuFirstChild(frame, child);
     internal bool LeZhouFeiXianshuLifecycleEdge(int index) => _resolve().LeZhouFeiXianshuLifecycleEdge(index);
     internal ProgramSkillFrame? LeZhouFeiXianshuObserverRoot() => _resolve().LeZhouFeiXianshuObserverRoot();

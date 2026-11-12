@@ -36,8 +36,8 @@ internal sealed partial class CoreHealthContinuationServicesRuntime
     int IHealthContinuationProtocols.SupportedRecoveryHpBefore(RecoveryReplacementFrame recovery, int fallback) => _characterCaoSongOlOperations.SupportedRecoveryHpBefore(recovery, fallback);
     bool IHealthContinuationProtocols.IsRecoveryParent(ProgramRecoveryParentPhase phase, ProgramSkillFrame parent, RecoveryReplacementFrame child) => _coreProgramRuntimeHooksOperations.RuntimeHooks.IsRecoveryParent(phase, parent, child);
     bool IHealthContinuationProtocols.NativeCardRecoveryReturnMatches(CardUseFrame use, HpChangedTriggerWindowFrame hp) => _coreNativeRecoveryDamageOperations.NativeCardRecoveryReturnMatches(use, hp);
-    bool IHealthContinuationProtocols.ExactPaidNativeRecoveryUseEdge(ResolutionFrame parent, ResolutionFrame child, Func<IReadOnlyList<IGameEvent>> history) => _coreNativeRecoveryDamageOperations.ExactPaidNativeRecoveryUseEdge(parent, child, history);
-    bool IHealthContinuationProtocols.ExactPaidNativeRecoveryReplacementEdge(ResolutionFrame parent, ResolutionFrame child, Func<IReadOnlyList<IGameEvent>> history) => _coreNativeRecoveryDamageOperations.ExactPaidNativeRecoveryReplacementEdge(parent, child, history);
+    bool IHealthContinuationProtocols.ExactPaidNativeRecoveryUseEdge(ResolutionFrame parent, ResolutionFrame child) => _coreNativeRecoveryDamageOperations.ExactPaidNativeRecoveryUseEdge(parent, child);
+    bool IHealthContinuationProtocols.ExactPaidNativeRecoveryReplacementEdge(ResolutionFrame parent, ResolutionFrame child) => _coreNativeRecoveryDamageOperations.ExactPaidNativeRecoveryReplacementEdge(parent, child);
     bool IHealthContinuationProtocols.DamageProgramMatchesWindow(ProgramSkillFrame root, DamageTriggerWindowFrame window) => _coreDamageObserverCursorQueriesOperations.DamageProgramMatchesWindow(root, window);
     bool IHealthContinuationProtocols.IsAmountSupportHealthChild(RecoveryReplacementFrame recovery, HpChangedTriggerWindowFrame hp) => _characterCaoSongOlOperations.IsAmountSupportHealthChild(recovery, hp);
 }

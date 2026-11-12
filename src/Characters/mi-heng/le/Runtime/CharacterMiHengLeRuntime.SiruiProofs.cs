@@ -22,7 +22,6 @@ internal sealed partial class CharacterMiHengLeRuntime
 
     [ProgramCardUsePayment(ProgramCardUsePaymentStage.SlashCountExemption, 50)]
     internal bool HasIssuedSiruiUse(long useId, int actorSeat) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Sirui: { NativeKind: SiruiNativeUseKind.CardUse } r } use && r.Source.OwnerSeat == actorSeat && ValidSiruiInvoice(use, r, requirePayment: false);
-    internal bool IsSiruiOutsideGeneralWeaponMaterial(long useId, int cardId) => _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is { Sirui: { NativeKind: SiruiNativeUseKind.CardUse, PrintedKind: CardKind.GeneralWeapon, PaymentSequence: > 0 } r } use && r.CardId == cardId && r.From.Zone == CardZoneKind.Equipment && _cardZonesOperations._cardZones.GetLocation(cardId) == CardLocation.OutsideGame && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SiruiMaterialPaidEvent>().Any(e => e.OwnerFrameId == useId && e.CardId == cardId && e.From == r.From && e.To == CardLocation.OutsideGame && e.MovementSequence == r.PaymentSequence && e.Reason == CardMoveReasons.Use) && ValidSiruiInvoice(use, r, requirePayment: true);
     internal int? SiruiResponseRank(CardConversionSource? source, IReadOnlyList<CardActionCost> costs)
     {
         if (!IsSiruiSource(source) || costs is not [var cost])

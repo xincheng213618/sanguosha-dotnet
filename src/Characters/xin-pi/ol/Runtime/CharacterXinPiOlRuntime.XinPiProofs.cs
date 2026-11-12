@@ -99,22 +99,12 @@ internal sealed partial class CharacterXinPiOlRuntime
         return invoice.Finished is { } finished ? invoice.FinishedBatchId is> 0 && finished.CardId == invoice.CardId && finished.From == CardLocation.Processing && finished.To == CardLocation.DiscardPile && tail is [var actual] && actual == finished && _cardZonesOperations._cardZones.GetLocation(invoice.CardId) == CardLocation.DiscardPile : tail.Length == 0 && _cardZonesOperations._cardZones.GetLocation(invoice.CardId) == CardLocation.Processing;
     }
 
-    internal bool IsXinPiUseIneffective(CardUseFrame use)
-    {
-        if (use.ChijieInvalidation is not { } p)
-            return false;
-        if (p.UseId != use.Id || use.Action is not { } a || p.ActionId != a.ActionId || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramBindingStartedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.SkillId == p.Source.SkillId && e.BindingId == p.Source.BindingId && e.SkillInstanceId == p.Source.SkillInstanceId && e.OwnerSeat == p.Source.OwnerSeat && e.Window == SkillProgramTriggerWindow.AfterDamageApplied) != 1 || _contentRegistryOperations._contentRegistry.GetSkill(p.Source.SkillId).Program?.GameplayHash != p.GameplayHash || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChijieUseInvalidatedEvent>().Count(e => e.Proof == p) != 1 || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ChijieUsedEvent>().Count(e => e.FrameId == p.ProgramFrameId && e.Source == p.Source && e.Branch == "invalidate" && e.UseId == use.Id && e.ActionId == a.ActionId && e.ActualTurn == p.ActualTurn) != 1 || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CompletedUndamagedUseDamageRecordedEvent>().Any(e => e.CardUseFrameId == use.Id && e.CardActionId == a.ActionId && e.DamageFrameId == p.DamageFrameId && e.SourceSeat == p.SourceSeat && e.TargetSeat == p.TargetSeat && e.Amount > 0 && !e.SourceLess))
-            throw new InvalidOperationException("Chijie invalidation lost its exact already-applied native card damage proof.");
-        return true;
-    }
-
-    internal bool IsXinPiRemainingCardDamageIneffective(GameEngine.IDamageAttempt attack) => attack is NativeOwners.CardAttackHandle c && !c.IsProgramSkillDamage && !c.IsProgramJudgmentDamage && !c.IsDelayedJudgmentDamage && _coreCardUseLifecycleOperations.LifecycleCardUse(c.ResolutionId)is { } use && use.CardKind == c.EffectiveCardKind && _coreCompletedUndamagedTargetRevealOperations.CompletedUndamagedNativeUseActorMatches(use, c) && IsXinPiUseIneffective(use);
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 550)]
     internal bool CanOfferXinPi(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w)
     {
         var features = ProgramInstructionResolver.Default.Features(t);
         if (features.HasOperation(SkillProgramEffectOp.InvalidateRemainingActualDamageCardEffects))
-            return _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].ChijieUsedActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && ChijieDamageUse(c.OwnerSeat, w, out _)is { } use && !IsXinPiUseIneffective(use);
+            return _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].ChijieUsedActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && ChijieDamageUse(c.OwnerSeat, w, out _)is { } use && !_nativeInvalidations.SuppressesRemainingCardDamage(use.Id);
         if (features.HasOperation(SkillProgramEffectOp.ClaimCompletedUndamagedIncomingCardEntities))
             return _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].ChijieUsedActualTurn != _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && ChijieUndamagedIncoming(c.OwnerSeat, w, out _);
         if (features.HasOperation(SkillProgramEffectOp.PreventYinjuDamageAndRecover))

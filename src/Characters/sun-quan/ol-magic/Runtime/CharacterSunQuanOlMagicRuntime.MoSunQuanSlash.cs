@@ -133,14 +133,7 @@ internal sealed partial class CharacterSunQuanOlMagicRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoQuanyuSlashAppliedEvent(f.Id, use.Id, r.Original.ActionId, r.Mask, r.AddedTargetSeat));
         if ((r.Mask & MoQuanyuBit(MoQuanyuEffect.Baili)) != 0)
         {
-            var native = new ExtraCardEffectState
-            {
-                Source = r.Source,
-                ProgramFrameId = f.Id,
-                ActionId = r.Original.ActionId,
-                PaidCardId = 0
-            };
-            _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, current => current with { MoQuanyuExtraRound = new(r.Original.ActionId, f.Id, r.Source, r.GameplayHash, native) });
+            _nativeCardEffectEpisodes.Issue(use.Id, new(f.Id, f.InstructionIndex - 1, 0, r.Source, r.GameplayHash, new(30)));
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MoQuanyuExtraRoundIssuedEvent(f.Id, use.Id, r.Original.ActionId, r.Source, r.GameplayHash));
         }
 

@@ -11,7 +11,7 @@ internal enum ProgramSkillSourceRemoval
 /// children and expiry qualification remain with their original callers.
 /// </summary>
 [ProgramRuntimeModule, ProgramCapability]
-internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, IProgramSkillChangeOperations operations, ISkillGrantRevisionObservations observations, IMatchParticipantStateAccess participants, IProgramTurnQueries turn, IActualDiscardRecoveryPhaseQueries phases, IProgramHealthChildQueries healthChildren, IProgramEventJournalQueries journal, EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess directed, EngineOwners.IKernelTurnCardUseEffectsAccess turnEffects) : IProgramSkillAcquisitions, IProgramRuleLifetimes, IProgramRuleBoundaries
+internal sealed class ProgramSkillChangeRuntime(IHandLimitExemptionBoundaries handLimitExemptions, IAppliedResponseRelationBoundaries responseRelations, IProgramSkillChangeFacts facts, IProgramSkillChangeOperations operations, ISkillGrantRevisionObservations observations, IMatchParticipantStateAccess participants, IProgramTurnQueries turn, IActualDiscardRecoveryPhaseQueries phases, IProgramHealthChildQueries healthChildren, IProgramEventJournalQueries journal, EngineStates.Contracts.ICoreDirectedTurnCardPoliciesDirectedTurnCardPoliciesAccess directed, EngineOwners.IKernelTurnCardUseEffectsAccess turnEffects) : IProgramSkillAcquisitions, IProgramRuleLifetimes, IProgramRuleBoundaries
 {
     void IProgramSkillAcquisitions.Grant(ProgramSkillFrame frame, int recipientSeat, IReadOnlyList<string> skillIds) => Grant(frame, recipientSeat, skillIds);
     SkillGrant IProgramSkillAcquisitions.GrantOwnedSource(ProgramSkillFrame frame, string sourceId, string skillId) => GrantOwnedSource(frame, sourceId, skillId);
@@ -167,6 +167,8 @@ internal sealed class ProgramSkillChangeRuntime(IProgramSkillChangeFacts facts, 
         _processingBoundary = boundary;
         try
         {
+            responseRelations.ProcessBoundary(boundary);
+            handLimitExemptions.ProcessBoundary(boundary);
             directed._directedTurnCardPolicies.RemoveAll(policy => policy.Until.Any(end => ProgramRuleLifetimeBoundaries.Matches(end, boundary)));
             var expiredProhibitions = turnEffects is null ? Array.Empty<long>() :
                 turnEffects._turnCardUseEffects.ExpireActionProhibitions(boundary);

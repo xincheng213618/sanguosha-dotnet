@@ -40,7 +40,11 @@ internal sealed class ProgramActionCatalog
         var sources = Enum.GetValues<ProgramActionSourcePhase>().ToDictionary(phase => phase, _ => new SortedDictionary<int, MethodInfo>());
         var handlers = Enum.GetValues<ProgramActionHandlerKind>().ToDictionary(kind => kind, _ => new SortedDictionary<int, MethodInfo>());
         var augmentations = Enum.GetValues<ProgramCardActionPhase>().ToDictionary(phase => phase, _ => new SortedDictionary<int, MethodInfo>());
-        foreach (var method in methods.OrderBy(method => method.Name, StringComparer.Ordinal))
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramActionSourceAttribute), inherit: true) ||
+                     method.IsDefined(typeof(ProgramActionHandlerAttribute), inherit: true) ||
+                     method.IsDefined(typeof(ProgramCardActionAttribute), inherit: true))
+                     .OrderBy(method => method.Name, StringComparer.Ordinal))
         {
             var source = method.GetCustomAttribute<ProgramActionSourceAttribute>();
             var handler = method.GetCustomAttribute<ProgramActionHandlerAttribute>();

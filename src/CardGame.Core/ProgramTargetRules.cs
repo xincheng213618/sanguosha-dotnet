@@ -67,7 +67,8 @@ internal sealed class ProgramTargetRuleCatalog
         ArgumentNullException.ThrowIfNull(methods);
         var entries = Enum.GetValues<ProgramTargetRulePoint>().ToDictionary(point => point,
             _ => new SortedDictionary<int, ProgramTargetRuleRegistration>());
-        foreach (var method in methods)
+        foreach (var method in methods.Where(method => method is null ||
+                     method.IsDefined(typeof(ProgramTargetRuleAttribute), inherit: true)))
         foreach (var attribute in method.GetCustomAttributes<ProgramTargetRuleAttribute>())
         {
             if (!Enum.IsDefined(attribute.Point) || attribute.Order <= 0)

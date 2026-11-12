@@ -34,7 +34,6 @@ public sealed record BoundarySidiDraft(int InstructionIndex, BoundarySidiStage S
 public sealed record BoundarySidiCancelledEvent(long ProgramFrameId, long UseFrameId, long ActionId, int OwnerSeat, string SkillInstanceId, string GameplayHash) : IGameEvent;
 public sealed record BoundarySidiForecastRecordedEvent(long FrameId, int OwnerSeat) : IGameEvent;
 public sealed partial record ProgramSkillFrame { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public BoundarySidiDraft? BoundarySidi { get; init; } }
-public sealed partial record CardUseFrame { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public BoundarySidiCancelledEvent? BoundarySidiCancellation { get; init; } }
 public sealed partial class CharacterState { internal IReadOnlyList<BoundarySidiPrediction>? BoundarySidiPredictions { get; set; } }
 public sealed partial record GameSnapshot { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public IReadOnlyList<BoundarySidiPredictionView>? BoundarySidiPredictions { get; init; } }
 

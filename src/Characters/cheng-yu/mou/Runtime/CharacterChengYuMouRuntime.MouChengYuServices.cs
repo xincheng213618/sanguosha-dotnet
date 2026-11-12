@@ -108,7 +108,7 @@ internal sealed partial class CharacterChengYuMouRuntime
         }, disclosure: r.Stage == MouCyStage.ObtainChildren ? CardMovementDisclosure.Unspecified : CardMovementDisclosure.FaceUp);
     }
 
-    void IMouChengYuAnniversaryNative.Invalidate(ProgramSkillFrame f, MouCyUseInvalidatedEvent proof) => ApplyMouCyInvalidation(f, proof);
+    void IMouChengYuAnniversaryNative.Invalidate(ProgramSkillFrame f) => ApplyMouCyInvalidation(f);
     void IMouChengYuAnniversaryNative.Damage(ProgramSkillFrame f, int target, int amount)
     {
         if (!MouChengYuAnniversary.Valid(f) || f.MouChengYuAnniversary is not { Stage: MouCyStage.Damage, DamageCard: true } r || r.Target != target || r.RevealCount != amount)

@@ -18,6 +18,7 @@ public sealed record WushuangZengouInvalidatedEvent(WushuangZengouPaidEvent Paym
 public sealed record WushuangZengouGainedCardEvent(long ProgramFrameId, long ActionId, int OwnerSeat, int CardId, long MovementSequence) : IGameEvent;
 public sealed partial record CardUseFrame
 {
+    // Original Zengou payment opportunity receipt only; response effectiveness belongs to INativeCardActionInvalidations.
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public WushuangZengouInvalidatedEvent? WushuangZengouInvalidation { get; init; }
 }
 internal interface IWushuangZengouHost { SkillProgramStepOutcome Resolve(ProgramSkillFrame frame); }

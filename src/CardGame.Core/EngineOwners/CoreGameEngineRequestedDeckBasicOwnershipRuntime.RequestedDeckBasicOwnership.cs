@@ -13,6 +13,10 @@ internal sealed partial class CoreGameEngineRequestedDeckBasicOwnershipRuntime
 
     internal bool HasValidRequestedDeckBasicMaterial(ResolutionFrame owner)
     {
+        if (owner.RequestedDeckBasicMaterial is { } issued && CoreGameEngineRequestedDeckBasicsRuntime.IsProgramSlashIntent(issued.Intent) &&
+            (issued.Claiming ? owner is not ProgramSkillFrame requestFrame || issued.ProgramRequestAcceptance is not { } acceptance ||
+                !_slashRequests.OwnsAcceptance(requestFrame, acceptance, issued.ActorSeat) : issued.ProgramRequestAcceptance is not null))
+            return false;
         if (owner.RequestedDeckBasicMaterial is not { } r || r.OwnerFrameId != owner.Id || r.ViewFrameId <= r.RequestFrameId || r.ActorSeat < 0 || r.ActorSeat >= _coreMatchParticipantsPlayersAccess._players.Count || r.Cursor < 0 || r.ViewedCount < 0 || r.ViewedCount > 4 || CharacterZhugeKeMobileRuntime.IsMobileZhugeKeAocai(r.Source.SkillId) && r.ViewedCount > 2 || r.Source.OwnerSeat != r.ActorSeat || string.IsNullOrWhiteSpace(r.Source.SkillInstanceId) || _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(r.Source.SkillId)?.Program is not { } program || program.GameplayHash != r.GameplayHash || program.CardPolicies.SingleOrDefault(p => p.Id == r.Source.BindingId)is not { Kind: SkillProgramCardPolicyKind.PrivateTopBasicRequest, Value: 2 } || !_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<RequestedDeckBasicViewedEvent>().Any(e => e.FrameId == r.ViewFrameId && e.OwnerFrameId == owner.Id && e.ActorSeat == r.ActorSeat && e.SkillId == r.Source.SkillId && e.Count == r.ViewedCount && e.Intent == r.Intent))
             return false;
         if (!r.Claiming)

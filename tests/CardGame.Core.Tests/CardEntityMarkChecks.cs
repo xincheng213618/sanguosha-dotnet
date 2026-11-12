@@ -68,6 +68,47 @@ internal static class CardEntityMarkChecks
         Need(game.CreateSnapshot(0).Players[0].Hand.Single(card => card.Id == fresh).SkillMarkLabel == "所选",
             "A JSON mark declaration automatically labels a newly marked visible card without a character projection hook.");
         Cold();
+        var changedBatches = 0;
+        game.EventCommitted += envelope =>
+        {
+            if (envelope.Payload is not CardEntityMarksChangedEvent changed) return;
+            changedBatches++;
+            Need(changed.Changes.Count == 2 && changed.Changes.All(change => Marks().Has(change.CardId, change.Mark) == change.Marked) &&
+                changed.Changes is IList<CardEntityMarkChange> { IsReadOnly: true },
+                "One immutable canonical mark batch exposes both physical changes together to its first actual observer.");
+        };
+        ChangeOpeningMarks("unmark", false);
+        Need(changedBatches == 1, "A real two-entity clear publishes one atomic canonical change fact.");
+        ChangeOpeningMarks("restore", true);
+        ChangeOpeningMarks("unmark", false);
+        ChangeOpeningMarks("set", true);
+        var legacy = new CardEntityMarkedEvent(1, initial[0], "opening", 0);
+        var legacyJson = JsonSerializer.Serialize(legacy);
+        Need(JsonSerializer.Deserialize<CardEntityMarkedEvent>(legacyJson) == legacy &&
+            !legacyJson.Contains("ChangeCount", StringComparison.Ordinal) && !legacyJson.Contains("Changes", StringComparison.Ordinal) &&
+            game.Events.Select(envelope => envelope.Payload).OfType<ICardEntityMarkFact>()
+                .SelectMany(fact => Enumerable.Range(0, fact.ChangeCount).Select(fact.ChangeAt))
+                .Where(change => change.CardId == initial[0] && change.Mark == "opening").Select(change => change.Marked)
+                .TakeLast(4).SequenceEqual([false, true, false, true]),
+            "Legacy positive marks retain their original record equality and JSON while mixed old/new facts read their actual global latest value.");
+
+        void ChangeOpeningMarks(string activation, bool marked)
+        {
+            Submit(new UseProgramSkillCommand(0, Skill, activation, [], [], game.Revision, Prompt()!.PromptId));
+            foreach (var id in initial.Take(2))
+            {
+                Reach(() => Prompt()?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("program-action") == "select-owned-cards") == true);
+                var prompt = Prompt()!;
+                Submit(new AnswerPromptCommand(0, prompt.PromptId, prompt.Choices.Single(choice => choice.Cards.SequenceEqual([id])).Id, game.Revision));
+            }
+            Reach(() => Prompt() is { Kind: DecisionKind.PlayCard });
+            Need(initial.Take(2).All(id => Marks().Has(id, "opening") == marked && Marks().InitialOwnerSeat(id, "opening") == 0 &&
+                    Marks().MarkedNames(id).Any(name => name.Mark == "opening") == marked) &&
+                Marks().MarkedCardIds("opening").SequenceEqual(marked ? initial : initial.Skip(2)) &&
+                Marks().CountMarked(0, "opening", CardZoneKind.Hand) == (marked ? 4 : 2),
+                "Real set/clear instructions update identity, visible names and physical counts while preserving the permanent initial-owner fact and original entity order.");
+            Cold();
+        }
         Submit(new UseProgramSkillCommand(0, Skill, "drop", [fresh], [], game.Revision, Prompt()!.PromptId));
         Reach(() => Prompt() is { Kind: DecisionKind.PlayCard });
         Need(Marks().Has(fresh, "chosen") && Marks().CountMarked(0, "chosen", CardZoneKind.Hand) == 0 &&
@@ -269,6 +310,22 @@ internal static class CardEntityMarkChecks
                 {"id":"drop","minCards":1,"maxCards":1,"sourceZones":["hand"],"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,
                   "effects":[{"op":"discardSelected","target":"owner","amount":1}]}]}]}
             """;
+            var mutable = JsonNode.Parse(rules)!;
+            foreach (var (id, value) in new (string, bool?)[] { ("unmark", false), ("restore", null), ("set", true) })
+            {
+                var effects = JsonNode.Parse("""
+                    [{"op":"selectOwnedCards","target":"owner","amount":2,"zones":["hand"],"resultBind":"mutable"},
+                     {"op":"revealBoundCards","target":"owner","sourceBind":"mutable"},
+                     {"op":"markCards","target":"owner","mark":"opening","bind":"mutable"}]
+                    """)!.AsArray();
+                if (value is { } marked) effects[2]!["marked"] = marked;
+                mutable["skills"]![0]!["activations"]!.AsArray().Add(new JsonObject
+                {
+                    ["id"] = id, ["minCards"] = 0, ["maxCards"] = 0, ["minTargets"] = 0, ["maxTargets"] = 0,
+                    ["targetKind"] = "anyLiving", ["usesPerTurn"] = null, ["effects"] = effects
+                });
+            }
+            rules = mutable.ToJsonString();
             if (terminal is "lost" or "dead")
             {
                 var definition = System.Text.Json.Nodes.JsonNode.Parse(rules)!;

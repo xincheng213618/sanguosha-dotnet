@@ -41,6 +41,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         if (request is not null && request.ParentFrameId is { } parentId && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == parentId)is ProgramSkillFrame parent)
             request = request with
             {
+                RequestIdentity = _programSlashRequests.GetOffer(parent, request.ActorSeat),
                 ParentSkillId = parent.SkillId,
                 ParentSkillInstanceId = parent.SkillInstanceId,
                 ParentGameplayHash = parent.GameplayHash,
@@ -60,7 +61,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         HuanpeiIntent.NearestLegalSlash => DrawFundedDistinctBasicIntent.NearestLegalSlash,
         _ => DrawFundedDistinctBasicIntent.AssistedSlash
     }, n.ParentFrameId, n.RequestFrameId, n.ParentActionId, n.Cursor, n.FixedTargetSeat);
-    internal bool HuanpeiRequestParentCurrent(HuanpeiNativeRequest n)
+    internal bool HuanpeiRequestParentCurrent(HuanpeiNativeRequest n, bool paid = false, ProgramSlashRequestAcceptance? acceptedRequest = null)
     {
         if (n.Intent == HuanpeiIntent.Play)
             return _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseStartedTurnNumberTurnProgressionAccess._currentSeat == n.ActorSeat;
@@ -68,14 +69,27 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             return false;
         if (n.ParentSkillId is null)
             return true;
+        if (acceptedRequest is { } acceptance)
+            return request is ProgramSkillFrame accepted && _programSlashRequests.OwnsAcceptance(accepted, acceptance, n.ActorSeat);
+        if (n.RequestIdentity is { } identity)
+            return request is ProgramSkillFrame issued && (paid ? _programSlashRequests.OwnsIssuedIdentity(issued, identity, n.ActorSeat) : _programSlashRequests.OwnsOffer(issued, n.ActorSeat));
         return request is ProgramSkillFrame p && p.Id == n.ParentFrameId && p.InstructionIndex == n.Cursor && p.SkillId == n.ParentSkillId && p.SkillInstanceId == n.ParentSkillInstanceId && p.GameplayHash == n.ParentGameplayHash && _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(p)?.Op == n.ParentOperation;
     }
 
-    internal bool HuanpeiNativeLegal(HuanpeiNativeRequest n, CardKind kind, int? target)
+    internal bool HuanpeiNativeLegal(HuanpeiNativeRequest n, CardKind kind, int? target, bool paid = false, ProgramSlashRequestAcceptance? acceptedRequest = null)
     {
-        if (!HuanpeiRequestParentCurrent(n) || !CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Contains(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, kind, CardActionType.Use) || _appliedCardActionRestrictions.IsMaterialUseForbidden(n.ActorSeat, [], null) || !_coreMatchParticipantsPlayersAccess._players[n.ActorSeat].IsAlive)
+        if (!HuanpeiRequestParentCurrent(n, paid, acceptedRequest) || !CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Contains(kind) || _coreCardUseModulesOperations.IsCardUseForbidden(n.ActorSeat, kind, CardActionType.Use) || _appliedCardActionRestrictions.IsMaterialUseForbidden(n.ActorSeat, [], null) || !_coreMatchParticipantsPlayersAccess._players[n.ActorSeat].IsAlive)
             return false;
         var actor = _coreMatchParticipantsPlayersAccess._players[n.ActorSeat];
+        if (n.RequestIdentity is { } identity && CoreNativeCardClassificationsRuntime.IsSlashCard(kind))
+        {
+            var quotaSource = _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().LastOrDefault(f => f.HuanShuJun?.Request == n)?.HuanShuJun?.Source;
+            return target is { } issuedTarget && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == n.ParentFrameId) is ProgramSkillFrame issued &&
+                (acceptedRequest is null || _programSlashRequests.CanExecuteAcceptedUse(issued, acceptedRequest)) &&
+                (paid ? _programSlashRequests.GetIssuedTargets(issued, identity, n.ActorSeat) : _programSlashRequests.GetTargets(issued, n.ActorSeat)).Contains(issuedTarget) &&
+                _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[issuedTarget], new(0, kind, Suit.None, 0), effectiveKind: kind, physicalCardIds: [], ignoreDistance: identity.Spec.IgnoreDistance) &&
+                (!identity.Spec.CountsTowardSlashLimit || _slashQuota.CanSpendSlashUse(actor, _coreMatchParticipantsPlayersAccess._players[issuedTarget], _coreCardConversionsOperations.IgnoresProgramSlashLimit(actor, quotaSource), kind, physicalCardIds: []));
+        }
         if (n.Intent == HuanpeiIntent.WenyiPeach)
             return kind == CardKind.Peach && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == n.ParentFrameId)is ProgramSkillFrame p && TryGetWenyiPeachRequest(p, out var a, out var t) && a == actor.Seat && t == target && WenyiTargetCanReceivePeach(p);
         if (n.Intent == HuanpeiIntent.FixedSlash)
@@ -264,7 +278,7 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         }
 
         : r.Targets;
-        if (r.Kind is not { } kind || !HuanpeiNativeLegal(r.Request, kind, targets.FirstOrDefault(-1)))
+        if (r.Kind is not { } kind || !HuanpeiNativeLegal(r.Request, kind, targets.FirstOrDefault(-1), paid: true, acceptedRequest: r.RequestAcceptance))
         {
             FinishHuanShuJun(f);
             return;
@@ -278,14 +292,21 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
         var r = f.HuanShuJun!;
         if (!r.Paid || r.Stage != HuanShuJunStage.BasicChoice || r.Request is null || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
             throw new InvalidOperationException("Huanpei cannot issue an unpaid or dead user's output.");
-        if (r.Request.Intent is HuanpeiIntent.Play or HuanpeiIntent.KeBiNengBasic ? !HuanpeiPaidPlayActions(f).Any(a => a.PlayedCardKind == kind && a.TargetSeats.SequenceEqual(targets)) : !HuanpeiNativeLegal(r.Request, kind, targets.FirstOrDefault(-1)))
+        if (r.Request.Intent is HuanpeiIntent.Play or HuanpeiIntent.KeBiNengBasic ? !HuanpeiPaidPlayActions(f).Any(a => a.PlayedCardKind == kind && a.TargetSeats.SequenceEqual(targets)) : !HuanpeiNativeLegal(r.Request, kind, targets.FirstOrDefault(-1), paid: true, acceptedRequest: r.RequestAcceptance))
             throw new InvalidOperationException("Huanpei's paid output changed its native target or current use legality.");
+        ProgramSlashRequestAcceptance? requestAcceptance = r.RequestAcceptance;
+        if (requestAcceptance is null && CoreNativeCardClassificationsRuntime.IsSlashCard(kind) && targets is [var target] && r.Request.RequestIdentity is { } identity &&
+            _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.Request.ParentFrameId) is ProgramSkillFrame parent)
+        {
+            requestAcceptance = _programSlashRequests.AcceptIssued(parent, identity, r.Request.ActorSeat, target);
+        }
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuanpeiOutputChosenEvent(f.Id, kind, targets.Count));
         for (var i = 0; i < targets.Count; i++)
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new HuanpeiTargetChosenEvent(f.Id, i, targets[i]));
         var origin = new HuanpeiPaidOrigin(f.Id, r.Source, r.GameplayHash, r.Round, r.ActualTurn, r.TurnOwner, r.Request, r.FrozenHandCount, r.FrozenHp, Math.Abs(r.FrozenHandCount - r.FrozenHp), r.Before, r.After, kind)
         {
-            Targets = targets
+            Targets = targets,
+            RequestAcceptance = requestAcceptance
         };
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HuanShuJun = null, PendingMovementContinuation = null });
@@ -296,7 +317,20 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
 
     internal void RepublishHuanpeiOriginal(HuanShuJunReceipt r)
     {
-        if (r.Request is null || r.OriginalDecision is null || !HuanpeiRequestParentCurrent(r.Request) || !_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+        if (r.Request is null || r.OriginalDecision is null || !_coreMatchParticipantsPlayersAccess._players[r.Source.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
+            return;
+        if (r.RequestAcceptance is { } failedAcceptance && _resolutionStackOperations._resolutionStack.SingleOrDefault(x => x.Id == r.Request.ParentFrameId) is ProgramSkillFrame parent)
+        {
+            if (!_programSlashRequests.ReleaseAcceptance(parent, failedAcceptance))
+                return;
+            parent = _coreProgramLifecycleOperations.GetActiveProgramFrame(parent.Id);
+            if (_programSlashRequests.GetOffer(parent, r.Request.ActorSeat) is null)
+            {
+                _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(parent, "原用牌请求已不再允许新的响应；已支付费用不撤回。");
+                return;
+            }
+        }
+        if (!HuanpeiRequestParentCurrent(r.Request))
             return;
         _corePendingDecisionPolicyPipelineOperations._pendingDecision = r.OriginalDecision with
         {
@@ -337,7 +371,6 @@ internal sealed partial class CharacterHuanShuJunOlRuntime
             Choices = []
         };
         var need = CaptureHuanpeiRequest(prompt, parent);
-        var ignore = _characterLvKuangLvXiangOlOperations.IsQigongRequest(parent) || _characterWuJingOlOperations.IsWuJingHejiRequest(parent);
-        return candidates.Any(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Where(CoreNativeCardClassificationsRuntime.IsSlashCard).Any(kind => need is not null ? HuanpeiNativeLegal(need, kind, t) : _coreNativeTargetLegalityOperations.CanUseSlashTarget(actor, _coreMatchParticipantsPlayersAccess._players[t], new(0, kind, Suit.None, 0), effectiveKind: kind, noEffectiveRank: true, physicalCardIds: [], ignoreDistance: ignore)));
+        return need is not null && candidates.Any(t => _coreTableSeatQueriesOperations.IsValidPlayerSeat(t) && _coreMatchParticipantsPlayersAccess._players[t].IsAlive && CharacterHuanShuJunOlDefinitions.HuanpeiKinds.Where(CoreNativeCardClassificationsRuntime.IsSlashCard).Any(kind => HuanpeiNativeLegal(need, kind, t)));
     }
 }

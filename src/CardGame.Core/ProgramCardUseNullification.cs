@@ -10,6 +10,8 @@ public sealed record ProgramCardUseNullifiedEvent(
 
 public sealed partial record CardUseFrame
 {
+    // First program notification only. NativeUseInvalidation owns effectiveness;
+    // another accepted target may still complete its own paid conversion.
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ProgramCardUseNullifiedEvent? ProgramUseNullification { get; init; }
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]

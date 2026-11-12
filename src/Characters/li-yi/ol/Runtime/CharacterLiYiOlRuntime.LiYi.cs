@@ -61,6 +61,13 @@ internal sealed partial class CharacterLiYiOlRuntime
             return;
         }
 
+        if (r.Stage is ChanshuangStage.SlashTarget or ChanshuangStage.SlashChoice)
+        {
+            _slashRequests.Issue(f, actor,
+                new(ProgramSlashRequestTargetSource.AllOtherLiving, ResultBind: $"chanshuang-{r.Cursor}",
+                    RetainSourceLoss: true, RetainOwnerDeath: true, RetainAcceptedSourceLoss: true, RetainAcceptedOwnerDeath: true, QuotaTargets: ProgramSlashRequestPermissionTargets.AnyOtherTarget, ExemptIssuedSlashDebit: true, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction), r.Cursor);
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        }
         var choices = ChanshuangChoices(f);
         if (choices.Count == 0)
         {
@@ -121,6 +128,8 @@ internal sealed partial class CharacterLiYiOlRuntime
         if (r.Stage == ChanshuangStage.SlashTarget)
         {
             var target = selected.Targets.Single();
+            _slashRequests.SelectTarget(f, ChanshuangChooser(f), target);
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ChanshuangSlashSelectedEvent(f.Id, r.Cursor, ChanshuangItem(f).Seat, target));
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { Chanshuang = r with { Stage = ChanshuangStage.SlashChoice, SlashTarget = target } });
             PublishChanshuang(f);
@@ -140,6 +149,8 @@ internal sealed partial class CharacterLiYiOlRuntime
             var(cards, kind, conversion) = _coreAssistedSlashPaymentOperations.ReadAssistedSlashPayment(_coreMatchParticipantsPlayersAccess._players[actor], selected);
             if (!_coreAssistedPhysicalCardsOperations.AssistedSlashPaymentHasRange(_coreMatchParticipantsPlayersAccess._players[actor], target, cards) || !_coreNativeTargetLegalityOperations.CanUseSlashTarget(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[target], cards[0], conversion, kind, noEffectiveRank: cards.Count > 1, specificEffectiveRank: selected.Parameters.GetValueOrDefault("equipment") == CardKind.ZhangbaSerpentSpear.ToString() ? _coreFinalTargetSlashOperations.ZhangbaSpecificSlashRank(_coreMatchParticipantsPlayersAccess._players[actor], cards) : null, physicalCardIds: cards.Select(c => c.Id).ToArray()))
                 throw new InvalidOperationException("Chanshuang's Slash must retain ordinary range and native target legality.");
+            _slashRequests.Accept(f, actor, target);
+            f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             PrepareChanshuangSuppliedSlash(f, actor, actor, target, kind, cards, conversion);
             _coreNativeSlashUseOperations.ResolveSlashCore(_coreMatchParticipantsPlayersAccess._players[actor], _coreMatchParticipantsPlayersAccess._players[target], cards[0], kind, actor, physicalCards: cards, countsTowardSlashLimit: false, usesZhuqueFan: kind == CardKind.FireSlash && (cards[0].Kind == CardKind.Slash || _coreOwnPublicPileConversionsOperations.IsOwnPublicPileSlashMaterial(_coreMatchParticipantsPlayersAccess._players[actor], cards[0])) && _coreNativeTargetLegalityOperations.HasZhuqueFan(_coreMatchParticipantsPlayersAccess._players[actor]), conversionSource: conversion, programSkillCardUseFrameId: f.Id);
             return;
@@ -256,6 +267,8 @@ internal sealed partial class CharacterLiYiOlRuntime
 
     internal void CompleteChanshuangItem(ProgramSkillFrame f, bool actual)
     {
+        _slashRequests.Close(f);
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var r = f.Chanshuang!;
         if (r.Stage == ChanshuangStage.Votes)
         {
@@ -287,6 +300,13 @@ internal sealed partial class CharacterLiYiOlRuntime
     {
         if (_resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { Chanshuang: not null } f || f.Id != id)
             return false;
+        if (_slashRequests.TakeFailure(f) is not null)
+        {
+            CompleteChanshuangItem(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), false);
+            return true;
+        }
+        if (f.Chanshuang is { NativeReturned: true } && ResumeChanshuangSuppliedSlash(f))
+            return true;
         ContinueChanshuang(id);
         return true;
     }

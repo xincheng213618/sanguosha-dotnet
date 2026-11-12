@@ -31,12 +31,10 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal bool ExactTanbanDrawEndFrame(ProgramSkillFrame frame) => _resolve().ExactTanbanDrawEndFrame(frame);
     internal void FinishDiou(ProgramSkillFrame f) => _resolve().FinishDiou(f);
     internal bool HasIssuedDiouResponse(CardActionContext action) => _resolve().HasIssuedDiouResponse(action);
-    internal bool HasTanbanEntityMark(int cardId) => _resolve().HasTanbanEntityMark(cardId);
     internal SkillProgramStepOutcome InitializeTanban(ProgramSkillFrame supplied) => _resolve().InitializeTanban(supplied);
     internal bool IsDiouCarrier(int id) => _resolve().IsDiouCarrier(id);
     internal bool IsDiouCarrierDestroyedMaterial(CardMovementRecord movement) => _resolve().IsDiouCarrierDestroyedMaterial(movement);
     internal bool IsDiouCarrierDestroyedMaterial2(int cardId, CardLocation from, CardLocation to) => _resolve().IsDiouCarrierDestroyedMaterial(cardId, from, to);
-    internal bool IsDiouCarrierDestroyedMaterial3(long useId, int cardId) => _resolve().IsDiouCarrierDestroyedMaterial(useId, cardId);
     internal bool IsDiouNativeSettlementBatch(ProgramSkillFrame f, CardMovementBatchContext b) => _resolve().IsDiouNativeSettlementBatch(f, b);
     internal bool IsDiouRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsDiouRecoveryParent(f, recovery);
     internal bool IsDiouUse(long id) => _resolve().IsDiouUse(id);
@@ -45,7 +43,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal bool IsIssuedDiouCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().IsIssuedDiouCandidate(c, context);
     internal bool IsIssuedDiouUse(CardUseFrame use) => _resolve().IsIssuedDiouUse(use);
     internal bool IsIssuedTanbanInitialCandidate(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().IsIssuedTanbanInitialCandidate(candidate, context);
-    internal bool IsTanbanHandLimitExempt(CharacterState owner, int cardId) => _resolve().IsTanbanHandLimitExempt(owner, cardId);
     internal void IssueDiouUse(CardUseFrame use) => _resolve().IssueDiouUse(use);
     internal CardLocation NormalizeDiouCarrierDestination(Card card, CardLocation from, CardLocation to) => _resolve().NormalizeDiouCarrierDestination(card, from, to);
     internal void ObserveDiouNativeAcceptance(IGameEvent payload) => _resolve().ObserveDiouNativeAcceptance(payload);
@@ -54,7 +51,6 @@ internal sealed partial class CharacterDiaoChanLeEntries
     internal bool PermitPaidDiou(ProgramSkillFrame f) => _resolve().PermitPaidDiou(f);
     internal CardActionContext PrepareDiouAction(CardActionContext action) => _resolve().PrepareDiouAction(action);
     internal void ProjectDiouCarrierCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectDiouCarrierCardSkillMark(cardId, ref projection);
-    internal void ProjectTanbanCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectTanbanCardSkillMark(cardId, ref projection);
     internal void PublishDiou(ProgramSkillFrame f) => _resolve().PublishDiou(f);
     internal void RecordDiouCarrierDestruction(CardMovementRecord movement) => _resolve().RecordDiouCarrierDestruction(movement);
     internal void RestoreDiouParentAttack(ProgramSkillFrame f) => _resolve().RestoreDiouParentAttack(f);

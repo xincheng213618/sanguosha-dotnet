@@ -18,21 +18,30 @@ public sealed record ResponseRule
     public string? SkillName { get; }
     public ResponseRuleAudience Audience { get; }
     public CardConversionSource? Source { get; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool ExcludeActor { get; }
+    // This role belongs only to the whole-use issuer's notification protocol;
+    // an applied relation with the same audience is a different declaration.
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonInclude]
+    public bool IsWholeUseNoResponsePolicy { get; internal init; }
+    [JsonInclude]
     public int? InstructionIndex { get; internal init; }
     public ResponseRule(int minimum = 1, bool forbid = false, int? targetSeat = null, int? actorSeat = null,
         int? opponentSeat = null, IReadOnlyList<CardKind>? incomingKinds = null, IReadOnlyList<CardKind>? requiredKinds = null,
-        ProgramExpression? condition = null, bool matchUseKind = false, string? skillName = null,
-        ResponseRuleAudience audience = ResponseRuleAudience.Targets, CardConversionSource? source = null)
+        ProgramExpression? @while = null, bool matchUseKind = false, string? skillName = null,
+        ResponseRuleAudience audience = ResponseRuleAudience.Targets, CardConversionSource? source = null, bool excludeActor = false)
     {
-        if (minimum < 1 || condition is not null && (condition.Type != ProgramExpressionType.Bool ||
-            condition.Nodes().Any(node => node.Op is not ("bool" or "int" or "eventSource" or "eventTarget" or
+        if (minimum < 1 || @while is not null && (@while.Type != ProgramExpressionType.Bool ||
+            @while.Nodes().Any(node => node.Op is not ("bool" or "int" or "eventSource" or "eventTarget" or
                 "hp" or "maxHp" or "lostHp" or "handCount" or "equipmentCount" or "handPrintedSuitCount" or
                 "alive" or "hasHp" or "faceDown" or "chained" or "not" or "and" or "or" or "<" or "<=" or ">" or ">=" or "==" or "!=" or
                 "+" or "-" or "min" or "max" or "floorDiv" or "when"))))
             throw new InvalidOperationException("A response rule requires a positive minimum and public incoming-actor/responder conditions.");
         (Minimum, Forbid, TargetSeat, ActorSeat, OpponentSeat, IncomingKinds, RequiredKinds, While, MatchUseKind, SkillName, Audience, Source) =
             (minimum, forbid, targetSeat, actorSeat, opponentSeat, Array.AsReadOnly((incomingKinds ?? []).ToArray()),
-             Array.AsReadOnly((requiredKinds ?? []).ToArray()), condition, matchUseKind, skillName, audience, source);
+             Array.AsReadOnly((requiredKinds ?? []).ToArray()), @while, matchUseKind, skillName, audience, source);
+        ExcludeActor = excludeActor;
     }
 }
 
@@ -49,14 +58,14 @@ public abstract partial record ResolutionFrame
 
 internal readonly record struct NativeResponseQuery(long IncomingFrameId, int? InstructionIndex, int ActorSeat,
     int OpponentSeat, int ResponderSeat, int ProviderSeat, CardKind IncomingKind, CardKind RequiredKind,
-    IReadOnlyList<int> TargetSeats, int CounterspellDepth = 0);
+    IReadOnlyList<int> TargetSeats, int CounterspellDepth = 0, long? IncomingActionId = null);
 internal sealed record ResponseDecision(int Minimum, bool Forbidden, IReadOnlyList<string> SkillNames)
 {
     internal static ResponseDecision Default { get; } = new(1, false, []);
 }
 
 internal sealed class ResponseRuleExpressionWorld(NativeResponseQuery query, IReadOnlyList<CharacterState> players,
-    CardZoneStore cards, RuntimeEntries.CoreGameEngineHealthQueriesEntries health) : IProgramExpressionWorld
+    ICardZoneQueries cards, RuntimeEntries.CoreGameEngineHealthQueriesEntries health) : IProgramExpressionWorld
 {
     private CharacterState? Player(int seat) => seat >= 0 && seat < players.Count ? players[seat] : null;
     public int? Participant(string name) => name switch { "eventSource" => query.ActorSeat, "eventTarget" => query.ResponderSeat, _ => null };

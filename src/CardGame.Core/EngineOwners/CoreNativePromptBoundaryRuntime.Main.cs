@@ -109,7 +109,7 @@ internal sealed partial class CoreNativePromptBoundaryRuntime
             choices.AddRange(_coreExtendedViewAsOperations.ExtendedViewAsResponseChoices(responder, CardKind.Dodge));
         if (!isDodge && requiredCardKind == CardKind.Slash && responder is not null)
         {
-            foreach (var pair in _coreNativeResponseMaterialQueriesOperations.GetZhangbaSlashPairs(responder))
+            foreach (var pair in _coreNativeResponseMaterialQueriesOperations.EnumerateZhangbaSlashPairs(responder))
             {
                 choices.Add(new PromptChoice(new ChoiceId($"respond.zhangba-slash.cards-{(pair[0].Id)}-{(pair[1].Id)}"), isGroupAttack ? $"发动【丈八蛇矛】，将两张手牌当【杀】响应【{(incomingName)}】。" : "发动【丈八蛇矛】，将两张手牌当【杀】继续应战【决斗】。", [pair[0].Id, pair[1].Id], [], new Dictionary<string, string> { ["response"] = "zhangba-slash", ["required-card"] = responseName, ["response-card-kind"] = CardKind.Slash.ToString(), ["equipment"] = CardKind.ZhangbaSerpentSpear.ToString() }));
             }

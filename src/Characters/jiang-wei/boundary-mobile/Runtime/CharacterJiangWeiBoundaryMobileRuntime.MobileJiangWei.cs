@@ -27,6 +27,8 @@ internal sealed partial class CharacterJiangWeiBoundaryMobileRuntime
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AssistedSlashRequest = new(actor, f.OwnerSeat, ActorChoosesTarget: true) });
+        _slashRequests.Issue(f, actor, new(ProgramSlashRequestTargetSource.FrozenCandidates, [f.OwnerSeat], bind, UsesChoiceResult: true, FailureReturnPolicy: ProgramSlashRequestFailureReturnPolicy.ResumeOriginalInstruction));
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         _coreAssistedPhysicalCardsOperations.PublishAssistedPhysicalSlashPrompt(f);
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is { } p)
             _corePendingDecisionPolicyPipelineOperations._pendingDecision = p with
