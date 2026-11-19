@@ -50,10 +50,29 @@ internal static class NativeAdditionalSelfDiscardChecks
         s.Cold(); s.Continue(); s.Play();
         s.Need(s.G.CardMovements.Count(m => m.Reason.Value == "skill-program.yang-feng.jiawei.discard") == 2,
             "The original Jiawei paid child returns exactly once after cold recovery.");
-        s.End(); s.Play(); s.Use("ol:jiawei", "discard-reveal-partition", [1]);
+        s.End(); s.Play();
+        var slash = s.G.CreateSnapshot(0).Players[0].Hand.Single(card => card.Kind == CardKind.Slash).Id;
+        s.StageJiaweiReveal(slash); s.Play(); s.Use("ol:jiawei", "discard-reveal-partition", [1]);
         s.Reach(() => s.G.ResolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()?.YangFeng is { Stage: YangFengStage.DiscardChoice });
         s.Need(s.P!.RequiredCardCount == 0 && s.P.Choices.All(c => c.Cards.Count == 0 && !c.Parameters.ContainsKey("owned-selection-role")),
             "The same Jiawei skill preserves the other player's opaque hand slots instead of publishing them as the human's own multi-card material set.");
+        var foreign = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Last().YangFeng!;
+        for (var index = 0; index < foreign.RequiredDiscard; index++)
+            s.Answer(choice => choice.Parameters.GetValueOrDefault("branch") == "discard");
+        s.Pause();
+        var shown = s.E<ProgramCardsRevealedEvent>().Last(e => e.SkillId == "ol:jiawei");
+        var remainder = shown.Cards.Where(card => card.Kind == CardKind.Dodge).Select(card => card.Id).ToHashSet();
+        var ownerGain = s.G.CardMovements.Single(move => move.CardId == slash && move.Reason.Value == "skill-program.yang-feng.jiawei.owner-gain");
+        s.Need(shown.Cards.Count == foreign.X + 1 && shown.Cards.Any(card => card.Id == slash) &&
+            remainder.Count == foreign.X && ownerGain.From == CardLocation.Processing && ownerGain.To == CardLocation.Hand(0) &&
+            s.G.CreateCardZoneDiagnostics().Where(card => remainder.Contains(card.CardId)).All(card => card.Location == CardLocation.Processing),
+            "The shared reveal shows the original Slash and Dodge entries, and the owner's gain child suspends before the other cards are given.");
+        s.Cold(); s.Continue(); s.Play();
+        var targetGains = s.G.CardMovements.Where(move => move.Reason.Value == "skill-program.yang-feng.jiawei.target-gain" &&
+            move.Sequence > ownerGain.Sequence).ToArray();
+        s.Need(targetGains.Select(move => move.CardId).ToHashSet().SetEquals(remainder) &&
+            targetGains.Length == remainder.Count && targetGains.All(move => move.From == CardLocation.Processing && move.To == CardLocation.Hand(1)),
+            "Cold recovery grants the target every remaining original non-damage entry exactly once.");
         s.Replay();
     }
 
@@ -99,6 +118,7 @@ internal static class NativeAdditionalSelfDiscardChecks
         public void Play() => Reach(() => P is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
         public void End() => Accept(new EndPlayPhaseCommand(0, G.Revision, P!.PromptId));
         public void Use(string skill, string activation, int[] targets) => Accept(new UseProgramSkillCommand(0, skill, activation, [], targets, G.Revision, P!.PromptId));
+        public void StageJiaweiReveal(int card) => Accept(new UseProgramSkillCommand(0, Driver, "known-jiawei-top", [card], [], G.Revision, P!.PromptId));
         public void Pause() => Reach(() => P?.SkillPrompt?.SkillId == Watch);
         public void Continue() => Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         public void Answer(Func<PromptChoice, bool> predicate)
@@ -136,8 +156,12 @@ internal static class NativeAdditionalSelfDiscardChecks
         public static Scene Start(string hero)
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(hero));
+            IReadOnlyList<ShanheStartingCard> hand = [new(CardKind.Dodge, Suit.Heart, 2), new(CardKind.Dodge, Suit.Club, 3),
+                new(CardKind.Dodge, Suit.Diamond, 4), new(CardKind.Dodge, Suit.Spade, 5)];
+            if (hero == "ol:yang-feng")
+                hand = [.. hand, new(CardKind.Slash, Suit.Club, 6)];
             var setup = new ShanheBattleSetup(39, 1, "additional-native-self-discard", hero, 3, 0, 0, 0, 0, [Driver, Watch],
-                [new(CardKind.Dodge, Suit.Heart, 2), new(CardKind.Dodge, Suit.Club, 3), new(CardKind.Dodge, Suit.Diamond, 4), new(CardKind.Dodge, Suit.Spade, 5)], [],
+                hand, [],
                 Enumerable.Range(1, 3).Select(i => new ShanheCombatantDefinition(hero == "ol:lv-kai" && i == 1 ? Peer + "-attacker" : Peer, Hp: hero == "ol:lv-kai" && i == 1 ? 7 : 8,
                     ExtraSkillIds: hero == "ol:lv-kai" && i == 1 ? [Watch] : []) { StartingHand = hero == "ol:lv-kai" && i == 1
                         ? [new(CardKind.SilverLion, Suit.Club, 1), new(CardKind.Slash, Suit.Spade, 7), new(CardKind.Dodge, Suit.Heart, 6), new(CardKind.Dodge, Suit.Club, 7)]
@@ -155,11 +179,19 @@ internal static class NativeAdditionalSelfDiscardChecks
         {
             CharacterFixtureContent.Register(b, hero);
             if (hero == "ol:lv-kai") b.AddCard(Classic.Value.GetCard("classic:silver-lion"));
+            const string jiaweiTop = """
+                ,"activations":[{"id":"known-jiawei-top","minCards":1,"maxCards":1,"minTargets":0,"maxTargets":0,
+                   "sourceZones":["hand"],"cardKinds":["slash"],"targetKind":"anyLiving","usesPerTurn":1,
+                   "effects":[{"op":"captureSelectedCards","target":"owner","resultBind":"top"},
+                              {"op":"moveBoundCards","target":"owner","sourceBind":"top","destination":"drawPileTop","awaitMovementTriggers":true}]}]
+                """;
+            var jiaweiFixture = hero == "ol:yang-feng" ? jiaweiTop : "";
             var catalog = SkillProgramCatalog.Load($$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
-              {"id":"{{Driver}}","revision":1,"modifiers":[{"id":"hold","query":"handLimit","operation":"add","value":30,"priority":0}]},
+              {"id":"{{Driver}}","revision":1,"modifiers":[{"id":"hold","query":"handLimit","operation":"add","value":30,"priority":0}]{{jiaweiFixture}}},
               {"id":"{{Watch}}","revision":1,"triggers":[
                 {"id":"paid-group","window":"cardsMoved","subject":"owner","sourceZones":["hand"],"movementReasons":["skill-program.li-yi.chanshuang.discard","skill-program.yang-feng.jiawei.discard","skill-program.ol:bijing.bijing-punish"],"movementOccurrence":"perBatch","optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]},
+                {"id":"jiawei-owner-gain","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementReasons":["skill-program.yang-feng.jiawei.owner-gain"],"movementOccurrence":"perBatch","optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"owner-gained","options":[{"id":"continue"}]}]},
                 {"id":"paid-recovery","window":"afterHpRecovered","subject":"owner","optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"healed","options":[{"id":"continue"}]}]}
               ]},
               {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","window":"afterNormalDraw","subject":"owner","optional":false,"isSkillInvocation":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]}

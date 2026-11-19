@@ -26,12 +26,27 @@ internal sealed partial class CharacterQiaoZhouOlRuntime
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (f.QiaoZhouForecast is not null || f.WindowContext is not { Window: SkillProgramTriggerWindow.TurnEnding } context || _resolutionStackOperations._resolutionStack.OfType<TurnEndingBoundaryFrame>().SingleOrDefault(p => p.Id == context.ParentFrameId)is not { } ending || ending.OwnerSeat != f.OwnerSeat || ending.TurnNumber != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
             throw new InvalidOperationException("Xingbu requires its owner's actual ending boundary.");
+        var movementStart = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count;
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { QiaoZhouForecast = new(QiaoZhouSource(f), f.GameplayHash, f.InstructionIndex, ending.Id, QiaoZhouForecastStage.RevealChildren, 0, before, before) });
         _coreProgramLifecycleOperations.RevealProgramTopCards(f.Id, f.OwnerSeat, 3, null, QiaoZhouTableBind, SkillProgramCardSetVisibility.Public);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-        var cards = _coreProgramLifecycleOperations.GetProgramCardSet(f, QiaoZhouTableBind).CardIds.Select(id => new QiaoZhouRevealedCard(id, _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Suit, _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == id).Sequence)).ToArray();
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { QiaoZhouForecast = f.QiaoZhouForecast!with { Cards = cards, RedCount = cards.Count(c => CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit)), SequenceAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
+        var reveal = _coreProgramLifecycleOperations.GetProgramCardSet(f, QiaoZhouTableBind);
+        var revealReason = $"skill-program.{f.SkillId}.{CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f)}.reveal";
+        var entries = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Skip(movementStart)
+            .Where(move => move.Reason.Value == revealReason && move.From == CardLocation.DrawPile && move.To == CardLocation.Processing)
+            .ToDictionary(move => move.CardId);
+        var cards = reveal.CardIds.Select(id => new QiaoZhouRevealedCard(id,
+            entries[id].PrintedSuitAtMovement(_cardZonesOperations._cardZones), entries[id].Sequence)).ToArray();
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with
+        {
+            QiaoZhouForecast = f.QiaoZhouForecast! with
+            {
+                Cards = cards,
+                RedCount = cards.Count(c => CoreNativeCardClassificationsRuntime.IsRedSuit(c.Suit)),
+                SequenceAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
+            }
+        });
         ContinueQiaoZhouForecast(f.Id);
         return SkillProgramStepOutcome.AwaitChild;
     }
@@ -106,8 +121,16 @@ internal sealed partial class CharacterQiaoZhouOlRuntime
         {
             var r = f.QiaoZhouForecast;
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-            var ids = r.Cards.Where(c => _cardZonesOperations._cardZones.GetLocation(c.CardId) == CardLocation.Processing && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == c.CardId).Sequence == c.MovementSequence).Select(c => c.CardId).ToArray();
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { QiaoZhouForecast = r with { Stage = QiaoZhouForecastStage.CleanupChildren, SequenceBefore = before, SequenceAfter = before } });
+            var ids = r.Cards.Where(c => _zoneEntries.CurrentEntry(CardLocation.Processing, c.CardId) == c.MovementSequence)
+                .Select(c => c.CardId).ToArray();
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+            {
+                QiaoZhouForecast = r with { Stage = QiaoZhouForecastStage.CleanupChildren, SequenceBefore = before, SequenceAfter = before },
+                // The forecast is taking over cleanup of the original entries;
+                // generic completion must not then clean up those IDs again.
+                CardSetBindings = Array.AsReadOnly(f.CardSetBindings.Select(binding =>
+                    binding.Name == QiaoZhouTableBind ? binding with { IsReadOnlySnapshot = true } : binding).ToArray())
+            });
             _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources(ids, CardLocation.DiscardPile, new(QiaoZhouCleanupReason));
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { QiaoZhouForecast = f.QiaoZhouForecast!with { SequenceAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

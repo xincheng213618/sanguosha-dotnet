@@ -29,21 +29,21 @@ internal sealed partial class CharacterYangFengOlRuntime
         var entities = _coreProgramLifecycleOperations.GetProgramCardSet(f, JiaweiRevealBind).CardIds.Select((id, index) =>
         {
             var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
-            return new JiaweiRevealedEntity(new(id, card.Kind, CardLocation.Processing, index), IsJiaweiDamageCard(card.Kind), _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == id).Sequence);
+            var entry = _zoneEntries.CurrentEntry(CardLocation.Processing, id) ?? 0;
+            return new JiaweiRevealedEntity(new(id, card.Kind, CardLocation.Processing, index), IsJiaweiDamageCard(card.Kind), entry);
         }).ToArray();
         _coreRuntimeOperations.ReplaceRuntimeTop(f with { YangFeng = f.YangFeng!with { Revealed = entities } });
-        for (var i = 0; i < entities.Length; i++)
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JiaweiEntityRevealedEvent(f.Id, i, entities[i]));
         RecordYangFengMovement(f.Id, YangFengStage.RevealChildren, $"skill-program.{(f.SkillId)}.{(CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f))}.reveal", before, entities.Length);
     }
 
-    internal bool IsJiaweiOriginalProcessing(JiaweiRevealedEntity e) => _cardZonesOperations._cardZones.GetLocation(e.Material.CardId) == CardLocation.Processing && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == e.Material.CardId).Sequence == e.RevealSequence;
     internal void SettleJiawei(ProgramSkillFrame f, YangFengStage stage)
     {
         var r = f.YangFeng!;
         var cleanup = stage == YangFengStage.CleanupChildren;
         var recipient = stage == YangFengStage.OwnerGainChildren ? f.OwnerSeat : r.TargetSeat;
-        var entities = r.Revealed.Where(e => IsJiaweiOriginalProcessing(e) && (cleanup || e.DamageCard == (stage == YangFengStage.OwnerGainChildren))).Select(e => e.Material).ToArray();
+        var entities = r.Revealed.Where(e => (cleanup || e.DamageCard == (stage == YangFengStage.OwnerGainChildren)) &&
+            e.RevealSequence > 0 && _zoneEntries.CurrentEntry(CardLocation.Processing, e.Material.CardId) == e.RevealSequence)
+            .Select(e => e.Material).ToArray();
         if (!cleanup && !_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive)
             entities = [];
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { YangFeng = r with { Stage = stage }, PendingMovementContinuation = new(f.OwnerSeat, 0, null), CardSetBindings = Array.AsReadOnly(f.CardSetBindings.Where(b => b.Name != JiaweiRevealBind).ToArray()) });

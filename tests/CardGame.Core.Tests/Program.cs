@@ -766,6 +766,8 @@ var tests = new (string Name, Action Body)[]
     ("Luoying (Classic, OL, Mobile): old discard window cannot claim a newer pile entry", ClassicLuoyingChecks.OldDiscardWindowCannotClaimNewPileEntry),
     ("OL Boundary Jiang: first genuine discard batch, shared kinds and exact batch claim", OlBoundaryJiangChecks.FirstGenuineBatchOffersOnceAndClaimsItsQualifyingEntries),
     ("Mobile Youyi: collects genuine foreign discard in the actual phase", MobileYouyiChecks.CollectsActualPhaseDiscardWithoutInvocationPhase),
+    ("OL Cao Teng Jianxiong: draw child and original group material claim", OlCaoTengJianxiongChecks.DrawChildPrecedesOriginalGroupMaterialClaim),
+    ("OL Xingbu: frozen reveal and owned cleanup command replay", XingbuRevealChecks.FrozenPublicRevealAndOwnedCleanupReplay),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

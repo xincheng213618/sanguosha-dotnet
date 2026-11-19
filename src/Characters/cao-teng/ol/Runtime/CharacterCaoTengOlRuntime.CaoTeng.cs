@@ -49,7 +49,12 @@ internal sealed partial class CharacterCaoTengOlRuntime
         if (!q && !y)
             r = r with
             {
-                Materials = _coreProgramLifecycleOperations.GetClaimableProgramDamageCards(f).Select(c => new CaoTengDamageMaterial(c.Id, c.Kind, _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == c.Id).Sequence)).ToArray()
+                Materials = _coreProgramLifecycleOperations.GetClaimableProgramDamageCards(f).Select(card =>
+                {
+                    if (_zoneEntries.CurrentEntry(CardLocation.Processing, card.Id) is not { } entry || entry <= 0)
+                        throw new InvalidOperationException("Cao Teng's original damage material has no Processing entry.");
+                    return new CaoTengDamageMaterial(card.Id, card.Kind, entry);
+                }).ToArray()
             };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { CaoTeng = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoTengStartedEvent(f.Id, r.Source, r.GameplayHash, op, r.ActualTurn, r.ParentId));
@@ -224,7 +229,10 @@ internal sealed partial class CharacterCaoTengOlRuntime
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaoTengJianxiongClaimIssuedEvent(f.Id, r.Before));
                 if (_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
                 {
-                    var cards = _coreProgramLifecycleOperations.GetClaimableProgramDamageCards(f).Where(c => r.Materials.Any(m => m.CardId == c.Id && m.Kind == c.Kind && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(x => x.CardId == c.Id).Sequence == m.EntrySequence)).ToArray();
+                    var cards = _coreProgramLifecycleOperations.GetClaimableProgramDamageCards(f)
+                        .Where(card => r.Materials.Any(material => material.CardId == card.Id && material.Kind == card.Kind &&
+                            _zoneEntries.CurrentEntry(CardLocation.Processing, card.Id) == material.EntrySequence))
+                        .ToArray();
                     if (cards.Length > 0)
                     {
                         var damage = _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().Single(w => w.Id == r.ParentId);
