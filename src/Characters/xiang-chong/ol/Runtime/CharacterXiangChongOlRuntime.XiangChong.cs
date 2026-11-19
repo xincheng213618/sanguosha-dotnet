@@ -94,7 +94,10 @@ internal sealed partial class CharacterXiangChongOlRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal bool XiangLostStillAvailable(ProgramSkillFrame f) => f.XiangChong is { Lost: { } lost, LossDestination: { } to } r && _cardZonesOperations._cardZones.GetLocation(lost.CardId) == to && to != CardLocation.OutsideGame && to != CardLocation.Hand(f.OwnerSeat) && to != CardLocation.Equipment(f.OwnerSeat) && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == lost.CardId).Sequence == r.LossSequence;
+    internal bool XiangLostStillAvailable(ProgramSkillFrame f) =>
+        f.XiangChong is { Lost: { } lost, LossDestination: { } to } r &&
+        to != CardLocation.OutsideGame && to != CardLocation.Hand(f.OwnerSeat) && to != CardLocation.Equipment(f.OwnerSeat) &&
+        _zoneEntries.CurrentEntry(to, lost.CardId) == r.LossSequence;
     internal static Dictionary<string, string> XiangArgs(string branch) => RuntimeSkills.RuntimeRules_xiang_chong_ol_XiangChong.XiangArgs(branch);
     internal IReadOnlyList<PromptChoice> XiangChoices(ProgramSkillFrame f)
     {
@@ -113,8 +116,13 @@ internal sealed partial class CharacterXiangChongOlRuntime
         {
             if (_coreMatchParticipantsPlayersAccess._players[r.TurnOwner].IsAlive && XiangOwned(r.TurnOwner).Count > 0)
                 Add("give", "随机交给向宠一张牌");
-            if (XiangLostStillAvailable(f) && (!_coreEquipmentContentOperations.EquipmentRules.IsEquipment(r.Lost!.Kind) || CanIssueXiangChongGuyingEquipment(f, r.Lost.CardId, r.LossDestination!.Value)))
-                Add("return", _coreEquipmentContentOperations.EquipmentRules.IsEquipment(r.Lost!.Kind) ? "令向宠使用原装备牌" : "令向宠获得原失去的牌");
+            if (r.Lost is { } lost && r.LossDestination is { } destination)
+            {
+                var isEquipment = _coreEquipmentContentOperations.EquipmentRules.IsEquipment(lost.Kind);
+                var canReturn = isEquipment ? CanIssueXiangChongGuyingEquipment(f, lost.CardId, destination) : XiangLostStillAvailable(f);
+                if (canReturn)
+                    Add("return", isEquipment ? "令向宠使用原装备牌" : "令向宠获得原失去的牌");
+            }
         }
         else if (r.Stage == XiangChongStage.Targets)
         {
@@ -290,13 +298,15 @@ internal sealed partial class CharacterXiangChongOlRuntime
 
         if (r.Stage == XiangChongStage.EquipmentReady)
         {
-            if (!XiangLostStillAvailable(f) || !CanIssueXiangChongGuyingEquipment(f, r.Lost!.CardId, r.LossDestination!.Value))
+            if (r.Lost is not { } lost || r.LossDestination is not { } destination ||
+                !CanIssueXiangChongGuyingEquipment(f, lost.CardId, destination))
             {
                 FinishXiang(f, "original-equipment-no-longer-executable");
                 return;
             }
 
-            var origin = new XiangChongEquipmentOrigin(f.Id, _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1, r.Lost!.CardId, r.Lost.Kind, f.OwnerSeat, r.LossDestination!.Value);
+            var origin = new XiangChongEquipmentOrigin(f.Id, _coreResolutionIdentityBoundaryOperations._resolutionSequence + 1,
+                lost.CardId, lost.Kind, f.OwnerSeat, destination);
             var slot = _coreEquipmentContentOperations.EquipmentRules.Get(origin.CardKind).Slot;
             var eq = _corePhysicalOwnedCardQueriesOperations.GetEquipment2(f.OwnerSeat).Where(c => _coreEquipmentContentOperations.EquipmentRules.Get(c.Kind).Slot == slot).ToArray();
             var old = eq.Length >= _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].EquipmentSlotCapacity(slot) ? eq[0] : null;

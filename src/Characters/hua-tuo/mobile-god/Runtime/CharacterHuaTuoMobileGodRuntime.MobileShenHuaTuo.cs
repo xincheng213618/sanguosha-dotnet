@@ -14,10 +14,19 @@ internal sealed partial class CharacterHuaTuoMobileGodRuntime
     internal int[] MobileHtTeachingTargets() => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && MobileHtCourse(p.Seat)is null && p.Markers.GetValueOrDefault(PlayerMarkerKind.MobileWuling) == 0).OrderBy(p => _coreTableOrderOperations.RelativeTableOrder(_coreActualTurnProgressCurrentSeatAccess._currentSeat, p.Seat)).Select(p => p.Seat).ToArray();
     internal DiscardRecoveryEntity[] MobileHtDiscarded(int owner)
     {
-        if (_coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase || phase.ActorSeat != owner)
-            return[];
-        var invocations = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>().Where(e => e.Phase == phase).Select(e => e.InvocationId).ToHashSet();
-        return _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>().Where(e => invocations.Contains(e.InvocationId)).OrderBy(e => e.CompletionSequence).Select(e => new DiscardRecoveryEntity(e.CardId, e.CompletionSequence, e.From)).Where(_coreActualDiscardRecoveryPhasesOperations.ActualDiscardEntityStillAvailable).DistinctBy(e => e.CardId).ToArray();
+        if (_actualDiscardPhases.Current() is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase || phase.ActorSeat != owner)
+            return [];
+
+        var history = _coreProgramEventHistoryOperations.Value;
+        var invocations = history.ProgramEventHistory<NativeLogicalDiscardInvocationRecordedEvent>()
+            .Where(e => e.Phase == phase).Select(e => e.InvocationId).ToHashSet();
+        // Some native discard producers have an explicit payment receipt that the physical movement classifier does not recognize.
+        var logical = history.ProgramEventHistory<NativeLogicalDiscardMaterialCompletedEvent>()
+            .Where(e => e.To == CardLocation.DiscardPile && invocations.Contains(e.InvocationId))
+            .Select(e => new DiscardRecoveryEntity(e.CardId, e.CompletionSequence, e.From));
+        return _actualDiscardPhases.CurrentPhaseDiscards(phase).Concat(logical)
+            .Where(_actualDiscardPhases.StillAvailable).DistinctBy(e => e.CardId)
+            .OrderBy(e => e.MovementSequence).ToArray();
     }
 
     [ProgramActivationLegality(ProgramActivationLegalityPhase.BeforeOwnerFacts, 39100)]

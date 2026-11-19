@@ -765,6 +765,7 @@ var tests = new (string Name, Action Body)[]
     ("Classic Luoying: genuine foreign club discard and judgment, no recast", ClassicLuoyingChecks.OnlyOtherPlayersGenuineClubDiscardAndJudgmentCanBeClaimed),
     ("Luoying (Classic, OL, Mobile): old discard window cannot claim a newer pile entry", ClassicLuoyingChecks.OldDiscardWindowCannotClaimNewPileEntry),
     ("OL Boundary Jiang: first genuine discard batch, shared kinds and exact batch claim", OlBoundaryJiangChecks.FirstGenuineBatchOffersOnceAndClaimsItsQualifyingEntries),
+    ("Mobile Youyi: collects genuine foreign discard in the actual phase", MobileYouyiChecks.CollectsActualPhaseDiscardWithoutInvocationPhase),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

@@ -13,7 +13,11 @@ internal sealed partial class CharacterXiangChongOlRuntime
 
     internal bool CanIssueXiangChongGuyingEquipment(ProgramSkillFrame frame, int cardId, CardLocation from)
     {
-        if (frame.XiangChong is not { Lost: { } lost, LossDestination: { } destination } || lost.CardId != cardId || destination != from || !ValidXiang(frame) || !XiangLostStillAvailable(frame) || !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || from == CardLocation.OutsideGame || _cardZonesOperations._cardZones.GetLocation(cardId) != from || !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(lost.Kind))
+        if (frame.XiangChong is not { Lost: { } lost, LossDestination: { } destination } ||
+            lost.CardId != cardId || destination != from || !ValidXiang(frame) || !XiangLostStillAvailable(frame) ||
+            !_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive ||
+            _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None ||
+            !_coreEquipmentContentOperations.EquipmentRules.IsEquipment(lost.Kind))
             return false;
         var owner = _coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat];
         return owner.EquipmentSlotCapacity(_coreEquipmentContentOperations.EquipmentRules.Get(lost.Kind).Slot) > 0 && !_coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, lost.Kind, CardActionType.Use) && !_coreProgramParticipantPhaseOperationsOperations.IsTurnPhysicalUseForbidden(owner.Seat, [cardId]);
