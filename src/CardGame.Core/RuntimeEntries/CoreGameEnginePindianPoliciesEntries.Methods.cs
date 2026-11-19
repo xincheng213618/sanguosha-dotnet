@@ -7,4 +7,5 @@ internal sealed partial class CoreGameEnginePindianPoliciesEntries
     internal int EffectivePindianRank(CharacterState owner, Card card) => _resolve().EffectivePindianRank(owner, card);
     internal bool HasCurrentPindianSourceCard(PindianFrame frame) => _resolve().HasCurrentPindianSourceCard(frame);
     internal (int CardId, int? ReservationSequence) ReserveOrReadPindianTop(CharacterState owner, bool reserve) => _resolve().ReserveOrReadPindianTop(owner, reserve);
+    internal PindianProcessingEntry RevealPindianMaterial(Card card, CardLocation from, long? reservationSequence) => _resolve().RevealPindianMaterial(card, from, reservationSequence);
 }

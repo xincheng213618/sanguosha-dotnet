@@ -14,6 +14,21 @@ public sealed record PindianResult(
 
 public sealed record PindianDiscardEntry(int CardId, int EntrySequence);
 
+public sealed record PindianProcessingEntry(int CardId, long EntrySequence)
+{
+    internal static bool IsCurrent(ResolutionFrame parent, ICardZoneEntryQueries zoneEntries, int cardId)
+    {
+        var entries = parent switch
+        {
+            PindianFrame pair => pair.ProcessingEntries,
+            ProgramSkillFrame { SimultaneousPindian: { } group } => group.ProcessingEntries,
+            _ => null
+        };
+        var entry = entries?.SingleOrDefault(item => item.CardId == cardId);
+        return entry is not null && zoneEntries.CurrentEntry(CardLocation.Processing, cardId) == entry.EntrySequence;
+    }
+}
+
 public enum PindianStep { ChooseParticipants, ChooseSourceCard, ChooseOpponentCard, ClaimResult = 780 }
 
 /// <summary>Trusted-host data only. It is not included in player snapshots.</summary>
@@ -34,6 +49,8 @@ public sealed partial record PindianFrame(
     public bool SourceUsesDrawPileTop { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public int? SourceTopReservationSequence { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<PindianProcessingEntry>? ProcessingEntries { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public PindianRandomSelection? RandomSelection { get; init; }
     [System.Text.Json.Serialization.JsonIgnore(Condition=System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

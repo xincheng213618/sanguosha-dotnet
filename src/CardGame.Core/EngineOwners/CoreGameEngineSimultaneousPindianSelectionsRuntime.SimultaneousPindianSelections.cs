@@ -170,8 +170,19 @@ internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
         if (inputs.Any(c => c.CardId <= 0 || _cardZonesOperations._cardZones.GetLocation(c.CardId) != c.From))
             throw new InvalidOperationException("A simultaneous private commitment lost its original or exactly paid replacement entity.");
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
-        foreach (var c in inputs.Where(c => c.From != CardLocation.Processing))
-            _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId), c.From, CardLocation.Processing, CardMoveReasons.PindianReveal);
+        var processingEntries = new List<PindianProcessingEntry>(inputs.Length);
+        foreach (var input in inputs)
+        {
+            var reservation = input.ReservationSequence ??
+                r.TopReceipts.SingleOrDefault(top => top.CardId == input.CardId)?.ReservationMovementSequence;
+            processingEntries.Add(_corePindianPoliciesOperations.RevealPindianMaterial(
+                _coreAdvancedLifecycleOperations.GetAdvancedCard(input.CardId), input.From, reservation));
+        }
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+        {
+            SimultaneousPindian = f.SimultaneousPindian! with { ProcessingEntries = processingEntries.AsReadOnly() }
+        });
         _characterLuKangWumiaoOperations.RevealWuLuKangInputs(f);
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
         var mappedCards = _characterPangJiOlOperations.ApplyDouyuSimultaneousCards(f, inputs.Select(c => new PindianRevealedCard(c.Seat, c.CardId, c.Rank, c.Rank)).ToArray());

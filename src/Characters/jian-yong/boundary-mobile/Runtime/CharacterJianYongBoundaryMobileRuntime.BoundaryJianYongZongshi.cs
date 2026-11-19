@@ -105,18 +105,13 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
         return SkillProgramStepOutcome.AwaitChoice;
     }
 
-    internal int[] BoundaryZongshiLower(ResolutionFrame p) => p.BoundaryJianYongZongshiContest is { Result: { } r } ? (r.SourceRank == r.OpponentRank ? new[]
-    {
-        r.SourceCardId,
-        r.OpponentCardId
-    }
+    private static int[] BoundaryZongshiLowerIds(PindianResult result) => result.SourceRank == result.OpponentRank
+        ? [result.SourceCardId, result.OpponentCardId]
+        : [result.SourceRank < result.OpponentRank ? result.SourceCardId : result.OpponentCardId];
 
-    : new[]
-    {
-        r.SourceRank < r.OpponentRank ? r.SourceCardId : r.OpponentCardId
-    }
-
-    ).Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToArray() : [];
+    internal int[] BoundaryZongshiLower(ResolutionFrame parent) => parent.BoundaryJianYongZongshiContest is { Result: { } result }
+        ? BoundaryZongshiLowerIds(result).Where(id => PindianProcessingEntry.IsCurrent(parent, _zoneEntries, id)).ToArray()
+        : [];
     internal IReadOnlyList<PromptChoice> BoundaryZongshiChoices(ProgramSkillFrame f)
     {
         var r = f.BoundaryJianYongZongshi!;
@@ -223,20 +218,9 @@ internal sealed partial class CharacterJianYongBoundaryMobileRuntime
         if (r.Choice == 0 && r.TopCardId is { } viewed && (_cardZonesOperations._cardZones.GetLocation(viewed) != CardLocation.DrawPile || _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault()?.Id != viewed))
             throw new InvalidOperationException("Zongshi lost its original privately viewed deck top before choosing.");
         var parent = _resolutionStackOperations._resolutionStack[n - 1];
-        var pair = parent.BoundaryJianYongZongshiContest!.Result;
-        var comparisons = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().Where(e => e.FrameId == parent.Id).ToArray();
-        var comparison = r.ComparisonIndex < 0 ? 0 : r.ComparisonIndex;
-        var lower = pair.SourceRank == pair.OpponentRank ? new[]
-        {
-            pair.SourceCardId,
-            pair.OpponentCardId
-        }
-
-        : new[]
-        {
-            pair.SourceRank < pair.OpponentRank ? pair.SourceCardId : pair.OpponentCardId
-        };
-        if (r.Choice == 1 && (r.From == CardLocation.DrawPile ? r.PaidCardId != r.TopCardId : r.From != CardLocation.Processing || r.PaidCardId is not { } claimed || !lower.Contains(claimed)))
+        if (r.Choice == 1 && (r.From == CardLocation.DrawPile ? r.PaidCardId != r.TopCardId :
+                r.From != CardLocation.Processing || r.PaidCardId is not { } claimed ||
+                !BoundaryZongshiLowerIds(parent.BoundaryJianYongZongshiContest!.Result).Contains(claimed)))
             throw new InvalidOperationException("Zongshi payment must be its viewed top or exact lower/equal final-rank contest entity.");
         if (r.Choice == 1 && (r.PaidCardId is not { } id || r.From is not { } from || r.After <= r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Count(m => m.Sequence > r.Before && m.Sequence <= r.After && m.CardId == id && m.From == from && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason.Value == BoundaryZongshiReason) != 1 || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryJianYongZongshiPaidEvent>().Count(e => e == new BoundaryJianYongZongshiPaidEvent(f.Id, r.PindianId, f.OwnerSeat, from.Zone, r.Before, r.After, r.ComparisonIndex)) != 1))
             throw new InvalidOperationException("Zongshi lost its exact once-paid native Obtain.");

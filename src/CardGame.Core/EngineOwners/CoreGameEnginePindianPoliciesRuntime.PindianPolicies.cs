@@ -53,6 +53,24 @@ internal sealed partial class CoreGameEnginePindianPoliciesRuntime
         return (card.Id, reservation.Sequence);
     }
 
+    internal PindianProcessingEntry RevealPindianMaterial(Card card, CardLocation from, long? reservationSequence)
+    {
+        if (from == CardLocation.Processing)
+        {
+            if (reservationSequence is not { } reserved || _zoneEntries.CurrentEntry(from, card.Id) != reserved)
+                throw new InvalidOperationException("Pindian lost the original Processing reservation of its reveal material.");
+            return new(card.Id, reserved);
+        }
+
+        int? entrySequence = null;
+        _corePhysicalMovementFacadesOperations.MoveCard(card, from, CardLocation.Processing, CardMoveReasons.PindianReveal,
+            movement =>
+            {
+                if (movement.To == CardLocation.Processing) entrySequence = movement.Sequence;
+            });
+        return new(card.Id, entrySequence ?? throw new InvalidOperationException("Pindian reveal did not deliver its original material."));
+    }
+
     internal int[] CurrentPindianProcessingIds(PindianFrame frame)
     {
         if (frame.WuLuKangContest is not null)

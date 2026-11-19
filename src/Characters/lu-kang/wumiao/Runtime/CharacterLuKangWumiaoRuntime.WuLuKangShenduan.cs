@@ -58,7 +58,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         {
             var winner = result.SourceWon ? result.SourceSeat : result.OpponentSeat;
             var id = result.CardOf(winner);
-            if (_cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing)
+            if (PindianProcessingEntry.IsCurrent(parent, _zoneEntries, id))
             {
                 var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
                 _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), CardLocation.Processing, CardLocation.DrawPile, new(WuLuKangBottomReason), m =>

@@ -28,6 +28,8 @@ public sealed record SimultaneousPindianReceipt
     public PindianPolicyClaims? Claims { get; init; }
     public bool SelfMarkerIssued { get; init; }
     public bool Revealed { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<PindianProcessingEntry>? ProcessingEntries { get; init; }
     public long RevealBefore { get; init; }
     public long RevealAfter { get; init; }
     public long MovementBefore { get; init; }

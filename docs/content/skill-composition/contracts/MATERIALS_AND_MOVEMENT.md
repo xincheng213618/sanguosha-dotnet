@@ -21,6 +21,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - A pair Pindian returns the discard-pile entries actually delivered by its own cleanup with the native result binding. Each side has a separate receipt. A card obtained during an earlier window has no cleanup receipt even if a later discard moves the same physical card into the pile. A consumer rechecks the exact entry before acquiring it.
 
+- Before publishing revealed Pindian materials, the pair or simultaneous contest records each physical Processing entry on its original frame. An already reserved card keeps the original reservation sequence. A reveal swap changes seat assignments and leaves the entry attached to the physical card. Zongshi and Shenduan compare their current eligible card with this entry before moving it. Their paid child continuations use their own settlement facts.
+
 ## Native-use material retirement
 
 - Record actual non-Processing payment or destruction through `INativeMaterialClaims.CaptureRetirement` on the original `CardUseFrame.MaterialClaims`. A `Retirement` has no acquisition recipient and does not contribute to `WasClaimed` or claimed entities. A `Delivery` retains its acquisition and residency semantics. Ordinary payment into Processing issues no retirement receipt.

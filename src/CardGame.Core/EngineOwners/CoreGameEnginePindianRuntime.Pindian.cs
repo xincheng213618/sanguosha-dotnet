@@ -152,10 +152,15 @@ internal sealed partial class CoreGameEnginePindianRuntime
         var opponentCard = _cardZonesOperations._cardZones.CardsAt(opponentInput.From).Single(card => card.Id == opponentInput.CardId);
         var sourceIdentityRank = frame.WuLuKangContest is not null ? sourceInput.Rank : _characterGuanYuWumiaoOperations.JuewuForeignHandRank(source, sourceCard)is not null ? _corePindianPoliciesOperations.EffectivePindianRank(source, sourceCard) : _coreAlcoholIdentityPoliciesOperations.CaptureAlcoholPindianRank(frame, source, sourceCard, true, frame.SourceUsesDrawPileTop);
         var opponentIdentityRank = frame.WuLuKangContest is not null ? opponentInput.Rank : _characterGuanYuWumiaoOperations.JuewuForeignHandRank(opponent, opponentCard)is not null ? _corePindianPoliciesOperations.EffectivePindianRank(opponent, opponentCard) : _coreAlcoholIdentityPoliciesOperations.CaptureAlcoholPindianRank(frame, opponent, opponentCard, false, opponentTop);
-        if (sourceLocation != CardLocation.Processing)
-            _corePhysicalMovementFacadesOperations.MoveCard(sourceCard, sourceLocation, CardLocation.Processing, CardMoveReasons.PindianReveal);
-        if (opponentInput.From != CardLocation.Processing)
-            _corePhysicalMovementFacadesOperations.MoveCard(opponentCard, opponentInput.From, CardLocation.Processing, CardMoveReasons.PindianReveal);
+        var sourceEntry = _corePindianPoliciesOperations.RevealPindianMaterial(sourceCard, sourceLocation,
+            sourceInput.ReservationSequence ?? frame.SourceTopReservationSequence);
+        var opponentEntry = _corePindianPoliciesOperations.RevealPindianMaterial(opponentCard, opponentInput.From,
+            opponentInput.ReservationSequence);
+        frame = (PindianFrame)_resolutionStackOperations._resolutionStack[^1];
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with
+        {
+            ProcessingEntries = Array.AsReadOnly(new[] { sourceEntry, opponentEntry })
+        });
         _characterLuKangWumiaoOperations.RevealWuLuKangInputs(frame);
         var result = new PindianResult(source.Seat, opponent.Seat, sourceCard.Id, opponentCard.Id, sourceIdentityRank ?? _corePindianPoliciesOperations.EffectivePindianRank(source, sourceCard), opponentIdentityRank ?? _corePindianPoliciesOperations.EffectivePindianRank(opponent, opponentCard));
         frame = (PindianFrame)_resolutionStackOperations._resolutionStack[^1];
