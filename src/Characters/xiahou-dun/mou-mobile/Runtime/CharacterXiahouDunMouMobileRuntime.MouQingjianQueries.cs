@@ -16,13 +16,23 @@ internal sealed partial class CharacterXiahouDunMouMobileRuntime
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MouXiahouDunMobileDiscardOriginEvent(batch.Id, move.Sequence, move.CardId, _coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, move)));
     }
 
-    internal int[] MatchingMouXiahouDunDiscardIndexes(CardMovementBatchContext batch) => batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From != x.m.To && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouDunMobileDiscardOriginEvent>().Count(e => e == new MouXiahouDunMobileDiscardOriginEvent(batch.Id, x.m.Sequence, x.m.CardId, false)) == 1).Select(x => x.i).ToArray();
+    private bool IsMouQingjianDiscardCurrent(CardMovementBatchContext batch, CardMovementRecord move) =>
+        move.To == CardLocation.DiscardPile && move.From != move.To &&
+        _zoneEntries.CurrentEntry(CardLocation.DiscardPile, move.CardId) == move.Sequence &&
+        _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouXiahouDunMobileDiscardOriginEvent>()
+            .Count(e => e == new MouXiahouDunMobileDiscardOriginEvent(batch.Id, move.Sequence, move.CardId, false)) == 1;
+
+    internal int[] MatchingMouXiahouDunDiscardIndexes(CardMovementBatchContext batch) => batch.Movements
+        .Select((move, index) => (move, index))
+        .Where(item => IsMouQingjianDiscardCurrent(batch, item.move)).Select(item => item.index).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 31200, SkillProgramEffectOp.CollectMouXiahouDunQingjian, SkillProgramEffectOp.DistributeMouXiahouDunQingjian)]
     internal bool CanOfferMouXiahouDunQingjian(ProgramTriggerLegalityContext gate)
     {
         if (gate.Context.Window == SkillProgramTriggerWindow.PlayEnding)
             return MouXiahouDunPile(gate.Owner.Seat, gate.Candidate.SkillInstanceId)is { } pile && _corePublicPileSourcesOperations.PublicPileCards(pile).Count > 0;
-        return gate.Context is { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } && index >= 0 && index < batch.Movements.Count && MatchingMouXiahouDunDiscardIndexes(batch).Contains(index) && _cardZonesOperations._cardZones.GetLocation(batch.Movements[index].CardId) == CardLocation.DiscardPile && MouXiahouDunQingjianCount(gate.Owner.Seat) < MouXiahouDunQingjianCapacity(gate.Owner.Seat);
+        return gate.Context is { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } &&
+            (uint)index < (uint)batch.Movements.Count && IsMouQingjianDiscardCurrent(batch, batch.Movements[index]) &&
+            MouXiahouDunQingjianCount(gate.Owner.Seat) < MouXiahouDunQingjianCapacity(gate.Owner.Seat);
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CompleteMovementBatch, 4700)]

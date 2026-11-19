@@ -29,7 +29,13 @@ internal sealed partial class CharacterXunXuAnniversaryRuntime
     internal int[] XunXuDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate)
     {
         var source = new CardConversionSource(candidate.SkillId, candidate.BindingId, candidate.OwnerSeat, candidate.SkillInstanceId);
-        return !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuClaimEvent>().Any(e => e.Source == source && e.BatchId == batch.Id) ? [] : batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From != x.m.To && _cardZonesOperations._cardZones.GetLocation(x.m.CardId) == CardLocation.DiscardPile).Select(x => x.i).ToArray();
+        if (!_coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryXunXuClaimEvent>().Any(e => e.Source == source && e.BatchId == batch.Id))
+            return [];
+
+        return batch.Movements.Select((move, index) => (move, index))
+            .Where(item => item.move.To == CardLocation.DiscardPile && item.move.From != item.move.To &&
+                _zoneEntries.CurrentEntry(CardLocation.DiscardPile, item.move.CardId) == item.move.Sequence)
+            .Select(item => item.index).ToArray();
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 46100)]

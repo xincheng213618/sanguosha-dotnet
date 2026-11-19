@@ -38,7 +38,7 @@ internal sealed partial class CharacterXiahouDunMouMobileRuntime
             var context = f.WindowContext!;
             var batch = context.MovementBatch!;
             var move = batch.Movements[context.MovementIndex!.Value];
-            if (!MatchingMouXiahouDunDiscardIndexes(batch).Contains(context.MovementIndex.Value) || _cardZonesOperations._cardZones.GetLocation(move.CardId) != CardLocation.DiscardPile || MouXiahouDunQingjianCount(f.OwnerSeat) >= MouXiahouDunQingjianCapacity(f.OwnerSeat))
+            if (!IsMouQingjianDiscardCurrent(batch, move) || MouXiahouDunQingjianCount(f.OwnerSeat) >= MouXiahouDunQingjianCapacity(f.OwnerSeat))
             {
                 FinishMouXiahouDun(f);
                 return SkillProgramStepOutcome.AwaitChild;

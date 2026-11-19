@@ -787,6 +787,8 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Sun Ce: Zhiba first claim before challenger's Hanzhan cold", BoundarySunCeMobileChecks.ZhibaHasFirstClaimBeforeChallengersHanzhan),
     ("OL Boundary Zongxuan: first actual Zhifou discard freezes the upper-seat batch", OlBoundaryZongxuanChecks.ZhifouFirstPreviousDiscardOffersOriginalBatchOnce),
     ("classic Luoying claims only the effective Club from native Zhifou", LuoyingNativeDiscardChecks.ZhifouOffersOnlyTheActualClubDiscard),
+    ("Anniversary Diyin: seventh loss claims only the next original discard entry", AnniversaryDiyinChecks.SeventhLossClaimsOnlyTheNextOriginalDiscardEntry),
+    ("Mou Xiahou Dun Qingjian cannot collect an old discard entry after rediscard", MouQingjianDiscardEntryChecks.QingjianCannotCollectTheNewEntryThroughAnOldDiscardWindow),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
