@@ -14,12 +14,14 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
     private readonly ICardMovementBatchQueue _batches;
     private readonly IProgramEventHistoryQueries _history;
     private readonly ICardZoneQueries _zones;
+    private readonly ICardZoneEntryQueries _zoneEntries;
+    private readonly INativeLogicalDiscardMovement _discardMovement;
     private readonly IProgramRuntimeFrames _frames;
     private readonly IProgramRuntimeEvents _events;
     private readonly IProgramRuntimePrompts _prompts;
     private readonly IProgramWindowCursors _cursors;
     private readonly INativeGivenCardQueries _givenCards;
-    internal CardsMovedWindowRuntime(ICardsMovedWindowNativeProofs native,ICardsMovedWindowCardUseProofs cardUse,ICardsMovedWindowNativeReturns returns,ICardsMovedWindowCardUseContinuations cardUseContinuations,ICardsMovedWindowSelections selection,ICardsMovedWindowOperations operations,ICardsMovedWindowFacts facts,ICardsMovedWindowPipeline pipeline,ICardMovementBatchQueue batches,IProgramEventHistoryQueries history,ICardZoneQueries zones,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramWindowCursors cursors, RuntimeEntries.DeferredRuntime<EquipmentMovementRuntime> equipment, INativeGivenCardQueries givenCards)
+    internal CardsMovedWindowRuntime(ICardsMovedWindowNativeProofs native,ICardsMovedWindowCardUseProofs cardUse,ICardsMovedWindowNativeReturns returns,ICardsMovedWindowCardUseContinuations cardUseContinuations,ICardsMovedWindowSelections selection,ICardsMovedWindowOperations operations,ICardsMovedWindowFacts facts,ICardsMovedWindowPipeline pipeline,ICardMovementBatchQueue batches,IProgramEventHistoryQueries history,ICardZoneQueries zones,IProgramRuntimeFrames frames,IProgramRuntimeEvents events,IProgramRuntimePrompts prompts,IProgramWindowCursors cursors, RuntimeEntries.DeferredRuntime<EquipmentMovementRuntime> equipment, INativeGivenCardQueries givenCards, ICardZoneEntryQueries zoneEntries, INativeLogicalDiscardMovement discardMovement)
     {
         _equipment = equipment;
         _native = native;
@@ -33,6 +35,8 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
         _batches = batches;
         _history = history;
         _zones = zones;
+        _zoneEntries = zoneEntries;
+        _discardMovement = discardMovement;
         _frames = frames;
         _events = events;
         _prompts = prompts;
@@ -435,7 +439,8 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
                     continue;
                 var occurrences = trigger.MovementOccurrence == SkillProgramMovementOccurrence.PerBatch ? new[]
                 {
-                    RuntimeSkills.RuntimeRules_Core_JudgedRankSlashPolicies.IsOtherActualBasicDiscardTrigger(trigger) || (trigger.Effects is [{ Op: SkillProgramEffectOp.ResolveOrdinaryGuYongBingyi }]) ? indexes[0] : 0
+                    RuntimeSkills.RuntimeRules_Core_JudgedRankSlashPolicies.IsOtherActualBasicDiscardTrigger(trigger) ||
+                    trigger.Effects is [{ Op: SkillProgramEffectOp.ResolveOrdinaryGuYongBingyi }] || ClaimsDiscardBatch(trigger) ? indexes[0] : 0
                 }
 
                 : indexes;
@@ -447,6 +452,15 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
     }
 
     internal int[] MatchingDiscardPileIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger)
+    {
+        var indexes = FindMatchingDiscardPileIndexes(batch, candidate, trigger);
+        if (!ClaimsDiscardBatch(trigger)) return indexes;
+
+        return indexes.Where(index => batch.Movements[index] is { } move && move.To == CardLocation.DiscardPile &&
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, move.CardId) == move.Sequence).ToArray();
+    }
+
+    private int[] FindMatchingDiscardPileIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger)
     {
         if (trigger.Effects.Any(e => e.Op == SkillProgramEffectOp.CollectMouXiahouDunQingjian))
             return _selection.MatchingMouXiahouDunDiscardIndexes(batch);
@@ -476,15 +490,61 @@ internal sealed class CardsMovedWindowRuntime : IProgramMovementWindows
         var active = _frames.ActiveProgram(frame.Id);
         if (active.WindowContext is not { Window: SkillProgramTriggerWindow.DiscardPileReceived, MovementBatch: { } batch, MovementIndex: { } index } || index < 0 || index >= batch.Movements.Count)
             throw new InvalidOperationException("The moved-card claim lost its discard window.");
+        if (_frames.Find(batch.Id) is CardsMovedTriggerWindowFrame window &&
+            (uint)window.CandidateIndex < (uint)window.Candidates.Count)
+        {
+            var candidate = window.Candidates[window.CandidateIndex];
+            var trigger = _facts.GetProgramTrigger(candidate);
+            if (ClaimsDiscardBatch(trigger))
+            {
+                ClaimDiscardBatch(active, batch, candidate, trigger);
+                return;
+            }
+        }
+
         var movement = batch.Movements[index];
         if (movement.To != CardLocation.DiscardPile || movement.From.OwnerSeat is not { } source || source == active.OwnerSeat)
             throw new InvalidOperationException("A moved-card claim must answer another player's discard into the discard pile.");
         if (!_facts.IsAlive(active.OwnerSeat) || _zones.GetLocation(movement.CardId) != CardLocation.DiscardPile)
             return;
         var card = _zones.CardsAt(CardLocation.DiscardPile).Single(item => item.Id == movement.CardId);
-        _operations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(active.OwnerSeat), new CardMoveReason($"skill-program.{active.SkillId}.{SkillProgramEffectOp.ClaimMovedCards}"));
-        _events.AdvanceFact(new ProgramMovedCardsClaimedEvent(active.Id, active.SkillId, active.TriggerId!, active.OwnerSeat, source, card.Id));
-        _operations.AddLog("SkillTriggered", $"{_facts.PlayerName(active.OwnerSeat)} 发动【{_facts.SkillName(active.SkillId)}】，获得 {card.DisplayName}。", active.OwnerSeat, source);
+        _operations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(active.OwnerSeat), DiscardClaimReason(active));
+        RecordDiscardClaim(active, card, source);
+    }
+
+    private static bool ClaimsDiscardBatch(SkillProgramTrigger trigger) =>
+        trigger is { MovementOccurrence: SkillProgramMovementOccurrence.PerBatch, MovementDiscardOnly: true } &&
+        trigger.Effects.Any(effect => effect.Op == SkillProgramEffectOp.ClaimMovedCards);
+
+    private void ClaimDiscardBatch(ProgramSkillFrame frame, CardMovementBatchContext batch, ProgramTriggerCandidate candidate,
+        SkillProgramTrigger trigger)
+    {
+        if (!_facts.IsAlive(frame.OwnerSeat)) return;
+
+        var cardsInDiscard = _zones.CardsAt(CardLocation.DiscardPile).ToDictionary(card => card.Id);
+        var claims = MatchingDiscardPileIndexes(batch, candidate, trigger).Select(index => batch.Movements[index])
+            .Select(move => (Card: cardsInDiscard[move.CardId], SourceSeat: _facts.GetProgramDiscardSource(move)?.OwnerSeat))
+            .Where(claim => claim.SourceSeat is not null).ToArray();
+        if (claims.Length == 0) return;
+
+        var destination = CardLocation.Hand(frame.OwnerSeat);
+        var delivered = new HashSet<int>();
+        _discardMovement.MoveCards(claims.Select(claim => claim.Card).ToArray(), CardLocation.DiscardPile, destination,
+            DiscardClaimReason(frame), movement =>
+            {
+                if (movement.To == destination) delivered.Add(movement.CardId);
+            });
+        foreach (var claim in claims.Where(claim => delivered.Contains(claim.Card.Id)))
+            RecordDiscardClaim(frame, claim.Card, claim.SourceSeat!.Value);
+    }
+
+    private static CardMoveReason DiscardClaimReason(ProgramSkillFrame frame) =>
+        new($"skill-program.{frame.SkillId}.{SkillProgramEffectOp.ClaimMovedCards}");
+
+    private void RecordDiscardClaim(ProgramSkillFrame frame, Card card, int source)
+    {
+        _events.AdvanceFact(new ProgramMovedCardsClaimedEvent(frame.Id, frame.SkillId, frame.TriggerId!, frame.OwnerSeat, source, card.Id));
+        _operations.AddLog("SkillTriggered", $"{_facts.PlayerName(frame.OwnerSeat)} 发动【{_facts.SkillName(frame.SkillId)}】，获得 {card.DisplayName}。", frame.OwnerSeat, source);
     }
 
     internal int[] MatchingMovementIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger, CardLocation location)

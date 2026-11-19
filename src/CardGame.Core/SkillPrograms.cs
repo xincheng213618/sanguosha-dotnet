@@ -6372,6 +6372,14 @@ EngineOwners.CoreGameEngineComparedBlackSlashPoliciesRuntime.ValidateComparedBla
                 ? EnumValue<SkillProgramMovementOccurrence>(node, "movementOccurrence", path)
                 : effects.Any(e => e.Op is SkillProgramEffectOp.DrawFromOtherActualBasicDiscard or SkillProgramEffectOp.DiscardAfterActualOutsideDiscard or SkillProgramEffectOp.GiveOffTurnUsedCards)
                     ? SkillProgramMovementOccurrence.PerBatch : SkillProgramMovementOccurrence.PerCard;
+        if (window == SkillProgramTriggerWindow.DiscardPileReceived && node.TryGetProperty("movementOccurrence", out _) &&
+            effects.Any(e => e.Op == SkillProgramEffectOp.ClaimMovedCards))
+        {
+            movementOccurrence = EnumValue<SkillProgramMovementOccurrence>(node, "movementOccurrence", path);
+            if (movementOccurrence is not (SkillProgramMovementOccurrence.PerCard or SkillProgramMovementOccurrence.PerBatch) ||
+                movementOccurrence == SkillProgramMovementOccurrence.PerBatch && (!movementDiscardOnly || subject != SkillProgramTriggerSubject.Owner))
+                Fail(path + ".movementOccurrence", "a perBatch moved-card claim requires an owner trigger for true discards");
+        }
         if (movementOccurrence == SkillProgramMovementOccurrence.PerSourceOwner && window != SkillProgramTriggerWindow.CardsGained)
             Fail(path + ".movementOccurrence", "perSourceOwner requires a cardsGained boundary");
         if (movementOccurrence == SkillProgramMovementOccurrence.PerOwnerBatch && window != SkillProgramTriggerWindow.CardsMoved)

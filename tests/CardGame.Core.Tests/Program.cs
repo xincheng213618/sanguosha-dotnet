@@ -764,6 +764,7 @@ var tests = new (string Name, Action Body)[]
     ("Wushuang Guzheng: equipment return, original discard entry and command replay", WushuangGuzhengChecks.EquipmentReturnAndOriginalEntryClaimReplay),
     ("Classic Luoying: genuine foreign club discard and judgment, no recast", ClassicLuoyingChecks.OnlyOtherPlayersGenuineClubDiscardAndJudgmentCanBeClaimed),
     ("Luoying (Classic, OL, Mobile): old discard window cannot claim a newer pile entry", ClassicLuoyingChecks.OldDiscardWindowCannotClaimNewPileEntry),
+    ("OL Boundary Jiang: first genuine discard batch, shared kinds and exact batch claim", OlBoundaryJiangChecks.FirstGenuineBatchOffersOnceAndClaimsItsQualifyingEntries),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

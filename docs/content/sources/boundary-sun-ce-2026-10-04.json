@@ -22,9 +22,9 @@
       "programId": "boundary:jiang-current",
       "notes": [
         "前半句与 classic:jiang 逐字同文，四个触发体（cardUseBeforeTargetEffects × ownerRelation actor/target × 决斗 / 红杀 cardActionCardIsRed）逐字复用已验收形状，无次数限制。",
-        "界升级点为后半句新增的弃牌回收：两个 discardPileReceived 触发体，红杀用 cardKinds slash/fireSlash + suits heart/diamond 表达红色，排除清单复用 classic:luoying 的因使用/结算完毕清单，只保留因弃置入堆的移动。",
-        "效果链 loseHp 1 → claimMovedCards；每回合首次用 usageScope turn + usageLimit 1 的共享 namedUsageGroup \"jiang-reclaim\" 表达，两种牌型合计每回合一次。",
-        "已知口径：claimMovedCards 沿用仓库牌移动边界（只回收其他角色弃置入堆的牌，见 GameEngine.CardMovementPrograms 的来源校验），拥有者自己弃置的决斗/红杀不在回收范围内；可选触发在被拒绝时不计次，本回合后续符合条件的牌会再次询问（引擎契约：触发次数在接受时消耗）。"
+        "弃牌回收在 discardPileReceived 逐批触发。按官网未限定弃置角色的文案，任意角色实际弃置入堆的决斗与红色杀在同一回合共用首批资格。真实弃置复用引擎来源判断，使用结束、打出结束等正常退役进入弃牌堆不计入。",
+        "项目确认的同批结算口径：本回合首个含合格牌的真实弃置批只询问一次，放弃后同回合后续批次不再询问。发动只失去1点体力，然后一次获得该批全部仍处于原入堆记录的合格牌，其他牌留在弃牌堆。下个实际回合重新判断。",
+        "效果链复用 loseHp 1 → claimMovedCards 的逐批形态。首次资格从实际回合与引擎原始移动批次读取，接受发动仍沿用普通的接受计次。"
       ]
     },
     {
@@ -68,6 +68,6 @@
     "官方页 fetch 时间 2026-10-04，页面 https://www.sanguosha.com/hero/452 与 /api/v1/hero/info?gid=452 均 HTTP 200；技能文案取自官方页服务端渲染的 skill-text 区块（制霸/激昂/魂姿三个页签）。",
     "gid 定位：官方武将列表页数据中 \"gid\":452 与资源 45200.png 对应界孙策（界姜维=480、界邓艾=471 相邻段核对）。",
     "本批为单武将批次：仅接入界孙策，不涉及其它并行批次范围。",
-    "激昂每回合首次的次数语义按“两种牌型合计每回合一次”实现（namedUsageGroup 共享每回合计数）。"
+    "2023-01-04 三国杀OL 3.5.2 更新公告（https://www.sanguosha.com/news/20230103_4238_5213）与当前武将页的弃牌回收条款一致。官网条款未说明同一批包含数张合格牌时的处理，本仓库按项目确认的逐批口径实现。"
   ]
 }

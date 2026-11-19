@@ -1,6 +1,6 @@
 namespace CardGame.Core;
 
-/// <summary>Claims the frozen discarded card of a discardPileReceived occurrence into the owner's hand.</summary>
+/// <summary>Claims the discarded entity or matching true-discard batch from the original movement window.</summary>
 internal sealed class ClaimMovedCardsProgramOperationDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ClaimMovedCards;
