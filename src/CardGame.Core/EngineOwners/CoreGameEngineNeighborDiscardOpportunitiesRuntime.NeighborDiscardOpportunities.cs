@@ -78,19 +78,27 @@ internal sealed partial class CoreGameEngineNeighborDiscardOpportunitiesRuntime
         return new(SkillProgramTriggerWindow.CardsMoved, window.Id, candidate.OwnerSeat, SourceSeat: NeighborDiscardSourceSeat(window.Batch, candidate.OwnerSeat), TargetSeat: candidate.OwnerSeat, Facts: _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat])with { MovedCardCount = NeighborDiscardIndexes(window.Batch, candidate.OwnerSeat).Length, FrozenPreviousLivingSeat = fact.PreviousLivingSeat }, MovementBatch: window.Batch);
     }
 
-    internal bool IsProgramDiscardTopMovement(ProgramSkillFrame frame, CardMovementRecord move)
+    private IEnumerable<CardMovementRecord> CurrentNeighborDiscardMovements(CardMovementBatchContext batch, int owner) =>
+        NeighborDiscardIndexes(batch, owner).Select(index => batch.Movements[index]).Where(movement =>
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, movement.CardId) == movement.Sequence);
+
+    internal IEnumerable<CardMovementRecord> EligibleProgramDiscardTopMovements(ProgramSkillFrame frame)
     {
+        if (frame.WindowContext?.MovementBatch is not { } batch)
+            return [];
         var paused = ProgramInstructionResolver.Default.Resolve(frame, _contentRegistryOperations._contentRegistry.GetSkill(frame.SkillId).Program!).GetPausedInstruction(frame.InstructionIndex).Effect;
         if (paused.Op != SkillProgramEffectOp.PutOwnOrPreviousFirstDiscardOnTop)
         {
-            var source = _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move);
             var zones = _coreProgramLifecycleOperations.GetProgramTrigger(frame).SourceZones;
-            return source is { } discarded && discarded.OwnerSeat == frame.OwnerSeat && (zones.Count == 0 || zones.Contains(discarded.Zone));
+            return batch.Movements.Where(movement =>
+                _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement) is { } discarded &&
+                discarded.OwnerSeat == frame.OwnerSeat && (zones.Count == 0 || zones.Contains(discarded.Zone)));
         }
 
-        if (frame.WindowContext?.MovementBatch is not { } batch || NeighborDiscardFact(batch, frame.OwnerSeat)is not { } fact || frame.WindowContext.Facts?.FrozenPreviousLivingSeat != fact.PreviousLivingSeat)
-            return false;
-        return NeighborDiscardIndexes(batch, frame.OwnerSeat).Any(index => batch.Movements[index] == move);
+        if (NeighborDiscardFact(batch, frame.OwnerSeat) is not { } fact || frame.WindowContext.Facts?.FrozenPreviousLivingSeat != fact.PreviousLivingSeat)
+            return [];
+
+        return CurrentNeighborDiscardMovements(batch, frame.OwnerSeat);
     }
 
     internal bool MatchesFrozenOwnOrPreviousEnding(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => context.SourceSeat == candidate.OwnerSeat || context.Facts?.FrozenPreviousLivingSeat == context.SourceSeat;
@@ -110,5 +118,10 @@ internal sealed partial class CoreGameEngineNeighborDiscardOpportunitiesRuntime
     [ProgramPipelineHook(ProgramPipelinePhase.CaptureMovementBatchFacts, 200)]
     internal void CaptureMovementBatchFactsCaptureNeighborDiscardOpportunity(CardMovementBatchBuilder batch, IReadOnlyList<CardMovementRecord> movements) => CaptureNeighborDiscardOpportunity(batch.Id, batch.TurnNumber, movements);
     [ProgramTriggerProof(ProgramTriggerProofPhase.MovementOwner, 250, ProgramTriggerProofMatch.Decision)]
-    internal bool? ProveNeighborDiscardMovement(SkillProgramTrigger trigger, ProgramSkillWindowContext context, CardMovementBatchContext batch, CharacterState owner) => IsNeighborDiscardTopTrigger(trigger) ? NeighborDiscardIndexes(batch, owner.Seat).Length > 0 && context.TargetSeat == owner.Seat && context.SourceSeat == NeighborDiscardSourceSeat(batch, owner.Seat) && NeighborDiscardFact(batch, owner.Seat)?.PreviousLivingSeat == context.Facts?.FrozenPreviousLivingSeat : null;
+    internal bool? ProveNeighborDiscardMovement(SkillProgramTrigger trigger, ProgramSkillWindowContext context, CardMovementBatchContext batch, CharacterState owner) =>
+        IsNeighborDiscardTopTrigger(trigger)
+            ? context.TargetSeat == owner.Seat && context.SourceSeat == NeighborDiscardSourceSeat(batch, owner.Seat) &&
+                NeighborDiscardFact(batch, owner.Seat)?.PreviousLivingSeat == context.Facts?.FrozenPreviousLivingSeat &&
+                CurrentNeighborDiscardMovements(batch, owner.Seat).Any()
+            : null;
 }

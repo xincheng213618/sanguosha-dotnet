@@ -11,6 +11,90 @@ internal static class OlBoundaryZongxuanChecks
     private const string ZhifouDiscard = "skill-program.ol:lingxi-or-zhifou.discard";
     private const string PutOnTop = "skill-program.boundary:zongxuan-current.PutDiscardedCardsOnDrawPileTop";
     private const string LaterDiscard = "skill-program.fixture:ol-zongxuan-driver.SelectAndMoveOwnedCard";
+    private const string ReentryMode = "identity:ol-zongxuan-reentry", ReentryDeck = "fixture:ol-zongxuan-reentry-deck";
+    private const string FirstDiscardSkill = "fixture:ol-zongxuan-first-discard", ReentrySkill = "fixture:ol-zongxuan-reentry";
+    private const string FirstDiscardReason = "skill-program.fixture:ol-zongxuan-first-discard.SelectAndMoveOwnedCard";
+    private const string ReentryDiscardReason = "skill-program.fixture:ol-zongxuan-reentry.SelectAndMoveOwnedCard";
+    private static readonly string[] ReentryGenerals = ["fixture:ol-zongxuan-upper-seat", YuFan,
+        "fixture:ol-zongxuan-reentry-peer-2", "fixture:ol-zongxuan-reentry-peer-3"];
+
+    internal static void FirstPreviousDiscardCannotPlaceTheSameCardAtANewerEntryCold()
+    {
+        var content = ContentRegistry.Build(new StandardContentPackage(), new ReentryFixture());
+        var game = GameEngine.CreateStandard(new GameOptions { Seed = 47, PlayerCount = 4, ModeId = ReentryMode,
+            HumanSeat = 0, HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord, UseInteractiveSetup = true,
+            UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false }, content);
+        Accept(game, new StartGameCommand());
+        Reach(game, prompt => prompt.Kind is DecisionKind.SelectGeneral or DecisionKind.PlayCard);
+        while (P(game) is { Kind: DecisionKind.SelectGeneral } selection)
+        {
+            Accept(game, new SelectGeneralCommand(selection.PlayerSeat, ReentryGenerals[selection.PlayerSeat], game.Revision, selection.PromptId));
+            Reach(game, prompt => prompt.Kind is DecisionKind.SelectGeneral or DecisionKind.PlayCard);
+        }
+
+        Require(P(game) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard }, "The upper seat starts the actual Play phase.");
+        Accept(game, new UseProgramSkillCommand(0, FirstDiscardSkill, "discard", [], [], game.Revision, P(game)!.PromptId));
+        Reach(game, prompt => prompt is { PlayerSeat: 0, SkillPrompt.SkillId: FirstDiscardSkill });
+        var card = P(game)!.Choices.First(choice => choice.Cards.Count == 1).Cards.Single();
+        Answer(game, choice => choice.Cards.SequenceEqual([card]));
+        Reach(game, prompt => prompt is { PlayerSeat: 0, SkillPrompt.SkillId: ReentrySkill });
+
+        var original = game.CardMovements.Single(move => move.CardId == card && move.Reason.Value == FirstDiscardReason);
+        var originalWindow = game.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(window => window.Batch.Id == original.BatchId);
+        Require(original.From == CardLocation.Hand(0) && original.To == CardLocation.DiscardPile &&
+            originalWindow.Candidates.Any(candidate => candidate.OwnerSeat == 1 && candidate.SkillId == Zongxuan),
+            "The next seat's Zongxuan is queued on the upper seat's first discard batch.");
+
+        var control = ColdReentry(game, content);
+        Skip(control);
+        Reach(control, prompt => prompt is { PlayerSeat: 1, SkillPrompt.SkillId: Zongxuan });
+        Activate(control);
+        Reach(control, prompt => prompt is { PlayerSeat: 1, SkillPrompt.SkillId: Zongxuan } &&
+            prompt.Choices.Any(choice => choice.Cards.SequenceEqual([card])));
+        Answer(control, choice => choice.Cards.SequenceEqual([card]));
+        Answer(control, choice => choice.Parameters.GetValueOrDefault("program-action") == "discard-top-finish");
+        Settle(control);
+        var placed = control.CardMovements.Single(move => move.Reason.Value == PutOnTop);
+        Require(placed.CardId == card && placed.From == CardLocation.DiscardPile && placed.To == CardLocation.DrawPile &&
+            placed.Sequence > original.Sequence && control.CreateCardZoneDiagnostics().Where(item => item.Location == CardLocation.DrawPile)
+                .MaxBy(item => item.ZoneIndex)!.CardId == card,
+            "Zongxuan can choose and confirm the original discard while it is still in the pile, making it the next draw.");
+
+        Activate(game);
+        Reach(game, prompt => prompt is { PlayerSeat: 0, SkillPrompt.SkillId: ReentrySkill } &&
+            prompt.Choices.Any(choice => choice.Cards.SequenceEqual([card])));
+        var recovered = game.CardMovements.Last(move => move.CardId == card);
+        Require(recovered.From == CardLocation.DiscardPile && recovered.To == CardLocation.Hand(0) && recovered.Sequence > original.Sequence,
+            "The earlier movement trigger actually takes the original card back before the Zongxuan decision.");
+        game = ColdReentry(game, content);
+        Answer(game, choice => choice.Cards.SequenceEqual([card]));
+        Reach(game, prompt => prompt.SkillPrompt?.SkillId == Zongxuan || prompt is { PlayerSeat: 0, Kind: DecisionKind.PlayCard });
+
+        var newer = game.CardMovements.Single(move => move.CardId == card && move.Reason.Value == ReentryDiscardReason);
+        var relations = game.Events.Select(e => e.Payload).OfType<DiscardNeighborhoodFrozenEvent>().Where(fact => fact.OwnerSeat == 1).ToArray();
+        var firstFact = game.Events.Select(e => e.Payload).OfType<ActualTurnFirstOwnedDiscardBatchEvent>()
+            .Single(fact => fact.ActualTurnNumber == original.TurnNumber && fact.DiscardOwnerSeat == 0);
+        Require(newer.From == original.From && newer.To == original.To && newer.Sequence > original.Sequence &&
+            newer.BatchId != original.BatchId && newer.TurnNumber == original.TurnNumber && firstFact.BatchId == original.BatchId &&
+            relations.Single(fact => fact.BatchId == original.BatchId) is { PreviousLivingSeat: 0, IncludesFirstPreviousDiscard: true } &&
+            relations.Single(fact => fact.BatchId == newer.BatchId) is { PreviousLivingSeat: 0, IncludesFirstPreviousDiscard: false },
+            "The same physical card enters the discard pile a second time, and only the outer batch remains the first upper-seat discard.");
+
+        Require(P(game) is { PlayerSeat: 0, Kind: DecisionKind.PlayCard },
+            "The outer batch no longer offers Zongxuan once its only eligible original entry has left the pile.");
+        Require(!game.CardMovements.Any(move => move.Reason.Value == PutOnTop) &&
+            game.CreateCardZoneDiagnostics().Single(item => item.CardId == card).Location == CardLocation.DiscardPile,
+            $"Zongxuan must leave the card at its newer entry {newer.Sequence}; the first batch referred to entry {original.Sequence}.");
+    }
+
+    private static GameEngine ColdReentry(GameEngine game, ContentRegistry content)
+    {
+        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
+        Require(restored.CardMovements.SequenceEqual(game.CardMovements) && Enumerable.Range(0, game.PlayerCount).All(seat =>
+            SnapshotJson.Serialize(restored.CreateSnapshot(seat)) == SnapshotJson.Serialize(game.CreateSnapshot(seat))),
+            "Cold replay preserves both the private decision and the original batch in the physical movement journal.");
+        return restored;
+    }
 
     internal static void ZhifouFirstPreviousDiscardOffersOriginalBatchOnce()
     {
@@ -125,6 +209,45 @@ internal static class OlBoundaryZongxuanChecks
             game.CardMovements.All(move => move.Reason.Value != ZhifouDiscard),
             "One remaining wing suit sets the hand adjustment to the two cards drawn by Ex Nihilo.");
         return (game, content);
+    }
+
+    private sealed class ReentryFixture : IGameContentPackage
+    {
+        public PackageManifest Manifest { get; } = new("fixture-ol-zongxuan-reentry", new(1, 0));
+
+        public void Register(IContentRegistryBuilder builder)
+        {
+            CharacterFixtureContent.Register(builder, YuFan);
+            var rules = $$$"""
+                {"skills":[{"id":"{{{FirstDiscardSkill}}}","revision":1,"activations":[
+                    {"id":"discard","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":1,
+                     "effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},
+                        "zones":["hand"],"count":1,"destination":"discardPile","awaitMovementTriggers":true}]}]},
+                  {"id":"{{{ReentrySkill}}}","revision":1,"triggers":[{"id":"recover-and-discard","window":"cardsMoved","subject":"owner",
+                    "sourceZones":["hand"],"movementOccurrence":"perBatch","movementReasons":["{{{FirstDiscardReason}}}"],"optional":true,
+                    "effects":[{"op":"selectRandomPileEquipment","target":"owner","amount":1,"resultBind":"recovered","zones":["discardPile"]},
+                        {"op":"moveBoundCards","target":"owner","sourceBind":"recovered","destination":"ownerHand","awaitMovementTriggers":true},
+                        {"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},"cardOwnerRef":{"kind":"owner"},
+                         "zones":["hand"],"count":1,"destination":"discardPile","awaitMovementTriggers":true}]}]}]}
+                """;
+            var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                skills = new Dictionary<string, object> {
+                    [FirstDiscardSkill] = new { name = "首弃", description = "弃置一张手牌。" },
+                    [ReentrySkill] = new { name = "取回再弃", description = "取回刚弃置的装备，再弃置一张手牌。" } } });
+            var catalog = SkillProgramCatalog.LoadCurrent(rules, presentation);
+            foreach (var (id, program) in catalog.Programs)
+                builder.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description)
+                    { Program = program, ProgramPresentation = catalog.Presentations[id] });
+
+            builder.AddGeneral(new(ReentryGenerals[0], "上家", "supporter", FirstDiscardSkill, "wei", 8, [ReentrySkill]));
+            foreach (var id in ReentryGenerals.Skip(2))
+                builder.AddGeneral(new(id, "同桌", "supporter", "standard:none", "wei", 8));
+            builder.AddDeck(new(ReentryDeck, "固定八卦阵", 4, 2, []) { PhysicalCards = Enumerable.Range(0, 48)
+                .Select(_ => new ContentDeckPhysicalCard("standard:bagua", Suit.Club, 7)).ToArray() });
+            builder.AddMode(new(ReentryMode, "纵玄旧入堆", 4, 4, new Dictionary<string, int>
+                { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 2 }, ReentryDeck,
+                GeneralCandidateCount: 4, GeneralPoolIds: ReentryGenerals));
+        }
     }
 
     private sealed class Fixture : IGameContentPackage

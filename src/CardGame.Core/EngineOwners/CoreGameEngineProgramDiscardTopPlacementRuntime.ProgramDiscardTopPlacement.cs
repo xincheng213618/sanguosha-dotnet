@@ -6,12 +6,18 @@ internal sealed partial class CoreGameEngineProgramDiscardTopPlacementRuntime
     SkillProgramStepOutcome IProgramDiscardTopPlacementHost.PutDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame) => PutProgramDiscardedCardsOnDrawPileTop(frame);
 
     internal static bool IsDiscardMovementReason(CardMoveReason reason) => RuntimeSkills.RuntimeRules_Core_ProgramDiscardTopPlacement.IsDiscardMovementReason(reason);
+
+    private IEnumerable<int> AvailableProgramDiscardTopCards(ProgramSkillFrame frame) =>
+        _coreNeighborDiscardOpportunitiesOperations.Value.EligibleProgramDiscardTopMovements(frame)
+            .Where(movement => _cardZonesOperations._cardZones.GetLocation(movement.CardId) == CardLocation.DiscardPile)
+            .Select(movement => movement.CardId).Distinct();
+
     internal SkillProgramStepOutcome PutProgramDiscardedCardsOnDrawPileTop(ProgramSkillFrame frame)
     {
         var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-        if (active.WindowContext is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: { } batch } || active.DiscardTopPlacement is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
+        if (active.WindowContext is not { Window: SkillProgramTriggerWindow.CardsMoved, MovementBatch: not null } || active.DiscardTopPlacement is not null || _corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             throw new InvalidOperationException("Discard-top placement requires a clean frozen movement window.");
-        var ids = batch.Movements.Where(move => _coreNeighborDiscardOpportunitiesOperations.Value.IsProgramDiscardTopMovement(active, move) && _cardZonesOperations._cardZones.GetLocation(move.CardId) == CardLocation.DiscardPile).Select(move => move.CardId).Distinct().ToArray();
+        var ids = AvailableProgramDiscardTopCards(active).ToArray();
         if (ids.Length == 0 || !_coreMatchParticipantsPlayersAccess._players[active.OwnerSeat].IsAlive)
             return SkillProgramStepOutcome.Continue;
         active = active with
@@ -52,7 +58,9 @@ internal sealed partial class CoreGameEngineProgramDiscardTopPlacementRuntime
         var state = frame.DiscardTopPlacement ?? throw new InvalidOperationException("Discard-top placement lost its draft.");
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { Kind: DecisionKind.ProgramTrigger } decision || decision.PlayerSeat != frame.OwnerSeat || !decision.Choices.Any(item => item.Id == choice.Id))
             throw new InvalidOperationException("Discard-top placement choice is not current.");
-        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) || state.CandidateCardIds.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DiscardPile))
+        if (!_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive ||
+            !_coreProgramLifecycleOperations.CanInvokeProgramSkill(frame) ||
+            state.CandidateCardIds.Except(AvailableProgramDiscardTopCards(frame)).Any())
         {
             _coreNativePromptBoundaryOperations.ClearPendingDecision();
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(frame, "弃牌已变化，牌堆顶放置取消。");

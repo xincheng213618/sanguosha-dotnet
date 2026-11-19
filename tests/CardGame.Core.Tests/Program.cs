@@ -791,6 +791,8 @@ var tests = new (string Name, Action Body)[]
     ("Mou Xiahou Dun Qingjian cannot collect an old discard entry after rediscard", MouQingjianDiscardEntryChecks.QingjianCannotCollectTheNewEntryThroughAnOldDiscardWindow),
     ("OL Yisuan: paid maximum HP leaves the re-discarded Trick at its newer entry cold", OlYisuanChecks.PaidMaximumHpCannotObtainTheSameTrickAtANewerDiscardEntryCold),
     ("OL Fu Rong Xiaosi offers only the original discard payments", FuRongDiscardEntryChecks.XiaosiOffersOnlyTheOriginalPaymentEntries),
+    ("OL Boundary Zongxuan: first previous discard cannot place same card at a newer entry cold", OlBoundaryZongxuanChecks.FirstPreviousDiscardCannotPlaceTheSameCardAtANewerEntryCold),
+    ("Mobile Zhongchun: Bique material receipts qualify the actual Ending actor", MobileZhongchunChecks.BiqueDiscardMaterialsQualifyAtEndingAndReplay),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
