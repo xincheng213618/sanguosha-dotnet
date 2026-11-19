@@ -797,6 +797,8 @@ var tests = new (string Name, Action Body)[]
     ("OL Silv: refunds the native Bique discard to its actual holder", OlSilvChecks.BiqueDiscardRefundsTheMarkedEntityToItsActualHolder),
     ("Qu Huang runtime: Nishou keeps the original equipment entry through re-discard cold", QuHuangRuntimeChecks.NishouCannotUseEquipmentFromANewerDiscardEntryCold),
     ("Mobile Shi Huang Zu Duanyang cannot store a newer entry through an old discard window cold", ShiHuangZuDiscardEntryChecks.DuanyangCannotStoreTheNewEntryThroughAnOldDiscardWindowCold),
+    ("OL Mo Diao Chan Qingshi: original non-use discard entry survives or is relinquished", OlMoDiaoChanQingshiChecks.RecaptureUsesTheOriginalNonUseDiscardEntry),
+    ("Anniversary Chiying: same physical card pays once for each different victim cold", AnniversaryGaoXiangChecks.ChiyingAcceptsTwoPaymentsOfTheSameCardFromDifferentVictimsCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

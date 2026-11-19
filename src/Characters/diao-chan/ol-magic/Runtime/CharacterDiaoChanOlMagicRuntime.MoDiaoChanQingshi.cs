@@ -134,7 +134,13 @@ internal sealed partial class CharacterDiaoChanOlMagicRuntime
         }
     }
 
-    internal int[] MoDcRecaptureIndexes(CardMovementBatchContext batch, int owner) => batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && HasMoDcQingshiCard(owner, x.m.CardId) && _cardZonesOperations._cardZones.GetLocation(x.m.CardId) == CardLocation.DiscardPile && !MoDcUsePaymentMovement(x.m) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanDiscardClaimedEvent>().Any(e => e.Source.OwnerSeat == owner && e.CardId == x.m.CardId && e.Sequence == x.m.Sequence)).Select(x => x.i).ToArray();
+    internal int[] MoDcRecaptureIndexes(CardMovementBatchContext batch, int owner) => batch.Movements
+        .Select((move, index) => (move, index))
+        .Where(item => item.move.To == CardLocation.DiscardPile && HasMoDcQingshiCard(owner, item.move.CardId) &&
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, item.move.CardId) == item.move.Sequence &&
+            !MoDcUsePaymentMovement(item.move) && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MoDiaoChanDiscardClaimedEvent>()
+                .Any(claim => claim.Source.OwnerSeat == owner && claim.CardId == item.move.CardId && claim.Sequence == item.move.Sequence))
+        .Select(item => item.index).ToArray();
     internal CardMovementRecord[] MoDcRecaptureCards(int owner, ProgramSkillWindowContext c) => c.Window == SkillProgramTriggerWindow.DiscardPileReceived && c.MovementBatch is { } batch && c.MovementIndex is { } index && MoDcRecaptureIndexes(batch, owner).Contains(index) ? [batch.Movements[index]] : [];
     internal void RecaptureMoDcCards(ProgramSkillFrame f)
     {
