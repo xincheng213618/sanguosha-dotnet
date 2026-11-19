@@ -25,6 +25,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - A pair's ordinary result claims and native cleanup read those same reveal entries. The published choice retains its original claimant and result identities. Execution rechecks each physical entry before moving it. Declining or exhausting the choices leaves native cleanup responsible for the original entries still in Processing.
 
+- Maximum-Slash claims use the original reveal entries in both pair and simultaneous comparisons. The initial freeze takes the highest effective rank among the eligible Slash entries at that time. Later loss of a frozen entry does not substitute a lower-ranked Slash. Simultaneous cleanup follows the group's final card assignment order and moves only its surviving original entries, including during the native death path.
+
 ## Native-use material retirement
 
 - Record actual non-Processing payment or destruction through `INativeMaterialClaims.CaptureRetirement` on the original `CardUseFrame.MaterialClaims`. A `Retirement` has no acquisition recipient and does not contribute to `WasClaimed` or claimed entities. A `Delivery` retains its acquisition and residency semantics. Ordinary payment into Processing issues no retirement receipt.

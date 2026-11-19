@@ -10,7 +10,8 @@ internal sealed partial class CoreGameEngineSimultaneousPindianClaimsRuntime
             (Id: result.SourceCardId, Rank: result.SourceRank),
             (Id: result.OpponentCardId, Rank: result.OpponentRank)
         };
-        var slashes = pairCards.Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.Processing && CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Id).Kind)).ToArray();
+        var slashes = pairCards.Where(c => PindianProcessingEntry.IsCurrent(root, _zoneEntries, c.Id) &&
+            CoreNativeCardClassificationsRuntime.IsSlashCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.Id).Kind)).ToArray();
         var maximum = slashes.Select(c => c.Rank).DefaultIfEmpty(0).Max();
         var maximumIds = slashes.Where(c => c.Rank == maximum).Select(c => c.Id).ToArray();
         var claims = new List<PindianPolicyClaim>();
@@ -43,14 +44,16 @@ internal sealed partial class CoreGameEngineSimultaneousPindianClaimsRuntime
         return new(Array.AsReadOnly(claims.ToArray()));
     }
 
-    internal int[] AvailableSimultaneousClaimCards(PindianPolicyClaim claim) => _corePindianRandomSelectionsOperations.PindianPolicySourceLive(claim.OwnerSeat, claim.Source, claim.Kind) ? claim.CardIds.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToArray() : [];
+    internal int[] AvailableSimultaneousClaimCards(ProgramSkillFrame frame, PindianPolicyClaim claim) =>
+        _corePindianRandomSelectionsOperations.PindianPolicySourceLive(claim.OwnerSeat, claim.Source, claim.Kind)
+            ? claim.CardIds.Where(id => PindianProcessingEntry.IsCurrent(frame, _zoneEntries, id)).ToArray() : [];
     internal bool OfferSimultaneousClaim(ProgramSkillFrame f)
     {
         var r = f.SimultaneousPindian!;
         var claims = r.Claims!;
         while (claims.Index < claims.Claims.Count)
         {
-            if (AvailableSimultaneousClaimCards(claims.Claims[claims.Index]).Length > 0)
+            if (AvailableSimultaneousClaimCards(f, claims.Claims[claims.Index]).Length > 0)
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimultaneousPindian = r with { Stage = SimultaneousPindianStage.Claiming, Claims = claims } });
                 _coreSimultaneousPindianOperations.Value.PublishSimultaneousChoice(f);
@@ -72,7 +75,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianClaimsRuntime
         var r = f.SimultaneousPindian!;
         var claim = r.Claims!.Claims[r.Claims.Index];
         var taken = choice.Parameters["branch"] == "claim";
-        var available = AvailableSimultaneousClaimCards(claim);
+        var available = AvailableSimultaneousClaimCards(f, claim);
         if (available.Length == 0 || taken && !choice.Cards.SequenceEqual(available) || !taken && choice.Cards.Count != 0)
             throw new InvalidOperationException("A simultaneous claim lost its exact frozen public entities or live policy source.");
         var before = _coreCardMovementJournalMovementSequenceAccess._movementSequence;

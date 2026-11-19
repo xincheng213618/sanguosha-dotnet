@@ -84,7 +84,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
         if (r.Stage == SimultaneousPindianStage.Claiming)
         {
             var claim = r.Claims!.Claims[r.Claims.Index];
-            var ids = _coreSimultaneousPindianClaimsOperations.Value.AvailableSimultaneousClaimCards(claim);
+            var ids = _coreSimultaneousPindianClaimsOperations.Value.AvailableSimultaneousClaimCards(f, claim);
             return Array.AsReadOnly(new[] { new PromptChoice(new($"simultaneous.{(f.Id)}.{(r.ComparisonIndex)}.claim.{(r.Claims.Index)}"), $"获得拼点牌（{(ids.Length)}张）", ids, [], P("claim")), new PromptChoice(new($"simultaneous.{(f.Id)}.{(r.ComparisonIndex)}.claim-decline.{(r.Claims.Index)}"), "不获得拼点牌", [], [], P("claim-decline")) });
         }
 
@@ -346,7 +346,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianRuntime
 
     internal void CleanupSimultaneousPindianCards(ProgramSkillFrame f)
     {
-        foreach (var c in f.SimultaneousPindian!.Cards.Where(c => _cardZonesOperations._cardZones.GetLocation(c.CardId) == CardLocation.Processing))
+        foreach (var c in f.SimultaneousPindian!.Cards.Where(c => PindianProcessingEntry.IsCurrent(f, _zoneEntries, c.CardId)))
             _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(c.CardId), CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.PindianFinish);
     }
 

@@ -16,7 +16,8 @@ internal sealed partial class CoreGameEnginePindianMaximumSlashClaimsRuntime
             (Id: result.SourceCardId, Rank: result.SourceRank),
             (Id: result.OpponentCardId, Rank: result.OpponentRank)
         };
-        var slashes = cards.Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.Processing && CoreNativeCardClassificationsRuntime.IsSlashCard(_cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == c.Id).Kind)).ToArray();
+        var slashes = cards.Where(c => PindianProcessingEntry.IsCurrent(frame, _zoneEntries, c.Id) &&
+            CoreNativeCardClassificationsRuntime.IsSlashCard(_cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == c.Id).Kind)).ToArray();
         var maximum = slashes.Length == 0 ? 0 : slashes.Max(c => c.Rank);
         var maximumIds = slashes.Where(c => c.Rank == maximum).Select(c => c.Id).ToArray();
         var claims = new List<PindianPolicyClaim>();
@@ -57,7 +58,7 @@ internal sealed partial class CoreGameEnginePindianMaximumSlashClaimsRuntime
         while (state.Index < state.Claims.Count)
         {
             var claim = state.Claims[state.Index];
-            var ids = claim.CardIds.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToArray();
+            var ids = claim.CardIds.Where(id => PindianProcessingEntry.IsCurrent(frame, _zoneEntries, id)).ToArray();
             if (ids.Length == 0 || !_corePindianRandomSelectionsOperations.PindianPolicySourceLive(claim.OwnerSeat, claim.Source, claim.Kind))
             {
                 state = state with
@@ -96,7 +97,7 @@ internal sealed partial class CoreGameEnginePindianMaximumSlashClaimsRuntime
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
         // Frozen identities only: if another claimant already obtained one, never replace it with a lower Slash.
         if (selected.Parameters["take"] == "true" && _corePindianRandomSelectionsOperations.PindianPolicySourceLive(claim.OwnerSeat, claim.Source, claim.Kind))
-            foreach (var id in selected.Cards.Where(id => claim.CardIds.Contains(id) && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing))
+            foreach (var id in selected.Cards.Where(id => claim.CardIds.Contains(id) && PindianProcessingEntry.IsCurrent(frame, _zoneEntries, id)))
             {
                 var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(c => c.Id == id);
                 _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.Hand(claim.OwnerSeat), new CardMoveReason("program.pindian.claim"));

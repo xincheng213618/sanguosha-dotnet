@@ -779,6 +779,9 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Sun Ce: Zhiba original pair claim and decline cold", BoundarySunCeMobileChecks.ZhibaClaimsOriginalPairAfterColdRestore),
     ("OL Boundary Zhiba: source claims original tie entries or declines cold", BoundarySunCeZhibaChecks.SourceClaimsOriginalTieEntriesOrDeclinesAfterColdRestore),
     ("OL Boundary Zhiba: earlier claim leaves one entry and opponent win closes entitlement", BoundarySunCeZhibaChecks.EarlierClaimLeavesOnlyOriginalSurvivorAndOpponentWinDoesNotOffer),
+    ("OL Wang Lang Gushe cleans original simultaneous Pindian materials in order", OlGusheChecks.ThreeComparisonsCleanOriginalMaterialsInOrderAndReplay),
+    ("OL Hanzhan: Tianyi claims only maximum effective Slash entries cold", BoundaryTaiShiCiChecks.TianyiClaimsOnlyMaximumEffectiveSlashEntriesCold),
+    ("OL Hanzhan: Gushe claims the shared maximum only once", BoundaryTaiShiCiChecks.GusheClaimsSharedMaximumOnlyOnce),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
