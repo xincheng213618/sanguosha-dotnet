@@ -12,10 +12,8 @@ internal sealed partial class CharacterYanJunOlEntries
     internal int[] MatchingOwnSettledActionCardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate) => _resolve().MatchingOwnSettledActionCardIndexes(batch, candidate);
     internal (bool Ascending, int PhaseEventIndex)? OwnTurnGuanchaoPattern(int ownerSeat, string skillId) => _resolve().OwnTurnGuanchaoPattern(ownerSeat, skillId);
     internal void ResolveGuanchaoPatternChoice(PromptChoice selected) => _resolve().ResolveGuanchaoPatternChoice(selected);
-    internal void ResolveXunxianGiftChoice(PromptChoice selected) => _resolve().ResolveXunxianGiftChoice(selected);
     internal int[]? SelectWindowIndexes_MatchingOwnSettledActionCardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger) => _resolve().SelectWindowIndexes_MatchingOwnSettledActionCardIndexes(batch, candidate, trigger);
     internal CardActionContext? SettledActionContext(int cardId) => _resolve().SettledActionContext(cardId);
     internal bool UsesOwnTurnGuanchaoLedger(ProgramSkillFrame frame) => _resolve().UsesOwnTurnGuanchaoLedger(frame);
-    internal SkillProgramStepOutcome XunxianProgramGiftUsedCard(ProgramSkillFrame frame, SkillProgramEffect effect) => _resolve().XunxianProgramGiftUsedCard(frame, effect);
     internal bool TracksSettledActionCards { get => _resolve().TracksSettledActionCards; }
 }

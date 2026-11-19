@@ -1,10 +1,10 @@
 namespace CardGame.Core;
 
 internal interface IMobileZhuRongProgramHost { SkillProgramStepOutcome Exchange(ProgramSkillFrame frame); }
-internal sealed class ExchangeMobileLierenPindianCardsDescriptor : ProgramOperationDescriptorBase
+internal sealed class ExchangeMobileLierenPindianCardsDescriptor : ProgramOperationDescriptorBase, ISkillProgramEffectHandler
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.ExchangeMobileLierenPindianCards;
-    public override ISkillProgramEffectHandler Handler { get; } = new ExchangeMobileLierenPindianCardsHandler();
+    public override ISkillProgramEffectHandler Handler => this;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.Move, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader)
     {
@@ -15,10 +15,6 @@ internal sealed class ExchangeMobileLierenPindianCardsDescriptor : ProgramOperat
         return effect;
     }
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) => [new ReadPindianResult(effect.SourceBind!)];
-}
-internal sealed class ExchangeMobileLierenPindianCardsHandler : ISkillProgramEffectHandler
-{
-    public SkillProgramEffectOp Op => SkillProgramEffectOp.ExchangeMobileLierenPindianCards;
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int targetSeat, ISkillProgramEffectHost host) => host.GetCapability<IMobileZhuRongProgramHost>().Exchange(frame);
 }
 internal static class MobileZhuRongComposition

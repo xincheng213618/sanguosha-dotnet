@@ -4,8 +4,7 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiaoHuaBoundaryMobileRuntime
 {
     internal const string BoundaryMobileDangxian = "boundary:dangxian-mobile", BoundaryLiaoHuaDiscardAction = "boundary-liao-hua-discard-slash", BoundaryLiaoHuaDiscardReason = "skill-program.boundary:liao-hua-mobile.discard-slash";
-    SkillProgramStepOutcome IBoundaryLiaoHuaMobileHost.Execute(ProgramSkillFrame frame, SkillProgramEffectOp op) => BeginBoundaryLiaoHuaDiscardSlash(frame);
-    internal SkillProgramStepOutcome BeginBoundaryLiaoHuaDiscardSlash(ProgramSkillFrame supplied)
+    SkillProgramStepOutcome IBoundaryLiaoHuaMobileHost.BeginBoundaryLiaoHuaDiscardSlash(ProgramSkillFrame supplied)
     {
         var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         if (frame.SkillId != BoundaryMobileDangxian || frame.TriggerId != "discard-slash-extra-play" || frame.InstructionIndex != 1 || frame.WindowContext is not { Window: SkillProgramTriggerWindow.TurnStartBeforeNormalFlow } context || frame.BoundaryLiaoHuaDiscardSlash is not null)
@@ -50,23 +49,22 @@ internal sealed partial class CharacterLiaoHuaBoundaryMobileRuntime
             return;
         }
 
-        var receipt = frame.BoundaryLiaoHuaDiscardSlash!with
+        var cardId = selected.Cards.Single();
+        var receipt = frame.BoundaryLiaoHuaDiscardSlash! with
         {
-            CardId = selected.Cards.Single(),
+            CardId = cardId,
             Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { BoundaryLiaoHuaDiscardSlash = receipt });
-        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([receipt.CardId.Value], CardLocation.Hand(frame.OwnerSeat), new(BoundaryLiaoHuaDiscardReason), (batch, moves) =>
+        _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([cardId], CardLocation.Hand(frame.OwnerSeat), new(BoundaryLiaoHuaDiscardReason), (batch, _) =>
         {
+            var after = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
-            _coreRuntimeOperations.ReplaceRuntimeTop(active with { BoundaryLiaoHuaDiscardSlash = receipt with { BatchId = batch, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryLiaoHuaDiscardSlashObtainedEvent(frame.Id, receipt.InstructionIndex, frame.OwnerSeat, receipt.CardId.Value, batch, receipt.Before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
+            _coreRuntimeOperations.ReplaceRuntimeTop(active with { BoundaryLiaoHuaDiscardSlash = receipt with { BatchId = batch, After = after } });
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryLiaoHuaDiscardSlashObtainedEvent(frame.Id, receipt.InstructionIndex, frame.OwnerSeat, cardId, batch, receipt.Before, after));
         });
         if (_coreBoundCardMovementContinuationOperations.AwaitProgramBoundCardMovements(frame.Id, frame.OwnerSeat) == SkillProgramStepOutcome.Continue)
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { BoundaryLiaoHuaDiscardSlash = null });
-            _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
-        }
+            FinishBoundaryLiaoHuaDiscardSlash(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id));
     }
 
     internal bool ValidBoundaryLiaoHuaDiscardSlash(ProgramSkillFrame frame)
@@ -85,9 +83,14 @@ internal sealed partial class CharacterLiaoHuaBoundaryMobileRuntime
             return false;
         if (!ValidBoundaryLiaoHuaDiscardSlash(frame))
             throw new InvalidOperationException("Mobile Dangxian lost its exact paid discard gain and original instruction.");
+        FinishBoundaryLiaoHuaDiscardSlash(frame);
+        return true;
+    }
+
+    private void FinishBoundaryLiaoHuaDiscardSlash(ProgramSkillFrame frame)
+    {
         _coreRuntimeOperations.ReplaceRuntimeTop(frame with { BoundaryLiaoHuaDiscardSlash = null, PendingMovementContinuation = null });
         _coreRuntimeOperations.AdvanceRuntimeProgram(frame.Id);
-        return true;
     }
 
     [ProgramContinuation(ProgramContinuationKind.Resume, 55600)]

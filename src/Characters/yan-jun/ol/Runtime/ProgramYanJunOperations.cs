@@ -4,7 +4,7 @@ internal interface IYanJunProgramHost
 {
     SkillProgramStepOutcome GuanchaoChoosePattern(ProgramSkillFrame frame, SkillProgramEffect effect);
     SkillProgramStepOutcome GuanchaoRankDraw(ProgramSkillFrame frame, SkillProgramEffect effect);
-    SkillProgramStepOutcome XunxianGiftUsedCard(ProgramSkillFrame frame, SkillProgramEffect effect);
+    SkillProgramStepOutcome XunxianGiftUsedCard(ProgramSkillFrame frame);
 }
 
 // Public-only pricing for the 逊贤 transfer: the recipient visibly gains the

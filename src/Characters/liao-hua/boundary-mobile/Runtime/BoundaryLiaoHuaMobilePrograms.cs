@@ -4,27 +4,20 @@ namespace CardGame.Core;
 
 internal interface IBoundaryLiaoHuaMobileHost
 {
-    SkillProgramStepOutcome Execute(ProgramSkillFrame frame, SkillProgramEffectOp op);
+    SkillProgramStepOutcome BeginBoundaryLiaoHuaDiscardSlash(ProgramSkillFrame frame);
 }
 
-internal abstract class BoundaryLiaoHuaMobileDescriptor : ProgramOperationDescriptorBase
+internal sealed class ObtainBoundaryLiaoHuaDiscardSlashDescriptor : ProgramOperationDescriptorBase, ISkillProgramEffectHandler
 {
-    public override ISkillProgramEffectHandler Handler => new BoundaryLiaoHuaMobileHandler(Op);
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.ObtainBoundaryLiaoHuaDiscardSlash;
+    public override ISkillProgramEffectHandler Handler => this;
+    public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
+    public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, _) => { });
     public override SkillProgramEffect Parse(ProgramOperationNodeReader reader) => ParseOwnerAlways(reader);
     public override IReadOnlyList<ProgramResourceOperation> Resources(SkillProgramEffect effect) =>
         [new RequireTriggerWindow(SkillProgramTriggerWindow.TurnStartBeforeNormalFlow)];
-}
-internal sealed class ObtainBoundaryLiaoHuaDiscardSlashDescriptor : BoundaryLiaoHuaMobileDescriptor
-{
-    public override SkillProgramEffectOp Op => SkillProgramEffectOp.ObtainBoundaryLiaoHuaDiscardSlash;
-    public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
-    public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GainCards, static (_, _) => { });
-}
-internal sealed class BoundaryLiaoHuaMobileHandler(SkillProgramEffectOp operation) : ISkillProgramEffectHandler
-{
-    public SkillProgramEffectOp Op => operation;
     public SkillProgramStepOutcome Execute(SkillProgramEffect effect, ProgramSkillFrame frame, int target, ISkillProgramEffectHost host) =>
-        host.GetCapability<IBoundaryLiaoHuaMobileHost>().Execute(frame, Op);
+        host.GetCapability<IBoundaryLiaoHuaMobileHost>().BeginBoundaryLiaoHuaDiscardSlash(frame);
 }
 
 public sealed record BoundaryLiaoHuaDiscardSlashReceipt(CardConversionSource Source, string GameplayHash, long WindowFrameId, int InstructionIndex)

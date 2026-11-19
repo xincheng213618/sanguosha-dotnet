@@ -18,5 +18,5 @@ public sealed class XunxianGiftUsedCardHandler : ISkillProgramEffectHandler
 {
     public SkillProgramEffectOp Op => SkillProgramEffectOp.XunxianGiftUsedCard;
     public SkillProgramStepOutcome Execute(SkillProgramEffect e, ProgramSkillFrame f, int seat, ISkillProgramEffectHost host) =>
-        host.GetCapability<IYanJunProgramHost>().XunxianGiftUsedCard(f, e);
+        host.GetCapability<IYanJunProgramHost>().XunxianGiftUsedCard(f);
 }

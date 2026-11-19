@@ -9,38 +9,46 @@ internal sealed partial class CharacterZhuRongBoundaryMobileRuntime
     {
         if (parent.SkillId != MobileZhuRongSkill)
             return;
-        if (parent.InstructionIndex != 1 || parent.TriggerId != "contest-on-slash-target" || native.ParentFrameId != parent.Id || native.ProgramResultBind != "contest" || native.Result is not { } result || result.SourceSeat != parent.OwnerSeat || parent.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, TargetSeat: var target } || target != result.OpponentSeat || parent.PindianResultBindings is not [{ Name: "contest", SourceSeat: var source, OpponentSeat: var opponent }] || source != result.SourceSeat || opponent != result.OpponentSeat || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<PindianResultDeterminedEvent>().Count(e => e.FrameId == native.Id && e.SkillId == parent.SkillId && e.Result == result) != 1)
+        if (parent.InstructionIndex != 1 || parent.TriggerId != "contest-on-slash-target" ||
+            native.ParentFrameId != parent.Id || native.SkillId != parent.SkillId ||
+            native.ProgramResultBind != "contest" || native.Result is not { } result || result.SourceSeat != parent.OwnerSeat ||
+            parent.WindowContext is not { Window: SkillProgramTriggerWindow.CardUseTargetsFinalized, TargetSeat: var target } ||
+            target != result.OpponentSeat ||
+            parent.PindianResultBindings is not [{ Name: "contest", Visibility: SkillProgramCardSetVisibility.Public } binding] ||
+            binding.NativePindianFrameId != native.Id || binding.SourceSeat != result.SourceSeat ||
+            binding.OpponentSeat != result.OpponentSeat || binding.SourceRank != result.SourceRank ||
+            binding.OpponentRank != result.OpponentRank || binding.SourceWon != result.SourceWon)
             throw new InvalidOperationException("Mobile Lieren lost its exact public native Pindian return.");
-        _coreProgramLifecycleOperations.SetProgramCardSet(parent.Id, MobileZhuRongSource, [result.SourceCardId], SkillProgramCardSetVisibility.Public, [CardLocation.DiscardPile]);
-        _coreProgramLifecycleOperations.SetProgramCardSet(parent.Id, MobileZhuRongOpponent, [result.OpponentCardId], SkillProgramCardSetVisibility.Public, [CardLocation.DiscardPile]);
+        cardSets.SetProgramCardSet(parent.Id, MobileZhuRongSource, [result.SourceCardId], SkillProgramCardSetVisibility.Public, [CardLocation.DiscardPile]);
+        cardSets.SetProgramCardSet(parent.Id, MobileZhuRongOpponent, [result.OpponentCardId], SkillProgramCardSetVisibility.Public, [CardLocation.DiscardPile]);
     }
 
-    SkillProgramStepOutcome IMobileZhuRongProgramHost.Exchange(ProgramSkillFrame frame) => ExchangeMobileZhuRongCards(frame);
-    internal SkillProgramStepOutcome ExchangeMobileZhuRongCards(ProgramSkillFrame supplied)
+    SkillProgramStepOutcome IMobileZhuRongProgramHost.Exchange(ProgramSkillFrame supplied)
     {
-        var frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
+        var frame = frames.ActiveProgram(supplied.Id);
         if (frame.SkillId != MobileZhuRongSkill || frame.InstructionIndex != 3 || frame.PendingMovementContinuation is not null || frame.PindianResultBindings is not [{ Name: "contest", SourceSeat: var owner, OpponentSeat: var opponent, SourceWon: false }] || owner != frame.OwnerSeat)
             throw new InvalidOperationException("Mobile Lieren exchange lost its non-winning original contest.");
-        var sourceCard = _coreProgramLifecycleOperations.GetProgramCardSet(frame, MobileZhuRongSource).CardIds.Single();
-        var opponentCard = _coreProgramLifecycleOperations.GetProgramCardSet(frame, MobileZhuRongOpponent).CardIds.Single();
-        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
-        foreach (var(id, recipient)in new[]
-        {
-            (sourceCard, opponent),
-            (opponentCard, owner)
-        }
+        var sourceCard = ProgramBoundCardRuntime.GetProgramCardSet(frame, MobileZhuRongSource).CardIds.Single();
+        var opponentCard = ProgramBoundCardRuntime.GetProgramCardSet(frame, MobileZhuRongOpponent).CardIds.Single();
+        frames.ReplaceTop(frame with { PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
+        GiveDiscardedCard(sourceCard, opponent);
+        GiveDiscardedCard(opponentCard, owner);
 
-        )
-        {
-            if (!_coreMatchParticipantsPlayersAccess._players[recipient].IsAlive || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DiscardPile)
-                continue;
-            var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(c => c.Id == id);
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(recipient), new(MobileZhuRongExchange), disclosure: CardMovementDisclosure.FaceUp);
-        }
-
-        if (_coreCardMovementProgramsOperations.TryBeginCardsMovedProgramWindow(frame.Id))
+        if (movementWindows.Begin(frame.Id))
             return SkillProgramStepOutcome.AwaitChild;
-        _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id)with { PendingMovementContinuation = null });
+        frames.ReplaceTop(frames.ActiveProgram(frame.Id) with { PendingMovementContinuation = null });
         return SkillProgramStepOutcome.Continue;
+
+        void GiveDiscardedCard(int cardId, int recipient)
+        {
+            if (!participants.At(recipient).IsAlive ||
+                zones.GetLocation(cardId) != CardLocation.DiscardPile)
+                return;
+
+            // The zone store indexes each registered physical identity once.
+            var card = zones.CardsAt(CardLocation.DiscardPile).First(card => card.Id == cardId);
+            movement.Move(card, CardLocation.DiscardPile, CardLocation.Hand(recipient),
+                new(MobileZhuRongExchange), disclosure: CardMovementDisclosure.FaceUp);
+        }
     }
 }

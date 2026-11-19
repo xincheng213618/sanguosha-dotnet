@@ -2,6 +2,12 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule, Core.ProgramCapability]
-internal sealed partial class CharacterZhuRongBoundaryMobileRuntime(IKernelCardZoneStoreAccess _cardZonesOperations,RuntimeEntries.CoreGameEngineCardMovementProgramsEntries _coreCardMovementProgramsOperations,RuntimeEntries.DeferredRuntime<EngineOwners.CoreGameEngineProgramEventHistoryRuntime> _coreProgramEventHistoryOperations,RuntimeEntries.CoreGameEngineProgramLifecycleEntries _coreProgramLifecycleOperations,RuntimeEntries.CoreGameEngineRuntimeEntries _coreRuntimeOperations,RuntimeEntries.CorePhysicalMovementFacadesEntries _corePhysicalMovementFacadesOperations,EngineStates.Contracts.ICoreMatchParticipantsPlayersAccess _coreMatchParticipantsPlayersAccess) : IMobileZhuRongProgramHost
+internal sealed partial class CharacterZhuRongBoundaryMobileRuntime(
+    ICardZoneQueries zones,
+    IProgramMovementWindows movementWindows,
+    IProgramCardSetBindings cardSets,
+    IProgramRuntimeFrames frames,
+    INativeLogicalDiscardMovement movement,
+    IMatchParticipantStateAccess participants) : IMobileZhuRongProgramHost
 {
 }

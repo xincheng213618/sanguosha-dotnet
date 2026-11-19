@@ -48,7 +48,6 @@ internal sealed partial class CharacterYanJunOlRuntime
 
     SkillProgramStepOutcome IYanJunProgramHost.GuanchaoChoosePattern(ProgramSkillFrame frame, SkillProgramEffect effect) => GuanchaoProgramChoosePattern(frame, effect);
     SkillProgramStepOutcome IYanJunProgramHost.GuanchaoRankDraw(ProgramSkillFrame frame, SkillProgramEffect effect) => GuanchaoProgramRankDraw(frame, effect);
-    SkillProgramStepOutcome IYanJunProgramHost.XunxianGiftUsedCard(ProgramSkillFrame frame, SkillProgramEffect effect) => XunxianProgramGiftUsedCard(frame, effect);
     [ProgramPipelineHook(ProgramPipelinePhase.SelectLegacyDiscardIndexes, 600)]
     internal int[]? SelectWindowIndexes_MatchingOwnSettledActionCardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger)
     {
