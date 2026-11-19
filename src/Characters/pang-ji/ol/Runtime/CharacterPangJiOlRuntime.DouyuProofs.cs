@@ -16,8 +16,15 @@ internal sealed partial class CharacterPangJiOlRuntime
                 if (r.OriginalCards.Any(c => !_characterLuKangWumiaoOperations.IsWuLuKangOriginalInput(p, c.Seat, c.CardId, c.PaymentFrom, c.Top, c.ReservationSequence)))
                     return false;
             }
-            else if (p.SourceCardId != r.OriginalCards[0].CardId || r.OriginalCards[0].PaymentFrom != (p.OwnedPileSource?.Pile.Location ?? (p.SourceUsesDrawPileTop ? CardLocation.Processing : CardLocation.Hand(p.SourceSeat))) || p.SourceUsesDrawPileTop != r.OriginalCards[0].Top || r.OriginalCards[1].PaymentFrom != (r.OriginalCards[1].Top ? CardLocation.DrawPile : CardLocation.Hand(p.OpponentSeat!.Value)))
-                return false;
+            else
+            {
+                var source = r.OriginalCards[0];
+                if (p.SourceCardId != source.CardId || source.PaymentFrom != (p.OwnedPileSource?.Pile.Location ?? (p.SourceUsesDrawPileTop ? CardLocation.Processing : CardLocation.Hand(p.SourceSeat))) ||
+                    p.SourceUsesDrawPileTop != source.Top || p.SourceTopReservationSequence != source.ReservationSequence ||
+                    p.SourceUsesDrawPileTop && !r.Paid && !_corePindianPoliciesOperations.HasCurrentPindianSourceCard(p) ||
+                    r.OriginalCards[1].PaymentFrom != (r.OriginalCards[1].Top ? CardLocation.DrawPile : CardLocation.Hand(p.OpponentSeat!.Value)))
+                    return false;
+            }
         }
         else if (parent is ProgramSkillFrame { SimultaneousPindian: { } simultaneous } f)
         {

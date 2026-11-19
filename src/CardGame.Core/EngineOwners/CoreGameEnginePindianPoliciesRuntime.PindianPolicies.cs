@@ -15,8 +15,27 @@ internal sealed partial class CoreGameEnginePindianPoliciesRuntime
         return rank;
     }
 
-    internal bool HasCurrentPindianSourceCard(PindianFrame frame) => frame.WuLuKangContest is { SourcesReady: true } w ? w.Assignments[0].CardId > 0 && _cardZonesOperations._cardZones.GetLocation(w.Assignments[0].CardId) == _characterLuKangWumiaoOperations.WuLuKangAssignedLocation(frame, frame.SourceSeat) : frame.SourceCardId == 0 && _characterLuKangWumiaoOperations.CanWuLuKangDiscardForPindian(_coreMatchParticipantsPlayersAccess._players[frame.SourceSeat]) ? true : frame.OwnedPileSource is not null ? _characterGuanHaiOlOperations.IsGuanHaiPindianSource(frame, false) : frame.SourceUsesDrawPileTop ? frame.SourceCardId is { } id && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing && !(frame.ParentProcessingCardIds ?? []).Contains(id) : _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[frame.SourceSeat]).Any(c => c.Id == frame.SourceCardId);
-    internal int ReserveOrReadPindianTop(CharacterState owner, bool reserve)
+    internal bool HasCurrentPindianSourceCard(PindianFrame frame)
+    {
+        if (frame.WuLuKangContest is { SourcesReady: true } contest)
+            return contest.Assignments[0].CardId > 0 &&
+                _cardZonesOperations._cardZones.GetLocation(contest.Assignments[0].CardId) ==
+                _characterLuKangWumiaoOperations.WuLuKangAssignedLocation(frame, frame.SourceSeat);
+        var source = _coreMatchParticipantsPlayersAccess._players[frame.SourceSeat];
+        if (frame.SourceCardId == 0 && _characterLuKangWumiaoOperations.CanWuLuKangDiscardForPindian(source))
+            return true;
+        if (frame.OwnedPileSource is not null)
+            return _characterGuanHaiOlOperations.IsGuanHaiPindianSource(frame, false);
+        return frame.SourceUsesDrawPileTop
+            ? HoldsPindianSourceTop(frame)
+            : _corePhysicalOwnedCardQueriesOperations.GetHand(source).Any(card => card.Id == frame.SourceCardId);
+    }
+
+    private bool HoldsPindianSourceTop(PindianFrame frame) => frame.SourceCardId is { } id &&
+        frame.SourceTopReservationSequence is { } entry && _zoneEntries.CurrentEntry(CardLocation.Processing, id) == entry &&
+        !(frame.ParentProcessingCardIds ?? []).Contains(id);
+
+    internal (int CardId, int? ReservationSequence) ReserveOrReadPindianTop(CharacterState owner, bool reserve)
     {
         if (!CanOfferPindianTopChoice(owner) || !_corePhysicalDrawFacadesOperations.EnsureDrawPile())
             throw new InvalidOperationException("The optional Pindian top source is unavailable.");
@@ -24,10 +43,22 @@ internal sealed partial class CoreGameEnginePindianPoliciesRuntime
         var binding = _coreProgramCardPoliciesOperations.CardPolicies(owner, SkillProgramCardPolicyKind.PindianTopCardChoice).First();
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PindianTopSourceChosenEvent(owner.Seat, new(binding.Source.SkillId, binding.Policy.Id, owner.Seat, binding.Source.SkillInstanceId), card.Id));
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 发动【{(_contentRegistryOperations._contentRegistry.GetSkill(binding.Source.SkillId).Name)}】，使用牌堆顶的牌拼点。", owner.Seat);
-        if (reserve)
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Processing, new CardMoveReason("pindian.reserve-top"));
-        return card.Id;
+        if (!reserve) return (card.Id, null);
+
+        CardMovementRecord? reservation = null;
+        _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DrawPile, CardLocation.Processing,
+            new CardMoveReason("pindian.reserve-top"), movement => reservation = movement);
+        if (reservation is not { From: var from, To: var to } || from != CardLocation.DrawPile || to != CardLocation.Processing)
+            throw new InvalidOperationException("Pindian did not reserve its original draw-pile selection in Processing.");
+        return (card.Id, reservation.Sequence);
     }
 
-    internal int[] CurrentPindianProcessingIds(PindianFrame frame) => frame.WuLuKangContest is not null ? _characterLuKangWumiaoOperations.WuLuKangHeldProcessing(frame).ToArray() : frame.Result is { } result ? _corePindianOperations.AvailablePindianCards(result) : frame.SourceUsesDrawPileTop && frame.SourceCardId is { } id ? [id] : [];
+    internal int[] CurrentPindianProcessingIds(PindianFrame frame)
+    {
+        if (frame.WuLuKangContest is not null)
+            return _characterLuKangWumiaoOperations.WuLuKangHeldProcessing(frame).ToArray();
+        if (frame.Result is { } result)
+            return _corePindianOperations.AvailablePindianCards(result);
+        return frame.SourceUsesDrawPileTop && frame.SourceCardId is { } id && HoldsPindianSourceTop(frame) ? [id] : [];
+    }
 }

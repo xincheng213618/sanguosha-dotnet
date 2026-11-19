@@ -67,11 +67,17 @@ internal sealed partial class CoreGameEnginePindianRandomSelectionsRuntime
         {
             var forced = state.Receipts.Any(r => r.TargetSeat == frame.SourceSeat);
             if (!forced)
+            {
+                (int CardId, int? ReservationSequence)? top = state.DeferredSourceTop
+                    ? _corePindianPoliciesOperations.ReserveOrReadPindianTop(_coreMatchParticipantsPlayersAccess._players[frame.SourceSeat], true)
+                    : null;
                 frame = frame with
                 {
-                    SourceCardId = state.DeferredSourceTop ? _corePindianPoliciesOperations.ReserveOrReadPindianTop(_coreMatchParticipantsPlayersAccess._players[frame.SourceSeat], true) : state.DeferredSourceCardId,
-                    SourceUsesDrawPileTop = state.DeferredSourceTop
+                    SourceCardId = top?.CardId ?? state.DeferredSourceCardId,
+                    SourceUsesDrawPileTop = top is not null,
+                    SourceTopReservationSequence = top?.ReservationSequence
                 };
+            }
             state = state with
             {
                 DeferredSourceTop = false,
@@ -121,7 +127,8 @@ internal sealed partial class CoreGameEnginePindianRandomSelectionsRuntime
                     frame = frame with
                     {
                         SourceCardId = cardId,
-                        SourceUsesDrawPileTop = false
+                        SourceUsesDrawPileTop = false,
+                        SourceTopReservationSequence = null
                     };
                 }
                 else

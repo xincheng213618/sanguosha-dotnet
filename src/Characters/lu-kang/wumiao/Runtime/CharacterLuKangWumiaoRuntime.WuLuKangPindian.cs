@@ -65,7 +65,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
                 return new(seat, id, CardKind.Slash, from, 0, false, null);
             var card = _coreAdvancedLifecycleOperations.GetAdvancedCard(id);
             var rank = _coreAlcoholIdentityPoliciesOperations.CaptureAlcoholPindianRank(f, _coreMatchParticipantsPlayersAccess._players[seat], card, seat == f.SourceSeat, isTop) ?? _corePindianPoliciesOperations.EffectivePindianRank(_coreMatchParticipantsPlayersAccess._players[seat], card);
-            return new(seat, id, card.Kind, from, rank, isTop, from == CardLocation.Processing ? _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == id && m.To == CardLocation.Processing).Sequence : null);
+            return new(seat, id, card.Kind, from, rank, isTop, from == CardLocation.Processing ? f.SourceTopReservationSequence : null);
         }
 
         CaptureWuLuKangContest(f, false, f.SourceSeat, [Input(f.SourceSeat, f.SourceCardId ?? 0, sourceFrom, f.SourceUsesDrawPileTop), Input(other, opponentCardId, top ? CardLocation.DrawPile : CardLocation.Hand(other), top)]);
@@ -138,7 +138,7 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         if (w.Stage == WuLuKangPindianStage.BeforeSourceReplacement)
         {
             foreach (var input in r.Original.Where(c => c.From == CardLocation.Processing && r.Assignments.All(a => a.CardId != c.CardId)))
-                if (_cardZonesOperations._cardZones.GetLocation(input.CardId) == CardLocation.Processing)
+                if (IsWuLuKangReservationHeld(input.CardId, input.ReservationSequence))
                     _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(input.CardId), CardLocation.Processing, CardLocation.DrawPile, new(WuLuKangReserveReason), emitCardMovedEvents: false, disclosure: CardMovementDisclosure.FaceDown);
             r = r with
             {
@@ -253,7 +253,24 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
 
     [ProgramViewContributor(ProgramViewContribution.ConcealedCardExclusion, 20)]
     internal bool IsWuLuKangPrivatePindianCard(int id) => _resolutionStackOperations._resolutionStack.Any(f => f.WuLuKangContest is { Revealed: false, Cancelled: false } r && (r.Replacements.Any(p => p.ReservedCardId == id) || r.Original.Any(p => p.CardId == id && p.From == CardLocation.Processing)));
-    internal IReadOnlyList<int> WuLuKangHeldProcessing(ResolutionFrame parent) => parent.WuLuKangContest is not { } r ? [] : r.Original.Select(c => c.CardId).Concat(r.Replacements.Where(p => p.ReservedCardId is not null).Select(p => p.ReservedCardId!.Value)).Where(id => id > 0 && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Distinct().ToArray();
+
+    private bool IsWuLuKangReservationHeld(int cardId, long? reservationSequence) =>
+        reservationSequence is { } sequence && _zoneEntries.CurrentEntry(CardLocation.Processing, cardId) == sequence;
+
+    internal IReadOnlyList<int> WuLuKangHeldProcessing(ResolutionFrame parent)
+    {
+        if (parent.WuLuKangContest is not { } contest)
+            return [];
+
+        bool IsHeld(int id, long? reservation) => id > 0 && (contest.Revealed
+            ? _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing
+            : IsWuLuKangReservationHeld(id, reservation));
+
+        return contest.Original.Where(c => IsHeld(c.CardId, c.ReservationSequence)).Select(c => c.CardId)
+            .Concat(contest.Replacements.Where(p => p.ReservedCardId is { } id && IsHeld(id, p.ReservationSequence))
+                .Select(p => p.ReservedCardId!.Value)).Distinct().ToArray();
+    }
+
     internal void RevealWuLuKangInputs(ResolutionFrame parent)
     {
         if (parent.WuLuKangContest is not { Revealed: false } r)

@@ -17,6 +17,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Actual native material deliveries use `INativeMaterialClaims` and the original use or delayed Judgment frame's `MaterialClaims`. Capture real journal deliveries once; distinguish representation residency from the original owner's retirement right, which is relinquished after delivery even if that entity later reenters Processing. Keep accepted promises, child handoffs and producer retention separate from delivered acquisition; no character proof scan may replace this shared delivery fact.
 
+- A pair Pindian retains the source's original draw-pile reservation sequence on its own frame. Its unrevealed source and any replacement that returns the reserved card must still refer to that Processing entry. A read of the opponent's draw-pile top leaves it in the draw pile until payment. Simultaneous Pindian keeps its own reservation receipts, and paid reveal and result claims retain their own lifetimes.
+
 ## Native-use material retirement
 
 - Record actual non-Processing payment or destruction through `INativeMaterialClaims.CaptureRetirement` on the original `CardUseFrame.MaterialClaims`. A `Retirement` has no acquisition recipient and does not contribute to `WasClaimed` or claimed entities. A `Delivery` retains its acquisition and residency semantics. Ordinary payment into Processing issues no retirement receipt.

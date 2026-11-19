@@ -75,7 +75,7 @@ internal sealed partial class CharacterPangJiOlRuntime
         var opponentCard = _cardZonesOperations._cardZones.CardsAt(opponentFrom).Single(c => c.Id == opponentCardId);
         if (opponentTop && frame.WuLuKangContest is null && _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).Last().Id != opponentCardId)
             throw new InvalidOperationException("Douyu cannot choose a different private opponent top.");
-        long? reserved = frame.WuLuKangContest is not null ? sourceInput.ReservationSequence : frame.SourceUsesDrawPileTop ? _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == sourceId && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing && m.Reason.Value == "pindian.reserve-top").Sequence : null;
+        long? reserved = frame.WuLuKangContest is not null ? sourceInput.ReservationSequence : frame.SourceTopReservationSequence;
         CaptureDouyuContest(frame, false, frame.SourceSeat, [new(frame.SourceSeat, sourceId, sourceCard.Kind, from, frame.WuLuKangContest is not null ? sourceInput.Rank : _coreAlcoholIdentityPoliciesOperations.CaptureAlcoholPindianRank(frame, _coreMatchParticipantsPlayersAccess._players[frame.SourceSeat], sourceCard, true, frame.SourceUsesDrawPileTop) ?? _corePindianPoliciesOperations.EffectivePindianRank(_coreMatchParticipantsPlayersAccess._players[frame.SourceSeat], sourceCard), sourceInput.Top, reserved), new(opponent, opponentCardId, opponentCard.Kind, opponentFrom, frame.WuLuKangContest is not null ? opponentInput.Rank : _coreAlcoholIdentityPoliciesOperations.CaptureAlcoholPindianRank(frame, _coreMatchParticipantsPlayersAccess._players[opponent], opponentCard, false, opponentTop) ?? _corePindianPoliciesOperations.EffectivePindianRank(_coreMatchParticipantsPlayersAccess._players[opponent], opponentCard), opponentInput.Top, opponentInput.ReservationSequence)], opportunities);
         return true;
     }
@@ -141,8 +141,20 @@ internal sealed partial class CharacterPangJiOlRuntime
             if (_cardZonesOperations._cardZones.GetLocation(original.CardId) != CardLocation.Processing)
                 throw new InvalidOperationException("Douyu cannot invent an unpaid native Pindian entity.");
             var reserved = original.PaymentFrom == CardLocation.Processing;
-            var movement = reserved ? _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence == original.ReservationSequence && m.CardId == original.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing) : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence > r.SequenceBefore && m.CardId == original.CardId && m.CardKind == original.PrintedKind && m.From == original.PaymentFrom && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.PindianReveal);
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DouyuNativePaymentEvent(parent.Id, original.Seat, original.CardId, original.PrintedKind, original.PaymentFrom, movement.Sequence, reserved));
+            long movementSequence;
+            if (parent is PindianFrame { WuLuKangContest: null, SourceUsesDrawPileTop: true } pair && original.Seat == pair.SourceSeat)
+            {
+                if (pair.SourceTopReservationSequence is not { } sequence || original.ReservationSequence != sequence ||
+                    !_corePindianPoliciesOperations.HasCurrentPindianSourceCard(pair))
+                    throw new InvalidOperationException("Douyu requires the original unpaid Pindian top reservation.");
+                movementSequence = sequence;
+            }
+            else
+            {
+                var movement = reserved ? _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence == original.ReservationSequence && m.CardId == original.CardId && m.From == CardLocation.DrawPile && m.To == CardLocation.Processing) : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Single(m => m.Sequence > r.SequenceBefore && m.CardId == original.CardId && m.CardKind == original.PrintedKind && m.From == original.PaymentFrom && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.PindianReveal);
+                movementSequence = movement.Sequence;
+            }
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DouyuNativePaymentEvent(parent.Id, original.Seat, original.CardId, original.PrintedKind, original.PaymentFrom, movementSequence, reserved));
         }
 
         _coreRuntimeOperations.ReplaceRuntimeFrame(parent.Id, parent with { DouyuContest = r with { Paid = true, SequenceAfter = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });

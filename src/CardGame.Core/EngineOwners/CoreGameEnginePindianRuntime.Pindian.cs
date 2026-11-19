@@ -94,10 +94,12 @@ internal sealed partial class CoreGameEnginePindianRuntime
         }
 
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
-        var top = selected.Parameters.GetValueOrDefault("action") == "pindian-top";
+        var action = selected.Parameters.GetValueOrDefault("action");
         var selectingSource = frame.PindianStep is PindianStep.ChooseParticipants or PindianStep.ChooseSourceCard;
         var chooser = _coreMatchParticipantsPlayersAccess._players[selectingSource ? frame.SourceSeat : frame.OpponentSeat!.Value];
-        var selectedId = selected.Parameters.GetValueOrDefault("action") == "pindian-maximum" ? 0 : top ? _corePindianPoliciesOperations.ReserveOrReadPindianTop(chooser, selectingSource) : selected.Cards.Single();
+        (int CardId, int? ReservationSequence)? top = action == "pindian-top"
+            ? _corePindianPoliciesOperations.ReserveOrReadPindianTop(chooser, selectingSource) : null;
+        var selectedId = action == "pindian-maximum" ? 0 : top?.CardId ?? selected.Cards.Single();
         switch (frame.PindianStep)
         {
             case PindianStep.ChooseParticipants:
@@ -105,7 +107,8 @@ internal sealed partial class CoreGameEnginePindianRuntime
                 {
                     OpponentSeat = selected.Targets.Single(),
                     SourceCardId = selectedId,
-                    SourceUsesDrawPileTop = top,
+                    SourceUsesDrawPileTop = top is not null,
+                    SourceTopReservationSequence = top?.ReservationSequence,
                     PindianStep = PindianStep.ChooseOpponentCard
                 };
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame);
@@ -115,14 +118,15 @@ internal sealed partial class CoreGameEnginePindianRuntime
                 frame = frame with
                 {
                     SourceCardId = selectedId,
-                    SourceUsesDrawPileTop = top,
+                    SourceUsesDrawPileTop = top is not null,
+                    SourceTopReservationSequence = top?.ReservationSequence,
                     PindianStep = PindianStep.ChooseOpponentCard
                 };
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame);
                 PublishPindianSelection(frame);
                 return;
             case PindianStep.ChooseOpponentCard:
-                RevealPindian(frame, selectedId, top);
+                RevealPindian(frame, selectedId, top is not null);
                 return;
             default:
                 throw new InvalidOperationException("Unknown Pindian step.");
@@ -131,6 +135,8 @@ internal sealed partial class CoreGameEnginePindianRuntime
 
     internal void RevealPindian(PindianFrame frame, int opponentCardId, bool opponentTop = false)
     {
+        if (frame.SourceUsesDrawPileTop && frame.WuLuKangContest is null && !_corePindianPoliciesOperations.HasCurrentPindianSourceCard(frame))
+            throw new InvalidOperationException("Pindian lost its original draw-pile reservation before reveal.");
         if (_characterLuKangWumiaoOperations.TryBeginWuLuKangPairBeforeReveal(frame, opponentCardId, opponentTop))
             return;
         if (_characterPangJiOlOperations.TryBeginDouyuPairPreReveal(frame, opponentCardId, opponentTop))
@@ -276,7 +282,7 @@ internal sealed partial class CoreGameEnginePindianRuntime
         }
 
         var owner = frame.PindianStep is PindianStep.ChooseParticipants or PindianStep.ChooseSourceCard ? frame.SourceSeat : frame.OpponentSeat!.Value;
-        if (decision.PlayerSeat != owner || decision.SkillPrompt.SkillId != frame.SkillId || frame.PindianStep == PindianStep.ChooseSourceCard && frame.SourceCardId is { } selectedSource && (frame.OwnedPileSource is not null || _resolutionStackOperations._resolutionStack[^2] is not ProgramSkillFrame sourceProgram || !sourceProgram.SelectedCardIds.SequenceEqual([selectedSource]) || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Any(card => card.Id == selectedSource) || decision.ValidCardIds.Any(id => id != selectedSource) || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("action") != "pindian-top" && !choice.Cards.SequenceEqual([selectedSource]))) || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("action") == "pindian-maximum" ? choice.Cards.Count != 0 || !_characterLuKangWumiaoOperations.CanWuLuKangDiscardForPindian(_coreMatchParticipantsPlayersAccess._players[owner]) : choice.Parameters.GetValueOrDefault("action") == "pindian-top" ? choice.Cards.Count != 0 || !_corePindianPoliciesOperations.CanOfferPindianTopChoice(_coreMatchParticipantsPlayersAccess._players[owner]) : choice.Cards.Count != 1 || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Any(card => card.Id == choice.Cards[0])) || frame.PindianStep == PindianStep.ChooseOpponentCard && !_corePindianPoliciesOperations.HasCurrentPindianSourceCard(frame))
+        if (decision.PlayerSeat != owner || decision.SkillPrompt.SkillId != frame.SkillId || frame.PindianStep == PindianStep.ChooseSourceCard && frame.SourceCardId is { } selectedSource && (frame.OwnedPileSource is not null || _resolutionStackOperations._resolutionStack[^2] is not ProgramSkillFrame sourceProgram || !sourceProgram.SelectedCardIds.SequenceEqual([selectedSource]) || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Any(card => card.Id == selectedSource) || decision.ValidCardIds.Any(id => id != selectedSource) || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("action") is not ("pindian-top" or "pindian-maximum") && !choice.Cards.SequenceEqual([selectedSource]))) || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("action") == "pindian-maximum" ? choice.Cards.Count != 0 || !_characterLuKangWumiaoOperations.CanWuLuKangDiscardForPindian(_coreMatchParticipantsPlayersAccess._players[owner]) : choice.Parameters.GetValueOrDefault("action") == "pindian-top" ? choice.Cards.Count != 0 || !_corePindianPoliciesOperations.CanOfferPindianTopChoice(_coreMatchParticipantsPlayersAccess._players[owner]) : choice.Cards.Count != 1 || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[owner]).Any(card => card.Id == choice.Cards[0])) || frame.PindianStep == PindianStep.ChooseOpponentCard && !_corePindianPoliciesOperations.HasCurrentPindianSourceCard(frame))
             throw new InvalidOperationException("Pindian selection leaked or lost a private hand card.");
     }
 }

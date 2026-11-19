@@ -771,6 +771,7 @@ var tests = new (string Name, Action Body)[]
     ("Mou Deng Ai Jigu: original used discard cannot claim a same-card rediscard", JiguDiscardEntryChecks.JiguDoesNotCollectSameDodgeMaterialAfterRediscard),
     ("OL Boundary Jiang: typed Zhifou discard opens the original batch", NativeCollectedDiscardProjectionChecks.CaoXianTypedDiscardOpensJiangOnItsOriginalBatch),
     ("Dongxin: reclaim only the original paid discard entry", OlDongxinChecks.ReclaimRetainsOriginalPaidEntry),
+    ("OL Douyu: private swap preserves original top payment cold", OlDouyuChecks.PrivateSwapPreservesOriginalTopPaymentCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

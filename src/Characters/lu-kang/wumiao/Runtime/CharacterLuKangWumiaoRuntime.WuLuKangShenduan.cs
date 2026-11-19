@@ -150,7 +150,31 @@ internal sealed partial class CharacterLuKangWumiaoRuntime
         ContinueWuLuKangShenduan(f.Id);
     }
 
-    internal bool WuLuKangInputsAvailable(ResolutionFrame parent, int? replacing = null) => parent.WuLuKangContest!.Assignments.All(a => _coreMatchParticipantsPlayersAccess._players[a.Seat].IsAlive && (a.Seat == replacing || a.CardId > 0 && _cardZonesOperations._cardZones.GetLocation(a.CardId) == WuLuKangAssignedLocation(parent, a.Seat) || a.CardId <= 0 && !parent.WuLuKangContest.SourcesReady && !parent.WuLuKangContest.Replacements.Any(p => p.ParticipantSeat == a.Seat) && CanWuLuKangDiscardForPindian(_coreMatchParticipantsPlayersAccess._players[a.Seat])));
+    internal bool WuLuKangInputsAvailable(ResolutionFrame parent, int? replacing = null)
+    {
+        var contest = parent.WuLuKangContest!;
+        return contest.Assignments.All(Available);
+
+        bool Available(WuLuKangPindianAssignment assigned)
+        {
+            var participant = _coreMatchParticipantsPlayersAccess._players[assigned.Seat];
+            if (!participant.IsAlive)
+                return false;
+            if (assigned.Seat == replacing)
+                return true;
+            if (assigned.CardId <= 0)
+                return !contest.SourcesReady && !contest.Replacements.Any(p => p.ParticipantSeat == assigned.Seat)
+                    && CanWuLuKangDiscardForPindian(participant);
+
+            var replacement = contest.Replacements.LastOrDefault(p => p.ParticipantSeat == assigned.Seat && p.ReservedCardId == assigned.CardId);
+            if (replacement is not null)
+                return IsWuLuKangReservationHeld(assigned.CardId, replacement.ReservationSequence);
+            var original = contest.Original.Single(input => input.Seat == assigned.Seat);
+            return original.From == CardLocation.Processing
+                ? IsWuLuKangReservationHeld(assigned.CardId, original.ReservationSequence)
+                : _cardZonesOperations._cardZones.GetLocation(assigned.CardId) == original.From;
+        }
+    }
     internal void ContinueWuLuKangShenduan(long id)
     {
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null || _resolutionStackOperations._resolutionStack.LastOrDefault()is not ProgramSkillFrame { WuLuKangShenduan: { } r } f || f.Id != id)
