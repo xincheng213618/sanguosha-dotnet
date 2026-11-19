@@ -58,7 +58,10 @@ internal sealed partial class CharacterLiWanOlRuntime
             return false;
         var move = batch.Movements[c.OccurrenceIndex];
         var mark = SilvMark(move.CardId);
-        return mark is not null && mark.Source.OwnerSeat == c.OwnerSeat && mark.Source.SkillId == c.SkillId && mark.Source.SkillInstanceId == c.SkillInstanceId && mark.GameplayHash == c.GameplayHash && IsRefundableSilvMovement(move) && context.SourceSeat == _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move)?.OwnerSeat && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiWanStartedEvent>().Any(e => e.RefundSequence == move.Sequence);
+        return mark is not null && mark.Source.OwnerSeat == c.OwnerSeat && mark.Source.SkillId == c.SkillId &&
+            mark.Source.SkillInstanceId == c.SkillInstanceId && mark.GameplayHash == c.GameplayHash &&
+            SilvRefundHolder(move) is { } holder && context.SourceSeat == holder &&
+            !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiWanStartedEvent>().Any(e => e.RefundSequence == move.Sequence);
     }
 
     [ProgramIssuedTrigger(550, ProgramIssuedTriggerMatch.Decision)]

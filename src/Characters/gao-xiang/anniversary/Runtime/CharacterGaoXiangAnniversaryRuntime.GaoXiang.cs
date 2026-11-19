@@ -183,7 +183,10 @@ internal sealed partial class CharacterGaoXiangAnniversaryRuntime
                     return true;
                 }
 
-                var gain = r.Actor == f.OwnerSeat ? [] : r.Discards.Where(m => m.To == CardLocation.DiscardPile && CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(m.PrintedKind) == SkillProgramCardCategory.Basic && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile).ToArray();
+                var gain = r.Actor == f.OwnerSeat ? [] : r.Discards.Where(m =>
+                    m.To == CardLocation.DiscardPile &&
+                    CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(m.PrintedKind) == SkillProgramCardCategory.Basic &&
+                    _zoneEntries.CurrentEntry(CardLocation.DiscardPile, m.CardId) == m.Sequence).ToArray();
                 if (gain.Length == 0)
                 {
                     _coreSkillProgramsOperations.FinishProgramSkill(f, true);

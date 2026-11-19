@@ -40,7 +40,7 @@ internal sealed partial class CharacterLiWanOlRuntime
             var move = context.MovementBatch!.Movements[context.MovementIndex!.Value];
             r = r with
             {
-                RecipientSeat = _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(move)!.Value.OwnerSeat!.Value,
+                RecipientSeat = context.SourceSeat,
                 RefundSequence = move.Sequence,
                 ChosenCards = [move.CardId]
             };
@@ -157,12 +157,14 @@ internal sealed partial class CharacterLiWanOlRuntime
                 count = _corePhysicalDrawFacadesOperations.DrawCards(_coreMatchParticipantsPlayersAccess._players[recipient], 1, true, new(SilvDrawReason)).Count;
             else
             {
-                var ids = r.ChosenCards!.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile).ToArray();
-                if (ids.Length != r.ChosenCards!.Count)
+                var ids = r.ChosenCards!;
+                if (ids.Any(id => r.Op == SkillProgramEffectOp.ReturnDiscardedSilvEntity
+                    ? r.RefundSequence is not { } sequence || _zoneEntries.CurrentEntry(CardLocation.DiscardPile, id) != sequence
+                    : _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DiscardPile))
                     throw new InvalidOperationException("Lianju cannot substitute or recycle a selected entity before payment.");
-                if (ids.Length > 0)
+                if (ids.Count > 0)
                     _corePhysicalMovementFacadesOperations.MoveCards(ids.Select(_coreAdvancedLifecycleOperations.GetAdvancedCard).ToArray(), CardLocation.DiscardPile, CardLocation.Hand(recipient), new(r.Op == SkillProgramEffectOp.ReturnDiscardedSilvEntity ? SilvRefundReason : LianjuGainReason));
-                count = ids.Length;
+                count = ids.Count;
             }
         }
 

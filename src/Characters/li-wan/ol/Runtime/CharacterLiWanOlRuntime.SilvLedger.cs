@@ -13,7 +13,16 @@ internal sealed partial class CharacterLiWanOlRuntime
 
     internal bool HasSilvEntityMark(int cardId) => HasLiWanCapability && SilvMark(cardId)is not null;
     internal bool ValidSilvMark(SilvEntityMarkedEvent e) => e.CardId > 0 && e.Source.SkillId == "ol:silv" && _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(e.Source.SkillId)?.Program is { } program && program.GameplayHash == e.GameplayHash && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Any(m => m.Sequence == e.GainMovementSequence && m.CardId == e.CardId && m.To.Zone == CardZoneKind.Hand && m.Reason.Value is LianjuGainReason or SilvDrawReason) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiWanPaidEvent>().Any(p => p.FrameId == e.ProducerFrameId && e.GainMovementSequence > p.Before && e.GainMovementSequence <= p.After);
-    internal bool IsRefundableSilvMovement(CardMovementRecord m) => m.To == CardLocation.DiscardPile && _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)?.OwnerSeat is { } loser && _coreTableSeatQueriesOperations.IsValidPlayerSeat(loser) && _coreMatchParticipantsPlayersAccess._players[loser].IsAlive && SilvMark(m.CardId)is not null && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(x => x.CardId == m.CardId).Sequence == m.Sequence;
+    private int? SilvRefundHolder(CardMovementRecord move)
+    {
+        if (move.To != CardLocation.DiscardPile ||
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, move.CardId) != move.Sequence ||
+            _coreProgramDiscardOriginsOperations.GetCompletedProgramDiscardSource(move)?.OwnerSeat is not { } holder ||
+            !_coreTableSeatQueriesOperations.IsValidPlayerSeat(holder) || !_coreMatchParticipantsPlayersAccess._players[holder].IsAlive)
+            return null;
+        return holder;
+    }
+
     internal IReadOnlyList<ProgramTriggerCandidate> CollectSilvRefundCandidates(CardMovementBatchContext batch)
     {
         if (!HasLiWanCapability)
@@ -22,9 +31,9 @@ internal sealed partial class CharacterLiWanOlRuntime
         for (var i = 0; i < batch.Movements.Count; i++)
         {
             var move = batch.Movements[i];
-            if (!IsRefundableSilvMovement(move) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiWanStartedEvent>().Any(e => e.RefundSequence == move.Sequence))
+            if (move.To != CardLocation.DiscardPile || SilvMark(move.CardId) is not { } mark || SilvRefundHolder(move) is null ||
+                _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LiWanStartedEvent>().Any(e => e.RefundSequence == move.Sequence))
                 continue;
-            var mark = SilvMark(move.CardId)!;
             var p = _contentRegistryOperations._contentRegistry.GetSkill(mark.Source.SkillId).Program!;
             var t = p.Triggers.Single(t => t.Effects is [{ Op: SkillProgramEffectOp.ReturnDiscardedSilvEntity }]);
             result.Add(new(mark.Source.OwnerSeat, mark.Source.SkillId, t.Id, mark.Source.SkillInstanceId, mark.GameplayHash, t.Priority, i));
@@ -35,4 +44,18 @@ internal sealed partial class CharacterLiWanOlRuntime
 
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 2500)]
     internal void CollectWindow_CollectSilvRefundCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result) => result.AddRange(CollectSilvRefundCandidates(batch));
+
+    [ProgramPipelineHook(ProgramPipelinePhase.CreateMovementContext, 4600)]
+    internal ProgramSkillWindowContext? CreateSilvRefundContext(CardsMovedTriggerWindowFrame window, ProgramTriggerCandidate candidate)
+    {
+        if (candidate.SkillId != "ol:silv" ||
+            _coreProgramLifecycleOperations.GetProgramTrigger2(candidate).Effects is not [{ Op: SkillProgramEffectOp.ReturnDiscardedSilvEntity }])
+            return null;
+        var index = candidate.OccurrenceIndex;
+        var holder = SilvRefundHolder(window.Batch.Movements[index]);
+        var facts = _coreProgramLifecycleOperations.CaptureProgramTriggerFacts(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat])
+            with { MovedCardCount = 1 };
+        return new(SkillProgramTriggerWindow.DiscardPileReceived, window.Id, candidate.OwnerSeat, SourceSeat: holder,
+            OccurrenceIndex: index, Facts: facts, MovementBatch: window.Batch, MovementIndex: index);
+    }
 }

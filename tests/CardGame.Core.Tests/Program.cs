@@ -793,6 +793,8 @@ var tests = new (string Name, Action Body)[]
     ("OL Fu Rong Xiaosi offers only the original discard payments", FuRongDiscardEntryChecks.XiaosiOffersOnlyTheOriginalPaymentEntries),
     ("OL Boundary Zongxuan: first previous discard cannot place same card at a newer entry cold", OlBoundaryZongxuanChecks.FirstPreviousDiscardCannotPlaceTheSameCardAtANewerEntryCold),
     ("Mobile Zhongchun: Bique material receipts qualify the actual Ending actor", MobileZhongchunChecks.BiqueDiscardMaterialsQualifyAtEndingAndReplay),
+    ("Anniversary Chiying: original discard does not transfer a basic at a newer entry cold", AnniversaryGaoXiangChecks.ChiyingCannotTransferABasicAtANewerDiscardEntryCold),
+    ("OL Silv: refunds the native Bique discard to its actual holder", OlSilvChecks.BiqueDiscardRefundsTheMarkedEntityToItsActualHolder),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

@@ -8,5 +8,6 @@ internal sealed class DrawSilvMarkedCardAfterDamageDescriptor : LiWanDescriptor
 { public override SkillProgramEffectOp Op => SkillProgramEffectOp.DrawSilvMarkedCardAfterDamage; }
 internal sealed class ReturnDiscardedSilvEntityDescriptor : LiWanDescriptor
 { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ReturnDiscardedSilvEntity;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeLogicalDiscard);
     public override bool AllowsDeadTarget(in ProgramEffectContinuationContext context) => true;
 }
