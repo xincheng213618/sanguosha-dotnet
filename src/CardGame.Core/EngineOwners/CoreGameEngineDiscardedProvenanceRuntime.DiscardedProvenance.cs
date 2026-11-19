@@ -44,11 +44,20 @@ internal sealed partial class CoreGameEngineDiscardedProvenanceRuntime
     }
 
     internal ProgramDiscardedEntityOriginEvent? DiscardedProvenanceOrigin(CardMovementRecord movement) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<ProgramDiscardedEntityOriginEvent>().SingleOrDefault(e => e.MovementSequence == movement.Sequence);
-    internal int[] MatchingProvenanceDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger)
-    {
-        var current = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).ToDictionary(c => c.Id);
-        return batch.Movements.Select((m, i) => (m, i, origin: DiscardedProvenanceOrigin(m))).Where(x => x.origin is not null && x.m.To == CardLocation.DiscardPile && x.origin.SourceSeat != candidate.OwnerSeat && current.ContainsKey(x.m.CardId) && (trigger.Suits.Count == 0 || trigger.Suits.Contains(x.origin.EffectiveSuit))).Select(x => x.i).ToArray();
-    }
+    private bool IsOriginalDiscardEntry(CardMovementRecord movement) =>
+        movement.To == CardLocation.DiscardPile &&
+        _zoneEntries.CurrentEntry(CardLocation.DiscardPile, movement.CardId) == movement.Sequence;
+
+    internal int[] MatchingProvenanceDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, SkillProgramTrigger trigger) =>
+        batch.Movements.Select((movement, index) => (movement, index))
+            .Where(entry => IsOriginalDiscardEntry(entry.movement) && DiscardedProvenanceOrigin(entry.movement) is { } origin &&
+                origin.SourceSeat != candidate.OwnerSeat && (trigger.Suits.Count == 0 || trigger.Suits.Contains(origin.EffectiveSuit)))
+            .Select(entry => entry.index).ToArray();
+
+    [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 915, SkillProgramEffectOp.ClaimDiscardedEntityWithProvenance)]
+    private bool CanOfferOriginalDiscardEntry(ProgramTriggerLegalityContext context) =>
+        context.WindowContext is { MovementBatch: { } batch, MovementIndex: { } index } &&
+        (uint)index < (uint)batch.Movements.Count && IsOriginalDiscardEntry(batch.Movements[index]);
 
     SkillProgramStepOutcome IDiscardedProvenanceProgramHost.ClaimDiscardedEntityWithProvenance(ProgramSkillFrame frame, string provenanceId) => BeginDiscardedProvenanceClaim(frame, provenanceId);
     SkillProgramStepOutcome IDiscardedProvenanceProgramHost.OfferFaceUpForOutsideClaims(ProgramSkillFrame frame, string provenanceId) => OfferProvenanceFaceUp(frame, provenanceId);
@@ -62,7 +71,7 @@ internal sealed partial class CoreGameEngineDiscardedProvenanceRuntime
         var origin = DiscardedProvenanceOrigin(movement);
         if (origin is null || origin.SourceSeat == f.OwnerSeat || movement.To != CardLocation.DiscardPile || !_coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(movement))
             throw new InvalidOperationException("A provenance claim lost its captured discard/judgment origin.");
-        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || _cardZonesOperations._cardZones.GetLocation(movement.CardId) != CardLocation.DiscardPile)
+        if (_coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || !_coreProgramLifecycleOperations.CanInvokeProgramSkill(f) || !IsOriginalDiscardEntry(movement))
         {
             _coreProgramLifecycleOperations.CancelProgramBindingAndCleanup(f, "落英实体或来源已失效，未领取牌。");
             return SkillProgramStepOutcome.AwaitChild;

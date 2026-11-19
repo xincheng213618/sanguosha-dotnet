@@ -763,6 +763,7 @@ var tests = new (string Name, Action Body)[]
     ("OL Guzheng: immediate same-source batch, paid children and command replay", OlGuzhengChecks.ImmediateSameSourceBatchAndPaidChildrenReplay),
     ("Wushuang Guzheng: equipment return, original discard entry and command replay", WushuangGuzhengChecks.EquipmentReturnAndOriginalEntryClaimReplay),
     ("Classic Luoying: genuine foreign club discard and judgment, no recast", ClassicLuoyingChecks.OnlyOtherPlayersGenuineClubDiscardAndJudgmentCanBeClaimed),
+    ("Luoying (Classic, OL, Mobile): old discard window cannot claim a newer pile entry", ClassicLuoyingChecks.OldDiscardWindowCannotClaimNewPileEntry),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
