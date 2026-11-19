@@ -754,6 +754,7 @@ var tests = new (string Name, Action Body)[]
     ("Boundary Zhang Fei cancellation next real Use freeze", BoundaryZhangFeiChecks.CancellationAndUseFreeze),
     ("Mobile boundary Cao Cao: native claim children precede draw and cardless damage cold", BoundaryCaoCaoMobileChecks.NativeClaimChildrenPrecedeDrawAndCardlessDamageStillDrawsCold),
     ("Mobile boundary Cao Cao: death during the claim stops the following draw", BoundaryCaoCaoMobileChecks.OwnerDeathDuringClaimStopsTheFollowingDraw),
+    ("Classic Guzheng actual discard scope, optional claim and command replay", ClassicGuzhengChecks.ActualDiscardScopeAndOptionalClaimReplay),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

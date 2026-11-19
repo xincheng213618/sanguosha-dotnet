@@ -788,6 +788,8 @@ internal static class SkillStateChecks
         internal ActualDiscardRecoveryPhaseKey? Value;
         public ActualDiscardRecoveryPhaseKey? Current() => Value;
         public bool IsRecorded(ActualDiscardRecoveryPhaseKey phase) => phase == Value;
+        public IReadOnlyList<DiscardRecoveryEntity> CurrentPhaseDiscards(ActualDiscardRecoveryPhaseKey phase) => [];
+        public bool StillAvailable(DiscardRecoveryEntity entity) => false;
     }
 
     private static void PermanentRestrictionExpiresOnItsTargetDeath()

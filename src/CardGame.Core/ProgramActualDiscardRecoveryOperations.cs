@@ -3,7 +3,10 @@ namespace CardGame.Core;
 public enum ActualDiscardRecoveryPhaseKind { Preparation, Judgment, Draw, Play, Discard, Ending }
 public sealed record ActualDiscardRecoveryPhaseKey(long Token, int TurnNumber, int ActualTurnOwnerSeat,
     int ActorSeat, ActualDiscardRecoveryPhaseKind Kind);
-public sealed record ActualDiscardRecoveryPhaseStartedEvent(ActualDiscardRecoveryPhaseKey Phase) : IGameEvent;
+public sealed record ActualDiscardRecoveryPhaseStartedEvent(ActualDiscardRecoveryPhaseKey Phase) : IGameEvent
+{
+    public int MovementSequenceBefore { get; init; }
+}
 public sealed record ActualDiscardRecoveryBatchQualifiedEvent(long BatchId, ActualDiscardRecoveryPhaseKey Phase,
     int DiscardOwnerSeat, int OriginalCount) : IGameEvent;
 public sealed record DiscardRecoveryEntity(int CardId, long MovementSequence, CardLocation OriginalFrom);

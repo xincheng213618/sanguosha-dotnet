@@ -226,6 +226,7 @@ internal sealed class ChooseOtherOwnedCardDiscardProgramOperationDescriptor : Pr
 internal sealed class RestorePhaseHandDiscardsProgramOperationDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.RestorePhaseHandDiscards;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
     public override ISkillProgramEffectHandler Handler { get; } = new RestorePhaseHandDiscardsSkillProgramEffectHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(

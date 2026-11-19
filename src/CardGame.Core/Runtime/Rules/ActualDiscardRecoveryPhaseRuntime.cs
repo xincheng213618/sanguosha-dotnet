@@ -47,7 +47,7 @@ internal sealed class ActualDiscardRecoveryPhaseRuntime(IProgramRuntimeFrames fr
         var token = history.Read<ActualDiscardRecoveryPhaseStartedEvent>()
             .Select(e => e.Phase.Token).DefaultIfEmpty().Max() + 1;
         events.AdvanceFact(new ActualDiscardRecoveryPhaseStartedEvent(new(token, turn.TurnNumber,
-            turn.TurnOwnerSeat, actor, kind)));
+            turn.TurnOwnerSeat, actor, kind)) { MovementSequenceBefore = movements.Last()?.Sequence ?? 0 });
     }
 
     public void RecordSkipped(ActualDiscardRecoveryPhaseKind kind, int actor, long? nativeFrameId = null, bool isExtra = false)
@@ -104,7 +104,28 @@ internal sealed class ActualDiscardRecoveryPhaseRuntime(IProgramRuntimeFrames fr
             .GroupBy(m => m.CardId).Select(g => g.OrderBy(m => m.Sequence).First())
             .OrderBy(m => m.Sequence).Select(m => new DiscardRecoveryEntity(m.CardId, m.Sequence, discards.DiscardSource(m)!.Value)).ToArray());
 
-    internal bool StillAvailable(DiscardRecoveryEntity entity) =>
+    public IReadOnlyList<DiscardRecoveryEntity> CurrentPhaseDiscards(ActualDiscardRecoveryPhaseKey key)
+    {
+        if (key.Kind != ActualDiscardRecoveryPhaseKind.Discard || Current() != key ||
+            journal.LastMatching(e => e is ActualDiscardRecoveryPhaseStartedEvent started && started.Phase == key)
+                is not ActualDiscardRecoveryPhaseStartedEvent start)
+            return [];
+
+        var entries = new List<DiscardRecoveryEntity>();
+        var seen = new HashSet<int>();
+        var records = movements.Read();
+        for (var i = records.Count - 1; i >= 0; i--)
+        {
+            var record = records[i];
+            if (record.Sequence <= start.MovementSequenceBefore) break;
+            if (seen.Add(record.CardId) && record.To == CardLocation.DiscardPile && discards.DiscardSource(record) is { } from)
+                entries.Add(new(record.CardId, record.Sequence, from));
+        }
+        entries.Reverse();
+        return entries;
+    }
+
+    public bool StillAvailable(DiscardRecoveryEntity entity) =>
         zones.GetLocation(entity.CardId) == CardLocation.DiscardPile &&
         !movements.Read().Any(m => m.CardId == entity.CardId && m.Sequence > entity.MovementSequence && m.From == CardLocation.DiscardPile);
 

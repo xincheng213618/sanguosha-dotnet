@@ -4,6 +4,8 @@ internal interface IActualDiscardRecoveryPhaseQueries : IProgramSelectionQuery
 {
     ActualDiscardRecoveryPhaseKey? Current();
     bool IsRecorded(ActualDiscardRecoveryPhaseKey phase);
+    IReadOnlyList<DiscardRecoveryEntity> CurrentPhaseDiscards(ActualDiscardRecoveryPhaseKey phase);
+    bool StillAvailable(DiscardRecoveryEntity entity);
 }
 
 internal interface IActualDiscardRecoveryPhaseOperations : IProgramRuntimeOperations

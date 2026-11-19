@@ -227,7 +227,7 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
     [ProgramAnswer("select-subset")]
     internal void ResolveProgramCardSubsetAnswer(PromptChoice selected) => _programBoundCardOperations.Get().ResolveProgramCardSubsetAnswer(selected);
     internal void ResolveProgramActivationChoice(PromptChoice selected) => _programBindingOperations.Get().ResolveActivation(selected);
-    [ProgramAnswer("sole-target-protection", "pair-obtain", "shown-pair-gift", "equipment-donation", "actual-ended-equipment", "limited-owned-gift", "finish-limited-owned-gift", "select-target", "select-targets", "select-source-card", "select-and-move-owned-card", "choose-other-owned-card-discard", "choose-other-owned-card-decline", "restore-phase-hand-discard", "restore-phase-hand-decline", "choose-own-card-discard", "select-owned-cards", "finish-owned-cards", "give-bound-card", "keep-bound-cards", "distribute-owned-card", "decline-owned-card-distribution", "reveal-target-hand-card", "reveal-target-hand-card-decline", "request-slash", "request-slash-decline", "request-slash-nearest", "request-slash-nearest-decline", "nearest-legal-slash", "unlimited-virtual-slash", "damage-judgment-suit-payment", "attack-range-aid-discard-weapon", "attack-range-aid-draw")]
+    [ProgramAnswer("sole-target-protection", "pair-obtain", "shown-pair-gift", "equipment-donation", "actual-ended-equipment", "limited-owned-gift", "finish-limited-owned-gift", "select-target", "select-targets", "select-source-card", "select-and-move-owned-card", "choose-other-owned-card-discard", "choose-other-owned-card-decline", "choose-own-card-discard", "select-owned-cards", "finish-owned-cards", "give-bound-card", "keep-bound-cards", "distribute-owned-card", "decline-owned-card-distribution", "reveal-target-hand-card", "reveal-target-hand-card-decline", "request-slash", "request-slash-decline", "request-slash-nearest", "request-slash-nearest-decline", "nearest-legal-slash", "unlimited-virtual-slash", "damage-judgment-suit-payment", "attack-range-aid-discard-weapon", "attack-range-aid-draw")]
     internal void ResolveProgramInstructionChoice(PromptChoice selected, string action)
     {
         var frame = _resolutionStackOperations._resolutionStack.LastOrDefault() as ProgramSkillFrame ?? throw new InvalidOperationException("The program instruction choice lost its frame.");
@@ -307,10 +307,6 @@ internal sealed partial class CoreGameEngineProgramLifecycleRuntime
             case "choose-other-owned-card-discard":
             case "choose-other-owned-card-decline":
                 _coreProgramOtherOwnedCardDiscardsOperations.ResolveProgramOtherOwnedCardDiscardChoice(selected);
-                return;
-            case "restore-phase-hand-discard":
-            case "restore-phase-hand-decline":
-                _coreProgramPhaseHandDiscardsOperations.Value.ResolveProgramPhaseHandDiscardChoice(selected);
                 return;
             case "request-slash":
             case "request-slash-decline":
