@@ -8,11 +8,69 @@ internal static class MobileLierenChecks
     private const string Lieren = "boundary:lieren-mobile", Hero = "boundary:zhu-rong-mobile";
     private const string Observer = "fixture:mobile-lieren-observer", Mode = "identity:mobile-lieren-test";
     private const string Deck = "fixture:mobile-lieren-deck", Exchange = "skill-program.boundary:lieren-mobile.exchange";
+    private const string Zongshi = "boundary:zongshih-mobile", ZongshiObtain = "skill-program.boundary:zongshih-mobile.obtain";
+    private const string Rediscard = "fixture:mobile-lieren-rediscard", RediscardReason = "skill-program.fixture:mobile-lieren-rediscard.SelectAndMoveOwnedCard";
     private static readonly string[] Generals = [Hero, "fixture:mobile-lieren-target", "fixture:mobile-lieren-peer-2", "fixture:mobile-lieren-peer-3"];
 
     internal static void TiedPindianExchangesOriginalCardsAndResumes()
     {
-        var content = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+        var (game, content, source, opponent) = StartTiedPindian(new Fixture());
+        Reach(game, prompt => prompt.SkillPrompt?.SkillId == Observer);
+        Require(game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Lieren) is
+            { PendingMovementContinuation: not null, PindianResultBindings: [{ SourceWon: false, SourceRank: 5, OpponentRank: 5 }] },
+            "A tied contest must suspend the original invocation while its exchange movement child is active.");
+        CheckExchange(game);
+        ReplayFourViews(game, content);
+        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
+        Answer(restored, choice => choice.Parameters.GetValueOrDefault("option-id") == "finish");
+        Settle(restored);
+        CheckExchange(restored);
+
+        void CheckExchange(GameEngine run)
+        {
+            var moves = run.CardMovements.Where(move => move.Reason.Value == Exchange);
+            Require(moves.Select(move => (move.CardId, move.From, move.To)).SequenceEqual([
+                (source, CardLocation.DiscardPile, CardLocation.Hand(1)),
+                (opponent, CardLocation.DiscardPile, CardLocation.Hand(0))]),
+                "Each original contest card moves once from discard to the opposite hand, in source-then-opponent order.");
+        }
+    }
+
+    internal static void TiedPindianSkipsCardClaimedAndRediscardedBeforeFinish()
+    {
+        var (game, content, source, opponent) = StartTiedPindian(new Fixture(rediscard: true));
+        Reach(game, prompt => prompt is { PlayerSeat: 1, SkillPrompt.SkillId: Zongshi });
+        Answer(game, choice => choice.Parameters.GetValueOrDefault("branch") == "contest" && choice.Cards.SequenceEqual([opponent]));
+        Reach(game, prompt => prompt is { PlayerSeat: 1, SkillPrompt.SkillId: Rediscard });
+        var taken = game.CardMovements.Single(move => move.Reason.Value == ZongshiObtain);
+        Require(taken.CardId == opponent && taken.From == CardLocation.Processing && taken.To == CardLocation.Hand(1) &&
+            !game.CardMovements.Any(move => move.Reason == CardMoveReasons.PindianFinish || move.Reason.Value == Exchange),
+            "Zongshi's actual gain must open a hand discard child before the original contest finishes.");
+
+        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
+        foreach (var run in new[] { game, restored })
+        {
+            Answer(run, choice => choice.Cards.SequenceEqual([opponent]));
+            Reach(run, prompt => prompt.SkillPrompt?.SkillId == Observer);
+            var returned = run.CardMovements.Single(move => move.CardId == opponent && move.Reason.Value == RediscardReason);
+            var finished = run.CardMovements.Where(move => move.Reason == CardMoveReasons.PindianFinish).ToArray();
+            Require(returned.From == CardLocation.Hand(1) && returned.To == CardLocation.DiscardPile && returned.Sequence > taken.Sequence &&
+                finished is [var original] && original.CardId == source && original.From == CardLocation.Processing &&
+                original.To == CardLocation.DiscardPile && original.Sequence > returned.Sequence,
+                "Only the unclaimed card enters the discard pile through the original Pindian finish.");
+            var exchanges = run.CardMovements.Where(move => move.Reason.Value == Exchange).ToArray();
+            Require(exchanges is [var exchange] && exchange.CardId == source && exchange.From == CardLocation.DiscardPile &&
+                exchange.To == CardLocation.Hand(1) &&
+                run.CreateCardZoneDiagnostics().Single(card => card.CardId == opponent).Location == CardLocation.DiscardPile,
+                "Lieren may exchange the original finish entry, while the Zongshi card stays at its later discard entry.");
+            Answer(run, choice => choice.Parameters.GetValueOrDefault("option-id") == "finish");
+            Settle(run);
+        }
+    }
+
+    private static (GameEngine Game, ContentRegistry Content, int Source, int Opponent) StartTiedPindian(Fixture fixture)
+    {
+        var content = ContentRegistry.Build(new StandardContentPackage(), fixture);
         var game = GameEngine.CreateStandard(new GameOptions
         {
             Seed = 47, PlayerCount = 4, HumanSeat = 0, HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord,
@@ -42,32 +100,13 @@ internal static class MobileLierenChecks
         var opponent = P(game)!.Choices.First(choice => choice.Cards.Count == 1).Cards.Single();
         ReplayFourViews(game, content);
         Answer(game, choice => choice.Cards.SequenceEqual([opponent]));
-
-        Reach(game, prompt => prompt.SkillPrompt?.SkillId == Observer);
-        Require(game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Lieren) is
-            { PendingMovementContinuation: not null, PindianResultBindings: [{ SourceWon: false, SourceRank: 5, OpponentRank: 5 }] },
-            "A tied contest must suspend the original invocation while its exchange movement child is active.");
-        CheckExchange(game);
-        ReplayFourViews(game, content);
-        var restored = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
-        Answer(restored, choice => choice.Parameters.GetValueOrDefault("option-id") == "finish");
-        Settle(restored);
-        CheckExchange(restored);
+        return (game, content, source, opponent);
 
         void ReachSetupBoundary() => Reach(game, prompt => prompt.Kind == DecisionKind.SelectGeneral ||
             prompt is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 });
-
-        void CheckExchange(GameEngine run)
-        {
-            var moves = run.CardMovements.Where(move => move.Reason.Value == Exchange);
-            Require(moves.Select(move => (move.CardId, move.From, move.To)).SequenceEqual([
-                (source, CardLocation.DiscardPile, CardLocation.Hand(1)),
-                (opponent, CardLocation.DiscardPile, CardLocation.Hand(0))]),
-                "Each original contest card moves once from discard to the opposite hand, in source-then-opponent order.");
-        }
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool rediscard = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-mobile-lieren", new(1, 0, 0), []);
 
@@ -89,7 +128,9 @@ internal static class MobileLierenChecks
             var catalog = SkillProgramCatalog.Load(rules, presentation);
             builder.AddSkill(new(Observer, catalog.Presentations[Observer].Name, catalog.Presentations[Observer].Description)
                 { Program = catalog.Programs[Observer], ProgramPresentation = catalog.Presentations[Observer] });
-            builder.AddGeneral(new(Generals[1], "拼点目标", "supporter", Observer, "wei", 4));
+            if (rediscard)
+                RegisterRediscard(builder);
+            builder.AddGeneral(new(Generals[1], "拼点目标", "supporter", Observer, "wei", 4, rediscard ? [Zongshi, Rediscard] : []));
             foreach (var id in Generals.Skip(2))
                 builder.AddGeneral(new(id, "其他角色", "supporter", "standard:none", "wei", 4));
             builder.AddDeck(new(Deck, "同点数牌", 4, 0, [])
@@ -100,6 +141,30 @@ internal static class MobileLierenChecks
             builder.AddMode(new(Mode, "烈刃规则场景", 4, 4, new Dictionary<string, int>
                 { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 2 }, Deck,
                 GeneralCandidateCount: 4, GeneralPoolIds: Generals));
+        }
+
+        private static void RegisterRediscard(IContentRegistryBuilder builder)
+        {
+            var production = CharacterFixtureContent.EmbeddedProgramBundle("boundary-jian-yong-mobile");
+            var zongshi = production.Presentations[Zongshi];
+            builder.AddSkill(new(Zongshi, zongshi.Name, zongshi.Description)
+                { Program = production.Programs[Zongshi], ProgramPresentation = zongshi });
+            var rules = $$$"""
+                {"schemaVersion":{{{SkillProgramCatalog.RulesSchemaVersion}}},"skills":[{"id":"{{{Rediscard}}}","revision":1,"triggers":[
+                    {"id":"rediscard-after-zongshi","window":"cardsGained","subject":"owner","destinationZones":["hand"],
+                     "movementOccurrence":"perBatch","movementReasons":["{{{ZongshiObtain}}}"],"optional":false,
+                     "effects":[{"op":"selectAndMoveOwnedCard","target":"owner","chooserRef":{"kind":"owner"},
+                        "cardOwnerRef":{"kind":"owner"},"zones":["hand"],"count":1,"destination":"discardPile","awaitMovementTriggers":true}]}]}]}
+                """;
+            var presentation = JsonSerializer.Serialize(new
+            {
+                schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                skills = new Dictionary<string, object> { [Rediscard] = new { name = "重弃", description = "纵适获得牌后弃置一张手牌。" } }
+            });
+            var catalog = SkillProgramCatalog.Load(rules, presentation);
+            var definition = catalog.Presentations[Rediscard];
+            builder.AddSkill(new(Rediscard, definition.Name, definition.Description)
+                { Program = catalog.Programs[Rediscard], ProgramPresentation = definition });
         }
     }
 }

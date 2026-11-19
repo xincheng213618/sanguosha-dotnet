@@ -17,14 +17,18 @@ internal static partial class OrdinaryXunChenChecks
             c.Targets.SequenceEqual([seat]));
     }
 
-    private sealed class Fixture(bool allFenglve = false) : IGameContentPackage
+    private sealed class Fixture(bool allFenglve = false, bool claimOwnPindianCard = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-xc", new(1, 0, 0), []);
         public void Register(IContentRegistryBuilder b)
         {
-            CharacterFixtureContent.Register(b, "ol:xun-chen");
+            if (claimOwnPindianCard)
+                CharacterFixtureContent.Register(b, "ol:xun-chen", "classic:jian-yong");
+            else
+                CharacterFixtureContent.Register(b, "ol:xun-chen");
             // Elevated fixture HP keeps the lord alive across the AI slash cycle (no peaches exist).
-            b.AddGeneral(new("fixture:xc", "荀谌", "ol-xun-chen", Fenglve, "qun", 6, [Moushi]));
+            b.AddGeneral(new("fixture:xc", "荀谌", "ol-xun-chen", Fenglve, "qun", 6,
+                claimOwnPindianCard ? [Moushi, Zongshi] : [Moushi]));
             for (var i = 1; i < 4; i++)
                 b.AddGeneral(new($"fixture:xc-{i}", "其他" + i, "supporter", allFenglve ? Fenglve : "standard:none", "wei", 5, null));
             // Alternating hearts: ranks stay equal (pindian ties are losses) while
@@ -42,9 +46,9 @@ internal static partial class OrdinaryXunChenChecks
         }
     }
 
-    private static (GameEngine, ContentRegistry) Start()
+    private static (GameEngine, ContentRegistry) Start(bool claimOwnPindianCard = false)
     {
-        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
+        var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture(claimOwnPindianCard: claimOwnPindianCard));
         var g = GameEngine.CreateStandard(new GameOptions
         {
             Seed = 47, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord, ModeId = "identity:xc",

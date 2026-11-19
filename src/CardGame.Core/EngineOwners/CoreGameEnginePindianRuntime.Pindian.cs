@@ -184,10 +184,20 @@ internal sealed partial class CoreGameEnginePindianRuntime
     internal void CompletePindian(PindianFrame frame)
     {
         var foreignOrigin = _resolutionStackOperations._resolutionStack.Count >= 2 && _resolutionStackOperations._resolutionStack[^2] is ProgramSkillFrame owner ? _coreForeignTurnContestsOperations.Value.FreezeForeignTurnPindianOrigin(owner, frame) : null;
-        foreach (var id in AvailablePindianCards(frame.Result!))
+        var result = frame.Result ?? throw new InvalidOperationException("Pindian cannot complete without a native result.");
+        PindianDiscardEntry? sourceDiscard = null;
+        PindianDiscardEntry? opponentDiscard = null;
+        foreach (var id in AvailablePindianCards(result))
         {
             var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == id);
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile, CardMoveReasons.PindianFinish);
+            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile,
+                CardMoveReasons.PindianFinish, movement =>
+                {
+                    if (movement.To != CardLocation.DiscardPile) return;
+                    var entry = new PindianDiscardEntry(movement.CardId, movement.Sequence);
+                    if (movement.CardId == result.SourceCardId) sourceDiscard = entry;
+                    else opponentDiscard = entry;
+                });
         }
 
         _coreRuntimeOperations.PopResolutionFrame(frame.Id, ResolutionFrameKind.Pindian);
@@ -195,10 +205,19 @@ internal sealed partial class CoreGameEnginePindianRuntime
         {
             if (frame.ProgramResultBind is not { } bind || program.PindianResultBindings.Any(item => item.Name == bind))
                 throw new InvalidOperationException("Program Pindian lost its unique result binding.");
-            var result = frame.Result!;
-            _coreRuntimeOperations.ReplaceRuntimeTop(program with { PindianResultBindings = Array.AsReadOnly(program.PindianResultBindings.Append(new ProgramPindianResultBinding(bind, result.SourceSeat, result.OpponentSeat, result.SourceRank, result.OpponentRank, result.SourceWon, frame.ProgramResultVisibility) { ForeignTurnOrigin = foreignOrigin, NativePindianFrameId = frame.Id }).ToArray()) });
+            var binding = new ProgramPindianResultBinding(bind, result.SourceSeat, result.OpponentSeat,
+                result.SourceRank, result.OpponentRank, result.SourceWon, frame.ProgramResultVisibility)
+            {
+                ForeignTurnOrigin = foreignOrigin,
+                NativePindianFrameId = frame.Id,
+                SourceDiscard = sourceDiscard,
+                OpponentDiscard = opponentDiscard
+            };
+            _coreRuntimeOperations.ReplaceRuntimeTop(program with
+            {
+                PindianResultBindings = Array.AsReadOnly(program.PindianResultBindings.Append(binding).ToArray())
+            });
             _corePindianHandReturnsOperations.RecordPindianHandContestReturn(_coreProgramLifecycleOperations.GetActiveProgramFrame(program.Id), frame);
-            _characterZhuRongBoundaryMobileOperations.CaptureMobileZhuRongPindianReturn(_coreProgramLifecycleOperations.GetActiveProgramFrame(program.Id), frame);
             _coreRuntimeOperations.AdvanceRuntimeProgram(program.Id);
         }
         else

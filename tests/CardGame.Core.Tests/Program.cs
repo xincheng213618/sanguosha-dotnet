@@ -772,6 +772,8 @@ var tests = new (string Name, Action Body)[]
     ("OL Boundary Jiang: typed Zhifou discard opens the original batch", NativeCollectedDiscardProjectionChecks.CaoXianTypedDiscardOpensJiangOnItsOriginalBatch),
     ("Dongxin: reclaim only the original paid discard entry", OlDongxinChecks.ReclaimRetainsOriginalPaidEntry),
     ("OL Douyu: private swap preserves original top payment cold", OlDouyuChecks.PrivateSwapPreservesOriginalTopPaymentCold),
+    ("mobile Lieren: skip the Zongshi card rediscarded before Pindian finish", MobileLierenChecks.TiedPindianSkipsCardClaimedAndRediscardedBeforeFinish),
+    ("Ordinary Xun Chen: Fenglve skips its source already claimed by Zongshi", OrdinaryXunChenChecks.FenglveGiftContinuesWhenZongshiAlreadyClaimedItsSource),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

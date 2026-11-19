@@ -2208,7 +2208,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhuRanMouMobileRuntime> ZhuRanMouMobileEntries => GetDeferredModule<EngineOwners.CharacterZhuRanMouMobileRuntime>();
 
-    internal Core.RuntimeEntries.CharacterZhuRongBoundaryMobileEntries ZhuRongBoundaryMobileEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhuRongBoundaryMobileEntries, EngineOwners.CharacterZhuRongBoundaryMobileRuntime>(Core.RuntimeEntries.CharacterZhuRongBoundaryMobileEntries.Create);
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhuRongMouMobileRuntime> ZhuRongMouMobileEntries => GetDeferredModule<EngineOwners.CharacterZhuRongMouMobileRuntime>();
 

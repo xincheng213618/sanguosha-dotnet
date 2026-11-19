@@ -12,6 +12,8 @@ public sealed record PindianResult(
         seat == OpponentSeat ? OpponentCardId : throw new ArgumentOutOfRangeException(nameof(seat));
 }
 
+public sealed record PindianDiscardEntry(int CardId, int EntrySequence);
+
 public enum PindianStep { ChooseParticipants, ChooseSourceCard, ChooseOpponentCard, ClaimResult = 780 }
 
 /// <summary>Trusted-host data only. It is not included in player snapshots.</summary>

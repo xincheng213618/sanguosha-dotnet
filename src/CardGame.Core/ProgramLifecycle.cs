@@ -151,6 +151,12 @@ public sealed record ProgramPindianResultBinding(
 
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public ForeignTurnPindianOrigin? ForeignTurnOrigin { get; init; }
+
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public PindianDiscardEntry? SourceDiscard { get; init; }
+
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public PindianDiscardEntry? OpponentDiscard { get; init; }
 }
 
 public sealed record ProgramSkillCardSetBinding(
