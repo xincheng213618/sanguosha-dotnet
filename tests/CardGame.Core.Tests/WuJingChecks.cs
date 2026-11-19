@@ -51,6 +51,34 @@ internal static class WuJingChecks
         var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(scene)); var g = GameEngine.CreateStandard(new GameOptions { Seed = 31, PlayerCount = 4, HumanSeat = 0, HumanRole = scene == "reward-death" ? Role.Renegade : Role.Lord, ModeId = Mode, UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 12 }, registry);
         Accept(g, new StartGameCommand()); Reach(g, () => P(g) is { PlayerSeat: 0, Kind: DecisionKind.SelectGeneral }); Accept(g, new SelectGeneralCommand(0, Owner, g.Revision, P(g)!.PromptId)); Play(g); return (g, registry);
     }
+
+    public static void LiubingClaimsOriginalColorlessSlashMaterialsCold()
+    {
+        var (game, registry) = Start("multi");
+        var pair = new[] { V(game).Hand.First(card => card.Suit == Suit.Spade).Id,
+            V(game).Hand.First(card => card.Suit == Suit.Heart).Id };
+        var claimant = Enumerable.Range(1, 3).Single(seat =>
+            V(game, seat).Skills!.Any(skill => skill.ContentId == Liubing));
+
+        Use(game, "pair", cards: pair, targets: [3]);
+        var use = game.ResolutionStack.OfType<CardUseFrame>().Single(frame =>
+            frame.PhysicalCardIds?.Order().SequenceEqual(pair.Order()) == true);
+        Need(use.Action is { Type: CardActionType.Use, EffectiveIsRed: null, ActorSeat: 0 },
+            "The two selected cards must pay an actual colorless Slash.");
+        game = Cold(game, registry);
+        Play(game);
+
+        var settled = E<WuJingLiubingSettledEvent>(game).Where(fact => fact.UseId == use.Id).ToArray();
+        var gains = game.CardMovements.Where(move => move.Reason.Value == "skill-program.wu-jing.liubing.claim").ToArray();
+        Need(settled.Select(fact => fact.CardId).Order().SequenceEqual(pair.Order()) &&
+            gains.Select(move => move.CardId).SequenceEqual(settled.OrderBy(fact => fact.MovementSequence).Select(fact => fact.CardId)) &&
+            gains.All(move => move.From == CardLocation.DiscardPile && move.To == CardLocation.Hand(claimant)) &&
+            gains.Select(move => move.BatchId).Distinct().Count() == pair.Length &&
+            E<DamageAppliedEvent>(game).Length == 0,
+            "Liubing must obtain exactly the original finished materials in the existing separate movement batches.");
+        _ = Cold(game, registry);
+    }
+
     private sealed class Fixture(string scene) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-wu-jing", new(1, 0, 0), []);

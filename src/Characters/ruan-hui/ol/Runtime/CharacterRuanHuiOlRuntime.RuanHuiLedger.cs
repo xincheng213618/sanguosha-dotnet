@@ -69,9 +69,9 @@ internal sealed partial class CharacterRuanHuiOlRuntime
         return actor;
     }
 
-    internal bool JingzhongMaterialStillOwnsDiscard(JingzhongUseEntityEvent fact, CardMovementRecord last)
+    private bool JingzhongMaterialStillOwnsDiscard(JingzhongUseEntityEvent fact, CardMovementRecord last)
     {
-        if (last.To != CardLocation.DiscardPile || _cardZonesOperations._cardZones.GetLocation(fact.CardId) != CardLocation.DiscardPile || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == fact.CardId).Sequence != last.Sequence || last.CardKind != fact.PhysicalKind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongUseEntityEvent>().Any(e => e.CardId == fact.CardId && e.ActionId != fact.ActionId && (e.CapturedAfterSequence > fact.CapturedAfterSequence || e.CapturedAfterSequence == fact.CapturedAfterSequence && e.ActionId > fact.ActionId)))
+        if (last.To != CardLocation.DiscardPile || _cardZonesOperations._cardZones.GetLocation(fact.CardId) != CardLocation.DiscardPile || last.CardKind != fact.PhysicalKind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongUseEntityEvent>().Any(e => e.CardId == fact.CardId && e.ActionId != fact.ActionId && (e.CapturedAfterSequence > fact.CapturedAfterSequence || e.CapturedAfterSequence == fact.CapturedAfterSequence && e.ActionId > fact.ActionId)))
             return false;
         var paid = fact.PaidEntrySequence is { } sequence ? _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.SingleOrDefault(m => m.Sequence == sequence && m.CardId == fact.CardId) : _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.FirstOrDefault(m => m.CardId == fact.CardId && m.Sequence > fact.CapturedAfterSequence && m.From == fact.OriginalFrom && (fact.Response ? m.Reason == CardMoveReasons.Respond || m.Reason == CardMoveReasons.Nullification : m.Reason == CardMoveReasons.Use || m.Reason == CardMoveReasons.EquipmentUse || m.Reason == CardMoveReasons.IronChainUse));
         if (paid is null || paid.Sequence > last.Sequence || paid.From != fact.OriginalFrom || paid.To.Zone is not (CardZoneKind.Processing or CardZoneKind.Equipment or CardZoneKind.Judgment))
@@ -123,16 +123,6 @@ internal sealed partial class CharacterRuanHuiOlRuntime
             }
     }
 
-    internal JingzhongSettledEntityEvent[] RuanHuiClaimFacts(CardMovementBatchContext batch, ProgramTriggerCandidate c)
-    {
-        if (c.OccurrenceIndex < 0 || c.OccurrenceIndex >= batch.Movements.Count)
-            return[];
-        var move = batch.Movements[c.OccurrenceIndex];
-        var matching = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongSettledEntityEvent>().Where(e => e.BatchId == batch.Id && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongLeaseEvent>().Any(l => l.FrameId == e.LeaseId && l.Source.OwnerSeat == c.OwnerSeat && l.Source.SkillInstanceId == c.SkillInstanceId && l.GameplayHash == c.GameplayHash) && !JingzhongClaimAlreadyIssued(_coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongLeaseEvent>().Single(l => l.FrameId == e.LeaseId), e.ActionId)).OrderBy(e => e.LeaseId).ThenBy(e => e.ActionId).ThenBy(e => e.MovementSequence).ToArray();
-        var anchor = matching.FirstOrDefault(e => e.CardId == move.CardId && e.MovementSequence == move.Sequence);
-        return anchor is null ? [] : matching.Where(e => e.LeaseId == anchor.LeaseId && e.ActionId == anchor.ActionId).ToArray();
-    }
-
     internal IReadOnlyList<ProgramTriggerCandidate> CollectRuanHuiClaimCandidates(CardMovementBatchContext batch)
     {
         if (!HasRuanHuiCapability)
@@ -147,11 +137,36 @@ internal sealed partial class CharacterRuanHuiOlRuntime
     }
 
     internal bool IsIssuedRuanHuiCandidate(ProgramTriggerCandidate c) => _contentRegistryOperations._contentRegistry.Skills.GetValueOrDefault(c.SkillId)?.Program?.Triggers.Any(t => t.Id == c.BindingId && t.Effects is [{ Op: SkillProgramEffectOp.ObtainJingzhongUsedEntities }]) == true;
-    internal bool CanRunIssuedRuanHuiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
+    internal bool CanRunIssuedRuanHuiCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) =>
+        AvailableJingzhongClaim(c, context).Any();
+
+    private IEnumerable<JingzhongSettledEntityEvent> AvailableJingzhongClaim(ProgramTriggerCandidate c, ProgramSkillWindowContext context)
     {
-        if (!IsIssuedRuanHuiCandidate(c) || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || context.OwnerSeat != c.OwnerSeat || context.Window != SkillProgramTriggerWindow.DiscardPileReceived || context.MovementBatch is not { } b || context.ParentFrameId != b.Id || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == b.Id)is not { } w || w.CandidateIndex < 0 || w.CandidateIndex >= w.Candidates.Count || w.Candidates[w.CandidateIndex] != c || !w.Batch.Movements.SequenceEqual(b.Movements))
-            return false;
-        return RuanHuiClaimFacts(b, c).Any(e => JingzhongUsedCount(e.LeaseId) < 3 && _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == e.CardId).Sequence == e.MovementSequence);
+        if (!IsIssuedRuanHuiCandidate(c) || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive ||
+            context.OwnerSeat != c.OwnerSeat || context.Window != SkillProgramTriggerWindow.DiscardPileReceived ||
+            context.MovementBatch is not { } batch || context.ParentFrameId != batch.Id ||
+            _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>()
+                .SingleOrDefault(window => window.Id == batch.Id) is not { } owner ||
+            owner.CandidateIndex < 0 || owner.CandidateIndex >= owner.Candidates.Count ||
+            owner.Candidates[owner.CandidateIndex] != c || !owner.Batch.Movements.SequenceEqual(batch.Movements) ||
+            c.OccurrenceIndex < 0 || c.OccurrenceIndex >= batch.Movements.Count)
+            return [];
+
+        var history = _coreProgramEventHistoryOperations.Value;
+        var move = batch.Movements[c.OccurrenceIndex];
+        var facts = history.ProgramEventHistory<JingzhongSettledEntityEvent>();
+        var leases = history.ProgramEventHistory<JingzhongLeaseEvent>();
+        var anchor = facts.Where(e => e.BatchId == batch.Id && e.CardId == move.CardId && e.MovementSequence == move.Sequence)
+            .OrderBy(e => e.LeaseId).ThenBy(e => e.ActionId)
+            .FirstOrDefault(e => leases.SingleOrDefault(lease => lease.FrameId == e.LeaseId) is { } lease &&
+                lease.Source.OwnerSeat == c.OwnerSeat && lease.Source.SkillInstanceId == c.SkillInstanceId &&
+                lease.GameplayHash == c.GameplayHash && !JingzhongClaimAlreadyIssued(lease, e.ActionId));
+        if (anchor is null || JingzhongUsedCount(anchor.LeaseId) >= 3)
+            return [];
+
+        return facts.Where(e => e.BatchId == batch.Id && e.LeaseId == anchor.LeaseId && e.ActionId == anchor.ActionId)
+            .OrderBy(e => e.MovementSequence)
+            .Where(e => _zoneEntries.CurrentEntry(CardLocation.DiscardPile, e.CardId) == e.MovementSequence);
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 3300)]

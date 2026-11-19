@@ -36,7 +36,9 @@ internal sealed partial class CharacterWuJingOlRuntime
             throw new InvalidOperationException("Wu Jing lost his completed use or genuine discard invoice.");
         var use = op == SkillProgramEffectOp.ClaimLiubingUndamagingSlash ? null : WuJingCompletedUse(context)!;
         var claim = op == SkillProgramEffectOp.ClaimLiubingUndamagingSlash ? WuJingClaimFacts(context.MovementBatch!, c) : [];
-        var entities = claim.Where(e => _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == e.CardId).Sequence == e.MovementSequence).Select(e => new WuJingMaterial(e.CardId, _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId).Kind, CardLocation.DiscardPile, e.MovementSequence)).ToArray();
+        var entities = claim.Where(e => LiubingEntryStillAvailable(e.CardId, e.MovementSequence))
+            .Select(e => new WuJingMaterial(e.CardId, _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId).Kind,
+                CardLocation.DiscardPile, e.MovementSequence)).ToArray();
         var r = new WuJingReceipt(WuJingSource(f), f.GameplayHash, op, context.ParentFrameId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, op == SkillProgramEffectOp.UseHejiAtCompletedSingleTarget ? WuJingStage.UseChoice : op == SkillProgramEffectOp.RewardHejiUnconvertedUse ? WuJingStage.RewardChildren : WuJingStage.ClaimChildren, use?.Id ?? claim[0].UseId, use?.Action!.ActionId ?? claim[0].ActionId, op == SkillProgramEffectOp.RewardHejiUnconvertedUse ? use!.WuJingHeji!.Origin.TargetSeat : use?.TargetSeats.Single() ?? context.SourceSeat!.Value, NativeOrigin: op == SkillProgramEffectOp.RewardHejiUnconvertedUse ? use!.WuJingHeji!.Origin : null, Before: _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After: _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
         {
             Entities = entities
@@ -64,10 +66,10 @@ internal sealed partial class CharacterWuJingOlRuntime
         else
         {
             foreach (var entity in entities)
-                _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(entity.CardId), CardLocation.DiscardPile, CardLocation.Hand(f.OwnerSeat), new(WuJingClaimReason));
+                _liubingMovement.Move(_coreAdvancedLifecycleOperations.GetAdvancedCard(entity.CardId),
+                    CardLocation.DiscardPile, CardLocation.Hand(f.OwnerSeat), new(WuJingClaimReason));
             f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WuJing = f.WuJing!with { After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuJingClaimIssuedEvent(f.Id, r.UseId, r.ActionId, context.MovementBatch!.Id, entities.Length, r.Before, _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence));
         }
 
         ContinueWuJing(f.Id);

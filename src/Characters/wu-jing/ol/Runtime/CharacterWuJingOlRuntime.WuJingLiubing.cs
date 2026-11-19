@@ -31,7 +31,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     {
         if (card is null || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { WuJingLiubing: { } r, Action: { } a } use || r.CardId != card.Id)
             return card;
-        if (r.UseId != use.Id || r.ActionId != a.ActionId || r.Kind != use.CardKind || a.EffectiveSuit != r.Suit || r.Suit != Suit.Diamond || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingLiubingAppearanceIssuedEvent>().Count(e => e.Receipt == r) != 1)
+        if (r.UseId != use.Id || r.ActionId != a.ActionId || r.Kind != use.CardKind || a.EffectiveSuit != r.Suit || r.Suit != Suit.Diamond)
             throw new InvalidOperationException("Liubing lost its exact issued first physical Slash appearance.");
         return card with
         {
@@ -55,7 +55,6 @@ internal sealed partial class CharacterWuJingOlRuntime
                     throw new InvalidOperationException("The first Liubing physical Slash must freeze Diamond before native declaration and response.");
                 var r = new WuJingLiubingAppearance(use.Id, action.ActionId, new(binding.SkillId, binding.Trigger.Id, action.ActorSeat, binding.SkillInstanceId), _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat, action.ActorSeat, material.CardId, action.EffectiveKind, Suit.Diamond);
                 _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { WuJingLiubing = r });
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new WuJingLiubingAppearanceIssuedEvent(r));
             }
         }
 
@@ -69,11 +68,14 @@ internal sealed partial class CharacterWuJingOlRuntime
 
     internal bool WuJingSettledMaterial(WuJingUseMaterialEvent fact, CardMovementRecord last)
     {
-        if (last.To != CardLocation.DiscardPile || _cardZonesOperations._cardZones.GetLocation(fact.CardId) != CardLocation.DiscardPile || _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == fact.CardId).Sequence != last.Sequence || last.CardKind != fact.PrintedKind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingUseMaterialEvent>().Any(e => e.CardId == fact.CardId && e.UseId != fact.UseId && (e.Before > fact.Before || e.Before == fact.Before && e.UseId > fact.UseId)))
+        if (last.To != CardLocation.DiscardPile || !LiubingEntryStillAvailable(fact.CardId, last.Sequence) || last.CardKind != fact.PrintedKind || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingUseMaterialEvent>().Any(e => e.CardId == fact.CardId && e.UseId != fact.UseId && (e.Before > fact.Before || e.Before == fact.Before && e.UseId > fact.UseId)))
             return false;
         var paid = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.FirstOrDefault(m => m.CardId == fact.CardId && m.Sequence > fact.Before && m.From == fact.From && m.To == CardLocation.Processing && m.Reason == CardMoveReasons.Use);
         return paid is not null && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.CardId == fact.CardId && m.Sequence > paid.Sequence && m.Sequence <= last.Sequence).ToArray()is [var finish] && finish == last && finish.From == CardLocation.Processing && finish.Reason == CardMoveReasons.UseFinished;
     }
+
+    private bool LiubingEntryStillAvailable(int cardId, long sequence) =>
+        _zoneEntries.CurrentEntry(CardLocation.DiscardPile, cardId) == sequence;
 
     internal void CaptureWuJingLiubingBatch(CardMovementBatchContext batch)
     {
@@ -127,7 +129,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     {
         if (!IsWuJingLiubingCandidate(c) || !_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat], c.SkillId, c.SkillInstanceId) || context.Window != SkillProgramTriggerWindow.DiscardPileReceived || context.OwnerSeat != c.OwnerSeat || context.MovementBatch is not { } batch || context.ParentFrameId != batch.Id || _resolutionStackOperations._resolutionStack.OfType<CardsMovedTriggerWindowFrame>().SingleOrDefault(w => w.Id == batch.Id)is not { } parent || parent.CandidateIndex < 0 || parent.CandidateIndex >= parent.Candidates.Count || parent.Candidates[parent.CandidateIndex] != c)
             return false;
-        return WuJingClaimFacts(batch, c).Any(e => _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == e.CardId).Sequence == e.MovementSequence);
+        return WuJingClaimFacts(batch, c).Any(e => LiubingEntryStillAvailable(e.CardId, e.MovementSequence));
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.CollectMovementCandidates, 3500)]

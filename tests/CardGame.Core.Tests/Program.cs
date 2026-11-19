@@ -758,6 +758,8 @@ var tests = new (string Name, Action Body)[]
     ("Mobile boundary Cao Cao: native claim children precede draw and cardless damage cold", BoundaryCaoCaoMobileChecks.NativeClaimChildrenPrecedeDrawAndCardlessDamageStillDrawsCold),
     ("Mobile boundary Cao Cao: death during the claim stops the following draw", BoundaryCaoCaoMobileChecks.OwnerDeathDuringClaimStopsTheFollowingDraw),
     ("Classic Guzheng actual discard scope, optional claim and command replay", ClassicGuzhengChecks.ActualDiscardScopeAndOptionalClaimReplay),
+    ("OL Wu Jing Liubing: original colorless Slash materials and command replay", WuJingChecks.LiubingClaimsOriginalColorlessSlashMaterialsCold),
+    ("OL Jingzhong: one claim per multi-material use, separate gain windows and replay", OlJingzhongChecks.MultiMaterialClaimKeepsMovementWindowsAndUsesOneOfThreeClaims),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

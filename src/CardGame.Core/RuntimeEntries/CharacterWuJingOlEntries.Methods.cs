@@ -9,18 +9,14 @@ internal sealed partial class CharacterWuJingOlEntries
     internal void BeginWuJingFaction(ProgramSkillFrame f) => _resolve().BeginWuJingFaction(f);
     internal void BeginWuJingRoundOnce(ProgramSkillFrame f, CardConversionSource source) => _resolve().BeginWuJingRoundOnce(f, source);
     internal void BindWuJingHejiUse(long id) => _resolve().BindWuJingHejiUse(id);
-    internal bool CanRunWuJingLiubingCandidate(ProgramTriggerCandidate c, ProgramSkillWindowContext context) => _resolve().CanRunWuJingLiubingCandidate(c, context);
     internal void CaptureWuJingHejiTrickPaymentBatch(CardMovementBatchContext batch) => _resolve().CaptureWuJingHejiTrickPaymentBatch(batch);
-    internal void CaptureWuJingLiubingBatch(CardMovementBatchContext batch) => _resolve().CaptureWuJingLiubingBatch(batch);
     internal void CollectIssuedWuJingHejiReward(CardActionContext action, SkillProgramTriggerWindow window, List<ProgramCardTriggerCandidate> result) => _resolve().CollectIssuedWuJingHejiReward(action, window, result);
     internal void CollectWindow_CollectWuJingLiubingCandidates(CardMovementBatchContext batch, List<ProgramTriggerCandidate> result) => _resolve().CollectWindow_CollectWuJingLiubingCandidates(batch, result);
-    internal IReadOnlyList<ProgramTriggerCandidate> CollectWuJingLiubingCandidates(CardMovementBatchContext batch) => _resolve().CollectWuJingLiubingCandidates(batch);
     internal CardMovementBatchContext CompleteMovementBatchCaptureWuJingHejiTrickPaymentBatch(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureWuJingHejiTrickPaymentBatch(batch, completed);
     internal CardMovementBatchContext CompleteMovementBatchCaptureWuJingLiubingBatch(CardMovementBatchBuilder batch, CardMovementBatchContext completed) => _resolve().CompleteMovementBatchCaptureWuJingLiubingBatch(batch, completed);
     internal void CompleteWuJingHejiPayment(long id) => _resolve().CompleteWuJingHejiPayment(id);
     internal bool ContinuePaidWuJing(ProgramSkillFrame f) => _resolve().ContinuePaidWuJing(f);
     internal void ContinueWuJing(long id) => _resolve().ContinueWuJing(id);
-    internal ProgramSkillWindowContext CreateWuJingLiubingContext(CardsMovedTriggerWindowFrame frame, ProgramTriggerCandidate c) => _resolve().CreateWuJingLiubingContext(frame, c);
     internal bool? DecideIssuedTrigger640(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger640(candidate, context);
     internal bool? DecideIssuedTrigger650(ProgramTriggerCandidate candidate, ProgramSkillWindowContext context) => _resolve().DecideIssuedTrigger650(candidate, context);
     internal bool DrainWuJing(ProgramSkillFrame f) => _resolve().DrainWuJing(f);
@@ -49,7 +45,6 @@ internal sealed partial class CharacterWuJingOlEntries
     internal bool WindowSettlement_IsWuJingNativeSettlementBatch(ProgramSkillFrame frame, CardMovementBatchContext batch) => _resolve().WindowSettlement_IsWuJingNativeSettlementBatch(frame, batch);
     internal bool WuJingCanUse(int owner, int target, Card card, CardKind kind, CardConversionSource? conversion, IReadOnlyList<int> ids) => _resolve().WuJingCanUse(owner, target, card, kind, conversion, ids);
     internal IReadOnlyList<PromptChoice> WuJingChoices(ProgramSkillFrame f) => _resolve().WuJingChoices(f);
-    internal WuJingLiubingSettledEvent[] WuJingClaimFacts(CardMovementBatchContext batch, ProgramTriggerCandidate c) => _resolve().WuJingClaimFacts(batch, c);
     internal CardUseFrame? WuJingCompletedUse(ProgramSkillWindowContext context) => _resolve().WuJingCompletedUse(context);
     internal bool WuJingFactionTarget(ProgramSkillFrame f) => _resolve().WuJingFactionTarget(f);
     internal bool WuJingFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().WuJingFirstChild(f, child);
@@ -64,7 +59,6 @@ internal sealed partial class CharacterWuJingOlEntries
     internal ProgramSkillFrame? WuJingObserverRoot() => _resolve().WuJingObserverRoot();
     internal bool WuJingOwnsLiubing(int actor) => _resolve().WuJingOwnsLiubing(actor);
     internal bool WuJingRequestIdentity(ProgramSkillFrame f) => _resolve().WuJingRequestIdentity(f);
-    internal bool WuJingSettledMaterial(WuJingUseMaterialEvent fact, CardMovementRecord last) => _resolve().WuJingSettledMaterial(fact, last);
     internal CardConversionSource WuJingSource(ProgramSkillFrame f) => _resolve().WuJingSource(f);
     internal bool HasWuJingHeji { get => _resolve().HasWuJingHeji; }
     internal bool HasWuJingLiubing { get => _resolve().HasWuJingLiubing; }

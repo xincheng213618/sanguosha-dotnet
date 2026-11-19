@@ -22,22 +22,33 @@ internal sealed partial class CharacterRuanHuiOlRuntime
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var context = f.WindowContext;
-        if (f.RuanHui is not null || f.InstructionIndex != 1 || context is null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !QualifyRuanHui(new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex), _coreProgramLifecycleOperations.GetProgramTrigger(f), context))
+        if (f.RuanHui is not null || f.InstructionIndex != 1 || context is null || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0)
             throw new InvalidOperationException("Ruan Hui requires her exact unissued native boundary.");
+        var trigger = _coreProgramLifecycleOperations.GetProgramTrigger(f);
+        var candidate = new ProgramTriggerCandidate(f.OwnerSeat, f.SkillId, trigger.Id, f.SkillInstanceId,
+            f.GameplayHash, trigger.Priority, context.OccurrenceIndex);
+        if (op != SkillProgramEffectOp.ObtainJingzhongUsedEntities && !QualifyRuanHui(candidate, trigger, context))
+            throw new InvalidOperationException("Ruan Hui requires her exact unissued native boundary.");
+
         var r = new RuanHuiReceipt(RuanHuiSource(f), f.GameplayHash, op, f.InstructionIndex, context.ParentFrameId, _coreActualTurnProgressTurnNumberAccess._turnNumber, op == SkillProgramEffectOp.ResolveMingchaRevealDrawChoice ? RuanHuiStage.RevealChildren : RuanHuiStage.TargetChoice, [], []);
+        Card[] claimCards = [];
         if (op == SkillProgramEffectOp.ObtainJingzhongUsedEntities)
         {
-            var facts = RuanHuiClaimFacts(context.MovementBatch!, new(f.OwnerSeat, f.SkillId, CoreGameEngineProgramLifecycleRuntime.GetProgramBindingId(f), f.SkillInstanceId, f.GameplayHash, _coreProgramLifecycleOperations.GetProgramTrigger(f).Priority, context.OccurrenceIndex));
-            var first = facts.First(e => JingzhongUsedCount(e.LeaseId) < 3 && _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == e.CardId).Sequence == e.MovementSequence);
-            var entities = facts.Where(e => e.LeaseId == first.LeaseId && e.ActionId == first.ActionId && _cardZonesOperations._cardZones.GetLocation(e.CardId) == CardLocation.DiscardPile && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == e.CardId).Sequence == e.MovementSequence).Select(e => new RuanHuiEntity(e.CardId, _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId).Kind, _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId).Rank, CardLocation.DiscardPile, e.MovementSequence)).ToArray();
+            var claims = AvailableJingzhongClaim(candidate, context).ToArray();
+            if (claims.Length == 0)
+                throw new InvalidOperationException("Jingzhong requires its issued claim with an available discard entry.");
+            var first = claims[0];
+            claimCards = claims.Select(e => _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId)).ToArray();
             r = r with
             {
                 LeaseId = first.LeaseId,
                 ActionId = first.ActionId,
                 Stage = RuanHuiStage.ClaimChildren,
-                Entities = entities
+                Entities = claimCards.Select((card, index) =>
+                    new RuanHuiEntity(card.Id, card.Kind, card.Rank, CardLocation.DiscardPile, claims[index].MovementSequence)).ToArray()
             };
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JingzhongClaimIssuedEvent(f.Id, first.LeaseId, first.PhaseToken, first.ActionId, context.MovementBatch!.Id, entities.Length));
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new JingzhongClaimIssuedEvent(
+                f.Id, first.LeaseId, first.PhaseToken, first.ActionId, first.BatchId, claimCards.Length));
         }
 
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { RuanHui = r });
@@ -59,9 +70,9 @@ internal sealed partial class CharacterRuanHuiOlRuntime
         {
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-            foreach (var entity in r.Entities)
-                _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(entity.CardId), CardLocation.DiscardPile, CardLocation.Hand(f.OwnerSeat), new(JingzhongGain));
-            AddRuanHuiStep(f.Id, RuanHuiStage.ClaimChildren, before, r.Entities.Count);
+            foreach (var card in claimCards)
+                _claimMovement.Move(card, CardLocation.DiscardPile, CardLocation.Hand(f.OwnerSeat), new(JingzhongGain));
+            AddRuanHuiStep(f.Id, RuanHuiStage.ClaimChildren, before, claimCards.Length);
             ContinueRuanHui(f.Id);
         }
         else
