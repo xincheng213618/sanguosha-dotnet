@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CardGame.Core;
 
 public sealed record MobileShiWeiYanPhaseGrantEvent(long FrameId, int OwnerSeat, int TurnNumber, int PhaseInstanceId,
@@ -20,6 +22,8 @@ public sealed record MobileShiWeiYanPending(string Operation, int Stage, int Tur
     private readonly IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     public NativeDrawOutcome? KuangguDraw { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public long? DiscardEntrySequence { get; init; }
 }
 public sealed partial record ProgramSkillFrame
 {

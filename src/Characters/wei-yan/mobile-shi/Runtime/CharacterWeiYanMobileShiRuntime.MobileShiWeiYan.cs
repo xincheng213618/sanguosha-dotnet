@@ -221,8 +221,23 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
         }
 
         var idToDiscard = selected.Cards.Count == 1 ? selected.Cards[0] : _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.TargetSeat])[int.Parse(selected.Parameters["slot-index"], CultureInfo.InvariantCulture)].Id;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiWeiYan = r with { Stage = 6, CardId = idToDiscard }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, [idToDiscard], new(ShiWyDiscard));
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+        {
+            MobileShiWeiYan = r with { Stage = 6, CardId = idToDiscard, DiscardEntrySequence = null },
+            PendingMovementContinuation = new(f.OwnerSeat, 0, null)
+        });
+        _coreNativeLogicalDiscardsOperations.MoveProgramLogicalDiscard(f, f.OwnerSeat, [idToDiscard], new(ShiWyDiscard), (_, records) =>
+        {
+            var entry = records.SingleOrDefault(move => move.CardId == idToDiscard &&
+                move.From.OwnerSeat == r.TargetSeat && move.To == CardLocation.DiscardPile);
+            if (entry is null)
+                return;
+            var paid = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+            _coreRuntimeOperations.ReplaceRuntimeFrame(paid.Id, paid with
+            {
+                MobileShiWeiYan = paid.MobileShiWeiYan! with { DiscardEntrySequence = entry.Sequence }
+            });
+        });
         ContinueMobileShiWeiYan(f.Id);
     }
 
@@ -273,7 +288,8 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
             {
                 _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiWeiYan = r with { Stage = 7 }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
                 _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(f.Id, f.OwnerSeat, f.OwnerSeat, 1, null, null);
-                if (r.CardId is { } discarded && _cardZonesOperations._cardZones.GetLocation(discarded) == CardLocation.DiscardPile)
+                if (r.CardId is { } discarded && r.DiscardEntrySequence is { } entry &&
+                    _zoneEntries.CurrentEntry(CardLocation.DiscardPile, discarded) == entry)
                     _coreProgramAtomicCardMovesOperations.MoveProgramCardsFromMultipleSources([discarded], CardLocation.Hand(f.OwnerSeat), new(ShiWyObtain));
                 ContinueMobileShiWeiYan(id);
                 return;
@@ -284,7 +300,14 @@ internal sealed partial class CharacterWeiYanMobileShiRuntime
             if (next is not null)
             {
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiYinzhanClaimedEvent(next.Id, f.Id));
-                _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiWeiYan = r with { Stage = 0, TargetSeat = next.TargetSeat, CardId = null, ClaimId = next.Id, Chengshi = next.HpQualified } });
+                _coreRuntimeOperations.ReplaceRuntimeTop(f = f with
+                {
+                    MobileShiWeiYan = r with
+                    {
+                        Stage = 0, TargetSeat = next.TargetSeat, CardId = null, DiscardEntrySequence = null,
+                        ClaimId = next.Id, Chengshi = next.HpQualified
+                    }
+                });
                 if (_coreMatchParticipantsPlayersAccess._players[next.TargetSeat].IsAlive && MobileShiWeiYanChoices(f).Count > 0)
                 {
                     PublishMobileShiWeiYan(f);

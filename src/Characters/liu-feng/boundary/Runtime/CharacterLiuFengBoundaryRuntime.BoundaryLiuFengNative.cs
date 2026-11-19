@@ -159,7 +159,9 @@ internal sealed partial class CharacterLiuFengBoundaryRuntime
     internal void SettleBoundaryLiuFeng(ProgramSkillFrame f)
     {
         var r = f.BoundaryLiuFeng!;
-        var move = !r.Damaged && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && r.Cards is [var card] && _cardZonesOperations._cardZones.GetLocation(card) == CardLocation.DiscardPile;
+        var move = !r.Damaged && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive &&
+            r.CostSequence > 0 && r.Cards is [var card] &&
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, card) == r.CostSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryLiuFeng = r with { ConsequencePaid = true, Movement = "reward", Before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, After = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryLiuFengConsequenceEvent(f.Id, r.UseId, r.Damaged, move));
         if (move)
