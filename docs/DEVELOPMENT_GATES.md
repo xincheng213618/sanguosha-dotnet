@@ -53,20 +53,20 @@ the SDK selected by [global.json](../global.json), and Python 3.10+ on PATH.
 Python uses only the standard library to register temporary outputs.
 The runner builds an isolated scope once per invocation and reuses its outputs.
 
-- Add focused Core behavior checks for the new rule. Add WPF checks only for UI behavior, and shared mechanism checks when a shared capability changes. Reuse the existing `--filter=<name>` runners and `tools/Test-Changed.ps1`; do not add character-specific runner switches or a new test framework. Run the relevant focused checks during development and routine verification after a batch.
+- The sole routine gameplay acceptance runs one fixed-seed all-AI identity match through the public command API. It requires a normal victory and compares the winner and each seat's final snapshot after replaying the accepted commands from the same opening. A stall, exception or mismatch fails acceptance. Run it once when a gameplay batch is ready.
 
 - Full verification is manual only: run `tools/Test-Changed.ps1 -Full` or any unfiltered test runner only when the user explicitly requests a manual full run. Do not automatically start full verification after a change, batch, development milestone, or routine-check failure. This restriction remains in force throughout the main development cycle and later follow-up cycles until the user explicitly cancels it; completing the main development cycle does not lift it automatically.
 
-- Run `tools/Test-Changed.ps1` without filters for the measured routine scope in `tools/VerificationScopes.psd1` and relevant name filters while developing. Full verification follows the manual-only restriction above. Routine coverage and all registered checks are different scopes; report actual timings and failures. Fix each failing check you see or confirm it already fails on the base commit; only an explicit user request starts full verification.
+- For targeted diagnosis, use the existing Core and WPF checks with the relevant name filter. Add a focused check for uncovered behavior or a specific regression, using the same runner and filter syntax. Keep WPF checks specific to UI behavior. Fix a failing check or establish whether it already fails on the base commit.
 
 Run from the repository root:
 
 ```powershell
-# Choose filters relevant to the changed behavior.
+# Run once after integrating a gameplay batch.
+pwsh -File .\tools\Test-Changed.ps1 -CoreFilter 'Fixed-seed all-AI identity match and command replay'
+# Examples of filters for targeted diagnosis.
 pwsh -File .\tools\Test-Changed.ps1 -CoreFilter 'program interaction '
 pwsh -File .\tools\Test-Changed.ps1 -WpfFilter 'selection, target toggle'
-# Run once after integrating a code/content batch.
-pwsh -File .\tools\Test-Changed.ps1
 git diff --check
 ```
 
@@ -74,13 +74,11 @@ For documentation-only changes, check content, links and the intended diff; a
 game build or test run is unnecessary. Do not turn a documentation edit into a
 verification run against unrelated concurrent source changes.
 
-The routine lane is defined by [VerificationScopes.psd1](../tools/VerificationScopes.psd1);
-it covers victory rules, separation of rules and presentation, invalid definitions,
-and registration IDs/references/fingerprints. Read that file for the current list.
-Routine coverage, all registered checks and interactive desktop acceptance are
-different scopes.
-
-- Keep the default smoke checks near one second of test-process time; report build, dependency validation and runner overhead separately. Run relevant engine, replay, privacy, card movement and WPF regressions by existing name filters when those behaviors change. Prefer a small existing fixture or a verified seed over repeated seed searches and complete-match simulations. Retain integration coverage and all assertions for the behavior under test; measure the default run after a batch instead of assuming fewer checks means less time.
+Running the script without filters selects its historical diagnostic scope from
+[VerificationScopes.psd1](../tools/VerificationScopes.psd1). It covers victory
+rules, separation of rules and presentation, invalid definitions, and registration
+IDs, references and fingerprints. When changing those smoke checks, keep their
+test-process time near one second and measure build and runner overhead separately.
 
 Multiple filters in one group run their union, with each check executed once.
 Explicit empty filters and zero matches fail. Preserve the real failure count,

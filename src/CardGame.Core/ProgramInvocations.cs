@@ -20,6 +20,8 @@ public sealed record ProgramInvocationAuthorization(long WindowId, long NativeFr
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? CandidateIndex { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? DeliveredInstructionIndex { get; init; }
 }
 
 public abstract partial record ResolutionFrame
@@ -140,6 +142,25 @@ internal static class ProgramInvocations
             .Append(accepted).ToArray()
     };
 
+    internal static void RetainDamageClaim(IProgramRuntimeFrames frames, ProgramSkillFrame frame, long windowId)
+    {
+        if (frames.Find(windowId) is not DamageTriggerWindowFrame window ||
+            window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count)
+            throw new InvalidOperationException("A damage-card claim requires an active damage candidate.");
+        var candidate = window.Candidates[window.CandidateIndex].ToProgramCandidate();
+        var original = Find(window, candidate, frame.WindowContext!, frame.Id) ??
+            new ProgramInvocationAuthorization(window.Id, window.ParentFrameId, window.TriggerWindow, candidate);
+        var grant = original with { ProgramFrameId = frame.Id, CandidateIndex = window.CandidateIndex,
+            DeliveredInstructionIndex = frame.InstructionIndex };
+        var parent = window with { InvocationAuthorizations = (window.InvocationAuthorizations ?? [])
+            .Where(previous => previous.ProgramFrameId != frame.Id).Append(grant).ToArray() };
+        var child = frame with { InvocationAuthorization = grant };
+        if (!Allows(child, parent))
+            throw new InvalidOperationException("A delivered damage-card claim requires its original trigger and skill instance.");
+        frames.Replace(parent.Id, parent);
+        frames.ReplaceTop(child);
+    }
+
     internal static ProgramInvocationAuthorization? Find(ResolutionFrame? parent,
         ProgramTriggerCandidate candidate, ProgramSkillWindowContext context, long? programFrameId = null)
     {
@@ -188,9 +209,12 @@ internal static class ProgramInvocations
             window.CandidateIndex < 0 || window.CandidateIndex >= window.Candidates.Count ||
             window.Candidates[window.CandidateIndex].ToProgramCandidate() != candidate)
             return null;
-        return window.InvocationAuthorizations?.SingleOrDefault(authorization => authorization.ProgramFrameId == 0 &&
+        var grants = window.InvocationAuthorizations?.Where(authorization =>
             authorization.WindowId == window.Id && authorization.NativeFrameId == window.ParentFrameId &&
             authorization.Window == context.Window && authorization.Candidate == candidate);
+        return (programFrameId is > 0 ? grants?.SingleOrDefault(grant =>
+            grant.ProgramFrameId == programFrameId && grant.CandidateIndex == window.CandidateIndex) : null)
+            ?? grants?.SingleOrDefault(grant => grant.ProgramFrameId == 0);
     }
 
     internal static bool Allows(ProgramSkillFrame frame, ResolutionFrame? parent) =>

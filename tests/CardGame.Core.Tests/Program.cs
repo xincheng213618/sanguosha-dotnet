@@ -723,6 +723,7 @@ var tests = new (string Name, Action Body)[]
     ("Tactical planning AI: native Yuanchou traits preserve visibility", TacticalPlanningIntegrationChecks.NativeYuanchouTraitsRespectOwnerAndTargetVisibility),
     ("Ganglie source guard: source-less Lightning keeps judgment and cold", SourceLessGanglieChecks.LightningKeepsJudgmentButSkipsMissingSourceAndColdRestores),
     ("Ganglie source guard: sourced punishment and condition shape", SourceLessGanglieChecks.SourcedJudgmentStillPunishesOriginalParticipantAndConditionShapeIsValidated),
+    ("Fixed-seed all-AI identity match and command replay", TacticalAiChecks.FixedSeedIdentityReplay),
     ("AI policy versions validate and replay deterministically", TacticalAiChecks.PolicyReplay),
     ("AI published materials: foreign Xiansi native payment cold", AiPublishedMaterialChecks.ForeignXiansiMaterialsUsePublishedOwnerPileAndPayNativeSlashCold),
     ("AI published materials: round once cardless Slash native quota cold", AiPublishedMaterialChecks.RoundOnceCardlessSlashScoresWithoutPhysicalMaterialAndReturnsCold),
@@ -752,6 +753,7 @@ var tests = new (string Name, Action Body)[]
     ("snapshot is JSON serializable", SnapshotSerialization),
     ("Boundary Zhang Fei cancellation next real Use freeze", BoundaryZhangFeiChecks.CancellationAndUseFreeze),
     ("Mobile boundary Cao Cao: native claim children precede draw and cardless damage cold", BoundaryCaoCaoMobileChecks.NativeClaimChildrenPrecedeDrawAndCardlessDamageStillDrawsCold),
+    ("Mobile boundary Cao Cao: death during the claim stops the following draw", BoundaryCaoCaoMobileChecks.OwnerDeathDuringClaimStopsTheFollowingDraw),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

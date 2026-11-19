@@ -110,7 +110,10 @@ internal sealed class ProgramCompletionRuntime(IProgramRuntimeFrames frames, IPr
         frames.ReplaceTop(frame with { PendingMovementContinuation = null });
         var acceptedDrain = !facts.Alive(frame.OwnerSeat) && pending.SubjectSeat == frame.OwnerSeat &&
             ProgramAcceptedCardMovements.DrainsOwnerDeath(frame);
-        var deliveredDrain = pending.SubjectSeat == frame.OwnerSeat && ProgramInstructionDeliveries.HasDeliveredMovement(frame);
+        var deliveredDrain = pending.SubjectSeat == frame.OwnerSeat &&
+            (ProgramInstructionDeliveries.HasDeliveredMovement(frame) ||
+             frame.InvocationAuthorization is { DeliveredInstructionIndex: { } delivered } grant &&
+             delivered == frame.InstructionIndex && ProgramInvocations.Allows(frame, frames.Find(grant.WindowId)));
         if ((!facts.Alive(frame.OwnerSeat) || !facts.Alive(pending.SubjectSeat)) && !acceptedDrain && !deliveredDrain ||
             !facts.CanInvokeProgramSkill(frame) &&
             !facts.CanContinueConditionalGrant(frame) && !facts.CanContinuePhaseAlcohol(frame) &&

@@ -2,23 +2,18 @@ namespace CardGame.Core;
 
 internal sealed record ProgramDamageCardMaterial(bool Applied, IReadOnlyList<int> CardIds);
 
-internal interface IProgramDamageCardMaterialQueries : IProgramSelectionQuery
-{
-    ProgramDamageCardMaterial? Read(long attackFrameId);
-}
-
 internal interface IProgramDamageCardClaims : IProgramRuntimeOperations
 {
-    void Claim(long frameId, int ownerSeat, CardMoveReason reason);
+    void Claim(long frameId, int ownerSeat, CardMoveReason reason, bool retainInvocationOnDelivery = false);
 }
 
 /// <summary>Claims actual damage material through the existing atomic movement and original frame receipts.</summary>
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class ProgramDamageCardClaimRuntime(IProgramRuntimeFrames frames, ICardZoneQueries zones,
     IProgramBoundCardMovementOperations movement, IProgramRuntimeEvents events,
-    IProgramDamageCardClaimNativeRules nativeRules, ICardUseMaterialClaims claims) : IProgramDamageCardMaterialQueries, IProgramDamageCardClaims
+    IProgramDamageCardClaimNativeRules nativeRules, ICardUseMaterialClaims claims) : IProgramDamageCardClaims
 {
-    public ProgramDamageCardMaterial? Read(long attackFrameId)
+    internal ProgramDamageCardMaterial? Read(long attackFrameId)
     {
         var owner = frames.Find(attackFrameId);
         if (owner is ProgramSkillFrame { AttackAttempt: { } program })
@@ -56,7 +51,7 @@ internal sealed class ProgramDamageCardClaimRuntime(IProgramRuntimeFrames frames
             .Where(card => zones.GetLocation(card.Id) == CardLocation.Processing).ToArray();
     }
 
-    public void Claim(long frameId, int ownerSeat, CardMoveReason reason)
+    public void Claim(long frameId, int ownerSeat, CardMoveReason reason, bool retainInvocationOnDelivery = false)
     {
         var frame = frames.ActiveProgram(frameId);
         var cards = GetClaimable(frame);
@@ -67,6 +62,10 @@ internal sealed class ProgramDamageCardClaimRuntime(IProgramRuntimeFrames frames
         movement.MoveCards(cards, CardLocation.Processing, CardLocation.Hand(ownerSeat), reason);
         if (nativeRules.ActiveGroupOwnerId is { } groupOwnerId) RecordGroupClaims(groupOwnerId, damage, cards);
         if (attackOwner.IsNativeCard) claims.Capture(attackOwner.FrameId, ownerSeat, cards, before, reason);
+        if (retainInvocationOnDelivery && frames.Find(damage.ParentFrameId) is DamageFrame source &&
+            Read(source.ParentFrameId) is { Applied: true } material &&
+            cards.All(card => material.CardIds.Contains(card.Id) && zones.GetLocation(card.Id) == CardLocation.Hand(ownerSeat)))
+            ProgramInvocations.RetainDamageClaim(frames, frames.ActiveProgram(frameId), damage.Id);
         events.AdvanceFact(new ProgramDamageCardsClaimedEvent(frame.Id, frame.SkillId, frame.TriggerId!, ownerSeat,
             Array.AsReadOnly(cards.Select(card => card.Id).ToArray())));
     }

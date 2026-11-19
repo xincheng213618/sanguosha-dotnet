@@ -35,6 +35,39 @@ internal static class TacticalAiChecks
         throw new InvalidOperationException("A prompt with no published choices must remain invalid.");
     }
 
+    public static void FixedSeedIdentityReplay()
+    {
+        var options = new GameOptions
+        {
+            Seed = 561923,
+            ModeId = "identity:standard-8",
+            PlayerCount = 8,
+            HumanSeat = -1,
+            HumanRole = null,
+            UseInteractiveSetup = true,
+            AiPolicyVersion = AiDecisionPolicy.CurrentVersion
+        };
+        var content = StandardContentRegistry.Create();
+        var game = GameEngine.CreateStandard(options, content);
+        var result = game.Submit(new StartGameCommand(game.Revision));
+        Require(result.Accepted, $"Start rejected: {result.Error?.Code} {result.Error?.Message}");
+        Require(result.Status == EngineStatus.Completed &&
+            result.Winner is Winner.LordAndLoyalists or Winner.Rebels or Winner.Renegade,
+            $"Expected an identity victory, got {result.Status}/{result.Winner} on turn {result.State.TurnNumber}.");
+
+        var record = game.CreateCheckpoint();
+        var replay = GameReplay.Replay(record.Options, record.Commands, content);
+        Require(replay.State.Winner == result.Winner, "Command replay changed the winning camp.");
+        for (var seat = 0; seat < game.PlayerCount; seat++)
+        {
+            Require(SnapshotJson.Serialize(game.CreateSnapshot(seat)) == SnapshotJson.Serialize(replay.CreateSnapshot(seat)),
+                $"Command replay changed the final view for seat {seat}.");
+        }
+        Console.WriteLine($"{game.ModeId}, seed {options.Seed}, policy {options.AiPolicyVersion}: " +
+            $"{result.Winner} on turn {result.State.TurnNumber}; replayed {record.Commands.Count} host command(s), " +
+            $"all {game.PlayerCount} seat views match.");
+    }
+
     public static void PolicyReplay()
     {
         foreach (var version in new[] { 1, 2, 3, AiDecisionPolicy.CooperativeCategoryGiftVersion,
