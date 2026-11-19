@@ -6,6 +6,7 @@ using static BoundaryLiDianChecks;
 internal static class BoundarySunCeZhibaChecks
 {
     private const string Hero = "boundary:sun-ce", Zhiba = "boundary:zhiba-current", Zongshi = "boundary:zongshih-mobile";
+    private const string TaishiCi = "boundary:taishi-ci", Hanzhan = "boundary:hanzhan";
     private const string Mode = "identity:boundary-zhiba-test", Deck = "fixture:boundary-zhiba-deck";
     private const string Claim = "program.pindian.claim", ZongshiObtain = "skill-program.boundary:zongshih-mobile.obtain";
     private static readonly string[] Generals = [Hero, "fixture:boundary-zhiba-wu", "fixture:boundary-zhiba-wei", "fixture:boundary-zhiba-shu"];
@@ -72,6 +73,50 @@ internal static class BoundarySunCeZhibaChecks
             "An actual opponent victory closes the source lord's claim and finishes both original cards.");
     }
 
+    internal static void HanzhanWithoutSlashKeepsTheSourceClaim()
+    {
+        var (game, content, result) = Contest(new Fixture(hanzhan: true));
+        Require(result is { SourceRank: 7, OpponentRank: 7 } && game.CardMovements.Count(move =>
+                move.Reason == CardMoveReasons.PindianReveal && move.CardKind == CardKind.Crossbow) == 2,
+            "The real Zhiba and Hanzhan participants tie using two revealed Crossbows.");
+        Reach(game, _ => true);
+        Require(P(game) is { PlayerSeat: 0, SkillPrompt.SkillId: Zhiba },
+            "OL Zhiba must keep the source lord's tie claim when Hanzhan has no Slash to take.");
+
+        var expected = new[] { result.SourceCardId, result.OpponentCardId }.Order().ToArray();
+        game = Restore(game, content);
+        ReachClaim(game, expected);
+        Answer(game, Take);
+        Settle(game);
+        var moves = game.CardMovements.Where(move => move.Reason.Value == Claim).ToArray();
+        Require(moves.Select(move => move.CardId).SequenceEqual(expected) &&
+            moves.All(move => move.From == CardLocation.Processing && move.To == CardLocation.Hand(0)) &&
+            game.CardMovements.All(move => move.Reason != CardMoveReasons.PindianFinish),
+            "The cold-restored source claim obtains both original Crossbows once.");
+    }
+
+    internal static void HanzhanTakesOriginalTiedSlashesAfterSourceDeclines()
+    {
+        var (game, content, result) = Contest(new Fixture(hanzhan: true, slash: true));
+        var cards = new[] { result.SourceCardId, result.OpponentCardId };
+        Reach(game, _ => true);
+        Require(P(game) is { PlayerSeat: 0, SkillPrompt.SkillId: Zhiba },
+            "The source's Zhiba result claim precedes the opponent's Hanzhan result claim.");
+        ReachClaim(game, cards.Order().ToArray());
+        Answer(game, choice => choice.Parameters.GetValueOrDefault("take") == "false");
+        Reach(game, prompt => prompt is { PlayerSeat: 1, SkillPrompt.SkillId: Hanzhan } && prompt.Choices.Any(Take));
+        game = Restore(game, content);
+        Require(P(game)!.Choices.Single(Take).Cards.SequenceEqual(cards) && game.CardMovements.All(move => move.Reason.Value != Claim),
+            "The opponent's restored Hanzhan choice contains both original tied maximum Slashes.");
+        Answer(game, Take);
+        Settle(game);
+        var moves = game.CardMovements.Where(move => move.Reason.Value == Claim).ToArray();
+        Require(moves.Select(move => move.CardId).SequenceEqual(cards) &&
+            moves.All(move => move.From == CardLocation.Processing && move.To == CardLocation.Hand(1)) &&
+            game.CardMovements.All(move => move.Reason != CardMoveReasons.PindianFinish),
+            "Hanzhan obtains the actual original Slashes once after the source declines.");
+    }
+
     private static (GameEngine Game, ContentRegistry Content, PindianResult Result) Contest(Fixture fixture)
     {
         var content = ContentRegistry.Build(new StandardContentPackage(), fixture);
@@ -84,7 +129,7 @@ internal static class BoundarySunCeZhibaChecks
         ReachSetup();
         while (P(game) is { Kind: DecisionKind.SelectGeneral } selection)
         {
-            Accept(game, new SelectGeneralCommand(selection.PlayerSeat, Generals[selection.PlayerSeat], game.Revision, selection.PromptId));
+            Accept(game, new SelectGeneralCommand(selection.PlayerSeat, fixture.GeneralIds[selection.PlayerSeat], game.Revision, selection.PromptId));
             ReachSetup();
         }
 
@@ -95,6 +140,12 @@ internal static class BoundarySunCeZhibaChecks
         Require(!game.Submit(new UseProgramSkillCommand(0, Zhiba, "challenge-wu", [source], [2], revision, play.PromptId)).Accepted &&
             game.Revision == revision, "The OL Zhiba activation admits only other Wu targets.");
         Accept(game, new UseProgramSkillCommand(0, Zhiba, "challenge-wu", [source], [1], game.Revision, play.PromptId));
+        if (fixture.GeneralIds[1] == TaishiCi)
+        {
+            Reach(game, prompt => prompt is { PlayerSeat: 1, SkillPrompt.SkillId: Hanzhan } &&
+                prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("action") == "pindian-random"));
+            Answer(game, choice => choice.Parameters.GetValueOrDefault("take") == "false");
+        }
         Reach(game, prompt => prompt.PlayerSeat == 1 && prompt.Choices.Any(choice => choice.Parameters.GetValueOrDefault("action") == "pindian-card"));
         Answer(game, choice => choice.Cards.SequenceEqual([opponent]));
 
@@ -131,9 +182,10 @@ internal static class BoundarySunCeZhibaChecks
         return restored;
     }
 
-    private sealed class Fixture(bool earlierClaim = false, bool opponentWins = false) : IGameContentPackage
+    private sealed class Fixture(bool earlierClaim = false, bool opponentWins = false, bool hanzhan = false, bool slash = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-boundary-zhiba", new(1, 0));
+        public IReadOnlyList<string> GeneralIds { get; } = hanzhan ? [Hero, TaishiCi, Generals[2], Generals[3]] : Generals;
 
         public void Register(IContentRegistryBuilder builder)
         {
@@ -147,15 +199,20 @@ internal static class BoundarySunCeZhibaChecks
                 builder.AddSkill(new(Zongshi, presentation.Name, presentation.Description)
                     { Program = bundle.Programs[Zongshi], ProgramPresentation = presentation });
             }
-            var opponentSkill = earlierClaim ? Zongshi : opponentWins ? "classic:tianbian" : "standard:none";
-            builder.AddGeneral(new(Generals[1], "吴势力拼点者", "supporter", opponentSkill, "wu", 4));
+            if (GeneralIds[1] == TaishiCi)
+                CharacterFixtureContent.Register(builder, TaishiCi);
+            else
+            {
+                var opponentSkill = earlierClaim ? Zongshi : opponentWins ? "classic:tianbian" : "standard:none";
+                builder.AddGeneral(new(Generals[1], "吴势力拼点者", "supporter", opponentSkill, "wu", 4));
+            }
             builder.AddGeneral(new(Generals[2], "魏势力角色", "supporter", "standard:none", "wei", 4));
             builder.AddGeneral(new(Generals[3], "蜀势力角色", "supporter", "standard:none", "shu", 4));
             builder.AddDeck(new(Deck, "固定红桃七", 4, 2, []) { PhysicalCards = Enumerable.Range(0, 48)
-                .Select(_ => new ContentDeckPhysicalCard("standard:crossbow", Suit.Heart, 7)).ToArray() });
+                .Select(_ => new ContentDeckPhysicalCard(slash ? "standard:slash" : "standard:crossbow", Suit.Heart, 7)).ToArray() });
             builder.AddMode(new(Mode, "OL 界制霸", 4, 4, new Dictionary<string, int>
                 { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 2 }, Deck,
-                GeneralCandidateCount: 4, GeneralPoolIds: Generals));
+                GeneralCandidateCount: 4, GeneralPoolIds: GeneralIds));
         }
     }
 }

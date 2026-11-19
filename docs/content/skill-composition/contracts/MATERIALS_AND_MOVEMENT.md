@@ -27,6 +27,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Maximum-Slash claims use the original reveal entries in both pair and simultaneous comparisons. The initial freeze takes the highest effective rank among the eligible Slash entries at that time. Later loss of a frozen entry does not substitute a lower-ranked Slash. Simultaneous cleanup follows the group's final card assignment order and moves only its surviving original entries, including during the native death path.
 
+- The pair policy queue used when a Maximum-Slash policy is live includes eligible source-side all-card claims, even when no Slash qualifies. It follows participant order and checks all-card, ordinary and Maximum-Slash policies within each participant. A source-side all-card policy with no eligible original entry does not add a choice to that queue. The mobile Zhiba challenge keeps its separately issued lord claim before the policy queue.
+
 ## Native-use material retirement
 
 - Record actual non-Processing payment or destruction through `INativeMaterialClaims.CaptureRetirement` on the original `CardUseFrame.MaterialClaims`. A `Retirement` has no acquisition recipient and does not contribute to `WasClaimed` or claimed entities. A `Delivery` retains its acquisition and residency semantics. Ordinary payment into Processing issues no retirement receipt.

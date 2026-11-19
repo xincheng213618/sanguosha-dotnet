@@ -34,7 +34,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianClaimsRuntime
                 var binding = _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[seat], kind).FirstOrDefault();
                 if (binding.Source is null)
                     continue;
-                var ids = kind == SkillProgramCardPolicyKind.PindianMaximumSlashClaim ? maximumIds : kind == SkillProgramCardPolicyKind.PindianClaimAllWhenSourceWins ? seat == result.SourceSeat && !result.WonBy(result.OpponentSeat) ? pairCards.Select(c => c.Id).ToArray() : [] : new[]
+                var ids = kind == SkillProgramCardPolicyKind.PindianMaximumSlashClaim ? maximumIds : kind == SkillProgramCardPolicyKind.PindianClaimAllWhenSourceWins ? result.SourceMayClaimAll(seat) ? pairCards.Select(c => c.Id).ToArray() : [] : new[]
                 {
                     result.WonBy(seat) ? result.SourceRank < result.OpponentRank ? result.SourceCardId : result.OpponentCardId : result.CardOf(seat)
                 };

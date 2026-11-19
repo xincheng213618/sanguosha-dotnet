@@ -782,6 +782,9 @@ var tests = new (string Name, Action Body)[]
     ("OL Wang Lang Gushe cleans original simultaneous Pindian materials in order", OlGusheChecks.ThreeComparisonsCleanOriginalMaterialsInOrderAndReplay),
     ("OL Hanzhan: Tianyi claims only maximum effective Slash entries cold", BoundaryTaiShiCiChecks.TianyiClaimsOnlyMaximumEffectiveSlashEntriesCold),
     ("OL Hanzhan: Gushe claims the shared maximum only once", BoundaryTaiShiCiChecks.GusheClaimsSharedMaximumOnlyOnce),
+    ("OL Boundary Zhiba: Hanzhan without any Slash keeps the source claim", BoundarySunCeZhibaChecks.HanzhanWithoutSlashKeepsTheSourceClaim),
+    ("OL Boundary Zhiba: Hanzhan claims the original tied Slashes after source declines", BoundarySunCeZhibaChecks.HanzhanTakesOriginalTiedSlashesAfterSourceDeclines),
+    ("Mobile Sun Ce: Zhiba first claim before challenger's Hanzhan cold", BoundarySunCeMobileChecks.ZhibaHasFirstClaimBeforeChallengersHanzhan),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

@@ -29,9 +29,10 @@ internal sealed partial class CoreGameEnginePindianMaximumSlashClaimsRuntime
 
         )
         {
-            // Participant order is unchanged. Within a participant, the existing claim precedes the new one.
+            // Match the simultaneous policy order within each participant.
             foreach (var kind in new[]
             {
+                SkillProgramCardPolicyKind.PindianClaimAllWhenSourceWins,
                 SkillProgramCardPolicyKind.PindianClaim,
                 SkillProgramCardPolicyKind.PindianMaximumSlashClaim
             }
@@ -41,10 +42,16 @@ internal sealed partial class CoreGameEnginePindianMaximumSlashClaimsRuntime
                 var binding = _coreProgramCardPoliciesOperations.CardPolicies(_coreMatchParticipantsPlayersAccess._players[seat], kind).FirstOrDefault();
                 if (binding.Source is null)
                     continue;
-                var ids = kind == SkillProgramCardPolicyKind.PindianMaximumSlashClaim ? maximumIds : new[]
+                int[] ids = kind switch
                 {
-                    result.WonBy(seat) ? result.SourceRank < result.OpponentRank ? result.SourceCardId : result.OpponentCardId : result.CardOf(seat)
+                    SkillProgramCardPolicyKind.PindianMaximumSlashClaim => maximumIds,
+                    SkillProgramCardPolicyKind.PindianClaimAllWhenSourceWins when result.SourceMayClaimAll(seat) =>
+                        _corePindianOperations.AvailablePindianCards(frame).Order().ToArray(),
+                    SkillProgramCardPolicyKind.PindianClaimAllWhenSourceWins => [],
+                    _ => [result.WonBy(seat) ? result.CardOf(seat == result.SourceSeat ? result.OpponentSeat : result.SourceSeat) : result.CardOf(seat)]
                 };
+                if (kind == SkillProgramCardPolicyKind.PindianClaimAllWhenSourceWins && ids.Length == 0)
+                    continue;
                 claims.Add(new(seat, new(binding.Source.SkillId, binding.Policy.Id, seat, binding.Source.SkillInstanceId), kind, Array.AsReadOnly(ids.ToArray())));
             }
         }

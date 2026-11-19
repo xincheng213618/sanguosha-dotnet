@@ -8,6 +8,7 @@ public sealed record PindianResult(
     public bool SourceWon => SourceRank > OpponentRank;
     public bool WonBy(int seat) => seat == SourceSeat ? SourceWon :
         seat == OpponentSeat && OpponentRank > SourceRank;
+    internal bool SourceMayClaimAll(int seat) => seat == SourceSeat && !WonBy(OpponentSeat);
     public int CardOf(int seat) => seat == SourceSeat ? SourceCardId :
         seat == OpponentSeat ? OpponentCardId : throw new ArgumentOutOfRangeException(nameof(seat));
 }

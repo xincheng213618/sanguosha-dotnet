@@ -30,7 +30,7 @@ internal sealed partial class CoreGameEnginePindianClaimsRuntime
             var binding = claimAll.Source is not null ? claimAll : _coreProgramCardPoliciesOperations.CardPolicies(player, SkillProgramCardPolicyKind.PindianClaim).FirstOrDefault();
             int[] ids;
             if (claimAll.Source is not null)
-                ids = seat == result.SourceSeat && !result.WonBy(result.OpponentSeat) ? available.Order().ToArray() : [];
+                ids = result.SourceMayClaimAll(seat) ? available.Order().ToArray() : [];
             else
                 ids = [result.WonBy(seat) ? result.CardOf(seat == result.SourceSeat ? result.OpponentSeat : result.SourceSeat) : result.CardOf(seat)];
             if (!player.IsAlive || binding.Source is null || ids.Length == 0 || ids.Any(id => !available.Contains(id)))
