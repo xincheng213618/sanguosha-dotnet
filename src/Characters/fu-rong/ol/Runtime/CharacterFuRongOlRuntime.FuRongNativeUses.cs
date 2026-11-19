@@ -6,25 +6,43 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterFuRongOlRuntime
 {
     internal ProgramSkillFrame? FuRongDiscardQueryOwner(int seat) => _resolutionStackOperations._resolutionStack.LastOrDefault()is ProgramSkillFrame { FuRongPair: { Stage: FuRongPairStage.UseChoice or FuRongPairStage.NativeUse } } f && f.OwnerSeat == seat ? f : null;
-    internal bool FuRongUnspentDiscard(ProgramSkillFrame f, int id) => f.FuRongPair is { } r && !r.UsedCardIds.Contains(id) && (r.OwnerPayment?.CardId == id || r.TargetPayment?.CardId == id) && _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile;
+    internal bool FuRongUnspentDiscard(ProgramSkillFrame f, int id) =>
+        f.FuRongPair is { } r && !r.UsedCardIds.Contains(id) && IsFuRongPaymentCurrent(r, id);
+
+    private bool IsFuRongPaymentCurrent(ProgramFuRongPairReceipt receipt, int id)
+    {
+        long? ownerSequence = receipt.OwnerPayment is { } owner && owner.CardId == id ? owner.Sequence : null;
+        long? targetSequence = receipt.TargetPayment is { } target && target.CardId == id ? target.Sequence : null;
+        if (ownerSequence is null && targetSequence is null)
+            return false;
+        var entry = _zoneEntries.CurrentEntry(CardLocation.DiscardPile, id);
+        return entry is > 0 && (entry == ownerSequence || entry == targetSequence);
+    }
+
+    private bool IsFuRongQueryableDiscard(ProgramSkillFrame frame, int id) =>
+        frame.FuRongPair is { } receipt && (receipt.Stage == FuRongPairStage.UseChoice
+            ? FuRongUnspentDiscard(frame, id)
+            : receipt.SelectedUseCardId == id && IsFuRongPaymentCurrent(receipt, id));
+
     internal IReadOnlyList<Card> AppendFuRongDiscardCards(CharacterState actor, IReadOnlyList<Card> held)
     {
         var f = FuRongDiscardQueryOwner(actor.Seat);
         if (f is null)
             return held;
-        var r = f.FuRongPair!;
-        var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => r.Stage == FuRongPairStage.UseChoice ? FuRongUnspentDiscard(f, c.Id) : r.SelectedUseCardId == c.Id);
+        var cards = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(c => IsFuRongQueryableDiscard(f, c.Id));
         return Array.AsReadOnly(held.Concat(cards).DistinctBy(c => c.Id).ToArray());
     }
 
     internal Card? FindFuRongDiscardCard(CharacterState actor, int id) => IsFuRongSelectedDiscard(actor.Seat, id) ? _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(c => c.Id == id) : null;
     internal bool IsFuRongSelectedDiscard(int seat, int id)
     {
-        if (id <= 0 || !_cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, id))
+        if (id <= 0)
             return false;
         if (FuRongDiscardQueryOwner(seat)is { } querying)
-            return querying.FuRongPair!.Stage == FuRongPairStage.UseChoice ? FuRongUnspentDiscard(querying, id) : querying.FuRongPair.SelectedUseCardId == id;
-        return _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { FuRongReturn: { } ret } use && ret.CardId == id && use.CardId == id && HasIssuedFuRongDistance(use.Id, seat);
+            return IsFuRongQueryableDiscard(querying, id);
+        return _resolutionStackOperations._resolutionStack.LastOrDefault()is CardUseFrame { FuRongReturn: { } ret } use &&
+            ret.CardId == id && use.CardId == id && _cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, id) &&
+            HasIssuedFuRongDistance(use.Id, seat);
     }
 
     internal bool IsFuRongDiscardQuery(CharacterState actor, int? id) => id is> 0 && FuRongDiscardQueryOwner(actor.Seat)is not null && IsFuRongSelectedDiscard(actor.Seat, id.Value);
@@ -38,14 +56,27 @@ internal sealed partial class CharacterFuRongOlRuntime
     }
 
     internal bool HasIssuedFuRongUnlimitedUse(long id, int seat) => HasIssuedFuRongDistance(id, seat);
-    internal IReadOnlyList<LegalAction> FuRongNativeActions(ProgramSkillFrame f) => Array.AsReadOnly(new[] { f.FuRongPair!.OwnerPayment, f.FuRongPair.TargetPayment }.OfType<FuRongPayment>().Where(p => FuRongUnspentDiscard(f, p.CardId)).SelectMany(p => _coreNativeLegalActionsOperations.BuildLegalActions(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], includeProgramActions: false, selectedPhysicalCardId: p.CardId)).Where(a => a.CardId is> 0 && a.ConversionSource is null && a.Kind is not (LegalActionKind.Recast or LegalActionKind.UseProgramSkill or LegalActionKind.UseEquipmentEffect or LegalActionKind.RevealGeneral)).ToArray());
+    internal IReadOnlyList<LegalAction> FuRongNativeActions(ProgramSkillFrame f) => Array.AsReadOnly(
+        new[] { f.FuRongPair!.OwnerPayment, f.FuRongPair.TargetPayment }.OfType<FuRongPayment>().Select(p => p.CardId).Distinct()
+            .Where(id => FuRongUnspentDiscard(f, id))
+            .SelectMany(id => _coreNativeLegalActionsOperations.BuildLegalActions(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat],
+                includeProgramActions: false, selectedPhysicalCardId: id))
+            .Where(a => a.CardId is > 0 && a.ConversionSource is null && a.Kind is not (LegalActionKind.Recast or
+                LegalActionKind.UseProgramSkill or LegalActionKind.UseEquipmentEffect or LegalActionKind.RevealGeneral)).ToArray());
     internal IReadOnlyList<PromptChoice> FuRongUseChoices(ProgramSkillFrame f)
     {
-        var result = FuRongNativeActions(f).Select((a, i) =>
+        var actions = FuRongNativeActions(f);
+        var receipt = f.FuRongPair!;
+        // A returned owner payment could precede the remaining actions in the old ordinal list.
+        var useCardChoiceId = actions.Count > 0 && receipt.OwnerPayment is { } owner &&
+            actions[0].CardId != owner.CardId && !receipt.UsedCardIds.Contains(owner.CardId) &&
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, owner.CardId) is > 0 and var ownerEntry && ownerEntry != owner.Sequence;
+        var result = actions.Select((a, i) =>
         {
             var args = FuRongArgs(f, "use");
             args["action-index"] = i.ToString(CultureInfo.InvariantCulture);
-            return new PromptChoice(new($"fu-rong-use.{(f.Id)}.{(i)}"), a.Description, [a.CardId!.Value], a.TargetSeats.Count > 0 ? a.TargetSeats : a.TargetSeat is { } seat ? [seat] : [], args);
+            var choiceId = useCardChoiceId ? $"fu-rong-use.{f.Id}.card-{a.CardId}.{i}" : $"fu-rong-use.{f.Id}.{i}";
+            return new PromptChoice(new(choiceId), a.Description, [a.CardId!.Value], a.TargetSeats.Count > 0 ? a.TargetSeats : a.TargetSeat is { } seat ? [seat] : [], args);
         }).ToList();
         result.Add(new(new($"fu-rong-use.{(f.Id)}.finish"), "结束效死用牌。", [], [], FuRongArgs(f, "finish")));
         return Array.AsReadOnly(result.ToArray());
@@ -91,7 +122,7 @@ internal sealed partial class CharacterFuRongOlRuntime
         var at = _resolutionStackOperations._resolutionStack.FindIndex(x => x.Id == use.Id);
         if (at < 1 || _resolutionStackOperations._resolutionStack[at - 1] is not ProgramSkillFrame { FuRongPair: { Stage: FuRongPairStage.NativeUse } r } f || r.ReservedUseId != use.Id)
             return;
-        if (r.NativeReturn is not null || r.SelectedUseCardId != use.CardId || use.SourceSeat != f.OwnerSeat || use.Action is not { } action || use.PhysicalCardIds is not [var id] || id != use.CardId || !r.UsedCardIds.Contains(id) || (r.OwnerPayment?.CardId != id && r.TargetPayment?.CardId != id) || _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.DiscardPile)
+        if (r.NativeReturn is not null || r.SelectedUseCardId != use.CardId || use.SourceSeat != f.OwnerSeat || use.Action is not { } action || use.PhysicalCardIds is not [var id] || id != use.CardId || !r.UsedCardIds.Contains(id) || !IsFuRongPaymentCurrent(r, id))
             throw new InvalidOperationException("Xiaosi must issue its one selected paid original discard entity through native Use.");
         var ret = new FuRongUseReturn(f.Id, use.Id, id, use.CardKind, action.ActionId);
         _coreRuntimeOperations.ReplaceRuntimeFrame(f.Id, f with { FuRongPair = r with { NativeReturn = ret } });

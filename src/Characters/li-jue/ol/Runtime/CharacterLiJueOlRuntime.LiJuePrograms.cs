@@ -89,7 +89,10 @@ internal sealed partial class CharacterLiJueOlRuntime
         }
 
         var original = r.OriginalUse!;
-        var cards = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && original.FinishedMovements.All(m => _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile) ? original.FinishedMovements.Select(m => m.CardId).ToArray() : [];
+        var cards = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive &&
+            original.FinishedMovements.All(IsOriginalDiscardEntryCurrent)
+            ? original.FinishedMovements.Select(movement => movement.CardId).ToArray()
+            : [];
         r = r with
         {
             Stage = LiJueStage.GainChildren,

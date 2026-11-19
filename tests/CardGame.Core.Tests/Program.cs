@@ -789,6 +789,8 @@ var tests = new (string Name, Action Body)[]
     ("classic Luoying claims only the effective Club from native Zhifou", LuoyingNativeDiscardChecks.ZhifouOffersOnlyTheActualClubDiscard),
     ("Anniversary Diyin: seventh loss claims only the next original discard entry", AnniversaryDiyinChecks.SeventhLossClaimsOnlyTheNextOriginalDiscardEntry),
     ("Mou Xiahou Dun Qingjian cannot collect an old discard entry after rediscard", MouQingjianDiscardEntryChecks.QingjianCannotCollectTheNewEntryThroughAnOldDiscardWindow),
+    ("OL Yisuan: paid maximum HP leaves the re-discarded Trick at its newer entry cold", OlYisuanChecks.PaidMaximumHpCannotObtainTheSameTrickAtANewerDiscardEntryCold),
+    ("OL Fu Rong Xiaosi offers only the original discard payments", FuRongDiscardEntryChecks.XiaosiOffersOnlyTheOriginalPaymentEntries),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

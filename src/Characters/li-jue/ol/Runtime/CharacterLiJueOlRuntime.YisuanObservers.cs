@@ -134,8 +134,18 @@ internal sealed partial class CharacterLiJueOlRuntime
             return false;
         if (invoice.NullificationUse && (!_coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardActionAcceptedEvent>().Any(e => e.Action.ActionId == action.ActionId && CoreGameEngineOverflowTargetCancellationObserversRuntime.SameOverflowAction(e.Action, action)) || _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<YisuanNullificationQualifiedEvent>().Count(e => e.BatchId == invoice.BatchId && e.WindowId == invoice.NativeUseId && e.ActionId == action.ActionId && e.OwnerSeat == owner && e.ActualTurn == invoice.ActualTurn && e.PhaseInstance == invoice.PhaseInstance && e.FirstSequence == invoice.FinishedMovements.Min(m => m.Sequence) && e.LastSequence == invoice.FinishedMovements.Max(m => m.Sequence)) != 1))
             return false;
-        return invoice.FinishedMovements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.From == CardLocation.Processing && m.To == CardLocation.DiscardPile && (invoice.NullificationUse ? m.Reason == CardMoveReasons.NullificationFinished || m.Reason == CardMoveReasons.ResponseFinished : m.Reason == CardMoveReasons.UseFinished) && action.PhysicalCards.Count(c => c.CardId == m.CardId) == 1 && (!requireAvailable || _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile));
+        return invoice.FinishedMovements.All(movement =>
+            _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(movement) &&
+            movement.From == CardLocation.Processing && movement.To == CardLocation.DiscardPile &&
+            (invoice.NullificationUse
+                ? movement.Reason == CardMoveReasons.NullificationFinished || movement.Reason == CardMoveReasons.ResponseFinished
+                : movement.Reason == CardMoveReasons.UseFinished) &&
+            action.PhysicalCards.Count(card => card.CardId == movement.CardId) == 1 &&
+            (!requireAvailable || IsOriginalDiscardEntryCurrent(movement)));
     }
+
+    private bool IsOriginalDiscardEntryCurrent(CardMovementRecord movement) =>
+        _zoneEntries.CurrentEntry(CardLocation.DiscardPile, movement.CardId) == movement.Sequence;
 
     internal IReadOnlyList<ProgramTriggerCandidate> CollectLiJueUseDiscardCandidates(CardMovementBatchContext batch)
     {
