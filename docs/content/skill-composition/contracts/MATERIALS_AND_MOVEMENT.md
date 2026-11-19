@@ -23,6 +23,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Before publishing revealed Pindian materials, the pair or simultaneous contest records each physical Processing entry on its original frame. An already reserved card keeps the original reservation sequence. A reveal swap changes seat assignments and leaves the entry attached to the physical card. Zongshi and Shenduan compare their current eligible card with this entry before moving it. Their paid child continuations use their own settlement facts.
 
+- A pair's ordinary result claims and native cleanup read those same reveal entries. The published choice retains its original claimant and result identities. Execution rechecks each physical entry before moving it. Declining or exhausting the choices leaves native cleanup responsible for the original entries still in Processing.
+
 ## Native-use material retirement
 
 - Record actual non-Processing payment or destruction through `INativeMaterialClaims.CaptureRetirement` on the original `CardUseFrame.MaterialClaims`. A `Retirement` has no acquisition recipient and does not contribute to `WasClaimed` or claimed entities. A `Delivery` retains its acquisition and residency semantics. Ordinary payment into Processing issues no retirement receipt.

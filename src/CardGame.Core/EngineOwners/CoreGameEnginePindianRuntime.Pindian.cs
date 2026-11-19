@@ -181,18 +181,20 @@ internal sealed partial class CoreGameEnginePindianRuntime
             CompletePindian((PindianFrame)_resolutionStackOperations._resolutionStack[^1]);
     }
 
-    internal int[] AvailablePindianCards(PindianResult result) => new[]
+    internal int[] AvailablePindianCards(PindianFrame frame)
     {
-        result.SourceCardId,
-        result.OpponentCardId
-    }.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).ToArray();
+        var result = frame.Result ?? throw new InvalidOperationException("Available Pindian cards require a revealed result.");
+        return new[] { result.SourceCardId, result.OpponentCardId }
+            .Where(id => PindianProcessingEntry.IsCurrent(frame, _zoneEntries, id)).ToArray();
+    }
+
     internal void CompletePindian(PindianFrame frame)
     {
         var foreignOrigin = _resolutionStackOperations._resolutionStack.Count >= 2 && _resolutionStackOperations._resolutionStack[^2] is ProgramSkillFrame owner ? _coreForeignTurnContestsOperations.Value.FreezeForeignTurnPindianOrigin(owner, frame) : null;
         var result = frame.Result ?? throw new InvalidOperationException("Pindian cannot complete without a native result.");
         PindianDiscardEntry? sourceDiscard = null;
         PindianDiscardEntry? opponentDiscard = null;
-        foreach (var id in AvailablePindianCards(result))
+        foreach (var id in AvailablePindianCards(frame))
         {
             var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == id);
             _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.DiscardPile,
@@ -300,7 +302,9 @@ internal sealed partial class CoreGameEnginePindianRuntime
         {
             _corePindianMaximumSlashClaimsOperations.Value.AssertPindianPolicyClaims(frame);
             var claimantSeat = frame.PolicyClaims is { } policyClaims ? (int? )policyClaims.Claims[policyClaims.Index].OwnerSeat : frame.ClaimSeats is { } seats && frame.ClaimIndex >= 0 && frame.ClaimIndex < seats.Count ? seats[frame.ClaimIndex] : null;
-            if (frame.Result is null || decision.PlayerSeat != claimantSeat || decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("action") != "pindian-claim" || choice.Cards.Any(id => !contestCards.Contains(id))))
+            if (frame.Result is not { } result || decision.PlayerSeat != claimantSeat ||
+                decision.Choices.Any(choice => choice.Parameters.GetValueOrDefault("action") != "pindian-claim" ||
+                    choice.Cards.Any(id => id != result.SourceCardId && id != result.OpponentCardId)))
                 throw new InvalidOperationException("Pindian claim lost its public card or claimant.");
             return;
         }

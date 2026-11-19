@@ -3,7 +3,7 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEnginePindianEntries
 {
     internal void AssertPindianInvariant() => _resolve().AssertPindianInvariant();
-    internal int[] AvailablePindianCards(PindianResult result) => _resolve().AvailablePindianCards(result);
+    internal int[] AvailablePindianCards(PindianFrame frame) => _resolve().AvailablePindianCards(frame);
     internal void BeginSharedPindian(long parentId, SkillPromptPresentation presentation, int sourceSeat, int? opponentSeat = default, int? sourceCardId = default, string? programResultBind = default, SkillProgramCardSetVisibility programResultVisibility = (SkillProgramCardSetVisibility)1, PindianOwnedPileSource? ownedPileSource = default) => _resolve().BeginSharedPindian(parentId, presentation, sourceSeat, opponentSeat, sourceCardId, programResultBind, programResultVisibility, ownedPileSource);
     internal void CompletePindian(PindianFrame frame) => _resolve().CompletePindian(frame);
     internal bool HasPindianChild(long parentId) => _resolve().HasPindianChild(parentId);

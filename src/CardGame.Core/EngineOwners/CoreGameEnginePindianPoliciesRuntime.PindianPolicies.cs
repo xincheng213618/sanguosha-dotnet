@@ -73,10 +73,10 @@ internal sealed partial class CoreGameEnginePindianPoliciesRuntime
 
     internal int[] CurrentPindianProcessingIds(PindianFrame frame)
     {
+        if (frame.Result is not null)
+            return _corePindianOperations.AvailablePindianCards(frame);
         if (frame.WuLuKangContest is not null)
             return _characterLuKangWumiaoOperations.WuLuKangHeldProcessing(frame).ToArray();
-        if (frame.Result is { } result)
-            return _corePindianOperations.AvailablePindianCards(result);
         return frame.SourceUsesDrawPileTop && frame.SourceCardId is { } id && HoldsPindianSourceTop(frame) ? [id] : [];
     }
 }

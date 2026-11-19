@@ -114,7 +114,7 @@ internal sealed partial class CharacterSunCeBoundaryMobileRuntime
     {
         if (pair.ClaimSeats is not null || pair.Result is not { SourceWon: false } result || _resolutionStackOperations._resolutionStack.Count < 2 || _resolutionStackOperations._resolutionStack[^2] is not ProgramSkillFrame { BoundarySunCeChallenge: { Stage: "contest" } r } f || pair.SkillId != f.SkillId || r.PindianFrameId != pair.Id || pair.ParentFrameId != f.Id || result.SourceSeat != r.ProviderSeat || result.OpponentSeat != f.OwnerSeat || !_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive)
             return false;
-        var ids = _corePindianOperations.AvailablePindianCards(result);
+        var ids = _corePindianOperations.AvailablePindianCards(pair);
         if (ids.Length == 0)
             return false;
         pair = pair with

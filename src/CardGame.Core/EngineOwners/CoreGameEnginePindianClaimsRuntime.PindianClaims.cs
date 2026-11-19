@@ -16,6 +16,7 @@ internal sealed partial class CoreGameEnginePindianClaimsRuntime
         if (_corePindianMaximumSlashClaimsOperations.Value.HasMaximumSlashPindianClaim(frame))
             return _corePindianMaximumSlashClaimsOperations.Value.BeginMaximumSlashPindianClaims(frame);
         var result = frame.Result ?? throw new InvalidOperationException("Pindian claim requires a revealed result.");
+        var available = _corePindianOperations.AvailablePindianCards(frame);
         var seats = frame.ClaimSeats ?? new[]
         {
             result.SourceSeat,
@@ -27,15 +28,12 @@ internal sealed partial class CoreGameEnginePindianClaimsRuntime
             var player = _coreMatchParticipantsPlayersAccess._players[seat];
             var claimAll = _coreProgramCardPoliciesOperations.CardPolicies(player, SkillProgramCardPolicyKind.PindianClaimAllWhenSourceWins).FirstOrDefault();
             var binding = claimAll.Source is not null ? claimAll : _coreProgramCardPoliciesOperations.CardPolicies(player, SkillProgramCardPolicyKind.PindianClaim).FirstOrDefault();
-            var ids = claimAll.Source is not null ? seat == result.SourceSeat && !result.WonBy(result.OpponentSeat) ? new[]
-            {
-                result.SourceCardId,
-                result.OpponentCardId
-            }.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Order().ToArray() : [] : new[]
-            {
-                result.WonBy(seat) ? result.SourceRank < result.OpponentRank ? result.SourceCardId : result.OpponentCardId : result.CardOf(seat)
-            };
-            if (!player.IsAlive || binding.Source is null || ids.Length == 0 || ids.Any(id => _cardZonesOperations._cardZones.GetLocation(id) != CardLocation.Processing))
+            int[] ids;
+            if (claimAll.Source is not null)
+                ids = seat == result.SourceSeat && !result.WonBy(result.OpponentSeat) ? available.Order().ToArray() : [];
+            else
+                ids = [result.WonBy(seat) ? result.CardOf(seat == result.SourceSeat ? result.OpponentSeat : result.SourceSeat) : result.CardOf(seat)];
+            if (!player.IsAlive || binding.Source is null || ids.Length == 0 || ids.Any(id => !available.Contains(id)))
             {
                 frame = frame with
                 {
@@ -84,6 +82,8 @@ internal sealed partial class CoreGameEnginePindianClaimsRuntime
         {
             foreach (var id in selected.Cards)
             {
+                if (!PindianProcessingEntry.IsCurrent(frame, _zoneEntries, id))
+                    continue;
                 var card = _cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(item => item.Id == id);
                 _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.Processing, CardLocation.Hand(seat), new CardMoveReason("program.pindian.claim"));
             }

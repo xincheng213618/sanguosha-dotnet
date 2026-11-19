@@ -776,6 +776,9 @@ var tests = new (string Name, Action Body)[]
     ("Ordinary Xun Chen: Fenglve skips its source already claimed by Zongshi", OrdinaryXunChenChecks.FenglveGiftContinuesWhenZongshiAlreadyClaimedItsSource),
     ("Shenduan: original winning entry bottoms before King draw and replays", WuLuKangShenduanChecks.WinningOriginalEntryBottomsBeforeKingDrawAndReplays),
     ("mobile Jian Yong Zongshi uses the original simultaneous Pindian entry", BoundaryJianYongMobileChecks.FirstComparisonObtainsCommonCardAndSecondUsesOriginalEntries),
+    ("Mobile Sun Ce: Zhiba original pair claim and decline cold", BoundarySunCeMobileChecks.ZhibaClaimsOriginalPairAfterColdRestore),
+    ("OL Boundary Zhiba: source claims original tie entries or declines cold", BoundarySunCeZhibaChecks.SourceClaimsOriginalTieEntriesOrDeclinesAfterColdRestore),
+    ("OL Boundary Zhiba: earlier claim leaves one entry and opponent win closes entitlement", BoundarySunCeZhibaChecks.EarlierClaimLeavesOnlyOriginalSurvivorAndOpponentWinDoesNotOffer),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
