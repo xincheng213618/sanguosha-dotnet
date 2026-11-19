@@ -3,6 +3,8 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterRuanHuiOlRuntime
 {
+    private const int JingzhongClaimLimitPerPhase = 3;
+
     internal bool HasRuanHuiCapability => _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMingchaRevealDrawChoice) || _contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ArmJingzhongNextActualPlay);
 
     internal static CardConversionSource RuanHuiSource(ProgramSkillFrame f) => RuntimeSkills.RuntimeRules_ruan_hui_ol_RuanHuiLedger.RuanHuiSource(f);
@@ -18,7 +20,9 @@ internal sealed partial class CharacterRuanHuiOlRuntime
     }
 
     internal bool JingzhongClaimAlreadyIssued(JingzhongLeaseEvent lease, long action) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongClaimIssuedEvent>().Any(e => e.PhaseToken == JingzhongDuePhase(lease)?.Token && e.ActionId == action && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongLeaseEvent>().Any(l => l.FrameId == e.LeaseId && SameJingzhongLeaseOwner(l, lease)));
-    internal JingzhongLeaseEvent[] JingzhongPhaseLeases(long phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongLeaseEvent>().Where(l => JingzhongDuePhase(l)?.Token == phase && JingzhongUsedCount(l.FrameId) < 3 && _coreMatchParticipantsPlayersAccess._players[l.Source.OwnerSeat].IsAlive).ToArray();
+    internal JingzhongLeaseEvent[] JingzhongPhaseLeases(long phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<JingzhongLeaseEvent>()
+        .Where(l => JingzhongDuePhase(l)?.Token == phase && JingzhongUsedCount(l.FrameId) < JingzhongClaimLimitPerPhase &&
+            _coreMatchParticipantsPlayersAccess._players[l.Source.OwnerSeat].IsAlive).ToArray();
     [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 27080)]
     internal void ObserveRuanHuiUse(IGameEvent fact)
     {
@@ -161,7 +165,7 @@ internal sealed partial class CharacterRuanHuiOlRuntime
             .FirstOrDefault(e => leases.SingleOrDefault(lease => lease.FrameId == e.LeaseId) is { } lease &&
                 lease.Source.OwnerSeat == c.OwnerSeat && lease.Source.SkillInstanceId == c.SkillInstanceId &&
                 lease.GameplayHash == c.GameplayHash && !JingzhongClaimAlreadyIssued(lease, e.ActionId));
-        if (anchor is null || JingzhongUsedCount(anchor.LeaseId) >= 3)
+        if (anchor is null || JingzhongUsedCount(anchor.LeaseId) >= JingzhongClaimLimitPerPhase)
             return [];
 
         return facts.Where(e => e.BatchId == batch.Id && e.LeaseId == anchor.LeaseId && e.ActionId == anchor.ActionId)

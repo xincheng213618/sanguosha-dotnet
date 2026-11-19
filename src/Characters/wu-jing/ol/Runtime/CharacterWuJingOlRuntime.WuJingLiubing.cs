@@ -3,12 +3,14 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterWuJingOlRuntime
 {
+    private const Suit FirstPhysicalSlashSuit = Suit.Diamond;
+
     internal bool HasWuJingLiubing => _contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ClaimLiubingUndamagingSlash) == true;
 
     internal bool WuJingOwnsLiubing(int actor) => _coreTableSeatQueriesOperations.IsValidPlayerSeat(actor) && _coreMatchParticipantsPlayersAccess._players[actor].IsAlive && (_coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[actor])?.GetInstanceTriggers(SkillProgramTriggerWindow.DiscardPileReceived) ?? []).Any(b => b.Trigger.Effects is [{ Op: SkillProgramEffectOp.ClaimLiubingUndamagingSlash }]);
     internal static bool WuJingPhysicalSlash(Card card, CardKind kind, IReadOnlyList<int> ids, IReadOnlyList<CardConversionSource>? conversions) => RuntimeSkills.RuntimeRules_wu_jing_ol_WuJingLiubing.WuJingPhysicalSlash(card, kind, ids, conversions);
     internal bool WuJingFirstPhysicalSlash(int actor) => !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WuJingActualPhysicalSlashEvent>().Any(e => e.ActualTurn == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber && e.TurnOwner == _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat && e.ActorSeat == actor);
-    internal Suit? WuJingLiubingUsedSuit(int actorSeat, Card card, CardKind effectiveKind, IReadOnlyList<int> ids, IReadOnlyList<CardConversionSource>? conversions, Suit? ordinary) => HasWuJingLiubing && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && WuJingOwnsLiubing(actorSeat) && WuJingPhysicalSlash(card, effectiveKind, ids, conversions) && WuJingFirstPhysicalSlash(actorSeat) ? Suit.Diamond : ordinary;
+    internal Suit? WuJingLiubingUsedSuit(int actorSeat, Card card, CardKind effectiveKind, IReadOnlyList<int> ids, IReadOnlyList<CardConversionSource>? conversions, Suit? ordinary) => HasWuJingLiubing && _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber > 0 && WuJingOwnsLiubing(actorSeat) && WuJingPhysicalSlash(card, effectiveKind, ids, conversions) && WuJingFirstPhysicalSlash(actorSeat) ? FirstPhysicalSlashSuit : ordinary;
     internal Card WuJingLiubingUseCard(CharacterState actor, Card card, CardKind kind, CardConversionSource? conversion = null, IReadOnlyList<int>? ids = null, long? existingUseId = null)
     {
         if (!HasWuJingLiubing)
@@ -31,7 +33,7 @@ internal sealed partial class CharacterWuJingOlRuntime
     {
         if (card is null || _coreCardUseLifecycleOperations.LifecycleCardUse(useId)is not { WuJingLiubing: { } r, Action: { } a } use || r.CardId != card.Id)
             return card;
-        if (r.UseId != use.Id || r.ActionId != a.ActionId || r.Kind != use.CardKind || a.EffectiveSuit != r.Suit || r.Suit != Suit.Diamond)
+        if (r.UseId != use.Id || r.ActionId != a.ActionId || r.Kind != use.CardKind || a.EffectiveSuit != r.Suit || r.Suit != FirstPhysicalSlashSuit)
             throw new InvalidOperationException("Liubing lost its exact issued first physical Slash appearance.");
         return card with
         {
@@ -51,9 +53,10 @@ internal sealed partial class CharacterWuJingOlRuntime
             if (ordinal == 1 && WuJingOwnsLiubing(action.ActorSeat))
             {
                 var binding = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat]).GetInstanceTriggers(SkillProgramTriggerWindow.DiscardPileReceived).First(b => b.Trigger.Effects is [{ Op: SkillProgramEffectOp.ClaimLiubingUndamagingSlash }]);
-                if (action.EffectiveSuit != Suit.Diamond || action.EffectiveIsRed != true)
-                    throw new InvalidOperationException("The first Liubing physical Slash must freeze Diamond before native declaration and response.");
-                var r = new WuJingLiubingAppearance(use.Id, action.ActionId, new(binding.SkillId, binding.Trigger.Id, action.ActorSeat, binding.SkillInstanceId), _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat, action.ActorSeat, material.CardId, action.EffectiveKind, Suit.Diamond);
+                if (action.EffectiveSuit != FirstPhysicalSlashSuit ||
+                    action.EffectiveIsRed != CoreNativeCardClassificationsRuntime.IsRedSuit(FirstPhysicalSlashSuit))
+                    throw new InvalidOperationException($"The first Liubing physical Slash must freeze {FirstPhysicalSlashSuit} before native declaration and response.");
+                var r = new WuJingLiubingAppearance(use.Id, action.ActionId, new(binding.SkillId, binding.Trigger.Id, action.ActorSeat, binding.SkillInstanceId), _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._turnNumber, _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._currentSeat, action.ActorSeat, material.CardId, action.EffectiveKind, FirstPhysicalSlashSuit);
                 _coreCardUseLifecycleOperations.UpdateLifecycleCardUse(use.Id, u => u with { WuJingLiubing = r });
             }
         }
