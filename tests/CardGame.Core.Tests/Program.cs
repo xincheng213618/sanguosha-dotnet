@@ -768,6 +768,9 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Youyi: collects genuine foreign discard in the actual phase", MobileYouyiChecks.CollectsActualPhaseDiscardWithoutInvocationPhase),
     ("OL Cao Teng Jianxiong: draw child and original group material claim", OlCaoTengJianxiongChecks.DrawChildPrecedesOriginalGroupMaterialClaim),
     ("OL Xingbu: frozen reveal and owned cleanup command replay", XingbuRevealChecks.FrozenPublicRevealAndOwnedCleanupReplay),
+    ("Mou Deng Ai Jigu: original used discard cannot claim a same-card rediscard", JiguDiscardEntryChecks.JiguDoesNotCollectSameDodgeMaterialAfterRediscard),
+    ("OL Boundary Jiang: typed Zhifou discard opens the original batch", NativeCollectedDiscardProjectionChecks.CaoXianTypedDiscardOpensJiangOnItsOriginalBatch),
+    ("Dongxin: reclaim only the original paid discard entry", OlDongxinChecks.ReclaimRetainsOriginalPaidEntry),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

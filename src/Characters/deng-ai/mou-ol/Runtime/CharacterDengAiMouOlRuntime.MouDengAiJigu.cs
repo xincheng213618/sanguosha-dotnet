@@ -37,7 +37,16 @@ internal sealed partial class CharacterDengAiMouOlRuntime
         }
     }
 
-    internal int[] MouDengAiDiscardIndexes(CardMovementBatchContext batch) => batch.Movements.Select((m, i) => (m, i)).Where(x => x.m.To == CardLocation.DiscardPile && x.m.From == CardLocation.Processing && _coreAdvancedLifecycleOperations.GetAdvancedCard(x.m.CardId).Suit != Suit.Heart && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDengAiUseDiscardEvent>().Any(e => e.BatchId == batch.Id && e.CardId == x.m.CardId && e.Sequence == x.m.Sequence && e.ParentId == batch.ParentFrameId)).Select(x => x.i).ToArray();
+    internal int[] MouDengAiDiscardIndexes(CardMovementBatchContext batch) => batch.Movements
+        .Select((move, index) => (Move: move, Index: index))
+        .Where(item => item.Move.From == CardLocation.Processing && item.Move.To == CardLocation.DiscardPile &&
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, item.Move.CardId) == item.Move.Sequence &&
+            _coreAdvancedLifecycleOperations.GetAdvancedCard(item.Move.CardId).Suit != Suit.Heart &&
+            _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MouDengAiUseDiscardEvent>().Any(fact =>
+                fact.BatchId == batch.Id && fact.CardId == item.Move.CardId && fact.Sequence == item.Move.Sequence &&
+                fact.ParentId == batch.ParentFrameId))
+        .Select(item => item.Index)
+        .ToArray();
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 33400)]
     internal int[]? SelectMouDengAiDiscardIndexes(CardMovementBatchContext batch, ProgramTriggerCandidate candidate, ProgramInstructionFeatures features) => features.HasOperation(SkillProgramEffectOp.CollectMouDengAiJigu) ? MouDengAiDiscardIndexes(batch) : null;
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 33400, SkillProgramEffectOp.CollectMouDengAiJigu, SkillProgramEffectOp.ExchangeMouDengAiJigu, SkillProgramEffectOp.UseMouDengAiJiewan, SkillProgramEffectOp.GrowMouDengAiJiewan)]
@@ -45,7 +54,8 @@ internal sealed partial class CharacterDengAiMouOlRuntime
     {
         var op = c.Trigger.Effects.Single().Op;
         if (op == SkillProgramEffectOp.CollectMouDengAiJigu)
-            return c.Context.MovementBatch is { } b && MouDengAiGu(c.Owner.Seat).Length < c.Owner.MaxHp && MouDengAiDiscardIndexes(b).Any(i => _cardZonesOperations._cardZones.GetLocation(b.Movements[i].CardId) == CardLocation.DiscardPile);
+            return c.Context.MovementBatch is { } b && MouDengAiGu(c.Owner.Seat).Length < c.Owner.MaxHp &&
+                MouDengAiDiscardIndexes(b).Length > 0;
         if (op == SkillProgramEffectOp.ExchangeMouDengAiJigu)
             return c.Context.SourceSeat is { } seat && _coreMatchParticipantsPlayersAccess._players[seat].MaxHp == c.Owner.MaxHp && _corePhysicalOwnedCardQueriesOperations.GetHand(c.Owner).Count > 0 && MouDengAiGu(c.Owner.Seat).Length > 0;
         if (op == SkillProgramEffectOp.GrowMouDengAiJiewan)
@@ -74,7 +84,7 @@ internal sealed partial class CharacterDengAiMouOlRuntime
             var b = w.MovementBatch!;
             var count = MouDengAiGu(f.OwnerSeat).Length;
             var max = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].MaxHp;
-            var cards = MouDengAiDiscardIndexes(b).Select(i => b.Movements[i]).Where(m => _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile).ToArray();
+            var cards = MouDengAiDiscardIndexes(b).Select(i => b.Movements[i]).ToArray();
             if (count >= max || cards.Length == 0)
             {
                 FinishMouDengAiOl(f);

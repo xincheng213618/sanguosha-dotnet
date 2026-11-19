@@ -17,14 +17,27 @@ internal sealed partial class CharacterSunYuanOlRuntime
     internal void ReclaimDongxin(ProgramSkillFrame f)
     {
         var r = f.SunYuan!;
-        var eligible = r.Materials.Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.EffectiveKind) && _cardZonesOperations._cardZones.Contains(CardLocation.DiscardPile, c.CardId) && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunYuanEntityMovedEvent>().SingleOrDefault(e => e.FrameId == f.Id && e.Stage == SunYuanStage.DiscardChildren && e.CardId == c.CardId)is { } paid && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Last(m => m.CardId == c.CardId).Sequence == paid.Sequence).Select(c => c.CardId).ToArray();
+        var discarded = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunYuanEntityMovedEvent>()
+            .Where(e => e.FrameId == f.Id && e.Stage == SunYuanStage.DiscardChildren && e.To == CardLocation.DiscardPile)
+            .ToDictionary(e => e.CardId);
+        var eligible = r.Materials
+            .Where(c => CoreNativeCardClassificationsRuntime.IsSlashCard(c.EffectiveKind) &&
+                discarded.TryGetValue(c.CardId, out var paid) &&
+                _zoneEntries.CurrentEntry(CardLocation.DiscardPile, c.CardId) == paid.Sequence)
+            .Select(c => c.CardId)
+            .ToArray();
         if (!_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None || eligible.Length == 0)
         {
             FinishSunYuan(f, true);
             return;
         }
 
-        IssueSunYuanMove(f, eligible, CardLocation.Hand(f.OwnerSeat), SunYuanStage.ReclaimChildren, DongxinReclaimReason, false);
+        IssueSunYuanMove(f, eligible, CardLocation.Hand(f.OwnerSeat), SunYuanStage.ReclaimChildren, DongxinReclaimReason, false, movement =>
+        {
+            var original = r.Materials.Single(c => c.CardId == movement.CardId);
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DongxinEntityAcquiredEvent(
+                f.Id, r.Source, f.OwnerSeat, movement.CardId, original.EffectiveKind, discarded[movement.CardId].Sequence, movement.Sequence));
+        });
         ContinueSunYuan(f.Id);
     }
 }

@@ -3,6 +3,7 @@ using CardGame.Core.RuntimeSkills;
 namespace CardGame.Core;
 
 [ProgramRuntimeModule]
+[ProgramPassiveFactRequirements("boundary:jiang-current", ProgramTrackedFact.NativeLogicalDiscard)]
 internal sealed class BoundarySunCeDiscardClaim(ICardMovementHistoryQueries movements, ICardZoneQueries zones,
     INativeLogicalDiscardOrigins discards)
 {
@@ -43,5 +44,5 @@ internal sealed class BoundarySunCeDiscardClaim(ICardMovementHistoryQueries move
         move.To == CardLocation.DiscardPile &&
         (move.CardKind == CardKind.Duel || RuntimeRules_Core_CommonRules.IsSlashCard(move.CardKind) &&
             move.PrintedSuitAtMovement(zones) is Suit.Heart or Suit.Diamond) &&
-        discards.GetProgramDiscardSource(move) is { OwnerSeat: not null };
+        discards.GetCompletedProgramDiscardSource(move) is { OwnerSeat: not null };
 }

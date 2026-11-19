@@ -28,12 +28,10 @@ internal sealed partial class CharacterSunYuanOlEntries
     internal bool IsSayingSlashRequest(ProgramSkillFrame f) => _resolve().IsSayingSlashRequest(f);
     internal bool IsSunYuanPaidMovement(ProgramSkillFrame f, CardMovementRecord m) => _resolve().IsSunYuanPaidMovement(f, m);
     internal bool IsSunYuanRecoveryParent(ProgramSkillFrame f, RecoveryReplacementFrame recovery) => _resolve().IsSunYuanRecoveryParent(f, recovery);
-    internal void IssueSunYuanMove(ProgramSkillFrame supplied, IReadOnlyList<int> ids, CardLocation to, SunYuanStage stage, string reason, bool discard) => _resolve().IssueSunYuanMove(supplied, ids, to, stage, reason, discard);
     internal void PayDongxin(ProgramSkillFrame f) => _resolve().PayDongxin(f);
     internal void PrepareSayingSuppliedSlash(ProgramSkillFrame supplied, int actorSeat, int providerSeat, int targetSeat, CardKind kind, IReadOnlyList<Card> materials, CardConversionSource? conversionSource, IReadOnlyList<CardConversionSource>? additionalConversionSources = default) => _resolve().PrepareSayingSuppliedSlash(supplied, actorSeat, providerSeat, targetSeat, kind, materials, conversionSource, additionalConversionSources);
     internal void ProjectDongxinCardSkillMark(int cardId, ref CardSkillMarkProjection projection) => _resolve().ProjectDongxinCardSkillMark(cardId, ref projection);
     internal void PublishSaying(ProgramSkillFrame supplied, bool keepCurrentRequest = false) => _resolve().PublishSaying(supplied, keepCurrentRequest);
-    internal void ReclaimDongxin(ProgramSkillFrame f) => _resolve().ReclaimDongxin(f);
     internal void RecordDongxinEntityDeparture(CardMovedEvent e) => _resolve().RecordDongxinEntityDeparture(e);
     internal void RecordSayingSlashPayment(CardMovedEvent e) => _resolve().RecordSayingSlashPayment(e);
     internal bool ResumeSayingSuppliedSlash(ProgramSkillFrame supplied) => _resolve().ResumeSayingSuppliedSlash(supplied);

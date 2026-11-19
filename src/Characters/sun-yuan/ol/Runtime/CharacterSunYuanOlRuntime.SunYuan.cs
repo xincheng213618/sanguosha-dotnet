@@ -124,7 +124,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
         PayDongxin(f);
     }
 
-    internal void IssueSunYuanMove(ProgramSkillFrame supplied, IReadOnlyList<int> ids, CardLocation to, SunYuanStage stage, string reason, bool discard)
+    internal void IssueSunYuanMove(ProgramSkillFrame supplied, IReadOnlyList<int> ids, CardLocation to, SunYuanStage stage, string reason, bool discard, Action<CardMovementRecord>? afterEntityMoved = null)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
         var r = f.SunYuan!;
@@ -167,12 +167,7 @@ internal sealed partial class CharacterSunYuanOlRuntime
             {
                 var m = records.Single(m => m.CardId == material.CardId);
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new SunYuanEntityMovedEvent(f.Id, r.Step, stage, batch, m.CardId, m.CardKind, m.From, m.To, m.Sequence));
-                if (stage == SunYuanStage.ReclaimChildren)
-                {
-                    var original = r.Materials.Single(c => c.CardId == m.CardId);
-                    var paid = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<SunYuanEntityMovedEvent>().Single(e => e.FrameId == f.Id && e.Stage == SunYuanStage.DiscardChildren && e.CardId == m.CardId);
-                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new DongxinEntityAcquiredEvent(f.Id, r.Source, f.OwnerSeat, m.CardId, original.EffectiveKind, paid.Sequence, m.Sequence));
-                }
+                afterEntityMoved?.Invoke(m);
             }
         }
 

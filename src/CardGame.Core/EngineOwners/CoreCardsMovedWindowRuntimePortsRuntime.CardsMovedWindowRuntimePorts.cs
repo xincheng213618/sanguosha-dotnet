@@ -22,7 +22,6 @@ internal sealed partial class CoreCardsMovedWindowRuntimePortsRuntime
     SkillProgramTrigger ICardsMovedWindowFacts.GetProgramTrigger(ProgramTriggerCandidate candidate) => _coreProgramLifecycleOperations.GetProgramTrigger2(candidate);
     IEnumerable<(CardMovementSourceCount Count, bool DiscardOriginOnly)> ICardsMovedWindowFacts.ProgramMovementSourceCounts(CardMovementBatchContext batch, SkillProgramTriggerWindow window) => _coreProgramMovementSourceCountsOperations.ProgramMovementSourceCounts(batch, window);
     bool ICardsMovedWindowFacts.ContainsMovement(CardMovementRecord movement) => _coreCardMovementJournalCardMovementsAccess._cardMovements.Contains(movement);
-    CardLocation? ICardsMovedWindowFacts.GetProgramDiscardSource(CardMovementRecord movement) => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement);
     PublicPersistentPileSource? ICardsMovedWindowFacts.RicePile(ProgramTriggerCandidate candidate) => _coreGameEnginePublicPileSourcesPublicPersistentPilesAccess._publicPersistentPiles.GetValueOrDefault((candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId));
     bool ICardsMovedWindowFacts.RiceProducer(PublicPersistentPileSource pile) => _coreRicePileOperations.RiceProducer(pile);
     CardKind ICardsMovedWindowFacts.GetAttackCardKind(int cardId) => _coreCardAttackStateOperations.GetAttackCard(cardId).Kind;

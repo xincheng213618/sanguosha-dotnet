@@ -40,6 +40,7 @@ internal interface INativeLogicalDiscardOrigins : IProgramSelectionQuery
     bool IsOwnedDiscardSource(CardLocation location);
     bool IsProgramDiscardOriginReason(CardMoveReason reason);
     CardLocation? GetProgramDiscardSource(CardMovementRecord movement);
+    CardLocation? GetCompletedProgramDiscardSource(CardMovementRecord movement);
     bool IsEphemeralCardDestroyedMaterial(CardMovementRecord movement);
 }
 

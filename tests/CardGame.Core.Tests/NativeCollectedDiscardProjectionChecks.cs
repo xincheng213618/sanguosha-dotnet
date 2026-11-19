@@ -9,6 +9,7 @@ internal static class NativeCollectedDiscardProjectionChecks
     private const string Mode = "identity:classic-native-collected-discard";
     private const string Owner = "fixture:native-collected-owner";
     private const string Driver = "fixture:native-collected-driver";
+    private const string CaoXianDiscardReason = "skill-program.ol:lingxi-or-zhifou.discard";
 
     public static void CaoXianAdjustmentAndTargetDiscardPreserveNativeCollectionCold()
     {
@@ -25,7 +26,7 @@ internal static class NativeCollectedDiscardProjectionChecks
         game = Cold(game, registry);
         for (var i = 0; i < 4; i++) Pick(game, c => HasRole(c, "pick"));
         Reach(game, _ => game.ResolutionStack.OfType<ProgramSkillFrame>().LastOrDefault()?.CaoXian?.Stage == CaoXianStage.OptionTarget);
-        Require(game.CardMovements.Skip(before).Count(m => m.Reason.Value == "skill-program.ol:lingxi-or-zhifou.discard") == 5,
+        Require(game.CardMovements.Skip(before).Count(m => m.Reason.Value == CaoXianDiscardReason) == 5,
             "All five Lingxi adjustment entities pay once as their original collection completes.");
         BeginCaoXianSelfDiscard(game);
         prompt = Prompt(game)!; before = game.CardMovements.Count;
@@ -35,18 +36,55 @@ internal static class NativeCollectedDiscardProjectionChecks
         Require(Prompt(game) is { RequiredCardCount: 1 } && game.CardMovements.Count == before,
             "Cold recovery does not pay Zhifou's first singleton or combine it with the earlier Lingxi set.");
         Pick(game, c => HasRole(c, "pick")); Reach(game, IsOwnPlay);
-        Require(game.CardMovements.Skip(before).Count(m => m.Reason.Value == "skill-program.ol:lingxi-or-zhifou.discard") == 2 &&
+        Require(game.CardMovements.Skip(before).Count(m => m.Reason.Value == CaoXianDiscardReason) == 2 &&
             game.CreateSnapshot(0).Players[0].HandCount == 0, "The exact final native selection pays the second two-card batch once.");
     }
 
-    internal static (GameEngine Game, ContentRegistry Registry) CreateCaoXianDiscardScene()
+    public static void CaoXianTypedDiscardOpensJiangOnItsOriginalBatch()
     {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new CaoXianFixture());
+        var (game, registry) = CreateCaoXianDiscardScene(includeJiang: true);
+        var duel = game.CreateSnapshot(0).Players[0].Hand.Single(card => card.Kind == CardKind.Duel).Id;
+        var count = Prompt(game)!.RequiredCardCount;
+        for (var index = 0; index < count; index++)
+            Pick(game, choice => HasRole(choice, "pick") && choice.Cards.Single() != duel);
+
+        BeginCaoXianSelfDiscard(game);
+        Pick(game, choice => HasRole(choice, "pick") && choice.Cards.Single() != duel);
+        Pick(game, choice => HasRole(choice, "pick") && choice.Cards.SequenceEqual([duel]));
+
+        var discard = game.CardMovements.Single(move => move.CardId == duel && move.Reason.Value == CaoXianDiscardReason);
+        var material = game.Events.Select(e => e.Payload).OfType<NativeLogicalDiscardMaterialCompletedEvent>()
+            .Single(e => e.CardId == duel && e.CompletionSequence == discard.Sequence);
+        var invoice = game.Events.Select(e => e.Payload).OfType<NativeLogicalDiscardInvocationRecordedEvent>()
+            .Single(e => e.InvocationId == material.InvocationId);
+        Require(discard is { BatchId: > 0 } && material.From == CardLocation.Hand(0) &&
+            material.To == CardLocation.DiscardPile && invoice is { InitiatorSeat: 0, ExecutorSeat: 0, ActualCount: 2 },
+            "The selected Duel must actually enter the discard pile in the genuine two-card Zhifou invoice.");
+
+        Reach(game, IsOwnPlay);
+        var resolution = game.Events.Select(e => e.Payload).OfType<ProgramBindingResolvedEvent>()
+            .SingleOrDefault(e => e.SkillId == "boundary:jiang-current" && e.BindingId == "reclaim-first-discard-batch");
+        Require(resolution is { OwnerSeat: 1, Window: SkillProgramTriggerWindow.DiscardPileReceived, Activated: false } &&
+            resolution.FrameId == discard.BatchId &&
+            game.CardMovements.Last(move => move.CardId == duel) == discard,
+            "The typed Zhifou receipt must offer Jiang in its original movement window; the AI decline leaves the Duel there.");
+
+        var restored = Cold(game, registry);
+        Require(restored.Events.Select(e => e.Payload).OfType<ProgramBindingResolvedEvent>()
+            .Any(resolved => resolved == resolution), "Cold replay preserves the AI decline on the original discard batch.");
+    }
+
+    internal static (GameEngine Game, ContentRegistry Registry) CreateCaoXianDiscardScene(bool includeJiang = false)
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new CaoXianFixture(includeJiang));
         ShanheStartingCard[] hand = [new(CardKind.Dodge, Suit.Heart, 1), new(CardKind.Dodge, Suit.Heart, 2),
             new(CardKind.DrawTwo, Suit.Club, 3), new(CardKind.Dodge, Suit.Spade, 4), new(CardKind.Dodge, Suit.Club, 5),
-            new(CardKind.Dodge, Suit.Diamond, 6), new(CardKind.Dodge, Suit.Spade, 7), new(CardKind.Dodge, Suit.Club, 8)];
+            new(CardKind.Dodge, Suit.Diamond, 6), new(CardKind.Dodge, Suit.Spade, 7),
+            new(includeJiang ? CardKind.Duel : CardKind.Dodge, Suit.Club, 8)];
+        var firstPeer = includeJiang ? new ShanheCombatantDefinition("boundary:sun-ce", Hp: 4) { StartingHand = [] }
+            : new ShanheCombatantDefinition(CaoXianFixture.Peer, Hp: 8) { StartingHand = [] };
         var setup = new ShanheBattleSetup(373, 1, "cao-xian-native-discard-draft", "ol:cao-xian", 3, 0, 0, 0, 0,
-            [CaoXianFixture.Driver], hand, [], [new(CaoXianFixture.Peer, Hp: 8) { StartingHand = [] },
+            [CaoXianFixture.Driver], hand, [], [firstPeer,
                 new(CaoXianFixture.Peer, Hp: 8) { StartingHand = [] }, new(CaoXianFixture.Peer, Hp: 8) { StartingHand = [] }], [], new string('c', 64));
         var game = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0,
             HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId,
@@ -212,13 +250,15 @@ internal static class NativeCollectedDiscardProjectionChecks
     }
     private static void Require(bool yes, string why) { if (!yes) throw new InvalidOperationException(why); }
 
-    private sealed class CaoXianFixture : IGameContentPackage
+    private sealed class CaoXianFixture(bool includeJiang) : IGameContentPackage
     {
         internal const string Driver = "fixture:native-cao-xian-driver", Peer = "fixture:native-cao-xian-peer", Deck = "fixture:native-cao-xian-deck";
         public PackageManifest Manifest { get; } = new("fixture-native-cao-xian-discard", new(1, 0));
         public void Register(IContentRegistryBuilder b)
         {
             CharacterFixtureContent.Register(b, "ol:cao-xian");
+            if (includeJiang)
+                CharacterFixtureContent.Register(b, "boundary:sun-ce", "classic:sun-jian", "classic:zhou-yu");
             var rules = $$"""
             {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{Driver}}","revision":1,
               "triggers":[{"id":"no-draw","window":"drawPhaseStarting","subject":"owner","optional":false,"isSkillInvocation":false,
@@ -232,7 +272,7 @@ internal static class NativeCollectedDiscardProjectionChecks
             b.AddDeck(new(Deck, "固定真实闪牌堆", 0, 2, []) { PhysicalCards = Enumerable.Range(0, 80)
                 .Select(_ => new ContentDeckPhysicalCard("standard:dodge", Suit.Spade, 10)).ToArray() });
             b.AddMode(new(ShanheBattleSetup.BattleModeId, "曹宪原生多选弃牌", 4, 4, new Dictionary<string, int>(), Deck,
-                GeneralPoolIds: ["ol:cao-xian", Peer], ModeKind: ContentModeKind.Team,
+                GeneralPoolIds: includeJiang ? ["ol:cao-xian", Peer, "boundary:sun-ce"] : ["ol:cao-xian", Peer], ModeKind: ContentModeKind.Team,
                 TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 1, [ShanheBattleSetup.EnemyTeamId] = 3 }));
         }
     }

@@ -3,6 +3,19 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramDiscardOriginsRuntime
 {
+    internal CardLocation? GetCompletedProgramDiscardSource(CardMovementRecord movement)
+    {
+        var physicalSource = GetProgramDiscardSource(movement);
+        if (physicalSource is not null || movement.To != CardLocation.DiscardPile) return physicalSource;
+
+        // Native payment can settle after physical batch capture. Later discard
+        // windows can read the original typed receipt even when the old reason
+        // classifier could not recognize the producer at movement time.
+        return _history.Read<NativeLogicalDiscardMaterialCompletedEvent>()
+            .LastOrDefault(material => material.CardId == movement.CardId && material.To == movement.To &&
+                material.CompletionSequence == movement.Sequence)?.From;
+    }
+
     internal CardLocation? GetProgramDiscardSource(CardMovementRecord movement)
     {
         if (_characterZhangFenAnniversaryOperations.IsDagongCheDestroyedMaterial(movement) && IsProgramDiscardOriginReason(movement.Reason))

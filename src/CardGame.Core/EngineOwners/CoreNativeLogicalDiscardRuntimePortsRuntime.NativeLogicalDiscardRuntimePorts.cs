@@ -12,6 +12,7 @@ internal sealed partial class CoreNativeLogicalDiscardRuntimePortsRuntime
     bool INativeLogicalDiscardOrigins.IsOwnedDiscardSource(CardLocation location) => CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(location);
     bool INativeLogicalDiscardOrigins.IsProgramDiscardOriginReason(CardMoveReason reason) => CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(reason);
     CardLocation? INativeLogicalDiscardOrigins.GetProgramDiscardSource(CardMovementRecord movement) => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement);
+    CardLocation? INativeLogicalDiscardOrigins.GetCompletedProgramDiscardSource(CardMovementRecord movement) => _coreProgramDiscardOriginsOperations.GetCompletedProgramDiscardSource(movement);
     bool INativeLogicalDiscardOrigins.IsEphemeralCardDestroyedMaterial(CardMovementRecord movement) => _coreEphemeralCardMaterialsOperations.IsEphemeralCardDestroyedMaterial(movement);
     NativeLogicalDiscardInvocationDraft? INativeLogicalDiscardAdmissions.Admit(NativeLogicalDiscardInvocationDraft? draft) => _characterZhangFeiWumiaoOperations.AdmitWuZishengNativeDiscard(draft);
     void INativeLogicalDiscardAdmissions.AdmitMaterials(NativeLogicalDiscardInvocationDraft draft) => _characterZhangFeiWumiaoOperations.AdmitWuZishengDiscardMaterials(draft);

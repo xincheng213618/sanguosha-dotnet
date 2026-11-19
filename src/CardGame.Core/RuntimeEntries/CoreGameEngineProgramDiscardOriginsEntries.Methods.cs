@@ -4,4 +4,5 @@ internal sealed partial class CoreGameEngineProgramDiscardOriginsEntries
 {
     internal CardMovementSourceCount GetProgramDiscardOriginSourceCount(CardLocation source, IReadOnlyList<CardMovementRecord> completions) => _resolve().GetProgramDiscardOriginSourceCount(source, completions);
     internal CardLocation? GetProgramDiscardSource(CardMovementRecord movement) => _resolve().GetProgramDiscardSource(movement);
+    internal CardLocation? GetCompletedProgramDiscardSource(CardMovementRecord movement) => _resolve().GetCompletedProgramDiscardSource(movement);
 }

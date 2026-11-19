@@ -14,7 +14,6 @@ internal interface ICardsMovedWindowFacts : IProgramTriggerQueries
     SkillProgramTrigger GetProgramTrigger(ProgramTriggerCandidate candidate);
     IEnumerable<(CardMovementSourceCount Count, bool DiscardOriginOnly)> ProgramMovementSourceCounts(CardMovementBatchContext batch, SkillProgramTriggerWindow window);
     bool ContainsMovement(CardMovementRecord movement);
-    CardLocation? GetProgramDiscardSource(CardMovementRecord movement);
     PublicPersistentPileSource? RicePile(ProgramTriggerCandidate candidate);
     bool RiceProducer(PublicPersistentPileSource pile);
     CardKind GetAttackCardKind(int cardId);
