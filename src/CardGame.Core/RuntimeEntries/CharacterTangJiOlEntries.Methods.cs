@@ -3,7 +3,6 @@ namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterTangJiOlEntries
 {
     internal int? GetKanggeMarkedSeat(int ownerSeat) => _resolve().GetKanggeMarkedSeat(ownerSeat);
-    internal int GiftJielieSuitCards(ProgramSkillFrame frame, JielieGiftState state, int amount) => _resolve().GiftJielieSuitCards(frame, state, amount);
     internal bool HasJielieGiftDying(long beforeDamageId) => _resolve().HasJielieGiftDying(beforeDamageId);
     internal bool IsJielieGiftProgramDying() => _resolve().IsJielieGiftProgramDying();
     internal bool IsKanggeMarkedSeat(int seat, int ownerSeat) => _resolve().IsKanggeMarkedSeat(seat, ownerSeat);

@@ -762,6 +762,7 @@ var tests = new (string Name, Action Body)[]
     ("OL Jingzhong: one claim per multi-material use, separate gain windows and replay", OlJingzhongChecks.MultiMaterialClaimKeepsMovementWindowsAndUsesOneOfThreeClaims),
     ("OL Guzheng: immediate same-source batch, paid children and command replay", OlGuzhengChecks.ImmediateSameSourceBatchAndPaidChildrenReplay),
     ("Wushuang Guzheng: equipment return, original discard entry and command replay", WushuangGuzhengChecks.EquipmentReturnAndOriginalEntryClaimReplay),
+    ("Classic Luoying: genuine foreign club discard and judgment, no recast", ClassicLuoyingChecks.OnlyOtherPlayersGenuineClubDiscardAndJudgmentCanBeClaimed),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

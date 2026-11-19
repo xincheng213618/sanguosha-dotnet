@@ -74,7 +74,7 @@ internal sealed partial class CharacterTangJiOlRuntime
         return SkillProgramStepOutcome.Continue;
     }
 
-    internal int GiftJielieSuitCards(ProgramSkillFrame frame, JielieGiftState state, int amount)
+    private int GiftJielieSuitCards(ProgramSkillFrame frame, JielieGiftState state, int amount)
     {
         var marked = state.MarkedSeat;
         var pool = _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Where(card => card.Suit == state.Suit).ToList();
@@ -82,9 +82,10 @@ internal sealed partial class CharacterTangJiOlRuntime
         var gifted = 0;
         while (gifted < amount && pool.Count > 0)
         {
-            var card = pool[_randomOperations._random.Next(pool.Count)];
-            pool.Remove(card);
-            _corePhysicalMovementFacadesOperations.MoveCard(card, CardLocation.DiscardPile, CardLocation.Hand(marked), reason);
+            var index = _random.Next(pool.Count);
+            var card = pool[index];
+            pool.RemoveAt(index);
+            _jielieMovement.Move(card, CardLocation.DiscardPile, CardLocation.Hand(marked), reason);
             gifted++;
         }
 

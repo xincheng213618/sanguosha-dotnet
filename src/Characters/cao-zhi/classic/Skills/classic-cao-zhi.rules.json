@@ -12,26 +12,20 @@
           "id": "claim-discarded-club",
           "window": "discardPileReceived",
           "subject": "owner",
+          "movementOccurrence": "perCard",
           "suits": ["club"],
           "optional": true,
           "priority": 0,
-          "excludedMovementReasons": [
-            "card.use-finished",
-            "card.response-finished",
-            "card.respond.nullification-finished",
-            "card.effect.iron-chain-finished",
-            "card.effect.delayed-finish",
-            "card.effect.fire-attack-finished",
-            "card.effect.fire-attack-discard-finished",
-            "card.effect.dismantlement-finished",
-            "card.effect.snatch-finished",
-            "card.effect.dismantlement-judgment-finished",
-            "card.effect.snatch-judgment-finished"
-          ],
           "effects": [
             {
-              "op": "claimMovedCards",
-              "target": "owner"
+              "op": "claimDiscardedEntityWithProvenance",
+              "target": "owner",
+              "provenanceId": "classic-luoying"
+            },
+            {
+              "op": "offerFaceUpForOutsideClaims",
+              "target": "owner",
+              "provenanceId": "classic-luoying"
             }
           ]
         }
