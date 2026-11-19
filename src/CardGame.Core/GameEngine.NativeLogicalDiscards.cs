@@ -12,7 +12,19 @@ public sealed record NativeLogicalDiscardInvocationRecordedEvent(long Invocation
     public ActualDiscardRecoveryPhaseKey? Phase { get; init; }
 }
 
-public sealed record NativeLogicalDiscardMaterial(int CardId, CardLocation From);
+public sealed record NativeLogicalDiscardMaterial(int CardId, CardLocation From)
+{
+    internal Suit? EffectiveSuitAtPayment { get; init; }
+}
+
+internal sealed record NativeProgramDiscardPreparation(long FrameId, int SequenceBefore, CardMoveReason Reason,
+    IReadOnlyList<NativeLogicalDiscardMaterial> Materials);
+
+public sealed partial record CardMovementRecord
+{
+    internal NativeLogicalDiscardMaterial? NativeDiscard { get; init; }
+}
+
 public sealed record NativeLogicalDiscardMaterialCompletedEvent(long InvocationId, int CardId,
     CardLocation From, CardLocation To, long CompletionSequence) : IGameEvent;
 

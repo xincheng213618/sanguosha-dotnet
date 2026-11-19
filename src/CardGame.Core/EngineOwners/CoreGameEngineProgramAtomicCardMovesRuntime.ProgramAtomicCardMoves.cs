@@ -3,7 +3,7 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineProgramAtomicCardMovesRuntime
 {
-    internal void MoveProgramCardsFromMultipleSources(IReadOnlyList<int> ids, CardLocation destination, CardMoveReason reason, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null, Func<Card, CardLocation, CardLocation>? destinationForCard = null, CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified, Action<HappyWeiYanGainRequestSettlement>? afterRequestSettled = null, long? producerFrameId = null)
+    internal void MoveProgramCardsFromMultipleSources(IReadOnlyList<int> ids, CardLocation destination, CardMoveReason reason, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null, Func<Card, CardLocation, CardLocation>? destinationForCard = null, CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified, Action<HappyWeiYanGainRequestSettlement>? afterRequestSettled = null, long? producerFrameId = null, NativeProgramDiscardPreparation? nativeDiscard = null)
     {
         if (afterPhysicalRecords is not null && afterRequestSettled is not null)
             throw new InvalidOperationException("A gain request must choose one physical or request-settlement continuation.");
@@ -32,6 +32,11 @@ internal sealed partial class CoreGameEngineProgramAtomicCardMovesRuntime
         if (retainedEntries.Length > 0 && afterPhysicalRecords is not null)
             throw new InvalidOperationException("A replaced gain retaining its source hand requires a typed request-settlement continuation, not physical movement evidence.");
         var producerId = producerFrameId ?? _resolutionStackOperations._resolutionStack.LastOrDefault()?.Id;
+        if (nativeDiscard is { } discard && (discard.FrameId != producerId || discard.SequenceBefore != sequenceBefore ||
+                discard.Reason != reason || destination != CardLocation.DiscardPile || disclosure != CardMovementDisclosure.FaceUp ||
+                discard.Materials.Any(material => !entries.Any(entry => entry.Card.Id == material.CardId && entry.Source == material.From))))
+            throw new InvalidOperationException("An atomic native discard requires its original producer, payment and owned material entries.");
+        var nativeMaterials = nativeDiscard?.Materials.ToDictionary(material => material.CardId);
         if ((retainedEntries.Length > 0 || afterRequestSettled is not null) && producerId is null)
             throw new InvalidOperationException("A gain request settlement requires its original active producer.");
         var retained = retainedEntries.Select(item => _coreHappyWeiYanGainDestinationsOperations.SettleHappyWeiYanRetainedGain(item.GainDestination!, producerId)).ToArray();
@@ -58,7 +63,7 @@ internal sealed partial class CoreGameEngineProgramAtomicCardMovesRuntime
             if (afterPhysicalRecords is not null || afterRequestSettled is not null)
             {
                 foreach (var item in entries)
-                    movements.Add(_corePhysicalMovementFacadesOperations.RecordMovement(item.Card, item.Source, item.Target, reason, disclosure: disclosure, happyWeiYanGainDestination: item.GainDestination, happyZuoCiPhantomDestination: item.PhantomDestination));
+                    movements.Add(_corePhysicalMovementFacadesOperations.RecordMovement(item.Card, item.Source, item.Target, reason, disclosure: disclosure, happyWeiYanGainDestination: item.GainDestination, happyZuoCiPhantomDestination: item.PhantomDestination, nativeDiscard: nativeMaterials?.GetValueOrDefault(item.Card.Id)));
                 if (shiyou is not null)
                     _coreHellMengpoProgramsOperations.CompleteHellShiyouDiscardTransfers(shiyou, movements);
                 var records = Array.AsReadOnly(movements.ToArray());
@@ -78,7 +83,7 @@ internal sealed partial class CoreGameEngineProgramAtomicCardMovesRuntime
             else
                 foreach (var item in entries)
                 {
-                    movements.Add(_corePhysicalMovementFacadesOperations.RecordMovement(item.Card, item.Source, item.Target, reason, disclosure: disclosure, happyWeiYanGainDestination: item.GainDestination, happyZuoCiPhantomDestination: item.PhantomDestination));
+                    movements.Add(_corePhysicalMovementFacadesOperations.RecordMovement(item.Card, item.Source, item.Target, reason, disclosure: disclosure, happyWeiYanGainDestination: item.GainDestination, happyZuoCiPhantomDestination: item.PhantomDestination, nativeDiscard: nativeMaterials?.GetValueOrDefault(item.Card.Id)));
                     _coreEquipmentSkillsOperations.ResolveEquipmentSkillGrant(item.Card, item.Source, item.Target);
                     _corePhysicalMovementFacadesOperations.ClearJudgmentEffectiveKindAfterMove(item.Card, item.Source, item.Target);
                     _corePhysicalMovementFacadesOperations.ResolveSilverLionRemoval(item.Card, item.Source, reason);

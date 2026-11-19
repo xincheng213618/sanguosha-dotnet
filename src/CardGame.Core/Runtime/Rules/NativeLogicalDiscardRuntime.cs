@@ -87,9 +87,31 @@ internal sealed class NativeLogicalDiscardRuntime(IProgramRuntimeFrames frames, 
         CardMoveReason reason, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null)
     {
         var draft = Capture(frame.OwnerSeat, executorSeat, ids, reason, frame.Id);
+        var prepared = PrepareProgramDiscard(frame.Id, ids, reason);
         programMovement.MoveMultipleSources(ids, CardLocation.DiscardPile, reason,
-            CardMovementDisclosure.FaceUp, afterPhysicalRecords);
+            CardMovementDisclosure.FaceUp, afterPhysicalRecords, prepared);
         Complete(draft);
+    }
+
+    private NativeProgramDiscardPreparation? PrepareProgramDiscard(long frameId, IReadOnlyList<int> ids, CardMoveReason reason)
+    {
+        var captureSuit = content.HasTriggerOperation(SkillProgramEffectOp.ClaimDiscardedEntityWithProvenance);
+        if (!facts.SetupComplete || turn.TurnNumber <= 0 || frames.Top?.Id != frameId ||
+            !captureSuit && !content.HasTriggerOperation(SkillProgramEffectOp.PutOwnOrPreviousFirstDiscardOnTop))
+            return null;
+
+        var materials = new List<NativeLogicalDiscardMaterial>(ids.Count);
+        foreach (var id in ids)
+        {
+            var from = zones.GetLocation(id);
+            if (!origins.IsOwnedDiscardSource(from) || from.OwnerSeat is not { } owner) continue;
+            var suit = captureSuit
+                ? facts.EffectiveSuitAtDiscardSource(zones.CardsAt(from).Single(card => card.Id == id), owner)
+                : (Suit?)null;
+            materials.Add(new(id, from) { EffectiveSuitAtPayment = suit });
+        }
+
+        return materials.Count > 0 ? new(frameId, facts.MovementSequence, reason, materials.AsReadOnly()) : null;
     }
 
     public void Move(int initiatorSeat, int executorSeat, Card card, CardLocation from,

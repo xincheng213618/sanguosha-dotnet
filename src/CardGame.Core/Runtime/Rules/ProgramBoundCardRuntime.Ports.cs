@@ -50,7 +50,8 @@ internal interface IProgramBoundCardMovementOperations : IProgramRuntimeOperatio
     void MoveCards(IReadOnlyList<Card> cards, CardLocation source, CardLocation destination, CardMoveReason reason,
         ProgramBoundCardGive? give = null, CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified);
     void MoveMultipleSources(IReadOnlyList<int> ids, CardLocation destination, CardMoveReason reason,
-        CardMovementDisclosure disclosure, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null);
+        CardMovementDisclosure disclosure, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null,
+        NativeProgramDiscardPreparation? nativeDiscard = null);
     void PlaceAtBottom(IReadOnlyList<int> ids);
     void PlaceAtTop(IReadOnlyList<int> ids);
 }

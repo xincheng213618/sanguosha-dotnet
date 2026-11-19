@@ -454,8 +454,9 @@ internal static class PhysicalCardDrawRuntimeChecks
             ProgramBoundCardGive? give = null, CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified)
         { movement.MoveCards(cards, source, destination, reason, give, disclosure); AfterPrimaryMove(); }
         public void MoveMultipleSources(IReadOnlyList<int> ids, CardLocation destination, CardMoveReason reason,
-            CardMovementDisclosure disclosure, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null)
-        { movement.MoveMultipleSources(ids, destination, reason, disclosure, afterPhysicalRecords); AfterPrimaryMove(); }
+            CardMovementDisclosure disclosure, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null,
+            NativeProgramDiscardPreparation? nativeDiscard = null)
+        { movement.MoveMultipleSources(ids, destination, reason, disclosure, afterPhysicalRecords, nativeDiscard); AfterPrimaryMove(); }
         public void PlaceAtBottom(IReadOnlyList<int> ids) => movement.PlaceAtBottom(ids);
         public void PlaceAtTop(IReadOnlyList<int> ids) => movement.PlaceAtTop(ids);
     }

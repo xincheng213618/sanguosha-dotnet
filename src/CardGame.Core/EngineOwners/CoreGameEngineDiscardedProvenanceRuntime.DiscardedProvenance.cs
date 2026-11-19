@@ -27,9 +27,13 @@ internal sealed partial class CoreGameEngineDiscardedProvenanceRuntime
             return;
         }
 
-        if (_coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement)?.OwnerSeat is not { } source)
+        var native = movement.NativeDiscard;
+        if ((native?.From ?? _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement))?.OwnerSeat is not { } source)
             return;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ProgramDiscardedEntityOriginEvent(movement.Sequence, source, _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[source], card), null));
+        var effectiveSuit = native?.EffectiveSuitAtPayment ??
+            _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[source], card);
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(
+            new ProgramDiscardedEntityOriginEvent(movement.Sequence, source, effectiveSuit, null));
     }
 
     internal bool IsProvenanceJudgmentResultHandoff(int cardId, ProgramJudgmentEntityOriginEvent judged, CardMovementRecord previous, CardLocation currentFrom)

@@ -9,6 +9,9 @@ internal sealed partial class CoreNativeLogicalDiscardRuntimePortsRuntime
 
     long INativeLogicalDiscardFacts.ResolutionSequence => _coreResolutionIdentityBoundaryOperations._resolutionSequence;
 
+    Suit INativeLogicalDiscardFacts.EffectiveSuitAtDiscardSource(Card card, int owner) =>
+        _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card);
+
     bool INativeLogicalDiscardOrigins.IsOwnedDiscardSource(CardLocation location) => CoreGameEngineProgramDiscardOriginsRuntime.IsOwnedDiscardSource(location);
     bool INativeLogicalDiscardOrigins.IsProgramDiscardOriginReason(CardMoveReason reason) => CoreGameEngineProgramDiscardOriginsRuntime.IsProgramDiscardOriginReason(reason);
     CardLocation? INativeLogicalDiscardOrigins.GetProgramDiscardSource(CardMovementRecord movement) => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement);

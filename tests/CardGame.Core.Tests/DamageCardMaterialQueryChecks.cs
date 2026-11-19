@@ -256,7 +256,8 @@ internal static class DamageCardMaterialQueryChecks
         public void Move(Card card, CardLocation source, CardLocation destination, CardMoveReason reason,
             ProgramBoundCardGive? give = null, CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified) => throw new NotSupportedException();
         public void MoveMultipleSources(IReadOnlyList<int> ids, CardLocation destination, CardMoveReason reason,
-            CardMovementDisclosure disclosure, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null) => throw new NotSupportedException();
+            CardMovementDisclosure disclosure, Action<long, IReadOnlyList<CardMovementRecord>>? afterPhysicalRecords = null,
+            NativeProgramDiscardPreparation? nativeDiscard = null) => throw new NotSupportedException();
         public void PlaceAtBottom(IReadOnlyList<int> ids) => throw new NotSupportedException();
         public void PlaceAtTop(IReadOnlyList<int> ids) => throw new NotSupportedException();
         public NativeLogicalDiscardInvocationDraft? CaptureLogicalDiscard(int initiator, int executor, IReadOnlyList<int> ids,

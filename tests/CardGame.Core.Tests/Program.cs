@@ -785,6 +785,8 @@ var tests = new (string Name, Action Body)[]
     ("OL Boundary Zhiba: Hanzhan without any Slash keeps the source claim", BoundarySunCeZhibaChecks.HanzhanWithoutSlashKeepsTheSourceClaim),
     ("OL Boundary Zhiba: Hanzhan claims the original tied Slashes after source declines", BoundarySunCeZhibaChecks.HanzhanTakesOriginalTiedSlashesAfterSourceDeclines),
     ("Mobile Sun Ce: Zhiba first claim before challenger's Hanzhan cold", BoundarySunCeMobileChecks.ZhibaHasFirstClaimBeforeChallengersHanzhan),
+    ("OL Boundary Zongxuan: first actual Zhifou discard freezes the upper-seat batch", OlBoundaryZongxuanChecks.ZhifouFirstPreviousDiscardOffersOriginalBatchOnce),
+    ("classic Luoying claims only the effective Club from native Zhifou", LuoyingNativeDiscardChecks.ZhifouOffersOnlyTheActualClubDiscard),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

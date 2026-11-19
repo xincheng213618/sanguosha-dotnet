@@ -19,11 +19,14 @@ internal sealed partial class CoreGameEngineNeighborDiscardOpportunitiesRuntime
 
     internal static bool IsNeighborDiscardTopTrigger(SkillProgramTrigger trigger) => RuntimeSkills.RuntimeRules_Core_NeighborDiscardOpportunities.IsNeighborDiscardTopTrigger(trigger);
     internal IEnumerable<IGameEvent> NeighborDiscardHistory() => _coreCommandJournalStorageEventsPendingEventsAccess._events.Select(e => e.Payload).Concat(_coreCommandJournalStorageEventsPendingEventsAccess._pendingEvents);
+    private CardLocation? NeighborDiscardSource(CardMovementRecord movement) =>
+        movement.NativeDiscard?.From ?? _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(movement);
+
     internal void CaptureNeighborDiscardOpportunity(long batchId, int actualTurn, IReadOnlyList<CardMovementRecord> movements)
     {
         if (!TracksNeighborDiscardOpportunities || actualTurn <= 0)
             return;
-        var owners = movements.Select(_coreProgramDiscardOriginsOperations.GetProgramDiscardSource).Where(location => location is { OwnerSeat: not null, Zone: CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment }).Select(location => location!.Value.OwnerSeat!.Value).Distinct().ToArray();
+        var owners = movements.Select(NeighborDiscardSource).Where(location => location is { OwnerSeat: not null, Zone: CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment }).Select(location => location!.Value.OwnerSeat!.Value).Distinct().ToArray();
         if (owners.Length == 0)
             return;
         foreach (var source in owners)
@@ -45,7 +48,7 @@ internal sealed partial class CoreGameEngineNeighborDiscardOpportunitiesRuntime
     {
         if (NeighborDiscardFact(batch, owner)is not { } fact)
             return[];
-        return batch.Movements.Select((move, index) => (move, index)).Where(item => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(item.move)is { OwnerSeat: { } source, Zone: CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment } && (source == owner && fact.IncludesOwnDiscard || source == fact.PreviousLivingSeat && fact.IncludesFirstPreviousDiscard)).Select(item => item.index).ToArray();
+        return batch.Movements.Select((move, index) => (move, index)).Where(item => NeighborDiscardSource(item.move) is { OwnerSeat: { } source, Zone: CardZoneKind.Hand or CardZoneKind.Equipment or CardZoneKind.Judgment } && (source == owner && fact.IncludesOwnDiscard || source == fact.PreviousLivingSeat && fact.IncludesFirstPreviousDiscard)).Select(item => item.index).ToArray();
     }
 
     internal IEnumerable<ProgramTriggerCandidate> CollectNeighborDiscardCandidates(CardMovementBatchContext batch)
@@ -65,7 +68,7 @@ internal sealed partial class CoreGameEngineNeighborDiscardOpportunitiesRuntime
 
     internal int? NeighborDiscardSourceSeat(CardMovementBatchContext batch, int owner)
     {
-        var sources = NeighborDiscardIndexes(batch, owner).Select(index => _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(batch.Movements[index])!.Value.OwnerSeat!.Value).Distinct().ToArray();
+        var sources = NeighborDiscardIndexes(batch, owner).Select(index => NeighborDiscardSource(batch.Movements[index])!.Value.OwnerSeat!.Value).Distinct().ToArray();
         return sources.Length == 1 ? sources[0] : null;
     }
 

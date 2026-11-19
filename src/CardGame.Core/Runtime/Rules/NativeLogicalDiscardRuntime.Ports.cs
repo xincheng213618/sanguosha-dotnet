@@ -32,6 +32,7 @@ internal interface INativeLogicalDiscardFacts : IProgramSelectionQuery
     bool SetupComplete { get; }
     int MovementSequence { get; }
     long ResolutionSequence { get; }
+    Suit EffectiveSuitAtDiscardSource(Card card, int owner);
 }
 
 // Original source and prepaid-material owners retain their native proof rules.

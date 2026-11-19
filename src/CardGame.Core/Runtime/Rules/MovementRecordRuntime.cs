@@ -15,7 +15,8 @@ internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovemen
         CardMoveReason reason, Action<CardMovementRecord>? beforeFact = null, CardKind? adjacentDiscardIdentity = null,
         CardMovementDisclosure disclosure = CardMovementDisclosure.Unspecified,
         HappyWeiYanGainDestinationPlan? happyWeiYanGainDestination = null,
-        HappyZuoCiPhantomDestinationPlan? happyZuoCiPhantomDestination = null)
+        HappyZuoCiPhantomDestinationPlan? happyZuoCiPhantomDestination = null,
+        NativeLogicalDiscardMaterial? nativeDiscard = null)
     {
         var movement = new CardMovementRecord(
             journal.NextSequence(),
@@ -31,7 +32,9 @@ internal sealed class MovementRecordRuntime(IMovementRecordFacts facts, IMovemen
                 AnniversaryGuoZhaoLoss = metadata.CaptureAnniversaryGuoZhaoLoss(card, from, to, facts.Sequence),
                 AnniversaryZhangHeng = metadata.CaptureAnniversaryZhangHengMovement(card, from, to),
                 HappyWeiYanGainDestination = happyWeiYanGainDestination,
-                HappyZuoCiPhantomDestination = happyZuoCiPhantomDestination };
+                HappyZuoCiPhantomDestination = happyZuoCiPhantomDestination,
+                NativeDiscard = nativeDiscard is { } material && material.CardId == card.Id && material.From == from &&
+                    to == CardLocation.DiscardPile && batches.ActiveBatchId is > 0 ? material : null };
         journal.Append(movement);
         equipmentLifetime.Value.CaptureNativeMaterialDeparture(movement);
         materials.ValidateHappyWeiYanGainDestinationRecord(movement);
