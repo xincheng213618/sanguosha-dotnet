@@ -6,7 +6,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule, ProgramCapability]
 internal sealed class ActualDiscardRecoveryPhaseRuntime(IProgramRuntimeFrames frames, IProgramRuntimeEvents events,
     INativeFactDemand demand, IProgramEventHistoryQueries history, IProgramEventJournalQueries journal,
-    ICardZoneQueries zones, ICardMovementHistoryQueries movements, IProgramTurnQueries turn,
+    ICardZoneEntryQueries entries, ICardMovementHistoryQueries movements, IProgramTurnQueries turn,
     IProgramPhaseQueries phase, ISelectionParticipantQueries participants, IMatchParticipantStateAccess participantState,
     IProgramWindowCandidateQueries candidates, IProgramBindingFacts bindings, IProgramOwnedZoneDiscardFacts discards,
     IActualDiscardRecoveryPhaseFacts facts, IActualPhaseQueryCache cache, IProgramPhaseScheduleState schedules)
@@ -111,7 +111,7 @@ internal sealed class ActualDiscardRecoveryPhaseRuntime(IProgramRuntimeFrames fr
                 is not ActualDiscardRecoveryPhaseStartedEvent start)
             return [];
 
-        var entries = new List<DiscardRecoveryEntity>();
+        var discardsInPhase = new List<DiscardRecoveryEntity>();
         var seen = new HashSet<int>();
         var records = movements.Read();
         for (var i = records.Count - 1; i >= 0; i--)
@@ -119,15 +119,14 @@ internal sealed class ActualDiscardRecoveryPhaseRuntime(IProgramRuntimeFrames fr
             var record = records[i];
             if (record.Sequence <= start.MovementSequenceBefore) break;
             if (seen.Add(record.CardId) && record.To == CardLocation.DiscardPile && discards.DiscardSource(record) is { } from)
-                entries.Add(new(record.CardId, record.Sequence, from));
+                discardsInPhase.Add(new(record.CardId, record.Sequence, from));
         }
-        entries.Reverse();
-        return entries;
+        discardsInPhase.Reverse();
+        return discardsInPhase;
     }
 
     public bool StillAvailable(DiscardRecoveryEntity entity) =>
-        zones.GetLocation(entity.CardId) == CardLocation.DiscardPile &&
-        !movements.Read().Any(m => m.CardId == entity.CardId && m.Sequence > entity.MovementSequence && m.From == CardLocation.DiscardPile);
+        entries.CurrentEntry(CardLocation.DiscardPile, entity.CardId) == entity.MovementSequence;
 
     private void CaptureBatch(long batchId, ActualDiscardRecoveryPhaseKey? key, IReadOnlyList<CardMovementRecord> records)
     {

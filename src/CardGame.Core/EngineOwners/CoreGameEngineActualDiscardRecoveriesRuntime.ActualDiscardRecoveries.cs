@@ -72,7 +72,8 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime
             if (!_coreActualDiscardRecoveryPhasesOperations.ActualDiscardEntityStillAvailable(entity))
                 throw new InvalidOperationException("The original discarded entity left its exact discard provenance.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null), ActualDiscardRecovery = r with { Stage = ActualDiscardRecoveryStage.ReturnPaid, ReturnedCardId = id } });
-            _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), CardLocation.DiscardPile, CardLocation.Hand(r.DiscardOwnerSeat), new($"skill-program.{(f.SkillId)}.actual-discard-return"), move =>
+            _movement.Move(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), CardLocation.DiscardPile,
+                CardLocation.Hand(r.DiscardOwnerSeat), new($"skill-program.{f.SkillId}.actual-discard-return"), move =>
             {
                 var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
                 _coreRuntimeOperations.ReplaceRuntimeTop(active with { ActualDiscardRecovery = active.ActualDiscardRecovery!with { ReturnMovementSequence = move.Sequence } });
@@ -86,11 +87,11 @@ internal sealed partial class CoreGameEngineActualDiscardRecoveriesRuntime
             var before = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? 0;
             _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = new(f.OwnerSeat, 0, null), ActualDiscardRecovery = r with { Stage = ActualDiscardRecoveryStage.ClaimPaid, ClaimRemaining = claim, ClaimedCardIds = ids, ClaimSequenceBefore = before } });
             if (ids.Length > 0)
-                _corePhysicalMovementFacadesOperations.MoveCards(ids.Select(_coreAdvancedLifecycleOperations.GetAdvancedCard).ToArray(), CardLocation.DiscardPile, CardLocation.Hand(f.OwnerSeat), new($"skill-program.{(f.SkillId)}.actual-discard-claim"));
+                _movement.MoveCards(ids.Select(_coreAdvancedLifecycleOperations.GetAdvancedCard).ToArray(),
+                    CardLocation.DiscardPile, CardLocation.Hand(f.OwnerSeat), new($"skill-program.{f.SkillId}.actual-discard-claim"));
             var after = _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault()?.Sequence ?? before;
             var active = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
             _coreRuntimeOperations.ReplaceRuntimeTop(active with { ActualDiscardRecovery = active.ActualDiscardRecovery!with { ClaimSequenceAfter = after } });
-            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ActualDiscardRecoveryClaimedEvent(f.Id, r.BatchId, ids, before, after));
         }
         else
             throw new InvalidOperationException("Discard recovery cannot repay a completed choice.");

@@ -760,6 +760,8 @@ var tests = new (string Name, Action Body)[]
     ("Classic Guzheng actual discard scope, optional claim and command replay", ClassicGuzhengChecks.ActualDiscardScopeAndOptionalClaimReplay),
     ("OL Wu Jing Liubing: original colorless Slash materials and command replay", WuJingChecks.LiubingClaimsOriginalColorlessSlashMaterialsCold),
     ("OL Jingzhong: one claim per multi-material use, separate gain windows and replay", OlJingzhongChecks.MultiMaterialClaimKeepsMovementWindowsAndUsesOneOfThreeClaims),
+    ("OL Guzheng: immediate same-source batch, paid children and command replay", OlGuzhengChecks.ImmediateSameSourceBatchAndPaidChildrenReplay),
+    ("Wushuang Guzheng: equipment return, original discard entry and command replay", WushuangGuzhengChecks.EquipmentReturnAndOriginalEntryClaimReplay),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

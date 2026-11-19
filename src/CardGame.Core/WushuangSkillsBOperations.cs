@@ -9,6 +9,13 @@ public sealed record WushuangBReceipt(int InstructionIndex, SkillProgramEffectOp
 {
     private readonly IReadOnlyList<int> _cards = Array.AsReadOnly(Array.Empty<int>());
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
+    private readonly IReadOnlyList<DiscardRecoveryEntity>? _discardEntries;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<DiscardRecoveryEntity>? DiscardEntries
+    {
+        get => _discardEntries;
+        init => _discardEntries = value is null ? null : Array.AsReadOnly(value.ToArray());
+    }
 }
 public sealed partial record ProgramSkillFrame
 {
@@ -87,7 +94,11 @@ internal sealed class WushuangDinganCommittedUseContract : IProgramCommittedUseC
     }
 }
 
-internal sealed class WushuangGuzhengDescriptor : WushuangBOperationDescriptor { public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveWushuangGuzheng; }
+internal sealed class WushuangGuzhengDescriptor : WushuangBOperationDescriptor
+{
+    public override SkillProgramEffectOp Op => SkillProgramEffectOp.ResolveWushuangGuzheng;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.ActualDiscardRecoveryPhase);
+}
 internal sealed class WushuangGuanchaoCommittedUseContract : IProgramCommittedUseContract
 {
     public string SkillId => "wushuang:skill-3076";

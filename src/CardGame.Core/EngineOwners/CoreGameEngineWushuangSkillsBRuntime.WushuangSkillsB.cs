@@ -74,6 +74,8 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeCondition, 61200)]
     internal bool CanTriggerWushuangBSkill(ProgramTriggerCandidate c, SkillProgramTrigger trigger, ProgramSkillWindowContext context)
     {
+        if (c.SkillId == BGuzheng)
+            return context.SourceSeat is { } phaseOwner && WushuangGuzhengEntries(phaseOwner).Count != 0;
         if (c.SkillId == BWeiyi)
             return context.TargetSeat is { } target && _coreTableSeatQueriesOperations.IsValidPlayerSeat(target) && _coreMatchParticipantsPlayersAccess._players[target].IsAlive && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<WushuangWeiyiUsedEvent>().Any(e => e.OwnerSeat == c.OwnerSeat && e.SkillId == c.SkillId && e.TargetSeat == target);
         if (c.SkillId == BZhendan)
@@ -103,6 +105,8 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
             return SkillProgramStepOutcome.Continue;
         if (f.WushuangB is not null)
             throw new InvalidOperationException("A Wushuang instruction cannot repeat its pending operation.");
+        if (op == SkillProgramEffectOp.ResolveWushuangGuzheng)
+            return BeginWushuangGuzheng(f);
         if (op == SkillProgramEffectOp.DrawWushuangZhendan)
         {
             if (BZhendanDisabled(f.OwnerSeat))
@@ -133,7 +137,7 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
             return SkillProgramStepOutcome.Continue;
         }
 
-        var targetSeat = op == SkillProgramEffectOp.ResolveWushuangGuzheng ? f.WindowContext?.SourceSeat ?? -1 : op is SkillProgramEffectOp.ResolveWushuangWeiyi or SkillProgramEffectOp.ResolveWushuangBianyu ? f.WindowContext?.TargetSeat ?? -1 : -1;
+        var targetSeat = op is SkillProgramEffectOp.ResolveWushuangWeiyi or SkillProgramEffectOp.ResolveWushuangBianyu ? f.WindowContext?.TargetSeat ?? -1 : -1;
         var stage = op switch
         {
             SkillProgramEffectOp.ResolveWushuangWeiyi => "health",
@@ -142,7 +146,6 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
             SkillProgramEffectOp.ResolveWushuangXiaojie => "trick",
             SkillProgramEffectOp.ResolveWushuangDingan => "draw-target",
             SkillProgramEffectOp.RecoverWushuangChunlao => "chun",
-            SkillProgramEffectOp.ResolveWushuangGuzheng => "guzheng-return",
             _ => throw new InvalidOperationException("Unknown Wushuang B instruction.")};
         var previous = op == SkillProgramEffectOp.ResolveWushuangXiaojie ? _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<CardUseDeclaredEvent>().LastOrDefault(e => e.SourceSeat == f.OwnerSeat && BOrdinaryTrick(e.CardKind))?.CardKind : null;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WushuangB = new(f.InstructionIndex, op, stage, targetSeat, Before: _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence, OutputKind: previous) });
@@ -162,6 +165,8 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
     internal IReadOnlyList<PromptChoice> WushuangBChoices(ProgramSkillFrame f)
     {
         var r = f.WushuangB!;
+        if (r.Operation == SkillProgramEffectOp.ResolveWushuangGuzheng)
+            return WushuangGuzhengChoices(f, r);
         var list = new List<PromptChoice>();
         if (r.Stage == "health")
         {
@@ -232,7 +237,6 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
                 list.Add(BChoice(f, r.Stage, group.Key.ToString(), $"弃置{(group.Count())}张【{(CardCatalog.Get(group.Key).DisplayName)}】", group.Select(c => c.Id).ToArray()));
         }
 
-        _coreWushuangSkillsBAuditOperations.AddWushuangGuzhengChoices(f, list);
         return Array.AsReadOnly(list.ToArray());
     }
 
@@ -266,14 +270,17 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not { } prompt || !WushuangBChoices(f).Any(c => c.Id == selected.Id && c.Cards.SequenceEqual(selected.Cards) && c.Targets.SequenceEqual(selected.Targets) && c.Parameters.OrderBy(p => p.Key).SequenceEqual(selected.Parameters.OrderBy(p => p.Key))))
             throw new InvalidOperationException("Wushuang choice is not its current published option.");
         _coreNativePromptBoundaryOperations.ClearPendingDecision();
+        if (r.Operation == SkillProgramEffectOp.ResolveWushuangGuzheng)
+        {
+            AnswerWushuangGuzheng(f, r, selected);
+            return;
+        }
         if (!BSourceCurrent(f))
         {
             FinishWushuangB(f);
             return;
         }
 
-        if (_coreWushuangSkillsBAuditOperations.AnswerWushuangGuzheng(f, selected))
-            return;
         var value = selected.Parameters["value"];
         if (r.Stage == "health")
         {
@@ -434,7 +441,12 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
             return false;
         if (_corePendingDecisionPolicyPipelineOperations._pendingDecision is not null)
             return true;
-        if (r.Stage is "health" or "target" or "color" or "mark" or "chun" or "trick" or "draw-target" or "punish" or "discard-name" or "guzheng-return" or "guzheng-claim")
+        if (r.Operation == SkillProgramEffectOp.ResolveWushuangGuzheng)
+        {
+            ContinueWushuangGuzheng(f, r);
+            return true;
+        }
+        if (r.Stage is "health" or "target" or "color" or "mark" or "chun" or "trick" or "draw-target" or "punish" or "discard-name")
         {
             PublishWushuangBChoice(f);
             return true;
@@ -448,13 +460,6 @@ internal sealed partial class CoreGameEngineWushuangSkillsBRuntime
         r = f.WushuangB!;
         if (f.PendingMovementContinuation is not null)
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
-        if (r.Stage == "guzheng-returned")
-        {
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WushuangB = r with { Stage = "guzheng-claim" } });
-            PublishWushuangBChoice(f);
-            return true;
-        }
-
         if (r.Stage == "draw-children")
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { WushuangB = r with { Stage = "punish" } });
