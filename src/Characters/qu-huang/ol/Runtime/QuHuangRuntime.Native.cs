@@ -3,7 +3,10 @@ internal sealed partial class QuHuangRuntime
 {
     private bool CanIssueQuHuangNishouLightning(ProgramSkillFrame f)
     {
-        if(f.QuHuang is not{Stage:QuHuangStage.NishouChoice,Equipment:{}lost}||!_players[f.OwnerSeat].IsAlive||_winner!=Winner.None||_cardZones.GetLocation(lost.CardId)!=CardLocation.DiscardPile)return false;
+        if (f.QuHuang is not { Stage: QuHuangStage.NishouChoice, Equipment: { } lost } ||
+            !_players[f.OwnerSeat].IsAlive || _winner != Winner.None ||
+            zoneEntries.CurrentEntry(CardLocation.DiscardPile, lost.CardId) != lost.Sequence)
+            return false;
         var owner=_players[f.OwnerSeat];var card=GetAdvancedCard(lost.CardId);var suit=bound.EffectiveSuit(owner.Seat,card);
         return !owner.JudgmentAreaAbolished&&!native.HasJudgmentCard(owner.Seat,CardKind.Lightning)&&!native.HasCardPolicy(owner.Seat,SkillProgramCardPolicyKind.ProhibitDelayedTrickTarget)&&!native.IsCardUseForbidden(owner.Seat,CardKind.Lightning,CardActionType.Use)&&!native.IsDirectedTargetProhibited(owner.Seat,owner.Seat,CardKind.Lightning)&&!native.IsSelfTargetForbidden(owner.Seat,CardKind.Lightning,[owner.Seat])&&!native.IsCardTargetProhibited(owner.Seat,CardKind.Lightning,suit,SuitColor(suit))&&!native.HasBeneficiarySuitShield(owner.Seat,owner.Seat,suit)&&!native.IsPhysicalUseForbidden(owner.Seat,[card.Id])&&!native.IsSuitUseForbidden(owner.Seat,suit);
     }

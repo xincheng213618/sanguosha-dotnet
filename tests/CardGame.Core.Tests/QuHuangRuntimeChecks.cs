@@ -8,6 +8,9 @@ internal static class QuHuangRuntimeChecks
         Watch = "fixture:qu-huang-paid-child", Mode = "identity:qu-huang-runtime",
         Qiejian = "ol:qiejian", Nishou = "ol:nishou",
         DrawReason = "skill-program.qu-huang.qiejian.draw", HoldReason = "skill-program.qu-huang.nishou.hold";
+    private const string Reentry = "fixture:qu-huang-reentry";
+    private const string GearDiscard = "skill-program.fixture:qu-huang-driver.DiscardOwnedZoneCards";
+    private const string Rediscard = "skill-program.fixture:qu-huang-reentry.SelectAndMoveOwnedCard";
 
     public static void QiejianPaidDrawFieldDiscardAndRoundBlockCold()
     {
@@ -73,6 +76,56 @@ internal static class QuHuangRuntimeChecks
             "The alternate branch pays the original discarded physical equipment once, resolves native Lightning and returns to its exact program without issuing a swap debt.");
     }
 
+    public static void NishouCannotUseEquipmentFromANewerDiscardEntryCold()
+    {
+        var scene = Scene.Start(qiejian: false, reentry: true);
+        scene.Play();
+        var gear = scene.Equip();
+        scene.Use("lose-gear");
+        scene.Reach(() => scene.Offer(Reentry));
+        var original = scene.G.CardMovements.Single(move => move.CardId == gear && move.Reason.Value == GearDiscard);
+        var loss = scene.E<NishouEquipmentLostEvent>().Single();
+        var window = scene.G.ResolutionStack.OfType<CardsMovedTriggerWindowFrame>().Single(frame => frame.Batch.Id == original.BatchId);
+        Need(original.From == CardLocation.Equipment(0) && original.To == CardLocation.DiscardPile &&
+            loss is { OwnerSeat: 0, CardId: var lost, Phase: not null } && lost == gear &&
+            loss.Sequence == original.Sequence && loss.BatchId == original.BatchId &&
+            window.Candidates.Any(candidate => candidate.SkillId == Nishou && candidate.OwnerSeat == 0),
+            "The prior movement trigger can act while Nishou still holds the original equipment loss.");
+
+        var control = scene.ColdCopy();
+        control.Answer(choice => choice.Parameters.GetValueOrDefault("program-action") == "skip");
+        control.Reach(() => control.Branch("lightning"));
+        control.Answer(choice => choice.Parameters.GetValueOrDefault("branch") == "lightning" && choice.Cards.SequenceEqual([gear]));
+        control.Play();
+        var paid = control.E<NishouLightningPaidEvent>().Single();
+        Need(paid.Origin.CardId == gear && paid.Origin.LossSequence == original.Sequence &&
+            control.E<NishouLightningReturnedEvent>().Single().Origin == paid.Origin &&
+            control.G.CreateCardZoneDiagnostics().Single(card => card.CardId == gear).Location == CardLocation.Judgment(0),
+            "The same untouched discard still pays and resolves a real Lightning once.");
+
+        scene.Answer(choice => choice.Parameters.GetValueOrDefault("program-action") == "activate");
+        scene.Reach(() => scene.P is { SkillPrompt.SkillId: Reentry } prompt &&
+            prompt.Choices.Any(choice => choice.Cards.SequenceEqual([gear])));
+        var recovered = scene.G.CardMovements.Last(move => move.CardId == gear);
+        Need(recovered.From == CardLocation.DiscardPile && recovered.To == CardLocation.Hand(0),
+            "The child recovers the original equipment before choosing the hand discard.");
+        scene.Cold();
+        scene.Answer(choice => choice.Cards.SequenceEqual([gear]));
+        scene.Reach(() => scene.Branch("defer"));
+        var newer = scene.G.CardMovements.Single(move => move.CardId == gear && move.Reason.Value == Rediscard);
+        Need(newer.From == CardLocation.Hand(0) && newer.To == CardLocation.DiscardPile && newer.Sequence > original.Sequence &&
+            newer.BatchId != original.BatchId && scene.E<NishouEquipmentLostEvent>().SequenceEqual([loss]),
+            "The same physical card enters the discard pile in a second batch from hand without another equipment-loss trigger.");
+        Need(!scene.Branch("lightning"),
+            $"Nishou may not offer Lightning for entry {newer.Sequence} using the original loss at entry {original.Sequence}.");
+        scene.Answer(choice => choice.Parameters.GetValueOrDefault("branch") == "defer");
+        scene.Play();
+        var debt = scene.E<NishouSwapDebtIssuedEvent>().Single();
+        Need(debt.Phase == loss.Phase && !scene.E<NishouLightningPaidEvent>().Any() &&
+            scene.G.CreateCardZoneDiagnostics().Single(card => card.CardId == gear).Location == CardLocation.DiscardPile,
+            "The original phase still issues its swap debt while the later hand discard stays in the pile.");
+    }
+
     private static void Need(bool condition, string message) { if (!condition) throw new InvalidOperationException(message); }
 
     private sealed class Scene(ContentRegistry registry, GameEngine game)
@@ -109,16 +162,19 @@ internal static class QuHuangRuntimeChecks
             }
             Need(done(), "The bounded fixed Qu Huang scene missed its expected boundary.");
         }
-        public void Cold()
+        public void Cold() => G = ColdCopy().G;
+        public Scene ColdCopy()
         {
-            var before = State(); G = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry);
-            Need(before == State(), "Cold command replay preserves original paid Qu Huang receipts, frozen Hands, private child and native physical zones.");
+            var restored = new Scene(registry,
+                GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry));
+            Need(State() == restored.State(), "Cold command replay preserves original paid Qu Huang receipts, frozen Hands, private child and native physical zones.");
+            return restored;
         }
         private string State() => JsonSerializer.Serialize(new { Views = Enumerable.Range(0, 4).Select(i => SnapshotJson.Serialize(G.CreateSnapshot(i))),
             Frames = G.ResolutionStack.Select(f => JsonSerializer.Serialize(f, f.GetType())), G.CardMovements, Zones = G.CreateCardZoneDiagnostics() });
-        public static Scene Start(bool qiejian)
+        public static Scene Start(bool qiejian, bool reentry = false)
         {
-            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(qiejian));
+            var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(qiejian, reentry));
             var scene = new Scene(registry, GameEngine.CreateStandard(new() { Seed = 31, PlayerCount = 4, HumanSeat = 0,
                 HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord, ModeId = Mode, UseInteractiveSetup = true,
                 UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 3 }, registry));
@@ -126,13 +182,13 @@ internal static class QuHuangRuntimeChecks
         }
     }
 
-    private sealed class Fixture(bool qiejian) : IGameContentPackage
+    private sealed class Fixture(bool qiejian, bool reentry) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-qu-huang-runtime", new(1, 0, 0));
         public void Register(IContentRegistryBuilder builder)
         {
             CharacterFixtureContent.Register(builder, "ol:qu-huang");
-            var skills = new object[] {
+            var skills = new List<object> {
                 new { id = Driver, revision = 1, modifiers = new[] { new { id = "keep", query = "handLimit", operation = "add", value = 50, priority = 0 } },
                     activations = new[] { new { id = "empty-hand", minCards = 0, maxCards = 0, minTargets = 0, maxTargets = 0,
                         targetKind = "anyLiving", usesPerTurn = (int?)null, effects = new[] { new { op = "discardOwnedZoneCards", target = "owner", zones = new[] { "hand" } } } },
@@ -147,13 +203,27 @@ internal static class QuHuangRuntimeChecks
             };
             var labels = new Dictionary<string, object> { [Driver] = new { name = "屈晃原生驱动", description = "真实原区弃置" },
                 [Watch] = new { name = "屈晃已支付子窗", description = "原生移动子窗", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } };
+            if (reentry)
+            {
+                skills.Add(new { id = Reentry, revision = 1, triggers = new[] { new { id = "recover-and-discard",
+                    window = "cardsMoved", subject = "owner", sourceZones = new[] { "equipment" }, movementOccurrence = "perBatch",
+                    movementReasons = new[] { GearDiscard }, optional = true, priority = 100,
+                    effects = new object[] {
+                        new { op = "selectRandomPileEquipment", target = "owner", amount = 1, resultBind = "recovered", zones = new[] { "discardPile" } },
+                        new { op = "moveBoundCards", target = "owner", sourceBind = "recovered", destination = "ownerHand", awaitMovementTriggers = true },
+                        new { op = "selectAndMoveOwnedCard", target = "owner", chooserRef = new { kind = "owner" }, cardOwnerRef = new { kind = "owner" },
+                            zones = new[] { "hand" }, count = 1, destination = "discardPile", awaitMovementTriggers = true }
+                    } } } });
+                labels.Add(Reentry, new { name = "取回重弃", description = "取回刚弃置的装备，再弃置一张手牌。" });
+            }
             var rules = System.Text.Json.Nodes.JsonNode.Parse(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills }))!;
             rules["skills"]![1]!["triggers"]![0]!.AsObject().Remove(qiejian ? "sourceZones" : "destinationZones");
             var catalog = SkillProgramCatalog.Load(rules.ToJsonString(),
                 JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
             foreach (var (id, program) in catalog.Programs) builder.AddSkill(new(id, catalog.Presentations[id].Name, catalog.Presentations[id].Description)
                 { Program = program, ProgramPresentation = catalog.Presentations[id] });
-            builder.AddGeneral(new(Owner, "屈晃真实结算夹具", "supporter", qiejian ? Qiejian : Nishou, "wu", 6, AdditionalSkillIds: [Driver, Watch]));
+            builder.AddGeneral(new(Owner, "屈晃真实结算夹具", "supporter", qiejian ? Qiejian : Nishou, "wu", 6,
+                AdditionalSkillIds: reentry ? [Driver, Watch, Reentry] : [Driver, Watch]));
             var peers = Enumerable.Range(1, 3).Select(seat => "fixture:qu-huang-peer-" + seat).ToArray();
             foreach (var peer in peers) builder.AddGeneral(new(peer, "实际其他角色", "supporter", "standard:none", "wei", 6));
             const string deck = "fixture:qu-huang-deck";

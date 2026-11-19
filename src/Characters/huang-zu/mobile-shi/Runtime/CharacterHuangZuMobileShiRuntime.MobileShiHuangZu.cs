@@ -22,7 +22,14 @@ internal sealed partial class CharacterHuangZuMobileShiRuntime
     {
         if (batch.TurnNumber != _coreActualTurnProgressTurnNumberAccess._turnNumber)
             return[];
-        return batch.Movements.Where(m => m.To == CardLocation.DiscardPile && m.From != m.To && CoreNativeCardClassificationsRuntime.IsSlashCard(m.CardKind) && _cardZonesOperations._cardZones.GetLocation(m.CardId) == CardLocation.DiscardPile && !_coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, m) && (m.From == CardLocation.Hand(owner) || m.From == CardLocation.Processing && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(p => p.CardId == m.CardId && p.Sequence < m.Sequence)is { } previous && previous.To == CardLocation.Processing && previous.From == CardLocation.Hand(owner))).DistinctBy(m => m.CardId).OrderBy(m => m.Sequence).ToArray();
+        return batch.Movements.Where(m =>
+            m.To == CardLocation.DiscardPile && m.From != m.To && CoreNativeCardClassificationsRuntime.IsSlashCard(m.CardKind) &&
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, m.CardId) == m.Sequence &&
+            !_coreNativeUsedDiscardOriginsOperations.Value.IsNativeTrueUseDiscardMovement(batch, m) &&
+            (m.From == CardLocation.Hand(owner) || m.From == CardLocation.Processing &&
+                _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(p => p.CardId == m.CardId && p.Sequence < m.Sequence) is { } previous &&
+                previous.To == CardLocation.Processing && previous.From == CardLocation.Hand(owner)))
+            .DistinctBy(m => m.CardId).OrderBy(m => m.Sequence).ToArray();
     }
 
     [ProgramPipelineHook(ProgramPipelinePhase.SelectDiscardBatchIndexes, 47900)]

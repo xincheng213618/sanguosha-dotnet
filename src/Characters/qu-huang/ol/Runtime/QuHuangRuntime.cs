@@ -2,7 +2,7 @@ namespace CardGame.Core;
 [ProgramRuntimeModule,ProgramCapability]
 internal sealed partial class QuHuangRuntime(IProgramRuntimeFrames frames,IProgramRuntimeEvents events,
     IProgramRuntimePrompts prompts,IProgramEventHistoryQueries history,ICardMovementHistoryQueries movements,
-    ICardZoneQueries zones,IProgramContentQueries content,IMatchParticipantStateAccess participants,
+    ICardZoneQueries zones,ICardZoneEntryQueries zoneEntries,IProgramContentQueries content,IMatchParticipantStateAccess participants,
     IPhysicalCardDrawOperations draws,IProgramBoundCardMovementOperations movement,IProgramBoundCardFacts bound,
     INativeLogicalDiscardOperations logicalDiscards,INativeLogicalDiscardMovement nativeMovement,
     IActualDiscardRecoveryPhaseQueries phases,IActualPhaseEndQueries phaseEnds,IProgramBindingFacts bindings,

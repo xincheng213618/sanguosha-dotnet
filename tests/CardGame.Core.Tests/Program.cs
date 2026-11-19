@@ -795,6 +795,8 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Zhongchun: Bique material receipts qualify the actual Ending actor", MobileZhongchunChecks.BiqueDiscardMaterialsQualifyAtEndingAndReplay),
     ("Anniversary Chiying: original discard does not transfer a basic at a newer entry cold", AnniversaryGaoXiangChecks.ChiyingCannotTransferABasicAtANewerDiscardEntryCold),
     ("OL Silv: refunds the native Bique discard to its actual holder", OlSilvChecks.BiqueDiscardRefundsTheMarkedEntityToItsActualHolder),
+    ("Qu Huang runtime: Nishou keeps the original equipment entry through re-discard cold", QuHuangRuntimeChecks.NishouCannotUseEquipmentFromANewerDiscardEntryCold),
+    ("Mobile Shi Huang Zu Duanyang cannot store a newer entry through an old discard window cold", ShiHuangZuDiscardEntryChecks.DuanyangCannotStoreTheNewEntryThroughAnOldDiscardWindowCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
