@@ -37,7 +37,12 @@ internal sealed partial class CoreGameEngineRecipientContestsRuntime
         return SkillProgramStepOutcome.AwaitChild;
     }
 
-    internal int[] RecipientContestThirds(ProgramSkillFrame f) => _coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && p.Seat != f.RecipientContest!.RecipientSeat && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(f.RecipientContest.RecipientSeat, p.Seat)).Select(p => p.Seat).ToArray();
+    internal int[] RecipientContestThirds(ProgramSkillFrame f) =>
+        _coreMatchParticipantsPlayersAccess._players
+            .Where(player => player.IsAlive && player.Seat != f.OwnerSeat && player.Seat != f.RecipientContest!.RecipientSeat &&
+                _pindianPolicyQueries.CanBePindianTarget(f.RecipientContest.RecipientSeat, player.Seat))
+            .Select(player => player.Seat)
+            .ToArray();
     internal void PublishRecipientContestThird(ProgramSkillFrame f)
     {
         var r = f.RecipientContest!;

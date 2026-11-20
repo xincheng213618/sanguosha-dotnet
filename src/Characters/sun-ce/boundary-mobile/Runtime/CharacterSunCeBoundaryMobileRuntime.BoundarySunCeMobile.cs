@@ -10,7 +10,7 @@ internal sealed partial class CharacterSunCeBoundaryMobileRuntime
     {
         if (_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(provider) != "wu" || _corePhysicalOwnedCardQueriesOperations.GetHand(provider).Count == 0)
             yield break;
-        foreach (var lord in _coreMatchParticipantsPlayersAccess._players.Where(p => p.Seat != provider.Seat && _coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(provider.Seat, p.Seat)))
+        foreach (var lord in _coreMatchParticipantsPlayersAccess._players.Where(p => p.Seat != provider.Seat && _pindianPolicies.CanBePindianTarget(provider.Seat, p.Seat)))
             foreach (var program in _coreSkillProgramsOperations.EnabledSkillPrograms(lord))
                 foreach (var activation in program.Activations.Where(a => ProgramInstructionResolver.Default.Features(a).HasOperation(SkillProgramEffectOp.ResolveBoundarySunCeZhiba)))
                 {
@@ -36,7 +36,7 @@ internal sealed partial class CharacterSunCeBoundaryMobileRuntime
         if (plan?.Features.HasOperation(SkillProgramEffectOp.ResolveBoundarySunCeZhiba) != true)
             return false;
         var key = (provider.Seat, lord.Seat, p!.Id, plan.BindingId);
-        if (!BoundarySunCeLordQualified(lord, p.Id) || provider.Seat == lord.Seat || _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(provider) != "wu" || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(provider.Seat, lord.Seat) || !_corePhysicalOwnedCardQueriesOperations.GetHand(provider).Any(c => c.Id == card) || _coreGameEngineSkillProgramsProgramContributionUsesAccess._programContributionUses.GetValueOrDefault(key) != 0)
+        if (!BoundarySunCeLordQualified(lord, p.Id) || provider.Seat == lord.Seat || _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(provider) != "wu" || !_pindianPolicies.CanBePindianTarget(provider.Seat, lord.Seat) || !_corePhysicalOwnedCardQueriesOperations.GetHand(provider).Any(c => c.Id == card) || _coreGameEngineSkillProgramsProgramContributionUsesAccess._programContributionUses.GetValueOrDefault(key) != 0)
             throw new InvalidOperationException("Mobile Zhiba requires another Wu player's unused native Play-phase challenge and actual hand card.");
         var awakening = plan.Instructions[0].SkillIds.SingleOrDefault() ?? BoundarySunCeMobileHunzi;
         var awake = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ProgramBindingResolvedEvent>().Any(e => e.OwnerSeat == lord.Seat && e.SkillId == awakening && e.Activated && e.Completed);
@@ -97,7 +97,7 @@ internal sealed partial class CharacterSunCeBoundaryMobileRuntime
     internal void BeginBoundarySunCeMobileContest(ProgramSkillFrame f)
     {
         var r = f.BoundarySunCeChallenge!;
-        if (!BoundarySunCeLordQualified(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId) || !_coreMatchParticipantsPlayersAccess._players[r.ProviderSeat].IsAlive || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.ProviderSeat]).Any(c => c.Id == r.ProviderCardId) || !_coreEquipmentSlotGroupProgramsOperations.CanBePindianTarget(r.ProviderSeat, f.OwnerSeat))
+        if (!BoundarySunCeLordQualified(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId) || !_coreMatchParticipantsPlayersAccess._players[r.ProviderSeat].IsAlive || !_corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[r.ProviderSeat]).Any(c => c.Id == r.ProviderCardId) || !_pindianPolicies.CanBePindianTarget(r.ProviderSeat, f.OwnerSeat))
         {
             _coreSkillProgramsOperations.FinishProgramSkill(f, false);
             return;
