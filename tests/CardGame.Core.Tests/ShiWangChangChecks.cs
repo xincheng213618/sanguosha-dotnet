@@ -8,6 +8,56 @@ internal static class ShiWangChangChecks
     private const string Hero = "mobile:shi-wang-chang", Kaiji = "mobile:shi-kaiji", Shepan = "mobile:shi-shepan",
         Driver = "fixture:shi-wang-chang-driver", Watch = "fixture:shi-wang-chang-watch", Quiet = "fixture:shi-wang-chang-quiet",
         Peer = "fixture:shi-wang-chang-peer", Source = "fixture:shi-wang-chang-source", Deck = "fixture:shi-wang-chang-deck";
+    private const string RecipientDrawReason = "skill-program.mobile:shi-kaiji.recipient-draw", RewardDrawReason = "skill-program.mobile:shi-kaiji.Draw";
+
+    public static void KaijiOrderedRecipientsAndSingleRewardCold()
+    {
+        var s = Scene.Start(true);
+        s.Play();
+        s.Drive("hurt", [1]); s.Rescue(); s.Play();
+        s.Drive("hurt", [2]); s.Rescue(); s.Play();
+        s.Need(s.E<PlayerDyingEvent>().Select(fact => fact.VictimSeat).Distinct().Order().SequenceEqual([1, 2]) &&
+            s.V(1).IsAlive && s.V(2).IsAlive,
+            "Two different real opponents previously entered native dying and received the two actual Peach rescues.");
+        s.Drive("extra"); s.Play(); s.End();
+        s.Offer(Kaiji); s.Activate();
+        s.Need(s.Root!.MobileShiWangChang is { Maximum: 2 }, "The extra turn's Preparation freezes the two living previously-dying participants as X.");
+        s.Branch("pick", 1); s.Branch("pick", 0); s.Branch("unpick", 1); s.Branch("pick", 1);
+        var frameId = s.Root!.Id;
+        var turn = s.G.State.TurnNumber;
+        s.Branch("done"); s.PaidWatch();
+
+        var first = s.Root!.NativeOperationDrawReturns.Single();
+        s.Need(s.Root.Id == frameId && s.Root.MobileShiWangChang is { Stage: MobileShiWangChangStage.DrawChildren, Index: 0 } &&
+            s.P?.PlayerSeat == 0 && first is { InstructionIndex: 1, Operation: SkillProgramEffectOp.SelectMobileShiKaijiTargets } &&
+            first.Reason.Value == RecipientDrawReason && first.Outcome is { RecipientSeat: 0, RequestedCount: 1, ActualDrawIds.Count: 1 },
+            "The first frozen recipient's real draw has completed on the original instruction before the second can begin.");
+        s.Continue(); s.PaidWatch();
+
+        var secondParent = s.Root!;
+        var paid = secondParent.NativeOperationDrawReturns;
+        s.Need(secondParent.Id == frameId && secondParent.MobileShiWangChang is
+                { Stage: MobileShiWangChangStage.DrawChildren, Index: 1, NonBasicGained: true } && s.P?.PlayerSeat == 1 &&
+            paid is [var earlier, var latest] && earlier == first && latest is { InstructionIndex: 1, Operation: SkillProgramEffectOp.SelectMobileShiKaijiTargets } &&
+            latest.Reason.Value == RecipientDrawReason && latest.Outcome is { RecipientSeat: 1, RequestedCount: 1, ActualDrawIds.Count: 1 } &&
+            latest.Outcome.SequenceBefore >= first.Outcome.SequenceAfter && s.E<MobileShiKaijiRewardBoundEvent>().All(fact => fact.FrameId != frameId),
+            "The second recipient has its own latest receipt on the same instruction, with the first retained and the reward still pending.");
+        var drawnIds = paid.SelectMany(receipt => receipt.Outcome.ActualDrawIds).ToArray();
+        s.Cold(); s.Continue(); s.Play();
+
+        var committed = s.E<MobileShiKaijiTargetCommittedEvent>().Where(fact => fact.FrameId == frameId).ToArray();
+        var returns = s.E<MobileShiKaijiDrawReturnedEvent>().Where(fact => fact.FrameId == frameId).ToArray();
+        var recipientDraws = s.G.CardMovements.Where(move => move.TurnNumber == turn && move.Reason.Value == RecipientDrawReason).ToArray();
+        var rewardDraws = s.G.CardMovements.Where(move => move.TurnNumber == turn && move.Reason.Value == RewardDrawReason).ToArray();
+        s.Need(committed is [{ Index: 0, Target: 0 }, { Index: 1, Target: 1 }] &&
+            returns is [{ Index: 0, Target: 0, Actual: 1, Replacement: 0, NonBasicGained: true }, { Index: 1, Target: 1, Actual: 1, Replacement: 0, NonBasicGained: true }] &&
+            recipientDraws.Select(move => move.CardId).SequenceEqual(drawnIds) && drawnIds.Distinct().Count() == 2 &&
+            recipientDraws.All(move => move.From == CardLocation.DrawPile) && recipientDraws.Select(move => move.To).SequenceEqual([CardLocation.Hand(0), CardLocation.Hand(1)]) &&
+            s.E<MobileShiKaijiRewardBoundEvent>().Where(fact => fact.FrameId == frameId).ToArray() is [{ Qualified: true }] &&
+            rewardDraws is [var reward] && reward.Sequence > returns[1].After && reward.From == CardLocation.DrawPile && reward.To == CardLocation.Hand(0) &&
+            s.E<ProgramBindingResolvedEvent>().Count(fact => fact.FrameId == frameId && fact.SkillId == Kaiji && fact.Activated && fact.Completed) == 1,
+            "The restored foreign gain closes once, preserves actual draw order, and pays one independent owner reward after both nonbasic recipient draws.");
+    }
 
     public static void ShepanHiddenTopDeckExactUseTurnAndRoundNameLimitsCold()
     {
@@ -116,7 +166,7 @@ internal static class ShiWangChangChecks
             ShanheStartingCard[] opening = kaiji ? [new(CardKind.Peach, Suit.Heart, 3), new(CardKind.Peach, Suit.Heart, 4), new(CardKind.Peach, Suit.Heart, 5), new(CardKind.Dodge, Suit.Club, 2)] :
                 [new(CardKind.Slash, Suit.Spade, 7), new(CardKind.FireSlash, Suit.Heart, 8), new(CardKind.ThunderSlash, Suit.Club, 9),
                  new(CardKind.Duel, Suit.Spade, 1), new(CardKind.Duel, Suit.Club, 1), new(CardKind.Peach, Suit.Heart, 3), new(CardKind.Dodge, Suit.Diamond, 2)];
-            var enemies = kaiji ? new ShanheCombatantDefinition[] { new(Peer, Hp: 1) { StartingHand = [] }, new(Peer, Hp: 1) { StartingHand = [] }, new(Peer, Hp: 8) { StartingHand = [] } } :
+            var enemies = kaiji ? new ShanheCombatantDefinition[] { new(Peer, Hp: 1, ExtraSkillIds: [Watch]) { StartingHand = [] }, new(Peer, Hp: 1) { StartingHand = [] }, new(Peer, Hp: 8) { StartingHand = [] } } :
                 [new(Hero, ExtraSkillIds: [Quiet]) { StartingHand = Enumerable.Range(0, 7).Select(i => new ShanheStartingCard(CardKind.Dodge, Suit.Heart, i + 1)).ToArray() }, new(Peer, Hp: 8) { StartingHand = [] }, new(Peer, Hp: 8) { StartingHand = [] }];
             var setup = new ShanheBattleSetup(61, 1, "shi-wang-chang-native", kaiji ? Hero : Source, 2, 0, 0, 0, 0,
                 kaiji ? [Driver, Watch] : [Watch], opening, [], enemies, [], new string('a', 64));

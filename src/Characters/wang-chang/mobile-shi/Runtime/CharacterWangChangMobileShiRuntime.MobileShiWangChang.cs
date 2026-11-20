@@ -131,7 +131,7 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
         {
             for (var i = 0; i < r.Targets.Count; i++)
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiKaijiTargetCommittedEvent(f.Id, i, r.Targets[i]));
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiWangChang = r with { Stage = MobileShiWangChangStage.DrawChildren } });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f with { MobileShiWangChang = r with { Stage = MobileShiWangChangStage.DrawChildren } });
             ContinueShiKaiji(f.Id);
             return;
         }
@@ -153,28 +153,29 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
             return;
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         r = f.MobileShiWangChang!;
-        var index = r.Index + (r.Draw is null ? 0 : 1);
+        var index = r.Index + (ShiKaijiCompletedDraw(f, r) is null ? 0 : 1);
         while (index < r.Targets.Count && !_coreMatchParticipantsPlayersAccess._players[r.Targets[index]].IsAlive)
             index++;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, MobileShiWangChang = r with { Index = index, Draw = null } });
         if (index >= r.Targets.Count || _coreMatchOutcomeStatusWinnerAccess._winner != Winner.None)
         {
-            _coreRuntimeOperations.ReplaceRuntimeTop(f with { MobileShiWangChang = f.MobileShiWangChang!with { Stage = MobileShiWangChangStage.Complete } });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f with { PendingMovementContinuation = null, MobileShiWangChang = r with { Index = index, Stage = MobileShiWangChangStage.Complete } });
             _coreRuntimeOperations.AdvanceRuntimeProgram(id);
             return;
         }
 
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiWangChang = f.MobileShiWangChang!with { Stage = MobileShiWangChangStage.Drawing } });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null, MobileShiWangChang = r with { Index = index, Stage = MobileShiWangChangStage.Drawing } });
         _coreProgramNativeDrawOperations.BeginOperationProgramDraw(f, r.Targets[index], 1, new(ShiKaijiDraw));
     }
 
     [ProgramNativeDrawReturn(SkillProgramEffectOp.SelectMobileShiKaijiTargets)]
     internal void ReturnShiKaijiDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.MobileShiWangChang is not { Stage: MobileShiWangChangStage.Drawing, Draw: null } r || outcome.RequestedCount != 1 || r.Index >= r.Targets.Count || outcome.RecipientSeat != r.Targets[r.Index])
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
+        if (f.MobileShiWangChang is not { Stage: MobileShiWangChangStage.Drawing } r || f.NativeDraw is not null || ShiKaijiCompletedDraw(f, r) != outcome)
             throw new InvalidOperationException("Kaiji lost its original once-issued recipient draw.");
+        RequireShiWangChang(f);
         var nonBasic = outcome.ActualDrawIds.Concat(outcome.ReplacementGainedIds).Any(id => CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(_coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind) != SkillProgramCardCategory.Basic);
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiWangChang = r with { Stage = MobileShiWangChangStage.DrawChildren, Draw = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter, NonBasicGained = r.NonBasicGained || nonBasic }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { MobileShiWangChang = r with { Stage = MobileShiWangChangStage.DrawChildren, NonBasicGained = r.NonBasicGained || nonBasic }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new MobileShiKaijiDrawReturnedEvent(f.Id, r.Index, outcome.RecipientSeat, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, nonBasic, outcome.SequenceBefore, outcome.SequenceAfter));
         ContinueShiKaiji(f.Id);
     }

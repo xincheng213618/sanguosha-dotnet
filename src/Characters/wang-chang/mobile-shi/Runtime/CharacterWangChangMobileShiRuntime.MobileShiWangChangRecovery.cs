@@ -5,7 +5,7 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
 {
     internal void RequireShiWangChang(ProgramSkillFrame f)
     {
-        if (f.MobileShiWangChang is not { } r || r.Source != ShiWangChangSource(f) || r.GameplayHash != f.GameplayHash || f.WindowContext is not { } c || c.ParentFrameId != r.WindowId || c.OwnerSeat != f.OwnerSeat || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !Enum.IsDefined(r.Stage) || r.Before < 0 || r.After < r.Before || r.After > _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWangChangStartedEvent>().Count(e => e == new MobileShiWangChangStartedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, r.ActualTurn, r.TurnOwner, r.Maximum, r.UseId, r.ActionId, r.Actor, r.Kind)) != 1)
+        if (f.MobileShiWangChang is not { } r || r.Source != ShiWangChangSource(f) || r.GameplayHash != f.GameplayHash || f.WindowContext is not { } c || c.ParentFrameId != r.WindowId || c.OwnerSeat != f.OwnerSeat || r.ActualTurn != _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber || r.TurnOwner != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat || f.SelectedCardIds.Count != 0 || f.SelectedTargetSeats.Count != 0 || !Enum.IsDefined(r.Stage) || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiWangChangStartedEvent>().Count(e => e == new MobileShiWangChangStartedEvent(f.Id, r.Source, r.GameplayHash, r.WindowId, r.ActualTurn, r.TurnOwner, r.Maximum, r.UseId, r.ActionId, r.Actor, r.Kind)) != 1)
             throw new InvalidOperationException("Shi Wang Chang lost its exact source, native boundary or issued invoice.");
         if (f.SkillId == ShiKaiji)
         {
@@ -13,24 +13,42 @@ internal sealed partial class CharacterWangChangMobileShiRuntime
                 throw new InvalidOperationException("Kaiji changed its preparation selection or paid recipient cursor.");
             if (r.Stage != MobileShiWangChangStage.Targets && !_coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiKaijiTargetCommittedEvent>().Where(e => e.FrameId == f.Id).OrderBy(e => e.Index).Select(e => e.Target).SequenceEqual(r.Targets))
                 throw new InvalidOperationException("Kaiji changed its frozen original recipients after payment began.");
-            if (r.Draw is { } draw && (r.Stage != MobileShiWangChangStage.DrawChildren || r.Index >= r.Targets.Count || draw.RecipientSeat != r.Targets[r.Index] || draw.RequestedCount != 1 || draw.SequenceBefore != r.Before || draw.SequenceAfter != r.After || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiKaijiDrawReturnedEvent>().Count(e => e.FrameId == f.Id && e.Index == r.Index && e.Target == draw.RecipientSeat && e.Actual == draw.ActualDrawIds.Count && e.Replacement == draw.ReplacementGainedIds.Count && e.Before == r.Before && e.After == r.After) != 1))
+            if (r.Stage != MobileShiWangChangStage.DrawChildren)
+                return;
+            // The first call after committing targets has neither a receipt nor movement to drain.
+            if (r.Index == 0 && f.NativeOperationDrawReturns.Count == 0 && f.PendingMovementContinuation is null)
+                return;
+            if (ShiKaijiCompletedDraw(f, r) is not { } draw ||
+                _coreProgramEventHistoryOperations.Value.ProgramEventHistory<MobileShiKaijiDrawReturnedEvent>().Count(e =>
+                    e.FrameId == f.Id && e.Index == r.Index && e.Target == draw.RecipientSeat && e.Actual == draw.ActualDrawIds.Count &&
+                    e.Replacement == draw.ReplacementGainedIds.Count && e.Before == draw.SequenceBefore && e.After == draw.SequenceAfter) != 1)
                 throw new InvalidOperationException("Kaiji cannot repeat or redirect a completed native draw.");
         }
-        else if (f.SkillId != ShiShepan || f.TriggerId != "shepan-adjust" || c.Window != SkillProgramTriggerWindow.CardUseBeforeTargetEffects || ShiShepanUse(c, f.OwnerSeat)is not { } use || use.Id != r.UseId || use.Action!.ActionId != r.ActionId || use.SourceSeat != r.Actor || use.CardKind != r.Kind || r.Maximum != 0 || r.Targets.Count != 0 || r.Index != 0 || r.Draw is not null || r.Stage is not (MobileShiWangChangStage.Mode or MobileShiWangChangStage.Resolving or MobileShiWangChangStage.Complete) || r.Stage == MobileShiWangChangStage.Mode && r.Mode is not null || r.Stage != MobileShiWangChangStage.Mode && r.Mode is not ("draw" or "top"))
+        else if (f.SkillId != ShiShepan || f.TriggerId != "shepan-adjust" || c.Window != SkillProgramTriggerWindow.CardUseBeforeTargetEffects || ShiShepanUse(c, f.OwnerSeat)is not { } use || use.Id != r.UseId || use.Action!.ActionId != r.ActionId || use.SourceSeat != r.Actor || use.CardKind != r.Kind || r.Maximum != 0 || r.Targets.Count != 0 || r.Index != 0 || r.Stage is not (MobileShiWangChangStage.Mode or MobileShiWangChangStage.Resolving or MobileShiWangChangStage.Complete) || r.Stage == MobileShiWangChangStage.Mode && r.Mode is not null || r.Stage != MobileShiWangChangStage.Mode && r.Mode is not ("draw" or "top"))
             throw new InvalidOperationException("Shepan lost its original current damage-card target, branch or adjustment.");
     }
+
+    private NativeDrawOutcome? ShiKaijiCompletedDraw(ProgramSkillFrame f, MobileShiWangChangReceipt r) =>
+        r.Index >= 0 && r.Index < r.Targets.Count &&
+        NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.SelectMobileShiKaijiTargets, new(ShiKaijiDraw)) is { } draw &&
+        draw.RecipientSeat == r.Targets[r.Index] && draw.RequestedCount == 1 && draw.SequenceBefore >= 0 &&
+        draw.SequenceAfter >= draw.SequenceBefore && draw.SequenceAfter <= _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence ? draw : null;
 
     internal bool ShiKaijiFirstChild(ProgramSkillFrame f, ResolutionFrame child)
     {
         if (f.SkillId != ShiKaiji || f.InstructionIndex != 1 || f.MobileShiWangChang is not { } r)
             return false;
         RequireShiWangChang(f);
-        if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
-            return r.Stage == MobileShiWangChangStage.Drawing && f.NativeDraw is not null;
-        if (r.Stage != MobileShiWangChangStage.DrawChildren || r.Draw is null)
+        if (child is NativeDrawAttemptFrame attempt)
+            return r.Stage == MobileShiWangChangStage.Drawing && r.Index < r.Targets.Count &&
+                attempt.Context.RecipientSeat == r.Targets[r.Index] && attempt.Context.RequestedCount == 1 &&
+                NativeDrawProducerRuntime.MatchesOperationAttempt(f, attempt, SkillProgramEffectOp.SelectMobileShiKaijiTargets, new(ShiKaijiDraw));
+        if (r.Stage != MobileShiWangChangStage.DrawChildren || ShiKaijiCompletedDraw(f, r) is not { } draw)
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)
-            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m =>
+                m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter &&
+                _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame recovery)
             return _coreProgramRecoveryReceiptsOperations.ProgramRecoveryReplacementReceiptMatches(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)

@@ -206,6 +206,8 @@ var tests = new (string Name, Action Body)[]
     ("Shi Wei Yan: paid phase quotas Yinzhan mission and backwater cold", ShiWeiYanChecks.PaidPhaseQuotasYinzhanMissionAndBackwaterCold),
     ("Shi Wei Yan: dying mission failure keeps paid parent and Kunfen cold", ShiWeiYanChecks.DyingMissionFailureKeepsPaidParentAndKunfenCold),
     ("Shi Wang Chang: hidden top deck exact use turn and round name limits cold", ShiWangChangChecks.ShepanHiddenTopDeckExactUseTurnAndRoundNameLimitsCold),
+    ("Shi Wang Chang Kaiji: ordered recipients and single reward cold", ShiWangChangChecks.KaijiOrderedRecipientsAndSingleRewardCold),
+    ("Anniversary Liu Yong Fengxiang: Xi leader change and damage draw use original receipt cold", AnniversaryLiuYongFengxiangChecks.XiLeaderChangeAndDamageDrawUseOriginalReceiptCold),
     ("Shi Chen Zhi: paid HE extra turn lease and dying recovery cold", ShiChenZhiChecks.ExtraTurnDiscardChildrenDyingRecoveryAndSameRoundLimitCold),
     ("Multiplayer: human seats prompts privacy and cold replay", MultiplayerChecks.MultipleHumansWaitRespondAndReplay),
     ("LAN rooms: HTTP players AI isolation retries and match completion", LanRoomChecks.HttpPlayersAiAndIsolation),

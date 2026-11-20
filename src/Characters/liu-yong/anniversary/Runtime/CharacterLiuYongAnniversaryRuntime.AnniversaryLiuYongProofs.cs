@@ -3,14 +3,33 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterLiuYongAnniversaryRuntime
 {
-    internal bool AnniversaryLiuYongMovementProof(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
+    private static NativeDrawOutcome? CompletedFengxiangDraw(ProgramSkillFrame f) =>
+        NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveAnniversaryLiuYongFengxiang, AnniversaryLiuYongDrawReason);
+
+    private (long Before, long After)? AnniversaryLiuYongMovementRange(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending)
     {
         if (f.AnniversaryLiuYong is not { Stage: AnniversaryLiuYongStage.GiftChildren or AnniversaryLiuYongStage.DrawChildren } r || pending != f.PendingMovementContinuation || pending.SubjectSeat != f.OwnerSeat || pending.BeforeCount != 0 || pending.CoverageResultBind is not null || effect?.Op != (r.Mode == "gift" ? SkillProgramEffectOp.ResolveAnniversaryLiuYongZhuning : SkillProgramEffectOp.ResolveAnniversaryLiuYongFengxiang))
-            return false;
-        var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > r.Before && m.Sequence <= r.After).ToArray();
-        if (r.Stage == AnniversaryLiuYongStage.DrawChildren)
-            return r.Draw is { } draw && draw.SequenceBefore == r.Before && draw.SequenceAfter == r.After && draw.RecipientSeat == f.OwnerSeat && draw.RequestedCount == 1 && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuYongDrawReturnedEvent>().Count(e => e == new AnniversaryLiuYongDrawReturnedEvent(f.Id, draw.AttemptFrameId, r.Before, r.After, draw.ActualDrawIds.Count)) == 1 && draw.ActualDrawIds.All(id => moves.Count(m => m.CardId == id && m.From == CardLocation.DrawPile && m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason == AnniversaryLiuYongDrawReason) == 1);
-        return r.GiftPaid && r.Cards.Count == r.From.Count && r.Cards.Select((id, index) => (id, from: r.From[index])).All(x => moves.Count(m => m.CardId == x.id && m.From == x.from && m.To == CardLocation.Hand(r.Recipient) && m.Reason == AnniversaryLiuYongGiftReason) == 1);
+            return null;
+        var draw = r.Stage == AnniversaryLiuYongStage.DrawChildren ? CompletedFengxiangDraw(f) : null;
+        if (r.Stage == AnniversaryLiuYongStage.DrawChildren && draw is null)
+            return null;
+        var before = draw?.SequenceBefore ?? r.Before;
+        var after = draw?.SequenceAfter ?? r.After;
+        var moves = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Where(m => m.Sequence > before && m.Sequence <= after).ToArray();
+        if (draw is not null)
+        {
+            if (draw.RecipientSeat != f.OwnerSeat || draw.RequestedCount != 1 ||
+                _coreProgramEventHistoryOperations.Value.ProgramEventHistory<AnniversaryLiuYongDrawReturnedEvent>()
+                    .Count(e => e == new AnniversaryLiuYongDrawReturnedEvent(f.Id, draw.AttemptFrameId, before, after, draw.ActualDrawIds.Count)) != 1 ||
+                !draw.ActualDrawIds.All(id => moves.Count(m => m.CardId == id && m.From == CardLocation.DrawPile &&
+                    m.To == CardLocation.Hand(f.OwnerSeat) && m.Reason == AnniversaryLiuYongDrawReason) == 1))
+                return null;
+        }
+        else if (!r.GiftPaid || r.Cards.Count != r.From.Count ||
+            !r.Cards.Select((id, index) => (id, from: r.From[index])).All(x => moves.Count(m => m.CardId == x.id && m.From == x.from &&
+                m.To == CardLocation.Hand(r.Recipient) && m.Reason == AnniversaryLiuYongGiftReason) == 1))
+            return null;
+        return (before, after);
     }
 
     internal bool AnniversaryLiuYongFirstChild(ProgramSkillFrame f, ResolutionFrame child)
@@ -20,9 +39,13 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
         if (child is CardUseFrame use)
             return r.Stage == AnniversaryLiuYongStage.NativeUse && (IsAnniversaryLiuYongSlashUse(use) || IsAnniversaryLiuYongVirtualUse(use));
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryLiuYongStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == 1;
+            return r.Stage == AnniversaryLiuYongStage.Drawing &&
+                NativeDrawProducerRuntime.MatchesOperationAttempt(f, draw, SkillProgramEffectOp.ResolveAnniversaryLiuYongFengxiang, AnniversaryLiuYongDrawReason);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return f.PendingMovementContinuation is { } pending && AnniversaryLiuYongMovementProof(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
+            return f.PendingMovementContinuation is { } pending &&
+                AnniversaryLiuYongMovementRange(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), pending) is { } range &&
+                CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) &&
+                moved.Batch.Movements.All(m => m.Sequence > range.Before && m.Sequence <= range.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is HappyQiaoHealthChoiceFrame health)
             return r.Stage == AnniversaryLiuYongStage.HealthChildren && _characterDaQiaoXiaoQiaoHappyGodOperations.HappyQiaoHealthChoiceRidesOn(health, f);
         if (child is RecoveryReplacementFrame recovery)

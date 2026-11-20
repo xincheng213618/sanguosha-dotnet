@@ -19,8 +19,7 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
         var leader = mode == "damage" ? AnniversaryLiuYongLeader(f.OwnerSeat) : null;
         var r = new AnniversaryLiuYongReceipt(AnniversaryLiuYongSource(f), f.GameplayHash, f.WindowContext?.ParentFrameId ?? 0, _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, mode, gift ? AnniversaryLiuYongStage.Gift : mode == "damage" && leader is not null ? AnniversaryLiuYongStage.HealthChildren : AnniversaryLiuYongStage.Drawing)
         {
-            Recipient = gift ? f.SelectedTargetSeats.Single() : leader ?? f.OwnerSeat,
-            Leader = leader
+            Recipient = gift ? f.SelectedTargetSeats.Single() : leader ?? f.OwnerSeat
         };
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryLiuYong = r });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuYongStartedEvent(f.Id, r.Source, r.Hash, r.ParentId, r.Turn, r.PhaseInstance, mode));
@@ -167,9 +166,10 @@ internal sealed partial class CharacterLiuYongAnniversaryRuntime
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveAnniversaryLiuYongFengxiang)]
     internal void ReturnAnniversaryLiuYongDraw(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (f.AnniversaryLiuYong is not { Stage: AnniversaryLiuYongStage.Drawing, Draw: null } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1 || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
+        if (f.AnniversaryLiuYong is not { Stage: AnniversaryLiuYongStage.Drawing } r || CompletedFengxiangDraw(f) != outcome ||
+            outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != 1 || outcome.SequenceAfter != _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence)
             throw new InvalidOperationException("Fengxiang lost its exact one-card native draw return.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f with { AnniversaryLiuYong = r with { Stage = AnniversaryLiuYongStage.DrawChildren, Draw = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f with { AnniversaryLiuYong = r with { Stage = AnniversaryLiuYongStage.DrawChildren }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new AnniversaryLiuYongDrawReturnedEvent(f.Id, outcome.AttemptFrameId, outcome.SequenceBefore, outcome.SequenceAfter, outcome.ActualDrawIds.Count));
         ContinueAnniversaryLiuYong(f.Id);
     }

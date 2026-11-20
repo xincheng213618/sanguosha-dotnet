@@ -34,7 +34,6 @@ public sealed record AnniversaryLiuYongPlan(CardKind Kind, LegalActionKind Actio
 public sealed record AnniversaryLiuYongReceipt(CardConversionSource Source, string Hash, long ParentId, int Turn, int PhaseInstance, string Mode, AnniversaryLiuYongStage Stage)
 {
     public int Recipient { get; init; } = -1;
-    public int? Leader { get; init; }
     private readonly IReadOnlyList<int> _cards = [];
     public IReadOnlyList<int> Cards { get => _cards; init => _cards = Array.AsReadOnly(value.ToArray()); }
     private readonly IReadOnlyList<CardLocation> _from = [];
@@ -47,7 +46,6 @@ public sealed record AnniversaryLiuYongReceipt(CardConversionSource Source, stri
     public long ActionId { get; init; }
     public bool CausedDamage { get; init; }
     public bool HadAttack { get; init; }
-    public NativeDrawOutcome? Draw { get; init; }
 }
 public sealed partial record ProgramSkillFrame
 { [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public AnniversaryLiuYongReceipt? AnniversaryLiuYong { get; init; } }

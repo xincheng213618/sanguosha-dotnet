@@ -15,9 +15,6 @@ public sealed record MobileShiWangChangReceipt(CardConversionSource Source, stri
     public long ActionId { get; init; }
     public int Actor { get; init; } = -1;
     public CardKind Kind { get; init; }
-    public long Before { get; init; }
-    public long After { get; init; }
-    public NativeDrawOutcome? Draw { get; init; }
 }
 public sealed partial record ProgramSkillFrame
 {
