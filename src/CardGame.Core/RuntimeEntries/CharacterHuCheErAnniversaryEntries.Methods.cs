@@ -5,7 +5,6 @@ internal sealed partial class CharacterHuCheErAnniversaryEntries
     internal IEnumerable<AnniversaryHuCheErSlashForbiddenEvent> ActiveHuCheErSlashBans(int actor) => _resolve().ActiveHuCheErSlashBans(actor);
     internal bool AdvanceHuCheErChildren() => _resolve().AdvanceHuCheErChildren();
     internal PromptChoice AiHuCheEr(PendingDecision p, ProgramSkillFrame f) => _resolve().AiHuCheEr(p, f);
-    internal IEnumerable<RuleQueryContribution> AnniversaryHuCheErHandLimitContributions(CharacterState p) => _resolve().AnniversaryHuCheErHandLimitContributions(p);
     internal void AnswerHuCheEr(PromptChoice choice) => _resolve().AnswerHuCheEr(choice);
     internal SkillProgramStepOutcome BeginHuCheEr(ProgramSkillFrame input) => _resolve().BeginHuCheEr(input);
     internal bool CanOfferHuCheEr(ProgramTriggerCandidate c, SkillProgramTrigger t, ProgramSkillWindowContext w) => _resolve().CanOfferHuCheEr(c, t, w);

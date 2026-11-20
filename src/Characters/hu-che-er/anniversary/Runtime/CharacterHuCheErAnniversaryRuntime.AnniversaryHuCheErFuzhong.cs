@@ -6,13 +6,19 @@ internal sealed partial class CharacterHuCheErAnniversaryRuntime
     internal int HuCheErZhong(CharacterState p) => HasAnniversaryHuCheErRules && _coreNativeSkillContextQueriesOperations.HasProgramSkill(p, AnniversaryHuCheErComposition.Fuzhong) ? p.Markers.GetValueOrDefault(PlayerMarkerKind.AnniversaryHuCheErZhong) : 0;
 
     [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 100)]
-    internal void AddFuzhongDrawContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    internal void AddFuzhongNumericContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
     {
-        if (query == SkillRuleQuery.DrawCount && HuCheErZhong(_coreMatchParticipantsPlayersAccess._players[seat]) >= 1)
-            CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{seat}:anniversary-fuzhong:draw", 1);
+        var tier = query switch
+        {
+            SkillRuleQuery.DrawCount => (MinimumWeight: 1, Amount: 1, Source: $"state:{seat}:anniversary-fuzhong:draw"),
+            SkillRuleQuery.HandLimit => (MinimumWeight: 3, Amount: 3, Source: $"state:{seat}:anniversary:fuzhong:hand-limit"),
+            _ => default
+        };
+
+        if (tier.Source is { } source && HuCheErZhong(_coreMatchParticipantsPlayersAccess._players[seat]) >= tier.MinimumWeight)
+            CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, source, tier.Amount);
     }
 
-    internal IEnumerable<RuleQueryContribution> AnniversaryHuCheErHandLimitContributions(CharacterState p) => HuCheErZhong(p) >= 3 ? [new FiniteRuleQueryContribution($"state:{(p.Seat)}:anniversary:fuzhong:hand-limit", SkillRuleOperation.Add, 3)] : [];
     [ProgramDistanceRule(ProgramDistanceStage.DistanceBaseTerms, 49500)]
     internal void HuCheErOutgoingDistance(ProgramDistanceQuery q, List<RuleQueryBaseTerm> terms)
     {

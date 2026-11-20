@@ -25,7 +25,6 @@ internal interface IMatchHandLimitQuery : IProgramSelectionQuery
     IEnumerable<RuleQueryContribution> ShenZfContributions { get; }
     IEnumerable<RuleQueryContribution> LiuLiContributions { get; }
     IEnumerable<RuleQueryContribution> YanXiangContributions { get; }
-    IEnumerable<RuleQueryContribution> HuCheErContributions { get; }
     bool HasLiushiEffect { get; }
     int LiushiMarkerCount { get; }
     IEnumerable<RuleQueryContribution> ActorPenaltyContributions { get; }
@@ -70,7 +69,6 @@ internal sealed class MatchHandLimitQueries(IKernelProgramPipelineHooksAccess pi
         contributions.AddRange(query.ShenZfContributions);
         contributions.AddRange(query.LiuLiContributions);
         contributions.AddRange(query.YanXiangContributions);
-        contributions.AddRange(query.HuCheErContributions);
         if (query.HasLiushiEffect)
             AddFiniteContribution(contributions, $"state:{query.Seat}:liushi:hand-limit", -query.LiushiMarkerCount);
         contributions.AddRange(query.ActorPenaltyContributions);
