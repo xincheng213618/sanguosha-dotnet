@@ -4,6 +4,32 @@ namespace CardGame.Core.EngineOwners;
 
 internal sealed partial class CoreActualTurnsRuntime
 {
+    internal bool HasBeforeTurnPreludeBindingWork(CharacterState owner)
+    {
+        const SkillProgramTriggerWindow ownWindow = SkillProgramTriggerWindow.TurnBeforeStart;
+        const SkillProgramTriggerWindow roundWindow = SkillProgramTriggerWindow.RoundStarting;
+
+        return HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.MarkUnmarkedOtherBeforeActualTurn) ||
+            _coreMatchParticipantsPlayersAccess._players.Any(player =>
+                HasBeforeTurnPreludeBinding(player, roundWindow, SkillProgramEffectOp.MarkLowestHpUnmarkedOtherAtRoundStart)) ||
+            _coreMatchParticipantsPlayersAccess._players.Any(player =>
+                HasBeforeTurnPreludeBinding(player, roundWindow, SkillProgramEffectOp.ResolveAnniversaryLiuLiDehua)) ||
+            (_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.AssignOrderedDragonPhoenixOnFirstActualTurn) &&
+                HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.AssignOrderedDragonPhoenixOnFirstActualTurn) &&
+                _eventHistory.CountActualTurnStarts(owner.Seat) == 0) ||
+            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.ResolveShenTaishiCiPowei) ||
+            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.ResolveHappyTaishiCiChongwei) ||
+            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.ObtainHappyTaishiCiStartSlash) ||
+            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.EditDinghanNames) ||
+            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.AwakenJianghuo) ||
+            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.ObtainWushuangDeckCards) ||
+            HasBeforeTurnPreludeBinding(owner, ownWindow, SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng);
+    }
+
+    private bool HasBeforeTurnPreludeBinding(CharacterState player, SkillProgramTriggerWindow window, SkillProgramEffectOp operation) =>
+        player.IsAlive && _coreNationalSkillsOperations.GetSkillBindingShard(player).GetInstanceTriggers(window)
+            .Any(binding => ProgramInstructionResolver.Default.Features(binding.Trigger).HasOperation(operation));
+
     internal long OpenBeforeTurnPrelude(CharacterState owner)
     {
         var oldRound = _coreActualRoundProgressRoundNumberAccess._roundNumber;

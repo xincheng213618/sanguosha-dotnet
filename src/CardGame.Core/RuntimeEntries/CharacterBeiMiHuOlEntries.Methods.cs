@@ -28,7 +28,6 @@ internal sealed partial class CharacterBeiMiHuOlEntries
     internal bool DrainBeiMiHuChildren(ProgramSkillFrame f) => _resolve().DrainBeiMiHuChildren(f);
     internal bool ExactBeiMiHuLifecycleParent(ProgramSkillFrame f) => _resolve().ExactBeiMiHuLifecycleParent(f);
     internal void FinishBeiMiHu(ProgramSkillFrame f) => _resolve().FinishBeiMiHu(f);
-    internal bool HasBeiMiHuPreludeBindings(CharacterState player, SkillProgramTriggerWindow window, SkillProgramEffectOp operation) => _resolve().HasBeiMiHuPreludeBindings(player, window, operation);
     internal bool IsBeiMiHuMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation pending) => _resolve().IsBeiMiHuMovement(f, effect, pending);
     internal bool KuiAppendTargetFinalizedInstantTrickRequirementTargetWindow(ProgramTargetCardWindowQuery query) => _resolve().KuiAppendTargetFinalizedInstantTrickRequirementTargetWindow(query);
     internal bool KuiAppendTargetNormalizeImplicitDrawTwoTargetWindow(ProgramTargetCardWindowQuery query) => _resolve().KuiAppendTargetNormalizeImplicitDrawTwoTargetWindow(query);
