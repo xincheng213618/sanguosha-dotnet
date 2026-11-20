@@ -50,8 +50,9 @@ internal sealed partial class CharacterMengHuoMouMobileRuntime
     {
         if (!ValidMouMh(f))
             return false;
-        if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
-            return f.NativeDraw is not null && f.MouMengHuo!.Stage == MouMengHuoStage.Drawing;
+        if (child is NativeDrawAttemptFrame draw)
+            return f.MouMengHuo!.Stage == MouMengHuoStage.Drawing &&
+                CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, 1);
         if (IsMouMhSilverLionChild(f, child) || _healthChildren.ProgramRecoveryChild(f, child))
             return true;
         if (child is CardsMovedTriggerWindowFrame moved)

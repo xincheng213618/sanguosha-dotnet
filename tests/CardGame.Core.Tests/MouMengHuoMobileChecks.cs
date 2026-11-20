@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core.Campaigns;
+using CardGame.Core.EngineOwners;
 namespace CardGame.Core.Tests;
 
 internal static class MouMengHuoMobileChecks
@@ -44,8 +45,26 @@ internal static class MouMengHuoMobileChecks
             s.E<SilverLionRemovedRecoveryEvent>().Any(e => e.PlayerSeat == 0 && e.Reason.Value == "skill-program.mou-mobile:zaiqi.discard" && e.RecoveredAmount == 1 && e.RemainingHp == 3),
             "The whole recipient count is debited once. The real first recipient equipment discard has already drained SilverLion recovery to three and pauses before Zaiqi's separate native recovery.");
         s.Private(); s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+        s.Reach(() => s.P?.SkillPrompt?.SkillId == Scene.DrawWatch &&
+            s.G.ResolutionStack.OfType<NativeDrawAttemptFrame>().Any(draw => draw.Context.ParentFrameId == frame.Id));
+        var drawing = s.G.ResolutionStack.OfType<ProgramSkillFrame>().Single(parent => parent.Id == frame.Id);
+        var attempt = s.G.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single(draw => draw.Context.ParentFrameId == frame.Id);
+        var runtime = s.G.GetRuntimeModule<CharacterMengHuoMouMobileRuntime>();
+        s.Need(drawing.MouMengHuo is { Stage: MouMengHuoStage.Drawing, Cursor: 1, Draw: null } &&
+            s.E<MouMengHuoRecipientDecidedEvent>().Last() == new MouMengHuoRecipientDecidedEvent(frame.Id, 1, 1, "draw") &&
+            attempt.Context is { RecipientSeat: 0, RequestedCount: 1 } &&
+            attempt.Context.Reason.Value == CharacterMengHuoMouMobileRuntime.MouMhDrawReason &&
+            attempt.Return.Kind == NativeDrawAttemptReturnKind.ProgramOperation && runtime.MouMhFirstChild(drawing, attempt) &&
+            !runtime.MouMhFirstChild(drawing, attempt with { Context = attempt.Context with { RecipientSeat = 1 } }),
+            "The actual ally's draw choice opens the original paid Zaiqi frame's one-card native attempt for owner zero.");
+        s.Private(); s.Cold(); s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
         s.Reach(() => s.E<MouMengHuoCompletedEvent>().Count(e => !e.Obtain && e.Accepted) == 2);
         var spent = s.E<MouMengHuoChargeSpentEvent>().Last(); var payments = s.E<MouMengHuoDiscardPaidEvent>();
+        var returnedDraw = s.E<MouMengHuoDrawReturnedEvent>().Single(e => e.FrameId == frame.Id && e.Index == 1);
+        s.Need(returnedDraw is { Requested: 1, Actual: 1, Replacement: 0 } && returnedDraw.AttemptId == attempt.Id &&
+            s.G.CardMovements.Count(move => move.Reason == attempt.Context.Reason && move.From == CardLocation.DrawPile &&
+                move.To == CardLocation.Hand(0) && move.Sequence > returnedDraw.Before && move.Sequence <= returnedDraw.After) == 1,
+            "Cold return gives exactly one physical card to the original skill owner on the ally's election.");
         s.Need(spent is { Count: 2, Before: 2, After: 0 } && payments is [{ RecipientSeat: 0 }] &&
             payments[0].Payment.PrintedKind == CardKind.SilverLion && payments[0].Payment.From == CardLocation.Equipment(0) &&
             s.E<NativeLogicalDiscardInvocationRecordedEvent>().Any(e => e.InvocationId == payments[0].Payment.InvocationId && e.ActualCount == 1 && e.HandCount == 0) &&
@@ -58,7 +77,7 @@ internal static class MouMengHuoMobileChecks
     private static ShanheStartingCard C(CardKind k, int rank = 7) => new(k, Suit.Spade, rank);
     private sealed class Scene(GameEngine game, ContentRegistry registry)
     {
-        public const string Hero = "mou:meng-huo-mobile", Watch = "fixture:moumh-watch";
+        public const string Hero = "mou:meng-huo-mobile", Watch = "fixture:moumh-watch", DrawWatch = "fixture:moumh-draw-watch";
         private const string DriverId = "fixture:moumh-driver", Quiet = "fixture:moumh-quiet", Ally = "fixture:moumh-ally", EnemyA = "fixture:moumh-enemy-a", EnemyB = "fixture:moumh-enemy-b", Deck = "fixture:moumh-deck";
         public GameEngine G { get; private set; } = game;
         public PendingDecision? P => Enumerable.Range(0, 4).Select(i => G.CreateSnapshot(i).PendingDecision).FirstOrDefault(p => p is not null);
@@ -84,6 +103,7 @@ internal static class MouMengHuoMobileChecks
                 if (done()) return; Need(G.State.Winner == Winner.None, "Unexpected native terminal cutoff at " + line);
                 var p = P;
                 if (p is null || p.PlayerSeat != 0) Accept(new AdvanceOneStepCommand(G.Revision));
+                else if (p.SkillPrompt?.SkillId == DrawWatch) Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
                 else if (p.Kind == DecisionKind.PlayCard) End();
                 else if (p.Kind is DecisionKind.RespondDodge or DecisionKind.RespondSlash or DecisionKind.Nullification or DecisionKind.RescueDying)
                     Answer(c => c.Parameters.GetValueOrDefault("response") is "pass" or "take-damage" or "let-die");
@@ -104,7 +124,7 @@ internal static class MouMengHuoMobileChecks
         public static Scene Start()
         {
             var r = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
-            var setup = new ShanheBattleSetup(7, 1, "moumh-native", Hero, 4, 0, 0, 0, 0, [DriverId, Watch], [C(CardKind.BarbarianAssault, 3), C(CardKind.BarbarianAssault, 4), C(CardKind.Dodge, 5), C(CardKind.Dodge, 6)], [C(CardKind.SilverLion, 9)],
+            var setup = new ShanheBattleSetup(7, 1, "moumh-native", Hero, 4, 0, 0, 0, 0, [DriverId, Watch, DrawWatch], [C(CardKind.BarbarianAssault, 3), C(CardKind.BarbarianAssault, 4), C(CardKind.Dodge, 5), C(CardKind.Dodge, 6)], [C(CardKind.SilverLion, 9)],
                 [new(EnemyA, Hp: 12) { StartingHand = [] }, new(EnemyB, Hp: 12) { StartingHand = [] }], [new(Ally, Hp: 12) { StartingHand = [C(CardKind.BarbarianAssault, 8)] }], new string('b', 64));
             var g = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null, HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,
                 UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 8 }, r);
@@ -121,9 +141,16 @@ internal static class MouMengHuoMobileChecks
                     new { id = DriverId, revision = 1, activations = new[] { new { id = "lose-two", minCards = 0, maxCards = 0, minTargets = 0, maxTargets = 0, targetKind = "anyLiving", usesPerTurn = (int?)null, effects = new[] { new { op = "loseHp", target = "owner", amount = 2 } } } } },
                     new { id = Quiet, revision = 1, triggers = new[] { new { id = "quiet", window = "afterNormalDraw", subject = "owner", optional = false, effects = new[] { new { op = "skipTurnPhases", target = "owner", phases = new[] { "play" } } } } } },
                     new { id = Watch, revision = 1, triggers = new[] { new { id = "real-recipient-discard", window = "cardsMoved", subject = "owner", sourceZones = new[] { "equipment" }, movementReasons = new[] { "skill-program.mou-mobile:zaiqi.discard" }, movementOccurrence = "perBatch", optional = false,
+                        effects = new[] { new { op = "chooseOption", target = "owner", resultBind = "hold", options = new[] { new { id = "continue" } } } } } } },
+                    new { id = DrawWatch, revision = 1, triggers = new[] { new { id = "real-draw-attempt", window = "nativeDrawStarting", subject = "owner", optional = false, isSkillInvocation = false,
                         effects = new[] { new { op = "chooseOption", target = "owner", resultBind = "hold", options = new[] { new { id = "continue" } } } } } } }
                 };
-                var labels = new[] { DriverId, Quiet, Watch }.ToDictionary(id => id, id => new { name = id, description = "谋孟获真实原生小局", optionLabels = id == Watch ? new Dictionary<string, string> { ["continue"] = "继续实际弃牌后回复" } : new Dictionary<string, string>() });
+                var labels = new[] { DriverId, Quiet, Watch, DrawWatch }.ToDictionary(id => id, id => new { name = id, description = "谋孟获真实原生小局", optionLabels = id switch
+                {
+                    Watch => new Dictionary<string, string> { ["continue"] = "继续实际弃牌后回复" },
+                    DrawWatch => new Dictionary<string, string> { ["continue"] = "继续实际摸牌" },
+                    _ => new Dictionary<string, string>()
+                } });
                 var catalog = SkillProgramCatalog.Load(JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.RulesSchemaVersion, skills = defs }), JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion, skills = labels }));
                 foreach (var (id, p) in catalog.Programs) b.AddSkill(new(id, id, labels[id].description) { Program = p, ProgramPresentation = catalog.Presentations[id] });
                 b.AddGeneral(new(Ally, "真实同盟", "", "standard:none", "shu", 12, []));

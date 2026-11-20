@@ -1,3 +1,5 @@
+using CardGame.Core.EngineOwners;
+
 namespace CardGame.Core;
 
 internal sealed partial class MouSunShangxiangRuntime
@@ -10,7 +12,9 @@ internal sealed partial class MouSunShangxiangRuntime
     private bool FirstChild(ProgramSkillFrame f,ResolutionFrame child)
     {
         if(f.MouSsx is not{}r||!Valid(f))return false;
-        if(child is NativeDrawAttemptFrame draw)return r.Stage==MouSsxStage.Drawing&&RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.NativeDrawAttemptRidesOn(draw,f);
+        if (child is NativeDrawAttemptFrame draw)
+            return r.Stage == MouSsxStage.Drawing &&
+                CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.RecipientSeat, r.Required);
         if(child is CardsMovedTriggerWindowFrame moved)return f.PendingMovementContinuation is not null&&
             RuntimeSkills.RuntimeRules_Core_CommonRules.ProgramMovementReturnMatches(f,moved)&&moved.Batch.Movements.All(m=>m.Sequence>r.Before&&m.Sequence<=r.After);
         if(health.ProgramRecoveryChild(f,child)||facts.MovementRecoveryChild(f,child))return true;
