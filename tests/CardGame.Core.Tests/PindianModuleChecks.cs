@@ -55,6 +55,8 @@ internal static class PindianModuleChecks
         var hand = game.CreateSnapshot(0).Players[0].Hand[0].Id;
         Accept(game.Submit(new UseProgramSkillCommand(0, ProgramSkillId, "contest", [hand], [1],
             game.Revision, game.PendingDecision!.PromptId)));
+        ShenduanPaysForOriginalMaximum(VerifyCommandReplay(game, registry), registry, hand);
+
         Answer(game, 0, choice => choice.Parameters.GetValueOrDefault("action") == "pindian-top");
         var reservation = game.CardMovements.Single(move => move.Reason.Value == "pindian.reserve-top");
         Require(reservation.From == CardLocation.DrawPile && reservation.To == CardLocation.Processing &&
@@ -93,6 +95,41 @@ internal static class PindianModuleChecks
                 !replacing.CardMovements.Any(move => move.CardId == reservation.CardId && move.Reason == CardMoveReasons.PindianFinish),
             "Replacing Tianbian returns its original entry once and uses only the newly paid maximum.");
         VerifyReplay(replacing, registry);
+    }
+
+    private static void ShenduanPaysForOriginalMaximum(GameEngine game, ContentRegistry registry, int hand)
+    {
+        var parent = game.ResolutionStack.OfType<PindianFrame>().Single();
+        var movementsBefore = game.CardMovements.Count;
+        Require(game.CreateSnapshot(0).PendingDecision is { IsPrivate: true } offer &&
+                offer.Choices.Single(choice => choice.Parameters.GetValueOrDefault("action") == "pindian-maximum").Cards.Count == 0 &&
+                game.CreateSnapshot(2).PendingDecision is null, "The alternative is private and selects no physical card before payment.");
+        Answer(game, 0, choice => choice.Parameters.GetValueOrDefault("action") == "pindian-maximum");
+        Require(game.ResolutionStack.OfType<PindianFrame>().Single() is
+                { SourceCardId: 0, SourceUsesDrawPileTop: false, SourceTopReservationSequence: null, PindianStep: PindianStep.ChooseOpponentCard } current &&
+                current.Id == parent.Id && game.CardMovements.Count == movementsBefore &&
+                game.CreateSnapshot(1).PendingDecision is { IsPrivate: true } &&
+                game.CreateSnapshot(0).PendingDecision is null && game.CreateSnapshot(2).PendingDecision is null,
+            "The original contest stores the unpaid maximum while only the opponent chooses a physical card.");
+        game = VerifyReplay(game, registry);
+        var opponent = game.CreateSnapshot(1).PendingDecision!.Choices.First(choice =>
+            choice.Parameters.GetValueOrDefault("action") == "pindian-card").Cards.Single();
+        Answer(game, 1, choice => choice.Parameters.GetValueOrDefault("action") == "pindian-card" && choice.Cards.SequenceEqual([opponent]));
+        Require(game.CreateSnapshot(0).PendingDecision is { SkillPrompt.SkillId: Shenduan, IsPrivate: true } &&
+                game.CreateSnapshot(2).PendingDecision is null &&
+                game.ResolutionStack.OfType<PindianFrame>().Single().WuLuKangContest!.Original[0].CardId == 0,
+            "Only the original source now sees the Shenduan payment.");
+        Answer(game, 0, choice => choice.Parameters.GetValueOrDefault("branch") == "discard" && choice.Cards.SequenceEqual([hand]));
+        var paid = game.Events.Select(entry => entry.Payload).OfType<WuLuKangShenduanDiscardPaidEvent>().Single();
+        var maximum = game.CardMovements.Single(move => move.Reason.Value == "skill-program.wu-lu-kang.shenduan.reserve");
+        var result = game.Events.Select(entry => entry.Payload).OfType<PindianResultDeterminedEvent>().Single();
+        Require(paid.ContestId == parent.Id && paid.ParticipantSeat == 0 && paid.CardId == hand &&
+                paid.From == CardLocation.Hand(0) && paid.To == CardLocation.DiscardPile && paid.Sequence < maximum.Sequence &&
+                maximum.From == CardLocation.DrawPile && maximum.To == CardLocation.Processing && maximum.CardId != hand &&
+                result.FrameId == parent.Id && result.Result.SourceCardId == maximum.CardId && result.Result.OpponentCardId == opponent &&
+                game.CardMovements.Count(move => move.CardId == maximum.CardId && move.Reason == CardMoveReasons.PindianFinish) == 1,
+            "The discard precedes reserving the exact deck card, which becomes the original contest input and is cleaned once.");
+        VerifyReplay(game, registry);
     }
 
     private static void Answer(GameEngine game, int seat, Func<PromptChoice, bool> pick)

@@ -22,7 +22,7 @@ internal sealed partial class CoreGameEnginePindianPoliciesRuntime
                 _cardZonesOperations._cardZones.GetLocation(contest.Assignments[0].CardId) ==
                 _characterLuKangWumiaoOperations.WuLuKangAssignedLocation(frame, frame.SourceSeat);
         var source = _coreMatchParticipantsPlayersAccess._players[frame.SourceSeat];
-        if (frame.SourceCardId == 0 && _characterLuKangWumiaoOperations.CanWuLuKangDiscardForPindian(source))
+        if (frame.SourceCardId == 0 && _pindianPolicyQueries.CanDiscardForPindian(source.Seat))
             return true;
         if (frame.OwnedPileSource is not null)
             return _characterGuanHaiOlOperations.IsGuanHaiPindianSource(frame, false);

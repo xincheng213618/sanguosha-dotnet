@@ -117,7 +117,7 @@ internal sealed partial class CoreGameEngineSimultaneousPindianSelectionsRuntime
         int rank;
         if (choice.Parameters["branch"] == "maximum")
         {
-            if (!_characterLuKangWumiaoOperations.CanWuLuKangDiscardForPindian(_coreMatchParticipantsPlayersAccess._players[seat]))
+            if (!_pindianPolicyQueries.CanDiscardForPindian(seat))
                 throw new InvalidOperationException("The discard-backed source lost its actual HE policy.");
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { SimultaneousPindian = r with { Cards = r.Cards.Append(new(seat, -seat - 1, 0, 0)).ToArray(), SelectionIndex = r.SelectionIndex + 1 } });
             ContinueSimultaneousSelection(f);
