@@ -47,6 +47,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Native program execution offers `TryBeginProgramInvocation` before the resume catalog and before direct execution. A registered observer can start an invocation on the original program frame. Its issuing qualification and typed return stay with the observer. The resume catalog and step executor retain their existing entry points.
 
+- Native equipment invocations capture the first effective physical card of the matching printed kind from field equipment. An accepted invocation can record equipment ID `0` when no matching physical card is present, including virtual equipment and a weapon already spent on the original payment. The original native parent owns the frozen receipt, fingerprint and typed return. The equipment entity ID is independent of the invocation's skill instance ID.
+
 ## Selections and expression bindings
 
 - Expression card sets carry only known frozen facts and original physical residency. Derived bindings inherit source locations and entry tokens, including unknown tokens, rather than sampling a new origin; use the shared zone-entry query. Accepted after-turn-ended calls retain only their declared original-frame invocation permission, independently of owner-death draining.

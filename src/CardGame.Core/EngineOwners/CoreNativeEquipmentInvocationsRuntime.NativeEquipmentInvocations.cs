@@ -17,7 +17,7 @@ internal sealed partial class CoreNativeEquipmentInvocationsRuntime
     {
         var parent = _resolutionStackOperations._resolutionStack.LastOrDefault() ?? throw new InvalidOperationException("Equipment invocation requires a live native owner.");
         var equipment = NativeInvocationEquipment(kind);
-        var cardId = _characterHuCheErMouOperations.KongwuEffectiveEquipment(_coreMatchParticipantsPlayersAccess._players[actorSeat]).FirstOrDefault(c => c.Kind == equipment)?.Id ?? 0;
+        var cardId = _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(_coreMatchParticipantsPlayersAccess._players[actorSeat]).FirstOrDefault(c => c.Kind == equipment)?.Id ?? 0;
         var ordinal = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<NativeEquipmentInvocationIssuedEvent>().Count(e => e.ParentFrameId == parent.Id && e.Kind == kind && e.ActorSeat == actorSeat);
         var nonce = $"{(_randomOperations._random.Next(int.MaxValue)):X8}{(_randomOperations._random.Next(int.MaxValue)):X8}";
         return new(parent.Id, attack.ResolutionId, kind, actorSeat, targetSeat, CardCatalog.Get(equipment).DisplayName, $"native-equipment:{(attack.ResolutionId)}:{(kind)}:{(actorSeat)}:{(ordinal)}", cardId, CommitmentNonce: nonce);
