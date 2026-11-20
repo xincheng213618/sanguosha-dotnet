@@ -37,6 +37,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Mobile Li Yan's Duliang contributes the original grants assigned to the beneficiary's current actual Draw phase. Separate grants can stack on the first actual Draw, including an inserted phase, and survive loss of the issuing skill. The next Draw phase reads its own assignments.
 
+- Anniversary Hu Che Er's Fuzhong contributes one card to the actual Draw count when its skill is effective and the holder has at least one Zhong. A fixed amount from a separate native draw producer uses its own amount.
+
 - Accepted card-action and movement trigger continuations use `ProgramInvocations` on the original native window and candidate cursor. Acceptance-scoped rights begin only after the actual binding starts; preserve earlier source-frozen permissions as distinct declarations. Keep source-loss invocation rights separate from owner-death rights; never refresh accepted qualification from later use history or recreate character payment-proof ledgers.
 
 - Accepted materials are commitments on their original frame, separately from chosen inputs and physical payment results. Acceptance freezes eligibility; execution drops materials that left their frozen source without requalifying the promise. Declare source-loss continuation separately from owner-death draining, and never use draining to issue future effects.

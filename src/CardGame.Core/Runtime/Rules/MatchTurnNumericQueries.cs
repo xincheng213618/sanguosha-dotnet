@@ -25,7 +25,6 @@ internal interface IMatchDrawCountQuery : IMatchTurnNumericQuery
     int LuanxinNextDrawBonus { get; }
     int AlternatingNextDrawBonus { get; }
     int KuangxiangDrawPenalty { get; }
-    int FuzhongDrawBonus { get; }
     int JuguanDrawAdjustment { get; }
     int QuxiDrawAdjustment { get; }
 }
@@ -72,7 +71,6 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
         pipelineHooks._programPipelineHooks.AppendNumericRuleContributions(query.Seat, SkillRuleQuery.DrawCount, contributions);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:kuangxiang:draw", -query.KuangxiangDrawPenalty);
         AddFiniteContribution(contributions, $"state:{query.Seat}:hengye:growth", query.HengyeGrowth);
-        AddFiniteContribution(contributions, $"state:{query.Seat}:anniversary-fuzhong:draw", query.FuzhongDrawBonus);
         AddFiniteContribution(contributions, $"turn:{query.Seat}:draw-count", query.AdditiveTurnBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:juguan:draw", query.JuguanDrawAdjustment);
         AddFiniteContribution(contributions, $"state:{query.Seat}:quxi:draw", query.QuxiDrawAdjustment);

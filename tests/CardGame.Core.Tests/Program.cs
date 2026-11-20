@@ -907,6 +907,7 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Guzheng: redirected return does not unlock the rest cold", MobileGuzhengReturnReplacementChecks.OnlyTheActualReturnToThePhaseOwnerUnlocksTheRestCold),
     ("Native draw amount: boundary Yingzi applies only to actual Draw phases cold", NativeDrawAttemptChecks.BoundaryYingziAddsOnlyToEachActualDrawPhaseCold),
     ("Mobile Li Yan: inserted Draw consumes stack before natural Draw cold", MobileLiYanDuliangDrawChecks.InsertedDrawConsumesStackBeforeNaturalDrawCold),
+    ("Anniversary Hu Che Er Fuzhong: one foreign batch adds one card to next normal Draw cold", AnniversaryHuCheErFuzhongDrawChecks.OneForeignBatchAddsOneCardToNextNormalDrawCold),
     ("OL Du Fu Ren Shunshi: paid preparation gift funds three actual phases cold", OlDuFuRenShunshiNumericChecks.PreparationGiftFundsThreeActualPhasesCold),
     ("OL Cao Xi Gangshu: draw expires on actual Draw or prior Dodge cold", OlCaoXiGangshuDrawChecks.GangshuDrawExpiresOnActualDrawOrPriorDodgeCold),
     ("Native Slash quota: OL boundary Jiangchi finite recast and directed Xianzhen expire cold", BoundaryJiangchiQuotaChecks.RecastAllowsTwoFiniteSlashUsesAndExpiresApartFromDirectedAllowanceCold),
