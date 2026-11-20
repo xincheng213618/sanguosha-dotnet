@@ -41,6 +41,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - `CoreGameEngineAssistedPhysicalCardsRuntime` still initializes fixed-target requests through 移动姜维 and 复掠. Once issued, `GetOffer` answers continuing eligibility. The cardless request menu still includes 谋 OL 小乔's material entry. Preserve actual material and distance rules as their own boundaries when replacing the remaining producer wiring. Directed rights also retain separate 郭汜 Pact and 移动惴恐 distance contributions.
 
+- Borrowed Sword checks for a currently effective physical weapon when admitting its weapon holder and again before requesting the Slash. The paired victim retains its own target and distance checks. Once the original response branch authorizes delivery, the transfer selects from the actual occupied weapon slot and settles the resulting movement.
+
 ## Response materials and action-query snapshots
 
 - `CoreNativePromptBoundaryRuntime.CreateResponseChoices` publishes the original required card kind after checking each eligible response material. Retain the chosen identity or view-as source and its private parameters on the choice. Command admission and payment recheck the current material and its exact selected source.
