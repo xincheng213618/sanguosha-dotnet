@@ -52,6 +52,8 @@ internal static class PindianModuleChecks
     {
         var registry = ContentRegistry.Build(new StandardContentPackage(), new ProgramFixturePackage(program, ShenduanTop: true));
         var game = CreateProgram(registry);
+        Require(game.GetHumanLegalActions().Single(action => action.ProgramSkillId == ProgramSkillId).MinCardCount == 1,
+            "The contest followed by a draw retains its declared selected hand card, even with an active discard alternative.");
         var hand = game.CreateSnapshot(0).Players[0].Hand[0].Id;
         Accept(game.Submit(new UseProgramSkillCommand(0, ProgramSkillId, "contest", [hand], [1],
             game.Revision, game.PendingDecision!.PromptId)));

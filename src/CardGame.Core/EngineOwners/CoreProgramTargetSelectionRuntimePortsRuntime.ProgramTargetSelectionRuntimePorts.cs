@@ -35,7 +35,7 @@ internal sealed partial class CoreProgramTargetSelectionRuntimePortsRuntime
     bool IProgramTargetFacts.IsEquipmentExchangePair(int ownerSeat, int firstSeat, int secondSeat) => _coreProgramEquipmentExchangesOperations.Value.IsProgramEquipmentExchangePair(ownerSeat, firstSeat, secondSeat);
     int IProgramTargetFacts.GetCombatDistance(int ownerSeat, int targetSeat) => _coreNativeRuleQueriesOperations.GetCombatDistance(ownerSeat, targetSeat);
     int IProgramTargetFacts.PlannedNormalDrawCount(ProgramSkillFrame frame) => _coreProgramLifecycleOperations.GetProgramPlannedNormalDrawCount(frame);
-    bool IProgramTargetFacts.IsPindianSourceSelectionInstruction(IReadOnlyList<SkillProgramEffect> instructions, int index) => CharacterLuKangWumiaoRuntime.IsWuLuKangPindianTargetInstruction(instructions, index);
+    bool IProgramTargetFacts.IsPindianSourceSelectionInstruction(IReadOnlyList<SkillProgramEffect> instructions, int index) => ProgramPindianSelectionRules.SelectsPindianOpponent(instructions, index);
     void IProgramTargetSelectionProtocols.Present(PendingDecision decision, int ownerSeat)
     {
         // Keep publication before the owner-control read, as in the original prompt boundary.

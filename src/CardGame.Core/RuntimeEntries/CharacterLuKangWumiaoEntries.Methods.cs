@@ -92,11 +92,9 @@ internal sealed partial class CharacterLuKangWumiaoEntries
     internal bool ValidWuLuKangKegou(ProgramSkillFrame f) => _resolve().ValidWuLuKangKegou(f);
     internal bool ValidWuLuKangShenduan(ProgramSkillFrame f) => _resolve().ValidWuLuKangShenduan(f);
     internal void ValidateWuLuKangKegouNative(CardUseFrame use) => _resolve().ValidateWuLuKangKegouNative(use);
-    internal bool WuLuKangActivationTargetHasPindianSource(ProgramExecutionPlan plan, CharacterState target) => _resolve().WuLuKangActivationTargetHasPindianSource(plan, target);
     internal bool WuLuKangActualEndedCutoff(WuLuKangKegouQualification q) => _resolve().WuLuKangActualEndedCutoff(q);
     internal WuLuKangPindianInput WuLuKangActualInput(ResolutionFrame parent, int seat, int id, CardLocation from, int rank, bool top) => _resolve().WuLuKangActualInput(parent, seat, id, from, rank, top);
     internal CardLocation WuLuKangAssignedLocation(ResolutionFrame parent, int seat) => _resolve().WuLuKangAssignedLocation(parent, seat);
-    internal bool WuLuKangCanOmitPindianSource(int owner, SkillProgramActivation activation) => _resolve().WuLuKangCanOmitPindianSource(owner, activation);
     internal ProgramSkillWindowContext WuLuKangContext(WuLuKangPindianFrame w, ProgramTriggerCandidate c) => _resolve().WuLuKangContext(w, c);
     internal bool WuLuKangDixianFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().WuLuKangDixianFirstChild(f, child);
     internal WuLuKangDixianGrant? WuLuKangDixianGrantFor(int actorSeat) => _resolve().WuLuKangDixianGrantFor(actorSeat);

@@ -82,13 +82,13 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
                         SkillProgramTargetKind.OtherLivingWithQinggangSword => target.Seat != owner.Seat && _coreAdvancedWeaponsOperations.HasWeaponAbility(target, CardKind.QinggangSword),
                         SkillProgramTargetKind.OtherLivingSlashable => _coreNativeEquipmentAndFactionQueriesOperations.CanUseProvidedSlashTarget(owner, target),
                         SkillProgramTargetKind.OtherLivingVirtualSlashTarget => !_coreCardUseModulesOperations.IsCardUseForbidden(owner.Seat, CardKind.Slash, CardActionType.Use) && !_coreCardUseModulesOperations.HasTurnCardTargetRestriction(owner.Seat, SkillProgramCardTargetRestriction.SelfOnly) && _coreProgramLifecycleOperations.GetProgramTargetSeats(owner.Seat, activation.TargetKind).Contains(target.Seat),
-                        SkillProgramTargetKind.AnyLivingWithHand => _characterLuKangWumiaoOperations.WuLuKangActivationTargetHasPindianSource(plan, target),
-                        SkillProgramTargetKind.OtherLivingWithHand => target.Seat != owner.Seat && _characterLuKangWumiaoOperations.WuLuKangActivationTargetHasPindianSource(plan, target),
-                        SkillProgramTargetKind.OtherLivingWuFactionWithHand => target.Seat != owner.Seat && _characterLuKangWumiaoOperations.WuLuKangActivationTargetHasPindianSource(plan, target) && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(target) == "wu",
+                        SkillProgramTargetKind.AnyLivingWithHand => HasHandOrDeclaredPindianInput(plan, target),
+                        SkillProgramTargetKind.OtherLivingWithHand => target.Seat != owner.Seat && HasHandOrDeclaredPindianInput(plan, target),
+                        SkillProgramTargetKind.OtherLivingWuFactionWithHand => target.Seat != owner.Seat && HasHandOrDeclaredPindianInput(plan, target) && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(target) == "wu",
                         SkillProgramTargetKind.OtherLivingWithHandOrEquipment => target.Seat != owner.Seat && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count + _corePhysicalOwnedCardQueriesOperations.GetEquipment(target).Count > 0,
                         SkillProgramTargetKind.OtherLivingWithDiscardableHandOrEquipment => target.Seat != owner.Seat && _coreForeignEquipmentDiscardPoliciesOperations.HasDiscardableHeBy(owner.Seat, target.Seat),
                         SkillProgramTargetKind.OtherLivingEmptyHand => target.Seat != owner.Seat && _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count == 0,
-                        SkillProgramTargetKind.OtherLivingWithHandHpGreaterThanOwner => target.Seat != owner.Seat && _characterLuKangWumiaoOperations.WuLuKangActivationTargetHasPindianSource(plan, target) && target.HasHpValue && owner.HasHpValue && target.Hp > owner.Hp,
+                        SkillProgramTargetKind.OtherLivingWithHandHpGreaterThanOwner => target.Seat != owner.Seat && HasHandOrDeclaredPindianInput(plan, target) && target.HasHpValue && owner.HasHpValue && target.Hp > owner.Hp,
                         SkillProgramTargetKind.OtherLivingAtDistanceOne => target.Seat != owner.Seat && _coreNativeRuleQueriesOperations.GetCombatDistance(owner.Seat, target.Seat) == 1,
                         SkillProgramTargetKind.AnyLiving => true,
                         SkillProgramTargetKind.AnyLivingMale => target.Gender == GeneralGender.Male,
@@ -164,7 +164,17 @@ internal sealed partial class CoreGameEngineSkillProgramsRuntime
         return _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Any(card => _coreEquipmentContentOperations.EquipmentRules.IsEquipment(card.Kind) && !occupiedSlots.Contains(_coreFieldEquipmentOperations.FieldEquipmentSlot(card)));
     }
 
-    internal int GetProgramActivationMinimumCards(int ownerSeat, string skillId, SkillProgramActivation activation) => _characterLuKangWumiaoOperations.WuLuKangCanOmitPindianSource(ownerSeat, activation) ? 0 : activation.CardCountExpression switch
+    private bool HasHandOrDeclaredPindianInput(ProgramExecutionPlan plan, CharacterState target) =>
+        _corePhysicalOwnedCardQueriesOperations.GetHand(target).Count > 0 ||
+        (plan.Features.HasOperation(SkillProgramEffectOp.Pindian) ||
+         plan.Features.HasOperation(SkillProgramEffectOp.StartPindian) ||
+         plan.Features.HasOperation(SkillProgramEffectOp.StartSimultaneousPindian) ||
+         plan.Features.HasOperation(SkillProgramEffectOp.ResolveYouqueMinimumBaitPindian)) &&
+        _pindianPolicyQueries.CanDiscardForPindian(target.Seat);
+
+    internal int GetProgramActivationMinimumCards(int ownerSeat, string skillId, SkillProgramActivation activation) =>
+        ProgramPindianSelectionRules.UsesSelectedHandSource(activation) && _pindianPolicyQueries.CanDiscardForPindian(ownerSeat)
+            ? 0 : activation.CardCountExpression switch
     {
         null => activation.MinCards,
         SkillProgramCardCountExpression.NextPhaseActivationOrdinal => checked(_coreGameEngineSkillProgramsProgramContributionUsesProgramPhaseUsesProgramUsesAccess._programPhaseUses.GetValueOrDefault((ownerSeat, skillId, activation.UsageGroup)) + 1),

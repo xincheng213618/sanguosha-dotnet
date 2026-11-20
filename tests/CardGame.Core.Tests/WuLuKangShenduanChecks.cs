@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.Campaigns;
 using static BoundaryLiDianChecks;
 
 internal static class WuLuKangShenduanChecks
@@ -68,6 +69,91 @@ internal static class WuLuKangShenduanChecks
                 entry.Sequence < bottom.Sequence && bottom.Sequence < draw.Sequence &&
                 run.CreateCardZoneDiagnostics().Single(card => card.CardId == entry.CardId) is { Location.Zone: CardZoneKind.DrawPile, ZoneIndex: 0 },
                 "Shenduan puts the actual winning entry at the bottom once, before the King participant's native draw.");
+        }
+    }
+
+    internal static void EmptyHandTianyiPaysActualEquipmentForMaximumCold()
+    {
+        var content = ContentRegistry.Build(new StandardContentPackage(), new EquipmentFixture());
+        var unavailable = Start(null);
+        var revision = unavailable.Revision;
+        Require(!unavailable.GetHumanLegalActions().Any(action => action.SkillId == EquipmentFixture.Tianyi) &&
+            !unavailable.Submit(new UseProgramSkillCommand(0, EquipmentFixture.Tianyi, "contest", [], [1], revision, P(unavailable)!.PromptId)).Accepted &&
+            unavailable.Revision == revision, "The same empty hand without equipment cannot advertise or accept an empty contest selection.");
+
+        var game = Start(new(CardKind.Crossbow, Suit.Club, 8));
+        var owner = game.CreateSnapshot(0).Players[0];
+        var equipment = owner.Equipment.Single().Id;
+        var action = game.GetHumanLegalActions().Single(item => item.SkillId == EquipmentFixture.Tianyi);
+        var target = action.SelectableTargetSeats.Single();
+        Require(owner.HandCount == 0 && action.MinCardCount == 0 && action.SelectableCardIds.Count == 0 &&
+            game.CreateSnapshot(0).Players[target].GeneralId == Generals[1],
+            "Tianyi advertises the native empty selection while actual equipment can pay Shenduan.");
+        Accept(game, new UseProgramSkillCommand(0, EquipmentFixture.Tianyi, "contest", [], [target], game.Revision, P(game)!.PromptId));
+        var native = game.ResolutionStack.OfType<PindianFrame>().Single();
+        var admission = game.Events.Select(item => item.Payload).OfType<WuLuKangPindianSelectionAdmittedEvent>().Single().Admission;
+        Require(native is { SourceSeat: 0, SourceCardId: 0, PindianStep: PindianStep.ChooseOpponentCard } && native.OpponentSeat == target &&
+            admission.FrameId == native.ParentFrameId && admission.ProgramSource is { SkillId: EquipmentFixture.Tianyi, BindingId: "contest" } &&
+            admission.CapabilitySource is { SkillId: Shenduan, BindingId: "maximum-deck-source" } &&
+            game.CreateCardZoneDiagnostics().Single(card => card.CardId == equipment).Location == CardLocation.Equipment(0),
+            "The original activation admits its own Shenduan instance without paying equipment before the private contest.");
+        Accept(game, new AdvanceOneStepCommand(game.Revision));
+        Reach(game, prompt => prompt is { PlayerSeat: 0, SkillPrompt.SkillId: Shenduan });
+        Require(P(game)!.Choices.Where(choice => choice.Parameters.GetValueOrDefault("branch") == "discard")
+            .Single().Cards.SequenceEqual([equipment]), "The private payment offers only the original equipment entity.");
+
+        ReplayFourViews(game, content);
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), content);
+        Answer(game, choice => choice.Parameters.GetValueOrDefault("branch") == "discard" && choice.Cards.SequenceEqual([equipment]));
+        Settle(game);
+        var paid = game.Events.Select(item => item.Payload).OfType<WuLuKangShenduanDiscardPaidEvent>().Single();
+        var result = game.Events.Select(item => item.Payload).OfType<PindianResultDeterminedEvent>().Single();
+        var maximum = game.CardMovements.Single(move => move.Reason.Value == "skill-program.wu-lu-kang.shenduan.reserve");
+        Require(paid.ContestId == native.Id && paid.CardId == equipment && paid.From == CardLocation.Equipment(0) &&
+            paid.To == CardLocation.DiscardPile && paid.Sequence < maximum.Sequence && result.FrameId == native.Id &&
+            result.Result is { SourceRank: 13, OpponentRank: 7, SourceWon: true } &&
+            result.Result.SourceCardId == maximum.CardId && maximum.From == CardLocation.DrawPile && maximum.To == CardLocation.Processing &&
+            game.CardMovements.Count(move => move.CardId == equipment && move.From == CardLocation.Equipment(0)) == 1,
+            "Returning the original prompt pays the actual equipment once and uses the original contest's maximum deck entity.");
+
+        GameEngine Start(ShanheStartingCard? equipmentCard)
+        {
+            var setup = new ShanheBattleSetup(7, 1, "shenduan-equipment", EquipmentFixture.Owner, 4, 0, 0, 0, 0, [], [],
+                equipmentCard is { } card ? [card] : [],
+                [new(Generals[1]) { StartingHand = [new(CardKind.Dodge, Suit.Spade, 7)] }, new(Generals[2]) { StartingHand = [] }],
+                [new(Generals[3]) { StartingHand = [] }], new string('d', 64));
+            var match = GameEngine.CreateStandard(new GameOptions
+            {
+                Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
+                HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,
+                UseInteractiveSetup = false, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false, MaxTurns = 4
+            }, content);
+            Accept(match, new StartGameCommand());
+            Settle(match);
+            return match;
+        }
+    }
+
+    private sealed class EquipmentFixture : IGameContentPackage
+    {
+        internal const string Owner = "fixture:shenduan-equipment-owner", Tianyi = "classic:tianyi";
+        private const string EquipmentDeck = "fixture:shenduan-equipment-deck";
+        public PackageManifest Manifest { get; } = new("fixture-shenduan-equipment", new(1, 0));
+
+        public void Register(IContentRegistryBuilder builder)
+        {
+            CharacterFixtureContent.Register(builder, "wumiao:lu-kang", "classic:taishi-ci");
+            builder.AddGeneral(new(Owner, "审断只付装备", "supporter", Tianyi, "wu", 4, [Shenduan]));
+            foreach (var id in Generals.Skip(1))
+                builder.AddGeneral(new(id, "固定同桌", "supporter", "standard:none", "wei", 10));
+            builder.AddDeck(new(EquipmentDeck, "固定十三点", 0, 0, [])
+            {
+                PhysicalCards = Enumerable.Range(0, 40)
+                    .Select(_ => new ContentDeckPhysicalCard("standard:dodge", Suit.Heart, 13)).ToArray()
+            });
+            builder.AddMode(new(ShanheBattleSetup.BattleModeId, "实际空手审断", 4, 4, new Dictionary<string, int>(), EquipmentDeck,
+                GeneralPoolIds: [Owner, .. Generals.Skip(1)], ModeKind: ContentModeKind.Team,
+                TeamCounts: new Dictionary<string, int> { [ShanheBattleSetup.PlayerTeamId] = 2, [ShanheBattleSetup.EnemyTeamId] = 2 }));
         }
     }
 
