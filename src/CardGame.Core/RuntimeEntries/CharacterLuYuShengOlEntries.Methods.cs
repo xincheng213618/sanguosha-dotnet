@@ -25,7 +25,6 @@ internal sealed partial class CharacterLuYuShengOlEntries
     internal bool LuYuShengFirstDamage(int seat) => _resolve().LuYuShengFirstDamage(seat);
     internal ProgramSkillFrame? LuYuShengObserverRoot() => _resolve().LuYuShengObserverRoot();
     internal bool LuYuShengParent(ProgramTriggerCandidate candidate, ProgramSkillWindowContext c) => _resolve().LuYuShengParent(candidate, c);
-    internal int LuYuShengRunweiHandLimitBonus(int actorSeat) => _resolve().LuYuShengRunweiHandLimitBonus(actorSeat);
     internal bool LuYuShengSilverLion(ProgramSkillFrame f) => _resolve().LuYuShengSilverLion(f);
     internal CardConversionSource LuYuShengSource(ProgramSkillFrame f) => _resolve().LuYuShengSource(f);
     internal void ObserveLuYuShengDamageTransfer(IGameEvent payload) => _resolve().ObserveLuYuShengDamageTransfer(payload);

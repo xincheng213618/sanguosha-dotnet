@@ -11,5 +11,17 @@ internal sealed partial class CharacterLuYuShengOlRuntime
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new LuYuShengRunweiPhaseIssuedEvent(f.Id, r.Source, p, delta));
     }
 
-    internal int LuYuShengRunweiHandLimitBonus(int actorSeat) => _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase == TurnPhase.Discard && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Discard } p && p.ActorSeat == actorSeat ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LuYuShengRunweiPhaseIssuedEvent>().Where(e => e.Phase == p).Sum(e => e.Delta) : 0;
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 135)]
+    internal void AddRunweiHandLimitContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        if (query != SkillRuleQuery.HandLimit || _coreActualTurnProgressCurrentSeatPhaseTurnNumberTurnProgressionAccess._phase != TurnPhase.Discard ||
+            _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase() is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase ||
+            phase.ActorSeat != seat)
+            return;
+
+        var adjustment = _coreProgramEventHistoryOperations.Value.ProgramEventHistory<LuYuShengRunweiPhaseIssuedEvent>()
+            .Where(grant => grant.Phase == phase)
+            .Sum(grant => grant.Delta);
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{seat}:lu-yu-sheng:runwei:hand-limit", adjustment);
+    }
 }
