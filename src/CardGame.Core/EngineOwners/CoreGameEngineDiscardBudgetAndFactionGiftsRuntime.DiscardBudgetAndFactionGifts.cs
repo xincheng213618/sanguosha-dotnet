@@ -258,16 +258,28 @@ internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsRuntime
             _coreRuntimeOperations.AdvanceRuntimeProgram(f.Id);
     }
 
-    internal CardActionContext FactionGiftAction(ProgramSkillFrame f) => f.WindowContext is { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } use } ? _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(w => w.Id == f.WindowContext.ParentFrameId && w.Action.ActionId == use.CardActionId).Action : throw new InvalidOperationException("Faction gift lost its actual completed action.");
+    private ProgramCardTriggerWindowFrame FactionGiftWindow(ProgramSkillFrame frame) =>
+        frame.WindowContext is { Window: SkillProgramTriggerWindow.CardUseCompleted, CardUse: { } use } context
+            ? _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().Single(window =>
+                window.Id == context.ParentFrameId && window.ParentFrameId == use.ParentCardUseFrameId &&
+                window.Action.ActionId == use.CardActionId)
+            : throw new InvalidOperationException("Faction gift lost its actual completed action.");
+
     internal string? CompletedFactionGiftFaction(ProgramSkillFrame f) => ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect.ProviderFactionId;
-    internal bool CompletedFactionGiftLive(ProgramSkillFrame f, ProgramCompletedFactionGiftDraft d) => BudgetGiftSourceValid(f) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId, Role.Lord) && _coreMatchParticipantsPlayersAccess._players[d.ProviderSeat].IsAlive && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[d.ProviderSeat]) == CompletedFactionGiftFaction(f) && d.ProviderSeat != f.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == d.ProviderSeat && d.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && FactionGiftAction(f)is { Type: CardActionType.Use } action && action.ActionId == d.ActionId && action.ActorSeat == d.ProviderSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind);
-    internal int[] AvailableFactionGiftCosts(CardActionContext a) => a.PhysicalCards.Where(p => _cardZonesOperations._cardZones.GetLocation(p.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile).Select(p => p.CardId).ToArray();
+    internal bool CompletedFactionGiftLive(ProgramSkillFrame f, ProgramCompletedFactionGiftDraft d) => BudgetGiftSourceValid(f) && _coreLordSkillProjectionsOperations.HasSkillRoleQualification(_coreMatchParticipantsPlayersAccess._players[f.OwnerSeat], f.SkillId, f.SkillInstanceId, Role.Lord) && _coreMatchParticipantsPlayersAccess._players[d.ProviderSeat].IsAlive && _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[d.ProviderSeat]) == CompletedFactionGiftFaction(f) && d.ProviderSeat != f.OwnerSeat && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._currentSeat == d.ProviderSeat && d.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId && FactionGiftWindow(f).Action is { Type: CardActionType.Use } action && action.ActionId == d.ActionId && action.ActorSeat == d.ProviderSeat && CoreNativeCardClassificationsRuntime.IsSlashCard(action.EffectiveKind);
+
+    private int[] AvailableFactionGiftCosts(ProgramCardTriggerWindowFrame window) => window.Action.PhysicalCards
+        .Where(material => (_cardZonesOperations._cardZones.GetLocation(material.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile) &&
+            !_nativeMaterialClaims.HasRelinquishedMaterial(window.ParentFrameId, material.CardId))
+        .Select(material => material.CardId).ToArray();
+
     internal bool FactionGiftUsed(int provider) => _corePlayCardHistoryOperations.EventsSinceLastBoundary(e => e is PhaseChangedEvent or TurnStartedEvent).OfType<CompletedFactionCostGiftedEvent>().Any(e => e.ProviderSeat == provider && e.TurnNumber == _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber && e.PhaseInstanceId == _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId);
     internal SkillProgramStepOutcome BeginCompletedFactionGift(ProgramSkillFrame f, string faction)
     {
-        var action = FactionGiftAction(f);
+        var window = FactionGiftWindow(f);
+        var action = window.Action;
         var provider = _coreMatchParticipantsPlayersAccess._players[action.ActorSeat];
-        var ids = AvailableFactionGiftCosts(action);
+        var ids = AvailableFactionGiftCosts(window);
         var d = new ProgramCompletedFactionGiftDraft(action.ActionId, provider.Seat, _coreGameEngineCardUseDebitsCardUseDebitPhaseInstanceIdAccess._cardUseDebitPhaseInstanceId, ids);
         if (!CompletedFactionGiftLive(f, d) || _coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(provider) != faction || FactionGiftUsed(provider.Seat) || ids.Length == 0)
             return SkillProgramStepOutcome.Continue;
@@ -319,7 +331,7 @@ internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsRuntime
         }
 
         var effect = ProgramInstructionResolver.Default.Resolve(f, _contentRegistryOperations._contentRegistry.GetSkill(f.SkillId).Program!).GetPausedInstruction(f.InstructionIndex).Effect;
-        if (_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[d.ProviderSeat]) != effect.ProviderFactionId || FactionGiftUsed(d.ProviderSeat) || !AvailableFactionGiftCosts(FactionGiftAction(f)).SequenceEqual(d.CardIds))
+        if (_coreMatchSetupDefinitionsOperations.GetEffectiveFactionId(_coreMatchParticipantsPlayersAccess._players[d.ProviderSeat]) != effect.ProviderFactionId || FactionGiftUsed(d.ProviderSeat) || !AvailableFactionGiftCosts(FactionGiftWindow(f)).SequenceEqual(d.CardIds))
             throw new InvalidOperationException("Faction gift lost its exact phase, physical costs or faction.");
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CompletedFactionCostGiftedEvent(f.Id, d.ActionId, d.ProviderSeat, f.OwnerSeat, f.SkillId, f.SkillInstanceId, _coreActualTurnProgressCurrentSeatPhaseTurnNumberAccess._turnNumber, d.PhaseInstanceId, d.CardIds));
         f = f with

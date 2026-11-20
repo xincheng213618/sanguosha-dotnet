@@ -40,10 +40,7 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         var response = accepted.Action;
         if (response.Type != CardActionType.Response || response.PhysicalCards.Count == 0)
             return;
-        var content = _contentRegistryOperations._contentRegistry;
-        if (!content.ProgramDependencies.GetTriggerOperationSkillIds(SkillProgramEffectOp.ExchangeRespondedCardEntities).Any(skill =>
-                content.GetSkill(skill).Program!.Triggers.Any(trigger => trigger.Effects.Any(effect =>
-                    effect.Op == SkillProgramEffectOp.ExchangeRespondedCardEntities && effect.ResponseExchangeMode is null))))
+        if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ExchangeRespondedCardEntities))
             return;
 
         var parent = response.EffectiveKind == CardKind.Nullification
@@ -100,6 +97,9 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         effect.ResponseExchangeMode != ProgramResponseExchangeMode.ClaimResponseOnly &&
         !ResponseExchangeUpgraded(owner, skill, instance, effect.StateId!);
 
+    private static bool RequiresAcceptedResponseEntries(SkillProgramEffect effect, bool deliversOriginal) =>
+        effect.ResponseExchangeMode == ProgramResponseExchangeMode.ClaimResponseOnly || deliversOriginal;
+
     internal CardActionContext? ActualRespondedAction(CardActionContext response)
     {
         if (response.Type != CardActionType.Response)
@@ -129,12 +129,13 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         var effect = trigger.Effects.FirstOrDefault(e => e.Op == SkillProgramEffectOp.ExchangeRespondedCardEntities);
         if (effect is null)
             return true;
-        var response = ResponseExchangeHistory().OfType<CardActionAcceptedEvent>().Select(e => e.Action).LastOrDefault(a => a.ActionId == context.CardUse?.CardActionId);
-        if (response is null || !CanExchangeResponseEntities(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, effect, response))
+        if (_resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(frame => frame.Id == context.ParentFrameId) is not { } window ||
+            window.Action.ActionId != context.CardUse?.CardActionId ||
+            !CanExchangeResponseEntities(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, effect, window.Action))
             return false;
-        return !DeliversOriginalResponseExchangeCard(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, effect) ||
-            _resolutionStackOperations._resolutionStack.OfType<ProgramCardTriggerWindowFrame>().SingleOrDefault(frame => frame.Id == context.ParentFrameId) is { } window &&
-                CurrentAcceptedResponseEntries(window).Count == response.PhysicalCards.Count;
+        var deliversOriginal = DeliversOriginalResponseExchangeCard(candidate.OwnerSeat, candidate.SkillId, candidate.SkillInstanceId, effect);
+        return !RequiresAcceptedResponseEntries(effect, deliversOriginal) ||
+            CurrentAcceptedResponseEntries(window).Count == window.Action.PhysicalCards.Count;
     }
 
     internal SkillProgramStepOutcome BeginResponseEntityExchange(ProgramSkillFrame frame, SkillProgramEffect effect)
@@ -144,9 +145,9 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
         var original = ActualRespondedAction(response);
         if (original is null || !CanExchangeResponseEntities(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, effect, response))
             return SkillProgramStepOutcome.Continue;
-        var originals = DeliversOriginalResponseExchangeCard(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, effect)
-            ? original.PhysicalCards.Select(c => c.CardId).ToArray() : [];
-        var entries = originals.Length == 0 ? null : CurrentAcceptedResponseEntries(window);
+        var deliversOriginal = DeliversOriginalResponseExchangeCard(frame.OwnerSeat, frame.SkillId, frame.SkillInstanceId, effect);
+        var originals = deliversOriginal ? original.PhysicalCards.Select(c => c.CardId).ToArray() : [];
+        var entries = RequiresAcceptedResponseEntries(effect, deliversOriginal) ? CurrentAcceptedResponseEntries(window) : null;
         if (entries is not null && entries.Count != response.PhysicalCards.Count)
             return SkillProgramStepOutcome.Continue;
         _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with
@@ -257,7 +258,7 @@ internal sealed partial class CoreGameEngineResponseEntityExchangeRuntime
                 _coreRuntimeOperations.ReplaceRuntimeTop(frame = frame with { ResponseEntityExchange = exchange with { Stage = 2 } });
                 if (_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat].IsAlive)
                 {
-                    var current = exchange.OriginalCardIds.Count == 0
+                    var current = exchange.ResponseEntries is null && exchange.OriginalCardIds.Count == 0
                         ? exchange.ResponseCardIds.Where(id => _cardZonesOperations._cardZones.GetLocation(id).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile)
                         : (exchange.ResponseEntries ?? []).Where(IsCurrentResponseEntry).Select(entry => entry.CardId);
                     ClaimResponseEntities(frame, exchange.ResponseActionId, frame.OwnerSeat,

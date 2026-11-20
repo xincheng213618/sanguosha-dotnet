@@ -825,6 +825,10 @@ var tests = new (string Name, Action Body)[]
     ("Classic Shenduan: only the original black basic discard can become Supply Shortage cold", ClassicShenduanDiscardEntryChecks.ShenduanOnlyUsesItsOriginalBlackBasicDiscardCold),
     ("Classic Zhongyong: original response Dodge discard entry cold", ClassicZhouCangZhongyongDiscardEntryChecks.ZhongyongCannotGiftANewerEntryOfTheOriginalDodgeCold),
     ("Classic Funan: original counterspell discard entry", ClassicFunanDiscardEntryChecks.FunanCannotClaimARediscardedCounterspellFromItsOldResponse),
+    ("Classic Lijun: the old Slash cannot gift a rediscarded material cold", ClassicLijunDiscardEntryChecks.LijunCannotGiftTheRediscardedMaterialOfTheOldSlashCold),
+    ("Classic Xingshang: original death cleanup entries cold", ClassicCaoPiXingshangDiscardEntryChecks.XingshangClaimsUntouchedDeathEquipmentButCannotClaimTheRedroppedHandCardCold),
+    ("Mobile Funan: original accepted counterspell entry", MobileFunanDiscardEntryChecks.FunanCannotClaimARediscardedCounterspellAfterAnEarlierAcceptedCandidate),
+    ("Classic Zhongyong: the original Slash cannot be gifted after delivery and rediscard cold", ClassicZhongyongOriginalSlashChecks.ZhongyongCannotGiftTheRediscardedOriginalSlashCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

@@ -48,6 +48,8 @@ dependency direction in the rest of native card-use scheduling.
 
 - Whole discard-phase settlement reads genuine discards from the actual phase's starting movement sequence through the original physical journal. Freeze eligible discard-pile entries on the issuing program frame. Recheck the original entry when moving a card. Returning a card to a player settles its child windows before a later decision claims the remaining entries.
 
+- A death cleanup claim reads the actual discard entries on the original DeathFrame. An optional source-zone filter applies to those movements. A later entry of the same card cannot restore eligibility for the original death claim.
+
 - Discard and judgment provenance claims use the original movement entry at collection, candidate admission and execution. Reentering the discard pile gives the physical card a new entry and ends the previous opportunity.
 
 - A delayed-trick conversion from discarded material checks the original discard entry at admission, target selection and native issuance. Once issued, the resulting use owns the material and resolves placement through the ordinary delayed-trick continuation.

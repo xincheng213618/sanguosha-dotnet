@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsEntries
 {
-    internal int[] AvailableFactionGiftCosts(CardActionContext a) => _resolve().AvailableFactionGiftCosts(a);
     internal SkillProgramStepOutcome BeginCompletedFactionGift(ProgramSkillFrame f, string faction) => _resolve().BeginCompletedFactionGift(f, faction);
     internal SkillProgramStepOutcome BeginDiscardBudget(ProgramSkillFrame f) => _resolve().BeginDiscardBudget(f);
     internal SkillProgramStepOutcome BeginOutsideRangeDiscard(ProgramSkillFrame f) => _resolve().BeginOutsideRangeDiscard(f);
@@ -12,7 +11,6 @@ internal sealed partial class CoreGameEngineDiscardBudgetAndFactionGiftsEntries
     internal string? CompletedFactionGiftFaction(ProgramSkillFrame f) => _resolve().CompletedFactionGiftFaction(f);
     internal bool CompletedFactionGiftLive(ProgramSkillFrame f, ProgramCompletedFactionGiftDraft d) => _resolve().CompletedFactionGiftLive(f, d);
     internal IReadOnlyList<PromptChoice> DiscardBudgetChoices(ProgramSkillFrame f) => _resolve().DiscardBudgetChoices(f);
-    internal CardActionContext FactionGiftAction(ProgramSkillFrame f) => _resolve().FactionGiftAction(f);
     internal bool FactionGiftUsed(int provider) => _resolve().FactionGiftUsed(provider);
     internal IReadOnlyList<PromptChoice> OutsideRangeDiscardChoices(ProgramSkillFrame f) => _resolve().OutsideRangeDiscardChoices(f);
     internal int[] OutsideRangePlayers(int owner) => _resolve().OutsideRangePlayers(owner);

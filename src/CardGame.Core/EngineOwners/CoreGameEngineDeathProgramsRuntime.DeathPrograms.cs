@@ -336,9 +336,9 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 86200, SkillProgramEffectOp.ClaimDeathCleanupCards)]
     internal bool HasInitialFilteredDeathClaimResources(ProgramTriggerLegalityContext eligibility)
     {
-        // An explicit initial source filter is also its resource prerequisite.
-        // Legacy unfiltered claims and later conditional branches keep their admission.
-        if (eligibility.Plan.Instructions.FirstOrDefault()is not { Op: SkillProgramEffectOp.ClaimDeathCleanupCards, Condition.Kind: SkillProgramConditionKind.Always } effect || effect.Zones.Count == 0)
+        // The direct claim needs at least one original entry. Later and
+        // conditional claims qualify when their instruction executes.
+        if (eligibility.Plan.Instructions.FirstOrDefault() is not { Op: SkillProgramEffectOp.ClaimDeathCleanupCards, Condition.Kind: SkillProgramConditionKind.Always } effect)
             return true;
         return FilteredDeathClaimParent(eligibility.OwnerSeat, eligibility.Context)is { } death && QueryProgramDeathCleanupCards(death, effect.Zones).Length > 0;
     }
@@ -375,7 +375,15 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
         _corePhysicalMovementFacadesOperations.MoveCards(claimable, CardLocation.DiscardPile, CardLocation.Hand(frame.OwnerSeat), reason);
     }
 
-    internal Card[] QueryProgramDeathCleanupCards(DeathFrame death, IReadOnlyList<CardZoneKind> sourceZones) => death.CleanedUpCardIds.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.DiscardPile && (sourceZones.Count == 0 || _coreCardMovementJournalCardMovementsAccess._cardMovements.LastOrDefault(m => m.CardId == id)is { } movement && movement.From.OwnerSeat == death.VictimSeat && sourceZones.Contains(movement.From.Zone) && movement.To == CardLocation.DiscardPile && (movement.From.Zone == CardZoneKind.Equipment ? movement.Reason == CardMoveReasons.DeathEquipmentDiscard : movement.From.Zone is CardZoneKind.Hand or CardZoneKind.Judgment && movement.Reason == CardMoveReasons.DeathDiscard))).Select(id => _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(c => c.Id == id)).ToArray();
+    internal Card[] QueryProgramDeathCleanupCards(DeathFrame death, IReadOnlyList<CardZoneKind> sourceZones) =>
+        (death.NativeCleanupDiscardEntries ?? []).Where(movement =>
+            (sourceZones.Count == 0 || movement.From.OwnerSeat == death.VictimSeat && sourceZones.Contains(movement.From.Zone) &&
+                (movement.From.Zone == CardZoneKind.Equipment ? movement.Reason == CardMoveReasons.DeathEquipmentDiscard :
+                    movement.From.Zone is CardZoneKind.Hand or CardZoneKind.Judgment && movement.Reason == CardMoveReasons.DeathDiscard)) &&
+            _zoneEntries.CurrentEntry(CardLocation.DiscardPile, movement.CardId) == movement.Sequence)
+            .Select(movement => _cardZonesOperations._cardZones.CardsAt(CardLocation.DiscardPile).Single(card => card.Id == movement.CardId))
+            .ToArray();
+
     internal void ClearAttributedMarkerSources(CharacterState owner, long resolutionId)
     {
         foreach (var player in _coreMatchParticipantsPlayersAccess._players)
@@ -408,6 +416,19 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
         }
     }
 
+    [ProgramPipelineHook(ProgramPipelinePhase.ObserveCommittedMovement, 310)]
+    internal void RecordNativeDeathCleanupMovement(CardMovementBatchBuilder batch, CardMovementRecord movement)
+    {
+        if (batch.ParentFrameId is not { } parentId ||
+            _resolutionStackOperations._resolutionStack.OfType<DeathFrame>().LastOrDefault(frame => frame.Id == parentId)
+                is not { PendingNativeCleanup: { } cleanup } death || batch.ParentBatchId != cleanup.ParentBatchId)
+            return;
+        UpdateDeathFrame(death.Id, frame => frame with
+        {
+            PendingNativeCleanup = cleanup with { Movements = Array.AsReadOnly(cleanup.Movements.Append(movement).ToArray()) }
+        });
+    }
+
     internal void ContinuePlayerDeathCleanup(long deathFrameId)
     {
         var death = GetCurrentDeathFrame(deathFrameId);
@@ -415,6 +436,7 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
         var killer = death.KillerSeat is { } killerSeat ? _coreMatchParticipantsPlayersAccess._players[killerSeat] : null;
         try
         {
+            UpdateDeathFrame(deathFrameId, frame => frame with { PendingNativeCleanup = new(_movementBatches.ActiveBatchId, []) });
             var deathCleanupCardIds = new List<int>();
             void MoveDiedCards(IEnumerable<Card> cards, CardLocation from, CardMoveReason reason)
             {
@@ -449,7 +471,20 @@ internal sealed partial class CoreGameEngineDeathProgramsRuntime
             deathCleanupCardIds.AddRange(_characterHuangQuanMobileShiOperations.DiscardShiQuanHolderDeathPiles(_resolutionStackOperations._resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
             deathCleanupCardIds.AddRange(_characterZhouFeiBoundaryMobileOperations.DiscardBoundaryZhouFeiHolderDeathPiles(_resolutionStackOperations._resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
             deathCleanupCardIds.AddRange(_characterSunQuanAnniversaryGodOperations.DiscardAnniversarySunQuanMingOnDeath(_resolutionStackOperations._resolutionStack.OfType<DeathFrame>().Single(frame => frame.Id == deathFrameId)));
-            UpdateDeathFrame(deathFrameId, frame => frame with { CleanedUpCardIds = deathCleanupCardIds });
+            var cleanup = GetCurrentDeathFrame(deathFrameId).PendingNativeCleanup ??
+                throw new InvalidOperationException("Death cleanup lost its own committed physical entries.");
+            // Keep the existing ordered cleanup list for death facts. Some requested
+            // departures go elsewhere, and only the first actual movement is the cleanup.
+            var departures = cleanup.Movements.GroupBy(movement => movement.CardId)
+                .ToDictionary(group => group.Key, group => group.First());
+            var discardEntries = deathCleanupCardIds.Distinct().Select(id => departures.GetValueOrDefault(id))
+                .OfType<CardMovementRecord>().Where(movement => movement.To == CardLocation.DiscardPile).ToArray();
+            UpdateDeathFrame(deathFrameId, frame => frame with
+            {
+                CleanedUpCardIds = deathCleanupCardIds,
+                PendingNativeCleanup = null,
+                NativeCleanupDiscardEntries = discardEntries.Length == 0 ? null : Array.AsReadOnly(discardEntries)
+            });
             _coreMatchLogOperations.AddLog("PlayerDied", _coreNativeDamageHandlesOperations.Value.IsNationalWarMode ? $"{(victim.Name)} 阵亡，属于{(CoreMatchPresentationRuntime.GetFactionName(victim.NationalFactionId!))}势力。" : $"{(victim.Name)} 阵亡，身份是【{(_coreMatchPresentationOperations.GetRoleName(victim.Role))}】。", killer?.Seat, victim.Seat);
             _coreConvertingGiftsOperations.MarkConvertingGiftExactDeath(deathFrameId, victim.Seat);
             _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new PlayerDiedEvent(victim.Seat, killer?.Seat));

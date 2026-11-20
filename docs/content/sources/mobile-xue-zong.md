@@ -19,7 +19,7 @@
 
 ## 生产契约
 
-- `exchangeRespondedCardEntities.responseExchangeMode=claimResponseOnly`只改变原牌交付策略。仍要求真实直接被响应动作由技能所有者使用、响应者为他人、响应实体可在Processing/Discard被主张且未被其他主张消费。无懈链直接上一张无懈沿已有`ActualRespondedAction`解析。省略策略保持经典交换行为。
+- `exchangeRespondedCardEntities.responseExchangeMode=claimResponseOnly`省略原牌交付。真实直接被响应动作由技能所有者使用，响应者为他人。响应实体须仍在原生接受时记录的公共入区，或该次响应接续产生的原生入堆，且未被其他主张消费。无懈链直接上一张无懈沿已有`ActualRespondedAction`解析。省略策略保持经典交换行为。
 - `drawPublicSuitThenEscalatingDiscard.publicSuitDiscardMode=chooseSuitCappedCurrentCountRetain`是固定的一整套重制规则；定义必须给四个真实花色。选择、摸牌数、累计弃牌数保留在同一个`ProgramPublicSuitDiscardDraft`，真实弃牌付款时冻结手牌集合，随后按原逻辑弃置及移牌子窗返回，不能在观察者回调后重新看空手牌判断升级。
 - 持久升级经`CommitProgramSkillChangeFact`，继续发原`ProgramResponseExchangeUpgradedEvent`，只修改与本诫训同一实际技能来源配对的复难实例。重复弃尽手牌不会重复升级，也不会移除诫训。
 - 取得实体再次使用的资格在原生`CardActionAcceptedEvent`边界冻结，包含实际ActionId、使用者、技能实例/内容指纹、实体ID、原取得动作及真实取得移动序号。完成时不按当前手牌、牌名或所有者布尔值猜测资格。新事件均为标量，不新增集合事件投影。

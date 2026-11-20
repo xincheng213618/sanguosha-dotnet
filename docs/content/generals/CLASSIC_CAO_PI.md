@@ -4,7 +4,7 @@
 
 ## 行殇
 
-`classic:xingshang` 在 `characterDied` 窗口提供可选触发。死亡帧保留此次清理的实体牌 ID，`claimDeathCleanupCards` 取得其中仍在弃牌堆的牌并移入曹丕手牌；已经移走的牌不会重复取得。无可取得牌时不产生空效果选择，曹丕自己的死亡不能作为自己的行殇对象。
+`classic:xingshang` 在 `characterDied` 窗口提供可选触发。死亡帧保留此次清理实际进入弃牌堆的移动记录。`claimDeathCleanupCards` 将仍处于原入堆位置的实体移入曹丕手牌。同一实体离开弃牌堆后再次进入时，原死亡结算的领取机会已经结束。无可取得牌时不产生空效果选择，曹丕自己的死亡不能作为自己的行殇对象。
 
 行殇复用死亡流程的清理结果与父子续接，死亡奖惩和胜负继续由统一死亡结算负责。实现入口是 `GameEngine.DeathPrograms.ClaimProgramDeathCleanupCards`。
 

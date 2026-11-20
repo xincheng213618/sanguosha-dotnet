@@ -19,7 +19,8 @@ internal sealed partial class CoreGameEngineCompletedCardGiftsRuntime
         var action = use.Action!;
         var sources = new List<CardActionContext>();
         if (action.PhysicalCards.Count > 0 && action.PhysicalCards.All(cost =>
-                _cardZonesOperations._cardZones.GetLocation(cost.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile))
+                (_cardZonesOperations._cardZones.GetLocation(cost.CardId).Zone is CardZoneKind.Processing or CardZoneKind.DiscardPile) &&
+                !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, cost.CardId)))
             sources.Add(action);
 
         foreach (var response in use.NativeDodgeResponses ?? [])
