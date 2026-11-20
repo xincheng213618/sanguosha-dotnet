@@ -3,12 +3,23 @@
 namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
 {
+    internal static bool IsDeckTopJudgmentReplacement(SkillProgramTrigger trigger) =>
+        trigger.Effects is [{ Op: SkillProgramEffectOp.ReplaceJudgment, Zones: [CardZoneKind.DrawPile] }];
+
+    private bool HasDeckTopJudgmentReplacementMaterial() =>
+        _cardZonesOperations._cardZones.Count(CardLocation.DrawPile) + _cardZonesOperations._cardZones.Count(CardLocation.DiscardPile) > 0;
+
+    internal bool CanCollectProgramJudgmentReplacement(CharacterState owner, SkillProgramTrigger trigger, int targetSeat, string reason) =>
+        MatchesProgramJudgmentReplacement(owner, trigger, targetSeat, reason) &&
+        (IsDeckTopJudgmentReplacement(trigger) ? HasDeckTopJudgmentReplacementMaterial() :
+            GetProgramJudgmentReplacementCards(owner, trigger, targetSeat, reason, ignoreCurrentColor: true).Count > 0);
+
     internal bool MatchesProgramJudgmentReplacement(CharacterState owner, SkillProgramTrigger trigger, int targetSeat, string reason) => trigger.Window == SkillProgramTriggerWindow.JudgmentReplacing && CoreGameEngineProgramMarkerPaymentsRuntime.CanPayProgramMarkerCost(owner, trigger.MarkerCost) && (trigger.Subject == SkillProgramTriggerSubject.Any || owner.Seat == targetSeat) && !trigger.ExcludedReasons.Contains(reason, StringComparer.Ordinal) && trigger.Effects[0].Condition.Evaluate(_coreNativeSkillContextQueriesOperations.CreateSkillContext(owner));
     internal IReadOnlyList<Card> GetProgramJudgmentReplacementCards(CharacterState owner, SkillProgramTrigger trigger, int judgmentSubjectSeat, string judgmentReason, bool ignoreCurrentColor = false)
     {
         if (trigger.Effects is [{ Op: SkillProgramEffectOp.ReplaceJudgmentFromPublicRice }])
             return _coreRiceJudgmentOperations.Value.RiceJudgmentReplacementCards(owner, trigger);
-        if (CharacterWangYiMobileRuntime.IsDeckTopJudgmentReplacement(trigger))
+        if (IsDeckTopJudgmentReplacement(trigger))
             return _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).TakeLast(1).ToArray();
         if (trigger.Window != SkillProgramTriggerWindow.JudgmentReplacing || trigger.Effects.Count == 0 || trigger.Effects[0] is not { Op: SkillProgramEffectOp.ReplaceJudgment or SkillProgramEffectOp.DelegateJudgmentReplacement } replacement || !replacement.Condition.Evaluate(_coreNativeSkillContextQueriesOperations.CreateSkillContext(owner)))
             return[];
@@ -52,9 +63,9 @@ internal sealed partial class CoreGameEngineJudgmentReplacementProgramsRuntime
         var(program, trigger) = GetProgramJudgmentReplacement(candidate);
         var owner = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat];
         var enabled = owner.IsAlive && _coreNationalSkillsOperations.HasRuntimeSkillInstance(owner, program.Id, candidate.SkillInstanceId) && MatchesProgramJudgmentReplacement(owner, trigger, pending.TargetSeat, pending.Reason);
-        if (CharacterWangYiMobileRuntime.IsDeckTopJudgmentReplacement(trigger))
+        if (IsDeckTopJudgmentReplacement(trigger))
         {
-            if (enabled && _characterWangYiMobileOperations.Value.HasDeckTopJudgmentReplacementMaterial())
+            if (enabled && HasDeckTopJudgmentReplacementMaterial())
                 _characterWangYiMobileOperations.Value.BeginDeckTopJudgmentReplacementChoice(pending, candidate, program, trigger);
             else
                 _coreNativeJudgmentOperations.AdvanceJudgmentCandidate(pending);

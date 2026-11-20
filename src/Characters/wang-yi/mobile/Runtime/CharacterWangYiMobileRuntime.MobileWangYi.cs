@@ -11,8 +11,6 @@ internal sealed partial class CharacterWangYiMobileRuntime
         return cards.CardIds.Where(id => _cardZonesOperations._cardZones.GetLocation(id) == CardLocation.Processing).Select(id => _coreSnapshotValueProjectionOperations.ToSnapshot(_cardZonesOperations._cardZones.CardsAt(CardLocation.Processing).Single(card => card.Id == id))).ToArray();
     }
 
-    internal static bool IsDeckTopJudgmentReplacement(SkillProgramTrigger trigger) => trigger.Effects is [{ Op: SkillProgramEffectOp.ReplaceJudgment, Zones: [CardZoneKind.DrawPile] }];
-    internal bool HasDeckTopJudgmentReplacementMaterial() => _cardZonesOperations._cardZones.Count(CardLocation.DrawPile) + _cardZonesOperations._cardZones.Count(CardLocation.DiscardPile) > 0;
     internal void BeginDeckTopJudgmentReplacementChoice(JudgmentFrame pending, JudgmentTriggerCandidate candidate, SkillProgram program, SkillProgramTrigger trigger)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat];
@@ -37,12 +35,12 @@ internal sealed partial class CharacterWangYiMobileRuntime
         if (candidate is null || decision is not { Kind: DecisionKind.ProgramJudgmentReplacement, IsPrivate: true, ValidCardIds.Count: 0, ValidTargetSeats.Count: 0, Choices.Count: 2 } || decision.PlayerSeat != candidate.OwnerSeat || decision.SourceSeat != judgment.TargetSeat || decision.TargetSeat != judgment.TargetSeat)
             return false;
         var(program, trigger) = _coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacement(candidate);
-        return IsDeckTopJudgmentReplacement(trigger) && decision.SkillPrompt?.SkillId == program.Id && decision.Choices.All(choice => choice.Cards.Count == 0 && choice.Targets.Count == 0) && decision.Choices[0].Id.Value == $"program-judgment-top.{(program.Id)}.{(trigger.Id)}.activate" && decision.Choices[0].Parameters.GetValueOrDefault("action") == "program-judgment-top-replace" && decision.Choices[1].Id.Value == $"program-judgment-top.{(program.Id)}.{(trigger.Id)}.skip" && decision.Choices[1].Parameters.GetValueOrDefault("action") == "program-judgment-replace-skip";
+        return CoreGameEngineJudgmentReplacementProgramsRuntime.IsDeckTopJudgmentReplacement(trigger) && decision.SkillPrompt?.SkillId == program.Id && decision.Choices.All(choice => choice.Cards.Count == 0 && choice.Targets.Count == 0) && decision.Choices[0].Id.Value == $"program-judgment-top.{(program.Id)}.{(trigger.Id)}.activate" && decision.Choices[0].Parameters.GetValueOrDefault("action") == "program-judgment-top-replace" && decision.Choices[1].Id.Value == $"program-judgment-top.{(program.Id)}.{(trigger.Id)}.skip" && decision.Choices[1].Parameters.GetValueOrDefault("action") == "program-judgment-replace-skip";
     }
 
     internal bool TryResolveDeckTopJudgmentReplacement(PromptChoice selected, JudgmentFrame pending, JudgmentTriggerCandidate candidate, SkillProgram program, SkillProgramTrigger trigger)
     {
-        if (!IsDeckTopJudgmentReplacement(trigger) || selected.Parameters.GetValueOrDefault("action") != "program-judgment-top-replace")
+        if (!CoreGameEngineJudgmentReplacementProgramsRuntime.IsDeckTopJudgmentReplacement(trigger) || selected.Parameters.GetValueOrDefault("action") != "program-judgment-top-replace")
             return false;
         if (!IsDeckTopJudgmentReplacementPromptValid(pending, _corePendingDecisionPolicyPipelineOperations._pendingDecision) || !_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat].IsAlive || !_coreNationalSkillsOperations.HasRuntimeSkillInstance(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], program.Id, candidate.SkillInstanceId!) || !_coreJudgmentReplacementProgramsOperations.MatchesProgramJudgmentReplacement(_coreMatchParticipantsPlayersAccess._players[candidate.OwnerSeat], trigger, pending.TargetSeat, pending.Reason))
             throw new InvalidOperationException("The accepted deck-top retrial lost its original owning judgment candidate.");
@@ -63,12 +61,12 @@ internal sealed partial class CharacterWangYiMobileRuntime
     internal bool IsDeckTopJudgmentReplacementInput(JudgmentFrame judgment, CharacterState owner, Card card)
     {
         var candidate = _coreNativeJudgmentOperations.CurrentJudgmentCandidate(judgment);
-        return candidate is not null && candidate.OwnerSeat == owner.Seat && judgment.TargetSeat == owner.Seat && IsDeckTopJudgmentReplacement(_coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacement(candidate).Trigger) && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.DrawPile && _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault()?.Id == card.Id;
+        return candidate is not null && candidate.OwnerSeat == owner.Seat && judgment.TargetSeat == owner.Seat && CoreGameEngineJudgmentReplacementProgramsRuntime.IsDeckTopJudgmentReplacement(_coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacement(candidate).Trigger) && _cardZonesOperations._cardZones.GetLocation(card.Id) == CardLocation.DrawPile && _cardZonesOperations._cardZones.CardsAt(CardLocation.DrawPile).LastOrDefault()?.Id == card.Id;
     }
 
     internal bool TryResolveAiDeckTopJudgmentReplacement()
     {
-        if (_coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is not { } judgment || _coreNativeJudgmentOperations.CurrentJudgmentCandidate(judgment)is not { } candidate || !IsDeckTopJudgmentReplacement(_coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacement(candidate).Trigger))
+        if (_coreJudgmentCursorRuntimeOperations.Value.ActiveJudgment is not { } judgment || _coreNativeJudgmentOperations.CurrentJudgmentCandidate(judgment)is not { } candidate || !CoreGameEngineJudgmentReplacementProgramsRuntime.IsDeckTopJudgmentReplacement(_coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacement(candidate).Trigger))
             return false;
         var current = _coreNativeDamageHandlesOperations.Value.GetJudgmentCard(judgment)!;
         // The choice only uses the current public judgment, never the hidden

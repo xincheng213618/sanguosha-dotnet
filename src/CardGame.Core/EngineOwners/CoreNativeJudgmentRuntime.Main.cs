@@ -135,7 +135,7 @@ internal sealed partial class CoreNativeJudgmentRuntime
             {
                 var program = binding.Program;
                 var trigger = binding.Trigger;
-                if (!_coreJudgmentReplacementProgramsOperations.MatchesProgramJudgmentReplacement(owner, trigger, targetSeat, reason) || (CharacterWangYiMobileRuntime.IsDeckTopJudgmentReplacement(trigger) ? !_characterWangYiMobileOperations.Value.HasDeckTopJudgmentReplacementMaterial() : _coreJudgmentReplacementProgramsOperations.GetProgramJudgmentReplacementCards(owner, trigger, targetSeat, reason, ignoreCurrentColor: true).Count == 0))
+                if (!_coreJudgmentReplacementProgramsOperations.CanCollectProgramJudgmentReplacement(owner, trigger, targetSeat, reason))
                 {
                     continue;
                 }
