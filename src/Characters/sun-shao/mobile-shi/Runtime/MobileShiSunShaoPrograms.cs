@@ -13,7 +13,7 @@ public sealed record ShiSsZhujiEquippedEvent(long FrameId, int OwnerSeat, int Ac
 public sealed record ShiSsZhujiBonusEvent(long FrameId, int OwnerSeat, int ActualTurn, string Choice,
     int Amount) : IGameEvent;
 
-public enum ShiSsStage { GanjueMaterial = 0, GanjueIssued = 1, ZhujiAsk = 2, ZhujiHand = 3, ZhujiBonus = 4 }
+public enum ShiSsStage { GanjueMaterial = 0, GanjueIssued = 1, ZhujiAsk = 2, ZhujiHand = 3, ZhujiBonus = 4, ZhujiRecovery = 5 }
 
 public sealed record ShiSsReceipt(string Operation, int ActualTurn, ShiSsStage Stage)
 {
@@ -23,6 +23,10 @@ public sealed record ShiSsReceipt(string Operation, int ActualTurn, ShiSsStage S
     public int DamageCountBefore { get; init; }
     public int ChosenCardId { get; init; }
     public int DiscardedCount { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public long? RecoveryAttemptId { get; init; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int Recovered { get; init; }
 }
 
 public sealed partial record ProgramSkillFrame

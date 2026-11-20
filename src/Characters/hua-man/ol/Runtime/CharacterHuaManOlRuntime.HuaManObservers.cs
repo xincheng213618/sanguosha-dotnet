@@ -14,24 +14,21 @@ internal sealed partial class CharacterHuaManOlRuntime
         {
             SkillProgramEffectOp.DrawAndCountMansiActualBarbarianDamage => w.DamageFrameId is { } damage && _resolutionStackOperations._resolutionStack.OfType<DamageFrame>().SingleOrDefault(d => d.Id == damage)is { } d && d.Amount > 0 && _resolutionStackOperations._resolutionStack.OfType<DamageTriggerWindowFrame>().SingleOrDefault(f => f.ParentFrameId == damage)is { } window && _coreNativeDamageHandlesOperations.Value.GetDamageTriggerAttack(window).EffectiveCardKind == CardKind.BarbarianAssault,
             SkillProgramEffectOp.AwakenZhanyuanAndOfferXili => c.OwnerSeat == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && ((_coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].HuaManProgress?.MansiCards ?? 0) > 7 || _characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(c.OwnerSeat, c.SkillId, c.BindingId)) && _coreMatchParticipantsPlayersAccess._players[c.OwnerSeat].HuaManProgress?.Awakened != true && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Preparation } phase && phase.ActorSeat == c.OwnerSeat,
-            SkillProgramEffectOp.PaySouyingDirectionalSoleTarget => GetSouyingQualification(w) is { } q && q.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && (q.ActorSeat == c.OwnerSeat || q.TargetSeat == c.OwnerSeat) && _coreCardUseLifecycleOperations.LifecycleCardUse(q.NativeUseId)is { Action: { } a } use && a.ActorSeat == q.ActorSeat && a.ProviderSeat == q.ProviderSeat && a.EffectiveDesignatedTargetSeats.SequenceEqual([q.TargetSeat]) && (q.TargetSeat == c.OwnerSeat || a.PhysicalCards.Any(p => _cardZonesOperations._cardZones.GetLocation(p.CardId) == CardLocation.Processing && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, p.CardId))) && HasHuaManDiscard(c.OwnerSeat, includeStoredCards: false),
+            SkillProgramEffectOp.PaySouyingDirectionalSoleTarget => GetSouyingQualification(w) is { } q && q.ActualTurn == _coreActualTurnProgressCurrentSeatTurnNumberAccess._turnNumber && (q.ActorSeat == c.OwnerSeat || q.TargetSeat == c.OwnerSeat) && _coreCardUseLifecycleOperations.LifecycleCardUse(q.NativeUseId)is { Action: { } a } use && a.ActorSeat == q.ActorSeat && a.ProviderSeat == q.ProviderSeat && a.EffectiveDesignatedTargetSeats.SequenceEqual([q.TargetSeat]) && (q.TargetSeat == c.OwnerSeat || a.PhysicalCards.Any(p => _cardZonesOperations._cardZones.GetLocation(p.CardId) == CardLocation.Processing && !_nativeMaterialClaims.HasRelinquishedMaterial(use.Id, p.CardId))) && HasHuaManDiscard(c.OwnerSeat),
             SkillProgramEffectOp.PayXiliActualOtherOwnerDamage => w.SourceSeat is { } source && source != c.OwnerSeat && source == _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat && w.Amount > 0 && w.TargetSeat is { } target && HasRuntimeXili(source) && !HasRuntimeXili(target) && _coreProgramAttackAttemptOperations.CurrentDamageAttempt is { IsSourceLess: false, IsDelayedJudgmentDamage: false } attack && attack.SourceSeat == source && attack.TargetSeat == target && HasHuaManDiscard(c.OwnerSeat),
             _ => false
         };
     }
 
-    internal IEnumerable<Card> HuaManDiscardCards(int seat, bool includeStoredCards = true)
+    internal IEnumerable<Card> HuaManDiscardCards(int seat)
     {
         var owner = _coreMatchParticipantsPlayersAccess._players[seat];
-        var equipment = _corePhysicalOwnedCardQueriesOperations.GetEquipment(owner);
-        var cards = _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(equipment);
-        if (includeStoredCards && _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && equipment.Any(c => c.Kind == CardKind.WoodenOx))
-            cards = cards.Concat(_corePhysicalOwnedCardQueriesOperations.GetWoodenOxGrain(owner));
-        return cards.Where(c => !c.IsGeneralWeapon && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard));
+        return _corePhysicalOwnedCardQueriesOperations.GetHand(owner).Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(owner))
+            .Where(c => !c.IsGeneralWeapon && !_coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(seat, c, _cardZonesOperations._cardZones.GetLocation(c.Id), OwnedCardMoveIntent.Discard));
     }
 
-    internal bool HuaManDiscardLocation(int seat, CardLocation at, bool includeStoredCards = true) => at.OwnerSeat == seat && (at.Zone is CardZoneKind.Hand or CardZoneKind.Equipment || includeStoredCards && at == CardLocation.WoodenOxGrain(seat) && _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && _corePhysicalOwnedCardQueriesOperations.GetEquipment(_coreMatchParticipantsPlayersAccess._players[seat]).Any(c => c.Kind == CardKind.WoodenOx));
-    internal bool HasHuaManDiscard(int seat, bool includeStoredCards = true) => HuaManDiscardCards(seat, includeStoredCards).Any();
+    internal bool HuaManDiscardLocation(int seat, CardLocation at) => at.OwnerSeat == seat && at.Zone is CardZoneKind.Hand or CardZoneKind.Equipment;
+    internal bool HasHuaManDiscard(int seat) => HuaManDiscardCards(seat).Any();
 
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 340)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 340)]

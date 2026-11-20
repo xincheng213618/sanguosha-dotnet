@@ -70,10 +70,7 @@ internal sealed partial class CharacterHuaManOlRuntime
             return Array.AsReadOnly(_coreMatchParticipantsPlayersAccess._players.Where(p => p.IsAlive && p.Seat != f.OwnerSeat && p.Gender == GeneralGender.Male).Select(p => new PromptChoice(new($"huaman.{(f.Id)}.male.{(p.Seat)}"), p.Name, [], [p.Seat], new Dictionary<string, string> { { "program-action", "huaman" }, { "branch", "male" } })).Append(new(new($"huaman.{(f.Id)}.cancel"), "不选择男性角色", [], [], new Dictionary<string, string> { { "program-action", "huaman" }, { "branch", "cancel" } })).ToArray());
         if (r.Stage != HuaManStage.DiscardChoice)
             return[];
-        var payments = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard, canSelect: (_, c) => !c.IsGeneralWeapon).ToList();
-        if (r.Souying is null)
-            foreach (var card in HuaManDiscardCards(f.OwnerSeat).Where(c => _cardZonesOperations._cardZones.GetLocation(c.Id) == CardLocation.WoodenOxGrain(f.OwnerSeat)))
-                payments.Add(new(new($"huaman.{(f.Id)}.grain.{(card.Id)}"), $"弃置【{(card.DisplayName)}】", [card.Id], [], new Dictionary<string, string> { { "source-zone", CardZoneKind.WoodenOxGrain.ToString() }, { "frame-id", f.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) } }));
+        var payments = _coreProgramCardPaymentsOperations.BuildOwnedCardPaymentChoices(f.Id, f.OwnerSeat, f.OwnerSeat, [CardZoneKind.Hand, CardZoneKind.Equipment], OwnedCardMoveIntent.Discard, canSelect: (_, c) => !c.IsGeneralWeapon);
         return Array.AsReadOnly(payments.Select(c => c with { Parameters = new System.Collections.ObjectModel.ReadOnlyDictionary<string, string>(new Dictionary<string, string>(c.Parameters) { ["program-action"] = "huaman", ["branch"] = "discard" }) }).ToArray());
     }
 
@@ -115,7 +112,7 @@ internal sealed partial class CharacterHuaManOlRuntime
             return;
         }
 
-        if (!HuaManCurrent(f) || r.Stage != HuaManStage.DiscardChoice || choice.Cards is not [var id] || !HuaManDiscardLocation(f.OwnerSeat, _cardZonesOperations._cardZones.GetLocation(id), includeStoredCards: r.Souying is null) || _coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, _coreAdvancedLifecycleOperations.GetAdvancedCard(id), _cardZonesOperations._cardZones.GetLocation(id), OwnedCardMoveIntent.Discard))
+        if (!HuaManCurrent(f) || r.Stage != HuaManStage.DiscardChoice || choice.Cards is not [var id] || !HuaManDiscardLocation(f.OwnerSeat, _cardZonesOperations._cardZones.GetLocation(id)) || _coreTurnHandCategoryRestrictionsOperations.IsSelfHandCategoryDiscardForbidden(f.OwnerSeat, _coreAdvancedLifecycleOperations.GetAdvancedCard(id), _cardZonesOperations._cardZones.GetLocation(id), OwnedCardMoveIntent.Discard))
             throw new InvalidOperationException("Hua Man cannot pay a moved, forbidden or foreign entity.");
         var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { HuaMan = r with { Stage = HuaManStage.DiscardChildren, Before = before, After = before, DiscardedId = id, Paid = true, NativeOwnerHpBefore = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp, NativeOwnerHpAfter = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].Hp }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });

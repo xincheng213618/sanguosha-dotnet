@@ -849,6 +849,9 @@ var tests = new (string Name, Action Body)[]
     ("Shi Guo Yuan Qingdao: empty hand omits use and keeps real benefits cold", ShiGuoYuanChecks.QingdaoOmitsEmptyHandUseAndKeepsRealBenefits),
     ("OL Souying: Wooden Ox equipment but not stored grain is discardable cold", OlHuaManSouyingWoodenOxChecks.SouyingCanDiscardTreasureButCannotDirectlyDiscardItsGrainCold),
     ("OL Buqu: own Play recovery allows Liangzhu cold", OlBoundaryBuquRecoveryChecks.BuquInOwnPlayQualifiesRealLiangzhuAndDrawCold),
+    ("Happy Feifu: stores only its original paid Dodge entry cold", HappyZhenJiFeifuDiscardEntryChecks.FeifuStoresOnlyTheOriginalPaidDodgeEntry),
+    ("Mobile Shi Sun Shao Zhuji: actual recovery applies Shanhe Yaoli cold", MobileShiSunShaoRecoveryChecks.ZhujiRecoveryAllowsOneActualShanheYaoliBonusCold),
+    ("OL Xili: Wooden Ox equipment but not stored grain is discardable cold", OlHuaManXiliWoodenOxChecks.XiliCanDiscardTreasureButCannotDirectlyDiscardItsGrainCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

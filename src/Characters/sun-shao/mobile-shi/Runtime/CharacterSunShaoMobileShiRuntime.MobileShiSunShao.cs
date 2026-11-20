@@ -144,20 +144,8 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
                 _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiSsZhujiBonusEvent(f.Id, f.OwnerSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, "draw", 2));
                 break;
             case "recover":
-            {
-                var target = _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat];
-                var recovered = target.IsAlive ? Math.Min(1, Math.Max(0, target.MaxHp - target.Hp)) : 0;
-                if (recovered > 0)
-                {
-                    var recoveryId = _coreNativeRecoveryFramesOperations.BeginRecovery(active.Id, active.OwnerSeat, active.OwnerSeat, recovered);
-                    target.Hp += recovered;
-                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new RecoveryAppliedEvent(active.OwnerSeat, active.OwnerSeat, recovered, target.Hp));
-                    _coreRuntimeOperations.PopResolutionFrame(recoveryId, ResolutionFrameKind.Recovery);
-                }
-
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiSsZhujiBonusEvent(f.Id, f.OwnerSeat, _coreActualTurnProgressTurnNumberAccess._turnNumber, "recover", recovered));
-                break;
-            }
+                BeginShiSsZhujiRecovery(active, r);
+                return;
 
             case "armor":
             {
@@ -175,6 +163,37 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
         }
 
         FinishShiSsOperation(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id));
+    }
+
+    private void BeginShiSsZhujiRecovery(ProgramSkillFrame frame, ShiSsReceipt receipt)
+    {
+        _coreRuntimeOperations.ReplaceRuntimeTop(frame with { SunShao = receipt with { Stage = ShiSsStage.ZhujiRecovery },
+            PendingMovementContinuation = new(frame.OwnerSeat, 0, null) });
+        _kernelCoreGameEngineAdvancedLifecycleHostOperations.CreateProgramSkillHost().Recover(frame.Id, frame.OwnerSeat, frame.OwnerSeat, 1, null, null);
+        frame = _coreProgramLifecycleOperations.GetActiveProgramFrame(frame.Id);
+        var attempt = frame.PendingRecoveryAttempts?.SingleOrDefault(candidate => candidate.SourceSeat == frame.OwnerSeat &&
+            candidate.TargetSeat == frame.OwnerSeat && candidate.Completion == new RecoveryAttemptCompletion(RecoveryAttemptProducer.Program, frame.InstructionIndex));
+        if (attempt is not null)
+            _coreRuntimeOperations.ReplaceRuntimeTop(frame with { SunShao = frame.SunShao! with { RecoveryAttemptId = attempt.Id } });
+        ResumeShiSs(frame.Id);
+    }
+
+    [ProgramRuleObserver(ProgramRulePhase.BeforeEvent, 68400)]
+    internal void CaptureShiSsZhujiRecovery(RecoveryAppliedEvent applied)
+    {
+        var stack = _resolutionStackOperations._resolutionStack;
+        if (stack.Count < 2 || stack[^1] is not RecoveryFrame recovery || recovery.ParentFrameId != stack[^2].Id)
+            return;
+        var frame = stack[^2] as ProgramSkillFrame;
+        if (stack.Count >= 3 && stack[^2] is RecoveryReplacementFrame { CandidateIndex: null } replacement &&
+            stack[^3] is ProgramSkillFrame original && replacement.ParentFrameId == original.Id && original.SunShao?.RecoveryAttemptId == replacement.Id)
+            frame = original;
+        if (frame?.SunShao is not { Stage: ShiSsStage.ZhujiRecovery } receipt || recovery.SourceSeat != frame.OwnerSeat ||
+            recovery.TargetSeat != frame.OwnerSeat || applied.SourceSeat != frame.OwnerSeat || applied.TargetSeat != frame.OwnerSeat || applied.Amount <= 0)
+            return;
+        if (receipt.Recovered != 0)
+            throw new InvalidOperationException("Zhuji received its actual recovery twice.");
+        _coreRuntimeOperations.ReplaceRuntimeFrame(frame.Id, frame with { SunShao = receipt with { Recovered = applied.Amount } });
     }
 
     internal IReadOnlyList<PromptChoice> ShiSsChoices(ProgramSkillFrame f)
@@ -254,7 +273,7 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
     internal void ContinueShiSs(long id) => PublishShiSs(_coreProgramLifecycleOperations.GetActiveProgramFrame(id));
     internal void FinishShiSsOperation(ProgramSkillFrame f)
     {
-        _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { SunShao = null });
+        _coreRuntimeOperations.ReplaceRuntimeTop(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id)with { SunShao = null, PendingMovementContinuation = null });
         _coreSkillProgramsOperations.FinishProgramSkill(_coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id), true);
     }
 
@@ -272,7 +291,14 @@ internal sealed partial class CharacterSunShaoMobileShiRuntime
 
         if (DrainShiSs(_coreProgramLifecycleOperations.GetActiveProgramFrame(id)))
             return true;
-        PublishShiSs(_coreProgramLifecycleOperations.GetActiveProgramFrame(id));
+        f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
+        if (f.SunShao is { Stage: ShiSsStage.ZhujiRecovery } recovery)
+        {
+            _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new ShiSsZhujiBonusEvent(f.Id, f.OwnerSeat, recovery.ActualTurn, "recover", recovery.Recovered));
+            FinishShiSsOperation(f);
+            return true;
+        }
+        PublishShiSs(f);
         return true;
     }
 

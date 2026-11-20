@@ -25,9 +25,16 @@ internal sealed partial class CharacterZhenJiHappyGodRuntime
     };
     internal CardActionCost? HappyFeifuCost(ProgramCardTriggerWindowFrame w, int owner, string instance)
     {
-        if (w.ResponseCompletion is not { CostsDrained: true } || !_coreResponseCompletionOperations.ValidResponseCompletionWindow(w) || w.Action.EffectiveKind != CardKind.Dodge || w.Action.PhysicalCards is not [var card] || card.From.OwnerSeat != owner || card.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) || !w.Action.ConversionChain.Contains(new CardConversionSource(HappyFeifu, "black-as-dodge", owner, instance)) || !_coreResponseCompletionOperations.IsResponseCompletionCostFinished(w, card) || _cardZonesOperations._cardZones.GetLocation(card.CardId) != CardLocation.DiscardPile || _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZjFeifuClaimedEvent>().Any(e => e.ActionId == w.Action.ActionId && e.CardId == card.CardId))
+        if (w.ResponseCompletion is not { CostsDrained: true } receipt ||
+            !_coreResponseCompletionOperations.ValidResponseCompletionWindow(w) || w.Action.EffectiveKind != CardKind.Dodge ||
+            w.Action.PhysicalCards is not [var card] || card.From.OwnerSeat != owner ||
+            card.From.Zone is not (CardZoneKind.Hand or CardZoneKind.Equipment) ||
+            !w.Action.ConversionChain.Contains(new CardConversionSource(HappyFeifu, "black-as-dodge", owner, instance)) ||
+            _coreProgramEventHistoryOperations.Value.ProgramEventHistory<HappyZjFeifuClaimedEvent>().Any(e => e.ActionId == w.Action.ActionId && e.CardId == card.CardId))
             return null;
-        return card;
+
+        var discard = receipt.NativeCosts.Where(move => move.CardId == card.CardId && move.To == CardLocation.DiscardPile).ToArray();
+        return discard is [var finish] && _zoneEntries.CurrentEntry(CardLocation.DiscardPile, card.CardId) == finish.Sequence ? card : null;
     }
 
     internal SkillProgramStepOutcome BeginHappyZj(ProgramSkillFrame supplied, SkillProgramEffectOp op)
