@@ -28,21 +28,6 @@ internal sealed partial class CharacterPanShuOlRuntime
     }
 
     internal static bool LostLastHandCard(CardMovementBatchContext batch, int sourceSeat) => RuntimeSkills.RuntimeRules_pan_shu_ol_PanShuPrograms.LostLastHandCard(batch, sourceSeat);
-    internal IReadOnlySet<SkillProgramCardCategory> CardIdsCategorySet(IReadOnlyList<int> cardIds)
-    {
-        var categories = new HashSet<SkillProgramCardCategory>();
-        foreach (var cardId in cardIds)
-        {
-            var location = _cardZonesOperations._cardZones.GetLocation(cardId);
-            if (location.OwnerSeat is null)
-                continue;
-            var card = _cardZonesOperations._cardZones.CardsAt(location).Single(item => item.Id == cardId);
-            categories.Add(CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind));
-        }
-
-        return categories;
-    }
-
     internal void SetForeignProgramBooleanState(ProgramSkillFrame frame, string targetSkillId, string stateId, bool value)
     {
         var instance = _coreNationalSkillsOperations.GetSkillBindingShard(_coreMatchParticipantsPlayersAccess._players[frame.OwnerSeat]).ProgramInstances.SingleOrDefault(item => item.SkillId == targetSkillId) ?? throw new InvalidOperationException($"The paired program instance '{(targetSkillId)}' is not installed.");

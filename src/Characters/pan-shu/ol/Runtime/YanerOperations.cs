@@ -1,8 +1,8 @@
 namespace CardGame.Core;
 
-// 燕尔 follow-up: draws two pairs (the owner first, then the last-hand loser)
-// and when both pairs share one category set, grants the paired 织纴 its
-// own-turn-free modification until the owner's next turn and recovers the loser.
+// 燕尔 draws two pairs, the owner first and then the last-hand loser.
+// The owner's matching pair relaxes 织纴 until their next turn.
+// The loser's matching pair recovers that player by one HP.
 internal sealed class YanerResolvePairBenefitDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.YanerResolvePairBenefit;

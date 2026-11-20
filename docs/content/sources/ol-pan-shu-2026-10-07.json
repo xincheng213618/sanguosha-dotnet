@@ -4,6 +4,7 @@
   "officialId": 478,
   "sourcePage": "https://www.sanguosha.com/hero/478",
   "textSource": "https://wiki.biligame.com/sgs/潘淑（官网 heroDetail 页面文本有限，技能文本取自百科同一武将词条，并用 https://www.sanguosha.com/api/v1/hero/info?gid=478 交叉核对元数据）",
+  "officialReleaseAnnouncement": "https://www.sanguosha.com/news/20211013_2282_4810",
   "capturedAt": "2026-10-07",
   "rulesetId": "sanguosha-ol",
   "indexFields": {
@@ -45,8 +46,8 @@
       "notes": [
         "Trigger yaner-last-hand: cardsMoved with new movement occurrence perOtherLastHandLoss (1031) and a shared collector shaped like the existing third-party-hand-gain ones: the movement leaves another living character's hand during that character's own play phase (live phase/turn-owner check at batch completion) and the batch source counts show Hand(loser) going from >0 to 0; the frozen condition repeats the before>=1/after==0 comparison as data.",
         "usageScope turn + usageLimit 1 gives the per-turn ledger; consumption happens at program binding begin, so a declined launch still spends the once-per-turn window, matching '每回合限一次'.",
-        "Bespoke op yanerResolvePairBenefit (7206) draws two for the owner first and then two for the loser (both binds private), and only when both pairs drew exactly two cards compares the unordered SkillProgramCardCategory sets.",
-        "On equal category sets the op writes the paired skill's declared public boolean state (skillIds names ol:zhiren, stateId zhiren-unrestricted) through a cross-skill boolean write helper and recovers the loser by one HP through the shared recovery queue.",
+        "The October 2021 tenth-anniversary release announcement explains the two clauses independently. Each recipient qualifies for their own benefit by drawing two actual cards of the same category through this skill.",
+        "The owner's matching pair sets the declared public zhiren-unrestricted state for ol:zhiren. The last-hand loser's matching pair recovers that player by one HP through the shared recovery queue. Draw order remains owner first, then the loser, with each draw privately bound.",
         "The 织纴 own trigger zhiren-unrestricted-clear (turnStartBeforeNormalFlow, subject owner, mandatory setBooleanState false) clears the modification exactly at the owner's next turn start; resetScope game keeps it across intervening foreign turns."
       ]
     }
@@ -54,6 +55,7 @@
   "observations": [
     "BWIKI lists 潘淑 (officialId 478) as wu female, title 神女, online 2021-10-14, package 荟萃-章台春望; the official hero info API (gid=478) independently reports hp 3 and figure 吴. The BWIKI infobox renders HP as magatama icons; the rendered page text does not expose a numeral and the raw HTML fetch was EdgeOne-blocked, so the HP=3 record relies on the official API value (3) cross-checked against the icon count expectation.",
     "Both skill texts on BWIKI match the coordinator-locked wording verbatim, including the '若X不小于（X为此牌牌名字数）' bracket and the slash-separated '直到你的下个回合开始/其回复1点体力' tail.",
+    "The skill pair shown by the 2021-10-13 tenth-anniversary release announcement is 织纴 and 燕尔. The current hero detail page shows another edition with 威仪 and 锦织.",
     "New bespoke ops 7204-7206 (zhirenReorderTopByLength, zhirenResolveFieldTiers, yanerResolvePairBenefit); new trigger value currentTurnNonConvertedUseCount (1030); new movement occurrence perOtherLastHandLoss (1031). No new player markers, trigger windows, condition kinds or schema nodes; RulesSchemaVersion and CurrentRulesVersion unchanged.",
     "Shared capability notes: BeginProgramTopReorder gained an optional requireCurrentSeat parameter (default true preserves every existing caller's behavior); CaptureProgramTriggerFacts captures the gated CurrentTurnNonConvertedUseCount only when some content uses the value; the cards-moved candidate collection gained the perOtherLastHandLoss collector alongside the existing third-party/owner-source collectors."
   ]

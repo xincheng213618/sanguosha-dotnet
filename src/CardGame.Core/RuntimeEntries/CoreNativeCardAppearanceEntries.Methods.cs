@@ -2,5 +2,5 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CoreNativeCardAppearanceEntries
 {
-    internal Suit EffectiveSuit(CharacterState owner, Card card) => _resolve().EffectiveSuit(owner, card);
+    internal Suit EffectiveSuit(CharacterState owner, Card card, CardLocation? identityLocation = null) => _resolve().EffectiveSuit(owner, card, identityLocation);
 }

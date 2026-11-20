@@ -856,6 +856,9 @@ var tests = new (string Name, Action Body)[]
     ("Mobile Youyi: paid group recovery reaches unequal Qiao pools cold", MobileYouyiGroupRecoveryChecks.YouyiKeepsItsPaidGroupRecoveryAcrossUnequalQiaoPoolsCold),
     ("OL Shoufu: basic talisman bars its holder native dying Peach cold", OlZhangLingShoufuDyingPeachChecks.BasicShoufuBlocksOnlyItsHoldersNativeDyingPeachCold),
     ("Happy Qiao: ordinary distance needs no scalar HP cold", CardGame.Core.Tests.HappyShenDaXiaoQiaoChecks.OrdinaryDistanceIgnoresUnusedHealthComparisonsCold),
+    ("Mobile Mingzhe: original Dismantlement hand suit cold", MobileZhugeJinMingzheDiscardSuitChecks.DismantlementUsesTheOriginalHandSuitForMingzheCold),
+    ("OL Tanbei: issued target ban bars its actor native dying Peach cold", OlGuoSiTanbeiDyingPeachChecks.TanbeiTargetProhibitionBlocksOnlyGuoSiDyingPeachCold),
+    ("OL Yaner: each actual draw pair owns its independent benefit cold", OlPanShuYanerChecks.YanerGrantsEachRealDrawPairItsOwnBenefitCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))

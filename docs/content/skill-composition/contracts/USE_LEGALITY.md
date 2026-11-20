@@ -35,7 +35,7 @@ Required when changing these mechanisms or their consumers. See the
 
 ## Response materials and action-query snapshots
 
-- The native physical Peach rescue uses the same live response legality for its published options and submitted payment. The category restriction reads the actual responder and the effective Peach identity.
+- The native physical Peach rescue uses the same live response legality for its published options and submitted payment. A category restriction reads the actual responder and the effective Peach identity. An issued directed restriction checks that responder against the original dying recipient before the rescue offers materials.
 
 - Faction-supplied Slash target eligibility uses `IProvidedSlashPaymentTargets`; do not gate actual-material validation on a character or distance/color privilege. Candidate conversion and final-kind issuance query the same actual materials separately.
 

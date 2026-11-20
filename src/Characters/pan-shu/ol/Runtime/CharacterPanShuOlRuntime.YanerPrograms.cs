@@ -18,28 +18,29 @@ internal sealed partial class CharacterPanShuOlRuntime
             otherDrawn = _coreProgramLifecycleOperations.GetProgramCardSet(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id), "yaner-other").CardIds;
         }
 
-        if (otherDrawn.Count != 2)
-        {
-            _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
-            return SkillProgramStepOutcome.AwaitChild;
-        }
-
         var ownDrawn = _coreProgramLifecycleOperations.GetProgramCardSet(_coreProgramLifecycleOperations.GetActiveProgramFrame(active.Id), "yaner-own").CardIds;
-        if (ownDrawn.Count != 2)
-        {
-            _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
-            return SkillProgramStepOutcome.AwaitChild;
-        }
-
-        if (CardIdsCategorySet(ownDrawn).SetEquals(CardIdsCategorySet(otherDrawn)))
+        if (IsYanerMatchingDrawPair(ownDrawn))
         {
             var targetSkillId = effect.SkillIds.Single();
             SetForeignProgramBooleanState(active, targetSkillId, effect.StateId!, value: true);
-            _coreMatchLogOperations.AddLog("SkillTriggered", $"{(owner.Name)} 以【燕尔】摸到的牌与 {(_coreMatchParticipantsPlayersAccess._players[loserSeat].Name)} 摸到的牌类别相同，" + $"【{(_contentRegistryOperations._contentRegistry!.GetSkill(targetSkillId).Name)}】直到其下回合开始删去“你的回合内”。", active.OwnerSeat, loserSeat);
-            ApplyProgramSkillRecovery(active.Id, active.OwnerSeat, loserSeat);
+            _coreMatchLogOperations.AddLog("SkillTriggered", $"{owner.Name} 以【燕尔】摸到两张同类别的牌，【{_contentRegistryOperations._contentRegistry!.GetSkill(targetSkillId).Name}】直到其下回合开始删去“你的回合内”。", active.OwnerSeat);
         }
+        if (IsYanerMatchingDrawPair(otherDrawn))
+            ApplyProgramSkillRecovery(active.Id, active.OwnerSeat, loserSeat);
 
         _coreRuntimeOperations.AdvanceRuntimeProgram(active.Id);
         return SkillProgramStepOutcome.AwaitChild;
+    }
+
+    private bool IsYanerMatchingDrawPair(IReadOnlyList<int> cardIds)
+    {
+        return cardIds is [var first, var second] && GetCategory(first) == GetCategory(second);
+
+        SkillProgramCardCategory GetCategory(int cardId)
+        {
+            var zones = _cardZonesOperations._cardZones;
+            var card = zones.CardsAt(zones.GetLocation(cardId)).Single(item => item.Id == cardId);
+            return CoreGameEngineProgramCardPaymentsRuntime.GetProgramCardCategory(card.Kind);
+        }
     }
 }

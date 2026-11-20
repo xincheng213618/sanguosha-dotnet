@@ -43,8 +43,10 @@ internal sealed partial class CoreNativeDyingRuntime
     {
         if (_characterPangJiOlOperations.IsBiguoCategoryForbidden(responder.Seat, CardKind.Peach))
             return[];
-        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying && !_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(responder.Seat, dying.VictimSeat))
-            return[];
+        if (_coreDyingCursorRuntimeOperations.Value.ActiveDying is { } dying &&
+            (!_coreProgramAllHandBonusOperationOperations.CanUsePeachToRescue(responder.Seat, dying.VictimSeat) ||
+             _coreDirectedTurnCardPoliciesOperations.IsDirectedCardTargetProhibited(responder.Seat, dying.VictimSeat, CardKind.Peach)))
+            return [];
         var handCandidates = _corePhysicalOwnedCardQueriesOperations.GetPlayableCards(responder).Concat(_coreNativePublicPileOriginalCardsOperations.NativePublicPileResponseCards(responder, CardKind.Peach)).Where(card => !_coreProgramCardLegalityOperations.IsProgramMaterialUseForbidden(responder.Seat, CardKind.Peach, [card.Id])).Where(card => _coreProgramCardLegalityOperations.IsProgramNativeResponseAllowed(responder, CardKind.Peach, [card.Id], dyingUse: true)).Where(card => !_coreCardUseModulesOperations.IsTurnHandCardRestricted(responder, card)).Where(card => !_coreCardConversionsOperations.HasProgramCardIdentity(responder, card) || _characterGuanYuWumiaoOperations.IsWuyouIdentityKind(responder, card, CardKind.Peach)).Where(card => card.Kind == CardKind.Peach && !_coreWenhePoisonOperations.IsWenhePhysicalPoison(responder, card) && !_appliedCardActionRestrictions.IsMaterialUseForbidden(responder.Seat, [card.Id], _coreNativeCardAppearanceOperations.EffectiveSuit(responder, _corePlayCardHistoryOperations.ApplyProgramUseAppearance(responder, card, null))) && (_coreDyingCursorRuntimeOperations.Value.ActiveDying is not { } victim || !_coreDeckEquipmentProgramsOperations.HasBeneficiarySuitShield(responder.Seat, victim.VictimSeat, _coreNativeCardAppearanceOperations.EffectiveSuit(responder, card))) || GetDyingPeachConversionSources(responder, card).Count != 0).ToArray();
         return handCandidates.Concat(_corePhysicalOwnedCardQueriesOperations.GetEquipment(responder).Where(card => GetDyingPeachConversionSources(responder, card).Count != 0)).ToArray();
     }

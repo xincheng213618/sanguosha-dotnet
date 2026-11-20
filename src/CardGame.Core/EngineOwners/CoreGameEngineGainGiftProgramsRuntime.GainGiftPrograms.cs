@@ -12,7 +12,7 @@ internal sealed partial class CoreGameEngineGainGiftProgramsRuntime
         // grants/removal observers change that owner. The snapshot keeps printed suit.
         if (!TracksRedOwnedLoss || from.OwnerSeat is not { } owner || !OwnedLossZone(from.Zone) || to.OwnerSeat == owner && OwnedLossZone(to.Zone) || _coreCardMovementProgramsOperations.CaptureMovementTiming()is not { } timing || timing.Phase == TurnPhase.Play && timing.PhaseActorSeat == owner && !(_characterZhugeJinMobileOperations.Value.HasMobileMingzheRegistration && timing.ActualTurnOwnerSeat != owner))
             return null;
-        var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card);
+        var suit = _coreNativeCardAppearanceOperations.EffectiveSuit(_coreMatchParticipantsPlayersAccess._players[owner], card, from);
         return suit is Suit.Heart or Suit.Diamond ? new(owner, _coreSnapshotValueProjectionOperations.ToSnapshot(card), suit, timing, sequence) : null;
     }
 
