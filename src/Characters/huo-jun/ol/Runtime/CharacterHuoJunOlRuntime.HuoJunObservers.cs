@@ -17,7 +17,10 @@ internal sealed partial class CharacterHuoJunOlRuntime
         if (child is RecoveryReplacementFrame recovery)
             return IsHuoJunFenruiRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
-            return r.Stage == HuoJunFenruiStage.CostChildren && r.CostCardId is { } id && _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind == CardKind.SilverLion && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1 && hp.Change.TargetSeat == f.OwnerSeat;
+            return r.Stage == HuoJunFenruiStage.CostChildren && r.CostCardId is { } id &&
+                _coreAdvancedLifecycleOperations.GetAdvancedCard(id).Kind == CardKind.SilverLion &&
+                ProgramChildWindowRuntime.MatchesHpChangedChild(f.Id, hp, PostEventContinuation.Program) &&
+                hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1 && hp.Change.TargetSeat == f.OwnerSeat;
         if (child is BeforeDamageProgramWindowFrame before)
             return r.Stage == HuoJunFenruiStage.DamageIssued && f.AttackAttempt is not null && (before.ContinuationAttackResolutionId ?? before.ParentFrameId) == f.Id;
         return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram && CanContinuePaidHuoJunFenrui(f);

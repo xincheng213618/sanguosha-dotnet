@@ -957,6 +957,7 @@ var tests = new (string Name, Action Body)[]
     ("Anniversary Hu Che Er Fuzhong: one foreign batch adds one card to next normal Draw cold", AnniversaryHuCheErFuzhongDrawChecks.OneForeignBatchAddsOneCardToNextNormalDrawCold),
     ("Anniversary Hu Che Er Fuzhong: three foreign batches retain seven after actual discard cold", AnniversaryHuCheErFuzhongDrawChecks.ThreeForeignBatchesRetainSevenAfterActualDiscardCold),
     ("OL Huo Jun Qiongshou: declared additions set actual Discard quota cold", OlHuoJunQiongshouDeclaredHandLimitChecks.DeclaredAdditionsSetActualDiscardQuotaCold),
+    ("Wu Guan Yu Yixian: field Lion recovers original foreign owner cold", WuGuanYuYixianLionRecoveryChecks.FieldLionRecoversOriginalForeignOwnerCold),
     ("OL Cao Teng Yongzu: the other chooser keeps the issued card in actual Discard cold", OlCaoTengYongzuHandLimitChecks.OtherChooserKeepsTheIssuedCardInActualDiscardCold),
     ("OL Cao Teng Yongzu: first skill grant returns original SkillsChanged child cold", OlCaoTengYongzuHandLimitChecks.FirstSkillGrantReturnsOriginalSkillsChangedChildCold),
     ("OL Lu Yu Sheng Runwei: foreign draw reduces only original Discard hand limit cold", OlLuYuShengRunweiHandLimitChecks.ForeignDrawReducesOnlyOriginalDiscardHandLimitCold),

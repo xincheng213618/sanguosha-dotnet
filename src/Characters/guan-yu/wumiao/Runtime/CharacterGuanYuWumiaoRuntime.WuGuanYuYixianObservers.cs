@@ -54,7 +54,12 @@ internal sealed partial class CharacterGuanYuWumiaoRuntime
         if (child is RecoveryReplacementFrame recovery)
             return IsWuYixianRecoveryParent(f, recovery);
         if (child is HpChangedTriggerWindowFrame hp)
-            return hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.AwaitedProgramMovement && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1 && (r.Stage == YixianStage.EquipmentChildren && hp.Change.SourceSeat == hp.Change.TargetSeat && WuYixianLionRemoval(f, hp.Change.TargetSeat) || r.Stage == YixianStage.RecoveryChildren && hp.Change.SourceSeat == f.OwnerSeat && hp.Change.TargetSeat == r.Recipients[r.Cursor].Seat);
+            return ProgramChildWindowRuntime.MatchesHpChangedChild(f.Id, hp, PostEventContinuation.AwaitedProgramMovement) &&
+                hp.Change.Kind == HpChangeKind.Recovery && hp.Change.Amount == 1 &&
+                (r.Stage == YixianStage.EquipmentChildren && hp.Change.SourceSeat == hp.Change.TargetSeat &&
+                    WuYixianLionRemoval(f, hp.Change.TargetSeat) ||
+                 r.Stage == YixianStage.RecoveryChildren && hp.Change.SourceSeat == f.OwnerSeat &&
+                    hp.Change.TargetSeat == r.Recipients[r.Cursor].Seat);
         if (child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills)
             return skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
         if (child is ProgramLifecycleTriggerWindowFrame state)
