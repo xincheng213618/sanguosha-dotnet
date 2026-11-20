@@ -1,3 +1,5 @@
+using CardGame.Core.EngineOwners;
+
 namespace CardGame.Core;
 
 // Each port is scoped to one synchronous calculation. Facts retain the supplied
@@ -17,7 +19,6 @@ internal interface IMatchHandLimitQuery : IProgramSelectionQuery
     int YongzuBonus { get; }
     int ShunshiBonus { get; }
     int OriginalHandBonus { get; }
-    int XiugengBonus { get; }
     int XiezhiOverflowCount { get; }
     int KejiArmorBonus { get; }
     IEnumerable<RuleQueryContribution> ProgramDamageContributions { get; }
@@ -45,7 +46,7 @@ internal interface IMatchHandLimitQuery : IProgramSelectionQuery
 
 /// <summary>Composes hand limits through their original ordered numeric and projection stages.</summary>
 [ProgramRuntimeModule]
-internal sealed class MatchHandLimitQueries
+internal sealed class MatchHandLimitQueries(IKernelProgramPipelineHooksAccess pipelineHooks)
 {
     internal RuleQueryEvaluation EvaluateHandLimit<TQuery>(TQuery query, bool suppressHanSongYinbi = false)
         where TQuery : IMatchHandLimitQuery
@@ -64,7 +65,7 @@ internal sealed class MatchHandLimitQueries
         AddFiniteContribution(contributions, $"issued:{query.Seat}:cao-teng:yongzu:hand-limit", query.YongzuBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:shunshi:hand-limit", query.ShunshiBonus);
         AddFiniteContribution(contributions, $"state:{query.Seat}:original-hand:hand-limit", query.OriginalHandBonus);
-        AddFiniteContribution(contributions, $"issued:{query.Seat}:mobile:shi-xiugeng:hand-limit", query.XiugengBonus);
+        pipelineHooks._programPipelineHooks.AppendNumericRuleContributions(query.Seat, SkillRuleQuery.HandLimit, contributions);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:mobile:shi-xiezhi:hand-limit", query.XiezhiOverflowCount);
         AddFiniteContribution(contributions, $"state:{query.Seat}:mou-mobile:keji:armor-hand-limit", query.KejiArmorBonus);
         contributions.AddRange(query.ProgramDamageContributions);

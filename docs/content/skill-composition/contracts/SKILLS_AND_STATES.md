@@ -29,6 +29,8 @@ Required when changing these mechanisms or their consumers. See the
 
 ### Hand-limit exemptions
 
+- `MatchHandLimitQueries` combines declared numeric modifiers with registered contributions. Mobile Shi Guo Yuan's Xiugeng contributes the original permanent bonus for its recipient through `AppendNumericRuleContributions`. Counted hand entities, discard eligibility, and payment use their own shared queries.
+
 - `IHandLimitCounting` supplies the counted physical Hand set for manual discard, automatic discard and refresh after partial payment. `HandLimitCountingRuntime` combines active policies, mode benefits and issued relations through the single `IHandLimitExemptions` matcher. Counting exemptions leave numeric `handLimit`, discard permission and payment obligations unchanged. Physical exemptions require a registered card and actual Hand residency for counting.
 - Continuing `cardPolicies` use `handLimitCardKindExemption` with optional `handLimitMatch`. Evaluate current source effectiveness, role, declared conditions and the applicable mark, kind, current physical rank, effective suit or color, and survival requirements. Qualification can resume against the same permanent mark without another grant. A mark alone grants no benefit to another holder. Unknown color stays distinct from known suitlessness and black. Legacy kind matching accepts the printed kind and also accepts Alcohol as Slash when the existing identity policy allows it.
 - `IgnoreTurnObtainedHandCardsForDiscard` exempts cards that entered that player's Hand after actual `TurnStarted`. Same-zone no-ops do not count as entries. A real reentry qualifies. These entry facts serve that policy and do not establish general acquisition or payment.

@@ -13,6 +13,17 @@ internal sealed partial class CharacterGuoYuanMobileShiRuntime
     internal ShiGyRecordCommittedEvent? ShiGyRecord(int owner, string instance) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiGyRecordCommittedEvent>().LastOrDefault(e => e.Source.OwnerSeat == owner && e.Source.SkillInstanceId == instance);
     internal ShiGyHandRecordedEvent? ShiGyRecordedHand(int owner, string instance, int target) => ShiGyRecord(owner, instance)is { } record ? _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiGyHandRecordedEvent>().SingleOrDefault(e => e.FrameId == record.FrameId && e.Target == target) : null;
     internal int ShiGyHandLimitBonus(int target) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiGyHandLimitRaisedEvent>().Count(e => e.Target == target);
+
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 20)]
+    internal void AddXiugengHandLimitContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        if (query != SkillRuleQuery.HandLimit)
+            return;
+
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"issued:{seat}:{ShiGyXiugeng}:hand-limit",
+            ShiGyHandLimitBonus(seat));
+    }
+
     internal IReadOnlyList<ProgramTriggerCandidate> IncludeShiGyDrawObservers(CharacterState subject, IReadOnlyList<ProgramTriggerCandidate> existing)
     {
         if (!_contentRegistryOperations._contentRegistry.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.ResolveMobileShiGuoYuanXiugeng))

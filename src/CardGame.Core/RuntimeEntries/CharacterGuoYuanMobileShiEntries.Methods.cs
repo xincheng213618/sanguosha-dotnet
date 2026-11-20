@@ -38,7 +38,6 @@ internal sealed partial class CharacterGuoYuanMobileShiEntries
     internal bool ShiGyDyingChild() => _resolve().ShiGyDyingChild();
     internal IReadOnlyList<int> ShiGyExpectedTargets(ShiGyNativeUse n) => _resolve().ShiGyExpectedTargets(n);
     internal bool ShiGyFirstChild(ProgramSkillFrame f, ResolutionFrame child) => _resolve().ShiGyFirstChild(f, child);
-    internal int ShiGyHandLimitBonus(int target) => _resolve().ShiGyHandLimitBonus(target);
     internal bool ShiGyMovement(ProgramSkillFrame f, SkillProgramEffect? effect, ProgramMovementContinuation p) => _resolve().ShiGyMovement(f, effect, p);
     internal ProgramSkillFrame? ShiGyObserverRoot() => _resolve().ShiGyObserverRoot();
     internal bool ShiGyOffTurnSlash(long id, int actor) => _resolve().ShiGyOffTurnSlash(id, actor);
