@@ -5,18 +5,32 @@ using CardGame.Core;
 internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
 {
     private const string Huishi = "mobile:huishi-gift", Baijia = "ol:baijia", Guju = "ol:guju", Canshi = "ol:canshi";
+    private const string Dujiang = "mou-mobile:dujiang", Duojing = "mou-mobile:duojing";
     private const string OwnerGeneral = "fixture:huishi-baijia-owner", Watch = "fixture:huishi-baijia-maximum";
     private const string Mode = "identity:classic-huishi-baijia", Deck = "fixture:huishi-baijia-deck";
+    private const string WatchMaximum = """
+        {"id":"maximum-paid","window":"afterHealthChanged","subject":"owner",
+         "condition":{"kind":"healthChangeKindIs","hpChangeKind":"maximumHp"},"optional":false,"isSkillInvocation":false,
+         "effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]}
+        """;
+    private const string WatchSkillGrant = """
+        {"id":"actual-grant-child","window":"skillsChanged","subject":"owner",
+         "usageScope":"game","usageLimit":1,"optional":false,"isSkillInvocation":false,
+         "effects":[{"op":"chooseOption","target":"owner","resultBind":"grant","options":[{"id":"continue"}]}]}
+        """;
 
-    internal static void PaidHuishiWaivesBaijiaThresholdForNextPreparationCold()
-    {
-        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
-        var game = GameEngine.CreateStandard(new GameOptions
+    private static GameEngine CreateMatch(ContentRegistry registry) =>
+        GameEngine.CreateStandard(new GameOptions
         {
             Seed = 7, PlayerCount = 4, HumanSeat = 0, HumanRole = Role.Lord, ModeId = Mode,
             UseInteractiveSetup = true, ConfirmOpeningHand = false, UseInteractiveDiscard = false,
             AdvanceAfterHumanCommands = false, MaxTurns = 8
         }, registry);
+
+    internal static void PaidHuishiWaivesBaijiaThresholdForNextPreparationCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("ol:bei-mi-hu", [Baijia, Guju], WatchMaximum));
+        var game = CreateMatch(registry);
 
         PendingDecision? Pending() => game.CreateSnapshot(0).PendingDecision;
         PlayerSnapshot Owner() => game.CreateSnapshot(0).Players[0];
@@ -116,26 +130,108 @@ internal static class MobileGodGuoJiaAwakeningOverrideOwnerChecks
             "Returning that child completes the original awakening once with its normal skill replacement and no second expense.");
     }
 
-    private sealed class Fixture : IGameContentPackage
+    internal static void PaidHuishiWaivesDujiangArmorForNextPreparationCold()
+    {
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture("mou:lu-meng-mobile", [Dujiang], WatchSkillGrant));
+        var game = CreateMatch(registry);
+        PendingDecision? Pending() => game.CreateSnapshot(0).PendingDecision;
+        PlayerSnapshot Owner() => game.CreateSnapshot(0).Players[0];
+        T[] Facts<T>() where T : IGameEvent => game.Events.Select(entry => entry.Payload).OfType<T>().ToArray();
+        bool AtPlay() => Pending() is { Kind: DecisionKind.PlayCard, PlayerSeat: 0 } && game.ResolutionStack.Count == 0;
+        void Need(bool condition, string message)
+        {
+            if (!condition)
+                throw new InvalidOperationException($"{message} Turn {game.State.TurnNumber}, phase {game.State.Phase}, " +
+                    $"prompt {Pending()?.Kind}/{Pending()?.SkillPrompt?.SkillId}.");
+        }
+        void Submit(GameCommand command)
+        {
+            var result = game.Submit(command);
+            Need(result.Accepted, result.Error?.Message ?? "The real Huishi or Dujiang command was rejected.");
+        }
+        void Answer(string parameter, string value)
+        {
+            var prompt = Pending()!;
+            var choice = prompt.Choices.Single(choice => choice.Parameters.GetValueOrDefault(parameter) == value);
+            Submit(new AnswerPromptCommand(0, prompt.PromptId, choice.Id, game.Revision));
+        }
+        void Reach(Func<bool> ready)
+        {
+            for (var step = 0; step < 155 && !ready(); step++)
+            {
+                Need(Pending() is null && game.State.Winner == Winner.None, "The Dujiang fixture reached an unexpected boundary.");
+                Submit(new AdvanceOneStepCommand(game.Revision));
+            }
+            Need(ready(), "The actual Preparation or original skill grant child was not reached.");
+        }
+
+        Submit(new StartGameCommand());
+        Reach(() => Pending() is { Kind: DecisionKind.SelectGeneral, PlayerSeat: 0 });
+        Submit(new SelectGeneralCommand(0, OwnerGeneral, game.Revision, Pending()!.PromptId));
+        Reach(AtPlay);
+        var firstTurn = game.State.TurnNumber;
+        var initialMaximum = Owner().MaxHp;
+        Need(Owner().Armor == 0 && Facts<MouLuMengDujiangAwakenedEvent>().Length == 0 &&
+            Owner().Skills?.Any(skill => skill.ContentId == Dujiang) == true, "The first real Preparation offers no natural Dujiang.");
+
+        Submit(new UseProgramSkillCommand(0, Huishi, "grant-awakening", [], [0], game.Revision, Pending()!.PromptId));
+        Reach(() => Pending()?.Choices.Any(choice => choice.Parameters.GetValueOrDefault("value") == Dujiang) == true);
+        Answer("value", Dujiang);
+        Reach(AtPlay);
+        var grant = Facts<ShenGuoJiaAwakeningOverrideEvent>().Single();
+        Need(grant is { Recipient: 0, SkillId: Dujiang, Source: { OwnerSeat: 0, SkillId: Huishi, BindingId: "grant-awakening" } } &&
+            Owner().MaxHp == initialMaximum - 2 && Owner().Armor == 0 &&
+            Facts<ShenGuoJiaMaximumPaidEvent>().Single().FrameId == grant.FrameId &&
+            Facts<MouLuMengDujiangAwakenedEvent>().Length == 0, "Paid Huishi grants the exact Dujiang instance without manufacturing Armor.");
+
+        Submit(new EndPlayPhaseCommand(0, game.Revision, Pending()!.PromptId));
+        Reach(() => Pending()?.SkillPrompt?.SkillId == Watch);
+        var awakened = Facts<MouLuMengDujiangAwakenedEvent>().Single();
+        var root = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == awakened.FrameId);
+        var watcher = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.SkillId == Watch);
+        Need(awakened is { OwnerSeat: 0, Armor: 0, Phase: { Kind: ActualDiscardRecoveryPhaseKind.Preparation, ActorSeat: 0, ActualTurnOwnerSeat: 0 } } &&
+            Facts<TurnStartedEvent>().Where(fact => fact.ActorSeat == 0).Select(fact => fact.TurnNumber).SequenceEqual([firstTurn, awakened.Phase.TurnNumber]) &&
+            Facts<ActualDiscardRecoveryPhaseStartedEvent>().Any(fact => fact.Phase == awakened.Phase) &&
+            grant.FrameId < root.Id && awakened.Source.SkillInstanceId == grant.InstanceId && awakened.GameplayHash == grant.GameplayHash &&
+            root.MouLuMengDujiang == new MouLuMengDujiangReceipt(awakened.Source, awakened.GameplayHash, awakened.Phase) &&
+            watcher.WindowContext is { Window: SkillProgramTriggerWindow.SkillsChanged, OwnerSeat: 0 },
+            "Dujiang uses its real Preparation receipt at zero Armor while its original skill grant is awaiting a child.");
+
+        var before = game;
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(before.CreateCheckpoint())), registry);
+        Need(Enumerable.Range(0, 4).All(seat => SnapshotJson.Serialize(game.CreateSnapshot(seat)) == SnapshotJson.Serialize(before.CreateSnapshot(seat))) &&
+            game.CardMovements.SequenceEqual(before.CardMovements) &&
+            Facts<ShenGuoJiaAwakeningOverrideEvent>().SequenceEqual([grant]) &&
+            Facts<MouLuMengDujiangAwakenedEvent>().SequenceEqual([awakened]) &&
+            JsonSerializer.Serialize(game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == root.Id)) == JsonSerializer.Serialize(root),
+            "Cold replay keeps the same grant boundary and exact zero-Armor Dujiang parent.");
+        Answer("option-id", "continue");
+        Reach(AtPlay);
+        Need(Owner().Armor == 0 && Owner().MaxHp == initialMaximum - 2 &&
+            Owner().Skills?.Count(skill => skill.ContentId == Duojing) == 1 &&
+            Facts<SkillsAcquiredEvent>().Count(fact => fact.PlayerSeat == 0 && fact.SourceSkillId == Dujiang && fact.SkillIds.SequenceEqual([Duojing])) == 1 &&
+            Facts<MouLuMengDujiangAwakenedEvent>().SequenceEqual([awakened]),
+            "The original Dujiang settles once and grants exactly one Duojing to the recorded recipient.");
+    }
+
+    private sealed class Fixture(string recipientGeneral, IReadOnlyList<string> recipientSkills, string watchTrigger) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-huishi-baijia-owner", new(1, 0));
 
         public void Register(IContentRegistryBuilder builder)
         {
-            CharacterFixtureContent.Register(builder, "mobile:shen-guo-jia", "ol:bei-mi-hu");
+            CharacterFixtureContent.Register(builder, "mobile:shen-guo-jia", recipientGeneral);
             var catalog = SkillProgramCatalog.Load($$"""
-                {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{Watch}}","revision":1,"triggers":[
-                  {"id":"maximum-paid","window":"afterHealthChanged","subject":"owner",
-                    "condition":{"kind":"healthChangeKindIs","hpChangeKind":"maximumHp"},"optional":false,"isSkillInvocation":false,
-                    "effects":[{"op":"chooseOption","target":"owner","resultBind":"paid","options":[{"id":"continue"}]}]}
-                ]}]}
+                {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[
+                  {"id":"{{Watch}}","revision":1,"triggers":[{{watchTrigger}}]}
+                ]}
                 """, $$"""
                 {"schemaVersion":{{SkillProgramCatalog.PresentationSchemaVersion}},"skills":{"{{Watch}}":{
                   "name":"体力上限已支付","description":"实际体力上限变化后暂停。","optionLabels":{"continue":"继续"} } } }
                 """);
             builder.AddSkill(new(Watch, catalog.Presentations[Watch].Name, catalog.Presentations[Watch].Description)
                 { Program = catalog.Programs[Watch], ProgramPresentation = catalog.Presentations[Watch] });
-            builder.AddGeneral(new(OwnerGeneral, "辉逝拜假原生夹具", "supporter", Huishi, "wei", 6, [Baijia, Guju, Watch]));
+            builder.AddGeneral(new(OwnerGeneral, "辉逝觉醒原生夹具", "supporter", Huishi, "wei", 6, [.. recipientSkills, Watch]));
             var peers = Enumerable.Range(1, 3).Select(index => $"fixture:huishi-baijia-peer-{index}").ToArray();
             foreach (var peer in peers)
                 builder.AddGeneral(new(peer, "固定同桌", "supporter", "standard:none", "wei", 8));

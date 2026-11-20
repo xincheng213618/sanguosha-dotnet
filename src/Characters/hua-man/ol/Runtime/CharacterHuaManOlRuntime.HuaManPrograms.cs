@@ -23,7 +23,9 @@ internal sealed partial class CharacterHuaManOlRuntime
         if (op == SkillProgramEffectOp.AwakenZhanyuanAndOfferXili)
         {
             var progress = owner.HuaManProgress ?? new HuaManProgress(0);
-            if (progress.Awakened || progress.MansiCards <= 7 && !_characterGuoJiaMobileGodOperations.HasShenGuoJiaAwakeningCondition(f.OwnerSeat, f.SkillId, f.TriggerId) || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Preparation } phase || phase.ActorSeat != f.OwnerSeat || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
+            if (progress.Awakened || (progress.MansiCards <= 7 && !_awakeningOverrides.Granted(f.OwnerSeat, f.SkillId, f.TriggerId)) ||
+                _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase() is not { Kind: ActualDiscardRecoveryPhaseKind.Preparation } phase ||
+                phase.ActorSeat != f.OwnerSeat || f.OwnerSeat != _coreActualTurnProgressCurrentSeatTurnNumberAccess._currentSeat)
                 throw new InvalidOperationException("Zhanyuan requires actual preparation and its natural or issued awakening condition.");
             owner.HuaManProgress = progress with
             {
