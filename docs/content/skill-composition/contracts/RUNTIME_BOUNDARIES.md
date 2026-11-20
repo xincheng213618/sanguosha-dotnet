@@ -27,6 +27,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Delivered native Draw and awaited bound-gift instructions use the original frame's instruction delivery to drain their own children and finish their terminal instruction after source loss or death. Keep delivery on the original frame, including zero-card or legally replaced results; delivery never authorizes an unpaid suffix or an undelivered request. Preserve the synchronous path's existing contract when no native producer is used.
 
+- `NativeDrawProducerRuntime` owns the program Draw cursor for both the ordinary `draw` step and the `IProgramOperationDraws` entry. The step dispatches from the active program frame. A typed operation reads the outcome on that frame. Phase draw counts and native card-effect amounts have their own producers.
+
 - Accepted card-action and movement trigger continuations use `ProgramInvocations` on the original native window and candidate cursor. Acceptance-scoped rights begin only after the actual binding starts; preserve earlier source-frozen permissions as distinct declarations. Keep source-loss invocation rights separate from owner-death rights; never refresh accepted qualification from later use history or recreate character payment-proof ledgers.
 
 - Accepted materials are commitments on their original frame, separately from chosen inputs and physical payment results. Acceptance freezes eligibility; execution drops materials that left their frozen source without requalifying the promise. Declare source-loss continuation separately from owner-death draining, and never use draining to issue future effects.

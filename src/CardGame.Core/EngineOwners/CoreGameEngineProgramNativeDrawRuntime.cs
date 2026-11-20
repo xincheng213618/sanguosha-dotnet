@@ -2,7 +2,7 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineProgramNativeDrawRuntime(ICoreProgramNativeDrawNativeDrawProducerOperations _nativeDrawProducerOperations, RuntimeAccess.IClosedProgramOperationDrawsSource _closedProgramOperationDrawsSource)
+internal sealed partial class CoreGameEngineProgramNativeDrawRuntime(RuntimeAccess.IClosedProgramOperationDrawsSource _closedProgramOperationDrawsSource)
 {
 
 }
