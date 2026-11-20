@@ -19,7 +19,7 @@ internal sealed partial class CharacterDuXiOlRuntime
             return r.Stage == DuXiQuxiStage.ObtainChildren && r.ObtainedFrom?.Zone == CardZoneKind.Equipment && r.ObtainedCardId is { } lion && _coreAdvancedLifecycleOperations.GetAdvancedCard(lion).Kind == CardKind.SilverLion && hp.Change.ParentFrameId == f.Id && hp.ResumeFrameId == f.Id && hp.Continuation == PostEventContinuation.Program && hp.Change.Kind == HpChangeKind.Recovery && hp.Change.TargetSeat == r.MoreHandSeat && hp.Change.Amount == 1;
         if (child is ProgramLifecycleTriggerWindowFrame { CharacterStateContinuation: CharacterStateContinuation.Program } state)
             return r.Stage == DuXiQuxiStage.FaceDownChildren && state.ResumeProgramFrameId == f.Id && state.Continuation == ProgramLifecycleContinuation.ResumeCharacterStateChange;
-        return child is ProgramLifecycleTriggerWindowFrame { Window: SkillProgramTriggerWindow.SkillsChanged } skills && skills.ResumeProgramFrameId == f.Id && skills.Continuation == ProgramLifecycleContinuation.ResumeParentProgram;
+        return child is ProgramLifecycleTriggerWindowFrame skills && ProgramChildWindowRuntime.MatchesSkillsChangedChild(f.Id, skills);
     }
 
     internal bool DuXiObserverSuffix(int rootIndex) => _coreObserverSubtreesOperations.HasObserverSuffix(rootIndex, (i) => _coreObserverSubtreesOperations.IsMovementObserverEdge(i) || _coreRecoveryReplacementDamageRidesOperations.RecoveryReplacementFrameRidesOn(_resolutionStackOperations2._resolutionStack()[i], _resolutionStackOperations2._resolutionStack()[i - 1]), (i, dying) => _coreObserverSubtreesOperations.IsSuspendedOrPaidRescueObserverSuffix(i, dying));

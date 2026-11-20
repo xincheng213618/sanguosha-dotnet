@@ -8,7 +8,7 @@ namespace CardGame.Core.Tests;
 internal static class SpPangTongRuntimeChecks
 {
     private const string Hero = "ol:pang-tong-sp", Driver = "fixture:sp-pt-driver", Quiet = "fixture:sp-pt-quiet",
-        Watch = "fixture:sp-pt-watch", Peer = "fixture:sp-pt-peer", Deck = "fixture:sp-pt-deck";
+        Watch = "fixture:sp-pt-watch", GrantWatch = "fixture:sp-pt-grant-watch", Peer = "fixture:sp-pt-peer", Deck = "fixture:sp-pt-deck";
 
     public static void GuolunExchangeReturnsOriginalPaidChildrenCold()
     {
@@ -46,16 +46,47 @@ internal static class SpPangTongRuntimeChecks
     {
         foreach (var wounded in new[] { false, true })
         {
-            var s = Scene.Start(); s.Play();
+            var s = Scene.Start(watchGrant: !wounded); s.Play();
             if (wounded) { s.Use(Driver, "wound", []); s.Play(); }
             var hp = s.V(0).Hp; var max = s.V(0).MaxHp;
             s.Use(Driver, "kill", [2]);
             s.Reach(() => s.P?.SkillPrompt?.SkillId == "ol:songsang");
-            s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate"); s.Play();
+            s.Answer(c => c.Parameters.GetValueOrDefault("program-action") == "activate");
+            if (!wounded)
+            {
+                s.Reach(() => s.P is { PlayerSeat: 0, SkillPrompt.SkillId: GrantWatch });
+                var health = s.E<SongsangHealthIssuedEvent>().Single();
+                var stack = s.G.ResolutionStack.ToArray();
+                var parent = stack.OfType<ProgramSkillFrame>().Single(f => f.Id == health.FrameId);
+                var watcher = stack.OfType<ProgramSkillFrame>().Single(f => f.SkillId == GrantWatch);
+                var window = stack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(f => f.Id == watcher.WindowContext?.ParentFrameId);
+                var childIndex = Array.IndexOf(stack, window);
+                s.Need(parent is { SkillId: "ol:songsang", OwnerSeat: 0, SpPangTong.Stage: "grant-children" } &&
+                    childIndex > 0 && childIndex + 1 < stack.Length && stack[childIndex - 1].Id == parent.Id &&
+                    stack[childIndex + 1].Id == watcher.Id && window.OwnerSeat == 0 && ZhanjiGrants(s) == 1 &&
+                    s.V(0).Skills!.Count(skill => skill.ContentId == "ol:zhanji") == 1,
+                    "The original Songsang frame has granted Zhanji once and directly owns the native skill-change window.");
+                s.Cold();
+                var restored = s.G.ResolutionStack.OfType<ProgramLifecycleTriggerWindowFrame>().Single(f => f.Id == window.Id);
+                s.Need(ProgramChildWindowRuntime.MatchesSkillsChangedChild(parent.Id, restored) &&
+                    !ProgramChildWindowRuntime.MatchesSkillsChangedChild(parent.Id, restored with { ResumeProgramFrameId = watcher.Id }) &&
+                    !ProgramChildWindowRuntime.MatchesSkillsChangedChild(parent.Id, restored with { Continuation = ProgramLifecycleContinuation.ResumeCharacterStateChange }) &&
+                    !ProgramChildWindowRuntime.MatchesSkillsChangedChild(parent.Id, restored with { Window = SkillProgramTriggerWindow.CharacterDied }),
+                    "The restored child matches the original parent, SkillsChanged window and parent-program continuation.");
+                s.Answer(c => c.Parameters.GetValueOrDefault("option-id") == "continue");
+                s.Play();
+                var resolved = new ProgramBindingResolvedEvent(parent.Id, parent.SkillId,
+                    parent.TriggerId!, parent.SkillInstanceId, parent.OwnerSeat, SkillProgramTriggerWindow.CharacterDied,
+                    Activated: true, Completed: true);
+                s.Need(s.G.ResolutionStack.All(f => f.Id != parent.Id && f.Id != window.Id) &&
+                    s.E<ProgramBindingResolvedEvent>().Count(fact => fact == resolved) == 1,
+                    "The native window returns to the original Songsang frame and completes it once.");
+            }
+            else s.Play();
             s.Need(!s.V(2).IsAlive && s.V(0).Hp == hp + (wounded ? 1 : 0) &&
                 s.V(0).MaxHp == max + (wounded ? 0 : 1) &&
                 s.E<SongsangHealthIssuedEvent>() is [{ Wounded: var frozen }] && frozen == wounded &&
-                s.V(0).Skills!.Any(skill => skill.ContentId == "ol:zhanji"),
+                ZhanjiGrants(s) == 1 && s.V(0).Skills!.Count(skill => skill.ContentId == "ol:zhanji") == 1,
                 "Songsang resolves its actual other death, preserves the original wounded/maximum-HP branch, and really grants Zhanji.");
             var before = s.V(0).Hand.Count;
             s.Use(Driver, "draw-two", []); s.Play();
@@ -66,6 +97,9 @@ internal static class SpPangTongRuntimeChecks
                 "One actual own Play draw invocation of two cards earns exactly one Zhanji card; that skill's own physical draw cannot recurse.");
         }
     }
+
+    private static int ZhanjiGrants(Scene scene) => scene.E<SkillsAcquiredEvent>().Count(fact =>
+        fact.PlayerSeat == 0 && fact.SourceSkillId == "ol:songsang" && fact.SkillIds.SequenceEqual(["ol:zhanji"]));
 
     private sealed class Fixture : IGameContentPackage
     {
@@ -80,12 +114,14 @@ internal static class SpPangTongRuntimeChecks
                 {"id":"kill","minCards":0,"maxCards":0,"minTargets":1,"maxTargets":1,"targetKind":"otherLiving","usesPerTurn":null,"effects":[{"op":"damage","target":"selectedTarget","amount":20}]},
                 {"id":"draw-two","minCards":0,"maxCards":0,"minTargets":0,"maxTargets":0,"targetKind":"anyLiving","usesPerTurn":null,"effects":[{"op":"draw","target":"owner","amount":2}]}]},
               {"id":"{{Quiet}}","revision":1,"triggers":[{"id":"quiet","isSkillInvocation":false,"window":"afterNormalDraw","subject":"owner","optional":false,"effects":[{"op":"skipTurnPhases","target":"owner","phases":["play"]}]}]},
-              {"id":"{{Watch}}","revision":1,"triggers":[{"id":"exchange-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementReasons":["skill-program.guolun.exchange"],"movementOccurrence":"perBatch","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}]}]}]}
+              {"id":"{{Watch}}","revision":1,"triggers":[{"id":"exchange-child","window":"cardsGained","subject":"owner","destinationZones":["hand"],"movementReasons":["skill-program.guolun.exchange"],"movementOccurrence":"perBatch","optional":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}]}]},
+              {"id":"{{GrantWatch}}","revision":1,"triggers":[{"id":"grant-child","window":"skillsChanged","subject":"owner","usageScope":"game","usageLimit":1,"optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"seen","options":[{"id":"continue"}]}]}]}]}
             """;
             var presentation = JsonSerializer.Serialize(new { schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
                 skills = new Dictionary<string, object> { [Driver] = new { name = Driver, description = "真实原生伤害、失去体力和摸牌" },
                     [Quiet] = new { name = Quiet, description = "固定同桌跳过出牌阶段" },
-                    [Watch] = new { name = Watch, description = "已交换后的真实获得牌子窗", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } });
+                    [Watch] = new { name = Watch, description = "已交换后的真实获得牌子窗", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } },
+                    [GrantWatch] = new { name = GrantWatch, description = "展骥授予后的原生技能变化窗口", optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } } });
             var catalog = SkillProgramCatalog.Load(rules, presentation);
             foreach (var (id, program) in catalog.Programs)
                 b.AddSkill(new(id, id, catalog.Presentations[id].Description) { Program = program, ProgramPresentation = catalog.Presentations[id] });
@@ -127,10 +163,10 @@ internal static class SpPangTongRuntimeChecks
         public void Cold() { var before = State(); G = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(G.CreateCheckpoint())), registry); Need(before == State(), "Cold restore preserves every original paid frame, movement invoice and published child choice."); }
         public void Accept(GameCommand command) { var result = G.Submit(CommandJson.Deserialize(CommandJson.Serialize([command])).Single()); Need(result.Accepted, result.Error?.Message ?? "Rejected command."); }
         public void Need(bool value, string message) { if (!value) throw new InvalidOperationException(message + JsonSerializer.Serialize(new { G.State.CurrentSeat, G.State.TurnNumber, P })); }
-        public static Scene Start()
+        public static Scene Start(bool watchGrant = false)
         {
             var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture());
-            var setup = new ShanheBattleSetup(37, 1, "sp-pang-tong-runtime", Hero, 3, 0, 0, 0, 0, [Driver], [], [],
+            var setup = new ShanheBattleSetup(37, 1, "sp-pang-tong-runtime", Hero, 3, 0, 0, 0, 0, watchGrant ? [Driver, GrantWatch] : [Driver], [], [],
                 [new(Peer), new(Peer)], [new(Peer)], new string('a', 64));
             var game = GameEngine.CreateStandard(new GameOptions { Seed = setup.BattleSeed, PlayerCount = 4, HumanSeat = 0, HumanRole = null,
                 HumanTeamId = ShanheBattleSetup.PlayerTeamId, ModeId = ShanheBattleSetup.BattleModeId, ShanheBattle = setup,
