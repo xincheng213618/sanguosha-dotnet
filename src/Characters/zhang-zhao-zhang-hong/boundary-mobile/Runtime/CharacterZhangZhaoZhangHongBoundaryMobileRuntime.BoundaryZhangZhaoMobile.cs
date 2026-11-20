@@ -4,18 +4,6 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
 {
     internal const string BoundaryZhangZhaoGuzheng = "boundary:guzheng-mobile", BoundaryZhangZhaoZhijian = "boundary:zhijian-mobile";
-    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 66600)]
-    internal void ObserveBoundaryZhangZhaoPhaseDiscard(CardMovedEvent e)
-    {
-        if (!_contentRegistryOperations._contentRegistry.Skills.ContainsKey(BoundaryZhangZhaoGuzheng) || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } phase)
-            return;
-        var m = _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.LastOrDefault(m => m.CardId == e.CardId && m.From == e.From && m.To == e.To && m.Reason == e.Reason);
-        if (m is null || _coreProgramDiscardOriginsOperations.GetProgramDiscardSource(m)is not { } from)
-            return;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryZhangZhaoPhaseDiscardEvent(phase, m.CardId, m.Sequence, from));
-    }
-
-    internal IReadOnlyList<DiscardRecoveryEntity> BoundaryZhangZhaoPhaseEntities(ActualDiscardRecoveryPhaseKey phase) => _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhangZhaoPhaseDiscardEvent>().Where(e => e.Phase == phase).Select(e => new DiscardRecoveryEntity(e.CardId, e.MovementSequence, e.OriginalFrom)).Where(_coreActualDiscardRecoveryPhasesOperations.ActualDiscardEntityStillAvailable).GroupBy(e => e.CardId).Select(g => g.First()).OrderBy(e => e.MovementSequence).ToArray();
     [ProgramTriggerLegality(ProgramTriggerLegalityPhase.BeforeGainQualification, 66600)]
     internal bool QualifyBoundaryZhangZhaoMobile(ProgramTriggerCandidate b, ProgramSkillWindowContext c)
     {
@@ -23,15 +11,15 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
             return c.Window == SkillProgramTriggerWindow.CardUseTargetsFinalized && _coreActualTurnProgressCurrentSeatPhaseAccess._phase == TurnPhase.Play && _coreActualTurnProgressCurrentSeatPhaseAccess._currentSeat == b.OwnerSeat;
         if (b.SkillId != BoundaryZhangZhaoGuzheng)
             return true;
-        return c.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is { Kind: ActualDiscardRecoveryPhaseKind.Discard } p && p.ActorSeat != b.OwnerSeat && BoundaryZhangZhaoPhaseEntities(p).Any(e => e.OriginalFrom == CardLocation.Hand(p.ActorSeat));
+        return c.Window == SkillProgramTriggerWindow.DiscardPhaseEnded && _discardPhases.Current() is { Kind: ActualDiscardRecoveryPhaseKind.Discard } p && p.ActorSeat != b.OwnerSeat && _discardPhases.CurrentPhaseDiscards(p).Any(e => e.OriginalFrom == CardLocation.Hand(p.ActorSeat));
     }
 
     SkillProgramStepOutcome IBoundaryZhangZhaoMobileHost.Restore(ProgramSkillFrame f) => BeginBoundaryZhangZhaoPhase(f);
     internal SkillProgramStepOutcome BeginBoundaryZhangZhaoPhase(ProgramSkillFrame f)
     {
-        if (f.BoundaryZhangZhaoPhase is not null || f.WindowContext?.Window != SkillProgramTriggerWindow.DiscardPhaseEnded || _coreActualDiscardRecoveryPhasesOperations.CurrentActualDiscardRecoveryPhase()is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } p || p.ActorSeat == f.OwnerSeat)
+        if (f.BoundaryZhangZhaoPhase is not null || f.WindowContext?.Window != SkillProgramTriggerWindow.DiscardPhaseEnded || _discardPhases.Current() is not { Kind: ActualDiscardRecoveryPhaseKind.Discard } p || p.ActorSeat == f.OwnerSeat)
             throw new InvalidOperationException("Mobile Guzheng requires its original other player's completed discard phase.");
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryZhangZhaoPhase = new(p, p.ActorSeat, "return", BoundaryZhangZhaoPhaseEntities(p)) });
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryZhangZhaoPhase = new(p, p.ActorSeat, "return", _discardPhases.CurrentPhaseDiscards(p)) });
         PublishBoundaryZhangZhaoPhase(f);
         return SkillProgramStepOutcome.AwaitChoice;
     }
@@ -41,7 +29,7 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
         var r = f.BoundaryZhangZhaoPhase!;
         PromptChoice Choice(string branch, int? card, string label) => new(new($"mobile-guzheng.{(f.Id)}.{(branch)}.{(card)}"), label, card is { } id ? [id] : [], [], new Dictionary<string, string> { ["program-action"] = "boundary-zhang-zhao-phase", ["branch"] = branch });
         if (r.Stage == "return")
-            return r.OriginalEntities.Where(e => e.OriginalFrom == CardLocation.Hand(r.PhaseOwnerSeat) && _coreActualDiscardRecoveryPhasesOperations.ActualDiscardEntityStillAvailable(e)).Select(e => Choice("return", e.CardId, "交还【" + _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId).DisplayName + "】")).ToArray();
+            return r.OriginalEntities.Where(e => e.OriginalFrom == CardLocation.Hand(r.PhaseOwnerSeat) && _discardPhases.StillAvailable(e)).Select(e => Choice("return", e.CardId, "交还【" + _coreAdvancedLifecycleOperations.GetAdvancedCard(e.CardId).DisplayName + "】")).ToArray();
         return new[]
         {
             Choice("claim", null, "获得本阶段其余仍在弃牌堆的弃牌"),
@@ -78,18 +66,27 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
             }
 
             var id = choice.Cards.Single();
-            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryZhangZhaoPhase = r with { Stage = "return-children", ReturnedCardId = id }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+            _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryZhangZhaoPhase = r with { Stage = "return-children" }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             _corePhysicalMovementFacadesOperations.MoveCard(_coreAdvancedLifecycleOperations.GetAdvancedCard(id), CardLocation.DiscardPile, CardLocation.Hand(r.PhaseOwnerSeat), new("skill-program.boundary:guzheng-mobile.phase-return"), m =>
             {
                 var current = _coreProgramLifecycleOperations.GetActiveProgramFrame(f.Id);
-                _coreRuntimeOperations.ReplaceRuntimeTop(current with { BoundaryZhangZhaoPhase = current.BoundaryZhangZhaoPhase!with { ReturnMovementSequence = m.Sequence } });
-                _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryZhangZhaoReturnedEvent(f.Id, r.PhaseOwnerSeat, id, m.Sequence));
+                var received = m.To == CardLocation.Hand(r.PhaseOwnerSeat);
+                _coreRuntimeOperations.ReplaceRuntimeTop(current with
+                {
+                    BoundaryZhangZhaoPhase = current.BoundaryZhangZhaoPhase! with
+                    {
+                        ReturnMovementSequence = m.Sequence,
+                        ReturnedCardId = received ? id : null
+                    }
+                });
+                if (received)
+                    _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new BoundaryZhangZhaoReturnedEvent(f.Id, r.PhaseOwnerSeat, id, m.Sequence));
             });
         }
         else if (r.Stage == "claim")
         {
             var take = choice.Parameters["branch"] == "claim" && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None;
-            var ids = take ? r.OriginalEntities.Where(e => e.CardId != r.ReturnedCardId && _coreActualDiscardRecoveryPhasesOperations.ActualDiscardEntityStillAvailable(e)).Select(e => e.CardId).ToArray() : [];
+            var ids = take ? r.OriginalEntities.Where(e => e.CardId != r.ReturnedCardId && _discardPhases.StillAvailable(e)).Select(e => e.CardId).ToArray() : [];
             var before = _coreCardMovementJournalCardMovementsMovementSequenceAccess._movementSequence;
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryZhangZhaoPhase = r with { Stage = "claim-children" }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
             if (ids.Length != 0)
@@ -113,7 +110,7 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
         f = _coreProgramLifecycleOperations.GetActiveProgramFrame(id);
         r = f.BoundaryZhangZhaoPhase!;
         _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { PendingMovementContinuation = null });
-        if (r.Stage == "return-children" && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && r.OriginalEntities.Any(e => e.CardId != r.ReturnedCardId && _coreActualDiscardRecoveryPhasesOperations.ActualDiscardEntityStillAvailable(e)))
+        if (r.Stage == "return-children" && r.ReturnedCardId is not null && _coreMatchOutcomeStatusWinnerAccess._winner == Winner.None && _coreMatchParticipantsPlayersAccess._players[f.OwnerSeat].IsAlive && r.OriginalEntities.Any(e => e.CardId != r.ReturnedCardId && _discardPhases.StillAvailable(e)))
         {
             _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { BoundaryZhangZhaoPhase = r with { Stage = "claim" } });
             PublishBoundaryZhangZhaoPhase(f);
@@ -129,7 +126,7 @@ internal sealed partial class CharacterZhangZhaoZhangHongBoundaryMobileRuntime
     internal bool ReturnBoundaryZhangZhaoPhase(ProgramSkillFrame f) => f.BoundaryZhangZhaoPhase is not null && ResumeBoundaryZhangZhaoPhase(f.Id);
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterSkillLoss, 66600)]
     [ProgramRuntimeHook(ProgramRuntimePhase.AfterOwnerDeath, 66600)]
-    internal bool KeepBoundaryZhangZhaoPaidReturn(ProgramSkillFrame f) => f.BoundaryZhangZhaoPhase is { ReturnMovementSequence: > 0 } r && _coreProgramEventHistoryOperations.Value.ProgramEventHistory<BoundaryZhangZhaoReturnedEvent>().Count(e => e.FrameId == f.Id && e.PhaseOwnerSeat == r.PhaseOwnerSeat && e.CardId == r.ReturnedCardId && e.MovementSequence == r.ReturnMovementSequence) == 1;
+    internal bool KeepBoundaryZhangZhaoPaidReturn(ProgramSkillFrame f) => f.BoundaryZhangZhaoPhase is { ReturnMovementSequence: > 0 };
 
     [ProgramAiChoice(SkillProgramEffectOp.CaptureBoundaryZhangZhaoPhaseDiscards)]
     internal PromptChoice BoundaryZhangZhaoPhaseAi(PendingDecision p, ProgramSkillFrame f) => p.Choices.First();

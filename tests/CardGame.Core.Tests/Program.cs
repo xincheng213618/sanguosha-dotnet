@@ -890,6 +890,7 @@ var tests = new (string Name, Action Body)[]
     ("OL SP Ma Chao Zhuiji: recasts Guandu Chariot as destroyed payment cold", OlSpMaChaoZhuijiGuanduChariotChecks.ZhuijiRecastsGuanduChariotAsItsRealDestroyedPaymentCold),
     ("OL Xunxian preserves the turn use with no recipient cold", OlXunxianChecks.XunxianKeepsTurnUseWhenNoRecipientCanReceiveCold),
     ("Shi Zhong Hui Sizi: both paid activations stop at the next owner turn cold", ShiZhongHuiSiziExpiryChecks.BothPaidSiziActivationsStopAtTheOwnersNextActualTurnCold),
+    ("Mobile Guzheng: redirected return does not unlock the rest cold", MobileGuzhengReturnReplacementChecks.OnlyTheActualReturnToThePhaseOwnerUnlocksTheRestCold),
 };
 
 var nameFilters = args.Where(argument => argument.StartsWith("--filter=", StringComparison.OrdinalIgnoreCase))
