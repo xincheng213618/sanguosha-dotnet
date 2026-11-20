@@ -9,6 +9,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - `CoreGameEngineFieldEquipmentRuntime.GetEquipmentWithPrintedEffects` reads the equipped entities whose printed effects apply. A current bone occupies its equipment slot as a bone. The same physical card contributes its printed effect when later equipped as an ordinary card. Kongwu's issued restriction independently gates the holder's equipment effects.
 
+- Native Wooden Ox storage admission reads effective equipment when publishing and validating the action. The stored hand card moves face down. An optional transfer reads the effective Wooden Ox at its existing transfer boundary, after storage. Use of stored cards qualifies their original material separately, and the equipment departure resolves grain from the actual old and new locations.
+
 ## Claims, deliveries and retirement
 
 - Actual damage-card claims are captured once on the original CardUseFrame by CardUseMaterialClaimRuntime from physical movement delivery. Extra-effect episodes do not copy claim ledgers; separate the persistent claim fact from current material-retirement destinations, and retain non-CardUse damage owners' own protocols.

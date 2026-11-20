@@ -16,7 +16,7 @@ internal sealed partial class CoreNativeWoodenOxRuntime
 
         if (_coreMatchParticipantsPlayersAccess._players[targetSeat].EquipmentAreaAbolished)
             throw new InvalidOperationException("Wooden Ox cannot enter an abolished equipment area.");
-        var woodenOx = _characterHuCheErMouOperations.KongwuEffectiveEquipment(actor).Single(card => card.Kind == CardKind.WoodenOx);
+        var woodenOx = _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(actor).Single(card => card.Kind == CardKind.WoodenOx);
         _corePhysicalMovementFacadesOperations.MoveCard(woodenOx, CardLocation.Equipment(actor.Seat), CardLocation.Equipment(targetSeat), CardMoveReasons.WoodenOxTransfer);
         _coreMatchLogOperations.AddLog("EquipmentEffect", $"{(actor.Name)} 将【木牛流马】移动给 {(_coreMatchParticipantsPlayersAccess._players[targetSeat].Name)}。", actor.Seat);
     }

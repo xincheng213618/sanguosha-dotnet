@@ -375,7 +375,7 @@ internal sealed partial class CoreNativeLegalActionsRuntime
             }
         }
 
-        if (selectedPhysicalCardId is null && _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && !_coreCurrentTurnStatisticsSlashCountThisTurnWoodenOxUsedThisTurnAccess._woodenOxUsedThisTurn && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count > 0 && _characterHuCheErMouOperations.KongwuEffectiveEquipment(actor).Any(card => card.Kind == CardKind.WoodenOx))
+        if (selectedPhysicalCardId is null && _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && !_coreCurrentTurnStatisticsSlashCountThisTurnWoodenOxUsedThisTurnAccess._woodenOxUsedThisTurn && _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Count > 0 && _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(actor).Any(card => card.Kind == CardKind.WoodenOx))
         {
             actions.Add(new LegalAction(LegalActionKind.UseEquipmentEffect, null, null, "发动【木牛流马】，将一张手牌扣置为“粮”，并可移动此装备", MinCardCount: 1, MaxCardCount: 1, MinTargetCount: 0, MaxTargetCount: 1, EquipmentKind: CardKind.WoodenOx) { SelectableCardIds = _corePhysicalOwnedCardQueriesOperations.GetHand(actor).Select(card => card.Id).Order().ToArray(), SelectableTargetSeats = _coreMatchParticipantsPlayersAccess._players.Where(player => player.IsAlive && player.Seat != actor.Seat && !player.EquipmentAreaAbolished && _corePhysicalOwnedCardQueriesOperations.GetEquipment(player).All(card => _coreFieldEquipmentOperations.FieldEquipmentSlot(card) != EquipmentSlot.Treasure)).Select(player => player.Seat).Order().ToArray() });
         }
