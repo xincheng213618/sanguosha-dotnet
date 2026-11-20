@@ -10,6 +10,6 @@ internal sealed partial class CoreGameEngineFieldEquipmentRuntime
             : _coreEquipmentContentOperations.EquipmentRules.Get(card.Kind).Slot;
 
     internal IReadOnlyList<Card> GetEquipmentWithPrintedEffects(CharacterState player) =>
-        player.SkillGrants.ArePrintedEquipmentEffectsSuppressed ? [] : _corePhysicalOwnedCardQueriesOperations.GetEquipment(player)
+        player.SkillGrants.ArePrintedEquipmentEffectsSuppressed ? [] : cards.CardsAt(CardLocation.Equipment(player.Seat))
             .Where(card => pipelineHooks._programPipelineHooks.GetFieldEquipmentRepresentation(card.Id) is null).ToArray();
 }

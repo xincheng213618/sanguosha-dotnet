@@ -2,6 +2,6 @@
 
 namespace CardGame.Core.EngineOwners;
 [Core.ProgramRuntimeModule]
-internal sealed partial class CoreGameEngineFieldEquipmentRuntime(IKernelProgramPipelineHooksAccess pipelineHooks, ICoreFieldEquipmentCoreEquipmentContentOperations _coreEquipmentContentOperations, RuntimeEntries.CorePhysicalOwnedCardQueriesEntries _corePhysicalOwnedCardQueriesOperations)
+internal sealed partial class CoreGameEngineFieldEquipmentRuntime(IKernelProgramPipelineHooksAccess pipelineHooks, ICoreFieldEquipmentCoreEquipmentContentOperations _coreEquipmentContentOperations, ICardZoneQueries cards)
 {
 }

@@ -11,6 +11,8 @@ Required when changing these mechanisms or their consumers. See the
 
 - Native Wooden Ox storage admission reads effective equipment when publishing and validating the action. The stored hand card moves face down. An optional transfer reads the effective Wooden Ox at its existing transfer boundary, after storage. Use of stored cards qualifies their original material separately, and the equipment departure resolves grain from the actual old and new locations.
 
+- The playable-card query publishes an available declared card with the original hand. Otherwise the formal Wooden Ox rules append the owner's grain after the hand when the field contains an effective Wooden Ox. The field equipment owner reads the original equipment zone through `ICardZoneQueries`.
+
 - Silver Lion departure starts from the original card and equipment location after the actual move. The original holder's typed equipment suppression applies at this boundary, alongside the existing health and armor conditions. Recovery belongs to the original movement continuation.
 
 ## Claims, deliveries and retirement

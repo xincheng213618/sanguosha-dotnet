@@ -9,7 +9,17 @@ internal sealed partial class CorePhysicalOwnedCardQueriesRuntime
     internal IReadOnlyList<Card> GetAuthority(CharacterState player) => _cardZonesOperations._cardZones.CardsAt(CardLocation.Authority(player.Seat));
     internal IReadOnlyList<Card> GetPlayableCards(CharacterState player)
     {
-        var cards = _characterGongsunZanMouMobileOperations.AppendMouGszHuPlayable(player, _characterYaDanOlOperations.AppendQingyaDiscardCards(player, _characterDuanJiongOlOperations.AppendDuanJiongSaoguDiscardCards(player, _characterFuRongOlOperations.AppendFuRongDiscardCards(player, _coreRequestedDeckBasicsOperations.AppendRequestedDeckBasicCards(player, _coreCardDeclarationsOperations.AvailableDeclarationCard(player)is { } declared ? GetHand(player).Append(declared).ToArray() : _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx && _characterHuCheErMouOperations.KongwuEffectiveEquipment(player).Any(card => card.Kind == CardKind.WoodenOx) ? GetHand(player).Concat(GetWoodenOxGrain(player)).ToArray() : GetHand(player))))));
+        IReadOnlyList<Card> cards = _coreCardDeclarationsOperations.AvailableDeclarationCard(player) is { } declared
+            ? GetHand(player).Append(declared).ToArray()
+            : _coreNativeDamageHandlesOperations.Value.UsesFormalWoodenOx &&
+                _coreFieldEquipmentOperations.GetEquipmentWithPrintedEffects(player).Any(card => card.Kind == CardKind.WoodenOx)
+                ? GetHand(player).Concat(GetWoodenOxGrain(player)).ToArray()
+                : GetHand(player);
+        cards = _coreRequestedDeckBasicsOperations.AppendRequestedDeckBasicCards(player, cards);
+        cards = _characterFuRongOlOperations.AppendFuRongDiscardCards(player, cards);
+        cards = _characterDuanJiongOlOperations.AppendDuanJiongSaoguDiscardCards(player, cards);
+        cards = _characterYaDanOlOperations.AppendQingyaDiscardCards(player, cards);
+        cards = _characterGongsunZanMouMobileOperations.AppendMouGszHuPlayable(player, cards);
         return _characterLuSuMobileShiOperations.AppendShiLsPlayableCards(player, _characterBaiLingYunAnniversaryOperations.AppendAnniversaryBaiLingYunPlayableCards(player, _characterDuKuiAnniversaryOperations.AppendDuKuiFanyinPlayableCards(player, cards)));
     }
 
