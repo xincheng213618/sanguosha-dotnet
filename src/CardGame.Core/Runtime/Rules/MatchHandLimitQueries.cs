@@ -18,7 +18,6 @@ internal interface IMatchHandLimitQuery : IProgramSelectionQuery
     int RunweiBonus { get; }
     int YongzuBonus { get; }
     int OriginalHandBonus { get; }
-    int XiezhiOverflowCount { get; }
     int KejiArmorBonus { get; }
     IEnumerable<RuleQueryContribution> ProgramDamageContributions { get; }
     IEnumerable<RuleQueryContribution> PersistentContributions { get; }
@@ -64,7 +63,6 @@ internal sealed class MatchHandLimitQueries(IKernelProgramPipelineHooksAccess pi
         AddFiniteContribution(contributions, $"issued:{query.Seat}:cao-teng:yongzu:hand-limit", query.YongzuBonus);
         AddFiniteContribution(contributions, $"state:{query.Seat}:original-hand:hand-limit", query.OriginalHandBonus);
         pipelineHooks._programPipelineHooks.AppendNumericRuleContributions(query.Seat, SkillRuleQuery.HandLimit, contributions);
-        AddFiniteContribution(contributions, $"issued:{query.Seat}:mobile:shi-xiezhi:hand-limit", query.XiezhiOverflowCount);
         AddFiniteContribution(contributions, $"state:{query.Seat}:mou-mobile:keji:armor-hand-limit", query.KejiArmorBonus);
         contributions.AddRange(query.ProgramDamageContributions);
         contributions.AddRange(query.PersistentContributions);

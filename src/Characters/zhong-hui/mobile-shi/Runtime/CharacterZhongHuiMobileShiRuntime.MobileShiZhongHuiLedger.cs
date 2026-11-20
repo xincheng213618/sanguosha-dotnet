@@ -4,7 +4,23 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CharacterZhongHuiMobileShiRuntime
 {
     internal int ShiZhHuiCharge(int owner) => _coreMatchParticipantsPlayersAccess._players[owner].Markers.GetValueOrDefault(PlayerMarkerKind.ShiZhHuiCharge);
-    internal int ShiZhHuiOverflowCount(int seat) => !HasShiZhHuiCapability ? 0 : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiXiezhiOverflowEvent>().Count(entry => entry.OwnerSeat == seat);
+
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 60)]
+    internal void AddXiezhiOverflowContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        var sourceSuffix = query switch
+        {
+            SkillRuleQuery.SlashLimit => "slash-limit",
+            SkillRuleQuery.HandLimit => "hand-limit",
+            _ => null
+        };
+        if (sourceSuffix is not null)
+            CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions,
+                $"issued:{seat}:mobile:shi-xiezhi:{sourceSuffix}", ShiZhHuiOverflowCount(seat));
+    }
+
+    private int ShiZhHuiOverflowCount(int seat) => !HasShiZhHuiCapability ? 0 : _coreProgramEventHistoryOperations.Value.ProgramEventHistory<ShiZhHuiXiezhiOverflowEvent>().Count(entry => entry.OwnerSeat == seat);
+
     internal int ChangeShiZhHuiCharge(long frameId, int owner, int amount, string reason, out int excess)
     {
         var before = ShiZhHuiCharge(owner);

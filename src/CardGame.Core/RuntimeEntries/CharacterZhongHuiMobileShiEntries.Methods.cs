@@ -28,7 +28,6 @@ internal sealed partial class CharacterZhongHuiMobileShiEntries
     internal bool ShiZhHuiKeChangCannotRespond(int sourceSeat, int responderSeat, CardKind incomingKind, IReadOnlyList<int> targetSeats) => _resolve().ShiZhHuiKeChangCannotRespond(sourceSeat, responderSeat, incomingKind, targetSeats);
     internal int ShiZhHuiKechangLevel(int seat) => _resolve().ShiZhHuiKechangLevel(seat);
     internal int ShiZhHuiKechangLevelForResponses(int sourceSeat) => _resolve().ShiZhHuiKechangLevelForResponses(sourceSeat);
-    internal int ShiZhHuiOverflowCount(int seat) => _resolve().ShiZhHuiOverflowCount(seat);
     internal IReadOnlyList<PromptChoice> ShiZhHuiSiziChoices(ProgramSkillFrame f) => _resolve().ShiZhHuiSiziChoices(f);
     internal int ShiZhHuiSiziDamageBonus(GameEngine.IDamageAttempt attack) => _resolve().ShiZhHuiSiziDamageBonus(attack);
     internal ShiZhHuiReceipt StartShiZhHuiSizi(ProgramSkillFrame f) => _resolve().StartShiZhHuiSizi(f);
