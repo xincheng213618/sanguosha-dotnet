@@ -72,10 +72,20 @@ internal sealed partial class CharacterZhaoYanOlRuntime
     }
 
     internal bool IsTongxieProducedUse(long actionId) => _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TongxieSettledSlashUseEvent>().Any(use => use.ActionId == actionId && use.ParentProgramFrameId is not null);
-    internal void CaptureTongxieSettledSlashUse(long batchId, CardMovementRecord movement)
+    [ProgramRuleObserver(ProgramRulePhase.AfterEvent, 160)]
+    internal void CaptureTongxieSettledSlashUse(SettledActionCardDiscardEvent settled)
     {
-        if (_contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.TongxieFollowUp) != true || movement.Reason != CardMoveReasons.UseFinished || movement.From != CardLocation.Processing || movement.To != CardLocation.DiscardPile)
+        if (_contentRegistryOperations._contentRegistry?.ProgramDependencies.HasTriggerOperation(SkillProgramEffectOp.TongxieFollowUp) != true)
             return;
+
+        var movements = _movementHistory.Read();
+        if (settled.MovementSequence <= 0 || settled.MovementSequence > movements.Count)
+            return;
+        var movement = movements[settled.MovementSequence - 1];
+        if (movement.Sequence != settled.MovementSequence || movement.BatchId != settled.BatchId || movement.CardId != settled.CardId ||
+            movement.Reason != CardMoveReasons.UseFinished || movement.From != CardLocation.Processing || movement.To != CardLocation.DiscardPile)
+            return;
+
         var use = _resolutionStackOperations._resolutionStack.OfType<CardUseFrame>().LastOrDefault(frame => frame.Action is { Type: CardActionType.Use } action && action.PhysicalCards is [var cost] && cost.CardId == movement.CardId);
         if (use?.Action is not { } accepted || !CoreNativeCardClassificationsRuntime.IsSlashCard(accepted.EffectiveKind) || use.TargetSeats is not [var target] || !_coreTableSeatQueriesOperations.IsValidPlayerSeat(target))
             return;
@@ -84,7 +94,7 @@ internal sealed partial class CharacterZhaoYanOlRuntime
         long? parentId = null;
         if (use.CardAttack?.ProgramSkillCardUseFrameId is { } candidateId && _resolutionStackOperations._resolutionStack.OfType<ProgramSkillFrame>().SingleOrDefault(frame => frame.Id == candidateId)is { ReexecuteParticipantInstruction: true, TongxieFollowUp: { } pending } parent && pending.UsedCardIds.LastOrDefault() == movement.CardId && pending.UsedBy.LastOrDefault() == accepted.ProviderSeat && accepted.PhysicalCards[0].From == CardLocation.Hand(accepted.ProviderSeat) && _contentRegistryOperations._contentRegistry.GetSkill(parent.SkillId).Program is { } program && program.GameplayHash == parent.GameplayHash && parent.InstructionIndex > 0 && ProgramInstructionResolver.Default.Resolve(parent, program).GetPausedInstruction(parent.InstructionIndex).Effect.Op == SkillProgramEffectOp.TongxieFollowUp)
             parentId = parent.Id;
-        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TongxieSettledSlashUseEvent(use.Id, accepted.ActionId, movement.CardId, accepted.ActorSeat, target, accepted.EffectiveKind, batchId, movement.Sequence, parentId));
+        _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new TongxieSettledSlashUseEvent(use.Id, accepted.ActionId, movement.CardId, accepted.ActorSeat, target, accepted.EffectiveKind, settled.BatchId, movement.Sequence, parentId));
     }
 
     internal TongxieChainUse? FindTongxieChainUse(CardMovementBatchContext batch, int movementIndex)
@@ -98,7 +108,7 @@ internal sealed partial class CharacterZhaoYanOlRuntime
 
     internal int[] MatchingTongxieSettledSlashIndexes(CardMovementBatchContext batch)
     {
-        if (!_characterYanJunOlOperations.TracksSettledActionCards)
+        if (_contentRegistryOperations._contentRegistry?.ProgramDependencies.RequiresFact(ProgramTrackedFact.NativeSettledActionDiscard) != true)
             return[];
         var settled = _coreAlternatingBenefitsOperations.CompleteProgramEventHistory().OfType<TongxieSettledSlashUseEvent>().Where(entry => entry.BatchId == batch.Id).Select(entry => entry.MovementSequence).ToHashSet();
         return batch.Movements.Select((movement, index) => (movement, index))

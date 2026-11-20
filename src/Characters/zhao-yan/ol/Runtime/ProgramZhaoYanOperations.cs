@@ -32,6 +32,7 @@ public sealed class TongxieArmHandler : ISkillProgramEffectHandler
 internal sealed class TongxieFollowUpDescriptor : ProgramOperationDescriptorBase
 {
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.TongxieFollowUp;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeSettledActionDiscard);
     public override ISkillProgramEffectHandler Handler { get; } = new TongxieFollowUpHandler();
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.RequestSlashByTarget,
         static (_, _) => { });

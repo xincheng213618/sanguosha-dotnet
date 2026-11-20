@@ -11,10 +11,5 @@ public sealed record ProgramGuanchaoRankDrawEvent(long FrameId, string SkillId, 
     public long CardActionId { get; init; }
 }
 
-// 逊贤 evidence: one scalar per used/played card that finished into the discard
-// pile, attributed while the acting use frame is still live; the gift itself is
-// public once it moves.
-public sealed record SettledActionCardDiscardEvent(long BatchId, int MovementSequence, int CardId,
-    int ActorSeat, int TurnNumber) : IGameEvent;
 public sealed record ProgramXunxianGiftEvent(long FrameId, string SkillId, string BindingId,
     int OwnerSeat, int RecipientSeat, int CardId, int DiscardMovementSequence) : IGameEvent;

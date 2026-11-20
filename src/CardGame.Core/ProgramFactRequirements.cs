@@ -19,7 +19,8 @@ public enum ProgramTrackedFact
     NativeGive = 4096,
     ActualTurnReturn = 8192,
     FirstActualTurnHpChange = 16384,
-    NativeProgramDiscardSource = 32768
+    NativeProgramDiscardSource = 32768,
+    NativeSettledActionDiscard = 65536
 }
 
 // Definition-only demand for shared native facts. Keep trigger and activation
@@ -48,7 +49,7 @@ internal readonly record struct ProgramFactRequirements(
           ProgramTrackedFact.MovementTiming | ProgramTrackedFact.HandGainOccurrence | ProgramTrackedFact.ActualRound |
           ProgramTrackedFact.PublicCardRevealHistory | ProgramTrackedFact.NativeGive |
           ProgramTrackedFact.ActualTurnReturn | ProgramTrackedFact.FirstActualTurnHpChange |
-          ProgramTrackedFact.NativeProgramDiscardSource)) == ProgramTrackedFact.None;
+          ProgramTrackedFact.NativeProgramDiscardSource | ProgramTrackedFact.NativeSettledActionDiscard)) == ProgramTrackedFact.None;
 }
 
 // Boundary consumers declare their own immutable lifetime data. Capture demand

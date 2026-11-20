@@ -1654,7 +1654,6 @@ xun-xu/anniversary	CardGame.Core.EngineOwners.CharacterXunXuAnniversaryRuntime	C
 xun-yu/mobile-god	CardGame.Core.EngineOwners.CharacterXunYuMobileGodRuntime	CardGame.Core.RuntimeEntries.CharacterSimaYiMobileGodEntries	sima-yi/mobile-god	CardGame.Core.EngineOwners.CharacterSimaYiMobileGodRuntime
 xun-yu/mou	CardGame.Core.EngineOwners.CharacterXunYuMouRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 ya-dan/ol	CardGame.Core.EngineOwners.CharacterYaDanOlRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
-yan-jun/ol	CardGame.Core.EngineOwners.CharacterYanJunOlRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterZhaoYanOlRuntime>	zhao-yan/ol	CardGame.Core.EngineOwners.CharacterZhaoYanOlRuntime
 yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime	CardGame.Core.RuntimeEntries.CharacterGuanYuHappyGodEntries	guan-yu/happy-god	CardGame.Core.EngineOwners.CharacterGuanYuHappyGodRuntime
 yan-rou/ol	CardGame.Core.EngineOwners.CharacterYanRouOlRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 yan-xiang/anniversary	CardGame.Core.EngineOwners.CharacterYanXiangAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterGuanHaiOlEntries	guan-hai/ol	CardGame.Core.EngineOwners.CharacterGuanHaiOlRuntime
@@ -1695,7 +1694,6 @@ zhao-tong-zhao-guang/anniversary	CardGame.Core.EngineOwners.CharacterZhaoTongZha
 zhao-tong-zhao-guang/anniversary	CardGame.Core.EngineOwners.CharacterZhaoTongZhaoGuangAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterHuangGaiMouMobileEntries	huang-gai/mou-mobile	CardGame.Core.EngineOwners.CharacterHuangGaiMouMobileRuntime
 zhao-tong-zhao-guang/anniversary	CardGame.Core.EngineOwners.CharacterZhaoTongZhaoGuangAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterHuangQuanOlEntries	huang-quan/ol	CardGame.Core.EngineOwners.CharacterHuangQuanOlRuntime
 zhao-tong-zhao-guang/anniversary	CardGame.Core.EngineOwners.CharacterZhaoTongZhaoGuangAnniversaryRuntime	CardGame.Core.RuntimeEntries.CharacterZhugeLiangMouEntries	zhuge-liang/mou	CardGame.Core.EngineOwners.CharacterZhugeLiangMouRuntime
-zhao-yan/ol	CardGame.Core.EngineOwners.CharacterZhaoYanOlRuntime	CardGame.Core.RuntimeEntries.CharacterYanJunOlEntries	yan-jun/ol	CardGame.Core.EngineOwners.CharacterYanJunOlRuntime
 zhao-zhong/ol	CardGame.Core.EngineOwners.CharacterZhaoZhongOlRuntime	CardGame.Core.RuntimeEntries.CharacterSunHongOlEntries	sun-hong/ol	CardGame.Core.EngineOwners.CharacterSunHongOlRuntime
 zhao-zhong/ol	CardGame.Core.EngineOwners.CharacterZhaoZhongOlRuntime	CardGame.Core.RuntimeEntries.CharacterYanPuOlEntries	yan-pu/ol	CardGame.Core.EngineOwners.CharacterYanPuOlRuntime
 zhen-ji/happy-god	CardGame.Core.EngineOwners.CharacterZhenJiHappyGodRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterZhenJiOlGodRuntime>	zhen-ji/ol-god	CardGame.Core.EngineOwners.CharacterZhenJiOlGodRuntime
@@ -1733,7 +1731,6 @@ zhuge-liang/mou	CardGame.Core.EngineOwners.CharacterZhugeLiangMouRuntime	CardGam
 zhuge-liang/mou	CardGame.Core.EngineOwners.CharacterZhugeLiangMouRuntime	CardGame.Core.RuntimeEntries.CharacterWenChouMouOlEntries	wen-chou/mou-ol	CardGame.Core.EngineOwners.CharacterWenChouMouOlRuntime
 zhuge-liang/mou	CardGame.Core.EngineOwners.CharacterZhugeLiangMouRuntime	CardGame.Core.RuntimeEntries.CharacterXiaoQiaoMouOlEntries	xiao-qiao/mou-ol	CardGame.Core.EngineOwners.CharacterXiaoQiaoMouOlRuntime
 zhuge-liang/mou	CardGame.Core.EngineOwners.CharacterZhugeLiangMouRuntime	CardGame.Core.RuntimeEntries.CharacterXuHuangMouMobileEntries	xu-huang/mou-mobile	CardGame.Core.EngineOwners.CharacterXuHuangMouMobileRuntime
-zhuge-liang/mou	CardGame.Core.EngineOwners.CharacterZhugeLiangMouRuntime	CardGame.Core.RuntimeEntries.CharacterYanJunOlEntries	yan-jun/ol	CardGame.Core.EngineOwners.CharacterYanJunOlRuntime
 zhuge-liang/mou	CardGame.Core.EngineOwners.CharacterZhugeLiangMouRuntime	CardGame.Core.RuntimeEntries.CharacterZhouYuMouEntries	zhou-yu/mou	CardGame.Core.EngineOwners.CharacterZhouYuMouRuntime
 zhuge-liang/mou	CardGame.Core.EngineOwners.CharacterZhugeLiangMouRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterAHuiNanOlRuntime>	a-hui-nan/ol	CardGame.Core.EngineOwners.CharacterAHuiNanOlRuntime
 zhuge-liang/mou	CardGame.Core.EngineOwners.CharacterZhugeLiangMouRuntime	CardGame.Core.RuntimeEntries.DeferredRuntime`1<CardGame.Core.EngineOwners.CharacterLvYiMobileShiRuntime>	lv-yi/mobile-shi	CardGame.Core.EngineOwners.CharacterLvYiMobileShiRuntime

@@ -7,6 +7,7 @@ internal sealed class XunxianGiftUsedCardDescriptor : ProgramOperationDescriptor
     public override SkillProgramEffectOp Op => SkillProgramEffectOp.XunxianGiftUsedCard;
     public override ISkillProgramEffectHandler Handler { get; } = new XunxianGiftUsedCardHandler();
     public override ProgramOperationInteraction Interaction => ProgramOperationInteraction.Choice;
+    public override ProgramFactRequirements FactRequirements => new(Triggered: ProgramTrackedFact.NativeSettledActionDiscard);
     public override ProgramOperationAiPolicy AiPolicy { get; } = new(ProgramOperationAiSemantic.GiftSettledUsedCard,
         static (effect, context) => context.GiftSettledUsedCard(effect));
     public override SkillProgramEffect Parse(ProgramOperationNodeReader r) => ParseOwnerAlways(r);

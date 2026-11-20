@@ -10,3 +10,8 @@ public enum NativeTrueUseDiscardKind { Use, Dodge, Nullification }
 public sealed record NativeTrueUseProcessingEntryEvent(long ParentFrameId, long ParentActionId,
     int CardId, CardKind CardKind, CardLocation From, long EntrySequence, int ProviderSeat,
     NativeTrueUseDiscardKind Kind) : IGameEvent;
+
+// The original discard movement of a finished use or response, attributed
+// while its native action is still available.
+public sealed record SettledActionCardDiscardEvent(long BatchId, int MovementSequence, int CardId,
+    int ActorSeat, int TurnNumber) : IGameEvent;

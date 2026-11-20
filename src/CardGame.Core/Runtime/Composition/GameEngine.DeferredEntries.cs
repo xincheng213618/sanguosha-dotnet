@@ -2046,7 +2046,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterYaDanOlEntries YaDanOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYaDanOlEntries, EngineOwners.CharacterYaDanOlRuntime>(Core.RuntimeEntries.CharacterYaDanOlEntries.Create);
 
-    internal Core.RuntimeEntries.CharacterYanJunOlEntries YanJunOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterYanJunOlEntries, EngineOwners.CharacterYanJunOlRuntime>(Core.RuntimeEntries.CharacterYanJunOlEntries.Create);
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterYanLiangWenChouBoundaryMobileRuntime> YanLiangWenChouBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterYanLiangWenChouBoundaryMobileRuntime>();
 
@@ -2154,7 +2153,6 @@ public sealed partial class GameEngine
 
     internal Core.RuntimeEntries.CharacterZhaoXiangOlEntries ZhaoXiangOlEntries => GetDeferredRuntimeEntry<Core.RuntimeEntries.CharacterZhaoXiangOlEntries, EngineOwners.CharacterZhaoXiangOlRuntime>(Core.RuntimeEntries.CharacterZhaoXiangOlEntries.Create);
 
-    internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhaoYanOlRuntime> ZhaoYanOlEntries => GetDeferredModule<EngineOwners.CharacterZhaoYanOlRuntime>();
 
     internal Core.RuntimeEntries.DeferredRuntime<EngineOwners.CharacterZhaoYunBoundaryMobileRuntime> ZhaoYunBoundaryMobileEntries => GetDeferredModule<EngineOwners.CharacterZhaoYunBoundaryMobileRuntime>();
 

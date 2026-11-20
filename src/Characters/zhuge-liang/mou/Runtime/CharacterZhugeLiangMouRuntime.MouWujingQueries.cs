@@ -8,7 +8,7 @@ internal sealed partial class CharacterZhugeLiangMouRuntime
     {
         if (move.Reason == CardMoveReasons.UseFinished || move.Reason == CardMoveReasons.FireAttackFinished || move.Reason == CardMoveReasons.IronChainFinished || move.Reason == CardMoveReasons.DelayedCardFinish || move.Reason == CardMoveReasons.NullificationFinished)
             return false;
-        if (move.Reason == CardMoveReasons.ResponseFinished && _characterYanJunOlOperations.SettledActionContext(move.CardId)is { } action && (action.Type == CardActionType.Use || action.Type == CardActionType.Response && (action.EffectiveKind == CardKind.Nullification || _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action.EffectiveKind))))
+        if (move.Reason == CardMoveReasons.ResponseFinished && _nativeUsedDiscardOrigins.Value.SettledActionContext(move.CardId)is { } action && (action.Type == CardActionType.Use || action.Type == CardActionType.Response && (action.EffectiveKind == CardKind.Nullification || _coreAlternativeViewAsCostsOperations.IsProgramResponseCardUse(_coreMatchParticipantsPlayersAccess._players[action.ActorSeat], action.EffectiveKind))))
             return false;
         return true;
     }
