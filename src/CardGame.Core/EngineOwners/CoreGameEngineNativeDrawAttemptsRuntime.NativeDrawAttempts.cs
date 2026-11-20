@@ -15,4 +15,9 @@ internal sealed partial class CoreGameEngineNativeDrawAttemptsRuntime
     internal void ReturnNativeDrawAttemptWindow(ProgramLifecycleTriggerWindowFrame window) => NativeDrawAttempts.ReturnNativeDrawAttemptWindow(window);
     internal void ContinueNativeDrawAttempt(long id) => NativeDrawAttempts.ContinueNativeDrawAttempt(id);
     internal static bool NativeDrawAttemptRidesOn(ResolutionFrame child, ResolutionFrame parent) => RuntimeSkills.RuntimeRules_Core_NativeDrawAttempts.NativeDrawAttemptRidesOn(child, parent);
+
+    internal static bool MatchesProgramDrawAttempt(ProgramSkillFrame parent, NativeDrawAttemptFrame draw,
+        int recipientSeat, int requestedCount) =>
+        draw.Context.RecipientSeat == recipientSeat && draw.Context.RequestedCount == requestedCount &&
+        NativeDrawAttemptRidesOn(draw, parent);
 }

@@ -17,7 +17,7 @@ internal sealed partial class CharacterHeYanAnniversaryRuntime
         if (child is PublicHandRevealWindowFrame reveal)
             return r.Stage == AnniversaryHeYanStage.Revealing && reveal.ParentFrameId == f.Id && reveal.ReturnKind == PublicHandRevealReturnKind.Registered && reveal.ReturnKey == HeYanRevealReturn && _publicHandRevealWindows.ProducerSuspended(f.Id, HeYanRevealReturn);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryHeYanStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.DrawTarget && draw.Context.RequestedCount == r.DrawAmount && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryHeYanStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.DrawTarget, r.DrawAmount);
         if (r.Stage is not (AnniversaryHeYanStage.MovementChildren or AnniversaryHeYanStage.DrawChildren))
             return false;
         if (child is CardsMovedTriggerWindowFrame moved)

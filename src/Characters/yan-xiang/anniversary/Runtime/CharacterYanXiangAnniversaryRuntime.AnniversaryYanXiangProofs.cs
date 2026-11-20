@@ -74,7 +74,7 @@ internal sealed partial class CharacterYanXiangAnniversaryRuntime
         if (child is CardUseFrame use)
             return r.Stage == AnniversaryYanXiangStage.NativeUse && IsYanXiangNativeUse(use);
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryYanXiangStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == r.Actor && draw.Context.RequestedCount == r.Requested && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryYanXiangStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, r.Actor, r.Requested);
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is { } p && YanXiangMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame recovery)

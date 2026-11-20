@@ -1,11 +1,13 @@
 using System.Text.Json;
 using CardGame.Content.Standard;
 using CardGame.Core;
+using CardGame.Core.EngineOwners;
 
 internal static class AnniversaryCuiLiePindianTargetChecks
 {
     private const string Hero = "anniversary:cui-lie", Chibi = "anniversary:chibi";
     private const string Mode = "identity:anniversary-chibi-target", Deck = "fixture:anniversary-chibi-target-deck";
+    private const string DrawWatch = "fixture:anniversary-zijue-native-draw";
     private static readonly string[] Generals =
         ["fixture:anniversary-chibi-user", Hero, "fixture:anniversary-chibi-far", "fixture:anniversary-chibi-near"];
 
@@ -192,18 +194,128 @@ internal static class AnniversaryCuiLiePindianTargetChecks
             "Cui Lie's next actual turn start expires the original distance benefit.");
     }
 
+    internal static void DeclinedGiftReturnsOriginalNativeDrawCold()
+    {
+        const int owner = 0, declarer = 1, count = 4;
+        const string skill = "anniversary:zijue", reason = "skill-program.anniversary:zijue.draw";
+        var registry = ContentRegistry.Build(new StandardContentPackage(), new Fixture(watchDraw: true));
+        var game = GameEngine.CreateStandard(new GameOptions
+        {
+            Seed = 47, PlayerCount = 4, ModeId = Mode, HumanSeat = owner, HumanSeats = [0, 1, 2, 3], HumanRole = Role.Lord,
+            UseInteractiveSetup = true, UseInteractiveDiscard = false, AdvanceAfterHumanCommands = false
+        }, registry);
+        T[] Facts<T>() where T : IGameEvent => game.Events.Select(entry => entry.Payload).OfType<T>().ToArray();
+        void Submit(GameCommand command)
+        {
+            var result = game.Submit(command);
+            Need(result.Accepted, result.Error?.Message ?? "The Zijue native draw fixture command was rejected.");
+        }
+        PendingDecision Reach(Func<PendingDecision, bool> expected)
+        {
+            for (var step = 0; step < 80; step++)
+            {
+                var prompt = Enumerable.Range(0, 4).Select(seat => game.CreateSnapshot(seat).PendingDecision)
+                    .FirstOrDefault(candidate => candidate is not null);
+                if (prompt is not null)
+                {
+                    Need(expected(prompt), $"Unexpected Zijue native draw prompt {prompt.Kind}/{prompt.SkillPrompt?.SkillId} for seat {prompt.PlayerSeat}.");
+                    return prompt;
+                }
+                Submit(new AdvanceOneStepCommand(game.Revision));
+            }
+            throw new InvalidOperationException("The Zijue native draw fixture missed its expected prompt.");
+        }
+        void Answer(PendingDecision prompt, Func<PromptChoice, bool> choice) => Submit(new AnswerPromptCommand(
+            prompt.PlayerSeat, prompt.PromptId, prompt.Choices.Single(choice).Id, game.Revision));
+
+        Submit(new StartGameCommand());
+        var play = Reach(prompt => prompt.Kind is DecisionKind.SelectGeneral or DecisionKind.PlayCard);
+        while (play.Kind == DecisionKind.SelectGeneral)
+        {
+            var general = play.PlayerSeat switch
+            {
+                owner => Hero, declarer => Generals[owner], _ => Generals[play.PlayerSeat]
+            };
+            Submit(new SelectGeneralCommand(play.PlayerSeat, general, game.Revision, play.PromptId));
+            play = Reach(prompt => prompt.Kind is DecisionKind.SelectGeneral or DecisionKind.PlayCard);
+        }
+        Need(play.PlayerSeat == owner, "The real Cui Lie starts his own Play phase.");
+        var handBefore = game.CreateSnapshot(owner).Players[owner].HandCount;
+        Submit(new UseProgramSkillCommand(owner, skill, "declare-number", [], [declarer], game.Revision, play.PromptId));
+        Answer(Reach(prompt => prompt is { PlayerSeat: declarer, SkillPrompt.SkillId: skill }),
+            choice => choice.Parameters.GetValueOrDefault("value") == "4");
+        Answer(Reach(prompt => prompt is { PlayerSeat: owner, SkillPrompt.SkillId: skill }),
+            choice => choice.Parameters.GetValueOrDefault("verb") == "draw");
+        Reach(prompt => prompt is { PlayerSeat: owner, SkillPrompt.SkillId: DrawWatch });
+
+        var declaration = Facts<AnniversaryCuiLieNumberEvent>().Single();
+        var stack = game.ResolutionStack.ToArray();
+        var parent = stack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == declaration.FrameId);
+        var attempt = stack.OfType<NativeDrawAttemptFrame>().Single();
+        var attemptIndex = Array.IndexOf(stack, attempt);
+        Need(declaration is { Recipient: declarer, Number: count } && attemptIndex > 0 && stack[attemptIndex - 1].Id == parent.Id &&
+            parent.AnniversaryCuiLie is { Stage: AnniversaryCuiLieStage.Drawing, Number: count } &&
+            attempt.Context is { RecipientSeat: owner, RequestedCount: count } && attempt.Context.Reason.Value == reason &&
+            attempt.Return.Kind == NativeDrawAttemptReturnKind.ProgramOperation && parent.NativeDraw?.ActiveAttemptId == attempt.Id &&
+            Facts<NativeDrawAttemptStartedEvent>().Count(entry => entry.Context == attempt.Context && entry.Return == attempt.Return) == 1 &&
+            Facts<AnniversaryCuiLieDrawReturnedEvent>().Length == 0 && game.CardMovements.All(move => move.Reason.Value != reason) &&
+            game.CreateSnapshot(owner).Players[owner].HandCount == handBefore,
+            "Declining the gift attaches an unpaid native request for the declared four to the original Zijue frame.");
+
+        game = GameReplay.Restore(GameCheckpointJson.Deserialize(GameCheckpointJson.Serialize(game.CreateCheckpoint())), registry);
+        var restoredParent = game.ResolutionStack.OfType<ProgramSkillFrame>().Single(frame => frame.Id == parent.Id);
+        var restoredAttempt = game.ResolutionStack.OfType<NativeDrawAttemptFrame>().Single(frame => frame.Id == attempt.Id);
+        var runtime = game.GetRuntimeModule<CharacterCuiLieAnniversaryRuntime>();
+        Need(restoredAttempt.Context == attempt.Context && runtime.CuiLieFirstChild(restoredParent, restoredAttempt) &&
+            !runtime.CuiLieFirstChild(restoredParent, restoredAttempt with { Context = restoredAttempt.Context with { ParentFrameId = attempt.Id } }) &&
+            !runtime.CuiLieFirstChild(restoredParent, restoredAttempt with { Context = restoredAttempt.Context with { RecipientSeat = declarer } }) &&
+            !runtime.CuiLieFirstChild(restoredParent, restoredAttempt with { Context = restoredAttempt.Context with { RequestedCount = count - 1 } }),
+            "Cold restore retains Zijue's original request and rejects a different parent, recipient, or count.");
+        Answer(Reach(prompt => prompt is { PlayerSeat: owner, SkillPrompt.SkillId: DrawWatch }),
+            choice => choice.Parameters.GetValueOrDefault("option-id") == "continue");
+        Reach(prompt => prompt is { Kind: DecisionKind.PlayCard, PlayerSeat: owner });
+
+        var returned = Facts<AnniversaryCuiLieDrawReturnedEvent>().Single();
+        var drawn = game.CardMovements.Where(move => move.Reason.Value == reason).ToArray();
+        Need(returned is { Recipient: owner, Requested: count, Actual: count } &&
+            returned.FrameId == parent.Id && returned.Before == attempt.Context.SequenceBefore &&
+            drawn.Length == count && drawn.Select(move => move.CardId).Distinct().Count() == count &&
+            drawn.All(move => move.From == CardLocation.DrawPile && move.To == CardLocation.Hand(owner) &&
+                move.Sequence > returned.Before && move.Sequence <= returned.After) &&
+            game.CreateSnapshot(owner).Players[owner].HandCount == handBefore + count &&
+            Facts<ProgramSkillResolvedEvent>().Count(entry => entry.FrameId == parent.Id && entry.Completed) == 1 &&
+            Facts<AnniversaryCuiLieGiftEvent>().Length == 0 && Facts<AnniversaryCuiLieLeaseEvent>().Length == 0,
+            "The original Zijue resumes once, draws four physical cards for Cui Lie, and issues no gift or distance benefit.");
+    }
+
     private static void Need(bool condition, string message)
     {
         if (!condition) throw new InvalidOperationException(message);
     }
 
-    private sealed class Fixture : IGameContentPackage
+    private sealed class Fixture(bool watchDraw = false) : IGameContentPackage
     {
         public PackageManifest Manifest { get; } = new("fixture-anniversary-chibi-target", new(1, 0));
 
         public void Register(IContentRegistryBuilder builder)
         {
-            CharacterFixtureContent.Register(builder, Hero);
+            if (watchDraw)
+            {
+                var catalog = SkillProgramCatalog.Load($$"""
+                    {"schemaVersion":{{SkillProgramCatalog.RulesSchemaVersion}},"skills":[{"id":"{{DrawWatch}}","revision":1,"triggers":[
+                      {"id":"zijue-real-draw","window":"nativeDrawStarting","subject":"owner","condition":{"kind":"phaseIsPlay"},
+                       "optional":false,"isSkillInvocation":false,"effects":[{"op":"chooseOption","target":"owner","resultBind":"draw",
+                        "options":[{"id":"continue"}]}]}]}]}
+                    """, JsonSerializer.Serialize(new
+                    {
+                        schemaVersion = SkillProgramCatalog.PresentationSchemaVersion,
+                        skills = new Dictionary<string, object> { [DrawWatch] = new { name = "观察赀爵摸牌", description = "暂停于原生摸牌请求。",
+                            optionLabels = new Dictionary<string, string> { ["continue"] = "继续" } } }
+                    }));
+                builder.AddSkill(new(DrawWatch, catalog.Presentations[DrawWatch].Name, catalog.Presentations[DrawWatch].Description)
+                    { Program = catalog.Programs[DrawWatch], ProgramPresentation = catalog.Presentations[DrawWatch] });
+            }
+            CharacterFixtureContent.Register(watchDraw ? new DrawWatchOwner(builder) : builder, Hero);
             foreach (var general in Generals.Where(id => id != Hero))
                 builder.AddGeneral(new(general, "固定同桌", "supporter", "standard:none", "wei", 4));
             builder.AddDeck(new(Deck, "斥避固定牌堆", 2, 0, [])
@@ -215,5 +327,15 @@ internal static class AnniversaryCuiLiePindianTargetChecks
                 { [nameof(Role.Lord)] = 1, [nameof(Role.Loyalist)] = 1, [nameof(Role.Rebel)] = 2 }, Deck,
                 GeneralCandidateCount: 4, GeneralPoolIds: Generals));
         }
+    }
+
+    private sealed class DrawWatchOwner(IContentRegistryBuilder builder) : IContentRegistryBuilder
+    {
+        public void AddGeneral(ContentGeneralDefinition general) => builder.AddGeneral(general.Id == Hero
+            ? general with { AdditionalSkillIds = [.. general.AdditionalSkillIds ?? [], DrawWatch] } : general);
+        public void AddSkill(ContentSkillDefinition skill) => builder.AddSkill(skill);
+        public void AddCard(ContentCardDefinition card) => builder.AddCard(card);
+        public void AddDeck(ContentDeckRecipe deck) => builder.AddDeck(deck);
+        public void AddMode(ContentModeDefinition mode) => builder.AddMode(mode);
     }
 }

@@ -64,7 +64,7 @@ internal sealed partial class CharacterCuiLieAnniversaryRuntime
         if (child is PindianFrame pair)
             return r.Stage == AnniversaryCuiLieStage.Pindian && pair.Id == r.PindianId && pair.ParentFrameId == f.Id && pair.SourceSeat == f.OwnerSeat && pair.OpponentSeat == r.Actor && pair.SkillId == f.SkillId && pair.ProgramResultBind == CuiLieContest;
         if (child is NativeDrawAttemptFrame draw)
-            return r.Stage == AnniversaryCuiLieStage.Drawing && draw.Context.ParentFrameId == f.Id && draw.Context.RecipientSeat == f.OwnerSeat && draw.Context.RequestedCount == r.Number && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(draw, f);
+            return r.Stage == AnniversaryCuiLieStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.MatchesProgramDrawAttempt(f, draw, f.OwnerSeat, r.Number);
         if (child is CardsMovedTriggerWindowFrame moved)
             return f.PendingMovementContinuation is { } p && CuiLieMovement(f, _corePrivateOfferReturnsOperations.GetPausedPrivateOfferEffect(f), p) && (IsAnniversaryCuiLiePindianSettlementBatch(f, moved.Batch) || CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved)) && moved.Batch.Movements.All(m => m.Sequence > r.Before && m.Sequence <= r.After && _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m));
         if (child is RecoveryReplacementFrame recovery)
