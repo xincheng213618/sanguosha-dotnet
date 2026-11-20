@@ -56,7 +56,7 @@ public sealed record CaiYangJiaofengRecoveryIssuedEvent(long FrameId,int Request
 public sealed record CaiYangCompletedEvent(long FrameId):IGameEvent;
 public enum AnniversaryCaiYangStage{Duel,Damage,DamageReturned,Drawing,DrawChildren,RecoveryChildren}
 public sealed record AnniversaryCaiYangReceipt(CardConversionSource Source,string Hash,long ParentId,int ActualTurn,AnniversaryCaiYangStage Stage,
- CaiYangXunjiOrigin? Duel=null,CaiYangJiaofengOrigin? FirstDamage=null,long DamageId=0,int DamageTarget=-1,int DamageAmount=0,NativeDrawOutcome? Draw=null,bool RecoveryIssued=false);
+ CaiYangXunjiOrigin? Duel=null,CaiYangJiaofengOrigin? FirstDamage=null,long DamageId=0,int DamageTarget=-1,int DamageAmount=0,bool RecoveryIssued=false);
 public sealed partial record ProgramSkillFrame
 {[JsonIgnore(Condition=JsonIgnoreCondition.WhenWritingNull)]public AnniversaryCaiYangReceipt? AnniversaryCaiYang{get;init;}}
 public sealed partial record BeforeDamageProgramWindowFrame

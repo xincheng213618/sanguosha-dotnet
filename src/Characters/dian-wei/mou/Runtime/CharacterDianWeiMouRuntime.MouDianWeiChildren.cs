@@ -8,8 +8,9 @@ internal sealed partial class CharacterDianWeiMouRuntime
     {
         if (!MouDianWei.Valid(f) || f.MouDianWei is not { } r)
             return false;
-        if (CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
-            return r.Stage == MouDianWeiStage.Drawing && f.NativeDraw is not null;
+        if (child is NativeDrawAttemptFrame draw)
+            return r.Stage == MouDianWeiStage.Drawing &&
+                NativeDrawProducerRuntime.MatchesOperationAttempt(f, draw, SkillProgramEffectOp.ResolveMouDianWeiKuangzhan, new(MouDianWeiRuntime.DrawReason));
         if (child is PindianFrame contest)
             return r.Stage == MouDianWeiStage.Pindian && contest.Id == r.ContestId && contest.ParentFrameId == f.Id && contest.SourceSeat == f.OwnerSeat && contest.OpponentSeat == r.Opponent && contest.ProgramResultBind == MouDianWeiRuntime.Bind(r);
         if (child is CardUseFrame use)
@@ -19,7 +20,17 @@ internal sealed partial class CharacterDianWeiMouRuntime
             var movement = moved.Batch.Movements;
             if (r.Stage == MouDianWeiStage.PindianChildren)
                 return moved.ResumeProgramFrameId == f.Id && movement.Count > 0 && movement.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After && m.Reason == CardMoveReasons.PindianFinish);
-            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) && moved.Batch.ParentFrameId == f.Id && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && movement.Count > 0 && movement.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > r.Before && m.Sequence <= r.After);
+
+            var (before, after) = (r.Before, r.After);
+            if (r.Stage == MouDianWeiStage.DrawChildren)
+            {
+                if (NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveMouDianWeiKuangzhan, new(MouDianWeiRuntime.DrawReason)) is not { } outcome)
+                    return false;
+                (before, after) = (outcome.SequenceBefore, outcome.SequenceAfter);
+            }
+            return CoreDamageObserverCursorQueriesRuntime.ProgramMovementReturnMatches(f, moved) &&
+                movement.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) &&
+                    m.Sequence > before && m.Sequence <= after);
         }
 
         if (r.Stage == MouDianWeiStage.RecoveryChildren)

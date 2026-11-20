@@ -34,10 +34,16 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     {
         if (f.AnniversaryCaiYang is not { } r)
             return false;
-        if (r.Stage == AnniversaryCaiYangStage.Drawing && CoreGameEngineNativeDrawAttemptsRuntime.NativeDrawAttemptRidesOn(child, f))
-            return true;
+        if (child is NativeDrawAttemptFrame attempt)
+            return r.Stage == AnniversaryCaiYangStage.Drawing && NativeDrawProducerRuntime.MatchesOperationAttempt(f, attempt,
+                SkillProgramEffectOp.ResolveAnniversaryCaiYangJiaofeng, CharacterCaiYangAnniversaryDefinitions.CaiYangJiaofengDrawReason);
         if (child is CardsMovedTriggerWindowFrame moved)
-            return r.Stage == AnniversaryCaiYangStage.DrawChildren && r.Draw is { } d && moved.Batch.ParentFrameId == f.Id && (moved.ResumeProgramFrameId == f.Id || moved.Batch.AwaitingProgramFrameId == f.Id) && moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId && moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) && m.Sequence > d.SequenceBefore && m.Sequence <= d.SequenceAfter);
+            return r.Stage == AnniversaryCaiYangStage.DrawChildren && NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex,
+                    SkillProgramEffectOp.ResolveAnniversaryCaiYangJiaofeng, CharacterCaiYangAnniversaryDefinitions.CaiYangJiaofengDrawReason) is { } draw &&
+                moved.Batch.ParentFrameId == f.Id && (moved.ResumeProgramFrameId == f.Id || moved.Batch.AwaitingProgramFrameId == f.Id) &&
+                moved.Batch.OriginOwnerSeat == f.OwnerSeat && moved.Batch.OriginSkillId == f.SkillId && moved.Batch.OriginSkillInstanceId == f.SkillInstanceId &&
+                moved.Batch.Movements.Count > 0 && moved.Batch.Movements.All(m => _coreCardMovementJournalCardMovementsMovementSequenceAccess._cardMovements.Contains(m) &&
+                    m.Sequence > draw.SequenceBefore && m.Sequence <= draw.SequenceAfter);
         if (child is HpChangedTriggerWindowFrame hp)
             return r.Stage == AnniversaryCaiYangStage.RecoveryChildren && r.RecoveryIssued &&
                 ProgramChildWindowRuntime.MatchesHpChangedChild(f.Id, hp, PostEventContinuation.Program) &&

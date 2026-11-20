@@ -103,11 +103,14 @@ internal sealed class MouDianWeiRuntime(IMouDianWeiFacts facts, IMouDianWeiNativ
     [ProgramNativeDrawReturn(SkillProgramEffectOp.ResolveMouDianWeiKuangzhan)]
     private void DrawReturned(ProgramSkillFrame f, NativeDrawOutcome outcome)
     {
-        if (!Valid(f) || f.MouDianWei is not { Stage: MouDianWeiStage.Drawing, Draw: null } r || outcome.RecipientSeat != f.OwnerSeat || outcome.RequestedCount != r.Requested)
+        if (!Valid(f) || f.MouDianWei is not { Stage: MouDianWeiStage.Drawing } r ||
+            NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveMouDianWeiKuangzhan, new(DrawReason)) != outcome)
             throw new InvalidOperationException("Kuangzhan cannot replay or substitute its actual draw-to-maximum receipt.");
         var x = outcome.ActualDrawIds.Concat(outcome.ReplacementGainedIds).Distinct().Count();
-        frames.ReplaceTop(f = f with { MouDianWei = r with { Stage = MouDianWeiStage.DrawChildren, X = x, Draw = outcome, Before = outcome.SequenceBefore, After = outcome.SequenceAfter }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
-        events.AdvanceFact(new MouDianWeiDrawReturnedEvent(f.Id, r.Requested, outcome.ActualDrawIds.Count, outcome.ReplacementGainedIds.Count, x, outcome.AttemptFrameId)); Continue(f.Id);
+        frames.ReplaceTop(f = f with { MouDianWei = r with { Stage = MouDianWeiStage.DrawChildren, X = x }, PendingMovementContinuation = new(f.OwnerSeat, 0, null) });
+        events.AdvanceFact(new MouDianWeiDrawReturnedEvent(f.Id, outcome.RequestedCount, outcome.ActualDrawIds.Count,
+            outcome.ReplacementGainedIds.Count, x, outcome.AttemptFrameId));
+        Continue(f.Id);
     }
     internal void SlashReturned(ProgramSkillFrame f, MouDianWeiSlash returned)
     {

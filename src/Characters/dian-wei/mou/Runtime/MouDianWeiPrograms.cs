@@ -16,7 +16,6 @@ public sealed record MouDianWeiReceipt(CardConversionSource Source, string Gamep
     public long ContestId { get; init; }
     public long Before { get; init; }
     public long After { get; init; }
-    public NativeDrawOutcome? Draw { get; init; }
     public MouDianWeiSlash? Slash { get; init; }
     public int HpBefore { get; init; }
     public int ActualLoss { get; init; }

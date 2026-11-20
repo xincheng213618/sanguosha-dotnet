@@ -120,8 +120,11 @@ internal sealed partial class CharacterCaiYangAnniversaryRuntime
     internal void ReturnCaiYangDraw(ProgramSkillFrame supplied, NativeDrawOutcome draw)
     {
         var f = _coreProgramLifecycleOperations.GetActiveProgramFrame(supplied.Id);
-        var r = f.AnniversaryCaiYang!;
-        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryCaiYang = r with { Stage = AnniversaryCaiYangStage.DrawChildren, Draw = draw } });
+        if (f.AnniversaryCaiYang is not { Stage: AnniversaryCaiYangStage.Drawing } r ||
+            NativeDrawProducerRuntime.CompletedOperationDraw(f, f.InstructionIndex, SkillProgramEffectOp.ResolveAnniversaryCaiYangJiaofeng,
+                CharacterCaiYangAnniversaryDefinitions.CaiYangJiaofengDrawReason) != draw)
+            throw new InvalidOperationException("Jiaofeng lost its original native draw return.");
+        _coreRuntimeOperations.ReplaceRuntimeTop(f = f with { AnniversaryCaiYang = r with { Stage = AnniversaryCaiYangStage.DrawChildren } });
         _kernelCoreGameEngineRuleProgressionOperations.AdvanceEventRulesAndQueueFact(new CaiYangJiaofengDrawReturnedEvent(f.Id, draw.ActualDrawIds.Count, draw.AttemptFrameId, draw.SequenceBefore, draw.SequenceAfter));
         ContinueCaiYang(f.Id);
     }
