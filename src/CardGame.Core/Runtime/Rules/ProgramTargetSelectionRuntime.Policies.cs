@@ -11,7 +11,7 @@ internal sealed partial class ProgramTargetSelectionRuntime
                 ReferenceEquals(item.effect, selection) &&
                 facts.IsPindianSourceSelectionInstruction(instructions, item.index))) return seats;
         return seats.Concat(Players.Where(player => player.IsAlive && player.Seat != ownerSeat &&
-                pindianPolicies.CanDiscardForPindian(player.Seat) && CanBePindianTarget(ownerSeat, player.Seat))
+                pindianPolicies.CanDiscardForPindian(player.Seat) && pindianPolicies.CanBePindianTarget(ownerSeat, player.Seat))
             .Select(player => player.Seat)).Distinct().Order().ToArray();
     }
 
@@ -40,7 +40,7 @@ internal sealed partial class ProgramTargetSelectionRuntime
 
     internal bool CanSelectPindianOpponent(ProgramSkillFrame frame, int targetSeat)
     {
-        if (CanBePindianTarget(frame.OwnerSeat, targetSeat)) return true;
+        if (pindianPolicies.CanBePindianTarget(frame.OwnerSeat, targetSeat)) return true;
         var instructions = ProgramInstructionResolver.Default.Resolve(frame, content.Skill(frame.SkillId).Program!).Instructions;
         // Only the immediately following unconditional owner contest consumes this selection.
         if (frame.InstructionIndex < instructions.Count &&
@@ -53,10 +53,4 @@ internal sealed partial class ProgramTargetSelectionRuntime
             }) return false;
         return true;
     }
-
-    private bool CanBePindianTarget(int sourceSeat, int targetSeat) =>
-        ProgramOperationLegalityPolicy.HandContest.CanSelectTarget(PindianParticipant(sourceSeat), PindianParticipant(targetSeat));
-
-    private ProgramLegalityParticipant PindianParticipant(int seat) => new(seat, Hand(Player(seat)).Count,
-        pindianPolicies.ProhibitsPindianTarget(seat), pindianPolicies.CanDiscardForPindian(seat));
 }

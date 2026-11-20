@@ -4,8 +4,8 @@ namespace CardGame.Core.EngineOwners;
 internal sealed partial class CoreGameEngineEquipmentSlotGroupProgramsRuntime
 {
     internal bool ResolveEnteringChain(CharacterState player, bool requested) => requested && !player.IsChained && _coreProgramCardPoliciesOperations.HasCardPolicy(player, SkillProgramCardPolicyKind.PreventEnteringChain) ? false : requested;
-    internal ProgramLegalityParticipant CreateProgramLegalityParticipant(int seat) => new(seat, _corePhysicalOwnedCardQueriesOperations.GetHand(_coreMatchParticipantsPlayersAccess._players[seat]).Count, _coreProgramCardPoliciesOperations.HasCardPolicy(_coreMatchParticipantsPlayersAccess._players[seat], SkillProgramCardPolicyKind.ProhibitPindianTarget), _pindianPolicyQueries.CanDiscardForPindian(seat));
-    internal bool CanBePindianTarget(int sourceSeat, int targetSeat) => ProgramOperationLegalityPolicy.HandContest.CanSelectTarget(CreateProgramLegalityParticipant(sourceSeat), CreateProgramLegalityParticipant(targetSeat));
+    internal ProgramLegalityParticipant CreateProgramLegalityParticipant(int seat) => _pindianPolicyQueries.CreateLegalityParticipant(seat);
+    internal bool CanBePindianTarget(int sourceSeat, int targetSeat) => _pindianPolicyQueries.CanBePindianTarget(sourceSeat, targetSeat);
 
     internal IReadOnlyList<int> PindianOpponents(int sourceSeat) =>
         !_pindianPolicyQueries.HasPindianInput(sourceSeat) ? [] :

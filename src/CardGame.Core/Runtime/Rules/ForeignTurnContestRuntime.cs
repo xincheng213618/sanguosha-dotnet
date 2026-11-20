@@ -31,8 +31,7 @@ internal sealed class ForeignTurnContestRuntime(IProgramRuntimeFrames frames, IN
                     : participants.Hp(owner) > 0 && facts.IsRuleWounded(owner))) &&
             context.SourceSeat == turn.CurrentSeat && context.TargetSeat == turn.CurrentSeat && owner != turn.CurrentSeat &&
             participants.IsAlive(turn.CurrentSeat) && (HasIndependentForeignTurnRule(candidate.SkillId) ||
-                HasPindianInput(owner) && HasPindianInput(turn.CurrentSeat) &&
-                ProgramOperationLegalityPolicy.HandContest.CanSelectTarget(PindianParticipant(owner), PindianParticipant(turn.CurrentSeat))) &&
+                pindianPolicies.HasPindianInput(owner) && pindianPolicies.CanBePindianTarget(owner, turn.CurrentSeat)) &&
             LastForeignActualTurnStartWindow() is { } parent &&
             parent.Id == context.ParentFrameId && parent.OwnerSeat == turn.CurrentSeat && parent.ActualTurnNumber == turn.TurnNumber &&
             parent.CandidateIndex >= 0 && parent.CandidateIndex < parent.Candidates.Count &&
@@ -54,10 +53,6 @@ internal sealed class ForeignTurnContestRuntime(IProgramRuntimeFrames frames, IN
             if (nativeFrames.FrameAt(index) is CardUseFrame use && use.Id == frameId) return true;
         return false;
     }
-
-    private bool HasPindianInput(int seat) => zones.Count(CardLocation.Hand(seat)) > 0 || pindianPolicies.CanDiscardForPindian(seat);
-    private ProgramLegalityParticipant PindianParticipant(int seat) =>
-        new(seat, zones.Count(CardLocation.Hand(seat)), pindianPolicies.ProhibitsPindianTarget(seat), pindianPolicies.CanDiscardForPindian(seat));
 
     // Called while the revealed native Pindian is still the direct child. Old
     // bindings retain their null origin and exact historical JSON shape.

@@ -2,9 +2,13 @@ namespace CardGame.Core;
 
 internal interface IProgramPindianPolicyQueries : IProgramSelectionQuery
 {
-    bool ProhibitsPindianTarget(int seat);
     bool CanDiscardForPindian(int seat);
     bool HasPindianInput(int seat);
+    ProgramLegalityParticipant CreateLegalityParticipant(int seat);
+
+    bool CanBePindianTarget(int sourceSeat, int targetSeat) =>
+        ProgramOperationLegalityPolicy.HandContest.CanSelectTarget(
+            CreateLegalityParticipant(sourceSeat), CreateLegalityParticipant(targetSeat));
 }
 
 internal interface IProgramPindianProducer : IProgramRuntimeOperations
@@ -36,8 +40,7 @@ internal sealed class ProgramPindianRuntime(IProgramRuntimeFrames frames, ICardZ
                 "Program Pindian requires an active selected opponent or a damage-event opponent and no pending program cards.");
         var opponentSeat = eventOpponent ? frame.WindowContext!.TargetSeat!.Value : frame.SelectedTargetSeats.Single();
         if (!participants.IsAlive(frame.OwnerSeat) || !participants.IsAlive(opponentSeat) || opponentSeat == frame.OwnerSeat ||
-            !ProgramOperationLegalityPolicy.HandContest.CanSelectTarget(Participant(frame.OwnerSeat), Participant(opponentSeat)) ||
-            !policies.HasPindianInput(frame.OwnerSeat) || !policies.HasPindianInput(opponentSeat))
+            !policies.CanBePindianTarget(frame.OwnerSeat, opponentSeat) || !policies.HasPindianInput(frame.OwnerSeat))
             throw new InvalidOperationException("Program Pindian participants no longer have a legal native source.");
         var skill = content.Skill(frame.SkillId);
         producer.Begin(frame.Id,
@@ -45,9 +48,6 @@ internal sealed class ProgramPindianRuntime(IProgramRuntimeFrames frames, ICardZ
             frame.OwnerSeat, opponentSeat, resultBind, visibility);
         return SkillProgramStepOutcome.AwaitChild;
     }
-
-    private ProgramLegalityParticipant Participant(int seat) => new(seat,
-        zones.CardsAt(CardLocation.Hand(seat)).Count, policies.ProhibitsPindianTarget(seat), policies.CanDiscardForPindian(seat));
 
     private bool HasPendingBoundCards() => frames.OfType<ProgramSkillFrame>()
             .SelectMany(frame => frame.CardSetBindings).Where(binding => !binding.IsReadOnlySnapshot).SelectMany(binding => binding.CardIds).Distinct()

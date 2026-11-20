@@ -170,9 +170,10 @@ internal static class ProgramPindianRuntimeChecks
     {
         internal bool[] Alternative { get; } = new bool[2];
         internal bool[] Prohibited { get; } = new bool[2];
-        public bool ProhibitsPindianTarget(int seat) => Prohibited[seat];
         public bool CanDiscardForPindian(int seat) => Alternative[seat];
         public bool HasPindianInput(int seat) => zones.CardsAt(CardLocation.Hand(seat)).Count > 0 || CanDiscardForPindian(seat);
+        public ProgramLegalityParticipant CreateLegalityParticipant(int seat) =>
+            new(seat, zones.CardsAt(CardLocation.Hand(seat)).Count, Prohibited[seat], Alternative[seat]);
     }
 
     private sealed class Turn : IProgramTurnQueries, IProgramPhaseQueries
