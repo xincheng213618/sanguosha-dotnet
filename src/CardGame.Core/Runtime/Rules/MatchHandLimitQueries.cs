@@ -32,7 +32,6 @@ internal interface IMatchHandLimitQuery : IProgramSelectionQuery
     int AdditiveTurnBonus { get; }
     IEnumerable<(IndexedSkillProgramInstance Source, SkillProgramCardPolicy Policy)> FactionPolicies { get; }
     int LivingOtherFactionCount(string? factionId);
-    int HengyeGrowth { get; }
     RuleQueryEvaluation ApplyEquipmentSuit(RuleQueryEvaluation evaluation);
     RuleQueryEvaluation ApplyZhangYiKangrui(RuleQueryEvaluation evaluation);
     RuleQueryEvaluation ApplyBoundaryZhuZhi(RuleQueryEvaluation evaluation);
@@ -81,7 +80,6 @@ internal sealed class MatchHandLimitQueries(IKernelProgramPipelineHooksAccess pi
                 $"skill:{source.SkillId}:{source.SkillInstanceId}:policy:{policy.Id}",
                 checked(allies * policy.Value));
         }
-        AddFiniteContribution(contributions, $"state:{query.Seat}:hengye:growth", query.HengyeGrowth);
         var ordinary = query.ApplyZhangYiKangrui(query.ApplyEquipmentSuit(RuleQueryService.Evaluate(
             SkillRuleQuery.HandLimit,
             new RuleQueryBounds(0, int.MaxValue),

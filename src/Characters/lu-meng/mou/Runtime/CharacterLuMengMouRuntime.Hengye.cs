@@ -46,6 +46,14 @@ internal sealed partial class CharacterLuMengMouRuntime
         _coreMatchLogOperations.AddLog("SkillTriggered", $"{(killer.Name)} 杀死一名角色，重置【横野】至游戏开始时状态。", killer.Seat);
     }
 
+    [ProgramPipelineHook(ProgramPipelinePhase.AppendNumericRuleContributions, 125)]
+    internal void AddHengyeNumericContribution(int seat, SkillRuleQuery query, List<RuleQueryContribution> contributions)
+    {
+        if (query is SkillRuleQuery.DrawCount or SkillRuleQuery.SlashLimit or SkillRuleQuery.HandLimit)
+            AddHengyeGrowthContribution(_coreMatchParticipantsPlayersAccess._players[seat], contributions);
+    }
+
     [ProgramDistanceRule(ProgramDistanceStage.AttackRangeContributions, 50)]
-    internal void AddGetHengyeGrowthAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{(player.Seat)}:hengye:growth", GetHengyeGrowth(player));
+    internal void AddHengyeGrowthContribution(CharacterState player, List<RuleQueryContribution> contributions) =>
+        CoreGameEngineRuleQueriesRuntime.AddFiniteContribution(contributions, $"state:{player.Seat}:hengye:growth", GetHengyeGrowth(player));
 }

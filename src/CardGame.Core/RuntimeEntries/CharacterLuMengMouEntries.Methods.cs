@@ -2,7 +2,6 @@
 namespace CardGame.Core.RuntimeEntries;
 internal sealed partial class CharacterLuMengMouEntries
 {
-    internal void AddGetHengyeGrowthAttackRangeContribution(CharacterState player, List<RuleQueryContribution> contributions) => _resolve().AddGetHengyeGrowthAttackRangeContribution(player, contributions);
     internal void ApplyHengyeGrowth(long damageFrameId, CharacterState source, CharacterState target, int amount) => _resolve().ApplyHengyeGrowth(damageFrameId, source, target, amount);
     internal int GetHengyeGrowth(CharacterState player) => _resolve().GetHengyeGrowth(player);
     internal void HumanYingboCore(PromptChoice selected, bool advanceToHumanBoundary) => _resolve().HumanYingboCore(selected, advanceToHumanBoundary);

@@ -12,7 +12,6 @@ internal interface IMatchTurnNumericQuery : IProgramSelectionQuery
     IEnumerable<RuleQueryContribution> Contributions { get; }
     int MarketBonus { get; }
     int SharedRankBonus { get; }
-    int HengyeGrowth { get; }
     int AdditiveTurnBonus { get; }
     EquipmentDefinition EquipmentDefinition(CardKind kind);
     RuleQueryEvaluation Project(RuleQueryEvaluation evaluation);
@@ -65,7 +64,6 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
         AddFiniteContribution(contributions, $"issued:{query.Seat}:shanhe-luanxin:draw", query.LuanxinNextDrawBonus);
         AddFiniteContribution(contributions, $"issued:{query.Seat}:alternating-next-draw", query.AlternatingNextDrawBonus);
         pipelineHooks._programPipelineHooks.AppendNumericRuleContributions(query.Seat, SkillRuleQuery.DrawCount, contributions);
-        AddFiniteContribution(contributions, $"state:{query.Seat}:hengye:growth", query.HengyeGrowth);
         AddFiniteContribution(contributions, $"turn:{query.Seat}:draw-count", query.AdditiveTurnBonus);
         return query.Project(RuleQueryService.Evaluate(
             SkillRuleQuery.DrawCount,
@@ -105,7 +103,6 @@ internal sealed class MatchTurnNumericQueries(IKernelProgramPipelineHooksAccess 
             else
                 AddFiniteContribution(contributions, $"equipment:{card.Id}:slash-use-limit", bonus);
         }
-        AddFiniteContribution(contributions, $"state:{query.Seat}:hengye:growth", query.HengyeGrowth);
         AddFiniteContribution(contributions, $"turn:{query.Seat}:slash-limit",
             query.AdditiveTurnBonus);
         if (query.HasUnlimitedTurnBonus)
